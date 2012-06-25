@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -58,18 +59,15 @@ public class TripsPrism {
 	// parameters
 	// TODO: import
 	private final boolean departureIsOnStartOfLink = false;
-	private final boolean arrivalIsOnStartOfLink = true;
-	private final double maxBeeFlySpeed = 100 / 3.6;
+	private final boolean arrivalIsOnStartOfLink = false;
+	private final double maxBeeFlySpeed = 120 / 3.6;
 
 	// values
 	private final QuadTree<Record> recordsByOrigin;
 	private final QuadTree<Record> recordsByDestination;
 	private final Network network;
 
-	// caches
-	private final Map<Od, DistanceAndDuration> freeFlowsDistanceAndDurationsBetweenNodes = new TreeMap<Od, DistanceAndDuration>();
-
-	private final LeastCostPathCalculator shortPathAlgo;
+	private final TravelTimeEstimator ttEstimator;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
@@ -81,6 +79,7 @@ public class TripsPrism {
 	 */
 	public TripsPrism(
 			final Collection<Record> trips,
+			final TravelTime travelTime,
 			final Network network) {
 		log.debug( "initializing prism with "+trips.size()+" records" );
 
@@ -107,8 +106,11 @@ public class TripsPrism {
 				network);
 		log.debug( "the destination quad tree has "+recordsByDestination.size()+" records" );
 		this.network = network;
-		FreespeedTravelTimeAndDisutility dis = new FreespeedTravelTimeAndDisutility( -1 , 0 , -1 );
-		shortPathAlgo = new FastAStarLandmarksFactory( network, dis).createPathCalculator( network , dis , dis );
+		this.ttEstimator = new TravelTimeEstimator(
+				departureIsOnStartOfLink,
+				arrivalIsOnStartOfLink,
+				travelTime,
+				network );
 	}
 
 	private static QuadTree<Record> constructQuadTree(
@@ -270,6 +272,7 @@ public class TripsPrism {
 			final Collection<Record> records,
 			final double maxTravelTime,
 			final double halfTimeWindow) {
+		final double driverDepartureTime = driverTrip.getDepartureTime();
 		List<PassengerRecord> prism = new ArrayList<PassengerRecord>();
 		Iterator<Record> iterator = records.iterator();
 
@@ -284,9 +287,12 @@ public class TripsPrism {
 				continue;
 			}
 
-			DistanceAndDuration access = getTravelTime(
+			double now = driverDepartureTime;
+			DistanceAndDuration access = ttEstimator.getTravelTime(
+					now,
 					getOriginLink( driverTrip ),
 					getOriginLink( passengerTrip ));
+			now += access.duration;
 
 			if (access.duration > maxTravelTime) continue;
 
@@ -295,9 +301,10 @@ public class TripsPrism {
 			DistanceAndDuration jointSection;
 			
 			if (passengerTrip.getEstimatedNetworkDistance() < 0) {
-				jointSection = getTravelTime(
-					getOriginLink( passengerTrip ),
-					getDestinationLink( passengerTrip ) );
+				jointSection = ttEstimator.getTravelTime(
+						now,
+						getOriginLink( passengerTrip ),
+						getDestinationLink( passengerTrip ) );
 				passengerTrip.setEstimatedNetworkDistance( jointSection.distance );
 				passengerTrip.setEstimatedNetworkDuration( jointSection.duration );
 			}
@@ -306,12 +313,14 @@ public class TripsPrism {
 						passengerTrip.getEstimatedNetworkDistance(),
 						passengerTrip.getEstimatedNetworkDuration());
 			}
+			now += jointSection.duration;
 
 			if (access.duration + jointSection.duration > maxTravelTime) {
 				continue;
 			}
 
-			DistanceAndDuration egress = getTravelTime(
+			DistanceAndDuration egress = ttEstimator.getTravelTime(
+					now,
 					getDestinationLink( passengerTrip ),
 					getDestinationLink( driverTrip ));
 
@@ -346,9 +355,10 @@ public class TripsPrism {
 			DistanceAndDuration direct;
 			
 			if (driverTrip.getEstimatedNetworkDistance() < 0) {
-				direct = getTravelTime(
-					getOriginLink( driverTrip ),
-					getDestinationLink( driverTrip ) );
+				direct = ttEstimator.getTravelTime(
+						driverTrip.getDepartureTime(),
+						getOriginLink( driverTrip ),
+						getDestinationLink( driverTrip ) );
 				driverTrip.setEstimatedNetworkDistance( direct.distance );
 				driverTrip.setEstimatedNetworkDuration( direct.duration );
 			}
@@ -402,51 +412,7 @@ public class TripsPrism {
 		return l;
 	}
 
-	private DistanceAndDuration getTravelTime(
-			final Link o,
-			final Link d) {
-		DistanceAndDuration estimate = getTravelTimeBetweenNodes(
-				o.getToNode(),
-				d.getFromNode());
-		double tt = estimate.duration;
-		double dist = estimate.distance;
 
-		if (departureIsOnStartOfLink) {
-			tt += o.getLength() / o.getFreespeed();
-			dist += o.getLength();
-		}
-		if (!arrivalIsOnStartOfLink) {
-			tt += d.getLength() / d.getFreespeed();
-			dist += d.getLength();
-		}
-
-		return new DistanceAndDuration( dist , tt );
-	}
-
-	private DistanceAndDuration getTravelTimeBetweenNodes(
-			final Node originNode,
-			final Node destinationNode) {
-		Od od = new Od( originNode.getId() , destinationNode.getId() );
-		DistanceAndDuration estimate = freeFlowsDistanceAndDurationsBetweenNodes.get( od ) ;
-
-		if (estimate == null) {
-			LeastCostPathCalculator.Path p = shortPathAlgo.calcLeastCostPath(
-					originNode,
-					destinationNode,
-					0,
-					null,
-					null);
-			double tt = p.travelTime;
-			double dist = 0;
-
-			for (Link l : p.links) dist += l.getLength();
-
-			estimate = new DistanceAndDuration( dist , tt );
-			freeFlowsDistanceAndDurationsBetweenNodes.put( od , estimate );
-		}
-
-		return estimate;
-	}
 
 	private static Coord getCenter(
 			final Coord coord1,
@@ -498,6 +464,10 @@ public class TripsPrism {
 
 		return timeAndSpaceRestricted;
 	}
+ 
+	public void logStats() {
+		ttEstimator.logStats();
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// interfaces
@@ -508,53 +478,6 @@ public class TripsPrism {
 
 	private static interface IdGetter {
 		public Id getId( Record record );
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// classes
-	// /////////////////////////////////////////////////////////////////////////
-	private static class Od implements Comparable<Od> {
-		// this is use for caching in a tree map: comparison should
-		// be as efficient as possible. Storing as strings removes
-		// the cost of repetidly unboxing ids without loss of information.
-		private final String origin, destination;
-
-		public Od(
-				final Id origin,
-				final Id destination) {
-			this.origin = origin.toString();
-			this.destination = destination.toString();
-		}
-
-		@Override
-		public boolean equals(final Object other) {
-			return other instanceof Od &&
-				((Od) other).origin.equals( origin ) &&
-				((Od) other).destination.equals( destination );
-		}
-
-		@Override
-		public int hashCode() {
-			return origin.hashCode() + 1000 * destination.hashCode();
-		}
-
-		@Override
-		public final int compareTo(final Od other) {
-			final int comp = origin.compareTo( other.origin );
-			return comp == 0 ? destination.compareTo( other.destination ) : comp;
-		}
-	}
-
-	private static class DistanceAndDuration {
-		public final double distance;
-		public final double duration;
-
-		public DistanceAndDuration(
-				final double distance,
-				final double duration) {
-			this.distance = distance;
-			this.duration = duration;
-		}
 	}
 
 	public static class PassengerRecord {

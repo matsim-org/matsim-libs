@@ -22,6 +22,7 @@ package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.FileAppender;
@@ -38,6 +39,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 
@@ -52,6 +55,8 @@ public class ExtractRecordsFromEvents {
 
 	private static final double DETOUR_FRAC = 0.25;
 	private static final double TIME_WINDOW_RADIUS = 0.25 * 3600;
+	private static final boolean CONSIDER_ONLY_CAR_TRIPS = true;
+	private static final boolean PRUNE_ZERO_LENGTH_TRIPS = true;
 
 	public static void main(final String[] args) {
 		String networkFile = args[0];
@@ -62,9 +67,17 @@ public class ExtractRecordsFromEvents {
 
 		mkdirs( outPrefix );
 
-		List<Record> records = extractRecords( eventFile );
 		Network network = getNetwork( networkFile );
-		TripsPrism prism = new TripsPrism( records , network );
+
+		TripsRecordsEventsHandler parser = new TripsRecordsEventsHandler();
+		TravelTimeCalculator travelTime = new TravelTimeCalculator(
+				network,
+				new TravelTimeCalculatorConfigGroup());
+		processEvents( parser , travelTime , eventFile );
+
+		List<Record> records = extractRecords( parser );
+
+		TripsPrism prism = new TripsPrism( records , travelTime , network );
 
 		RecordsFlatFormatWriter.writeRecords( records , outPrefix+"records.dat" );
 		RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat.gz" );
@@ -79,6 +92,7 @@ public class ExtractRecordsFromEvents {
 		}
 		counter.printCounter();
 		writer.close();
+		prism.logStats();
 	}
 
 	private static void mkdirs(final String outPrefix) {
@@ -104,12 +118,40 @@ public class ExtractRecordsFromEvents {
 		return sc.getNetwork();
 	}
 
-	private static List<Record> extractRecords(final String eventFile) {
+	private static void processEvents(
+			final TripsRecordsEventsHandler parser,
+			final TravelTimeCalculator travelTime,
+			final String eventFile) {
 		EventsManager manager = EventsUtils.createEventsManager();
-		TripsRecordsEventsHandler parser = new TripsRecordsEventsHandler();
 		manager.addHandler( parser );
+		manager.addHandler( travelTime );
 		(new MatsimEventsReader( manager )).readFile( eventFile );
-		return parser.getRecords();
+	}
+
+	private static List<Record> extractRecords(final TripsRecordsEventsHandler parser) {
+		List<Record> records = parser.getRecords();
+
+		if (CONSIDER_ONLY_CAR_TRIPS) {
+			Iterator<Record> it = records.iterator();
+
+			while (it.hasNext()) {
+				if (!it.next().getTripMode().equals( TransportMode.car )) {
+					it.remove();
+				}
+			}
+		}
+		if (PRUNE_ZERO_LENGTH_TRIPS) {
+			Iterator<Record> it = records.iterator();
+
+			while (it.hasNext()) {
+				Record r = it.next();
+				if (r.getDestinationLink().equals( r.getOriginLink() )) {
+					it.remove();
+				}
+			}
+		}
+
+		return records;
 	}
 }
 
