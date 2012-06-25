@@ -127,7 +127,7 @@ public class CreateScenario {
 		
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {		
 			double income = personWeeks.getIncome();
-			
+						
 			// income null
 			if (income < 0.0) {
 				income = 0.0;
@@ -331,6 +331,7 @@ public class CreateScenario {
 				this.personWeeksMZ.get(person.getId()).setCurrentWeek(week);
 			}
 			this.personWeeksMZ.get(person.getId()).addDay(dow, person.getSelectedPlan());
+			this.personWeeksMZ.get(person.getId()).setIncome((Double)thurgauPerson.getCustomAttributes().get("income"));
 		}
 	}
 	
