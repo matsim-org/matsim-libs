@@ -35,14 +35,16 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.char
 	private AgentMemories memories = new AgentMemories();
 	private String day;
 	private ObjectAttributes incomes;
+	private ObjectAttributes preferences;
 
 	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
-			AgentMemories memories, String day, ObjectAttributes incomes) {
+			AgentMemories memories, String day, ObjectAttributes incomes, ObjectAttributes preferences) {
 		super(configGroup, network);
 		this.controler = controler;
 		this.memories = memories;
 		this.day = day;
 		this.incomes = incomes;
+		this.preferences = preferences;
 	}
 	
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
@@ -50,14 +52,19 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.char
 		
 		SurpriceActivityScoringFunction scoringFunction = new SurpriceActivityScoringFunction(
 				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(),
-				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"), this.day);
+				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"), 
+				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), this.day),
+				this.day);
+		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
 				super.getParams(), controler.getNetwork(), controler.getConfig(),
 				this.memories.getMemory(plan.getPerson().getId()),
 				this.day,
-				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income")));
+				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"),
+				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), this.day)));
+		
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 		return scoringFunctionAccumulator;
 	}

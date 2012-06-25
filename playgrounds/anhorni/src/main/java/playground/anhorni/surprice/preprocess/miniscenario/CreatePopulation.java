@@ -61,7 +61,9 @@ public class CreatePopulation {
 	private Random random = new Random(37835409);
 	
 	private Zone tollZone;	
-	private ObjectAttributes votFactors = new ObjectAttributes();
+	private ObjectAttributes incomes = new ObjectAttributes();
+	
+	private ObjectAttributes preferences = new ObjectAttributes();
 				
 	public void createPopulation(ScenarioImpl scenario, Config config) {		
 		this.scenario = scenario;
@@ -82,6 +84,8 @@ public class CreatePopulation {
 				Plan plan = this.memories.getMemory(person.getId()).getRandomPlanAndRemove(day, this.random);
 				((PersonImpl)person).addPlan(plan);
 				((PersonImpl)person).setSelectedPlan(plan);
+				
+				this.preferences.putAttribute(person.getId().toString(), day, this.random.nextDouble());
 			}
 			String outPath = config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath") + day;
 			new File(outPath).mkdirs();
@@ -93,6 +97,7 @@ public class CreatePopulation {
 			}
 		}
 		this.writeIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+		this.writePreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
 	
 	private void initZone(Zone zone) {
@@ -157,8 +162,8 @@ public class CreatePopulation {
 				}
 			}
 			
-			String votFactor = Double.toString(r);
-			this.votFactors.putAttribute(p.getId().toString(), "income", votFactor);
+			String income = Double.toString(r);
+			this.incomes.putAttribute(p.getId().toString(), "income", income);
 			
 			this.memories.addMemory(p.getId(), new AgentMemory());
 			this.memories.getMemory(p.getId()).setHomeZone(origin);
@@ -256,9 +261,15 @@ public class CreatePopulation {
 	}
 	
 	private void writeIncomes(String path) {
-		log.info("Writing incomes to " + path + "votFactor.xml");
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.votFactors);
-		attributesWriter.writeFile(path + "/votFactors.xml"); 
+		log.info("Writing incomes to " + path + "/incomes.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.incomes);
+		attributesWriter.writeFile(path + "/incomes.xml"); 
+	}
+	
+	private void writePreferences(String path) {
+		log.info("Writing preferences to " + path + "/preferences.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.preferences);
+		attributesWriter.writeFile(path + "/preferences.xml"); 
 	}
 
 	public Zone getTollZone() {

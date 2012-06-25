@@ -53,6 +53,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private String day;
     private AgentMemory memory;
     private double income;
+    private double preference;
     private Config config;
     
     private double constantCar;
@@ -61,29 +62,22 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private double constantWalk;    
 
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
-    		String day, double income) {
+    		String day, double income, double preference) {
 		this.params = params;
         this.network = network;
         
         this.memory = memory;
         this.day = day;
         this.income = income;
+        this.preference = preference;
         this.config = config;
 		this.reset();		
 				
 		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
 			this.adaptCoefficientsLagged();
 		}
-		
-		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePreferenceVar"))) {
-			this.adaptCoefficientsPreferenceVar();
-		}
 	}
-    
-    private void adaptCoefficientsPreferenceVar() {
-    	
-    }
-    
+        
     private void adaptCoefficientsLagged() {
     	this.constantCar = this.params.constantCar;
     	this.constantPt = this.params.constantPt;
@@ -144,14 +138,23 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
+		
+		// ============= CAR =======================================================
+		// add additional gain if trip purpose is shop or leisure according to individual preference		
 		if (TransportMode.car.equals(leg.getMode())) {
 			double dist = 0.0; // distance in meters
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * f + this.params.marginalUtilityOfDistanceCar_m * dist;
+			double p = 1.0;
+			if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePreferenceVar"))) {
+				p = 1.0 - preference; // due to marginal ut of traveling < 0. Essentially does not play a role but to be consistent with act scoring
+			}
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * f * p + this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.constantCar;
+			
+		// ============= CAR =======================================================
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			double dist = 0.0; // distance in meters
 			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {

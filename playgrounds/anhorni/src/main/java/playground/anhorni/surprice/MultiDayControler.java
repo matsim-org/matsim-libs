@@ -46,12 +46,15 @@ public class MultiDayControler {
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 			
-		    ObjectAttributes votFactors = new ObjectAttributes();
-		    
-		    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(votFactors);
-			attributesReader.parse(path + "incomes.xml");
+		    ObjectAttributes incomes = new ObjectAttributes();		    
+		    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(incomes);
+			attributesReader.parse(path + "/incomes.xml");
 			
-			DayControler controler = new DayControler(config, memories, day, votFactors);
+			ObjectAttributes preferences = new ObjectAttributes();
+			ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(preferences);
+			preferencesReader.parse(path + "/preferences.xml");
+			
+			DayControler controler = new DayControler(config, memories, day, incomes, preferences);
 			controler.run();
 		}		
 		UtilityAnalyzer analyzer = new UtilityAnalyzer();

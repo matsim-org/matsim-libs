@@ -29,20 +29,22 @@ public class DayControler extends Controler {
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
 	ObjectAttributes incomes;
+	ObjectAttributes preferences;
 	
-	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes incomes) {
+	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes incomes, ObjectAttributes preferences) {
 		super(config);	
 		super.setOverwriteFiles(true);
 		this.memories = memories;	
 		this.day = day;
 		this.incomes = incomes;
+		this.preferences = preferences;
 	} 
 		
 	protected void setUp() {
 	    super.setUp();	
 	    	    
 	  	SurpriceScoringFunctionFactory scoringFunctionFactory = new SurpriceScoringFunctionFactory(
-	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.incomes);	  		
+	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.incomes, this.preferences);	  		
 	  	this.setScoringFunctionFactory(scoringFunctionFactory);
 	  	
 	  	//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!

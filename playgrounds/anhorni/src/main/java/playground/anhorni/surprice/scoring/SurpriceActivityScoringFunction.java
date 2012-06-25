@@ -43,18 +43,20 @@ public class SurpriceActivityScoringFunction extends ActivityScoringFunction {
 	
 	private CharyparNagelScoringParameters params;
 	private double income;
+	private double preference;
 	private Config config;
 	private final ActivityFacilities facilities;
 	private DayType day;
 	private Plan plan;
 		
 	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
-			ActivityFacilities facilities, double income, String day) {
+			ActivityFacilities facilities, double income, double preference, String day) {
 		super(params);
 		super.reset();
 		this.params = params;
 		this.config = config;
 		this.income = income;
+		this.preference = preference;
 		this.facilities = facilities;
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
