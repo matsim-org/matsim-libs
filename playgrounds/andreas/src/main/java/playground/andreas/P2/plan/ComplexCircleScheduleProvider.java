@@ -61,8 +61,9 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	private TransitSchedule scheduleWithStopsOnly;
 	private RandomStopProvider randomStopProvider;
 	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private double planningSpeedFactor;
 	
-	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration) {
+	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double planningSpeedFactor) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
@@ -79,6 +80,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		}
 		
 		this.randomStopProvider = randomStopProvider;
+		this.planningSpeedFactor = planningSpeedFactor;
 	}
 
 	@Override
@@ -156,7 +158,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		
 		// additional stops
 		for (Link link : links) {
-			runningTime += link.getLength() / link.getFreespeed();
+			runningTime += link.getLength() / (link.getFreespeed() * this.planningSpeedFactor);
 			if(this.linkId2StopFacilityMap.get(link.getId()) == null){
 				continue;
 			}
@@ -165,7 +167,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		}
 		
 		// last stop
-		runningTime += this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getLength() / this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getFreespeed();
+		runningTime += this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getLength() / (this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getFreespeed() * this.planningSpeedFactor);
 		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(tempStopsToBeServed.get(0), runningTime, runningTime);
 		stops.add(routeStop);
 		

@@ -199,7 +199,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
 			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0);
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)){
-			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0);
+			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getPlanningSpeedFactor());
 		} else {
 			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
 			return null;
