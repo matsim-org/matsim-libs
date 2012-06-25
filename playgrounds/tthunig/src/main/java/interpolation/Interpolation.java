@@ -110,6 +110,10 @@ public class Interpolation {
 		case 2: return this.inverseDistanceWeighting.inverseDistanceWeighting(x, y, this.exp);		
 		}
 		return Double.NaN;
+	}
+
+	public int getInterpolationMethod() {
+		return interpolationMethod;
 	}	
 	
 }

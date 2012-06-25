@@ -10,8 +10,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
- * class for testing the implemented interpolation methods visually
- * uses the car accessibilities of the zurich scenario at resolution 100m
+ * Class for testing the implemented interpolation methods visually.
+ * Uses the car accessibilities of the zurich scenario at resolution 100m.
+ * Reads them as SpatialGrid and interpolates them to one resolution higher.
  * 
  * @author tthunig
  *
@@ -44,7 +45,8 @@ public class TestScenario {
 	}
 	
 	/**
-	 * interpolates the grid with one chosen interpolation method
+	 * Interpolates the grid with one chosen interpolation method to one resolution higher.
+	 * Writes the interpolated SpatialGrid out.
 	 * 
 	 * @param sg
 	 * @param interpolationMethod
@@ -54,11 +56,10 @@ public class TestScenario {
 		Interpolation interpolation = new Interpolation(sg, interpolationMethod, 1);
 		
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
-		GeometryFactory factory = new GeometryFactory();
 		// calculate new values for higher resolution
-		for (double y = sg.getYmin(); y <= sg.getYmax(); y = y+ sg.getResolution()/2) {
-			for (double x = sg.getXmin(); x <= sg.getXmax(); x = x+ sg.getResolution()/2) {
-				sg_new.setValue(interpolation.interpolate(x, y), factory.createPoint(new Coordinate(x, y)));
+		for (double y = sg.getYmin(); y <= sg.getYmax(); y += sg.getResolution()/2) {
+			for (double x = sg.getXmin(); x <= sg.getXmax(); x += sg.getResolution()/2) {
+				sg_new.setValue(interpolation.interpolate(x, y), x, y);
 			}
 		}
 		
