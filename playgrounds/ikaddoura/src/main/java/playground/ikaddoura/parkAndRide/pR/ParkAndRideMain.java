@@ -48,6 +48,18 @@ public class ParkAndRideMain {
 	static String configFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_config.xml";
 	static String prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRfacilities.txt";
 	
+	static int prCapacity = 100;
+	static double transferPenalty = 0.;
+	
+	static double addRemoveProb = 0.05;
+	static int addRemoveDisable = 500;
+	
+	static double changeLocationProb = 0.05;
+	static int changeLocationDisable = 500;
+	
+	static double timeAllocationProb = 0.1;
+	static int timeAllocationDisable = 500;
+	
 	public static void main(String[] args) {
 		ParkAndRideMain main = new ParkAndRideMain();
 		main.run();
@@ -62,12 +74,12 @@ public class ParkAndRideMain {
 		PRFileReader prReader = new PRFileReader(prFacilityFile);
 		Map<Id, ParkAndRideFacility> id2prFacility = prReader.getId2prFacility();
 
-		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(id2prFacility);
+		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(id2prFacility, prCapacity);
 		
-		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility));
+		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addRemoveProb, addRemoveDisable, changeLocationProb, changeLocationDisable, timeAllocationProb, timeAllocationDisable));
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
-		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork());
+		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork(), transferPenalty);
 		controler.setScoringFunctionFactory(scoringfactory);
 		
 		final MobsimFactory mf = new QSimFactory();

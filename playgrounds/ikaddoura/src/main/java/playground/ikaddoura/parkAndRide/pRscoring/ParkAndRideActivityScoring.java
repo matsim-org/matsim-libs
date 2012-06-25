@@ -55,12 +55,14 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 
 	private Activity firstActivity;
 	private PlanCalcScoreConfigGroup config;
+	private double transferPenalty;
 
 	private static final Logger log = Logger.getLogger(ParkAndRideActivityScoring.class);
 
-	public ParkAndRideActivityScoring(final CharyparNagelScoringParameters params, PlanCalcScoreConfigGroup config) {
+	public ParkAndRideActivityScoring(final CharyparNagelScoringParameters params, PlanCalcScoreConfigGroup config, double transferPenalty) {
 		this.params = params;
 		this.config = config;
+		this.transferPenalty = transferPenalty;
 		this.reset();
 	}
 
@@ -118,7 +120,7 @@ public class ParkAndRideActivityScoring implements ActivityScoring, BasicScoring
 		
 		if (act.getType().toString().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
 			
-			double penalty = 0.;
+			double penalty = this.transferPenalty;
 //			double penalty = this.config.getUtilityOfLineSwitch() * 3.0;
 //			System.out.println("******************************* Park'n'Ride penalty: " + penalty);
 			tmpScore += penalty;

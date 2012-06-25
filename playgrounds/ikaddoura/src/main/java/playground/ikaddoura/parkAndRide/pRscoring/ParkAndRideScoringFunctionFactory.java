@@ -37,12 +37,14 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 	private final CharyparNagelScoringParameters params;
     protected Network network;
     private final PlanCalcScoreConfigGroup config;
+	private double transferPenalty;
 
 
-	public ParkAndRideScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
+	public ParkAndRideScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network, double transferPenalty) {
 		this.params = new CharyparNagelScoringParameters(config);
         this.network = network;
         this.config = config;
+        this.transferPenalty = transferPenalty;
 	}
 
 	@Override
@@ -54,7 +56,7 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 //		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(-999999));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
-		scoringFunctionAccumulator.addScoringFunction(new ParkAndRideActivityScoring(params, config));
+		scoringFunctionAccumulator.addScoringFunction(new ParkAndRideActivityScoring(params, config, transferPenalty));
 		return scoringFunctionAccumulator;
 	}
 

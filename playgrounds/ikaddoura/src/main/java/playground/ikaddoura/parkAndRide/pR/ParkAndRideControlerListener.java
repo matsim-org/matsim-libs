@@ -49,11 +49,23 @@ public class ParkAndRideControlerListener implements StartupListener {
 	AdaptiveCapacityControl adaptiveControl;
 	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
+	private double addRemoveProb;
+	private int addRemoveDisable;
+	private double changeLocationProb;
+	private int changeLocationDisable;
+	private double timeAllocationProb;
+	private int timeAllocationDisable;
 	
-	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility) {
+	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility, double addRemoveProb, int addRemoveDisable, double changeLocationProb, int changeLocationDisable, double timeAllocationProb, int timeAllocationDisable) {
 		this.controler = ctl;
 		this.adaptiveControl = adaptiveControl;
 		this.id2prFacility = id2prFacility;
+		this.addRemoveProb = addRemoveProb;
+		this.addRemoveDisable = addRemoveDisable;
+		this.changeLocationProb = changeLocationProb;
+		this.changeLocationDisable = changeLocationDisable;
+		this.timeAllocationProb = timeAllocationProb;
+		this.timeAllocationDisable = timeAllocationDisable;
 	}
 
 	@Override
@@ -76,14 +88,14 @@ public class ParkAndRideControlerListener implements StartupListener {
 
 		StrategyManager manager = this.controler.getStrategyManager() ;
 	
-		manager.addStrategy(strategyAddRemove, 0.05);
-		manager.addChangeRequest(500, strategyAddRemove, 0.);
+		manager.addStrategy(strategyAddRemove, this.addRemoveProb);
+		manager.addChangeRequest(this.addRemoveDisable, strategyAddRemove, 0.);
 				
-		manager.addStrategy(strategyChangeLocation, 0.05);
-		manager.addChangeRequest(500, strategyChangeLocation, 0.);
+		manager.addStrategy(strategyChangeLocation, this.changeLocationProb);
+		manager.addChangeRequest(this.changeLocationDisable, strategyChangeLocation, 0.);
 		
-		manager.addStrategy(strategyTimeAllocation, 0.1);
-		manager.addChangeRequest(500, strategyTimeAllocation, 0.);
+		manager.addStrategy(strategyTimeAllocation, this.timeAllocationProb);
+		manager.addChangeRequest(this.timeAllocationDisable, strategyTimeAllocation, 0.);
 		
 	}
 

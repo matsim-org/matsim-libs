@@ -45,12 +45,13 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
 	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 
-	private Integer maxCapacity = 100;
+	private Integer maxCapacity;
 	
 	private InternalInterface internalInterface;
 	
-	public AdaptiveCapacityControl(Map<Id, ParkAndRideFacility> id2prFacility) {
+	public AdaptiveCapacityControl(Map<Id, ParkAndRideFacility> id2prFacility, int prCapacity) {
 		this.id2prFacility = id2prFacility;
+		this.maxCapacity = prCapacity;
 	}
 
 	@Override
