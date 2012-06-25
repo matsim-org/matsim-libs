@@ -52,7 +52,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	
 	private Counter counter;
 	private double time = 0.0;
-	private volatile boolean simulationRunning = true;
+	private volatile boolean simulationRunning = false;
 	
 	/*
 	 *  The original WithinDayReplanners are initialized and assigned
@@ -121,6 +121,10 @@ public abstract class ReplanningRunnable implements Runnable {
 		for (WithinDayReplanner<? extends Identifier> withinDayReplanner : this.withinDayReplanners.values()) {
 			withinDayReplanner.reset();
 		}
+	}
+	
+	public final void beforeSim() {
+		this.simulationRunning = true;
 	}
 	
 	public final void afterSim() {

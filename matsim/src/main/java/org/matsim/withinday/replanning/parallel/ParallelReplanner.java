@@ -112,6 +112,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		
 		// finalize thread setup and start them
 		for (int i = 0; i < numOfThreads; i++) {
+			replanningRunnables[i].beforeSim();
 			Thread replanningThread = replanningThreads[i];
 			replanningThread.setDaemon(true);
 			replanningThread.start();
