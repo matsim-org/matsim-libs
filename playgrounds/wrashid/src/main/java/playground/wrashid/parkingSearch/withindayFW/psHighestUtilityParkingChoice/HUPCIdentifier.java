@@ -51,7 +51,7 @@ import playground.wrashid.lib.obj.SortableMapObject;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
-import playground.wrashid.parkingSearch.withindayFW.util.ParkingDurationEstimator;
+import playground.wrashid.parkingSearch.withindayFW.util.ActivityDurationEstimator;
 
 public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
 	
@@ -124,12 +124,12 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 					
 					double parkingDuration;
 					if (isLastParkingOfDay(personId)){
-						parkingDuration=ParkingDurationEstimator.estimateParkingDurationLastParkingOfDay(time, parkingAgentsTracker.getFirstCarDepartureTimeOfDay().getTime(agentId));
+						parkingDuration=ActivityDurationEstimator.estimateActivityDurationLastParkingOfDay(time, parkingAgentsTracker.getFirstCarDepartureTimeOfDay().getTime(agentId));
 					} else {
-						parkingDuration=ParkingDurationEstimator.estimateParkingDurationDuringDay(time, planElements, currentPlanElementIndex);
+						parkingDuration=ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time, planElements, currentPlanElementIndex);
 					}
 					
-					double activityDuration=ParkingDurationEstimator.estimateParkingDurationDuringDay(time, planElements, currentPlanElementIndex);
+					double activityDuration=ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time, planElements, currentPlanElementIndex);
 					double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration, GeneralLib.getWalkingTravelDuration(walkingDistance));
 					double costScore = parkingAgentsTracker.getParkingCostScore(personId,time , parkingDuration, parkingFacility.getId());
 					

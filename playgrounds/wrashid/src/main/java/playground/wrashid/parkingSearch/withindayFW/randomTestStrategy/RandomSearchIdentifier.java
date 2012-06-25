@@ -99,14 +99,7 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 					parkingInfrastructure.parkVehicle(facilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, facilityId);
 					
-					//TODO: calc score - this score should be 
-					// this could be done in handler, when the parking is released + for last parking
-					// separate.
-					
-					// this score also needs to be set on the strategy (for the specific leg).
-					
-					
-					//calcScore();
+				
 					identifiedAgents.add(agent);
 				}
 				

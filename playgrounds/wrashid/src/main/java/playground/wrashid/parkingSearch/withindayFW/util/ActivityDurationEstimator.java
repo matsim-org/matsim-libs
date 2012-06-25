@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.withindayFW.util;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
@@ -29,19 +30,19 @@ import org.matsim.core.population.ActivityImpl;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 
-public class ParkingDurationEstimator {
+public class ActivityDurationEstimator {
 
-	public static Double estimateParkingDurationLastParkingOfDay(double arrivalTime, double firstCarDepartureTimeOfDay) {
+	public static Double estimateActivityDurationLastParkingOfDay(double arrivalTime, double firstCarDepartureTimeOfDay) {
 		return GeneralLib.getIntervalDuration(arrivalTime, firstCarDepartureTimeOfDay);
 	}
 
-	// TODO: instead of this, we could also only consider the actual activity
-	// durations (without the walk legs/parking activity, to be consistent with
-	// the figures used elsewhere 
-	public static double estimateParkingDurationDuringDay(double currentTime, List<PlanElement> planElements,
+
+	public static double estimateActivityDurationParkingDuringDay(double currentTime, List<PlanElement> planElements,
 			int currentCarLegPlanElementIndex) {
 		double estimatedActduration = 0;
-		for (int i = currentCarLegPlanElementIndex + 1; i < planElements.size(); i++) {
+		
+		int indexOfFirstActivity = currentCarLegPlanElementIndex + 3;
+		for (int i = indexOfFirstActivity; i < planElements.size(); i++) {
 
 			if (planElements.get(i) instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) planElements.get(i);
@@ -55,7 +56,7 @@ public class ParkingDurationEstimator {
 			} else {
 				Leg leg = (Leg) planElements.get(i);
 
-				if (leg.getMode().equals(TransportMode.car)) {
+				if (leg.getMode().equals(TransportMode.walk) && ((Activity) planElements.get(i+1)).getType().equalsIgnoreCase("parking")) {
 					break;
 				}
 
