@@ -144,11 +144,11 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 			departureOffset += longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset();
 		}
 		
-		int headway = (int) (departureOffset) / vehicleIds.size(); 
-		// set headway to a minimum of 1min
-		headway = Math.max(60, headway);
+		double headway = departureOffset / vehicleIds.size(); 
+		// set headway to a minimum of 3min
+		headway = Math.max(3*60, headway);
 		// resulting number of vehicles with the new headway
-		int nVehicles = (int) (departureOffset) / headway;
+		int nVehicles = (int) (departureOffset / headway);
 		
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
 		if (longestRouteH != null) {
