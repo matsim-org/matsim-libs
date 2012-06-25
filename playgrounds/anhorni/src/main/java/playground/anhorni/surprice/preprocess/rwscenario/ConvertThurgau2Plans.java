@@ -39,7 +39,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -165,20 +164,12 @@ public class ConvertThurgau2Plans {
 		if (plan.getPlanElements().size() != 0) { // already lines parsed and added
 			ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 			from_act.setEndTime(departure);
-			LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
-			//leg.setDepartureTime(departure);
-			//leg.setTravelTime(arrival-departure);
-			//leg.setArrivalTime(arrival);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);			
 		}
 		else {
 			ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME);
 			homeAct.setEndTime(departure);
-			LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
-			//leg.setDepartureTime(departure);
-			//leg.setTravelTime(arrival-departure);
-			//leg.setArrivalTime(arrival);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);
 		}
@@ -225,8 +216,8 @@ public class ConvertThurgau2Plans {
 			}
 			else {
 				if (prev_id != Integer.MIN_VALUE) {
-					if (person_strings.put(prev_pid,person_string) != null) {
-						Gbl.errorMsg("Person id="+prev_pid+" already parsed!");
+					if (person_strings.put(prev_pid, person_string) != null) {
+						Gbl.errorMsg("Person id=" + prev_pid + " already parsed!");
 					}
 				}
 				person_string = curr_line + "\n";
@@ -234,8 +225,8 @@ public class ConvertThurgau2Plans {
 				prev_pid = new IdImpl(prev_id);
 			}
 		}
-		if (person_strings.put(prev_pid,person_string) != null) {
-			Gbl.errorMsg("Person id="+prev_pid+" already parsed!");
+		if (person_strings.put(prev_pid, person_string) != null) {
+			Gbl.errorMsg("Person id=" + prev_pid + " already parsed!");
 		}
 		br.close();
 		fr.close();
@@ -285,7 +276,7 @@ public class ConvertThurgau2Plans {
 				this.personWeeks.get(pid).addDay((int) Math.floor(plan.getScore()), plan);
 			}		
 			this.personWeeks.get(pid).setIsWorker();
-			this.personWeeks.get(pid).setIncome((Double)person.getCustomAttributes().get("vot"));
+			this.personWeeks.get(pid).setIncome((Double)person.getCustomAttributes().get("income"));
 		}
 	}
 	
@@ -325,12 +316,12 @@ public class ConvertThurgau2Plans {
 			person.setSex(gender);
 			population.addPerson(person);
 			
-			double votFactor = this.convertIncome2VOT(householdIncome);
-			person.getCustomAttributes().put("vot", votFactor);
+			double income = this.convertIncome(householdIncome);
+			person.getCustomAttributes().put("income", income);
 		}
 	}
 	
-	private double convertIncome2VOT(int householdIncome) {
+	private double convertIncome(int householdIncome) {
 		// TODO: more sophisticated conversion here
 		/* 1: below 2000 CHF
 		 * 2: 2001 - 3000 CHF
@@ -360,8 +351,8 @@ public class ConvertThurgau2Plans {
 		this.removeNonHomeBasedPlans(population);
 
 		// keep them
-		//log.info("      remove plans with act type '"+ OTHR +"'...");
-		//this.removePlansWithTypeOther(population);
+		// log.info("      remove plans with act type '"+ OTHR +"'...");
+		// this.removePlansWithTypeOther(population);
 
 		log.info("      remove plans with mode undefined ...");
 		this.removePlansModeTypeUndef(population);

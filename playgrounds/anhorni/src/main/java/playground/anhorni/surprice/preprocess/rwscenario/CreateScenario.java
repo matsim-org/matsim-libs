@@ -101,18 +101,35 @@ public class CreateScenario {
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
 		this.writeIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+		
+		this.createPreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+	}
+	
+	private void createPreferences(String path) {
+		ObjectAttributes preferences = new ObjectAttributes();
+		for (String day : Surprice.days) {
+			// choose random plan for day
+			for (Person person : this.scenario.getPopulation().getPersons().values()) {		
+			preferences.putAttribute(person.getId().toString(), day, this.random.nextDouble());
+			}
+		}
+		this.writePreferences(path, preferences);
+	}
+	
+	private void writePreferences(String path, ObjectAttributes preferences) {
+		log.info("Writing preferences to " + path + "/preferences.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
+		attributesWriter.writeFile(path + "/preferences.xml"); 
 	}
 	
 	private void writeIncomes(String outPath) {
 		ObjectAttributes incomes = new ObjectAttributes();
 		
-		for (PersonWeeks personWeeks : personWeeksMZ.values()) {
-			double r = Math.abs(random.nextGaussian() * Surprice.stdDev + Surprice.mean);
-			
+		for (PersonWeeks personWeeks : personWeeksMZ.values()) {		
 			double income = personWeeks.getIncome();
 			
 			// income null
-			if (income < 0) {
+			if (income < 0.0) {
 				income = 0.0;
 			}			
 			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", income);
