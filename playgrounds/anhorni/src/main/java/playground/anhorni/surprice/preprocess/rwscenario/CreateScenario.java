@@ -100,29 +100,26 @@ public class CreateScenario {
 				
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
-		this.writeVOTs(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+		this.writeIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
 	
-	private void writeVOTs(String outPath) {
-		ObjectAttributes votFactors = new ObjectAttributes();
+	private void writeIncomes(String outPath) {
+		ObjectAttributes incomes = new ObjectAttributes();
 		
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {
 			double r = Math.abs(random.nextGaussian() * Surprice.stdDev + Surprice.mean);
 			
-			double f = personWeeks.getIncome();
-			
-			f = f / 3.0 + 1.0;
+			double income = personWeeks.getIncome();
 			
 			// income null
-			if (f < 0) {
-				f = 1.0;
+			if (income < 0) {
+				income = 0.0;
 			}			
-			double vot = r * f;
-			votFactors.putAttribute(personWeeks.getPerson().getId().toString(), "vot", vot);
+			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", income);
 		}		
-		log.info("Writing vots to " + outPath + "/votFactor.xml");
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(votFactors);
-		attributesWriter.writeFile(outPath + "/votFactors.xml");
+		log.info("Writing incomes to " + outPath + "/incomes.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(incomes);
+		attributesWriter.writeFile(outPath + "/incomes.xml");
 	}
 	
 	private void createToll(String outPath) {	

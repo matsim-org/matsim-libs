@@ -34,15 +34,15 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
 	private String day;
-	private ObjectAttributes vot;
+	private ObjectAttributes incomes;
 
 	public LaggedScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
-			AgentMemories memories, String day, ObjectAttributes vot) {
+			AgentMemories memories, String day, ObjectAttributes incomes) {
 		super(configGroup, network);
 		this.controler = controler;
 		this.memories = memories;
 		this.day = day;
-		this.vot = vot;
+		this.incomes = incomes;
 	}
 	
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
@@ -50,14 +50,14 @@ public class LaggedScoringFunctionFactory extends org.matsim.core.scoring.charyp
 		
 		LaggedActivityScoringFunction scoringFunction = new LaggedActivityScoringFunction(
 				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(),
-				(Double)this.vot.getAttribute(plan.getPerson().getId().toString(), "vot"), this.day);
+				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"), this.day);
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		
 		scoringFunctionAccumulator.addScoringFunction(new LaggedLegScoringFunction(
 				super.getParams(), controler.getNetwork(), controler.getConfig(),
 				this.memories.getMemory(plan.getPerson().getId()),
 				this.day,
-				(Double)this.vot.getAttribute(plan.getPerson().getId().toString(), "vot")));
+				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income")));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 		return scoringFunctionAccumulator;
 	}

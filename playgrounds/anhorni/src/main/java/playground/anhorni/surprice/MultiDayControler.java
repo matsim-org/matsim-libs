@@ -49,7 +49,7 @@ public class MultiDayControler {
 		    ObjectAttributes votFactors = new ObjectAttributes();
 		    
 		    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(votFactors);
-			attributesReader.parse(path + "votFactors.xml");
+			attributesReader.parse(path + "incomes.xml");
 			
 			DayControler controler = new DayControler(config, memories, day, votFactors);
 			controler.run();

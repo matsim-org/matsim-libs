@@ -52,7 +52,7 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
     
     private String day;
     private AgentMemory memory;
-    private double votFactor;
+    private double income;
     private Config config;
     
     private double constantCar;
@@ -60,28 +60,37 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
     private double constantBike;
     private double constantWalk;    
 
-    public LaggedLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, String day, double votFactor) {
+    public LaggedLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
+    		String day, double income) {
 		this.params = params;
         this.network = network;
         
         this.memory = memory;
         this.day = day;
-        this.votFactor = votFactor;
+        this.income = income;
         this.config = config;
 		this.reset();		
 				
 		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
-			this.adaptCoefficients();
+			this.adaptCoefficientsLagged();
+		}
+		
+		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePreferenceVar"))) {
+			this.adaptCoefficientsPreferenceVar();
 		}
 	}
     
-    private void adaptCoefficients() {
+    private void adaptCoefficientsPreferenceVar() {
+    	
+    }
+    
+    private void adaptCoefficientsLagged() {
     	this.constantCar = this.params.constantCar;
     	this.constantPt = this.params.constantPt;
     	this.constantBike = this.params.constantBike;
     	this.constantWalk = this.params.constantWalk;  
     	
-    	double f = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "f"));
+    	double f = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "f_lagged"));
     	
 		// adapt for tue - sun: 
 		if (!this.day.equals("mon")) {
@@ -129,8 +138,8 @@ public class LaggedLegScoringFunction implements LegScoring, BasicScoring {
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
 		
 		double f = 1.0;
-		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useVoT"))) {
-			f = this.votFactor;
+		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncome"))) {
+			f = this.income;
 		}
 		
 		double tmpScore = 0.0;

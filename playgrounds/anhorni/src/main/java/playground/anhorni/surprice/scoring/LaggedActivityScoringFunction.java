@@ -42,19 +42,19 @@ import playground.anhorni.surprice.Surprice;
 public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 	
 	private CharyparNagelScoringParameters params;
-	private double votFactor;
+	private double income;
 	private Config config;
 	private final ActivityFacilities facilities;
 	private DayType day;
 	private Plan plan;
 		
 	public LaggedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
-			ActivityFacilities facilities, double votFactor, String day) {
+			ActivityFacilities facilities, double income, String day) {
 		super(params);
 		super.reset();
 		this.params = params;
 		this.config = config;
-		this.votFactor = votFactor;
+		this.income = income;
 		this.facilities = facilities;
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
@@ -63,8 +63,8 @@ public class LaggedActivityScoringFunction extends ActivityScoringFunction {
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		
 		double f = 1.0;
-		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useVoT"))) {
-			f = this.votFactor;
+		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncomes"))) {
+			f = this.income;
 		}
 
 //		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
