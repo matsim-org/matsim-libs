@@ -50,7 +50,8 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	private final double maleScaleFactor = 1.41 / 1.34;		// according to Weidmann
 	private final double femaleScaleFactor = 1.27 / 1.34;	// according to Weidmann
 	
-	private final double scatterStandardDeviation = 0.26;	// according to Weidmann, [m/s]
+	private final double weidmannReferenceWalkSpeed = 1.34;			// 1.34 according to Weidmann, [m/s]
+	private final double weidmannScatterStandardDeviation = 0.26;	// 0.26 according to Weidmann, [m/s]
 	
 	// age from 0 .. 100
 	private final double[] ageFactors = {
@@ -208,15 +209,19 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		// calculate scatter factor
 		random.setSeed(person.getId().toString().hashCode());
 		for (int i = 0; i < 5; i++) random.nextDouble();
-		
-		// limit scatter factor to +/- 4 times the standard deviation
-		double scatterSpeed = random.nextGaussian() * scatterStandardDeviation + referenceWalkSpeed;
-		if (scatterSpeed < referenceWalkSpeed - 4 * scatterStandardDeviation) {
-			scatterSpeed = referenceWalkSpeed - 4 * scatterStandardDeviation;
-		} else if (scatterSpeed > referenceWalkSpeed + 4 * scatterStandardDeviation) {
-			scatterSpeed = referenceWalkSpeed + 4 * scatterStandardDeviation;
+				
+		/*
+		 * Limit scatter factor to +/- 4 times the standard deviation.
+		 * Therefore, the scatter factor is 0.224 ... 1.777
+		 */
+		double scatterLimit = 4 * weidmannScatterStandardDeviation;
+		double scatterSpeed = random.nextGaussian() * weidmannScatterStandardDeviation + weidmannReferenceWalkSpeed;
+		if (scatterSpeed < weidmannReferenceWalkSpeed - scatterLimit) {
+			scatterSpeed = weidmannReferenceWalkSpeed - scatterLimit;
+		} else if (scatterSpeed > weidmannReferenceWalkSpeed + scatterLimit) {
+			scatterSpeed = weidmannReferenceWalkSpeed + scatterLimit;
 		}
-		scatterFactor = this.referenceWalkSpeed / scatterSpeed;
+		scatterFactor = scatterSpeed / weidmannReferenceWalkSpeed;
 		
 		if (person instanceof PersonImpl) {
 			PersonImpl p = (PersonImpl) person;

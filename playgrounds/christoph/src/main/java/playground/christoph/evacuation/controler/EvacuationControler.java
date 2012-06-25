@@ -259,7 +259,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
 		legModeChecker.printStatistics();
-				
+		
 		/*
 		 * Prepare the scenario:
 		 * 	- connect facilities to network
@@ -269,6 +269,12 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		 *  - add z Coordinates to network
 		 */
 		new PrepareEvacuationScenario().prepareScenario(this.scenarioData);
+		
+		/*
+		 * Adapt walk- and bike speed according to car speed reduction.
+		 */
+		this.config.plansCalcRoute().setWalkSpeed(this.config.plansCalcRoute().getWalkSpeed() * EvacuationConfig.speedFactor);
+		this.config.plansCalcRoute().setBikeSpeed(this.config.plansCalcRoute().getBikeSpeed() * EvacuationConfig.speedFactor);
 		
 		// load household object attributes
 		this.householdObjectAttributes = new ObjectAttributes();
