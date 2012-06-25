@@ -43,6 +43,19 @@ public class DgCreateFlightScenario {
 		filter.put("JFK", Direction.BOTH);
 	}
 	
+	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 5000.0, 1.0, 10.0);
+	
+	public static final Map<String, DgStarinfo> stars = new HashMap<String, DgStarinfo>();
+	static {
+		stars.put("default", DEFAULTSTAR);
+	}
+	
+	public static final Map<String, Double> STARoffset = new HashMap<String, Double>();
+	static {
+		STARoffset.put("default", 10.);
+		STARoffset.put("MUC", 17.4*60);
+	}
+	
 	public static void createWorldFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception {
 //		String baseDirectory = "/media/data/work/repos/"
 //				+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/";
@@ -54,7 +67,6 @@ public class DgCreateFlightScenario {
 		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		airScheduleBuilder.filter.putAll(filter);
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, utcOffsetfile);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";

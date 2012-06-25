@@ -136,6 +136,7 @@ public class SfTransitBuilder {
 				linkList.add(new IdImpl(origin+"taxiOutbound"));
 				linkList.add(new IdImpl(origin+"runwayOutbound"));
 				linkList.add(new IdImpl(origin+destination));
+				linkList.add(new IdImpl(destination+"star"));
 				linkList.add(new IdImpl(destination+"runwayInbound"));
 				linkList.add(new IdImpl(destination+"taxiInbound"));
 				linkListMap.put(routeId, linkList);

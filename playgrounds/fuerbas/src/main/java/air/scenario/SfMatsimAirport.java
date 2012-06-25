@@ -55,10 +55,10 @@ public class SfMatsimAirport {
 		
 		Id idApron = this.id;													//Id for apron link and central airport node
 		Id idApronEnd = new IdImpl(this.id+"apron");							//Id for end of apron node
-		Id idTaxiIn = new IdImpl(this.id.toString()+"taxiInbound");				//Id for taxiway link and end of taxiway node
-		Id idTaxiOut = new IdImpl(this.id.toString()+"taxiOutbound");			//Id for taxiway link and end of taxiway node
-		Id idRunwayIn = new IdImpl(this.id.toString()+"runwayInbound");			//Id for runway link and end of runway node
-		Id idRunwayOut = new IdImpl(this.id.toString()+"runwayOutbound");		//Id for runway link and end of runway node	
+		Id idTaxiIn = new IdImpl(this.id+"taxiInbound");				//Id for taxiway link and end of taxiway node
+		Id idTaxiOut = new IdImpl(this.id+"taxiOutbound");			//Id for taxiway link and end of taxiway node
+		Id idRunwayIn = new IdImpl(this.id+"runwayInbound");			//Id for runway link and end of runway node
+		Id idRunwayOut = new IdImpl(this.id+"runwayOutbound");		//Id for runway link and end of runway node	
 		
 //		create Coords for nodes
 		
@@ -126,7 +126,7 @@ public class SfMatsimAirport {
 		linkTaxiIn.setFreespeed(taxiwayFreespeed);
 		linkTaxiOut.setFreespeed(taxiwayFreespeed);
 		linkRunwayIn.setFreespeed(runwayFreespeed);
-		linkRunwayOut.setFreespeed(runwayFreespeed);		
+		linkRunwayOut.setFreespeed(runwayFreespeed);	
 		
 //		add links to network
 				
@@ -136,6 +136,32 @@ public class SfMatsimAirport {
 		network.addLink(linkRunwayIn);	
 		network.addLink(linkRunwayOut);
 		
+//		add STAR to network
+
+		Id idStar = new IdImpl(this.id.toString()+"star");						//Id for STAR route
+
+		if (DgCreateFlightScenario.stars.containsKey(idApron)) {
+			Coord coordStar = new CoordImpl(coordRunwayInEnd.getX()-DgCreateFlightScenario.stars.get(idStar).getLength(), coordRunwayInEnd.getY());
+			Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
+			network.addNode(nodeStar);
+			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunwayIn);
+			linkStarIn.setAllowedModes(allowedModes);
+			linkStarIn.setLength(DgCreateFlightScenario.stars.get(idStar).getLength());
+			linkStarIn.setCapacity(DgCreateFlightScenario.stars.get(idStar).getCapacity());
+			linkStarIn.setFreespeed(DgCreateFlightScenario.stars.get(idStar).getFreespeed());
+			network.addLink(linkStarIn);
+		}
+		else {
+			Coord coordStar = new CoordImpl(coordRunwayInEnd.getX()-DgCreateFlightScenario.DEFAULTSTAR.getLength(), coordRunwayInEnd.getY());
+			Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
+			network.addNode(nodeStar);
+			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunwayIn);
+			linkStarIn.setAllowedModes(allowedModes);
+			linkStarIn.setLength(DgCreateFlightScenario.DEFAULTSTAR.getLength());
+			linkStarIn.setCapacity(DgCreateFlightScenario.DEFAULTSTAR.getCapacity());
+			linkStarIn.setFreespeed(DgCreateFlightScenario.DEFAULTSTAR.getFreespeed());
+			network.addLink(linkStarIn);
+		}
 
 	}
 

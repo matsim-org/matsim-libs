@@ -60,12 +60,6 @@ public class SfAirScheduleBuilder {
 	
 	private static final boolean use_STAR_MUC = false;	//set true if STAR are in use at MUC
 	
-//	public enum Direction {INBOUND, OUTBOUND, BOTH};
-	
-//	public final Map<String, Direction> filter = new HashMap<String, Direction>();	
-	
-	public Map<String,DgCreateFlightScenario.Direction> filter = new HashMap<String,DgCreateFlightScenario.Direction>();
-	
 	protected Map<String, Coord> airports = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
 	protected Map<String, Double> routes = new HashMap<String, Double>();
@@ -156,11 +150,11 @@ public class SfAirScheduleBuilder {
 								&& (stops < 1)
 								&& (fullRouting.length() <= 6)
 								&& (
-									(this.filter.containsKey(destinationAirport) && (this.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.INBOUND)))
-									|| (this.filter.containsKey(originAirport) && (this.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.OUTBOUND)))
-									|| (this.filter.containsKey(originAirport)) && (this.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.BOTH))
-									|| (this.filter.containsKey(destinationAirport)) && (this.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.BOTH))
-									|| (this.filter==null)
+									(DgCreateFlightScenario.filter.containsKey(destinationAirport) && (DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.INBOUND)))
+									|| (DgCreateFlightScenario.filter.containsKey(originAirport) && (DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.OUTBOUND)))
+									|| (DgCreateFlightScenario.filter.containsKey(originAirport)) && (DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.BOTH))
+									|| (DgCreateFlightScenario.filter.containsKey(destinationAirport)) && (DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.BOTH))
+									|| (DgCreateFlightScenario.filter==null)
 									)
 //								&& destinationAirport.equalsIgnoreCase("MUC")
 //								&& originAirport.equalsIgnoreCase("MUC")
@@ -170,10 +164,13 @@ public class SfAirScheduleBuilder {
 //						use these lines to filter desired airports: currently all flights to/from MUC
 //						for fixed city pairs use: originAirport.equalsIgnoreCase("FRA") && destinationAirport.equalsIgnoreCase("MUC") and vice versa
 								) {
+//										if (use_STAR_MUC && destinationAirport.equalsIgnoreCase("MUC")) duration = duration-(17.4*60);	//17.4 minutes duration for MUC STAR arrivals
 										
-										if (use_STAR_MUC && destinationAirport.equalsIgnoreCase("MUC")) duration = duration-(17.4*60);	//17.4 minutes duration for MUC STAR arrivals
+										if (DgCreateFlightScenario.STARoffset.containsKey(destinationAirport)) duration = duration-(DgCreateFlightScenario.STARoffset.get(destinationAirport));
+										else duration = duration-DgCreateFlightScenario.STARoffset.get("default");
 										
 			//				**********		weltweite Map für STAR Offsets
+//											Länge, Geschw., Fluss
 			
 										if (!this.routes.containsKey(route)) {
 											this.routes.put(route, duration);

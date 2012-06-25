@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -23,6 +25,8 @@ public class SfAirNetworkBuilder {
 	public static final String NETWORK_FILENAME = "air_network.xml";
 	private static final double MACH_2 = 686.0;
 	public static final double CAP_PERIOD = 3600.0;
+	
+	public final Map<String, Double> STARoffset = new HashMap<String, Double>();
 
 	public void createNetwork(String Airports, String cityPairs, String networkOutputFilename) throws IOException {
 		int airportcounter = 0;
@@ -59,14 +63,14 @@ public class SfAirNetworkBuilder {
 			String[] airportCodes = lineEntries[0].split("_");
 			double length = Double.parseDouble(lineEntries[1])*1000;	//distance between O&D in meters
 			double groundSpeed = MACH_2;	
-			double duration = Double.parseDouble(lineEntries[2]);
+//			double duration = Double.parseDouble(lineEntries[2]);
 //			groundSpeed = Math.round(100*length/(duration-SfMatsimAirport.TAXI_TOL_TIME))/100.;	//set for older MATSim version, where max. speed in VehicleType ist not supported
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
 			
 			Id originRunway = new IdImpl(origin+"runwayOutbound");
-			Id destinationRunway = new IdImpl(destination+"runwayInbound");
-			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), network.getNodes().get(destinationRunway));
+			Id destinationStar = new IdImpl(destination+"star");
+			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), network.getNodes().get(destinationStar));
 			originToDestination.setAllowedModes(allowedModes);
 			
 			originToDestination.setCapacity(1.0*CAP_PERIOD);
