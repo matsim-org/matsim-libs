@@ -41,6 +41,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.misc.ClassUtils;
 
 /**
  * Class encapsulating all behavior concerning the ControlerEvents/Listeners
@@ -72,10 +73,9 @@ public final class ControlerListenerManager implements MatsimManager {
 	 */
 	@SuppressWarnings("unchecked")
 	protected void addCoreControlerListener(final ControlerListener l) {
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
-				this.coreListenerList.add(interfaces[i], l);
+		for (Class type : ClassUtils.getAllTypes(l.getClass())) {
+			if (type.isInterface() && ControlerListener.class.isAssignableFrom(type)) {
+				this.coreListenerList.add(type, l);
 			}
 		}
 	}
@@ -87,10 +87,9 @@ public final class ControlerListenerManager implements MatsimManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public void addControlerListener(final ControlerListener l) {
-		Class[] interfaces = l.getClass().getInterfaces();
-		for (int i = 0; i < interfaces.length; i++) {
-			if (ControlerListener.class.isAssignableFrom(interfaces[i])) {
-				this.listenerList.add(interfaces[i], l);
+		for (Class type : ClassUtils.getAllTypes(l.getClass())) {
+			if (ControlerListener.class.isAssignableFrom(type)) {
+				this.listenerList.add(type, l);
 			}
 		}
 	}
