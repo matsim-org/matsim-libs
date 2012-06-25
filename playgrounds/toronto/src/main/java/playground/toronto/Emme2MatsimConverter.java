@@ -25,6 +25,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -137,14 +139,15 @@ public class Emme2MatsimConverter {
 		JCheckBox opt4 = new JCheckBox("Apply Capacity Factor");
 		JCheckBox opt5 = new JCheckBox("Add turn restrictions");
 		JCheckBox opt6 = new JCheckBox("Export to ESRI Shapefile");
+		JCheckBox opt7 = new JCheckBox("Filter modes");
 		
 		String message = "The Emme2Matsim network converter can also perform several additional operations on the network before exporting it. Additional information will be provided once your selection has been\nmade; you will also be allowed to cancel. Please select 0-6 of the following options. ";
 		
 		choice = 0;
-		choice = JOptionPane.showOptionDialog(null, message, "test title", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{opt1, opt2, opt3, opt4, opt5, opt6, "OK", "Cancel"} , null);
+		choice = JOptionPane.showOptionDialog(null, message, "test title", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[]{opt1, opt2, opt3, opt4, opt5, opt6, opt7, "OK", "Cancel"} , null);
 		
-		if (choice == JOptionPane.CLOSED_OPTION || choice == 7) return false;
-		else if (choice == JOptionPane.OK_OPTION || choice == 6){
+		if (choice == JOptionPane.CLOSED_OPTION || choice == 8) return false;
+		else if (choice == JOptionPane.OK_OPTION || choice == 7){
 			
 			if (opt2.isSelected()){
 				//Re-draw links
@@ -244,7 +247,27 @@ public class Emme2MatsimConverter {
 					}
 				}
 			}
-						
+				
+			if (opt7.isSelected()){
+				//Filter network by modes
+				//TODO test this
+				info = "FILTER NETWORK BY MODES\n" +
+						"---------------------------------\n\n" +
+						"This option filter the network by modes.\n\n" +
+						"Proceed?";
+				
+				choice = JOptionPane.showConfirmDialog(null, info, "Info", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				if (choice == JOptionPane.OK_OPTION){
+					HashSet<String> modes = new HashSet<String>();
+					for (Link L : network.getLinks().values()) {
+						for (String s : L.getAllowedModes()) modes.add(s);
+					}
+					
+					Set<String> S = CollectionUtils.stringToSet(JOptionPane.showInputDialog("Please enter a comma-delimited set of modes to filter\nModes available in network: " + modes.toString()));
+					filterModes(S);
+				}
+			}
+			
 			if (opt1.isSelected()){
 				//Coordinate Transformations
 				info = "COORDINATE TRANSFORMATION\n" +
@@ -328,6 +351,7 @@ public class Emme2MatsimConverter {
 					if (choice == JFileChooser.APPROVE_OPTION){
 						shpefileName = fc.getSelectedFile().getAbsolutePath();
 						if (!(shpefileName == "") && (shpefileName != null)){
+							if (!shpefileName.endsWith(".shp")) shpefileName += ".shp";
 							String system = JOptionPane.showInputDialog("Please input the coordinate system of the network or blank for default (default = \"EPSG:26917\")");
 							if (system.equals("")) system = "EPSG:26917";
 							writeLinks2ESRI(shpefileName.replace(".shp", "_links.shp"), shpefileName.replace(".shp", "_nodes.shp"), system);
@@ -347,6 +371,7 @@ public class Emme2MatsimConverter {
 			if (choice == JFileChooser.APPROVE_OPTION){
 				outFileName = fc.getSelectedFile().getAbsolutePath();
 				if (!(outFileName == "") && (outFileName != null)){
+					if (!outFileName.endsWith(".xml")) outFileName += ".xml";
 					writeNetworkXML(outFileName);
 				}
 			}else if(choice == JFileChooser.CANCEL_OPTION) return false;
@@ -363,6 +388,15 @@ public class Emme2MatsimConverter {
 	// ////////////////////////////////////////////////////////////////////
 	// sub functions
 	// ////////////////////////////////////////////////////////////////////
+	
+	private static void filterModes(Set<String> modes){
+		
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+		NetworkImpl filteredNetwork = NetworkImpl.createNetwork();
+		filter.filter(filteredNetwork, modes);
+		
+		network = filteredNetwork;
+	}
 	
 	private static String getHelp(){
 		String s = "EMME 2 MATSIM CONVERTER\n" +

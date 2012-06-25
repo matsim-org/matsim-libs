@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.toronto.demand;
+package playground.toronto.demand.modechoice;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;

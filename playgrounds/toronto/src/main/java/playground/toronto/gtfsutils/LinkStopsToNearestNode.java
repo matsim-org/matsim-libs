@@ -1,4 +1,4 @@
-package playground.toronto.transitnetworkutils;
+package playground.toronto.gtfsutils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

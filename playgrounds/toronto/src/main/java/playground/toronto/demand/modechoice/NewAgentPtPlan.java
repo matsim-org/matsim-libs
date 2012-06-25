@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.toronto.demand;
+package playground.toronto.demand.modechoice;
 
 import java.util.ArrayList;
 import java.util.List;

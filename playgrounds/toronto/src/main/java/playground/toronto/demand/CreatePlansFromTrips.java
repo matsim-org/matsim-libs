@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.balmermi.world.WorldUtils;
 import playground.balmermi.world.Zone;
@@ -345,6 +347,10 @@ public class CreatePlansFromTrips {
 				}else if (type == 2){
 					//auto-access/auto-egress transit (ie, to GO/subway)
 					//TODO handle auto access/egress trips
+					
+					
+					
+					
 					continue;
 				}else{
 					log.error("Type \"" + type + "\" not recognized!");
@@ -413,23 +419,13 @@ public class CreatePlansFromTrips {
 	}
 	
 	private void bubbleSortTrips(List<Trip> a){
-		Trip earliestTrip = null;
-		for (int i = 0; i < a.size(); i++){
-			for (int j = 1; j < (a.size() - 1); j++){
-				if(convertTime(a.get(j - 1).start_time) > convertTime(a.get(j).start_time)){
-					earliestTrip = a.get(j - 1);
-					a.set(j - 1, a.get(j));
-					a.set(j, earliestTrip);
-				}
-			}
-		}
-		
+		Collections.sort(a);
 	}	
 	
 	private int checkTripChain(List<Trip> a){
 		
 		for (Trip T : a) if ((zones.getLocation(new IdImpl(T.zone_o)) == null) 
-				|| zones.getLocation(new IdImpl(T.zone_d)) == null) return 5;
+				|| zones.getLocation(new IdImpl(T.zone_d)) == null) return 5; //could not find zone.
 		
 		if (a.size() == 1) return 4; //only one trip in trip chain
 		
@@ -439,7 +435,7 @@ public class CreatePlansFromTrips {
 		
 		int i = 1;
 		for (; i < a.size(); i++){
-			if (!a.get(i).act_o.equals(nextActivity)) return 3; //If an activity is missing.
+			if (!a.get(i).act_o.equals(nextActivity)) return 3; //Mismatch between two subsequent trip-chains
 			if (a.get(i).act_o.equals("H") || a.get(i).act_d.equals("H")) hasHomeEpisode = true;
 			nextActivity = a.get(i).act_d;
 		}
@@ -544,7 +540,7 @@ public class CreatePlansFromTrips {
 	// private Trip class
 	// ////////////////////////////////////////////////////////////////////
 	
-	private static class Trip{
+	private static class Trip implements Comparable<Trip>{
 		public String zone_o;
 		public String zone_d;
 		public String act_o;
@@ -559,6 +555,13 @@ public class CreatePlansFromTrips {
 			this.act_d = ad;
 			this.start_time = st;
 			this.type = t;
+		}
+
+		@Override
+		public int compareTo(Trip o) {
+			if (Time.parseTime(o.start_time) < Time.parseTime(this.start_time)) return 1;
+			else if (Time.parseTime(o.start_time) > Time.parseTime(this.start_time)) return -1;
+			else return 0;
 		}
 	}
 	
