@@ -130,7 +130,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
 		
-		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure);
+		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getReplanningManager());
 		this.setMobsimFactory(mobsimFactory);
 		
 		this.initIdentifiers();

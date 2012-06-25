@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.withinday.mobsim.ReplanningManager;
 
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
@@ -57,10 +58,13 @@ public class ParkingQSimFactory implements MobsimFactory {
 
     private final InsertParkingActivities insertParkingActivities;
     private final ParkingInfrastructure parkingInfrastructure;
+    private final ReplanningManager replanningManager;
     
-    public ParkingQSimFactory(InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure) {
+    public ParkingQSimFactory(InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure,
+    		ReplanningManager replanningManager) {
     	this.insertParkingActivities = insertParkingActivities;
     	this.parkingInfrastructure = parkingInfrastructure;
+    	this.replanningManager = replanningManager;
     }
     
     @Override
@@ -90,6 +94,7 @@ public class ParkingQSimFactory implements MobsimFactory {
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim1.addMobsimEngine(teleportationEngine);
+		qSim1.addMobsimEngine(replanningManager);
         QSim qSim = qSim1;
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
