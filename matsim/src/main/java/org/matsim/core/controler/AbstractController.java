@@ -84,7 +84,7 @@ public abstract class AbstractController {
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 		OutputDirectoryLogging.catchLogEntries();
 	}
-	
+
 
 	private void resetRandomNumbers(long seed, int iteration) {
 		MatsimRandom.reset(seed + iteration);
@@ -94,19 +94,13 @@ public abstract class AbstractController {
 		// Fixme [kn] this should really be ten thousand draws instead of just
 		// one
 	}
-	
-	public final void run(Config config) {
-		run(config, false);
-	}
-	
-	public final void run(Config config, boolean overwriteFiles, Controler controler) {
-		run(config, overwriteFiles);
-	}
 
-
-	public final void run(Config config, boolean overwriteFiles) {
-		this.controlerIO = new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), overwriteFiles); // output dir needs to be before logging
+	public final void setupOutputDirectory(final String outputDirectory, final boolean overwriteFiles) {
+		this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, overwriteFiles); // output dir needs to be before logging
 		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
+	}
+
+	public final void run(Config config) {
 		loadCoreListeners();
 		this.controlerListenerManager.fireControlerStartupEvent();
 		// make sure all routes are calculated.

@@ -286,17 +286,17 @@ public class Controler extends AbstractController {
 	 * Starts the simulation.
 	 */
 	public void run() {
+		loadConfig();
+		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.overwriteFiles);
 		init();
-		run(config, overwriteFiles);
+		run(config);
 	}
 
 	private void init() {
-		loadConfig();
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			setupMultiModalSimulation();
 		}
 		if (this.config.scenario().isUseTransit()) {
-			log.warn("setting up the transit config _after_ the config dump :-( ...");
 			setupTransitSimulation();
 		}
 		this.events = (EventsManagerImpl) EventsUtils.createEventsManager(config);
@@ -547,6 +547,7 @@ public class Controler extends AbstractController {
 	 * added is very important. Check the comments in the source file before
 	 * overwriting this method!
 	 */
+	@Override
 	protected void loadCoreListeners() {
 
 		/*

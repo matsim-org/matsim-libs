@@ -152,11 +152,15 @@ public abstract class OutputDirectoryLogging {
 	public static void closeOutputDirLogging() {
 		Logger root = Logger.getRootLogger();
 		Appender app = root.getAppender(LOGFILE);
-		root.removeAppender(app);
-		app.close();
+		if (app != null) {
+			root.removeAppender(app);
+			app.close();
+		}
 		app = root.getAppender(WARNLOGFILE);
-		root.removeAppender(app);
-		app.close();
+		if (app != null) {
+			root.removeAppender(app);
+			app.close();
+		}
 	}
 
 }
