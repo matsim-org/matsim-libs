@@ -102,19 +102,6 @@
 		<param name="calibratedLines" value="M44" />
 	</module>
 
-	<module name="ptRouter">
-		<param name="searchRadius" value="600.0" />
-		<param name="extensionRadius" value="200.0" />
-		<param name="beelineWalkConnectionDistance" value="300.0" />
-		<param name="allowDirectWalks" value="true" />
-		<param name="minIniStations" value="2" />
-
-		<param name="walkValue" value="6.0" />
-		<param name="distanceValue" value="0.7" />
-		<param name="transferValue" value="240" />
-		<param name="timeValue" value="6.0" />
-	</module>
-
 	<module name="ptCounts">
 		<param name="inputBoardCountsFile" value="&INPUTBASE;counts/counts_boarding.xml" />
 		<param name="inputOccupancyCountsFile" value="&INPUTBASE;counts/counts_occupancy.xml" />
