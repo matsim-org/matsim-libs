@@ -164,12 +164,14 @@ public class ConvertThurgau2Plans {
 		if (plan.getPlanElements().size() != 0) { // already lines parsed and added
 			ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 			from_act.setEndTime(departure);
+			((PlanImpl) plan).createAndAddLeg(mode);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);			
 		}
 		else {
 			ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME);
 			homeAct.setEndTime(departure);
+			((PlanImpl) plan).createAndAddLeg(mode);
 			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype);
 			act.setStartTime(arrival);
 		}
