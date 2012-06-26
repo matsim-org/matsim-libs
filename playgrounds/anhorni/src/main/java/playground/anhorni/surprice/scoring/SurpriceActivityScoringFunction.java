@@ -66,7 +66,7 @@ public class SurpriceActivityScoringFunction extends ActivityScoringFunction {
 		
 		double f = 1.0;
 		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncomes"))) {
-			f = this.income;
+			f = this.income / 7.0;
 		}
 
 //		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());

@@ -332,7 +332,8 @@ public class ConvertThurgau2Plans {
 		 * 5: 5001 - 7500 CHF
 		 * 6: 7501 - 10000 CHF
 		 * 7: beyond 10000 CHF 
-		 */		
+		 */	
+		if (householdIncome == -99) householdIncome = 4;
 		return householdIncome;
 	}
 	
