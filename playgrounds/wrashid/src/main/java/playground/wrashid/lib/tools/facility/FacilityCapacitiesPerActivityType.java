@@ -33,7 +33,7 @@ import playground.wrashid.lib.tools.kml.Color;
 public class FacilityCapacitiesPerActivityType {
 
 	public static void main(String[] args) {
-		String facilitiesPath = "H:/data/experiments/ARTEMIS/output/run10/output_facilities.xml.gz";
+		String facilitiesPath = "E:/svn/studies/switzerland/facilities/facilities.zrhCutC.xml.gz";
 
 		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		

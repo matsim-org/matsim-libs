@@ -45,8 +45,8 @@ import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoic
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class HUPCController extends WithinDayParkingController  {
-	public HUPCController(String[] args) {
+public class HUPCControllerNonKTI extends WithinDayParkingController  {
+	public HUPCControllerNonKTI(String[] args) {
 		super(args);
 	}
 
@@ -108,8 +108,11 @@ public class HUPCController extends WithinDayParkingController  {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println("using default config");
 			args = new String[] { "test/input/playground/wrashid/parkingSearch/withinday/chessboard/config.xml" };
+			
+		
 		}
-		final HUPCController controller = new HUPCController(args);
+		final HUPCControllerNonKTI controller = new HUPCControllerNonKTI(args);
+
 		controller.setOverwriteFiles(true);
 		GeneralLib.controler=controller;
 
