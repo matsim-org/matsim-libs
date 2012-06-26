@@ -4,7 +4,7 @@
 
 <!-- Author: mrieser -->
 
-<!ELEMENT roadpricing    (description?,links,cost+)>
+<!ELEMENT roadpricing    (description?,links,cost*)>
 <!ATTLIST roadpricing
           type           CDATA #REQUIRED
           name           CDATA #REQUIRED>
