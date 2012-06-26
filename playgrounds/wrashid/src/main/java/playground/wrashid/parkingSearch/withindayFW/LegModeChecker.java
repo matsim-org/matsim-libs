@@ -22,9 +22,11 @@ package playground.wrashid.parkingSearch.withindayFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,7 +34,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -141,7 +145,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				 * Get position of the car. We assume that the car is located at
 				 * the coordinate of the home location of an agent.
 				 */
-				Coord carCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(firstActivity.getFacilityId()).getCoord();
+				Map<Id, ActivityFacility> facilities = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities();
+				Coord carCoord = facilities.get(firstActivity.getFacilityId()).getCoord();
 				
 				/*
 				 * Where does the first car trip start?
@@ -166,6 +171,16 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 						newPlan.addActivity(previousActivity);
 						newPlan.addLeg(leg);
 						newPlan.addActivity(nextActivity);
+						
+						if (previousActivity.getLinkId()==null || nextActivity.getLinkId()==null){
+							ActivityFacility prevActivityFacility = facilities.get(previousActivity.getFacilityId());
+							ActivityFacility nextActivityFacility = facilities.get(nextActivity.getFacilityId());
+							
+							((ActivityImpl) previousActivity).setLinkId(prevActivityFacility.getLinkId());
+							((ActivityImpl) nextActivity).setLinkId(nextActivityFacility.getLinkId());
+						}
+						
+						
 						routingAlgorithm.run(newPlan);						
 					}
 				}
