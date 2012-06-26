@@ -152,7 +152,7 @@ public class CreateScenario {
 		// dummy zone
 		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
 		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
-		double radius = 1000.0;
+		double radius = 5000.0;
 
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
 			if (bellevue.calcDistance(facility.getCoord()) < radius) {

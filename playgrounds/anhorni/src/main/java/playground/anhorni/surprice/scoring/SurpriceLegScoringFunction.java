@@ -133,7 +133,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		
 		double f = 1.0;
 		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncome"))) {
-			f = this.income;
+			f = this.income / 7.0;
 		}
 		
 		double tmpScore = 0.0;
