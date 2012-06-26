@@ -61,13 +61,19 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 	private CooperativeFactory cooperativeFactory;
 	private PRouteProvider routeProvider;
 	private PConfigGroup pConfig;
+	private HashMap<String, TransitStopFacility> originalStops;
 	
 	private HashMap<Id, PPlan> lineId2PlanMap = new HashMap<Id, PPlan>();
 
-	public CreateCooperativeFromSchedule(CooperativeFactory cooperativeFactory, PRouteProvider routeProvider, PConfigGroup pConfig) {
+	public CreateCooperativeFromSchedule(CooperativeFactory cooperativeFactory, PRouteProvider routeProvider, PConfigGroup pConfig, TransitSchedule originalSchedule) {
 		this.cooperativeFactory = cooperativeFactory;
 		this.routeProvider = routeProvider;
 		this.pConfig = pConfig;
+		
+		this.originalStops = new HashMap<String, TransitStopFacility>();
+		for (TransitStopFacility stop : originalSchedule.getFacilities().values()) {
+			this.originalStops.put(stop.getId().toString(), stop);
+		}
 	}
 
 	public LinkedList<Cooperative> run() {
@@ -154,14 +160,16 @@ public class CreateCooperativeFromSchedule implements PPlanStrategy{
 		if (longestRouteH != null) {
 			for (TransitRouteStop routeStop : longestRouteH.getStops()) {
 				if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
-					stopsToBeServed.add(routeStop.getStopFacility());
+					TransitStopFacility originalStopFacility = this.originalStops.get(routeStop.getStopFacility().getId().toString());
+					stopsToBeServed.add(originalStopFacility);
 				}
 			}
 		}
 		if (longestRouteR != null) {
 			for (TransitRouteStop routeStop : longestRouteR.getStops()) {
 				if (this.checkStopInServiceArea(routeStop.getStopFacility(), this.pConfig)) {
-					stopsToBeServed.add(routeStop.getStopFacility());
+					TransitStopFacility originalStopFacility = this.originalStops.get(routeStop.getStopFacility().getId().toString());
+					stopsToBeServed.add(originalStopFacility);
 				}
 			}
 		}
