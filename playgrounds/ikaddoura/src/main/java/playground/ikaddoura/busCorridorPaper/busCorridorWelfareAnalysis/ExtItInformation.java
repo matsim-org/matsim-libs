@@ -45,6 +45,8 @@ public class ExtItInformation {
 	private double numberOfPtLegs;
 	private double numberOfWalkLegs;
 	
+	private int noValidPlanScore;
+	
 	private List <Double> waitingTimes = new ArrayList<Double>();
 	private List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private List <Double> waitingTimesNotMissed = new ArrayList<Double>();
@@ -197,7 +199,11 @@ public class ExtItInformation {
 			sumOfWaitingTimes = sumOfWaitingTimes + waitingTime;
 			counter++;
 		}
-		return sumOfWaitingTimes / counter;
+		if (sumOfWaitingTimes == 0.0){
+			return 0.0;
+		} else {
+			return sumOfWaitingTimes / counter;
+		}
 	}
 	
 	protected double getAvgWaitingTimeNotMissingBus() {
@@ -207,7 +213,11 @@ public class ExtItInformation {
 			sumOfWaitingTimesNotMissingBus = sumOfWaitingTimesNotMissingBus + waitingTime;
 			counter++;
 		}
-		return sumOfWaitingTimesNotMissingBus / counter;
+		if (sumOfWaitingTimesNotMissingBus == 0.0){
+			return 0.0;
+		} else {
+			return sumOfWaitingTimesNotMissingBus / counter;
+		}
 	}
 	
 	protected double getAvgWaitingTimeMissingBus() {
@@ -217,7 +227,19 @@ public class ExtItInformation {
 			sumOfWaitingTimesMissingBus = sumOfWaitingTimesMissingBus + waitingTime;
 			counter++;
 		}
-		return sumOfWaitingTimesMissingBus / counter;
+		if (sumOfWaitingTimesMissingBus == 0.0){
+			return 0.0;
+		} else {
+			return sumOfWaitingTimesMissingBus / counter;
+		}
+	}
+
+	public void setNoValidPlanScore(int noValidPlanScore) {
+		this.noValidPlanScore = noValidPlanScore;
+	}
+
+	public int getNoValidPlanScore() {
+		return noValidPlanScore;
 	}
 	
 }

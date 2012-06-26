@@ -113,7 +113,11 @@ public class Users {
 	public double getLogSum() {
 		return logSum;
 	}
-
+	
+	public int getNoValidPlanScore() {
+		return noValidPlanScore;
+	}
+	
 	public void setParametersForExtIteration(Scenario scenario) {
 		this.scenario = scenario;
 		this.marginalUtlOfMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
@@ -125,4 +129,5 @@ public class Users {
 		this.minusScore = 0;
 		this.noValidPlanScore = 0;
 	}
+	
 }

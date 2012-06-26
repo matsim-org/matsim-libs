@@ -64,16 +64,16 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test2";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/testStuck";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-		lastExternalIterationParam1 = 2;
+		lastExternalIterationParam1 = 3;
 		
 //		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
-		lastExternalIterationParam2 = 2;
+		lastExternalIterationParam2 = 0;
 				
 		incrBusNumber = 2;
 		incrFare = -1.0;
@@ -150,6 +150,7 @@ class ExternalControler {
 				info.setNumberOfCarLegs(analysis.getSumOfCarLegs());
 				info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
 				info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
+				info.setNoValidPlanScore(users.getNoValidPlanScore());
 				
 				info.setWaitingTimes(analysis.getWaitHandler().getWaitingTimes());
 				info.setWaitingTimesNotMissed(analysis.getWaitHandler().getWaitingTimesNotMissed());
@@ -220,11 +221,11 @@ class ExternalControler {
 			log.info("Analyzing combined optimization parameters " + op1 + " and " + op2);
 			if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES) && op2.equals(OptimizationParameter2.FARE)){
 				this.fare = -0.;
-				this.capacity = 1;
+				this.capacity = 10;
 				this.numberOfBuses = 1;
 			} else if (op1.equals(OptimizationParameter1.FARE) && op2.equals(OptimizationParameter2.NUMBER_OF_BUSES)){
 				this.fare = -0.;
-				this.capacity = 1;
+				this.capacity = 10;
 				this.numberOfBuses = 1;
 			} else {
 				throw new RuntimeException("Undefined default parameters for combined optimization parameters op1 = " + op1 + " and op2 = " + op2 + ". Aborting...");
