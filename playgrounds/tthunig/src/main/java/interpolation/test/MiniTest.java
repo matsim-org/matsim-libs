@@ -30,6 +30,7 @@ public class MiniTest {
 	private SpatialGrid interpolatedSG= null;
 	private Interpolation interpolation= null;
 	private boolean interpolationUseful= true;
+	private long interpolationTime= Long.MAX_VALUE;
 	
 	/**
 	 * Creates a SpatialGrid with the given size for testing.
@@ -55,7 +56,12 @@ public class MiniTest {
 		
 		System.out.println("SpatialGrid for testing:");
 		printSG(this.sg);
+		long startTime= System.currentTimeMillis();
 		this.interpolation = new Interpolation(this.sg, interpolationMethod);
+		this.interpolateSG();
+		this.interpolationTime= System.currentTimeMillis()-startTime;
+		System.out.println("interpolated SpatialGrid:");
+		printSG(this.interpolatedSG);
 	}
 	
 	/**
@@ -74,6 +80,29 @@ public class MiniTest {
 			
 		logger.info("Using bounding box with xmin=" + box[0] + ", ymin=" + box[1] + ", xmax=" + box[2] + ", ymax=" + box[3]);
 		return box;
+	}
+	
+	/**
+	 * Method for preparing the interpolation test.
+	 * Interpolates the SpatialGrid to one resolution higher.
+	 * Times the interpolation time needed for this interpolation.
+	 */
+	private void interpolateSG(){
+		this.interpolatedSG = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
+		for (double x = this.sg.getXmin(); x <= this.sg.getXmax(); x += this.sg.getResolution()/2) {
+			for (double y = this.sg.getYmin(); y <= this.sg.getYmax(); y += this.sg.getResolution()/2) {
+				this.interpolatedSG.setValue(this.interpolation.interpolate(x, y), x, y);
+			}
+		}
+	}
+	
+	/**
+	 * Returns the time needed for interpolation of the current scenario with the used interpolation method.
+	 * 
+	 * @return the interpolation time
+	 */
+	public long getInterpolationTime(){
+		return this.interpolationTime;
 	}
 	
 	/**
@@ -154,7 +183,7 @@ public class MiniTest {
 	}	
 	
 	/**
-	 * This method interpolates the SpatialGrid to one resolution higher and checks the range of all interpolated values.
+	 * This method checks the range of all interpolated values of the interpolated SpatialGrid of one resolution higher.
 	 */
 	private void testRangeOfValues() {
 		logger.info("Test range of values...");
@@ -162,11 +191,9 @@ public class MiniTest {
 		boolean rangeOfInterpValuesUseful= true;
 		double min= Double.MAX_VALUE;
 		double max= Double.MIN_VALUE;
-		this.interpolatedSG = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		for (double x = this.sg.getXmin(); x <= this.sg.getXmax(); x += this.sg.getResolution()/2) {
 			for (double y = this.sg.getYmin(); y <= this.sg.getYmax(); y += this.sg.getResolution()/2) {
-				double interpValue= this.interpolation.interpolate(x, y);
-				this.interpolatedSG.setValue(interpValue, x, y);
+				double interpValue= this.interpolatedSG.getValue(x, y);
 				
 				switch (this.interpolation.getInterpolationMethod()){
 				case 0:
@@ -179,8 +206,6 @@ public class MiniTest {
 				if (interpValue > max) max= interpValue;
 			}
 		}
-//		System.out.println("The tested values are:");
-//		printSG(this.interpolatedSG);
 		logger.info("The minimum of the tested interpolation values is " + min + "; the maximum is " + max + ".");
 		if(!rangeOfInterpValuesUseful){
 			logger.warn("The range of interpolated values is not useful!");
@@ -262,6 +287,8 @@ public class MiniTest {
 		testScenario.testKnownValues(3);
 		testScenario.testSpecificValues();
 		testScenario.testRangeOfValues();
+		
+		logger.info("The interpolation needed a calculation time of " + testScenario.getInterpolationTime() + " ms.");
 		
 		if(!testScenario.isInterpolationUseful()){
 			switch (interpolationMethod){

@@ -27,7 +27,7 @@ public class TestScenario {
 	/**
 	 * reads the data from the scenario and interpolates the grid of known values to a higher resolution first with bilinear interpolation second with bicubic spline interpolation
 	 * 
-	 * @param args
+	 * @param args not used
 	 */
 	public static void main(String[] args) {
 		java.net.URL input = ClassLoader.getSystemResource(filename+".txt");
@@ -53,6 +53,7 @@ public class TestScenario {
 	 */
 	private static void testOneMethod(SpatialGrid sg, int interpolationMethod){
 		log.info("interpolating data with the interpolation method " + interpolationMethod + "...");
+		long startTime= System.currentTimeMillis();
 		Interpolation interpolation = new Interpolation(sg, interpolationMethod, 1);
 		
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
@@ -62,6 +63,7 @@ public class TestScenario {
 				sg_new.setValue(interpolation.interpolate(x, y), x, y);
 			}
 		}
+		log.info("The interpolation needed a computation time of " + (System.currentTimeMillis()-startTime) + " ms.");
 		
 		log.info("writing interpolated data...");
 		sg_new.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename + "_" + interpolationMethod + ".txt"); //TODO in resources speichern
