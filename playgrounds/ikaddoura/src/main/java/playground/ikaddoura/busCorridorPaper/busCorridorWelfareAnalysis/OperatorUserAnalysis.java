@@ -41,13 +41,16 @@ public class OperatorUserAnalysis {
 	MoneyEventHandler moneyHandler;
 	TransitEventHandler transitHandler;
 	LinksEventHandler linksHandler;
+	WaitingTimeHandler waitHandler;
 	
 	private final String lastEventFile;
 	private final Network network;
+	private final Double headway;
 	
-	public OperatorUserAnalysis(Network network, String directoryExtIt, int lastInternalIteration) {
+	public OperatorUserAnalysis(Network network, String directoryExtIt, int lastInternalIteration, Double headway) {
 		this.lastEventFile = directoryExtIt + "/internalIterations/ITERS/it." + lastInternalIteration + "/" + lastInternalIteration + ".events.xml.gz";
 		this.network = network;
+		this.headway = headway;
 	}
 	
 	public void readEvents(){
@@ -56,11 +59,13 @@ public class OperatorUserAnalysis {
 		this.moneyHandler = new MoneyEventHandler();
 		this.transitHandler = new TransitEventHandler();
 		this.linksHandler = new LinksEventHandler(this.network);
+		this.waitHandler = new WaitingTimeHandler(headway);
 		
 		events.addHandler(this.departureHandler);	
 		events.addHandler(this.moneyHandler);	
 		events.addHandler(this.transitHandler);
-		events.addHandler(this.linksHandler);		
+		events.addHandler(this.linksHandler);
+		events.addHandler(this.waitHandler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(this.lastEventFile);
@@ -93,4 +98,9 @@ public class OperatorUserAnalysis {
 	protected int getSumOfPtLegs() {
 		return departureHandler.getNumberOfPtLegs();
 	}
+
+	public WaitingTimeHandler getWaitHandler() {
+		return waitHandler;
+	}
+	
 }

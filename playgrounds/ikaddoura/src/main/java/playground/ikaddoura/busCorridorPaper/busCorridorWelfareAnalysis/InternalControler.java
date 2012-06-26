@@ -49,7 +49,6 @@ public class InternalControler {
 	private final Scenario scenario;
 	private final String directoryExtIt;
 	private final double fare;
-	private final double headway;
 	
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
 	private final double PERFORMING = 0.96;
@@ -76,12 +75,11 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(Scenario scenario, String directoryExtIt, double fare, double headway) {
+	public InternalControler(Scenario scenario, String directoryExtIt, double fare) {
 		this.scenario = scenario;
 		this.directoryExtIt = directoryExtIt;
 		this.fare = fare;
-		this.headway = headway;
-		this.ptLegHandler = new PtLegHandler(this.headway);
+		this.ptLegHandler = new PtLegHandler();
 	
 		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt(); // estimated parameter -2.08; is being adjusted via config
 		log.warn("Setting constant for PT to " + this.CONSTANT_PT);
@@ -132,22 +130,6 @@ public class InternalControler {
 
 	public double getMarginalUtlOfMoney() {
 		return MARGINAL_UTILITY_OF_MONEY;
-	}
-	
-	public double getSumOfWaitingTimes() {
-		return this.ptLegHandler.getSumOfWaitingTimes();
-	}
-	
-	public int getNumberOfWaitingTimesMoreThanHeadway() {
-		return this.ptLegHandler.getNumberOfAgentsWaitingMoreThanHeadway();
-	}
-	
-	public int getNumberOfMissedVehicles(){
-		return this.ptLegHandler.getNumberOfMissedVehicles();
-	}
-
-	public Map<Id, FacilityInfo> getFacilityId2FacilityInfo(){
-		return this.ptLegHandler.getFacilityId2facilityInfos();
 	}
 	
 }

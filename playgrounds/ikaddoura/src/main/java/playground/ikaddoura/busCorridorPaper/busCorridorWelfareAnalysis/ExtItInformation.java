@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -42,11 +44,40 @@ public class ExtItInformation {
 	private double numberOfCarLegs;
 	private double numberOfPtLegs;
 	private double numberOfWalkLegs;
-	private double sumOfWaitingTimes;
-	private int numberOfWaitingTimesMoreThanHeadway;
+	
+	private List <Double> waitingTimes = new ArrayList<Double>();
+	private List <Double> waitingTimesMissed = new ArrayList<Double>();
+	private List <Double> waitingTimesNotMissed = new ArrayList<Double>();
+		
 	private int numberOfMissedVehicles;
 	private Map <Id, FacilityInfo> facilityId2facilityInfos = new HashMap<Id, FacilityInfo>();
 	
+	public List <Double> getWaitingTimes() {
+		return waitingTimes;
+	}
+
+	public void setWaitingTimes(List <Double> waitingTimes) {
+		this.waitingTimes = waitingTimes;
+	}
+
+	public List <Double> getWaitingTimesMissed() {
+		return waitingTimesMissed;
+	}
+
+	public void setWaitingTimesMissed(
+			List <Double> waitingTimesMissed) {
+		this.waitingTimesMissed = waitingTimesMissed;
+	}
+
+	public List <Double> getWaitingTimesNotMissed() {
+		return waitingTimesNotMissed;
+	}
+
+	public void setWaitingTimesNotMissed(
+			List <Double> waitingTimesNotMissed) {
+		this.waitingTimesNotMissed = waitingTimesNotMissed;
+	}
+
 	protected double getFare() {
 		return fare;
 	}
@@ -123,49 +154,70 @@ public class ExtItInformation {
 		this.numberOfWalkLegs = numberOfWalkLegs;
 	}
 
-	protected double getSumOfWaitingTimes() {
-		return sumOfWaitingTimes;
-	}
-
-	protected void setSumOfWaitingTimes(double sumOfWaitingTimes) {
-		this.sumOfWaitingTimes = sumOfWaitingTimes;
-	}
-
 	protected double getWelfare() {
 		return this.getOperatorProfit() + this.usersLogSum;
 	}
 
-	public void setHeadway(double headway) {
+	protected void setHeadway(double headway) {
 		this.headway = headway;
 	}
 
-	public double getHeadway() {
+	protected double getHeadway() {
 		return headway;
 	}
 
-	public void setNumberOfWaitingTimesMoreThanHeadway(
-			int numberOfWaitingTimesMoreThanHeadway) {
-		this.numberOfWaitingTimesMoreThanHeadway = numberOfWaitingTimesMoreThanHeadway;
+	protected int getMissedBusTrips() {
+		return this.waitingTimesMissed.size();
+	}
+	
+	protected int getNotMissedBusTrips() {
+		return this.waitingTimesNotMissed.size();
 	}
 
-	public int getNumberOfWaitingTimesMoreThanHeadway() {
-		return numberOfWaitingTimesMoreThanHeadway;
-	}
-
-	public void setNumberOfMissedVehicles(int numberOfMissedVehicles) {
+	protected void setNumberOfMissedVehicles(int numberOfMissedVehicles) {
 		this.numberOfMissedVehicles = numberOfMissedVehicles;
 	}
 
-	public int getNumberOfMissedVehicles() {
+	protected int getNumberOfMissedVehicles() {
 		return numberOfMissedVehicles;
 	}
 
-	public void setFacilityId2facilityInfos(Map <Id, FacilityInfo> facilityId2facilityInfos) {
+	protected void setFacilityId2facilityInfos(Map <Id, FacilityInfo> facilityId2facilityInfos) {
 		this.facilityId2facilityInfos = facilityId2facilityInfos;
 	}
 	
-	public Map <Id, FacilityInfo> getFacilityId2facilityInfos() {
+	protected Map <Id, FacilityInfo> getFacilityId2facilityInfos() {
 		return facilityId2facilityInfos;
+	}
+	
+	protected double getAvgWaitingTimeAll() {
+		int counter = 0;
+		double sumOfWaitingTimes = 0.0;
+		for(Double waitingTime : this.waitingTimes){
+			sumOfWaitingTimes = sumOfWaitingTimes + waitingTime;
+			counter++;
+		}
+		return sumOfWaitingTimes / counter;
+	}
+	
+	protected double getAvgWaitingTimeNotMissingBus() {
+		int counter = 0;
+		double sumOfWaitingTimesNotMissingBus = 0.0;
+		for(Double waitingTime : this.waitingTimesNotMissed){
+			sumOfWaitingTimesNotMissingBus = sumOfWaitingTimesNotMissingBus + waitingTime;
+			counter++;
+		}
+		return sumOfWaitingTimesNotMissingBus / counter;
+	}
+	
+	protected double getAvgWaitingTimeMissingBus() {
+		int counter = 0;
+		double sumOfWaitingTimesMissingBus = 0.0;
+		for(Double waitingTime : this.waitingTimesMissed){
+			sumOfWaitingTimesMissingBus = sumOfWaitingTimesMissingBus + waitingTime;
+			counter++;
+		}
+		return sumOfWaitingTimesMissingBus / counter;
 	}
 	
 }

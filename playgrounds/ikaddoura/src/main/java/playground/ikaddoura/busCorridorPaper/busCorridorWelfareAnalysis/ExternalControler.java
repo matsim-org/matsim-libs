@@ -64,16 +64,16 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_timeChoice_TEST2";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test2";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-		lastExternalIterationParam1 = 5;
+		lastExternalIterationParam1 = 2;
 		
 //		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
-		lastExternalIterationParam2 = 5;
+		lastExternalIterationParam2 = 2;
 				
 		incrBusNumber = 2;
 		incrFare = -1.0;
@@ -127,13 +127,13 @@ class ExternalControler {
 				VehicleScheduleWriter vsw = new VehicleScheduleWriter(this.numberOfBuses, this.capacity, sc.getNetwork(), directoryExtItParam2Param1);
 				vsw.writeTransitVehiclesAndSchedule();
 				
-				InternalControler internalControler = new InternalControler(sc, directoryExtItParam2Param1, this.fare, vsw.getHeadway());
+				InternalControler internalControler = new InternalControler(sc, directoryExtItParam2Param1, this.fare);
 				internalControler.run();
 	
 				operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
 				users.setParametersForExtIteration(sc);
 				
-				OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), directoryExtItParam2Param1, sc.getConfig().controler().getLastIteration());
+				OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), directoryExtItParam2Param1, sc.getConfig().controler().getLastIteration(), vsw.getHeadway());
 				analysis.readEvents();
 				
 				operator.calculateCosts(analysis);
@@ -150,10 +150,12 @@ class ExternalControler {
 				info.setNumberOfCarLegs(analysis.getSumOfCarLegs());
 				info.setNumberOfPtLegs(analysis.getSumOfPtLegs());
 				info.setNumberOfWalkLegs(analysis.getSumOfWalkLegs());
-				info.setSumOfWaitingTimes(internalControler.getSumOfWaitingTimes());
-				info.setNumberOfWaitingTimesMoreThanHeadway(internalControler.getNumberOfWaitingTimesMoreThanHeadway());
-				info.setNumberOfMissedVehicles(internalControler.getNumberOfMissedVehicles());
-				info.setFacilityId2facilityInfos(internalControler.getFacilityId2FacilityInfo());
+				
+				info.setWaitingTimes(analysis.getWaitHandler().getWaitingTimes());
+				info.setWaitingTimesNotMissed(analysis.getWaitHandler().getWaitingTimesNotMissed());
+				info.setWaitingTimesMissed(analysis.getWaitHandler().getWaitingTimesMissed());
+				info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
+				info.setFacilityId2facilityInfos(analysis.getWaitHandler().getFacilityId2facilityInfos());
 				
 				this.extIt2information.put(extItParam1, info);
 				
@@ -218,11 +220,11 @@ class ExternalControler {
 			log.info("Analyzing combined optimization parameters " + op1 + " and " + op2);
 			if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES) && op2.equals(OptimizationParameter2.FARE)){
 				this.fare = -0.;
-				this.capacity = 50;
+				this.capacity = 1;
 				this.numberOfBuses = 1;
 			} else if (op1.equals(OptimizationParameter1.FARE) && op2.equals(OptimizationParameter2.NUMBER_OF_BUSES)){
 				this.fare = -0.;
-				this.capacity = 50;
+				this.capacity = 1;
 				this.numberOfBuses = 1;
 			} else {
 				throw new RuntimeException("Undefined default parameters for combined optimization parameters op1 = " + op1 + " and op2 = " + op2 + ". Aborting...");

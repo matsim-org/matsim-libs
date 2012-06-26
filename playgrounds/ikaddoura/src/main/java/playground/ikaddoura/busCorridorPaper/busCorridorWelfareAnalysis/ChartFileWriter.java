@@ -116,7 +116,6 @@ public class ChartFileWriter {
 		SortedMap<Integer, Integer> iteration2numberOfWalkLegs = new TreeMap<Integer, Integer>();
 		SortedMap<Integer, Double> iteration2fare = new TreeMap<Integer, Double>();
 		SortedMap<Integer, Double> iteration2capacity = new TreeMap<Integer, Double>();
-		SortedMap<Integer, Double> iteration2waitTimeSum = new TreeMap<Integer, Double>();
 
 		 for (Integer iteration : extIt2information.keySet()){
 			 iteration2numberOfBuses.put(iteration, extIt2information.get(iteration).getNumberOfBuses());
@@ -130,7 +129,6 @@ public class ChartFileWriter {
 			 iteration2numberOfWalkLegs.put(iteration, (int)extIt2information.get(iteration).getNumberOfWalkLegs());
 			 iteration2fare.put(iteration, extIt2information.get(iteration).getFare());
 			 iteration2capacity.put(iteration, extIt2information.get(iteration).getCapacity());
-			 iteration2waitTimeSum.put(iteration, extIt2information.get(iteration).getSumOfWaitingTimes());
 		 }
 		
 		// Map<Integer, Double> key2value, String title, String x, String y, String fileName 

@@ -24,7 +24,7 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; SumOfWaitingTimes (sec) ; WaitingTime > Headway (trips), MissedBusses";
+	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; AvgWaitingTimeAll (sec) ; AvgWaitingTimeNotMissing (sec) ; AvgWaitingTimeMissing (sec) ; NumberOfMissedBusTrips, NumberOfNotMissedBusTrips, MissedBusses";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -41,11 +41,14 @@ public class TextFileWriter {
 	    	double walkLegs = extIt2information.get(iteration).getNumberOfWalkLegs();
 	    	double fare = extIt2information.get(iteration).getFare();
 	    	double capacity = extIt2information.get(iteration).getCapacity();
-	    	double waitTime = extIt2information.get(iteration).getSumOfWaitingTimes();
-	    	double waitingTimeMoreThanHeadway = extIt2information.get(iteration).getNumberOfWaitingTimesMoreThanHeadway();
+	    	double avgWaitTimeAll = extIt2information.get(iteration).getAvgWaitingTimeAll();
+	    	double avgWaitTimeMissing = extIt2information.get(iteration).getAvgWaitingTimeMissingBus();
+	    	double avgWaitTimeNotMissing = extIt2information.get(iteration).getAvgWaitingTimeNotMissingBus();
+	    	double waitingTimeMoreThanHeadway = extIt2information.get(iteration).getMissedBusTrips();
+	    	double waitingTimeLessThanHeadway = extIt2information.get(iteration).getNotMissedBusTrips();
 	    	double missedBusses = extIt2information.get(iteration).getNumberOfMissedVehicles();
 	    	
-	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+waitTime+" ; "+waitingTimeMoreThanHeadway+" ; "+missedBusses;
+	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+avgWaitTimeAll+" ; " +avgWaitTimeNotMissing+" ; "+avgWaitTimeMissing+" ; "+waitingTimeMoreThanHeadway+" ; "+waitingTimeLessThanHeadway+" ; "+missedBusses;
 	
 	    	bw.write(zeile);
 	        bw.newLine();
@@ -171,7 +174,7 @@ public class TextFileWriter {
 			    bw.write(zeile0);
 			    bw.newLine();
 			    
-			    String zeile1 = "WaitingTimeId ; DayTime (sec) ; WaitingTime (sec)";
+			    String zeile1 = "WaitingTimeId ; Daytime (sec) (when entering a vehicle); WaitingTime (sec)";
 			    bw.write(zeile1);
 			    bw.newLine();
 			   			   	
