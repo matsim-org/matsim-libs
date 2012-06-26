@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -35,10 +34,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -50,6 +45,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * space time prisms (in the sense of car pooling potential) easy.
  * This class is just responsible from organising the {@link Record}s.
  * The classes responsible from imporiting the records should not do any computation.
+ * <br>
+ * BEWARE: this class does not uses the arrival times from the event, but new ones
+ * estimated consistently with the detour travel time. This avoids strange artifacts
+ * for trips with unexpectedly high or low travel time, but may be difficult to interpret
+ * for non-car trips! The code should be reworked if non-car trips are to be included in
+ * the analysis.
  * @author thibautd
  */
 public class TripsPrism {
@@ -158,12 +159,11 @@ public class TripsPrism {
 		if (log.isTraceEnabled()) {
 			log.trace( "~~~~~ getting passengers for record "+driverTrip.getTripId()+": " );
 		}
-		final double initialTravelTime = driverTrip.getArrivalTime() - driverTrip.getDepartureTime();
+		final double driverDepartureTime = driverTrip.getDepartureTime();
+		final double initialTravelTime = getEstimatedTravelTime( driverTrip );
 		final double detourTime = maximumDetourTimeFraction * initialTravelTime;
 		final double maxTravelTime = initialTravelTime + detourTime;
 		final double radius = maxTravelTime * maxBeeFlySpeed / 2;
-		// time to shift departure and arrival to get min and max times to consider
-		final double timeShift = timeWindowWidth + (detourTime / 2);
 
 		Link origLink = getOriginLink( driverTrip );
 		Link destLink = getDestinationLink( driverTrip );
@@ -181,8 +181,9 @@ public class TripsPrism {
 						return record.getDepartureTime();
 					}
 				},
-				driverTrip.getDepartureTime() - timeShift,
-				driverTrip.getArrivalTime() + timeShift);
+				// do not consider trips with earliest departure after latest arrival
+				Double.NEGATIVE_INFINITY,
+				driverDepartureTime + initialTravelTime + 2 * timeWindowWidth);
 
 		if (log.isTraceEnabled()) {
 			log.trace( records.size()+" trips with origin in the ball" );
@@ -197,11 +198,12 @@ public class TripsPrism {
 					new DoubleGetter() {
 						@Override
 						public double getValue(final Record record) {
-							return record.getArrivalTime();
+							return record.getDepartureTime() + getEstimatedTravelTime( record );
 						}
 					},
-					driverTrip.getDepartureTime() - timeShift,
-					driverTrip.getArrivalTime() + timeShift));
+					// do not consider trips with lattest arrival before earliest departure
+					driverDepartureTime - 2 * timeWindowWidth,
+					Double.POSITIVE_INFINITY));
 
 		if (log.isTraceEnabled()) {
 			log.trace( records.size()+" trips with origin and destination in the ball" );
@@ -276,6 +278,8 @@ public class TripsPrism {
 			final double maxTravelTime,
 			final double halfTimeWindow) {
 		final double driverDepartureTime = driverTrip.getDepartureTime();
+		final double driverDirectTravelTime = getEstimatedTravelTime( driverTrip );
+		final double driverArrivalTime = driverDepartureTime + driverDirectTravelTime;
 		List<PassengerRecord> prism = new ArrayList<PassengerRecord>();
 		Iterator<Record> iterator = records.iterator();
 
@@ -289,6 +293,10 @@ public class TripsPrism {
 				// do not count trips of the same agent
 				continue;
 			}
+			// XXX: uses car tt for all modes! avoids strange results for car mode,
+			// but my be more difficult to interpret for non-car modes!
+			final double passengerArrivalTime = passengerTrip.getDepartureTime()
+					+ getEstimatedTravelTime( passengerTrip );
 
 			double now = driverDepartureTime;
 			DistanceAndDuration access = ttEstimator.getTravelTime(
@@ -299,23 +307,9 @@ public class TripsPrism {
 
 			if (access.duration > maxTravelTime) continue;
 
-			// use free flow even if better estimates can be obtained from the record
-			// for car trips, for consistency reasons
-			DistanceAndDuration jointSection;
-			
-			if (passengerTrip.getEstimatedNetworkDistance() < 0) {
-				jointSection = ttEstimator.getTravelTime(
-						now,
-						getOriginLink( passengerTrip ),
-						getDestinationLink( passengerTrip ) );
-				passengerTrip.setEstimatedNetworkDistance( jointSection.distance );
-				passengerTrip.setEstimatedNetworkDuration( jointSection.duration );
-			}
-			else {
-				jointSection = new DistanceAndDuration(
-						passengerTrip.getEstimatedNetworkDistance(),
-						passengerTrip.getEstimatedNetworkDuration());
-			}
+			DistanceAndDuration jointSection = new DistanceAndDuration(
+						getEstimatedDistance( passengerTrip ),
+						getEstimatedTravelTime( passengerTrip ));
 			now += jointSection.duration;
 
 			if (access.duration + jointSection.duration > maxTravelTime) {
@@ -333,16 +327,24 @@ public class TripsPrism {
 			}
 
 			double timeWindow = 2 * halfTimeWindow;
+			// time window necessary for the driver to be able to perform his trip
+			double minTimeWindow = access.duration + jointSection.duration +
+				egress.duration - driverDirectTravelTime;
+
+			if (minTimeWindow > timeWindow) continue;
+
 			// time window for later joint departure > earlier acceptable passenger departure
-			double minTimeWindow = passengerTrip.getDepartureTime() - driverTrip.getArrivalTime() +
-				egress.duration + jointSection.duration;
+			minTimeWindow = Math.max(
+					minTimeWindow,
+					passengerTrip.getDepartureTime() - driverArrivalTime +
+						egress.duration + jointSection.duration);
 
 			if (minTimeWindow > timeWindow) continue;
 
 			minTimeWindow = Math.max(
 					minTimeWindow,
 					// time window for earliest possible driver arrival at dest < lattest acceptable passenger departure
-					driverTrip.getDepartureTime() - passengerTrip.getArrivalTime()
+					driverDepartureTime - passengerArrivalTime
 						+ access.duration + jointSection.duration);
 
 			if (minTimeWindow > timeWindow) continue;
@@ -350,7 +352,7 @@ public class TripsPrism {
 			minTimeWindow = Math.max(
 					minTimeWindow,
 					// time window for the joint travel time to be acceptable for the passenger
-					passengerTrip.getDepartureTime() - passengerTrip.getArrivalTime() + jointSection.duration);
+					passengerTrip.getDepartureTime() - passengerArrivalTime + jointSection.duration);
 
 			if (minTimeWindow > timeWindow) continue;
 
@@ -383,7 +385,7 @@ public class TripsPrism {
 						access.duration,
 						jointSection.duration,
 						egress.duration,
-						Math.max( 0 , minTimeWindow ) / 2d));
+						minTimeWindow / 2d));
 		}
 
 		if (log.isTraceEnabled()) {
@@ -466,6 +468,36 @@ public class TripsPrism {
 		}
 
 		return timeAndSpaceRestricted;
+	}
+
+	private double getEstimatedTravelTime(final Record r) {
+		if (r.getEstimatedNetworkDistance() < 0) {
+			DistanceAndDuration ds = ttEstimator.getTravelTime(
+					r.getDepartureTime(),
+					getOriginLink( r ),
+					getDestinationLink( r ) );
+			r.setEstimatedNetworkDistance( ds.distance );
+			r.setEstimatedNetworkDuration( ds.duration );
+			return ds.duration;
+		}
+		else {
+			return r.getEstimatedNetworkDuration();
+		}
+	}
+
+	private double getEstimatedDistance(final Record r) {
+		if (r.getEstimatedNetworkDistance() < 0) {
+			DistanceAndDuration ds = ttEstimator.getTravelTime(
+					r.getDepartureTime(),
+					getOriginLink( r ),
+					getDestinationLink( r ) );
+			r.setEstimatedNetworkDistance( ds.distance );
+			r.setEstimatedNetworkDuration( ds.duration );
+			return ds.distance;
+		}
+		else {
+			return r.getEstimatedNetworkDistance();
+		}
 	}
  
 	public void logStats() {
