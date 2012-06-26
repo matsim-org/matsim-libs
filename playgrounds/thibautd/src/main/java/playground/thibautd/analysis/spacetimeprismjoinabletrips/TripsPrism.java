@@ -159,14 +159,18 @@ public class TripsPrism {
 			log.trace( "~~~~~ getting passengers for record "+driverTrip.getTripId()+": " );
 		}
 		final double initialTravelTime = driverTrip.getArrivalTime() - driverTrip.getDepartureTime();
-		double detourTime = maximumDetourTimeFraction * initialTravelTime;
-		double radius = (initialTravelTime + Math.min( detourTime, timeWindowWidth )) * maxBeeFlySpeed / 2;
+		final double detourTime = maximumDetourTimeFraction * initialTravelTime;
+		final double maxTravelTime = initialTravelTime + detourTime;
+		final double radius = maxTravelTime * maxBeeFlySpeed / 2;
+		// time to shift departure and arrival to get min and max times to consider
+		final double timeShift = timeWindowWidth + (detourTime / 2);
 
 		Link origLink = getOriginLink( driverTrip );
 		Link destLink = getDestinationLink( driverTrip );
 		Coord center = getCenter( origLink.getCoord() , destLink.getCoord() );
 
 		// restricted origins
+
 		Collection<Record> records = getSpaceTimeBall(
 				recordsByOrigin,
 				center,
@@ -177,8 +181,8 @@ public class TripsPrism {
 						return record.getDepartureTime();
 					}
 				},
-				driverTrip.getDepartureTime() - detourTime / 2,
-				driverTrip.getArrivalTime() + detourTime / 2);
+				driverTrip.getDepartureTime() - timeShift,
+				driverTrip.getArrivalTime() + timeShift);
 
 		if (log.isTraceEnabled()) {
 			log.trace( records.size()+" trips with origin in the ball" );
@@ -196,14 +200,13 @@ public class TripsPrism {
 							return record.getArrivalTime();
 						}
 					},
-					driverTrip.getDepartureTime() - detourTime / 2,
-					driverTrip.getArrivalTime() + detourTime / 2));
+					driverTrip.getDepartureTime() - timeShift,
+					driverTrip.getArrivalTime() + timeShift));
 
 		if (log.isTraceEnabled()) {
 			log.trace( records.size()+" trips with origin and destination in the ball" );
 		}
 
-		double maxTravelTime = initialTravelTime + detourTime;
 		pruneNonEllipsisElements(
 				origLink.getCoord(),
 				destLink.getCoord(),
