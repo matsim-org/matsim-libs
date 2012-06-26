@@ -23,6 +23,8 @@
  */
 package playground.ikaddoura.parkAndRide.prepare;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
@@ -41,18 +43,30 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class NetworkAddPRMain {
 	
-	// input
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_network.xml";
-	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_schedule.xml";
-	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_vehicles.xml";
+	
+//	// input
+//	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinNetwork.xml";
+//	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitSchedule.xml";
+//	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitVehicles.xml";
+//	
+//	// output
+//	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRfacilities.txt";
+//	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRnetwork.xml";
+//	
+//	static double extensionRadius = 500;
+//	static int maxSearchSteps = 500;
+	
+	static String networkFile;
+	static String scheduleFile;
+	static String vehiclesFile;
 	
 	// output
-	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRfacilities.txt";
-	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRnetwork.xml";
+	static String prFacilitiesFile;
+	static String prNetworkFile;
 	
-	private double extensionRadius = 100;
-	private int maxSearchSteps = 50;
-	
+	static double extensionRadius;
+	static int maxSearchSteps;
+		     
 	// parkAndRide Link:
 	private double capacity = 2000;
 	private double freeSpeed = 2.77778;
@@ -61,7 +75,20 @@ public class NetworkAddPRMain {
 	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		
+		// input
+		networkFile = args[0];
+		scheduleFile = args[1];
+		vehiclesFile = args[2];
+		
+		// output
+		prFacilitiesFile = args[3];
+		prNetworkFile = args[4];
+		
+		extensionRadius = Double.parseDouble(args[5]);
+		maxSearchSteps = Integer.parseInt(args[6]);
+		
 		NetworkAddPRMain addParkAndRide = new NetworkAddPRMain();
 		addParkAndRide.run();
 	}
@@ -71,18 +98,28 @@ public class NetworkAddPRMain {
 		loadScenario();
 		
 		PRNodeSearch prNodeSearch = new PRNodeSearch();
-		prNodeSearch.searchForCarLink(this.scenario, this.extensionRadius, this.maxSearchSteps);
+		prNodeSearch.searchForCarLink(this.scenario, extensionRadius, maxSearchSteps);
 		
 		PRFacilityCreator prFacilityCreator = new PRFacilityCreator();
 		prFacilityCreator.setCapacity(this.capacity);
 		prFacilityCreator.setFreeSpeed(this.freeSpeed);
 		prFacilityCreator.setLength(this.length);
 		prFacilityCreator.setNrOfLanes(this.nrOfLanes);
+		
 		int i = 0;
 		for (Node node : prNodeSearch.getCarLinkToNodes()){
 			Id id = new IdImpl(i);
 			prFacilityCreator.createPRFacility(id, node, this.scenario);
 			i++;
+		}
+		
+		System.out.println("***");
+		
+		if (prNodeSearch.getStopsWithoutPRFacility().isEmpty()){
+			System.out.println("For all TransitStopFacilities a car-Link was found and a Park'n'Ride Facility was created.");
+		}
+		for (TransitStopFacility stop : prNodeSearch.getStopsWithoutPRFacility()){
+			System.out.println("No Park'n'Ride Facility created for: " + stop.getId());
 		}
 		
 		NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork());
