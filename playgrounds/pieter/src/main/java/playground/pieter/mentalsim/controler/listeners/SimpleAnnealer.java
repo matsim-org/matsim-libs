@@ -165,7 +165,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			double weight = stratMan.getWeights().get(
 					strategies.indexOf(strategy));
 			double newWeight = weight;
-			if (strategyName.contains("selector")
+			if ((strategyName.contains("selector")||strategyName.contains("expbetaplanchanger"))
 					&& !strategyName.contains("_")
 			// selector-only strategy
 			) {

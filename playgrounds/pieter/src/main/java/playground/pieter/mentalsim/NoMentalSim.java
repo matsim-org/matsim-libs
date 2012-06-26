@@ -9,6 +9,8 @@ import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
 import playground.pieter.mentalsim.controler.listeners.ScoreResetStrategyModuleAppender;
 import playground.pieter.mentalsim.controler.listeners.SimpleAnnealer;
 import playground.pieter.mentalsim.trafficinfo.MyTTCalcFactory;
+import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculator;
+import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculatorFactory;
 import playground.pieter.router.util.StochasticRouterFactory;
 
 
@@ -21,9 +23,10 @@ public class NoMentalSim {
 		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
 //		c.addControlerListener(new SimpleAnnealer());
-		StochasticRouterFactory str = new StochasticRouterFactory();
-		str.setBeta(0.0000001);
-		c.setLeastCostPathCalculatorFactory(str);
+//		StochasticRouterFactory str = new StochasticRouterFactory();
+//		str.setBeta(4);
+//		c.setLeastCostPathCalculatorFactory(str);
+//		c.setTravelDisutilityFactory(new CapacityFavoringStochasticCostCalculatorFactory());
 		c.run();
 		System.exit(0);
 		

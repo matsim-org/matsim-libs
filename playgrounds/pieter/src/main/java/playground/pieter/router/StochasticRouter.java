@@ -134,14 +134,17 @@ public class StochasticRouter implements LeastCostPathCalculator {
 				Link link = outLinks.get(i);
 				// never go upstream
 				linkCost = linkCosts.get(link);
-				if (linkCost <= nodeCost) {
-//					double contribution = Math.exp(-1 * beta * linkCost);
-//					total += contribution;
-//					utils[i] = contribution;
-					double contribution = Math.log(linkCost+1);
-					total += contribution;
-					utils[i] = contribution;
-				}
+				double contribution = linkCost <= nodeCost?Math.pow(linkCost,-1*beta):Math.pow(linkCost,-2*beta);
+//				if (linkCost <= nodeCost) {
+////					double contribution = Math.exp(-1 * beta * linkCost);
+////					total += contribution;
+////					utils[i] = contribution;
+//					double contribution = Math.pow(linkCost,beta);
+//				}else{
+//					
+//				}
+				total += contribution;
+				utils[i] = contribution;
 			}
 			// convert utils>0 to probabilities
 			double sampleProb = MatsimRandom.getRandom().nextDouble() * total;
