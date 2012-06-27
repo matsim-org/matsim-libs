@@ -50,11 +50,11 @@ public class NetworkAddPRMain {
 //	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitVehicles.xml";
 //	
 //	// output
-//	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRfacilities.txt";
-//	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRnetwork.xml";
+//	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRfacilitiesTest.txt";
+//	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRnetworkTest.xml";
 //	
-//	static double extensionRadius = 500;
-//	static int maxSearchSteps = 500;
+//	static double extensionRadius = 10;
+//	static int maxSearchSteps = 100;
 	
 	static String networkFile;
 	static String scheduleFile;
@@ -119,17 +119,17 @@ public class NetworkAddPRMain {
 			System.out.println("For all TransitStopFacilities a car-Link was found and a Park'n'Ride Facility was created.");
 		}
 		for (TransitStopFacility stop : prNodeSearch.getStopsWithoutPRFacility()){
-			System.out.println("No Park'n'Ride Facility created for: " + stop.getId());
+			System.out.println("No Park'n'Ride Facility created for: " + stop.getId() + ": " + stop.getName());
 		}
 		
 		NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork());
-		networkWriter.write(prNetworkFile);	
+		networkWriter.write(prNetworkFile);
 		
 		PRFacilitiesWriter prFacilityWriter = new PRFacilitiesWriter();	
 		prFacilityWriter.write(prFacilityCreator.getParkAndRideFacilities(), prFacilitiesFile);
 		
 		for (TransitStopFacility stop : prNodeSearch.getTransitStop2nearestCarLink().keySet()){
-			System.out.println("TranistStopFacility: " + stop.getId().toString() + " " + stop.getCoord().toString() + " / next car-Link: " + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getId() + " / toNode:" + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getToNode().getCoord().toString());
+			System.out.println("TranistStopFacility: " + stop.getId().toString() + " " + stop.getName() + " " + stop.getCoord().toString() + " / next car-Link: " + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getId() + " / toNode:" + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getToNode().getCoord().toString());
 		}	
 	}
 
