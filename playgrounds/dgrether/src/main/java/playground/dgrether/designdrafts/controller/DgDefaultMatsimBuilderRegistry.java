@@ -61,6 +61,7 @@ public class DgDefaultMatsimBuilderRegistry implements DgMATSimBuilderRegistry {
 	
 	@Override
 	public void setScoringBuilder(DgScoringBuilder scoringBuilder) {
+		//this warning could be replaced by an exception that is thrown if not both are replaced
 		log.warn("Changing the scoring implies in nearly all usecases that you have to change the replanning as well!");
 		this.scoringBuilder = scoringBuilder;
 	}
