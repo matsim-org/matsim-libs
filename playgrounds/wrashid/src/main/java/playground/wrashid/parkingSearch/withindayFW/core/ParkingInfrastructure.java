@@ -46,13 +46,13 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 
-public class ParkingInfrastructure implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class ParkingInfrastructure  {
 
 	private final QuadTree<ActivityFacility> parkingFacilities;
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
-	private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
+	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
 	private final IntegerValueHashMap<Id> reservedCapcities;	// number of reserved parkings
-	private final IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
+	private IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
 	private final HashMap<String, HashSet<Id>> parkingTypes;
 	private final ParkingCostCalculator parkingCostCalculator;
 	private final Scenario scenario;
@@ -62,7 +62,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		this.parkingCostCalculator = parkingCostCalculator;
 		facilityCapacities = new IntegerValueHashMap<Id>();
 		reservedCapcities = new IntegerValueHashMap<Id>();
-		facilityToLinkMapping = new HashMap<Id, Id>();
+	//	facilityToLinkMapping = new HashMap<Id, Id>();
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 		
 		// Create a quadtree containing all parking facilities
@@ -102,7 +102,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 				}
 				
 				// add the facility to the facilityToLinkMapping
-				facilityToLinkMapping.put(facilityId, linkId);
+		//		getFacilityToLinkMapping().put(facilityId, linkId);
 			}
 		}
 		
@@ -132,27 +132,10 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		return null;
 	}
 
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		/*
-		if (event.getActType().equals("parking")) {
-			reservedCapcities.decrement(event.getFacilityId());
-			facilityCapacities.increment(event.getFacilityId());
-		}
-		*/
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		/*
-		if (event.getActType().equals("parking")) {
-			facilityCapacities.increment(event.getFacilityId());
-		}
-		*/
-	}
+	
 	
 	public int getFreeCapacity(Id facilityId) {
-		int freeCapacity = facilityCapacities.get(facilityId)-reservedCapcities.get(facilityId);
+		int freeCapacity = getFacilityCapacities().get(facilityId)-reservedCapcities.get(facilityId);
 		
 		if (freeCapacity<0){
 			DebugLib.stopSystemAndReportInconsistency();
@@ -191,7 +174,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 					continue;
 				}
 				
-				int capacity = facilityCapacities.get(id);
+				int capacity = getFacilityCapacities().get(id);
 				int reserved = reservedCapcities.get(id);
 				if ((capacity - reserved) > maxCapacity) facilityId = id;
 			}
@@ -204,7 +187,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full, try finding other free parkings in the quadtree
-		while (facilityCapacities.get(parkingFacility.getId())<=0){
+		while (getFacilityCapacities().get(parkingFacility.getId())<=0){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
 			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
 		}
@@ -219,7 +202,7 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
-		while (facilityCapacities.get(parkingFacility.getId())<=0 || parkingFacility.getLinkId().equals(linkId)){
+		while (getFacilityCapacities().get(parkingFacility.getId())<=0 || parkingFacility.getLinkId().equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
 			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
 		}
@@ -241,16 +224,6 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		}
 	}
 
-	@Override
-	public void reset(int iteration) {
-		
-		for (Id facilityId : facilityToLinkMapping.keySet()) {
-			// set initial capacity
-			// TODO: read in proper facility capacity!
-			facilityCapacities.set(facilityId, 1000);
-			reservedCapcities.set(facilityId, 0);
-		}
-	}
 
 	public ParkingCostCalculator getParkingCostCalculator() {
 		return parkingCostCalculator;
@@ -286,5 +259,21 @@ public class ParkingInfrastructure implements ActivityStartEventHandler, Activit
 		
 		return parkings;
 	}
+
+	public IntegerValueHashMap<Id> getFacilityCapacities() {
+		return facilityCapacities;
+	}
+	
+	public void setFacilityCapacities(IntegerValueHashMap<Id> facilityCapacities) {
+		this.facilityCapacities=facilityCapacities;
+	}
+	
+	public Collection<ActivityFacility> getParkingFacilities(){
+		return parkingFacilities.values();
+	}
+
+//	public Map<Id, Id> getFacilityToLinkMapping() {
+//		return facilityToLinkMapping;
+//	}
 	
 }

@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 
 //If several activities between two parking activities, count sum of all activities
@@ -75,6 +76,10 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+			return;
+		}
+		
 		if (isPlanElementDuringDay(personId, planElementIndex)) {
 			Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex + 2);
 
@@ -85,6 +90,10 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 		}
 	}
 
+	private boolean agentDoesNotDriveCarDuringWholeDay(Id personId) {
+		return firstParkingActivityPlanElemIndex.get(personId)==null;
+	}
+
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
@@ -92,6 +101,10 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
+		
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+			return;
+		}
 
 		if (isPlanElementDuringDay(personId, planElementIndex)) {
 			Activity previousAct = (Activity) executedPlan.getPlanElements().get(planElementIndex - 2);

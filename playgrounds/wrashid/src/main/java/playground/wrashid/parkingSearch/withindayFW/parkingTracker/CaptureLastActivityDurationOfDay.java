@@ -74,6 +74,10 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+			return;
+		}
+		
 		if (!isPlanElementDuringDay(personId, planElementIndex)) {
 			Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex + 2);
 
@@ -95,6 +99,10 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+			return;
+		}
+		
 		if (!isPlanElementDuringDay(personId, planElementIndex)) {
 			Activity previousAct = (Activity) executedPlan.getPlanElements().get(planElementIndex - 2);
 
@@ -113,6 +121,10 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 
 		}
 
+	}
+	
+	private boolean agentDoesNotDriveCarDuringWholeDay(Id personId) {
+		return firstParkingActivityPlanElemIndex.get(personId)==null;
 	}
 
 	private boolean isPlanElementDuringDay(Id personId, int planElementIndex) {

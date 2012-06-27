@@ -99,7 +99,7 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		
-		if (agentHasNoCarLegDuringDay(personId)){
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
 			return;
 		}
 		
@@ -119,9 +119,8 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, durationFirstWalk, durationSecondWalk);
 	}
 
-	private boolean agentHasNoCarLegDuringDay(Id personId) {
-		
-		return firstParkingWalkTmp.get(personId)==null || secondParkingWalkTmp.get(personId)==null;
+	private boolean agentDoesNotDriveCarDuringWholeDay(Id personId) {
+		return firstParkingActivityPlanElemIndex.get(personId)==null;
 	}
 
 	private boolean isPlanElementDuringDay(Id personId, int planElementIndex) {
@@ -137,6 +136,10 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		double startTimeWalkLeg = event.getTime();
 
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+			return;
+		}
+		
 		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, startTimeWalkLeg, startTimeWalkLeg);
 	}
 

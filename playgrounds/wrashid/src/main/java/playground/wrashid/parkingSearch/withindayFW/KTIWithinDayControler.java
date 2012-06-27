@@ -95,7 +95,7 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 		super.loadControlerListeners();
 
 		// the scoring function processes facility loads
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
+		//this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
 		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));

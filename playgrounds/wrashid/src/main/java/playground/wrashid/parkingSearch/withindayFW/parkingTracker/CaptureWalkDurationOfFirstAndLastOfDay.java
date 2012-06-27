@@ -68,19 +68,26 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
-		if (agentHasNoCarLegDuringDay(personId)){
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
 			return;
 		}
 		
-		double durationFirstWalk = GeneralLib.getIntervalDuration(firstParkWalkOfDayTmp.get(personId), event.getTime());
-		double durationLastWalk = GeneralLib.getIntervalDuration(lastParkWalkOfDayTmp.get(personId), event.getTime());
-
+		
+		double durationFirstWalk=0.0;
+		if (firstParkWalkOfDayTmp.get(personId)!=null){
+			durationFirstWalk = GeneralLib.getIntervalDuration(firstParkWalkOfDayTmp.get(personId), event.getTime());
+		}
+		
+		double durationLastWalk=0.0;
+		if (lastParkWalkOfDayTmp.get(personId)!=null){
+			durationLastWalk = GeneralLib.getIntervalDuration(lastParkWalkOfDayTmp.get(personId), event.getTime());
+		}
+		
 		updateWalkTmpVariables(personId, planElementIndex, durationFirstWalk, durationLastWalk);
 	}
 	
-	private boolean agentHasNoCarLegDuringDay(Id personId) {
-		
-		return firstParkWalkOfDayTmp.get(personId)==null || lastParkWalkOfDayTmp.get(personId)==null;
+	private boolean agentDoesNotDriveCarDuringWholeDay(Id personId) {
+		return firstParkingActivityPlanElemIndex.get(personId)==null;
 	}
 	
 
@@ -99,6 +106,10 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		double startTimeWalkLeg = event.getTime();
 
+		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+			return;
+		}
+		
 		updateWalkTmpVariables(personId, planElementIndex, startTimeWalkLeg, startTimeWalkLeg);
 	}
 

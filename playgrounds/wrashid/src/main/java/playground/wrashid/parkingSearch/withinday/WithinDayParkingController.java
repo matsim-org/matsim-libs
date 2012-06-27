@@ -122,7 +122,6 @@ public class WithinDayParkingController extends WithinDayController implements S
 		legModeChecker.run(this.scenarioData.getPopulation());
 		
 		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,null,null);
-		this.getEvents().addHandler(this.parkingInfrastructure);
 		
 		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 2000.0);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);

@@ -23,8 +23,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -38,6 +40,8 @@ import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.IntegerValueHashMap;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCIdentifier;
@@ -50,8 +54,9 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		super(args);
 	}
 
+	
 	@Override
-	protected void initParkingStrategyFactories() {
+	protected void startUpFinishing() {
 		
 		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, null);
 
@@ -99,6 +104,16 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 
 		this.getReplanningManager().setEventsManager(this.getEvents());
 	
+		initParkingFacilityCapacities();
+	}
+	
+	private void initParkingFacilityCapacities() {
+		IntegerValueHashMap<Id> facilityCapacities=new IntegerValueHashMap<Id>();
+		parkingInfrastructure.setFacilityCapacities(facilityCapacities);
+		
+		for (ActivityFacility parkingFacility:parkingInfrastructure.getParkingFacilities()){
+			facilityCapacities.incrementBy(parkingFacility.getId(),1000);
+		}
 	}
 	
 	

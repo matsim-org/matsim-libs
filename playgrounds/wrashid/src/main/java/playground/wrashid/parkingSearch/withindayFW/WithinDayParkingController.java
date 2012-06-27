@@ -91,7 +91,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		super.addControlerListener(this);
 	}
 
-	protected void initParkingStrategyFactories() {
+	protected void startUpFinishing() {
 		ParkingPersonalBetas parkingPersonalBetas=new ParkingPersonalBetas(this.scenarioData, null);
 		
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
@@ -158,6 +158,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		startUpBegin();
+		
 		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(event);
 		
 		// connect facilities to network
@@ -174,7 +176,6 @@ public class WithinDayParkingController extends WithinDayController implements S
 		legModeChecker.run(this.scenarioData.getPopulation());
 
 		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
-		this.getEvents().addHandler(this.parkingInfrastructure);
 
 		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 10000.0, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
@@ -188,7 +189,11 @@ public class WithinDayParkingController extends WithinDayController implements S
 
 		// this.initIdentifiers();
 		// this.initReplanners();
-		initParkingStrategyFactories();
+		startUpFinishing();
+	}
+
+	protected void startUpBegin() {
+		
 	}
 
 	private HashMap<String, HashSet<Id>> initParkingTypes(StartupEvent event) {

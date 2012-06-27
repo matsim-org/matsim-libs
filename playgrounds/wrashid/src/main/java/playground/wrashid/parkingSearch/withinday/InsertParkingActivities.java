@@ -52,6 +52,8 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	private final PersonAlgorithm personPrepareForSim;
 	private final ParkingInfrastructure parkingInfrastructure;
 
+	
+	// TODO: instead of selecting closest parking, we could select parking from previous day.
 	/*
 	 * use a InitialIdentifierImpl and set handleAllAgents to true
 	 */
