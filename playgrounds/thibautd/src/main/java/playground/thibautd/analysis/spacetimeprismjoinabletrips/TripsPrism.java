@@ -76,6 +76,7 @@ public class TripsPrism {
 	/**
 	 * Initialises the structure with the trip records passed as an argument.
 	 * @param trips the records to use. They can be extracted from events, plans or whatever.
+	 * @param travelTime the {@link TravelTime} to use to get travel time estimates.
 	 * @param network the network to use for the space dimensions.
 	 */
 	public TripsPrism(
@@ -152,6 +153,13 @@ public class TripsPrism {
 	// /////////////////////////////////////////////////////////////////////////
 	// public "prism" methods
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Returns the trips in the space-time prism of a driver trip
+	 * @param driverTrip the trip to consider as a driver
+	 * @param maximumDetourTimeFraction the maximum fraction of the direct travel time to allow as a detour
+	 * @param timeWindowWidth the time window width
+	 * @return the potential passenger trips
+	 */
 	public List<PassengerRecord> getTripsInPrism(
 			final Record driverTrip,
 			final double maximumDetourTimeFraction,
@@ -164,26 +172,20 @@ public class TripsPrism {
 		final double detourTime = maximumDetourTimeFraction * initialTravelTime;
 		final double maxTravelTime = initialTravelTime + detourTime;
 		final double radius = maxTravelTime * maxBeeFlySpeed / 2;
+		final double earliestPassengerArrival = driverDepartureTime - 2 * timeWindowWidth;
+		final double lattestPassengerDeparture = driverDepartureTime + initialTravelTime + 2 * timeWindowWidth;
 
 		Link origLink = getOriginLink( driverTrip );
 		Link destLink = getDestinationLink( driverTrip );
 		Coord center = getCenter( origLink.getCoord() , destLink.getCoord() );
 
 		// restricted origins
-
 		Collection<Record> records = getSpaceTimeBall(
 				recordsByOrigin,
 				center,
 				radius,
-				new DoubleGetter() {
-					@Override
-					public double getValue(final Record record) {
-						return record.getDepartureTime();
-					}
-				},
-				// do not consider trips with earliest departure after latest arrival
-				Double.NEGATIVE_INFINITY,
-				driverDepartureTime + initialTravelTime + 2 * timeWindowWidth);
+				earliestPassengerArrival,
+				lattestPassengerDeparture);
 
 		if (log.isTraceEnabled()) {
 			log.trace( records.size()+" trips with origin in the ball" );
@@ -195,15 +197,8 @@ public class TripsPrism {
 					recordsByDestination,
 					center,
 					radius,
-					new DoubleGetter() {
-						@Override
-						public double getValue(final Record record) {
-							return record.getDepartureTime() + getEstimatedTravelTime( record );
-						}
-					},
-					// do not consider trips with lattest arrival before earliest departure
-					driverDepartureTime - 2 * timeWindowWidth,
-					Double.POSITIVE_INFINITY));
+					earliestPassengerArrival,
+					lattestPassengerDeparture));
 
 		if (log.isTraceEnabled()) {
 			log.trace( records.size()+" trips with origin and destination in the ball" );
@@ -417,8 +412,6 @@ public class TripsPrism {
 		return l;
 	}
 
-
-
 	private static Coord getCenter(
 			final Coord coord1,
 			final Coord coord2) {
@@ -427,15 +420,14 @@ public class TripsPrism {
 				(coord1.getY() + coord2.getY()) / 2);
 	}
 
-	private static Collection<Record> getSpaceTimeBall(
+	private Collection<Record> getSpaceTimeBall(
 			final QuadTree<Record> records,
 			final Coord center,
 			final double radius,
-			final DoubleGetter orderingValueGetter,
-			final double minOrderingValue,
-			final double maxOrderingValue) {
+			final double earliestArrival,
+			final double lattestDeparture) {
 		if (log.isTraceEnabled()) {
-			log.trace( "getting ball with center "+center+" and radius "+radius+", min time limit "+minOrderingValue+" max time limit "+maxOrderingValue );
+			log.trace( "getting ball with center "+center+" and radius "+radius+", earliest arrival "+earliestArrival+" lattest departure "+lattestDeparture );
 			log.trace( "the quad tree contains "+records.size()+" records" );
 		}
 
@@ -456,9 +448,9 @@ public class TripsPrism {
 							}} );
 
 		for (Record r : spaceRestricted) {
-			double val = orderingValueGetter.getValue( r );
-
-			if (val >= minOrderingValue && val <= maxOrderingValue) {
+			final double dep = r.getDepartureTime();
+			final double arr = dep + getEstimatedTravelTime( r );
+			if (dep < lattestDeparture && arr > earliestArrival) {
 				timeAndSpaceRestricted.add( r );
 			}
 		}
@@ -505,12 +497,8 @@ public class TripsPrism {
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
-	// interfaces
+	// interfaces/classes
 	// /////////////////////////////////////////////////////////////////////////
-	private static interface DoubleGetter {
-		public double getValue( Record record );
-	}
-
 	private static interface IdGetter {
 		public Id getId( Record record );
 	}
