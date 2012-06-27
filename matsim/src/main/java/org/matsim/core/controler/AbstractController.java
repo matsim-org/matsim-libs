@@ -61,6 +61,7 @@ public abstract class AbstractController {
 	
 
 	public AbstractController() {
+		OutputDirectoryLogging.catchLogEntries();
 		Gbl.printSystemInfo();
 		Gbl.printBuildInfo();
 		log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
@@ -82,7 +83,6 @@ public abstract class AbstractController {
 			this.controlerListenerManager = new ControlerListenerManager(null);
 		}
 		Runtime.getRuntime().addShutdownHook(this.shutdownHook);
-		OutputDirectoryLogging.catchLogEntries();
 	}
 
 
