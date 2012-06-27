@@ -106,7 +106,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		DebugLib.traceAgent(withinDayAgent.getId());
 		
-		InsertParkingActivities.updateNextParkingActivityIfNeededAndRoute(parkingAgentsTracker.getParkingInfrastructure(),
+		InsertParkingActivities.updateNextParkingActivityIfNeededAndRouteDuringDay(parkingAgentsTracker.getParkingInfrastructure(),
 				withinDayAgent, scenario, routeAlgo);
 
 		withinDayAgent.resetCaches();

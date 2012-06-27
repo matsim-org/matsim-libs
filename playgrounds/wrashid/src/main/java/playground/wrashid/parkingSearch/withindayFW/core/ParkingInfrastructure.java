@@ -56,7 +56,12 @@ public class ParkingInfrastructure  {
 	private final HashMap<String, HashSet<Id>> parkingTypes;
 	private final ParkingCostCalculator parkingCostCalculator;
 	private final Scenario scenario;
+	private HashMap<Id,ActivityFacility> initialParkingFacilityOfAgent;
 	
+	public void setInitialParkingFacilityOfAgent(HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent) {
+		this.initialParkingFacilityOfAgent = initialParkingFacilityOfAgent;
+	}
+
 	public ParkingInfrastructure(Scenario scenario, HashMap<String, HashSet<Id>> parkingTypes, ParkingCostCalculator parkingCostCalculator) {
 		this.scenario = scenario;
 		this.parkingCostCalculator = parkingCostCalculator;
@@ -107,6 +112,14 @@ public class ParkingInfrastructure  {
 		}
 		
 		this.parkingTypes=parkingTypes;
+		
+		this.initialParkingFacilityOfAgent=new HashMap<Id, ActivityFacility>();
+		// cont' here -> fill this in parking population agent source.
+		// there, make that if variable is empty, initialize it based on closest parking
+		
+		// could also set this from outside at the beginning and allow to change it from inside.
+		// make it TODO (for starting, the initial approach is enough)
+		
 	}
 
 	private void assignFacilityToLink(Id linkId, Id facilityId) {
@@ -270,6 +283,10 @@ public class ParkingInfrastructure  {
 	
 	public Collection<ActivityFacility> getParkingFacilities(){
 		return parkingFacilities.values();
+	}
+
+	public HashMap<Id, ActivityFacility> getInitialParkingFacilityOfAgent() {
+		return initialParkingFacilityOfAgent;
 	}
 
 //	public Map<Id, Id> getFacilityToLinkMapping() {

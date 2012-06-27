@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.withinday;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -43,6 +44,7 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.utils.EditRoutes;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
@@ -51,6 +53,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	private final Scenario scenario;
 	private final PersonAlgorithm personPrepareForSim;
 	private final ParkingInfrastructure parkingInfrastructure;
+	private final PlanAlgorithm routingAlgorithm;
 
 	
 	// TODO: instead of selecting closest parking, we could select parking from previous day.
@@ -59,13 +62,18 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	 */
 	public InsertParkingActivities(Scenario scenario, PlanAlgorithm planAlgorithm, ParkingInfrastructure parkingInfrastructure) {
 		this.scenario = scenario;
+		this.routingAlgorithm = planAlgorithm;
 		this.personPrepareForSim = new PersonPrepareForSim(planAlgorithm, (ScenarioImpl) scenario);
 		this.parkingInfrastructure = parkingInfrastructure;
 	}
 
 	@Override
 	public void run(Plan plan) {
+		
 		List<PlanElement> planElements = plan.getPlanElements();
+		
+		DebugLib.traceAgent(plan.getPerson().getId());
+		
 
 		/*
 		 * Changes to this plan will be executed but not written to the person
@@ -134,7 +142,9 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		 * off to avoid this problem.
 		 */
 
-		// removeSameLinkParkingOnConsequitiveLinks(planElements);
+		adaptFirstParkingActivity(plan);
+		
+		updateSecondParkingActivityLinkOfDayIfNeeded(parkingInfrastructure,plan,scenario);
 
 		/*
 		 * Create initial routes for new legs
@@ -149,12 +159,103 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		personPrepareForSim.run(dummyPerson);
 		plan.setPerson(person);
 	}
+	
+	//TODO: unrequired routings could be removed...
+	private void adaptFirstParkingActivity(Plan plan) {
+		List<PlanElement> planElements = plan.getPlanElements();
+		
+		for (int i=0;i<planElements.size();i++){
+			if (planElements.get(i) instanceof Activity){
+				ActivityImpl act=(ActivityImpl) planElements.get(i);
+				
+				if (act.getType().equalsIgnoreCase("parking")){
+					
+					HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent = parkingInfrastructure.getInitialParkingFacilityOfAgent();
+					Id personId = plan.getPerson().getId();
+					ActivityFacility parkingFacility = initialParkingFacilityOfAgent.get(personId);
+					act.setLinkId(parkingFacility.getLinkId());
+					act.setFacilityId(parkingFacility.getId());
+					
+					EditRoutes editRoutes=new EditRoutes();
+					//update walk leg
+					editRoutes.replanFutureLegRoute(plan, i-1, routingAlgorithm);
+					//update car leg
+					editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
+				}
+			}
+		}
+		
+	}
+
+	// if first parking act is on same link as second parking act, change the link id of the second
+		// parking (else search cannot start).
+	//TODO: find out, if through refactoring this can be merged with "updateNextParkingActivityIfNeededAndRouteDuringDay"
+		private void updateSecondParkingActivityLinkOfDayIfNeeded(ParkingInfrastructure pi, Plan plan, Scenario sc){
+			EditRoutes editRoutes=new EditRoutes();
+			
+			Activity currentParkingDepartureAct = null;
+			Activity nextParkingArrivalAct = null;
+			Activity nextParkingDepartureAct = null;
+			
+			List<PlanElement> planElements = plan.getPlanElements();
+			int firstPossibleParkingActIndex = 2;
+			for (int i = firstPossibleParkingActIndex; i < planElements.size(); i++) {
+				if (planElements.get(i) instanceof Activity) {
+					Activity act = (Activity) planElements.get(i);
+					if (act.getType().equalsIgnoreCase("parking")) {
+						if (currentParkingDepartureAct == null) {
+							currentParkingDepartureAct = act;
+						} else if (nextParkingArrivalAct == null) {
+							nextParkingArrivalAct = act;
+						} else if (nextParkingDepartureAct == null) {
+							nextParkingDepartureAct = act;
+						}
+					}
+				}
+			}
+			
+			PlanAlgorithm routingAlgo=routingAlgorithm;
+			
+			Id newParkingFacilityId=null;
+			if (nextParkingArrivalAct!=null){
+				if (currentParkingDepartureAct.getLinkId() == nextParkingArrivalAct.getLinkId()) {
+					newParkingFacilityId = pi.getClosestParkingFacilityNotOnLink(nextParkingArrivalAct.getCoord(), nextParkingArrivalAct.getLinkId());
+					Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
+					int indexNextParkingArrival = planElements.indexOf(nextParkingArrivalAct);
+					planElements.remove(indexNextParkingArrival);
+					planElements.add(indexNextParkingArrival, newParkingAct);
+					
+					// update car leg
+					editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival-1, routingAlgo);
+					
+					// update walk leg
+					editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival+1, routingAlgo);
+					
+				}
+			}
+			
+			
+			if (nextParkingDepartureAct!=null && newParkingFacilityId != null) {
+				Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
+				int indexNextParkingDeparture = planElements.indexOf(nextParkingDepartureAct);
+				planElements.remove(indexNextParkingDeparture);
+				planElements.add(indexNextParkingDeparture, newParkingAct);
+				
+				//update car leg
+				editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture + 1, routingAlgo);
+				
+				// update walk leg
+				editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture-1, routingAlgo);
+				
+			}
+			
+		}
 
 	public static Activity createParkingActivity(Scenario sc, Id parkingFacilityId) {
 		ActivityFacility facility = ((ScenarioImpl) sc).getActivityFacilities().getFacilities().get(parkingFacilityId);
 
 		ActivityImpl activity = (ActivityImpl) sc.getPopulation().getFactory()
-				.createActivityFromLinkId("parking", parkingFacilityId);
+				.createActivityFromLinkId("parking", facility.getLinkId());
 		activity.setMaximumDuration(180);
 		activity.setCoord(facility.getCoord());
 		activity.setFacilityId(parkingFacilityId);
@@ -182,8 +283,12 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		return activity;
 	}
 
+	
+	
+	
+	
 	// TODO: also invoke for first leg => after init...
-	public static void updateNextParkingActivityIfNeededAndRoute(ParkingInfrastructure pi,
+	public static void updateNextParkingActivityIfNeededAndRouteDuringDay(ParkingInfrastructure pi,
 			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, PlanAlgorithm routeAlgo) {
 
 		EditRoutes editRoutes = new EditRoutes();

@@ -569,6 +569,11 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	}
 
 	private boolean ifParkingSearchTimeDifferentThanZero(Id personId) {
+		
+		if (this.getSearchStartTime().get(personId)==null){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		return this.getSearchStartTime().get(personId) != Double.NEGATIVE_INFINITY;
 	}
 

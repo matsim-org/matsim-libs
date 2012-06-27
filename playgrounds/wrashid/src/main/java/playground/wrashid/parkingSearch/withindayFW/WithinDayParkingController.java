@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
@@ -37,6 +38,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -92,6 +94,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 	}
 
 	protected void startUpFinishing() {
+		/*
 		ParkingPersonalBetas parkingPersonalBetas=new ParkingPersonalBetas(this.scenarioData, null);
 		
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
@@ -105,6 +108,12 @@ public class WithinDayParkingController extends WithinDayController implements S
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory())
 				.getModeRouteFactory();
 
+		
+		Set<String> analyzedModes = new HashSet<String>();
+		analyzedModes.add(TransportMode.car);
+		super.createAndInitTravelTimeCollector(analyzedModes);
+		TravelTimeFactoryWrapper travelTimeCollectorWrapperFactory = new TravelTimeFactoryWrapper(this.getTravelTimeCollector());
+
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
 		// TravelTimeCollector for car mode
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
@@ -112,7 +121,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 				.getPersonalizableTravelTimeFactories().entrySet()) {
 			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
 		}
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, super.getTravelTimeCollectorFactory());
+
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, travelTimeCollectorWrapperFactory);
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 
@@ -147,7 +157,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
-
+*/
 	}
 
 

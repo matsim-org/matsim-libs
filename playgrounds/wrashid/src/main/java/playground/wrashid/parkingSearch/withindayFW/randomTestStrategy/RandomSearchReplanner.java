@@ -190,7 +190,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 						withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);
 			}
 			
-			InsertParkingActivities.updateNextParkingActivityIfNeededAndRoute(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
+			InsertParkingActivities.updateNextParkingActivityIfNeededAndRouteDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
 		}
 
 		withinDayAgent.resetCaches();

@@ -63,26 +63,26 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 		this.firstParkingActivityPlanElemIndex = firstParkingActivityPlanElemIndex;
 		this.lastParkingActivityPlanElemIndex = lastParkingActivityPlanElemIndex;
 		this.agents = agents;
-		
-		for (ExperimentalBasicWithindayAgent agent: agents.values()){
-			Id personId=agent.getSelectedPlan().getPerson().getId();
-			
-			for (PlanElement pe: agent.getSelectedPlan().getPlanElements()){
-				if (pe instanceof Leg){
-					Leg leg=(Leg) pe;
-					
-					if (leg.getMode().equals(TransportMode.car)){
+
+		for (ExperimentalBasicWithindayAgent agent : agents.values()) {
+			Id personId = agent.getSelectedPlan().getPerson().getId();
+
+			for (PlanElement pe : agent.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+
+					if (leg.getMode().equals(TransportMode.car)) {
 						firstParkingWalkTmp.put(personId, 0.0);
 						secondParkingWalkTmp.put(personId, 0.0);
 						break;
 					}
-					
+
 				}
 			}
 		}
 	}
 
-	public double getSumBothParkingWalkDurationsInSecond(Id personId) {	
+	public double getSumBothParkingWalkDurationsInSecond(Id personId) {
 		return firstParkingWalkTmp.get(personId) + secondParkingWalkTmp.get(personId);
 	}
 
@@ -95,32 +95,42 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		Id personId = event.getPersonId();
+		DebugLib.traceAgent(personId);
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
-		
-		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+
+		if (agentDoesNotDriveCarDuringWholeDay(personId)) {
 			return;
 		}
-		
-		
-		
-		double durationFirstWalk = GeneralLib.getIntervalDuration(firstParkingWalkTmp.get(personId), event.getTime());
-		double durationSecondWalk = GeneralLib.getIntervalDuration(secondParkingWalkTmp.get(personId), event.getTime());
 
-		if (firstParkingWalkTmp.get(personId)==event.getTime()){
-			durationFirstWalk=0.0;
+		if (!isPlanElementDuringDay(personId, planElementIndex)) {
+			return;
 		}
-		
-		if (secondParkingWalkTmp.get(personId)==event.getTime()){
-			durationSecondWalk=0.0;
+
+		if (firstParkingWalkTmp.get(personId) == null) {
+			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
+
+		double durationFirstWalk = 0;
+		double durationSecondWalk = 0;
+
 		
-		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, durationFirstWalk, durationSecondWalk);
+		// same start and end time causes wrong interval calculation (3600*24 seconds, instead of zero).
+		if (firstParkingWalkTmp.get(personId) != null && firstParkingWalkTmp.get(personId) != event.getTime()) {
+			durationFirstWalk = GeneralLib.getIntervalDuration(firstParkingWalkTmp.get(personId), event.getTime());
+		}
+
+		if (secondParkingWalkTmp.get(personId) != null && secondParkingWalkTmp.get(personId) == event.getTime()) {
+			durationSecondWalk = GeneralLib.getIntervalDuration(secondParkingWalkTmp.get(personId), event.getTime());
+		}
+
+		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, durationFirstWalk,
+				durationSecondWalk);
 	}
 
 	private boolean agentDoesNotDriveCarDuringWholeDay(Id personId) {
-		return firstParkingActivityPlanElemIndex.get(personId)==null;
+		return firstParkingActivityPlanElemIndex.get(personId) == null;
 	}
 
 	private boolean isPlanElementDuringDay(Id personId, int planElementIndex) {
@@ -130,21 +140,24 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
+
 		Id personId = event.getPersonId();
+		DebugLib.traceAgent(personId);
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		double startTimeWalkLeg = event.getTime();
 
-		if (agentDoesNotDriveCarDuringWholeDay(personId)){
+		if (agentDoesNotDriveCarDuringWholeDay(personId)) {
 			return;
 		}
-		
-		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, startTimeWalkLeg, startTimeWalkLeg);
+
+		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, startTimeWalkLeg,
+				startTimeWalkLeg);
 	}
 
-	private void updateWalkTimeTmpVariables(String legMod, Id personId, Plan executedPlan, int planElementIndex,
-			double valueA, double valueB) {
+	private void updateWalkTimeTmpVariables(String legMod, Id personId, Plan executedPlan, int planElementIndex, double valueA,
+			double valueB) {
 		if (isPlanElementDuringDay(personId, planElementIndex)) {
 			if (legMod.equals(TransportMode.walk)) {
 				Activity previousAct = (Activity) executedPlan.getPlanElements().get(planElementIndex - 1);

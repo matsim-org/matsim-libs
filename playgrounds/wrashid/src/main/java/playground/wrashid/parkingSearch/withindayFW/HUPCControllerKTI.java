@@ -20,7 +20,9 @@
 package playground.wrashid.parkingSearch.withindayFW;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
@@ -34,6 +36,7 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -95,20 +98,34 @@ public class HUPCControllerKTI extends KTIWithinDayControler  {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory())
 				.getModeRouteFactory();
 
-		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
-		// TravelTimeCollector for car mode
-		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory()
-				.getPersonalizableTravelTimeFactories().entrySet()) {
-			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
-		}
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, super.getTravelTimeCollectorFactory());
+		/*
+		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
+		 * factory but returns always the same travel time object, which is possible since
+		 * the TravelTimeCollector is not personalized.
+		 */
+		Set<String> analyzedModes = new HashSet<String>();
+		analyzedModes.add(TransportMode.car);
+		super.createAndInitTravelTimeCollector(analyzedModes);
+		TravelTimeFactoryWrapper travelTimeCollectorWrapperFactory = new TravelTimeFactoryWrapper(this.getTravelTimeCollector());
 
+//		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
+//		// TravelTimeCollector for car mode
+//		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+//		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory()
+//				.getPersonalizableTravelTimeFactories().entrySet()) {
+//			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
+//		}
+//
+//		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, travelTimeCollectorWrapperFactory);
+		
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory,
+//		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory,
+//				routeFactory);
+		
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimeCollectorWrapperFactory, factory,
 				routeFactory);
-
+		
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getReplanningManager(),
 				router, 1.0, this.scenarioData, parkingAgentsTracker);
