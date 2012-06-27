@@ -53,8 +53,8 @@ public class ExtractRecordsFromEvents {
 	// private static final Level LOG_LEVEL = Level.TRACE;
 	private static final Level LOG_LEVEL = Level.DEBUG;
 
-	private static final double DETOUR_FRAC = 0.25;
-	private static final double TIME_WINDOW_RADIUS = 0.25 * 3600;
+	private static final double DETOUR_FRAC = 0.5;
+	private static final double TIME_WINDOW_RADIUS = 0.5 * 3600;
 	private static final boolean CONSIDER_ONLY_CAR_TRIPS = true;
 	private static final boolean PRUNE_ZERO_LENGTH_TRIPS = true;
 
