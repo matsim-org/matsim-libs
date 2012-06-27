@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Id;
  * @author Ihab
  *
  */
-public class FacilityInfo {
+public class FacilityWaitTimeInfo {
 	
 	private Id facilityId;
 	private int numberOfWaitingTimesMoreThanHeadway;

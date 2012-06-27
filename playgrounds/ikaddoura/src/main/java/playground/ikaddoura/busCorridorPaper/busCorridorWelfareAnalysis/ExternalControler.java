@@ -64,12 +64,12 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/testStuck";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/1";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-		lastExternalIterationParam1 = 3;
+		lastExternalIterationParam1 = 0;
 		
 //		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
@@ -133,8 +133,19 @@ class ExternalControler {
 				operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
 				users.setParametersForExtIteration(sc);
 				
-				OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), directoryExtItParam2Param1, sc.getConfig().controler().getLastIteration(), vsw.getHeadway());
+				OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), sc.getTransitSchedule(), directoryExtItParam2Param1, sc.getConfig().controler().getLastIteration(), vsw.getHeadway());
 				analysis.readEvents();
+				
+				System.out.println("PtLoad:");
+				for (RouteInfo routeInfo : analysis.getPtLoadHandler().getRouteId2RouteInfo().values()){
+					System.out.println("*********Route: " + routeInfo.getRouteId());
+					for (FacilityLoadInfo info : routeInfo.getTransitStopId2FacilityLoadInfo().values()){
+						System.out.println(info.getFacilityId());
+						System.out.println("Entering daytimes: " + info.getPersonEntering());
+						System.out.println("Leaving daytimes: " + info.getPersonLeaving());
+					}
+
+				}
 				
 				operator.calculateCosts(analysis);
 				users.calculateLogsum();
@@ -156,15 +167,19 @@ class ExternalControler {
 				info.setWaitingTimesNotMissed(analysis.getWaitHandler().getWaitingTimesNotMissed());
 				info.setWaitingTimesMissed(analysis.getWaitHandler().getWaitingTimesMissed());
 				info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
-				info.setFacilityId2facilityInfos(analysis.getWaitHandler().getFacilityId2facilityInfos());
+				info.setId2facilityWaitInfo(analysis.getWaitHandler().getFacilityId2facilityInfos());
+				
+//				info.setId2facilityLoadInfo(analysis.getPtLoadHandler().getId2FacilityLoadInfo());
 				
 				this.extIt2information.put(extItParam1, info);
+				this.it2information.put(iterationCounter, info);
 				
 				textWriter.writeExtItData(directoryExtItParam2, this.extIt2information);
 				textWriter.writeDataTransitStops(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				textWriter.writeDataEachTransitStop(directoryExtItParam2Param1, this.extIt2information, extItParam1);
+				textWriter.writeLoadData(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				chartWriter.write(directoryExtItParam2, this.extIt2information);
-				
+								
 				// settings for next external iteration (optimization parameter 1)
 				if (extItParam1 < lastExternalIterationParam1){
 					if(op1.equals(OptimizationParameter1.FARE)) this.fare = this.fare + incrFare;
@@ -172,7 +187,7 @@ class ExternalControler {
 					if(op1.equals(OptimizationParameter1.NUMBER_OF_BUSES)) this.numberOfBuses = this.numberOfBuses + incrBusNumber;
 				}
 				log.info("************* EXTERNAL ITERATION (1) " + extItParam1 + " ENDS *************");
-				this.it2information.put(iterationCounter, info);
+				
 				iterationCounter++;
 				textWriter.writeExtItData(outputExternalIterationDirPath, this.it2information);
 				textWriter.writeMatrices(outputExternalIterationDirPath, this.it2information);

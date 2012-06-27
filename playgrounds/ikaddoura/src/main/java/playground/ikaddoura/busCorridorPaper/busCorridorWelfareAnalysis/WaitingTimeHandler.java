@@ -54,7 +54,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
 	private final Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
-	private final Map <Id, FacilityInfo> facilityId2facilityInfos = new HashMap<Id, FacilityInfo>();
+	private final Map <Id, FacilityWaitTimeInfo> facilityId2facilityInfos = new HashMap<Id, FacilityWaitTimeInfo>();
 
 	private int numberOfMissedVehicles;
 		
@@ -120,7 +120,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 			Id currentFacilityId = this.busId2currentFacilityId.get(vehId);
 
 			if (this.facilityId2facilityInfos.get(currentFacilityId) == null){
-				FacilityInfo facilityInfo = new FacilityInfo();
+				FacilityWaitTimeInfo facilityInfo = new FacilityWaitTimeInfo();
 				SortedMap<Id, Double> waitingEvent2WaitingTime = new TreeMap<Id, Double>();
 				SortedMap<Id, Double> waitingEvent2DayTime = new TreeMap<Id, Double>(); // daytime when person enters vehicle
 				
@@ -139,7 +139,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 				this.facilityId2facilityInfos.put(currentFacilityId, facilityInfo);
 				
 			} else {
-				FacilityInfo facilityInfo = this.facilityId2facilityInfos.get(currentFacilityId);
+				FacilityWaitTimeInfo facilityInfo = this.facilityId2facilityInfos.get(currentFacilityId);
 				SortedMap<Id, Double> waitingEvent2WaitingTime = facilityInfo.getWaitingEvent2WaitingTime();
 				SortedMap<Id, Double> waitingEvent2DayTime = facilityInfo.getWaitingEvent2DayTime();
 				
@@ -153,6 +153,8 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 					int missed = (int) (waitingTime / this.headway);
 					facilityInfo.setNumberOfMissedVehicles(facilityInfo.getNumberOfMissedVehicles() + missed);
 				}
+				
+				this.facilityId2facilityInfos.put(currentFacilityId, facilityInfo);
 			}
 		
 			waitingTimeCounter++;
@@ -219,7 +221,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 		return numberOfMissedVehicles;
 	}
 
-	public Map<Id, FacilityInfo> getFacilityId2facilityInfos() {
+	public Map<Id, FacilityWaitTimeInfo> getFacilityId2facilityInfos() {
 		return facilityId2facilityInfos;
 	}
 

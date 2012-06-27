@@ -121,16 +121,16 @@ public class TextFileWriter {
 	}
 
 	public void writeDataTransitStops(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
-		String path = directoryExtItParam2Param1 + "/transitStopData/";
+		String path = directoryExtItParam2Param1 + "/Data/";
 		File directory = new File(path);
 		directory.mkdirs();
 
-		File file = new File(path + "/transitStopData.txt");
+		File file = new File(path + "/transitStopWaitData.txt");
 			
 		try {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 		    
-		String zeile0 = "TransitStopsData of external iteration " + extItParam1 + ":";
+		String zeile0 = "TransitStopsWaitData of external iteration " + extItParam1 + ":";
 		bw.write(zeile0);
 		bw.newLine();
 		    
@@ -138,7 +138,7 @@ public class TextFileWriter {
 		bw.write(zeile1);
 		bw.newLine();
 		
-		for (FacilityInfo facilityInfo : extIt2information.get(extItParam1).getFacilityId2facilityInfos().values()){
+		for (FacilityWaitTimeInfo facilityInfo : extIt2information.get(extItParam1).getId2facilityWaitInfo().values()){
 		    	
 			Id facilityId = facilityInfo.getFacilityId();
 	    	Double avgWaitTime = facilityInfo.getAvgWaitingTime();
@@ -160,18 +160,18 @@ public class TextFileWriter {
 	}
 
 	public void writeDataEachTransitStop(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
-		String path = directoryExtItParam2Param1 + "/transitStopData/";
+		String path = directoryExtItParam2Param1 + "/Data/";
 		File directory = new File(path);
 		directory.mkdirs();
 		
-		for (FacilityInfo facilityInfo : extIt2information.get(extItParam1).getFacilityId2facilityInfos().values()) {
+		for (FacilityWaitTimeInfo facilityInfo : extIt2information.get(extItParam1).getId2facilityWaitInfo().values()) {
 			
-			File file = new File(path + "/transitStopData_" + facilityInfo.getFacilityId().toString() + ".txt");
+			File file = new File(path + "/transitStopWaitData_" + facilityInfo.getFacilityId().toString() + ".txt");
 			
 			try {
 			    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			    
-			    String zeile0 = "TransitStopData of TransitStopFacility " + facilityInfo.getFacilityId().toString() + " (External iteration " + extItParam1 + "):";
+			    String zeile0 = "TransitStopWaitData of TransitStopFacility " + facilityInfo.getFacilityId().toString() + " (External iteration " + extItParam1 + "):";
 			    bw.write(zeile0);
 			    bw.newLine();
 			    
@@ -200,5 +200,44 @@ public class TextFileWriter {
 			
 		}
 		
+	}
+
+	public void writeLoadData(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
+		String path = directoryExtItParam2Param1 + "/Data/";
+		File directory = new File(path);
+		directory.mkdirs();
+
+		File file = new File(path + "/LoadData.txt");
+			
+		try {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		    
+		String zeile0 = "LoadData " + directoryExtItParam2Param1 + ":";
+		bw.write(zeile0);
+		bw.newLine();
+		    
+		String zeile1 = "TransitStopId ; SumOfWaitingTime (sec) ; AverageWaitingTime (sec) ; WaitingTime > Headway (trips) ; MissedVehicles";
+		bw.write(zeile1);
+		bw.newLine();
+		
+//		for (FacilityLoadInfo facilityInfo : extIt2information.get(extItParam1).getTime2facilityIdLoadInfo().values()){
+//		    	
+////			Id facilityId = facilityInfo.getFacilityId();
+////	    	Double avgWaitTime = facilityInfo.getAvgWaitingTime();
+////	    	Double sumWaitTime = facilityInfo.getSumOfWaitingTimes();
+////	    	int waitTimeMoreThanHeadway = facilityInfo.getNumberOfWaitingTimesMoreThanHeadway();
+////	    	int missedVehicles = facilityInfo.getNumberOfMissedVehicles();
+////	    	
+////	    	String zeile = facilityId + " ; " + sumWaitTime + " ; " + avgWaitTime + " ; " + waitTimeMoreThanHeadway + " ; " + missedVehicles;
+////	
+////	    	bw.write(zeile);
+//	        bw.newLine();
+//		 }
+		
+		 bw.flush();
+		 bw.close();
+		 log.info("Textfile written to "+file.toString());
+	    
+		 } catch (IOException e) {}		
 	}
 }

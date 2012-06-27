@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 
 /**
@@ -42,15 +43,18 @@ public class OperatorUserAnalysis {
 	TransitEventHandler transitHandler;
 	LinksEventHandler linksHandler;
 	WaitingTimeHandler waitHandler;
+	PtLoadHandler ptLoadHandler;
 	
 	private final String lastEventFile;
 	private final Network network;
+	private final TransitSchedule schedule;
 	private final Double headway;
 	
-	public OperatorUserAnalysis(Network network, String directoryExtIt, int lastInternalIteration, Double headway) {
+	public OperatorUserAnalysis(Network network, TransitSchedule schedule, String directoryExtIt, int lastInternalIteration, Double headway) {
 		this.lastEventFile = directoryExtIt + "/internalIterations/ITERS/it." + lastInternalIteration + "/" + lastInternalIteration + ".events.xml.gz";
 		this.network = network;
 		this.headway = headway;
+		this.schedule = schedule;
 	}
 	
 	public void readEvents(){
@@ -60,12 +64,14 @@ public class OperatorUserAnalysis {
 		this.transitHandler = new TransitEventHandler();
 		this.linksHandler = new LinksEventHandler(this.network);
 		this.waitHandler = new WaitingTimeHandler(headway);
+		this.ptLoadHandler = new PtLoadHandler(this.schedule);
 		
 		events.addHandler(this.departureHandler);	
 		events.addHandler(this.moneyHandler);	
 		events.addHandler(this.transitHandler);
 		events.addHandler(this.linksHandler);
 		events.addHandler(this.waitHandler);
+		events.addHandler(this.ptLoadHandler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(this.lastEventFile);
@@ -102,5 +108,11 @@ public class OperatorUserAnalysis {
 	public WaitingTimeHandler getWaitHandler() {
 		return waitHandler;
 	}
+
+	public PtLoadHandler getPtLoadHandler() {
+		return ptLoadHandler;
+	}
+	
+	
 	
 }

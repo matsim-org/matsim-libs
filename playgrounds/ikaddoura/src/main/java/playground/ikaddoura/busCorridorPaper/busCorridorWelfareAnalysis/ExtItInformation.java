@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -52,7 +53,8 @@ public class ExtItInformation {
 	private List <Double> waitingTimesNotMissed = new ArrayList<Double>();
 		
 	private int numberOfMissedVehicles;
-	private Map <Id, FacilityInfo> facilityId2facilityInfos = new HashMap<Id, FacilityInfo>();
+	private Map <Id, FacilityWaitTimeInfo> id2facilityWaitInfo = new HashMap<Id, FacilityWaitTimeInfo>();
+	private Map <Id, FacilityLoadInfo> id2facilityLoadInfo = new HashMap<Id, FacilityLoadInfo>();
 	
 	public List <Double> getWaitingTimes() {
 		return waitingTimes;
@@ -184,12 +186,12 @@ public class ExtItInformation {
 		return numberOfMissedVehicles;
 	}
 
-	protected void setFacilityId2facilityInfos(Map <Id, FacilityInfo> facilityId2facilityInfos) {
-		this.facilityId2facilityInfos = facilityId2facilityInfos;
+	protected void setId2facilityWaitInfo(Map <Id, FacilityWaitTimeInfo> facilityId2facilityInfos) {
+		this.id2facilityWaitInfo = facilityId2facilityInfos;
 	}
 	
-	protected Map <Id, FacilityInfo> getFacilityId2facilityInfos() {
-		return facilityId2facilityInfos;
+	protected Map <Id, FacilityWaitTimeInfo> getId2facilityWaitInfo() {
+		return id2facilityWaitInfo;
 	}
 	
 	protected double getAvgWaitingTimeAll() {
@@ -241,5 +243,13 @@ public class ExtItInformation {
 	public int getNoValidPlanScore() {
 		return noValidPlanScore;
 	}
-	
+
+	public Map<Id, FacilityLoadInfo> getId2facilityLoadInfo() {
+		return id2facilityLoadInfo;
+	}
+
+	public void setId2facilityLoadInfo(Map<Id, FacilityLoadInfo> id2facilityLoadInfo) {
+		this.id2facilityLoadInfo = id2facilityLoadInfo;
+	}
+
 }
