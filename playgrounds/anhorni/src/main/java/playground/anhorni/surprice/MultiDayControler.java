@@ -38,21 +38,21 @@ public class MultiDayControler {
 		Config config = ConfigUtils.loadConfig(configFile);
 		String path = config.plans().getInputFile();
 		String outPath = config.controler().getOutputDirectory();
+				
+	    ObjectAttributes incomes = new ObjectAttributes();		    
+	    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(incomes);
+		attributesReader.parse(path + "/incomes.xml");
 		
-		AgentMemories memories = new AgentMemories();
+		ObjectAttributes preferences = new ObjectAttributes();
+		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(preferences);
+		preferencesReader.parse(path + "/preferences.xml");
 				
 		for (String day : Surprice.days) {			
 			config.setParam("controler", "outputDirectory", outPath + "/" + day);
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 			
-		    ObjectAttributes incomes = new ObjectAttributes();		    
-		    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(incomes);
-			attributesReader.parse(path + "/incomes.xml");
-			
-			ObjectAttributes preferences = new ObjectAttributes();
-			ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(preferences);
-			preferencesReader.parse(path + "/preferences.xml");
+			AgentMemories memories = new AgentMemories();
 			
 			DayControler controler = new DayControler(config, memories, day, incomes, preferences);
 			controler.run();
