@@ -22,6 +22,7 @@ package playground.dgrether.koehlerstrehlersignal.data;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 
@@ -31,10 +32,15 @@ import org.matsim.api.core.v01.Id;
  */
 public class DgKSNetwork {
 
+	private static final Logger log = Logger.getLogger(DgKSNetwork.class);
+	
 	private Map<Id, DgCrossing> crossings = new HashMap<Id, DgCrossing>();
 	private Map<Id, DgStreet> streets = new HashMap<Id, DgStreet>();
 
 	public void addCrossing(DgCrossing crossing) {
+		if (this.crossings.containsKey(crossing.getId())) {
+			log.warn("Crossing Id " + crossing.getId() + " already exists and will be overwritten!");
+		}
 		this.crossings.put(crossing.getId(), crossing);
 	}
 	
@@ -43,6 +49,9 @@ public class DgKSNetwork {
 	}
 
 	public void addStreet(DgStreet street) {
+		if (this.streets.containsKey(street.getId())) {
+			log.warn("Street Id " + street.getId() + " already exists and will be overwritten!");
+		}
 		this.streets.put(street.getId(), street);
 	}
 	

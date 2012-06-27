@@ -179,8 +179,15 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 			DgCrossingNode toNode = new DgCrossingNode(convertLinkId2ToCrossingNodeId(link.getId()));
 			toNodeCrossing.addNode(toNode);
 			DgStreet street = new DgStreet(convertLinkId2StreetId(link.getId()), fromNode, toNode);
-			long fs = Math.round((link.getLength() / link.getFreespeed()));
-			street.setCost(fs);
+			double fsd = link.getLength() / link.getFreespeed();
+			long fs = Math.round(fsd);
+			if (fs != 0){
+				street.setCost(fs);
+			}
+			else {
+				log.warn("Street id " + street.getId() + " has a freespeed tt of " + fsd + " that is rounded to " + fs + " replacing by 1");
+				street.setCost(0);
+			}
 			double capacity = link.getCapacity() / net.getCapacityPeriod() * this.timeInterval;
 			street.setCapacity(capacity);
 			ksnet.addStreet(street);
