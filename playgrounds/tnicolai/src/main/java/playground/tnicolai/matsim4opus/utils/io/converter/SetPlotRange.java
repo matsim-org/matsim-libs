@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author thomas
  *
  */
-public class SetMinimumValues4Plots {
+public class SetPlotRange {
 	
 	private static final String TAB = "\t";
 	private static final String NA  = "NA";
@@ -40,7 +40,8 @@ public class SetMinimumValues4Plots {
 		
 		String sourceFile = args[0];
 		String destinationFile = args[1];
-		double minValue = Double.parseDouble(args[2]);
+		double maxValue = Double.parseDouble(args[2]);
+		double minValue = Double.parseDouble(args[3]);
 		
 		BufferedReader br = IOUtils.getBufferedReader(sourceFile);
 		BufferedWriter bw = IOUtils.getBufferedWriter(destinationFile);
@@ -59,7 +60,7 @@ public class SetMinimumValues4Plots {
 				
 				for(int i = 0; i < parts.length; i++){
 					
-					if(i == 0)
+					if(i == 0) // y coordinate
 						bw.write(parts[i]);
 					else{
 						if(parts[i].equalsIgnoreCase(NA))
@@ -68,6 +69,8 @@ public class SetMinimumValues4Plots {
 							double value = Double.parseDouble(parts[i]);
 							if(value < minValue)
 								bw.write(String.valueOf(minValue));
+							else if(value > maxValue)
+								bw.write(String.valueOf(maxValue));
 							else
 								bw.write(parts[i]);
 						}
