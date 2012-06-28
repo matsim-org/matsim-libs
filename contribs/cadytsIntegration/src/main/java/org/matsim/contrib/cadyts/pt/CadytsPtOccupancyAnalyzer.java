@@ -41,6 +41,7 @@ import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
 import org.matsim.pt.counts.SimpleWriter;
 
 /**
@@ -190,20 +191,18 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	public void writeResultsForSelectedStopIds(final String filename, final Counts occupCounts, final Collection<Id> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
+		final char TAB = '\t';
+		final char NL = '\n';
+
 		// write header
-		final String oc = "oc";
-		final String sim = "scalSim";
-		final String sep = "-";
-		final char CHR_HT = '\t';
-		final char CHR_NL = '\n';
-		StringBuffer countValBuff = new StringBuffer("stopId\t");
-		StringBuffer simValBuff = new StringBuffer();
+		writer.write("stopId\t");
 		for (int i = 0; i < 24; i++) {
-			countValBuff.append(oc + i + sep + (i + 1) + CHR_HT);
-			simValBuff.append(sim + i + sep + (i + 1) + CHR_HT);
+			writer.write("oc" + i + "-" + (i + 1) + TAB);
 		}
-		countValBuff.append(simValBuff.toString() + "coordinate\tcsId\n");
-		writer.write(countValBuff.toString());
+		for (int i = 0; i < 24; i++) {
+			writer.write("scalSim" + i + "-" + (i + 1) + TAB);
+		}
+		writer.write("coordinate\tcsId\n");
 
 		// write content
 		for (Id stopId : stopIds) {
@@ -215,20 +214,19 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 
 			// get sim-Values
 			int[] ocuppancy = this.occupancies.get(stopId);
-//			if (ocuppancy == null) {
-//				 log.debug("stopId:\t" + stopId + "\tthere aren't passengers in Bus after the transfer!");
-//			}
-			countValBuff = new StringBuffer(stopId.toString() + CHR_HT);
-			simValBuff = new StringBuffer();
+			writer.write(stopId.toString() + TAB);
 			for (int i = 0; i < 24; i++) {
-				countValBuff.append(count.getVolume(i + 1).getValue() + CHR_HT); // all volumes from 1 to 24 must be given in counts file, even with 0 as value.
-				simValBuff.append((ocuppancy != null ? ocuppancy[i] : 0) + CHR_HT);
+				Volume v = count.getVolume(i + 1);
+				if (v != null) {
+					writer.write(v.getValue() + TAB);
+				} else {
+					writer.write("n/a" + TAB);
+				}
 			}
-			countValBuff.append(simValBuff.toString() + count.getCoord().toString() + CHR_HT + count.getCsId() + CHR_NL);
-			writer.write(countValBuff.toString());
-
-			countValBuff = null;
-			simValBuff = null;
+			for (int i = 0; i < 24; i++) {
+				writer.write((ocuppancy != null ? ocuppancy[i] : 0) + TAB);
+			}
+			writer.write(count.getCoord().toString() + TAB + count.getCsId() + NL);
 		}
 		writer.write(this.occupancyRecord.toString());
 		writer.close();
