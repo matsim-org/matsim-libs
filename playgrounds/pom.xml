@@ -55,6 +55,7 @@
 	</build>
 
 	<modules>
+		<module>acmarmol</module>
 		<module>andreas</module>
 		<module>anhorni</module>
 		<module>artemc</module>
