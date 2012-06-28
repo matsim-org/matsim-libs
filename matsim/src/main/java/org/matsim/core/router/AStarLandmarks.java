@@ -297,13 +297,14 @@ public class AStarLandmarks extends AStarEuclidean {
 			final PreProcessLandmarks.LandmarksData fromRole,
 			final PreProcessLandmarks.LandmarksData toRole, final int index) {
 		double tmpTravTime;
-		if (fromRole.getMinLandmarkTravelTime(index) > toRole.getMaxLandmarkTravelTime(index)) {
-			tmpTravTime = fromRole.getMinLandmarkTravelTime(index) - toRole.getMaxLandmarkTravelTime(index);
-		} else {
-			tmpTravTime = toRole.getMinLandmarkTravelTime(index) - fromRole.getMaxLandmarkTravelTime(index);
-		}
+		final double fromMinLandmarkTravelTime = fromRole.getMinLandmarkTravelTime(index);
+		final double toMaxLandmarkTravelTime = toRole.getMaxLandmarkTravelTime(index);
+		tmpTravTime = fromMinLandmarkTravelTime - toMaxLandmarkTravelTime;
 		if (tmpTravTime < 0) {
-			return 0;
+			tmpTravTime = toRole.getMinLandmarkTravelTime(index) - fromRole.getMaxLandmarkTravelTime(index);
+			if (tmpTravTime <= 0) {
+				return 0;
+			}
 		}
 		return tmpTravTime * this.overdoFactor;
 	}
