@@ -64,7 +64,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		matsimCalibrator.setPreparatoryIterations(config.getPreparatoryIterations());
 		matsimCalibrator.setVarianceScale(config.getVarianceScale());
 		matsimCalibrator.setBruteForce(config.useBruteForce());
-		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "calibration-stats.txt");
+		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "/calibration-stats.txt");
 
 
 		int arStartTime = config.getStartHour();
