@@ -71,6 +71,8 @@ public final class NetworkImpl implements Network, BasicLocations {
 	private Map<Id, Link> links = new LinkedHashMap<Id, Link>();
 
 	protected QuadTree<Node> nodeQuadTree = null;
+	
+	private LinkQuadTree linkQuadTree = null;
 
 	private static final double DEFAULT_EFFECTIVE_CELL_SIZE = 7.5;
 
@@ -297,6 +299,13 @@ public final class NetworkImpl implements Network, BasicLocations {
 		}
 		return nearestLink;
 	}
+	
+	public Link getNearestLinkExactly(final Coord coord) {
+		if (this.linkQuadTree == null) {
+			buildLinkQuadTree();
+		}
+		return this.linkQuadTree.getNearest(coord.getX(), coord.getY());
+	}
 
 	/**
 	 * Finds the (approx.) nearest link to a given point on the map,
@@ -487,6 +496,34 @@ public final class NetworkImpl implements Network, BasicLocations {
 		 */
 		this.nodeQuadTree = quadTree;
 		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
+	}
+	
+	synchronized private void buildLinkQuadTree() {
+		if (this.linkQuadTree != null) {
+			return;
+		}
+		double startTime = System.currentTimeMillis();
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for (Node n : this.nodes.values()) {
+			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
+			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
+			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
+			if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		log.info("building LinkQuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		LinkQuadTree qt = new LinkQuadTree(minx, miny, maxx, maxy);
+		for (Link l : this.links.values()) {
+			qt.put(l);
+		}
+		this.linkQuadTree = qt;
+		log.info("Building LinkQuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
 	}
 
 	@Override
