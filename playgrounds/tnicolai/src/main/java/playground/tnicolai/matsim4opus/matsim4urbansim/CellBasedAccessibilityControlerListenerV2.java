@@ -91,6 +91,9 @@ import com.vividsolutions.jts.geom.Point;
  * - the walk distance (measuring point -> nearest node) for accessibilities by 
  * car has changed: Now only the orthoganal distance (measuring point -> nearest 
  * link) is measured.
+ * - re-added free-speed car travel time calculation
+ * - Todo: implement a new "getNearestLink" method. The current approach uses nearest nodes to determine the link, 
+ *         this leads to some artefacts in the accessibility plots.
  * 
  * @author thomas
  * 
@@ -144,6 +147,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		Controler controler = event.getControler();
 		
 		TravelTime ttc = controler.getTravelTimeCalculator();
+		// get the free-speed car travel times (in seconds)
 		LeastCostPathTree lcptFreeSpeedCarTravelTime = new LeastCostPathTree( ttc, new FreeSpeedTravelTimeCostCalculator() );
 		// get the congested car travel time (in seconds)
 		LeastCostPathTree lcptCongestedCarTravelTime = new LeastCostPathTree( ttc, new TravelTimeCostCalculator(ttc) );
@@ -237,16 +241,12 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					
 					// for debugging freespeed accessibility
 					freeTT = getAsUtilCar(betaCarTT, freeSpeedTravelTime_h, betaWalkTT, offsetWalkTime2Node_h);
-					// freeTTPower = getAsUtilCar(betaCarTTPower, freeSpeedTravelTime_h * freeSpeedTravelTime_h, betaWalkTTPower, offsetWalkTime2NearestNode_h * offsetWalkTime2NearestNode_h);
-					freeTTPower = 0.;
-					// freeLnTT = getAsUtilCar(betaCarLnTT, Math.log(freeSpeedTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2NearestNode_h));
-					freeLnTT = 0.;
+					freeTTPower = getAsUtilCar(betaCarTTPower, freeSpeedTravelTime_h * freeSpeedTravelTime_h, betaWalkTTPower, offsetWalkTime2Node_h * offsetWalkTime2Node_h);
+					freeLnTT = getAsUtilCar(betaCarLnTT, Math.log(freeSpeedTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node_h));
 					
 					freeTD = getAsUtilCar(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter);
-					// freeTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, offsetDistance2NearestNode_meter * offsetDistance2NearestNode_meter);
-					freeTDPower = 0.;
-					// freeLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter), betaWalkLnTD, Math.log(offsetDistance2NearestNode_meter));
-					freeLnTD = 0.;
+					freeTDPower = getAsUtilCar(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
+					freeLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
 					
 					freeTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
 					freeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
@@ -266,16 +266,12 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					
 					// for debugging car accessibility
 					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, offsetWalkTime2Node_h);
-					// carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, offsetWalkTime2NearestNode_h * offsetWalkTime2NearestNode_h);
-					carTTPower = 0.;
-					// carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2NearestNode_h));
-					carLnTT = 0.;
+					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, offsetWalkTime2Node_h * offsetWalkTime2Node_h);
+					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node_h));
 					
 					carTD = getAsUtilCar(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); // carOffsetWalkTime2NearestLink_meter
-					// carTDPower = getAsUtilCar(betaCarTDPower, travelDistance_meter * travelDistance_meter, betaWalkTDPower, offsetDistance2NearestNode_meter * offsetDistance2NearestNode_meter);
-					carTDPower = 0.;
-					// carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter), betaWalkLnTD, Math.log(offsetDistance2NearestNode_meter));
-					carLnTD = 0.;
+					carTDPower = getAsUtilCar(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
+					carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
 					
 					carTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
 					carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs jet 
@@ -296,16 +292,12 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					
 					// for debugging walk accessibility
 					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour));
-					// walkTTPower = getAsUtilWalk(betaWalkTTPower, walkTravelTime_h*walkTravelTime_h + offsetWalkTime2NearestNode_h*offsetWalkTime2NearestNode_h );
-					walkTTPower = 0.;
-					// walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + offsetWalkTime2NearestNode_h ));
-					walkLnTT = 0.;
+					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow(walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour), 2) );
+					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour) ));
 					
 					walkTD = getAsUtilWalk(betaWalkTD, travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter);
-					// walkTDPower = getAsUtilWalk(betaWalkTDPower, travelDistance_meter*travelDistance_meter + offsetDistance2NearestNode_meter*offsetDistance2NearestNode_meter);
-					walkTDPower = 0.;
-					// walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + offsetDistance2NearestNode_meter));
-					walkLnTD = 0.;
+					walkTDPower = getAsUtilWalk(betaWalkTDPower, Math.pow(travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter, 2));
+					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter));
 					
 					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
 					walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
@@ -365,6 +357,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 						+ this.benchmark.getDurationInSeconds(benchmarkID)
 						/ 60. + " minutes).");
 			}
+			// tnicolai: for debugging (remove for relaease)
 			log.info("Euclidian vs Othogonal Distance:");
 			log.info("Total Counter:" + NetworkUtil.totalCounter);
 			log.info("Euclidian Counter:" + NetworkUtil.euclidianCounter);

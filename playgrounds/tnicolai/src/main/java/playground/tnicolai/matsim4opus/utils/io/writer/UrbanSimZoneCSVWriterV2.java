@@ -33,6 +33,7 @@ public class UrbanSimZoneCSVWriterV2 {
 			
 			// create header
 			zoneWriter.write( InternalConstants.ZONE_ID + "," +
+							  InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 							  InternalConstants.ACCESSIBILITY_BY_CAR + "," +
 							  InternalConstants.ACCESSIBILITY_BY_WALK);
 			zoneWriter.newLine();
@@ -51,14 +52,16 @@ public class UrbanSimZoneCSVWriterV2 {
 	 * @param walkAccessibility
 	 */
 	public static void write(Id zoneID,
+							 double freeSpeedAccessibility,
 							 double carAccessibility, 
 							 double walkAccessibility){
 		
 		try{
 			assert(UrbanSimZoneCSVWriterV2.zoneWriter != null);
 			zoneWriter.write( zoneID + "," + 
-										   carAccessibility + "," + 
-										   walkAccessibility );
+							  freeSpeedAccessibility + "," + 
+							  carAccessibility + "," + 
+							  walkAccessibility );
 			zoneWriter.newLine();
 		}
 		catch(Exception e){

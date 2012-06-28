@@ -31,6 +31,7 @@ public class AnalysisZoneCSVWriterV2 {
 								 InternalConstants.ZONE_CENTROID_Y_COORD + "," +
 								 InternalConstants.NEARESTNODE_X_COORD + "," +
 								 InternalConstants.NEARESTNODE_Y_COORD + "," +
+								 InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 								 InternalConstants.ACCESSIBILITY_BY_CAR + "," +
 								 InternalConstants.ACCESSIBILITY_BY_WALK);
 			zoneCSVWriter.newLine();
@@ -54,6 +55,7 @@ public class AnalysisZoneCSVWriterV2 {
 	public static void write(Id zoneID,
 							 Coord zoneCentroid,
 							 Coord nearestNode,
+							 double freeSpeedAccessibility,
 							 double carAccessibility, 
 							 double walkAccessibility){
 		
@@ -64,6 +66,7 @@ public class AnalysisZoneCSVWriterV2 {
 								 zoneCentroid.getY() + "," + 
 								 nearestNode.getX() + "," + 
 								 nearestNode.getY() + "," + 
+								 freeSpeedAccessibility + "," +
 								 carAccessibility + "," + 
 								 walkAccessibility );
 			zoneCSVWriter.newLine();
