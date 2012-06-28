@@ -57,6 +57,7 @@ public class PConfigGroup extends Module{
 	private static final String MIN_Y = "minY";
 	private static final String MAX_X = "maxX";
 	private static final String MAX_Y = "maxY";
+	private static final String SERVICEAREAFILE = "serviceAreaFile";
 	private static final String COOP_TYPE = "coopType";
 	private static final String NUMBER_OF_COOPERATIVES = "numberOfCooperatives";
 	private static final String PAX_PER_VEHICLE = "paxPerVehicle";
@@ -95,6 +96,7 @@ public class PConfigGroup extends Module{
 	private double minY = -Double.MAX_VALUE;	
 	private double maxX = Double.MAX_VALUE;
 	private double maxY = Double.MAX_VALUE;
+	private String serviceAreaFile = "";
 	private String coopType = BasicCooperative.COOP_NAME;
 	private int numberOfCooperatives = 1;
 	private int paxPerVehicle = 10;
@@ -139,7 +141,9 @@ public class PConfigGroup extends Module{
 	public void addParam(final String key, final String value) {
 		if (P_IDENTIFIER.equals(key)){
 			this.pIdentifier = value;
-		} else if (MIN_X.equals(key)) {
+		}else if (SERVICEAREAFILE.equals(key)) {
+			this.serviceAreaFile = value;
+		}else if (MIN_X.equals(key)) {
 			this.minX = Double.parseDouble(value);
 		} else if (MIN_Y.equals(key)) {
 			this.minY = Double.parseDouble(value);
@@ -147,7 +151,7 @@ public class PConfigGroup extends Module{
 			this.maxX = Double.parseDouble(value);
 		} else if (MAX_Y.equals(key)) {
 			this.maxY = Double.parseDouble(value);
-		} else if (COOP_TYPE.equals(key)){
+		}else if (COOP_TYPE.equals(key)){
 			this.coopType = value;
 		} else if (NUMBER_OF_COOPERATIVES.equals(key)) {
 			this.numberOfCooperatives = Integer.parseInt(value);
@@ -210,6 +214,8 @@ public class PConfigGroup extends Module{
 		} else if (key != null && key.startsWith(PMODULE_PARAMETER)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE_PARAMETER.length())), true);
 			settings.setParameters(value);
+		}else{
+			log.warn("unknown parameter: " + key + "...");
 		}
 	}
 	
@@ -224,6 +230,7 @@ public class PConfigGroup extends Module{
 		map.put(MIN_Y, Double.toString(this.minY));
 		map.put(MAX_X, Double.toString(this.maxX));
 		map.put(MAX_Y, Double.toString(this.maxY));
+		map.put(SERVICEAREAFILE, this.serviceAreaFile);
 		map.put(COOP_TYPE, this.coopType);
 		map.put(NUMBER_OF_COOPERATIVES, Integer.toString(this.numberOfCooperatives));
 		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, Integer.toString(this.numberOfIterationsForProspecting));
@@ -269,6 +276,7 @@ public class PConfigGroup extends Module{
 		map.put(MIN_Y, "min y coordinate for service area");
 		map.put(MAX_X, "max x coordinate for service area");
 		map.put(MAX_Y, "max y coordinate for service area");
+		map.put(SERVICEAREAFILE, "a shapefile containing a shape of the service-area or a textfile containing a sequence of x/y values, describing a line string");
 		map.put(COOP_TYPE, "Type of cooperative to be used");
 		map.put(NUMBER_OF_COOPERATIVES, "number of cooperatives operating");
 		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, "number of iterations an cooperative will survive with a negative scoring");
@@ -307,6 +315,10 @@ public class PConfigGroup extends Module{
 	
 	public String getPIdentifier(){
 		return this.pIdentifier;
+	}
+	
+	public String getServiceAreaFile(){
+		return this.serviceAreaFile;
 	}
 	
 	public double getMinX() {
