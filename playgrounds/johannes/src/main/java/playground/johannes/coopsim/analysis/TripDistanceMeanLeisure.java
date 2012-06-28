@@ -77,6 +77,7 @@ public class TripDistanceMeanLeisure extends AbstractTrajectoryProperty {
 					ActivityFacility fac = facilities.getFacilities().get(id);
 					Coord source = fac.getCoord();
 					
+					if(!destination.getFacilityId().equals(origin.getFacilityId())) {
 					try {
 						double d = calculator.distance(MatsimCoordUtils.coordToPoint(source), MatsimCoordUtils.coordToPoint(dest));
 						if(d > 0) {
@@ -85,6 +86,7 @@ public class TripDistanceMeanLeisure extends AbstractTrajectoryProperty {
 						}
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
+					}
 					}
 				}
 				

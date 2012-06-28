@@ -53,8 +53,8 @@ public class ActivityDurationTask extends TrajectoryAnalyzerTask {
 			
 			try {
 //				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
-//				writeHistograms(stats, key, 100, 50);
-				writeHistograms(stats, key, 30, 1);
+				writeHistograms(stats, key, 100, 50);
+//				writeHistograms(stats, key, 30, 1);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

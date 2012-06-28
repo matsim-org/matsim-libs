@@ -41,7 +41,7 @@ public class Convergence {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String root = "/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run252/";
+		String root = "/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run259/tasks/8/";
 		File outputDir = new File(root + "/output");
 		String property = "d_trip_culture";
 		

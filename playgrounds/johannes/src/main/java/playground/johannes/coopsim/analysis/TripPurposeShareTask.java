@@ -20,8 +20,7 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.TObjectDoubleIterator;
 
 import java.io.IOException;
 import java.util.Map;
@@ -45,7 +44,7 @@ public class TripPurposeShareTask extends TrajectoryAnalyzerTask {
 	 */
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		TObjectIntHashMap<String> hist = new TObjectIntHashMap<String>();
+		TObjectDoubleHashMap<String> hist = new TObjectDoubleHashMap<String>();
 		
 		for(Trajectory t : trajectories) {
 			for(int i = 1; i < t.getElements().size(); i += 2) {
@@ -58,7 +57,7 @@ public class TripPurposeShareTask extends TrajectoryAnalyzerTask {
 			}
 		}
 
-		TObjectIntIterator<String> it = hist.iterator();
+		TObjectDoubleIterator<String> it = hist.iterator();
 		int sumHome = 0;
 		int sum = 0;
 		for(int i = 0; i < hist.size(); i++) {
@@ -80,6 +79,7 @@ public class TripPurposeShareTask extends TrajectoryAnalyzerTask {
 		
 		
 		try {
+			TXTWriter.writeMap(hist, "type", "n", String.format("%1$s/tripPurpose.txt", getOutputDirectory()));
 			TXTWriter.writeMap(histWOHome, "type", "p", String.format("%1$s/tripPurposeShare.nohome.txt", getOutputDirectory()));
 			TXTWriter.writeMap(histWHome, "type", "p", String.format("%1$s/tripPurposeShare.txt", getOutputDirectory()));
 		} catch (IOException e) {

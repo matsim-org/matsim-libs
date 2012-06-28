@@ -62,6 +62,7 @@ import playground.johannes.coopsim.analysis.ArrivalTimeTask;
 import playground.johannes.coopsim.analysis.CoordinationComplexityTask;
 import playground.johannes.coopsim.analysis.DepartureLoadTask;
 import playground.johannes.coopsim.analysis.DesiredTimeDiffTask;
+import playground.johannes.coopsim.analysis.DistanceArrivalTimeTask;
 import playground.johannes.coopsim.analysis.DistanceVisitorsTask;
 import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
 import playground.johannes.coopsim.analysis.InfiniteScoresTask;
@@ -72,7 +73,9 @@ import playground.johannes.coopsim.analysis.ScoreTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TransitionProbaAnalyzer;
+import playground.johannes.coopsim.analysis.TripDistanceMean;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
 import playground.johannes.coopsim.analysis.TripDurationTask;
 import playground.johannes.coopsim.analysis.TripPurposeShareTask;
 import playground.johannes.coopsim.eval.ActivityEvaluator2;
@@ -111,6 +114,7 @@ import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
 import playground.johannes.sna.util.MultiThreading;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.GaussDistribution;
@@ -525,7 +529,9 @@ public class Simulator {
 			Map<SocialVertex, Double> arrivals = initArrivalTimes(arrTimePDF, 86400, random);
 			
 			LinearDistribution visitArrDur = new LinearDistribution(-0.2, 22091);
-			Map<SocialVertex, Double> durations = initDurations(arrivals, visitArrDur, 0.8864, 1061, random);
+//			Map<SocialVertex, Double> durations = initDurations(arrivals, visitArrDur, 0.8864, 1061, random);
+			Map<SocialVertex, Double> durations = initDurations(arrivals, visitArrDur, 6.392550645818048E7, 1061, random);
+//			Map<SocialVertex, Double> durations = initDurations(arrivals, visitArrDur, 386473804, 1061, random);
 			
 			addDesire(durations, arrivals, ActivityType.visit.name());
 			//culture
@@ -536,7 +542,9 @@ public class Simulator {
 			arrivals = initArrivalTimes(arrTimePDF, 86400, random);
 			
 			PowerLawDistribution cultureArrDur = new PowerLawDistribution(-1.28, 9.528E09);
-			durations = initDurations(arrivals, cultureArrDur, 0.9609, 1093, random);
+//			durations = initDurations(arrivals, cultureArrDur, 0.9609, 1093, random);
+			durations = initDurations(arrivals, cultureArrDur, 5.367723221521734E7, 1093, random);
+//			durations = initDurations(arrivals, cultureArrDur, 169505132, 1093, random);
 			
 			addDesire(durations, arrivals, ActivityType.culture.name());
 			//gastro
@@ -550,7 +558,9 @@ public class Simulator {
 			AdditiveDistribution arrDurPDF = new AdditiveDistribution();
 			arrDurPDF.addComponent(new GaussDistribution(8185, 42524, 168916676));
 			arrDurPDF.addComponent(new GaussDistribution(9321, 69593, 169103450));
-			durations = initDurations(arrivals, arrDurPDF, 0.6883, 522, random);
+//			durations = initDurations(arrivals, arrDurPDF, 0.6883, 522, random);
+			durations = initDurations(arrivals, arrDurPDF, 2.4991600411477614E7, 522, random);
+//			durations = initDurations(arrivals, arrDurPDF, 23294057, 522, random);
 
 			addDesire(durations, arrivals, ActivityType.gastro.name());
 			
@@ -583,7 +593,7 @@ public class Simulator {
 		return map;
 	}
 	
-	private static Map<SocialVertex, Double> initDurations(Map<SocialVertex, Double> arrivals, UnivariateRealFunction arrDur, double sigma, double lin, Random random) {
+	private static Map<SocialVertex, Double> initDurations(Map<SocialVertex, Double> arrivals, UnivariateRealFunction arrDur, double var, double lin, Random random) {
 		Map<SocialVertex, Double> durations = new HashMap<SocialVertex, Double>();
 		for(SocialVertex v : graph.getVertices()) {
 			double t_arr = arrivals.get(v);
@@ -591,12 +601,17 @@ public class Simulator {
 			try {
 				dur_mean = arrDur.value(t_arr);
 				if(dur_mean > 0) {
-					double mu = Math.log(dur_mean) - Math.pow(sigma, 2)/2.0;
-				
-					TimeSampler sampler = new TimeSampler(new LogNormalDistribution(sigma, mu, lin), 86400, random);
+					double sigma_2 = Math.log(1 + (var/Math.pow(dur_mean, 2)));
+					double mu = Math.log(dur_mean) - (sigma_2/2.0);
+					
+					TimeSampler sampler = new TimeSampler(new LogNormalDistribution(Math.sqrt(sigma_2), mu, lin), 86400, random);
 					double dur = sampler.nextSample();
 					durations.put(v, dur);
+					
+				} else {
+					throw new RuntimeException("Zeor duration.");
 				}
+				
 			} catch (FunctionEvaluationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -610,7 +625,7 @@ public class Simulator {
 		composite.addTask(new PlansWriterTask(network));
 		composite.addTask(new ArrivalTimeTask());
 		composite.addTask(new ActivityDurationTask());
-		composite.addTask(new TripDistanceTask(facilities));
+		composite.addTask(new TripDistanceTask(facilities, CartesianDistanceCalculator.getInstance()));
 		composite.addTask(new TripDurationTask());
 		composite.addTask(new JointActivityTask(graph, physical.getVisitorTracker()));
 		scoreTask = new ScoreTask();
@@ -627,6 +642,8 @@ public class Simulator {
 		composite.addTask(new CoordinationComplexityTask(physical.getVisitorTracker(), personDesires, graph));
 		composite.addTask(new DepartureLoadTask());
 		composite.addTask(new TripPurposeShareTask());
+		composite.addTask(new DistanceArrivalTimeTask(new TripDistanceMean(null, facilities, CartesianDistanceCalculator.getInstance())));
+		composite.addTask(new TripDurationArrivalTime());
 		return composite;
 	}
 	

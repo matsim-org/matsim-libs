@@ -75,13 +75,15 @@ public class TripDistanceMean extends AbstractTrajectoryProperty {
 					ActivityFacility fac = facilities.getFacilities().get(id);
 					Coord source = fac.getCoord();
 					
+					if(!destination.getFacilityId().equals(origin.getFacilityId())) {
 					try {
 						double d = calculator.distance(MatsimCoordUtils.coordToPoint(source), MatsimCoordUtils.coordToPoint(dest));
 						d_sum += d;
 						cnt++;
-						
+					
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
+					}
 					}
 				}
 			}

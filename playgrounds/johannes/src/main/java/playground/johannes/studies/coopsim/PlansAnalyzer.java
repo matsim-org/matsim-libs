@@ -49,6 +49,7 @@ import playground.johannes.coopsim.analysis.AgeTripCorrelationTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
 import playground.johannes.coopsim.analysis.CoordinationComplexityTask;
 import playground.johannes.coopsim.analysis.DesiredTimeDiffTask;
+import playground.johannes.coopsim.analysis.DistanceArrivalTimeTask;
 import playground.johannes.coopsim.analysis.DistanceVisitorsTask;
 import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
 import playground.johannes.coopsim.analysis.GenderTripCorrelationTask;
@@ -60,8 +61,11 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceAccessibilityTask;
 import playground.johannes.coopsim.analysis.TripDistanceDegreeTask;
+import playground.johannes.coopsim.analysis.TripDistanceMean;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
 import playground.johannes.coopsim.analysis.TripDurationTask;
+import playground.johannes.coopsim.analysis.TripPurposeShareTask;
 import playground.johannes.coopsim.analysis.VisitorsAccessibilityTask;
 import playground.johannes.coopsim.eval.ActivityEvaluator2;
 import playground.johannes.coopsim.eval.EvalEngine;
@@ -76,6 +80,7 @@ import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.coopsim.pysical.VisitorTracker;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
@@ -95,7 +100,7 @@ public class PlansAnalyzer {
 		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/analysis/run247/plans.xml.gz");
+		reader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run267/tasks/5/output/5200000/plans.xml.gz");
 		
 		SocialSparseGraphMLReader reader2 = new SocialSparseGraphMLReader();
 		SocialGraph graph = reader2.readGraph("/Users/jillenberger/Work/socialnets/locationChoice/mcmc.backup/run340/output/60000000000/graph.graphml", scenario.getPopulation());
@@ -111,7 +116,8 @@ public class PlansAnalyzer {
 		
 		FacilityValidator.generate(scenario.getActivityFacilities(), (NetworkImpl) scenario.getNetwork(), graph);
 		
-		ParallelPseudoSim sim = new ParallelPseudoSim(1);
+//		ParallelPseudoSim sim = new ParallelPseudoSim(1);
+		PhysicalEngine engine = new PhysicalEngine(scenario.getNetwork(), 3.0);
 		
 		Set<Plan> plans = new HashSet<Plan>();
 		Set<Person> persons = new HashSet<Person>();
@@ -125,13 +131,14 @@ public class PlansAnalyzer {
 		TrajectoryEventsBuilder builder = new TrajectoryEventsBuilder(persons);
 		eventManager.addHandler(builder);
 		
-		TravelTime travelTime = new TravelTimeCalculator(scenario.getNetwork(), 900, 86400, new TravelTimeCalculatorConfigGroup());
+//		TravelTime travelTime = new TravelTimeCalculator(scenario.getNetwork(), 900, 86400, new TravelTimeCalculatorConfigGroup());
 		
-		VisitorTracker tracker = new VisitorTracker();
-		eventManager.addHandler(tracker);
-		tracker.reset(0);
+		VisitorTracker tracker = engine.getVisitorTracker();
+//		eventManager.addHandler(tracker);
+//		tracker.reset(0);
 		
-		sim.run(plans, scenario.getNetwork(), travelTime, eventManager);
+//		sim.run(plans, scenario.getNetwork(), travelTime, eventManager);
+		engine.run(plans, eventManager);
 		
 		Set<Trajectory> trajectories = builder.trajectories();
 		
@@ -147,14 +154,17 @@ public class PlansAnalyzer {
 		composite.addTask(new DurationArrivalTimeTask());
 		composite.addTask(new LegLoadTask());
 //		composite.addTask(new ScoreTask());
-		composite.addTask(new VisitorsAccessibilityTask(tracker, graph));
+//		composite.addTask(new VisitorsAccessibilityTask(tracker, graph));
 		composite.addTask(new DistanceVisitorsTask(tracker, graph, scenario.getActivityFacilities()));
 //		composite.addTask(new CoordinationComplexityTask(tracker, personDesires, graph));
 //		composite.addTask(new TripAcceptanceProba(scenario.getActivityFacilities(), CartesianDistanceCalculator.getInstance()));
 		composite.addTask(new TripDistanceDegreeTask(graph, scenario.getActivityFacilities()));
 		composite.addTask(new AgeTripCorrelationTask(graph, tracker));
 		composite.addTask(new GenderTripCorrelationTask(graph, tracker));
-		composite.addTask(new TripDistanceAccessibilityTask(graph, scenario.getActivityFacilities()));
+//		composite.addTask(new TripDistanceAccessibilityTask(graph, scenario.getActivityFacilities()));
+		composite.addTask(new TripPurposeShareTask());
+		composite.addTask(new DistanceArrivalTimeTask(new TripDistanceMean(null, scenario.getActivityFacilities(), CartesianDistanceCalculator.getInstance())));
+		composite.addTask(new TripDurationArrivalTime());
 		
 //		EvaluatorComposite evaluator = new EvaluatorComposite();
 //		evaluator.addComponent(new JointActivityEvaluator2(10, tracker, graph, 0.2, 1, 0.2, 0));
@@ -162,8 +172,8 @@ public class PlansAnalyzer {
 //		EvalEngine eval = new EvalEngine(evaluator);
 //		eval.evaluate(trajectories);
 		
-		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/analysis/run247/");
+		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/analysis/run267/5/");
 		
-		sim.finalize();
+		engine.finalize();
 	}
 }

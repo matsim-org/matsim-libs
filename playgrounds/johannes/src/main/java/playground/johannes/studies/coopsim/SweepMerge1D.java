@@ -47,12 +47,14 @@ public class SweepMerge1D {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		File root = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run231/");
-		String property = "visitors_culture";
-//		String property = "score";
+		File root = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run272/");
+//		String property = "score_join_culture";
+		String property = "d_trip_culture";
 		int valIdx = 1;
+//		String parameterKey = "beta_join";
+//		String parameterKey = "performing";
 		String parameterKey = "alterProba_culture";
-//		String parameterKey = "traveling";
+		
 		int dumps = 1;
 
 		File analysis = new File(String.format("%1$s/analysis/", root.getAbsolutePath()));

@@ -22,7 +22,6 @@ package playground.johannes.coopsim.eval;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 
@@ -35,7 +34,7 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class ActivityEvaluator2 implements Evaluator {
 
-	private final static Logger logger = Logger.getLogger(ActivityEvaluator2.class);
+//	private final static Logger logger = Logger.getLogger(ActivityEvaluator2.class);
 
 	private final static String HOME = "home";
 
@@ -62,19 +61,24 @@ public class ActivityEvaluator2 implements Evaluator {
 	@Override
 	public double evaluate(Trajectory trajectory) {
 		double score = 0;
-		double t_sum = 0;
+//		double t_sum = 0;
+		double t_home = 0;
 		double t_star_sum = 0;
 
-		for (int i = 2; i < trajectory.getElements().size() - 2; i += 2) {
+		for (int i = 0; i < trajectory.getElements().size(); i += 2) {
 			Activity act = (Activity) trajectory.getElements().get(i);
 
 			double t = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
-			t_sum += t;
-
+			
 			if (act.getType().equals(IDLE)) {
 				score += IDLE_PENALTY;
+//				t_sum += t;
 				t_star_sum += t;
+			} else if(act.getType().equals(HOME)) {
+				t_home += t;
 			} else {
+//				t_sum += t;
+				
 				double v_star = getPriority(act.getType());
 
 				if (beta == 0) {
@@ -94,8 +98,8 @@ public class ActivityEvaluator2 implements Evaluator {
 		if (beta == 0) {
 			score += getPriority(HOME);
 		} else {
-			double t_home = 86400 - t_sum;
-			double t_star_home = 86400 - t_star_sum;
+			double t_end = trajectory.getTransitions().get(trajectory.getTransitions().size() - 1);
+			double t_star_home = t_end - t_star_sum;
 			if (t_home <= 0 || t_star_home <= 0) {
 				throw new RuntimeException(String.format("t_home=%1$s, t_start_home=%2$s.", t_home, t_star_home));
 			}
