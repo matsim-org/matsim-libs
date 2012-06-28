@@ -72,7 +72,7 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return
 	 */
-	public static double getDistance2Node(LinkImpl link, Coord point, Node destinationNode){
+	public static double getDistance2Node(Link link, Coord point, Node destinationNode){
 		
 		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
 	}
@@ -89,7 +89,7 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return
 	 */
-	public static double getDistance2Node(LinkImpl link, Point point, Node destinationNode){
+	public static double getDistance2Node(Link link, Point point, Node destinationNode){
 		
 		return getDistance2Node(link, point.getX(), point.getY(), destinationNode);
 	}
@@ -107,7 +107,7 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return
 	 */
-	private static double getDistance2Node(LinkImpl link, double pointx, double pointy, Node destinationNode){
+	private static double getDistance2Node(Link link, double pointx, double pointy, Node destinationNode){
 		
 		double ax = link.getFromNode().getCoord().getX();
 		double ay = link.getFromNode().getCoord().getY();
@@ -146,7 +146,7 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return Distances
 	 */
-	public static Distances  getDistance2NodeV2(LinkImpl link, Coord point, Node destinationNode){
+	public static Distances  getDistance2NodeV2(Link link, Coord point, Node destinationNode){
 		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
 	}
 	
@@ -159,11 +159,11 @@ public class NetworkUtil {
 	 * @param destinationNode
 	 * @return Distances
 	 */
-	public static Distances  getDistance2NodeV2(LinkImpl link, Point point, Node destinationNode){
+	public static Distances  getDistance2NodeV2(Link link, Point point, Node destinationNode){
 		return getDistance2NodeV2(link, point.getX(), point.getY(), destinationNode);
 	}
 	
-	private static Distances getDistance2NodeV2(LinkImpl link, double pointx, double pointy, Node destinationNode){
+	private static Distances getDistance2NodeV2(Link link, double pointx, double pointy, Node destinationNode){
 		
 		Distances d = new Distances();
 		

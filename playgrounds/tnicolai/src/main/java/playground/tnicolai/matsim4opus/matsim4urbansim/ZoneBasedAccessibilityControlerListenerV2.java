@@ -3,12 +3,12 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -127,7 +127,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				LinkImpl nearestLink = network.getNearestLink(coordFromZone);
+				Link nearestLink = network.getNearestLink(coordFromZone);
 				// captures the distance (as walk time) between a zone centroid and its nearest node
 				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, coordFromZone, fromNode);

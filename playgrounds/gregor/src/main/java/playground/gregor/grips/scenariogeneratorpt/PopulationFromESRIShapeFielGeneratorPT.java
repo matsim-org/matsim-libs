@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.grips.scenariogenerator.PopulationFromESRIShapeFileGenerator;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -74,7 +73,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		
 		
 		NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
-		LinkImpl l = net.getNearestLink(c);
+		Link l = net.getNearestLink(c);
 		Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
 		((ActivityImpl)act).setCoord(c);
 		act.setEndTime(0);
@@ -109,7 +108,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		
 		
 		NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
-		LinkImpl l = net.getNearestLink(c);
+		Link l = net.getNearestLink(c);
 		Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
 		((ActivityImpl)act).setCoord(c);
 		act.setEndTime(0);

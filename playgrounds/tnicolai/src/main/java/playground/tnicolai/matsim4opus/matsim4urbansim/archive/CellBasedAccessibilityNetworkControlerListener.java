@@ -31,15 +31,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
@@ -228,8 +229,8 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 				// from here: accessibility computation for current starting point ("fromNode")
 				
 				// captures the euclidean distance between a square centroid and its nearest node
-				LinkImpl nearestLink = network.getNearestLink( coordFromZone );
-				double distCentroid2Link = nearestLink.calcDistance(coordFromZone);
+				Link nearestLink = network.getNearestLink( coordFromZone );
+				double distCentroid2Link = CoordUtils.distancePointLinesegment(nearestLink.getFromNode().getCoord(), nearestLink.getToNode().getCoord(), coordFromZone);
 				double walkTimeOffset_min = (distCentroid2Link / this.walkSpeedMeterPerMin); 
 //				double walkTimeOffset_min = NetworkUtil.getDistance2Node(network.getNearestLink(coordFromZone), 
 //																		 point, 

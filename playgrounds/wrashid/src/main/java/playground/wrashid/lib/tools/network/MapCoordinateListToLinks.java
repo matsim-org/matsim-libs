@@ -23,7 +23,6 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -33,9 +32,6 @@ import playground.wrashid.lib.tools.kml.Color;
 
 public class MapCoordinateListToLinks {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String inputNetworkPath="H:/data/experiments/ARTEMIS/output/run10/output_network.xml.gz";
 		
@@ -59,10 +55,10 @@ public class MapCoordinateListToLinks {
 
 		NetworkImpl network= (NetworkImpl) GeneralLib.readNetwork(inputNetworkPath);
 		
-		LinkedList<LinkImpl> selectedLinks=new LinkedList<LinkImpl>();
+		LinkedList<Link> selectedLinks=new LinkedList<Link>();
 		
 		for (Coord coordinate:linkCoordinates){
-				LinkImpl nearestLink = network.getNearestLink(coordinate);
+				Link nearestLink = network.getNearestLink(coordinate);
 				System.out.println(nearestLink.getId());
 				selectedLinks.add(nearestLink);
 		}
@@ -70,10 +66,10 @@ public class MapCoordinateListToLinks {
 		createKMLAtTempLocation(selectedLinks);
 	}
 
-	private static void createKMLAtTempLocation(LinkedList<LinkImpl> selectedLinks) {
+	private static void createKMLAtTempLocation(LinkedList<Link> selectedLinks) {
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		
-		for (Link link:selectedLinks){
+		for (Link link : selectedLinks) {
 			basicPointVisualizer.addPointCoordinate(link.getCoord(), link.getId().toString(),Color.GREEN);
 		}
 		

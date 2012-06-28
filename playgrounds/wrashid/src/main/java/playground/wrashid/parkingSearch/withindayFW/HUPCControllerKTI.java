@@ -23,21 +23,17 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -47,8 +43,6 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.GeneralLib;
@@ -79,7 +73,7 @@ public class HUPCControllerKTI extends KTIWithinDayControler  {
 	
 	@Override
 	protected void startUpBegin() {
-		initParkingInfrastructure((Controler) this);
+		initParkingInfrastructure(this);
 	}
 
 	@Override
@@ -175,7 +169,7 @@ public class HUPCControllerKTI extends KTIWithinDayControler  {
 		for (Parking parking:parkings){
 			
 			ActivityFacility parkingFacility = this.scenarioData.getActivityFacilities().createFacility(parking.getId(), parking.getCoord());
-			LinkImpl nearestLink = ((NetworkImpl)this.scenarioData.getNetwork()).getNearestLink(parking.getCoord());
+			Link nearestLink = ((NetworkImpl)this.scenarioData.getNetwork()).getNearestLink(parking.getCoord());
 			
 			((ActivityFacilityImpl)parkingFacility).setLinkId(nearestLink.getId());
 			

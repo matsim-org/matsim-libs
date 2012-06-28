@@ -22,13 +22,13 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -104,7 +104,7 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 				}
 
 				// If the linkId is still null get nearest link from the network
-				LinkImpl link = this.network.getNearestLink(act.getCoord());
+				Link link = this.network.getNearestLink(act.getCoord());
 				if (null == link) {
 					throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
 				}

@@ -212,7 +212,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 			l1 = allLinks.get(allLinks.size()-1);
 			
 			TransitRouteStop curr = stops.get(i);
-			LinkImpl l2 = ((NetworkImpl)network).getNearestLink(curr.getStopFacility().getCoord());
+			Link l2 = ((NetworkImpl)network).getNearestLink(curr.getStopFacility().getCoord());
 			
 			Node start = l1.getToNode();
 			Node end = l2.getFromNode();

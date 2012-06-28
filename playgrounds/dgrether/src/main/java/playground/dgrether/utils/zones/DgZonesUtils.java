@@ -36,7 +36,6 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -75,7 +74,7 @@ public class DgZonesUtils {
 		Map<DgZone, Link> map = new HashMap<DgZone, Link>();
 		for (DgZone zone : zones){
 			Coord coord = MGC.coordinate2Coord(zone.getCoordinate());
-			LinkImpl link = network.getNearestLink(coord);
+			Link link = network.getNearestLink(coord);
 			map.put(zone, link);
 		}
 		return map;

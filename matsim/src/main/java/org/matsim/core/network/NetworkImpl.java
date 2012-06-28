@@ -267,8 +267,8 @@ public final class NetworkImpl implements Network, BasicLocations {
 	 *          the coordinate for which the closest link should be found
 	 * @return the link found closest to coord
 	 */
-	public LinkImpl getNearestLink(final Coord coord) {
-		LinkImpl nearestLink = null;
+	public Link getNearestLink(final Coord coord) {
+		Link nearestLink = null;
 		Node nearestNode = null;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
@@ -291,7 +291,7 @@ public final class NetworkImpl implements Network, BasicLocations {
 			double dist = ((LinkImpl) link).calcDistance(coord);
 			if (dist < shortestDistance) {
 				shortestDistance = dist;
-				nearestLink = (LinkImpl) link;
+				nearestLink = link;
 			}
 		}
 		if ( nearestLink == null ) {
