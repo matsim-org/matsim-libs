@@ -32,24 +32,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-import org.matsim.core.controler.Controler;
 
 /** A class with some static utility functions for file-I/O. */
 public class IOUtils {
 
 	private static final String GZ = ".gz";
-
-
 	
 	public static final Charset CHARSET_UTF8 = Charset.forName("UTF8");
 	public static final Charset CHARSET_WINDOWS_ISO88591 = Charset.forName("ISO-8859-1");
@@ -57,9 +49,6 @@ public class IOUtils {
 	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
 
 	private final static Logger log = Logger.getLogger(IOUtils.class);
-
-
-
 
 	/**
 	 * Tries to open the specified file for reading and returns a BufferedReader for it.
