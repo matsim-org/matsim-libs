@@ -58,7 +58,7 @@ public class MultiDayControler {
 			controler.run();
 		}		
 		UtilityAnalyzer analyzer = new UtilityAnalyzer();
-		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreate.xml");
+		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreateSC.xml");
 		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
 		analyzer.analyze(config, outPath, sideLength);
 		
