@@ -98,12 +98,21 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
 			Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
 			
+			if (agents.get(personId).getCurrentPlanElementIndex() == 15) {
+
+				DebugLib.traceAgent(personId,1);
+				
+				// DebugLib.traceAgent(personId);
+			}
+			
 			/*
 			 * If the agent has not selected a parking facility yet.
 			 */
 			if (requiresReplanning(agent)) {
 				
 				markFlagForNoSearchTime(agentId);
+				
+				
 				
 				
 				// get all parking within 1000m (of destination) or at least on parking, if that set is empty.

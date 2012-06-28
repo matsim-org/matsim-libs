@@ -48,7 +48,8 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 
 public class ParkingInfrastructure  {
 
-	private final QuadTree<ActivityFacility> parkingFacilities;
+	private final QuadTree<ActivityFacility> nonFullParkingFacilities;
+	private final HashSet<ActivityFacility> fullParkingFacilities;
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
 	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
 	private final IntegerValueHashMap<Id> reservedCapcities;	// number of reserved parkings
@@ -86,14 +87,14 @@ public class ParkingInfrastructure  {
 		maxx += 1.0;
 		maxy += 1.0;
 		
-		parkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		nonFullParkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
 			
 			// if the facility offers a parking activity
 			if (facility.getActivityOptions().containsKey("parking")) {
 				
 				// add the facility to the quadtree
-				parkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
+				nonFullParkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 				
 				// add the facility to the facilitiesOnLinkMapping
 				
@@ -114,6 +115,7 @@ public class ParkingInfrastructure  {
 		this.parkingTypes=parkingTypes;
 		
 		this.initialParkingFacilityOfAgent=new HashMap<Id, ActivityFacility>();
+		this.fullParkingFacilities=new HashSet<ActivityFacility>();
 		// cont' here -> fill this in parking population agent source.
 		// there, make that if variable is empty, initialize it based on closest parking
 		
@@ -159,13 +161,31 @@ public class ParkingInfrastructure  {
 
 	public void parkVehicle(Id facilityId) {
 		reservedCapcities.decrement(facilityId);
+		
+		if (getFreeCapacity(facilityId)==0){
+			markFacilityAsFull(facilityId);
+		}
+	}
+
+	private void markFacilityAsFull(Id facilityId) {
+		ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		nonFullParkingFacilities.remove(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), activityFacility);
 	}
 
 	public void unParkVehicle(Id facilityId) {
 		reservedCapcities.increment(facilityId);
+		
+		if (getFreeCapacity(facilityId)==1){
+			markFacilityAsNonFull(facilityId);
+		}
 	}
 	
 
+
+	private void markFacilityAsNonFull(Id facilityId) {
+		ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		nonFullParkingFacilities.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), activityFacility);
+	}
 
 	public List<Id> getParkingsOnLink(Id linkId) {
 		return parkingFacilitiesOnLinkMapping.get(linkId);
@@ -197,12 +217,12 @@ public class ParkingInfrastructure  {
 	
 	public ActivityFacility getClosestFreeParkingFacility(Coord coord) {
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
-		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		ActivityFacility parkingFacility=nonFullParkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full, try finding other free parkings in the quadtree
 		while (getFacilityCapacities().get(parkingFacility.getId())<=0){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility=nonFullParkingFacilities.get(coord.getX(), coord.getY());
 		}
 		
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -212,12 +232,12 @@ public class ParkingInfrastructure  {
 	
 	public Id getClosestFreeParkingFacilityNotOnLink(Coord coord, Id linkId){
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
-		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		ActivityFacility parkingFacility=nonFullParkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
 		while (getFacilityCapacities().get(parkingFacility.getId())<=0 || parkingFacility.getLinkId().equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility=nonFullParkingFacilities.get(coord.getX(), coord.getY());
 		}
 		
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -228,12 +248,12 @@ public class ParkingInfrastructure  {
 
 	private void removeFullParkingFromQuadTree(LinkedList<ActivityFacility> tmpList, ActivityFacility parkingFacility) {
 		tmpList.add(parkingFacility);
-		parkingFacilities.remove(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getY(), parkingFacility);
+		nonFullParkingFacilities.remove(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getY(), parkingFacility);
 	}
 
 	private void resetParkingFacilitiesQuadTree(LinkedList<ActivityFacility> tmpList) {
 		for (ActivityFacility parking:tmpList){
-			parkingFacilities.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
+			nonFullParkingFacilities.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 		}
 	}
 
@@ -243,17 +263,17 @@ public class ParkingInfrastructure  {
 	}
 
 	public Id getClosestParkingFacility(Coord coord) {		
-		return parkingFacilities.get(coord.getX(), coord.getY()).getId();
+		return nonFullParkingFacilities.get(coord.getX(), coord.getY()).getId();
 	}
 	
 	public Id getClosestParkingFacilityNotOnLink(Coord coord, Id linkId) {		
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
-		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		ActivityFacility parkingFacility=nonFullParkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
 		while (parkingFacility.getLinkId().equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
-			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+			parkingFacility=nonFullParkingFacilities.get(coord.getX(), coord.getY());
 		}
 		
 		resetParkingFacilitiesQuadTree(tmpList);
@@ -262,15 +282,19 @@ public class ParkingInfrastructure  {
 	}
 	
 	public Collection<ActivityFacility> getAllFreeParkingWithinDistance(double distance,Coord coord){
-		Collection<ActivityFacility> parkings = parkingFacilities.get(coord.getX(), coord.getY(),distance);
+		Collection<ActivityFacility> parkings = getAllParkingWithinDistance(distance, coord);
 		
-		for (ActivityFacility parking:parkings){
-			if (getFreeCapacity(parking.getId())==0){
-				parkings.remove(parking.getId());
-			}
-		}
+//		for (ActivityFacility parking:parkings){
+//			if (getFreeCapacity(parking.getId())==0){
+//				parkings.remove(parking.getId());
+//			}
+//		}
 		
 		return parkings;
+	}
+
+	private Collection<ActivityFacility> getAllParkingWithinDistance(double distance, Coord coord) {
+		return nonFullParkingFacilities.get(coord.getX(), coord.getY(),distance);
 	}
 
 	public IntegerValueHashMap<Id> getFacilityCapacities() {
@@ -282,7 +306,7 @@ public class ParkingInfrastructure  {
 	}
 	
 	public Collection<ActivityFacility> getParkingFacilities(){
-		return parkingFacilities.values();
+		return nonFullParkingFacilities.values();
 	}
 
 	public HashMap<Id, ActivityFacility> getInitialParkingFacilityOfAgent() {

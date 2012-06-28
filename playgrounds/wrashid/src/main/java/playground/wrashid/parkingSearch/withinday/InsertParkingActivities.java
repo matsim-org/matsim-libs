@@ -72,7 +72,6 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		
 		List<PlanElement> planElements = plan.getPlanElements();
 		
-		DebugLib.traceAgent(plan.getPerson().getId());
 		
 
 		/*

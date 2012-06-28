@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -59,6 +60,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -110,7 +112,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	private final Set<Id> searchingAgents;
 	private final Set<Id> linkEnteredAgents;
 	private final Set<Id> lastTimeStepsLinkEnteredAgents;
-	private final Map<Id, ActivityFacility> nextActivityFacilityMap;
 	protected final Map<Id, ExperimentalBasicWithindayAgent> agents;
 	private final Map<Id, Id> selectedParkingsMap;
 	private final Map<Id, Activity> nextNonParkingActivity;
@@ -167,7 +168,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 																	// to be be
 																	// deterministic!
 		this.searchingAgents = new HashSet<Id>();
-		this.nextActivityFacilityMap = new HashMap<Id, ActivityFacility>();
 		this.agents = new HashMap<Id, ExperimentalBasicWithindayAgent>();
 		this.nextNonParkingActivity = new HashMap<Id, Activity>();
 
@@ -295,9 +295,10 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			Plan executedPlan = agent.getSelectedPlan();
 			int planElementIndex = agent.getCurrentPlanElementIndex();
 
-			if (agents.get(personId).getCurrentPlanElementIndex() == 9) {
+			if (agents.get(personId).getCurrentPlanElementIndex() == 15) {
 
-				Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex + 1);
+				DebugLib.traceAgent(personId,1);
+				
 				// DebugLib.traceAgent(personId);
 			}
 
@@ -316,12 +317,12 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			Activity nextNonParkingActivity = (Activity) executedPlan.getPlanElements().get(planElementIndex + 3);
 			this.getNextNonParkingActivity().put(agent.getId(), nextNonParkingActivity);
 
-			ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities()
-					.get(nextNonParkingActivity.getFacilityId());
-			nextActivityFacilityMap.put(personId, facility);
+			Link nextActivityLink = getNextActivityLink(personId);
+	
+			//nextActivityFacilityMap.put(personId, facility);
 
 			Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-			double distanceToNextActivity = CoordUtils.calcDistance(facility.getCoord(), coord);
+			double distanceToNextActivity = CoordUtils.calcDistance(nextActivityLink.getCoord(), coord);
 
 			/*
 			 * If the agent is within distance 'd' to target activity or OR If
@@ -333,7 +334,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			 * activity).
 			 */
 
-			if (shouldStartSearchParking(event.getLinkId(), facility.getLinkId(), distanceToNextActivity)) {
+		
+			if (shouldStartSearchParking(event.getLinkId(), nextActivityLink, distanceToNextActivity)) {
 				searchingAgents.add(personId);
 			}
 		}
@@ -372,7 +374,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		Id personId = event.getPersonId();
 
-		if (agents.get(personId).getCurrentPlanElementIndex() == 9) {
+		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+		if (currentPlanElementIndex == 9) {
 			// DebugLib.traceAgent(personId);
 		}
 
@@ -380,8 +383,10 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		if (carLegAgents.contains(personId)) {
 			if (!searchingAgents.contains(personId)) {
 				Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-				ActivityFacility facility = nextActivityFacilityMap.get(personId);
-				double distanceToNextActivity = CoordUtils.calcDistance(facility.getCoord(), coord);
+				
+				Link nextActivityLink = getNextActivityLink(personId);
+				
+				double distanceToNextActivity = CoordUtils.calcDistance(nextActivityLink.getCoord(), coord);
 
 				/*
 				 * If the agent is within the parking radius
@@ -391,11 +396,16 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				 * activity is performed.
 				 */
 
-				if (personId.toString().equalsIgnoreCase("185")) {
-					System.out.println(distanceToNextActivity);
-				}
+				if (currentPlanElementIndex == 15) {
 
-				if (shouldStartSearchParking(event.getLinkId(), facility.getLinkId(), distanceToNextActivity)) {
+					DebugLib.traceAgent(personId,1);
+					
+					// DebugLib.traceAgent(personId);
+				}
+				
+				
+				
+				if (shouldStartSearchParking(event.getLinkId(), nextActivityLink, distanceToNextActivity)) {
 					searchingAgents.add(personId);
 					linkEnteredAgents.add(personId);
 					updateIdentifierOfAgentForParkingSearch(personId);
@@ -407,6 +417,17 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				updateIdentifierOfAgentForParkingSearch(personId);
 			}
 		}
+	}
+
+	private Link getNextActivityLink(Id personId) {
+		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
+
+		ActivityImpl act=(ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1);
+		
+		Id actLinkId=act.getLinkId();
+		Link actLink = scenario.getNetwork().getLinks().get(actLinkId);
+		
+		return actLink;
 	}
 
 	private void updateIdentifierOfAgentForParkingSearch(Id personId) {
@@ -430,8 +451,9 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				personId);
 	}
 
-	private boolean shouldStartSearchParking(Id currentLinkId, Id nextActivityLinkId, double distanceToNextActivity) {
-		return distanceToNextActivity <= distance || nextActivityLinkId.equals(currentLinkId);
+	
+	private boolean shouldStartSearchParking(Id currentLinkId, Link nextActivityLink, double distanceToNextActivity) {
+		return distanceToNextActivity <= distance || nextActivityLink.getId().equals(currentLinkId) || nextActivityLink.getLength()>distance;
 	}
 
 	@Override
@@ -443,7 +465,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		searchingAgents.clear();
 		linkEnteredAgents.clear();
 		selectedParkingsMap.clear();
-		nextActivityFacilityMap.clear();
 		lastTimeStepsLinkEnteredAgents.clear();
 		this.parkingIterationScoreSum = new DoubleValueHashMap<Id>();
 		didUseCarOnce.clear();
@@ -532,8 +553,14 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			System.out.println(agents.get(personId).getCurrentPlanElementIndex());
 
 			System.out
-					.println(" probably, you should start earlier the search with this algorithm (agent did not register with any identifier for this search till now and already drove to initially planned parking)");
+					.println("first possiblity: probably, you should start earlier the search with this algorithm (agent did not register with any identifier for this search till now and already drove to initially planned parking)");
 
+			System.out
+			.println("second probability: two consquete parking are on the same link");
+			
+			System.out
+			.println("third probability: the network is too coarse, so that the agent reaches the destination, even before search area started (due to long link) => this should be fixed now in method 'shouldStartSearchParking'");
+			
 			// as initial parking can be located away from real destination
 			// (even further away for test cases than the start search range,
 			// this error can occur => must fix it - one way to do it: place
@@ -565,7 +592,6 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime);
 
-		DebugLib.traceAgent(personId);
 	}
 
 	private boolean ifParkingSearchTimeDifferentThanZero(Id personId) {

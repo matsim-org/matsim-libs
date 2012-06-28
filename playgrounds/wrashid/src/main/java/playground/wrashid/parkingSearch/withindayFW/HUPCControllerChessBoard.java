@@ -54,7 +54,7 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		super(args);
 	}
 
-	
+	 
 	@Override
 	protected void startUpFinishing() {
 		

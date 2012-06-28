@@ -95,7 +95,7 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		Id personId = event.getPersonId();
-		DebugLib.traceAgent(personId);
+		
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
@@ -142,7 +142,7 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 	public void handleEvent(AgentDepartureEvent event) {
 
 		Id personId = event.getPersonId();
-		DebugLib.traceAgent(personId);
+	
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();

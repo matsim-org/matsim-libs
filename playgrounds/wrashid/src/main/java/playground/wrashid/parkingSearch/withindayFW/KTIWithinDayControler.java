@@ -39,7 +39,7 @@ import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
-import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
+import playground.wrashid.parkingSearch.withindayFW.kti.KTIYear3ScoringFunctionFactory;
 
 public class KTIWithinDayControler extends WithinDayParkingController {
 
