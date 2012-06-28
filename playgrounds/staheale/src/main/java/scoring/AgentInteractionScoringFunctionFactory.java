@@ -20,6 +20,7 @@
 
 package scoring;
 
+import java.util.HashSet;
 import java.util.TreeMap;
 
 import occupancy.FacilitiesOccupancyCalculator;
@@ -28,7 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -37,7 +40,12 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoringFunctionFactory {
 
@@ -45,24 +53,93 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 	private ObjectAttributes attributes;
 	private final CharyparNagelScoringParameters params;
 	private final ActivityFacilities facilities;
-    private Network network;
-    private double scaleNumberOfPersons;
+	private Network network;
+	private double scaleNumberOfPersons;
 
-    public AgentInteractionScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final ActivityFacilities facilities, Network network, double scaleNumberOfPersons,TreeMap<Id, FacilityOccupancy> facilityOccupancies, ObjectAttributes attributes) {
+	private final Controler controler;
+	private ObjectAttributes facilitiesKValues;
+	private ObjectAttributes personsKValues;
+	private ScaleEpsilon scaleEpsilon;
+	private ActTypeConverter actTypeConverter;
+	private HashSet<String> flexibleTypes;
+	private Config config2;
+
+	public AgentInteractionScoringFunctionFactory(final Controler controler,
+			final Config config2, final PlanCalcScoreConfigGroup config,
+			final ActivityFacilities facilities, Network network,
+			double scaleNumberOfPersons,TreeMap<Id, FacilityOccupancy> facilityOccupancies,
+			ObjectAttributes attributes,
+			ScaleEpsilon scaleEpsilon,
+			ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
+
 		super(config, network);
-    	this.params = new CharyparNagelScoringParameters(config);
+		this.params = new CharyparNagelScoringParameters(config);
 		this.facilities = facilities;
-        this.network = network;
-        this.scaleNumberOfPersons = scaleNumberOfPersons;
-        this.facilityOccupancies = facilityOccupancies;
-        this.attributes = attributes;
+		this.network = network;
+		this.scaleNumberOfPersons = scaleNumberOfPersons;
+		this.facilityOccupancies = facilityOccupancies;
+		this.attributes = attributes;
+
+		this.controler = controler;
+		this.scaleEpsilon = scaleEpsilon;
+		this.actTypeConverter = actTypeConverter;		
+		this.flexibleTypes = flexibleTypes;	
+		this.config2 = config2;
+		this.createObjectAttributes(Long.parseLong(config2.locationchoice().getRandomSeed()));
 	}
-	
+
+	private void createObjectAttributes(long seed) {
+		this.facilitiesKValues = new ObjectAttributes();
+		this.personsKValues = new ObjectAttributes();
+
+		String pkValues = this.config2.locationchoice().getpkValuesFile();
+		if (!pkValues.equals("null")) {
+			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsKValues);
+			try {
+				attributesReader.parse(pkValues);
+			} catch  (UncheckedIOException e) {
+				// reading was not successful
+				this.computeAttributes(seed);
+			}
+		}
+		else {
+			this.computeAttributes(seed);
+		}
+		String fkValues = this.config2.locationchoice().getfkValuesFile();
+		if (!fkValues.equals("null")) {
+			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
+			try {
+				attributesReader.parse(fkValues);
+			} catch  (UncheckedIOException e) {
+				// reading was not successful
+				this.computeAttributes(seed);
+			}
+		}
+		else {
+			this.computeAttributes(seed);
+		}
+	}
+
+	private void computeAttributes(long seed) {
+		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
+				seed, this.controler.getScenario(), this.config2, this.scaleEpsilon, this.actTypeConverter, this.flexibleTypes);
+		computer.assignKValues();
+
+		this.personsKValues = computer.getPersonsKValues();
+		this.facilitiesKValues = computer.getFacilitiesKValues();
+	}
+
 	@Override
 	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		
+
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new AgentInteractionScoringFunction(plan, params, facilityOccupancies, this.facilities, this.attributes, this.scaleNumberOfPersons));
+
+		AgentInteractionScoringFunction scoringFunction = new AgentInteractionScoringFunction(plan, params,
+				facilityOccupancies, this.facilities, this.attributes, this.scaleNumberOfPersons
+				,this.controler.getConfig(),this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
+
+		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
+
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
 		//scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
@@ -70,4 +147,3 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 	}
 
 }
-

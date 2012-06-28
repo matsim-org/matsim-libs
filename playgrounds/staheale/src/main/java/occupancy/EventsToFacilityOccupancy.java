@@ -35,11 +35,11 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 
 
 public class EventsToFacilityOccupancy implements ActivityStartEventHandler, ActivityEndEventHandler {
-	
+
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private final static Logger log = Logger.getLogger(EventsToFacilityOccupancy.class);
 
-	
+
 	public EventsToFacilityOccupancy(final ActivityFacilities facilities, int numberOfTimeBins, double scaleNumberOfPersons,
 			TreeMap<Id, FacilityOccupancy> facilityOccupancies, LocationChoiceConfigGroup config) {
 		super();
@@ -47,7 +47,7 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 		this.facilityOccupancies = facilityOccupancies;
 
 		log.info("facilities size: " + facilities.getFacilities().values().size());
-				
+
 		int counter = 0;
 		int nextMsg = 1;
 		for (ActivityFacility f : facilities.getFacilities().values()) {
@@ -60,7 +60,7 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 		}
 		log.info("finished init");
 	}
-	
+
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
 		if (!(event.getActType().startsWith("h")||
@@ -71,7 +71,7 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 			this.facilityOccupancies.get(facilityId).addArrival(event.getTime());
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		if (!(event.getActType().startsWith("h")||
@@ -82,7 +82,7 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 			this.facilityOccupancies.get(facilityId).addDeparture(event.getTime());
 		}
 	}
-	
+
 	@Override
 	public void reset(final int iteration) {
 		Iterator<? extends FacilityOccupancy> iter_fo = this.facilityOccupancies.values().iterator();
@@ -91,8 +91,8 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 			fo.reset();
 		}
 		log.info("EventsToFacilityOccupancy resetted");
-			}
-	
+	}
+
 	public TreeMap<Id, FacilityOccupancy> getFacilityOccupancies() {
 		return facilityOccupancies;
 	}

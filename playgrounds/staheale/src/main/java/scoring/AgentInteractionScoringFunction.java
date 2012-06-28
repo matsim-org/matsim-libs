@@ -31,17 +31,23 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 //import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
@@ -57,44 +63,60 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 	int numberOfTimeBins = AgentInteraction.numberOfTimeBins;
 	private static Logger log = Logger.getLogger(AgentInteractionScoringFunction.class);
 
+	private DestinationChoiceScoring destinationChoiceScoring;
+	private Config config2;
+
+
+
 	public AgentInteractionScoringFunction(final Plan plan,
 			final CharyparNagelScoringParameters params,
 			final TreeMap<Id, FacilityOccupancy> facilityOccupancies,
 			final ActivityFacilities facilities,
-			final ObjectAttributes attributes, double scaleNumberOfPersons) {
+			final ObjectAttributes attributes, double scaleNumberOfPersons
+			, Config config2, ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues,ScaleEpsilon scaleEpsilon) {
 		super(params);
 		this.params = params;
 		this.facilities = facilities;
 		this.plan = plan;
 		this.attributes = attributes;
 		this.facilityOccupancies = facilityOccupancies;
+		this.config2 = config2;
+		this.destinationChoiceScoring = new DestinationChoiceScoring(
+				this.facilities, this.config2, facilitiesKValues, personsKValues, scaleEpsilon);
 	}
-	
+
 	/* 
 	 * All values >= 100800s (4h) are merged into the last time bin
 	 */
-	
+
 	public int timeBinIndex(double time) {
 		int lastBinIndex = this.numberOfTimeBins-1;
 		int numberOfBinsPerHour = this.numberOfTimeBins/24;
 		int secondsPerBin = 3600/numberOfBinsPerHour;
 		return Math.min(lastBinIndex, (int)(time/secondsPerBin));
 	}
-	
+
 	@Override
 	protected double calcActScore(final double arrivalTime,
 			final double departureTime, final Activity act) {
-		
+
 		double tmpScore = 0.0;
-				
-		double[] openingInterval = this.getOpeningInterval(act);
-		
-		
+
+		double[] openingInterval = getOpeningInterval(act);
+
+
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
+
+		//		if (act.getType().startsWith("w")){
+		//			log.info("for activity type = " +act.getType()+ ", openingTime = " +openingTime+ ", closingTime = " +closingTime);
+		//		}
+
 		double activityStart = arrivalTime;
 		double activityEnd = departureTime;
-		
+
+
+
 
 		if ((openingTime >=  0) && (arrivalTime < openingTime)) {
 			activityStart = openingTime;
@@ -110,6 +132,10 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		}
 		double duration = activityEnd - activityStart;
 
+		//		if (act.getType().startsWith("w")){
+		//			log.info("for activity type = " +act.getType()+ ", activityStart = " +activityStart+ ", arrivalTime = " +arrivalTime);
+		//		}
+
 		// utility of performing an action, duration is >= 1, thus log is no problem ----------------
 		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
 
@@ -119,13 +145,13 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 					* Math.log((duration / 3600.0) / zeroUtilityDuration);
 			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-//			log.info("for person 101 utility of performing an action is: " +Math.max(0, Math.max(utilPerf, utilWait)));
-			
-			
+			//			log.info("for person 101 utility of performing an action is: " +Math.max(0, Math.max(utilPerf, utilWait)));
+
+
 		} else {
 			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(duration);
-//			log.info("for person 101 utility of late arrival is: " +(2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(duration)));
-			
+			//			log.info("for person 101 utility of late arrival is: " +(2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(duration)));
+
 		}
 
 
@@ -134,46 +160,49 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
 			tmpScore += this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime);
-//			log.info("for person 101 utility of early arrival is: " +(this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime)));
-			
+
+
+
+			//log.info("for person x utility of early arrival is: " +(this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime))+ ", actType: " +act.getType());
+
 		}
 
 		// disutility if too late
 		double latestStartTime = closingTime;
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
 			tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
-//			log.info("for person 101 utility of late arrival is: " +(this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime)));
-			
+			//			log.info("for person 101 utility of late arrival is: " +(this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime)));
+
 		}
 
 		// disutility if stopping too early
-//		double earliestEndTime = params.getEarliestEndTime();
-//		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-//			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
-//		}
+		//		double earliestEndTime = params.getEarliestEndTime();
+		//		if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
+		//			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
+		//		}
 
 		// disutility if going to away to late
 		if (activityEnd < departureTime) {
 			tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
-//			log.info("for person 101 utility of going away too late is: " +(this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd)));
-			
+			//			log.info("for person " +this.plan.getPerson().getId()+ " utility of going away too late is: " +(this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd))+ ", departure time: "+ departureTime+ ", activity end: "+activityEnd+ ", marginal utility: " +this.params.marginalUtilityOfWaiting_s);
+
 		}
 
 		// disutility if duration was too short
 		double minimalDuration = typicalDuration / 3.0;
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
-//			log.info("for person " +this.plan.getPerson().getId()+ " utility of going away too soon is: " +(this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration)));
-			
+			//			log.info("for person " +this.plan.getPerson().getId()+ " utility of going away too soon is: " +(this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration)));
+
 		}
-				
+
 		// ------------disutilities of agent interaction-----------
 		//TODO: how to handle activities that last longer than 24 hours...
 		if (act.getType().startsWith("s")|| act.getType().startsWith("l")) {
 			ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-			log.info("facility id: "+facility.getId()+", activity type: "+act.getType());
+			//log.info("facility id: "+facility.getId()+", activity type: "+act.getType());
 			double capacity = facility.getActivityOptions().get(act.getType()).getCapacity();
-			log.info("capacity for "+facility.getId()+" is: "+capacity);
+			//log.info("capacity for "+facility.getId()+" is: "+capacity);
 			double lowerBound = (Double) this.attributes.getAttribute(facility.getId().toString(), "LowerThreshold");
 			//log.info("lower bound is " +lowerBound);
 			double lowerMarginalUtility = ((Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfUnderArousal"))/3600;
@@ -182,7 +211,7 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 			//log.info("upper bound is " +upperBound);
 			double upperMarginalUtility = ((Double) this.attributes.getAttribute(facility.getId().toString(), "MarginalUtilityOfOverArousal"))/3600;
 
-			
+
 			int timeBinStart = timeBinIndex(activityStart);
 			int timeBinEnd = timeBinIndex(activityEnd);
 			//log.info("timeBinStart ("+activityStart+") is " +timeBinStart+ " and timeBinEnd ("+activityEnd+") is " +timeBinEnd+ ", therefore numberOfTimeBins is " +(timeBinEnd-timeBinStart));
@@ -192,9 +221,9 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 				offsetEnd = 900; //activityEnd-(95*900);
 			}
 			else {
-			offsetEnd = 900+(timeBinEnd*900)-activityEnd;
+				offsetEnd = 900+(timeBinEnd*900)-activityEnd;
 			}
-						
+
 			for (int i = 0; i < (timeBinEnd-timeBinStart); i++){
 				double occupancy = this.facilityOccupancies.get(facility.getId()).getCurrentOccupancy((timeBinStart+i));
 				//log.info("for facility " +facility.getId()+ " and agent " +plan.getPerson().getId()+ " current occupancy is: " +occupancy+ " while performing " +act.getType()+ " activity at "+(activityStart+i*900)/3600);
@@ -207,8 +236,8 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 						//log.info("firstTimeBin, duration is: " +dur);
 					}
 					else{
-					dur = offsetStart;
-					//log.info("firstTimeBin, duration is: " +dur);
+						dur = offsetStart;
+						//log.info("firstTimeBin, duration is: " +dur);
 					}
 				}
 				if (i+1 == (timeBinEnd-timeBinStart)){
@@ -217,55 +246,36 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 				}
 				// -----------------------disutility of agent interaction underarousal
 				if ((load < lowerBound)) {
-					if (load < 0.02){
-						load = 0.02;
-					}
-					double penaltyUnderarousal = (lowerMarginalUtility/load * dur);
+
+					double loadTemp = 1-load;
+
+					double penaltyUnderarousal = (lowerMarginalUtility*loadTemp * dur);
 					if (penaltyUnderarousal>0){
 						log.info("positive penaltyUnderarousal of " +penaltyUnderarousal+ ", load = " +load+ ", dur = "+dur+" beta = "+lowerMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
 						Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
 					}
 					tmpScore += penaltyUnderarousal;
-				//	log.info("lowerMarginalUtility is " +lowerMarginalUtility);
-				//	log.info("an underarousal penalty of " +penaltyUnderarousal+ " is given due to load " +load);
+					//	log.info("lowerMarginalUtility is " +lowerMarginalUtility);
+					//	log.info("an underarousal penalty of " +penaltyUnderarousal+ " is given due to load " +load);
 				}
 				// -----------------------disutility of agent interaction overarousal
 				if ((load > upperBound)) {
-					//load values between upperBound and 1 are treated as underarousal loads
-					if (load < 1){
-						double loadTemp = 1-load;
-						if (loadTemp < 0.02){
-							loadTemp = 0.02;
-						}
-						double penaltyUpperarousal = (upperMarginalUtility/loadTemp * dur);
-						if (penaltyUpperarousal>0){
-							log.info("positive penaltyUpperarousal of " +penaltyUpperarousal+ ", load = " +loadTemp+ ", dur = "+dur+" beta = "+upperMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
-							Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
 
-						}
-						tmpScore += penaltyUpperarousal;
-					//	log.info("upperMarginalUtility is " +upperMarginalUtility);
-					//	log.info("an overarousal penalty of " +penaltyUpperarousal+ " is given due to load " +load);
+					double penaltyUpperarousal = (upperMarginalUtility*load * dur);
+					if (penaltyUpperarousal>0){
+						log.info("positive penaltyUpperarousal of " +penaltyUpperarousal+ ", load = " +load+ ", dur = "+dur+" beta = "+upperMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
+						Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
+
 					}
-					// load values higher than 1 are penalized with a fixed part and a part dependent on the load
-					else {
-						double penaltyStart = (upperMarginalUtility/0.02);
-						double penaltyUpperarousal = ((penaltyStart + upperMarginalUtility) * load * dur);
-						if (penaltyUpperarousal>0){
-							log.info("positive penaltyUpperarousal of " +penaltyUpperarousal+ ", load = " +load+ ", dur = "+dur+" beta = "+upperMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
-							Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
-						}
-						tmpScore += penaltyUpperarousal;
-					//	log.info("an overarousal penalty of " +penaltyUpperarousal+ " is given due to load " +load);
-					}
+					tmpScore += penaltyUpperarousal;		
 				}
 			}
 		}
-				
-//		log.info("for person " +this.plan.getPerson().getId()+ " total activity score is: " +tmpScore);
-		
 
-		
+		//		log.info("for person " +this.plan.getPerson().getId()+ " total activity score is: " +tmpScore);
+
+
+
 		return tmpScore;
 	}
 	@Override
@@ -275,52 +285,91 @@ public class AgentInteractionScoringFunction extends ActivityScoringFunction {
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+		double [] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+
 
 		boolean foundAct = false;
-		
+
 		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-		
-		
-		
-			Set<OpeningTime> opentimes = null;
-			if (!act.getType().startsWith("h") && !act.getType().endsWith("a")) {
-				if (!(facility.getActivityOptions().containsKey("home"))){
-				
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wed);
-					
-					if (opentimes == null) {
-						opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wkday);
-					}
-					if (opentimes == null) {
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wk);
-					}
-					if (opentimes != null) {
-						// ignoring lunch breaks with the following procedure:
-						// if there is only one wed/wkday open time interval, use it
-						// if there are two or more, use the earliest start time and the latest end time
-						openInterval[0] = Double.MAX_VALUE;
-						openInterval[1] = Double.MIN_VALUE;
 
-						for (OpeningTime opentime : opentimes) {
 
-							openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-							openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
-						//	log.info("for activity type = " +act.getType()+ " opentimes are: " +Math.min(openInterval[0], opentime.getStartTime())+ " - " +Math.max(openInterval[1], opentime.getEndTime()));
-						}
-						
-					}
+
+		Set<OpeningTime> opentimes = null;
+		if (!act.getType().startsWith("h") && !act.getType().endsWith("a")) {
+			//if (!(facility.getActivityOptions().containsKey("home"))){
+
+			opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wed);
+
+			if (opentimes == null) {
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wkday);
+			}
+			if (opentimes == null) {
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wk);
+			}
+			if (opentimes != null) {
+				// ignoring lunch breaks with the following procedure:
+				// if there is only one wed/wkday open time interval, use it
+				// if there are two or more, use the earliest start time and the latest end time
+				openInterval[0] = Double.MAX_VALUE;
+				openInterval[1] = Double.MIN_VALUE;
 
 				for (OpeningTime opentime : opentimes) {
 
-					openInterval[0] = opentime.getStartTime();
-					openInterval[1] = opentime.getEndTime();
+					openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+					openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+
+					//					log.info("for activity type = " +act.getType()+ " opentimes are: " +Math.min(openInterval[0], opentime.getStartTime())+ " - " +Math.max(openInterval[1], opentime.getEndTime()));
 				}
+
 			}
-				
+
+			for (OpeningTime opentime : opentimes) {
+
+				openInterval[0] = opentime.getStartTime();
+				openInterval[1] = opentime.getEndTime();
 			}
-			return openInterval;
-		
+		}
+
+		//}
+		return openInterval;
+
 	}
-	
+
+	@Override
+	public void finish() {		
+
+		// do not use distance scoring anymore
+		//		boolean distance = false;				
+		//		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementDistance")) > 0.000001) distance = true;
+
+		// ----------------------------------------------------------
+		// The initial score is set when scoring during or just after the mobsim. 
+		// Then the score is still NULL but this.score (ScoringFunction) is NOT.
+		// Replanning (setting plan score to -999.0) is done afterwards.
+
+		// Setting distance = true (plan.score=-999) for travel time estimation only
+		// score is reset to 0.0 after estimation.
+		//if (!(this.plan.getScore() == null)) {
+		//if (this.plan.getScore() < -998) {
+		//	distance = true;
+		//}
+		//}
+		// ----------------------------------------------------------
+
+		super.finish();
+
+		/* always use tt, thus 
+		 * this.config.locationchoice().getTravelTimes() is always true)  
+		 * i.e., score is never set to zero
+		 *		if (!(Boolean.parseBoolean(this.config.locationchoice().getTravelTimes())) || distance) {
+		 *			this.score = 0.0;
+		}
+		 */		
+		for (PlanElement pe : this.plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe);
+			}
+		}
+	}
+
 }

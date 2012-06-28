@@ -20,6 +20,7 @@
 
 package miniscenario;
 
+import java.util.HashSet;
 import java.util.TreeMap;
 
 import occupancy.FacilitiesOccupancyCalculator;
@@ -29,6 +30,7 @@ import miniscenario.AgentInteraction;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.analysis.DistanceStats;
@@ -41,7 +43,7 @@ import scoring.AgentInteractionScoringFunctionFactory;
 
 public class MiniScenarioControler extends Controler {
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies = new TreeMap<Id, FacilityOccupancy>();;
-	
+
 
 	public MiniScenarioControler(final String[] args) {
 		super(args);
@@ -52,42 +54,47 @@ public class MiniScenarioControler extends Controler {
 		MiniScenarioControler controler = new MiniScenarioControler( args ) ;	
 		controler.run();
 	}
-	
+
 	protected void setUp() {
 
 		this.setCreateGraphs(true);
 		this.setDumpDataAtEnd(false);
 		this.setWriteEventsInterval(0);
-		
-	    ObjectAttributes attributes = new ObjectAttributes();
-	    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(attributes);
-		attributesReader.parse("./input/miniScenarioFacilityAttributes.xml");
-		
+
+		ObjectAttributes attributes = new ObjectAttributes();
+		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(attributes);
+		attributesReader.parse("./input/testMiniScenario/testMiniScenarioFacilityAttributes.xml");
+
 		//---------------location choice module---------------------
 
 		this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
-			    	  
+
 		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
-		//ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
-			  		
+		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
+
 		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
-			
+
 		//---------------location choice module end-------------------
-		
+
 		// get objects that are required as parameter for the AgentInteractionScoringFunctionFactory 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.getConfig().planCalcScore();
+
 		ActivityFacilities facilities = this.getFacilities();
 		Network network = this.getNetwork();
 
 		// create the AgentInteractionScoringFunctionFactory
-		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(planCalcScoreConfigGroup, facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()), facilityOccupancies, attributes);
+		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(this, this.config, planCalcScoreConfigGroup,
+				facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()),
+				facilityOccupancies, attributes, scaleEpsilon, actTypeConverter,
+				defineFlexibleActivities.getFlexibleTypes());
+
 
 		// set the AgentInteractionScoringFunctionFactory as default in the controler 
 		this.setScoringFunctionFactory(factory);
-	    super.setUp();	
-		
+		super.setUp();	
+
 		addControlerListener(new FacilitiesOccupancyCalculator(this.facilityOccupancies, AgentInteraction.numberOfTimeBins, AgentInteraction.scaleNumberOfPersons));
-		
+
 		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter));
 		this.addControlerListener(new DistanceStats(this.config, "best", "l", actTypeConverter));
 	}

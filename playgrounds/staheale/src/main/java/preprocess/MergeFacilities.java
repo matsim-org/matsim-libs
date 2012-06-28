@@ -41,61 +41,61 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class MergeFacilities {
 	private static Logger log = Logger.getLogger(MergeFacilities.class);
-	
-public static void main(String[] args) throws IOException {
-	
-	final ScenarioImpl scenarioWork = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	MatsimFacilitiesReader workFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioWork);  
-	System.out.println("Reading work facilities xml file... ");
-	workFacReader.readFile("./input/workFacilities.xml.gz");
-	System.out.println("Reading work facilities xml file...done.");
-	ActivityFacilitiesImpl workFacilities = ((ScenarioImpl) scenarioWork).getActivityFacilities();
-    log.info("Number of work facilities: " +workFacilities.getFacilities().size());
-    
-    
-    //---------------------read home facilities xml file---------
-    
-    final ScenarioImpl scenarioHome = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    
-	MatsimFacilitiesReader homeFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioHome);  
-	System.out.println("Reading home facilities xml file... ");
-	homeFacReader.readFile("./input/homeFacilities.xml");
-	System.out.println("Reading home facilities xml file...done.");
-	ActivityFacilitiesImpl homeFacilities = ((ScenarioImpl) scenarioHome).getActivityFacilities();
-    log.info("Number of home facilities: " +homeFacilities.getFacilities().size());
+	public static void main(String[] args) throws IOException {
 
-    TreeMap<Id, ActivityFacility> ActHomeFacilities = homeFacilities.getFacilitiesForActivityType("home");
-    log.info("Number of facilities of activity type home: " +ActHomeFacilities.size());
-    
-    //------------------initial home facility file is zero------
-    
-//    final ScenarioImpl scenarioActHome = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//    
-//	MatsimFacilitiesReader aHomeFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioActHome);  
-//	aHomeFacReader.readFile("./input/aHomeFacilities.xml");
-//	ActivityFacilitiesImpl aHomeFacilities = ((ScenarioImpl) scenarioActHome).getActivityFacilities();
-//    
-//	for (ActivityFacility f : ActHomeFacilities.values()) {
-//		ActivityFacilityImpl a = aHomeFacilities.createFacility(f.getId(), f.getCoord());
-//		a.createActivityOption("home");
-//		a.getActivityOptions().get("home").addOpeningTime(new OpeningTimeImpl(
-//			DayType.wk,
-//			0.0 * 3600,
-//			24.0 * 3600));
-//	}
-    
-    for (ActivityFacility f : ActHomeFacilities.values()) {
-    	
-    	ActivityFacilityImpl a = workFacilities.createFacility(f.getId(), f.getCoord());
-        a.createActivityOption("home");
-        a.getActivityOptions().get("home").addOpeningTime(new OpeningTimeImpl(
-				DayType.wk,
-				0.0 * 3600,
-				24.0 * 3600));
-    	}
-    log.info("Number of work facilities: " +workFacilities.getFacilities().size());
-    
-	new FacilitiesWriter(workFacilities).write("./output/facilities.xml.gz");
+		final ScenarioImpl scenarioWork = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		MatsimFacilitiesReader workFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioWork);  
+		System.out.println("Reading work facilities xml file... ");
+		workFacReader.readFile("./input/workFacilities.xml.gz");
+		System.out.println("Reading work facilities xml file...done.");
+		ActivityFacilitiesImpl workFacilities = ((ScenarioImpl) scenarioWork).getActivityFacilities();
+		log.info("Number of work facilities: " +workFacilities.getFacilities().size());
+
+
+		//---------------------read home facilities xml file---------
+
+		final ScenarioImpl scenarioHome = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		MatsimFacilitiesReader homeFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioHome);  
+		System.out.println("Reading home facilities xml file... ");
+		homeFacReader.readFile("./input/homeFacilities.xml");
+		System.out.println("Reading home facilities xml file...done.");
+		ActivityFacilitiesImpl homeFacilities = ((ScenarioImpl) scenarioHome).getActivityFacilities();
+		log.info("Number of home facilities: " +homeFacilities.getFacilities().size());
+
+		TreeMap<Id, ActivityFacility> ActHomeFacilities = homeFacilities.getFacilitiesForActivityType("home");
+		log.info("Number of facilities of activity type home: " +ActHomeFacilities.size());
+
+		//------------------initial home facility file is zero------
+
+		//    final ScenarioImpl scenarioActHome = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		//    
+		//	MatsimFacilitiesReader aHomeFacReader = new MatsimFacilitiesReader((ScenarioImpl) scenarioActHome);  
+		//	aHomeFacReader.readFile("./input/aHomeFacilities.xml");
+		//	ActivityFacilitiesImpl aHomeFacilities = ((ScenarioImpl) scenarioActHome).getActivityFacilities();
+		//    
+		//	for (ActivityFacility f : ActHomeFacilities.values()) {
+		//		ActivityFacilityImpl a = aHomeFacilities.createFacility(f.getId(), f.getCoord());
+		//		a.createActivityOption("home");
+		//		a.getActivityOptions().get("home").addOpeningTime(new OpeningTimeImpl(
+		//			DayType.wk,
+		//			0.0 * 3600,
+		//			24.0 * 3600));
+		//	}
+
+		for (ActivityFacility f : ActHomeFacilities.values()) {
+
+			ActivityFacilityImpl a = workFacilities.createFacility(f.getId(), f.getCoord());
+			a.createActivityOption("home");
+			//        a.getActivityOptions().get("home").addOpeningTime(new OpeningTimeImpl(
+			//				DayType.wk,
+			//				0.0 * 3600,
+			//				24.0 * 3600));
+		}
+		log.info("Number of work facilities: " +workFacilities.getFacilities().size());
+
+		new FacilitiesWriter(workFacilities).write("./output/facilities.xml.gz");
 	}
 }

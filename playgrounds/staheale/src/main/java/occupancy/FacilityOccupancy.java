@@ -23,24 +23,24 @@ package occupancy;
 import miniscenario.AgentInteraction;
 
 public class FacilityOccupancy {
-		
+
 	private int [] arrivals = null;
 	private int [] departures = null;
 	private int [] occupancy = null;
-	
+
 	private int numberOfTimeBins = 96;
-	
+
 	// visitors which are included in the penalty calculation (arrival before 24:00)
 	private double numberOfVisitorsPerDay = 0.0;
-	
+
 	// including also visitors which arrive after 24:00
 	private double allVisitors = 0.0;
-		
+
 	private double scaleNumberOfPersons = AgentInteraction.scaleNumberOfPersons;
 
-	
+
 	// ----------------------------------------------------------------------
-		
+
 	FacilityOccupancy(int numberOfTimeBins, double scaleNumberOfPersons) {
 		this.numberOfTimeBins = numberOfTimeBins;
 		this.arrivals = new int [(numberOfTimeBins+16)];
@@ -55,17 +55,17 @@ public class FacilityOccupancy {
 			this.occupancy[i] = 0;
 		}
 	}
-	
-//	private void calculateFacilityOccupancy24() {
-//		//log.info("calculateFacilityLoad24");
-//		int numberOfVisitors = 0;
-//		for (int i = 0; i < this.numberOfTimeBins; i++) {
-//			numberOfVisitors += this.arrivals[i];
-//			this.occupancy[i] = (int) (numberOfVisitors * this.scaleNumberOfPersons);
-//			numberOfVisitors -= this.departures[i];			
-//		}
-//	}
-	
+
+	//	private void calculateFacilityOccupancy24() {
+	//		//log.info("calculateFacilityLoad24");
+	//		int numberOfVisitors = 0;
+	//		for (int i = 0; i < this.numberOfTimeBins; i++) {
+	//			numberOfVisitors += this.arrivals[i];
+	//			this.occupancy[i] = (int) (numberOfVisitors * this.scaleNumberOfPersons);
+	//			numberOfVisitors -= this.departures[i];			
+	//		}
+	//	}
+
 	public void addArrival(double time) {		
 		this.addToAllVisitors(this.scaleNumberOfPersons);
 		/* We do not handle times > 24h
@@ -84,7 +84,7 @@ public class FacilityOccupancy {
 		//log.info("arrival at: " + time + " bin: " + timeBinIndex);
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
 	}
-	
+
 	public void addDeparture(double time) {
 		/* We do not handle times > 24h
 		 * We do not care about #arrivals==#departures after the last time bin
@@ -101,19 +101,19 @@ public class FacilityOccupancy {
 		}
 		//log.info("departure at: " + time + " bin: " + timeBinIndex);
 	}
-	
-//	public double getCurrentOccupancy (double time) {
-//		int timeBinIndex = this.timeBinIndex(time);
-//		this.occupancy[timeBinIndex] += this.arrivals[timeBinIndex];
-//		this.occupancy[timeBinIndex] -= this.departures[timeBinIndex];
-//		double CurrentOccupancy = this.occupancy[timeBinIndex];
-//		return CurrentOccupancy;		
-//	}
-	
+
+	//	public double getCurrentOccupancy (double time) {
+	//		int timeBinIndex = this.timeBinIndex(time);
+	//		this.occupancy[timeBinIndex] += this.arrivals[timeBinIndex];
+	//		this.occupancy[timeBinIndex] -= this.departures[timeBinIndex];
+	//		double CurrentOccupancy = this.occupancy[timeBinIndex];
+	//		return CurrentOccupancy;		
+	//	}
+
 	public void addToAllVisitors(double scaleNumberOfPersons) {
 		this.allVisitors += scaleNumberOfPersons;
 	}
-	
+
 	public void addToVisitorsPerDay(double scaleNumberOfPersons) {
 		this.numberOfVisitorsPerDay += scaleNumberOfPersons;
 	}
@@ -121,7 +121,7 @@ public class FacilityOccupancy {
 	public int[] getOccupancy() {
 		return occupancy;
 	}
-	
+
 	public double getOccupancyPerHour(double hour) {
 		double hourlyOccupancy = 0.0;
 
@@ -131,7 +131,7 @@ public class FacilityOccupancy {
 		}
 		return hourlyOccupancy/4;
 	}
-	
+
 	public double getNumberOfVisitorsPerDay() {
 		return numberOfVisitorsPerDay;
 	}
@@ -139,7 +139,7 @@ public class FacilityOccupancy {
 	public double getAllVisitors() {
 		return this.allVisitors;
 	}
-	
+
 	public double getCurrentOccupancy(int timeBinIndex) {
 		int t = timeBinIndex;
 		int sumArrivals = 0;
@@ -154,11 +154,11 @@ public class FacilityOccupancy {
 		return currentOccupancy;
 	}
 
-//	public void finish() {
-//		//log.info("FacilityLoad finished");
-//		this.calculateFacilityOccupancy24();
-//	}
-	
+	//	public void finish() {
+	//		//log.info("FacilityLoad finished");
+	//		this.calculateFacilityOccupancy24();
+	//	}
+
 	public void reset() {
 		for (int i=0; i<this.numberOfTimeBins; i++) {
 			this.arrivals[i] = 0;
@@ -168,7 +168,7 @@ public class FacilityOccupancy {
 		this.numberOfVisitorsPerDay = 0.0;
 		this.allVisitors = 0.0;
 	}
-	
+
 	/* 
 	 * All values >= 86400 (24h) are merged into the last time bin
 	 */

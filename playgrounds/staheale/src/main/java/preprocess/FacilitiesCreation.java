@@ -31,10 +31,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-//import java.util.regex.Pattern;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -43,39 +40,28 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-//import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
-//import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
-//import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
-//import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus.ProductionSector;
-//import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
-//import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
-//import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI.KTIYear;
-//import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensus;
-//import playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ.entreprisecensus.EnterpriseCensusParser;
-//import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
 
 
 
-
-public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
+public class FacilitiesCreation { 
 
 	private TreeMap<String, String> facilityActivities = new TreeMap<String, String>();
 
 	private static Logger log = Logger.getLogger(FacilitiesCreation.class);
-	
+
 	private KTIYear ktiYear;
-	
+
 	private final static String TEMPORARY_FACILITY_ID_SEPARATOR = "_";
-	
+
 	private AgentInteractionEnterpriseCensus myCensus;
-	
+
 	public FacilitiesCreation(KTIYear ktiYear) {
 		//super(null);
 		this.ktiYear = ktiYear;
-	
+
 	}
-	
-	
+
+
 
 	public void run(ActivityFacilitiesImpl facilities) {
 
@@ -96,8 +82,8 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 			e.printStackTrace();
 		}
 
-	//	myCensus.printPresenceCodesReport();
-	//	myCensus.printHectareAggregationReport();
+		//	myCensus.printPresenceCodesReport();
+		//	myCensus.printHectareAggregationReport();
 
 		log.info("Reading enterprise census files into EnterpriseCensus object...done.");
 	}
@@ -122,15 +108,15 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 		TreeMap<Integer, Integer> maxFTEsPerFacility = new TreeMap<Integer, Integer>();
 		// commented out you see the correct ones, the used ones are +1 because of rounding
 		// but I think the error is minimal (in fact it is completely irrelevant but I am a perfectionist)
-//		maxFTEsPerFacility.put(1, 9); // 0-9 fulltime equivalents
-//		maxFTEsPerFacility.put(2, 49); // 10-49 fulltime equivalents
-//		maxFTEsPerFacility.put(3, 249); // 50-249 fulltime equivalents
-//		maxFTEsPerFacility.put(4, Integer.MAX_VALUE); // >250 fulltime equivalents
+		//		maxFTEsPerFacility.put(1, 9); // 0-9 fulltime equivalents
+		//		maxFTEsPerFacility.put(2, 49); // 10-49 fulltime equivalents
+		//		maxFTEsPerFacility.put(3, 249); // 50-249 fulltime equivalents
+		//		maxFTEsPerFacility.put(4, Integer.MAX_VALUE); // >250 fulltime equivalents
 		maxFTEsPerFacility.put(1, 10); // 0-9 fulltime equivalents
 		maxFTEsPerFacility.put(2, 50); // 10-49 fulltime equivalents
 		maxFTEsPerFacility.put(3, 250); // 50-249 fulltime equivalents
 		maxFTEsPerFacility.put(4, Integer.MAX_VALUE); // >250 fulltime equivalents
-//		int maxFTEs = Integer.MIN_VALUE;
+		//		int maxFTEs = Integer.MIN_VALUE;
 
 		// after we will have distributed the minimum FTEs,
 		// we randomly distribute the remaining ones
@@ -187,9 +173,9 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 
 					// create temporary facilities, set minimum FTEs
 					for (int i=0; i < numFacilities; i++) {
-//-------------TODO: setting id offset-----------------
+						//-------------TODO: setting id offset-----------------
 						tempFacilityId = this.createTemporaryFacilityID(10000000+facilityCnt++, attributeId);
-//						System.out.println("Creating temporary " + tempFacilityId + "...");
+						//						System.out.println("Creating temporary " + tempFacilityId + "...");
 						tempFacilities.put(tempFacilityId, minFTEs);
 						numSectorFTE -= minFTEs;
 						// the number of distributed FTEs should not exceed the number of available ones
@@ -267,147 +253,149 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 							a = f.createActivityOption(FacilitiesProduction.WORK_SECTOR3);
 							a.setCapacity((double) Math.max(1,tempFacilities.get(tempFacilityId)));
 						}
-								
+
 						if (this.facilityActivities.containsKey(activityId)) {
 							a = f.createActivityOption(this.facilityActivities.get(activityId));
 						}
-							//--------------------shop retail capacity definition
-							
-							//shop retail capacity is assumed to depend on sales area where arbitrary 50% are subtracted for shelfs, cash points etc., then a LOS E value of 1.35 P/m2 is assumed for capacity definition; for sales area a random pick in the given intervals is performed 
-										
+						//--------------------shop retail capacity definition
+
+						//shop retail capacity is assumed to depend on sales area where arbitrary 50% are subtracted for shelfs, cash points etc.,
+						//then a value of 0.135 P/m2 is assumed as capacity limit;
+						//for sales area a random pick in the given intervals is performed, except for get100 
+
 						if (f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500)) {
-							double n = Math.round(0.675*(random.nextInt(4500) + 2501));
+							double n = Math.round(0.0675*(random.nextInt(4500) + 2501));
 							a.setCapacity((double) n);
 							//log.info("capacity of shop retail gt2500 set to " +n);
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000)) {
-							double x = Math.round(0.675*(1000 + random.nextInt(1501)));
+							double x = Math.round(0.0675*(1000 + random.nextInt(1501)));
 							a.setCapacity((double) x);
 							log.info("capacity of shop retail get1000 set to " +x);
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET400)) {
-							a.setCapacity((double) Math.round(0.675*(400 + random.nextInt(600))));
+							a.setCapacity((double) Math.round(0.0675*(400 + random.nextInt(600))));
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET100)) {
-							double z = Math.round(0.675*(100 + random.nextInt(300)));
+							double z = Math.round(0.0675*(100 + random.nextInt(300)));
 							a.setCapacity((double) z);
 							//log.info("capacity of shop retail get100 set to " +z);
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_LT100)) {
-							a.setCapacity((double) Math.round(0.675*(20 + random.nextInt(80))));
+							a.setCapacity((double) 20);
 						}
-							
-						//shop retail other sales area is assumed to vary between 20 and 1000 m2
-							
+
+						//shop retail other sales area is assumed to vary between 150 and 1000 m2
+
 						else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
-							a.setCapacity((double) Math.round(0.675*(20 + random.nextInt(981))));
+							a.setCapacity((double) Math.round(0.0675*(150 + random.nextInt(851))));
 						}
-						
+
 						//-------------------------shop service capacity definition
-						
+
 						//capacity is assumed to depend on the number of people working there, one employee can serve 1 customer, subtract 10% for vacancies and 20% for shift operation
-							
+
 						else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_SERVICE)) {
 							double v = Math.max(1,Math.round((tempFacilities.get(tempFacilityId)*0.7)));
 							a.setCapacity((double) v);
 							//log.info("setting shop service capacity to " +v);
 						}
-							
+
 						//-------------------------sports & fun capacity definition
-							
+
 						//bar, disco, dancings, arcades casino: capacity is assumed to depend on the number of people working there, one employee can serve between 10-20 customer, subtract 10% for vacancies and 20% for shift operation
-				
+
 						else if(f.getActivityOptions().containsKey("B015540A") || f.getActivityOptions().containsKey("B019234B") || f.getActivityOptions().containsKey("B019234C")|| f.getActivityOptions().containsKey("B019271A")) {
 							double y = Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(11))));
 							a.setCapacity((double) y);
 							//log.info("setting capacity for bar, disco, etc. with a value of: " +y);
 						}
-						
+
 						//dancing school, other sportive activities like tennis or golf schools: capacity is assumed to depend on the number of people working there, one employee can serve between 20-30 customer, subtract 10% for vacancies and 20% for shift operation
-						
+
 						else if(f.getActivityOptions().containsKey("B019234A") || f.getActivityOptions().containsKey("B019262B") || f.getActivityOptions().containsKey("B019272A")) {
 							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(20 + random.nextInt(11)))));
 						}
-						
+
 						//operation of sport facilities: 
-						
+
 						else if(f.getActivityOptions().containsKey("B019261A")) {
 							a.setCapacity((double)Math.round(30+(0.7*(tempFacilities.get(tempFacilityId)))*(0.7*(tempFacilities.get(tempFacilityId)))));
-						//	log.info("setting capacity for sport facilities");
+							//	log.info("setting capacity for sport facilities");
 
 						}
-						
+
 						//sport clubs:
-							
+
 						else if(f.getActivityOptions().containsKey("B019262A")) {
 							a.setCapacity((double) Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(1))));
-						//	log.info("setting capacity for sport club");
+							//	log.info("setting capacity for sport club");
 						}
-							
+
 						//sauna, solarium, gym, thermal bath, etc.:
-							
+
 						else if(f.getActivityOptions().containsKey("B019304A")|| f.getActivityOptions().containsKey("B019304B") || f.getActivityOptions().containsKey("B019304C")) {
 							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(2 + random.nextInt(9)))));
-						//	log.info("setting capacity for sauna, solarium, gym, etc.");
+							//	log.info("setting capacity for sauna, solarium, gym, etc.");
 						}
-							
+
 						//amusement parks:
-							
+
 						else if(f.getActivityOptions().containsKey("B019233A")) {
 							a.setCapacity((double) Math.round(100+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(25))));
 						}
-							
+
 						//-------------------------gastro & culture capacity definition
-							
+
 						//restaurant, canteen: arbitrary set to vary between 25 and 200
-				
+
 						else if(f.getActivityOptions().containsKey("B015530A") || f.getActivityOptions().containsKey("B015551A")) {
 							a.setCapacity((double) Math.max(1,Math.min(1000,Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(11))))));
 						}
-							
+
 						//cinema:
-							
+
 						else if(f.getActivityOptions().containsKey("B019213A")) {
 							a.setCapacity((double) Math.max(1,Math.min(800,Math.round(200+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))))));
 						}
-							
+
 						//theater, orchestra, circus, etc.:
-							
+
 						else if(f.getActivityOptions().containsKey("B019231A") || f.getActivityOptions().containsKey("B019231B") || f.getActivityOptions().containsKey("B019234D")) {
 							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
 						}
-							
+
 						//libraries:
-							
+
 						else if(f.getActivityOptions().containsKey("B019251A")) {
 							a.setCapacity((double) Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(5))));
 						}
-							
+
 						//museum:
-							
+
 						else if(f.getActivityOptions().containsKey("B019252A")) {
 							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
 						}
-							
+
 						//zoo, gardens, natural parks: arbitrary set to vary between 50 and 1000
-							
+
 						else if(f.getActivityOptions().containsKey("B019253A")) {
 							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(15))));
 						}
-													
+
 					}
 
 				}
 
 				tempFacilities.clear();
 
-//				System.out.println(
-//				"Remaining FTEs in sector " + new Integer(sector).toString() +
-//				" of hectare " + new Integer(hectareCnt).toString() +
-//				": " + new Integer(numSectorFTE).toString());
+				//				System.out.println(
+				//				"Remaining FTEs in sector " + new Integer(sector).toString() +
+				//				" of hectare " + new Integer(hectareCnt).toString() +
+				//				": " + new Integer(numSectorFTE).toString());
 			}
 
 			hectareCnt++;
-//			if ((hectareCnt % skip) == 0) {
-//			log.info("Processed " + hectareCnt + " hectares.");
-//			skip *= 2;
-//			}
+			//			if ((hectareCnt % skip) == 0) {
+			//			log.info("Processed " + hectareCnt + " hectares.");
+			//			skip *= 2;
+			//			}
 		}
 		log.info("Processed " + hectareCnt + " hectares.");
 		log.info("creating facilities...DONE.");
@@ -426,7 +414,7 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 		return temporaryFacilityId.substring(
 				0,
 				temporaryFacilityId.indexOf(TEMPORARY_FACILITY_ID_SEPARATOR)
-		);
+				);
 
 	}
 	private String getAttributeIdFromTemporaryFacilityID(final String temporaryFacilityId) {
@@ -434,165 +422,165 @@ public class FacilitiesCreation { //extends FacilitiesAllActivitiesFTE {
 		return temporaryFacilityId.substring(
 				temporaryFacilityId.indexOf(TEMPORARY_FACILITY_ID_SEPARATOR) + 1,
 				temporaryFacilityId.length()
-		);
+				);
 
 	}
 
-	
-		private void loadFacilityActivities() {
-			
-			//------------------new classification for KTI_YEAR_2008
-			if (this.ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
 
-				// education
-				for (String str : new String[]{"B018010A"}) {
-					this.facilityActivities.put(
-							str,
-							FacilitiesProduction.EDUCATION_KINDERGARTEN);
-				}
+	private void loadFacilityActivities() {
 
-				for (String str : new String[]{"B018010B"}) {
-					this.facilityActivities.put(
-							str,
-							FacilitiesProduction.EDUCATION_PRIMARY);
-				}
+		//------------------new classification for KTI_YEAR_2008
+		if (this.ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
 
-				for (String str : new String[]{"B018021A", "B018021B", "B018021C", "B018022A"}) {
-					this.facilityActivities.put(
-							str,
-							FacilitiesProduction.EDUCATION_SECONDARY);
-				}
-
-				for (String str : new String[]{"B018030A", "B018030B", "B018030C", "B018030D"}) {
-					this.facilityActivities.put(
-							str,
-							FacilitiesProduction.EDUCATION_HIGHER);
-				}
-
-				for (String str : new String[]{"B018041A", "B018042A", "B018042B", "B018042C", "B018042D", "B018042E"}) {
-					this.facilityActivities.put(
-							str,
-							FacilitiesProduction.EDUCATION_OTHER);
-				}
-
-				// shopping
-				for (String str : new String[]{"11A"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
-							str,
-							FacilitiesProduction.SHOP_RETAIL_GT2500);
-				}
-
-				for (String str : new String[]{"11B"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
-							str,
-							FacilitiesProduction.SHOP_RETAIL_GET1000);
-				}
-
-				for (String str : new String[]{"11C"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
-							str,
-							FacilitiesProduction.SHOP_RETAIL_GET400);
-				}
-
-				for (String str : new String[]{"11D"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
-							str,
-							FacilitiesProduction.SHOP_RETAIL_GET100);
-				}
-
-				for (String str : new String[]{"11E"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
-							str,
-							FacilitiesProduction.SHOP_RETAIL_LT100);
-				}
-				
-				// new classification: SHOP_RETAIL_OTHER
-				for (String str : new String[]{
-						"12A","12B",
-						"21A","22A","23A","24A","25A","26A","27A","27B",
-						"31A","32A","33A","33B",
-						"41A","42A","42B","42C","42D","42E","43A","43B","44A","44B","44C","45A","45B","45C","45D","45E","46A","46B","47A","47B","47C","48A","48B","48C","48D","48E","48F","48G","48H","48I","48J","48K","48L","48M","48N","48O","48P",
-						"50A","50B"
-						//,"61A","62A","63A"-->retail shopping not in sales rooms!
-						//,"71A","72A","73A","74A"-->repair stores now in shop service class!
-						}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
-							str,
-							FacilitiesProduction.SHOP_RETAIL_OTHER);
-				}
-
-				// new classification: SHOP_SERVICE
-				for (String str : new String[]{"71A","72A","73A","74A"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +//52
-							str,
-							FacilitiesProduction.SHOP_SERVICE); //CHANGED
-				}
-				for (String str : new String[]{"01A","02A","02B","05A"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.PERSONAL_SERVICE_NOGA_SECTION + //93
-							str,
-							FacilitiesProduction.SHOP_SERVICE);
-				}
-				
-				// new classification: SPORTS_FUN
-				for (String str : new String[]{"40A",}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.HOSPITALITY_NOGA_SECTION +//55
-							str,
-							FacilitiesProduction.SPORTS_FUN);
-				}
-				for (String str : new String[]{"33A","34A","34B","34C",
-						"61A","62A","62B","71A","72A"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.CULTURE_NOGA_SECTION +//92
-							str,
-							FacilitiesProduction.SPORTS_FUN);
-				}
-				for (String str : new String[]{"04A","04B","04C"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.PERSONAL_SERVICE_NOGA_SECTION +//93
-							str,
-							FacilitiesProduction.SPORTS_FUN);
-				}
-
-				// new classification: GASTRO_CULTURE
-				for (String str : new String[]{"30A","51A"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.HOSPITALITY_NOGA_SECTION +
-							str,
-							FacilitiesProduction.GASTRO_CULTURE);
-				}
-				for (String str : new String[]{"13A","31A","31B","34D","51A","52A","53A"}) {
-					this.facilityActivities.put(
-							AgentInteractionEnterpriseCensus.EC01_PREFIX +
-							AgentInteractionEnterpriseCensus.CULTURE_NOGA_SECTION +
-							str,
-							FacilitiesProduction.GASTRO_CULTURE);
-				}
-			}
-			for (String str : facilityActivities.keySet()) {
-				System.out.println(str + "\t|\t" + facilityActivities.get(str));
+			// education
+			for (String str : new String[]{"B018010A"}) {
+				this.facilityActivities.put(
+						str,
+						FacilitiesProduction.EDUCATION_KINDERGARTEN);
 			}
 
+			for (String str : new String[]{"B018010B"}) {
+				this.facilityActivities.put(
+						str,
+						FacilitiesProduction.EDUCATION_PRIMARY);
+			}
+
+			for (String str : new String[]{"B018021A", "B018021B", "B018021C", "B018022A"}) {
+				this.facilityActivities.put(
+						str,
+						FacilitiesProduction.EDUCATION_SECONDARY);
+			}
+
+			for (String str : new String[]{"B018030A", "B018030B", "B018030C", "B018030D"}) {
+				this.facilityActivities.put(
+						str,
+						FacilitiesProduction.EDUCATION_HIGHER);
+			}
+
+			for (String str : new String[]{"B018041A", "B018042A", "B018042B", "B018042C", "B018042D", "B018042E"}) {
+				this.facilityActivities.put(
+						str,
+						FacilitiesProduction.EDUCATION_OTHER);
+			}
+
+			// shopping
+			for (String str : new String[]{"11A"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
+						FacilitiesProduction.SHOP_RETAIL_GT2500);
+			}
+
+			for (String str : new String[]{"11B"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
+						FacilitiesProduction.SHOP_RETAIL_GET1000);
+			}
+
+			for (String str : new String[]{"11C"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
+						FacilitiesProduction.SHOP_RETAIL_GET400);
+			}
+
+			for (String str : new String[]{"11D"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
+						FacilitiesProduction.SHOP_RETAIL_GET100);
+			}
+
+			for (String str : new String[]{"11E"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
+						FacilitiesProduction.SHOP_RETAIL_LT100);
+			}
+
+			// new classification: SHOP_RETAIL_OTHER
+			for (String str : new String[]{
+					"12A","12B",
+					"21A","22A","23A","24A","25A","26A","27A","27B",
+					"31A","32A","33A","33B",
+					"41A","42A","42B","42C","42D","42E","43A","43B","44A","44B","44C","45A","45B","45C","45D","45E","46A","46B","47A","47B","47C","48A","48B","48C","48D","48E","48F","48G","48H","48I","48J","48K","48L","48M","48N","48O","48P",
+					"50A","50B"
+					//,"61A","62A","63A"-->retail shopping not in sales rooms!
+					//,"71A","72A","73A","74A"-->repair stores now in shop service class!
+			}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +
+						str,
+						FacilitiesProduction.SHOP_RETAIL_OTHER);
+			}
+
+			// new classification: SHOP_SERVICE
+			for (String str : new String[]{"71A","72A","73A","74A"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.SHOP_NOGA_SECTION +//52
+						str,
+						FacilitiesProduction.SHOP_SERVICE); //CHANGED
+			}
+			for (String str : new String[]{"01A","02A","02B","05A"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.PERSONAL_SERVICE_NOGA_SECTION + //93
+						str,
+						FacilitiesProduction.SHOP_SERVICE);
+			}
+
+			// new classification: SPORTS_FUN
+			for (String str : new String[]{"40A",}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.HOSPITALITY_NOGA_SECTION +//55
+						str,
+						FacilitiesProduction.SPORTS_FUN);
+			}
+			for (String str : new String[]{"33A","34A","34B","34C",
+					"61A","62A","62B","71A","72A"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.CULTURE_NOGA_SECTION +//92
+						str,
+						FacilitiesProduction.SPORTS_FUN);
+			}
+			for (String str : new String[]{"04A","04B","04C"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.PERSONAL_SERVICE_NOGA_SECTION +//93
+						str,
+						FacilitiesProduction.SPORTS_FUN);
+			}
+
+			// new classification: GASTRO_CULTURE
+			for (String str : new String[]{"30A","51A"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.HOSPITALITY_NOGA_SECTION +
+						str,
+						FacilitiesProduction.GASTRO_CULTURE);
+			}
+			for (String str : new String[]{"13A","31A","31B","34D","51A","52A","53A"}) {
+				this.facilityActivities.put(
+						AgentInteractionEnterpriseCensus.EC01_PREFIX +
+						AgentInteractionEnterpriseCensus.CULTURE_NOGA_SECTION +
+						str,
+						FacilitiesProduction.GASTRO_CULTURE);
+			}
 		}
-		
+		for (String str : facilityActivities.keySet()) {
+			System.out.println(str + "\t|\t" + facilityActivities.get(str));
+		}
+
 	}
+
+}
