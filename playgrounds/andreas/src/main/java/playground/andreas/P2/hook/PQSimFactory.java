@@ -40,6 +40,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
+import playground.andreas.P2.helper.PConfigGroup;
+
 /**
  * The MobsimFactory is only necessary so that I can add the {@link PTransitAgent}.
  *
@@ -81,7 +83,7 @@ public class PQSimFactory implements MobsimFactory {
         AgentFactory agentFactory;
         
         if (sc.getConfig().scenario().isUseTransit()) {
-            agentFactory = new PTransitAgentFactory(qSim);
+            agentFactory = new PTransitAgentFactory(qSim, ((PConfigGroup) sc.getConfig().getModule(PConfigGroup.GROUP_NAME)).getPassengersBoardEveryLine());
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

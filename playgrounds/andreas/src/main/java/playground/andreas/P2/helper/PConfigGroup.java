@@ -83,6 +83,7 @@ public class PConfigGroup extends Module{
 	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
 	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
 	private static final String REROUTE_AGENTS_STUCK = "reRouteAgentsStuck";
+	private static final String PASSENGERS_BOARD_EVERY_LINE = "passengersBoardEveryLine";
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
 	private static final String PT_ENABLER = "ptEnabler";
 	
@@ -122,6 +123,7 @@ public class PConfigGroup extends Module{
 	private boolean useAdaptiveNumberOfCooperatives = false;
 	private double shareOfCooperativesWithProfit = 0.50;
 	private boolean reRouteAgentsStuck = false;
+	private boolean passengersBoardEveryLine = false;
 	private String transitScheduleToStartWith = null;
 	private String ptEnabler = null;
 
@@ -201,6 +203,8 @@ public class PConfigGroup extends Module{
 			this.shareOfCooperativesWithProfit = Double.parseDouble(value);
 		} else if (REROUTE_AGENTS_STUCK.equals(key)){
 			this.reRouteAgentsStuck = Boolean.parseBoolean(value);
+		} else if (PASSENGERS_BOARD_EVERY_LINE.equals(key)){
+			this.passengersBoardEveryLine = Boolean.parseBoolean(value);
 		} else if (TRANSIT_SCHEDULE_TO_START_WITH.equals(key)){
 			this.transitScheduleToStartWith = value;
 		} else if (PT_ENABLER.equals(key)){
@@ -256,6 +260,7 @@ public class PConfigGroup extends Module{
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, Double.toString(this.shareOfCooperativesWithProfit));
 		map.put(REROUTE_AGENTS_STUCK, Boolean.toString(this.reRouteAgentsStuck));
+		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
@@ -302,6 +307,7 @@ public class PConfigGroup extends Module{
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
 		map.put(REROUTE_AGENTS_STUCK, "All agents stuck will be rerouted at the beginning of an iteration, if set to true.");
+		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one cooperative for each transit line with the given time of operation and number of vehicles");
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
@@ -435,6 +441,10 @@ public class PConfigGroup extends Module{
 	
 	public boolean getReRouteAgentsStuck() {
 		return this.reRouteAgentsStuck;
+	}
+	
+	public boolean getPassengersBoardEveryLine() {
+		return this.passengersBoardEveryLine;
 	}
 	
 	public String getTransitScheduleToStartWith() {
