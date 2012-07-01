@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -105,6 +106,7 @@ import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas
 public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements MobsimInitializedListener,
 		MobsimAfterSimStepListener, AfterMobsimListener {
 
+	protected static final Logger log = Logger.getLogger(ParkingAgentsTracker.class);
 	private final Scenario scenario;
 	private final double distance;
 	private ParkingOccupancyStats parkingOccupancy;
@@ -694,12 +696,10 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			}
 		}
 		
-		System.out.println("Strategies used by agents");
+		//"Strategies used by agents"
 		for (ParkingStrategy ps:numberOfTimesStrategyUser.getKeySet()){
-			System.out.println(ps.getIdentifier() + " -> " + numberOfTimesStrategyUser.get(ps));
+			log.info("parking strategy currently selected (iteration):\t" + event.getIteration() + "\t" +  ps.getIdentifier() + "\t" + numberOfTimesStrategyUser.get(ps));
 		}
-		
-		
 	}
 
 	private void processScoreOfLastParking(Id personId) {

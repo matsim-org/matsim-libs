@@ -4,11 +4,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -28,6 +30,7 @@ import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas
 
 public class ParkingStrategyManager implements BeforeMobsimListener, MobsimInitializedListener {
 
+	protected static final Logger log = Logger.getLogger(ParkingStrategyManager.class);
 	private final ParkingStrategyActivityMapperFW strategyActivityMapper;
 	private final Collection<ParkingStrategy> parkingStrategies;
 
@@ -174,11 +177,12 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 		double bestStrategyScore = Double.NEGATIVE_INFINITY ;
 		for (ParkingStrategy parkingStrategy : parkingStrategies) {
 			if (agent.getId().toString().equalsIgnoreCase("303")){
-				System.out.println(parkingStrategy.getScore(agent.getId(), 3));
+				System.out.println(parkingStrategy.getIdentifier() + "->" +  parkingStrategy.getScore(agent.getId(), 3));
 			}
 			
 			if (parkingStrategy.getScore(agent.getId(), legPlanElementIndex) > bestStrategyScore) {
 				selectedParkingStrategy = parkingStrategy;
+				bestStrategyScore=parkingStrategy.getScore(agent.getId(), legPlanElementIndex);
 			}
 		}
 		
