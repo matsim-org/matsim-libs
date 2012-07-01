@@ -76,7 +76,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 * How many parallel Threads shall do the Replanning.
 	 */
 	// TODO: set this parameter from config!
-	protected int numReplanningThreads = 4;
+	protected int numReplanningThreads = 3;
 
 	// protected RandomSearchIdentifier randomSearchIdentifier;
 	// protected RandomSearchReplannerFactory randomSearchReplannerFactory;

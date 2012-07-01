@@ -44,6 +44,7 @@ import org.matsim.withinday.utils.EditRoutes;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 
 /**
  * 
@@ -67,7 +68,10 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
 		
+		EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
+		
 		Plan plan = withinDayAgent.getSelectedPlan();
+		DebugLib.traceAgent(plan.getPerson().getId(), 3);
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 
 		if (currentLegIndex == 15) {
@@ -88,6 +92,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 				.get(parkingFacilityId);
 		firstParkingAct.setLinkId(parkingFacility.getLinkId());
 
+		
 		editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), firstWalkLegIndex, routeAlgo);
 
 		Integer secondParkingActIndex = getSecondParkingActIndex(withinDayAgent);
@@ -100,7 +105,11 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 			secondParkingAct.setLinkId(parkingFacility.getLinkId());
 
 			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, routeAlgo);
-			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, routeAlgo);
+			
+			editPartialRoute.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex);
+			// this causes servious problem
+			//########################################################## => check, why does not function?
+			//editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, routeAlgo);
 		}
 
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();

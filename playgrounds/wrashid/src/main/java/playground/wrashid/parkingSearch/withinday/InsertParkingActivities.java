@@ -34,10 +34,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -47,6 +49,7 @@ import org.matsim.withinday.utils.EditRoutes;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 
 public class InsertParkingActivities implements PlanAlgorithm {
 
@@ -141,9 +144,9 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		 * off to avoid this problem.
 		 */
 
-		adaptFirstParkingActivity(plan);
+		initializeFirstParkingActivityOfDay(plan);
 		
-		updateSecondParkingActivityLinkOfDayIfNeeded(parkingInfrastructure,plan,scenario);
+		
 
 		/*
 		 * Create initial routes for new legs
@@ -153,14 +156,20 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		 * to the person it really belongs to.
 		 */
 		Person person = plan.getPerson();
-		Person dummyPerson = this.scenario.getPopulation().getFactory().createPerson(scenario.createId("dummy"));
-		dummyPerson.addPlan(plan);
-		personPrepareForSim.run(dummyPerson);
+		//Person dummyPerson = this.scenario.getPopulation().getFactory().createPerson(scenario.createId("dummy"));
+		//dummyPerson.addPlan(plan);
+		//personPrepareForSim.run(dummyPerson);
 		plan.setPerson(person);
 	}
 	
 	//TODO: unrequired routings could be removed...
-	private void adaptFirstParkingActivity(Plan plan) {
+	// set the first parking facility of day as specified by parking infrastructure
+	private void initializeFirstParkingActivityOfDay(Plan plan) {
+		
+		//DebugLib.traceAgent(plan.getPerson().getId(), 2);
+		
+		DebugLib.traceAgent(plan.getPerson().getId(), 3);
+		
 		List<PlanElement> planElements = plan.getPlanElements();
 		
 		for (int i=0;i<planElements.size();i++){
@@ -175,11 +184,18 @@ public class InsertParkingActivities implements PlanAlgorithm {
 					act.setLinkId(parkingFacility.getLinkId());
 					act.setFacilityId(parkingFacility.getId());
 					
+					updateSecondParkingActivityLinkOfDayIfNeeded(parkingInfrastructure,plan,scenario);
+					
 					EditRoutes editRoutes=new EditRoutes();
 					//update walk leg
 					editRoutes.replanFutureLegRoute(plan, i-1, routingAlgorithm);
 					//update car leg
-					editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
+					
+					EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
+					//editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
+					editPartialRoute.replanFutureLegRoute(plan, i+1);
+					
+					break;
 				}
 			}
 		}
@@ -193,8 +209,8 @@ public class InsertParkingActivities implements PlanAlgorithm {
 			EditRoutes editRoutes=new EditRoutes();
 			
 			Activity currentParkingDepartureAct = null;
-			Activity nextParkingArrivalAct = null;
-			Activity nextParkingDepartureAct = null;
+			ActivityImpl nextParkingArrivalAct = null;
+			ActivityImpl nextParkingDepartureAct = null;
 			
 			List<PlanElement> planElements = plan.getPlanElements();
 			int firstPossibleParkingActIndex = 2;
@@ -205,9 +221,9 @@ public class InsertParkingActivities implements PlanAlgorithm {
 						if (currentParkingDepartureAct == null) {
 							currentParkingDepartureAct = act;
 						} else if (nextParkingArrivalAct == null) {
-							nextParkingArrivalAct = act;
+							nextParkingArrivalAct = (ActivityImpl) act;
 						} else if (nextParkingDepartureAct == null) {
-							nextParkingDepartureAct = act;
+							nextParkingDepartureAct = (ActivityImpl) act;
 						}
 					}
 				}
@@ -219,32 +235,29 @@ public class InsertParkingActivities implements PlanAlgorithm {
 			if (nextParkingArrivalAct!=null){
 				if (currentParkingDepartureAct.getLinkId() == nextParkingArrivalAct.getLinkId()) {
 					newParkingFacilityId = pi.getClosestParkingFacilityNotOnLink(nextParkingArrivalAct.getCoord(), nextParkingArrivalAct.getLinkId());
-					Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
-					int indexNextParkingArrival = planElements.indexOf(nextParkingArrivalAct);
-					planElements.remove(indexNextParkingArrival);
-					planElements.add(indexNextParkingArrival, newParkingAct);
+					nextParkingArrivalAct.setLinkId(((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(newParkingFacilityId).getLinkId());
+					nextParkingArrivalAct.setFacilityId(newParkingFacilityId);
+
 					
 					// update car leg
-					editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival-1, routingAlgo);
+					//editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival-1, routingAlgo);
 					
 					// update walk leg
-					editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival+1, routingAlgo);
+					//editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival+1, routingAlgo);
 					
 				}
 			}
 			
 			
 			if (nextParkingDepartureAct!=null && newParkingFacilityId != null) {
-				Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
-				int indexNextParkingDeparture = planElements.indexOf(nextParkingDepartureAct);
-				planElements.remove(indexNextParkingDeparture);
-				planElements.add(indexNextParkingDeparture, newParkingAct);
+				nextParkingDepartureAct.setLinkId(((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(newParkingFacilityId).getLinkId());
+				nextParkingDepartureAct.setFacilityId(newParkingFacilityId);
 				
 				//update car leg
-				editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture + 1, routingAlgo);
+				//editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture + 1, routingAlgo);
 				
 				// update walk leg
-				editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture-1, routingAlgo);
+				//editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture-1, routingAlgo);
 				
 			}
 			
@@ -289,13 +302,15 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	// TODO: also invoke for first leg => after init...
 	public static void updateNextParkingActivityIfNeededAndRouteDuringDay(ParkingInfrastructure pi,
 			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, PlanAlgorithm routeAlgo) {
+		EditPartialRoute editPartialRoute=new EditPartialRoute(sc, routeAlgo);
+		
 
 		EditRoutes editRoutes = new EditRoutes();
 
 		Activity currentParkingArrivalAct = null;
 		Activity currentParkingDepartureAct = null;
-		Activity nextParkingArrivalAct = null;
-		Activity nextParkingDepartureAct = null;
+		ActivityImpl nextParkingArrivalAct = null;
+		ActivityImpl nextParkingDepartureAct = null;
 
 		Plan executedPlan = withinDayAgent.getSelectedPlan();
 		int currentPlanElemIndex = withinDayAgent.getCurrentPlanElementIndex();
@@ -310,45 +325,80 @@ public class InsertParkingActivities implements PlanAlgorithm {
 					} else if (currentParkingDepartureAct == null) {
 						currentParkingDepartureAct = act;
 					} else if (nextParkingArrivalAct == null) {
-						nextParkingArrivalAct = act;
+						nextParkingArrivalAct = (ActivityImpl) act;
 					} else if (nextParkingDepartureAct == null) {
-						nextParkingDepartureAct = act;
+						nextParkingDepartureAct = (ActivityImpl) act;
 					}
 				}
 			}
 		}
 		
 
+//		Id newParkingFacilityId=null;
+//		if (nextParkingArrivalAct!=null){
+//			if (currentParkingArrivalAct.getLinkId() == nextParkingArrivalAct.getLinkId()) {
+//				newParkingFacilityId = pi.getClosestParkingFacilityNotOnLink(nextParkingArrivalAct.getCoord(), nextParkingArrivalAct.getLinkId());
+//				Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
+//				int indexNextParkingArrival = planElements.indexOf(nextParkingArrivalAct);
+//				executedPlan.getPlanElements().remove(indexNextParkingArrival);
+//				executedPlan.getPlanElements().add(indexNextParkingArrival, newParkingAct);
+//				
+//				// update car leg
+//				editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingArrival-1, routeAlgo);
+//				
+//				// update walk leg
+//				editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingArrival+1, routeAlgo);
+//				
+//			}
+//		}
+//		
+//
+//		if (nextParkingDepartureAct!=null && newParkingFacilityId != null) {
+//			Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
+//			int indexNextParkingDeparture = planElements.indexOf(nextParkingDepartureAct);
+//			executedPlan.getPlanElements().remove(indexNextParkingDeparture);
+//			executedPlan.getPlanElements().add(indexNextParkingDeparture, newParkingAct);
+//			
+//			//update car leg
+//			editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingDeparture + 1, routeAlgo);
+//			
+//			// update walk leg
+//			editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingDeparture-1, routeAlgo);
+//			
+//		}
+		
 		Id newParkingFacilityId=null;
 		if (nextParkingArrivalAct!=null){
-			if (currentParkingArrivalAct.getLinkId() == nextParkingArrivalAct.getLinkId()) {
+			if (currentParkingDepartureAct.getLinkId() == nextParkingArrivalAct.getLinkId()) {
 				newParkingFacilityId = pi.getClosestParkingFacilityNotOnLink(nextParkingArrivalAct.getCoord(), nextParkingArrivalAct.getLinkId());
-				Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
+				nextParkingArrivalAct.setLinkId(((ScenarioImpl) sc).getActivityFacilities().getFacilities().get(newParkingFacilityId).getLinkId());
+				nextParkingArrivalAct.setFacilityId(newParkingFacilityId);
+
 				int indexNextParkingArrival = planElements.indexOf(nextParkingArrivalAct);
-				executedPlan.getPlanElements().remove(indexNextParkingArrival);
-				executedPlan.getPlanElements().add(indexNextParkingArrival, newParkingAct);
 				
 				// update car leg
-				editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingArrival-1, routeAlgo);
+				//editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival-1, routingAlgo);
+				editPartialRoute.replanFutureLegRoute(executedPlan, indexNextParkingArrival-1);
+				
+				// no need to update walk leg, as destination will change anyway.
 				
 				// update walk leg
-				editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingArrival+1, routeAlgo);
+				//editPartialRoute.replanFutureLegRoute(executedPlan, indexNextParkingArrival+1);
+				//editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival+1, routingAlgo);
 				
 			}
 		}
 		
-
+		
 		if (nextParkingDepartureAct!=null && newParkingFacilityId != null) {
-			Activity newParkingAct = InsertParkingActivities.createParkingActivity(sc, newParkingFacilityId);
-			int indexNextParkingDeparture = planElements.indexOf(nextParkingDepartureAct);
-			executedPlan.getPlanElements().remove(indexNextParkingDeparture);
-			executedPlan.getPlanElements().add(indexNextParkingDeparture, newParkingAct);
+			nextParkingDepartureAct.setLinkId(((ScenarioImpl) sc).getActivityFacilities().getFacilities().get(newParkingFacilityId).getLinkId());
+			nextParkingDepartureAct.setFacilityId(newParkingFacilityId);
 			
 			//update car leg
-			editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingDeparture + 1, routeAlgo);
+			//editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture + 1, routingAlgo);
 			
 			// update walk leg
-			editRoutes.replanFutureLegRoute(executedPlan, indexNextParkingDeparture-1, routeAlgo);
+			//editRoutes.replanFutureLegRoute(plan, indexNextParkingDeparture-1, routingAlgo);
 			
 		}
 
