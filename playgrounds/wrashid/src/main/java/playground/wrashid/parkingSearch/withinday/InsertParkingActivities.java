@@ -193,7 +193,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 					
 					EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
 					//editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
-					editPartialRoute.replanFutureLegRoute(plan, i+1);
+					editPartialRoute.replanFutureCarLegRoute(plan, i+1);
 					
 					break;
 				}
@@ -378,7 +378,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 				
 				// update car leg
 				//editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival-1, routingAlgo);
-				editPartialRoute.replanFutureLegRoute(executedPlan, indexNextParkingArrival-1);
+				editPartialRoute.replanFutureCarLegRoute(executedPlan, indexNextParkingArrival-1);
 				
 				// no need to update walk leg, as destination will change anyway.
 				

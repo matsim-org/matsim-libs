@@ -106,7 +106,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 
 			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, routeAlgo);
 			
-			editPartialRoute.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex);
+			editPartialRoute.replanFutureCarLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex);
 			// this causes servious problem
 			//########################################################## => check, why does not function?
 			//editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, routeAlgo);
@@ -116,7 +116,9 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
-		editRoutes.replanCurrentLegRoute(withinDayAgent.getSelectedPlan(), currentLegIndex, currentLinkIndex, routeAlgo, time);
+		//editRoutes.replanCurrentLegRoute(withinDayAgent.getSelectedPlan(), currentLegIndex, currentLinkIndex, routeAlgo, time);
+		editPartialRoute.replanCurrentCarLegRoute(plan, currentLegIndex, currentLinkIndex, time);
+		
 		
 		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();
 		
