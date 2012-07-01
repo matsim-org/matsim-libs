@@ -49,11 +49,11 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCReplannerFactory;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class HUPCControllerKTI extends KTIWithinDayControler  {

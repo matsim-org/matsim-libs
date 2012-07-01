@@ -72,6 +72,7 @@ import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.HashMapHashSetConcat;
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.event.EventHandlerCodeSeparator;
 import playground.wrashid.parkingChoice.ParkingManager;
@@ -85,7 +86,6 @@ import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CapturePrevio
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureWalkDurationOfFirstAndLastOfDay;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateEndTimeOfPreviousActivity;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateLastParkingArrivalTime;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 // TODO: clearly inspect, which variables have not been reset at beginning of 1st iteration (after 0th iteration).
@@ -334,6 +334,14 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			 * activity).
 			 */
 
+			if (planElementIndex == 3) {
+				
+				ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = agents.get(personId);
+				
+				
+				 DebugLib.traceAgent(personId,6);
+			}
+			
 		
 			if (shouldStartSearchParking(event.getLinkId(), nextActivityLink, distanceToNextActivity)) {
 				searchingAgents.add(personId);
@@ -394,12 +402,12 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				 * activity is performed.
 				 */
 
-				if (currentPlanElementIndex == 3) {
+				if (currentPlanElementIndex == 9) {
 					
 					ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = agents.get(personId);
 					
 					
-					 DebugLib.traceAgent(personId,3);
+					 DebugLib.traceAgent(personId,6);
 				}
 				
 				
@@ -676,6 +684,22 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		parkingOccupancy.writeOutParkingOccupanciesTxt(event.getControler());
 		parkingOccupancy.writeOutParkingOccupancySumPng(event.getControler());
+		
+		
+		
+		IntegerValueHashMap<ParkingStrategy> numberOfTimesStrategyUser=new IntegerValueHashMap<ParkingStrategy>();
+		for (Id personId:parkingStrategyManager.getCurrentlySelectedParkingStrategies().getKeySet1()){
+			for (Integer index:parkingStrategyManager.getCurrentlySelectedParkingStrategies().getKeySet2(personId)){
+				numberOfTimesStrategyUser.increment(parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, index));
+			}
+		}
+		
+		System.out.println("Strategies used by agents");
+		for (ParkingStrategy ps:numberOfTimesStrategyUser.getKeySet()){
+			System.out.println(ps.getIdentifier() + " -> " + numberOfTimesStrategyUser.get(ps));
+		}
+		
+		
 	}
 
 	private void processScoreOfLastParking(Id personId) {

@@ -24,7 +24,6 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class ParkingStrategyManager implements BeforeMobsimListener, MobsimInitializedListener {
@@ -149,7 +148,10 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 								// as we were driving car before, we have to
 								// tidy up the strategy score
 
-								tidyUpUnusedStrategyScores(agent, i);
+								
+								//TODO: uncomment following line (gives null pointer exception)
+								//also the line is not crutial, still would be good to fix it.
+								//tidyUpUnusedStrategyScores(agent, i);
 
 							}
 						}

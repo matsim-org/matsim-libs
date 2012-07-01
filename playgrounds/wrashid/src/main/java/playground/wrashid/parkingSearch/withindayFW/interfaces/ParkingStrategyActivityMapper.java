@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 
 public interface ParkingStrategyActivityMapper {
 

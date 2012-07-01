@@ -40,8 +40,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
+import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 
 /**
  * 
@@ -65,6 +67,12 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
+		if (withinDayAgent.getCurrentPlanElementIndex() ==3){
+			DebugLib.traceAgent(withinDayAgent.getId(), 6);
+		}
+		
+		EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
+		
 		Plan plan = withinDayAgent.getSelectedPlan();
 
 		Leg leg = withinDayAgent.getCurrentLeg();
@@ -129,7 +137,9 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 
 			// if the current linkId is different than the parking activity planned
 	
-			if (linkId != activity.getLinkId()) {
+			boolean parkingFacilityChanged = linkId != activity.getLinkId();
+			Integer nextParkingLegIndex=null;
+			if (parkingFacilityChanged) {
 				/*
 				 * move the parking activity after this leg
 				 */
@@ -140,15 +150,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				activity.setFacilityId(parkingFacilityId);
 
 				updateNextLeg = true;
-
-				/*
-				 * as the parking has changed, we must also
-				 * change the next parking when departing from the actual activity.
-				 * 
-				 * RW new comment: wir müssen beim letzen parking das nicht
-				 * machen, weil hier geht es ja nur um nicht ausgeführte Teile
-				 * des Plans.
-				 */
+				
 				for (int i = withinDayAgent.getCurrentPlanElementIndex() + 2; i < plan.getPlanElements().size(); i++) {
 					PlanElement planElement = plan.getPlanElements().get(i);
 					if (planElement instanceof ActivityImpl) {
@@ -158,15 +160,34 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 							a.setLinkId(linkId);
 							a.setFacilityId(parkingFacilityId);
 
-							// update walk leg to parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i - 1, routeAlgo);
-
-							// update car leg from parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i + 1, routeAlgo);
+							nextParkingLegIndex=i;
+							break;
 						}
 					}
 				}
 			}
+			
+			
+				/*
+				 * as the parking has changed, we must also
+				 * change the next parking when departing from the actual activity.
+				 * 
+				 * RW new comment: wir müssen beim letzen parking das nicht
+				 * machen, weil hier geht es ja nur um nicht ausgeführte Teile
+				 * des Plans.
+				 */
+				InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
+				
+					
+				
+				if (nextParkingLegIndex!=null){
+					// update walk leg to parking activity
+					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex - 1, routeAlgo);
+					
+					// update car leg from parking activity
+					//editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, routeAlgo);
+					editPartialRoute.replanFutureCarLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1);
+				}
 
 			// as we have found a parking on our way to the planned parking, we discard the rest
 			// of the route.
@@ -184,13 +205,13 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				updateNextLeg = true;
 			}
 
-			// adapt next walk leg.
-			if (updateNextLeg) {
-				editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
-						withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);
-			}
+			// update walk leg away from arriving pariking act
+			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
+					withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);	
 			
-			InsertParkingActivities.updateNextParkingActivityIfNeededAndRouteDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
+			
+			
+			
 		}
 
 		withinDayAgent.resetCaches();

@@ -190,7 +190,7 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 						withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);
 			}
 			
-			InsertParkingActivities.updateNextParkingActivityIfNeededAndRouteDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
+			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
 		}
 
 		withinDayAgent.resetCaches();

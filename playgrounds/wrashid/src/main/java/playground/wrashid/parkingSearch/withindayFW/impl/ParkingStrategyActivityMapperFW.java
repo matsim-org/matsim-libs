@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingStrategyActivityMapper;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 
 public class ParkingStrategyActivityMapperFW implements ParkingStrategyActivityMapper {
 

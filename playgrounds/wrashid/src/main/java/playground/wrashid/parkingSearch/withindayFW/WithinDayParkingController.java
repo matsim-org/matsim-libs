@@ -58,6 +58,7 @@ import playground.wrashid.parkingSearch.mobsim.ParkingQSimFactory;
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIReplannerFactory;
@@ -65,7 +66,6 @@ import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {

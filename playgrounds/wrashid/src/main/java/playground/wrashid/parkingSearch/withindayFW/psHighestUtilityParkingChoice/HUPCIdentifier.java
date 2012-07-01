@@ -50,7 +50,7 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.SortableMapObject;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.util.ActivityDurationEstimator;
 
 public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {

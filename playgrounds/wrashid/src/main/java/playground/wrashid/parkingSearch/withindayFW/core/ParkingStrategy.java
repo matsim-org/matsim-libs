@@ -1,4 +1,4 @@
-package playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW;
+package playground.wrashid.parkingSearch.withindayFW.core;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -6,7 +6,6 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 public class ParkingStrategy {
 

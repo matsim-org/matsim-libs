@@ -297,10 +297,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 
 	
 	
-	
-	
-	// TODO: also invoke for first leg => after init...
-	public static void updateNextParkingActivityIfNeededAndRouteDuringDay(ParkingInfrastructure pi,
+	public static void updateNextParkingActivityIfNeededDuringDay(ParkingInfrastructure pi,
 			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, PlanAlgorithm routeAlgo) {
 		EditPartialRoute editPartialRoute=new EditPartialRoute(sc, routeAlgo);
 		
@@ -378,7 +375,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 				
 				// update car leg
 				//editRoutes.replanFutureLegRoute(plan, indexNextParkingArrival-1, routingAlgo);
-				editPartialRoute.replanFutureCarLegRoute(executedPlan, indexNextParkingArrival-1);
+				//editPartialRoute.replanFutureCarLegRoute(executedPlan, indexNextParkingArrival-1);
 				
 				// no need to update walk leg, as destination will change anyway.
 				

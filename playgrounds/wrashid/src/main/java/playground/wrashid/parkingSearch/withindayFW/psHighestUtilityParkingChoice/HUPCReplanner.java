@@ -71,7 +71,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
 		
 		Plan plan = withinDayAgent.getSelectedPlan();
-		DebugLib.traceAgent(plan.getPerson().getId(), 3);
+		
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 
 		if (currentLegIndex == 15) {
@@ -97,6 +97,9 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 
 		Integer secondParkingActIndex = getSecondParkingActIndex(withinDayAgent);
 		if (!lastParkingOfDay(secondParkingActIndex)) {
+			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure(),
+					withinDayAgent, scenario, routeAlgo);
+			
 			Integer secondWalkgLegIndex = secondParkingActIndex - 1;
 			Integer nextCarLegIndex = secondParkingActIndex + 1;
 
@@ -107,10 +110,9 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, routeAlgo);
 			
 			editPartialRoute.replanFutureCarLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex);
-			// this causes servious problem
-			//########################################################## => check, why does not function?
-			//editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, routeAlgo);
 		}
+		
+		
 
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		
@@ -124,8 +126,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		
 		
-		InsertParkingActivities.updateNextParkingActivityIfNeededAndRouteDuringDay(parkingAgentsTracker.getParkingInfrastructure(),
-				withinDayAgent, scenario, routeAlgo);
+		
 
 		withinDayAgent.resetCaches();
 		return true;

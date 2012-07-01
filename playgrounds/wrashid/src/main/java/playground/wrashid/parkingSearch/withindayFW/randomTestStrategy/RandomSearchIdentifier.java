@@ -37,7 +37,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategyFW.ParkingStrategy;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 
 public class RandomSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
 	
@@ -83,6 +83,10 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 				//DebugLib.traceAgent(agentId);
 			}
 			
+			if (agents.get(agentId).getCurrentPlanElementIndex() ==3){
+				DebugLib.traceAgent(agentId, 6);
+			}
+			
 			if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)){
 				//System.out.println(agents.get(agentId).getCurrentPlanElementIndex());
 				//DebugLib.traceAgent(agentId);
@@ -94,7 +98,7 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Mobsi
 			 */
 			if (requiresReplanning(agent)) {
 				Id linkId = agent.getCurrentLinkId();
-				Id facilityId = parkingInfrastructure.getFreeParkingFacilityOnLink(linkId,"streetParking");
+				Id facilityId = parkingInfrastructure.getClosestFreeParkingFacility(linkId);
 				if (facilityId != null) {
 					parkingInfrastructure.parkVehicle(facilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, facilityId);

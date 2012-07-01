@@ -262,6 +262,7 @@ public class ParkingInfrastructure  {
 		return parkingCostCalculator;
 	}
 
+	//TODO: rename to include world free
 	public Id getClosestParkingFacility(Coord coord) {		
 		return nonFullParkingFacilities.get(coord.getX(), coord.getY()).getId();
 	}
@@ -313,8 +314,8 @@ public class ParkingInfrastructure  {
 		return initialParkingFacilityOfAgent;
 	}
 
-//	public Map<Id, Id> getFacilityToLinkMapping() {
-//		return facilityToLinkMapping;
-//	}
+	public Id getClosestFreeParkingFacility(Id linkId) {
+		return getClosestParkingFacility(scenario.getNetwork().getLinks().get(linkId).getCoord());
+	}
 	
 }
