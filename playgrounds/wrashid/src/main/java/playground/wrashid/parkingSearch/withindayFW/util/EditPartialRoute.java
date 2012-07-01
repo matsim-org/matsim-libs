@@ -297,8 +297,8 @@ public class EditPartialRoute {
 	}
 
 	public boolean replanCurrentCarLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, double time) {
-		if (legPlanElementIndex==9){
-			DebugLib.traceAgent(plan.getPerson().getId(), 5);
+		if (legPlanElementIndex==3){
+		//	DebugLib.traceAgent(plan.getPerson().getId(), 9);
 		}
 
 		if (plan == null)
@@ -328,6 +328,19 @@ public class EditPartialRoute {
 		Link oldDestinationLink = getLink(oldRoute.getEndLinkId());
 		Link newDestinationLink = getLink(toActivity.getLinkId());
 
+		List<Id> routeLinkIds = getRouteLinkIds(oldRoute);
+		
+		//routeShouldEndAtCurrentLink
+		if (routeLinkIds.get(currentLinkIndex).equals(newDestinationLink.getId())){
+			List<Id> subList = routeLinkIds.subList(1, currentLinkIndex);
+			
+			oldRoute.setLinkIds(routeLinkIds.get(0), subList, routeLinkIds.get(currentLinkIndex));
+			
+			return true;
+		}
+		
+		
+		
 		if (!oldDestinationLink.getId().equals(newDestinationLink.getId())) {
 			double distanceOldNewOriginal = GeneralLib.getDistance(oldDestinationLink.getCoord(), newDestinationLink.getCoord());
 
