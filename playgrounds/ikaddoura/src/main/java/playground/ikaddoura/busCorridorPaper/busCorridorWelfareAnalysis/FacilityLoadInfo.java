@@ -23,9 +23,6 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -34,8 +31,9 @@ import org.matsim.api.core.v01.Id;
  */
 public class FacilityLoadInfo {
 	private Id facilityId;
-	private List<Double> personEntering = new ArrayList<Double>();
-	private List<Double> personLeaving = new ArrayList<Double>();
+	private int personEntering = 0;
+	private int personLeaving = 0;
+	private int passengers = 0;
 
 	public FacilityLoadInfo(Id id) {
 		this.facilityId = id;
@@ -44,37 +42,28 @@ public class FacilityLoadInfo {
 	public Id getFacilityId() {
 		return facilityId;
 	}
-	public List<Double> getPersonEntering() {
-		return personEntering;
-	}
-	public void setPersonEntering(List<Double> personEntering) {
+
+	public void setPersonEntering(int personEntering) {
 		this.personEntering = personEntering;
 	}
-	public List<Double> getPersonLeaving() {
-		return personLeaving;
+
+	public int getPersonEntering() {
+		return personEntering;
 	}
-	public void setPersonLeaving(List<Double> personLeaving) {
+
+	public void setPersonLeaving(int personLeaving) {
 		this.personLeaving = personLeaving;
 	}
-	
-	public int getPersonsEnteringWithin(double start, double end){
-		int nr = 0;
-			for (Double time : this.personEntering){
-				if (time < end && time >= start) {
-					nr++;
-				}
-			}
-		return nr;
+
+	public int getPersonLeaving() {
+		return personLeaving;
 	}
-	
-	public int getPersonsLeavingWithin(double start, double end){
-		int nr = 0;
-			for (Double time : this.personLeaving){
-				if (time < end && time >= start) {
-					nr++;
-				}
-			}
-		return nr;
+
+	public void setPassengers(int passengers) {
+		this.passengers = passengers;
 	}
-	
+
+	public int getPassengers() {
+		return passengers;
+	}
 }

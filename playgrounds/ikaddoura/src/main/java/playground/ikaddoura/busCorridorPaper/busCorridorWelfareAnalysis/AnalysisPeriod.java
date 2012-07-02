@@ -23,6 +23,11 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
+
 /**
  * @author Ihab
  *
@@ -31,6 +36,7 @@ public class AnalysisPeriod {
 
 	private double start; 
 	private double end;
+	private SortedMap <Id, RouteInfo> routeId2RouteInfo = new TreeMap<Id, RouteInfo>();
 	
 	public AnalysisPeriod(double start, double end) {
 		this.start = start;
@@ -43,6 +49,14 @@ public class AnalysisPeriod {
 
 	public double getEnd() {
 		return end;
+	}
+
+	public void setRouteId2RouteInfo(SortedMap <Id, RouteInfo> routeId2RouteInfo) {
+		this.routeId2RouteInfo = routeId2RouteInfo;
+	}
+
+	public SortedMap <Id, RouteInfo> getRouteId2RouteInfo() {
+		return routeId2RouteInfo;
 	}
 
 }

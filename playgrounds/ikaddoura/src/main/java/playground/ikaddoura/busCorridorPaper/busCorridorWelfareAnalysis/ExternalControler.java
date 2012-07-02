@@ -171,7 +171,7 @@ class ExternalControler {
 				info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
 				info.setId2facilityWaitInfo(analysis.getWaitHandler().getFacilityId2facilityInfos());
 				
-				info.setRouteId2RouteInfo(analysis.getPtLoadHandler().getRouteId2RouteInfo());
+				info.setAnalysisPeriods(analysis.getPtLoadHandler().getAnalysisPeriods());
 				
 				this.extIt2information.put(extItParam1, info);
 				this.it2information.put(iterationCounter, info);

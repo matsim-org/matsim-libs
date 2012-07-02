@@ -23,7 +23,9 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -50,27 +52,50 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 	
 	private final Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
 	private final Map <Id, Id> busId2currentRoute = new HashMap<Id, Id>();
-	private int passengers = 0;
 	
-	private final SortedMap <Id, RouteInfo> routeId2RouteInfo = new TreeMap<Id, RouteInfo>();
 	
 	private final TransitSchedule schedule;
-	
+	private List<AnalysisPeriod> analysisPeriods = new ArrayList<AnalysisPeriod>();
+
 	public PtLoadHandler(TransitSchedule schedule) {
 		
 		this.schedule = schedule;
 		
-		for (TransitLine line : this.schedule.getTransitLines().values()){
-			for (TransitRoute route : line.getRoutes().values()){
+		AnalysisPeriod period1 = new AnalysisPeriod(4.*3600, 6.*3600);
+		analysisPeriods.add(period1);
+		AnalysisPeriod period2 = new AnalysisPeriod(6.*3600, 8.*3600);
+		analysisPeriods.add(period2);
+		AnalysisPeriod period3 = new AnalysisPeriod(10.*3600, 12.*3600);
+		analysisPeriods.add(period3);
+		AnalysisPeriod period4 = new AnalysisPeriod(12.*3600, 14.*3600);
+		analysisPeriods.add(period4);
+		AnalysisPeriod period5 = new AnalysisPeriod(14.*3600, 16.*3600);
+		analysisPeriods.add(period5);
+		AnalysisPeriod period6 = new AnalysisPeriod(16.*3600, 18.*3600);
+		analysisPeriods.add(period6);
+		AnalysisPeriod period7 = new AnalysisPeriod(18.*3600, 20.*3600);
+		analysisPeriods.add(period7);
+		AnalysisPeriod period8 = new AnalysisPeriod(20.*3600, 22.*3600);
+		analysisPeriods.add(period8);
+		AnalysisPeriod period9 = new AnalysisPeriod(22.*3600, 24.*3600);
+		analysisPeriods.add(period9);
+		
+		for (AnalysisPeriod period : analysisPeriods){
+			for (TransitLine line : this.schedule.getTransitLines().values()){
+				SortedMap <Id, RouteInfo> routeId2RouteInfo = new TreeMap<Id, RouteInfo>();
 				
-				RouteInfo routeInfo = new RouteInfo(route.getId());
-				SortedMap<Id, FacilityLoadInfo> id2FacilityLoadInfo = new TreeMap<Id, FacilityLoadInfo>();
-
-				for (TransitRouteStop stop : route.getStops()){
-					id2FacilityLoadInfo.put(stop.getStopFacility().getId(), new FacilityLoadInfo(stop.getStopFacility().getId()));
+				for (TransitRoute route : line.getRoutes().values()){
+					
+					RouteInfo routeInfo = new RouteInfo(route.getId());
+					SortedMap<Id, FacilityLoadInfo> id2FacilityLoadInfo = new TreeMap<Id, FacilityLoadInfo>();
+	
+					for (TransitRouteStop stop : route.getStops()){
+						id2FacilityLoadInfo.put(stop.getStopFacility().getId(), new FacilityLoadInfo(stop.getStopFacility().getId()));
+					}
+					routeInfo.setTransitStopId2FacilityLoadInfo(id2FacilityLoadInfo);
+					routeId2RouteInfo.put(route.getId(), routeInfo);
+					period.setRouteId2RouteInfo(routeId2RouteInfo);
 				}
-				routeInfo.setTransitStopId2FacilityLoadInfo(id2FacilityLoadInfo);
-				this.routeId2RouteInfo.put(route.getId(), routeInfo);
 			}
 		}
 	}
@@ -78,7 +103,7 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 	@Override
 	public void reset(int iteration) {
 		busId2currentFacilityId.clear();
-		routeId2RouteInfo.clear();
+		analysisPeriods.clear();
 		busId2currentRoute.clear();
 	}
 	
@@ -93,8 +118,12 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 			double daytime = event.getTime();
 			Id routeId = this.busId2currentRoute.get(vehId);
 			
-			this.routeId2RouteInfo.get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonEntering().add(daytime);
-			this.passengers++;
+			for (AnalysisPeriod period : this.analysisPeriods){
+				if (daytime < period.getEnd() && daytime >= period.getStart()) {
+					int entering = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonEntering();
+					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonEntering(entering + 1);
+				}
+			}
 					
 		} else {
 			// no person enters a bus
@@ -120,8 +149,12 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 			double daytime = event.getTime();
 			Id routeId = this.busId2currentRoute.get(vehId);
 			
-			this.routeId2RouteInfo.get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonLeaving().add(daytime);
-			this.passengers--;
+			for (AnalysisPeriod period : this.analysisPeriods){
+				if (daytime < period.getEnd() && daytime >= period.getStart()) {
+					int leaving = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonLeaving();
+					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonLeaving(leaving + 1);
+				}
+			}
 			
 		} else {
 			// no person leaves a bus
@@ -136,8 +169,8 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 		this.busId2currentRoute.put(busId, routeId);
 	}
 
-	public SortedMap<Id, RouteInfo> getRouteId2RouteInfo() {
-		return routeId2RouteInfo;
+	public List<AnalysisPeriod> getAnalysisPeriods() {
+		return analysisPeriods;
 	}
-	
+		
 }
