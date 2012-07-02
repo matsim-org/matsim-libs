@@ -75,7 +75,7 @@ public class SpatialGridTableWriter {
 				if(!Double.isNaN(val))
 					writer.write(String.valueOf(val));
 				else
-					writer.write("NA");
+					writer.write("NaN");
 			}
 			writer.newLine();
 		}
