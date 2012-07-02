@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilityLoadInfo.java
+ * AnalysisPeriod.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,58 +23,26 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.api.core.v01.Id;
-
 /**
  * @author Ihab
  *
  */
-public class FacilityLoadInfo {
-	private Id facilityId;
-	private List<Double> personEntering = new ArrayList<Double>();
-	private List<Double> personLeaving = new ArrayList<Double>();
+public class AnalysisPeriod {
 
-	public FacilityLoadInfo(Id id) {
-		this.facilityId = id;
-	}
+	private double start; 
+	private double end;
 	
-	public Id getFacilityId() {
-		return facilityId;
+	public AnalysisPeriod(double start, double end) {
+		this.start = start;
+		this.end = end;
 	}
-	public List<Double> getPersonEntering() {
-		return personEntering;
+
+	public double getStart() {
+		return start;
 	}
-	public void setPersonEntering(List<Double> personEntering) {
-		this.personEntering = personEntering;
+
+	public double getEnd() {
+		return end;
 	}
-	public List<Double> getPersonLeaving() {
-		return personLeaving;
-	}
-	public void setPersonLeaving(List<Double> personLeaving) {
-		this.personLeaving = personLeaving;
-	}
-	
-	public int getPersonsEnteringWithin(double start, double end){
-		int nr = 0;
-			for (Double time : this.personEntering){
-				if (time < end && time >= start) {
-					nr++;
-				}
-			}
-		return nr;
-	}
-	
-	public int getPersonsLeavingWithin(double start, double end){
-		int nr = 0;
-			for (Double time : this.personLeaving){
-				if (time < end && time >= start) {
-					nr++;
-				}
-			}
-		return nr;
-	}
-	
+
 }

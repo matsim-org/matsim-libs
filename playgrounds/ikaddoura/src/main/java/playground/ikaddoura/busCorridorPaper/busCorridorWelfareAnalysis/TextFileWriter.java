@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -215,24 +217,66 @@ public class TextFileWriter {
 		String zeile0 = "LoadData " + directoryExtItParam2Param1 + ":";
 		bw.write(zeile0);
 		bw.newLine();
-		    
-		String zeile1 = "TransitStopId ; SumOfWaitingTime (sec) ; AverageWaitingTime (sec) ; WaitingTime > Headway (trips) ; MissedVehicles";
-		bw.write(zeile1);
-		bw.newLine();
 		
-//		for (FacilityLoadInfo facilityInfo : extIt2information.get(extItParam1).getTime2facilityIdLoadInfo().values()){
-//		    	
-////			Id facilityId = facilityInfo.getFacilityId();
-////	    	Double avgWaitTime = facilityInfo.getAvgWaitingTime();
-////	    	Double sumWaitTime = facilityInfo.getSumOfWaitingTimes();
-////	    	int waitTimeMoreThanHeadway = facilityInfo.getNumberOfWaitingTimesMoreThanHeadway();
-////	    	int missedVehicles = facilityInfo.getNumberOfMissedVehicles();
-////	    	
-////	    	String zeile = facilityId + " ; " + sumWaitTime + " ; " + avgWaitTime + " ; " + waitTimeMoreThanHeadway + " ; " + missedVehicles;
-////	
-////	    	bw.write(zeile);
-//	        bw.newLine();
-//		 }
+		ExtItInformation info = extIt2information.get(extItParam1);
+		
+		// define here the analysis periods for vehicle loadings...
+		List<AnalysisPeriod> analysisPeriods = new ArrayList<AnalysisPeriod>();
+		AnalysisPeriod period1 = new AnalysisPeriod(4.*3600, 6.*3600);
+		analysisPeriods.add(period1);
+		AnalysisPeriod period2 = new AnalysisPeriod(6.*3600, 8.*3600);
+		analysisPeriods.add(period2);
+		AnalysisPeriod period3 = new AnalysisPeriod(10.*3600, 12.*3600);
+		analysisPeriods.add(period3);
+		AnalysisPeriod period4 = new AnalysisPeriod(12.*3600, 14.*3600);
+		analysisPeriods.add(period4);
+		AnalysisPeriod period5 = new AnalysisPeriod(14.*3600, 16.*3600);
+		analysisPeriods.add(period5);
+		AnalysisPeriod period6 = new AnalysisPeriod(16.*3600, 18.*3600);
+		analysisPeriods.add(period6);
+		AnalysisPeriod period7 = new AnalysisPeriod(18.*3600, 20.*3600);
+		analysisPeriods.add(period7);
+		AnalysisPeriod period8 = new AnalysisPeriod(20.*3600, 22.*3600);
+		analysisPeriods.add(period8);
+		AnalysisPeriod period9 = new AnalysisPeriod(22.*3600, 24.*3600);
+		analysisPeriods.add(period9);
+		// --------------------------------------------------------
+
+		for (AnalysisPeriod anaPeriod : analysisPeriods){
+			
+			SortedMap<Id, SortedMap<Id, Integer>> routeId2stopId2PersonEnteringPeriod = info.getRouteId2stopId2PersonsEnteringWithin(anaPeriod.getStart(), anaPeriod.getEnd());
+			SortedMap<Id, SortedMap<Id, Integer>> routeId2stopId2PersonLeavingPeriod = info.getRouteId2stopId2PersonsLeavingWithin(anaPeriod.getStart(), anaPeriod.getEnd());
+//			SortedMap<Id, SortedMap<Id, Integer>> routeId2stopId2PassengersPeriod = info.getRouteId2stopId2PassengersWithin(anaPeriod.getStart(), anaPeriod.getEnd());
+
+			
+			for (Id routeId : routeId2stopId2PersonEnteringPeriod.keySet()){
+				bw.newLine();
+				bw.newLine();
+				
+				String zeile1 = "TransitRoute: " + routeId.toString();
+				bw.write(zeile1);
+				bw.newLine();
+				
+				bw.newLine();
+				String zeilePeriod = "Period (hour): " + anaPeriod.getStart()/3600. + " - " + anaPeriod.getEnd()/3600.;
+				bw.write(zeilePeriod);
+				bw.newLine();
+	
+				String zeile2 = "TransitStopId ; EnteringAgents ; LeavingAgents ; Passengers";
+				bw.write(zeile2);
+				bw.newLine();
+				
+				SortedMap<Id, Integer> stopId2PersonEnteringPeriod = routeId2stopId2PersonEnteringPeriod.get(routeId);
+				SortedMap<Id, Integer> stopId2PersonLeavingPeriod = routeId2stopId2PersonLeavingPeriod.get(routeId);
+//				SortedMap<Id, Integer> stopId2PassengersPeriod = routeId2stopId2PassengersPeriod.get(routeId);
+//
+//				for (Id stopId : stopId2PersonEnteringPeriod.keySet()){
+//					String zeile3 = stopId.toString() + " ; " + stopId2PersonEnteringPeriod.get(stopId).toString() + " ; " + stopId2PersonLeavingPeriod.get(stopId).toString() + " ; " + stopId2PassengersPeriod.get(stopId).toString();
+//					bw.write(zeile3);
+//					bw.newLine();
+//				}		
+			}
+		}
 		
 		 bw.flush();
 		 bw.close();

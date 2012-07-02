@@ -50,14 +50,11 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 	
 	private final Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
 	private final Map <Id, Id> busId2currentRoute = new HashMap<Id, Id>();
+	private int passengers = 0;
 	
 	private final SortedMap <Id, RouteInfo> routeId2RouteInfo = new TreeMap<Id, RouteInfo>();
 	
 	private final TransitSchedule schedule;
-
-	final double startDayTime = 4.0 * 3600;
-	final double analysisPeriod = 2.0 * 3600;
-	final double endDayTime = 24.0 * 3600;
 	
 	public PtLoadHandler(TransitSchedule schedule) {
 		
@@ -97,6 +94,7 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 			Id routeId = this.busId2currentRoute.get(vehId);
 			
 			this.routeId2RouteInfo.get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonEntering().add(daytime);
+			this.passengers++;
 					
 		} else {
 			// no person enters a bus
@@ -123,7 +121,8 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 			Id routeId = this.busId2currentRoute.get(vehId);
 			
 			this.routeId2RouteInfo.get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonLeaving().add(daytime);
-					
+			this.passengers--;
+			
 		} else {
 			// no person leaves a bus
 		}

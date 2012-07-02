@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
@@ -54,7 +55,7 @@ public class ExtItInformation {
 		
 	private int numberOfMissedVehicles;
 	private Map <Id, FacilityWaitTimeInfo> id2facilityWaitInfo = new HashMap<Id, FacilityWaitTimeInfo>();
-	private Map <Id, FacilityLoadInfo> id2facilityLoadInfo = new HashMap<Id, FacilityLoadInfo>();
+	private SortedMap <Id, RouteInfo> routeId2RouteInfo = new TreeMap<Id, RouteInfo>();
 	
 	public List <Double> getWaitingTimes() {
 		return waitingTimes;
@@ -244,12 +245,48 @@ public class ExtItInformation {
 		return noValidPlanScore;
 	}
 
-	public Map<Id, FacilityLoadInfo> getId2facilityLoadInfo() {
-		return id2facilityLoadInfo;
+	public void setRouteId2RouteInfo(SortedMap <Id, RouteInfo> routeId2RouteInfo) {
+		this.routeId2RouteInfo = routeId2RouteInfo;
 	}
 
-	public void setId2facilityLoadInfo(Map<Id, FacilityLoadInfo> id2facilityLoadInfo) {
-		this.id2facilityLoadInfo = id2facilityLoadInfo;
+	public SortedMap<Id, RouteInfo> getRouteId2RouteInfo() {
+		return routeId2RouteInfo;
+	}
+	
+	public SortedMap<Id, SortedMap<Id, Integer>> getRouteId2stopId2PersonsEnteringWithin(double start, double end) {
+		SortedMap<Id, SortedMap<Id, Integer>> routeId2stopId2PersonEnteringWithin = new TreeMap<Id, SortedMap<Id, Integer>>();
+		for (RouteInfo routeInfo : this.routeId2RouteInfo.values()){
+			SortedMap<Id, Integer> stopId2PersonEnteringWithin = new TreeMap<Id, Integer>();
+			for (FacilityLoadInfo loadInfo : routeInfo.getTransitStopId2FacilityLoadInfo().values()){
+				stopId2PersonEnteringWithin.put(loadInfo.getFacilityId(), loadInfo.getPersonsEnteringWithin(start, end));
+			}
+			routeId2stopId2PersonEnteringWithin.put(routeInfo.getRouteId(), stopId2PersonEnteringWithin);
+		}
+		return routeId2stopId2PersonEnteringWithin;	
 	}
 
+	public SortedMap<Id, SortedMap<Id, Integer>> getRouteId2stopId2PersonsLeavingWithin(double start, double end) {
+		SortedMap<Id, SortedMap<Id, Integer>> routeId2stopId2PersonLeavingWithin = new TreeMap<Id, SortedMap<Id, Integer>>();
+		for (RouteInfo routeInfo : this.routeId2RouteInfo.values()){
+			SortedMap<Id, Integer> stopId2PersonLeavingWithin = new TreeMap<Id, Integer>();
+			for (FacilityLoadInfo loadInfo : routeInfo.getTransitStopId2FacilityLoadInfo().values()){
+				stopId2PersonLeavingWithin.put(loadInfo.getFacilityId(), loadInfo.getPersonsLeavingWithin(start, end));
+			}
+			routeId2stopId2PersonLeavingWithin.put(routeInfo.getRouteId(), stopId2PersonLeavingWithin);
+		}
+		return routeId2stopId2PersonLeavingWithin;	
+	}
+
+//	public SortedMap<Id, SortedMap<Id, Integer>> getRouteId2stopId2PassengersWithin(double start, double end) {
+//		SortedMap<Id, SortedMap<Id, Integer>> routeId2stopId2PassengersWithin = new TreeMap<Id, SortedMap<Id, Integer>>();
+//		for (RouteInfo routeInfo : this.routeId2RouteInfo.values()){
+//			SortedMap<Id, Integer> stopId2PassengersWithin = new TreeMap<Id, Integer>();
+//			for (FacilityLoadInfo loadInfo : routeInfo.getTransitStopId2FacilityLoadInfo().values()){
+//				stopId2PassengersWithin.put(loadInfo.getFacilityId(), loadInfo.getPassengersWithin(start, end));
+//			}
+//			routeId2stopId2PassengersWithin.put(routeInfo.getRouteId(), stopId2PassengersWithin);
+//		}
+//		return routeId2stopId2PassengersWithin;
+//	}
+	
 }

@@ -25,10 +25,12 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -64,7 +66,7 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/1";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test1";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
@@ -136,16 +138,16 @@ class ExternalControler {
 				OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), sc.getTransitSchedule(), directoryExtItParam2Param1, sc.getConfig().controler().getLastIteration(), vsw.getHeadway());
 				analysis.readEvents();
 				
-				System.out.println("PtLoad:");
-				for (RouteInfo routeInfo : analysis.getPtLoadHandler().getRouteId2RouteInfo().values()){
-					System.out.println("*********Route: " + routeInfo.getRouteId());
-					for (FacilityLoadInfo info : routeInfo.getTransitStopId2FacilityLoadInfo().values()){
-						System.out.println(info.getFacilityId());
-						System.out.println("Entering daytimes: " + info.getPersonEntering());
-						System.out.println("Leaving daytimes: " + info.getPersonLeaving());
-					}
-
-				}
+//				System.out.println("PtLoad:");
+//				for (RouteInfo routeInfo : analysis.getPtLoadHandler().getRouteId2RouteInfo().values()){
+//					System.out.println("*********Route: " + routeInfo.getRouteId());
+//					for (FacilityLoadInfo info : routeInfo.getTransitStopId2FacilityLoadInfo().values()){
+//						System.out.println(info.getFacilityId());
+//						System.out.println("Entering daytimes: " + info.getPersonEntering());
+//						System.out.println("Leaving daytimes: " + info.getPersonLeaving());
+//					}
+//
+//				}
 				
 				operator.calculateCosts(analysis);
 				users.calculateLogsum();
@@ -169,7 +171,7 @@ class ExternalControler {
 				info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
 				info.setId2facilityWaitInfo(analysis.getWaitHandler().getFacilityId2facilityInfos());
 				
-//				info.setId2facilityLoadInfo(analysis.getPtLoadHandler().getId2FacilityLoadInfo());
+				info.setRouteId2RouteInfo(analysis.getPtLoadHandler().getRouteId2RouteInfo());
 				
 				this.extIt2information.put(extItParam1, info);
 				this.it2information.put(iterationCounter, info);
