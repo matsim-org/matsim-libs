@@ -65,6 +65,8 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 		analysisPeriods.add(period1);
 		AnalysisPeriod period2 = new AnalysisPeriod(6.*3600, 8.*3600);
 		analysisPeriods.add(period2);
+		AnalysisPeriod period2a = new AnalysisPeriod(8.*3600, 10.*3600);
+		analysisPeriods.add(period2a);
 		AnalysisPeriod period3 = new AnalysisPeriod(10.*3600, 12.*3600);
 		analysisPeriods.add(period3);
 		AnalysisPeriod period4 = new AnalysisPeriod(12.*3600, 14.*3600);
@@ -122,6 +124,8 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 				if (daytime < period.getEnd() && daytime >= period.getStart()) {
 					int entering = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonEntering();
 					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonEntering(entering + 1);
+					int nrEnteringAllStops = period.getEntering();
+					period.setEntering(nrEnteringAllStops + 1);
 				}
 			}
 					
@@ -153,6 +157,8 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 				if (daytime < period.getEnd() && daytime >= period.getStart()) {
 					int leaving = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonLeaving();
 					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonLeaving(leaving + 1);
+					int nrLeavingAllStops = period.getLeaving();
+					period.setLeaving(nrLeavingAllStops + 1);
 				}
 			}
 			

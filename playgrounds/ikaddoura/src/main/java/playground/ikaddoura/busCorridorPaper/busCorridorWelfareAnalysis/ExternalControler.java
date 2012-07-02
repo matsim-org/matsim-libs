@@ -66,7 +66,7 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
 		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test1";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
 		
 //		op1 = OptimizationParameter1.FARE;
 //		op1 = OptimizationParameter1.CAPACITY;
@@ -179,7 +179,8 @@ class ExternalControler {
 				textWriter.writeExtItData(directoryExtItParam2, this.extIt2information);
 				textWriter.writeDataTransitStops(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				textWriter.writeDataEachTransitStop(directoryExtItParam2Param1, this.extIt2information, extItParam1);
-				textWriter.writeLoadData(directoryExtItParam2Param1, this.extIt2information, extItParam1);
+				textWriter.writeLoadData1(directoryExtItParam2Param1, this.extIt2information, extItParam1);
+				textWriter.writeLoadData2(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				chartWriter.write(directoryExtItParam2, this.extIt2information);
 								
 				// settings for next external iteration (optimization parameter 1)
@@ -238,11 +239,11 @@ class ExternalControler {
 			log.info("Analyzing combined optimization parameters " + op1 + " and " + op2);
 			if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES) && op2.equals(OptimizationParameter2.FARE)){
 				this.fare = -0.;
-				this.capacity = 10;
+				this.capacity = 50;
 				this.numberOfBuses = 1;
 			} else if (op1.equals(OptimizationParameter1.FARE) && op2.equals(OptimizationParameter2.NUMBER_OF_BUSES)){
 				this.fare = -0.;
-				this.capacity = 10;
+				this.capacity = 50;
 				this.numberOfBuses = 1;
 			} else {
 				throw new RuntimeException("Undefined default parameters for combined optimization parameters op1 = " + op1 + " and op2 = " + op2 + ". Aborting...");

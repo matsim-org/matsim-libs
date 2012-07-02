@@ -204,17 +204,17 @@ public class TextFileWriter {
 		
 	}
 
-	public void writeLoadData(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
+	public void writeLoadData1(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
 		String path = directoryExtItParam2Param1 + "/Data/";
 		File directory = new File(path);
 		directory.mkdirs();
 
-		File file = new File(path + "/LoadData.txt");
+		File file = new File(path + "/LoadDataTransitStops.txt");
 			
 		try {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 		    
-		String zeile0 = "LoadData " + directoryExtItParam2Param1 + ":";
+		String zeile0 = "LoadDataTransitStops " + directoryExtItParam2Param1 + ":";
 		bw.write(zeile0);
 		bw.newLine();
 		
@@ -256,4 +256,39 @@ public class TextFileWriter {
 	    
 		 } catch (IOException e) {}		
 	}
+	
+	public void writeLoadData2(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
+		String path = directoryExtItParam2Param1 + "/Data/";
+		File directory = new File(path);
+		directory.mkdirs();
+
+		File file = new File(path + "/LoadData.txt");
+			
+		try {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		    
+		String zeile0 = "LoadData " + directoryExtItParam2Param1 + ":";
+		bw.write(zeile0);
+		bw.newLine();
+		
+		ExtItInformation info = extIt2information.get(extItParam1);
+
+		String zeile1 = "Period (from-to) ; EnteringAgents ; LeavingAgents";
+		bw.write(zeile1);
+		bw.newLine();
+		
+		for (AnalysisPeriod anaPeriod : info.getAnalysisPeriods()){
+			String zeile = anaPeriod.getStart()/3600. + " - " + anaPeriod.getEnd()/3600. + " ; " + anaPeriod.getEntering() + " ; " + anaPeriod.getLeaving();
+			bw.write(zeile);
+			bw.newLine();
+		}
+		
+		 bw.flush();
+		 bw.close();
+		 log.info("Textfile written to "+file.toString());
+	    
+		 } catch (IOException e) {}		
+	}
+	
+	
 }

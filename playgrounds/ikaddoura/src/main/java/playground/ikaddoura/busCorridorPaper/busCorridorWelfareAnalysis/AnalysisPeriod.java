@@ -36,6 +36,9 @@ public class AnalysisPeriod {
 
 	private double start; 
 	private double end;
+	private int entering;
+	private int leaving;
+	
 	private SortedMap <Id, RouteInfo> routeId2RouteInfo = new TreeMap<Id, RouteInfo>();
 	
 	public AnalysisPeriod(double start, double end) {
@@ -57,6 +60,22 @@ public class AnalysisPeriod {
 
 	public SortedMap <Id, RouteInfo> getRouteId2RouteInfo() {
 		return routeId2RouteInfo;
+	}
+
+	public void setEntering(int entering) {
+		this.entering = entering;
+	}
+
+	public int getEntering() {
+		return entering;
+	}
+
+	public void setLeaving(int leaving) {
+		this.leaving = leaving;
+	}
+
+	public int getLeaving() {
+		return leaving;
 	}
 
 }
