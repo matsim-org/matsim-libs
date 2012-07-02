@@ -80,10 +80,11 @@ public class PRFacilityCreator {
 		return parkAndRideFacilities;
 	}
 	
-	public void createPRFacility(Id id, Node node, Scenario scenario) {
+	public void createPRFacility(Id id, Node node, Scenario scenario, String stopName) {
 		
 		ParkAndRideFacility prFacility = new ParkAndRideFacility();
 		prFacility.setId(id);
+		prFacility.setStopFacilityName(stopName);
 		
 		Id pRnodeId1 = new IdImpl("PR1_"+id);
 		Id pRnodeId2 = new IdImpl("PR2_"+id);

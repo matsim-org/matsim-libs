@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
@@ -37,14 +38,14 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  * @author Ihab
  *
  */
-public class PRFacilitiesWriter {
+public class TextFileWriter {
 
 	public void write(List<ParkAndRideFacility> parkAndRideFacilities, String prFacilitiesFile) {
 		File file = new File(prFacilitiesFile);
 		
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "Id ; Link1in ; Link1out ; Link2in ; Link2out ; Link3in ; Link3out";
+	    String zeile1 = "Id ; Link1in ; Link1out ; Link2in ; Link2out ; Link3in ; Link3out ; TransitStopFacilityName";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -56,8 +57,9 @@ public class PRFacilitiesWriter {
 	    	Id link2out = pr.getPrLink2out();
 	    	Id link3in = pr.getPrLink3in();
 	    	Id link3out = pr.getPrLink3out();
+	    	String name = pr.getStopFacilityName();
 	    	
-	    	String zeile = id + " ; " + link1in + " ; " + link1out + " ; " + link2in + " ; " + link2out + " ; " + link3in + " ; " + link3out;
+	    	String zeile = id + " ; " + link1in + " ; " + link1out + " ; " + link2in + " ; " + link2out + " ; " + link3in + " ; " + link3out + " ; " + name;
 	
 	    	bw.write(zeile);
 	        bw.newLine();
@@ -68,6 +70,27 @@ public class PRFacilitiesWriter {
     
 	    } catch (IOException e) {}
 	    System.out.println("ParkAndRideFacilites written to "+file.toString());		
+	}
+	
+	public void writeInfo (List<TransitStopFacility> stops, String name) {
+		File file = new File(name);
+		
+	    try {
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	
+	    for (TransitStopFacility stop : stops){
+	    	
+	    	String zeile = stop.getId().toString() + " / " + stop.getName().toString();
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+	    }
+	
+	    bw.flush();
+	    bw.close();
+    
+	    } catch (IOException e) {}
+	    System.out.println("Info written to "+file.toString());		
 	}
 
 }

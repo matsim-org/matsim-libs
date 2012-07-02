@@ -44,28 +44,28 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class NetworkAddPRMain {
 	
 	
-//	// input
-//	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinNetwork.xml";
-//	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitSchedule.xml";
-//	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitVehicles.xml";
-//	
-//	// output
-//	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRfacilitiesTest.txt";
-//	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinPRnetworkTest.xml";
-//	
-//	static double extensionRadius = 10;
-//	static int maxSearchSteps = 100;
-	
-	static String networkFile;
-	static String scheduleFile;
-	static String vehiclesFile;
+	// input
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinNetwork.xml";
+	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinTransitSchedule.xml";
+	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinTransitVehicles.xml";
 	
 	// output
-	static String prFacilitiesFile;
-	static String prNetworkFile;
+	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinPRfacilitiesTest.txt";
+	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinPRnetworkTest.xml";
 	
-	static double extensionRadius;
-	static int maxSearchSteps;
+	static double extensionRadius = 10;
+	static int maxSearchSteps = 100;
+	
+//	static String networkFile;
+//	static String scheduleFile;
+//	static String vehiclesFile;
+//	
+//	// output
+//	static String prFacilitiesFile;
+//	static String prNetworkFile;
+//	
+//	static double extensionRadius;
+//	static int maxSearchSteps;
 		     
 	// parkAndRide Link:
 	private double capacity = 2000;
@@ -77,17 +77,17 @@ public class NetworkAddPRMain {
 
 	public static void main(String[] args) throws IOException {
 		
-		// input
-		networkFile = args[0];
-		scheduleFile = args[1];
-		vehiclesFile = args[2];
-		
-		// output
-		prFacilitiesFile = args[3];
-		prNetworkFile = args[4];
-		
-		extensionRadius = Double.parseDouble(args[5]);
-		maxSearchSteps = Integer.parseInt(args[6]);
+//		// input
+//		networkFile = args[0];
+//		scheduleFile = args[1];
+//		vehiclesFile = args[2];
+//		
+//		// output
+//		prFacilitiesFile = args[3];
+//		prNetworkFile = args[4];
+//		
+//		extensionRadius = Double.parseDouble(args[5]);
+//		maxSearchSteps = Integer.parseInt(args[6]);
 		
 		NetworkAddPRMain addParkAndRide = new NetworkAddPRMain();
 		addParkAndRide.run();
@@ -107,9 +107,9 @@ public class NetworkAddPRMain {
 		prFacilityCreator.setNrOfLanes(this.nrOfLanes);
 		
 		int i = 0;
-		for (Node node : prNodeSearch.getCarLinkToNodes()){
+		for (Id nodeId : prNodeSearch.getCarLinkToNodes().keySet()){
 			Id id = new IdImpl(i);
-			prFacilityCreator.createPRFacility(id, node, this.scenario);
+			prFacilityCreator.createPRFacility(id, prNodeSearch.getCarLinkToNodes().get(nodeId).getNode(), this.scenario, prNodeSearch.getCarLinkToNodes().get(nodeId).getStopName());
 			i++;
 		}
 		
@@ -118,19 +118,24 @@ public class NetworkAddPRMain {
 		if (prNodeSearch.getStopsWithoutPRFacility().isEmpty()){
 			System.out.println("For all TransitStopFacilities a car-Link was found and a Park'n'Ride Facility was created.");
 		}
-		for (TransitStopFacility stop : prNodeSearch.getStopsWithoutPRFacility()){
-			System.out.println("No Park'n'Ride Facility created for: " + stop.getId() + ": " + stop.getName());
-		}
+//		for (TransitStopFacility stop : prNodeSearch.getStopsWithoutPRFacility()){
+//			System.out.println("No Park'n'Ride Facility created for: " + stop.getId() + ": " + stop.getName() + " because no car-Link was found!");
+//		}
+//		for (TransitStopFacility stop : prNodeSearch.getStopsNotSUBerlin()){
+//			System.out.println("No Park'n'Ride Facility created for: " + stop.getId() + ": " + stop.getName() + " because of the facility name. To be checked...");
+//		}
 		
 		NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork());
 		networkWriter.write(prNetworkFile);
 		
-		PRFacilitiesWriter prFacilityWriter = new PRFacilitiesWriter();	
-		prFacilityWriter.write(prFacilityCreator.getParkAndRideFacilities(), prFacilitiesFile);
+		TextFileWriter writer = new TextFileWriter();	
+		writer.write(prFacilityCreator.getParkAndRideFacilities(), prFacilitiesFile);
+		writer.writeInfo(prNodeSearch.getStopsWithoutPRFacility(), "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/stops_noCarLinkFound.txt");
+		writer.writeInfo(prNodeSearch.getStopsNotSUBerlin(), "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/stops_noPRbyName.txt");
 		
-		for (TransitStopFacility stop : prNodeSearch.getTransitStop2nearestCarLink().keySet()){
-			System.out.println("TranistStopFacility: " + stop.getId().toString() + " " + stop.getName() + " " + stop.getCoord().toString() + " / next car-Link: " + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getId() + " / toNode:" + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getToNode().getCoord().toString());
-		}	
+//		for (TransitStopFacility stop : prNodeSearch.getTransitStop2nearestCarLink().keySet()){
+//			System.out.println("TranistStopFacility: " + stop.getId().toString() + " " + stop.getName() + " " + stop.getCoord().toString() + " / next car-Link: " + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getId() + " / toNode:" + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getToNode().getCoord().toString());
+//		}	
 	}
 
 	private void loadScenario() {
