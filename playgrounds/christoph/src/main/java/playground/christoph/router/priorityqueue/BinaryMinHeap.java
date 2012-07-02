@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the type of elements held in this collection
  */
-public final class BinaryMinHeap<E extends HeapEntry> implements RouterPriorityQueue<E> {
+public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 
 	/**
 	 * Each HeapEntry contains a final integer value that points to a
