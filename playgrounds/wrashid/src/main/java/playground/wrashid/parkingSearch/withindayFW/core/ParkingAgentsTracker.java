@@ -692,8 +692,9 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			processScoreOfLastParking(personId);
 
 			ScoringFunction scoringFunction = event.getControler().getPlansScoring().getScoringFunctionForAgent(personId);
-			scoringFunction.addMoney(parkingIterationScoreSum.get(personId));
-
+			
+			double amount = parkingIterationScoreSum.get(personId);
+			scoringFunction.addMoney(amount);
 		}
 
 		parkingOccupancy.writeOutParkingOccupanciesTxt(event.getControler());

@@ -40,6 +40,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -51,6 +52,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.population.Desires;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
@@ -197,9 +199,23 @@ public class WithinDayParkingController extends WithinDayController implements S
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getReplanningManager());
 		this.setMobsimFactory(mobsimFactory);
 
+		setDesiresIfApplicable();
+		
 		// this.initIdentifiers();
 		// this.initReplanners();
 		startUpFinishing();
+	}
+
+	private void setDesiresIfApplicable() {
+		for (Person p:scenarioData.getPopulation().getPersons().values()){
+			PersonImpl person=(PersonImpl) p;
+			Desires desires = person.getDesires();
+			if (desires!=null){
+				// setting typical parking duration
+				// if missing, this causes score to become Infinity (e.g. kti scenario)
+				desires.putActivityDuration("parking", 180);
+			}
+		}
 	}
 
 	protected void startUpBegin() {
