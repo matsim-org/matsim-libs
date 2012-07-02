@@ -48,7 +48,7 @@ public class SfFlightDelayAnalysis {
 	private static final int DELAY_OUTPUT_INTERVAL = 5;		//set interval for delay accumulation
 	
 	private static String actualTimes = "Z:\\WinHome\\munich_output\\ITERS\\it.0\\0.statistic.csv";
-	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\oag_flights.txt";
+	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\oag_flights.txt";
 	private static String delayOutput = "Z:\\WinHome\\munich_output\\delay.csv";
 	private static String delayOutputAcc = "Z:\\WinHome\\munich_output\\delay_acc.csv";
 	
@@ -118,7 +118,7 @@ public class SfFlightDelayAnalysis {
 			this.scheduledArrival.put(flightNumber, arrival/60);
 			long flightDelay = Math.round(this.actualArrival.get(flightNumber)-this.scheduledArrival.get(flightNumber));
 			
-			bwDelaySingleFlights.write(this.actualArrival.get(flightNumber)+"\t"+flightDelay);
+			bwDelaySingleFlights.write(flightNumber+"\t"+this.actualArrival.get(flightNumber)+"\t"+flightDelay);
 			bwDelaySingleFlights.newLine();
 			
 				if (flightDelay==0) {

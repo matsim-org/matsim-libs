@@ -58,8 +58,6 @@ public class SfAirScheduleBuilder {
 	
 	public static final String UTC_OFFSET_FILE = "utc_offsets.txt";
 	
-	private static final boolean use_STAR_MUC = false;	//set true if STAR are in use at MUC
-	
 	protected Map<String, Coord> airports = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
 	protected Map<String, Double> routes = new HashMap<String, Double>();
@@ -149,29 +147,18 @@ public class SfAirScheduleBuilder {
 								&& !aircraftType.equalsIgnoreCase("TRN") //filter trains
 								&& (stops < 1)
 								&& (fullRouting.length() <= 6)
-								&& (
+								&& (	//filter for desired airports that may be set in DgCreateFlightScenario
 									(DgCreateFlightScenario.filter.containsKey(destinationAirport) && (DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.INBOUND)))
 									|| (DgCreateFlightScenario.filter.containsKey(originAirport) && (DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.OUTBOUND)))
 									|| (DgCreateFlightScenario.filter.containsKey(originAirport)) && (DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.BOTH))
 									|| (DgCreateFlightScenario.filter.containsKey(destinationAirport)) && (DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.BOTH))
 									|| (DgCreateFlightScenario.filter==null)
 									)
-//								&& destinationAirport.equalsIgnoreCase("MUC")
-//								&& originAirport.equalsIgnoreCase("MUC")
-//								&& (origin || destination)
-//								)
-//				**********		Map für zu filternde Airport erstellen
-//						use these lines to filter desired airports: currently all flights to/from MUC
-//						for fixed city pairs use: originAirport.equalsIgnoreCase("FRA") && destinationAirport.equalsIgnoreCase("MUC") and vice versa
-								) {
-//										if (use_STAR_MUC && destinationAirport.equalsIgnoreCase("MUC")) duration = duration-(17.4*60);	//17.4 minutes duration for MUC STAR arrivals
-										
+
+								) {		//desired values for STARs can be defined in DgCreateFlightScenario, otherwise default values will be used
 										if (DgCreateFlightScenario.STARoffset.containsKey(destinationAirport)) duration = duration-(DgCreateFlightScenario.STARoffset.get(destinationAirport));
 										else duration = duration-DgCreateFlightScenario.STARoffset.get("default");
 										
-			//				**********		weltweite Map für STAR Offsets
-//											Länge, Geschw., Fluss
-			
 										if (!this.routes.containsKey(route)) {
 											this.routes.put(route, duration);
 										}

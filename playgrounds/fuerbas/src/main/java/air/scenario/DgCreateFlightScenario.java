@@ -37,23 +37,22 @@ public class DgCreateFlightScenario {
 	
 	public static final Map<String, Direction> filter = new HashMap<String, Direction>();
 	static {
-		filter.put("FRA", Direction.BOTH);
-		filter.put("TXL", Direction.INBOUND);
-		filter.put("MUC", Direction.OUTBOUND);
-		filter.put("JFK", Direction.BOTH);
+		filter.put("MUC", Direction.BOTH);
 	}
 	
-	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 5000.0, 1.0, 10.0);
+	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 100000.0, 1./60., 463./3.6);	//default speed below FL100: 250 knots = 463km/h 
 	
-	public static final Map<String, DgStarinfo> stars = new HashMap<String, DgStarinfo>();
+	public static final Map<String, DgStarinfo> stars = new HashMap<String, DgStarinfo>();	
 	static {
 		stars.put("default", DEFAULTSTAR);
+		stars.put("MUC", new DgStarinfo("MUC", 134270.0, 58/3600., 463./3.6));	// v = s/t    s = t*v 
 	}
 	
 	public static final Map<String, Double> STARoffset = new HashMap<String, Double>();
 	static {
-		STARoffset.put("default", 10.);
-		STARoffset.put("MUC", 17.4*60);
+		double defaultduration = DEFAULTSTAR.getLength()/DEFAULTSTAR.getFreespeed();
+		STARoffset.put("default", defaultduration);
+		STARoffset.put("MUC", stars.get("MUC").getLength()/stars.get("MUC").getFreespeed());
 	}
 	
 	public static void createWorldFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception {
@@ -62,8 +61,7 @@ public class DgCreateFlightScenario {
 //		String utcOffsetfile = "/media/data/work/repos/"
 //		+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 		
-		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_outbound\\";
-//		String baseDirectory = "Z:\\WinHome\\flight_model_muc_all_flights\\";
+		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\";
 		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();

@@ -109,11 +109,11 @@ public class SfMatsimAirport {
 //		WARNING HINZUFÜGEN, CAP*5 NEHMEN
 		
 		linkApron.setCapacity(1.*network.getCapacityPeriod());
-		linkTaxiIn.setCapacity((1./60)*network.getCapacityPeriod());
+		linkTaxiIn.setCapacity((1./60.)*network.getCapacityPeriod());
 		linkTaxiIn.setNumberOfLanes(0.015);	
-		linkTaxiOut.setCapacity((1./60)*network.getCapacityPeriod());
-		linkRunwayIn.setCapacity(1.*network.getCapacityPeriod());
-		linkRunwayOut.setCapacity(1.*network.getCapacityPeriod());
+		linkTaxiOut.setCapacity((1./60.)*network.getCapacityPeriod());
+		linkRunwayIn.setCapacity((1.)*network.getCapacityPeriod());
+		linkRunwayOut.setCapacity((1.)*network.getCapacityPeriod());
 		linkRunwayOut.setNumberOfLanes(0.005);
 		
 		linkApron.setLength(taxiwayLength);
@@ -140,15 +140,16 @@ public class SfMatsimAirport {
 
 		Id idStar = new IdImpl(this.id.toString()+"star");						//Id for STAR route
 
-		if (DgCreateFlightScenario.stars.containsKey(idApron)) {
-			Coord coordStar = new CoordImpl(coordRunwayInEnd.getX()-DgCreateFlightScenario.stars.get(idStar).getLength(), coordRunwayInEnd.getY());
+		if (DgCreateFlightScenario.stars.containsKey(idApron.toString())) {
+			Coord coordStar = new CoordImpl(coordRunwayInEnd.getX()-DgCreateFlightScenario.stars.get(idApron.toString()).getLength(), coordRunwayInEnd.getY());
 			Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
 			network.addNode(nodeStar);
 			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunwayIn);
 			linkStarIn.setAllowedModes(allowedModes);
-			linkStarIn.setLength(DgCreateFlightScenario.stars.get(idStar).getLength());
-			linkStarIn.setCapacity(DgCreateFlightScenario.stars.get(idStar).getCapacity());
-			linkStarIn.setFreespeed(DgCreateFlightScenario.stars.get(idStar).getFreespeed());
+			linkStarIn.setLength(DgCreateFlightScenario.stars.get(idApron.toString()).getLength());
+			linkStarIn.setCapacity(network.getCapacityPeriod() * DgCreateFlightScenario.stars.get(idApron.toString()).getCapacity());
+			System.out.println("HOLE STAR MUC.................................................");
+			linkStarIn.setFreespeed(DgCreateFlightScenario.stars.get(idApron.toString()).getFreespeed());
 			network.addLink(linkStarIn);
 		}
 		else {
@@ -158,7 +159,7 @@ public class SfMatsimAirport {
 			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunwayIn);
 			linkStarIn.setAllowedModes(allowedModes);
 			linkStarIn.setLength(DgCreateFlightScenario.DEFAULTSTAR.getLength());
-			linkStarIn.setCapacity(DgCreateFlightScenario.DEFAULTSTAR.getCapacity());
+			linkStarIn.setCapacity(network.getCapacityPeriod() * DgCreateFlightScenario.DEFAULTSTAR.getCapacity());
 			linkStarIn.setFreespeed(DgCreateFlightScenario.DEFAULTSTAR.getFreespeed());
 			network.addLink(linkStarIn);
 		}
