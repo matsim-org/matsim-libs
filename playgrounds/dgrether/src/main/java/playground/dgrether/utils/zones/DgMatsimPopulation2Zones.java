@@ -242,9 +242,9 @@ public class DgMatsimPopulation2Zones {
 					isRouteInGrid = true;
 				}
 			}
-			if (! isRouteInGrid){
-				log.debug("  Route is not in area of interest");
-			}
+//			if (! isRouteInGrid){
+//				log.debug("  Route is not in area of interest");
+//			}
 		}
 	}
 

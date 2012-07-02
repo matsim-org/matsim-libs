@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgTaController
+ * DgAbstractSignalController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol.model;
+package playground.dgrether.signalsystems.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.model.SignalController;
-
-import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
-
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 
 /**
+ * 
  * @author dgrether
  *
  */
-public class DgTaController  extends DgAbstractSignalController implements SignalController {
+public abstract class DgAbstractSignalController implements SignalController {
 
-	@Override
-	public void updateState(double timeSeconds) {
-		
-		this.getNumberOfExpectedVehicles(timeSeconds);
-	}
+	protected SignalSystem system = null;
+	protected Map<Id, SignalPlan> signalPlans = new HashMap<Id, SignalPlan>();
 
-	@Override
-	public void reset(Integer iterationNumber) {
-	}
-
-	@Override
-	public void simulationInitialized(double simStartTimeSeconds) {
-	}
 	
-	
-	/**
-	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
-	 */
-	private int getNumberOfExpectedVehicles(double timeSeconds){
-		return 0;
+	@Override
+	public void addPlan(SignalPlan plan) {
+		this.signalPlans .put(plan.getId(), plan);
+	}
+
+	@Override
+	public void setSignalSystem(SignalSystem system) {
+		this.system = system;
 	}
 
 }

@@ -74,7 +74,7 @@ public class DgZonesUtils {
 		Map<DgZone, Link> map = new HashMap<DgZone, Link>();
 		for (DgZone zone : zones){
 			Coord coord = MGC.coordinate2Coord(zone.getCoordinate());
-			Link link = network.getNearestLink(coord);
+			Link link = network.getNearestLinkExactly(coord);
 			map.put(zone, link);
 		}
 		return map;

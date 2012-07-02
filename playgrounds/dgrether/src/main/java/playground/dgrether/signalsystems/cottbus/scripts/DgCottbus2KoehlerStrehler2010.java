@@ -45,6 +45,8 @@ import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010Zon
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
+import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
+import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
 import playground.dgrether.utils.DgGrid;
 import playground.dgrether.utils.DgGridUtils;
@@ -62,8 +64,8 @@ public class DgCottbus2KoehlerStrehler2010 {
 	public static final Logger log = Logger.getLogger(DgCottbus2KoehlerStrehler2010.class);
 	public static final String outputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/";
 	private static String smallNet = outputDirectory + "network_small.xml.gz";
-	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
-//	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
+//	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
+	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 	private static String modelOutfile = outputDirectory + "koehler_strehler_model.xml";
 	
 	private static String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
@@ -80,6 +82,9 @@ public class DgCottbus2KoehlerStrehler2010 {
 	
 	public static void main(String[] args) throws IOException {
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+		DgIdPool idPool = new DgIdPool();
+		DgIdConverter idConverter = new DgIdConverter(idPool);
+		
 		/*TODO add time support in respect to:
 		 * network capacity creation: document
 		*/
@@ -97,13 +102,16 @@ public class DgCottbus2KoehlerStrehler2010 {
 
 		//create koehler strehler network
 		Scenario sc = loadSmallNetworkLanesSignals();
-		DgKSNetwork ksNet = new DgMatsim2KoehlerStrehler2010NetworkConverter().convertNetworkLanesAndSignals(sc, startTime, endTime);
+		DgKSNetwork ksNet = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter).convertNetworkLanesAndSignals(sc, startTime, endTime);
 
-		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap);
+		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
 		DgCommodities commodities = demandConverter.convert(sc, ksNet);
 		
 		new DgKoehlerStrehler2010ModelWriter().write(ksNet, commodities, name, description, modelOutfile);
 		writeStats(ksNet, commodities);
+		
+		idPool.writeToFile(outputDirectory + "id_conversions.txt");
+		
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 	

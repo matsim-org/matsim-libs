@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgTaController
+ * TaSingleCrossingMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol.model;
+package playground.dgrether.signalsystems.tacontrol;
 
-import org.matsim.signalsystems.model.SignalController;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 
-import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
+import playground.dgrether.signalsystems.tacontrol.controler.DgTaControlerListenerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgTaController  extends DgAbstractSignalController implements SignalController {
+public class TaSingleCrossingMain {
 
-	@Override
-	public void updateState(double timeSeconds) {
-		
-		this.getNumberOfExpectedVehicles(timeSeconds);
-	}
-
-	@Override
-	public void reset(Integer iterationNumber) {
-	}
-
-	@Override
-	public void simulationInitialized(double simStartTimeSeconds) {
-	}
-	
-	
 	/**
-	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
+	 * @param args
 	 */
-	private int getNumberOfExpectedVehicles(double timeSeconds){
-		return 0;
+	public static void main(String[] args) {
+		Config config = ConfigUtils.createConfig();
+		
+		
+		Controler controler = new Controler(config);
+		controler.setSignalsControllerListenerFactory(new DgTaControlerListenerFactory());
+		controler.setOverwriteFiles(true);
+		controler.run();
+
 	}
 
 }

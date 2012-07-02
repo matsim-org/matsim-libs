@@ -35,11 +35,11 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalPlan;
-import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
+import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 
@@ -47,16 +47,13 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
  * @author dgrether
  *
  */
-public class DgSylviaController implements SignalController {
+public class DgSylviaController extends DgAbstractSignalController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(DgSylviaController.class);
 	
 	public final static String CONTROLLER_IDENTIFIER = "SylviaSignalControl";
 
 	private static int sylviaPlanDumpCount = 0;
-	
-	private SignalSystem system = null;
-	private Map<Id, SignalPlan> signalPlans = new HashMap<Id, SignalPlan>();
 	
 	private DgSylviaSignalPlan activeSylviaPlan = null;
 	private boolean extensionActive = false;
@@ -299,16 +296,6 @@ public class DgSylviaController implements SignalController {
 		return false;
 	}
 	
-	@Override
-	public void addPlan(SignalPlan plan) {
-		this.signalPlans .put(plan.getId(), plan);
-	}
-
-	@Override
-	public void setSignalSystem(SignalSystem system) {
-		this.system = system;
-	}
-
 	@Override
 	public void reset(Integer iterationNumber) {
 		this.init();
