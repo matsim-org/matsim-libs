@@ -11,7 +11,7 @@ public class DebugLib {
 	}
 	
 	public static void traceAgent(Id personId, int flag){
-		if (personId.toString().equalsIgnoreCase("197") && flag==6){
+		if (personId.toString().equalsIgnoreCase("3715285") && flag==10){
 			emptyFunctionForSettingBreakPoint();
 		}
 	}

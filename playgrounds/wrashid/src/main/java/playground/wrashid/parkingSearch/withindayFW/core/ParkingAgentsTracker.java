@@ -297,12 +297,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			Plan executedPlan = agent.getSelectedPlan();
 			int planElementIndex = agent.getCurrentPlanElementIndex();
 
-			if (agents.get(personId).getCurrentPlanElementIndex() == 3) {
-
-				DebugLib.traceAgent(personId,3);
-				
-				// DebugLib.traceAgent(personId);
-			}
+			
 
 			// TwoHashMapsConcatenated<Id, Integer, ParkingStrategy>
 			// currentlySelectedParkingStrategies =
@@ -336,16 +331,25 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			 * activity).
 			 */
 
-			if (planElementIndex == 3) {
+			if (planElementIndex == 33) {
 				
 				ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = agents.get(personId);
 				
 				
-				 DebugLib.traceAgent(personId,6);
+				 DebugLib.traceAgent(personId,10);
 			}
 			
 		
 			if (shouldStartSearchParking(event.getLinkId(), nextActivityLink, distanceToNextActivity)) {
+				
+				if (planElementIndex == 33) {
+					
+					ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = agents.get(personId);
+					
+					
+					 DebugLib.traceAgent(personId,10);
+				}
+				
 				searchingAgents.add(personId);
 			}
 		}
@@ -355,8 +359,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	public void handleEvent(AgentArrivalEvent event) {
 		super.handleEvent(event);
 
-		if (agents.get(event.getPersonId()).getCurrentPlanElementIndex() == 9) {
-			// DebugLib.traceAgent(event.getPersonId());
+		if (agents.get(event.getPersonId()).getCurrentPlanElementIndex() == 33) {
+			 DebugLib.traceAgent(event.getPersonId(),10);
 		}
 
 		Id personId = event.getPersonId();
@@ -387,6 +391,14 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
 		
 
+		if (currentPlanElementIndex == 33) {
+			
+			ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = agents.get(personId);
+			
+			
+			 DebugLib.traceAgent(personId,10);
+		}
+		
 		getLastCarMovementTime().put(personId, event.getTime());
 		if (carLegAgents.contains(personId)) {
 			if (!searchingAgents.contains(personId)) {
@@ -404,12 +416,12 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				 * activity is performed.
 				 */
 
-				if (currentPlanElementIndex == 9) {
+				if (currentPlanElementIndex == 33) {
 					
 					ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = agents.get(personId);
 					
 					
-					 DebugLib.traceAgent(personId,6);
+					 DebugLib.traceAgent(personId,10);
 				}
 				
 				

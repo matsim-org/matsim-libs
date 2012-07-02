@@ -98,9 +98,9 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
 			Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
 			
-			if (agents.get(personId).getCurrentPlanElementIndex() == 3) {
+			if (agents.get(personId).getCurrentPlanElementIndex() == 33) {
 
-				DebugLib.traceAgent(personId, 3);
+				DebugLib.traceAgent(personId, 10);
 				
 				// DebugLib.traceAgent(personId);
 			}

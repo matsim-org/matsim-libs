@@ -150,6 +150,28 @@ public class HUPCControllerKTI extends KTIWithinDayControler  {
 
 		initParkingFacilityCapacities();
 		
+		
+		cleanNetwork();
+		
+	}
+
+	private void cleanNetwork() {
+		//network cleaning
+		// set min length of link to 10m (else replanning does not function, because vehicle arrives
+		// before it can be replanned).
+		// case where this happend: although p1 and p2 are on different links, if both have length zero
+		// then replanning does not happen and walk leg, etc. is not set of link.
+		
+		//TODO: alternative to handle this (make check where getting alternative parking (not on same link)
+		// there check, if link length is zero of current and next link (and if this is the case), exclude both links
+		// until link with length non-zero in the set.
+		
+		int minLinkLength = 40;
+		for (Link link:network.getLinks().values()){
+			if (link.getLength()<minLinkLength){
+				link.setLength(minLinkLength);
+			}
+		}
 	}
 
 	private void initParkingFacilityCapacities() {

@@ -74,9 +74,9 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 
-		if (currentLegIndex == 15) {
+		if (currentLegIndex == 33) {
 
-			DebugLib.traceAgent(plan.getPerson().getId(),1);
+			DebugLib.traceAgent(plan.getPerson().getId(),10);
 			
 			// DebugLib.traceAgent(personId);
 		}
@@ -97,8 +97,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 
 		Integer secondParkingActIndex = getSecondParkingActIndex(withinDayAgent);
 		if (!lastParkingOfDay(secondParkingActIndex)) {
-			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure(),
-					withinDayAgent, scenario, routeAlgo);
+			
 			
 			Integer secondWalkgLegIndex = secondParkingActIndex - 1;
 			Integer nextCarLegIndex = secondParkingActIndex + 1;
@@ -107,6 +106,9 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 			secondParkingAct.setFacilityId(parkingFacilityId);
 			secondParkingAct.setLinkId(parkingFacility.getLinkId());
 
+			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure(),
+					withinDayAgent, scenario, routeAlgo);
+			
 			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, routeAlgo);
 			
 			editPartialRoute.replanFutureCarLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex);

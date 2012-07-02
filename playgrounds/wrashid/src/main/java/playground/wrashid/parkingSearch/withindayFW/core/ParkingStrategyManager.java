@@ -67,10 +67,6 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			
 			for (ExperimentalBasicWithindayAgent agent : agents.values()) {
 				Plan selectedPlan = agent.getSelectedPlan();
-
-				if (selectedPlan.getPerson().getId().equals(new IdImpl(304))){
-					System.out.println();
-				}
 				
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
@@ -105,58 +101,43 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 						if (leg.getMode().equals(TransportMode.car)) {
 							ActivityImpl activity = (ActivityImpl) selectedPlan.getPlanElements().get(i + 3);
-							if (!legModeActivityTypes.get(agent.getId(), i).equals(leg.getMode())
-									|| !legModeActivityTypes.get(agent.getId(), i + 3).equals(activity.getType())) {
-
-								if (legModeActivityTypes.get(agent.getId(), i).equals(TransportMode.car)) {
-									// as we changed the activity type, we must
-									// tidy up the previous strategy score
-
-									tidyUpUnusedStrategyScores(agent, i);
-								}
-
-								/*
-								 * we switched to car mode or switched the
-								 * activity type => we must start from beginning
-								 */
-
-								startNewRandomStrategy(agent, i, activity);
-							} else {
+//							if (!legModeActivityTypes.get(agent.getId(), i).equals(leg.getMode())
+//									|| !legModeActivityTypes.get(agent.getId(), i + 3).equals(activity.getType())) {
+//
+//								if (legModeActivityTypes.get(agent.getId(), i).equals(TransportMode.car)) {
+//									// as we changed the activity type, we must
+//									// tidy up the previous strategy score
+//
+//									tidyUpUnusedStrategyScores(agent, i);
+//								}
+//
+//								/*
+//								 * we switched to car mode or switched the
+//								 * activity type => we must start from beginning
+//								 */
+//
+//								startNewRandomStrategy(agent, i, activity);
+//							} else {
 								// use most of the time best strategy, but also try out others
 								
 								// TODO: make this unprobabiliistik later (anstatt dess period angeben, e.g. 10). 
 								if (MatsimRandom.getRandom().nextDouble() < 0.9) {
 									selectStrategyWithHighestScore(agent, i, activity);
 								} else {
-									Collection<ParkingStrategy> parkingStrategies = strategyActivityMapper.getParkingStrategies(agent.getId(),
-											activity.getType());
-									
-									// TODO: implement avoid starvation later here (round robin anstatt probabilistik).
-										int nextInt = MatsimRandom.getRandom().nextInt(parkingStrategies.size());
-
-										ParkingStrategy selectedParkingStrategy = null;
-										int j = 0;
-										for (ParkingStrategy parkingStrategy : parkingStrategies) {
-											if (j == nextInt) {
-												selectedParkingStrategy = parkingStrategy;
-											}
-											j++;
-										}
-
-										getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
+									selectStrategyAtRandom(agent, i, activity);
 								}
-							}
+//							}
 						} else {
-							if (legModeActivityTypes.get(agent.getId(), i).equals(TransportMode.car)) {
-								// as we were driving car before, we have to
-								// tidy up the strategy score
-
-								
-								//TODO: uncomment following line (gives null pointer exception)
-								//also the line is not crutial, still would be good to fix it.
-								//tidyUpUnusedStrategyScores(agent, i);
-
-							}
+//							if (legModeActivityTypes.get(agent.getId(), i).equals(TransportMode.car)) {
+//								// as we were driving car before, we have to
+//								// tidy up the strategy score
+//
+//								
+//								//TODO: uncomment following line (gives null pointer exception)
+//								//also the line is not crutial, still would be good to fix it.
+//								//tidyUpUnusedStrategyScores(agent, i);
+//
+//							}
 						}
 
 					}
@@ -164,9 +145,27 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			}
 		}
 
-		for (ExperimentalBasicWithindayAgent agent : agents.values()) {
-			updatedPlanElementHashCodes(agent);
-		}
+//		for (ExperimentalBasicWithindayAgent agent : agents.values()) {
+//			updatedPlanElementHashCodes(agent);
+//		}
+	}
+
+	private void selectStrategyAtRandom(ExperimentalBasicWithindayAgent agent, int i, ActivityImpl activity) {
+		Collection<ParkingStrategy> parkingStrategies = strategyActivityMapper.getParkingStrategies(agent.getId(),
+				activity.getType());
+		
+			int nextInt = MatsimRandom.getRandom().nextInt(parkingStrategies.size());
+
+			ParkingStrategy selectedParkingStrategy = null;
+			int j = 0;
+			for (ParkingStrategy parkingStrategy : parkingStrategies) {
+				if (j == nextInt) {
+					selectedParkingStrategy = parkingStrategy;
+				}
+				j++;
+			}
+
+			getCurrentlySelectedParkingStrategies().put(agent.getId(), i, selectedParkingStrategy);
 	}
 
 	private void selectStrategyWithHighestScore(ExperimentalBasicWithindayAgent agent, int legPlanElementIndex, ActivityImpl activity) {
@@ -176,9 +175,6 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 		ParkingStrategy selectedParkingStrategy = null;
 		double bestStrategyScore = Double.NEGATIVE_INFINITY ;
 		for (ParkingStrategy parkingStrategy : parkingStrategies) {
-			if (agent.getId().toString().equalsIgnoreCase("303")){
-				System.out.println(parkingStrategy.getIdentifier() + "->" +  parkingStrategy.getScore(agent.getId(), 3));
-			}
 			
 			if (parkingStrategy.getScore(agent.getId(), legPlanElementIndex) > bestStrategyScore) {
 				selectedParkingStrategy = parkingStrategy;
@@ -186,9 +182,11 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			}
 		}
 		
-		
-
-		getCurrentlySelectedParkingStrategies().put(agent.getId(), legPlanElementIndex, selectedParkingStrategy);
+		if (selectedParkingStrategy==null){
+			selectStrategyAtRandom(agent,legPlanElementIndex,activity);
+		} else {
+			getCurrentlySelectedParkingStrategies().put(agent.getId(), legPlanElementIndex, selectedParkingStrategy);
+		}
 	}
 
 	private void tidyUpUnusedStrategyScores(ExperimentalBasicWithindayAgent agent, int i) {
