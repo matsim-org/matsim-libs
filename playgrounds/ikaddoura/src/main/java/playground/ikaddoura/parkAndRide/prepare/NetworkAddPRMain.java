@@ -45,13 +45,13 @@ public class NetworkAddPRMain {
 	
 	
 	// input
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinNetwork.xml";
-	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinTransitSchedule.xml";
-	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinTransitVehicles.xml";
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinNetwork.xml";
+	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitSchedule.xml";
+	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitVehicles.xml";
 	
 	// output
-	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinPRfacilitiesTest.txt";
-	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinPRnetworkTest.xml";
+	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRfacilities_berlin.txt";
+	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRnetwork_berlin.xml";
 	
 	static double extensionRadius = 10;
 	static int maxSearchSteps = 100;
@@ -130,8 +130,8 @@ public class NetworkAddPRMain {
 		
 		TextFileWriter writer = new TextFileWriter();	
 		writer.write(prFacilityCreator.getParkAndRideFacilities(), prFacilitiesFile);
-		writer.writeInfo(prNodeSearch.getStopsWithoutPRFacility(), "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/stops_noCarLinkFound.txt");
-		writer.writeInfo(prNodeSearch.getStopsNotSUBerlin(), "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/stops_noPRbyName.txt");
+		writer.writeInfo(prNodeSearch.getStopsWithoutPRFacility(), "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/info_stops_noCarLinkFound.txt");
+		writer.writeInfo(prNodeSearch.getStopsNotSUBerlin(), "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/info_stops_noPRbyName.txt");
 		
 //		for (TransitStopFacility stop : prNodeSearch.getTransitStop2nearestCarLink().keySet()){
 //			System.out.println("TranistStopFacility: " + stop.getId().toString() + " " + stop.getName() + " " + stop.getCoord().toString() + " / next car-Link: " + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getId() + " / toNode:" + prNodeSearch.getTransitStop2nearestCarLink().get(stop).getToNode().getCoord().toString());

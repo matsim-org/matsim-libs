@@ -31,12 +31,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -58,10 +56,10 @@ public class PRNodeSearch {
 			System.out.println("__________________________________________________________");
 			System.out.println("TransitStop " + stop.getId() + " / "+stop.getName()+" / "+ stop.getCoord());
 			
-			double xMax = 4598530.0; // Warschauer Straße
-			double xMin = 4588834.0418; // Richard-Wagner-Platz
-			double yMax = 5823013.0; // Nordbahnhof
-			double yMin = 5817773.842; // Platz der Luftbrücke
+//			double xMax = 4598530.0; // Warschauer Straße
+//			double xMin = 4588834.0418; // Richard-Wagner-Platz
+//			double yMax = 5823013.0; // Nordbahnhof
+//			double yMin = 5817773.842; // Platz der Luftbrücke
 	
 //			if (stop.getCoord().getX() <= xMax && stop.getCoord().getX() >= xMin && stop.getCoord().getY() <= yMax && stop.getCoord().getY() >= yMin) {
 //				// within rectangle
