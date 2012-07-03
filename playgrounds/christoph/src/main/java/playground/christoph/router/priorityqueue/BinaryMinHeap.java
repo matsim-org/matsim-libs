@@ -315,22 +315,20 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		int index = indices[value.getArrayIndex()];
 		if (index < 0) {
 			return this.add(value, cost);
-		} 
+		}
 		
 		/*
 		 * If the cost should be increased, we cannot do this. Therefore we
 		 * return false.
 		 */
-		if (cost > costs[index]) {
-			return false;
-		}
-		
-		if (debug) {
-			double oldCost = costs[index];
-			if (oldCost < cost) {
+		double oldCost = costs[index];
+		if (oldCost < cost) {
+			if (debug) {
 				check();
 				throw new RuntimeException("Old costs (" + oldCost + ") are lower than new ones (" + cost + "). Cannot decrease key!");
-			}			
+			}
+			else
+				return false;
 		}
 
 		// update costs in array
