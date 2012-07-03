@@ -60,7 +60,7 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 	}
 
 	public void testPoll() {
-		BinaryMinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -72,24 +72,24 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 		assertEquals(3, pq.size());
-		assertEquals(entry1, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
 		assertEquals(2, pq.size());
 
 		pq.add(entry3, 1.0);
 		pq.add(entry4, 4.0);
 		pq.add(entry5, 9.0);
 		assertEquals(5, pq.size());
-		assertEquals(entry3, pq.remove());
-		assertEquals(entry4, pq.remove());
-		assertEquals(entry0, pq.remove());
-		assertEquals(entry2, pq.remove());
-		assertEquals(entry5, pq.remove());
+		assertEqualsHE(entry3, pq.remove());
+		assertEqualsHE(entry4, pq.remove());
+		assertEqualsHE(entry0, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
+		assertEqualsHE(entry5, pq.remove());
 		assertEquals(0, pq.size());
 		assertNull(pq.remove());
 	}
 	
 	public void testPoll2() {
-		BinaryMinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -101,18 +101,18 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 		assertEquals(3, pq.size());
-		assertEquals(entry1, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
 		assertEquals(2, pq.size());
 
 		pq.add(entry3, 1.0);
 		pq.add(entry4, 4.0);
 		pq.add(entry5, 9.0);
 		assertEquals(5, pq.size());
-		assertEquals(entry3, pq.remove());
-		assertEquals(entry4, pq.remove());
-		assertEquals(entry0, pq.remove());
-		assertEquals(entry2, pq.remove());
-		assertEquals(entry5, pq.remove());
+		assertEqualsHE(entry3, pq.remove());
+		assertEqualsHE(entry4, pq.remove());
+		assertEqualsHE(entry0, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
+		assertEqualsHE(entry5, pq.remove());
 		assertEquals(0, pq.size());
 		assertNull(pq.remove());
 	}
@@ -237,7 +237,7 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 	}
 
 	public void testRemove() {
-		BinaryMinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -246,7 +246,7 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 
-		Collection<HeapEntry> coll = getIteratorCollection(pq.iterator());
+		Collection<DummyHeapEntry> coll = getIteratorCollection(pq.iterator());
 		assertEquals(3, coll.size());
 		assertTrue(coll.contains(entry0));
 		assertTrue(coll.contains(entry1));
@@ -277,13 +277,13 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		assertTrue(coll.contains(entry2));
 
 		// now poll the pq and ensure, no removed element is returned
-		assertEquals(entry1, pq.remove());
-		assertEquals(entry2, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
 		assertNull(pq.remove());
 	}
 
 	public void testRemoveAndAdd_LowerPriority() {
-		BinaryMinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -298,15 +298,15 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		assertEquals(2, pq.size());
 		pq.add(entry0, 7.0);
 		assertEquals(3, pq.size());
-		assertEquals(entry1, pq.remove());
-		assertEquals(entry2, pq.remove());
-		assertEquals(entry0, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
+		assertEqualsHE(entry0, pq.remove());
 		assertNull(pq.remove());
 	}
 
 	// increase priority -> decrease key since it is a min-heap
 	public void testIncreasePriority() {
-		BinaryMinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -319,9 +319,9 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		// test decreasing an element by increasing priority (=lower value)
 		pq.decreaseKey(entry0, 2);
 		assertEquals(3, pq.size());
-		assertEquals(entry0, pq.remove());
-		assertEquals(entry1, pq.remove());
-		assertEquals(entry2, pq.remove());
+		assertEqualsHE(entry0, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
 		assertNull(pq.remove());
 		
 		/*
@@ -332,16 +332,16 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		pq.add(entry1, 5.0);
 		pq.add(entry2, 6.0);
 		assertEquals(3, pq.size());
-		pq.decreaseKey(entry2, 4);
+		pq.decreaseKey(entry2, 4.0);
 		assertEquals(3, pq.size());
-		assertEquals(entry2, pq.remove());
-		assertEquals(entry1, pq.remove());
-		assertEquals(entry0, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
+		assertEqualsHE(entry0, pq.remove());
 		assertNull(pq.remove());
 	}
 	
 	public void testRemoveAndAdd_HigherPriority() {
-		BinaryMinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -356,9 +356,9 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		assertEquals(2, pq.size());
 		pq.add(entry0, 2.5);
 		assertEquals(3, pq.size());
-		assertEquals(entry0, pq.remove());
-		assertEquals(entry1, pq.remove());
-		assertEquals(entry2, pq.remove());
+		assertEqualsHE(entry0, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
 		assertNull(pq.remove());
 	}
 

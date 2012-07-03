@@ -49,6 +49,11 @@ public class BinaryMinHeapTest extends TestCase {
 			return index;
 		}
 	}
+
+	protected void assertEqualsHE(DummyHeapEntry e1, DummyHeapEntry e2) {
+		assertEquals(e1.index, e2.index);
+		assertEquals(e1, e2);
+	}
 }
 
 
