@@ -86,6 +86,13 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	}
 	
 	/**
+	 * @return the fan-out of the heap
+	 */
+	public int getFanout() {
+		return FANOUT;
+	}
+
+	/**
 	 * Resets the queue to its initial state.
 	 */
 	public void reset() {
