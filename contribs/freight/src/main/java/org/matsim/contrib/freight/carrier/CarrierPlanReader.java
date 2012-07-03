@@ -151,17 +151,13 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			String capacity = atts.getValue(CAPACITY);
 			String startTime = atts.getValue(VEHICLESTART);
 			String endTime = atts.getValue(VEHICLEEND);
-			Integer cap = null;
-			if(capacity != null){
-				cap = getInt(capacity);
-				if(cap == 0){
-					logger.warn("vehicle " + vId + " capacity is 0.");
-				}
+			Integer cap = getInt(capacity);
+			String typeId = atts.getValue("typeId");
+			if(typeId == null){
+				logger.warn("no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)");
+				typeId = "default";
 			}
-			else{
-				throw new IllegalStateException("no capacity available");
-			}
-			CarrierVehicle vehicle = CarrierUtils.createAndAddVehicle(currentCarrier, vId, linkId, cap);
+			CarrierVehicle vehicle = CarrierUtils.createAndAddVehicle(currentCarrier, vId, linkId, cap, typeId);
 			if(startTime == null){
 				vehicle.setEarliestStartTime(0.0);
 			}

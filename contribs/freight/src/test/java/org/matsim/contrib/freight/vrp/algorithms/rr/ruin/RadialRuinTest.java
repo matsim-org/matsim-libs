@@ -23,31 +23,32 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.JobDistanceAvgCosts;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinRadial;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
-import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
 public class RadialRuinTest extends VRPTestCase {
 
 	VehicleRoutingProblem vrp;
 
-	RRSolution solution;
+	RuinAndRecreateSolution solution;
 
-	RadialRuin radialRuin;
+	RuinRadial radialRuin;
 
 	@Override
 	public void setUp() {
 		initJobsInPlainCoordinateSystem();
 		vrp = getVRP(2,2);
 		solution = getInitialSolution(vrp);
-		radialRuin = new RadialRuin(vrp, new AvgDistanceBetweenJobs(vrp.getCosts()));
-		radialRuin.setFractionOfAllNodes(0.25);
+		radialRuin = new RuinRadial(vrp, new JobDistanceAvgCosts(vrp.getCosts()));
+		radialRuin.setRuinFraction(0.25);
 		RandomNumberGeneration.reset();
 		/*
 		 * fraction=0.5 picks 0,10 rem 0,10 rem 1,5

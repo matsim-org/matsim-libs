@@ -19,10 +19,25 @@
 
 package org.matsim.contrib.freight.carrier;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class CarrierUtils {
+	
+	public static Collection<CarrierVehicle> getCarrierVehicles(CarrierCapabilities carrierCapabilities){
+		return new ArrayList<CarrierVehicle>(carrierCapabilities.getCarrierVehicles());
+	}
+	
+	public static Collection<CarrierShipment> getCarrierShipments(Collection<CarrierContract> contracts){
+		Collection<CarrierShipment> shipments = new ArrayList<CarrierShipment>();
+		for(Contract c : contracts){
+			shipments.add((CarrierShipment)c.getShipment());
+		}
+		return shipments;
+	}
 	
 	public static CarrierImpl createCarrier(String id, String depotLinkId){
 		CarrierImpl carrier = new CarrierImpl(makeId(id), makeId(depotLinkId));
@@ -34,9 +49,12 @@ public class CarrierUtils {
 		return new IdImpl(id);
 	}
 
-	public static CarrierVehicle createAndAddVehicle(Carrier carrier, String vehicleId, String vehicleLocationId, int vehicleCapacity){
+	public static CarrierVehicle createAndAddVehicle(Carrier carrier, String vehicleId, String vehicleLocationId, int vehicleCapacity, String type){
 		CarrierVehicle vehicle = new CarrierVehicle(makeId(vehicleId), makeId(vehicleLocationId));
 		vehicle.setCapacity(vehicleCapacity);
+		CarrierVehicleTypeImpl vehicleType = new CarrierVehicleTypeImpl(makeId(type));
+		vehicleType.setFreightCapacity(vehicleCapacity);
+		vehicle.setVehicleType(vehicleType);
 		if(carrier.getCarrierCapabilities() != null){
 			carrier.getCarrierCapabilities().getCarrierVehicles().add(vehicle);
 		}
@@ -48,8 +66,8 @@ public class CarrierUtils {
 		return vehicle;
 	}
 	
-	public static CarrierVehicle createAndAddVehicle(Carrier carrier, String vehicleId, String vehicleLocationId, int vehicleCapacity, double earliestOperationStart, double latestOperationEnd){
-		CarrierVehicle v = createAndAddVehicle(carrier, vehicleId, vehicleLocationId, vehicleCapacity);
+	public static CarrierVehicle createAndAddVehicle(Carrier carrier, String vehicleId, String vehicleLocationId, int vehicleCapacity, String type, double earliestOperationStart, double latestOperationEnd){
+		CarrierVehicle v = createAndAddVehicle(carrier, vehicleId, vehicleLocationId, vehicleCapacity,type);
 		v.setEarliestStartTime(earliestOperationStart);
 		v.setLatestEndTime(latestOperationEnd);
 		return v;

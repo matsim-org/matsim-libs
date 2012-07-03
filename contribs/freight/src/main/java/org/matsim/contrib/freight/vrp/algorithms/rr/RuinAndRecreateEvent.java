@@ -16,6 +16,7 @@ package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 
 
+
 /**
  * Collector of algo-information. Can be listened to.
  * 
@@ -35,23 +36,23 @@ public class RuinAndRecreateEvent {
 	
 	private boolean solutionAccepted;
 	
-	private RRSolution currentSolution;
+	private RuinAndRecreateSolution currentSolution;
 
 	public RuinAndRecreateEvent(int currentMutation, double tentativeSolution,
-			double currentResult, double currentThreshold, boolean solutionAccepted) {
+			double currentSolution, double currentThreshold, boolean solutionAccepted) {
 		super();
 		this.currentMutation = currentMutation;
 		this.tentativeSolution = tentativeSolution;
 		this.threshold = currentThreshold;
 		this.solutionAccepted = solutionAccepted;
-		this.currentResult = currentResult;
+		this.currentResult = currentSolution;
 	}
 
-	public RRSolution getCurrentSolution() {
+	public RuinAndRecreateSolution getCurrentSolution() {
 		return currentSolution;
 	}
 
-	public void setCurrentSolution(RRSolution rrSolution) {
+	public void setCurrentSolution(RuinAndRecreateSolution rrSolution) {
 		this.currentSolution = rrSolution;
 	}
 

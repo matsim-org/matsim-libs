@@ -13,19 +13,18 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 
+
 /**
  * 
  * @author stefan schroeder
  *
  */
 
-public class ManhattanCosts implements Costs {
+public class ManhattanCosts implements VehicleRoutingCosts {
 
 	public double speed = 1;
 	
 	private Locations locations;
-	
-	private DriverCostParams costParams = new DriverCostParams(1.0,1.0,0.0,0.0,0.0,100.0);
 		
 	public ManhattanCosts(Locations locations) {
 		super();
@@ -33,12 +32,12 @@ public class ManhattanCosts implements Costs {
 	}
 
 	@Override
-	public Double getTransportCost(String fromId, String toId, double time) {
-		return costParams.transportCost_per_meter*calculateDistance(fromId, toId);
+	public double getTransportCost(String fromId, String toId, double time, Driver driver, Vehicle vehicle) {
+		return calculateDistance(fromId, toId);
 	}
 
 	@Override
-	public Double getTransportTime(String fromId, String toId, double time) {
+	public double getTransportTime(String fromId, String toId, double time, Driver driver, Vehicle vehicle) {
 		double transportTime = calculateDistance(fromId, toId)/speed;
 		return transportTime;
 	}
@@ -50,17 +49,13 @@ public class ManhattanCosts implements Costs {
 	}
 
 	@Override
-	public Double getBackwardTransportCost(String fromId, String toId,double arrivalTime) {
-		return getTransportCost(fromId, toId, arrivalTime);
+	public double getBackwardTransportCost(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
+		return getTransportCost(fromId, toId, arrivalTime, null, null);
 	}
 
 	@Override
-	public Double getBackwardTransportTime(String fromId, String toId,double arrivalTime) {
-		return getTransportTime(fromId, toId, arrivalTime);
+	public double getBackwardTransportTime(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
+		return getTransportTime(fromId, toId, arrivalTime, null, null);
 	}
 
-	@Override
-	public DriverCostParams getCostParams() {
-		return costParams;
-	}
 }

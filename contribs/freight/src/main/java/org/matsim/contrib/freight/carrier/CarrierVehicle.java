@@ -4,6 +4,8 @@ import org.matsim.api.core.v01.Id;
 
 public class CarrierVehicle {
 
+	private CarrierVehicleType vehicleType;
+	
 	private Id vehicleId;
 	
 	private Id location;
@@ -23,7 +25,7 @@ public class CarrierVehicle {
 	private double earliestStartTime;
 	
 	private double latestEndTime;
-	
+
 	public CarrierVehicle(Id vehicleId, Id location) {
 		this.vehicleId = vehicleId;
 		this.location = location;
@@ -54,6 +56,14 @@ public class CarrierVehicle {
 		this.latestEndTime = endTime;
 	}
 	
+	public CarrierVehicleType getVehicleType() {
+		return vehicleType;
+	}
+
+	public void setVehicleType(CarrierVehicleType vehicleType) {
+		this.vehicleType = vehicleType;
+	}
+
 	public void setEarliestStartTime(double startTime){
 		this.earliestStartTime = startTime;
 	}
@@ -65,6 +75,11 @@ public class CarrierVehicle {
 	public double getLatestEndTime() {
 		return latestEndTime;
 	}
+	
+	public Id getVehicleTypeId(){
+		return vehicleType.getId();
+	}
+	
 
 	
 	

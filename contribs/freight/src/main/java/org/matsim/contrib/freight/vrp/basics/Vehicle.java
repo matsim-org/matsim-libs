@@ -1,72 +1,20 @@
-/*******************************************************************************
- * Copyright (c) 2011 Stefan Schroeder.
- * eMail: stefan.schroeder@kit.edu
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Public License v2.0
- * which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * 
- * Contributors:
- *     Stefan Schroeder - initial API and implementation
- ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
+import org.matsim.contrib.freight.vrp.basics.VehicleImpl.Type;
 
-/**
- * 
- * @author stefan schroeder
- *
- */
+public interface Vehicle {
 
-public class Vehicle{
-	
-	private int capacity;
-	
-	private String locationId;
-	
-	private String id;
-	
-	private double earliestDeparture = 0.0;
-	
-	private double latestArrival = Double.MAX_VALUE;
+	public abstract double getEarliestDeparture();
 
-	public double getEarliestDeparture() {
-		return earliestDeparture;
-	}
+	public abstract double getLatestArrival();
 
-	public void setEarliestDeparture(double earliestDeparture) {
-		this.earliestDeparture = earliestDeparture;
-	}
+	public abstract String getLocationId();
 
-	public double getLatestArrival() {
-		return latestArrival;
-	}
+	public abstract Type getType();
 
-	public void setLatestArrival(double latestArrival) {
-		this.latestArrival = latestArrival;
-	}
+	public abstract String getId();
 
-	public Vehicle(String id, String locationId, int capacity) {
-		super();
-		this.capacity = capacity;
-		this.locationId = locationId;
-		this.id = id;
-	}
+	public abstract int getCapacity();
 
-	public String getLocationId() {
-		return locationId;
-	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setLocationId(String locationId) {
-		this.locationId = locationId;
-	}
-
-	public int getCapacity() {
-		return capacity;
-	}
 }

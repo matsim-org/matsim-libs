@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
-import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
+import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
+import org.matsim.core.utils.collections.Tuple;
 
 
 
@@ -65,6 +65,14 @@ public class RuinStrategyManager {
 			}
 		}
 		throw new IllegalStateException("no ruin-strategy found");
+	}
+
+	public List<Tuple<RuinStrategy,Double>> getStrategies() {
+		List<Tuple<RuinStrategy,Double>> l = new ArrayList<Tuple<RuinStrategy,Double>>();
+		for(int i=0;i<strategies.size();i++){
+			l.add(new Tuple<RuinStrategy,Double>(strategies.get(i),weights.get(i)));
+		}
+		return l;
 	}
 
 }

@@ -12,8 +12,7 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 
 public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
@@ -21,7 +20,7 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 	
 	private double bestResult;
 	
-	private RRSolution bestSolution;
+	private RuinAndRecreateSolution bestSolution;
 	
 	@Override
 	public void inform(RuinAndRecreateEvent event) {
@@ -34,34 +33,34 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 	public void finish() {
 		System.out.println("totalCosts="+Math.round(bestResult));
 		System.out.println("#vehicles="+getActiveTours());
-		System.out.println("genCosts="+getGenCosts());
-		System.out.println("time=" + getTime());
+		System.out.println("transportCosts="+getGenCosts());
+		System.out.println("transportTime=" + getTime());
 	}
 	
-	private double getTime() {
+	public double getTime() {
 		double time = 0.0;
 		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
-			if(t.getTour().getActivities().size()>2){
+			if(t.isActive()){
 				time+=t.getTour().tourData.transportTime;
 			}
 		}
 		return time;
 	}
 
-	private double getGenCosts(){
+	public double getGenCosts(){
 		double dist = 0.0;
 		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
-			if(t.getTour().getActivities().size()>2){
+			if(t.isActive()){
 				dist+=t.getTour().tourData.transportCosts;
 			}
 		}
 		return dist;
 	}
 	
-	private int getActiveTours() {
+	public int getActiveTours() {
 		int nOfTours = 0;
 		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
-			if(t.getTour().getActivities().size()>2){
+			if(t.isActive()){
 				nOfTours++;
 			}
 		}

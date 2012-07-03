@@ -14,6 +14,8 @@ package org.matsim.contrib.freight.vrp.basics;
 
 import java.util.LinkedList;
 
+import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
+
 /**
  * 
  * @author stefan schroeder

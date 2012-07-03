@@ -27,15 +27,18 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.vrp.utils.matsim2vrp.MatsimVehicleAdapter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.vehicles.Vehicle;
 
 public class ReRouteVehicles implements CarrierPlanStrategyModule{
 
@@ -44,6 +47,7 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 	private LeastCostPathCalculator router;
 	
 	private Network network;
+	
 	
 	public ReRouteVehicles(LeastCostPathCalculator router, Network network) {
 		super();
@@ -61,6 +65,7 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 	
 	private void route(Collection<ScheduledTour> scheduledTours) {
 		for(ScheduledTour tour : scheduledTours){
+			MatsimVehicleAdapter matsimVehicle = new MatsimVehicleAdapter(tour.getVehicle());
 			double currTime = tour.getDeparture();
 			Id prevLink = tour.getTour().getStartLinkId();
 			Leg prevLeg = null;
@@ -71,7 +76,7 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 				}
 				if(e instanceof TourActivity){
 					TourActivity act = (TourActivity) e;
-					route(prevLeg, prevLink, act.getLocation());
+					route(prevLeg, prevLink, act.getLocation(), null, matsimVehicle);
 					double expectedArrival = currTime + prevLeg.getExpectedTransportTime();
 					act.setExpectedArrival(expectedArrival);
 					double startAct = Math.max(expectedArrival, act.getTimeWindow().getStart()); 
@@ -82,11 +87,11 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 				}
 			}
 			Id endLink = tour.getTour().getEndLinkId();
-			route(prevLeg,prevLink,endLink);
+			route(prevLeg,prevLink,endLink, null, matsimVehicle);
 		}
 	}
 	
-	private void route(Leg prevLeg, Id fromLinkId, Id toLinkId) {
+	private void route(Leg prevLeg, Id fromLinkId, Id toLinkId, Person person, Vehicle vehicle) {
 		if(fromLinkId.equals(toLinkId)){
 			prevLeg.setExpectedTransportTime(0);
 			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(fromLinkId,toLinkId);
@@ -95,7 +100,7 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 			prevLeg.setRoute(route);
 			return;
 		}
-		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getDepartureTime(), null, null);
+		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getDepartureTime(), person, vehicle);
 		prevLeg.setExpectedTransportTime(path.travelTime);
 		Route route = createRoute(fromLinkId,path,toLinkId);
 		prevLeg.setRoute(route);

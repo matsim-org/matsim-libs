@@ -44,10 +44,12 @@ import org.matsim.contrib.freight.replanning.ReScheduleVehicles;
 import org.matsim.contrib.freight.replanning.ScheduleVehicles;
 import org.matsim.contrib.freight.replanning.SelectBestPlan;
 import org.matsim.contrib.freight.vrp.DTWSolverFactory;
-import org.matsim.contrib.freight.vrp.NetworkTransportCosts;
-import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
-import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
-import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.TransportCostCalculator;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateChartListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.basics.Driver;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -73,36 +75,15 @@ import org.matsim.vehicles.Vehicle;
 
 public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener, IterationEndsListener {
 
-	public static class MyCarrierCostParams extends DriverCostParams {
 
-		public static double transportCost_per_second = 50.0/(60.0*60.0);
-		
-		public static double transportCost_per_meter = 1.0/1000.0;
-		
-		public static double waitingCost_per_second = 50.0/(60.0*60.0);
-		
-		public static double serviceCost_per_second = 50.0/(60.0*60.0);
-		
-		public static double cost_per_secondTooLate = 1000.0/(60.0*60.0);
-		
-		public static double cost_per_vehicle = 100.0;
-		
-		
-		public MyCarrierCostParams() {
-			super(transportCost_per_second, transportCost_per_meter, waitingCost_per_second,
-					serviceCost_per_second, cost_per_secondTooLate, cost_per_vehicle);
-			// TODO Auto-generated constructor stub
-		}
-		
-	}
 	
 	static class MyTravelCosts implements TravelDisutility{
 
 		private TravelTime travelTime;
 		
-		private double cost_per_m = new MyCarrierCostParams().transportCost_per_meter;
+		private double cost_per_m = 1.0/1000.0;
 		
-		private double cost_per_s = new MyCarrierCostParams().transportCost_per_second;
+		private double cost_per_s = 50.0/(60.0*60.0);
 		
 		public MyTravelCosts(TravelTime travelTime) {
 			super();
@@ -172,20 +153,29 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		
 //		final LeastCostPathCalculator router = event.getControler().getLeastCostPathCalculatorFactory().createPathCalculator(event.getControler().getScenario().getNetwork(), event.getControler().createTravelCostCalculator(), event.getControler().getTravelTimeCalculator());
 		
-		Costs costs = new NetworkTransportCosts(router, new MyCarrierCostParams(), event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+		VehicleRoutingCosts costs = new TransportCostCalculator(router,event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		
 		String filename = event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/" + event.getIteration() + ".vrp.png" ;
-		ChartListener chartListener = new ChartListener();
+		RuinAndRecreateChartListener chartListener = new RuinAndRecreateChartListener();
 		chartListener.setFilename(filename);
 		
-		ReScheduleVehicles vehicleReRouter = new ReScheduleVehicles(event.getControler().getNetwork(), costs);
+		TourCost tourCost = new TourCost(){
+
+			@Override
+			public double getTourCost(Tour tour, Driver driver, org.matsim.contrib.freight.vrp.basics.Vehicle vehicle) {
+				return vehicle.getType().vehicleCostParams.fix + tour.tourData.transportCosts;
+			}
+			
+		};
+		
+		ReScheduleVehicles vehicleReRouter = new ReScheduleVehicles(event.getControler().getNetwork(), costs, tourCost);
 //		vehicleReRouter.listeners.add(chartListener);
 		
 		planStrat_reSchedule.addModule(new MemorizeSelectedPlan());
 		planStrat_reSchedule.addModule(vehicleReRouter);
 		planStrat_reSchedule.addModule(new ReRouteVehicles(router, event.getControler().getNetwork()));
 		
-		ScheduleVehicles vehicleRouter = new ScheduleVehicles(event.getControler().getNetwork(), costs, new DTWSolverFactory());
+		ScheduleVehicles vehicleRouter = new ScheduleVehicles(event.getControler().getNetwork(), tourCost, costs, new DTWSolverFactory());
 		
 		
 		CarrierPlanStrategy planStrat_schedule = new CarrierPlanStrategy();

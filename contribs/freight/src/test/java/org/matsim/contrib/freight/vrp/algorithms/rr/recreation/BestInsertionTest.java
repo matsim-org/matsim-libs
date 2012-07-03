@@ -22,21 +22,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RecreationBestInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRDriverAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.VRPSchema;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
+import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
 
 public class BestInsertionTest extends VRPTestCase{
-	BestInsertion bestInsertion;
+	RecreationBestInsertion bestInsertion;
 	
 	VehicleRoutingProblem vrp;
 	
@@ -44,7 +47,7 @@ public class BestInsertionTest extends VRPTestCase{
 	
 	ServiceProviderAgent tourAgent2;
 	
-	RRSolution solution;
+	RuinAndRecreateSolution solution;
 	
 	List<Job> unassignedJobs;
 	
@@ -63,10 +66,19 @@ public class BestInsertionTest extends VRPTestCase{
 		tourBuilder.schedulePickup(s1);
 		tourBuilder.scheduleDelivery(s1);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		RRTourAgentFactory rrTourAgentFactory = new RRTourAgentFactory(tourStatusProcessor, 
-				vrp.getCosts().getCostParams(), new JobDistribOfferMaker(vrp.getCosts(), constraints, new DistribJIFFactory(new LocalMCCalculatorFactory())));
+		
+		TourCost tourCost = new TourCost(){
 
-		tourAgent1 = rrTourAgentFactory.createAgent(tourBuilder.build(), vrp.getVehicles().iterator().next(), costs);
+			@Override
+			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+				return 100 + tour.tourData.transportCosts;
+			}
+			
+		};
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, vrp.getCosts()).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+		
+		tourAgent1 = spFactory.createAgent(vrp.getVehicles().iterator().next(), new Driver(){}, tourBuilder.build());
+		
 		
 		VrpTourBuilder anotherTourBuilder = new VrpTourBuilder();
 		Shipment s2 = createShipment("2", makeId(10,0), makeId(0,0));
@@ -74,14 +86,14 @@ public class BestInsertionTest extends VRPTestCase{
 		anotherTourBuilder.schedulePickup(s2);
 		anotherTourBuilder.scheduleDelivery(s2);
 		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent2 = rrTourAgentFactory.createAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next(), costs);
+		tourAgent2 = spFactory.createAgent(vrp.getVehicles().iterator().next(), new Driver(){}, anotherTourBuilder.build());
 		
 		Collection<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
 		agents.add(tourAgent1);
 		agents.add(tourAgent2);
-		solution = new RRSolution(agents);
+		solution = new RuinAndRecreateSolution(agents);
 		
-		bestInsertion = new BestInsertion();
+		bestInsertion = new RecreationBestInsertion();
 		unassignedJobs = new ArrayList<Job>();
 		
 		Shipment s3 = createShipment("3", makeId(0,5), makeId(2,10));

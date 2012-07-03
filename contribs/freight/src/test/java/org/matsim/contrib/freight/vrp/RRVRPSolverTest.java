@@ -14,17 +14,20 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeImpl;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateAlgorithmFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.ServiceProviderFactoryFinder;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
-import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
-import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
+import org.matsim.contrib.freight.vrp.basics.Driver;
+import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.VRPSchema;
-import org.matsim.contrib.freight.vrp.constraints.PickAndDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
+import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,14 +39,11 @@ public class RRVRPSolverTest extends TestCase{
 	class MyVRPSolverFactory implements VRPSolverFactory{
 
 		@Override
-		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
-			DTWSolver solver = new DTWSolver(shipments, carrierVehicles,costs, network, new InitialSolution());
-			ServiceProviderFactory spFactory = new ServiceProviderFactoryFinder().getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
-			RuinAndRecreateAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateAlgorithmFactory(spFactory);
+		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
+			ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+			MatsimVrpSolver solver = new MatsimVrpSolver(shipments, carrierVehicles,costs);
+			RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
-			solver.setGlobalConstraints(new PickAndDeliveryCapacityAndTWConstraint());
-			solver.setnOfWarmupIterations(20);
-			solver.setnOfIterations(50);
 			return solver;
 		}
 	}
@@ -56,6 +56,8 @@ public class RRVRPSolverTest extends TestCase{
 	Scenario scenario;
 
 	private CrowFlyCosts costs;
+	
+	private TourCost tourCost;
 	
 	public void setUp(){
 		Config config = ConfigUtils.createConfig();
@@ -78,6 +80,16 @@ public class RRVRPSolverTest extends TestCase{
 		});
 		costs.speed = 18;
 		costs.detourFactor = 1.2;
+		
+		tourCost = new TourCost(){
+
+			@Override
+			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+				return 100 + tour.tourData.transportCosts;
+			}
+			
+		};
+		
 		RandomNumberGeneration.reset();
 	}
 	
@@ -112,9 +124,10 @@ public class RRVRPSolverTest extends TestCase{
 
 	public void testSolveWithNoShipments(){
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("vehicleLocation"));
+		vehicle.setVehicleType(new CarrierVehicleTypeImpl(makeId("standard")));
 		vehicle.setCapacity(10);
 		vehicles.add(vehicle);
-		Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
+		Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), tourCost, costs).solve();
 		assertTrue(tours.isEmpty());
 	}
 	
@@ -122,7 +135,7 @@ public class RRVRPSolverTest extends TestCase{
 		vehicles.clear();
 		shipments.add(makeShipment("depotLocation","customerLocation",20));
 		try{
-			Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
+			Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), tourCost, costs).solve();
 			assertTrue(false);
 		}
 		catch(IllegalStateException e){

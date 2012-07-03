@@ -23,25 +23,22 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.DistribJIFFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.JobDistribOfferMaker;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.LocalMCCalculatorFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
-import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.VRPSchema;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
-import org.matsim.contrib.freight.vrp.basics.VrpUtils;
-import org.matsim.contrib.freight.vrp.constraints.Constraints;
-import org.matsim.contrib.freight.vrp.constraints.PickAndDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.utils.VrpBuilder;
+import org.matsim.contrib.freight.vrp.utils.VrpUtils;
 
 @Ignore
 public class VRPTestCase extends TestCase{
@@ -63,15 +60,13 @@ public class VRPTestCase extends TestCase{
 	
 	public Tour tour;
 	
-	public Costs costs;
+	public VehicleRoutingCosts costs;
 	
 	public MyLocations locations;
 	
-	public Constraints constraints;
-	
 	public boolean init = false;
 	
-	public TourStatusProcessor tourStatusProcessor;
+//	public TourStatusProcessor tourStatusProcessor;
 	
 //	public TourFactory tourFactory;
 	
@@ -99,8 +94,7 @@ public class VRPTestCase extends TestCase{
 		locations = new MyLocations();
 		createLocations();
 		costs = new ManhattanCosts(locations);
-		constraints = new PickAndDeliveryCapacityAndTWConstraint();
-		tourStatusProcessor = new TourCostAndTWProcessor(costs);
+//		tourStatusProcessor = new TourCostAndTWProcessor(costs);
 //		tourFactory = new PickupAndDeliveryTourFactory(costs, constraints, tourStatusProcessor);
 	}
 
@@ -117,7 +111,7 @@ public class VRPTestCase extends TestCase{
 
 	protected VehicleRoutingProblem getVRP(int nOfVehicles, int capacity){
 		String depot = makeId(0,0);
-		VrpBuilder vrpBuilder = new VrpBuilder(costs, constraints);
+		VrpBuilder vrpBuilder = new VrpBuilder(costs);
 //		vrpBuilder.setDepot(depot, 0.0, Double.MAX_VALUE);
 		vrpBuilder.addJob(VrpUtils.createShipment("1", makeId(0,0), makeId(0,10), 1, 
 				VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
@@ -126,19 +120,34 @@ public class VRPTestCase extends TestCase{
 		vrpBuilder.addJob(VrpUtils.createShipment("3", makeId(1,4), makeId(1,5), 1, 
 				VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
 		for(int i=0; i<nOfVehicles;i++){
-			vrpBuilder.addVehicle(VrpUtils.createVehicle(""+i, depot, capacity));
+			vrpBuilder.addVehicle(VrpUtils.createVehicle(""+i, depot, capacity, "standard"));
 		}
 		return vrpBuilder.build();
 	}
 	
-	protected RRSolution getInitialSolution(VehicleRoutingProblem vrp){
-		return new InitialSolution().createInitialSolution(vrp);
+	protected RuinAndRecreateSolution getInitialSolution(VehicleRoutingProblem vrp){
+		TourCost tourCost = new TourCost(){
+
+			@Override
+			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+				return tour.tourData.transportCosts;
+			}
+			
+		};
+		return new InitialSolutionBestInsertion(new ServiceProviderAgentFactoryFinder(tourCost,vrp.getCosts()).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS)).createInitialSolution(vrp);
 	}
 	
 	protected ServiceProviderAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
-		
-		return new RRTourAgentFactory(tourStatusProcessor, vrp.getCosts().getCostParams(), 
-				new JobDistribOfferMaker(vrp.getCosts(), vrp.getGlobalConstraints(), new DistribJIFFactory(new LocalMCCalculatorFactory()))).createAgent(tour1, vehicle, costs);
+		TourCost tourCost = new TourCost(){
+
+			@Override
+			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+				return tour.tourData.transportCosts;
+			}
+			
+		};
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, vrp.getCosts()).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+		return spFactory.createAgent(vehicle, new Driver(){}, tour1);
 	}
 	
 	private Coordinate makeCoord(int i, int j) {

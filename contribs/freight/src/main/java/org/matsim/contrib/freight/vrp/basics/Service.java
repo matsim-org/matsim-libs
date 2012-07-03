@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
+
 public class Service implements Job{
 	
 	private String id;

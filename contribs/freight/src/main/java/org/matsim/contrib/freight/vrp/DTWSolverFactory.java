@@ -13,14 +13,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateAlgorithmFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.ServiceProviderFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.agentFactories.ServiceProviderFactoryFinder;
-import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VRPSchema;
-import org.matsim.contrib.freight.vrp.constraints.PickORDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.core.gbl.MatsimRandom;
 
 public class DTWSolverFactory implements VRPSolverFactory{
@@ -28,40 +27,19 @@ public class DTWSolverFactory implements VRPSolverFactory{
 	public List<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
 
 	private Random random = MatsimRandom.getRandom();
-	
-	private int iterations = 200;
-	
-	private int warmupIterations = 20;
-	
-	public DTWSolverFactory() {
-
-	}
-	
-	public DTWSolverFactory(int iterations, int warmupIterations) {
-		super();
-		this.iterations = iterations;
-		this.warmupIterations = warmupIterations;
-	}
-
-
 
 	public void setRandom(Random random) {
 		this.random = random;
 	}
 
 	@Override
-	public VRPSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
+	public VRPSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
 		verifyDistributionProblem(shipments,carrierVehicles);
-		ServiceProviderFactory spFactory = new ServiceProviderFactoryFinder().getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
-		DTWSolver rrSolver = new DTWSolver(shipments, carrierVehicles, costs, network, new InitialSolution());
-		RuinAndRecreateAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateAlgorithmFactory(spFactory);
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+		MatsimVrpSolver rrSolver = new MatsimVrpSolver(shipments, carrierVehicles, costs);
+		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
 		addListeners(ruinAndRecreateFactory);
 		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
-		rrSolver.setnOfWarmupIterations(warmupIterations);
-		rrSolver.setnOfIterations(iterations);
-		PickORDeliveryCapacityAndTWConstraint constraints = new PickORDeliveryCapacityAndTWConstraint();
-		rrSolver.setGlobalConstraints(constraints);
-		
 		return rrSolver;
 	}
 
@@ -86,7 +64,7 @@ public class DTWSolverFactory implements VRPSolverFactory{
 		
 	}
 
-	private void addListeners(RuinAndRecreateAlgorithmFactory ruinAndRecreateFactory) {
+	private void addListeners(RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory) {
 		for(RuinAndRecreateListener l : listeners){
 			ruinAndRecreateFactory.addRuinAndRecreateListener(l);
 		}

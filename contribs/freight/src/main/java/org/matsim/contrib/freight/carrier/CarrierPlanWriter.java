@@ -68,7 +68,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		writer.write("\t\t\t<vehicles>\n");
 		for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
 			writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId() + "\" linkId=\"" + v.getLocation() + "\"" +
-			" cap=\"" + v.getCapacity() + "\" earliestStart=\"" + getTime(v.getEarliestStartTime()) + "\" latestEnd=\"" + getTime(v.getLatestEndTime()) + "\"/>\n");
+			" cap=\"" + v.getCapacity() + "\" typeId=\"" + v.getVehicleType().getId().toString() + "\" earliestStart=\"" + getTime(v.getEarliestStartTime()) + "\" latestEnd=\"" + getTime(v.getLatestEndTime()) + "\"/>\n");
 		}
 		writer.write("\t\t\t</vehicles>\n");
 	}

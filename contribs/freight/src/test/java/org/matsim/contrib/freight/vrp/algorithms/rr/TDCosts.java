@@ -7,13 +7,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
-import org.matsim.contrib.freight.vrp.basics.DriverCostParams;
-import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
 @Ignore
-public class TDCosts implements Costs {
+public class TDCosts implements VehicleRoutingCosts {
 		
 		static class CostKey {
 			private String from;
@@ -90,7 +91,7 @@ public class TDCosts implements Costs {
 		
 		private List<Double> speed;
 		
-		private Costs crowFly;
+		private VehicleRoutingCosts crowFly;
 		
 		private Map<TDCosts.CostKey, Double> travelTimes = new HashMap<TDCosts.CostKey, Double>();
 		
@@ -102,22 +103,22 @@ public class TDCosts implements Costs {
 		}
 			
 		@Override
-		public Double getTransportCost(String fromId, String toId, double departureTime) {
-			double totDistance = crowFly.getTransportCost(fromId, toId, departureTime);
-			return totDistance + getTransportTime(fromId,toId,departureTime);
+		public double getTransportCost(String fromId, String toId, double departureTime, Driver driver, Vehicle vehicle) {
+			double totDistance = crowFly.getTransportCost(fromId, toId, departureTime, null, null);
+			return totDistance + getTransportTime(fromId,toId,departureTime, null, null);
 //			return getTransportTime(fromId,toId,departureTime);
 		}
 		
 		@Override
-		public Double getBackwardTransportCost(String fromId, String toId,double arrivalTime) {
-			return crowFly.getTransportCost(fromId, toId, arrivalTime) + getBackwardTransportTime(fromId, toId, arrivalTime);
+		public double getBackwardTransportCost(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
+			return crowFly.getTransportCost(fromId, toId, arrivalTime, null, null) + getBackwardTransportTime(fromId, toId, arrivalTime, null, null);
 //			return getBackwardTransportTime(fromId, toId, arrivalTime);
 		}
 
 		
 
 		@Override
-		public Double getTransportTime(String fromId, String toId, double departureTime) {
+		public double getTransportTime(String fromId, String toId, double departureTime, Driver driver, Vehicle vehicle) {
 			if(fromId.equals(toId)){
 				return 0.0;
 			}
@@ -126,7 +127,7 @@ public class TDCosts implements Costs {
 				return travelTimes.get(key);
 			}
 			double totalTravelTime = 0.0;
-			double distanceToTravel = crowFly.getTransportCost(fromId, toId, departureTime);
+			double distanceToTravel = crowFly.getTransportCost(fromId, toId, departureTime, null, null);
 			double currentTime = departureTime;
 			for(int i=0;i<timeBins.size();i++){
 				double timeThreshold = timeBins.get(i);
@@ -150,7 +151,7 @@ public class TDCosts implements Costs {
 
 
 		@Override
-		public Double getBackwardTransportTime(String fromId, String toId,double arrivalTime) {
+		public double getBackwardTransportTime(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
 			if(fromId.equals(toId)){
 				return 0.0;
 			}
@@ -159,7 +160,7 @@ public class TDCosts implements Costs {
 				return travelTimes.get(key);
 			}
 			double totalTravelTime = 0.0;
-			double distanceToTravel = crowFly.getTransportCost(fromId, toId, arrivalTime);
+			double distanceToTravel = crowFly.getTransportCost(fromId, toId, arrivalTime, null, null);
 			log.debug("distance2Travel="+distanceToTravel);
 			double currentTime = arrivalTime;
 			for(int i=timeBins.size()-1;i>=0;i--){
@@ -193,11 +194,6 @@ public class TDCosts implements Costs {
 			return totalTravelTime;
 		}
 
-		@Override
-		public DriverCostParams getCostParams() {
-			// TODO Auto-generated method stub
-			return null;
-		}
 
 		
 	}

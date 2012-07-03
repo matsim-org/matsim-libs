@@ -13,6 +13,7 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 
+
 public class End implements TourActivity{
 	
 	private String locationId;
@@ -72,5 +73,9 @@ public class End implements TourActivity{
 	public void setCurrentLoad(int load) {
 		this.currentLoad = load;
 		
+	}
+	
+	public String toString(){
+		return getType() + " @ "+ getLocationId();
 	}
 }

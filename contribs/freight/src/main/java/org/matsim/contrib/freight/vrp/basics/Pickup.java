@@ -13,6 +13,7 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 
+
 public class Pickup implements TourActivity, JobActivity{
 
 	private Shipment shipment;
@@ -82,5 +83,16 @@ public class Pickup implements TourActivity, JobActivity{
 	public void setCurrentLoad(int load) {
 		this.currentLoad = load;
 	}
+	
+	public String toString(){
+		return getType() + " of " + shipment.getSize() + " units @ "+ getLocationId()  + " @ practTW(" + round(practical_earliestArrivalTime) + "," +
+			round(practical_latestArrivalTime) + ") theoreticalTW(" + round(shipment.getPickupTW().getStart()) + "," + round(shipment.getPickupTW().getEnd()) + ")";
+	}
 
+	private String round(double time) {
+		if(time == Double.MAX_VALUE){
+			return "oo";
+		}
+		return "" + Math.round(time);
+	}
 }

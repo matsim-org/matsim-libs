@@ -18,17 +18,8 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 public interface RuinAndRecreateFactory {
 
+	public abstract RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp);
 	
-	public abstract RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution);
-	
-	public abstract RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, TourPlan initialSolution);
-
-	public abstract void addRuinAndRecreateListener(RuinAndRecreateListener l);
-	
-	public abstract void setIterations(int iterations);
-	
-	public abstract void setWarmUp(int nOfWarmUpIterations);
-	
-	
+	public abstract RuinAndRecreate createAlgorithm(TourPlan initialSolution, VehicleRoutingProblem vrp);
 	
 }
