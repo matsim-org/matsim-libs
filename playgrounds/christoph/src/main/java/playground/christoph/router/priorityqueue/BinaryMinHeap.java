@@ -132,8 +132,8 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		if (isEmpty())
 			return null;
 		else {
+			minValue = data[0];
 			if (classicalRemove) {
-				minValue = data[0];
 				data[0] = data[heapSize - 1];
 				costs[0] = costs[heapSize - 1];
 				indices[data[0].getArrayIndex()] = 0;
@@ -142,31 +142,32 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 				heapSize--;
 				if (heapSize > 0)
 					siftDown(0);
-				return minValue;
 			} else {
-				minValue = data[0];
-
 				/*
 				 * Set costs to Double.MAX_Value. Afterwards it is shifted
 				 * downwards to the heap's bottom.
 				 */
-				int index = removeSiftDown(0);
-
-				/*
-				 * Swap entry with heap's last entry.
-				 */
-				heapSize--;
-				this.copyData(index, heapSize);
+				siftDownUp(0);
 
 				indices[minValue.getArrayIndex()] = -1;
-
-				/*
-				 * Sift up entry that was previously at the heap's end.
-				 */
-				siftUp(index);
-				return minValue;
 			}
+			return minValue;
 		}
+	}
+
+	private void siftDownUp(int index) {
+		index = removeSiftDown(index);
+
+		/*
+		 * Swap entry with heap's last entry.
+		 */
+		heapSize--;
+		this.copyData(index, heapSize);
+
+		/*
+		 * Sift up entry that was previously at the heap's end.
+		 */
+		siftUp(index);
 	}
 		
 	/*
@@ -284,29 +285,10 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 					return false;
 				}
 			} else {
-				/*
-				 * Set costs to Double.MAX_Value. Afterwards it is
-				 * shifted downwards to the heap's bottom.
-				 */
-				costs[index] = Double.MAX_VALUE;
-				removeSiftDown(index);
-				
-				heapSize--;
-				
-				/*
-				 * Swap entry with heap's last entry.
-				 */
-				// update index
-				index = indices[value.getArrayIndex()];		
-				this.swapData(index, heapSize);
+				siftDownUp(index);
 
 				// index has changed, therefore we cannot use "index" again
 				indices[value.getArrayIndex()] = -1;
-				
-				/*
-				 * Sift up entry that was previously at the heap's end.
-				 */
-				siftUp(index);
 				return true;
 			}
 		}
