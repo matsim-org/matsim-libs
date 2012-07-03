@@ -77,8 +77,8 @@ public class SampleCpMatches {
 					count.incCounter();
 					String[] arr = line.split( "[ \t]+" );
 
-					String d = arr[0].intern();
-					String p = arr[1].intern();
+					String d = arr[0];//.intern();
+					String p = arr[1];//.intern();
 
 					getEntry( driversPerPassenger , p ).add( d );
 				}
