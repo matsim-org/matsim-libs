@@ -373,6 +373,23 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		assertNull(pq.remove());
 	}
 
+	public void testOddOrder() {
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		DummyHeapEntry entry0 = new DummyHeapEntry(0);
+		DummyHeapEntry entry1 = new DummyHeapEntry(1);
+		DummyHeapEntry entry2 = new DummyHeapEntry(2);
+		DummyHeapEntry entry3 = new DummyHeapEntry(3);
+		pq.add(entry0, 0.0);
+		pq.add(entry3, 3.0);
+		pq.add(entry1, 1.0);
+		pq.add(entry2, 2.0);
+		assertEqualsHE(entry0, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
+		assertEqualsHE(entry2, pq.remove());
+		assertEqualsHE(entry3, pq.remove());
+		assertNull(pq.remove());
+	}
+
 	private int iteratorElementCount(final Iterator<?> iterator) {
 		int cnt = 0;
 		while (iterator.hasNext()) {

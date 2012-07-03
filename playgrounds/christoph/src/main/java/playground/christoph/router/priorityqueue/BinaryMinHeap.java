@@ -187,25 +187,22 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 
 			int limitChildIndex = leftChildIndex + FANOUT;
 
-			int minIndex = leftChildIndex;
 			for (int rightChildIndex = leftChildIndex + 1; rightChildIndex < limitChildIndex; rightChildIndex++) {
 				// We use the sentinel values Double.MAX_VALUE
 				// to protect ourselves from looking beyond the heap's
 				// true size
 				double rightCosts = costs[rightChildIndex];
-				if (leftCosts < rightCosts)
-					;
-				else if (leftCosts > rightCosts) {
-					minIndex = rightChildIndex;
-				} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex]
-						.getArrayIndex())
-					;
-				else
-					minIndex = rightChildIndex;
+				if (leftCosts >= rightCosts
+						&& (leftCosts > rightCosts || data[leftChildIndex]
+								.getArrayIndex() > data[rightChildIndex]
+								.getArrayIndex())) {
+					leftChildIndex = rightChildIndex;
+					leftCosts = rightCosts;
+				}
 			}
 
-			copyData(nodeIndex, minIndex);
-			nodeIndex = minIndex;
+			copyData(nodeIndex, leftChildIndex);
+			nodeIndex = leftChildIndex;
 		}
 
 		return nodeIndex;

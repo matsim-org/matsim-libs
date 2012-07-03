@@ -53,7 +53,7 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 		long t = System.nanoTime();
 		for (int i = 1; i < ITERS; i++) {
 			double c = pq.peekCost();
-			assert (c >= cc);
+			assertTrue("Nondecreasing order for costs", c >= cc);
 			cc = c;
 			pq.remove();
 
