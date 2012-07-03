@@ -332,19 +332,21 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		}
 
 		// update costs in array
-		costs[index] = cost;
+		E entry = data[index];
 		
-		int parentIndex = getParentIndex(index);
-		double parentCost = costs[parentIndex];
-		while (index > 0 && cost < parentCost) {
-			
-			this.swapData(index, parentIndex);
+		while (index > 0) {
+			int parentIndex = getParentIndex(index);
+			double parentCost = costs[parentIndex];
+			if (cost >= parentCost)
+				break;
+			this.copyData(index, parentIndex);
 			
 			// for next iteration
 			index = parentIndex;
-			parentIndex = getParentIndex(index);
-			parentCost = costs[parentIndex];
 		}
+
+		data[index] = entry;
+		costs[index] = cost;
 		return true;
 	}
 
