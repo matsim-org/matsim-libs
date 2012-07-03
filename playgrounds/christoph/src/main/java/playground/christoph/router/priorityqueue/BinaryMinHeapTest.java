@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.BinaryMinHeap;
+import org.matsim.core.utils.collections.HeapEntry;
 
 /**
  * @author cdobler

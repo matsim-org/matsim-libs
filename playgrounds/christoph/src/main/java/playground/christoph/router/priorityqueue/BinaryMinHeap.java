@@ -23,8 +23,10 @@ package playground.christoph.router.priorityqueue;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.matsim.core.utils.collections.HeapEntry;
+import org.matsim.core.utils.collections.MinHeap;
+
 /**
- * 
  * @author cdobler
  *
  * @param <E> the type of elements held in this collection
@@ -34,7 +36,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	/**
 	 * Each HeapEntry contains a final integer value that points to a
 	 * position in the indices array. The value in the indices array points
-	 * to the position in the data and costs array where the HeapEntry
+	 * to the position in the data and costs arrays where the HeapEntry
 	 * is currently located.
 	 */
 	private final E[] data;
@@ -42,6 +44,23 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	final int[] indices;
 	
 	private int heapSize;
+	
+	/**
+	 *  The classic approach of removing the heap's head (poll) is to replace the 
+	 *  head with the heap's last entry. Afterwards this entry is sifted downwards
+	 *  until a valid position is reached. However, when doing so, two compare
+	 *  operations have to be performed for each level (comparing with left and right
+	 *  child).
+	 * 
+	 *  In the alternative approach, the head is sifted downwards to the left level in
+	 *  a special way. It replaces always the smaller ones of its children (only they
+	 *  are compared!). After reaching the bottom level, it its replaced with the heap's
+	 *  last entry. Finally, this entry is sifted upwards until a valid position is found.
+	 *  This approach should perform fewer compare operations than the classical approach.
+	 *  Idea: see http://magazin.c-plusplus.de/artikel/Binary%20Heaps
+	 * 
+	 */
+	private final boolean classicalRemove = false;
 	
 	private final boolean debug = false;
 	
@@ -99,21 +118,75 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	 */
 	@Override
 	public E remove() {
-		
 		E minValue;
 		if (isEmpty()) return null;
 		else {
-			minValue = data[0];
-			data[0] = data[heapSize - 1];
-			costs[0] = costs[heapSize - 1];
-			indices[data[0].getArrayIndex()] = 0;
-			indices[minValue.getArrayIndex()] = -1;
-			
-			heapSize--;
-			if (heapSize > 0) siftDown(0);
+			if (classicalRemove) {
+				minValue = data[0];
+				data[0] = data[heapSize - 1];
+				costs[0] = costs[heapSize - 1];
+				indices[data[0].getArrayIndex()] = 0;
+				indices[minValue.getArrayIndex()] = -1;
+				
+				heapSize--;
+				if (heapSize > 0) siftDown(0);
+				return minValue;
+			} else {
+				minValue = data[0];
+
+				/*
+				 * Set costs to Double.MAX_Value. Afterwards it is
+				 * shifted downwards to the heap's bottom.
+				 */
+				costs[0] = Double.MAX_VALUE;
+				removeSiftDown(0);
+				
+				/*
+				 * Swap entry with heap's last entry.
+				 */
+				heapSize--;
+				int index = indices[minValue.getArrayIndex()];
+				this.swapData(index, heapSize);
+
+				indices[minValue.getArrayIndex()] = -1;
+				
+				/*
+				 * Sift up entry that was previously at the heap's end.
+				 */
+				siftUp(index);			
+				return minValue;
+			}
 		}
+	}
 		
-		return minValue;
+	/*
+	 * Used by alternative remove() approach.
+	 * The costs have been set to Double.MAX_VALUE. Therefore we
+	 * only have to compare the nodes children.
+	 */
+	private void removeSiftDown(int nodeIndex) {
+		int leftChildIndex, rightChildIndex, minIndex;
+		double leftCosts, rightCosts;
+		
+		leftChildIndex = getLeftChildIndex(nodeIndex);
+		rightChildIndex = getRightChildIndex(nodeIndex);
+		if (rightChildIndex >= heapSize) {
+			if (leftChildIndex >= heapSize) return;
+			else minIndex = leftChildIndex;
+		} else {
+			leftCosts = costs[leftChildIndex];
+			rightCosts = costs[rightChildIndex];
+			if (leftCosts < rightCosts) {
+				minIndex = leftChildIndex;
+			} else if (leftCosts > rightCosts) {
+				minIndex = rightChildIndex;
+			} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex].getArrayIndex()) {
+				minIndex = leftChildIndex;
+			} else minIndex = rightChildIndex;
+		}
+
+		swapData(nodeIndex, minIndex);
+		removeSiftDown(minIndex);
 	}
 	
 	/**
@@ -180,31 +253,65 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		 * Check the elements index. "-1" means that the element is not
 		 * present in the heap. 
 		 */
-		if (indices[value.getArrayIndex()] < 0) {
+		int index = indices[value.getArrayIndex()];
+		if (index < 0) {
 			return false;
 		} else {
-			// Move entry to heap's top and then remove the heap's head.
-			boolean decreasedKey = decreaseKey(value, Double.MIN_VALUE);
-			if (decreasedKey && data[0] == value) {
-				this.remove();
-				return true;
-			} else {
-				if (debug) {
-					System.out.println("Could not remove Element?!");					
+			if (classicalRemove) {
+				// Move entry to heap's top and then remove the heap's head.
+				boolean decreasedKey = decreaseKey(value, Double.MIN_VALUE);
+				if (decreasedKey && data[0] == value) {
+					this.remove();
+					return true;
+				} else {
+					if (debug) {
+						System.out.println("Could not remove Element?!");					
+					}
+					return false;
 				}
-				return false;			
+			} else {
+				/*
+				 * Set costs to Double.MAX_Value. Afterwards it is
+				 * shifted downwards to the heap's bottom.
+				 */
+				costs[index] = Double.MAX_VALUE;
+				removeSiftDown(index);
+				
+				heapSize--;
+				
+				/*
+				 * Swap entry with heap's last entry.
+				 */
+				// update index
+				index = indices[value.getArrayIndex()];		
+				this.swapData(index, heapSize);
+
+				// index has changed, therefore we cannot use "index" again
+				indices[value.getArrayIndex()] = -1;
+				
+				/*
+				 * Sift up entry that was previously at the heap's end.
+				 */
+				siftUp(index);
+				return true;
 			}
 		}
 	}
 	
+	/**
+	 * Increases the priority (=decrease the given double value) of the element.
+	 * If the element ins not part of the queue, it is added. If the new priority
+	 * is lower than the existing one, the method returns <tt>false</tt>
+	 *
+	 * @return <tt>true</tt> if the elements priority was decreased.
+	 */
 	@Override
 	public boolean decreaseKey(E value, double cost) {
-		
-		int index = indices[value.getArrayIndex()];
-				
+
 		/*
 		 * If the element is not yet present in the heap, simply add it.
 		 */
+		int index = indices[value.getArrayIndex()];
 		if (index < 0) {
 			return this.add(value, cost);
 		} 
@@ -313,8 +420,10 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 			 * If the costs are equal, use the array indices to define the sort order.
 			 * Doing so should guarantee a deterministic order of the heap entries.
 			 */
-			if (costs[parentIndex] > costs[nodeIndex] ||
-					(costs[parentIndex] == costs[nodeIndex] && 
+			double parentCosts = costs[parentIndex];
+			double nodeCosts = costs[nodeIndex];
+			if (parentCosts > nodeCosts ||
+					(parentCosts == nodeCosts && 
 					 data[parentIndex].getArrayIndex() > data[nodeIndex].getArrayIndex())) {
 				
 				swapData(nodeIndex, parentIndex);				
@@ -325,23 +434,35 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 
 	private void siftDown(int nodeIndex) {
 		int leftChildIndex, rightChildIndex, minIndex;
-				
+		double leftCosts, rightCosts, minCosts, nodeCosts;
+		
 		leftChildIndex = getLeftChildIndex(nodeIndex);
 		rightChildIndex = getRightChildIndex(nodeIndex);
 		if (rightChildIndex >= heapSize) {
 			if (leftChildIndex >= heapSize) return;
-			else minIndex = leftChildIndex;
+			else {
+				minCosts = costs[leftChildIndex];
+				minIndex = leftChildIndex;
+			}
 		} else {
-			if (costs[leftChildIndex] <= costs[rightChildIndex]) minIndex = leftChildIndex;
-			else minIndex = rightChildIndex;
+			leftCosts = costs[leftChildIndex];
+			rightCosts = costs[rightChildIndex];
+			if (leftCosts <= rightCosts) {
+				minCosts = leftCosts;
+				minIndex = leftChildIndex;
+			} else {
+				minCosts = rightCosts;
+				minIndex = rightChildIndex;
+			}
 		}
 
 		/*
 		 * If the costs are equal, use the array indices to define the sort order.
 		 * Doing so should guarantee a deterministic order of the heap entries.
 		 */
-		if (costs[nodeIndex] > costs[minIndex] ||
-				(costs[nodeIndex] == costs[minIndex] && 
+		nodeCosts = costs[nodeIndex];
+		if (nodeCosts > minCosts ||
+				(nodeCosts == minCosts && 
 				 data[nodeIndex].getArrayIndex() > data[minIndex].getArrayIndex())) {
 			swapData(nodeIndex, minIndex);
 			siftDown(minIndex);
@@ -377,5 +498,4 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 			throw new UnsupportedOperationException("Not supported operation!");
 		}
 	}
-
 }
