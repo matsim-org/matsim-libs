@@ -446,19 +446,19 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 //				minCosts = rightCosts;
 //				minIndex = rightChildIndex;
 //			}
-		}
-
-		/*
-		 * If the costs are equal, use the array indices to define the sort order.
-		 * Doing so should guarantee a deterministic order of the heap entries.
-		 */
-		nodeCosts = costs[nodeIndex];
-		if (nodeCosts > minCosts ||
-				(nodeCosts == minCosts && 
-				 data[nodeIndex].getArrayIndex() > data[minIndex].getArrayIndex())) {
-			swapData(nodeIndex, minIndex);
-			siftDown(minIndex);
-		}
+//		}
+//
+//		/*
+//		 * If the costs are equal, use the array indices to define the sort order.
+//		 * Doing so should guarantee a deterministic order of the heap entries.
+//		 */
+//		nodeCosts = costs[nodeIndex];
+//		if (nodeCosts > minCosts ||
+//				(nodeCosts == minCosts && 
+//				 data[nodeIndex].getArrayIndex() > data[minIndex].getArrayIndex())) {
+//			swapData(nodeIndex, minIndex);
+//			siftDown(minIndex);
+//		}
 	}
 		
 	private final class ArrayIterator implements Iterator<E> {
