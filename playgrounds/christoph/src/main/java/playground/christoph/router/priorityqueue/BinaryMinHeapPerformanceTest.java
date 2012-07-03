@@ -20,8 +20,10 @@
 
 package playground.christoph.router.priorityqueue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.collections.iterators.ArrayIterator;
@@ -37,12 +39,23 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 		static final int OUTDEGREE = 3;
 		static final int DECREASE = 1;
 		static final int MAXENTRIES = ITERS * OUTDEGREE;
+		private final int id;
+		private final int threads;
+
+		TestThread(final int id, final int threads, final int fanout) {
+			this.id = id;
+			this.threads = threads;
+
+			heap = new BinaryMinHeap<DummyHeapEntry>(MAXENTRIES, fanout);
+
+			es = new DummyHeapEntry[MAXENTRIES];
+			for (int gen = 0; gen < MAXENTRIES; gen++)
+				es[gen] = new DummyHeapEntry(gen);
+		}
 
 		public long doTestDijkstraPerformance(BinaryMinHeap<DummyHeapEntry> pq,
 				Iterator<DummyHeapEntry> it) {
 			Random R = MatsimRandom.getLocalInstance();
-
-			System.gc();
 
 			double cc = 0.0;
 			pq.add(it.next(), cc);
@@ -75,22 +88,15 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 		}
 
 		private DescriptiveStatistics collectDijkstraPerformance() {
-			int RUNS = 50;
-			DescriptiveStatistics S = new DescriptiveStatistics();
-
-			final BinaryMinHeap<DummyHeapEntry> heap = new BinaryMinHeap<DummyHeapEntry>(
-					MAXENTRIES);
-
-			final DummyHeapEntry[] E = new DummyHeapEntry[MAXENTRIES];
-			for (int gen = 0; gen < MAXENTRIES; gen++)
-				E[gen] = new DummyHeapEntry(gen);
+			int RUNS = 20;
 
 			for (int i = 0; i < RUNS; i++) {
 				@SuppressWarnings("unchecked")
 				double dt = (doTestDijkstraPerformance(heap,
-						((Iterator<DummyHeapEntry>) new ArrayIterator(E))) / 1.0e6);
+						((Iterator<DummyHeapEntry>) new ArrayIterator(es))) / 1.0e6);
 				S.addValue(dt);
-				log.info(String.format("Iteration: %d, Time: %f", i, dt));
+				log.info(String.format("Fanout: %d, Thread: %d/%d, Iteration: %d, Time: %f",
+						heap.getFanout(), id, threads, i, dt));
 			}
 			return S;
 		}
@@ -99,7 +105,9 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 			return S;
 		}
 
-		private DescriptiveStatistics S;
+		private DescriptiveStatistics S = new DescriptiveStatistics();
+		private BinaryMinHeap<DummyHeapEntry> heap;
+		private DummyHeapEntry[] es;
 
 		@Override
 		public void run() {
@@ -107,26 +115,54 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 		}
 	}
 
-	public void testDijkstraPerformance() {
-		TestThread t = new TestThread();
-		t.run();
+	public Iterable<DescriptiveStatistics> collectThreadedDijkstraPerformance(
+			int threads, int fanout) {
+		List<TestThread> lt = new ArrayList<TestThread>(threads);
+		for (int i = 0; i < threads; i++)
+			lt.add(new TestThread(i, threads, fanout));
+
+		System.gc();
+
+		for (TestThread t : lt)
+			t.start();
+
+		List<DescriptiveStatistics> ls = new ArrayList<DescriptiveStatistics>(
+				threads);
 		try {
-			t.join();
+			for (TestThread t : lt) {
+				t.join();
+				ls.add(t.getStats());
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
-		DescriptiveStatistics S = t.getStats();
 
-		log.info(String.format(
-				"Time: Min/Max: %f/%f, Mean: %f, StDev: %f, 95%% CI: (%f, %f)",
-				S.getMin(), S.getMax(), S.getMean(), S.getStandardDeviation(),
-				(S.getMean() - 1.96 * S.getStandardDeviation()),
-				(S.getMean() + 1.96 * S.getStandardDeviation())));
-		log.info(Arrays.toString(S.getSortedValues()));
+		return ls;
+	}
+
+	private void doTestDijkstraPerformanceParam(final int threads,
+			final int fanout) {
+		for (DescriptiveStatistics S : collectThreadedDijkstraPerformance(threads, fanout)) {
+			log.info(String
+					.format("Time: Min/Max: %f/%f, Mean: %f, StDev: %f, 95%% CI: (%f, %f)",
+							S.getMin(), S.getMax(), S.getMean(),
+							S.getStandardDeviation(),
+							(S.getMean() - 1.96 * S.getStandardDeviation()),
+							(S.getMean() + 1.96 * S.getStandardDeviation())));
+			log.info(Arrays.toString(S.getSortedValues()));
+		}
+	}
+
+	public void testDijkstraPerformance() {
+		final int threads = 2;
+		final int fanout = 6;
+		doTestDijkstraPerformanceParam(threads, fanout);
 	}
 
 	public static void main(String args[]) {
-		new BinaryMinHeapPerformanceTest().testDijkstraPerformance();
+		int threads = Integer.parseInt(args[0]);
+		int fanout = Integer.parseInt(args[1]);
+		new BinaryMinHeapPerformanceTest().doTestDijkstraPerformanceParam(threads, fanout);
 	}
 }
