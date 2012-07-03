@@ -20,16 +20,9 @@
 
 package playground.christoph.router.priorityqueue;
 
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Random;
-
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author cdobler

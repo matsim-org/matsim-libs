@@ -24,9 +24,6 @@ import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Random;
-
-import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author cdobler
