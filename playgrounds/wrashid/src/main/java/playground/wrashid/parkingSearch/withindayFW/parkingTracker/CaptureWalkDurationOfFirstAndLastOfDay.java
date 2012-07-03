@@ -52,8 +52,8 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 		lastParkWalkOfDayTmp = new HashMap<Id, Double>();
 	}
 
-	public Double getDuration(Id personId) {
-		return GeneralLib.getIntervalDuration(firstParkWalkOfDayTmp.get(personId), lastParkWalkOfDayTmp.get(personId));
+	public Double getSumBothParkingWalkDurationsInSecond(Id personId) {
+		return firstParkWalkOfDayTmp.get(personId) + lastParkWalkOfDayTmp.get(personId);
 	}
 
 	@Override
@@ -74,12 +74,12 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 		
 		
 		double durationFirstWalk=0.0;
-		if (firstParkWalkOfDayTmp.get(personId)!=null){
+		if (firstParkWalkOfDayTmp.get(personId)!=null && firstParkWalkOfDayTmp.get(personId) != event.getTime()){
 			durationFirstWalk = GeneralLib.getIntervalDuration(firstParkWalkOfDayTmp.get(personId), event.getTime());
 		}
 		
 		double durationLastWalk=0.0;
-		if (lastParkWalkOfDayTmp.get(personId)!=null){
+		if (lastParkWalkOfDayTmp.get(personId)!=null && lastParkWalkOfDayTmp.get(personId) != event.getTime()){
 			durationLastWalk = GeneralLib.getIntervalDuration(lastParkWalkOfDayTmp.get(personId), event.getTime());
 		}
 		
