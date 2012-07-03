@@ -64,13 +64,17 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	@SuppressWarnings("unchecked")
 	public BinaryMinHeap(int size) {
 		this.data = (E[]) new HeapEntry[size];
+
 		this.costs = new double[size];
+		for (int i = 0; i < costs.length; i++) {
+			costs[i] = Double.MAX_VALUE;
+		}
+
 		this.indices = new int[size];
-		heapSize = 0;
-		
 		for (int i = 0; i < indices.length; i++) {
 			indices[i] = -1;
 		}
+		heapSize = 0;
 	}
 	
 	/**
@@ -164,6 +168,9 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		heapSize--;
 		this.copyData(index, heapSize);
 
+		// Reset sentinel here:
+		costs[heapSize] = Double.MAX_VALUE;
+
 		/*
 		 * Sift up entry that was previously at the heap's end.
 		 */
@@ -181,27 +188,29 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 
 			leftChildIndex = getLeftChildIndex(nodeIndex);
 			if (leftChildIndex >= heapSize)
-				return nodeIndex;
+				break;
 			rightChildIndex = getRightChildIndex(nodeIndex);
-			if (rightChildIndex >= heapSize) {
+
+			// We use the sentinel values Double.MAX_VALUE
+			// to protect ourselves from looking beyond the heap's
+			// true size
+			leftCosts = costs[leftChildIndex];
+			rightCosts = costs[rightChildIndex];
+			if (leftCosts < rightCosts) {
 				minIndex = leftChildIndex;
-			} else {
-				leftCosts = costs[leftChildIndex];
-				rightCosts = costs[rightChildIndex];
-				if (leftCosts < rightCosts) {
-					minIndex = leftChildIndex;
-				} else if (leftCosts > rightCosts) {
-					minIndex = rightChildIndex;
-				} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex]
-						.getArrayIndex()) {
-					minIndex = leftChildIndex;
-				} else
-					minIndex = rightChildIndex;
-			}
+			} else if (leftCosts > rightCosts) {
+				minIndex = rightChildIndex;
+			} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex]
+					.getArrayIndex()) {
+				minIndex = leftChildIndex;
+			} else
+				minIndex = rightChildIndex;
 
 			copyData(nodeIndex, minIndex);
 			nodeIndex = minIndex;
 		}
+
+		return nodeIndex;
 	}
 	
 	/**
