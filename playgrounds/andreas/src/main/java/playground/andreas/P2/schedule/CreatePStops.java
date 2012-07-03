@@ -90,8 +90,8 @@ public class CreatePStops{
 	 * Following FileTypes are supported:
 	 * <ul>
 	 * 	<li>Shapefiles with polygons. If one ore more attributes are defined, the last one is parsed 
-	 *	 	to Boolean and used to get the include- and exclude-areas.</li>
-	 * 	<li>Textfile, containing a List a x/y-pairs per row, divided by semicolon. The first and the last coordinate should be equal
+	 *	 	to Boolean and used to get include- and exclude-areas.</li>
+	 * 	<li>Textfile, containing a List of x/y-pairs per row, divided by semicolon. The first and the last coordinate should be equal
 	 * 		to get a closed and well defined Geometry.</li>
 	 * </ul>
 	 * @param net
@@ -101,7 +101,6 @@ public class CreatePStops{
 	public CreatePStops(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
-		//TODO get shape from config
 		this.factory = new GeometryFactory();
 		
 		this.linkId2StopFacilityMap = new HashMap<Id, TransitStopFacility>();
@@ -191,7 +190,7 @@ public class CreatePStops{
 		}
 		
 		if(lines.size() < 3){
-			log.warn("an area needs at least 3 points, to be defined. Falling back to simple x/y-values...");
+			log.warn("an area needs at least 3 points, to be defined. Falling back to simple (default) x/y-values...");
 			this.createServiceArea(pConfigGroup.getMinX(), pConfigGroup.getMaxX(), pConfigGroup.getMinY(), pConfigGroup.getMaxY());
 			return;	
 		}
@@ -225,7 +224,10 @@ public class CreatePStops{
 					g = (Geometry) o;
 				}else if (o instanceof MultiPolygon){
 					g = (Geometry) o;
-				}else if (o instanceof String){
+				}
+				// TODO use a better way to get the attributes, maybe directly per index.
+				// Now the last attribute is used per default... 
+				else if (o instanceof String){
 					incl = Boolean.parseBoolean((String) o);
 				}
 			}
