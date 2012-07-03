@@ -61,6 +61,8 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	
 	private final boolean debug = false;
 	
+	private static final int FANOUT = 6;
+
 	@SuppressWarnings("unchecked")
 	public BinaryMinHeap(int size) {
 		this.data = (E[]) new HeapEntry[size];
@@ -178,28 +180,29 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	 */
 	private int removeSiftDown(int nodeIndex) {
 		for (;;) {
-			int leftChildIndex, rightChildIndex, minIndex;
-			double leftCosts, rightCosts;
-
-			leftChildIndex = getLeftChildIndex(nodeIndex);
+			int leftChildIndex = getLeftChildIndex(nodeIndex);
 			if (leftChildIndex >= heapSize)
 				break;
-			rightChildIndex = getRightChildIndex(nodeIndex);
+			double leftCosts = costs[leftChildIndex];
 
-			// We use the sentinel values Double.MAX_VALUE
-			// to protect ourselves from looking beyond the heap's
-			// true size
-			leftCosts = costs[leftChildIndex];
-			rightCosts = costs[rightChildIndex];
-			if (leftCosts < rightCosts) {
-				minIndex = leftChildIndex;
-			} else if (leftCosts > rightCosts) {
-				minIndex = rightChildIndex;
-			} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex]
-					.getArrayIndex()) {
-				minIndex = leftChildIndex;
-			} else
-				minIndex = rightChildIndex;
+			int limitChildIndex = leftChildIndex + FANOUT;
+
+			int minIndex = leftChildIndex;
+			for (int rightChildIndex = leftChildIndex + 1; rightChildIndex < limitChildIndex; rightChildIndex++) {
+				// We use the sentinel values Double.MAX_VALUE
+				// to protect ourselves from looking beyond the heap's
+				// true size
+				double rightCosts = costs[rightChildIndex];
+				if (leftCosts < rightCosts)
+					;
+				else if (leftCosts > rightCosts) {
+					minIndex = rightChildIndex;
+				} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex]
+						.getArrayIndex())
+					;
+				else
+					minIndex = rightChildIndex;
+			}
 
 			copyData(nodeIndex, minIndex);
 			nodeIndex = minIndex;
@@ -394,15 +397,11 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	}
 
 	private int getLeftChildIndex(int nodeIndex) {
-		return 2 * nodeIndex + 1;
-	}
-
-	private int getRightChildIndex(int nodeIndex) {
-		return 2 * nodeIndex + 2;
+		return FANOUT * nodeIndex + 1;
 	}
 
 	private int getParentIndex(int nodeIndex) {
-		return (nodeIndex - 1) / 2;
+		return (nodeIndex - 1) / FANOUT;
 	}
 	
 	private void siftUp(int index, E newEntry, double newCost) {
@@ -425,27 +424,28 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	}
 
 	private void siftDown(int nodeIndex) {
-		int leftChildIndex, rightChildIndex, minIndex;
-		double leftCosts, rightCosts, minCosts, nodeCosts;
-		
-		leftChildIndex = getLeftChildIndex(nodeIndex);
-		rightChildIndex = getRightChildIndex(nodeIndex);
-		if (rightChildIndex >= heapSize) {
-			if (leftChildIndex >= heapSize) return;
-			else {
-				minCosts = costs[leftChildIndex];
-				minIndex = leftChildIndex;
-			}
-		} else {
-			leftCosts = costs[leftChildIndex];
-			rightCosts = costs[rightChildIndex];
-			if (leftCosts <= rightCosts) {
-				minCosts = leftCosts;
-				minIndex = leftChildIndex;
-			} else {
-				minCosts = rightCosts;
-				minIndex = rightChildIndex;
-			}
+		throw new RuntimeException("Not implemented");
+//		int leftChildIndex, rightChildIndex, minIndex;
+//		double leftCosts, rightCosts, minCosts, nodeCosts;
+//
+//		leftChildIndex = getLeftChildIndex(nodeIndex);
+//		rightChildIndex = getRightChildIndex(nodeIndex);
+//		if (rightChildIndex >= heapSize) {
+//			if (leftChildIndex >= heapSize) return;
+//			else {
+//				minCosts = costs[leftChildIndex];
+//				minIndex = leftChildIndex;
+//			}
+//		} else {
+//			leftCosts = costs[leftChildIndex];
+//			rightCosts = costs[rightChildIndex];
+//			if (leftCosts <= rightCosts) {
+//				minCosts = leftCosts;
+//				minIndex = leftChildIndex;
+//			} else {
+//				minCosts = rightCosts;
+//				minIndex = rightChildIndex;
+//			}
 		}
 
 		/*
