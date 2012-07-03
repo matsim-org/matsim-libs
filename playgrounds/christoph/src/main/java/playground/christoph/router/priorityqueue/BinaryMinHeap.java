@@ -180,12 +180,11 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 			double leftCosts, rightCosts;
 
 			leftChildIndex = getLeftChildIndex(nodeIndex);
+			if (leftChildIndex >= heapSize)
+				return;
 			rightChildIndex = getRightChildIndex(nodeIndex);
 			if (rightChildIndex >= heapSize) {
-				if (leftChildIndex >= heapSize)
-					return;
-				else
-					minIndex = leftChildIndex;
+				minIndex = leftChildIndex;
 			} else {
 				leftCosts = costs[leftChildIndex];
 				rightCosts = costs[rightChildIndex];
