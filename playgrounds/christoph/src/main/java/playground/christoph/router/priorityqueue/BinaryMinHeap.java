@@ -162,17 +162,16 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		 * Swap entry with heap's last entry.
 		 */
 		heapSize--;
-		this.copyData(index, heapSize);
-
-		// Reset sentinel here:
-		costs[heapSize] = Double.MAX_VALUE;
 
 		/*
 		 * Sift up entry that was previously at the heap's end.
 		 */
-		siftUp(index);
+		siftUp(index, data[heapSize], costs[heapSize]);
+
+		// Reset sentinel here:
+		costs[heapSize] = Double.MAX_VALUE;
 	}
-		
+
 	/*
 	 * Used by alternative remove() approach. The costs have been set to
 	 * Double.MAX_VALUE. Therefore we only have to compare the nodes children.
@@ -247,11 +246,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		
 		if (heapSize == data.length) throw new RuntimeException("Heap's underlying storage is overflow!");
 		else {
-			data[heapSize] = value;
-			costs[heapSize] = priority;
-			indices[value.getArrayIndex()] = heapSize;
-			
-			siftUp(heapSize);
+			siftUp(heapSize, value, priority);
 			heapSize++;
 		}
 		
@@ -332,21 +327,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		}
 
 		// update costs in array
-		E entry = data[index];
-		
-		while (index > 0) {
-			int parentIndex = getParentIndex(index);
-			double parentCost = costs[parentIndex];
-			if (cost >= parentCost)
-				break;
-			this.copyData(index, parentIndex);
-			
-			// for next iteration
-			index = parentIndex;
-		}
-
-		data[index] = entry;
-		costs[index] = cost;
+		siftUp(index, data[index], cost);
 		return true;
 	}
 
@@ -424,25 +405,23 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		return (nodeIndex - 1) / 2;
 	}
 	
-	private void siftUp(int nodeIndex) {
-		int parentIndex;
-		if (nodeIndex != 0) {
-			parentIndex = getParentIndex(nodeIndex);
+	private void siftUp(int index, E newEntry, double newCost) {
+		while (index > 0) {
+			int parentIndex = getParentIndex(index);
+			double parentCost = costs[parentIndex];
+			if (newCost > parentCost)
+				break;
+			if (newCost == parentCost && newEntry.getArrayIndex() > data[parentIndex].getArrayIndex())
+				break;
+			this.copyData(index, parentIndex);
 			
-			/*
-			 * If the costs are equal, use the array indices to define the sort order.
-			 * Doing so should guarantee a deterministic order of the heap entries.
-			 */
-			double parentCosts = costs[parentIndex];
-			double nodeCosts = costs[nodeIndex];
-			if (parentCosts > nodeCosts ||
-					(parentCosts == nodeCosts && 
-					 data[parentIndex].getArrayIndex() > data[nodeIndex].getArrayIndex())) {
-				
-				swapData(nodeIndex, parentIndex);				
-				siftUp(parentIndex);
-			}
+			// for next iteration
+			index = parentIndex;
 		}
+
+		data[index] = newEntry;
+		costs[index] = newCost;
+		indices[newEntry.getArrayIndex()] = index;
 	}
 
 	private void siftDown(int nodeIndex) {
