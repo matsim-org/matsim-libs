@@ -213,9 +213,7 @@ public class CreatePStops{
 				}else if (o instanceof String){
 					incl = Boolean.parseBoolean((String) o);
 				}
-//				System.out.println(o.toString());
 			}
-//			System.out.println("\n");
 			if(! (g == null)){
 				if(incl){
 					include.add(g);
@@ -253,12 +251,14 @@ public class CreatePStops{
 		if (linkHasAlreadyAFormalPTStopFromTheGivenSchedule(link)) {
 			return 0;
 		}
-
-		for (TransitStopFacility stop : this.transitSchedule.getFacilities().values()) {
-			if(stop.getLinkId().toString().equalsIgnoreCase(link.getId().toString())){
-				log.warn("Link " + link.getId() + " has already a stop. This should not happen. Check code.");
-				return 0;
-			}
+		
+		if (link.getFreespeed() >= this.pConfigGroup.getSpeedLimitForStops()) {
+			return 0;
+		}
+		
+		if (this.linkId2StopFacilityMap.get(link.getId()) != null) {
+			log.warn("Link " + link.getId() + " has already a stop. This should not happen. Check code.");
+			return 0;
 		}
 		
 		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(new IdImpl(this.pConfigGroup.getPIdentifier() + link.getId()), link.getToNode().getCoord(), false);
