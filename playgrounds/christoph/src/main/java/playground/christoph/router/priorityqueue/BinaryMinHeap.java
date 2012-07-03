@@ -171,33 +171,38 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	}
 		
 	/*
-	 * Used by alternative remove() approach.
-	 * The costs have been set to Double.MAX_VALUE. Therefore we
-	 * only have to compare the nodes children.
+	 * Used by alternative remove() approach. The costs have been set to
+	 * Double.MAX_VALUE. Therefore we only have to compare the nodes children.
 	 */
 	private void removeSiftDown(int nodeIndex) {
-		int leftChildIndex, rightChildIndex, minIndex;
-		double leftCosts, rightCosts;
-		
-		leftChildIndex = getLeftChildIndex(nodeIndex);
-		rightChildIndex = getRightChildIndex(nodeIndex);
-		if (rightChildIndex >= heapSize) {
-			if (leftChildIndex >= heapSize) return;
-			else minIndex = leftChildIndex;
-		} else {
-			leftCosts = costs[leftChildIndex];
-			rightCosts = costs[rightChildIndex];
-			if (leftCosts < rightCosts) {
-				minIndex = leftChildIndex;
-			} else if (leftCosts > rightCosts) {
-				minIndex = rightChildIndex;
-			} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex].getArrayIndex()) {
-				minIndex = leftChildIndex;
-			} else minIndex = rightChildIndex;
-		}
+		for (;;) {
+			int leftChildIndex, rightChildIndex, minIndex;
+			double leftCosts, rightCosts;
 
-		swapData(nodeIndex, minIndex);
-		removeSiftDown(minIndex);
+			leftChildIndex = getLeftChildIndex(nodeIndex);
+			rightChildIndex = getRightChildIndex(nodeIndex);
+			if (rightChildIndex >= heapSize) {
+				if (leftChildIndex >= heapSize)
+					return;
+				else
+					minIndex = leftChildIndex;
+			} else {
+				leftCosts = costs[leftChildIndex];
+				rightCosts = costs[rightChildIndex];
+				if (leftCosts < rightCosts) {
+					minIndex = leftChildIndex;
+				} else if (leftCosts > rightCosts) {
+					minIndex = rightChildIndex;
+				} else if (data[leftChildIndex].getArrayIndex() < data[rightChildIndex]
+						.getArrayIndex()) {
+					minIndex = leftChildIndex;
+				} else
+					minIndex = rightChildIndex;
+			}
+
+			swapData(nodeIndex, minIndex);
+			nodeIndex = minIndex;
+		}
 	}
 	
 	/**
