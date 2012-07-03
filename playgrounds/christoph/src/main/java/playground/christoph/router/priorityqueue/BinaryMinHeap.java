@@ -147,10 +147,6 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 				if (heapSize > 0)
 					siftDown(0);
 			} else {
-				/*
-				 * Set costs to Double.MAX_Value. Afterwards it is shifted
-				 * downwards to the heap's bottom.
-				 */
 				siftDownUp(0);
 
 				indices[minValue.getArrayIndex()] = -1;
