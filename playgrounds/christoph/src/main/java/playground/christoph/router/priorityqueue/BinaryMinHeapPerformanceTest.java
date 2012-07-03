@@ -32,7 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
  */
 public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 	public long doTestDijkstraPerformance() {
-		final int ITERS = 1000000;
+		final int ITERS = 500000;
 		final int OUTDEGREE = 3;
 		final int DECREASE = 1;
 		final int MAXENTRIES = ITERS * OUTDEGREE;
@@ -51,15 +51,19 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 		pq.add((DummyHeapEntry)it.next(), cc);
 		
 		long t = System.nanoTime();
-		for (int i = 1; i < ITERS; i++) {
+		for (int i = 1; ; i++) {
 			double c = pq.peekCost();
 			assertTrue("Nondecreasing order for costs", c >= cc);
 			cc = c;
 			pq.remove();
 
-			for (int j = 0; j < OUTDEGREE; j++) {
-				pq.add((DummyHeapEntry)it.next(), c + R.nextDouble());
+			if (i < ITERS) {
+				for (int j = 0; j < OUTDEGREE; j++) {
+					pq.add((DummyHeapEntry)it.next(), c + R.nextDouble());
+				}
 			}
+			else if (pq.isEmpty())
+				break;
 			
 			for (int j = 0; j < DECREASE; j++) {
 				final int index = R.nextInt(pq.size());
