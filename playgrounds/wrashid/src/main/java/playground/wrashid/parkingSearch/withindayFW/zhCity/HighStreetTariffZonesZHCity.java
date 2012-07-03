@@ -34,6 +34,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -85,5 +86,9 @@ public class HighStreetTariffZonesZHCity {
 
 	public boolean isInHighTariffZone(double x, double y){
 		return zhCityCentre.contains(x, y) || oerlikonCentre.contains(x, y);
+	}
+	
+	public boolean isInHighTariffZone(Coord coord){
+		return zhCityCentre.contains(coord.getX(), coord.getY()) || oerlikonCentre.contains(coord.getX(), coord.getY());
 	}
 }

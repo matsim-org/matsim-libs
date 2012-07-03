@@ -71,7 +71,7 @@ import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSea
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {
+public abstract class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {
 
 	protected static int currentScenarioId=2;
 	
@@ -188,7 +188,9 @@ public class WithinDayParkingController extends WithinDayController implements S
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
 
-		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
+		if (parkingInfrastructure==null){
+			parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
+		}
 
 		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 10000.0, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
@@ -271,10 +273,10 @@ public class WithinDayParkingController extends WithinDayController implements S
 			// String[]{"test/input/playground/wrashid/parkingSearch/withinday/chessboard/config_plans1.xml"};
 			args = new String[] { "test/input/playground/wrashid/parkingSearch/withinday/chessboard/config.xml" };
 		}
-		final WithinDayParkingController controller = new WithinDayParkingController(args);
-		controller.setOverwriteFiles(true);
+		//final WithinDayParkingController controller = new WithinDayParkingController(args);
+		//controller.setOverwriteFiles(true);
 
-		controller.run();
+		//controller.run();
 
 		System.exit(0);
 	}

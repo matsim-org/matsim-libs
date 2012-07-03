@@ -56,7 +56,7 @@ import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoic
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class HUPCControllerKTI extends KTIWithinDayControler  {
+public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 	private LinkedList<Parking> parkings;
 
 
@@ -67,7 +67,7 @@ public class HUPCControllerKTI extends KTIWithinDayControler  {
 
 
 
-	public HUPCControllerKTI(String[] args) {
+	public HUPCBasicControllerKTI(String[] args) {
 		super(args);
 	}
 	
@@ -284,7 +284,7 @@ public class HUPCControllerKTI extends KTIWithinDayControler  {
 			
 		
 		}
-		final HUPCControllerKTI controller = new HUPCControllerKTI(args);
+		final HUPCBasicControllerKTI controller = new HUPCBasicControllerKTI(args);
 
 		controller.setOverwriteFiles(true);
 		GeneralLib.controler=controller;
