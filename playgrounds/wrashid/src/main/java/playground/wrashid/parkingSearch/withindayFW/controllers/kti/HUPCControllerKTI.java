@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW;
+package playground.wrashid.parkingSearch.withindayFW.controllers.kti;
 
 import java.util.Collection;
 import java.util.HashSet;

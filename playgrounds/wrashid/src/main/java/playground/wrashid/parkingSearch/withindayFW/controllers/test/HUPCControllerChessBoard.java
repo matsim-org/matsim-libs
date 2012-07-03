@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW.testControllers;
+package playground.wrashid.parkingSearch.withindayFW.controllers.test;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -42,18 +42,16 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
-import playground.wrashid.parkingSearch.withindayFW.WithinDayParkingController;
+import playground.wrashid.parkingSearch.withindayFW.controllers.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoice.HUPCReplannerFactory;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
-import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public class HUPCAndRandomControllerChessBoard extends WithinDayParkingController  {
-	public HUPCAndRandomControllerChessBoard(String[] args) {
+public class HUPCControllerChessBoard extends WithinDayParkingController  {
+	public HUPCControllerChessBoard(String[] args) {
 		super(args);
 	}
 
@@ -102,21 +100,6 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "shopping", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "leisure", parkingStrategy);
 
-		
-		// adding random test strategy
-		RandomSearchReplannerFactory randomReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(),
-				router, 1.0, this.scenarioData, parkingAgentsTracker);
-		RandomSearchIdentifier randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure);
-		this.getFixedOrderSimulationListener().addSimulationListener(randomSearchIdentifier);
-		randomReplannerFactory.addIdentifier(randomSearchIdentifier);
-		parkingStrategy = new ParkingStrategy(randomSearchIdentifier);
-		parkingStrategies.add(parkingStrategy);
-		this.getReplanningManager().addDuringLegReplannerFactory(randomReplannerFactory);
-		parkingStrategyActivityMapperFW.addSearchStrategy(null, "home", parkingStrategy);
-		parkingStrategyActivityMapperFW.addSearchStrategy(null, "work", parkingStrategy);
-		parkingStrategyActivityMapperFW.addSearchStrategy(null, "shopping", parkingStrategy);
-		parkingStrategyActivityMapperFW.addSearchStrategy(null, "leisure", parkingStrategy);
-		
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 
@@ -144,7 +127,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 			
 		
 		}
-		final HUPCAndRandomControllerChessBoard controller = new HUPCAndRandomControllerChessBoard(args);
+		final HUPCControllerChessBoard controller = new HUPCControllerChessBoard(args);
 
 		controller.setOverwriteFiles(true);
 		GeneralLib.controler=controller;

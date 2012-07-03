@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW;
+package playground.wrashid.parkingSearch.withindayFW.controllers.kti;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
@@ -39,6 +39,7 @@ import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
+import playground.wrashid.parkingSearch.withindayFW.controllers.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withindayFW.kti.KTIYear3ScoringFunctionFactory;
 
 public class KTIWithinDayControler extends WithinDayParkingController {

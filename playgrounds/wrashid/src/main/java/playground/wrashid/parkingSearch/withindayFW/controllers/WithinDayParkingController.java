@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW;
+package playground.wrashid.parkingSearch.withindayFW.controllers;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,6 +57,7 @@ import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withindayFW.core.LegModeChecker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW;
+package playground.wrashid.parkingSearch.withindayFW.core;
 
 import java.util.ArrayList;
 import java.util.List;
