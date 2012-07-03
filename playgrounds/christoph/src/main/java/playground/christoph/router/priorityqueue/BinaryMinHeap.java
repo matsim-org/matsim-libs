@@ -23,9 +23,6 @@ package playground.christoph.router.priorityqueue;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.matsim.core.utils.collections.HeapEntry;
-import org.matsim.core.utils.collections.MinHeap;
-
 /**
  * @author cdobler
  *
