@@ -102,12 +102,22 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	
 	@Override
 	public E peek() {
-		if (isEmpty()) return null;
-		else return data[0];
+		if (isEmpty())
+			return null;
+		else
+			return peek(0);
+	}
+
+	public E peek(int index) {
+		return data[index];
 	}
 
 	public double peekCost() {
-		return costs[0];
+		return peekCost(0);
+	}
+
+	public double peekCost(int index) {
+		return costs[index];
 	}
 
 	/**
