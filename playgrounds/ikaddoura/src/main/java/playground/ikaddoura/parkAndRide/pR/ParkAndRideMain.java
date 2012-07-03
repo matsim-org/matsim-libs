@@ -24,6 +24,7 @@
 package playground.ikaddoura.parkAndRide.pR;
 
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -45,22 +46,54 @@ import playground.ikaddoura.parkAndRide.pRscoring.ParkAndRideScoringFunctionFact
  */
 public class ParkAndRideMain {
 	
-	static String configFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_config.xml";
-	static String prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRfacilities.txt";
+	static String configFile;
+	static String prFacilityFile;
 	
-	static int prCapacity = 100;
-	static double transferPenalty = 0.;
+	static int prCapacity;
+	static double transferPenalty;
 	
-	static double addRemoveProb = 0.05;
-	static int addRemoveDisable = 500;
+	static double addRemoveProb;
+	static int addRemoveDisable;
 	
-	static double changeLocationProb = 0.05;
-	static int changeLocationDisable = 500;
+	static double changeLocationProb;
+	static int changeLocationDisable;
 	
-	static double timeAllocationProb = 0.1;
-	static int timeAllocationDisable = 500;
+	static double timeAllocationProb;
+	static int timeAllocationDisable;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		
+//		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinConfig.xml";
+//		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRfacilities_berlin.txt";
+//		prCapacity = 100;
+//		transferPenalty = 0.;
+//		
+//		addRemoveProb = 0.05;
+//		addRemoveDisable = 500;
+//		
+//		changeLocationProb = 0.05;
+//		changeLocationDisable = 500;
+//		
+//		timeAllocationProb = 0.1;
+//		timeAllocationDisable = 500;
+		
+		
+//		**************************************************
+		
+		configFile = args[0];
+		prFacilityFile = args[1];
+		prCapacity = Integer.parseInt(args[2]);
+		transferPenalty = Double.parseDouble(args[3]);
+		
+		addRemoveProb = Double.parseDouble(args[4]);
+		addRemoveDisable = Integer.parseInt(args[5]);
+		
+		changeLocationProb = Double.parseDouble(args[6]);
+		changeLocationDisable = Integer.parseInt(args[7]);
+		
+		timeAllocationProb = Double.parseDouble(args[8]);
+		timeAllocationDisable = Integer.parseInt(args[9]);
+	
 		ParkAndRideMain main = new ParkAndRideMain();
 		main.run();
 	}

@@ -70,10 +70,10 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 
 	@Override
 	public void handlePlan(Plan plan) {
-		if (plan.getPerson().getId().toString().contains("car")) { // checks if car is available
-			
-			log.info("Car is available. ParkAndRide is possible.");
-			
+//		if (plan.getPerson().getId().toString().contains("car")) { // checks if car is available
+//			
+//			log.info("Car is available. ParkAndRide is possible.");
+//			
 			List<PlanElement> planElements = plan.getPlanElements();
 			List<Integer> planElementIndex = new ArrayList<Integer>();
 			boolean hasParkAndRide = false;
@@ -160,11 +160,11 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 					}
 				}
 			}
-		}
-		else {
-			log.info("Person has no car. Park and Ride is not possible.");
-			// do nothing!
-		}
+//		}
+//		else {
+//			log.info("Person has no car. Park and Ride is not possible.");
+//			// do nothing!
+//		}
 	}
 	
 	private Activity createParkAndRideActivity(Plan plan) {

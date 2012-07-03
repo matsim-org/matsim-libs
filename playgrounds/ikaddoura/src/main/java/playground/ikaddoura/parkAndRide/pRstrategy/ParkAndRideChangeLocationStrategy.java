@@ -52,7 +52,7 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 	private Population pop;
 	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
-	private int nrOfPrFacilitiesForReplanning = 2; // 0 means all P+R-Facilities are used for replanning
+	private int nrOfPrFacilitiesForReplanning = 0; // 0 means all P+R-Facilities are used for replanning
 
 
 	public ParkAndRideChangeLocationStrategy(Controler controler, Map<Id, ParkAndRideFacility> id2prFacility, Map<Id, List<PrWeight>> personId2prWeights) {
