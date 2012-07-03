@@ -121,7 +121,7 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 			durationFirstWalk = GeneralLib.getIntervalDuration(firstParkingWalkTmp.get(personId), event.getTime());
 		}
 
-		if (secondParkingWalkTmp.get(personId) != null && secondParkingWalkTmp.get(personId) == event.getTime()) {
+		if (secondParkingWalkTmp.get(personId) != null && secondParkingWalkTmp.get(personId) != event.getTime()) {
 			durationSecondWalk = GeneralLib.getIntervalDuration(secondParkingWalkTmp.get(personId), event.getTime());
 		}
 
