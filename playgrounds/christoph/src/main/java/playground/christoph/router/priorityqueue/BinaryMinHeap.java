@@ -121,16 +121,16 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	}
 
 	/**
-	 * Retrieves and removes the head of this queue, or <tt>null</tt>
-	 * if this queue is empty.
-	 *
-	 * @return the head of this queue, or <tt>null</tt> if this
-	 *         queue is empty.
+	 * Retrieves and removes the head of this queue, or <tt>null</tt> if this
+	 * queue is empty.
+	 * 
+	 * @return the head of this queue, or <tt>null</tt> if this queue is empty.
 	 */
 	@Override
 	public E remove() {
 		E minValue;
-		if (isEmpty()) return null;
+		if (isEmpty())
+			return null;
 		else {
 			if (classicalRemove) {
 				minValue = data[0];
@@ -138,33 +138,32 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 				costs[0] = costs[heapSize - 1];
 				indices[data[0].getArrayIndex()] = 0;
 				indices[minValue.getArrayIndex()] = -1;
-				
+
 				heapSize--;
-				if (heapSize > 0) siftDown(0);
+				if (heapSize > 0)
+					siftDown(0);
 				return minValue;
 			} else {
 				minValue = data[0];
 
 				/*
-				 * Set costs to Double.MAX_Value. Afterwards it is
-				 * shifted downwards to the heap's bottom.
+				 * Set costs to Double.MAX_Value. Afterwards it is shifted
+				 * downwards to the heap's bottom.
 				 */
-				costs[0] = Double.MAX_VALUE;
-				removeSiftDown(0);
-				
+				int index = removeSiftDown(0);
+
 				/*
 				 * Swap entry with heap's last entry.
 				 */
 				heapSize--;
-				int index = indices[minValue.getArrayIndex()];
-				this.swapData(index, heapSize);
+				this.copyData(index, heapSize);
 
 				indices[minValue.getArrayIndex()] = -1;
-				
+
 				/*
 				 * Sift up entry that was previously at the heap's end.
 				 */
-				siftUp(index);			
+				siftUp(index);
 				return minValue;
 			}
 		}
@@ -174,14 +173,14 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	 * Used by alternative remove() approach. The costs have been set to
 	 * Double.MAX_VALUE. Therefore we only have to compare the nodes children.
 	 */
-	private void removeSiftDown(int nodeIndex) {
+	private int removeSiftDown(int nodeIndex) {
 		for (;;) {
 			int leftChildIndex, rightChildIndex, minIndex;
 			double leftCosts, rightCosts;
 
 			leftChildIndex = getLeftChildIndex(nodeIndex);
 			if (leftChildIndex >= heapSize)
-				return;
+				return nodeIndex;
 			rightChildIndex = getRightChildIndex(nodeIndex);
 			if (rightChildIndex >= heapSize) {
 				minIndex = leftChildIndex;
@@ -199,7 +198,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 					minIndex = rightChildIndex;
 			}
 
-			swapData(nodeIndex, minIndex);
+			copyData(nodeIndex, minIndex);
 			nodeIndex = minIndex;
 		}
 	}
@@ -394,6 +393,18 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		}
 	}
 	
+	private void copyData(int indexTarget, int indexSource) {
+		// copy HeapEntries
+		E entry = data[indexSource];
+		data[indexTarget] = entry;
+
+		// copy costs
+		costs[indexTarget] = costs[indexSource];
+
+		// copy indices
+		indices[entry.getArrayIndex()] = indexTarget;
+	}
+
 	private void swapData(int index1, int index2) {
 
 		// swap HeapEntries
