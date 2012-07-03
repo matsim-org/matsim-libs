@@ -82,7 +82,22 @@ public class CreatePStops{
 		cS.run();
 		return cS.getTransitSchedule();
 	}
-
+	
+	/**
+	 * Creates PStops in two ways. First, if a serviceAreaFile is defined in the config and this file exists, the file is used.
+	 * Second, the (default) min/max-x/y-values are used.
+	 * 
+	 * Following FileTypes are supported:
+	 * <ul>
+	 * 	<li>Shapefiles with polygons. If one ore more attributes are defined, the last one is parsed 
+	 *	 	to Boolean and used to get the include- and exclude-areas.</li>
+	 * 	<li>Textfile, containing a List a x/y-pairs per row, divided by semicolon. The first and the last coordinate should be equal
+	 * 		to get a closed and well defined Geometry.</li>
+	 * </ul>
+	 * @param net
+	 * @param pConfigGroup
+	 * @param realTransitSchedule
+	 */
 	public CreatePStops(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
