@@ -362,6 +362,17 @@ public class BinaryMinHeapFunctionalityTest extends BinaryMinHeapTest {
 		assertNull(pq.remove());
 	}
 
+	public void testEqualCosts() {
+		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		DummyHeapEntry entry0 = new DummyHeapEntry(0);
+		DummyHeapEntry entry1 = new DummyHeapEntry(1);
+		pq.add(entry1, 0.0);
+		pq.add(entry0, 0.0);
+		assertEqualsHE(entry0, pq.remove());
+		assertEqualsHE(entry1, pq.remove());
+		assertNull(pq.remove());
+	}
+
 	private int iteratorElementCount(final Iterator<?> iterator) {
 		int cnt = 0;
 		while (iterator.hasNext()) {
