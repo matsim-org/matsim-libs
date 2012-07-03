@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 
 /**

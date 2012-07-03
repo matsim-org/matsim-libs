@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withinday;
+package playground.wrashid.parkingSearch.withindayFW.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +48,6 @@ import org.matsim.withinday.utils.EditRoutes;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 
 public class InsertParkingActivities implements PlanAlgorithm {

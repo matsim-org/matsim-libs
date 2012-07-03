@@ -56,12 +56,12 @@ import org.matsim.population.Desires;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
-import playground.wrashid.parkingSearch.mobsim.ParkingQSimFactory;
-import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
+import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingQSimFactory;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo.GPSNIReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;

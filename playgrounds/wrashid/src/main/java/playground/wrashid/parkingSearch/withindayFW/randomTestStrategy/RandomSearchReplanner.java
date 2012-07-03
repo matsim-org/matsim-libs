@@ -41,7 +41,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.wrashid.lib.DebugLib;
-import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.mobsim;
+package playground.wrashid.parkingSearch.withindayFW.core.mobsim;
 
 import java.util.HashMap;
 
@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 /**
