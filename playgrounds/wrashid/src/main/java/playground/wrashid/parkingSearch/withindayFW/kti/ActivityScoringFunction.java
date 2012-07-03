@@ -45,30 +45,32 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
-
 /**
- * This class implements the activity scoring as used in Year 3 of the KTI project.
- *
+ * This class implements the activity scoring as used in Year 3 of the KTI
+ * project.
+ * 
  * It has the following features:
- *
+ * 
  * <ul>
- * <li>use opening times from facilities, not from config. scoring function can process multiple opening time intervals per activity option</li>
+ * <li>use opening times from facilities, not from config. scoring function can
+ * process multiple opening time intervals per activity option</li>
  * <li>use typical durations from agents' desires, not from config</li>
- * <li>typical duration applies to the sum of all instances of an activity type, not to single instances (so agent finds out itself how much time to spend in which instance)</li>
+ * <li>typical duration applies to the sum of all instances of an activity type,
+ * not to single instances (so agent finds out itself how much time to spend in
+ * which instance)</li>
  * <li>use facility load penalties from LocationChoiceScoringFunction</li>
  * <li>no penalties for late arrival and early departure are computed</li>
  * </ul>
- *
+ * 
  * @author meisterk
- *
+ * 
  */
-public class ActivityScoringFunction extends
-org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
+public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	// TODO should be in person.desires
 	public static final int DEFAULT_PRIORITY = 1;
 	// TODO should be in person.desires
-	// TODO differentiate in any way?
+	//  TODO differentiate in any way?
 	public static final double MINIMUM_DURATION = 0.5 * 3600;
 
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
@@ -76,18 +78,20 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
-	
+
 	private Plan plan;
 	private CharyparNagelScoringParameters params;
-	
+
 	static {
-		OpeningTime defaultOpeningTime = new OpeningTimeImpl(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
+		OpeningTime defaultOpeningTime = new OpeningTimeImpl(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE,
+				Double.MAX_VALUE);
 		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
 
-	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
+	/* package */static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
 
-	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
+	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params,
+			final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
 		super(params);
 		this.params = params;
 		this.facilityPenalties = facilityPenalties;
@@ -108,27 +112,39 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	@Override
 	protected double calcActScore(double arrivalTime, double departureTime, Activity act) {
 
+		if (act.getType().equalsIgnoreCase("parking")) {
+			// reason for this: avoid scoring performing parking (positivly +
+			// avoid having disutility
+			// of parking for less than 30 min.
+
+			return 0.0;
+		}
+
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 
 		// technical penalty: negative activity durations are penalized heavily
-		// so that 24 hour plans are enforced (home activity must not start later than it ended)
+		// so that 24 hour plans are enforced (home activity must not start
+		// later than it ended)
 		// also: negative duration is also too short
 		if (fromArrivalToDeparture < 0.0) {
 			this.accumulatedNegativeDuration += fromArrivalToDeparture;
 			this.accumulatedTooShortDuration += (ActivityScoringFunction.MINIMUM_DURATION - fromArrivalToDeparture);
 		}
-		///////////////////////////////////////////////////////////////////
+		// /////////////////////////////////////////////////////////////////
 		// the time between arrival and departure is either spent
 		// - performing (when the associated facility is open) or
 		// - waiting (when it is closed)
-		// - the sum of the share performing and the share waiting equals the difference between arrival and departure
-		///////////////////////////////////////////////////////////////////
+		// - the sum of the share performing and the share waiting equals the
+		// difference between arrival and departure
+		// /////////////////////////////////////////////////////////////////
 		else {
 
 			SortedSet<OpeningTime> openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
-			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
+			// if no associated activity option exists, or if the activity
+			// option does not contain an <opentimes> element,
 			// assume facility is always open
-			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
+			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions()
+					.get(act.getType());
 			if (actOpt != null) {
 				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
 				if (openTimes == null) {
@@ -142,13 +158,19 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 			}
 
 			// calculate effective activity duration bounded by opening times
-			double timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
-			double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
-			double scoreImprovement; // calculate score improvement only as basis for facility load penalties
-			double openingTime, closingTime; // hold time information of an opening time interval
+			double timeSpentPerforming = 0.0; // accumulates performance
+												// intervals for this activity
+			double activityStart, activityEnd; // hold effective activity start
+												// and end due to facility
+												// opening times
+			double scoreImprovement; // calculate score improvement only as
+										// basis for facility load penalties
+			double openingTime, closingTime; // hold time information of an
+												// opening time interval
 			for (OpeningTime openTime : openTimes) {
 
-				// see explanation comments for processing opening time intervals in super class
+				// see explanation comments for processing opening time
+				// intervals in super class
 				openingTime = openTime.getStartTime();
 				closingTime = openTime.getEndTime();
 
@@ -164,7 +186,8 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 				double duration = activityEnd - activityStart;
 
 				// calculate penalty due to facility load only when:
-				// - activity type is penalized (currently only shop and leisure-type activities)
+				// - activity type is penalized (currently only shop and
+				// leisure-type activities)
 				// - duration is bigger than 0
 				if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
 					if (duration > 0) {
@@ -174,23 +197,20 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 							accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
 						}
 
-						scoreImprovement =
-							this.getPerformanceScore(act.getType(), accumulatedDuration + duration) -
-							this.getPerformanceScore(act.getType(), accumulatedDuration);
+						scoreImprovement = this.getPerformanceScore(act.getType(), accumulatedDuration + duration)
+								- this.getPerformanceScore(act.getType(), accumulatedDuration);
 
 						// lazy init of penalty data structure
 						if (this.penalty == null) {
 							this.penalty = new Vector<ScoringPenalty>();
 						}
-						/* Penalty due to facility load:
-						 * Store the temporary score to reduce it in finish() proportionally
-						 * to score and dep. on facility load.
+						/*
+						 * Penalty due to facility load: Store the temporary
+						 * score to reduce it in finish() proportionally to
+						 * score and dep. on facility load.
 						 */
-						this.penalty.add(new ScoringPenalty(
-								activityStart,
-								activityEnd,
-								this.facilityPenalties.get(act.getFacilityId()),
-								scoreImprovement));
+						this.penalty.add(new ScoringPenalty(activityStart, activityEnd, this.facilityPenalties.get(act
+								.getFacilityId()), scoreImprovement));
 					}
 
 				}
@@ -199,7 +219,8 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 			}
 
-			// accumulated waiting time, which is the time that could not be performed in activities due to closed facilities
+			// accumulated waiting time, which is the time that could not be
+			// performed in activities due to closed facilities
 			this.timeSpentWaiting += (fromArrivalToDeparture - timeSpentPerforming);
 
 			// accumulate time spent performing
@@ -227,7 +248,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		if (plan.getPlanElements().size() == 1) {
 			// One Activity only. Regular scoring does not handle this because
 			// the activity never ends and never starts.
-			this.score += calcActScore(0, 24*3600.0, (Activity) plan.getPlanElements().get(0)); // SCENARIO_DURATION
+			this.score += calcActScore(0, 24 * 3600.0, (Activity) plan.getPlanElements().get(0)); // SCENARIO_DURATION
 		}
 		this.score += this.getTooShortDurationScore();
 		this.score += this.getWaitingTimeScore();
@@ -235,7 +256,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 		this.score += this.getFacilityPenaltiesScore();
 		this.score += this.getNegativeDurationScore();
 	}
-	
+
 	public double getFacilityPenaltiesScore() {
 
 		double facilityPenaltiesScore = 0.0;
@@ -256,19 +277,21 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 		double typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
 
-		// initialize zero utility durations here for better code readability, because we only need them here
+		// initialize zero utility durations here for better code readability,
+		// because we only need them here
 		double zeroUtilityDuration;
 		if (this.zeroUtilityDurations.containsKey(actType)) {
 			zeroUtilityDuration = this.zeroUtilityDurations.get(actType);
 		} else {
-			zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
+			zeroUtilityDuration = (typicalDuration / 3600.0)
+					* Math.exp(-10.0 / (typicalDuration / 3600.0) / ActivityScoringFunction.DEFAULT_PRIORITY);
 			this.zeroUtilityDurations.put(actType, zeroUtilityDuration);
 		}
 
 		double tmpScore = 0.0;
 		if (duration > 0.0) {
 			double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-			* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
+					* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
 			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore = Math.max(0, Math.max(utilPerf, utilWait));
 		} else if (duration < 0.0) {
