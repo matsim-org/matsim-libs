@@ -32,69 +32,91 @@ import org.matsim.core.gbl.MatsimRandom;
  * @author muelleki
  */
 public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
-	static final int ITERS = 500000;
-	static final int OUTDEGREE = 3;
-	static final int DECREASE = 1;
-	static final int MAXENTRIES = ITERS * OUTDEGREE;
+	private class TestThread extends Thread {
+		static final int ITERS = 500000;
+		static final int OUTDEGREE = 3;
+		static final int DECREASE = 1;
+		static final int MAXENTRIES = ITERS * OUTDEGREE;
 
-	public long doTestDijkstraPerformance(BinaryMinHeap<DummyHeapEntry> pq,
-			Iterator<DummyHeapEntry> it) {
-		Random R = MatsimRandom.getLocalInstance();
+		public long doTestDijkstraPerformance(BinaryMinHeap<DummyHeapEntry> pq,
+				Iterator<DummyHeapEntry> it) {
+			Random R = MatsimRandom.getLocalInstance();
 
-		System.gc();
+			System.gc();
 
-		double cc = 0.0;
-		pq.add(it.next(), cc);
+			double cc = 0.0;
+			pq.add(it.next(), cc);
 
-		long t = System.nanoTime();
-		for (int i = 1;; i++) {
-			double c = pq.peekCost();
-			assertTrue("Nondecreasing order for costs", c >= cc);
-			cc = c;
-			pq.remove();
+			long t = System.nanoTime();
+			for (int i = 1;; i++) {
+				double c = pq.peekCost();
+				assertTrue("Nondecreasing order for costs", c >= cc);
+				cc = c;
+				pq.remove();
 
-			if (i < ITERS) {
-				for (int j = 0; j < OUTDEGREE; j++) {
-					pq.add(it.next(), c + R.nextDouble());
+				if (i < ITERS) {
+					for (int j = 0; j < OUTDEGREE; j++) {
+						pq.add(it.next(), c + R.nextDouble());
+					}
+				} else if (pq.isEmpty())
+					break;
+
+				for (int j = 0; j < DECREASE; j++) {
+					final int index = R.nextInt(pq.size());
+					DummyHeapEntry e = pq.peek(index);
+					double co = pq.peekCost(index);
+					double cn = cc + (co - cc) * R.nextDouble();
+					pq.decreaseKey(e, cn);
 				}
-			} else if (pq.isEmpty())
-				break;
-
-			for (int j = 0; j < DECREASE; j++) {
-				final int index = R.nextInt(pq.size());
-				DummyHeapEntry e = pq.peek(index);
-				double co = pq.peekCost(index);
-				double cn = cc + (co - cc) * R.nextDouble();
-				pq.decreaseKey(e, cn);
 			}
+
+			long tt = System.nanoTime();
+			return tt - t;
 		}
 
-		long tt = System.nanoTime();
-		return tt - t;
-	}
+		private DescriptiveStatistics collectDijkstraPerformance() {
+			int RUNS = 50;
+			DescriptiveStatistics S = new DescriptiveStatistics();
 
-	private DescriptiveStatistics collectDijkstraPerformance() {
-		int RUNS = 50;
-		DescriptiveStatistics S = new DescriptiveStatistics();
+			final BinaryMinHeap<DummyHeapEntry> heap = new BinaryMinHeap<DummyHeapEntry>(
+					MAXENTRIES);
 
-		final BinaryMinHeap<DummyHeapEntry> heap = new BinaryMinHeap<DummyHeapEntry>(MAXENTRIES);
+			final DummyHeapEntry[] E = new DummyHeapEntry[MAXENTRIES];
+			for (int gen = 0; gen < MAXENTRIES; gen++)
+				E[gen] = new DummyHeapEntry(gen);
 
-		final DummyHeapEntry[] E = new DummyHeapEntry[MAXENTRIES];
-		for (int gen = 0; gen < MAXENTRIES; gen++)
-			E[gen] = new DummyHeapEntry(gen);
-
-		for (int i = 0; i < RUNS; i++) {
-			@SuppressWarnings("unchecked")
-			double dt = (doTestDijkstraPerformance(heap,
-					((Iterator<DummyHeapEntry>)new ArrayIterator(E))) / 1.0e6);
-			S.addValue(dt);
-			log.info(String.format("Iteration: %d, Time: %f", i, dt));
+			for (int i = 0; i < RUNS; i++) {
+				@SuppressWarnings("unchecked")
+				double dt = (doTestDijkstraPerformance(heap,
+						((Iterator<DummyHeapEntry>) new ArrayIterator(E))) / 1.0e6);
+				S.addValue(dt);
+				log.info(String.format("Iteration: %d, Time: %f", i, dt));
+			}
+			return S;
 		}
-		return S;
+
+		public DescriptiveStatistics getStats() {
+			return S;
+		}
+
+		private DescriptiveStatistics S;
+
+		@Override
+		public void run() {
+			S = collectDijkstraPerformance();
+		}
 	}
 
 	public void testDijkstraPerformance() {
-		DescriptiveStatistics S = collectDijkstraPerformance();
+		TestThread t = new TestThread();
+		t.run();
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return;
+		}
+		DescriptiveStatistics S = t.getStats();
 
 		log.info(String.format(
 				"Time: Min/Max: %f/%f, Mean: %f, StDev: %f, 95%% CI: (%f, %f)",
