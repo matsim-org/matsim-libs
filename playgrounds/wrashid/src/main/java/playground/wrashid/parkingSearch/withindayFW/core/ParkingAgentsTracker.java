@@ -727,7 +727,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		// parking walk time
 
-		double walkingTimeTotalInMinutes = walkDurationFirstAndLastOfDay.getDuration(personId) / 60.0;
+		double walkingTimeTotalInMinutes = walkDurationFirstAndLastOfDay.getSumBothParkingWalkDurationsInSecond(personId) / 60.0;
 		parkingScore += getWalkScore(personId, lastActivityDurationOfDay, walkingTimeTotalInMinutes);
 
 		// parking search time
