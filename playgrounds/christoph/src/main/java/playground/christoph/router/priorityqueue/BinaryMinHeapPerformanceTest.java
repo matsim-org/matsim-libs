@@ -73,7 +73,7 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 		return tt - t;
 	}
 
-	public void testDijkstraPerformance() {
+	private DescriptiveStatistics collectDijkstraPerformance() {
 		int RUNS = 50;
 		DescriptiveStatistics S = new DescriptiveStatistics();
 
@@ -90,6 +90,11 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 			S.addValue(dt);
 			log.info(String.format("Iteration: %d, Time: %f", i, dt));
 		}
+		return S;
+	}
+
+	public void testDijkstraPerformance() {
+		DescriptiveStatistics S = collectDijkstraPerformance();
 
 		log.info(String.format(
 				"Time: Min/Max: %f/%f, Mean: %f, StDev: %f, 95%% CI: (%f, %f)",
