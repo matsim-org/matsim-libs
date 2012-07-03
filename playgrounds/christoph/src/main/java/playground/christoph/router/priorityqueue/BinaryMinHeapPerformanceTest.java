@@ -21,6 +21,7 @@
 package playground.christoph.router.priorityqueue;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.commons.collections.iterators.ArrayIterator;
@@ -31,27 +32,22 @@ import org.matsim.core.gbl.MatsimRandom;
  * @author muelleki
  */
 public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
-	public long doTestDijkstraPerformance() {
-		final int ITERS = 500000;
-		final int OUTDEGREE = 3;
-		final int DECREASE = 1;
-		final int MAXENTRIES = ITERS * OUTDEGREE;
-		BinaryMinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(MAXENTRIES);
+	static final int ITERS = 500000;
+	static final int OUTDEGREE = 3;
+	static final int DECREASE = 1;
+	static final int MAXENTRIES = ITERS * OUTDEGREE;
+
+	public long doTestDijkstraPerformance(BinaryMinHeap<DummyHeapEntry> pq,
+			Iterator<DummyHeapEntry> it) {
 		Random R = MatsimRandom.getLocalInstance();
-		
-		DummyHeapEntry[] E = new DummyHeapEntry[MAXENTRIES];
-		for (int gen = 0; gen < MAXENTRIES; gen++)
-			E[gen] = new DummyHeapEntry(gen);
-		
-		ArrayIterator it = new ArrayIterator(E);
-		
+
 		System.gc();
-		
+
 		double cc = 0.0;
-		pq.add((DummyHeapEntry)it.next(), cc);
-		
+		pq.add(it.next(), cc);
+
 		long t = System.nanoTime();
-		for (int i = 1; ; i++) {
+		for (int i = 1;; i++) {
 			double c = pq.peekCost();
 			assertTrue("Nondecreasing order for costs", c >= cc);
 			cc = c;
@@ -59,12 +55,11 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 
 			if (i < ITERS) {
 				for (int j = 0; j < OUTDEGREE; j++) {
-					pq.add((DummyHeapEntry)it.next(), c + R.nextDouble());
+					pq.add(it.next(), c + R.nextDouble());
 				}
-			}
-			else if (pq.isEmpty())
+			} else if (pq.isEmpty())
 				break;
-			
+
 			for (int j = 0; j < DECREASE; j++) {
 				final int index = R.nextInt(pq.size());
 				DummyHeapEntry e = pq.peek(index);
@@ -73,7 +68,7 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 				pq.decreaseKey(e, cn);
 			}
 		}
-		
+
 		long tt = System.nanoTime();
 		return tt - t;
 	}
@@ -82,8 +77,16 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 		int RUNS = 50;
 		DescriptiveStatistics S = new DescriptiveStatistics();
 
+		final BinaryMinHeap<DummyHeapEntry> heap = new BinaryMinHeap<DummyHeapEntry>(MAXENTRIES);
+
+		final DummyHeapEntry[] E = new DummyHeapEntry[MAXENTRIES];
+		for (int gen = 0; gen < MAXENTRIES; gen++)
+			E[gen] = new DummyHeapEntry(gen);
+
 		for (int i = 0; i < RUNS; i++) {
-			double dt = doTestDijkstraPerformance() / 1.0e6;
+			@SuppressWarnings("unchecked")
+			double dt = (doTestDijkstraPerformance(heap,
+					((Iterator<DummyHeapEntry>)new ArrayIterator(E))) / 1.0e6);
 			S.addValue(dt);
 			log.info(String.format("Iteration: %d, Time: %f", i, dt));
 		}
@@ -95,7 +98,7 @@ public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
 				(S.getMean() + 1.96 * S.getStandardDeviation())));
 		log.info(Arrays.toString(S.getSortedValues()));
 	}
-	
+
 	public static void main(String args[]) {
 		new BinaryMinHeapPerformanceTest().testDijkstraPerformance();
 	}
