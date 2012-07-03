@@ -61,10 +61,14 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	
 	private final boolean debug = false;
 	
-	private static final int FANOUT = 6;
+	private final int FANOUT;
+
+	public BinaryMinHeap(int size) {
+		this(size, 6);
+	}
 
 	@SuppressWarnings("unchecked")
-	public BinaryMinHeap(int size) {
+	public BinaryMinHeap(int size, int fanout) {
 		this.data = (E[]) new HeapEntry[size];
 
 		this.costs = new double[size];
@@ -77,6 +81,8 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 			indices[i] = -1;
 		}
 		heapSize = 0;
+
+		FANOUT = fanout;
 	}
 	
 	/**
