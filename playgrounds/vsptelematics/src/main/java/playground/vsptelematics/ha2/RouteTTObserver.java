@@ -148,9 +148,18 @@ public class RouteTTObserver implements AgentDepartureEventHandler, AgentArrival
 		for (Id p : route2) {
 			route2TTs.add(personTTs.get(p));
 		}
-
-		sumRoute1TTs = StatUtils.sum(ListUtils.toArray(route1TTs));
-		sumRoute2TTs = StatUtils.sum(ListUtils.toArray(route2TTs));
+		if (route1TTs.isEmpty()){
+			sumRoute1TTs = 0.0;
+		}
+		else {
+			sumRoute1TTs = StatUtils.sum(ListUtils.toArray(route1TTs));
+		}
+		if (route2TTs.isEmpty()){
+			sumRoute2TTs = 0.0;
+		}
+		else {
+			sumRoute2TTs = StatUtils.sum(ListUtils.toArray(route2TTs));
+		}
 
 		avr_route1TTs = StatUtils.mean(ListUtils.toArray(route1TTs));
 		avr_route2TTs = StatUtils.mean(ListUtils.toArray(route2TTs));
