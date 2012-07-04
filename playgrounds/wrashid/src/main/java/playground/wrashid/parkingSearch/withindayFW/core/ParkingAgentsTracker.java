@@ -590,12 +590,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		}
 
-		double parkingSearchTimeInMinutes = 0;
-
-		if (ifParkingSearchTimeDifferentThanZero(personId)) {
-			parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
-					parkingArrivalTime) / 60;
-		}
+		double parkingSearchTimeInMinutes = getParkingSearchTimeInMinutes(personId, parkingArrivalTime);
 
 		parkingScore += getSearchTimeScore(personId, activityDuration, parkingSearchTimeInMinutes);
 
@@ -614,6 +609,23 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime);
 
+	}
+
+	private double getParkingSearchTimeInMinutes(Id personId, double parkingArrivalTime) {
+		double parkingSearchTimeInMinutes=0;
+		if (ifParkingSearchTimeDifferentThanZero(personId)) {
+			if (fixedParkingSearchTime(personId)){
+				parkingSearchTimeInMinutes=-1*this.getSearchStartTime().get(personId);
+			} else {
+				parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
+						parkingArrivalTime) / 60;
+			}
+		}
+		return parkingSearchTimeInMinutes;
+	}
+
+	private boolean fixedParkingSearchTime(Id personId) {
+		return this.getSearchStartTime().get(personId)<0;
 	}
 
 	private boolean ifParkingSearchTimeDifferentThanZero(Id personId) {
@@ -737,11 +749,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		parkingScore += getWalkScore(personId, lastParkingActivityDurationOfDay, walkingTimeTotalInMinutes);
 
 		// parking search time
-		double parkingSearchTimeInMinutes = 0;
-		if (ifParkingSearchTimeDifferentThanZero(personId)) {
-			parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
-					parkingArrivalTime) / 60;
-		}
+		double parkingSearchTimeInMinutes=getParkingSearchTimeInMinutes(personId, parkingArrivalTime);
+		
 		parkingScore += getSearchTimeScore(personId, lastParkingActivityDurationOfDay, parkingSearchTimeInMinutes);
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
