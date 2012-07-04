@@ -57,6 +57,7 @@ import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivity
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZH;
+import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructureZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCReplannerFactory;
@@ -83,6 +84,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		String cityZones="H:/data/experiments/TRBAug2012/parkings/zones.csv";
 		parkingInfrastructure=new ParkingInfrastructureZH(this.scenarioData,parkingTypes, new ParkingCostCalculatorZH(parkingTypes, new CityZones(cityZones), scenarioData,parkings),parkings);
+		
 		
 	}
 
@@ -167,6 +169,8 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		
 		cleanNetwork();
+		
+		parkingAgentsTracker.setParkingOccupancyHandler(new ParkingOccupancyAnalysis(this));
 		
 	}
 

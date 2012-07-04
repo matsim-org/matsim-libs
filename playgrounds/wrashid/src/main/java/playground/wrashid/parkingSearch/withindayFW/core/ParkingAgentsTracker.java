@@ -77,6 +77,7 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.event.EventHandlerCodeSeparator;
 import playground.wrashid.parkingChoice.ParkingManager;
+import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyHandler;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureDurationOfLastParkingOfDay;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureFirstCarDepartureTimeOfDay;
@@ -109,6 +110,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	private final Scenario scenario;
 	private final double distance;
 	private ParkingOccupancyStats parkingOccupancy;
+	private ParkingOccupancyHandler parkingOccupancyHandler;
 	private final Set<Id> carLegAgents;
 	private final Set<Id> searchingAgents;
 	private final Set<Id> linkEnteredAgents;
@@ -156,7 +158,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	 */
 	public ParkingAgentsTracker(Scenario scenario, double distance, ParkingInfrastructure parkingInfrastructure) {
 		super();
-
+		
 		this.parkingOccupancy = new ParkingOccupancyStats();
 		this.scenario = scenario;
 		this.distance = distance;
@@ -695,9 +697,12 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			double amount = parkingIterationScoreSum.get(personId);
 			scoringFunction.addMoney(amount);
 		}
-
-		parkingOccupancy.writeOutParkingOccupanciesTxt(event.getControler());
-		parkingOccupancy.writeOutParkingOccupancySumPng(event.getControler());
+		
+		if (parkingOccupancyHandler==null){
+			parkingOccupancyHandler=new ParkingOccupancyHandler(event.getControler());
+		}
+		
+		parkingOccupancyHandler.updateParkingOccupancyStatistics(parkingOccupancy);
 		
 		
 		
@@ -718,17 +723,18 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		double parkingScore = 0.0;
 
 		Double parkingArrivalTime = lastCarArrivalTimeAtParking.getTime(personId);
-		double lastActivityDurationOfDay = durationOfLastParkingOfDay.getDuration(personId);
+		double lastParkingActivityDurationOfDay = durationOfLastParkingOfDay.getDuration(personId);
 
 		// parking cost scoring
 
-		parkingScore += getParkingCostScore(personId, parkingArrivalTime, lastActivityDurationOfDay,
-				getLastParkingFacilityIdOfDay(personId));
+		Id lastParkingFacilityIdOfDay = getLastParkingFacilityIdOfDay(personId);
+		parkingScore += getParkingCostScore(personId, parkingArrivalTime, lastParkingActivityDurationOfDay,
+				lastParkingFacilityIdOfDay);
 
 		// parking walk time
 
 		double walkingTimeTotalInMinutes = walkDurationFirstAndLastOfDay.getSumBothParkingWalkDurationsInSecond(personId) / 60.0;
-		parkingScore += getWalkScore(personId, lastActivityDurationOfDay, walkingTimeTotalInMinutes);
+		parkingScore += getWalkScore(personId, lastParkingActivityDurationOfDay, walkingTimeTotalInMinutes);
 
 		// parking search time
 		double parkingSearchTimeInMinutes = 0;
@@ -736,7 +742,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
 					parkingArrivalTime) / 60;
 		}
-		parkingScore += getSearchTimeScore(personId, lastActivityDurationOfDay, parkingSearchTimeInMinutes);
+		parkingScore += getSearchTimeScore(personId, lastParkingActivityDurationOfDay, parkingSearchTimeInMinutes);
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 
@@ -744,6 +750,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, lastCarLegIndexOfDay)
 				.putScore(personId, lastCarLegIndexOfDay, parkingScore);
 
+		
+		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, parkingArrivalTime, parkingArrivalTime+lastParkingActivityDurationOfDay);
 	}
 
 	private Integer getLastCarLegIndexOfDay(Id personId) {
@@ -859,5 +867,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	public void setFirstCarDepartureTimeOfDay(CaptureFirstCarDepartureTimeOfDay firstCarDepartureTimeOfDay) {
 		this.firstCarDepartureTimeOfDay = firstCarDepartureTimeOfDay;
 	}
-
+	
+	public void setParkingOccupancyHandler(ParkingOccupancyHandler parkingOccupancyHandler) {
+		this.parkingOccupancyHandler = parkingOccupancyHandler;
+	}
 }
