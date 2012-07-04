@@ -188,7 +188,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				Link nearestLink = network.getNearestLink(coordFromZone);
+				Link nearestLink = network.getNearestRightEntryLink(coordFromZone); // tnicolai: testing new get nearest link method
 				// captures the distance (as walk time) between a zone centroid and its nearest node
 				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
@@ -291,6 +291,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 									   carLnTC ));
 					
 					// for debugging walk accessibility
+					//walkTT = getAsUtilCar(betaWalkTT, (travelDistance_meter / 15000.) , betaWalkTT, offsetWalkTime2Node_h); // this is to measure bike travel times
 					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour));
 					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow(walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour), 2) );
 					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour) ));
