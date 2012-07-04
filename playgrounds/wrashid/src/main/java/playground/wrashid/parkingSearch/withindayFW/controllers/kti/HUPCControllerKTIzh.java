@@ -152,7 +152,10 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getReplanningManager(),
 				router, 1.0, this.scenarioData, parkingAgentsTracker);
-		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, (ParkingInfrastructureZH) parkingInfrastructure);
+		
+		String searchTimeEstimationConstantForHUPCString = this.getConfig().findParam("parking", "searchTimeEstimationConstantForHUPC");
+		double searchTimeEstimationConstantForHUPC=Double.parseDouble(searchTimeEstimationConstantForHUPCString);
+		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, (ParkingInfrastructureZH) parkingInfrastructure, searchTimeEstimationConstantForHUPC);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
@@ -321,7 +324,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println("using default config");
 		//	args = new String[] { "test/input/playground/wrashid/parkingSearch/withinday/chessboard/config.xml" };
-			args = new String[] { "H:/data/experiments/TRBAug2011/runs/ktiRun1/configRunLocal2.xml" };
+			args = new String[] { "H:/data/experiments/TRBAug2012/runs/run1/configRunLocal.xml" };
 			
 		
 		}
