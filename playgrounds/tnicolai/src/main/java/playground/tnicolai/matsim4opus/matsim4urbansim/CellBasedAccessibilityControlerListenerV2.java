@@ -191,6 +191,9 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				Link nearestLink = network.getNearestRightEntryLink(coordFromZone); // tnicolai: testing new get nearest link method
 				// captures the distance (as walk time) between a zone centroid and its nearest node
 				
+//				fromNode = nearestLink.getToNode() ;
+//				// tree initialization here!
+				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
 				
 				double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
