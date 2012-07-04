@@ -102,7 +102,6 @@ public class MobSimSwitcher implements ControlerListener,
 		return expensiveIters;
 	}
 
-
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		PersonalizableTravelTime ttcalc = controler.getTravelTimeCalculator();
@@ -125,19 +124,21 @@ public class MobSimSwitcher implements ControlerListener,
 			}
 		} else {
 			log.info("Running a cheap iteration with mental simulation");
-			controler.setMobsimFactory(new MentalSimFactory(ttcalc,controler));
+			controler.setMobsimFactory(new MentalSimFactory(ttcalc, controler));
 		}
 	}
 
 	public boolean checkExpensiveIter() {
-		
-		if (controler.getIterationNumber() == controler.getLastIteration()){
-			MobSimSwitcher.expensiveIter = true;			
+
+		if (controler.getIterationNumber() == controler.getLastIteration()) {
+			MobSimSwitcher.expensiveIter = true;
 			return expensiveIter;
 		}
 		if (controler.getIterationNumber() < endIter && expensiveIterCount > 0) {
-
-			if (expensiveIterCount == increaseEveryNExpensiveIters) {
+//			log.error("controler.getIterationNumber() < endIter && expensiveIterCount > 0");
+			if (expensiveIterCount >= increaseEveryNExpensiveIters
+					&& controler.getIterationNumber() > startIter) {
+				log.error("increase rate");
 				if (currentRate < endRate) {
 					if (switchType.equals(SwitchType.doubling)) {
 						currentRate *= 2;
@@ -162,12 +163,12 @@ public class MobSimSwitcher implements ControlerListener,
 			expensiveIterCount++;
 			return expensiveIter;
 		}
-		if(expensiveIter){
+		if (expensiveIter) {
 			this.expensiveIters.add(controler.getIterationNumber());
 			expensiveIterCount++;
-		}else{
-			cheapIterCount++; 
-			
+		} else {
+			cheapIterCount++;
+
 		}
 		return expensiveIter;
 	}

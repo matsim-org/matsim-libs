@@ -153,10 +153,10 @@ public class SimpleAnnealer implements IterationStartsListener,
 			totalWeights += weight;
 		}
 
-		double selectorFactor = (1 - proportion)
-				/ (totalSelectorWeights / totalWeights);
-		double nonSelectorFactor = proportion
-				/ ((totalWeights - totalSelectorWeights) / totalWeights);
+//		double selectorFactor = (1 - proportion)
+//				/ (totalSelectorWeights / totalWeights);
+//		double nonSelectorFactor = proportion
+//				/ ((totalWeights - totalSelectorWeights) / totalWeights);
 		String outputToWrite = "\t" + event.getIteration() + "\t" + currentIter
 				+ "\t" + proportion;
 		for (PlanStrategy strategy : strategies) {
@@ -170,10 +170,10 @@ public class SimpleAnnealer implements IterationStartsListener,
 			// selector-only strategy
 			) {
 				// change the weight of the next selector strategy as recorded
-				newWeight = selectorFactor * weight;
+				newWeight = (1-proportion) * weight/totalSelectorWeights;
 
 			} else {
-				newWeight = nonSelectorFactor * weight;
+				newWeight = proportion * weight/(totalWeights-totalSelectorWeights);
 			}
 			// log.error("In iter "+ event.getIteration()+ ", strategy " +
 			// strategy + " weight set from " + weight

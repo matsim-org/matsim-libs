@@ -63,6 +63,7 @@ public class MentalSimSubSetSimulationListener implements ControlerListener,
 			// MentalSim iterations
 			SimpleAnnealer.anneal(event, 0.9999999);
 			fakePopulationActive = true;
+			return;
 		}
 
 		if (fakePopulationActive && MobSimSwitcher.expensiveIter) {
@@ -73,6 +74,10 @@ public class MentalSimSubSetSimulationListener implements ControlerListener,
 					Integer.parseInt(controler.getConfig().getParam("strategy",
 							"maxAgentPlanMemorySize")));
 			fakePopulationActive = false;
+			return;
+		}
+		if(fakePopulationActive && !MobSimSwitcher.expensiveIter){
+			SimpleAnnealer.anneal(event, 0.9999999);
 		}
 
 	}

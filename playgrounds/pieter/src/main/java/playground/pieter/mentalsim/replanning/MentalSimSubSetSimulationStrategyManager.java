@@ -10,6 +10,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.pieter.mentalsim.controler.MentalSimControler;
+import playground.pieter.mentalsim.controler.listeners.MobSimSwitcher;
 
 /**
  * @author fouriep
@@ -24,8 +25,13 @@ public class MentalSimSubSetSimulationStrategyManager extends StrategyManager {
 	}
 
 	public PlanStrategy chooseStrategy(final Person person) {
-		if(controler.getAgentsMarkedForMentalSim().getAttribute(person.getId().toString(), controler.AGENT_ATT)==null){
-			return selectorStrategy;
+		if(!MobSimSwitcher.expensiveIter){
+			
+			if(controler.getAgentsMarkedForMentalSim().getAttribute(person.getId().toString(), controler.AGENT_ATT)==null){
+				return selectorStrategy;
+			}else{
+				return super.chooseStrategy(person);
+			}
 		}else{
 			return super.chooseStrategy(person);
 		}
