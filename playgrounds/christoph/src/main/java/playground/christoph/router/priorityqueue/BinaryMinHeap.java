@@ -106,7 +106,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		 * them might be faster than overwriting all entries. However, when doing so,
 		 * we have to do twice as much array accesses. 
 		 */
-		if (heapSize < indices.length / 2) {
+		if (heapSize < indices.length / 10) {
 			for (int i = 0; i < heapSize; i++) {
 				indices[data[i].getArrayIndex()] = -1;
 			}			
@@ -114,6 +114,10 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 			for (int i = 0; i < indices.length; i++) {
 				indices[i] = -1;
 			}
+		}
+		
+		for (int i = 0; i < heapSize; i++) {
+			costs[i] = Double.MAX_VALUE;
 		}
 		
 		heapSize = 0;
