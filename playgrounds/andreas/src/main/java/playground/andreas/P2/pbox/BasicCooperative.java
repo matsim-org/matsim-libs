@@ -50,11 +50,12 @@ public class BasicCooperative extends AbstractCooperative{
 			// compare scores
 			if (this.score > this.scoreLastIteration){
 				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
-				this.bestPlan.setStopsToBeServed(this.testPlan.getStopsToBeServed());
-				this.bestPlan.setStartTime(this.testPlan.getStartTime());
-				this.bestPlan.setEndTime(this.testPlan.getEndTime());
+				// changed to get a more useful output in the pCoopLogger /dr
+				this.testPlan.setNVehicles(this.testPlan.getNVehicles() + this.bestPlan.getNVehicles());
+				this.bestPlan = this.testPlan;
+			}else{
+				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + this.testPlan.getNVehicles());
 			}
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + this.testPlan.getNVehicles());
 			this.testPlan = null;
 		}
 		
