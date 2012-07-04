@@ -32,6 +32,7 @@ public class AccessibilityControlerListenerTemplate{
 	// storing the accessibility results
 	protected SpatialGrid freeSpeedGrid;
 	protected SpatialGrid carGrid;
+	protected SpatialGrid bikeGrid;
 	protected SpatialGrid walkGrid;
 	
 	// accessibility parameter
@@ -58,10 +59,12 @@ public class AccessibilityControlerListenerTemplate{
 	
 	protected double carTT, carTTPower, carLnTT, carTD, carTDPower, carLnTD, carTC, carTCPower, carLnTC,
 		   walkTT, walkTTPower, walkLnTT, walkTD, walkTDPower, walkLnTD, walkTC, walkTCPower, walkLnTC,
+		   bikeTT, bikeTTPower, bikeLnTT, bikeTD, bikeTDPower, bikeLnTD, bikeTC, bikeTCPower, bikeLnTC,
 		   freeTT, freeTTPower, freeLnTT, freeTD, freeTDPower, freeLnTD, freeTC, freeTCPower, freeLnTC;
 	
 	protected double depatureTime;
 	protected double walkSpeedMeterPerSecond = -1;
+	protected double bikeSpeedMeterPerHour = -1;
 	protected double walkSpeedMeterPerHour = -1;
 	Benchmark benchmark;
 
@@ -105,6 +108,7 @@ public class AccessibilityControlerListenerTemplate{
 		logitScaleParameter = module.getLogitScaleParameter();
 		walkSpeedMeterPerSecond = scenario.getConfig().plansCalcRoute().getWalkSpeed();
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
+		bikeSpeedMeterPerHour = 15000.;
 		
 		betaCarTT 	   	= module.getBetaCarTravelTime();
 		betaCarTTPower	= module.getBetaCarTravelTimePower2();
@@ -137,6 +141,7 @@ public class AccessibilityControlerListenerTemplate{
 		log.info("Computing and writing grid based accessibility measures with following settings:" );
 		log.info("Returning raw sum (not logsum): " + useRawSum);
 		log.info("Logit Scale Parameter: " + logitScaleParameter);
+		log.info("Bike speed (meter/h): " + this.bikeSpeedMeterPerHour);
 		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + " ("+this.walkSpeedMeterPerSecond+"meter/s)");
 		log.info("Depature time (in seconds): " + depatureTime);
 		log.info("Beta Car Travel Time: " + betaCarTT );

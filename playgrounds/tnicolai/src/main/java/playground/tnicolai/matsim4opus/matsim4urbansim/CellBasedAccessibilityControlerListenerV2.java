@@ -92,8 +92,10 @@ import com.vividsolutions.jts.geom.Point;
  * car has changed: Now only the orthoganal distance (measuring point -> nearest 
  * link) is measured.
  * - re-added free-speed car travel time calculation
- * - Todo: implement a new "getNearestLink" method. The current approach uses nearest nodes to determine the link, 
- *         this leads to some artefacts in the accessibility plots.
+ * - added accessibility calculation for bike
+ * - using network.getNearestRightEntryLink instead of network.getNearestLink. 
+ *   the new entry does not use nearest nodes to determine the link it directly detects the nearest link. 
+ *   This avoids some artifacts in accessibility computation (like selective fluctuation in accessibility )
  * 
  * @author thomas
  * 
@@ -110,6 +112,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
 													 SpatialGrid freeSpeedGrid,
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
+													 SpatialGrid bikeGrid,
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
 													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 Benchmark benchmark,										// Benchmark tool
@@ -126,6 +129,8 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		this.freeSpeedGrid = freeSpeedGrid;
 		assert (carGrid != null);
 		this.carGrid = carGrid;
+		assert (bikeGrid != null);
+		this.bikeGrid = walkGrid;
 		assert (walkGrid != null);
 		this.walkGrid = walkGrid;
 		assert (fileExtension != null);
@@ -178,21 +183,25 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				// get coordinate from origin (start point)
 				Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
 				assert( coordFromZone!=null );
+//				// determine nearest network node (old, dont use this)
+//				Node fromNode = network.getNearestNode(coordFromZone);
+//				assert( fromNode != null );
+//				// run dijkstra on network
+//				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
+//				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
+//				lcptTravelDistance.calculate(network, fromNode, depatureTime);
+				
+				// from here: accessibility computation for current starting point ("fromNode")
+				
+				// captures the distance (as walk time) between a zone centroid and its nearest node
+				Link nearestLink = network.getNearestRightEntryLink(coordFromZone); 
 				// determine nearest network node
-				Node fromNode = network.getNearestNode(coordFromZone);
+				Node fromNode = nearestLink.getToNode() ;
 				assert( fromNode != null );
 				// run dijkstra on network
 				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
 				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
 				lcptTravelDistance.calculate(network, fromNode, depatureTime);
-				
-				// from here: accessibility computation for current starting point ("fromNode")
-				
-				Link nearestLink = network.getNearestRightEntryLink(coordFromZone); // tnicolai: testing new get nearest link method
-				// captures the distance (as walk time) between a zone centroid and its nearest node
-				
-//				fromNode = nearestLink.getToNode() ;
-//				// tree initialization here!
 				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
 				
@@ -205,11 +214,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
 				double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
-				
-				
-//				double offsetDistance2NearestNode_meter = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode); // NetworkUtil.getDistance2Node(nearestLink, point, fromNode);
-//				double offsetWalkTime2NearestNode_h		= offsetDistance2NearestNode_meter / this.walkSpeedMeterPerHour;
-				
+
 				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
 				// Euclidean Distance (measuring point 2 nearest node):
 				// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
@@ -220,6 +225,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				double sumFREESPEED = 0.;
 				double sumCAR = 0.;
+				double sumBIKE = 0.;
 				double sumWALK= 0.;	
 
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
@@ -236,6 +242,8 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					double freeSpeedTravelTime_h = (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
 					// travel distance in meter
 					double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
+					// bike travel times in hours
+					double bikeTravelTime_h 	= travelDistance_meter / this.bikeSpeedMeterPerHour; // using a constant speed of 15km/h
 					// walk travel times in hours
 					double walkTravelTime_h		= travelDistance_meter / this.walkSpeedMeterPerHour;
 					// congested car travel times in hours
@@ -293,6 +301,32 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 									   carTCPower + 
 									   carLnTC ));
 					
+					// for debugging bike accessibility
+					bikeTT = getAsUtilCar(betaWalkTT, bikeTravelTime_h, betaWalkTT, offsetWalkTime2Node_h);
+					bikeTTPower = getAsUtilCar(betaWalkTTPower, bikeTravelTime_h * bikeTravelTime_h, betaWalkTTPower, offsetWalkTime2Node_h * offsetWalkTime2Node_h);
+					bikeLnTT	= getAsUtilCar(betaWalkLnTT, Math.log(bikeTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node_h));
+					
+					bikeTD = getAsUtilCar(betaWalkTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); 
+					bikeTDPower = getAsUtilCar(betaWalkTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
+					bikeLnTD = getAsUtilCar(betaWalkLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
+					
+					bikeTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
+					bikeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
+					bikeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
+					
+					// sum congested travel times
+					sumBIKE += opportunityWeight
+							* Math.exp(logitScaleParameterPreFactor *
+									  (bikeTT +
+									   bikeTTPower +
+									   bikeLnTT +
+									   bikeTD + 
+									   bikeTDPower + 
+									   bikeLnTD +
+									   bikeTC + 
+									   bikeTCPower + 
+									   bikeLnTC ));
+					
 					// for debugging walk accessibility
 					//walkTT = getAsUtilCar(betaWalkTT, (travelDistance_meter / 15000.) , betaWalkTT, offsetWalkTime2Node_h); // this is to measure bike travel times
 					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour));
@@ -322,21 +356,24 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				}
 				
 				// aggregated value
-				double freeSpeedAccessibility, carAccessibility, walkAccessibility;
+				double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility;
 				if(!useRawSum){ 	// get log sum
 					freeSpeedAccessibility = logitScaleParameterPreFactor * Math.log( sumFREESPEED );
 					carAccessibility = logitScaleParameterPreFactor * Math.log( sumCAR );
+					bikeAccessibility= logitScaleParameterPreFactor * Math.log( sumBIKE );
 					walkAccessibility= logitScaleParameterPreFactor * Math.log( sumWALK );
 				}
 				else{ 				// get raw sum
 					freeSpeedAccessibility = logitScaleParameterPreFactor * sumFREESPEED;
 					carAccessibility = logitScaleParameterPreFactor * sumCAR;
+					bikeAccessibility= logitScaleParameterPreFactor * sumBIKE;
 					walkAccessibility= logitScaleParameterPreFactor * sumWALK;
 				}
 				
 				// assign log sums to current starZone object and spatial grid
 				freeSpeedGrid.setValue(freeSpeedAccessibility, measurePoint.getGeometry().getCentroid());
 				carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());
+				bikeGrid.setValue(bikeAccessibility , measurePoint.getGeometry().getCentroid());
 				walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
 				
 				// writing accessibility values (stored in starZone object) in csv format ...
@@ -345,6 +382,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 								   fromNode, 
 								   freeSpeedAccessibility,
 								   carAccessibility, 
+								   bikeAccessibility,
 								   walkAccessibility);
 			}
 			System.out.println("");
@@ -394,6 +432,11 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				+ CellBasedAccessibilityControlerListenerV2.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
+		GridUtils.writeSpatialGridTable(bikeGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
+				+ "bikeAccessibility_cellsize_" + bikeGrid.getResolution()
+				+ CellBasedAccessibilityControlerListenerV2.fileExtension
+				+ InternalConstants.FILE_TYPE_TXT);
+		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
 				+ "walkAccessibility_cellsize_" + walkGrid.getResolution()
 				+ CellBasedAccessibilityControlerListenerV2.fileExtension
@@ -416,6 +459,13 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 										+ carGrid.getResolution()
 										+ CellBasedAccessibilityControlerListenerV2.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
+		GridUtils.writeKMZFiles(measuringPoints,								// bike results for google earth
+								bikeGrid,
+								InternalConstants.MATSIM_4_OPUS_TEMP
+										+ "bikeAccessibility_cellsize_"
+										+ bikeGrid.getResolution()
+										+ CellBasedAccessibilityControlerListenerV2.fileExtension
+										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPoints,								// walk results for google earth
 								walkGrid,
 								InternalConstants.MATSIM_4_OPUS_TEMP
@@ -435,6 +485,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		
 		Interpolation freeSpeedGridInterpolation = new Interpolation(freeSpeedGrid, Interpolation.BILINEAR);
 		Interpolation carGridInterpolation = new Interpolation(carGrid, Interpolation.BILINEAR);
+		Interpolation bikeGridInterpolation= new Interpolation(bikeGrid, Interpolation.BILINEAR);
 		Interpolation walkGridInterpolation= new Interpolation(walkGrid, Interpolation.BILINEAR);
 		
 		if(this.parcels != null){
@@ -442,6 +493,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 			int numberOfParcels = this.parcels.getFacilities().size();
 			double freeSpeedAccessibility = Double.NaN;
 			double carAccessibility = Double.NaN;
+			double bikeAccessibility= Double.NaN;
 			double walkAccessibility= Double.NaN;
 			
 			log.info(numberOfParcels + " parcels are now processing ...");
@@ -461,9 +513,10 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate( parcel.getCoord() );
 				carAccessibility = carGridInterpolation.interpolate( parcel.getCoord() );
+				bikeAccessibility = bikeGridInterpolation.interpolate( parcel.getCoord() );
 				walkAccessibility= walkGridInterpolation.interpolate( parcel.getCoord() );
 				
-				UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility, walkAccessibility);
+				UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility);
 			}
 			log.info("... done!");
 			UrbanSimParcelCSVWriter.close();

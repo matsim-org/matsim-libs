@@ -284,6 +284,7 @@ public class CellBasedAccessibilityNetworkControlerListener implements ShutdownL
 						   fromNode, 
 						   congestedTravelTimesCarLogSum, 
 						   freespeedTravelTimesCarLogSum, 
+						   0., // this should be bike accessibility tnicolai
 						   travelTimesWalkLogSum);
 			}
 			System.out.println("");

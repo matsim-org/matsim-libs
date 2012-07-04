@@ -140,6 +140,7 @@ public class InternalConstants {
 	/** UrbanSim and/or MATSim output file header items */
 	public static final String ACCESSIBILITY_BY_FREESPEED = "freespeed_accessibility";
 	public static final String ACCESSIBILITY_BY_CAR = "car_accessibility";
+	public static final String ACCESSIBILITY_BY_BIKE = "bike_accessibility";
 	public static final String ACCESSIBILITY_BY_WALK = "walk_accessibility";
 	public static final String TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
 	public static final String TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";

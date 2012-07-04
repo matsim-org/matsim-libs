@@ -308,8 +308,9 @@ public class MATSim4UrbanSimParcel {
 		
 		// new method
 		if(computeCellBasedAccessibility){
-			SpatialGrid freeSpeedGrid;				// 
-			SpatialGrid carGrid;					// matrix for car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			
 			ZoneLayer<CounterObject>  measuringPoints;
@@ -326,6 +327,7 @@ public class MATSim4UrbanSimParcel {
 																			   srid);
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				bikeGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
@@ -336,6 +338,7 @@ public class MATSim4UrbanSimParcel {
 																				   srid);
 				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				bikeGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			}
 			
@@ -344,6 +347,7 @@ public class MATSim4UrbanSimParcel {
 																						 parcels,
 																						 freeSpeedGrid,
 																						 carGrid,
+																						 bikeGrid,
 																						 walkGrid, 
 																						 fileExtension, 
 																						 benchmark, 
