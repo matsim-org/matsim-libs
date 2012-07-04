@@ -59,10 +59,12 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructureZH parkingInfrastructure;
 	private final Map<Id, PlanBasedWithinDayAgent> agents;
+	private double searchTimeEstimationConstantForHUPC;
 
-	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure) {
+	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure, double searchTimeEstimationConstantForHUPC) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkingInfrastructure = parkingInfrastructure;
+		this.searchTimeEstimationConstantForHUPC = searchTimeEstimationConstantForHUPC;
 
 		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
 	}
@@ -213,7 +215,8 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		}
 		
 		double epsilonToAvoidDivZero = 0.0001;
-		estimatedParkingSearchTimeInMinutes=20/(sumFreeCapacity/sumParkingCapacity+epsilonToAvoidDivZero)-20;
+		
+		estimatedParkingSearchTimeInMinutes=searchTimeEstimationConstantForHUPC/(sumFreeCapacity/sumParkingCapacity+epsilonToAvoidDivZero)-searchTimeEstimationConstantForHUPC;
 		// => for 10% free parking, we have 180 seconds search time
 		// => for 100% free parking, we have 0 seconds search time
 		return estimatedParkingSearchTimeInMinutes/60.0;
