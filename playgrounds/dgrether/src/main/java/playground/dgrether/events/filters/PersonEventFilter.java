@@ -21,8 +21,8 @@ package playground.dgrether.events.filters;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.PersonEventImpl;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.PersonEvent;
 
 
 /**
@@ -36,12 +36,15 @@ public class PersonEventFilter implements EventFilter {
 	public PersonEventFilter(final Set<Id> personIDs) {
 		this.personIds = personIDs;
 	}
-
-
-	/**
-	 * @see playground.dgrether.events.filters.EventFilter#judge(org.matsim.core.events.PersonEventImpl)
-	 */
-	public boolean judge(PersonEventImpl event) {
-		return this.personIds.contains(new IdImpl(event.getPersonId().toString()));
+	
+	
+	@Override
+	public boolean doProcessEvent(Event event) {
+		if (event instanceof PersonEvent) {
+			return this.personIds.contains(((PersonEvent)event).getPersonId());
+		}
+		return false;
 	}
+	
+	
 }

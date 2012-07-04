@@ -16,9 +16,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.events.filters;
+package playground.dgrether.events;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.events.EventsManagerImpl;
+
+import playground.dgrether.events.filters.EventFilter;
 
 
 
@@ -26,15 +32,43 @@ import org.matsim.core.api.experimental.events.Event;
  * @author dgrether
  *
  */
-public interface EventFilter {
-	/**
-	 * judges whether the Event will be processed or not
-	 *
-	 * @param event -
-	 *            which is being judged
-	 * @return true if the event meets the criterion of the implementation
-	 */
-	boolean doProcessEvent(Event event);
+public class EventsFilterManagerImpl extends EventsManagerImpl implements EventsFilterManager {
 
+	private List<EventFilter> filters = new ArrayList<EventFilter>();
+
+
+	@Override
+	public void addFilter(EventFilter filter) {
+		this.filters.add(filter);
+	}
+
+	/**
+	 * Delegates to List.remove() and returns the appropriate value
+	 * @param filter
+	 * @return the value of List.remove() see interface
+	 */
+	@Override
+	public boolean removeFilter(EventFilter filter) {
+		return this.filters.remove(filter);
+	}
+
+	/**
+	 * If all filters set in this class are returning true on the
+	 * event given as parameter the Events.processEvent() method is called.
+	 * Otherwise nothing is done at all.
+	 */
+	@Override
+	public void processEvent(final Event event) {
+		boolean doProcess = true;
+		for (EventFilter f : this.filters) {
+			if (!f.doProcessEvent(event)) {
+				doProcess = false;
+				break;
+			}
+		}
+		if (doProcess) {
+			super.processEvent(event);
+		}
+	}
 
 }
