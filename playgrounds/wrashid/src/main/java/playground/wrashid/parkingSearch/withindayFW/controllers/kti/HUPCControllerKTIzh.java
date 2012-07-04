@@ -87,10 +87,15 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		String cityZonesFilePath=null;
 		if (Boolean.parseBoolean(isRunningOnServer)) {
 			cityZonesFilePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2012/parkings/zones.csv";
+			String numReplanningThreadsString = this.getConfig().findParam("parking", "numReplanningThreads");
+			numReplanningThreads=Integer.parseInt(numReplanningThreadsString);
 		} else {
 			cityZonesFilePath = "H:/data/experiments/TRBAug2012/parkings/zones.csv";
 		}
 		parkingInfrastructure=new ParkingInfrastructureZH(this.scenarioData,parkingTypes, new ParkingCostCalculatorZH(parkingTypes, new CityZones(cityZonesFilePath), scenarioData,parkings),parkings);
+		
+		
+		
 		
 		
 	}
