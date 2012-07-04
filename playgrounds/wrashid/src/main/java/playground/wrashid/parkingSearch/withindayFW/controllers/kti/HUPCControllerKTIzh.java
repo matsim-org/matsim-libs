@@ -82,8 +82,15 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		HashMap<String, HashSet<Id>> parkingTypes=new HashMap<String, HashSet<Id>>();
 		initParkingInfrastructure(this,parkingTypes);
 		
-		String cityZones="H:/data/experiments/TRBAug2012/parkings/zones.csv";
-		parkingInfrastructure=new ParkingInfrastructureZH(this.scenarioData,parkingTypes, new ParkingCostCalculatorZH(parkingTypes, new CityZones(cityZones), scenarioData,parkings),parkings);
+		
+		String isRunningOnServer = this.getConfig().findParam("parking", "isRunningOnServer");
+		String cityZonesFilePath=null;
+		if (Boolean.parseBoolean(isRunningOnServer)) {
+			cityZonesFilePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2012/parkings/zones.csv";
+		} else {
+			cityZonesFilePath = "H:/data/experiments/TRBAug2012/parkings/zones.csv";
+		}
+		parkingInfrastructure=new ParkingInfrastructureZH(this.scenarioData,parkingTypes, new ParkingCostCalculatorZH(parkingTypes, new CityZones(cityZonesFilePath), scenarioData,parkings),parkings);
 		
 		
 	}
