@@ -10,16 +10,16 @@ import playground.kai.bvwp.Values.Type;
 public class IllustrationFictiveExamplePVwithoutOldUsers {
 
 	private static Values economicValues;
-	private static ScenarioForEval nullfall;
-	private static ScenarioForEval planfall;
+	private static ScenarioForEvalData nullfall;
+	private static ScenarioForEvalData planfall;
 
 	public static void main(String[] args) {
 
 		// create the economic values
-		economicValues = IllustrationFictiveExamplePVEconomicValues.createEconomicValues1();
+		economicValues = EconomicValues.createEconomicValuesFictiveExamplePV();
 
 		// create the base case:
-		nullfall = IllustrationFictiveExamplePVScenario.createNullfall1();
+		nullfall = ScenarioFictiveExamplePV.createNullfall1();
 		Values nullfallForOD = nullfall.getByODRelation(new IdImpl("BC")) ;
 		
 		// construct values for the rail mode for this OD relation:
@@ -32,7 +32,7 @@ public class IllustrationFictiveExamplePVwithoutOldUsers {
 
 
 		// create the policy case:
-		planfall = IllustrationFictiveExamplePVScenario.createPlanfall1(nullfall);
+		planfall = ScenarioFictiveExamplePV.createPlanfall1(nullfall);
 
 		runBVWP2003();
 		runBVWP2010();

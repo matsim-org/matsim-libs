@@ -4,19 +4,19 @@ package playground.kai.bvwp;
 public class IllustrationFictiveExamplePV {
 
 	private static Values economicValues;
-	private static ScenarioForEval nullfall;
-	private static ScenarioForEval planfall;
+	private static ScenarioForEvalData nullfall;
+	private static ScenarioForEvalData planfall;
 
 	public static void main(String[] args) {
 
 		// create the economic values
-		economicValues = IllustrationFictiveExamplePVEconomicValues.createEconomicValues1();
+		economicValues = EconomicValues.createEconomicValuesFictiveExamplePV();
 
 		// create the base case:
-		nullfall = IllustrationFictiveExamplePVScenario.createNullfall1();
+		nullfall = ScenarioFictiveExamplePV.createNullfall1();
 
 		// create the policy case:
-		planfall = IllustrationFictiveExamplePVScenario.createPlanfall1(nullfall);
+		planfall = ScenarioFictiveExamplePV.createPlanfall1(nullfall);
 
 		runRoH();
 		runBVWP2003();

@@ -22,6 +22,9 @@ package playground.kai.bvwp;
 import java.util.Map;
 import java.util.TreeMap;
 
+import playground.kai.bvwp.Values.Type;
+import playground.kai.bvwp.Values.Entry;
+
 class Values {
 	enum Entry { XX, km, hrs, mon }
 
@@ -53,3 +56,54 @@ class Values {
 	}
 }
 
+class ValuesForAMode {
+	Map<Type,ValuesForAUserType> valuesByType = new TreeMap<Type,ValuesForAUserType>() ;
+	ValuesForAMode createDeepCopy( ) {
+		ValuesForAMode planfall = new ValuesForAMode() ;
+		for ( Type mode : Type.values() ) {
+			ValuesForAUserType old = this.getByType(mode) ;
+			ValuesForAUserType tmp2 = old.createDeepCopy() ;
+			planfall.valuesByType.put( mode, tmp2 ) ;
+		}
+		return planfall ; 
+	}
+	ValuesForAMode() {
+		for ( Type mode : Type.values() ) {
+			ValuesForAUserType vals = new ValuesForAUserType() ;
+			valuesByType.put( mode, vals ) ;
+		}
+	}
+	ValuesForAUserType getByType( Type type ) {
+			return valuesByType.get(type) ;
+	}
+	void setValuesForType( Type type, ValuesForAUserType values ) {
+		valuesByType.put( type, values ) ;
+	}
+}
+
+class ValuesForAUserType {
+	Map<Entry,Double> quantities = new TreeMap<Entry,Double>() ;
+	ValuesForAUserType() {
+		for ( Entry entry : Entry.values() ) {
+			this.setByEntry( entry, 0. ) ;
+		}
+	}
+	double getByEntry( Entry entry ) {
+		return quantities.get(entry) ;
+	}
+	void setByEntry( Entry entry, double dbl ) {
+		quantities.put( entry, dbl ) ;
+	}
+	void incByEntry( Entry entry, double dbl ) {
+		double tmp = quantities.get( entry ) ;
+		quantities.put( entry, tmp + dbl ) ;
+	}
+	ValuesForAUserType createDeepCopy() {
+		ValuesForAUserType newValues = new ValuesForAUserType() ;
+		for ( Entry entry : Entry.values() ) {
+			newValues.setByEntry( entry, this.getByEntry(entry) ) ;
+		}
+		return newValues ;
+	}
+	
+}

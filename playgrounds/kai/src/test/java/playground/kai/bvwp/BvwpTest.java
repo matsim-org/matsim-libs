@@ -29,11 +29,11 @@ public class BvwpTest extends MatsimTestCase {
 	
 	public void testOne() {
 		
-		Values economicValues = EconomicValues1.createEconomicValues1();
+		Values economicValues = EconomicValues.createEconomicValuesForTest1();
 		
-		ScenarioForEval nullfall = Scenario1.createNullfall1();
+		ScenarioForEvalData nullfall = ScenarioForTest1.createNullfallForTest();
 		
-		ScenarioForEval planfall = Scenario1.createPlanfall1(nullfall);
+		ScenarioForEvalData planfall = ScenarioForTest1.createPlanfallForTest(nullfall);
 		
 		new UtilityChangesRuleOfHalf().utilityChange(economicValues, nullfall, planfall) ;
 		

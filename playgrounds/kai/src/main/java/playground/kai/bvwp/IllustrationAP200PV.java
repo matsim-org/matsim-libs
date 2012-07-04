@@ -4,13 +4,13 @@ package playground.kai.bvwp;
 public class IllustrationAP200PV {
 
 	private static Values economicValues;
-	private static ScenarioForEval nullfall;
-	private static ScenarioForEval planfall;
+	private static ScenarioForEvalData nullfall;
+	private static ScenarioForEvalData planfall;
 
 	public static void main(String[] args) {
 
 		// create the economic values
-		economicValues = IllustrationAP200PVEconomicValues.createEconomicValues1();
+		economicValues = EconomicValues.createEconomicValuesAP200PV();
 
 		runInduced();
 		runModeSwitch();
@@ -24,10 +24,10 @@ public class IllustrationAP200PV {
 		System.out.println("Running induced scenario...\n");
 
 		// create the base case:
-		nullfall = IllustrationAP200PVScenarioInduced.createNullfall1();
+		nullfall = ScenarioAP200PV.createNullfall();
 
 		// create the policy case:
-		planfall = IllustrationAP200PVScenarioInduced.createPlanfall1(nullfall);
+		planfall = ScenarioAP200PV.createPlanfallInduced(nullfall);
 
 		runRoH();
 		runBVWP2003();
@@ -41,10 +41,10 @@ public class IllustrationAP200PV {
 		System.out.println("Running mode switch scenario...\n");
 
 		// create the base case:
-		nullfall = IllustrationAP200PVScenarioModeSwitch.createNullfall1();
+		nullfall = ScenarioAP200PV.createNullfall();
 
 		// create the policy case:
-		planfall = IllustrationAP200PVScenarioModeSwitch.createPlanfall1(nullfall);
+		planfall = ScenarioAP200PV.createPlanfallModeSwitch(nullfall);
 
 		runRoH();
 		runBVWP2003();
@@ -58,10 +58,10 @@ public class IllustrationAP200PV {
 		System.out.println("Running mixed scenario...\n");
 
 		// create the base case:
-		nullfall = IllustrationAP200PVScenarioMixed.createNullfall1();
+		nullfall = ScenarioAP200PV.createNullfall();
 
 		// create the policy case:
-		planfall = IllustrationAP200PVScenarioMixed.createPlanfall1(nullfall);
+		planfall = ScenarioAP200PV.createPlanfallMixed(nullfall);
 
 		runRoH();
 		runBVWP2003();

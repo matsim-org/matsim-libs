@@ -27,15 +27,15 @@ import playground.kai.bvwp.Values.Entry;
  */
 public class UtilityChangesBVWP2010 extends UtilityChanges{
 	UtilityChangesBVWP2010() {
-		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
+		super() ;
 		System.out.println("\nTrying to reproduce methodology from ``Bedarfsplanüberprüfung 2010''...\n" ) ;
 	}
 
 	@Override
-	UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall,
+	UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall,
 			ValuesForAUserType quantitiesPlanfall, Entry entry) {
 
-		UtlChanges utlChanges = new UtlChanges();
+		UtlChangesData utlChanges = new UtlChangesData();
 		double personenXNull;
 		double personenXPlan;
 		double diff;

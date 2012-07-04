@@ -31,15 +31,15 @@ import playground.kai.bvwp.Values.Entry;
  *
  */
 public class UtilityChangesBVWP2015 extends UtilityChanges {
-	UtilityChangesBVWP2015() {
-		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
-	}
+//	UtilityChangesBVWP2015() {
+//		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
+//	}
 	
 	@Override
-	UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
+	UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
 			ValuesForAUserType quantitiesPlanfall, Entry entry) {
 		
-		UtlChanges utlChanges = new UtlChanges() ;
+		UtlChangesData utlChanges = new UtlChangesData() ;
 		
 		double personenXNull = quantitiesNullfall.getByEntry(Entry.XX) * quantitiesNullfall.getByEntry(entry);
 		double personenXPlan = quantitiesPlanfall.getByEntry(Entry.XX) * quantitiesPlanfall.getByEntry(entry);

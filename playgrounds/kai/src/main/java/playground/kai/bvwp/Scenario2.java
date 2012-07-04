@@ -12,9 +12,9 @@ import playground.kai.bvwp.Values.Type;
 
 class Scenario2 { // Relationsbezogen_mit_generalisierten_Kosten
 
-	static ScenarioForEval createNullfall1() {
+	static ScenarioForEvalData createNullfall() {
 		// set up the base case:
-		ScenarioForEval nullfall = new ScenarioForEval() ;
+		ScenarioForEvalData nullfall = new ScenarioForEvalData() ;
 	
 		// construct values for one OD relation:
 		Values nullfallForOD = new Values() ;
@@ -39,11 +39,11 @@ class Scenario2 { // Relationsbezogen_mit_generalisierten_Kosten
 		return nullfall;
 	}
 
-	static ScenarioForEval createPlanfall1(ScenarioForEval nullfall) {
+	static ScenarioForEvalData createPlanfall(ScenarioForEvalData nullfall) {
 		// (construct the policy case.  The base case can be used to simplify things ...)
 		
 		// The policy case is initialized as a complete copy of the base case:
-		ScenarioForEval planfall = nullfall.createDeepCopy() ;
+		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
 		// we are now looking at one specific OD relation (for this scenario, there is only one!)
 		Values planfallForOD = planfall.getByODRelation(new IdImpl("BC")) ;

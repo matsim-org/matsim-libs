@@ -13,7 +13,11 @@ import playground.kai.bvwp.Values.Type;
  * @author nagel
  */
 abstract class UtilityChanges {
-	final void utilityChange( Values economicValues, ScenarioForEval nullfall, ScenarioForEval planfall ) {
+	UtilityChanges() {
+		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
+	}
+	
+	final void utilityChange( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall ) {
 		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
 		// 0.5 * (GK-GK') (x+x') = 0.5 * ( GK*x + GK*x' - GK'*x - GK'*x' )
 
@@ -39,7 +43,7 @@ abstract class UtilityChanges {
 					}
 					for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
 						if ( entry != Entry.XX ) {
-							UtlChanges utlChanges = computeUtilities(econValues, quantitiesNullfall, quantitiesPlanfall, entry);
+							UtlChangesData utlChanges = computeUtilities(econValues, quantitiesNullfall, quantitiesPlanfall, entry);
 							double deltaQuantities = quantitiesPlanfall.getByEntry(entry)-quantitiesNullfall.getByEntry(entry) ; 
 							if (  deltaQuantities != 0. || utlChanges.utlGainByOldUsers!=0.
 									|| utlChanges.utlGainByNewUsers!=0. || utlChanges.utl!=0. ) {
@@ -62,6 +66,6 @@ abstract class UtilityChanges {
 		}
 		System.out.printf("utl gain: %10.1f\n", utils ) ;
 	}
-	abstract UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
+	abstract UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
 			ValuesForAUserType quantitiesPlanfall, Entry entry);
 }
