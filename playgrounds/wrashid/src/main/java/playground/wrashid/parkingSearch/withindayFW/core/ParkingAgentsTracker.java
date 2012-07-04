@@ -615,7 +615,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		double parkingSearchTimeInMinutes=0;
 		if (ifParkingSearchTimeDifferentThanZero(personId)) {
 			if (fixedParkingSearchTime(personId)){
-				parkingSearchTimeInMinutes=-1*this.getSearchStartTime().get(personId);
+				parkingSearchTimeInMinutes=-1*this.getSearchStartTime().get(personId)/60;
 			} else {
 				parkingSearchTimeInMinutes = GeneralLib.getIntervalDuration(this.getSearchStartTime().get(personId),
 						parkingArrivalTime) / 60;

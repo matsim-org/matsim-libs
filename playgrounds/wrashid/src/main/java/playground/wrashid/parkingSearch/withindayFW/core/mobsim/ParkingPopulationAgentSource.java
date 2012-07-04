@@ -66,6 +66,8 @@ public class ParkingPopulationAgentSource implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
+		parkingInfrastructure.resetParkingFacilityForNewIteration();
+		
 		for (Person p : population.getPersons().values()) {
 
 			reserveInitialParking(p);

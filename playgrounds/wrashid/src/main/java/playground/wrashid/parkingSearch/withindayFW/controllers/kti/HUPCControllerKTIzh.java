@@ -207,6 +207,15 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	private void initParkingInfrastructure(Controler controler, HashMap<String, HashSet<Id>> parkingTypes) {
 		parkings = getParkingsForScenario(controler);
 		
+		int i=0;
+		while (i<parkings.size()){
+			if (parkings.get(i).getCapacity()<1){
+				parkings.remove(i);
+				continue;
+			}
+			i++;
+		}
+		
 		for (Parking parking:parkings){
 			
 			ActivityFacility parkingFacility = this.scenarioData.getActivityFacilities().createFacility(parking.getId(), parking.getCoord());

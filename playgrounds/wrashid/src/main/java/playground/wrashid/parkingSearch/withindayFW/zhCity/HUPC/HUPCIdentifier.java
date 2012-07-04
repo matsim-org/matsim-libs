@@ -109,8 +109,8 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 			 * If the agent has not selected a parking facility yet.
 			 */
 			if (requiresReplanning(agent)) {
-
-				markFlagForNoSearchTime(agentId);
+				
+				double estimatedParkingSearchTimeInMinutes=0;
 
 				// get all parking within 1000m (of destination) or at least on
 				// parking, if that set is empty.
@@ -124,13 +124,19 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 					parkingFacilityId = freePrivateParking.getId();
 				} else {
 					// search for parking in public domain
-
+					//TODO: set distance for search area externally
 					Collection<ActivityFacility> parkings = parkingInfrastructure.getAllFreeParkingWithinDistance(1000,
 							nextNonParkingAct.getCoord());
 					if (parkings.size() == 0) {
 						parkings.add(parkingInfrastructure.getClosestFreeParkingFacility(nextNonParkingAct.getCoord()));
 					}
 
+					
+					//estimate parking street search time
+					estimatedParkingSearchTimeInMinutes= estimateParkingSearchTime(parkings);
+					
+					
+					
 					// get best parking
 					PriorityQueue<SortableMapObject<ActivityFacility>> priorityQueue = new PriorityQueue<SortableMapObject<ActivityFacility>>();
 
@@ -152,14 +158,31 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 								GeneralLib.getWalkingTravelDuration(walkingDistance));
 						double costScore = parkingAgentsTracker.getParkingCostScore(personId, time, parkingDuration,
 								parkingFacility.getId());
+						
+						double searchTimeScore = 0; 
+						
+						if (parkingFacility.getId().toString().contains("stp")){
+							searchTimeScore+=parkingAgentsTracker.getSearchTimeScore(personId, activityDuration, estimatedParkingSearchTimeInMinutes);;
+						}
+						
+						
 
-						priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, walkScore + costScore));
+						priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, walkScore + costScore + searchTimeScore));
 					}
 
 					ActivityFacility bestParkingFacility = priorityQueue.poll().getKey();
 
 					parkingFacilityId = bestParkingFacility.getId();
+					
+					
 				}
+				
+				if (parkingFacilityId.toString().contains("stp")){
+					parkingAgentsTracker.getSearchStartTime().put(agentId, -1*estimatedParkingSearchTimeInMinutes*60);
+				} else {
+					markFlagForNoSearchTime(agentId);
+				}
+				
 				if (parkingFacilityId != null) {
 					parkingInfrastructure.parkVehicle(parkingFacilityId);
 					parkingAgentsTracker.setSelectedParking(agentId, parkingFacilityId);
@@ -170,6 +193,30 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		}
 
 		return identifiedAgents;
+	}
+
+	private double estimateParkingSearchTime(Collection<ActivityFacility> parkings) {
+		double estimatedParkingSearchTimeInMinutes;
+		double sumParkingCapacity=0;
+		double sumFreeCapacity=0;
+		for (ActivityFacility parkingFacility : parkings) {
+			if (parkingFacility.getId().toString().contains("stp")){
+				sumParkingCapacity+=parkingInfrastructure.getFacilityCapacities().get(parkingFacility.getId());
+				sumFreeCapacity+=parkingInfrastructure.getFreeCapacity(parkingFacility.getId());
+			}
+		}
+		
+		if (sumFreeCapacity==0){
+			// this means, probably outside of city
+			// this value is actually irrelevant (using mean value).
+			return 90/60.0;
+		}
+		
+		double epsilonToAvoidDivZero = 0.0001;
+		estimatedParkingSearchTimeInMinutes=20/(sumFreeCapacity/sumParkingCapacity+epsilonToAvoidDivZero)-20;
+		// => for 10% free parking, we have 180 seconds search time
+		// => for 100% free parking, we have 0 seconds search time
+		return estimatedParkingSearchTimeInMinutes/60.0;
 	}
 
 	private boolean privateParkingAvailable(ActivityFacility freePrivateParking) {

@@ -49,14 +49,23 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 public class ParkingInfrastructure  {
 
 	protected final QuadTree<ActivityFacility> nonFullPublicParkingFacilities;
+	protected final HashSet<ActivityFacility> fullPublicParkingFacilities;
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
 	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
-	private final IntegerValueHashMap<Id> reservedCapcities;	// number of reserved parkings
+	private IntegerValueHashMap<Id> reservedCapacities;	// number of reserved parkings
 	private IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
 	private final HashMap<String, HashSet<Id>> parkingTypes;
 	private final ParkingCostCalculator parkingCostCalculator;
 	protected final Scenario scenario;
 	private HashMap<Id,ActivityFacility> initialParkingFacilityOfAgent;
+	
+	
+	public void resetParkingFacilityForNewIteration(){
+		for (ActivityFacility parkingFacility:fullPublicParkingFacilities){
+			nonFullPublicParkingFacilities.put(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getY(), parkingFacility);
+		}
+		reservedCapacities=new IntegerValueHashMap<Id>();
+	}
 	
 	public void setInitialParkingFacilityOfAgent(HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent) {
 		this.initialParkingFacilityOfAgent = initialParkingFacilityOfAgent;
@@ -66,7 +75,7 @@ public class ParkingInfrastructure  {
 		this.scenario = scenario;
 		this.parkingCostCalculator = parkingCostCalculator;
 		facilityCapacities = new IntegerValueHashMap<Id>();
-		reservedCapcities = new IntegerValueHashMap<Id>();
+		reservedCapacities = new IntegerValueHashMap<Id>();
 	//	facilityToLinkMapping = new HashMap<Id, Id>();
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 		
@@ -114,6 +123,7 @@ public class ParkingInfrastructure  {
 		this.parkingTypes=parkingTypes;
 		
 		this.initialParkingFacilityOfAgent=new HashMap<Id, ActivityFacility>();
+		this.fullPublicParkingFacilities=new HashSet<ActivityFacility>();
 		// cont' here -> fill this in parking population agent source.
 		// there, make that if variable is empty, initialize it based on closest parking
 		
@@ -148,9 +158,13 @@ public class ParkingInfrastructure  {
 	
 	
 	public int getFreeCapacity(Id facilityId) {
-		int freeCapacity = getFacilityCapacities().get(facilityId)-reservedCapcities.get(facilityId);
+		int freeCapacity = getFacilityCapacities().get(facilityId)-reservedCapacities.get(facilityId);
 		
 		if (freeCapacity<0){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+		
+		if (freeCapacity>getFacilityCapacities().get(facilityId)){
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 		
@@ -158,7 +172,11 @@ public class ParkingInfrastructure  {
 	}
 
 	public void parkVehicle(Id facilityId) {
-		reservedCapcities.decrement(facilityId);
+		reservedCapacities.increment(facilityId);
+		
+		if (getFreeCapacity(facilityId)<0){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
 		
 		if (getFreeCapacity(facilityId)==0){
 			markFacilityAsFull(facilityId);
@@ -168,10 +186,11 @@ public class ParkingInfrastructure  {
 	private void markFacilityAsFull(Id facilityId) {
 		ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
 		nonFullPublicParkingFacilities.remove(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), activityFacility);
+		fullPublicParkingFacilities.add(activityFacility);
 	}
 
 	public void unParkVehicle(Id facilityId) {
-		reservedCapcities.increment(facilityId);
+		reservedCapacities.decrement(facilityId);
 		
 		if (getFreeCapacity(facilityId)==1){
 			markFacilityAsNonFull(facilityId);
@@ -183,6 +202,7 @@ public class ParkingInfrastructure  {
 	private void markFacilityAsNonFull(Id facilityId) {
 		ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
 		nonFullPublicParkingFacilities.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), activityFacility);
+		fullPublicParkingFacilities.remove(activityFacility);
 	}
 
 	public List<Id> getParkingsOnLink(Id linkId) {
@@ -206,7 +226,7 @@ public class ParkingInfrastructure  {
 				}
 				
 				int capacity = getFacilityCapacities().get(id);
-				int reserved = reservedCapcities.get(id);
+				int reserved = reservedCapacities.get(id);
 				if ((capacity - reserved) > maxCapacity) facilityId = id;
 			}
 			return facilityId;
@@ -219,7 +239,7 @@ public class ParkingInfrastructure  {
 		
 		// if parking full, try finding other free parkings in the quadtree
 		
-		while (getFacilityCapacities().get(parkingFacility.getId())<=0){
+		while (getFreeCapacity(parkingFacility.getId())<=0){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
 			parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		}
@@ -234,7 +254,7 @@ public class ParkingInfrastructure  {
 		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
-		while (getFacilityCapacities().get(parkingFacility.getId())<=0 || parkingFacility.getLinkId().equals(linkId)){
+		while (getFreeCapacity(parkingFacility.getId())<=0 || parkingFacility.getLinkId().equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
 			parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		}

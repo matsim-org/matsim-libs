@@ -230,10 +230,19 @@ public class ParkingHerbieControler {
 	}
 
 	private static void calibarteParkings(LinkedList<Parking> parkingCollection, double calibrationFactor) {
+		LinkedList<Parking> emptyParking=new LinkedList<Parking>();
+		
 		for (Parking parking : parkingCollection) {
 			double capacity = parking.getCapacity();
 			parking.setCapacity(capacity * calibrationFactor);
+			
+			if (capacity<1){
+				emptyParking.add(parking);
+			}
 		}
+		
+		parkingCollection.removeAll(emptyParking);
+		
 	}
 
 	public static Coord getCoordinatesQuaiBridgeZH() {
