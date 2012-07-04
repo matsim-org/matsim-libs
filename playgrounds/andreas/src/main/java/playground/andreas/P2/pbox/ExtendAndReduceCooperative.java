@@ -19,12 +19,14 @@
 package playground.andreas.P2.pbox;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
@@ -36,6 +38,7 @@ import playground.andreas.P2.replanning.modules.RandomRouteEndExtension;
 import playground.andreas.P2.replanning.modules.RandomRouteStartExtension;
 import playground.andreas.P2.replanning.modules.RandomStartTimeAllocator;
 import playground.andreas.P2.replanning.modules.RectangleHullRouteExtension;
+import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
 
 /**
  * @author droeder
@@ -48,6 +51,23 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 	private static final Logger log = Logger
 			.getLogger(ExtendAndReduceCooperative.class);
 	
+	private final List<String> reduceStopsAfter = new ArrayList<String>(){{
+		add(RandomRouteStartExtension.STRATEGY_NAME);
+		add(RandomRouteEndExtension.STRATEGY_NAME);
+		add(RectangleHullRouteExtension.STRATEGY_NAME);
+		add(ConvexHullRouteExtension.STRATEGY_NAME);
+		add(RouteEnvelopeExtension.STRATEGY_NAME);
+	}};
+	
+	private final List<String> reduceTimeAfter = new ArrayList<String>(){{
+		add(RandomEndTimeAllocator.STRATEGY_NAME);
+		add(RandomStartTimeAllocator.STRATEGY_NAME); 
+		add(MaxRandomStartTimeAllocator.STRATEGY_NAME);
+		add(MaxRandomEndTimeAllocator.STRATEGY_NAME);
+	}};
+	
+
+	private boolean inProgress;
 	
 	/**
 	 * @param id
@@ -61,20 +81,7 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 	@Override
 	public void replan(PStrategyManager pStrategyManager, int iteration) {
 		this.currentIteration = iteration;
-		
-		if(this.testPlan != null){
-			// compare scores
-			if (this.score > this.scoreLastIteration){
-				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
-				this.bestPlan.setStopsToBeServed(this.testPlan.getStopsToBeServed());
-				this.bestPlan.setStartTime(this.testPlan.getStartTime());
-				this.bestPlan.setEndTime(this.testPlan.getEndTime());
-			}
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + this.testPlan.getNVehicles());
-			this.testPlan = null;
-		}
-		
-		// balance the budget
+		// balance the budget first
 		if(this.budget < 0){
 			// insufficient, sell vehicles
 			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) Math.floor(this.budget / this.costPerVehicleSell));
@@ -92,51 +99,94 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 //			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
 		}
 		
-		// First buy vehicles
+		// always buy vehicles without test
 		PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
-		this.testPlan = strategy.run(this);
-		if(!(this.testPlan == null)){
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + this.testPlan.getNVehicles());
-//			this.bestPlan.setLine(this.routeProvider.createTransitLine(
-//					this.id, this.bestPlan.getStartTime(), 
-//					this.bestPlan.getEndTime(), 
-//					this.bestPlan.getNVehicles() + this.testPlan.getNVehicles(), 
-//					this.bestPlan.getStopsToBeServed(), 
-//					this.bestPlan.getId()));
-			this.testPlan = null;
-			
+		PPlan buy = strategy.run(this);
+		if(!(buy == null)){
+			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + buy.getNVehicles());
 		}
-		
-		PPlanStrategy nextStrategy;
-		if((this.lastStrategy == RandomRouteStartExtension.STRATEGY_NAME) ||
-				(this.lastStrategy == RandomRouteEndExtension.STRATEGY_NAME) ||
-				(this.lastStrategy == RectangleHullRouteExtension.STRATEGY_NAME)||
-				(this.lastStrategy == ConvexHullRouteExtension.STRATEGY_NAME)){
-			nextStrategy = pStrategyManager.getReduceStopsToBeServed();
-		}
-		else if((this.lastStrategy == RandomEndTimeAllocator.STRATEGY_NAME) ||
-				(this.lastStrategy == RandomStartTimeAllocator.STRATEGY_NAME)|| 
-				(this.lastStrategy == MaxRandomStartTimeAllocator.STRATEGY_NAME) ||
-				(this.lastStrategy == MaxRandomEndTimeAllocator.STRATEGY_NAME)){
-			nextStrategy = pStrategyManager.getReduceTimeServed();
+		// check if currently replanning is in progress, due to the fixed strategy-order of this cooperative
+		if(this.inProgress){
+			this.replanInProgress(pStrategyManager, iteration);
 		}else{
-			nextStrategy = pStrategyManager.chooseStrategy();
+			this.randomReplan(pStrategyManager, iteration);
 		}
-		
-		this.lastStrategy = nextStrategy.getName();
-		this.testPlan = nextStrategy.run(this);
-		if (this.testPlan != null) {
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
-		}
-		this.bestPlan.setLine(this.routeProvider.createTransitLine(
-								this.id, this.bestPlan.getStartTime(), 
-								this.bestPlan.getEndTime(), 
-								this.bestPlan.getNVehicles(), 
-								this.bestPlan.getStopsToBeServed(), 
-								this.bestPlan.getId()));
+		// update transit-lines anyway
 		this.updateCurrentTransitLine();
 	}
+
+	/**
+	 * @param pStrategyManager
+	 * @param iteration
+	 */
+	private void randomReplan(PStrategyManager pStrategyManager, int iteration) {
+		PPlanStrategy s = pStrategyManager.chooseStrategy();
+		PPlan p = s.run(this);
+		
+		if(!(p == null)){
+			if(this.reduceStopsAfter.contains(s.getName()) || this.reduceTimeAfter.contains(s.getName())){
+				this.lastStrategy = s.getName();
+				this.inProgress = true;
+			}
+			this.testPlan = p;
+			this.testPlan.setNVehicles(1);
+			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() -1);
+		}
+	}
+
+	private double lastScore;
 	
+	/**
+	 * @param pStrategyManager
+	 * @param iteration
+	 */
+	private void replanInProgress(PStrategyManager pStrategyManager, int iteration) {
+		PPlanStrategy s;
+		if(this.reduceStopsAfter.contains(this.lastStrategy)){
+			this.lastScore = this.bestPlan.getScorePerVehicle();
+			s = pStrategyManager.getReduceStopsToBeServed();
+			this.lastStrategy = null;
+		}else if(this.reduceTimeAfter.contains(this.lastStrategy)){
+			this.lastScore = this.bestPlan.getScorePerVehicle();
+			s = pStrategyManager.getReduceTimeServed();
+			this.lastStrategy = null;
+		}else{
+			// accept the new plan if the score per Vehicle is better
+			if(this.lastScore < this.testPlan.getScorePerVehicle()){
+				this.testPlan.setNVehicles(this.testPlan.getNVehicles() + this.bestPlan.getNVehicles());
+				this.bestPlan = this.testPlan;
+			}
+			// start replanning from beginning
+			this.lastStrategy = null;
+			this.inProgress = false;
+			this.testPlan = null;
+			// start the process again
+			this.randomReplan(pStrategyManager, iteration);
+			return;
+		}
+		//store best-plan temporally and set best-plan to test-plan
+		PPlan temp = this.bestPlan;
+		this.bestPlan = this.testPlan;
+		// increase number of Vehicles of former test-plan so replanning is possible. remove the vehicle again later
+		this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + 1);
+		PPlan newPlan = s.run(this);
+		// set the bestPlan again
+		this.bestPlan = temp;
+		// set the new testplan
+		if(!(newPlan == null)){
+			newPlan.setNVehicles(1);
+			this.testPlan = newPlan;
+		}else{
+			// the new plan is null, so the replanning-Process ends here. But maybe
+			// the testplan from the earlier steps is better. So keep the better plan...
+			if(this.bestPlan.getScorePerVehicle() < this.testPlan.getScorePerVehicle()){
+				this.testPlan.setNVehicles(this.testPlan.getNVehicles() + this.bestPlan.getNVehicles());
+				this.bestPlan = this.testPlan;
+			}
+			this.inProgress = false;
+			this.testPlan = null;
+		}
+	}
 	
 
 }
