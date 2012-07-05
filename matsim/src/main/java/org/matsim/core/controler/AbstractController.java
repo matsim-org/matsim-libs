@@ -6,6 +6,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
@@ -95,8 +96,8 @@ public abstract class AbstractController {
 		// one
 	}
 
-	public final void setupOutputDirectory(final String outputDirectory, final boolean overwriteFiles) {
-		this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, overwriteFiles); // output dir needs to be before logging
+	public final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
+		this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be before logging
 		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
 	}
 

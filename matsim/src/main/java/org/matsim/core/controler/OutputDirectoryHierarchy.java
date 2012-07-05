@@ -22,7 +22,6 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 /**
  * 
  * Represents the directory hierarchy where the MATSim output goes in.
@@ -36,7 +35,7 @@ public class OutputDirectoryHierarchy {
 	
 	private static Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
 	
-	private Id runId = null;
+	private String runId = null;
 	
 	private final String outputPath;
 	
@@ -52,7 +51,7 @@ public class OutputDirectoryHierarchy {
 	 * @param overwriteFiles overwrite existing files instead of crashing
 	 * @param outputDirectory the path to the output directory
 	 */
-	public OutputDirectoryHierarchy(String outputPath, Id runId, boolean overwriteFiles){
+	public OutputDirectoryHierarchy(String outputPath, String runId, boolean overwriteFiles){
 		this.overwriteFiles = overwriteFiles;
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);

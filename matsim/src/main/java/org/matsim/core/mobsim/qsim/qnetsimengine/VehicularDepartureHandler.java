@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 class VehicularDepartureHandler implements DepartureHandler {
@@ -71,7 +70,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
-			if (vehicleBehavior == VehicleBehavior.TELEPORT && agent instanceof PersonDriverAgentImpl) {
+			if (vehicleBehavior == VehicleBehavior.TELEPORT) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 				teleportVehicleTo(vehicle, linkId);
 				qlink.letAgentDepartWithVehicle(agent, vehicle, now);

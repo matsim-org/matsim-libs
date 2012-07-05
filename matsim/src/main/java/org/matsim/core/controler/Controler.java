@@ -287,7 +287,7 @@ public class Controler extends AbstractController {
 	 */
 	public void run() {
 		loadConfig();
-		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.overwriteFiles);
+		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
 		init();
 		run(config);
 	}
