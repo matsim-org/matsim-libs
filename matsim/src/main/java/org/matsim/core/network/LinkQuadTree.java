@@ -58,7 +58,7 @@ public class LinkQuadTree {
 		public final double maxY;
 
 		private final ArrayList<LinkWrapper> links = new ArrayList<LinkWrapper>(3);
-		private Node[] childs = null;
+		private Node[] children = null;
 
 		public Node(final double minX, final double minY, final double maxX, final double maxY) {
 			this.minX = Math.min(minX, maxX);
@@ -68,17 +68,23 @@ public class LinkQuadTree {
 		}
 
 		public void put(final LinkWrapper w) {
-			if (this.childs == null && this.links.isEmpty()) {
+			if (this.children == null && this.links.isEmpty()) {
+				// (means quadtree node neither has children nor contains a link yet)
+				
 				this.links.add(w);
+				// (node now contains this link)
 			} else {
 				int pos = getChildPosition(w);
 				if (pos == NO_CHILD) {
 					this.links.add(w);
+					// (i.e. when bounding box of link includes center of this quadtree node, links is registered at this 
+					// quadtree node)
+
 				} else {
-					if (this.childs == null) {
+					if (this.children == null) {
 						split();
 					}
-					this.childs[pos].put(w);
+					this.children[pos].put(w);
 				}
 			}
 		}
@@ -92,16 +98,18 @@ public class LinkQuadTree {
 					closest = w;
 				}
 			}
-			if (this.childs != null) {
+			if (this.children != null) {
 				int childNo = this.getChildPosition(x, y);
 				if (childNo != NO_CHILD) {
-					LinkWrapper tmp = this.childs[childNo].getNearest(x, y, bestDistance);
+					LinkWrapper tmp = this.children[childNo].getNearest(x, y, bestDistance);
 					if (tmp != null) {
 						closest = tmp;
 					}
+					
+					// my current intuition is that the following block should be one level up.  kai, jul'12
 					for (int c = 0; c < 4; c++) {
 						if (c != childNo) {
-							Node child = this.childs[c];
+							Node child = this.children[c];
 							if (child.calcPseudoDistance(x, y) < bestDistance.value) {
 								tmp = child.getNearest(x, y, bestDistance);
 								if (tmp != null) {
@@ -119,11 +127,11 @@ public class LinkQuadTree {
 		private void split() {
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
-			this.childs = new Node[4];
-			this.childs[CHILD_NW] = new Node(this.minX, centerY, centerX, this.maxY);
-			this.childs[CHILD_NE] = new Node(centerX, centerY, this.maxX, this.maxY);
-			this.childs[CHILD_SE] = new Node(centerX, this.minY, this.maxX, centerY);
-			this.childs[CHILD_SW] = new Node(this.minX, this.minY, centerX, centerY);
+			this.children = new Node[4];
+			this.children[CHILD_NW] = new Node(this.minX, centerY, centerX, this.maxY);
+			this.children[CHILD_NE] = new Node(centerX, centerY, this.maxX, this.maxY);
+			this.children[CHILD_SE] = new Node(centerX, this.minY, this.maxX, centerY);
+			this.children[CHILD_SW] = new Node(this.minX, this.minY, centerX, centerY);
 
 			List<LinkWrapper> keep = new ArrayList<LinkWrapper>(this.links.size() / 2);
 			for (LinkWrapper w : this.links) {
@@ -131,7 +139,10 @@ public class LinkQuadTree {
 				if (pos == NO_CHILD) {
 					keep.add(w);
 				} else {
-					this.childs[pos].put(w);
+					this.children[pos].put(w);
+					// (seems to me that this cannot happen to more than one link since the quadtree node will split 
+					// as soon as a second link is added that contains the center of the quadtree node.  But
+					// I may be wrong.  kai, jul'12)
 				}
 			}
 			this.links.clear();
@@ -140,9 +151,12 @@ public class LinkQuadTree {
 		}
 
 		private int getChildPosition(final LinkWrapper w) {
+			// center of the bounding box of this quadtree node:
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
+			
 			if (w.maxX < centerX && w.minY > centerY) {
+				// (bounding box of link lies fully to left and above the center of the quadtree node)
 				return CHILD_NW;
 			}
 			if (w.minX > centerX && w.minY > centerY) {
@@ -155,6 +169,7 @@ public class LinkQuadTree {
 				return CHILD_SW;
 			}
 			return NO_CHILD;
+			// (happens when bounding box of link includes center of quadtree node .. i.e. in particular with long links)
 		}
 
 		private int getChildPosition(final double x, final double y) {
@@ -173,6 +188,8 @@ public class LinkQuadTree {
 				return CHILD_SW;
 			}
 			return NO_CHILD;
+			// (this can, in my view, only happen when one of the tests is exactly ``=''.  However, if you look at
+			// how this is used, this does not feel right.  kai, jul'12)
 		}
 
 		/**
