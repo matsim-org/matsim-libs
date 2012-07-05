@@ -113,6 +113,14 @@ public class MGC {
 	}
 
 	/**
+	 * Converts a Geotools coordinate into a <code>Point</code>
+	 * @return Geotools point
+	 */
+	public static final Point coordinate2Point(Coordinate coordinate) {
+		return geoFac.createPoint(coordinate);
+	}
+	
+	/**
 	 * Converts a Geotools <code>Point</code> into a MATSim {@link org.matsim.api.core.v01.Coord}
 	 * @param point Geotools point
 	 * @return MATSim coordinate
@@ -158,5 +166,7 @@ public class MGC {
 		}
 		return crs;
 	}
+
+
 
 }
