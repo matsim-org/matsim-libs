@@ -171,6 +171,11 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 			log.info(measuringPoints.getZones().size() + " measurement points are now processing ...");
 			
 			ProgressBar bar = new ProgressBar( measuringPoints.getZones().size() );
+			
+			
+//			// tnicolai: only for testing, disable afterwards
+//			ZoneLayer<CounterObject> testSet = createTestPoints();
+//			measuringPointIterator = testSet.getZones().iterator();
 		
 			// iterates through all starting points (fromZone) and calculates their accessibility, e.g. to jobs
 			while( measuringPointIterator.hasNext() ){
@@ -178,30 +183,31 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				bar.update();
 				
 				Zone<CounterObject> measurePoint = measuringPointIterator.next();
+//				System.out.println(measurePoint.getAttribute().counter);
 				
 				Point point = measurePoint.getGeometry().getCentroid();
 				// get coordinate from origin (start point)
 				Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
 				assert( coordFromZone!=null );
-//				// determine nearest network node (old, dont use this)
-//				Node fromNode = network.getNearestNode(coordFromZone);
-//				assert( fromNode != null );
-//				// run dijkstra on network
-//				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
-//				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
-//				lcptTravelDistance.calculate(network, fromNode, depatureTime);
-				
-				// from here: accessibility computation for current starting point ("fromNode")
-				
-				// captures the distance (as walk time) between a zone centroid and its nearest node
-				Link nearestLink = network.getNearestRightEntryLink(coordFromZone); 
 				// determine nearest network node
-				Node fromNode = nearestLink.getToNode() ;
+				Node fromNode = network.getNearestNode(coordFromZone);
 				assert( fromNode != null );
 				// run dijkstra on network
 				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
 				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
 				lcptTravelDistance.calculate(network, fromNode, depatureTime);
+				
+				// from here: accessibility computation for current starting point ("fromNode")
+				
+				// captures the distance (as walk time) between a zone centroid and its nearest node
+				Link nearestLink = network.getNearestRightEntryLink(coordFromZone); 
+//				// determine nearest network node
+//				Node fromNode = nearestLink.getToNode() ;
+//				assert( fromNode != null );
+//				// run dijkstra on network
+//				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
+//				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
+//				lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
 				

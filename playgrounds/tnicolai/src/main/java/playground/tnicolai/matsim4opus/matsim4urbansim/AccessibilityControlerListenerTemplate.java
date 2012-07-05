@@ -1,12 +1,23 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+
 import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule;
 import playground.tnicolai.matsim4opus.config.ConfigurationModule;
+import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
@@ -162,6 +173,57 @@ public class AccessibilityControlerListenerTemplate{
 		log.info("Beta Walk Travel Cost: " + betaWalkTC );
 		log.info("Beta Walk Travel Cost Power2: " + betaWalkTCPower );
 		log.info("Beta Walk Ln Travel Cost: " + betaWalkLnTC );
+	}
+	
+	protected ZoneLayer<CounterObject> createTestPoints(){
+		
+		GeometryFactory factory = new GeometryFactory();
+		Set<Zone<CounterObject>> zones = new HashSet<Zone<CounterObject>>();
+		int setPoints = 1;
+		int srid = InternalConstants.SRID_SWITZERLAND;
+		int gridSize = 10;
+		
+		Point point1 = factory.createPoint(new Coordinate(680699.1, 250976.0)); // oben links
+		Point point2 = factory.createPoint(new Coordinate(681410.0, 250670.0)); // oben mitte
+		Point point3 = factory.createPoint(new Coordinate(682419.0, 250232.0)); // oben rechts
+		Point point4 = factory.createPoint(new Coordinate(680602.2, 250934.2)); // unten links
+		
+		createCell(factory, zones, point1, setPoints++, srid, gridSize);
+		createCell(factory, zones, point2, setPoints++, srid, gridSize);
+		createCell(factory, zones, point3, setPoints++, srid, gridSize);
+		createCell(factory, zones, point4, setPoints++, srid, gridSize);
+		
+		ZoneLayer<CounterObject> layer = new ZoneLayer<CounterObject>(zones);
+		return layer;
+	}
+
+	/**
+	 * This is for testing purposes only
+	 * 
+	 * @param factory
+	 * @param zones
+	 * @param setPoints
+	 * @param srid
+	 */
+	private void createCell(GeometryFactory factory, Set<Zone<CounterObject>> zones, Point point, int setPoints, int srid, int gridSize) {
+		
+		double x = point.getCoordinate().x;
+		double y = point.getCoordinate().y;
+		
+		Coordinate[] coords = new Coordinate[5];
+		coords[0] = new Coordinate(x-gridSize, y-gridSize); 	// links unten
+		coords[1] = new Coordinate(x-gridSize, y + gridSize);	// links oben
+		coords[2] = new Coordinate(x + gridSize, y + gridSize);	// rechts oben
+		coords[3] = new Coordinate(x + gridSize, y-gridSize);	// rechts unten
+		coords[4] = new Coordinate(x-gridSize, y-gridSize); 	// links unten
+		// Linear Ring defines an artificial zone
+		LinearRing linearRing = factory.createLinearRing(coords);
+		Polygon polygon = factory.createPolygon(linearRing, null);
+		polygon.setSRID( srid ); 
+		
+		Zone<CounterObject> zone = new Zone<CounterObject>(polygon);
+		zone.setAttribute( new CounterObject( setPoints ) );
+		zones.add(zone);
 	}
 
 }
