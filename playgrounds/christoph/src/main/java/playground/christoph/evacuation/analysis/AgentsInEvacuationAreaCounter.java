@@ -20,11 +20,14 @@
 
 package playground.christoph.evacuation.analysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -54,10 +57,14 @@ import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 
+import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.PopulationAdministration;
 
@@ -86,7 +93,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected final CoordAnalyzer coordAnalyzer;
 	protected final PopulationAdministration popAdmin;
 	protected final double scaleFactor;
-		
+	
 	protected Set<Id> activityAgentsInEvacuationArea;
 	protected Map<String, Set<Id>> legAgentsInEvacuationArea;
 	protected Map<Id, String> currentTransportMode;
@@ -101,7 +108,8 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected Map<String, int[]> legBins;
 	protected Map<String, int[]> legBinsParticipating;
 	protected Map<String, int[]> legBinsNotParticipating;
-
+	protected Map<Id, Tuple<String, Double>> leftByMode;
+	
 	public AgentsInEvacuationAreaCounter(Scenario scenario, Set<String> transportModes, CoordAnalyzer coordAnalyzer,
 			PopulationAdministration popAdmin, double scaleFactor) {
 		this.scenario = scenario;
@@ -120,13 +128,14 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		vehiclesWithoutDriver = new HashSet<Id>();
 		driverVehicleMap = new HashMap<Id, Id>();
 		vehiclePassengersMap = new HashMap<Id, List<Id>>();
+		leftByMode = new HashMap<Id, Tuple<String, Double>>();
 		activityBins = new int[nofBins];
 		activityBinsParticipating = new int[nofBins];
 		activityBinsNotParticipating = new int[nofBins];
 		legBins = new TreeMap<String, int[]>();
 		legBinsParticipating = new TreeMap<String, int[]>();
 		legBinsNotParticipating = new TreeMap<String, int[]>();
-
+		
 		for (String string : transportModes) {
 			legAgentsInEvacuationArea.put(string, new HashSet<Id>());
 			legBins.put(string, new int[nofBins]);
@@ -175,15 +184,35 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			passengerSet = legAgentsInEvacuationArea.get(PassengerDepartureHandler.passengerTransportMode);
 		}
 		
+		boolean wasAffected = set.contains(event.getPersonId()); 
+		
 		if (this.coordAnalyzer.isLinkAffected(link)) {
 			set.add(event.getPersonId());
 			if (passengers != null) {
 				for (Id passengerId : passengers) passengerSet.add(passengerId);
 			}
+			
+			// if the agent just entered the evacuation area, reset its left mode
+			if (!wasAffected && event.getTime() >= EvacuationConfig.evacuationTime) {
+				this.leftByMode.remove(event.getPersonId());
+				if (passengers != null) {
+					for (Id passengerId : passengers) this.leftByMode.remove(passengerId);
+				}
+			}
 		} else {
 			set.remove(event.getPersonId());
 			if (passengers != null) {
 				for (Id passengerId : passengers) passengerSet.remove(passengerId);
+			}
+			
+			// if the agents just left the evacuation area set its left mode
+			if (wasAffected && event.getTime() >= EvacuationConfig.evacuationTime) {
+				this.leftByMode.put(event.getPersonId(), new Tuple<String, Double>(transportMode, event.getTime()));
+				if (passengers != null) {
+					for (Id passengerId : passengers) {
+						this.leftByMode.put(passengerId, new Tuple<String, Double>(PassengerDepartureHandler.passengerTransportMode, event.getTime()));
+					}
+				}
 			}
 		}
 	}
@@ -385,7 +414,6 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_" + legMode + "_not_participating.png");
 			writer.writeGraphic(fileName, legMode, legBinsNotParticipating.get(legMode));
-
 		}
 
 		/*
@@ -464,12 +492,128 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		}
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_comparison_not_participating.png");
 		writer.writeGraphic(fileName, names, data);
+		
+		/*
+		 * Count number of evacuees per mode
+		 */
+		Map<String, int[]> leftByModeBins = new HashMap<String, int[]>();
+		Map<String, int[]> participatingLeftByModeBins = new HashMap<String, int[]>();
+		Map<String, int[]> notParticipatingLeftByModeBins = new HashMap<String, int[]>();
+		Map<String, Integer> participatingEvacueesPerMode = new TreeMap<String, Integer>();
+		Map<String, Integer> notParticipatingEvacueesPerMode = new TreeMap<String, Integer>();
+		for (String transportMode : this.transportModes) {
+			participatingEvacueesPerMode.put(transportMode, 0);
+			notParticipatingEvacueesPerMode.put(transportMode, 0);
+			leftByModeBins.put(transportMode, new int[nofBins]);
+			participatingLeftByModeBins.put(transportMode, new int[nofBins]);
+			notParticipatingLeftByModeBins.put(transportMode, new int[nofBins]);
+		}
+		for (Entry<Id, Tuple<String, Double>> entry : this.leftByMode.entrySet()) {
+			boolean isParticipating = this.popAdmin.isAgentParticipating(entry.getKey());
+			Tuple<String, Double> tuple = entry.getValue();
+			String transportMode = tuple.getFirst();
+			double time = tuple.getSecond();
+			
+			if (isParticipating) {
+				int count = participatingEvacueesPerMode.get(transportMode);
+				participatingEvacueesPerMode.put(transportMode, count + 1);
+				
+				int binIndex = getBinIndex(time);
+				participatingLeftByModeBins.get(transportMode)[binIndex] = participatingLeftByModeBins.get(transportMode)[binIndex] + 1;
+			} else {
+				int count = notParticipatingEvacueesPerMode.get(transportMode);
+				notParticipatingEvacueesPerMode.put(transportMode, count + 1);
+				
+				int binIndex = getBinIndex(time);
+				notParticipatingLeftByModeBins.get(transportMode)[binIndex] = notParticipatingLeftByModeBins.get(transportMode)[binIndex] + 1;
+			}
+		}
+		
+		/*
+		 * So far each bin in (not)participatingLeftByModeBins contains the number of agents
+		 * left in the current bin. We cummulate the values.
+		 */		
+		for (String transportMode : this.transportModes) {
+			int participating = 0;
+			int notParticipating = 0;
+			int[] array = leftByModeBins.get(transportMode);
+			int[] participatingArray = participatingLeftByModeBins.get(transportMode);
+			int[] notParticipatingArray = notParticipatingLeftByModeBins.get(transportMode);
+			for (int idx = 0; idx < this.nofBins; idx++) {
+				participating += participatingArray[idx];
+				notParticipating += notParticipatingArray[idx];
+				participatingArray[idx] = participating;
+				notParticipatingArray[idx] = notParticipating;
+				array[idx] = participating + notParticipating;
+			}
+		}
+
+		for (String transportMode : this.transportModes) {
+			log.info("Participating agents using " + transportMode + " mode:\t" + participatingEvacueesPerMode.get(transportMode));
+			log.info("Not participating agents using " + transportMode + " mode:\t" + notParticipatingEvacueesPerMode.get(transportMode));		
+		}
+		
+		
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByModeTotal.txt");
+		try {
+			BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
+			bw.write("transport mode");
+			bw.write("\t");
+			bw.write("participating");
+			bw.write("\t");
+			bw.write("not participating");
+			bw.write("\t");
+			bw.write("total");
+			bw.write("\n");
+			
+			for (String transportMode : this.transportModes) {
+				bw.write(transportMode);
+				bw.write("\t");
+				bw.write(participatingEvacueesPerMode.get(transportMode));
+				bw.write("\t");
+				bw.write(notParticipatingEvacueesPerMode.get(transportMode));
+				bw.write("\t");
+				bw.write(participatingEvacueesPerMode.get(transportMode) + notParticipatingEvacueesPerMode.get(transportMode));
+				bw.write("\n");
+			}
+			
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		
+		/*
+		 * Write data and use dummies for activities since we are only interested in people traveling.
+		 */
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode.txt");
+		writer.write(fileName, new int[nofBins], leftByModeBins);
+		
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_participating.txt");
+		writer.write(fileName, new int[nofBins], participatingLeftByModeBins);
+		
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_not_participating.txt");
+		writer.write(fileName, new int[nofBins], notParticipatingLeftByModeBins);
+		
+		/*
+		 * write leg performing graphs
+		 */
+		for (String legMode : transportModes) {
+			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_" + legMode + ".png");
+			writer.writeGraphic(fileName, legMode, leftByModeBins.get(legMode));
+			
+			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_" + legMode + "_participating.png");
+			writer.writeGraphic(fileName, legMode, participatingLeftByModeBins.get(legMode));
+			
+			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_" + legMode + "_not_participating.png");
+			writer.writeGraphic(fileName, legMode, notParticipatingLeftByModeBins.get(legMode));
+		}
 	}
 
 	private int getBinIndex(final double time) {
 		int bin = (int) (time / this.binSize);
-		if (bin >= this.nofBins) {
-			return this.nofBins;
+		if (bin >= this.nofBins - 1) {
+			return this.nofBins - 1;
 		}
 		return bin;
 	}
