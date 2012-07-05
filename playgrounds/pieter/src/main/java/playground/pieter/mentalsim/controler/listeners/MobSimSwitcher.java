@@ -106,7 +106,7 @@ public class MobSimSwitcher implements ControlerListener,
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		PersonalizableTravelTime ttcalc = controler.getTravelTimeCalculator();
 
-		if (checkExpensiveIter()) {
+		if (checkExpensiveIter(event.getIteration())) {
 			log.warn("Running an expensive iteration with full queue simulation");
 			String mobsim = controler.getConfig().controler().getMobsim();
 
@@ -128,16 +128,16 @@ public class MobSimSwitcher implements ControlerListener,
 		}
 	}
 
-	public boolean checkExpensiveIter() {
+	public boolean checkExpensiveIter(int iteration) {
 
-		if (controler.getIterationNumber() == controler.getLastIteration()) {
+		if (iteration == controler.getLastIteration()) {
 			MobSimSwitcher.expensiveIter = true;
 			return expensiveIter;
 		}
-		if (controler.getIterationNumber() < endIter && expensiveIterCount > 0) {
+		if (iteration < endIter && expensiveIterCount > 0) {
 //			log.error("controler.getIterationNumber() < endIter && expensiveIterCount > 0");
 			if (expensiveIterCount >= increaseEveryNExpensiveIters
-					&& controler.getIterationNumber() > startIter) {
+					&& iteration > startIter) {
 				log.error("increase rate");
 				if (currentRate < endRate) {
 					if (switchType.equals(SwitchType.doubling)) {
@@ -151,20 +151,20 @@ public class MobSimSwitcher implements ControlerListener,
 			}
 		}
 		if (expensiveIter && cheapIterCount == 0
-				&& controler.getIterationNumber() > startIter) {
+				&& iteration > startIter) {
 			expensiveIter = false;
 			cheapIterCount++;
 			return expensiveIter;
 		}
 		if (cheapIterCount >= currentRate - 1) {
 			expensiveIter = true;
-			this.expensiveIters.add(controler.getIterationNumber());
+			this.expensiveIters.add(iteration);
 			cheapIterCount = 0;
 			expensiveIterCount++;
 			return expensiveIter;
 		}
 		if (expensiveIter) {
-			this.expensiveIters.add(controler.getIterationNumber());
+			this.expensiveIters.add(iteration);
 			expensiveIterCount++;
 		} else {
 			cheapIterCount++;
