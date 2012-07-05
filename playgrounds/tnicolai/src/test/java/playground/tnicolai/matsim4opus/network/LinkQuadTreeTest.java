@@ -124,7 +124,7 @@ public class LinkQuadTreeTest {
 		Link l2 = network.getNearestLinkExactly(c2);
 		Node ln2= l2.getToNode();
 //		Assert.assertTrue(n2.getId().compareTo(node3.getId()) == 0);
-//		Assert.assertTrue(l2.getId().compareTo(linkD.getId()) == 0);
+		Assert.assertTrue(l2.getId().compareTo(linkD.getId()) == 0);
 		Assert.assertTrue(ln2.getId().compareTo(nodeC.getId()) == 0);
 		
 		Node n3 = network.getNearestNode(c3);
