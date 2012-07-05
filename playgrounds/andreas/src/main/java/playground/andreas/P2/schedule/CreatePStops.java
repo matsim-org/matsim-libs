@@ -253,7 +253,9 @@ public class CreatePStops{
 			if(link.getAllowedModes().contains(TransportMode.car)){
 				stopsAdded += addStopOnLink(link);
 			}
-		}		
+		}
+		
+		log.info("Added " + stopsAdded + " additional stops for paratransit services");
 	}
 	
 	private int addStopOnLink(Link link) {
