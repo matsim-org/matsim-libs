@@ -98,7 +98,7 @@ public class ParkingQSimFactory implements MobsimFactory {
         QSim qSim = qSim1;
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
-        		insertParkingActivities, parkingInfrastructure);
+        		insertParkingActivities, parkingInfrastructure, numOfThreads);
         qSim.addAgentSource(agentSource);
         return qSim;
 

@@ -180,8 +180,10 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 							((ActivityImpl) nextActivity).setLinkId(nextActivityFacility.getLinkId());
 						}
 						
-						
-						routingAlgorithm.run(newPlan);						
+						synchronized(routingAlgorithm){
+							routingAlgorithm.run(newPlan);	
+						}
+											
 					}
 				}
 			}

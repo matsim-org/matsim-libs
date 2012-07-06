@@ -176,23 +176,33 @@ public class InsertParkingActivities implements PlanAlgorithm {
 				ActivityImpl act=(ActivityImpl) planElements.get(i);
 				
 				if (act.getType().equalsIgnoreCase("parking")){
-					
+					synchronized(parkingInfrastructure){
 					HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent = parkingInfrastructure.getInitialParkingFacilityOfAgent();
 					Id personId = plan.getPerson().getId();
 					ActivityFacility parkingFacility = initialParkingFacilityOfAgent.get(personId);
+					
 					act.setLinkId(parkingFacility.getLinkId());
 					act.setFacilityId(parkingFacility.getId());
+					}
 					
 					updateSecondParkingActivityLinkOfDayIfNeeded(parkingInfrastructure,plan,scenario);
 					
+					synchronized(this){
 					EditRoutes editRoutes=new EditRoutes();
+					
+					
+					
 					//update walk leg
 					editRoutes.replanFutureLegRoute(plan, i-1, routingAlgorithm);
 					//update car leg
 					
+					
 					EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
+					
+					
 					//editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
 					editPartialRoute.replanFutureCarLegRoute(plan, i+1);
+					}
 					
 					break;
 				}

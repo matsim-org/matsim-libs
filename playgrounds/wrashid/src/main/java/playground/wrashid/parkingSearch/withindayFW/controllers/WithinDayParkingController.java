@@ -53,6 +53,7 @@ import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
@@ -186,7 +187,8 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		legModeChecker = new LegModeChecker(this.scenarioData, this.createRoutingAlgorithm());
 		legModeChecker.setValidNonCarModes(new String[] { TransportMode.walk });
 		legModeChecker.setToCarProbability(0.5);
-		legModeChecker.run(this.scenarioData.getPopulation());
+		ParallelPersonAlgorithmRunner.run(this.scenarioData.getPopulation(), numReplanningThreads, legModeChecker);
+		//legModeChecker.run(this.scenarioData.getPopulation());
 
 		if (parkingInfrastructure==null){
 			parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
@@ -255,9 +257,11 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		 * might have been changed. Therefore, we have to ensure that the chains
 		 * are still valid.
 		 */
-		for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
-			legModeChecker.run(person.getSelectedPlan());
-		}
+		//for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
+		//	legModeChecker.run(person.getSelectedPlan());
+		//}
+		
+		ParallelPersonAlgorithmRunner.run(this.scenarioData.getPopulation(), numReplanningThreads, legModeChecker);
 	}
 
 	/*

@@ -35,6 +35,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
@@ -54,27 +56,80 @@ public class ParkingPopulationAgentSource implements AgentSource {
 	private final QSim qsim;
 	private final InsertParkingActivities insertParkingActivities;
 	private final ParkingInfrastructure parkingInfrastructure;
+	private final int numOfThreads;
 
 	public ParkingPopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim,
-			InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure) {
+			InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure, int numOfThreads) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
 		this.insertParkingActivities = insertParkingActivities;
 		this.parkingInfrastructure = parkingInfrastructure;
+		this.numOfThreads = numOfThreads;
 	}
 
 	@Override
 	public void insertAgentsIntoMobsim() {
 		parkingInfrastructure.resetParkingFacilityForNewIteration();
 		
-		for (Person p : population.getPersons().values()) {
+		ParallelPersonAlgorithmRunner.run(population, numOfThreads, new ParkingAgentInsertParkingActs(this.agentFactory));
+		
+		
+//		for (Person p : population.getPersons().values()) {
+//
+//			reserveInitialParking(p);
+//
+//			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+//			qsim.insertAgentIntoMobsim(agent);
+//
+//			/*
+//			 * If it is a within-day replanning agent, we use its plan instead
+//			 * of the person's plan because the agent's plan may have already
+//			 * been altered.
+//			 */
+//			Plan plan;
+//			if (agent instanceof ExperimentalBasicWithindayAgent) {
+//				plan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
+//			} else
+//				plan = p.getSelectedPlan();
+//
+//			/*
+//			 * Insert parking activities into the plan
+//			 */
+//			
+//
+//			insertParkingActivities.run(plan);
+//			
+//			qsim.createAndParkVehicleOnLink(
+//					VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()),
+//					getParkingLinkId(plan));
+//			
+//			
+//
+//		}
+	}
+	
+	private class ParkingAgentInsertParkingActs extends AbstractPersonAlgorithm{
 
-			reserveInitialParking(p);
+		private final AgentFactory agentFac;
 
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-			qsim.insertAgentIntoMobsim(agent);
-
+		public ParkingAgentInsertParkingActs(AgentFactory agentFactory){
+			agentFac = agentFactory;
+			
+		}
+		
+		@Override
+		public void run(Person person) {
+			MobsimAgent agent=null;
+			synchronized(parkingInfrastructure){
+				reserveInitialParking(person);
+			}
+				
+			synchronized(qsim){
+				agent = agentFac.createMobsimAgentFromPerson(person);
+				qsim.insertAgentIntoMobsim(agent);
+			}
+			
 			/*
 			 * If it is a within-day replanning agent, we use its plan instead
 			 * of the person's plan because the agent's plan may have already
@@ -84,18 +139,21 @@ public class ParkingPopulationAgentSource implements AgentSource {
 			if (agent instanceof ExperimentalBasicWithindayAgent) {
 				plan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
 			} else
-				plan = p.getSelectedPlan();
+				plan = person.getSelectedPlan();
 
 			/*
 			 * Insert parking activities into the plan
 			 */
+			
 			insertParkingActivities.run(plan);
-
+			
+			synchronized(qsim){
 			qsim.createAndParkVehicleOnLink(
 					VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()),
 					getParkingLinkId(plan));
-
-		}
+			}
+		
+		
 	}
 
 	private void reserveInitialParking(Person p) {
@@ -161,4 +219,4 @@ public class ParkingPopulationAgentSource implements AgentSource {
 			}
 		}
 	}
-}
+}}
