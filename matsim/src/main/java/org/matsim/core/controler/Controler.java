@@ -735,14 +735,14 @@ public class Controler extends AbstractController {
 	 * ===================================================================
 	 */
 
-	/**
-	 * Add a ControlerListener to the Controler instance
-	 * 
-	 * @param l
-	 */
-	public final void addControlerListener(final ControlerListener l) {
-		this.controlerListenerManager.addControlerListener(l);
-	}
+//	/**
+//	 * Add a ControlerListener to the Controler instance
+//	 * 
+//	 * @param l
+//	 */
+//	public final void addControlerListener(final ControlerListener l) {
+//		this.controlerListenerManager.addControlerListener(l);
+//	}
 
 	/**
 	 * Removes a ControlerListener from the Controler instance

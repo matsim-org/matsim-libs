@@ -9,6 +9,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -193,7 +194,15 @@ public abstract class AbstractController {
 				log.info("Checking consistency of config done.");
 			}
 
-
+	/**
+	 * Design comments:<ul>
+	 * <li> This is such that ControlerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
+	 * <li> Might be ok to make this public.  kai, jul'12
+	 * </ul>
+	 */
+	protected final void addControlerListener( ControlerListener l ) {
+		this.controlerListenerManager.addControlerListener(l) ;
+	}
 	
 	
 }
