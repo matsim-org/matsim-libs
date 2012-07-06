@@ -19,10 +19,15 @@ import org.matsim.api.core.v01.network.Link;
  * structures, www.cs.umd.edu/~hjs/pubs/SametSSD89.pdf)
  * <p/>
  * After having looked at the code for 5 min, I cannot, however, tell if this is
- * exactly what the code is doing, and if so, which version. kai, jun'12
- * 
+ * exactly what the code is doing, and if so, which version. kai, jul'12
+ *
+ * The implementation splits nodes whenever a node contains more than one link
+ * of which at least one can be assigned to a child node. According to the
+ * description above, the leaf nodes would always be empty. This implementation
+ * splits nodes whenever it is necessary, but not before, leading to leaf nodes
+ * that actually may contain elements.  marcel, jul'12
+ *
  * @author mrieser / senozon
- * 
  */
 public class LinkQuadTree {
 
@@ -152,14 +157,14 @@ public class LinkQuadTree {
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
 
-			if (w.maxX < centerX && w.minY > centerY) {
+			if (w.maxX < centerX && w.minY >= centerY) {
 				// (bounding box of link lies fully to left and above the center of the quadtree node)
 				return CHILD_NW;
 			}
-			if (w.minX > centerX && w.minY > centerY) {
+			if (w.minX >= centerX && w.minY >= centerY) {
 				return CHILD_NE;
 			}
-			if (w.minX > centerX && w.maxY < centerY) {
+			if (w.minX >= centerX && w.maxY < centerY) {
 				return CHILD_SE;
 			}
 			if (w.maxX < centerX && w.maxY < centerY) {
@@ -172,21 +177,20 @@ public class LinkQuadTree {
 		private int getChildPosition(final double x, final double y) {
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
-			if (x < centerX && y > centerY) {
+			if (x < centerX && y >= centerY) {
 				return CHILD_NW;
 			}
-			if (x > centerX && y > centerY) {
+			if (x >= centerX && y >= centerY) {
 				return CHILD_NE;
 			}
-			if (x > centerX && y < centerY) {
+			if (x >= centerX && y < centerY) {
 				return CHILD_SE;
 			}
 			if (x < centerX && y < centerY) {
 				return CHILD_SW;
 			}
+			// this should never happen...
 			return NO_CHILD;
-			// (this can, in my view, only happen when one of the tests is exactly ``=''.  However, if you look at
-			// how this is used, this does not feel right.  kai, jul'12)
 		}
 
 		/**
