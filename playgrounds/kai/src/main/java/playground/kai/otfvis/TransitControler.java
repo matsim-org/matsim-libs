@@ -20,6 +20,7 @@
 
 package playground.kai.otfvis;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -49,15 +50,19 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class TransitControler {
+	
+	private static boolean useTransit = true ;
 
 	public static void main(final String[] args) {
 		//		args[0] = "/Users/nagel/kw/rotterdam/config.xml" ;
 		Config config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile(args[0]);
-		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
+		if ( useTransit ) {
+			config.scenario().setUseTransit(true);
+			config.scenario().setUseVehicles(true);
 //		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
+		}
 
 		config.getQSimConfigGroup().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT ) ;
 
@@ -92,28 +97,35 @@ public class TransitControler {
 			} else {
 				netsimEngFactory = new DefaultQSimEngineFactory();
 			}
-			QSim qSim1 = new QSim(sc, eventsManager1);
+			QSim qSim = new QSim(sc, eventsManager1);
+			
 			ActivityEngine activityEngine = new ActivityEngine();
-			qSim1.addMobsimEngine(activityEngine);
-			qSim1.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1, MatsimRandom.getRandom());
-			qSim1.addMobsimEngine(netsimEngine);
-			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
-			qSim1.addMobsimEngine(teleportationEngine);
-			QSim qSim = qSim1;
-			AgentFactory agentFactory= new TransitAgentFactory(qSim);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setUseUmlaeufe(true);
-			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-			qSim.addAgentSource(agentSource);
+			qSim.addMobsimEngine(activityEngine);
+			qSim.addActivityHandler(activityEngine);
+			
+			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+			qSim.addMobsimEngine(netsimEngine);
+			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+			
+			qSim.addMobsimEngine(new TeleportationEngine());
+			
+			if ( useTransit ) {
+				AgentFactory agentFactory= new TransitAgentFactory(qSim);
+				TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+				transitEngine.setUseUmlaeufe(true);
+				transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+				qSim.addDepartureHandler(transitEngine);
+				qSim.addMobsimEngine(transitEngine);
+				qSim.addAgentSource(transitEngine);
+				PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+				qSim.addAgentSource(agentSource);
 
-//			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//			transitEngine.setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
+				//			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+				//			transitEngine.setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
+			} else {
+				Logger.getLogger(this.getClass()).warn("useTransit is switched off; is this what I want?") ;
+			}
+			
 			//			this.events.addHandler(new LogOutputEventHandler());
 
 			if ( useOTFVis ) {
