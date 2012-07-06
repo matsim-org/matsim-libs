@@ -6,7 +6,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -46,7 +45,10 @@ public abstract class AbstractController {
 	 */
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
 	
-	protected ControlerListenerManager controlerListenerManager;
+	/**
+	 * This is deliberately not even protected.  kai, jul'12 
+	 */
+	ControlerListenerManager controlerListenerManager;
 	
 	// for tests
 	protected volatile Throwable uncaughtException;
@@ -197,11 +199,14 @@ public abstract class AbstractController {
 	/**
 	 * Design comments:<ul>
 	 * <li> This is such that ControlerListenerManager does not need to be exposed.  One may decide otherwise ...  kai, jul'12
-	 * <li> Might be ok to make this public.  kai, jul'12
 	 * </ul>
 	 */
-	protected final void addControlerListener( ControlerListener l ) {
+	public final void addControlerListener( ControlerListener l ) {
 		this.controlerListenerManager.addControlerListener(l) ;
+	}
+
+	protected final void addCoreControlerListener( ControlerListener l ) {
+		this.controlerListenerManager.addCoreControlerListener(l) ;
 	}
 	
 	

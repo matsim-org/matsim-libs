@@ -128,23 +128,23 @@ public class KnSimplifiedController extends AbstractController {
 	protected void loadCoreListeners() {
 
 		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenarioData, controlerIO);
-		this.controlerListenerManager.addControlerListener(dumpDataAtEnd);
+		this.addControlerListener(dumpDataAtEnd);
 		
 		final PlansScoring plansScoring = buildPlansScoring();
-		this.controlerListenerManager.addControlerListener(plansScoring);
+		this.addControlerListener(plansScoring);
 
 		final StrategyManager strategyManager = buildStrategyManager() ;
-		this.controlerListenerManager.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
+		this.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
 		final PlansDumping plansDumping = new PlansDumping( this.scenarioData, this.config.controler().getFirstIteration(), 
 				this.config.controler().getWritePlansInterval(), stopwatch, controlerIO );
-		this.controlerListenerManager.addCoreControlerListener(plansDumping);
+		this.addCoreControlerListener(plansDumping);
 
-		this.controlerListenerManager.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
+		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
 		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) eventsManager,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
 				controlerIO );
-		this.controlerListenerManager.addCoreControlerListener(eventsHandling); 
+		this.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
 	}
 	private PlansScoring buildPlansScoring() {
@@ -200,7 +200,6 @@ public class KnSimplifiedController extends AbstractController {
 		checkConfigConsistencyAndWriteToLog(this.config, "Config dump before doIterations:");
 		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@SuppressWarnings("synthetic-access")
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenarioData);

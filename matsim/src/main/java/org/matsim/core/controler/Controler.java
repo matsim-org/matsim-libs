@@ -720,14 +720,14 @@ public class Controler extends AbstractController {
 	 * ===================================================================
 	 */
 
-	/**
-	 * Add a core ControlerListener to the Controler instance
-	 * 
-	 * @param l
-	 */
-	protected final void addCoreControlerListener(final ControlerListener l) {
-		this.controlerListenerManager.addCoreControlerListener(l);
-	}
+//	/**
+//	 * Add a core ControlerListener to the Controler instance
+//	 * 
+//	 * @param l
+//	 */
+//	protected final void addCoreControlerListener(final ControlerListener l) {
+//		this.controlerListenerManager.addCoreControlerListener(l);
+//	}
 
 	/*
 	 * ===================================================================
