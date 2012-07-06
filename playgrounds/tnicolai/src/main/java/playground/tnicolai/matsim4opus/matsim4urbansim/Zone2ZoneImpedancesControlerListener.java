@@ -49,6 +49,7 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.ZoneMapper;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
+import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
@@ -67,16 +68,21 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl parcels;
 	private String travelDataPath;
+	private Benchmark benchmark;
 
 	/**
 	 * constructor	
 	 * @param zones 
 	 * @param parcels
 	 */
-	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
+	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Benchmark benchmark) {
+		assert(zones != null);
 		this.zones = zones;
+		assert(parcels != null);
 		this.parcels = parcels;
 		this.travelDataPath = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.TRAVEL_DATA_FILE_CSV;
+		assert(benchmark != null);
+		this.benchmark = benchmark;
 	}
 	
 	/**
@@ -86,8 +92,10 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	 */
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		log.info("Entering notifyShutdown ..." ) ;
+		log.info("Entering notifyShutdown ..." );
 
+		int benchmarkID = this.benchmark.addMeasure("zone-to-zone impedances");
+		
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
@@ -179,8 +187,15 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			travelDataWriter.close();
 			log.info("... done with writing travel_data.csv" );
 			
-			System.out.println(" ... done");
-
+			if (this.benchmark != null && benchmarkID > 0) {
+				this.benchmark.stoppMeasurement(benchmarkID);
+				log.info("Zone-to-zone impedance measure with " 
+						 + zones.length + " zones took "
+						 + this.benchmark.getDurationInSeconds(benchmarkID)
+						 + " seconds ("
+						 + this.benchmark.getDurationInSeconds(benchmarkID) / 60. 
+						 + " minutes).");
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

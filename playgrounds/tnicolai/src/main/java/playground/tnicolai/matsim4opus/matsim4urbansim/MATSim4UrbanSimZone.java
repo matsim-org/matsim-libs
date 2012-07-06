@@ -181,7 +181,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		if(computeZone2ZoneImpedance)
 			// creates zone2zone impedance matrix
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
-																					  null) ); 
+																					  null, 
+																					  benchmark) ); 
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
 			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark));

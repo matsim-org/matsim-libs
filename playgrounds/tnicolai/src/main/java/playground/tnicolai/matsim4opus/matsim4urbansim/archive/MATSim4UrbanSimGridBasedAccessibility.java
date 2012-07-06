@@ -84,7 +84,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		
 		//controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionFeet, resolutionMeter, this.benchmark) );
 //		controler.addControlerListener( new GridBasedAccessibilityControlerListener(aggregatedWorkplaces, resolutionMeter, benchmark));
-		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener(zones, parcels));
+		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener(zones, parcels, benchmark));
 		
 		controler.run();
 		// Controller done!

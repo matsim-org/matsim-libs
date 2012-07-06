@@ -93,7 +93,7 @@ import com.vividsolutions.jts.geom.Point;
  * link) is measured.
  * - re-added free-speed car travel time calculation
  * - added accessibility calculation for bike
- * - using network.getNearestRightEntryLink instead of network.getNearestLink. 
+ * - using network.getNearestLinkExactly instead of network.getNearestLink. 
  *   the new entry does not use nearest nodes to determine the link it directly detects the nearest link. 
  *   This avoids some artifacts in accessibility computation (like selective fluctuation in accessibility )
  * 
@@ -112,7 +112,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
 													 SpatialGrid freeSpeedGrid,
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
-													 SpatialGrid bikeGrid,
+													 SpatialGrid bikeGrid,										// table for bike travel times in accessibility computation
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
 													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 Benchmark benchmark,										// Benchmark tool
@@ -130,7 +130,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		assert (carGrid != null);
 		this.carGrid = carGrid;
 		assert (bikeGrid != null);
-		this.bikeGrid = walkGrid;
+		this.bikeGrid = bikeGrid;
 		assert (walkGrid != null);
 		this.walkGrid = walkGrid;
 		assert (fileExtension != null);
@@ -183,31 +183,32 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				bar.update();
 				
 				Zone<CounterObject> measurePoint = measuringPointIterator.next();
-//				System.out.println(measurePoint.getAttribute().counter);
 				
 				Point point = measurePoint.getGeometry().getCentroid();
 				// get coordinate from origin (start point)
 				Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
 				assert( coordFromZone!=null );
-				// determine nearest network node
-				Node fromNode = network.getNearestNode(coordFromZone);
-				assert( fromNode != null );
-				// run dijkstra on network
-				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
-				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
-				lcptTravelDistance.calculate(network, fromNode, depatureTime);
-				
-				// from here: accessibility computation for current starting point ("fromNode")
-				
-				// captures the distance (as walk time) between a zone centroid and its nearest node
-				Link nearestLink = network.getNearestRightEntryLink(coordFromZone); 
 //				// determine nearest network node
-//				Node fromNode = nearestLink.getToNode() ;
+//				Node fromNode = network.getNearestNode(coordFromZone);
 //				assert( fromNode != null );
 //				// run dijkstra on network
 //				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
 //				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
 //				lcptTravelDistance.calculate(network, fromNode, depatureTime);
+				
+				// from here: accessibility computation for current starting point ("fromNode")
+				
+				// captures the distance (as walk time) between a zone centroid and its nearest node
+				// Link nearestLink = network.getNearestRightEntryLink(coordFromZone); // it returns the nearest link based on "nearest nodes", wich sometimes leads to artefacts
+				Link nearestLink = network.getNearestLinkExactly(coordFromZone);
+
+				// determine nearest network node (from- or toNode) based on the link 
+				Node fromNode = getNearestNode(coordFromZone, nearestLink);
+				assert( fromNode != null );
+				// run dijkstra on network
+				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
+				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
+				lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
 				
@@ -218,8 +219,9 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				double carTravelTime_meterpersec			= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime);
 				double freeSpeedTravelTime_meterpersec 		= nearestLink.getLength() / nearestLink.getFreespeed();
 				
-				double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
 				double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
+				double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
+				double offsetBikeTime_h						= distanceRoad2Node_meter / this.bikeSpeedMeterPerHour;
 
 				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
 				// Euclidean Distance (measuring point 2 nearest node):
@@ -249,7 +251,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					// travel distance in meter
 					double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
 					// bike travel times in hours
-					double bikeTravelTime_h 	= travelDistance_meter / this.bikeSpeedMeterPerHour; // using a constant speed of 15km/h
+					double bikeTravelTime_h 	= (travelDistance_meter / this.bikeSpeedMeterPerHour) + offsetBikeTime_h; // using a constant speed of 15km/h
 					// walk travel times in hours
 					double walkTravelTime_h		= travelDistance_meter / this.walkSpeedMeterPerHour;
 					// congested car travel times in hours
@@ -308,7 +310,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 									   carLnTC ));
 					
 					// for debugging bike accessibility
-					bikeTT = getAsUtilCar(betaWalkTT, bikeTravelTime_h, betaWalkTT, offsetWalkTime2Node_h);
+					bikeTT 		= getAsUtilCar(betaWalkTT, bikeTravelTime_h, betaWalkTT, offsetWalkTime2Node_h);
 					bikeTTPower = getAsUtilCar(betaWalkTTPower, bikeTravelTime_h * bikeTravelTime_h, betaWalkTTPower, offsetWalkTime2Node_h * offsetWalkTime2Node_h);
 					bikeLnTT	= getAsUtilCar(betaWalkLnTT, Math.log(bikeTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node_h));
 					
@@ -334,7 +336,6 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 									   bikeLnTC ));
 					
 					// for debugging walk accessibility
-					//walkTT = getAsUtilCar(betaWalkTT, (travelDistance_meter / 15000.) , betaWalkTT, offsetWalkTime2Node_h); // this is to measure bike travel times
 					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour));
 					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow(walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour), 2) );
 					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour) ));
@@ -391,7 +392,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 								   bikeAccessibility,
 								   walkAccessibility);
 			}
-			System.out.println("");
+			System.out.println();
 
 			if (this.benchmark != null && benchmarkID > 0) {
 				this.benchmark.stoppMeasurement(benchmarkID);
