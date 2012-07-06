@@ -88,7 +88,8 @@ public class QueryAgentUtils {
 			} else if (o instanceof Leg) {
 				Leg leg = (Leg) o;
 				Coord coord;
-				if (leg.getMode().equals(TransportMode.car)) {
+//				if (leg.getMode().equals(TransportMode.car)) {
+				if ( leg.getRoute() instanceof NetworkRoute ) {
 					if ( level==Level.ROUTES ) {
 						Node last = null;
 						for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
@@ -148,7 +149,8 @@ public class QueryAgentUtils {
 					continue ; // skip
 				}
 				Leg leg = (Leg) o;
-				if (leg.getMode().equals(TransportMode.car)) {
+//				if (leg.getMode().equals(TransportMode.car)) {
+				if ( leg.getRoute() instanceof NetworkRoute ) {
 					List<Id> route = ((NetworkRoute) leg.getRoute()).getLinkIds();
 					count += route.size();
 					if (route.size() != 0)
