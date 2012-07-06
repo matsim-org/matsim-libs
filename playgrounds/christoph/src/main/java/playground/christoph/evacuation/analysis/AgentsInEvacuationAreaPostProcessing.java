@@ -229,7 +229,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 				outputPath = outputPath.substring(0, outputPath.length() - 1);
 			}
 			if (this.scenarioData.getConfig().controler().getRunId() != null) {
-				this.controlerIO = new OutputDirectoryHierarchy(outputPath, scenario.createId(this.scenarioData.getConfig().controler().getRunId()), false);
+				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), false);
 			} else {
 				this.controlerIO = new OutputDirectoryHierarchy(outputPath, false);
 			}
