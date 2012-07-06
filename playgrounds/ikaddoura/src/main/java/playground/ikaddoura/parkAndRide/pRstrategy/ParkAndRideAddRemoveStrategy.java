@@ -77,7 +77,9 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 			List<PlanElement> planElements = plan.getPlanElements();
 			List<Integer> planElementIndex = new ArrayList<Integer>();
 			boolean hasParkAndRide = false;
-	
+			boolean hasHomeActivity = false;
+			boolean hasWorkActivity = false;
+
 			for (int i = 0; i < planElements.size(); i++) {
 				PlanElement pe = planElements.get(i);
 				if (pe instanceof Activity) {
@@ -85,81 +87,90 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 					if (act.toString().contains(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
 						hasParkAndRide = true;
 						planElementIndex.add(i);
+					} else if (act.toString().contains("home")){
+						hasHomeActivity = true;
+					} else if (act.toString().contains("work")){
+						hasWorkActivity = true;
 					}
 				}
 			}
-			
-			if (hasParkAndRide == false){
-				log.info("Plan doesn't contain ParkAndRide. Adding ParkAndRide...");
+			if (hasHomeActivity == true && hasWorkActivity == true) {
+				log.info("Plan contains Home and Work Activity. Proceeding...");
 
-				// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus den eingelesenen P+R-LinkIDs bzw. der prFacilities)
-				Activity parkAndRide = createParkAndRideActivity(plan);
+				if (hasParkAndRide == false){
+					log.info("Plan doesn't contain ParkAndRide. Adding ParkAndRide...");
 
-				// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
-				for (int i = 0; i < planElements.size(); i++) {
-					PlanElement pe = planElements.get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (act.getType().toString().equals("home") && i==0){
-							planElements.remove(1);
-							planElements.add(1, pop.getFactory().createLeg(TransportMode.car));
-							planElements.add(2, parkAndRide);
-							planElements.add(3, pop.getFactory().createLeg(TransportMode.pt));
-						} else {
-							// other activities
-						}
-					}
-				}
-				
-				// splits first Leg before homeActivity into ptLeg - parkAndRideActivity - carLeg
-				int size = planElements.size();
-				for (int i = 0; i < size; i++) {
-					PlanElement pe = planElements.get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (act.getType().equals("home") && i==planElements.size()-1) {
-							planElements.remove(size-2);
-							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.car));
-							planElements.add(size-2, parkAndRide);
-							planElements.add(size-2, pop.getFactory().createLeg(TransportMode.pt));	
-						} else {
-							// other activity
-						}
-					} 
-				}
-				
-				// change all carLegs between parkAndRideActivities to ptLegs
-				List <Integer> parkAndRidePlanElementIndex = getPlanElementIndex(planElements);
-				if (parkAndRidePlanElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities, don't know what's happening...");
-				for (int i = 0; i < planElements.size(); i++) {
-					PlanElement pe = planElements.get(i);
-					if (i>parkAndRidePlanElementIndex.get(0) && i < parkAndRidePlanElementIndex.get(1)){
-						if (pe instanceof Leg){
-							Leg leg = (Leg) pe;
-							if (TransportMode.car.equals(leg.getMode())){
-								leg.setMode(TransportMode.pt);
+					// erstelle ParkAndRideActivity (zufällige Auswahl einer linkID aus den eingelesenen P+R-LinkIDs bzw. der prFacilities)
+					Activity parkAndRide = createParkAndRideActivity(plan);
+
+					// splits first Leg after homeActivity into carLeg - parkAndRideActivity - ptLeg
+					for (int i = 0; i < planElements.size(); i++) {
+						PlanElement pe = planElements.get(i);
+						if (pe instanceof Activity) {
+							Activity act = (Activity) pe;
+							if (act.getType().toString().equals("home") && i==0){
+								planElements.remove(1);
+								planElements.add(1, pop.getFactory().createLeg(TransportMode.car));
+								planElements.add(2, parkAndRide);
+								planElements.add(3, pop.getFactory().createLeg(TransportMode.pt));
+							} else {
+								// other activities
 							}
 						}
 					}
-				}
-				
-			}
-			else {
-				log.info("Plan contains a ParkAndRide Activity. Removing the ParkAndRide Activity and the belonging pt Leg...");
-				
-				if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities, don't know what's happening...");
-				 
-				for (int i = 0; i < planElements.size(); i++) {
-					if (i==planElementIndex.get(0)){
-						planElements.remove(i); // first Park and Ride Activity
-						planElements.remove(i); // following ptLeg
+					
+					// splits first Leg before homeActivity into ptLeg - parkAndRideActivity - carLeg
+					int size = planElements.size();
+					for (int i = 0; i < size; i++) {
+						PlanElement pe = planElements.get(i);
+						if (pe instanceof Activity) {
+							Activity act = (Activity) pe;
+							if (act.getType().equals("home") && i==planElements.size()-1) {
+								planElements.remove(size-2);
+								planElements.add(size-2, pop.getFactory().createLeg(TransportMode.car));
+								planElements.add(size-2, parkAndRide);
+								planElements.add(size-2, pop.getFactory().createLeg(TransportMode.pt));	
+							} else {
+								// other activity
+							}
+						} 
 					}
-					else if (i==planElementIndex.get(1)){
-						planElements.remove(i-2); // second Park and Ride Activity
-						planElements.remove(i-3); // ptLeg before
+					
+					// change all carLegs between parkAndRideActivities to ptLegs
+					List <Integer> parkAndRidePlanElementIndex = getPlanElementIndex(planElements);
+					if (parkAndRidePlanElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities, don't know what's happening...");
+					for (int i = 0; i < planElements.size(); i++) {
+						PlanElement pe = planElements.get(i);
+						if (i>parkAndRidePlanElementIndex.get(0) && i < parkAndRidePlanElementIndex.get(1)){
+							if (pe instanceof Leg){
+								Leg leg = (Leg) pe;
+								if (TransportMode.car.equals(leg.getMode())){
+									leg.setMode(TransportMode.pt);
+								}
+							}
+						}
+					}
+					
+				}
+				else {
+					log.info("Plan contains a ParkAndRide Activity. Removing the ParkAndRide Activity and the belonging pt Leg...");
+					
+					if (planElementIndex.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities, don't know what's happening...");
+					 
+					for (int i = 0; i < planElements.size(); i++) {
+						if (i==planElementIndex.get(0)){
+							planElements.remove(i); // first Park and Ride Activity
+							planElements.remove(i); // following ptLeg
+						}
+						else if (i==planElementIndex.get(1)){
+							planElements.remove(i-2); // second Park and Ride Activity
+							planElements.remove(i-3); // ptLeg before
+						}
 					}
 				}
-			}
+			} else {
+				log.info("Plan doesn't contain Home and Work Activity. Not adding Park'n'Ride...");
+			}	
 //		}
 //		else {
 //			log.info("Person has no car. Park and Ride is not possible.");
