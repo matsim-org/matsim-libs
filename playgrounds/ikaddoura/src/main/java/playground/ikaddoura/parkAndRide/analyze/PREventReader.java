@@ -23,6 +23,8 @@
  */
 package playground.ikaddoura.parkAndRide.analyze;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -33,15 +35,22 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.parkAndRide.pR.PRFileReader;
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
+
 /**
  * @author Ihab
  *
  */
 public class PREventReader {
 	
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/input/testScenario_PRnetwork_2.xml";
-	static String eventFile = "../../shared-svn/studies/ihab/parkAndRide/output/testScenario_test6/ITERS/it.1000/1000.events.xml.gz";
-//	static String prTimesFile = "../../shared-svn/studies/ihab/parkAndRide/output/prTimes.txt";
+	static String prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRfacilities_berlin.txt";
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRnetwork_berlin.xml";
+	static String eventFile = "../../shared-svn/studies/ihab/parkAndRide/outputBerlin/testAgent_commuter/1.events.xml.gz";
+	
+	// output
+	static String prTimesFile = "../../shared-svn/studies/ihab/parkAndRide/outputBerlin/testAgent_commuter/prTimes.txt";
+	static String prUsersFile = "../../shared-svn/studies/ihab/parkAndRide/outputBerlin/testAgent_commuter/prUsers.txt";
 	
 	public static void main(String[] args) {
 		PREventReader reader = new PREventReader();
@@ -53,7 +62,11 @@ public class PREventReader {
 		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile(networkFile);
-		ScenarioUtils.loadScenario(scen);		
+		ScenarioUtils.loadScenario(scen);
+		
+		PRFileReader prFileReader = new PRFileReader(prFacilityFile);
+		
+		Map<Id, ParkAndRideFacility> id2PRFacility = prFileReader.getId2prFacility();
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
@@ -63,22 +76,9 @@ public class PREventReader {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		
-		int prUsers = 0;
-		System.out.println();
-		System.out.println("************************");
-		for (Id id : linkHandler.getLinkId2prActs().keySet()){
-			System.out.println(id + ": " + (int) (linkHandler.getLinkId2prActs().get(id)/2.0) + " Users");
-			prUsers = prUsers + (int) (linkHandler.getLinkId2prActs().get(id)/2.0);
-		}
-		System.out.println("************************");		
-		System.out.println("PR-Users: " + prUsers);
-		System.out.println("Pt-Users: " + (int) (linkHandler.getPtLegs()/2.0));
-		System.out.println("Only-Car-Legs: " + (int) (linkHandler.getCarLegs()/2.0 - prUsers));
-		System.out.println("Stucking Agents: " + linkHandler.getStuckEvents());
-		System.out.println("************************");
+		PRAnalysisWriter prWriter = new PRAnalysisWriter();
+		prWriter.writeTimes(linkHandler.getLinkId2prEndTimes(), prTimesFile);
+		prWriter.writePRusers(linkHandler.getLinkId2prActs(), id2PRFacility, prUsersFile);
 		
-//		PRTimesWriter prTimesWriter = new PRTimesWriter();
-//		prTimesWriter.write(linkHandler.getLinkId2prEndTimes(), prTimesFile);
 	}
-
 }

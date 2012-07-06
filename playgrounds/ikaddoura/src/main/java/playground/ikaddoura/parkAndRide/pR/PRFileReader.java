@@ -68,6 +68,7 @@ public class PRFileReader {
 	                	prFacility.setPrLink2out(new IdImpl(parts[4]));
 	                	prFacility.setPrLink3in(new IdImpl(parts[5]));
 	                	prFacility.setPrLink3out(new IdImpl(parts[6]));
+	                	prFacility.setStopFacilityName(parts[7]);
 	                	this.id2prFacility.put(prFacility.getId(), prFacility);
 	                	prCounter++;
 	                }

@@ -38,9 +38,9 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  * @author Ihab
  *
  */
-public class PRTimesWriter {
+public class PRAnalysisWriter {
 
-	public void write(Map<Id, List<Double>> linkId2prEndTimes, String prTimesFile) {
+	public void writeTimes(Map<Id, List<Double>> linkId2prEndTimes, String prTimesFile) {
 		File file = new File(prTimesFile);
 		try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -56,8 +56,6 @@ public class PRTimesWriter {
 				bw.write(zeile2);
 				bw.newLine();
 			}
-			bw.write("---------------------------");
-			bw.newLine();
 		}
 	
 	    bw.flush();
@@ -66,6 +64,47 @@ public class PRTimesWriter {
 	    } catch (IOException e) {}
 	    
 	    System.out.println("Park'n'Ride Times written to "+file.toString());		
+	}
+
+	public void writePRusers(Map<Id, Integer> linkId2prActs, Map<Id, ParkAndRideFacility> id2prFacility, String prUsersFile) {
+
+		File file = new File(prUsersFile);
+		try {
+
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			String zeile0 = "prId ; TransitStopName ; Users";
+			bw.write(zeile0);
+			bw.newLine();
+			
+			int prUsers = 0;
+			for (Id id : linkId2prActs.keySet()){
+				String name = "unknown";
+				for (ParkAndRideFacility pr : id2prFacility.values()){
+					if (pr.getPrLink3in().equals(id)){
+						name = pr.getStopFacilityName();
+					}
+				}
+				String zeile = id + " ; " + name + " ; " + (int) (linkId2prActs.get(id)/2.0);
+				bw.write(zeile);
+				bw.newLine();
+				
+				prUsers = prUsers + (int) (linkId2prActs.get(id)/2.0);
+			}
+			
+			String zeile1 = "*******************************";
+			bw.write(zeile1);
+			bw.newLine();
+			
+			String zeile2 = "Total PR-Users: " + prUsers;
+			bw.write(zeile2);
+			bw.newLine();
+			
+		    bw.flush();
+		    bw.close();
+		
+		} catch (IOException e) {}
+		
+		System.out.println("PR Users written to " + file.toString());
 	}
 
 }
