@@ -6,6 +6,8 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 public interface TourAgent {
 	
+	public String getId();
+	
 	public Tour getTour();
 	
 	public Vehicle getVehicle();

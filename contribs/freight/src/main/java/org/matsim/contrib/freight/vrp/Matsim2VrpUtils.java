@@ -6,10 +6,10 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
+import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.End;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
@@ -23,7 +23,7 @@ class Matsim2VrpUtils {
 	
 	static Collection<ScheduledTour> createTours(RuinAndRecreateSolution vrpSolution, Matsim2VrpMap matsim2vrpMap){
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
-		for(TourAgent a : vrpSolution.getTourAgents()){
+		for(ServiceProviderAgent a : vrpSolution.getTourAgents()){
 			if(!a.isActive()){
 				continue;
 			}

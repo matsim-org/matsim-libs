@@ -308,5 +308,6 @@ public final class RuinAndRecreate {
 	public void setIterations(int iterations) {
 		nOfIterations = iterations;
 	}
+
 	
 }

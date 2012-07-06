@@ -34,7 +34,7 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
  *
  */
 
-class RRDriverAgent implements ServiceProviderAgent {
+class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	
 	private static Logger logger = Logger.getLogger(RRDriverAgent.class);
 	
@@ -150,6 +150,7 @@ class RRDriverAgent implements ServiceProviderAgent {
 			tour.getActivities().add(id.deliveryInsertionIndex, new Delivery(shipment));
 			tour.getActivities().add(id.pickupInsertionIndex, new Pickup(shipment));
 			tourStatusOutOfSync = true;
+			syncTour();
 			offerMemory.clear();
 		}
 		else {
