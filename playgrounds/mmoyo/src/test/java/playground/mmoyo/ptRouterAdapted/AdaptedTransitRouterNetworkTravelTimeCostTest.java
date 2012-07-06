@@ -82,8 +82,8 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		//original MATSim
 		//assertEquals(2.0*60 + 7.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
 		//with adaption   (link travel time is not departureTime dependent anymore) 
-		//link travel time = 11 mins  
-		assertEquals(11.0*60 , timecost.getLinkTravelTime(testLink, 6.0*3600) , MatsimTestCase.EPSILON);
+		//link travel time = 9 mins    
+		assertEquals(9.0*60 , timecost.getLinkTravelTime(testLink, 6.0*3600) , MatsimTestCase.EPSILON);
 		
 		/*
 		//if the agents arrives to stop (in or outside the veh) before  06:02, his/her "arrrival veh time" is 05:58
