@@ -33,14 +33,19 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
+import playground.wrashid.lib.DebugLib;
+import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
+
 public class UpdateLastParkingArrivalTime implements AgentArrivalEventHandler {
 
 	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
 	private final Map<Id, Double> lastParkingArrivalTime;
+	private Map<Id, Double> currentPlanElementIndexCarDeparture;
 
 	public UpdateLastParkingArrivalTime(Map<Id, ExperimentalBasicWithindayAgent> agents) {
 		this.agents = agents;
 		this.lastParkingArrivalTime = new HashMap<Id, Double>();
+		this.currentPlanElementIndexCarDeparture=new HashMap<Id, Double>();
 	}
 
 	public Double getTime(Id personId) {
@@ -57,18 +62,20 @@ public class UpdateLastParkingArrivalTime implements AgentArrivalEventHandler {
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 
+		
 		if (planElementIndex+2==executedPlan.getPlanElements().size()){
 			return;
 		}
 		
-		Leg currentLeg = (Leg) executedPlan.getPlanElements().get(planElementIndex);
 		Leg nextLeg = (Leg) executedPlan.getPlanElements().get(planElementIndex + 2);
 
-		if (currentLeg.getMode().equals(TransportMode.car) && nextLeg.getMode().equals(TransportMode.walk)) {
+		if (event.getLegMode().equals(TransportMode.car) && nextLeg.getMode().equals(TransportMode.walk)) {
 			lastParkingArrivalTime.put(event.getPersonId(), event.getTime());
 		}
 	}
+	
+	
 
 }

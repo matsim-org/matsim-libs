@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
 //Done.
 public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEventHandler, AgentArrivalEventHandler {
@@ -66,7 +67,7 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 	public void handleEvent(AgentArrivalEvent event) {
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
 			return;
@@ -103,7 +104,7 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 	public void handleEvent(AgentDepartureEvent event) {
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 		double startTimeWalkLeg = event.getTime();
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
@@ -39,6 +40,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
 public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandler, ActivityEndEventHandler {
 	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
@@ -72,14 +74,15 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
 		Plan executedPlan = agent.getSelectedPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedActIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
 			return;
 		}
 		
-		if (!isPlanElementDuringDay(personId, planElementIndex)) {
-			Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex + 2);
+		if (!isPlanElementDuringDay(personId, planElementIndex) && executedPlan.getPlanElements().size()>planElementIndex+2) {
+			
+			Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex+2);
 
 			if (nextAct.getType().equals("parking")) {
 				double endActivityTime = event.getTime();
@@ -87,6 +90,8 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 			}
 		}
 	}
+	
+	
 
 	// this is invoked in the evening
 	@Override
@@ -97,7 +102,7 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedActIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
 			return;

@@ -40,6 +40,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
 /**
  * 
@@ -98,7 +99,7 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 		
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)) {
 			return;
@@ -125,6 +126,8 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 			durationSecondWalk = GeneralLib.getIntervalDuration(secondParkingWalkTmp.get(personId), event.getTime());
 		}
 
+		
+		
 		updateWalkTimeTmpVariables(event.getLegMode(), personId, executedPlan, planElementIndex, durationFirstWalk,
 				durationSecondWalk);
 	}
@@ -145,7 +148,7 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 	
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 		double startTimeWalkLeg = event.getTime();
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)) {
@@ -158,8 +161,11 @@ public class CaptureParkingWalkTimesDuringDay implements AgentDepartureEventHand
 
 	private void updateWalkTimeTmpVariables(String legMod, Id personId, Plan executedPlan, int planElementIndex, double valueA,
 			double valueB) {
+		
+		
 		if (isPlanElementDuringDay(personId, planElementIndex)) {
 			if (legMod.equals(TransportMode.walk)) {
+				
 				Activity previousAct = (Activity) executedPlan.getPlanElements().get(planElementIndex - 1);
 				Leg previousLeg = (Leg) executedPlan.getPlanElements().get(planElementIndex - 2);
 

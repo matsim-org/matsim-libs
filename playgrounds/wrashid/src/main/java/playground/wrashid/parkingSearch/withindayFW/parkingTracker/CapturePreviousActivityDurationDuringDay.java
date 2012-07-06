@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
 //If several activities between two parking activities, count sum of all activities
 
@@ -76,14 +77,23 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
+		DebugLib.traceAgent(personId, 11);
+		
+		
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
 			return;
 		}
 		
-		if (isPlanElementDuringDay(personId, planElementIndex)) {
-			Activity nextAct = (Activity) executedPlan.getPlanElements().get(planElementIndex + 2);
+		if (isCurrentActivityDuringDay(personId, planElementIndex)) {
+			
+			Activity nextAct = ParallelSafePlanElementAccessLib.getNextAct(agent);
 
 			if (nextAct.getType().equals("parking")) {
+				
+				if (activityDurationTmpValue.get(personId)==null){
+					DebugLib.emptyFunctionForSettingBreakPoint();
+				}
+				
 				activityDurationTmpValue.put(personId,
 						GeneralLib.getIntervalDuration(activityDurationTmpValue.get(personId), event.getTime()));
 			}
@@ -98,15 +108,17 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
 
+		
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		
+		DebugLib.traceAgent(personId, 11);
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
 			return;
 		}
 
-		if (isPlanElementDuringDay(personId, planElementIndex)) {
+		if (isCurrentActivityDuringDay(personId, planElementIndex)) {
 			Activity previousAct = (Activity) executedPlan.getPlanElements().get(planElementIndex - 2);
 
 			if (previousAct.getType().equals("parking")) {
@@ -118,7 +130,11 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 
 	}
 
-	private boolean isPlanElementDuringDay(Id personId, int planElementIndex) {
+	private boolean isCurrentActivityDuringDay(Id personId, int planElementIndex) {
+		if (planElementIndex%2==1){
+			planElementIndex--;
+		}
+		
 		return planElementIndex > firstParkingActivityPlanElemIndex.get(personId)
 				&& planElementIndex < lastParkingActivityPlanElemIndex.get(personId);
 	}

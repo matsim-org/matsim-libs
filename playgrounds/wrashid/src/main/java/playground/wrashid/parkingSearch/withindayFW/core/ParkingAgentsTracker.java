@@ -87,6 +87,7 @@ import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CapturePrevio
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureWalkDurationOfFirstAndLastOfDay;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateEndTimeOfPreviousActivity;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateLastParkingArrivalTime;
+import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 // TODO: clearly inspect, which variables have not been reset at beginning of 1st iteration (after 0th iteration).
@@ -371,7 +372,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		this.selectedParkingsMap.remove(personId);
 
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 		TwoHashMapsConcatenated<Id, Integer, ParkingStrategy> currentlySelectedParkingStrategies = parkingStrategyManager
 				.getCurrentlySelectedParkingStrategies();
 
@@ -511,13 +513,18 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		Plan executedPlan = agent.getSelectedPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedActIndex(agent);
 
 		if (event.getActType().equalsIgnoreCase("parking")) {
 			lastParkingFacilityId.put(personId, event.getFacilityId());
 
+			if (executedPlan.getPlanElements().size()<=planElementIndex+1){
+				//TODO: this is just a hack!
+				planElementIndex-=2;
+			}
+			
 			Leg nextLeg = (Leg) executedPlan.getPlanElements().get(planElementIndex + 1);
-
+			
 			if (isPlanElementDuringDay(personId, planElementIndex) && nextLeg.getMode().equals(TransportMode.car)) {
 
 				updateParkingScoreDuringDay(event);
