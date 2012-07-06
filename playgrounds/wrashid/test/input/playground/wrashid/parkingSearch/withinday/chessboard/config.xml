@@ -22,9 +22,9 @@
 	<module name="controler">
 		<param name="outputDirectory" value="./output/chessboard" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
-		<param name= "writeEventsInterval" value="10" />
-		<param name= "mobsim" value="QSim" />
+		<param name="lastIteration" value="100" />
+		<param name= "writeEventsInterval" value="0" />
+		<param name= "mobsim" value="qsim" />
 	</module>
 
 	<module name="multimodal" >
@@ -104,6 +104,14 @@
 		<param name="stuckTime" value="60" />
 		<param name="removeStuckVehicles" value="false" />
 		<param name="vehicleBehavior" value="exception" />
+	</module>
+
+<module name="TimeAllocationMutator">
+	<param name="mutationRange" value="7200.0" />
+</module>
+
+	<module name="parallelEventHandling">
+		<param name="numberOfThreads" value="1" />
 	</module>
 
 </config>
