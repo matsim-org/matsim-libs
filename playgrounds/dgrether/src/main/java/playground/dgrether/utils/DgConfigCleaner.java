@@ -56,7 +56,9 @@ public class DgConfigCleaner {
 					line.contains("evacuationTime") ||
 					line.contains("snapshotfile") ||
 					line.contains("offsetWalk") ||
-					line.contains("outputTimeFormat")
+					line.contains("outputTimeFormat") ||
+					line.contains("constrained") ||
+					line.contains("simple_tg")
 				) {
 				line = reader.readLine();
 				continue;
