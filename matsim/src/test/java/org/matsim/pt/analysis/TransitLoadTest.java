@@ -91,10 +91,14 @@ public class TransitLoadTest {
 		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.2*3600, id[3], vehicleIdDep1));
 		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(7.2*3600+20, vehicleIdDep1, stop3.getId(), 0));
 
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.25*3600, new IdImpl("carDriver1"), new IdImpl("car1")));
+
 		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(7.3*3600-20, vehicleIdDep1, stop4.getId(), 0));
 		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600-5, id[1], vehicleIdDep1));
 		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600, id[3], vehicleIdDep1));
 		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(7.3*3600+5, vehicleIdDep1, stop4.getId(), 0));
+
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.35*3600-5, new IdImpl("carDriver1"), new IdImpl("car1")));
 
 		Assert.assertEquals(1, tl.getLoadAtDeparture(line1, route1, stop1, dep1));
 		Assert.assertEquals(2, tl.getLoadAtDeparture(line1, route1, stop2, dep1));

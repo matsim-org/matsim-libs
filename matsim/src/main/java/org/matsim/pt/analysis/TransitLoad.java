@@ -80,25 +80,29 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 	}
 
 	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+	public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
 		this.vehicleFacilityMap.put(event.getVehicleId(), event.getFacilityId());
 		if (this.vehicleData == null) {
 			collectVehiclesInfo();
 		}
 		VehicleData vData = this.vehicleData.get(event.getVehicleId());
-		StopInformation si = getStopInformation(vData.line, vData.route, this.vehicleFacilityMap.get(event.getVehicleId()), vData.departure, true);
-		si.arrivalTime = event.getTime();
+		if (vData != null) {
+			StopInformation si = getStopInformation(vData.line, vData.route, this.vehicleFacilityMap.get(event.getVehicleId()), vData.departure, true);
+			si.arrivalTime = event.getTime();
+		}
 	}
 
 	@Override
-	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
 		Id stopId = this.vehicleFacilityMap.remove(event.getVehicleId());
 		if (this.vehicleData == null) {
 			collectVehiclesInfo();
 		}
 		VehicleData vData = this.vehicleData.get(event.getVehicleId());
-		StopInformation si = getStopInformation(vData.line, vData.route, stopId, vData.departure, true);
-		si.departureTime = event.getTime();
+		if (vData != null) {
+			StopInformation si = getStopInformation(vData.line, vData.route, stopId, vData.departure, true);
+			si.departureTime = event.getTime();
+		}
 	}
 
 	@Override
@@ -107,8 +111,10 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 			collectVehiclesInfo();
 		}
 		VehicleData vData = this.vehicleData.get(event.getVehicleId());
-		StopInformation si = getStopInformation(vData.line, vData.route, this.vehicleFacilityMap.get(event.getVehicleId()), vData.departure, true);
-		si.nOfEntering++;
+		if (vData != null) {
+			StopInformation si = getStopInformation(vData.line, vData.route, this.vehicleFacilityMap.get(event.getVehicleId()), vData.departure, true);
+			si.nOfEntering++;
+		}
 	}
 
 	@Override
@@ -117,12 +123,14 @@ public class TransitLoad implements VehicleArrivesAtFacilityEventHandler, Vehicl
 			collectVehiclesInfo();
 		}
 		VehicleData vData = this.vehicleData.get(event.getVehicleId());
-		StopInformation si = getStopInformation(vData.line, vData.route, this.vehicleFacilityMap.get(event.getVehicleId()), vData.departure, true);
-		si.nOfLeaving++;
+		if (vData != null) {
+			StopInformation si = getStopInformation(vData.line, vData.route, this.vehicleFacilityMap.get(event.getVehicleId()), vData.departure, true);
+			si.nOfLeaving++;
+		}
 	}
 
 	@Override
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		this.vehicleFacilityMap.clear();
 		if (this.vehicleData != null) {
 			this.vehicleData.clear();
