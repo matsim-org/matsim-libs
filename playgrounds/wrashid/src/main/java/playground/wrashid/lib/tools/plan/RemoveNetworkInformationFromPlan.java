@@ -16,12 +16,12 @@ import playground.wrashid.lib.GeneralLib;
 public class RemoveNetworkInformationFromPlan {
 	public static void main(String[] args) {
 		
-		String inputPlansFile="H:/data/experiments/ARTEMIS/input/plans_census2000v2_zrhCutC_1pct.xml";
-		String inputNetworkFile="P:/Projekte/matsim/data/switzerland/networks/teleatlas-ivtcheu-zrhCutC/network.xml.gz";
-		String inputFacilities="P:/Projekte/matsim/data/switzerland/facilities/facilities.zrhCutC.xml.gz";
+		String inputPlansFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_plans.xml.gz";
+		String inputNetworkFile="P:/Projekte/matsim/data/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
+		String inputFacilities="P:/Projekte/matsim/data/switzerland/facilities/facilities.xml.gz";
 		
 		
-		String outputPlansFile="H:/data/experiments/ARTEMIS/input/tmp.xml";		
+		String outputPlansFile="c:/eTmp/plans_census2000v2_zrhCutC_10pct_no_network_info.xml";		
 		
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
 		

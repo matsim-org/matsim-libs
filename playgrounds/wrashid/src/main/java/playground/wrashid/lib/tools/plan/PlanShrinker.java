@@ -8,7 +8,7 @@ import playground.wrashid.lib.GeneralLib;
 public class PlanShrinker {
 
 	public static void main(final String[] args) {
-		String inputPlansFile="H:/data/experiments/ARTEMIS/input/plans_census2000v2_zrhCutC_1pct_no_network_info.xml";
+		String inputPlansFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_plans.xml.gz";
 		String inputNetworkFile="H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
 		String inputFacilities="H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
 		double populationFraction=0.5;
