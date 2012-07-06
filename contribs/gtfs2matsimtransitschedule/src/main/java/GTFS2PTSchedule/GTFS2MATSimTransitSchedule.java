@@ -78,7 +78,7 @@ import GTFS2PTSchedule.auxiliar.LinkStops;
 
 
 public class GTFS2MATSimTransitSchedule {
-	
+
 	//Constants
 	/**
 	 * Log
@@ -90,7 +90,7 @@ public class GTFS2MATSimTransitSchedule {
 	private static final double MAX_DISTANCE_STOP_LINK = 50*180/(6371000*Math.PI);
 	private static final double DEFAULT_FREE_SPEED = 6;
 	private static final double DEFAULT_CAPACITY = 500;
-	
+
 	//Attributes
 	/**
 	 * The folder root of the GTFS files
@@ -125,14 +125,14 @@ public class GTFS2MATSimTransitSchedule {
 	 */
 	private SortedMap<String, Route>[] routes;
 	/**
-	 * The time format 
+	 * The time format
 	 */
 	private SimpleDateFormat timeFormat;
 	/**
 	 * Desired coordinates system
 	 */
 	private CoordinateTransformation coordinateTransformation;
-	
+
 	//Methods
 	/**
 	 * @param root
@@ -158,13 +158,12 @@ public class GTFS2MATSimTransitSchedule {
 			File networkFolder = new File(RoutesPathsGenerator.NEW_NETWORK_FOLDER);
 			if(!networkFolder.exists())
 				if(!networkFolder.mkdir()) {
-					log.error("It was not possible to create the network temporal folder");
-					throw new IOException();
+					String msg = "It was not possible to create the network temporal folder: " + networkFolder.getAbsolutePath();
+					throw new IOException(msg);
 				}
 			if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.exists())
 				if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.createNewFile()) {
-					log.error("It was not possible to create the network temporal nodes file");
-					throw new IOException();
+					throw new IOException("It was not possible to create the network temporal nodes file: " + RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.getAbsolutePath());
 				}
 			BufferedReader reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_NODES_FILE));
 			String line = reader.readLine();
@@ -176,8 +175,7 @@ public class GTFS2MATSimTransitSchedule {
 			reader.close();
 			if(!RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE.exists())
 				if(!RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE.createNewFile()) {
-					log.error("It was not possible to create the network temporal links file");
-					throw new IOException();
+					throw new IOException("It was not possible to create the network temporal links file: " + RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE);
 				}
 			reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE));
 			line = reader.readLine();
@@ -213,10 +211,10 @@ public class GTFS2MATSimTransitSchedule {
 			int size = roots.length;
 			stops = new Map[size];
 			services = new Map[size];
-			shapes = new Map[size]; 
+			shapes = new Map[size];
 			routes = new SortedMap[size];
 			int publicSystemNumber=0;
-			for(File root:roots) {
+			for(File root : roots) {
 				stops[publicSystemNumber]=new HashMap<String, Stop>();
 				services[publicSystemNumber]=new HashMap<String, Service>();
 				shapes[publicSystemNumber]=new HashMap<String, Shape>();
@@ -227,10 +225,10 @@ public class GTFS2MATSimTransitSchedule {
 						reader = new BufferedReader(new FileReader(file));
 						int[] indices = gtfs.getIndices(reader.readLine());
 						line = reader.readLine();
+						Method processMethod = GTFS2MATSimTransitSchedule.class.getMethod(gtfs.getFunction(), new Class[] {String[].class, int[].class, int.class});
 						while(line!=null) {
 							String[] parts = line.split(",");
-							Method m = GTFS2MATSimTransitSchedule.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class,int.class});
-							m.invoke(this, new Object[]{parts,indices,publicSystemNumber});
+							processMethod.invoke(this, new Object[]{parts, indices, publicSystemNumber});
 							line = reader.readLine();
 						}
 						reader.close();
@@ -322,7 +320,7 @@ public class GTFS2MATSimTransitSchedule {
 	}
 	/**
 	 * From the loaded information calculates all the necessary information for MATSim
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private void calculateUnknownInformation() throws IOException {
 		//Setting Route types to the stops
@@ -371,7 +369,7 @@ public class GTFS2MATSimTransitSchedule {
 				if(link!=null)
 					changeTrips(linkStops.getLink(), link, true, publicTransportSystem);
 			}
-		}	
+		}
 	}
 	private void changeTrips(Link link, Link split, boolean last, byte publicTransporSystem) {
 		for(Route route:routes[publicTransporSystem].values())
@@ -474,8 +472,8 @@ public class GTFS2MATSimTransitSchedule {
 	 * 0 - Transit schedule file
 	 * 1 - Input network file
 	 * 2 - Output network file
-	 * 3 - Name of the network 
-	 * @throws Exception 
+	 * 3 - Name of the network
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
