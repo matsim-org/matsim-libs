@@ -35,6 +35,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
@@ -46,6 +47,8 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 	private final static Logger log = Logger.getLogger(PTransitAgent.class);
 	
 	private boolean boardAllLines;
+	private TransitSchedule transitSchedule;
+
 
 	public static PTransitAgent createTransitAgent(Person p, Netsim simulation, boolean boardAllLines) {
 		PTransitAgent agent = new PTransitAgent(p, simulation, boardAllLines);
@@ -56,6 +59,7 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 	private PTransitAgent(final Person p, final Netsim simulation, boolean boardAllLines) {
 		super(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
 		this.boardAllLines = boardAllLines;
+		this.transitSchedule = simulation.getScenario().getTransitSchedule();
 	}
 
 	@Override
@@ -68,24 +72,70 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		
-		if (this.boardAllLines) {
-			return containsId(stopsToCome, route.getEgressStopId());
-		} else {
-			if (line.getId().equals(route.getLineId())) {
-				return containsId(stopsToCome, route.getEgressStopId());
-			} else {
-				return false;
+		if(containsId(stopsToCome, route.getEgressStopId())){
+			if (this.transitSchedule.getTransitLines().get(route.getLineId()) == null) {
+				// agent is still on an old line, which probably went bankrupt - enter anyway
+				return true;
+			}
+			
+			TransitRoute transitRoutePlanned = this.transitSchedule.getTransitLines().get(route.getLineId()).getRoutes().get(route.getRouteId());
+			if (transitRoutePlanned == null) {
+				// agent is still on an old route, which probably got dropped - enter anyway
+				return true;
+			}
+			
+			TransitRoute transitRouteOffered = this.transitSchedule.getTransitLines().get(line.getId()).getRoutes().get(transitRoute.getId());
+
+			double offsetPlanned = getArrivalOffsetFromRoute(transitRoutePlanned, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRoutePlanned, route.getAccessStopId());
+			double offsetOffered = getArrivalOffsetFromRoute(transitRouteOffered, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRoutePlanned, route.getAccessStopId());
+			
+			if (offsetOffered <= offsetPlanned) {
+				return true;
 			}
 		}
+
+		return false;
+		
+//		if (this.boardAllLines) {
+//			return containsId(stopsToCome, route.getEgressStopId());
+//		} else {
+//			if (line.getId().equals(route.getLineId())) {
+//				return containsId(stopsToCome, route.getEgressStopId());
+//			} else {
+//				return false;
+//			}
+//		}
 	}
+
+	private double getArrivalOffsetFromRoute(TransitRoute transitRoutePlanned, Id egressStopId) {
+		for (TransitRouteStop routeStop : transitRoutePlanned.getStops()) {
+			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
+				return routeStop.getArrivalOffset();
+			}
+		}
+
+		// returning what???
+		return -1.0;
+	}
+	
+	private double getDepartureOffsetFromRoute(TransitRoute transitRoutePlanned, Id accessStopId) {
+		for (TransitRouteStop routeStop : transitRoutePlanned.getStops()) {
+			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
+				return routeStop.getDepartureOffset();
+			}
+		}
+
+		// returning what???
+		return -1.0;
+	}
+
 
 	private Leg getCurrentLeg() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		return (Leg) currentPlanElement;
 	}
 
-	private boolean containsId(List<TransitRouteStop> stopsToCome,
-			Id egressStopId) {
+	private boolean containsId(List<TransitRouteStop> stopsToCome, Id egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
 				return true;
