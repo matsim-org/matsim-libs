@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Link;
  * network. Implementation is based on the idea of a MX-CIF quadtree (Kedem,
  * 1981).
  * <p/>
- *"The MX-CIF quadtree of Kedem (1981) (see also Abel and Smith 1983) is a
+ * "The MX-CIF quadtree of Kedem (1981) (see also Abel and Smith 1983) is a
  * region-based representation where each rectangle is associated with the
  * quadtree node corresponding to the smallest block which contains it in its
  * entirety. Subdivision ceases whenever a node's block contains no rectangles.
@@ -70,16 +70,14 @@ public class LinkQuadTree {
 		public void put(final LinkWrapper w) {
 			if (this.children == null && this.links.isEmpty()) {
 				// (means quadtree node neither has children nor contains a link yet)
-				
+
 				this.links.add(w);
 				// (node now contains this link)
 			} else {
 				int pos = getChildPosition(w);
 				if (pos == NO_CHILD) {
+					// (i.e. link extends over more than one child node, so the current node is the smallest one that fully contains the link.
 					this.links.add(w);
-					// (i.e. when bounding box of link includes center of this quadtree node, links is registered at this 
-					// quadtree node)
-
 				} else {
 					if (this.children == null) {
 						split();
@@ -105,7 +103,7 @@ public class LinkQuadTree {
 					if (tmp != null) {
 						closest = tmp;
 					}
-					
+
 					// my current intuition is that the following block should be one level up.  kai, jul'12
 					for (int c = 0; c < 4; c++) {
 						if (c != childNo) {
@@ -140,9 +138,8 @@ public class LinkQuadTree {
 					keep.add(w);
 				} else {
 					this.children[pos].put(w);
-					// (seems to me that this cannot happen to more than one link since the quadtree node will split 
-					// as soon as a second link is added that contains the center of the quadtree node.  But
-					// I may be wrong.  kai, jul'12)
+					// (seems to me that this cannot happen to more than one link since the quadtree node will split
+					// as soon as a second link is added that can be assigned to a child node.  kai, jul'12)
 				}
 			}
 			this.links.clear();
@@ -154,7 +151,7 @@ public class LinkQuadTree {
 			// center of the bounding box of this quadtree node:
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
-			
+
 			if (w.maxX < centerX && w.minY > centerY) {
 				// (bounding box of link lies fully to left and above the center of the quadtree node)
 				return CHILD_NW;
@@ -169,7 +166,7 @@ public class LinkQuadTree {
 				return CHILD_SW;
 			}
 			return NO_CHILD;
-			// (happens when bounding box of link includes center of quadtree node .. i.e. in particular with long links)
+			// (happens when bounding box of link overlaps more than one child node.. i.e. in particular with long links)
 		}
 
 		private int getChildPosition(final double x, final double y) {
@@ -267,7 +264,7 @@ public class LinkQuadTree {
 			double fy = link.getFromNode().getCoord().getY();
 			double tx = link.getToNode().getCoord().getX();
 			double ty = link.getToNode().getCoord().getY();
-			
+
 			this.minX = Math.min(fx, tx);
 			this.minY = Math.min(fy, ty);
 			this.maxX = Math.max(fx, tx);
