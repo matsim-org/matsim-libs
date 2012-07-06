@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -97,8 +96,7 @@ public class BkVisLiveFromLastIteration {
 		configReader.readFile(newConfigFile);
 		OutputDirectoryHierarchy oldConfControlerIO;
 		if (config.controler().getRunId() != null) {
-			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, new IdImpl(config.controler()
-					.getRunId()), false);
+			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, config.controler().getRunId(), false);
 		}
 		else {
 			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, false);

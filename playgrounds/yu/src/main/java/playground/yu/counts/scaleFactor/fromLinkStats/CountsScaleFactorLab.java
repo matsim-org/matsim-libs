@@ -35,13 +35,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
@@ -288,7 +288,7 @@ public class CountsScaleFactorLab {
 
 			int iteration = ctlCG.getFirstIteration();
 			OutputDirectoryHierarchy ctlIO = new OutputDirectoryHierarchy(ctlCG.getOutputDirectory(),
-					new IdImpl(ctlCG.getRunId()), false);
+					ctlCG.getRunId(), false);
 
 			// String filename = ctlIO.getIterationFilename(iteration, "sf"
 			// + scaleFactor + "_countscompare" + ".kmz");

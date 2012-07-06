@@ -293,7 +293,7 @@ public class CountsScaleFactorLab {
 
 			int iteration = ctlCG.getFirstIteration();
 			OutputDirectoryHierarchy ctlIO = new OutputDirectoryHierarchy(ctlCG.getOutputDirectory(),
-					new IdImpl(ctlCG.getRunId()), false);
+					ctlCG.getRunId(), false);
 
 			// String filename = ctlIO.getIterationFilename(iteration, "sf"
 			// + scaleFactor + "_countscompare" + ".kmz");

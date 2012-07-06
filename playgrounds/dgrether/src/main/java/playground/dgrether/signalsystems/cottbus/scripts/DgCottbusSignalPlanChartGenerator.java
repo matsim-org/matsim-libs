@@ -82,7 +82,7 @@ public class DgCottbusSignalPlanChartGenerator {
 		//skript
 		OutputDirectoryHierarchy io = null;
 		if (runId != null) 
-			io = new OutputDirectoryHierarchy(baseDir, runId, false);
+			io = new OutputDirectoryHierarchy(baseDir, runId.toString(), false);
 		else
 			io = new OutputDirectoryHierarchy(baseDir, false);
 		
