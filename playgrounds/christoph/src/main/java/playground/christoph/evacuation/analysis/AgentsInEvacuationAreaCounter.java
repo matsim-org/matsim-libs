@@ -567,13 +567,15 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			bw.write("\n");
 			
 			for (String transportMode : this.transportModes) {
+				int participating = participatingEvacueesPerMode.get(transportMode);
+				int notParticipating = notParticipatingEvacueesPerMode.get(transportMode);
 				bw.write(transportMode);
 				bw.write("\t");
-				bw.write(participatingEvacueesPerMode.get(transportMode));
+				bw.write(String.valueOf(participating));
 				bw.write("\t");
-				bw.write(notParticipatingEvacueesPerMode.get(transportMode));
+				bw.write(String.valueOf(notParticipating));
 				bw.write("\t");
-				bw.write(participatingEvacueesPerMode.get(transportMode) + notParticipatingEvacueesPerMode.get(transportMode));
+				bw.write(String.valueOf(participating + notParticipating));
 				bw.write("\n");
 			}
 			
