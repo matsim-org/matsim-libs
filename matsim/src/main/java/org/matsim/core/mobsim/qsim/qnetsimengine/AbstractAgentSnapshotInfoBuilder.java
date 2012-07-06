@@ -27,6 +27,7 @@ import java.util.Queue;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -141,9 +142,10 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			TransitVehicle transitVehicle = (TransitVehicle) veh; //currently only TransitVehicles are able to have passengers
 			this.createAndAddSnapshotInfoForPassengers(positions, transitVehicle.getPassengers(), distanceFromFromNode, startCoord, endCoord, lengthOfCurve, euclideanLength, 
 					lane, speedValueBetweenZeroAndOne);
-		}
-		else {
+		} else if ( driverAgent.getMode().equals(TransportMode.car)) {
 			pos.setAgentState(AgentState.PERSON_DRIVING_CAR);
+		} else {
+			pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		}
 		positions.add(pos);
 	}
