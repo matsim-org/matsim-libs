@@ -143,6 +143,12 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 					PriorityQueue<SortableMapObject<ActivityFacility>> priorityQueue = new PriorityQueue<SortableMapObject<ActivityFacility>>();
 
 					for (ActivityFacility parkingFacility : parkings) {
+						
+						if (parkingFacility.getId().toString().contains("gp")){
+							DebugLib.emptyFunctionForSettingBreakPoint();
+						}
+						
+						
 						double walkingDistance = GeneralLib.getDistance(parkingFacility.getCoord(), nextNonParkingAct.getCoord());
 
 						double parkingDuration;
@@ -157,7 +163,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 						double activityDuration = ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time,
 								planElements, currentPlanElementIndex);
 						double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration,
-								GeneralLib.getWalkingTravelDuration(walkingDistance));
+								GeneralLib.getWalkingTravelDuration(walkingDistance)/60);
 						double costScore = parkingAgentsTracker.getParkingCostScore(personId, time, parkingDuration,
 								parkingFacility.getId());
 						
