@@ -33,7 +33,7 @@ public class FacilityLoadInfo {
 	private Id facilityId;
 	private int personEntering = 0;
 	private int personLeaving = 0;
-	private int passengers = 0;
+	private int passengersWhenLeavingFacility;
 
 	public FacilityLoadInfo(Id id) {
 		this.facilityId = id;
@@ -59,11 +59,12 @@ public class FacilityLoadInfo {
 		return personLeaving;
 	}
 
-	public void setPassengers(int passengers) {
-		this.passengers = passengers;
+	public void setPassengersWhenLeavingFacility(
+			int passengersWhenLeavingFacility) {
+		this.passengersWhenLeavingFacility = passengersWhenLeavingFacility;
 	}
 
-	public int getPassengers() {
-		return passengers;
+	public int getPassengersWhenLeavingFacility() {
+		return passengersWhenLeavingFacility;
 	}
 }

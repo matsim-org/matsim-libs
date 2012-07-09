@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -177,7 +176,7 @@ public class TextFileWriter {
 			    bw.write(zeile0);
 			    bw.newLine();
 			    
-			    String zeile1 = "WaitingTimeId ; Daytime (sec) (when entering a vehicle); WaitingTime (sec)";
+			    String zeile1 = "WaitingTimeId ; Daytime (sec) (when entering a vehicle) ; PersonId ; WaitingTime (sec)";
 			    bw.write(zeile1);
 			    bw.newLine();
 			   			   	
@@ -185,8 +184,9 @@ public class TextFileWriter {
 			    				    	
 			    	Double dayTime = facilityInfo.getWaitingEvent2DayTime().get(waitingTimeId);
 			    	Double waitingTime = facilityInfo.getWaitingEvent2WaitingTime().get(waitingTimeId);
-			    			    	
-			    	String zeile = waitingTimeId + " ; " + dayTime + " ; " + waitingTime;
+			    	Id personId = facilityInfo.getWaitingEvent2PersonId().get(waitingTimeId);
+			    	
+			    	String zeile = waitingTimeId + " ; " + dayTime + " ; " + personId + " ; "+ waitingTime;
 			
 			    	bw.write(zeile);
 			        bw.newLine();
@@ -220,7 +220,7 @@ public class TextFileWriter {
 		
 		ExtItInformation info = extIt2information.get(extItParam1);
 
-		for (AnalysisPeriod anaPeriod : info.getAnalysisPeriods()){
+		for (AnalysisPeriod anaPeriod : info.getAnalysisPeriods().values()){
 				
 			for (Id routeId : anaPeriod.getRouteId2RouteInfo().keySet()){
 				bw.newLine();
@@ -235,15 +235,15 @@ public class TextFileWriter {
 				bw.write(zeilePeriod);
 				bw.newLine();
 	
-				String zeile2 = "TransitStopId ; EnteringAgents ; LeavingAgents";
+				String zeile2 = "TransitStopId ; EnteringAgents ; LeavingAgents ; PassengersWhenLeavingTransitStop";
 				bw.write(zeile2);
 				bw.newLine();
 				
-				SortedMap<Id, FacilityLoadInfo> stopId2FacilityLoadInfo = anaPeriod.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo();
-
+				Map<Id, FacilityLoadInfo> stopId2FacilityLoadInfo = anaPeriod.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo();
+				List<Id> stopIDs = anaPeriod.getRouteId2RouteInfo().get(routeId).getStopIDs();
 				
-				for (Id stopId : stopId2FacilityLoadInfo.keySet()){
-					String zeile3 = stopId.toString() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPersonEntering() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPersonLeaving();
+				for (Id stopId : stopIDs){
+					String zeile3 = stopId.toString() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPersonEntering() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPersonLeaving() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPassengersWhenLeavingFacility();
 					bw.write(zeile3);
 					bw.newLine();
 				}		
@@ -277,7 +277,7 @@ public class TextFileWriter {
 		bw.write(zeile1);
 		bw.newLine();
 		
-		for (AnalysisPeriod anaPeriod : info.getAnalysisPeriods()){
+		for (AnalysisPeriod anaPeriod : info.getAnalysisPeriods().values()){
 			String zeile = anaPeriod.getStart()/3600. + " - " + anaPeriod.getEnd()/3600. + " ; " + anaPeriod.getEntering() + " ; " + anaPeriod.getLeaving();
 			bw.write(zeile);
 			bw.newLine();

@@ -123,12 +123,15 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 				FacilityWaitTimeInfo facilityInfo = new FacilityWaitTimeInfo();
 				SortedMap<Id, Double> waitingEvent2WaitingTime = new TreeMap<Id, Double>();
 				SortedMap<Id, Double> waitingEvent2DayTime = new TreeMap<Id, Double>(); // daytime when person enters vehicle
-				
+				SortedMap<Id, Id> waitingEvent2PersonId = new TreeMap<Id, Id>();
+
 				facilityInfo.setFacilityId(currentFacilityId);
 				waitingEvent2WaitingTime.put(new IdImpl(waitingTimeCounter), waitingTime);
 				facilityInfo.setWaitingEvent2WaitingTime(waitingEvent2WaitingTime);
 				waitingEvent2DayTime.put(new IdImpl(waitingTimeCounter), event.getTime());
 				facilityInfo.setWaitingEvent2DayTime(waitingEvent2DayTime);
+				waitingEvent2PersonId.put(new IdImpl(waitingTimeCounter), event.getPersonId());
+				facilityInfo.setWaitingEvent2PersonId(waitingEvent2PersonId);
 				
 				if (waitingTime > this.headway){
 					facilityInfo.setNumberOfWaitingTimesMoreThanHeadway(1);

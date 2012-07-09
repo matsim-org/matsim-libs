@@ -39,6 +39,7 @@ public class FacilityWaitTimeInfo {
 	private int numberOfMissedVehicles;
 	private SortedMap<Id, Double> waitingEvent2WaitingTime = new TreeMap<Id, Double>();
 	private SortedMap<Id, Double> waitingEvent2DayTime = new TreeMap<Id, Double>();
+	private SortedMap<Id, Id> waitingEvent2PersonId = new TreeMap<Id, Id>();
 	
 	public Id getFacilityId() {
 		return facilityId;
@@ -92,6 +93,14 @@ public class FacilityWaitTimeInfo {
 
 	public int getNumberOfMissedVehicles() {
 		return numberOfMissedVehicles;
+	}
+
+	public void setWaitingEvent2PersonId(SortedMap<Id, Id> waitingEvent2PersonId) {
+		this.waitingEvent2PersonId = waitingEvent2PersonId;
+	}
+
+	public SortedMap<Id, Id> getWaitingEvent2PersonId() {
+		return waitingEvent2PersonId;
 	}
 	
 }

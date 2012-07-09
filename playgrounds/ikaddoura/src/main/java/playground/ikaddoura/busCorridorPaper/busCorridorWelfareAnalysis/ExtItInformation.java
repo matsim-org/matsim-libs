@@ -23,11 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
 /**
- * @author benjamin
+ * @author ihab and benjamin
  *
  */
 public class ExtItInformation {
@@ -51,7 +53,7 @@ public class ExtItInformation {
 	private List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private List <Double> waitingTimesNotMissed = new ArrayList<Double>();
 	
-	private List <AnalysisPeriod> analysisPeriods = new ArrayList<AnalysisPeriod>();
+	private SortedMap <Integer, AnalysisPeriod> analysisPeriods = new TreeMap<Integer, AnalysisPeriod>();
 		
 	private int numberOfMissedVehicles;
 	private Map <Id, FacilityWaitTimeInfo> id2facilityWaitInfo = new HashMap<Id, FacilityWaitTimeInfo>();
@@ -244,12 +246,12 @@ public class ExtItInformation {
 		return noValidPlanScore;
 	}
 
-	public void setAnalysisPeriods(List <AnalysisPeriod> analysisPeriods) {
+	public void setAnalysisPeriods(SortedMap <Integer, AnalysisPeriod> analysisPeriods) {	
 		this.analysisPeriods = analysisPeriods;
 	}
 
-	public List <AnalysisPeriod> getAnalysisPeriods() {
+	public SortedMap <Integer, AnalysisPeriod> getAnalysisPeriods() {
 		return analysisPeriods;
 	}
-	
+		
 }

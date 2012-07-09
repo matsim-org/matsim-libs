@@ -23,8 +23,10 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
@@ -35,8 +37,11 @@ import org.matsim.api.core.v01.Id;
 public class RouteInfo {
 
 	private Id routeId;
-	private SortedMap<Id, FacilityLoadInfo> transitStopId2FacilityLoadInfo = new TreeMap<Id, FacilityLoadInfo>();
-
+	private Map<Id, FacilityLoadInfo> transitStopId2FacilityLoadInfo = new HashMap<Id, FacilityLoadInfo>();
+	private int passengersAllVeh;
+	private boolean test = false;
+	private List<Id> stopIDs = new ArrayList<Id>();
+	
 	public RouteInfo(Id id) {
 		this.routeId = id;
 	}
@@ -45,12 +50,36 @@ public class RouteInfo {
 		return routeId;
 	}
 
-	public void setTransitStopId2FacilityLoadInfo(SortedMap<Id, FacilityLoadInfo> id2FacilityLoadInfo) {
+	public void setTransitStopId2FacilityLoadInfo(Map<Id, FacilityLoadInfo> id2FacilityLoadInfo) {
 		this.transitStopId2FacilityLoadInfo = id2FacilityLoadInfo;
 	}
 
-	public SortedMap<Id, FacilityLoadInfo> getTransitStopId2FacilityLoadInfo() {
+	public Map<Id, FacilityLoadInfo> getTransitStopId2FacilityLoadInfo() {
 		return transitStopId2FacilityLoadInfo;
+	}
+
+	public void setPassengersAllVeh(int passengersAllVeh) {
+		this.passengersAllVeh = passengersAllVeh;
+	}
+
+	public int getPassengersAllVeh() {
+		return passengersAllVeh;
+	}
+
+	public void setTest(boolean test) {
+		this.test = test;
+	}
+
+	public boolean isTest() {
+		return test;
+	}
+
+	public void setStopIDs(List<Id> routeIDs) {
+		this.stopIDs = routeIDs;
+	}
+
+	public List<Id> getStopIDs() {
+		return stopIDs;
 	}
 
 }
