@@ -286,7 +286,7 @@ public class ParkingInfrastructure  {
 		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY()).getId();
 	}
 	
-	public Id getClosestParkingFacilityNotOnLink(Coord coord, Id linkId) {		
+	public synchronized Id getClosestParkingFacilityNotOnLink(Coord coord, Id linkId) {		
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
 		ActivityFacility parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		
