@@ -62,41 +62,53 @@ class ExternalControler {
 	int numberOfBuses;
 		
 	public static void main(final String[] args) throws IOException {
-		
-//		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_noTimeChoice.xml";
-//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/buses_fare_noTimeChoice";
-		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
-		
-//		op1 = OptimizationParameter1.FARE;
-//		op1 = OptimizationParameter1.CAPACITY;
+
+//		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
+//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
+//		
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-		lastExternalIterationParam1 = 0;
+		lastExternalIterationParam1 = 20;
 		
-//		op2 = OptimizationParameter2.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
-		lastExternalIterationParam2 = 0;
+		lastExternalIterationParam2 = 20;
 				
-		incrBusNumber = 2;
-		incrFare = -1.0;
+		incrBusNumber = 1;
+		incrFare = -0.25;
 		incrCapacity = 4;
 		
-//		ToDo: adjust arguments for cluster runs		
-//		configFile = args[0];
-//		outputExternalIterationDirPath = args[1];
-//		lastExternalIteration = Integer.parseInt(args[2]);
-//		String opString = args[3];
-//		
-//		if(opString.equals(OptimizationParameter1.FARE.toString())){
+		// ************************************************
+		
+		configFile = args[0];
+		outputExternalIterationDirPath = args[1];
+		
+//		String op1String = args[2];
+//		lastExternalIterationParam1 = Integer.parseInt(args[3]);
+//
+//		if(op1String.equals(OptimizationParameter1.FARE.toString())){
 //			op1 = OptimizationParameter1.FARE;
-//		} else if(opString.equals(OptimizationParameter1.CAPACITY.toString())){
+//		} else if(op1String.equals(OptimizationParameter1.CAPACITY.toString())){
 //			op1 = OptimizationParameter1.CAPACITY;
-//		} else if(opString.equals(OptimizationParameter1.NUMBER_OF_BUSES.toString())){
+//		} else if(op1String.equals(OptimizationParameter1.NUMBER_OF_BUSES.toString())){
 //			op1 = OptimizationParameter1.NUMBER_OF_BUSES;
 //		} else {
-//			throw new RuntimeException("Optimization parameter " + opString + " is unknown. Aborting... ");
+//			throw new RuntimeException("Optimization parameter " + op1String + " is unknown. Aborting... ");
 //		}
-		
+//		
+//		String op2String = args[4];
+//		lastExternalIterationParam2 = Integer.parseInt(args[5]);
+//
+//		if(op2String.equals(OptimizationParameter2.FARE.toString())){
+//			op2 = OptimizationParameter2.FARE;
+//		} else if(op1String.equals(OptimizationParameter2.NUMBER_OF_BUSES.toString())){
+//			op2 = OptimizationParameter2.NUMBER_OF_BUSES;
+//		} else {
+//			throw new RuntimeException("Optimization parameter " + op2String + " is unknown. Aborting... ");
+//		}
+//		
+//		incrBusNumber = Integer.parseInt(args[6]);
+//		incrFare = Integer.parseInt(args[7]);
+//		incrCapacity = Integer.parseInt(args[8]);
+
 		ExternalControler externalControler = new ExternalControler();
 		externalControler.run();
 	}
@@ -137,17 +149,6 @@ class ExternalControler {
 				
 				OperatorUserAnalysis analysis = new OperatorUserAnalysis(sc.getNetwork(), sc.getTransitSchedule(), directoryExtItParam2Param1, sc.getConfig().controler().getLastIteration(), vsw.getHeadway());
 				analysis.readEvents();
-				
-//				System.out.println("PtLoad:");
-//				for (RouteInfo routeInfo : analysis.getPtLoadHandler().getRouteId2RouteInfo().values()){
-//					System.out.println("*********Route: " + routeInfo.getRouteId());
-//					for (FacilityLoadInfo info : routeInfo.getTransitStopId2FacilityLoadInfo().values()){
-//						System.out.println(info.getFacilityId());
-//						System.out.println("Entering daytimes: " + info.getPersonEntering());
-//						System.out.println("Leaving daytimes: " + info.getPersonLeaving());
-//					}
-//
-//				}
 				
 				operator.calculateCosts(analysis);
 				users.calculateLogsum();

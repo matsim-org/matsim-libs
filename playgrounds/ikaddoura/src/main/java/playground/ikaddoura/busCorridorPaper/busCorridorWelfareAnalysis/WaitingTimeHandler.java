@@ -96,8 +96,8 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 			
 			waitingTimes.add(waitingTime);
 						
-			System.out.println("Headway --------------> " + this.headway);
-			System.out.println("WaitingTime ----------> " + waitingTime);
+//			System.out.println("Headway --------------> " + this.headway);
+//			System.out.println("WaitingTime ----------> " + waitingTime);
 				
 			// analyze waitingTime and save waitingTime per person differentiated for agents who missed and who didn't miss a bus
 
@@ -106,7 +106,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 				waitingTimesMissed.add(waitingTime);
 							
 				int missed = (int) (waitingTime / this.headway);
-				System.out.println("Missed Busses: " + missed);
+//				System.out.println("Missed Busses: " + missed);
 				this.numberOfMissedVehicles = this.numberOfMissedVehicles + missed;
 			}
 			
