@@ -236,7 +236,7 @@ public class ParkingHerbieControler {
 			double capacity = parking.getCapacity();
 			parking.setCapacity(capacity * calibrationFactor);
 			
-			if (capacity<1){
+			if (parking.getCapacity() <1){
 				emptyParking.add(parking);
 			}
 		}
