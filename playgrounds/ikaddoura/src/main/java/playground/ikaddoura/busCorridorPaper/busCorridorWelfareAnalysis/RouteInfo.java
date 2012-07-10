@@ -38,7 +38,6 @@ public class RouteInfo {
 
 	private Id routeId;
 	private Map<Id, FacilityLoadInfo> transitStopId2FacilityLoadInfo = new HashMap<Id, FacilityLoadInfo>();
-	private int passengersAllVeh;
 	private boolean test = false;
 	private List<Id> stopIDs = new ArrayList<Id>();
 	
@@ -58,14 +57,6 @@ public class RouteInfo {
 		return transitStopId2FacilityLoadInfo;
 	}
 
-	public void setPassengersAllVeh(int passengersAllVeh) {
-		this.passengersAllVeh = passengersAllVeh;
-	}
-
-	public int getPassengersAllVeh() {
-		return passengersAllVeh;
-	}
-
 	public void setTest(boolean test) {
 		this.test = test;
 	}
@@ -81,5 +72,4 @@ public class RouteInfo {
 	public List<Id> getStopIDs() {
 		return stopIDs;
 	}
-
 }

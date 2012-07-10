@@ -35,10 +35,12 @@ import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -48,7 +50,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author Ihab
  *
  */
-public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler {
+public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler {
 	
 	private final Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
 	private final Map <Id, Id> busId2currentRoute = new HashMap<Id, Id>();
@@ -123,10 +125,21 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 			double daytime = event.getTime();
 			Id routeId = this.busId2currentRoute.get(vehId);
 			
-			for (AnalysisPeriod period : this.analysisPeriods.values()){
+			for (Integer periodNr : this.analysisPeriods.keySet()){
+				AnalysisPeriod period = this.analysisPeriods.get(periodNr);
 				if (daytime < period.getEnd() && daytime >= period.getStart()) {
 					int entering = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonEntering();
 					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonEntering(entering + 1);
+					int passengersThisBus;
+					if (period.getBusId2Passengers().get(vehId) == null) {
+						// passengers from period before!
+						passengersThisBus = this.analysisPeriods.get(periodNr-1).getBusId2Passengers().get(vehId);
+
+					} else {
+						// passengers from this period!
+						passengersThisBus = this.analysisPeriods.get(periodNr).getBusId2Passengers().get(vehId);
+					}
+					period.getBusId2Passengers().put(vehId, passengersThisBus + 1);
 				}
 			}
 					
@@ -155,10 +168,20 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 			double daytime = event.getTime();
 			Id routeId = this.busId2currentRoute.get(vehId);
 			
-			for (AnalysisPeriod period : this.analysisPeriods.values()){
+			for (Integer periodNr : this.analysisPeriods.keySet()){
+				AnalysisPeriod period = this.analysisPeriods.get(periodNr);
 				if (daytime < period.getEnd() && daytime >= period.getStart()) {
 					int leaving = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonLeaving();
 					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonLeaving(leaving + 1);
+					int passengersThisBus;
+					if (period.getBusId2Passengers().get(vehId) == null) {
+						// passengers from period before!
+						passengersThisBus = this.analysisPeriods.get(periodNr-1).getBusId2Passengers().get(vehId);
+					} else {
+						// passengers from this period!
+						passengersThisBus = this.analysisPeriods.get(periodNr).getBusId2Passengers().get(vehId);
+					}
+					period.getBusId2Passengers().put(vehId, passengersThisBus - 1);
 				}
 			}
 			
@@ -172,34 +195,45 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 		Id busId = event.getVehicleId();
 		Id routeId = event.getTransitRouteId();
 		this.busId2currentRoute.put(busId, routeId);
+		
+		for (AnalysisPeriod period : this.analysisPeriods.values()){
+			if (event.getTime() < period.getEnd() && event.getTime() >= period.getStart()) {
+				period.getBusId2Passengers().put(busId, 0);		
+			}
+		}
 	}
 
 	public SortedMap<Integer, AnalysisPeriod> getAnalysisPeriods() {
-		
-		for(Integer periodNr : analysisPeriods.keySet()){
-						
-			for (Id routeId : analysisPeriods.get(periodNr).getRouteId2RouteInfo().keySet()){
-				RouteInfo routeInfo = analysisPeriods.get(periodNr).getRouteId2RouteInfo().get(routeId);
-				
-				int passengers;
-				if (periodNr == 1){
-					passengers = 0;
-				} else {
-					passengers = analysisPeriods.get(periodNr - 1).getRouteId2RouteInfo().get(routeId).getPassengersAllVeh();
-				}
-				
-				Map<Id, FacilityLoadInfo> stopId2FacilityLoadInfo = routeInfo.getTransitStopId2FacilityLoadInfo();
-				List<Id> stopIDs = routeInfo.getStopIDs();
-				
-				for (Id stopId : stopIDs){
-					passengers = passengers + stopId2FacilityLoadInfo.get(stopId).getPersonEntering() - stopId2FacilityLoadInfo.get(stopId).getPersonLeaving();
-					stopId2FacilityLoadInfo.get(stopId).setPassengersWhenLeavingFacility(passengers);
-				}
-				routeInfo.setPassengersAllVeh(passengers);
-			}
-		}
-		
 		return analysisPeriods;
 	}
-	
+
+	@Override
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+
+//		je Period je Route je Bus für diese stopId die Anzahl der Passagiere berechnen!
+		
+		Id vehId = event.getVehicleId();
+		Id stopId = this.busId2currentFacilityId.get(vehId);
+		Id routeId = this.busId2currentRoute.get(vehId);
+		double daytime = event.getTime();
+		
+		for (Integer periodNr : this.analysisPeriods.keySet()){
+			AnalysisPeriod period = this.analysisPeriods.get(periodNr);
+			if (daytime < period.getEnd() && daytime >= period.getStart()) {
+				
+				int passengersWhenThisBusIsDeparting;
+				if (period.getBusId2Passengers().get(vehId) == null){
+					// passengers from period before!
+					passengersWhenThisBusIsDeparting = this.analysisPeriods.get(periodNr-1).getBusId2Passengers().get(vehId);
+				} else {
+					// passengers from this period!
+					passengersWhenThisBusIsDeparting = period.getBusId2Passengers().get(vehId);
+				}
+				int passengersDepartingBefore = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPassengersWhenLeavingFacility();
+				int passengersNew = passengersWhenThisBusIsDeparting + passengersDepartingBefore;
+				period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPassengersWhenLeavingFacility(passengersNew);
+								
+			}
+		}
+	}
 }

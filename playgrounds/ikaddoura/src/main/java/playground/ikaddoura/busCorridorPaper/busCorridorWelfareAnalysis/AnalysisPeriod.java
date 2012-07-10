@@ -23,6 +23,8 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -38,6 +40,7 @@ public class AnalysisPeriod {
 	private double end;
 	private int entering;
 	private int leaving;
+	private Map<Id, Integer> busId2Passengers = new HashMap<Id, Integer>();
 	
 	private SortedMap <Id, RouteInfo> routeId2RouteInfo = new TreeMap<Id, RouteInfo>();
 	
@@ -76,6 +79,14 @@ public class AnalysisPeriod {
 
 	public int getLeaving() {
 		return leaving;
+	}
+
+	public void setBusId2Passengers(Map<Id, Integer> busId2Passengers) {
+		this.busId2Passengers = busId2Passengers;
+	}
+
+	public Map<Id, Integer> getBusId2Passengers() {
+		return busId2Passengers;
 	}
 
 }
