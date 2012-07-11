@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.algorithms.rr.listener.AlgorithmEndsListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.listener.IterationEndsListener;
 import org.matsim.core.utils.charts.XYLineChart;
 
 
@@ -25,7 +27,7 @@ import org.matsim.core.utils.charts.XYLineChart;
  *
  */
 
-public class RuinAndRecreateChartListener implements RuinAndRecreateListener {
+public class RuinAndRecreateChartListener implements IterationEndsListener, AlgorithmEndsListener {
 	
 	private static Logger log = Logger.getLogger(RuinAndRecreateChartListener.class);
 	
@@ -44,15 +46,14 @@ public class RuinAndRecreateChartListener implements RuinAndRecreateListener {
 	}
 
 	@Override
-	public void inform(RuinAndRecreateEvent event) {
-		bestResultList.add(event.getCurrentResult());
-		tentativeResultList.add(event.getTentativeSolution());
-//		tentativeResult.add(event.getCurrentMutation(), event.getTentativeSolution());
-//		bestResult.add(event.getCurrentMutation(),event.getTentativeSolution());
+	public void informIterationEnds(int currentIteration, RuinAndRecreateSolution awardedSolution, RuinAndRecreateSolution rejectedSolution) {
+//		System.out.println()
+		bestResultList.add(awardedSolution.getResult());
+		tentativeResultList.add(rejectedSolution.getResult());
 	}
 
 	@Override
-	public void finish() {
+	public void informAlgorithmEnds(RuinAndRecreateSolution currentSolution) {
 		log.info("create chart " + filename);
 		bestResults = new double[bestResultList.size()];
 		tentativeResults = new double[tentativeResultList.size()];

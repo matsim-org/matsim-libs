@@ -23,7 +23,6 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
@@ -44,8 +43,6 @@ class MatsimVrpSolver implements VRPSolver{
 	private VehicleRoutingCosts costs;
 	
 	private RuinAndRecreateFactory rrFactory;
-	
-	public Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
 
 	private CarrierPlan initialPlan;
 	
@@ -88,7 +85,6 @@ class MatsimVrpSolver implements VRPSolver{
 		logger.debug("#print jobs");
 		logger.debug(printJobs(vrp));
 		RuinAndRecreate ruinAndRecreate = makeAlgorithm(vrp);
-		ruinAndRecreate.getListeners().addAll(listeners);
 		ruinAndRecreate.run();
 		logger.debug("");
 		logger.debug(printTours(getTours(ruinAndRecreate.getSolution())));

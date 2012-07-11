@@ -32,8 +32,6 @@ import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateFactory {
 
 	private static Logger logger = Logger.getLogger(RuinAndRecreateStandardAlgorithmFactory.class);
-	
-	private Collection<RuinAndRecreateListener> ruinAndRecreationListeners = new ArrayList<RuinAndRecreateListener>();
 
 	private Random random = RandomNumberGeneration.getRandom();
 	
@@ -56,11 +54,6 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 	}
 
 	
-	public void addRuinAndRecreateListener(RuinAndRecreateListener l){
-		ruinAndRecreationListeners.add(l);
-	}
-	
-
 	@Override
 	public final RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp) {
 
@@ -87,12 +80,7 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(radialRuin, 0.5);
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(randomRuin, 0.5);
 		
-		ruinAndRecreateAlgo.setThresholdFunction(new ThresholdFunctionSchrimpf(0.1));
-		
-		for(RuinAndRecreateListener l : ruinAndRecreationListeners){
-			ruinAndRecreateAlgo.getListeners().add(l);
-		}
-		
+		ruinAndRecreateAlgo.setThresholdFunction(new ThresholdFunctionSchrimpf(0.1));	
 		
 		return ruinAndRecreateAlgo;
 	}
@@ -132,10 +120,6 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(randomRuin, 0.5);
 		
 		ruinAndRecreateAlgo.setThresholdFunction(new ThresholdFunctionSchrimpf(0.1));
-		
-		for(RuinAndRecreateListener l : ruinAndRecreationListeners){
-			ruinAndRecreateAlgo.getListeners().add(l);
-		}
 		
 		return ruinAndRecreateAlgo;
 	}

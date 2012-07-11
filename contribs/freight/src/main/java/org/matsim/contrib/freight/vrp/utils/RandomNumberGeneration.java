@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class RandomNumberGeneration {
 	
-	private static long DEFAULT_SEED = 4711;
+	private static long DEFAULT_SEED = 4711L;
 	
 	private static Random random = new Random(DEFAULT_SEED);
 	

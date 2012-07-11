@@ -12,34 +12,15 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
+import org.matsim.contrib.freight.vrp.algorithms.rr.listener.AlgorithmEndsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 
-public class RuinAndRecreateReport implements RuinAndRecreateListener{
+public class RuinAndRecreateReport implements AlgorithmEndsListener{
 
-	private int nOfIteration = 0;
 	
-	private double bestResult;
-	
-	private RuinAndRecreateSolution bestSolution;
-	
-	@Override
-	public void inform(RuinAndRecreateEvent event) {
-		nOfIteration++;
-		bestResult = event.getCurrentResult();
-		bestSolution = event.getCurrentSolution();
-	}
-
-	@Override
-	public void finish() {
-		System.out.println("totalCosts="+Math.round(bestResult));
-		System.out.println("#vehicles="+getActiveTours());
-		System.out.println("transportCosts="+getGenCosts());
-		System.out.println("transportTime=" + getTime());
-	}
-	
-	public double getTime() {
+	private double getTime(RuinAndRecreateSolution solution) {
 		double time = 0.0;
-		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
+		for(ServiceProviderAgent t : solution.getTourAgents()){
 			if(t.isActive()){
 				time+=t.getTour().tourData.transportTime;
 			}
@@ -47,9 +28,9 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 		return time;
 	}
 
-	public double getGenCosts(){
+	private double getGenCosts(RuinAndRecreateSolution solution){
 		double dist = 0.0;
-		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
+		for(ServiceProviderAgent t : solution.getTourAgents()){
 			if(t.isActive()){
 				dist+=t.getTour().tourData.transportCosts;
 			}
@@ -57,9 +38,9 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 		return dist;
 	}
 	
-	public int getActiveTours() {
+	private int getActiveTours(RuinAndRecreateSolution solution) {
 		int nOfTours = 0;
-		for(ServiceProviderAgent t : bestSolution.getTourAgents()){
+		for(ServiceProviderAgent t : solution.getTourAgents()){
 			if(t.isActive()){
 				nOfTours++;
 			}
@@ -69,6 +50,14 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
 	private Long round(double time) {
 		return Math.round(time);
+	}
+
+	@Override
+	public void informAlgorithmEnds(RuinAndRecreateSolution currentSolution) {
+		System.out.println("totalCosts="+round(currentSolution.getResult()));
+		System.out.println("#vehicles="+getActiveTours(currentSolution));
+		System.out.println("transportCosts="+round(getGenCosts(currentSolution)));
+		System.out.println("transportTime=" + round(getTime(currentSolution)));
 	}
 	
 	
