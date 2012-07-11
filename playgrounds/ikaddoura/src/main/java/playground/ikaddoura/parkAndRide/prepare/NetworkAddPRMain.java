@@ -45,13 +45,13 @@ public class NetworkAddPRMain {
 	
 	
 	// input
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinNetwork.xml";
-	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitSchedule.xml";
-	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinTransitVehicles.xml";
+	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/testScenario_network.xml";
+	static String scheduleFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/testScenario_schedule.xml";
+	static String vehiclesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/testScenario_vehicles.xml";
 	
 	// output
-	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRfacilities_berlin.txt";
-	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRnetwork_berlin.xml";
+	static String prFacilitiesFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
+	static String prNetworkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/testScenario_network_PR.xml";
 	
 	static double extensionRadius = 10;
 	static int maxSearchSteps = 100;

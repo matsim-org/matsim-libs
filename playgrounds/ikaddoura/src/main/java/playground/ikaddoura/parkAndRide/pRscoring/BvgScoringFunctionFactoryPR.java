@@ -1,12 +1,9 @@
-package playground.ikaddoura.parkAndRide.pRscoring;
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyScoringFunctionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,6 +17,7 @@ package playground.ikaddoura.parkAndRide.pRscoring;
  *                                                                         *
  * *********************************************************************** */
 
+package playground.ikaddoura.parkAndRide.pRscoring;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,35 +30,36 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
-public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory {
+/**
+ * Scoring function accumulator using...
+ * {@link BvgLegScoringFunctionPR} instead of {@link LegScoringFunction} and
+ * {@link BvgActivityScoringFunctionPR} instead of {@link ActivityScoringFunction}
+ *
+ * @author ikaddoura
+ *
+ */
+public class BvgScoringFunctionFactoryPR implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParameters params;
-    protected Network network;
-    private final PlanCalcScoreConfigGroup config;
-	private double transferPenalty;
+	private final CharyparNagelScoringParameters charyparNagelConfigParameters;
+	private final BvgScoringFunctionParametersPR bvgParameters;
+	private final Double utilityOfLineSwitch;
+	private final Network network;
 
-
-	public ParkAndRideScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network, double transferPenalty) {
-		this.params = new CharyparNagelScoringParameters(config);
-        this.network = network;
-        this.config = config;
-        this.transferPenalty = transferPenalty;
+	public BvgScoringFunctionFactoryPR(final PlanCalcScoreConfigGroup charyparNagelConfig, final BvgScoringFunctionConfigGroupPR bvgConfig, Network network) {
+		this.charyparNagelConfigParameters = new CharyparNagelScoringParameters(charyparNagelConfig);
+		this.bvgParameters = new BvgScoringFunctionParametersPR(bvgConfig);
+		this.utilityOfLineSwitch = charyparNagelConfig.getUtilityOfLineSwitch();
+		this.network = network;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
-
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
-//		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(-999999));
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
-		scoringFunctionAccumulator.addScoringFunction(new ParkAndRideActivityScoring(params, config, transferPenalty));
+		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunctionPR(plan, this.charyparNagelConfigParameters, this.bvgParameters));
+		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunctionPR(plan, this.charyparNagelConfigParameters, this.bvgParameters, this.utilityOfLineSwitch, this.network));
+		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(this.charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(this.charyparNagelConfigParameters));
 		return scoringFunctionAccumulator;
 	}
 
-	public CharyparNagelScoringParameters getParams() {
-		return params;
-	}
 }

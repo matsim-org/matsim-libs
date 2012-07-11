@@ -53,33 +53,36 @@ public class PRNodeSearch {
 				
 		boolean hasPRnode;
 		for (TransitStopFacility stop : scenario.getTransitSchedule().getFacilities().values()){
-			System.out.println("__________________________________________________________");
-			System.out.println("TransitStop " + stop.getId() + " / "+stop.getName()+" / "+ stop.getCoord());
 			
+			String name = null;
+			if (stop.getName() == null){
+				name = stop.getId().toString();
+			} else {
+				name = stop.getName().toString();
+			}
+			System.out.println("__________________________________________________________");
+			System.out.println("TransitStop " + stop.getId() + " / " + name + " / "+ stop.getCoord());
+			
+			// ---------------------------------------------------
 //			double xMax = 4598530.0; // Warschauer Straße
 //			double xMin = 4588834.0418; // Richard-Wagner-Platz
 //			double yMax = 5823013.0; // Nordbahnhof
 //			double yMin = 5817773.842; // Platz der Luftbrücke
-	
 //			if (stop.getCoord().getX() <= xMax && stop.getCoord().getX() >= xMin && stop.getCoord().getY() <= yMax && stop.getCoord().getY() >= yMin) {
 //				// within rectangle
 //				System.out.println("TransitStop is within rectangle. --> Not creating Park'n'Ride Facility.");
 //			}
+			// ---------------------------------------------------
 			
-			if (stop.getName().toString().contains("B ") || stop.getName().toString().contains("T-Hst ") || stop.getName().toString().contains("N ") || stop.getName().toString().contains("T-Est ") || stop.getName().toString().contains("T+B ") ) {
+			if (name.contains("B ") || name.contains("T-Hst ") || name.contains("N ") || name.contains("T-Est ") || name.contains("T+B ") ) {
 				// Transit Stop seems to be a bus or tram stop
 				this.stopsNotSUBerlin.add(stop);
 				System.out.println("Transit Stop name contains B, T-Hst, N, T-Est or T+B --> no Park'n'Ride facility created.");
 			}
 			
-//			if ((stop.getName().toString().contains("B ") || stop.getName().toString().contains("T-Hst ")) || (stop.getCoord().getX() <= xMax && stop.getCoord().getX() >= xMin && stop.getCoord().getY() <= yMax && stop.getCoord().getY() >= yMin) ) {
-//				// Transit Stop seems to be a bus or tram stop or is within rectangle
-//				System.out.println("Transit Stop is in rectangle OR seems to be a bus OR tram stop. --> Not creating Park'n'Ride Facility.");
-//			}
-			
 			else {
 				
-				if (stop.getName().toString().contains("U ") || stop.getName().toString().contains("S ") || stop.getName().toString().contains("Berlin ") || stop.getName().toString().contains("Berlin-")){
+				if (name.contains("U ") || name.contains("S ") || name.contains("Berlin ") || name.contains("Berlin-")){
 					
 					hasPRnode = false;
 					
@@ -98,7 +101,7 @@ public class PRNodeSearch {
 								PRCarLinkToNode prCarLinkToNode = new PRCarLinkToNode();
 								prCarLinkToNode.setNodeId(stopLink.getToNode().getId());
 								prCarLinkToNode.setNode(stopLink.getToNode());
-								prCarLinkToNode.setStopName(stop.getName());
+								prCarLinkToNode.setStopName(name);
 								this.carLinkToNodes.put(stopLink.getToNode().getId(), prCarLinkToNode);
 								hasPRnode = true;
 							}
@@ -127,11 +130,10 @@ public class PRNodeSearch {
 												System.out.println("Der Link " + link.getId() + " ("+link.getToNode().getCoord()+") liegt im Suchradius um TransitStop " + stop.getId() + ".");
 												this.transitStop2nearestCarLink.put(stop, link);
 												if (this.carLinkToNodes.get(link.getToNode().getId()) == null){
-//												if (!this.carLinkToNodes.keySet().contains(link.getToNode())){
 													PRCarLinkToNode prCarLinkToNode = new PRCarLinkToNode();
 													prCarLinkToNode.setNodeId(link.getToNode().getId());
 													prCarLinkToNode.setNode(link.getToNode());
-													prCarLinkToNode.setStopName(stop.getName());
+													prCarLinkToNode.setStopName(name);
 													this.carLinkToNodes.put(link.getToNode().getId(), prCarLinkToNode);
 													hasPRnode = true;
 												}

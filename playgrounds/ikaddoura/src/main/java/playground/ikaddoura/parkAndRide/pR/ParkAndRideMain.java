@@ -30,15 +30,17 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.ikaddoura.parkAndRide.pRscoring.ParkAndRideScoringFunctionFactory;
+import playground.ikaddoura.parkAndRide.pRscoring.BvgScoringFunctionConfigGroupPR;
+import playground.ikaddoura.parkAndRide.pRscoring.BvgScoringFunctionFactoryPR;
 
 /**
  * @author Ihab
@@ -50,7 +52,6 @@ public class ParkAndRideMain {
 	static String prFacilityFile;
 	
 	static int prCapacity;
-	static double transferPenalty;
 	
 	static double addRemoveProb;
 	static int addRemoveDisable;
@@ -63,36 +64,34 @@ public class ParkAndRideMain {
 	
 	public static void main(String[] args) throws IOException {
 		
-//		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/berlinConfig.xml";
-//		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRfacilities_berlin.txt";
-//		prCapacity = 100;
-//		transferPenalty = 0.;
-//		
-//		addRemoveProb = 0.05;
-//		addRemoveDisable = 500;
-//		
-//		changeLocationProb = 0.05;
-//		changeLocationDisable = 500;
-//		
-//		timeAllocationProb = 0.1;
-//		timeAllocationDisable = 500;
+		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
+		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
+		prCapacity = 100;
+		
+		addRemoveProb = 100;
+		addRemoveDisable = 500;
+		
+		changeLocationProb = 0.1;
+		changeLocationDisable = 500;
+		
+		timeAllocationProb = 0.1;
+		timeAllocationDisable = 500;
 		
 		
 //		**************************************************
 		
-		configFile = args[0];
-		prFacilityFile = args[1];
-		prCapacity = Integer.parseInt(args[2]);
-		transferPenalty = Double.parseDouble(args[3]);
-		
-		addRemoveProb = Double.parseDouble(args[4]);
-		addRemoveDisable = Integer.parseInt(args[5]);
-		
-		changeLocationProb = Double.parseDouble(args[6]);
-		changeLocationDisable = Integer.parseInt(args[7]);
-		
-		timeAllocationProb = Double.parseDouble(args[8]);
-		timeAllocationDisable = Integer.parseInt(args[9]);
+//		configFile = args[0];
+//		prFacilityFile = args[1];
+//		prCapacity = Integer.parseInt(args[2]);
+//		
+//		addRemoveProb = Double.parseDouble(args[3]);
+//		addRemoveDisable = Integer.parseInt(args[4]);
+//		
+//		changeLocationProb = Double.parseDouble(args[5]);
+//		changeLocationDisable = Integer.parseInt(args[6]);
+//		
+//		timeAllocationProb = Double.parseDouble(args[7]);
+//		timeAllocationDisable = Integer.parseInt(args[8]);
 	
 		ParkAndRideMain main = new ParkAndRideMain();
 		main.run();
@@ -108,15 +107,17 @@ public class ParkAndRideMain {
 		Map<Id, ParkAndRideFacility> id2prFacility = prReader.getId2prFacility();
 
 		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(id2prFacility, prCapacity);
+				
+		// add "pt interaction" cause controler.init() is called too late and in a protected way
+		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+		controler.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
+		controler.setScoringFunctionFactory(new BvgScoringFunctionFactoryPR(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroupPR(controler.getConfig()), controler.getNetwork()));
+
 		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addRemoveProb, addRemoveDisable, changeLocationProb, changeLocationDisable, timeAllocationProb, timeAllocationDisable));
 		
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
-		ParkAndRideScoringFunctionFactory scoringfactory = new ParkAndRideScoringFunctionFactory(planCalcScoreConfigGroup, controler.getNetwork(), transferPenalty);
-		controler.setScoringFunctionFactory(scoringfactory);
-		
 		final MobsimFactory mf = new QSimFactory();
-		
 		controler.setMobsimFactory(new MobsimFactory() {
 			private QSim mobsim;
 
