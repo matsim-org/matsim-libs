@@ -9,6 +9,7 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -38,10 +39,18 @@ public class MentalSimSubSetSimulationListener implements ControlerListener,
 	final static String OFFLINE_PLAN_SIZE = "maxOfflineAgentPlanMemorySize";
 	MentalSimControler controler;
 	boolean fakePopulationActive = false;
+	private PlanSelector planselector;
 
-	public MentalSimSubSetSimulationListener(MentalSimControler c) {
-		this.controler = c;
+
+
+	public MentalSimSubSetSimulationListener(MentalSimControler controler,
+			PlanSelector planselector) {
+		super();
+		this.controler = controler;
+		this.planselector = planselector;
 	}
+
+
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -68,8 +77,7 @@ public class MentalSimSubSetSimulationListener implements ControlerListener,
 
 		if (fakePopulationActive && MobSimSwitcher.expensiveIter) {
 			controler
-					.stripOutMentalSimPlansExceptSelected(new ExpBetaPlanSelector(
-							new PlanCalcScoreConfigGroup()));
+					.stripOutMentalSimPlansExceptSelected(this.planselector);
 			controler.getStrategyManager().setMaxPlansPerAgent(
 					Integer.parseInt(controler.getConfig().getParam("strategy",
 							"maxAgentPlanMemorySize")));
