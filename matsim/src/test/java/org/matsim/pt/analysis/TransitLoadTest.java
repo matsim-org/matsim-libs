@@ -75,7 +75,10 @@ public class TransitLoadTest {
 
 		EventsFactoryImpl ef = new EventsFactoryImpl();
 
-		TransitLoad tl = new TransitLoad(schedule);
+		TransitLoad tl = new TransitLoad();
+
+		tl.handleEvent(ef.createTransitDriverStartsEvent(7.0*3600-20, new IdImpl("ptDriver1"), vehicleIdDep1, line1.getId(), route1.getId(), dep1.getId()));
+
 		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(7.0*3600-10, vehicleIdDep1, stop1.getId(), 0));
 		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1));
 		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(7.0*3600+10, vehicleIdDep1, stop1.getId(), 0));
