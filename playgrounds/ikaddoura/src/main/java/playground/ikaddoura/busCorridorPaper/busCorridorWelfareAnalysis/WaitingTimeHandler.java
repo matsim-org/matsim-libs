@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -132,7 +133,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 				facilityInfo.setWaitingEvent2DayTime(waitingEvent2DayTime);
 				waitingEvent2PersonId.put(new IdImpl(waitingTimeCounter), event.getPersonId());
 				facilityInfo.setWaitingEvent2PersonId(waitingEvent2PersonId);
-				
+								
 				if (waitingTime > this.headway){
 					facilityInfo.setNumberOfWaitingTimesMoreThanHeadway(1);
 					int missed = (int) (waitingTime / this.headway);
@@ -145,11 +146,15 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 				FacilityWaitTimeInfo facilityInfo = this.facilityId2facilityInfos.get(currentFacilityId);
 				SortedMap<Id, Double> waitingEvent2WaitingTime = facilityInfo.getWaitingEvent2WaitingTime();
 				SortedMap<Id, Double> waitingEvent2DayTime = facilityInfo.getWaitingEvent2DayTime();
+				SortedMap<Id, Id> waitingEvent2PersonId = facilityInfo.getWaitingEvent2PersonId();
 				
 				waitingEvent2WaitingTime.put(new IdImpl(waitingTimeCounter), waitingTime);
 				waitingEvent2DayTime.put(new IdImpl(waitingTimeCounter), event.getTime());
+				waitingEvent2PersonId.put(new IdImpl(waitingTimeCounter), event.getPersonId());
+
 				facilityInfo.setWaitingEvent2WaitingTime(waitingEvent2WaitingTime);
 				facilityInfo.setWaitingEvent2DayTime(waitingEvent2DayTime);
+				facilityInfo.setWaitingEvent2PersonId(waitingEvent2PersonId);
 				
 				if (waitingTime > this.headway){
 					facilityInfo.setNumberOfWaitingTimesMoreThanHeadway(facilityInfo.getNumberOfWaitingTimesMoreThanHeadway() + 1);

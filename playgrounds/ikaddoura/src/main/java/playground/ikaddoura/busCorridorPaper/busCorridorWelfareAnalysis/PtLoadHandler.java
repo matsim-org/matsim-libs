@@ -130,6 +130,9 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 				if (daytime < period.getEnd() && daytime >= period.getStart()) {
 					int entering = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonEntering();
 					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonEntering(entering + 1);
+					int enteringAllRoutesAllStops = period.getEntering();
+					period.setEntering(enteringAllRoutesAllStops + 1);
+					
 					int passengersThisBus;
 					if (period.getBusId2Passengers().get(vehId) == null) {
 						// passengers from period before!
@@ -173,6 +176,9 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 				if (daytime < period.getEnd() && daytime >= period.getStart()) {
 					int leaving = period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).getPersonLeaving();
 					period.getRouteId2RouteInfo().get(routeId).getTransitStopId2FacilityLoadInfo().get(stopId).setPersonLeaving(leaving + 1);
+					int leavingAllRoutesAllStops = period.getLeaving();
+					period.setLeaving(leavingAllRoutesAllStops + 1);
+					
 					int passengersThisBus;
 					if (period.getBusId2Passengers().get(vehId) == null) {
 						// passengers from period before!
