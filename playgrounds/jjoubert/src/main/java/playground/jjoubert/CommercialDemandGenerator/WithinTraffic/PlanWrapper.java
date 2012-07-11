@@ -86,7 +86,7 @@ public class PlanWrapper {
 			System.err.println("The last activity of the chain is not of type BasicActivity!!");
 		} else{
 			Activity la = (Activity) lastActivity;
-			if(la.getStartTime() < this.tw){
+			if(la.getStartTime() <= this.tw){
 				/*
 				 * The whole plan fits within the time window. Just return the complete plan.
 				 */
