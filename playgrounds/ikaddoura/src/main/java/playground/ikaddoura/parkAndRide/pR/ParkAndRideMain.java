@@ -64,34 +64,34 @@ public class ParkAndRideMain {
 	
 	public static void main(String[] args) throws IOException {
 		
-		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
-		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
-		prCapacity = 100;
-		
-		addRemoveProb = 100;
-		addRemoveDisable = 500;
-		
-		changeLocationProb = 0.1;
-		changeLocationDisable = 500;
-		
-		timeAllocationProb = 0.1;
-		timeAllocationDisable = 500;
+//		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
+//		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
+//		prCapacity = 100;
+//		
+//		addRemoveProb = 100;
+//		addRemoveDisable = 500;
+//		
+//		changeLocationProb = 0.1;
+//		changeLocationDisable = 500;
+//		
+//		timeAllocationProb = 0.1;
+//		timeAllocationDisable = 500;
 		
 		
 //		**************************************************
 		
-//		configFile = args[0];
-//		prFacilityFile = args[1];
-//		prCapacity = Integer.parseInt(args[2]);
-//		
-//		addRemoveProb = Double.parseDouble(args[3]);
-//		addRemoveDisable = Integer.parseInt(args[4]);
-//		
-//		changeLocationProb = Double.parseDouble(args[5]);
-//		changeLocationDisable = Integer.parseInt(args[6]);
-//		
-//		timeAllocationProb = Double.parseDouble(args[7]);
-//		timeAllocationDisable = Integer.parseInt(args[8]);
+		configFile = args[0];
+		prFacilityFile = args[1];
+		prCapacity = Integer.parseInt(args[2]);
+		
+		addRemoveProb = Double.parseDouble(args[3]);
+		addRemoveDisable = Integer.parseInt(args[4]);
+		
+		changeLocationProb = Double.parseDouble(args[5]);
+		changeLocationDisable = Integer.parseInt(args[6]);
+		
+		timeAllocationProb = Double.parseDouble(args[7]);
+		timeAllocationDisable = Integer.parseInt(args[8]);
 	
 		ParkAndRideMain main = new ParkAndRideMain();
 		main.run();
