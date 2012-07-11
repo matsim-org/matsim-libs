@@ -1,6 +1,5 @@
 package org.matsim.contrib.freight.replanning;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
@@ -10,7 +9,6 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.vrp.VRPSolver;
 import org.matsim.contrib.freight.vrp.VRPSolverFactoryImpl;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
@@ -23,8 +21,6 @@ public class ReScheduleVehicles implements CarrierPlanStrategyModule{
 
 	private VehicleRoutingCosts costs;
 	
-	public Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
-
 	private TourCost tourCost;
 
 	private Network network;

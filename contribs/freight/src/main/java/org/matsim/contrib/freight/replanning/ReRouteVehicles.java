@@ -100,7 +100,7 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 			prevLeg.setRoute(route);
 			return;
 		}
-		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getDepartureTime(), person, vehicle);
+		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getToNode(), prevLeg.getDepartureTime(), person, vehicle);
 		prevLeg.setExpectedTransportTime(path.travelTime);
 		Route route = createRoute(fromLinkId,path,toLinkId);
 		prevLeg.setRoute(route);
