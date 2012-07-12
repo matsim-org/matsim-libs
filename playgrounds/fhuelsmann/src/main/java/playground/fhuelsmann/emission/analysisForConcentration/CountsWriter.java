@@ -1,5 +1,10 @@
 package playground.fhuelsmann.emission.analysisForConcentration;
 
+/**
+ * @author friederike
+ *
+ */
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Map;
