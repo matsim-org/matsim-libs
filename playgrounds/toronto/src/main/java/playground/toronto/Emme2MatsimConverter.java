@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -50,10 +52,10 @@ public class Emme2MatsimConverter {
 	
 	private static FileFilter d211Filter = new FileFilter() {
 		@Override
-		public String getDescription() {return "EMME base network file *.211";}
+		public String getDescription() {return "EMME base network file *.211, *.in";}
 		@Override
 		public boolean accept(File f) {
-			return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".211" );
+			return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".211" ) || f.getName().toLowerCase(Locale.ROOT).endsWith( ".in" );
 		}
 	};
 	private static FileFilter turnsFilter = new FileFilter() {
@@ -98,7 +100,7 @@ public class Emme2MatsimConverter {
 			try {
 				if(runGUI()){
 					
-				}else log.error("Terminated prematurely.");
+				}else log.info("Cancelled / Exited.");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -106,7 +108,7 @@ public class Emme2MatsimConverter {
 	}
 	
 	private static boolean checkArgs(String[]args){
-		//TODO add old handling of args
+		//TODO add old handling of args. Or maybe not?
 		return true;
 	}
 	
@@ -115,6 +117,8 @@ public class Emme2MatsimConverter {
 	}
 	
 	private static boolean runGUI() throws IOException{
+		
+		//TODO migrate the GUI to the separate function calls
 		
 		String info = "";
 		int choice;
@@ -158,22 +162,12 @@ public class Emme2MatsimConverter {
 						"MATSim allows multiple links to connect two nodes, this algorithm identifies\n" +
 						"these links, tracing their virtual (zero-length) connectors back to their\n" +
 						"'proper' start/end nodes. No additional arguments are required.\n\n" +
+						"Update July 2012: Some problems exist re-drawing HOVs on highways. For now,\n" +
+						"this algorithm simply removes all HOV lanes from the network.\n\n" +
 						"Proceed?";
 				choice = JOptionPane.showConfirmDialog(null, info, "Info", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (choice == JOptionPane.OK_OPTION){
 					reDrawLinks();
-				}
-			}
-			if (opt3.isSelected()){
-				//Remove virtual links
-				info = "REMOVE VIRTUAL LINKS\n" +
-						"----------------------\n\n" +
-						"This option removes centroid connectors and walk/transfer links from the\n" +
-						"network. Useful in map-matching, but perhaps not for simulation.\n\n" +
-						"Proceed?";
-				choice = JOptionPane.showConfirmDialog(null, info, "Info", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-				if (choice == JOptionPane.OK_OPTION){
-					removeVirtualLinks();
 				}
 			}
 			if (opt5.isSelected()){
@@ -247,10 +241,20 @@ public class Emme2MatsimConverter {
 					}
 				}
 			}
-				
+			if (opt3.isSelected()){
+				//Remove virtual links
+				info = "REMOVE VIRTUAL LINKS\n" +
+						"----------------------\n\n" +
+						"This option removes centroid connectors and walk/transfer links from the\n" +
+						"network. Useful in map-matching, but perhaps not for simulation.\n\n" +
+						"Proceed?";
+				choice = JOptionPane.showConfirmDialog(null, info, "Info", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				if (choice == JOptionPane.OK_OPTION){
+					removeVirtualLinks();
+				}
+			}	
 			if (opt7.isSelected()){
 				//Filter network by modes
-				//TODO test this
 				info = "FILTER NETWORK BY MODES\n" +
 						"---------------------------------\n\n" +
 						"This option filter the network by modes.\n\n" +
@@ -418,7 +422,7 @@ public class Emme2MatsimConverter {
 		//capperiod="1:00:00"
 		network.setCapacityPeriod(60 * 60); //1 hour, in sec
 		
-		System.out.println("Reading file \"" + f + "\"...");
+		log.info("Reading file \"" + f + "\"...");
 		
 		BufferedReader emmeReader =  new BufferedReader(new FileReader(f));
 		boolean isReadingNodes = false;
@@ -461,7 +465,7 @@ public class Emme2MatsimConverter {
 				
 				String[] cells = line.split("\\s+");
 				if (cells.length != 11){
-					if (!line.trim().isEmpty()) System.err.println("WARN: Skipped line \"" + line + "\", invalid number of arguments.");
+					if (!line.trim().isEmpty()) log.warn("Skipped line \"" + line + "\", invalid number of arguments.");
 					
 					continue;
 				}
@@ -470,8 +474,8 @@ public class Emme2MatsimConverter {
 				Node j = network.getNodes().get(new IdImpl(cells[2]));
 				double length = Double.parseDouble(cells[3]) * 1000; //converts km to m
 				double speed = Double.parseDouble(cells[9]) / 3.6; //converts km/hr to m/s
-				double cap = Double.parseDouble(cells[10]);
 				double lanes = Double.parseDouble(cells[6]);
+				double cap = Double.parseDouble(cells[10]) * lanes;
 				if (lanes == 0.0) lanes = 1.0; //ensures that transit-only links have at least one lane.
 				
 				LinkFactoryImpl factory = new LinkFactoryImpl();
@@ -494,8 +498,7 @@ public class Emme2MatsimConverter {
 			
 		}
 		
-		System.out.print("done.");
-		System.out.println("Network contains " + network.getNodes().size() + " nodes and " + network.getLinks().size() + " links.");
+		log.info("Network contains " + network.getNodes().size() + " nodes and " + network.getLinks().size() + " links.");
 	}
 	
 	private static void writeNetworkXML(String filename){
@@ -519,7 +522,8 @@ public class Emme2MatsimConverter {
 	
 	private static void convertCoordinates(){
 		for(Node n : network.getNodes().values()){
-			coordinateTransformation.transform(n.getCoord());
+			NodeImpl N = (NodeImpl) n;
+			N.setCoord(coordinateTransformation.transform(n.getCoord()));
 		}
 		
 		//CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.NAD83_UTM17N);
@@ -527,52 +531,99 @@ public class Emme2MatsimConverter {
 
 	}
 	
-	private static void reDrawLinks(){
-		//Takes links which have been drawn in offset positions
-		//for special EMME handling (because EMME only permits
-		//two links for each node pair). Since MATSim is free
-		//from this restriction, this algorithm re-draws these
-		//links in their 'proper' locations.
-		//
-		//Currently only applies to two types of links: 
-		// - HOV links, connected to the network with links of 
-		//		'0' length. These have been previously
-		//		identified by the createType method and have
-		//		a 'Type' property = "HOV".
-		// - Dedicated Streetcar links (such as the Spadina
-		//		line or the St. Clair line). These links 
-		//		only allow streetcars on them ('Modes' = 
-		//		"Streetcar") and are connected to the network
-		//		by Walk/Transfer links.
+	/**
+	 * 	Takes links which have been drawn in offset positions
+		for special EMME handling (because EMME only permits
+		two links for each node pair). Since MATSim is free
+		from this restriction, this algorithm re-draws these
+		links in their 'proper' locations. This is
+		necessary to ensure that matsim doesn't pick these
+		links for trip origins/destinations
 		
-		System.out.println("Re-drawing HOV and streetcar ROWs...");
+		Currently only applies to two types of links:
+		 - HOV links, connected to the network with links of 
+				'0' length. These have been previously
+				identified by the createType method and have
+				a 'Type' property = "HOV".
+		 - Dedicated Streetcar links (such as the Spadina
+				line or the St. Clair line). These links 
+				only allow streetcars on them ('Modes' = 
+				"Streetcar") and are connected to the network
+				by Walk/Transfer links.
+	 */
+	private static void reDrawLinks(){		
 		
-		//HOV links
-		ArrayList<Id> hovs = new ArrayList<Id>();
+		//reDrawHOVs();
+		removeHOVs();
+		
+		reDrawStreetcarROWs();
+		
+	}
+	
+	/**
+	 * Simply clears the network of all HOV lanes.
+	 */
+	private static void removeHOVs(){
+		
+		
+		HashSet<Id> linksToRemove = new HashSet<Id>(); 
 		for (Link i : network.getLinks().values()) {
 			LinkImpl L = (LinkImpl) i;
-			if(L.getType() == "HOV") hovs.add(L.getId());
+			if(L.getType().equals("HOV") || L.getType().equals("HOV transfer")){
+				linksToRemove.add(L.getId());
+			}
 		}
 		
-		System.out.println(hovs.size() + " links are flagged as HOV");
+		for (Id i : linksToRemove){
+			network.removeLink(i);
+		}
+		//Clear unconnected nodes
+		HashSet<Id> nodesToRemove = new HashSet<Id>();
+		for (Node n : network.getNodes().values()) 
+			if (n.getInLinks().size() == 0 && n.getOutLinks().size() == 0)
+				nodesToRemove.add(n.getId());
+		for (Id i : nodesToRemove) network.removeNode(i);
 		
-		//	._______._______________.___________._______.
-		//	|		|				|			|		|
-		//==*=======*===============*===========*=======*===
+	}
+	
+	/**
+	 *  Update July 2012: Originally, this algorithm applied
+			arterial HOVs (ie, did not flag highway HOvs).
+			Fixing highway HOVs however requires dealing
+			with 'special case' lanes where the HOV lane
+			'skips' over several main road links. 
+	 */
+	@Deprecated
+	private static void reDrawHOVs(){
+		
+		//TODO implement HOV re-drawing.
+		
+		HashSet<Id> hovs = new HashSet<Id>(); 
+		for (Link i : network.getLinks().values()) {
+			LinkImpl L = (LinkImpl) i;
+			if(L.getType().equals("HOV")) hovs.add(L.getId());
+		}
+		
+		log.info("Re-drawing HOV lanes. " + hovs.size() + " links are flagged as HOV");
+		
+		//	._______.______.____.___.___________._______.
+		//	|		|  <-sp.case->	|			|		|
+		//==*=======*====*====*=====*===========*=======*===
 		//
 		//Algorithm 'follows' transfer links to the 'main' road,
 		//re-attaches the HOV link to the proper points. Transfer
 		//links are removed.
 		
-		ArrayList<Id> linksToRemove = new ArrayList<Id>();
-		
+		HashSet<Id> linksToRemove = new HashSet<Id>();
+				
 		for (Id i : hovs){
 			Link hovLane = network.getLinks().get(i);
 			
-			//Get incoming transfer link
+			//Get incoming transfer link. 
 			Link incomingTransfer = null;
 			for (Link L : hovLane.getFromNode().getInLinks().values()) {
-				if (L.getLength() == 0.0) {
+				LinkImpl l = (LinkImpl) L;
+				if (l.getType().equals("HOV transfer")) {
 					if (incomingTransfer != null) 
 						System.out.println("Check here.");
 					incomingTransfer = L; 
@@ -583,7 +634,8 @@ public class Emme2MatsimConverter {
 			//Get outgoing transfer link
 			Link outgoingTransfer = null;
 			for (Link L : hovLane.getToNode().getOutLinks().values()){
-				if (L.getLength() == 0.0) {
+				LinkImpl l = (LinkImpl) L;
+				if (l.getType().equals("HOV transfer")) {
 					if (outgoingTransfer != null) 
 						System.out.println("Check here.");
 					outgoingTransfer = L; 
@@ -596,9 +648,23 @@ public class Emme2MatsimConverter {
 			hovLane.setToNode(outgoingTransfer.getToNode());
 		}
 		
-		System.out.println("HOVs done. Starting Streetcar ROWs");
+		//Clear out unconnected transfer links.
+		for (Id i : linksToRemove){
+			network.removeLink(i);
+		}
+		//Clear unconnected nodes
+		HashSet<Id> nodesToRemove = new HashSet<Id>();
+		for (Node n : network.getNodes().values()) 
+			if (n.getInLinks().size() == 0 && n.getOutLinks().size() == 0)
+				nodesToRemove.add(n.getId());
+		for (Id i : nodesToRemove) network.removeNode(i);
 		
-		//Streetcar ROWs
+		log.info("Done. " + linksToRemove.size() + " transfer links removed from the network.");
+	}
+	
+	private static void reDrawStreetcarROWs(){
+		HashSet<Id> linksToRemove = new HashSet<Id>();
+		
 		ArrayList<Id> rows = new ArrayList<Id>();
 		for (Link i : network.getLinks().values()) {
 			LinkImpl L = (LinkImpl) i;
@@ -648,7 +714,7 @@ public class Emme2MatsimConverter {
 			// 4. Mid-route links with multiple transfers are flagged for checking,
 			//		as I don't intend to deal with them now (requires splitting of links).
 			
-			ArrayList<Id> tweakedNodes = new ArrayList<Id>();
+			HashSet<Id> tweakedNodes = new HashSet<Id>();
 			
 			//from Node
 			if (!hasIncomingTransitLink){//start point
@@ -699,8 +765,14 @@ public class Emme2MatsimConverter {
 		for (Id i : linksToRemove){
 			network.removeLink(i);
 		}
+		//Clear unconnected nodes
+		HashSet<Id> nodesToRemove = new HashSet<Id>();
+		for (Node n : network.getNodes().values()) 
+			if (n.getInLinks().size() == 0 && n.getOutLinks().size() == 0)
+				nodesToRemove.add(n.getId());
+		for (Id i : nodesToRemove) network.removeNode(i);
 		
-		System.out.println("Done. " + linksToRemove.size() + " transfer links removed from the network.");
+		log.info("Done. " + linksToRemove.size() + " transfer links removed from the network.");
 	}
 	
 	private static void removeVirtualLinks(){
@@ -721,6 +793,7 @@ public class Emme2MatsimConverter {
 		ArrayList<Id> nodesToRemove = new ArrayList<Id>();
 		for (Node n : network.getNodes().values()){
 			NodeImpl N = (NodeImpl) n;
+			if (N.getType() == null) continue;
 			if (N.getType().equals("Zone")) nodesToRemove.add(N.getId());
 		}
 		
@@ -792,10 +865,13 @@ public class Emme2MatsimConverter {
 		//0 1    2     3      4      5  6 7  8 9  10
 		//a 251 10274 0.12 chifedjv 106 2 90 0 40 9999
 		
+		final List<String> hovVDFs = Arrays.asList(new String[]{"41","16","17"});
+		
 		//HOV links
-		if (cells[7].equals("41") && Double.parseDouble(cells[3]) > 0) 
-			if (Double.parseDouble(cells[3]) > 0) return "HOV";
-			else return "HOV transfer";
+		if (hovVDFs.contains(cells[7])) {
+			if (cells[7].equals("17") || (Double.parseDouble(cells[3]) == 0.0 )) return "HOV transfer";
+			else return "HOV";
+		}
 		
 		//Centroid Connectors
 		if ((Integer.parseInt(cells[1]) < 10000) || (Integer.parseInt(cells[2]) < 10000)) return "CC";
