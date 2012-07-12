@@ -43,9 +43,12 @@ public class DistanceFuzzyFactorProviderFactory {
 
 	private static final Logger log = Logger.getLogger(DistanceFuzzyFactorProviderFactory.class);
 	
+	public static boolean useLookupMap = true;
+	
 	private final Map<Id, Map<Id, Double>> distanceFuzzyFactors;
 	private final Set<Id> observedLinks;
-	
+	private final Scenario scenario;
+		
 	/**
 	 * Creates and initializes distanceFuzzyFactor lookup maps.
 	 * Link pairs located outside the main observation area (e.g.
@@ -53,6 +56,7 @@ public class DistanceFuzzyFactorProviderFactory {
 	 * and a fuzzy factor of 0.0 is returned for them.
 	 */
 	DistanceFuzzyFactorProviderFactory(Scenario scenario) {
+		this.scenario = scenario;
 		
 		this.observedLinks = new HashSet<Id>();
 		identifyObservedLinks(scenario);
@@ -61,11 +65,13 @@ public class DistanceFuzzyFactorProviderFactory {
 		for (Id linkId : observedLinks) {
 			this.distanceFuzzyFactors.put(linkId, new ConcurrentHashMap<Id, Double>());
 		}
-		fillLookupMap(scenario);
+		
+		if (useLookupMap) fillLookupMap(scenario);
 	}
 	
 	public DistanceFuzzyFactorProvider createInstance() {
-		return new DistanceFuzzyFactorProvider(this.distanceFuzzyFactors, this.observedLinks);
+		if (useLookupMap) return new DistanceFuzzyFactorProviderLookup(this.distanceFuzzyFactors, this.observedLinks);
+		else return new DistanceFuzzyFactorProviderCalculate(scenario.getNetwork(), observedLinks);
 	}
 	
 	/*
@@ -143,6 +149,8 @@ public class DistanceFuzzyFactorProviderFactory {
 		private final Counter counter;
 		private final AtomicLong entryCount;
 		
+		private final double c = 1 / Math.exp(4);	// constant for fuzzy factor creation
+		
 		public DistanceFuzzyFactorProviderRunnable(Network network, Map<Id, Map<Id, Double>> distanceFuzzyFactors, 
 				Set<Id> observedLinks, Counter counter, AtomicLong entryCount) {
 			this.network = network;
@@ -174,7 +182,6 @@ public class DistanceFuzzyFactorProviderFactory {
 				Link fromLink = network.getLinks().get(fromLinkId);
 				
 				Map<Id, Double> fuzzyFactors = distanceFuzzyFactors.get(fromLink.getId());
-//				for (Id toLinkId : observedLinks) {
 				for (Id toLinkId : observedLinksArray) {
 					
 					// only store one value for each Id pair
@@ -183,14 +190,34 @@ public class DistanceFuzzyFactorProviderFactory {
 					
 					Link toLink = network.getLinks().get(toLinkId);
 					
-					// if both links are located outside the main observation area, ignore them
-					// cdobler: both links are taken from the observed links list, therefore we can skip this. may'12
-//					if (!observedLinks.contains(fromLink.getId()) && !observedLinks.contains(toLink.getId())) continue;
-										
 					double distance = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
 					
-					double factor = 1 / (1 + Math.exp((-distance/1000.0) + 4.0));
+					/*
+					 * Adapted formula, starting with:
+					 * factor = 1 / (1 + Math.exp((-distance/1000.0) + 4.0))
+					 * 
+					 * Math.exp((-distance/1000.0) + 4) = Math.exp(-distance/1000.0) * Math.exp(4)
+					 * -> factor = 1 / (1 + Math.exp(-distance/1000.0) * Math.exp(4));
+					 * 
+					 * divide by 1 / Math.exp(4)
+					 * -> factor = (1 / Math.exp(4)) / ((1 / Math.exp(4)) + Math.exp(-distance/1000.0));
+					 * 
+					 * define c = 1 / Math.exp(4)
+					 * -> factor = c / (c + Math.exp(-distance/1000.0));
+					 * 
+					 * -> factor = c / (c + 1/Math.exp(distance/1000.0));
+					 * -> factor = c / ( (c* Math.exp(distance/1000.0) + 1)/Math.exp(distance/1000.0) );
+					 * 
+					 * multiply with Math.exp(distance/1000.0)
+					 * -> factor = (c * Math.exp(distance/1000.0)) / (c * Math.exp(distance/1000.0) + 1);
+					 * 
+					 * define c2 = c * Math.exp(distance/1000.0)
+					 * -> factor = c2 / (c2 + 1)
+					 */
 //					double factor = 1 / (1 + Math.exp((-distance/1500.0) + 4.0));
+//					double factor = 1 / (1 + Math.exp((-distance/1000.0) + 4.0));
+					double c2 = c * Math.exp(distance/1000.0);
+					double factor = c2 / (c2 + 1);
 					
 					if (factor < 0.98) {
 						fuzzyFactors.put(toLink.getId(), factor);

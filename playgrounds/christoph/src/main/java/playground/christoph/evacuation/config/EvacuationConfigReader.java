@@ -28,6 +28,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.christoph.evacuation.router.util.DistanceFuzzyFactorProviderFactory;
+
 public class EvacuationConfigReader extends MatsimXmlParser {
 
 	private static final Logger log = Logger.getLogger(EvacuationConfigReader.class);
@@ -70,6 +72,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String RAYLEIGHSIGMA = "rayleighSigma";
 	public static String CAPACITYFACTOR = "capacityFactor";
 	public static String SPEEDFACTOR = "speedFactor";
+	public static String USELOOKUPMAP = "useLookupMap";
 		
 	private String path = "";
 	private boolean readVehicleFleet = false;
@@ -158,6 +161,10 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			}
 		} else if (FUZZYTRAVELTIMES.equalsIgnoreCase(name)) {
 			EvacuationConfig.useFuzzyTravelTimes = Boolean.valueOf(atts.getValue(ENABLED));
+			
+			if (atts.getValue(USELOOKUPMAP) != null) {
+				DistanceFuzzyFactorProviderFactory.useLookupMap = Boolean.valueOf(atts.getValue(USELOOKUPMAP));
+			}
 		}  else if (INFORMAGENTS.equalsIgnoreCase(name)) {
 			double value = Double.valueOf(atts.getValue(RAYLEIGHSIGMA));
 			if (value < 0.1) value = 0.1;

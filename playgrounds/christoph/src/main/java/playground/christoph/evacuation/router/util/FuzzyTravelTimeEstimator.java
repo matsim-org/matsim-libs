@@ -112,24 +112,25 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 
 	/*
 	 * So far use hard-coded values between 0.017 (distance 0.0) 
-	 * and 1.0 (distance ~ 15000.0).
+	 * and 1.0 (distance ~ 10000.0).
 	 */
-	private double calcDistanceFuzzyFactor(Link link) {		
+	private double calcDistanceFuzzyFactor(Link toLink) {	
 		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(pId);
 		Position positionType = agentPosition.getPositionType();
 
-		Id linkId = null;
+		Id fromLinkId = null;
 		if (positionType == Position.LINK) {
-			linkId = agentPosition.getPositionId();
+			fromLinkId = agentPosition.getPositionId();
 		} else if (positionType == Position.FACILITY) {
-			linkId = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
+			fromLinkId = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
 		} else if (positionType == Position.VEHICLE) {
-			linkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());			
+			fromLinkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());			
 		} else {
 			log.warn("Agent's position is undefined! Id: " + this.pId);
 			return 1.0;
 		}
-		return distanceFuzzyFactorProvider.getFuzzyFactor(linkId, link.getId());
+
+		return distanceFuzzyFactorProvider.getFuzzyFactor(fromLinkId, toLink);
 	}
 	
 	/*

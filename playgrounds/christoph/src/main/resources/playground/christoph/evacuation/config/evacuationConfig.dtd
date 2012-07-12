@@ -68,7 +68,8 @@
 			
 <!ELEMENT fuzzyTravelTimes	EMPTY>
 <!ATTLIST fuzzyTravelTimes
-			enabled				CDATA	#REQUIRED>
+			enabled				CDATA	#REQUIRED
+			useLookupMap		CDATA	#IMPLIED>
 			
 <!ELEMENT informAgents	EMPTY>
 <!ATTLIST informAgents

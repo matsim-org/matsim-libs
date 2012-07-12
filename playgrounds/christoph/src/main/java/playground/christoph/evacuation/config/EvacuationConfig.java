@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.christoph.evacuation.router.util.DistanceFuzzyFactorProviderFactory;
+
 public class EvacuationConfig {
 	
 	private static final Logger log = Logger.getLogger(EvacuationConfig.class);
@@ -57,6 +59,51 @@ public class EvacuationConfig {
 	public static boolean createEvacuationTimePicture = true;
 	public static boolean countAgentsInEvacuationArea = true;
 	
+	/*
+	 * survey based model parameter
+	 */
+	public static double pickupModelAlwaysConst = 2.67;
+	public static double pickupModelAlwaysAge31to60 = -0.71;
+	public static double pickupModelAlwaysAge61to70 = -0.71;
+	public static double pickupModelAlwaysAge71plus = 6.08;
+	public static double pickupModelAlwaysHasChildren = 1.66;
+	public static double pickupModelAlwaysHasDrivingLicence = 1.54;
+	public static double pickupModelAlwaysIsMale = -0.65;	// TODO: check if this is true
+	
+	public static double pickupModelIfSpaceConst = 0.92;
+	public static double pickupModelIfSpaceAge31to60 = -0.81;
+	public static double pickupModelIfSpaceAge61to70 = -0.76;
+	public static double pickupModelIfSpaceAge71plus = 6.43;
+	public static double pickupModelIfSpaceHasChildren = 1.57;
+	public static double pickupModelIfSpaceHasDrivingLicence = 3.00;
+	public static double pickupModelIfSpaceIsMale = -0.47;	// TODO: check if this is true
+
+	public static double leaveModelImmediatelyConst = 4.10;
+	public static double leaveModelImmediatelyChemistry = 1.61;
+	public static double leaveModelImmediatelyAtomic = 2.08;
+	public static double leaveModelImmediatelyFire = 0.59;
+	public static double leaveModelImmediatelyAge31to60 = -3.12;
+	public static double leaveModelImmediatelyAge61plus = -3.49;
+	public static double leaveModelImmediatelyTime8 = -1.66;
+	public static double leaveModelImmediatelyHouseholdUnited1 = -0.07;
+	public static double leaveModelImmediatelyTime16 = -1.99;
+	public static double leaveModelImmediatelyHouseholdUnited2 = -0.33;
+	
+	public static double leaveModelImmediatelyHasChildren = 0.60;
+	public static double leaveModelImmediatelyHasDrivingLicense = 0.52;
+
+	public static double leaveModelLaterConst = 3.36;
+	public static double leaveModelLaterChemistry = 0.982;
+	public static double leaveModelLaterAtomic = 0.777;
+	public static double leaveModelLaterFire = 0.297;
+	public static double leaveModelLaterAge31to60 = -1.9;
+	public static double leaveModelLaterAge61plus = -2.13;
+	public static double leaveModelLaterTime8 = 0.458;
+	public static double leaveModelLaterHouseholdUnited1 = -2.95;
+	public static double leaveModelLaterTime16 = 0.275;
+	public static double leaveModelLaterHouseholdUnited2 = -1.69;
+	
+	
 	public static Coord getRescueCoord() {
 		return new CoordImpl(centerCoord.getX() + 50000.0, centerCoord.getY() + 50000.0);
 	}
@@ -88,6 +135,7 @@ public class EvacuationConfig {
 		log.info("during leg re-routing share:\t" + duringLegReroutingShare);
 		log.info("agent pickup behaviour:\t" + pickupAgents.toString());
 		log.info("use fuzzy travel times:\t" + useFuzzyTravelTimes);
+		log.info("use lookup map for fuzzy travel times:\t" + DistanceFuzzyFactorProviderFactory.useLookupMap);
 		log.info("create evacuation time picture:\t" + createEvacuationTimePicture);
 		log.info("count agents in evacuation are:\t" + countAgentsInEvacuationArea);
 		log.info("sigma for inform-agents Rayleigh function:\t" + informAgentsRayleighSigma);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DistanceFuzzyFactorProvider.java
+ * DistanceFuzzyFactorProviderLookup.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,10 +20,47 @@
 
 package playground.christoph.evacuation.router.util;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public interface DistanceFuzzyFactorProvider {
+/**
+ * Uses a lookup table where the distance fuzzy factors for link pairs
+ * are stored.
+ * 
+ * @author cdobler
+ */
+public class DistanceFuzzyFactorProviderLookup implements DistanceFuzzyFactorProvider {
 
-	public double getFuzzyFactor(Id fromLinkId, Link toLink);
+	private final Map<Id, Map<Id, Double>> distanceFuzzyFactors;
+	private final Set<Id> observedLinks;
+	
+	public DistanceFuzzyFactorProviderLookup(Map<Id, Map<Id, Double>> distanceFuzzyFactors, Set<Id> observedLinks) {
+		this.distanceFuzzyFactors = distanceFuzzyFactors;
+		this.observedLinks = observedLinks;
+	}
+	
+	@Override
+	public double getFuzzyFactor(Id fromLinkId, Link toLink) {
+		
+		/*
+		 * If at least one of both links is not observed, there is no fuzzy factor
+		 * stored in the lookup map. Therefore return 0.0. 
+		 */
+		Id toLinkId = toLink.getId();
+		if (!observedLinks.contains(fromLinkId) || !observedLinks.contains(toLinkId)) return 0.0;
+		
+		int cmp = fromLinkId.compareTo(toLinkId);
+		if (cmp < 0) {
+			Double factor = this.distanceFuzzyFactors.get(fromLinkId).get(toLinkId);
+			if (factor == null) return 1.0;
+			else return factor;
+		} else if (cmp > 0) {
+			Double factor = this.distanceFuzzyFactors.get(toLinkId).get(fromLinkId);
+			if (factor == null) return 1.0;
+			else return factor;
+		} else return 0.0;
+	}
 }
