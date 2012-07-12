@@ -27,6 +27,7 @@ public class NoMentalSim {
 //		str.setBeta(4);
 //		c.setLeastCostPathCalculatorFactory(str);
 //		c.setTravelDisutilityFactory(new CapacityFavoringStochasticCostCalculatorFactory());
+		c.addControlerListener(new SimpleAnnealer());
 		c.run();
 		System.exit(0);
 		
