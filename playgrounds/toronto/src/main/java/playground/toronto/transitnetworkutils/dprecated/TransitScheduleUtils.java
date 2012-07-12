@@ -1,4 +1,4 @@
-package playground.toronto.transitnetworkutils;
+package playground.toronto.transitnetworkutils.dprecated;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

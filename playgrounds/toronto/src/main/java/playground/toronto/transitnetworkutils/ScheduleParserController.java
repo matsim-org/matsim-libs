@@ -12,6 +12,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
 
+import playground.toronto.transitnetworkutils.dprecated.TransitScheduleUtils;
+
 
 
 /**
