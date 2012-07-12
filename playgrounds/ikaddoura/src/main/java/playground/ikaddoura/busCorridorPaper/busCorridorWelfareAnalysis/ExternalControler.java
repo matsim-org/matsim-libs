@@ -209,6 +209,9 @@ class ExternalControler {
 				}
 			}
 			log.info("************* EXTERNAL ITERATION (2) " + extItParam2 + " ENDS *************");
+			
+			this.extIt2information.clear();
+		
 		}
 	}
 
