@@ -173,7 +173,7 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		
 		planStrat_reSchedule.addModule(new MemorizeSelectedPlan());
 		planStrat_reSchedule.addModule(vehicleReRouter);
-		planStrat_reSchedule.addModule(new ReRouteVehicles(router, event.getControler().getNetwork()));
+		planStrat_reSchedule.addModule(new ReRouteVehicles(router, event.getControler().getNetwork(), event.getControler().getTravelTimeCalculator()));
 		
 		ScheduleVehicles vehicleRouter = new ScheduleVehicles(event.getControler().getNetwork(), tourCost, costs, new DTWSolverFactory());
 		
@@ -181,7 +181,7 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		CarrierPlanStrategy planStrat_schedule = new CarrierPlanStrategy();
 		planStrat_schedule.addModule(new MemorizeSelectedPlan());
 		planStrat_schedule.addModule(vehicleRouter);
-		planStrat_schedule.addModule(new ReRouteVehicles(router, event.getControler().getNetwork()));
+		planStrat_schedule.addModule(new ReRouteVehicles(router, event.getControler().getNetwork(), event.getControler().getTravelTimeCalculator()));
 		
 		CarrierPlanStrategy planStrat_bestPlan = new CarrierPlanStrategy();
 		planStrat_bestPlan.addModule(new MemorizeSelectedPlan());
@@ -190,7 +190,7 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		CarrierPlanStrategy planStrat_reRoutePlan = new CarrierPlanStrategy();
 		planStrat_reRoutePlan.addModule(new MemorizeSelectedPlan());
 		planStrat_reRoutePlan.addModule(new SelectBestPlan());
-		planStrat_reRoutePlan.addModule(new ReRouteVehicles(router, event.getControler().getNetwork()));
+		planStrat_reRoutePlan.addModule(new ReRouteVehicles(router, event.getControler().getNetwork(), event.getControler().getTravelTimeCalculator()));
 		
 		PlanStrategyManager<Carrier> stratManager = new PlanStrategyManager<Carrier>();
 		stratManager.addStrategy(planStrat_reSchedule, 0.05);

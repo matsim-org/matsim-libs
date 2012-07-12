@@ -38,6 +38,7 @@ import org.matsim.contrib.freight.vrp.utils.matsim2vrp.MatsimVehicleAdapter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 public class ReRouteVehicles implements CarrierPlanStrategyModule{
@@ -48,11 +49,13 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 	
 	private Network network;
 	
+	private TravelTime travelTime;
 	
-	public ReRouteVehicles(LeastCostPathCalculator router, Network network) {
+	public ReRouteVehicles(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
 		super();
 		this.router = router;
 		this.network = network;
+		this.travelTime = travelTime;
 	}
 
 	@Override
@@ -100,8 +103,11 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 			prevLeg.setRoute(route);
 			return;
 		}
-		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getToNode(), prevLeg.getDepartureTime(), person, vehicle);
-		prevLeg.setExpectedTransportTime(path.travelTime);
+		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getDepartureTime(), person, vehicle);
+		double travelTime = path.travelTime;
+		double toLinkTravelTime = this.travelTime.getLinkTravelTime(network.getLinks().get(toLinkId),prevLeg.getDepartureTime()+travelTime);
+		travelTime += toLinkTravelTime;
+		prevLeg.setExpectedTransportTime(travelTime);
 		Route route = createRoute(fromLinkId,path,toLinkId);
 		prevLeg.setRoute(route);
 	}
