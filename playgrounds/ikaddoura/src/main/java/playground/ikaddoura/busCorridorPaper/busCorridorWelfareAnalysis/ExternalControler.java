@@ -66,11 +66,11 @@ class ExternalControler {
 //		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
 //		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
 //		
-		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-		lastExternalIterationParam1 = 20;
+//		lastExternalIterationParam1 = 16;
+//		lastExternalIterationParam2 = 16;
 		
+		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
-		lastExternalIterationParam2 = 20;
 				
 		incrBusNumber = 1;
 		incrFare = -0.25;
@@ -81,8 +81,10 @@ class ExternalControler {
 		configFile = args[0];
 		outputExternalIterationDirPath = args[1];
 		
-//		String op1String = args[2];
-//		lastExternalIterationParam1 = Integer.parseInt(args[3]);
+		lastExternalIterationParam1 = Integer.parseInt(args[2]);
+		lastExternalIterationParam2 = Integer.parseInt(args[3]);
+//		
+//		String op1String = args[4];
 //
 //		if(op1String.equals(OptimizationParameter1.FARE.toString())){
 //			op1 = OptimizationParameter1.FARE;
@@ -94,8 +96,7 @@ class ExternalControler {
 //			throw new RuntimeException("Optimization parameter " + op1String + " is unknown. Aborting... ");
 //		}
 //		
-//		String op2String = args[4];
-//		lastExternalIterationParam2 = Integer.parseInt(args[5]);
+//		String op2String = args[5];
 //
 //		if(op2String.equals(OptimizationParameter2.FARE.toString())){
 //			op2 = OptimizationParameter2.FARE;
