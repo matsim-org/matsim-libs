@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -51,6 +52,7 @@ import playground.toronto.demand.util.TableReader;
  * @author pkucirek
  *
  */
+@SuppressWarnings("deprecation")
 public class CreatePlansFromTrips {
 
 	// ////////////////////////////////////////////////////////////////////
@@ -75,14 +77,25 @@ public class CreatePlansFromTrips {
 			{"zone_id",
 			"x",
 			"y"});
+	private final List<String> additonalTripAttributeNames = Arrays.asList(new String[]
+			{"access_mode",
+			"egress_mode",
+			"access_zone",
+			"egress_zone"});
 	
 	private HashMap<Id, String> personHouseholdMap; //person id, hhid
 	private HashMap<Id, Trip> trips; //trip_id, attributes
 	private HashMap<Id, List<Id>> personTripsMap; //person id, list of trip ids.
+	private HashMap<Id, Coord> stations; //station id, location
+	private HashMap<String, Double> householdWeights; //hhid, expansionfactor
+	
 	private HashMap<String, Coord> householdCoords;
 	private HashSet<Id> unusableTripChains;
 	private HashSet<Id> nonHouseholdTripChains;
 	private HashSet<Id> chainsWithNoZones;
+	
+	private double expansionFactorFactor = 0; // All weights will be multiplied by this factor. 
+	private boolean isUsingMixedModeTrips = false;
 	
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -90,6 +103,26 @@ public class CreatePlansFromTrips {
 	
 	public CreatePlansFromTrips(){
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	}
+	
+	// ////////////////////////////////////////////////////////////////////
+	// get / set methods
+	// ////////////////////////////////////////////////////////////////////
+	
+	public double getExpansionFactorFactor() {
+		return expansionFactorFactor;
+	}
+
+	public void setExpansionFactorFactor(double expansionFactorFactor) {
+		this.expansionFactorFactor = expansionFactorFactor;
+	}
+
+	public boolean isUsingMixedModeTrips() {
+		return isUsingMixedModeTrips;
+	}
+
+	public void setUsingMixedModeTrips(boolean isUsingMixedModeTrips) {
+		this.isUsingMixedModeTrips = isUsingMixedModeTrips;
 	}
 	
 	// ////////////////////////////////////////////////////////////////////
@@ -123,6 +156,7 @@ public class CreatePlansFromTrips {
 		TableReader tr = new TableReader(filename);
 		tr.open();
 		if (!tr.checkHeaders(tripsFieldNames)) throw new IOException("Trips file not correctly formatted!");
+		if (tr.checkHeaders(additonalTripAttributeNames)) this.isUsingMixedModeTrips = true;
 		
 		this.personHouseholdMap = new HashMap<Id, String>();
 		this.trips = new HashMap<Id, CreatePlansFromTrips.Trip>();
@@ -130,9 +164,16 @@ public class CreatePlansFromTrips {
 		
 		long tripNum = 0;
 		while (tr.next()){
+			
+			//Puts the household factor into the map.
+			householdWeights = new HashMap<String, Double>();
+			householdWeights.put(tr.current().get("hhid"), 
+					new Double( tr.current().get("weight")));
+			
 			//Get the current person, create if necessary.
 			IdImpl pid = new IdImpl(tr.current().get("hhid") + "-" + tr.current().get("pid"));
 			PersonImpl P;
+
 			if (!scenario.getPopulation().getPersons().containsKey(pid)) {
 				P = new PersonImpl(pid);
 				scenario.getPopulation().addPerson(P);
@@ -159,6 +200,10 @@ public class CreatePlansFromTrips {
 		tr.close();
 		
 		log.info("Trips file opened successfully. " + scenario.getPopulation().getPersons().size() + " persons were recognized.");
+	}
+	
+	private void readStations(String filename){
+		//TODO read optional stations file.
 	}
 	
 	private void writePlans(String filename){
@@ -220,7 +265,7 @@ public class CreatePlansFromTrips {
 			for (Id i : personTripsMap.get(P.getId())) pTrips.add(trips.get(i));
 			
 			//Sort trips in order of start time
-			bubbleSortTrips(pTrips);
+			sortTrips(pTrips);
 
 			//Check the consistency of the trip chain
 			int state = checkTripChain(pTrips);
@@ -296,10 +341,13 @@ public class CreatePlansFromTrips {
 			
 			ArrayList<Trip> pTrips = new ArrayList<CreatePlansFromTrips.Trip>();
 			for (Id i : personTripsMap.get(P.getId())) pTrips.add(trips.get(i));
-			bubbleSortTrips(pTrips);
+			sortTrips(pTrips);
 			
 			PlanImpl p = new PlanImpl();
 			Trip T = null;
+			
+			HashMap<String, Coord> workplaceZoneMap = new HashMap<String, Coord>();
+			HashMap<String, Coord> schoolZoneMap = new HashMap<String, Coord>();
 			
 			for (int i = 0; i<pTrips.size(); i++){ //Decided against using a for each loop because ordering is important
 				T = pTrips.get(i); //The current trip
@@ -319,8 +367,18 @@ public class CreatePlansFromTrips {
 						c = getRandomCoordInZone(new IdImpl(T.zone_o));
 						householdCoords.put(personHouseholdMap.get(P.getId()), c);
 					}
+				}else if (act_o.equals("W")){ //Work activity
+					//Allows activity episodes occurring in the same zone to be assigned the same coordinate. Only applies to work or school activities.
+					String workZone = T.zone_o;
+					if (!workplaceZoneMap.containsKey(workZone)) workplaceZoneMap.put(workZone, getRandomCoordInZone(new IdImpl(T.zone_o)));
+					c = workplaceZoneMap.get(workZone);
+					
+				}else if (act_o.equals("S")){ //School activity
+					String schoolZone = T.zone_o;
+					if (!schoolZoneMap.containsKey(schoolZone)) schoolZoneMap.put(schoolZone, getRandomCoordInZone(new IdImpl(T.zone_o)));
+					c = schoolZoneMap.get(schoolZone);
+					
 				}else{
-					//TODO: Do I want to restrict subsequent work/school activities occurring in the same zone to having the same coordinates? Default is create a new coordinate for each activity.
 					c = getRandomCoordInZone(new IdImpl(T.zone_o));
 				}
 				
@@ -369,12 +427,22 @@ public class CreatePlansFromTrips {
 				if(householdCoords.containsKey(personHouseholdMap.get(P.getId()))){ //Household coord already set
 					c = householdCoords.get(personHouseholdMap.get(P.getId()));
 				}else{ //Household coordinate not set.
-					c = getRandomCoordInZone(new IdImpl(T.zone_o));
+					c = getRandomCoordInZone(new IdImpl(T.zone_d));
 					householdCoords.put(personHouseholdMap.get(P.getId()), c);
 				}
+			}else if (act_d.equals("W")){ //Work activity
+				//Allows activity episodes occurring in the same zone to be assigned the same coordinate. Only applies to work or school activities.
+				String workZone = T.zone_d;
+				if (!workplaceZoneMap.containsKey(workZone)) workplaceZoneMap.put(workZone, getRandomCoordInZone(new IdImpl(T.zone_d)));
+				c = workplaceZoneMap.get(workZone);
+				
+			}else if (act_d.equals("S")){ //School activity
+				String schoolZone = T.zone_d;
+				if (!schoolZoneMap.containsKey(schoolZone)) schoolZoneMap.put(schoolZone, getRandomCoordInZone(new IdImpl(T.zone_d)));
+				c = schoolZoneMap.get(schoolZone);
+				
 			}else{
-				//TODO: Do I want to restrict subsequent work/school activities occurring in the same zone to having the same coordinates? Default is create a new coordinate for each activity.
-				c = getRandomCoordInZone(new IdImpl(T.zone_o));
+				c = getRandomCoordInZone(new IdImpl(T.zone_d));
 			}
 			
 			p.addActivity(new ActivityImpl(act_d, c));
@@ -418,7 +486,7 @@ public class CreatePlansFromTrips {
 		return hours * 3600 + minutes * 60;
 	}
 	
-	private void bubbleSortTrips(List<Trip> a){
+	private void sortTrips(List<Trip> a){
 		Collections.sort(a);
 	}	
 	
@@ -429,7 +497,7 @@ public class CreatePlansFromTrips {
 		
 		if (a.size() == 1) return 4; //only one trip in trip chain
 		
-		String firstActivity = a.get(0).act_o;
+		//String firstActivity = a.get(0).act_o;
 		String nextActivity = a.get(0).act_d;
 		boolean hasHomeEpisode = false;
 		
@@ -439,12 +507,69 @@ public class CreatePlansFromTrips {
 			if (a.get(i).act_o.equals("H") || a.get(i).act_d.equals("H")) hasHomeEpisode = true;
 			nextActivity = a.get(i).act_d;
 		}
-		//Check that last activity == first activity
-		if (!a.get(i - 1).act_d.equals(firstActivity)) return 2; //first activity != last activity
+		
+		//@deprecated: Check that last activity == first activity. This should not be an issue
+		//if (!a.get(i - 1).act_d.equals(firstActivity)) return 2; //first activity != last activity
 		
 		if (!hasHomeEpisode) return 1; //Does not have home activity.
 		
 		return 0;
+	}
+	
+	private void expandPopulation(){
+		
+		double weightFactor = 0;
+		String message = "Please enter the weight factor. Household weights (ie, expansion factors)\n" +
+				"will be multiplied by this value. For example, to generate a full population,\n" +
+				"enter '1.0'. To generate a population with a 1:1 matching of the sample data\n" +
+				"enter '0', or leave this field blank.\n" +
+				"Default value = 0.0";
+		String s = JOptionPane.showInputDialog(message);
+		try {
+			weightFactor = Double.parseDouble(s);
+		} catch (NumberFormatException e) {
+			log.info("Expansion factor factor set to 0.");
+		}		
+		
+		if (weightFactor > 0.2){
+			message = "WARNING: Using the expansion factor will\n" +
+					"significantly increase the size of the\n" +
+					"population. The time required to create\n" +
+					"plans for all agents will increase\n" +
+					"accordingly.";
+			JOptionPane.showMessageDialog(null, message, "WARNING", JOptionPane.WARNING_MESSAGE);
+		}
+		
+		//Figure out which persons to create.
+		HashMap<Id, List<Id>> personNewPersonMap = new HashMap<Id, List<Id>>();
+		for (Person P : scenario.getPopulation().getPersons().values()){
+			Id pid = P.getId();
+			Double weight = householdWeights.get(personHouseholdMap.get(pid)) * weightFactor;
+			Integer additonalClones = weight.intValue();
+			List<Id> newPersons = new ArrayList<Id>();
+			for (int i = 0; i < additonalClones; i++){
+				newPersons.add(new IdImpl(pid.toString() + "_" + i));  
+			}
+			personNewPersonMap.put(pid, newPersons);
+		}
+		
+		for (Entry<Id, List<Id>> e : personNewPersonMap.entrySet()){
+			for (Id i : e.getValue()){
+				scenario.getPopulation().addPerson(new PersonImpl(i));
+				
+			}
+			
+			/*
+			P = new PersonImpl(pid);
+			scenario.getPopulation().addPerson(P);
+			personHouseholdMap.put(pid, tr.current().get("hhid"));
+			personTripsMap.put(pid, new ArrayList<Id>());
+			*/
+			
+		}
+		
+		
+		
 	}
 	
 	// ////////////////////////////////////////////////////////////////////
@@ -502,8 +627,14 @@ public class CreatePlansFromTrips {
 		if (state == JFileChooser.APPROVE_OPTION){
 			file = fc.getSelectedFile().getAbsolutePath();
 		}else if (state == JFileChooser.CANCEL_OPTION) return;
+		
+
+		
 		try {
 			converter.readTrips(file);
+			
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -547,6 +678,12 @@ public class CreatePlansFromTrips {
 		public String act_d;
 		public String start_time;
 		public String type;
+		
+		//Additional attributes for mixed-mode trips
+		public String zone_a; //access zone to transit
+		public String zone_e; //egress zone from transit
+		public String mode_a; //access mode to transit
+		public String mode_e; //egress mode from transit
 		
 		public Trip(String zo, String zd, String ao, String ad, String st, String t){
 			this.zone_o = zo;

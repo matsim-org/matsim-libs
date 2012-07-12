@@ -131,9 +131,9 @@ public class TableReader {
 			this.regex = ",";
 		}
 		else{
-			cells = line.split("\t");
+			cells = line.split("\\t");
 			if (cells.length > 1) {
-				this.regex = "\\s+";
+				this.regex = "\\t";
 			}
 			else{
 				cells = line.split("\\s+");
@@ -210,7 +210,8 @@ public class TableReader {
 	 * the column data (ie, if a String is stored where a Double
 	 * is expected, this method WILL NOT catch this problem).
 	 * 
-	 * @param fields: A List<String> of field headers to check.
+	 * @param 
+	 * 		fields A List<String> of field headers to check.
 	 * @return
 	 */
 	public boolean checkHeaders(List<String> fields){
