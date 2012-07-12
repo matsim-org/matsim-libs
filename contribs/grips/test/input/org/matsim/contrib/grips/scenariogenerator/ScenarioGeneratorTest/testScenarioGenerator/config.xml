@@ -4,6 +4,14 @@
 
 <!-- ====================================================================== -->
 
+	<module name="TimeAllocationMutator" >
+
+		<!-- Defines how many seconds a time mutation can maximally shift a time. -->
+		<param name="mutationRange" value="1800.0" />
+	</module>
+
+<!-- ====================================================================== -->
+
 	<module name="controler" >
 		<param name="enableLinkToLinkRouting" value="false" />
 
@@ -297,7 +305,7 @@
 		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
 		<param name="networkModes" value="car,ride" />
 
-		<!-- Free-speed factor for a teleported mode based on freespeed: freespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. -->
+		<!-- Free-speed factor for a teleported mode based on freespeed: freespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. freespeedFactor wins over teleportedModeSpeed, if both are set (says michaz). -->
 		<param name="teleportedModeFreespeedFactor_pt" value="2.0" />
 
 		<!-- Speed for a teleported mode based on beeline-distance: (<beeline distance> * beelineDistanceFactor) / speed. Insert a line like this for every such mode. -->
@@ -445,7 +453,7 @@
 
 	<module name="transit" >
 
-		<!-- Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt,bus,train,tram'. -->
+		<!-- Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt'. -->
 		<param name="transitModes" value="pt" />
 
 		<!-- Input file containing the transit schedule to be simulated. -->
@@ -499,7 +507,7 @@
 
 	<module name="vspExperimental" >
 
-		<!-- String: minOfDurationAndEndTime', 'tryEndTimeThenDuration', 'endTimeOnly' -->
+		<!-- String: minOfDurationAndEndTime tryEndTimeThenDuration endTimeOnly. Anything besides minOfDurationAndEndTime will internally use a different (simpler) version of the TimeAllocationMutator. -->
 		<param name="activityDurationInterpretation" value="minOfDurationAndEndTime" />
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
