@@ -19,8 +19,14 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class SummaryStatistics {
 
+	/**
+	 * @param simulationPath the root of the simulation
+	 * @param startIter 
+	 * @param endIter
+	 * @param dailyVolumes Whether the RMSD should track daily or hourly volumes on links
+	 */
 	public void linkStatsRMSDeltaPlot(String simulationPath, int startIter,
-			int endIter) {
+			int endIter, boolean dailyVolumes) {
 		ArrayList<String> files = new ArrayList<String>();
 		// create a list of file names to use in the comparison
 		ArrayList<Integer> relevantIters = new ArrayList<Integer>();
@@ -28,27 +34,33 @@ public class SummaryStatistics {
 			String fileName = getLinkStatsFileName(simulationPath, iter);
 			if (fileName == null)
 				continue;
-			else
-			{
+			else {
 				files.add(fileName);
-				relevantIters.add(iter);				
+				relevantIters.add(iter);
 			}
 		}
 		// now iterate through the list and get their rmses for plotting
-		double[] iters = new double[relevantIters.size()-1];
-		for(int iter=0;iter<relevantIters.size()-1;iter++){
-			iters[iter] = relevantIters.get(iter+1);
+		double[] iters = new double[relevantIters.size() - 1];
+		for (int iter = 0; iter < relevantIters.size() - 1; iter++) {
+			// iters[iter] = relevantIters.get(iter+1);
+			iters[iter] = iter + 1;
 		}
-		double[] values = new double[relevantIters.size()-1];
+		double[] valuesByIter = new double[relevantIters.size() - 1];
+		double[] valuesVsStart = new double[relevantIters.size() - 1];
 		for (int i = 0; i < files.size() - 1; i++) {
 			String firstFileName = files.get(i);
 			String secondFileName = files.get(i + 1);
-			values[i] = getRMSDelta(firstFileName, secondFileName);
+			valuesByIter[i] = getRMSDelta(firstFileName, secondFileName, dailyVolumes);
+			valuesVsStart[i] = getRMSDelta(files.get(0), secondFileName, dailyVolumes);
 		}
-		plotRMSDelta(iters, values, simulationPath, "Linkstats change over iterations for "+simulationPath);
+		plotRMSDelta(iters, valuesByIter, simulationPath,
+				"Linkstats change over iterations for " + simulationPath + (dailyVolumes?" (daily volumes)":""),dailyVolumes, false);
+		plotRMSDelta(iters, valuesVsStart, simulationPath,
+				"Linkstats change vs start for " + simulationPath + (dailyVolumes?" (daily volumes)":""), dailyVolumes, true);
 	}
 
-	private double getRMSDelta(String firstFileName, String secondFileName) {
+	private double getRMSDelta(String firstFileName, String secondFileName,
+			boolean dailyVolumes) {
 		double rmsd = 0;
 		try {
 			BufferedReader firstReader = IOUtils
@@ -59,15 +71,19 @@ public class SummaryStatistics {
 			// need the secondReader to progress past the headings as well
 			secondReader.readLine();
 			int[] countColumns = new int[24];
+			int dailyVolumeColumn = 0;
 			int indexCounter = 0;
 			for (int column = 0; column < headings.length; column++) {
 				String heading = headings[column];
-				if(heading.startsWith("HRS") && heading.endsWith("avg") && indexCounter<24){
-					countColumns[indexCounter] = column;
-					indexCounter++;					
+				if (heading.startsWith("HRS") && heading.endsWith("avg")) {
+					if (indexCounter < 24)
+						countColumns[indexCounter] = column;
+					else
+						dailyVolumeColumn = column;
+					indexCounter++;
 				}
 			}
-//			read the lines, and perform the rmsdelta calc
+			// read the lines, and perform the rmsdelta calc
 			int rowCount = 0;
 			double sumDeltaSquared = 0;
 			while (rowCount >= 0) {
@@ -79,18 +95,27 @@ public class SummaryStatistics {
 					rowCount++;
 				String[] firstBits = firstLine.split("\t");
 				String[] secondBits = secondLine.split("\t");
-				for(int column:countColumns){
-//					firstCounts.add(Double.parseDouble(firstBits[column]));
-//					secondCounts.add(Double.parseDouble(secondBits[column]));
-//					System.out.println(String.format("%s , %s",firstBits[column],secondBits[column]));
-					sumDeltaSquared += 
-							Math.pow(
-							Double.parseDouble(firstBits[column]) - 
-							Double.parseDouble(secondBits[column])
-							,2);
+				// go through all columns of counts or only through the total
+				// daily volume
+				if (dailyVolumes) {
+					sumDeltaSquared += Math
+							.pow(Double
+									.parseDouble(firstBits[dailyVolumeColumn])
+									- Double.parseDouble(secondBits[dailyVolumeColumn]),
+									2);
+				} else {
+					for (int column : countColumns) {
+						// firstCounts.add(Double.parseDouble(firstBits[column]));
+						// secondCounts.add(Double.parseDouble(secondBits[column]));
+						// System.out.println(String.format("%s , %s",firstBits[column],secondBits[column]));
+						sumDeltaSquared += Math
+								.pow(Double.parseDouble(firstBits[column])
+										- Double.parseDouble(secondBits[column]),
+										2);
+					}
 				}
 			}
-			rmsd=Math.pow(sumDeltaSquared/rowCount, 0.5);
+			rmsd = Math.pow(sumDeltaSquared / rowCount, 0.5);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -100,20 +125,26 @@ public class SummaryStatistics {
 	}
 
 	private void plotRMSDelta(double[] iters, double[] values,
-			String simulationPath, String title) {
+			String simulationPath, String title, boolean dailyVolumes, boolean vStart) {
 		double[] relativeValues = valuesRelativeToMax(values);
-		XYLineChart xyAbsolute = new XYLineChart(title, "iterations", "RMSD (absolute)");
-		XYLineChart xyRelative = new XYLineChart(title, "iterations", "RMSD (pct of max)");
+		XYLineChart xyAbsolute = new XYLineChart(title, "iterations",
+				"RMSD (absolute)");
+		XYLineChart xyRelative = new XYLineChart(title, "iterations",
+				"RMSD (pct of max)");
 		xyAbsolute.addSeries("RMSD", iters, values);
 		xyRelative.addSeries("RMSD pct", iters, relativeValues);
-		xyAbsolute.saveAsPng(simulationPath+"/linkstatsRMSD_abs.png", 800, 600);
-		xyRelative.saveAsPng(simulationPath+"/linkstatsRMSD_rel.png", 800, 600);
-		BufferedWriter writer = IOUtils.getBufferedWriter(simulationPath+"/linkstatsRMSD.txt");
+		xyAbsolute.saveAsPng(simulationPath + "/linkstatsRMSD_abs"+(vStart?"_vstart":"")+(dailyVolumes?"_daily":"")+".png", 800,
+				600);
+		xyRelative.saveAsPng(simulationPath + "/linkstatsRMSD_rel"+(vStart?"_vstart":"")+(dailyVolumes?"_daily":"")+".png", 800,
+				600);
+		BufferedWriter writer = IOUtils.getBufferedWriter(simulationPath
+				+ "/linkstatsRMSD"+(dailyVolumes?"_daily":"")+".txt");
 		try {
 			writer.write("ITERATION\tRMSD (absolute)\tRMSD (relative to max)\n");
 			writer.flush();
-			for(int i=0;i<iters.length;i++){
-				writer.write(String.format("%f\t%f\t%f\n",iters[i],values[i],relativeValues[i]));
+			for (int i = 0; i < iters.length; i++) {
+				writer.write(String.format("%f\t%f\t%f\n", iters[i], values[i],
+						relativeValues[i]));
 				writer.flush();
 			}
 			writer.close();
@@ -126,14 +157,14 @@ public class SummaryStatistics {
 	private double[] valuesRelativeToMax(double[] values) {
 		double max = 0d;
 		double[] result = new double[values.length];
-		for(double value:values){
-			if(value>max)
-				max=value;
+		for (double value : values) {
+			if (value > max)
+				max = value;
 		}
-		if(max == 0d)
+		if (max == 0d)
 			return result;
-		for(int i=0; i<values.length;i++){
-			result[i] = values[i]/max*100;
+		for (int i = 0; i < values.length; i++) {
+			result[i] = values[i] / max * 100;
 		}
 		return result;
 	}
@@ -156,6 +187,6 @@ public class SummaryStatistics {
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.showOpenDialog(new JPanel());
 		simPath = chooser.getSelectedFile().getPath();
-		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 1000);
+		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 5000,true);
 	}
 }
