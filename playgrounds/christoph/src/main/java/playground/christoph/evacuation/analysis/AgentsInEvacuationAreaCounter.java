@@ -542,15 +542,15 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			for (int idx = 0; idx < this.nofBins; idx++) {
 				participating += participatingArray[idx];
 				notParticipating += notParticipatingArray[idx];
-				participatingArray[idx] = participating;
-				notParticipatingArray[idx] = notParticipating;
-				array[idx] = participating + notParticipating;
+				participatingArray[idx] = (int) (participating * scaleFactor);
+				notParticipatingArray[idx] = (int) (notParticipating  * scaleFactor);
+				array[idx] = (int) ((participating + notParticipating) * scaleFactor);
 			}
 		}
 
 		for (String transportMode : this.transportModes) {
-			log.info("Participating agents using " + transportMode + " mode:\t" + participatingEvacueesPerMode.get(transportMode));
-			log.info("Not participating agents using " + transportMode + " mode:\t" + notParticipatingEvacueesPerMode.get(transportMode));		
+			log.info("Participating agents using " + transportMode + " mode:\t" + participatingEvacueesPerMode.get(transportMode) * scaleFactor);
+			log.info("Not participating agents using " + transportMode + " mode:\t" + notParticipatingEvacueesPerMode.get(transportMode) * scaleFactor);		
 		}
 		
 		
@@ -571,11 +571,11 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 				int notParticipating = notParticipatingEvacueesPerMode.get(transportMode);
 				bw.write(transportMode);
 				bw.write("\t");
-				bw.write(String.valueOf(participating));
+				bw.write(String.valueOf(participating * scaleFactor));
 				bw.write("\t");
-				bw.write(String.valueOf(notParticipating));
+				bw.write(String.valueOf(notParticipating * scaleFactor));
 				bw.write("\t");
-				bw.write(String.valueOf(participating + notParticipating));
+				bw.write(String.valueOf((participating + notParticipating) * scaleFactor));
 				bw.write("\n");
 			}
 			
