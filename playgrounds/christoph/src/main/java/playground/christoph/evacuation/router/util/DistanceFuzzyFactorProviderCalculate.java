@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -34,30 +33,35 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class DistanceFuzzyFactorProviderCalculate implements DistanceFuzzyFactorProvider {
 
-	private final Network network;
 	private final Set<Id> observedLinks;
 	private final double c = 1 / Math.exp(4);	// constant for fuzzy factor creation
 	
-	public DistanceFuzzyFactorProviderCalculate(Network network, Set<Id> observedLinks) {
-		this.network = network;
+	public DistanceFuzzyFactorProviderCalculate(Set<Id> observedLinks) {
 		this.observedLinks = observedLinks;
 	}
 	
 	@Override
-	public double getFuzzyFactor(Id fromLinkId, Link toLink) {
+	public boolean isLinkObserved(Id linkId) {
+		return this.observedLinks.contains(linkId);
+	}
+	
+	@Override
+	public double getFuzzyFactor(Link fromLink, Link toLink) {
 		
 		/*
 		 * If at least one of both links is not observed, there is no fuzzy factor
 		 * stored in the lookup map. Therefore return 0.0. 
 		 */
 		Id toLinkId = toLink.getId();
-		if (!observedLinks.contains(fromLinkId) || !observedLinks.contains(toLinkId)) return 0.0;
+		/*
+		 * FromLink is now observed in FuzzyTravelTimeEstimator. cdobler, jul'12
+		 */
+//		if (!observedLinks.contains(fromLinkId) || !observedLinks.contains(toLinkId)) return 0.0;
+		if (!observedLinks.contains(toLinkId)) return 0.0;
 
-		if (fromLinkId.equals(toLinkId)) return 0.0;
+		if (fromLink.equals(toLinkId)) return 0.0;
 		
-		Link fromLink = network.getLinks().get(fromLinkId);
 		double distance = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
-		
 		
 //		double factor = 1 / (1 + Math.exp((-distance/1000.0) + 4.0));
 //		double factor = c / (c + Math.exp((-distance/1000.0)));

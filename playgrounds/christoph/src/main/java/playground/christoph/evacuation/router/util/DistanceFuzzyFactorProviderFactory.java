@@ -47,7 +47,6 @@ public class DistanceFuzzyFactorProviderFactory {
 	
 	private final Map<Id, Map<Id, Double>> distanceFuzzyFactors;
 	private final Set<Id> observedLinks;
-	private final Scenario scenario;
 		
 	/**
 	 * Creates and initializes distanceFuzzyFactor lookup maps.
@@ -55,9 +54,7 @@ public class DistanceFuzzyFactorProviderFactory {
 	 * outside a 30 km radius around the research area) are ignored
 	 * and a fuzzy factor of 0.0 is returned for them.
 	 */
-	DistanceFuzzyFactorProviderFactory(Scenario scenario) {
-		this.scenario = scenario;
-		
+	DistanceFuzzyFactorProviderFactory(Scenario scenario) {	
 		this.observedLinks = new HashSet<Id>();
 		identifyObservedLinks(scenario);
 		
@@ -71,7 +68,7 @@ public class DistanceFuzzyFactorProviderFactory {
 	
 	public DistanceFuzzyFactorProvider createInstance() {
 		if (useLookupMap) return new DistanceFuzzyFactorProviderLookup(this.distanceFuzzyFactors, this.observedLinks);
-		else return new DistanceFuzzyFactorProviderCalculate(scenario.getNetwork(), observedLinks);
+		else return new DistanceFuzzyFactorProviderCalculate(observedLinks);
 	}
 	
 	/*

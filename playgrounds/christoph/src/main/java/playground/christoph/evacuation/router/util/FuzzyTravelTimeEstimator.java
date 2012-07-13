@@ -56,6 +56,11 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	private Id pId;
 	private int pIdHashCode;
 	private double personFuzzyFactor;
+	private AgentPosition agentPosition;
+	private Position positionType;
+	private Id fromLinkId;
+	private Link fromLink;
+	private boolean fromLinkIsObserved;
 	
 	/*package*/ FuzzyTravelTimeEstimator(Scenario scenario, PersonalizableTravelTime travelTime, AgentsTracker agentsTracker,
 			VehiclesTracker vehiclesTracker, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider) {
@@ -108,15 +113,21 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 		this.pId = person.getId();
 		this.pIdHashCode = person.getId().hashCode();
 		this.personFuzzyFactor = rng.hashCodeToRandomDouble(pIdHashCode);
+		this.agentPosition = this.agentsTracker.getAgentPosition(pId);
+		this.positionType = agentPosition.getPositionType();
 	}
 
 	/*
 	 * So far use hard-coded values between 0.017 (distance 0.0) 
 	 * and 1.0 (distance ~ 10000.0).
 	 */
-	private double calcDistanceFuzzyFactor(Link toLink) {	
-		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(pId);
-		Position positionType = agentPosition.getPositionType();
+	private double calcDistanceFuzzyFactor(Link toLink) {
+		/*
+		 *  AgentPosition and PositionType are now updated in the setPerson(...)
+		 *  method. cdobler, jul'12.
+		 */
+//		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(pId);
+//		Position positionType = agentPosition.getPositionType();
 
 		Id fromLinkId = null;
 		if (positionType == Position.LINK) {
@@ -129,8 +140,20 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 			log.warn("Agent's position is undefined! Id: " + this.pId);
 			return 1.0;
 		}
-
-		return distanceFuzzyFactorProvider.getFuzzyFactor(fromLinkId, toLink);
+		
+		if (!fromLinkId.equals(this.fromLinkId)) {
+			this.fromLinkId = fromLinkId;
+			this.fromLink = this.scenario.getNetwork().getLinks().get(fromLinkId);
+			this.fromLinkIsObserved = distanceFuzzyFactorProvider.isLinkObserved(fromLinkId);
+		}
+		
+		/*
+		 * If the agent's current link is not observed, the distance fuzzy factor is 0.0,
+		 * therefore we do not have to check the DistanceFuzzyFactorProviders return value.
+		 * cdobler, jul'12 
+		 */
+		if (!this.fromLinkIsObserved) return 0.0;
+		return distanceFuzzyFactorProvider.getFuzzyFactor(fromLink, toLink);
 	}
 	
 	/*

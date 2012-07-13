@@ -25,5 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 
 public interface DistanceFuzzyFactorProvider {
 
-	public double getFuzzyFactor(Id fromLinkId, Link toLink);
+	public double getFuzzyFactor(Link fromLink, Link toLink);
+	
+	public boolean isLinkObserved(Id linkId);
 }

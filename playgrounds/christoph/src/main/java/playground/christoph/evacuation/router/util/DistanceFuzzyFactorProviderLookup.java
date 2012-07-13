@@ -43,14 +43,25 @@ public class DistanceFuzzyFactorProviderLookup implements DistanceFuzzyFactorPro
 	}
 	
 	@Override
-	public double getFuzzyFactor(Id fromLinkId, Link toLink) {
+	public boolean isLinkObserved(Id linkId) {
+		return this.observedLinks.contains(linkId);
+	}
+	
+	@Override
+	public double getFuzzyFactor(Link fromLink, Link toLink) {
 		
 		/*
 		 * If at least one of both links is not observed, there is no fuzzy factor
 		 * stored in the lookup map. Therefore return 0.0. 
 		 */
+		Id fromLinkId = toLink.getId();
 		Id toLinkId = toLink.getId();
-		if (!observedLinks.contains(fromLinkId) || !observedLinks.contains(toLinkId)) return 0.0;
+		
+		/*
+		 * FromLink is now observed in FuzzyTravelTimeEstimator. cdobler, jul'12
+		 */
+//		if (!observedLinks.contains(fromLinkId) || !observedLinks.contains(toLinkId)) return 0.0;
+		if (!observedLinks.contains(toLinkId)) return 0.0;
 		
 		int cmp = fromLinkId.compareTo(toLinkId);
 		if (cmp < 0) {
