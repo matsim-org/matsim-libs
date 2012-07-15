@@ -46,8 +46,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CorridorNetworkWriter {
 	private Scenario scenario;
 	private Network network;
-	private final int linkNr = 40; // both directions
-	private final double capacity = 4000;
+	private final int linkNr = 40; // each direction
+	private final double capacity = 200;
 	private final double freeSpeed = 13.8888888889;
 	private final double length = 500;
 	private final double nrOfLanes = 1;
@@ -67,7 +67,7 @@ public class CorridorNetworkWriter {
 		setLinks();
 		
 		NetworkWriter networkWriter = new NetworkWriter(network);
-		networkWriter.write("../../shared-svn/studies/ihab/busCorridor/input/network80links.xml");
+		networkWriter.write("../../shared-svn/studies/ihab/busCorridor/input_Latsis/network80links_cap200.xml");
 	}
 	
 	private void createLinks(int linkNr) {
