@@ -63,11 +63,11 @@ class ExternalControler {
 		
 	public static void main(final String[] args) throws IOException {
 
-//		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
-//		
-//		lastExternalIterationParam1 = 16;
-//		lastExternalIterationParam2 = 16;
+		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
+		
+		lastExternalIterationParam1 = 0;
+		lastExternalIterationParam2 = 0;
 		
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
@@ -78,11 +78,11 @@ class ExternalControler {
 		
 		// ************************************************
 		
-		configFile = args[0];
-		outputExternalIterationDirPath = args[1];
-		
-		lastExternalIterationParam1 = Integer.parseInt(args[2]);
-		lastExternalIterationParam2 = Integer.parseInt(args[3]);
+//		configFile = args[0];
+//		outputExternalIterationDirPath = args[1];
+//		
+//		lastExternalIterationParam1 = Integer.parseInt(args[2]);
+//		lastExternalIterationParam2 = Integer.parseInt(args[3]);
 //		
 //		String op1String = args[4];
 //
@@ -170,6 +170,7 @@ class ExternalControler {
 				info.setWaitingTimes(analysis.getWaitHandler().getWaitingTimes());
 				info.setWaitingTimesNotMissed(analysis.getWaitHandler().getWaitingTimesNotMissed());
 				info.setWaitingTimesMissed(analysis.getWaitHandler().getWaitingTimesMissed());
+				info.setPersonId2waitingTimes(analysis.getWaitHandler().getPersonId2waitingTimes());
 				info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
 				info.setId2facilityWaitInfo(analysis.getWaitHandler().getFacilityId2facilityInfos());
 				
@@ -181,6 +182,7 @@ class ExternalControler {
 				textWriter.writeExtItData(directoryExtItParam2, this.extIt2information);
 				textWriter.writeDataTransitStops(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				textWriter.writeDataEachTransitStop(directoryExtItParam2Param1, this.extIt2information, extItParam1);
+				textWriter.writeWaitDataPerPerson(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				textWriter.writeLoadData1(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				textWriter.writeLoadData2(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				chartWriter.write(directoryExtItParam2, this.extIt2information);

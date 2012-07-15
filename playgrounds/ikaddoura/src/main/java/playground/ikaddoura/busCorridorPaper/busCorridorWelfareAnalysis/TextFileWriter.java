@@ -289,6 +289,47 @@ public class TextFileWriter {
 	    
 		 } catch (IOException e) {}		
 	}
+
+	public void writeWaitDataPerPerson(String directoryExtItParam2Param1, SortedMap<Integer, ExtItInformation> extIt2information, int extItParam1) {
+		
+		String path = directoryExtItParam2Param1 + "/Data/";
+		File directory = new File(path);
+		directory.mkdirs();
+
+		File file = new File(path + "/personWaitData.txt");
+			
+		try {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		    
+		String zeile0 = "PersonWaitData of external iteration " + extItParam1 + ":";
+		bw.write(zeile0);
+		bw.newLine();
+		    
+		String zeile1 = "PersonId ; WaitingTimes [sec]";
+		bw.write(zeile1);
+		bw.newLine();
+		
+		for (Id personId : extIt2information.get(extItParam1).getPersonId2waitingTimes().keySet()){
+		    
+			List<Double> waitingTimes = extIt2information.get(extItParam1).getPersonId2waitingTimes().get(personId);
+
+			String zeile = personId.toString();
+	    	
+	    	for (Double time : waitingTimes){
+	    		zeile = zeile + " ; " + time.toString();
+	    	}
+	 
+	    	bw.write(zeile);
+	        bw.newLine();
+		 }
+		
+		 bw.flush();
+		 bw.close();
+		 log.info("Textfile written to "+file.toString());
+	    
+		 } catch (IOException e) {}	
+		
+	}
 	
 	
 }

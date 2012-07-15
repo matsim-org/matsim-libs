@@ -230,7 +230,11 @@ public class PtLoadHandler implements PersonEntersVehicleEventHandler, PersonLea
 				int passengersWhenThisBusIsDeparting;
 				if (period.getBusId2Passengers().get(vehId) == null){
 					// passengers from period before!
-					passengersWhenThisBusIsDeparting = this.analysisPeriods.get(periodNr-1).getBusId2Passengers().get(vehId);
+					if (this.analysisPeriods.get(periodNr-1).getBusId2Passengers().get(vehId) == null){
+						passengersWhenThisBusIsDeparting = 0;
+					} else {
+						passengersWhenThisBusIsDeparting = this.analysisPeriods.get(periodNr-1).getBusId2Passengers().get(vehId);
+					}
 				} else {
 					// passengers from this period!
 					passengersWhenThisBusIsDeparting = period.getBusId2Passengers().get(vehId);

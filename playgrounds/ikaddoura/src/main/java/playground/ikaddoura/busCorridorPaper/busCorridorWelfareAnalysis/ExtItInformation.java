@@ -58,6 +58,8 @@ public class ExtItInformation {
 	private int numberOfMissedVehicles;
 	private Map <Id, FacilityWaitTimeInfo> id2facilityWaitInfo = new HashMap<Id, FacilityWaitTimeInfo>();
 	
+	private Map <Id, List<Double>> personId2waitingTimes = new HashMap<Id, List<Double>>();
+	
 	public List <Double> getWaitingTimes() {
 		return waitingTimes;
 	}
@@ -252,6 +254,14 @@ public class ExtItInformation {
 
 	public SortedMap <Integer, AnalysisPeriod> getAnalysisPeriods() {
 		return analysisPeriods;
+	}
+
+	public void setPersonId2waitingTimes(Map <Id, List<Double>> personId2waitingTimes) {
+		this.personId2waitingTimes = personId2waitingTimes;
+	}
+
+	public Map <Id, List<Double>> getPersonId2waitingTimes() {
+		return personId2waitingTimes;
 	}
 		
 }

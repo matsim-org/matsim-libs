@@ -50,6 +50,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	private final List <Double> waitingTimes = new ArrayList<Double>();
 	private final List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private final List <Double> waitingTimesNotMissed = new ArrayList<Double>();
+	private Map <Id, List<Double>> personId2waitingTimes = new HashMap<Id, List<Double>>();
 
 	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
@@ -71,6 +72,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 		waitingTimes.clear();
 		waitingTimesMissed.clear();
 		waitingTimesNotMissed.clear();
+		personId2waitingTimes.clear();
 		personId2PersonEntersVehicleTime.clear();
 		personId2AgentDepartureTime.clear();
 		personId2InVehicleTime.clear();
@@ -96,6 +98,17 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 			}
 			
 			waitingTimes.add(waitingTime);
+			
+			// save waitingTimes per person
+			if (personId2waitingTimes.get(personId) == null){
+				List<Double> waitingTimes = new ArrayList<Double>();
+				waitingTimes.add(waitingTime);
+				personId2waitingTimes.put(personId, waitingTimes);
+			} else {
+				List<Double> waitingTimes = personId2waitingTimes.get(personId);
+				waitingTimes.add(waitingTime);
+				personId2waitingTimes.put(personId, waitingTimes);
+			}
 						
 //			System.out.println("Headway --------------> " + this.headway);
 //			System.out.println("WaitingTime ----------> " + waitingTime);
@@ -239,6 +252,10 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 
 	public List <Double> getWaitingTimesNotMissed() {
 		return waitingTimesNotMissed;
+	}
+
+	public Map <Id, List<Double>> getPersonId2waitingTimes() {
+		return personId2waitingTimes;
 	}
 	
 }
