@@ -62,10 +62,10 @@ import com.vividsolutions.jts.geom.Envelope;
 public class DgCottbus2KoehlerStrehler2010 {
 	
 	public static final Logger log = Logger.getLogger(DgCottbus2KoehlerStrehler2010.class);
-	public static final String outputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/";
+	public static final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/run1292_1330_1830_5_5/";
 	private static String smallNet = outputDirectory + "network_small.xml.gz";
-//	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
-	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
+	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
+//	private static final String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 	private static String modelOutfile = outputDirectory + "koehler_strehler_model.xml";
 	
 	private static String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
@@ -77,17 +77,16 @@ public class DgCottbus2KoehlerStrehler2010 {
 	private static int cellsX = 5;
 	private static int cellsY = 5;
 	private static double boundingBoxOffset = 250.0;
-	private static double startTime = 5.5 * 3600.0;
-	private static double endTime = 9.5 * 3600.0;
+//	private static double startTime = 5.5 * 3600.0;
+//	private static double endTime = 9.5 * 3600.0;
+	private static double startTime = 13.5 * 3600.0;
+	private static double endTime = 18.5 * 3600.0;
 	
 	public static void main(String[] args) throws IOException {
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		
-		/*TODO add time support in respect to:
-		 * network capacity creation: document
-		*/
 		DgCottbusSmallNetworkGenerator netShrinker = shrinkAndWriteNetwork(netFile, signalSystems, smallNet, boundingBoxOffset);
 		DgGrid grid = createAndWriteGrid(netShrinker.getBoundingBox(), netShrinker.getCrs(), cellsX, cellsY,  outputDirectory + "grid.shp");
 		

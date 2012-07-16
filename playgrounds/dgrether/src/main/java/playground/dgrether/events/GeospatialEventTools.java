@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GeospatialEventFilter
+ * GeospatialEventTools
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.events.filters;
+package playground.dgrether.events;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,30 +43,31 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- * TODO make class use GeospatialEventTools
  * @author dgrether
  *
  */
-public class GeospatialEventFilter implements EventFilter {
-
+public class GeospatialEventTools {
+	
 	private Network network;
-	private List<Tuple<CoordinateReferenceSystem, Feature>> featureTuples;
 	private CoordinateReferenceSystem networkCrs;
 	private List<Geometry> transformedFeatureGeometries;
 	
-	public GeospatialEventFilter(Network network){
-		this.network = network;
-		this.featureTuples = new ArrayList<Tuple<CoordinateReferenceSystem, Feature>>();
+	public GeospatialEventTools(Network net, CoordinateReferenceSystem netCrs){
+		this.network = net;
+		this.networkCrs = netCrs;
 		this.transformedFeatureGeometries = new ArrayList<Geometry>();
+
 	}
 	
-	public GeospatialEventFilter(Network network, CoordinateReferenceSystem networkCrs){
-		this(network);
-		this.networkCrs = networkCrs;
+	public boolean doFeaturesContainCoordinate(Coordinate coordinate) {
+		Geometry linkPoint = MGC.coordinate2Point(coordinate);
+		for (Geometry featureGeo : this.transformedFeatureGeometries){
+				return featureGeo.contains(linkPoint);
+		}
+		return false;
 	}
 	
 	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, Feature> featureTuple) {
-		this.featureTuples.add(featureTuple);
 		if ( !(this.networkCrs == null)){
 			MathTransform transformation;
 			try {
@@ -86,17 +87,7 @@ public class GeospatialEventFilter implements EventFilter {
 		}
 	}
 
-	
-	private boolean doFeaturesContainCoordinate(Coordinate coordinate) {
-		Geometry linkPoint = MGC.coordinate2Point(coordinate);
-		for (Geometry featureGeo : this.transformedFeatureGeometries){
-				return featureGeo.contains(linkPoint);
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean doProcessEvent(Event event) {
+	public boolean doFeaturesContainEvent(Event event) {
 		if (event instanceof AgentEvent) {
 			AgentEvent e = (AgentEvent) event;
 			Link link = this.network.getLinks().get(e.getLinkId());
@@ -111,6 +102,5 @@ public class GeospatialEventFilter implements EventFilter {
 		}
 		return false;
 	}
-
-
+	
 }

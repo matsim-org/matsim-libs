@@ -21,10 +21,11 @@ package playground.dgrether.signalsystems.cottbus.scripts;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -34,9 +35,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.events.EventsFilterManager;
-import playground.dgrether.events.EventsFilterManagerImpl;
-import playground.dgrether.events.filters.GeospatialEventFilter;
+import playground.dgrether.events.handlers.DgLegHistogram;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 
@@ -45,17 +44,16 @@ import playground.dgrether.signalsystems.cottbus.CottbusUtils;
  *
  */
 public class DgCottbusLegHistogram {
-
 	
 	private static final Logger log = Logger.getLogger(DgCottbusLegHistogram.class);
 	
 	public static void main(String[] args) {
-		String runDirectory = DgPaths.RUNSSVN + "run1291/";
-		String networkFile = runDirectory + "1291.output_network.xml.gz";
+		String runDirectory = DgPaths.RUNSSVN + "run1293/";
+		String networkFile = runDirectory + "1293.output_network.xml.gz";
 		String outputDirectory = runDirectory + "ITERS/it.1000/";
-		String eventsFile = outputDirectory + "1291.1000.events.xml.gz";
-		String histoFile = outputDirectory + "1291.1000.cottbus_leg_histogram.txt";
-		String histoGraphicFile = outputDirectory + "1291.1000.cottbus_leg_histogram_all.png";
+		String eventsFile = outputDirectory + "1293.1000.events.xml.gz";
+		String histoFile = outputDirectory + "1293.1000.cottbus_leg_histogram.txt";
+		String histoGraphicFile = outputDirectory + "1293.1000.cottbus_leg_histogram_all.png";
 		String cottbusFeatureFile = DgPaths.REPOS
 				+ "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
 		CoordinateReferenceSystem netCrs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
@@ -64,15 +62,14 @@ public class DgCottbusLegHistogram {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		Network network = scenario.getNetwork();
-		GeospatialEventFilter filter = new GeospatialEventFilter(network, netCrs);
-		filter.addCrsFeatureTuple(cottbusFeatureTuple);
 		
 		
-		EventsFilterManager events = new EventsFilterManagerImpl();
-		events.addFilter(filter);
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		LegHistogram histo = new LegHistogram(300);
+		EventsManager events = EventsUtils.createEventsManager();
+		DgLegHistogram histo = new DgLegHistogram(network, netCrs, 300);
+		histo.addCrsFeatureTuple(cottbusFeatureTuple);
 		events.addHandler(histo);
+
+		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		histo.write(histoFile);
 		histo.writeGraphic(histoGraphicFile);
