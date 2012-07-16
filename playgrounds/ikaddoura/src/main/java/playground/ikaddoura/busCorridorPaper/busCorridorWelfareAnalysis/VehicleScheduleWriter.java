@@ -51,7 +51,7 @@ public class VehicleScheduleWriter {
 		this.network = network;
 		this.outputDir = outputDir;
 		
-		this.length = 0.1184 * this.capacity + 5.2152;	// see linear regression analysis in "BusCostsEstimations.xls"
+		this.length = (0.1184 * this.capacity + 5.2152) + 2.;	// see linear regression analysis in "BusCostsEstimations.xls", + 2m distance (before/behind)
 		this.busSeats = (int) (this.capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
 		this.standingRoom = (int) (this.capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 	}
