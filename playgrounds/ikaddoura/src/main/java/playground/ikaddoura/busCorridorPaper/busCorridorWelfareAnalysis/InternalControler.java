@@ -60,17 +60,15 @@ public class InternalControler {
 	private final double CONSTANT_WALK = 0.0;
 	private final double TRAVEL_WALK = -20.0; // only needed for the ptRouter to avoid transit walks over longer distances, not used for scoring because of the following differentiation in access and egress time:
 	private final double TRAVEL_PT_ACCESS = -0.0;
-	private final double TRAVEL_PT_EGRESS = -2.34;
+	private final double TRAVEL_PT_EGRESS = -0.0;
 	
 	private double CONSTANT_PT = 0.0;
 	private final double TRAVEL_PT = 0.0;
-//	private final double TRAVEL_PT = -20.0; // only needed for the ptRouter to avoid waiting at bus stops, not used for scoring because of the following differentiation:
 	private final double TRAVEL_PT_IN_VEHICLE = -0.18;
-//	private final double TRAVEL_PT_WAITING = -20.;
 	private final double TRAVEL_PT_WAITING = -0.096;
 	private final double MONETARY_DISTANCE_COST_RATE_PT = 0.0;
 
-	private final double LATE_ARRIVAL = 0.0;
+	private double LATE_ARRIVAL = 0.0;
 	private final double EARLY_DEPARTURE = 0.0;
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
@@ -83,6 +81,7 @@ public class InternalControler {
 	
 		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt(); // estimated parameter -2.08; is being adjusted via config
 		log.warn("Setting constant for PT to " + this.CONSTANT_PT);
+		this.LATE_ARRIVAL = this.PERFORMING * 3.; // coming early (which is the opportunity costs of time) multiplied by 3 (see Hollander 2006)
 	}
 	
 	public void run() {
