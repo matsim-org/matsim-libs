@@ -20,12 +20,10 @@
 
 package playground.kai.run;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author nagel

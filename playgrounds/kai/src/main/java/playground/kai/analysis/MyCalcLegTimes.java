@@ -65,7 +65,7 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
 	
 	// statistics types:
-	private enum StatType { duration, beelineDistance } ;
+	private enum StatType { duration, durationsOtherBins, beelineDistance } ;
 
 	// container that contains the statistics containers:
 	private final Map<StatType,Map<String,int[]>> legStatsContainer = new TreeMap<StatType,Map<String,int[]>>() ;
@@ -101,10 +101,13 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 			// define the bin boundaries:
 			if ( type==StatType.duration ) {
 				double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600.} ;
-				dataBoundaries.put( StatType.duration, dataBoundariesTmp ) ;
+				dataBoundaries.put( type, dataBoundariesTmp ) ;
+			} else if ( type==StatType.durationsOtherBins ) {
+				double[] dataBoundariesTmp = {0., 300., 900., 1800., 2700., 3600.} ;
+				dataBoundaries.put( type, dataBoundariesTmp ) ;
 			} else if ( type==StatType.beelineDistance ) {
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
-				dataBoundaries.put( StatType.beelineDistance, dataBoundariesTmp ) ;
+				dataBoundaries.put( type, dataBoundariesTmp ) ;
 			} else {
 				throw new RuntimeException("statistics container for type "+type.toString()+" not initialized.") ;
 			}
@@ -176,7 +179,7 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 
 				// .. generate correct "item" for statType ...
 				double item = 0. ;
-				if ( statType==StatType.duration ) {
+				if ( statType==StatType.duration || statType==StatType.durationsOtherBins) {
 					item = travTime ;
 				} else if ( statType==StatType.beelineDistance ) {
 					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {

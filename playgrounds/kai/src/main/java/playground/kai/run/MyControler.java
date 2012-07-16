@@ -2,7 +2,6 @@ package playground.kai.run;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -23,15 +22,9 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 import org.matsim.vehicles.VehicleType;
@@ -60,7 +53,7 @@ class MyControler {
 	}
 	
 	static class MyMobsimFactory implements MobsimFactory {
-		private boolean useOTFVis = true ;
+		private boolean useOTFVis = false ;
 
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -70,49 +63,52 @@ class MyControler {
 	            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 	        }
 
-	        QNetsimEngineFactory netsimEngFactory = new QNetsimEngineFactory() {
-				@Override
-				public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
-					NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
-						@Override
-						public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-							return new QLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
-						}
-						@Override
-						public QNode createNetsimNode(final Node node, QNetwork network) {
-							return new QNode(node, network);
-						}
-					};
-					return new QNetsimEngine((QSim) sim, random, netsimNetworkFactory) ;
-				}
-	        };
+	        // construct the QSim:
 			QSim qSim = new QSim(sc, eventsManager);
+
+			// add the actsim engine:
 			ActivityEngine activityEngine = new ActivityEngine();
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+
+			// add the netsim engine:
+			NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
+				@Override
+				public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+					return new QLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
+				}
+				@Override
+				public QNode createNetsimNode(final Node node, QNetwork network) {
+					return new QNode(node, network);
+				}
+			};
+			QNetsimEngine netsimEngine = new QNetsimEngine(qSim, MatsimRandom.getRandom(), netsimNetworkFactory) ;
+//			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+
 			TeleportationEngine teleportationEngine = new TeleportationEngine();
 			qSim.addMobsimEngine(teleportationEngine);
 	        
 			AgentFactory agentFactory;
-	        if (sc.getConfig().scenario().isUseTransit()) {
-	            agentFactory = new TransitAgentFactory(qSim);
-	            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-	            transitEngine.setUseUmlaeufe(true);
-	            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-	            qSim.addDepartureHandler(transitEngine);
-	            qSim.addAgentSource(transitEngine);
-	            qSim.addMobsimEngine(transitEngine);
-	        } else {
-	            agentFactory = new DefaultAgentFactory(qSim);
-	        }
-	        if (sc.getConfig().network().isTimeVariantNetwork()) {
-				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
-			}
+//	        if (sc.getConfig().scenario().isUseTransit()) {
+//	            agentFactory = new TransitAgentFactory(qSim);
+//	            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+//	            transitEngine.setUseUmlaeufe(true);
+//	            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+//	            qSim.addDepartureHandler(transitEngine);
+//	            qSim.addAgentSource(transitEngine);
+//	            qSim.addMobsimEngine(transitEngine);
+//	        } else {
+			agentFactory = new DefaultAgentFactory(qSim);
+//	        }
+//	        if (sc.getConfig().network().isTimeVariantNetwork()) {
+//				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+//			}
+
 	        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 	        Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+
 	        VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
 	        car.setMaximumVelocity(60.0/3.6);
 	        car.setPcuEquivalents(1.0);
@@ -125,7 +121,7 @@ class MyControler {
 	        
 	        VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(new IdImpl("bicycle"));
 	        bicycles.setMaximumVelocity(15.0/3.6);
-	        bicycles.setPcuEquivalents(0.25);
+	        bicycles.setPcuEquivalents(0.05);
 	        modeVehicleTypes.put("bicycle", bicycles);
 
 	        VehicleType walks = VehicleUtils.getFactory().createVehicleType(new IdImpl("walk"));
