@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,15 +16,19 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.jfree.chart.plot.XYPlot;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 public class SummaryStatistics {
 
 	/**
-	 * @param simulationPath the root of the simulation
-	 * @param startIter 
+	 * @param simulationPath
+	 *            the root of the simulation
+	 * @param startIter
 	 * @param endIter
-	 * @param dailyVolumes Whether the RMSD should track daily or hourly volumes on links
+	 * @param dailyVolumes
+	 *            Whether the RMSD should track daily or hourly volumes on links
 	 */
 	public void linkStatsRMSDeltaPlot(String simulationPath, int startIter,
 			int endIter, boolean dailyVolumes) {
@@ -50,19 +55,207 @@ public class SummaryStatistics {
 		for (int i = 0; i < files.size() - 1; i++) {
 			String firstFileName = files.get(i);
 			String secondFileName = files.get(i + 1);
-			valuesByIter[i] = getRMSDelta(firstFileName, secondFileName, dailyVolumes);
-			valuesVsStart[i] = getRMSDelta(files.get(0), secondFileName, dailyVolumes);
+			valuesByIter[i] = getLinkStatsRMSDelta(firstFileName,
+					secondFileName, dailyVolumes);
+			valuesVsStart[i] = getLinkStatsRMSDelta(files.get(0),
+					secondFileName, dailyVolumes);
 		}
 		String[] pathComponents = simulationPath.split("/");
-		String runID=pathComponents[pathComponents.length-1];
-		plotRMSDelta(iters, valuesByIter, simulationPath,
-				"Linkstats change over iterations for " + runID + (dailyVolumes?" (daily volumes)":""),dailyVolumes, false);
-		plotRMSDelta(iters, valuesVsStart, simulationPath,
-				"Linkstats change vs start for " + runID + (dailyVolumes?" (daily volumes)":""), dailyVolumes, true);
+		String runID = pathComponents[pathComponents.length - 1];
+		plotLinkStatsRMSDelta(iters, valuesByIter, simulationPath,
+				"Linkstats change over iterations for " + runID
+						+ (dailyVolumes ? " (daily volumes)" : ""),
+				dailyVolumes, false);
+		plotLinkStatsRMSDelta(iters, valuesVsStart, simulationPath,
+				"Linkstats change vs start for " + runID
+						+ (dailyVolumes ? " (daily volumes)" : ""),
+				dailyVolumes, true);
 	}
 
-	private double getRMSDelta(String firstFileName, String secondFileName,
-			boolean dailyVolumes) {
+	public void departuresAndModeShareRMSDeltaPlot(String simulationPath,
+			int startIter, int endIter, boolean modeShare) {
+		ArrayList<String> files = new ArrayList<String>();
+		// create a list of file names to use in the comparison
+		ArrayList<Integer> relevantIters = findQsimIters(simulationPath);
+		for (int iter : relevantIters) {
+			String fileName = getDepartureStatsFileName(simulationPath, iter);
+			if (fileName == null)
+				continue;
+			else {
+				files.add(fileName);
+			}
+		}
+		// now iterate through the list and get their rmses for plotting
+		double[] iters = new double[relevantIters.size()];
+		for (int iter = 0; iter < relevantIters.size(); iter++) {
+			iters[iter] = relevantIters.get(iter);
+		}
+		double[] rmsd = new double[relevantIters.size()];
+		rmsd[0] = 0;
+		double[] modeshare = new double[relevantIters.size()];
+		modeshare[0] = 100;
+		for (int i = 1; i < files.size(); i++) {
+			String secondFileName = files.get(i);
+			Tuple<Double, Double> deltaAndModeShare = getDeparturesRMSDeltaAndModeShare(files.get(0), secondFileName);
+			rmsd[i] = deltaAndModeShare.getFirst();
+			if (modeShare)
+				modeshare[i] = deltaAndModeShare.getSecond();
+		}
+		String[] pathComponents = simulationPath.split("/");
+		String runID = pathComponents[pathComponents.length - 1];
+		plotDepartureStatsRMSDelta(iters, rmsd, simulationPath,
+				"Departures change vs start for " + runID);
+		if (modeShare)
+			plotModeShare(iters, modeshare, simulationPath,
+					"Mode share of car for " + runID);
+	}
+
+	private void plotModeShare(double[] iters, double[] values,
+			String simulationPath, String title) {
+		
+		XYLineChart xyAbsolute = new XYLineChart(title, "iterations",
+				"Mode share of car (%)");
+
+		xyAbsolute.addSeries("Car", iters, values);
+		xyAbsolute.saveAsPng(simulationPath + "/modeShare.png", 800, 600);
+		BufferedWriter writer = IOUtils.getBufferedWriter(simulationPath
+				+ "/modeShare.txt");
+		try {
+			writer.write("ITERATION\tcarShare\n");
+			writer.flush();
+			for (int i = 0; i < iters.length; i++) {
+				writer.write(String.format("%f\t%f\n", iters[i], values[i]));
+				writer.flush();
+			}
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private void plotDepartureStatsRMSDelta(double[] iters, double[] values,
+			String simulationPath, String title) {
+		
+		XYLineChart xyAbsolute = new XYLineChart(title, "iterations",
+				"RMSD (absolute)");
+
+		xyAbsolute.addSeries("RMSD", iters, values);
+		xyAbsolute.saveAsPng(simulationPath + "/departuresRMSDelta.png", 800, 600);
+		BufferedWriter writer = IOUtils.getBufferedWriter(simulationPath
+				+ "/departuresRMSDelta.txt");
+		try {
+			writer.write("ITERATION\tdeparturesRMSD\n");
+			writer.flush();
+			for (int i = 0; i < iters.length; i++) {
+				writer.write(String.format("%f\t%f\n", iters[i], values[i]));
+				writer.flush();
+			}
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
+
+	/**
+	 * @param firstFileName
+	 * @param secondFileName
+	 * @return a Tuple of the RMSD of the second vs the first filename, and the mode share of the second file
+	 */
+	private Tuple<Double, Double> getDeparturesRMSDeltaAndModeShare(String firstFileName,
+			String secondFileName) {
+		double rmsd = 0;
+		double modeShare =0;
+		Tuple<Double, Double> rmsModeShare =  null;
+		try {
+			BufferedReader firstReader = IOUtils
+					.getBufferedReader(firstFileName);
+			BufferedReader secondReader = IOUtils
+					.getBufferedReader(secondFileName);
+			String[] headings = firstReader.readLine().split("\t");
+			// need the secondReader to progress past the headings as well
+			secondReader.readLine();
+			int totalDeparturesColumn = 0;
+			int carDeparturesColumn = 0;
+			for (int column = 0; column < headings.length; column++) {
+				String heading = headings[column];
+				if (heading.startsWith("departures_all"))
+					totalDeparturesColumn = column;
+				if (heading.startsWith("departures_car"))
+					carDeparturesColumn = column;
+			}
+			// read the lines, and perform the rmsdelta calc
+			int rowCount = 0;
+			double sumDeltaSquared = 0;
+			double totalDepartures = 0;
+			double totalCar = 0;
+			while (rowCount >= 0) {
+				String firstLine = firstReader.readLine();
+				String secondLine = secondReader.readLine();
+				if (firstLine == null || secondLine == null)
+					break;
+				else
+					rowCount++;
+				String[] firstBits = firstLine.split("\t");
+				String[] secondBits = secondLine.split("\t");
+				// go through all columns of counts
+				sumDeltaSquared += Math
+						.pow(Double.parseDouble(firstBits[totalDeparturesColumn])
+								- Double.parseDouble(secondBits[totalDeparturesColumn]),
+								2);
+				totalDepartures+=Double.parseDouble(secondBits[totalDeparturesColumn]);
+				totalCar+=Double.parseDouble(secondBits[carDeparturesColumn]);
+
+			}
+			rmsd = Math.pow(sumDeltaSquared / rowCount, 0.5);
+			modeShare = totalCar/totalDepartures*100;
+			rmsModeShare=new Tuple<Double, Double>(rmsd, modeShare);
+			firstReader.close();
+			secondReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(rmsd);
+		return rmsModeShare;
+	}
+
+	private ArrayList<Integer> findQsimIters(String simulationPath) {
+		ArrayList<Integer> qsimIters = new ArrayList<Integer>();
+		try{
+			BufferedReader reader = IOUtils.getBufferedReader(simulationPath
+					+ "/qsimstats.txt");
+			reader.readLine();
+			while (true) {
+				String line = reader.readLine();
+				if (line == null)
+					break;
+				qsimIters.add(Integer.parseInt(line.split("\t")[0]));
+			}
+			System.out.println(qsimIters);
+			return qsimIters;
+		}catch(UncheckedIOException fe){
+			for (int iter = 0; iter < 20000; iter++) {
+				String fileName = getLinkStatsFileName(simulationPath, iter);
+				if (fileName == null)
+					continue;
+				else {
+					qsimIters.add(iter);
+				}
+			}
+			return qsimIters;
+		} catch (IOException e) {
+			System.err.println("No qsimstats.txt found");
+		}
+		return null;
+	}
+
+	private double getLinkStatsRMSDelta(String firstFileName,
+			String secondFileName, boolean dailyVolumes) {
 		double rmsd = 0;
 		try {
 			BufferedReader firstReader = IOUtils
@@ -128,8 +321,9 @@ public class SummaryStatistics {
 
 	}
 
-	private void plotRMSDelta(double[] iters, double[] values,
-			String simulationPath, String title, boolean dailyVolumes, boolean vStart) {
+	private void plotLinkStatsRMSDelta(double[] iters, double[] values,
+			String simulationPath, String title, boolean dailyVolumes,
+			boolean vStart) {
 		double[] relativeValues = valuesRelativeToMax(values);
 		XYLineChart xyAbsolute = new XYLineChart(title, "iterations",
 				"RMSD (absolute)");
@@ -137,12 +331,14 @@ public class SummaryStatistics {
 				"RMSD (pct of max)");
 		xyAbsolute.addSeries("RMSD", iters, values);
 		xyRelative.addSeries("RMSD pct", iters, relativeValues);
-		xyAbsolute.saveAsPng(simulationPath + "/linkstatsRMSD_abs"+(vStart?"_vstart":"")+(dailyVolumes?"_daily":"")+".png", 800,
-				600);
-		xyRelative.saveAsPng(simulationPath + "/linkstatsRMSD_rel"+(vStart?"_vstart":"")+(dailyVolumes?"_daily":"")+".png", 800,
-				600);
+		xyAbsolute.saveAsPng(simulationPath + "/linkstatsRMSD_abs"
+				+ (vStart ? "_vstart" : "") + (dailyVolumes ? "_daily" : "")
+				+ ".png", 800, 600);
+		xyRelative.saveAsPng(simulationPath + "/linkstatsRMSD_rel"
+				+ (vStart ? "_vstart" : "") + (dailyVolumes ? "_daily" : "")
+				+ ".png", 800, 600);
 		BufferedWriter writer = IOUtils.getBufferedWriter(simulationPath
-				+ "/linkstatsRMSD"+(dailyVolumes?"_daily":"")+".txt");
+				+ "/linkstatsRMSD" + (dailyVolumes ? "_daily" : "") + ".txt");
 		try {
 			writer.write("ITERATION\tRMSD (absolute)\tRMSD (relative to max)\n");
 			writer.flush();
@@ -184,6 +380,17 @@ public class SummaryStatistics {
 		return files[0].toString();
 	}
 
+	private String getDepartureStatsFileName(String simulationPath, int iter) {
+		// TODO Auto-generated method stub
+		File dir = new File(simulationPath + "/ITERS/it." + iter);
+		FileFilter fileFilter = new WildcardFileFilter("*legHistogram.txt*");
+		File[] files = dir.listFiles(fileFilter);
+		if (files == null || files.length == 0)
+			return null;
+		// System.out.println(files[0].toString());
+		return files[0].toString();
+	}
+
 	public static void main(String[] args) {
 		String simPath = null;
 
@@ -191,7 +398,8 @@ public class SummaryStatistics {
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.showOpenDialog(new JPanel());
 		simPath = chooser.getSelectedFile().getPath();
-		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 5000,true);
-		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 5000,false);
+//		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 5000, true);
+		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 5000, false);
+		new SummaryStatistics().departuresAndModeShareRMSDeltaPlot(simPath, 0, 5000, false);
 	}
 }
