@@ -128,7 +128,6 @@ public class TrafficStateXmlReader {
 						 this.currentEdgeInfo = null;
 					 }
 				 }
-				 
 			}
 
 		} catch (XMLStreamException ex) {
