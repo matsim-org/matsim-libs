@@ -27,12 +27,12 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * @author dgrether
  */
-@XmlType(propOrder = {"poiID", "maximalCapacity","poiTimeInfos"})
+@XmlType(propOrder = {"poiID", "maximum_capacity","poiTimeInfos"})
 public class PoiInfo {
 
 	private String poiID;
 	
-	private Double maximalCapacity;
+	private Double maximumCapacity;
 	
 	private List<PoiTimeInfo> timeInfo = new ArrayList<PoiTimeInfo>();
 	
@@ -49,15 +49,15 @@ public class PoiInfo {
 		this.poiID = poiId;
 	}
 
-	@XmlElement(name="maximal_capacity", required=false)
+	@XmlElement(name="maximum_capacity", required=false)
 	public Double getMaximalCapacity() {
-		return maximalCapacity;
+		return maximumCapacity;
 	}
 
 
 	
 	public void setMaximalCapacity(Double maximalCapacity) {
-		this.maximalCapacity = maximalCapacity;
+		this.maximumCapacity = maximalCapacity;
 	}
 
 	@XmlElement(name = "occupancy_information", required=false)
