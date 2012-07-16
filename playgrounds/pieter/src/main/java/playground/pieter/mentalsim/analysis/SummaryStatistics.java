@@ -53,10 +53,12 @@ public class SummaryStatistics {
 			valuesByIter[i] = getRMSDelta(firstFileName, secondFileName, dailyVolumes);
 			valuesVsStart[i] = getRMSDelta(files.get(0), secondFileName, dailyVolumes);
 		}
+		String[] pathComponents = simulationPath.split("/");
+		String runID=pathComponents[pathComponents.length-1];
 		plotRMSDelta(iters, valuesByIter, simulationPath,
-				"Linkstats change over iterations for " + simulationPath + (dailyVolumes?" (daily volumes)":""),dailyVolumes, false);
+				"Linkstats change over iterations for " + runID + (dailyVolumes?" (daily volumes)":""),dailyVolumes, false);
 		plotRMSDelta(iters, valuesVsStart, simulationPath,
-				"Linkstats change vs start for " + simulationPath + (dailyVolumes?" (daily volumes)":""), dailyVolumes, true);
+				"Linkstats change vs start for " + runID + (dailyVolumes?" (daily volumes)":""), dailyVolumes, true);
 	}
 
 	private double getRMSDelta(String firstFileName, String secondFileName,
@@ -116,6 +118,8 @@ public class SummaryStatistics {
 				}
 			}
 			rmsd = Math.pow(sumDeltaSquared / rowCount, 0.5);
+			firstReader.close();
+			secondReader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -188,5 +192,6 @@ public class SummaryStatistics {
 		chooser.showOpenDialog(new JPanel());
 		simPath = chooser.getSelectedFile().getPath();
 		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 5000,true);
+		new SummaryStatistics().linkStatsRMSDeltaPlot(simPath, 0, 5000,false);
 	}
 }
