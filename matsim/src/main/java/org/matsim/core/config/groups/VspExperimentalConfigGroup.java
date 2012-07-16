@@ -109,16 +109,16 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	// ---
 
-	private static final String COLORING="coloring" ;
-
-	public static final String COLORING_STANDARD = "standard" ;
-	public static final String COLORING_BVG = "bvg" ;
-
-	private String coloring = COLORING_STANDARD ;
+//	private static final String COLORING="coloring" ;
+//
+//	public static final String COLORING_STANDARD = "standard" ;
+//	public static final String COLORING_BVG = "bvg" ;
+//
+//	private String coloring = COLORING_STANDARD ;
 
 	// ---
 	@Deprecated //somewhen should be deleted, Yu 03.2011
-	private static final String OFFSET_WALK = "offsetWalk";
+//	private static final String OFFSET_WALK = "offsetWalk";
 	// private double offsetWalk = 0d;
 
 	// ---
@@ -227,10 +227,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice by Yu");
 		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
 
-		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
-		"set offset for mode \"walk\" in leg scoring function");
+//		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
+//		"set offset for mode \"walk\" in leg scoring function");
 
-		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
+//		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				"indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal " +
 				"utilities of time.\n\t\t" +
@@ -259,8 +259,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			setActivityDurationInterpretation(ActivityDurationInterpretation.valueOf(value)) ;
 		} else if ( REMOVING_UNNECESSARY_PLAN_ATTRIBUTES.equalsIgnoreCase(key)) {
 			setRemovingUnneccessaryPlanAttributes(Boolean.parseBoolean(value)) ;
-		} else if ( COLORING.equalsIgnoreCase(key) ) {
-			setColoring( value ) ;
+		} else if ( "coloring".equalsIgnoreCase(key) ) {
+			throw new RuntimeException("coloring in vspExperimentalConfigGroup is no longer allowed; use the corresponding " +
+					"config option in the otfvis config group (or do not use at all).  jul'12") ;
 		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key)) {
 			setInputMZ05File(value);
 		} else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key)) {
@@ -269,8 +270,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			this.setUsingOpportunityCostOfTimeInPtRouting(Boolean.parseBoolean(value)) ;
 		} else if (CHAIN_BASED_MODES.equalsIgnoreCase(key)) {
 			setChainBasedModes(value);
-		} else if (OFFSET_WALK.equalsIgnoreCase(key)) {
-			//			this.setOffsetWalk(Double.parseDouble(value));
+		} else if ("offsetWalk".equalsIgnoreCase(key)) {
 			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
 			"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
 		} else if ( VSP_DEFAULTS_CHECKING_LEVEL.equals(key) ) {
@@ -316,7 +316,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				Boolean.toString( this.isUsingOpportunityCostOfTimeInPtRouting()) ) ;
-		map.put(COLORING, getColoring() ) ;
+//		map.put(COLORING, getColoring() ) ;
 
 		map.put( VSP_DEFAULTS_CHECKING_LEVEL, this.getVspDefaultsCheckingLevel() ) ;
 
@@ -380,12 +380,13 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	//		this.useActivityDurations = useActivityDurations;
 	//	}
 
-	public String getColoring() {
-		return this.coloring ;
-	}
-	public void setColoring( final String value ) {
-		this.coloring = value ;
-	}
+//	public String getColoring() {
+//		return this.coloring ;
+//	}
+//	public void setColoring( final String value ) {
+//		this.coloring = value ;
+//	}
+	// this parameter really is in otfvis config. kai, jul'12
 
 	public String getInputMZ05File() {
 		return this.inputMZ05File;
