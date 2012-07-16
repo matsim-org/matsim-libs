@@ -519,9 +519,6 @@
 		<!-- (do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. "car,bike", "car" -->
 		<param name="chainBasedModes" value="car" />
 
-		<!-- coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg'' -->
-		<param name="coloring" value="standard" />
-
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed cold emission factors -->
 		<param name="detailedColdEmissionFactorsFile" value="null" />
 
