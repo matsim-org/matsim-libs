@@ -74,16 +74,15 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		// find the link connecting C and D on the blue line
 		TransitRouterNetworkLink testLink = null;
 		for (TransitRouterNetworkLink link : adapRouterNet.getLinks().values()) {
-			if ((link.getLine() == f.blueLine) && (link.fromNode.stop.getStopFacility().getName().equals("C")) && (link.toNode.stop.getStopFacility().getName().equals("D"))) {
+			if ((link.getLine() == f.blueLine) && (link.fromNode.stop.getStopFacility().getName().equals("C")) 
+					&& (link.toNode.stop.getStopFacility().getName().equals("D"))) {
 				testLink = link;
 			}
 		}
 		
-		//original MATSim
-		//assertEquals(2.0*60 + 7.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
-		//with adaption   (link travel time is not departureTime dependent anymore) 
-		//link travel time = 9 mins    
+		//original MATSim. same as before
 		assertEquals(9.0*60 , timecost.getLinkTravelTime(testLink, 6.0*3600) , MatsimTestCase.EPSILON);
+		assertEquals(9.0*60+1 , timecost.getLinkTravelTime(testLink, 6.0*3600-1) , MatsimTestCase.EPSILON);
 		
 		/*
 		//if the agents arrives to stop (in or outside the veh) before  06:02, his/her "arrrival veh time" is 05:58
