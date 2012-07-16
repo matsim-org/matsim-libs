@@ -81,7 +81,7 @@ public class InternalControler {
 	
 		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt(); // estimated parameter -2.08; is being adjusted via config
 		log.warn("Setting constant for PT to " + this.CONSTANT_PT);
-		this.LATE_ARRIVAL = this.PERFORMING * 3.; // coming early (which is the opportunity costs of time) multiplied by 3 (see Hollander 2006)
+		this.LATE_ARRIVAL = -1. * this.PERFORMING * 2.; // coming early (which is the opportunity costs of time) multiplied by 3 --> multiplying by 2 (see Hollander 2006)
 	}
 	
 	public void run() {
