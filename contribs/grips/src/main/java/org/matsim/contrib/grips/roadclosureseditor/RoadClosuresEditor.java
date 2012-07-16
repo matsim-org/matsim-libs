@@ -54,14 +54,13 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -149,7 +148,7 @@ public class RoadClosuresEditor implements ActionListener{
 
 	private void loadMapView() {
 		
-		addMapViewer(osmTileFactory());
+		addMapViewer(TileFactoryBuilder.getOsmTileFactory());
 		this.jMapViewer.setCenterPosition(getNetworkCenter());
 		this.jMapViewer.setZoom(2);
 		this.compositePanel.repaint();
@@ -365,24 +364,6 @@ public class RoadClosuresEditor implements ActionListener{
 		this.compositePanel.add(this.jMapViewer);
 	}	
 	
-	private static TileFactory osmTileFactory() {
-		final int max=17;
-		TileFactoryInfo info = new TileFactoryInfo(0, 17, 17,
-				256, true, true,
-				"http://tile.openstreetmap.org",
-				"x","y","z") {
-			@Override
-			public String getTileUrl(int x, int y, int zoom) {
-				zoom = max-zoom;
-				String url = this.baseURL +"/"+zoom+"/"+x+"/"+y+".png";
-				return url;
-			}
-
-		};
-		TileFactory tf = new DefaultTileFactory(info);
-		return tf;
-	}
-
 	/**
 	 * save and open events
 	 * 

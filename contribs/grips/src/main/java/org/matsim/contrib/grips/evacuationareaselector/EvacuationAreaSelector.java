@@ -35,9 +35,8 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 
 public class EvacuationAreaSelector implements ActionListener{
 
@@ -55,8 +54,6 @@ public class EvacuationAreaSelector implements ActionListener{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		final String config = "";//args[0];
-		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -82,7 +79,7 @@ public class EvacuationAreaSelector implements ActionListener{
 
 	private void loadMapView(String osm) {
 		
-		addMapViewer(osmTileFactory());
+		addMapViewer(TileFactoryBuilder.getOsmTileFactory());
 		this.snapper = new ShapeToStreetSnapperThreadWrapper(osm,this);
 		this.jMapViewer.setSnapper(this.snapper);
 		this.jMapViewer.setCenterPosition(this.snapper.getNetworkCenter());
@@ -129,24 +126,6 @@ public class EvacuationAreaSelector implements ActionListener{
 		this.jMapViewer.setZoomEnabled(true);
 		this.compositePanel.add(this.jMapViewer);
 	}	
-	
-	private static TileFactory osmTileFactory() {
-		final int max=17;
-		TileFactoryInfo info = new TileFactoryInfo(0, 17, 17,
-				256, true, true,
-				"http://tile.openstreetmap.org",
-				"x","y","z") {
-			@Override
-			public String getTileUrl(int x, int y, int zoom) {
-				zoom = max-zoom;
-				String url = this.baseURL +"/"+zoom+"/"+x+"/"+y+".png";
-				return url;
-			}
-
-		};
-		TileFactory tf = new DefaultTileFactory(info);
-		return tf;
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
