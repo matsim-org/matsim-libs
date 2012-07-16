@@ -49,7 +49,7 @@ public class SfMatsimAirport {
 		this.coord=coord;
 	}
 	
-	public void createRunways(Network network) {
+	public void createTwoRunways(Network network) {
 			
 //		create Ids for nodes and links
 		
@@ -165,5 +165,112 @@ public class SfMatsimAirport {
 		}
 
 	}
+	
+	public void createOneRunway(Network network) {
+		
+//		create Ids for nodes and links
+		
+		Id idApron = this.id;													//Id for apron link and central airport node
+		Id idApronEnd = new IdImpl(this.id+"apron");							//Id for end of apron node
+		Id idTaxiIn = new IdImpl(this.id+"taxiInbound");				//Id for taxiway link and end of taxiway node
+		Id idTaxiOut = new IdImpl(this.id+"taxiOutbound");			//Id for taxiway link and end of taxiway node
+		Id idRunwayIn = new IdImpl(this.id+"runway");			//Id for runway link and end of runway node
+		
+//		create Coords for nodes
+		
+		Coord coordApronEnd = new CoordImpl(this.coord.getX()-runwayLength, this.coord.getY());			//shifting end of apron
+		Coord coordTaxiOut = new CoordImpl(coordApronEnd.getX(), this.coord.getY()-taxiwayLength);		//shifting taxiway
+		Coord coordTaxiIn = new CoordImpl(this.coord.getX(), this.coord.getY());		//shifting taxiway
+		Coord coordRunwayEnd = new CoordImpl(coordTaxiIn.getX(), coordTaxiIn.getY()-taxiwayLength);		//shifting runway
+		
+//		create nodes
+		
+		Node nodeAirport = network.getFactory().createNode(idApron, this.coord);			//central node of any airport	
+		Node nodeApron = network.getFactory().createNode(idApronEnd, coordApronEnd);		//end of apron node, apron is used for parking and as transit stop
+		Node nodeTaxiOut = network.getFactory().createNode(idTaxiIn, coordTaxiOut);			//taxiway inbound start = runway inbound end
+		Node nodeRunway = network.getFactory().createNode(idRunwayIn, coordRunwayEnd);	//start of inbound runway
+		
+//		add nodes to network
+		
+		network.addNode(nodeAirport); 			
+		network.addNode(nodeApron);
+		network.addNode(nodeTaxiOut);
+		network.addNode(nodeRunway);
+		
+//		create links
+		Link linkApron = network.getFactory().createLink(idApron, nodeAirport, nodeApron);
+		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, nodeRunway, nodeAirport);
+		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, nodeApron, nodeTaxiOut);
+		Link linkRunway = network.getFactory().createLink(idRunwayIn, nodeTaxiOut, nodeRunway);
+		
+//		set capacity, freespeed and modes
+		
+		Set<String> allowedModes = new HashSet<String>();
+		allowedModes.add("pt");
+		allowedModes.add("car");
+		linkApron.setAllowedModes(allowedModes);
+		linkTaxiIn.setAllowedModes(allowedModes);
+		linkTaxiOut.setAllowedModes(allowedModes);
+		linkRunway.setAllowedModes(allowedModes);
+		
+//		c_storage != 1; c_storage = (length*n_lanes)/7.5
+		
+//		WARNING HINZUFÜGEN, CAP*5 NEHMEN
+		
+		linkApron.setCapacity(1.*network.getCapacityPeriod());
+		linkTaxiIn.setCapacity((1./60.)*network.getCapacityPeriod());
+		linkTaxiIn.setNumberOfLanes(0.015);	
+		linkTaxiOut.setCapacity((1./60.)*network.getCapacityPeriod());
+		linkRunway.setCapacity((1.)*network.getCapacityPeriod());
+//		linkRunwayOut.setCapacity((1.)*network.getCapacityPeriod());
+//		linkRunwayOut.setNumberOfLanes(0.005);
+		
+		linkApron.setLength(taxiwayLength);
+		linkTaxiIn.setLength(taxiwayLength);
+		linkTaxiOut.setLength(taxiwayLength);
+		linkRunway.setLength(runwayLength);
+			
+		linkApron.setFreespeed(taxiwayFreespeed);
+		linkTaxiIn.setFreespeed(taxiwayFreespeed);
+		linkTaxiOut.setFreespeed(taxiwayFreespeed);
+		linkRunway.setFreespeed(runwayFreespeed);
+		
+//		add links to network
+				
+		network.addLink(linkApron);	
+		network.addLink(linkTaxiIn);
+		network.addLink(linkTaxiOut);		
+		network.addLink(linkRunway);	
+		
+//		add STAR to network
+
+		Id idStar = new IdImpl(this.id.toString()+"star");						//Id for STAR route
+
+		if (DgCreateFlightScenario.stars.containsKey(idApron.toString())) {
+			Coord coordStar = new CoordImpl(coordRunwayEnd.getX()-DgCreateFlightScenario.stars.get(idApron.toString()).getLength(), coordRunwayEnd.getY());
+			Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
+			network.addNode(nodeStar);
+			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunway);
+			linkStarIn.setAllowedModes(allowedModes);
+			linkStarIn.setLength(DgCreateFlightScenario.stars.get(idApron.toString()).getLength());
+			linkStarIn.setCapacity(network.getCapacityPeriod() * DgCreateFlightScenario.stars.get(idApron.toString()).getCapacity());
+			System.out.println("HOLE STAR MUC.................................................");
+			linkStarIn.setFreespeed(DgCreateFlightScenario.stars.get(idApron.toString()).getFreespeed());
+			network.addLink(linkStarIn);
+		}
+		else {
+			Coord coordStar = new CoordImpl(coordRunwayEnd.getX()-DgCreateFlightScenario.DEFAULTSTAR.getLength(), coordRunwayEnd.getY());
+			Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
+			network.addNode(nodeStar);
+			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunway);
+			linkStarIn.setAllowedModes(allowedModes);
+			linkStarIn.setLength(DgCreateFlightScenario.DEFAULTSTAR.getLength());
+			linkStarIn.setCapacity(network.getCapacityPeriod() * DgCreateFlightScenario.DEFAULTSTAR.getCapacity());
+			linkStarIn.setFreespeed(DgCreateFlightScenario.DEFAULTSTAR.getFreespeed());
+			network.addLink(linkStarIn);
+		}
+		
+	}
+	
 
 }

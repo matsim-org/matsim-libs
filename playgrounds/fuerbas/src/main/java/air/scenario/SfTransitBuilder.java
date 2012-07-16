@@ -132,12 +132,22 @@ public class SfTransitBuilder {
 				
 			//nur ausführen, wenn linkListMap noch keinen entsprechenden key enthält
 			
-			if (!linkListMap.containsKey(routeId)) {
+			if (!linkListMap.containsKey(routeId) && DgCreateFlightScenario.NUMBER_OF_RUNWAYS==2) {
 				linkList.add(new IdImpl(origin+"taxiOutbound"));
 				linkList.add(new IdImpl(origin+"runwayOutbound"));
 				linkList.add(new IdImpl(origin+destination));
 				linkList.add(new IdImpl(destination+"star"));
 				linkList.add(new IdImpl(destination+"runwayInbound"));
+				linkList.add(new IdImpl(destination+"taxiInbound"));
+				linkListMap.put(routeId, linkList);
+			}
+			
+			if (!linkListMap.containsKey(routeId) && DgCreateFlightScenario.NUMBER_OF_RUNWAYS==1) {
+				linkList.add(new IdImpl(origin+"taxiOutbound"));
+				linkList.add(new IdImpl(origin+"runway"));
+				linkList.add(new IdImpl(origin+destination));
+				linkList.add(new IdImpl(destination+"star"));
+				linkList.add(new IdImpl(destination+"runway"));
 				linkList.add(new IdImpl(destination+"taxiInbound"));
 				linkListMap.put(routeId, linkList);
 			}
