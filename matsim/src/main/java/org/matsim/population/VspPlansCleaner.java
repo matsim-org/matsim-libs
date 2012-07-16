@@ -20,16 +20,17 @@
 package org.matsim.population;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -37,6 +38,8 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class VspPlansCleaner implements BeforeMobsimListener {
+	
+	public VspPlansCleaner() {} 
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -78,10 +81,12 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 					if ( config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 						act.setStartTime(Time.UNDEFINED_TIME) ;
 					}
-
 					
-					
-					
+				} else if ( pe instanceof Leg ) {
+					Leg leg = (Leg) pe ;
+					if ( config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+						((LegImpl)leg).setArrivalTime(Time.UNDEFINED_TIME) ;
+					}
 				}
 			}
 									
