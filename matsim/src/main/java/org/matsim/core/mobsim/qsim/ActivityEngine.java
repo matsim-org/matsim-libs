@@ -62,6 +62,14 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			int cmp = Double.compare(arg0.activityEndTime, arg1.activityEndTime);
 			if (cmp == 0) {
 				// Both depart at the same time -> let the one with the larger id be first (=smaller)
+				//
+				// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
+				// to say that the agent with the larger ID should be "smaller" one in the comparison. 
+				// In practice, it seems
+				// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
+				// It is unclear why this convention is supposed to be helpful.
+				// kai & dominik, jul'12
+				//
 				return arg1.agent.getId().compareTo(arg0.agent.getId());
 			}
 			return cmp;
