@@ -175,9 +175,7 @@ public class KnSimplifiedController extends AbstractController {
 		// factory to generate routes:
 		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
-		// travel time:
-		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		final TravelTimeCalculator travelTime = travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		final TravelTimeCalculator travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		this.eventsManager.addHandler(travelTime);
 
 		// travel disutility (generalized cost)
