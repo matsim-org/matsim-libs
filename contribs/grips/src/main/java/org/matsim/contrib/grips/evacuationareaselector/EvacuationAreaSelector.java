@@ -115,6 +115,8 @@ public class EvacuationAreaSelector implements ActionListener{
 
 		this.openBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
+		
+		this.frame.setTitle("Evacuation Area Selector");
 	}
 	
 	public void addMapViewer(TileFactory tf) {
