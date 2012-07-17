@@ -55,7 +55,7 @@ public class IoTest {
 		ValidationInformation list = new ValidationInformation();
 		PoiInfo poiInfo = new PoiInfo();
 		poiInfo.setPoiID("test1");
-		poiInfo.setMaximalCapacity(5.);
+		poiInfo.setMaximumCapacity(5.);
 		list.add(poiInfo);
 		PoiTimeInfo poiTimeInfo = new PoiTimeInfo();
 		GregorianCalendar cal = this.getCalendar4Hour(6);
@@ -88,7 +88,7 @@ public class IoTest {
 		PoiInfo poiInfo = list.get(0);
 		Assert.assertEquals("test1", poiInfo.getPoiID());
 		Assert.assertNotNull(poiInfo.getPoiTimeInfos());
-		Assert.assertEquals(5.0, poiInfo.getMaximalCapacity());
+		Assert.assertEquals(5.0, poiInfo.getMaximumCapacity());
 	}
 	
 	

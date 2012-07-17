@@ -2,7 +2,7 @@
 <ns2:validation_information xmlns:ns2="http://www.matsim.org/files/dtd">
     <poi_info>
         <poi_id>test1</poi_id>
-        <maximal_capacity>5.0</maximal_capacity>
+        <maximum_capacity>5.0</maximum_capacity>
         <occupancy_information>
             <start_time>2012-05-16T06:00:00Z</start_time>
             <end_time>2012-05-16T07:00:00Z</end_time>
