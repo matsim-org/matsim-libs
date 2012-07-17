@@ -57,7 +57,7 @@ import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.TravelEventImpl;
+import org.matsim.core.events.TravelledEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -188,7 +188,7 @@ public class QueueSimulationTest extends TestCase {
 		assertEquals("wrong number of events.", 5, collector.getEvents().size());
 		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
-        assertEquals("wrong type of event.", TravelEventImpl.class, allEvents.get(2).getClass());
+        assertEquals("wrong type of event.", TravelledEventImpl.class, allEvents.get(2).getClass());
 		assertEquals("wrong type of event.", AgentArrivalEventImpl.class, allEvents.get(3).getClass());
 		assertEquals("wrong type of event.", ActivityStartEventImpl.class, allEvents.get(4).getClass());
 		assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);

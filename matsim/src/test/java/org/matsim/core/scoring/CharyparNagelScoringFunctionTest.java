@@ -45,7 +45,7 @@ import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.TravelEventImpl;
+import org.matsim.core.events.TravelledEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -131,7 +131,7 @@ public class CharyparNagelScoringFunctionTest {
 			}
 			eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), null));
 		} else {
-			eventsToScore.handleEvent(new TravelEventImpl(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
+			eventsToScore.handleEvent(new TravelledEventImpl(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
 		}
 		eventsToScore.handleEvent(new AgentArrivalEventImpl(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), leg.getMode()));
 	}

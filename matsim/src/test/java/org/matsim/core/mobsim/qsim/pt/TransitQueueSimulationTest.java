@@ -61,7 +61,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.TravelEventImpl;
+import org.matsim.core.events.TravelledEventImpl;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -859,7 +859,7 @@ public class TransitQueueSimulationTest {
         assertTrue(allEvents.get(0) instanceof ActivityEndEventImpl);
         assertEquals("h", ((ActivityEndEventImpl) allEvents.get(0)).getActType());
         assertTrue(allEvents.get(1) instanceof AgentDepartureEventImpl);
-        assertTrue(allEvents.get(offset+2) instanceof TravelEventImpl);
+        assertTrue(allEvents.get(offset+2) instanceof TravelledEventImpl);
         assertTrue(allEvents.get(offset+3) instanceof AgentArrivalEventImpl);
         assertTrue(allEvents.get(offset+4) instanceof ActivityStartEventImpl);
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(offset+4)).getActType());
@@ -877,14 +877,14 @@ public class TransitQueueSimulationTest {
         assertTrue(allEvents.get(offset+15) instanceof LinkEnterEventImpl); // pt-vehicle
         assertTrue(allEvents.get(offset+16) instanceof VehicleArrivesAtFacilityEvent); // pt-vehicle
         assertTrue(allEvents.get(offset+17) instanceof PersonLeavesVehicleEventImpl);
-        assertTrue(allEvents.get(offset+18) instanceof TravelEventImpl);
+        assertTrue(allEvents.get(offset+18) instanceof TravelledEventImpl);
         assertTrue(allEvents.get(offset+19) instanceof AgentArrivalEventImpl);
         assertTrue(allEvents.get(offset+20) instanceof ActivityStartEventImpl);
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEventImpl) allEvents.get(offset+20)).getActType());
         assertTrue(allEvents.get(offset+21) instanceof ActivityEndEventImpl); // zero activity duration, waiting at stop is considered as leg
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEventImpl) allEvents.get(offset+21)).getActType());
         assertTrue(allEvents.get(offset+22) instanceof AgentDepartureEventImpl); // walk
-        assertTrue(allEvents.get(2*offset+23) instanceof TravelEventImpl);
+        assertTrue(allEvents.get(2*offset+23) instanceof TravelledEventImpl);
         assertTrue(allEvents.get(2*offset+24) instanceof AgentArrivalEventImpl);
         assertTrue(allEvents.get(2*offset+25) instanceof ActivityStartEventImpl);
         assertEquals("w", ((ActivityStartEventImpl) allEvents.get(2*offset+25)).getActType());

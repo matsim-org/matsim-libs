@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -27,6 +29,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -37,17 +40,22 @@ class MyControler {
 	
 	public static void main ( String[] args ) {
 		Logger.getLogger("blabla").warn("here") ;
+		
+		// prepare the config:
+		Config config = ConfigUtils.loadConfig( args[0] ) ;
+		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
+		
+		// prepare the scenario
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
-		Controler controler = new Controler( args ) ;
-
+		// prepare the control(l)er:
+		Controler controler = new Controler( scenario ) ;
 		controler.setOverwriteFiles(true) ;
-		
 		controler.addControlerListener(new KaiAnalysisListener()) ;
-		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		
 		controler.setMobsimFactory(new MyMobsimFactory()) ;
-		
+
+		// run everything:
 		controler.run();
 	
 	}

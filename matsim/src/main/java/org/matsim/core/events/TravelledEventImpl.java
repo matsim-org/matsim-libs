@@ -20,20 +20,47 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+
+import java.util.Map;
+
+public class TravelledEventImpl extends EventImpl implements TravelledEvent {
 
 
-/**
- * A TravelEvent replaces, for teleported trips, the LinkLeave-LinkEnter-Event-Chain.  It contains a field for the
- * distance, which may be necessary for scoring. 
- * 
- * @author zilske
- *
- */
-public interface TravelEvent extends Event {
+	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUT_DISTANCE = "distance";
 
-    public Id getPersonId();
+	public static final String EVENT_TYPE = "travelled";
 
-    public double getDistance();
+    private Id agentId;
+    private double distance;
+
+    public TravelledEventImpl(double time, Id agentId, double distance) {
+        super(time);
+        this.agentId = agentId;
+        this.distance = distance;
+    }
+
+    @Override
+    public String getEventType() {
+        return EVENT_TYPE;
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        Map<String, String> attributes = super.getAttributes();
+        attributes.put(ATTRIBUTE_PERSON, agentId.toString());
+        attributes.put(ATTRIBUT_DISTANCE, Double.toString(distance));
+        return attributes;
+    }
+
+    @Override
+    public Id getPersonId() {
+        return agentId;
+    }
+
+    @Override
+    public double getDistance() {
+        return distance;
+    }
 
 }

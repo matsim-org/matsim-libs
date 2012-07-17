@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.TravelEvent;
+import org.matsim.core.events.TravelledEvent;
 import org.matsim.core.events.TravelEventHandler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRoute;
@@ -45,7 +45,7 @@ public class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEve
 
     private Map<Id, LegImpl> legs = new HashMap<Id, LegImpl>();
     private Map<Id, List<Id>> routes = new HashMap<Id, List<Id>>();
-    private Map<Id, TravelEvent> routelessTravels = new HashMap<Id, TravelEvent>();
+    private Map<Id, TravelledEvent> routelessTravels = new HashMap<Id, TravelledEvent>();
     private LegHandler legHandler;
 
     @Override
@@ -63,7 +63,7 @@ public class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEve
             routes.remove(event.getPersonId());
         } else {
             GenericRoute genericRoute = new GenericRouteImpl(route.get(0), event.getLinkId());
-            TravelEvent travelEvent = routelessTravels.get(event.getPersonId());
+            TravelledEvent travelEvent = routelessTravels.get(event.getPersonId());
             if (travelEvent != null) {
                 genericRoute.setDistance(travelEvent.getDistance());
             } else {
@@ -107,7 +107,7 @@ public class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEve
     }
 
     @Override
-    public void handleEvent(TravelEvent travelEvent) {
+    public void handleEvent(TravelledEvent travelEvent) {
         routelessTravels.put(travelEvent.getPersonId(), travelEvent);
     }
 

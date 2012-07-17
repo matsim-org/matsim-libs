@@ -45,7 +45,7 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.TravelEvent;
+import org.matsim.core.events.TravelledEvent;
 import org.matsim.core.events.TravelEventHandler;
 import org.matsim.core.scoring.ActivityHandler;
 import org.matsim.core.scoring.EventsToActivities;
@@ -167,7 +167,7 @@ public class Events2Score implements AgentArrivalEventHandler,
 	}
 
 	@Override
-	public void handleEvent(TravelEvent travelEvent) {
+	public void handleEvent(TravelledEvent travelEvent) {
 		eventsToLegs.handleEvent(travelEvent);
 	}
 

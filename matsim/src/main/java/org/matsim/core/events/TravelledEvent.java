@@ -20,47 +20,40 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
 
-import java.util.Map;
+/**
+ * A TravelEvent replaces, for teleported trips, the
+ * LinkLeave-LinkEnter-Event-Chain. It contains a field for the distance, which
+ * may be necessary for scoring.
+ * <p/>
+ * Some more info:
+ * <p/>
+ * I have a question concerning the "travelled" event.  As far as I understand,
+ * this was added in order to get the distance information into the scoring
+ * function. I am wondering why this was not just attached to the arrival event.
+ *  "arrival" means, in my understanding, the end (i.e. a point in time) of some
+ * travelling process (which is a section of a line in time). Was it just
+ * because of some hesitance to touch established code?  Or was there anything
+ * deeper behind it? kai
+ * <p/>
+ * Nothing deep, I think, but it was about symmetry/orthogonality. For network
+ * modes, an event listener which wants to know the travelled distance listens
+ * to a chain of LinkLeave-LinkEnter events. For non-network modes, an event
+ * listener which wants to know the travelled distance now listens to a new
+ * Event which is thrown in place of the LinkLeave-LinkEnter chain.
+ * 
+ * It was just a hunch. It doesn't need to stay that way... 
+ * 
+ * michael z.
+ * 
+ * @author zilske
+ * 
+ */
+public interface TravelledEvent extends Event {
 
-public class TravelEventImpl extends EventImpl implements TravelEvent {
+	public Id getPersonId();
 
-
-	public static final String ATTRIBUTE_PERSON = "person";
-	public static final String ATTRIBUT_DISTANCE = "distance";
-
-	public static final String EVENT_TYPE = "travelled";
-
-    private Id agentId;
-    private double distance;
-
-    public TravelEventImpl(double time, Id agentId, double distance) {
-        super(time);
-        this.agentId = agentId;
-        this.distance = distance;
-    }
-
-    @Override
-    public String getEventType() {
-        return EVENT_TYPE;
-    }
-
-    @Override
-    public Map<String, String> getAttributes() {
-        Map<String, String> attributes = super.getAttributes();
-        attributes.put(ATTRIBUTE_PERSON, agentId.toString());
-        attributes.put(ATTRIBUT_DISTANCE, Double.toString(distance));
-        return attributes;
-    }
-
-    @Override
-    public Id getPersonId() {
-        return agentId;
-    }
-
-    @Override
-    public double getDistance() {
-        return distance;
-    }
+	public double getDistance();
 
 }

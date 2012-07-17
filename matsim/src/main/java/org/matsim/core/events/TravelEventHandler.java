@@ -24,6 +24,6 @@ import org.matsim.core.events.handler.EventHandler;
 
 public interface TravelEventHandler extends EventHandler {
 
-    public void handleEvent(TravelEvent event);
+    public void handleEvent(TravelledEvent event);
 
 }
