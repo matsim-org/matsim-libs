@@ -87,7 +87,7 @@ public class PoiList {
 	private void initSlotMap(int slot, ValidationInformation info) {
 		for(PoiInfo i: info.getValidationInformationList()){
 			List<Slot> list = new ArrayList<Slot>();
-			list.add(new Slot(i.getMaximalCapacity(), slot, 0.));
+			list.add(new Slot(i.getMaximumCapacity(), slot, 0.));
 			this.slots.put(new IdImpl(i.getPoiID()), list);
 		}
 	}
