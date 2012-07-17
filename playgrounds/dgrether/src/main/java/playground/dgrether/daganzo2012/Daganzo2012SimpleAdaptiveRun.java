@@ -22,6 +22,7 @@ package playground.dgrether.daganzo2012;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -46,6 +47,9 @@ import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
  *
  */
 public class Daganzo2012SimpleAdaptiveRun {
+	
+	private static final Logger log = Logger.getLogger(Daganzo2012SimpleAdaptiveRun.class);
+	
 	private TTInOutflowEventHandler handler3;
 	private TTInOutflowEventHandler handler4;
 	private String outfile;
@@ -81,6 +85,10 @@ public class Daganzo2012SimpleAdaptiveRun {
 		
 		c.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent e) {
+				String initialRedString = e.getControler().getConfig().getParam("daganzo2012", "initialRedOn4");
+				log.debug("using initial red of " + initialRedString + " s");
+				double initialRed = Double.parseDouble(initialRedString);
+				adaptiveControl.setInitialRedOn4(initialRed);
 				e.getControler().getEvents().addHandler(adaptiveControl);
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);

@@ -49,11 +49,13 @@ public class SimpleAdaptiveControl implements MobsimEngine, LinkEnterEventHandle
 	private SignalizeableItem link4;
 
 	private SignalizeableItem link5;
+
+	private double initialRedOn4 = 0;
 	
 	@Override
 	public void doSimStep(double time) {
 		//324 first agent reaches the end of link 4
-		if (time < 400.0){
+		if (time < this.initialRedOn4){
 			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
 			link5.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
 			return;
@@ -112,6 +114,11 @@ public class SimpleAdaptiveControl implements MobsimEngine, LinkEnterEventHandle
 			if (id5.equals(event.getLinkId())){
 				this.vehicleExitTimesOnLink5.poll();
 			}
+	}
+
+
+	public void setInitialRedOn4(double initialRed) {
+		this.initialRedOn4  = initialRed;
 	}
 
 }
