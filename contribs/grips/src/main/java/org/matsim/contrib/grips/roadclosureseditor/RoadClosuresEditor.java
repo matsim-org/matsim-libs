@@ -83,7 +83,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class RoadClosuresEditor implements ActionListener{
 
 	private static final Logger log = Logger.getLogger(RoadClosuresEditor.class);
-	
+
 	private JFrame frame;
 	private JPanel compositePanel;
 	private MyMapViewer jMapViewer;
@@ -93,11 +93,11 @@ public class RoadClosuresEditor implements ActionListener{
 	private JTextField blockFieldLink1mm;
 	private JTextField blockFieldLink2hh;
 	private JTextField blockFieldLink2mm;
-	
+
 	private final HashMap<Id, String> roadClosures;
 	private Id currentLinkId1 = null;
 	private Id currentLinkId2 = null;
-	
+
 
 	private JPanel blockPanel;
 
@@ -112,7 +112,7 @@ public class RoadClosuresEditor implements ActionListener{
 	private JPanel panelLink1;
 
 	private JPanel panelLink2;
-	
+
 	private boolean saveLink1 = false;
 	private boolean saveLink2 = false;
 
@@ -126,29 +126,70 @@ public class RoadClosuresEditor implements ActionListener{
 
 	private String scPath;
 
+	private final String wms;
+
+	private final String layer;
+
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runner());
+
+		String wms = null;
+		String layer = null;
+		if (args.length == 4) {
+			for (int i = 0; i < 4; i += 2) {
+				if (args[i].equalsIgnoreCase("-wms")) {
+					wms = args[i+1];
+				}
+				if (args[i].equalsIgnoreCase("-layer")) {
+					layer = args[i+1];
+				}
+			}
+
+		} else if (args.length != 0) {
+			printUsage();
+			System.exit(-1);
+		}
+
+		EventQueue.invokeLater(new Runner(wms,layer));
 	}
-	
+
+	private static void printUsage() {
+		System.out.println();
+		System.out.println(RoadClosuresEditor.class.getSimpleName());
+		System.out.println("Starts the GRIPS road closures editor.");
+		System.out.println();
+		System.out.println("usage 1: " + RoadClosuresEditor.class.getSimpleName() +"\n" +
+				"         starts the editor and uses openstreetmap as backround layer\n" +
+				"         requires a working internet connection");
+		System.out.println("usage 2: " + RoadClosuresEditor.class.getSimpleName() + " -wms <url> -layer <layer name>\n" +
+				"         starts the editor and uses the given wms server to load a backgorund layer");
+
+	}
 
 
 	/**
 	 * Create the application.
+	 * @param layer 
+	 * @param wms 
 	 * @param config 
 	 */
-	public RoadClosuresEditor(){
+	public RoadClosuresEditor(String wms, String layer){
+		this.wms = wms;
+		this.layer = layer;
 		this.roadClosures = new HashMap<Id, String>();
-		
+
 		initialize();
 
 	}
 
 	private void loadMapView() {
-		
-		addMapViewer(TileFactoryBuilder.getOsmTileFactory());
+		if (this.wms == null) {
+			addMapViewer(TileFactoryBuilder.getOsmTileFactory());
+		} else {
+			addMapViewer(TileFactoryBuilder.getWMSTileFactory(this.wms, this.layer));
+		}
 		this.jMapViewer.setCenterPosition(getNetworkCenter());
 		this.jMapViewer.setZoom(2);
 		this.compositePanel.repaint();
@@ -166,7 +207,7 @@ public class RoadClosuresEditor implements ActionListener{
 		CoordinateTransformation ct2 =  new GeotoolsTransformation(this.sc.getConfig().global().getCoordinateSystem(),"EPSG:4326");
 		centerC = ct2.transform(centerC);
 		this.networkCenter = new GeoPosition(centerC.getY(),centerC.getX());
-		
+
 		return this.networkCenter;
 	}
 
@@ -182,22 +223,22 @@ public class RoadClosuresEditor implements ActionListener{
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.frame.setResizable(true);
-		
+
 		JPanel panel = new JPanel();
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
-		
+
 		this.blockPanel = new JPanel(new GridLayout(18, 2));
-		
-		
-		
+
+
+
 		this.blockFieldLink1hh = new JTextField("--");
 		this.blockFieldLink1mm = new JTextField("--");
 		this.blockFieldLink2hh = new JTextField("--");
 		this.blockFieldLink2mm = new JTextField("--");
 		this.blockButtonOK = new JButton("ok");
-		
+
 		this.blockPanel.setSize(new Dimension(200, 200));
-		
+
 		//add hour / minute input check listeners
 		this.blockFieldLink1hh.addKeyListener(new TypeHour());
 		this.blockFieldLink1mm.addKeyListener(new TypeMinute());
@@ -207,33 +248,33 @@ public class RoadClosuresEditor implements ActionListener{
 		this.blockFieldLink1mm.addFocusListener(new CheckMinute());
 		this.blockFieldLink2hh.addFocusListener(new CheckHour());
 		this.blockFieldLink2mm.addFocusListener(new CheckMinute());
-		
+
 		this.cbLink1 = new JCheckBox("link 1");
 		this.cbLink2 = new JCheckBox("link 2");
-		
+
 		this.blockButtonOK.addActionListener(new ActionListener()
 		{
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				updateRoadClosure();
-				
+
 			}
 		});
-		
+
 		this.cbLink1.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				RoadClosuresEditor.this.saveLink1 = !RoadClosuresEditor.this.saveLink1;
-				
+
 				if (RoadClosuresEditor.this.saveLink1)
 				{
 					RoadClosuresEditor.this.blockFieldLink1hh.setEnabled(true);
 					RoadClosuresEditor.this.blockFieldLink1mm.setEnabled(true);
-					
+
 				}
 				else
 				{
@@ -242,14 +283,14 @@ public class RoadClosuresEditor implements ActionListener{
 				}
 			}
 		});
-		
+
 		this.cbLink2.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				RoadClosuresEditor.this.saveLink2 = !RoadClosuresEditor.this.saveLink2;
-				
+
 				if (RoadClosuresEditor.this.saveLink2)
 				{
 					RoadClosuresEditor.this.blockFieldLink2hh.setEnabled(true);
@@ -261,62 +302,62 @@ public class RoadClosuresEditor implements ActionListener{
 					RoadClosuresEditor.this.blockFieldLink2mm.setEnabled(false);
 				}
 
-				
-				
+
+
 			}
 		});
-		
+
 		this.cbLink1.setBackground(Color.red);
 		this.cbLink2.setBackground(Color.green);
-		
+
 		this.cbLink1.setSelected(false);
 		this.cbLink2.setSelected(false);
-		
-		
+
+
 		this.panelDescriptions = new JPanel(new GridLayout(1, 3));
 		this.panelLink1 = new JPanel(new GridLayout(1, 3));
 		this.panelLink2 = new JPanel(new GridLayout(1, 3));
-		
+
 		this.panelDescriptions.add(new JLabel("Road ID"));
 		this.panelDescriptions.add(new JLabel("HH"));
 		this.panelDescriptions.add(new JLabel("MM"));
-		
+
 		this.panelLink1.add(this.cbLink1);
 		this.panelLink1.add(this.blockFieldLink1hh);
 		this.panelLink1.add(this.blockFieldLink1mm);
 		this.panelLink1.setBackground(Color.red);
-		
+
 		this.panelLink2.add(this.cbLink2);
 		this.panelLink2.add(this.blockFieldLink2hh);
 		this.panelLink2.add(this.blockFieldLink2mm);
 		this.panelLink2.setBackground(Color.green);
-		
+
 		this.blockPanel.add(this.panelDescriptions);
 		this.blockPanel.add(this.panelLink1);
 		this.blockPanel.add(this.panelLink2);
 		this.blockPanel.add(this.blockButtonOK);		
-		
+
 		this.blockPanel.setPreferredSize(new Dimension(300,300));
-		
+
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		
+
+
 		this.cbLink1.setEnabled(false); this.cbLink2.setEnabled(false);
-		
+
 		this.blockFieldLink1hh.setEnabled(false); this.blockFieldLink1mm.setEnabled(false);
 		this.blockFieldLink2hh.setEnabled(false); this.blockFieldLink2mm.setEnabled(false);
-		
+
 		this.blockButtonOK.setEnabled(false);
-		
-//		this.blockFieldLink1hh.setSelectedTextColor(Color.red);
-//		this.blockFieldLink1mm.setSelectedTextColor(Color.green);
-		
+
+		//		this.blockFieldLink1hh.setSelectedTextColor(Color.red);
+		//		this.blockFieldLink1mm.setSelectedTextColor(Color.green);
+
 		this.frame.getContentPane().add(this.blockPanel, BorderLayout.EAST);
-		
+
 		this.openBtn = new JButton("Open");
 		panel.add(this.openBtn);
-		
-		
+
+
 		this.saveButton = new JButton("Save");
 		this.saveButton.setEnabled(false);
 		this.saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -328,32 +369,32 @@ public class RoadClosuresEditor implements ActionListener{
 
 		this.openBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
-		
+
 		this.frame.addComponentListener(new ComponentListener() 
 		{  
-		        @Override
-				public void componentResized(ComponentEvent evt)
-		        {
-		            Component src = (Component)evt.getSource();
-		            Dimension newSize = src.getSize();
-		            updateMapViewerSize(newSize.width-200, newSize.height);
-		        }
-				@Override
-				public void componentMoved(ComponentEvent e) {}
-				@Override
-				public void componentShown(ComponentEvent e) {}
-				@Override
-				public void componentHidden(ComponentEvent e) {}
+			@Override
+			public void componentResized(ComponentEvent evt)
+			{
+				Component src = (Component)evt.getSource();
+				Dimension newSize = src.getSize();
+				updateMapViewerSize(newSize.width-200, newSize.height);
+			}
+			@Override
+			public void componentMoved(ComponentEvent e) {}
+			@Override
+			public void componentShown(ComponentEvent e) {}
+			@Override
+			public void componentHidden(ComponentEvent e) {}
 		});
-		
+
 	}
-	
+
 	public void updateMapViewerSize(int width, int height)
 	{
 		if (this.jMapViewer!=null)
 			this.jMapViewer.setBounds(0, 0, width, height);
 	}
-	
+
 	public void addMapViewer(TileFactory tf) {
 		this.compositePanel.setLayout(null);
 		this.jMapViewer = new MyMapViewer(this);
@@ -363,7 +404,7 @@ public class RoadClosuresEditor implements ActionListener{
 		this.jMapViewer.setZoomEnabled(true);
 		this.compositePanel.add(this.jMapViewer);
 	}	
-	
+
 	/**
 	 * save and open events
 	 * 
@@ -378,16 +419,16 @@ public class RoadClosuresEditor implements ActionListener{
 			new ConfigWriter(this.sc.getConfig()).write(this.configFile);
 			saveRoadClosures(changeEventsFile, this.roadClosures);
 		}
-		
+
 		if (e.getActionCommand() == "Open") {
 			final JFileChooser fc = new JFileChooser();
 			fc.setFileFilter(new FileFilter() {
-				
+
 				@Override
 				public String getDescription() {
 					return "MATSim config file";
 				}
-				
+
 				@Override
 				public boolean accept(File f) {
 					if (f.isDirectory()) {
@@ -399,69 +440,69 @@ public class RoadClosuresEditor implements ActionListener{
 					return false;
 				}
 			});
-			 int returnVal = fc.showOpenDialog(this.frame);
-		        if (returnVal == JFileChooser.APPROVE_OPTION) {
-		        	this.openBtn.setEnabled(false);
-		        	this.saveButton.setEnabled(true);
-		        	File file = fc.getSelectedFile();
-		            log.info("Opening: " + file.getAbsolutePath() + ".");
-		            this.configFile = file.getAbsolutePath();
-		            this.scPath = file.getParent();
-		            Config c = ConfigUtils.loadConfig(this.configFile);
-		            this.sc = ScenarioUtils.loadScenario(c);
-		            loadMapView();
-		        } else {
-		            log.info("Open command cancelled by user.");
-		        }
+			int returnVal = fc.showOpenDialog(this.frame);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				this.openBtn.setEnabled(false);
+				this.saveButton.setEnabled(true);
+				File file = fc.getSelectedFile();
+				log.info("Opening: " + file.getAbsolutePath() + ".");
+				this.configFile = file.getAbsolutePath();
+				this.scPath = file.getParent();
+				Config c = ConfigUtils.loadConfig(this.configFile);
+				this.sc = ScenarioUtils.loadScenario(c);
+				loadMapView();
+			} else {
+				log.info("Open command cancelled by user.");
+			}
 		}
-		
+
 	}
-	
-	
+
+
 	private synchronized void saveRoadClosures(String fileName, HashMap<Id, String> roadClosures)
 	{
 		if (roadClosures.size()>0)
 		{
-			
+
 
 			//create change event
 			Collection<NetworkChangeEvent> evs = new ArrayList<NetworkChangeEvent>();
 			NetworkChangeEventFactory fac = new NetworkChangeEventFactoryImpl();
-			
+
 			Iterator it = roadClosures.entrySet().iterator();
-		    while (it.hasNext())
-		    {
-		        Map.Entry pairs = (Map.Entry)it.next();
-		        
-		        Id currentId = (Id)pairs.getKey();
-		        String timeString = (String)pairs.getValue();
-		        
-		        try {
+			while (it.hasNext())
+			{
+				Map.Entry pairs = (Map.Entry)it.next();
+
+				Id currentId = (Id)pairs.getKey();
+				String timeString = (String)pairs.getValue();
+
+				try {
 					double time = Time.parseTime(timeString);
 					NetworkChangeEvent ev = fac.createNetworkChangeEvent(time);
 					ev.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
-					
+
 					ev.addLink(this.sc.getNetwork().getLinks().get(currentId));
 					evs.add(ev);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-		        
-		    }
-		    
-		    
-		    NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
-		    if (fileName.endsWith(".xml")) {
-		    	writer.write(fileName, evs);
-		    } else {
-		    	writer.write(fileName + ".xml", evs);		
-		    }
+
+			}
+
+
+			NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
+			if (fileName.endsWith(".xml")) {
+				writer.write(fileName, evs);
+			} else {
+				writer.write(fileName + ".xml", evs);		
+			}
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 	public void setSaveButtonEnabled(boolean enabled) {
 		this.saveButton.setEnabled(enabled);
 	}
@@ -484,30 +525,30 @@ public class RoadClosuresEditor implements ActionListener{
 			this.cbLink1.setEnabled(false);
 			this.cbLink2.setEnabled(false);
 			this.blockButtonOK.setEnabled(false);
-			
+
 			this.blockFieldLink1hh.setText("--");
 			this.blockFieldLink1mm.setText("--");
 			this.blockFieldLink1hh.setEnabled(false);
 			this.blockFieldLink1mm.setEnabled(false);
-			
+
 			this.blockFieldLink2hh.setText("--");
 			this.blockFieldLink2mm.setText("--");
 			this.blockFieldLink2hh.setEnabled(false);
 			this.blockFieldLink2mm.setEnabled(false);
-			
+
 			this.cbLink1.setSelected(false);
 			this.cbLink2.setSelected(false);
 			this.cbLink1.setText("-");
 			this.cbLink2.setText("-");
 			this.saveLink1 = false;
 			this.saveLink2 = false;
-			
-			
+
+
 		}
-			
-		
+
+
 	}
-	
+
 	/**
 	 * set id #1 of the first selected link (in gui and object data)
 	 * checks if there is any data for the link prior to this selection 
@@ -525,10 +566,10 @@ public class RoadClosuresEditor implements ActionListener{
 			{
 				this.cbLink1.setSelected(true);
 				this.blockFieldLink1hh.setEnabled(true); this.blockFieldLink1mm.setEnabled(true);
-				
+
 				this.blockFieldLink1hh.setText(this.roadClosures.get(id).substring(0,2));
 				this.blockFieldLink1mm.setText(this.roadClosures.get(id).substring(3,5));
-				
+
 				this.saveLink1 = true;
 			}
 		}
@@ -539,9 +580,9 @@ public class RoadClosuresEditor implements ActionListener{
 			this.cbLink1.setEnabled(false);
 
 		}
-		
+
 	}
-	
+
 	/**
 	 * set id #2 of the second selected link (in gui and object data)
 	 * checks if there is any data for the link prior to this selection 
@@ -554,15 +595,15 @@ public class RoadClosuresEditor implements ActionListener{
 		{
 			this.cbLink2.setText(id.toString());
 			this.currentLinkId2 = id;
-			
+
 			if(this.roadClosures.containsKey(id))	
 			{
 				this.cbLink2.setSelected(true);
 				this.blockFieldLink2hh.setEnabled(true); this.blockFieldLink2mm.setEnabled(true);
-				
+
 				this.blockFieldLink2hh.setText(this.roadClosures.get(id).substring(0,2));
 				this.blockFieldLink2mm.setText(this.roadClosures.get(id).substring(3,5));
-				
+
 				this.saveLink2 = true;
 			}
 		}
@@ -572,9 +613,9 @@ public class RoadClosuresEditor implements ActionListener{
 			this.blockFieldLink2hh.setEnabled(false); this.blockFieldLink2mm.setEnabled(false);
 			this.cbLink2.setEnabled(false);
 		}
-		
+
 	}
-	
+
 	public void updateRoadClosure()
 	{
 		if ((this.currentLinkId1!=null))
@@ -583,9 +624,9 @@ public class RoadClosuresEditor implements ActionListener{
 				this.roadClosures.put(this.currentLinkId1, this.blockFieldLink1hh.getText() + ":" + this.blockFieldLink1mm.getText());
 			else
 				this.roadClosures.remove(this.currentLinkId1);
-			
+
 		}
-		
+
 		if ((this.currentLinkId2!=null))
 		{
 			if (this.cbLink2.isSelected())
@@ -593,19 +634,19 @@ public class RoadClosuresEditor implements ActionListener{
 			else
 				this.roadClosures.remove(this.currentLinkId2);
 		}
-		
+
 		this.saveButton.setEnabled(this.roadClosures.size() > 0);
-		
+
 	}
-	
+
 	public synchronized HashMap<Id, String> getRoadClosures()
 	{
 		return this.roadClosures;
 	}
-	
+
 	class TypeHour implements KeyListener 
 	{
-		
+
 		@Override
 		public void keyTyped(KeyEvent e)
 		{
@@ -615,23 +656,23 @@ public class RoadClosuresEditor implements ActionListener{
 		@Override
 		public void keyReleased(KeyEvent e)
 		{
-			
+
 			JTextField src = (JTextField)e.getSource();
-			
+
 			String text = src.getText();
-			
-			
+
+
 			if (!text.matches("([01]?[0-9]|2[0-3])"))
-					src.setText("00");
-			
+				src.setText("00");
+
 		}
 		@Override
 		public void keyPressed(KeyEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}	
-	
+
 	class CheckHour implements FocusListener
 	{
 
@@ -641,7 +682,7 @@ public class RoadClosuresEditor implements ActionListener{
 			JTextField src = (JTextField)e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());			
-			
+
 		}
 
 		@Override
@@ -649,14 +690,14 @@ public class RoadClosuresEditor implements ActionListener{
 		{
 			JTextField src = (JTextField)e.getSource();
 			String text = src.getText();
-			
+
 			if (!text.matches("([01]?[0-9]|2[0-3])"))
 				src.setText("00");
 			else if (text.matches("[0-9]"))
 				src.setText("0"+text);
-			
+
 		}
-		
+
 	}
 
 	class CheckMinute implements FocusListener
@@ -668,31 +709,31 @@ public class RoadClosuresEditor implements ActionListener{
 			JTextField src = (JTextField)e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());			
-			
+
 		}
 
 		@Override
 		public void focusLost(FocusEvent e)
 		{
 			JTextField src = (JTextField)e.getSource();
-			
+
 			String text = src.getText();
-			
+
 			if ((!text.matches("[0-5][0-9]")) && (!text.matches("[0-9]")))
 				src.setText("00");
 			else if (text.matches("[0-9]"))
 				src.setText("0" + text);
 
 
-			
+
 		}
-		
+
 	}
-	
-	
+
+
 	class TypeMinute implements KeyListener 
 	{
-		
+
 		@Override
 		public void keyTyped(KeyEvent e)
 		{
@@ -702,41 +743,49 @@ public class RoadClosuresEditor implements ActionListener{
 		@Override
 		public void keyReleased(KeyEvent e)
 		{
-			
+
 
 		}
 		@Override
 		public void keyPressed(KeyEvent e) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	}
 
 
 	public boolean hasLink(Id id)
 	{
-		
-		
+
+
 		if (this.roadClosures.containsKey(id))
 			return true;
 		else
 			return false;
 	}	
-	
+
 	private static final class Runner implements Runnable{
 
-		
+
+		private final String wms;
+		private final String layer;
+
+		public Runner(String wms, String layer) {
+			this.wms = wms;
+			this.layer = layer;
+		}
+
 		@Override
 		public void run() {
 			try {
-				RoadClosuresEditor window = new RoadClosuresEditor();
+				RoadClosuresEditor window = new RoadClosuresEditor(this.wms,this.layer);
 				window.frame.setVisible(true);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 	}
 
 

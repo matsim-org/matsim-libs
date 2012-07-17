@@ -50,28 +50,61 @@ public class EvacuationAreaSelector implements ActionListener{
 
 	private ShapeToStreetSnapperThreadWrapper snapper;
 
+	private final String wms;
+
+	private final String layer;
+
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					EvacuationAreaSelector window = new EvacuationAreaSelector();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
+		
+		String wms = null;
+		String layer = null;
+		if (args.length == 4) {
+			for (int i = 0; i < 4; i += 2) {
+				if (args[i].equalsIgnoreCase("-wms")) {
+					wms = args[i+1];
+				}
+				if (args[i].equalsIgnoreCase("-layer")) {
+					layer = args[i+1];
 				}
 			}
-		});
+			
+		} else if (args.length != 0) {
+			printUsage();
+			System.exit(-1);
+		}
+		
+		
+		
+		
+		EventQueue.invokeLater(new Runner(wms,layer));
 	}
 
+	
+	private static void printUsage() {
+		System.out.println();
+		System.out.println(EvacuationAreaSelector.class.getSimpleName());
+		System.out.println("Starts the GRIPS evacuation area editor.");
+		System.out.println();
+		System.out.println("usage 1: " + EvacuationAreaSelector.class.getSimpleName() +"\n" +
+						   "         starts the editor and uses openstreetmap as backround layer\n" +
+						   "         requires a working internet connection");
+		System.out.println("usage 2: " + EvacuationAreaSelector.class.getSimpleName() + " -wms <url> -layer <layer name>\n" +
+				           "         starts the editor and uses the given wms server to load a backgorund layer");
+		
+	}
+	
 	/**
 	 * Create the application.
+	 * @param layer 
+	 * @param wms 
 	 * @param config 
 	 */
-	public EvacuationAreaSelector(){
+	public EvacuationAreaSelector(String wms, String layer){
+		this.wms = wms;
+		this.layer = layer;
 		initialize();
 //		loadMapView(osmFile);
 
@@ -79,7 +112,11 @@ public class EvacuationAreaSelector implements ActionListener{
 
 	private void loadMapView(String osm) {
 		
-		addMapViewer(TileFactoryBuilder.getOsmTileFactory());
+		if (this.wms == null) {
+			addMapViewer(TileFactoryBuilder.getOsmTileFactory());
+		} else {
+			addMapViewer(TileFactoryBuilder.getWMSTileFactory(this.wms, this.layer));
+		}
 		this.snapper = new ShapeToStreetSnapperThreadWrapper(osm,this);
 		this.jMapViewer.setSnapper(this.snapper);
 		this.jMapViewer.setCenterPosition(this.snapper.getNetworkCenter());
@@ -179,5 +216,24 @@ public class EvacuationAreaSelector implements ActionListener{
 	
 	public void setSaveButtonEnabled(boolean enabled) {
 		this.saveButton.setEnabled(enabled);
+	}
+	
+	private static final class Runner implements Runnable {
+		
+		private final String wms;
+		private final String layer;
+		public Runner(String wms,String layer) {
+			this.wms = wms;
+			this.layer = layer;
+		}
+		@Override
+		public void run() {
+			try {
+				EvacuationAreaSelector window = new EvacuationAreaSelector(this.wms,this.layer);
+				window.frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

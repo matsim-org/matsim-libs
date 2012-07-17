@@ -51,6 +51,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
@@ -130,6 +131,12 @@ public class EvacuationPTLinesEditor implements ActionListener{
 
 	private BusStop currentBusStop;
 
+	private JToggleButton osmButton;
+
+	private final String wms;
+
+	private final String layer;
+
 	private void setBusStopEditorPanelEnabled(boolean toggle) {
 		if (!toggle) {
 			this.greenLinkSelct.setEnabled(toggle);
@@ -149,25 +156,63 @@ public class EvacuationPTLinesEditor implements ActionListener{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runner());
+		
+		String wms = null;
+		String layer = null;
+		if (args.length == 4) {
+			for (int i = 0; i < 4; i += 2) {
+				if (args[i].equalsIgnoreCase("-wms")) {
+					wms = args[i+1];
+				}
+				if (args[i].equalsIgnoreCase("-layer")) {
+					layer = args[i+1];
+				}
+			}
+			
+		} else if (args.length != 0) {
+			printUsage();
+			System.exit(-1);
+		}
+		EventQueue.invokeLater(new Runner(wms,layer));
+	}
+
+
+
+	private static void printUsage() {
+		System.out.println();
+		System.out.println(EvacuationPTLinesEditor.class.getSimpleName());
+		System.out.println("Starts the GRIPS public transport lines editor.");
+		System.out.println();
+		System.out.println("usage 1: " + EvacuationPTLinesEditor.class.getSimpleName() +"\n" +
+						   "         starts the editor and uses openstreetmap as backround layer\n" +
+						   "         requires a working internet connection");
+		System.out.println("usage 2: " + EvacuationPTLinesEditor.class.getSimpleName() + " -wms <url> -layer <layer name>\n" +
+				           "         starts the editor and uses the given wms server to load a backgorund layer");
+		
 	}
 
 
 
 	/**
 	 * Create the application.
+	 * @param layer 
+	 * @param wms 
 	 * @param config 
 	 */
-	public EvacuationPTLinesEditor(){
-
+	public EvacuationPTLinesEditor(String wms, String layer){
+		this.wms = wms;
+		this.layer = layer;
 		initialize();
 
 	}
 
 	private void loadMapView() {
 
-		addMapViewer(TileFactoryBuilder.getOsmTileFactory());
-//		addMapViewer(TileFactoryBuilder.getWMSTileFactory("http://localhost:8080/geoserver/wms?service=WMS&", "hh"));
+		if (this.wms == null) {
+			addMapViewer(TileFactoryBuilder.getOsmTileFactory());
+		} else {
+			addMapViewer(TileFactoryBuilder.getWMSTileFactory(this.wms, this.layer));
+		}
 		this.jMapViewer.setCenterPosition(getNetworkCenter());
 		this.jMapViewer.setZoom(2);
 		this.compositePanel.repaint();
@@ -363,6 +408,8 @@ public class EvacuationPTLinesEditor implements ActionListener{
 		this.blockButtonOK.setEnabled(false);
 
 		this.frame.getContentPane().add(this.busStopConfigPanel, BorderLayout.EAST);
+		
+		
 
 		this.openBtn = new JButton("Open");
 		panel.add(this.openBtn);
@@ -372,6 +419,7 @@ public class EvacuationPTLinesEditor implements ActionListener{
 		this.saveButton.setEnabled(false);
 		this.saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
 		panel.add(this.saveButton);
+		
 		this.compositePanel = new JPanel();
 		this.compositePanel.setBounds(new Rectangle(0, 0, 800, 800));
 		this.frame.getContentPane().add(this.compositePanel, BorderLayout.CENTER);
@@ -699,10 +747,18 @@ public class EvacuationPTLinesEditor implements ActionListener{
 	private static final class Runner implements Runnable{
 
 
+		private final String wms;
+		private final String layer;
+
+		public Runner(String wms, String layer) {
+			this.wms = wms;
+			this.layer = layer;
+		}
+
 		@Override
 		public void run() {
 			try {
-				EvacuationPTLinesEditor window = new EvacuationPTLinesEditor();
+				EvacuationPTLinesEditor window = new EvacuationPTLinesEditor(this.wms,this.layer);
 				window.frame.setVisible(true);
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -62,7 +62,6 @@ public abstract class TileFactoryBuilder {
 					"","x","y","zoom") {
 				@Override
 				public String getTileUrl(int x, int y, int zoom) {
-					System.out.println("x:" + x + " y" + y);
 					int zz = maxZoom - zoom;
 					int z = (int)Math.pow(2,(double)zz-1);
 					return wms.toWMSURL(x-z, z-1-y, zz, getTileSize(zoom));
