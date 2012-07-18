@@ -34,14 +34,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.otfvis.OTFVis;
+//import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
+//import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.LinkFactoryImpl;
@@ -58,8 +58,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
+//import org.matsim.vis.otfvis.OTFClientLive;
+//import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
  * Class doing a simple one road straight line simulation.
@@ -99,8 +99,8 @@ public class LangeStreckeSzenario {
 
 	
 	public static void main(String[] args) {
-		int[] capacities = {1500,1500,1500};//must have a size of numberOfLinks!
-		new LangeStreckeSzenario(10000.0,3,capacities).run();
+		int[] capacities = {1500};//must have a size of numberOfLinks!
+		new LangeStreckeSzenario(10000.0,1,capacities).run();
 
 	}
 	
@@ -197,9 +197,9 @@ public class LangeStreckeSzenario {
 		Netsim qSim = new QSimFactory().createMobsim(scenario, events);
 		prepareForSim();
 		
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
+		//OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
 		
-		OTFClientLive.run(scenario.getConfig(), server);
+		//OTFClientLive.run(scenario.getConfig(), server);
 		qSim.run();
 	}
 	
