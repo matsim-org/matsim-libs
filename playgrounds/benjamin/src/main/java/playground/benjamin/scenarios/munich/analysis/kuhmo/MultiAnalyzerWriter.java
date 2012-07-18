@@ -63,7 +63,7 @@ public class MultiAnalyzerWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-			bw.write("\t users \t toll payers \t user logsum [EUR] \t toll payments [EUR]");
+			bw.write("user group \t users \t toll payers \t user logsum [EUR] \t toll payments [EUR]");
 			bw.newLine();
 
 			for(UserGroup userGroup : UserGroup.values()){
@@ -105,6 +105,7 @@ public class MultiAnalyzerWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
+			bw.write("user group");
 			for(String pollutant : emissionUtils.getListOfPollutants()){
 				bw.write("\t" + pollutant);
 			}
@@ -127,14 +128,14 @@ public class MultiAnalyzerWriter {
 		}
 	}
 
-	public void writeCarDistanceInformation(Map<Id, Double> personId2CarDistance, Map<UserGroup, Double> userGroup2carTrips) {
-		String fileName = this.outputDir + "/carDistanceInformation_" + runName + ".txt";
+	public void writeAvgCarDistanceInformation(Map<Id, Double> personId2CarDistance, Map<UserGroup, Double> userGroup2carTrips) {
+		String fileName = this.outputDir + "/avgCarDistanceInformation_" + runName + ".txt";
 		File file = new File(fileName);
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-			bw.write("\t car users \t car departures \t total car distance [km] \t avg car distance per car user [km] \t avg car distance per car departure [km]");
+			bw.write("user group \t car users \t car departures \t total car distance [km] \t avg car distance per car user [km] \t avg car distance per car departure [km]");
 			bw.newLine();
 
 			for(UserGroup userGroup : UserGroup.values()){
@@ -159,6 +160,36 @@ public class MultiAnalyzerWriter {
 			e.printStackTrace();
 		}
 	}
+	
+	public void writeDetailedCarDistanceInformation(Map<Id, Double> personId2carDistance) {
+		String fileName = this.outputDir + "/detailedCarDistanceInformation_" + runName + ".txt";
+		File file = new File(fileName);
+
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+
+			bw.write("person id \t user group \t total car distance [km]");
+//			bw.write("user group \t total car distance [km]");
+			bw.newLine();
+			
+			for(UserGroup userGroup : UserGroup.values()){
+				for(Id personId : personId2carDistance.keySet()){
+					if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
+						Double individualCarDistance_km = personId2carDistance.get(personId) / 1000.;
+
+						bw.write(personId.toString() + "\t");
+						bw.write(userGroup.toString() + "\t");
+						bw.write(individualCarDistance_km.toString());
+						bw.newLine();
+					}
+				}
+			}
+			bw.close();
+			logger.info("Finished writing output to " + fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void writeAvgTTInformation(Map<String, Map<Id, Double>> mode2personId2TravelTime, Map<UserGroup, Map<String, Double>> userGroup2mode2noOfTrips) {
 		String fileName = this.outputDir + "/avgTTInformation_" + runName + ".txt";
@@ -167,7 +198,7 @@ public class MultiAnalyzerWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
-			bw.write("\t mode \t users \t departures \t total travelTime [min] \t avg travelTime per user [min] \t avg travelTime per departure [min]");
+			bw.write("user group \t mode \t users \t departures \t total travelTime [min] \t avg travelTime per user [min] \t avg travelTime per departure [min]");
 			bw.newLine();
 
 			for(UserGroup userGroup : UserGroup.values()){

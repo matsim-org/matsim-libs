@@ -1,0 +1,49 @@
+#Boxplot: urbanbase neben urban30
+#gleiche Limits? -> Vergleichbarkeit
+rm(list = ls())		# Clear all variables  
+graphics.off()		# Close graphics windows
+overall<-F
+groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #one plot for each grop
+groupColors <- c("yellow","red","lightgreen","darkgreen") #base case, z30, pricing
+meanColor <- c("darkgrey","black","green") 
+
+directory <- commandArgs()[3]
+#read files and set directories
+distInfoBaCFile <- file.path(directory,"detailedCarDistanceInformation_baseCase_ctd.txt")
+distInfoPriFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing.txt")
+distInfoZ30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30.txt")
+
+distInfoBaC <- read.table(file = distInfoBaCFile, header=T, sep = "\t")
+distInfoZ30 <- read.table(file = distInfoZ30File, header=T, sep = "\t")
+distInfoPri <- read.table(file = distInfoPriFile, header=T, sep = "\t")
+
+outFileUrban <- file.path(commandArgs()[4], "plotDetailedCarTripDistance_WithOutline.pdf")
+
+pdf(outFileUrban, width=7, height=7)
+
+for(group in groupOrder){
+#limits
+distInfoBaCgroup<-distInfoBaC[(distInfoBaC$usergroup==group),]
+distInfoZ30group<-distInfoZ30[(distInfoZ30$usergroup==group),] 
+distInfoPrigroup<-distInfoPri[(distInfoPri$usergroup==group),]
+ylimitmax<-max(c(max(distInfoBaCgroup$totalcardistance),max(distInfoZ30group$totalcardistance),max(distInfoPrigroup$totalcardistance)))
+
+#boxplots
+boxplot(distInfoBaCgroup$totalcardistance, notch = F, outline = T, boxwex = 0.3, col=groupColors[1], 
+main= "Car distance", xlab=c(paste("User group", group),"Base Case, Zone 30, Pricing"), ylab="distance in km", at=1:1-0.3, ylimits=c(0, ylimitmax))
+boxplot(distInfoZ30group$totalcardistance, notch = F, outline = T, boxwex = 0.3, col=groupColors[2], add=T, at=1:1+0.0)
+boxplot(distInfoPrigroup$totalcardistance, notch = F, outline = T, boxwex = 0.3, col=groupColors[3], add=T, at=1:1+0.3)
+
+#means
+aline <- tapply(distInfoBaCgroup$totalcardistance, distInfoBaCgroup$usergroup==group ,mean)
+bline <- tapply(distInfoZ30group$totalcardistance, distInfoZ30group$usergroup==group ,mean)
+cline <- tapply(distInfoPrigroup$totalcardistance, distInfoPrigroup$usergroup==group ,mean)
+
+#draw means as lines
+segments(seq(along = aline) - 0.4, aline, seq(along = aline) - 0.2, aline, lwd = 2, col = meanColor[1]) 
+segments(seq(along = bline) - 0.1, bline, seq(along = bline) + 0.1, bline, lwd = 2, col = meanColor[2]) 
+segments(seq(along = cline) + 0.2, cline, seq(along = cline) + 0.4, cline, lwd = 2, col = meanColor[3]) 
+
+}
+dev.off()
+

@@ -25,6 +25,6 @@ package playground.benjamin.scenarios.munich.analysis.filter;
  */
 public enum UserGroup {
 	
-	MID, INN_COMMUTER, OUT_COMMUTER, FREIGHT
+	URBAN, COMMUTER, REV_COMMUTER, FREIGHT
 
 }

@@ -36,9 +36,9 @@ public class PersonFilter {
 	
 	public Population getPopulation(Population population, UserGroup userGroup) {
 		Population filteredPopulation = null;
-		if(userGroup.equals(UserGroup.MID)) filteredPopulation = getMiDPopulation(population);
-		else if(userGroup.equals(UserGroup.INN_COMMUTER)) filteredPopulation = getInnCommuter(population);
-		else if(userGroup.equals(UserGroup.OUT_COMMUTER)) filteredPopulation = getOutCommuter(population);
+		if(userGroup.equals(UserGroup.URBAN)) filteredPopulation = getMiDPopulation(population);
+		else if(userGroup.equals(UserGroup.COMMUTER)) filteredPopulation = getInnCommuter(population);
+		else if(userGroup.equals(UserGroup.REV_COMMUTER)) filteredPopulation = getOutCommuter(population);
 		else if(userGroup.equals(UserGroup.FREIGHT)) filteredPopulation = getFreightPopulation(population);
 		return filteredPopulation;
 	}
@@ -47,13 +47,13 @@ public class PersonFilter {
 		boolean isFromUserGroup = false;
 		
 		if(isPersonFromMID(personId)){
-			if(userGroup.equals(UserGroup.MID)) isFromUserGroup = true ;
+			if(userGroup.equals(UserGroup.URBAN)) isFromUserGroup = true ;
 		}
 		else if(isPersonInnCommuter(personId)){
-			if(userGroup.equals(UserGroup.INN_COMMUTER)) isFromUserGroup = true;
+			if(userGroup.equals(UserGroup.COMMUTER)) isFromUserGroup = true;
 		}
 		else if(isPersonOutCommuter(personId)){
-			if(userGroup.equals(UserGroup.OUT_COMMUTER)) isFromUserGroup = true;
+			if(userGroup.equals(UserGroup.REV_COMMUTER)) isFromUserGroup = true;
 		}
 		else if(isPersonFreight(personId)){
 			if(userGroup.equals(UserGroup.FREIGHT)) isFromUserGroup = true;

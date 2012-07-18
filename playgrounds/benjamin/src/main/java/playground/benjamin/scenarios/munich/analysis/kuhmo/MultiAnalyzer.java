@@ -166,7 +166,8 @@ public class MultiAnalyzer {
 		
 		
 		writer.setRunName(runName);
-		writer.writeCarDistanceInformation(personId2carDistance, userGroup2carTrips);
+		writer.writeAvgCarDistanceInformation(personId2carDistance, userGroup2carTrips);
+		writer.writeDetailedCarDistanceInformation(personId2carDistance);
 		writer.writeAvgTTInformation(mode2personId2TravelTime, userGroup2mode2noOfTrips);
 	}
 
