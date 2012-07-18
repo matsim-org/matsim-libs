@@ -106,6 +106,10 @@ public class PTLinesGenerator {
 	}
 
 	private void createTransitLine(BusStop stop) {
+		
+		if ((stop.id==null) || (stop.hh.equals("")) || (stop.mm.equals("")) || (stop.hh.equals("--")) || (stop.mm.equals("--")))
+			return;
+		
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		Id id = stop.id;
 		Link link = this.sc.getNetwork().getLinks().get(id);

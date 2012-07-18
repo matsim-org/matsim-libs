@@ -577,7 +577,9 @@ public class EvacuationPTLinesEditor implements ActionListener{
 				updateControlPanel(bs);
 			}
 			else {
+				
 				this.currentBusStop = new BusStop();
+				currentBusStop.id = id;
 				this.busStops.put(id, this.currentBusStop);
 				updateControlPanel(this.currentBusStop);
 			}
