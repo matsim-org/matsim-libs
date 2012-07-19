@@ -23,8 +23,9 @@ public class NoiseWriter {
 	private Map<Id,Double> linkId2Lden ;
 	private static String runDirectory = "/mobilTUMrunsKuhmo/output/output_baseCase_ctd/";
 	
-
-	public NoiseWriter (Map<Id,Map<Double,Double>> linkId2hour2lme , Map<Id,Double> linkId2Lden ){
+	//Das Schreiben der Events habe ich auskommentiert, weil es nicht funktioniert, siehe NoiseTool
+	
+	/*public NoiseWriter (Map<Id,Map<Double,Double>> linkId2hour2lme , Map<Id,Double> linkId2Lden ){
 		this.linkId2hour2lme = linkId2hour2lme;
 		this.linkId2Lden = linkId2Lden;
 		eventsList = new ArrayList<NoiseEventImpl> ();
@@ -54,7 +55,7 @@ public class NoiseWriter {
 		eWriter.closeFile();
 		logger.info("Finished writing output to " + outputfile);
 		
-	}
+	}*/
 	
 	//write LinkId;hour;car;HDV;freespeed from handler.getlinkId2hour2vehicles() to ../mobilTUM/OutputTests/InfosProStunde.txt
 	public void writeVehiclesFreespeedProStunde(Map <Id,double [][]> infos)throws IOException{

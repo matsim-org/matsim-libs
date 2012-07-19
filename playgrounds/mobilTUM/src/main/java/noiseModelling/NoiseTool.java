@@ -60,16 +60,17 @@ public class NoiseTool {
 	
 		/* new instance of the class Calculation*/
 		NoiseEmissionCalculation calculation = new NoiseEmissionCalculation();
-		Map <Id,Map<Double,Double>> calLmeCarHdvHour = NoiseEmissionCalculation.calLmeCarHdvHour(linkInfos);
-		Map <Id,Double> linkId2Lden = calculation.cal_lden(calLmeCarHdvHour);
 		
-		/* get information from class Calculation using the respective maps (linkInfos and res1) as input*/
-		//Map <Id,Map<String,Double>> linkId2timePeriod2lme = calculation.calculate_lme(linkInfos);
-		//Map <Id,Double> linkId2Lden = calculation.cal_lden(linkId2timePeriod2lme);
+		//die folgende Zeile wurde auskommentiert, weil fehlerhaft (Cannot make a static reference to the non-static method calLmeCarHdvHour(Map<Id,Map<Double,double[]>>) from the type NoiseEmissionCalculation)
+		//Map <Id,Map<Double,Double>> calLmeCarHdvHour = NoiseEmissionCalculation.calLmeCarHdvHour(linkInfos);
 		
-		/*new instance of the class NoiseWriter */
-		//NoiseWriter writer = new NoiseWriter (linkId2timePeriod2lme, linkId2Lden);
-		NoiseWriter writer = new NoiseWriter (linkInfos,linkId2Lden);
+		//die folgende Zeile wurde auskommentiert, weil fehlerhaft (calLmeCarHdvHour fehlt)
+		//Map <Id,Double> linkId2Lden = calculation.cal_lden(calLmeCarHdvHour);
+		
+		//die folgende Zeile wurde auskommentiert, weil fehlerhaft (The constructor NoiseWriter(Map<Id,Map<Double,double[]>>, Map<Id,Double>) is undefined)
+		//NoiseWriter writer = new NoiseWriter (linkInfos,linkId2Lden);
+		//die fehlerhafte Zeile wurde ersetzt durch die folgende, um zumindest die beiden Textdateien zu schreiben:
+		NoiseWriter writer = new NoiseWriter ();
 		
 		//writer.writeEvents();
 		

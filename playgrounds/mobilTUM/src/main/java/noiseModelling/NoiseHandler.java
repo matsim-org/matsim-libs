@@ -17,8 +17,6 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 	private final Network network;
 	// private final EventsManager NoiseEventsManager;
 
-	//private Map<Id, Map<String, double[]>> linkId2timePeriod2trafficInfo = new TreeMap<Id, Map<String, double[]>>();
-	//private Map<Id, List<Double>> linkTimes = new TreeMap<Id, List<Double>>();
 	private Map <Id,double[][]> linkId2hour2vehicles = new TreeMap <Id, double[][]> ();
 	private Map<Id, Map<Double, double[]>> linkId2hourd2vehicles = new TreeMap<Id, Map<Double, double[]>>();
 
@@ -79,7 +77,7 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 		//end calculation of vehicles  per hour version one with hour as integer
 		/*-------*/
 
-		//2nd try start, in analogy to FH: linkId2timePeriod2trafficInfo
+		//2nd version start, in analogy to FH: linkId2timePeriod2trafficInfo
 				
 		if (!linkId2hourd2vehicles.containsKey(linkId)) {
 			double[] trafficInfo = new double[3];
@@ -116,49 +114,9 @@ public class NoiseHandler implements LinkLeaveEventHandler {
 		}
 	}
 		
-		//2nd try end*/
+		//2nd version end*/
 		
 		
-		/*
-		//Map: linkId2timePeriod2trafficInfo, TreeMap<Id, Map<String, double[]>>
-		//if the linkId doesn't exist in the map: add it with a double[3] array
-		//store the needed information about the traffic: 
-		//freespeed [0]
-		//number of total vehicles [1]
-		//number of heavy duty vehicles [2] 
-		
-		if (!linkId2timePeriod2trafficInfo.containsKey(linkId)) {
-			double[] trafficInfo = new double[3];
-			//initialize the array
-			trafficInfo[0] = freeSpeedInKmh; //the first element of the array contains freespeed
-			trafficInfo[1] = 1.0; //the second element of the array contains the total number of vehicles
-
-			if (personId.toString().contains("gv_")) {
-				trafficInfo[2] = 1.0; //the third element contains the number of heavy duty vehicles
-			} else {
-				trafficInfo[2] = 0.0;
-			}
-			Map<String, double[]> timeToTrafficInfo = new TreeMap<String, double[]>();
-			timeToTrafficInfo.put(timePeriod, trafficInfo);
-			linkId2timePeriod2trafficInfo.put(linkId, timeToTrafficInfo);
-		} else {
-			if (!linkId2timePeriod2trafficInfo.get(linkId).containsKey(timePeriod)) {
-				double[] trafficInfo = new double[3];
-				trafficInfo[0] = freeSpeedInKmh; // the first element of the array contains freespeed
-				trafficInfo[1] = 1.0; // the second element of the array contains the total number of vehicles
-				if (personId.toString().contains("gv_")) {
-					trafficInfo[2] = 1.0; // the third element contains the number of HDV
-				} else {
-					trafficInfo[2] = 0.0;
-				}
-				linkId2timePeriod2trafficInfo.get(linkId).put(timePeriod, trafficInfo);
-			} else {
-				if (personId.toString().contains("gv_")) {
-					++linkId2timePeriod2trafficInfo.get(linkId).get(timePeriod)[2];
-				}
-				++linkId2timePeriod2trafficInfo.get(linkId).get(timePeriod)[1];
-			}
-		}*/
 	
 
 	private int calculateTimeClass(double time) {

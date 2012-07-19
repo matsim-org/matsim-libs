@@ -85,49 +85,7 @@ public class NoiseEmissionCalculation {
 		addBasicValue(linkId2Time2NoiseEmissions);
 		return linkId2Time2NoiseEmissions;
 	}
-
-		/*calculate Mittelungspegel
-	public double calc_lm(String periode, double dtv, double p) {
-		double lm = 0.0;
-		if (periode.equals("Day")) {
-			lm = 37.3 + 10.0 * (Math.log10(0.062 * dtv * (1.0 + 0.082 * p)));
-		}
-		if (periode.equals("Evening")) {
-			lm = 37.3 + 10.0 * (Math.log10(0.042 * dtv * (1.0 + 0.082 * p)));
-		}
-		if (periode.equals("Night")) {
-			lm = 37.3 + 10.0 * (Math.log10(0.011 * dtv * (1.0 + 0.082 * p)));
-		}
-		return lm;
-	}
-	
-	/*calculation of exceptions if there is no value for lme and if there is lme < 37.5 due to very few vehicles
-	
-	private void addBasicValue (Map <Id,Map<String , Double>> linkId2time2NoiseEmissions){
-		for (Entry <Id, Map<String, Double>> entry : linkId2time2NoiseEmissions.entrySet()){
-			Map<String, Double> timePeriod2lme = entry.getValue();
-			Id linkId = entry.getKey();
-			for (Entry <String,Double> component : timePeriod2lme.entrySet()){
-				String timePeriod =component.getKey();
-				Double lme = component.getValue();
-				if(lme < 37.3){					
-					timePeriod2lme.put(timePeriod, 37.3);				
-					linkId2time2NoiseEmissions.put(linkId, timePeriod2lme);
-				}	
-			}
-			
-			if(!timePeriod2lme.containsKey("Day")){
-				timePeriod2lme.put("Day",37.3);
-			}
-			if(!timePeriod2lme.containsKey("Evening")){
-				timePeriod2lme.put("Evening",37.3);
-			}
-			if(!timePeriod2lme.containsKey("Night")){
-				timePeriod2lme.put("Night",37.3);
-			}	
-		}		
-	}*/
-		
+	end FH code*/
 	
 	// calculation of LDEN nach VBUS
 
@@ -148,26 +106,6 @@ public class NoiseEmissionCalculation {
 		}
 		return linkId2lden;
 	}
-
-	
-	/*public Map<Id,Double> cal_lden (Map<Id,Map<String,Double>> linkId2timePeriod2lden){		
-		Map<Id,Double> linkId2lden = new TreeMap <Id,Double> ();
-		
-		for (Entry <Id,Map<String,Double>> entry : linkId2timePeriod2lden.entrySet()){
-			Id linkId = entry.getKey();
-			Map<String,Double> timeperiode_To_lme = entry.getValue();
-			double sum = 0.0;				
-			for (Entry <String , Double> element : timeperiode_To_lme.entrySet()){
-				String timeperiode = element.getKey();
-				double lme = element.getValue();
-				sum = sum + calcValue(timeperiode, lme);	
-							
-			}
-			double lden = 10.0 * (Math.log10((1.0/24.0)*sum)) ;
-			linkId2lden.put(linkId, lden);		
-		}
-		return linkId2lden;
-	}*/
 	
 	private double calcValueForLden(Double hour , double lme){
 		//den folgenden Befehl kann man ganz sicher eleganter ausdrücken, wie?
