@@ -12,10 +12,10 @@ emissioncolors<- c("black","mediumblue","limegreen","yellow","red")
 directory <- commandArgs()[3]
 baseFile <- file.path(directory, "emissionInformation_baseCase_ctd.txt")
 outFile <- file.path(commandArgs()[4], "PlotA.pdf")
-basecase <- read.table(file=baseFile, header = T, sep = "\t")
+basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 
 basecase.mat <- as.matrix(basecase)[,2:10]
-rownames(basecase.mat) <- basecase$usergroup
+rownames(basecase.mat) <- basecase$user.group
 colnames(basecase.mat) <- names(basecase)[2:10]
 
 numberCol <- 9
@@ -40,7 +40,7 @@ for(i in 1:numberCol){
 	#if column maximum <100
 	#or if column minimum >-100
 	while (abs(max(as.numeric(basecase.mat[,i])))<100 && 
-		(abs(min(as.numeric(basecase.mat[,i]))))>0){ #sonst ist die ganze Spalte Null
+		(abs(min(as.numeric(basecase.mat[,i]))))>0){ #string to numeric
 		basecase.mat[,i]<-10*as.numeric(basecase.mat[,i])
 		actualEmission<-colnames(basecase.mat)[i]
 		relativmatrix[1,actualEmission]<-relativmatrix[1,actualEmission]/10

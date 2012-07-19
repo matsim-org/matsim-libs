@@ -13,21 +13,21 @@ priFile <- file.path(directory, "emissionInformation_policyCase_pricing.txt")
 outFile <- file.path(commandArgs()[4], "plotB.pdf")
 
 #read files
-basecase <- read.table(file=baseFile, header = T, sep = "\t")
-policycasez30 <- read.table(file=z30File, header = T, sep = "\t")
-policycasePri <- read.table(file=priFile, header = T, sep = "\t")
+basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
+policycasez30 <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
+policycasePri <- read.table(file=priFile, header = T, sep = "\t", comment.char="")
 
 #initiate matrices with same row and column names 
 basecase.mat <- as.matrix(basecase)[,2:10]
-rownames(basecase.mat) <- basecase$usergroup
+rownames(basecase.mat) <- basecase$user.group
 colnames(basecase.mat) <- names(basecase)[2:10]
 
 policycasez30.mat <- as.matrix(policycasez30)[,2:10]
-rownames(policycasez30.mat) <- policycasez30$usergroup
+rownames(policycasez30.mat) <- policycasez30$user.group
 colnames(policycasez30.mat) <- names(policycasez30)[2:10]
 
 policycasePri.mat <- as.matrix(policycasePri)[,2:10]
-rownames(policycasePri.mat) <- policycasePri$usergroup
+rownames(policycasePri.mat) <- policycasePri$user.group
 colnames(policycasePri.mat) <- names(policycasePri)[2:10]
 
 sumbasecase<- matrix(nrow=1, ncol=length(emissions))
