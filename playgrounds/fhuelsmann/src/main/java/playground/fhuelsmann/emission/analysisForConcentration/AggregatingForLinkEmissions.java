@@ -20,6 +20,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,6 +63,7 @@ public class AggregatingForLinkEmissions {
 
 	Map<Double, Map<Id, Double>> time2CountsPerLink;
 	Map<Double, Map<Id, Double>> time2HdvCountsPerLink;
+	Map<Id, Map<String, Double>> linkId2AggregateEmissions = new HashMap<Id, Map<String, Double>>();
 
 	//final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static double xMin = 4452550.25;
@@ -87,7 +89,7 @@ public class AggregatingForLinkEmissions {
 		this.network = scenario.getNetwork();
 		this.featuresInMunich = readShape(munichShapeFile);
 		
-		Map<Double, Map<Id, Map<String,Map<String, Double>>>> time2EmissionMapToAnalyze;
+		Map<Double,Map<Id,Map<String, Double>>> time2EmissionMapToAnalyze;
 		
 		processEmissions(emissionFile);
 		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
@@ -97,9 +99,9 @@ public class AggregatingForLinkEmissions {
 
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal = sumUpEmissionsPerTimeInterval(time2warmEmissionsTotal, time2coldEmissionsTotal);
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered = filterLinks(time2EmissionsTotalFilled);
-		 Map<Double, Map<Id, Map<String, Map<String, Double>>>> time2linkId2splitLinkId2EmissionsMs = calculateEmissionsPerMeterSecond(time2EmissionsTotalFilledAndFiltered);
-		 Map<Double, Map<Id, Map<String, Map<String, Double>>>> EmissionsPerSplitlinkIdAggregate = AggregateEmissionsSameLinkLocation(time2linkId2splitLinkId2EmissionsMs);
+	//	Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered = filterLinks(time2EmissionsTotalFilled);
+		Map<Double, Map<Id, Map<String, Double>>> time2splitlinkId2emissions = calculateEmissionsinMgPerMeterSecond(time2EmissionsTotalFilled);
+		Map<Double, Map<Id, Map<String, Double>>> EmissionsPerSplitlinkIdAggregate = aggregateEmissionsSameLinkLocation(time2splitlinkId2emissions);
 		
 		//map of timePeriod, linkId, array of allVehiclecounts, hdvCounts, freeSpeed=freeSpeedhdv
 		Map<Double, Map<Id, Double[]>>time2CountsTotalFiltered = setNonCalculatedCountsAndFilter(time2CountsPerLink,time2HdvCountsPerLink);
@@ -137,28 +139,6 @@ public class AggregatingForLinkEmissions {
 		return time2EmissionsTotalFilled;
 	}
 
-	public Map<Double, Map<Id, Map<String, Double>>> filterLinks(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered = new HashMap<Double, Map<Id, Map<String, Double>>>();
-
-		for(Double endOfTimeInterval : time2EmissionsTotal.keySet()){
-			Map<Id, SortedMap<String, Double>> emissionsTotal = time2EmissionsTotal.get(endOfTimeInterval);
-			Map<Id, Map<String, Double>> emissionsTotalFiltered = new HashMap<Id, Map<String, Double>>();
-
-			for(Link link : network.getLinks().values()){
-				Coord linkCoord = link.getCoord();
-				Double xLink = linkCoord.getX();
-				Double yLink = linkCoord.getY();
-
-				if(xLink > xMin && xLink < xMax){
-					if(yLink > yMin && yLink < yMax){
-						emissionsTotalFiltered.put(link.getId(), emissionsTotal.get(link.getId()));
-					}
-				}			
-			}
-			time2EmissionsTotalFiltered.put(endOfTimeInterval, emissionsTotalFiltered);
-		}
-		return time2EmissionsTotalFiltered;
-	}
 
 		/*begin writing counts and freespeed to an array*/
 	private Map<Double, Map<Id, Double[]>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id, Double>> time2CountsPerLink,Map<Double, Map<Id, Double>>time2HdvCountsPerLink) {
@@ -169,12 +149,8 @@ public class AggregatingForLinkEmissions {
 			Map<Id, Double> linkIdHdvCount = time2HdvCountsPerLink.get(endOfTimeInterval);
 			Map<Id, Double[]> linkId2CountFiltered = new HashMap<Id, Double[]>();
 			for(Link link : network.getLinks().values()){
-				Coord linkCoord = link.getCoord();
-				Double xLink = linkCoord.getX();
-				Double yLink = linkCoord.getY();
-				if(xLink > xMin && xLink < xMax){
-					if(yLink > yMin && yLink < yMax){
 						Id linkId = link.getId();
+						if (isInMunichShape(linkId)) {
 						Double freeVelocity= link.getFreespeed();
 						Double length= link.getLength();
 						Double counts = linkId2Count.get(linkId);
@@ -198,7 +174,6 @@ public class AggregatingForLinkEmissions {
 						}
 					}
 				}
-			}
 			time2CountsTotalFiltered.put(endOfTimeInterval, linkId2CountFiltered);
 		}
 		return time2CountsTotalFiltered;
@@ -229,124 +204,134 @@ public class AggregatingForLinkEmissions {
 	}
 	
 	
-	private Map<Double, Map<Id, Map<String, Map<String, Double>>>> calculateEmissionsPerMeterSecond(
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered) {
+	private Map<Double, Map<Id, Map<String, Double>>> calculateEmissionsinMgPerMeterSecond(
+			Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
 
-		Map<Double, Map<Id, Map<String, Map<String, Double>>>> time2link2emissions2MeterSecond = new HashMap<Double, Map<Id, Map<String, Map<String, Double>>>>();
-
-		for (Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotalFilledAndFiltered.entrySet()) {
+		Map<Double, Map<Id, Map<String, Double>>> time2splitlinkId2emissions = new HashMap<Double, Map<Id, Map<String, Double>>>();
+		for (Entry<Double, Map<Id, SortedMap<String, Double>>> entry0 : time2EmissionsTotal.entrySet()) {
 			double endOfTimeInterval = entry0.getKey();
-			Map<Id, Map<String, Double>> linkId2Emissions = entry0.getValue();
+			Map<Id, SortedMap<String, Double>> linkId2Emissions = entry0.getValue();
 
-			Map<Id, Map<String, Map<String, Double>>> linkId2link2emissions2ms = new HashMap<Id, Map<String, Map<String, Double>>>();
-
-			for (Entry<Id, Map<String, Double>> entry1 : linkId2Emissions.entrySet()) {
+			Map<Id, Map<String, Double>> newlinkId2emissions = new HashMap<Id, Map<String, Double>>();
+			for (Entry<Id, SortedMap<String, Double>> entry1 : linkId2Emissions.entrySet()) {
 				Id linkId = entry1.getKey();
 				if (isInMunichShape(linkId)) {
-
+					
 					String linkString = linkId.toString();
 					String[] link;
 					String delimiter = "-";
-			
+				
 					link = linkString.split(delimiter);
-					
-					Map<String, Map<String, Double>> link2emissions2ms = new HashMap<String, Map<String, Double>>();
+					Map<Id, Map<String, Double>> splitlinkId2emissions = new HashMap<Id, Map<String, Double>>();
+					Map<Id, Map<String, Double>> testsplitlinkId2emissions = new HashMap<Id, Map<String, Double>>();
 					for (int i = 0; i < link.length; i++) {
 
-						Map<String, Double> emission2ms = new HashMap<String, Double>();
+						Map<String, Double> pollutant2emissions = new HashMap<String, Double>();
+						Map<String, Double> testpollutant2emissions = new HashMap<String, Double>();
+						
 						for (String pollutant : entry1.getValue().keySet()) {
 							Double emissions = entry1.getValue().get(pollutant);
+							testpollutant2emissions.put(pollutant, emissions);						
 							double linkLength_m = this.network.getLinks().get(linkId).getLength();
 							double emissionsPerM;
-							double emissionsPerMeterSecond;
-							emissionsPerM = emissions / linkLength_m;
-							emissionsPerMeterSecond = emissionsPerM / 3.6 * 100; // from 1%  to 100% sample
-							emission2ms.put(pollutant, emissionsPerMeterSecond);
+							double emissionsPerMs;
+							emissionsPerM = emissions / linkLength_m; //calculate emissions per meter
+							emissionsPerMs = emissionsPerM / 3.6 * 100; // calculate emissionsPerM per second, from g to mg, for the 100% sample
+							pollutant2emissions.put(pollutant, emissionsPerMs);
+							
+							if (entry1.getValue().get(pollutant)!= (testpollutant2emissions).get(pollutant)){
+								throw new RuntimeException("The orginal " + linkId + " doesn't show the same pollutant emissions as the splitlinkIds " +link[i]);
+							}
 						}
-						link2emissions2ms.put(link[i], emission2ms);
+						Id splitlinkId = new IdImpl(link[i]);
+						splitlinkId2emissions.put(splitlinkId, pollutant2emissions);
+						testsplitlinkId2emissions.put(splitlinkId, testpollutant2emissions);		
 					}
-					linkId2link2emissions2ms.put(linkId, link2emissions2ms);
+					newlinkId2emissions.putAll(splitlinkId2emissions);
 				}
 			}
-			time2link2emissions2MeterSecond.put(endOfTimeInterval,linkId2link2emissions2ms);
+			time2splitlinkId2emissions.put(endOfTimeInterval,newlinkId2emissions);
 		}
-		return time2link2emissions2MeterSecond;
+		return time2splitlinkId2emissions;
 	}
 	
-	private Map<Double, Map<Id, Map<String, Map<String, Double>>>> AggregateEmissionsSameLinkLocation(
-			Map<Double, Map<Id, Map<String, Map<String, Double>>>> time2linkId2splitLinkId2EmissionsMs) {
-		Map<Double, Map<Id, Map<String, Map<String, Double>>>> time2linkId2AggregateEmissions = new HashMap<Double, Map<Id, Map<String, Map<String, Double>>>>();
+	public Map<Double, Map<Id, Map<String, Double>>> aggregateEmissionsSameLinkLocation(
+			Map<Double, Map<Id, Map<String, Double>>> time2splitlinkId2emissions) {
+		Map<Double, Map<Id, Map<String, Double>>> time2SplitlinkId2AggregateEmissions = new HashMap<Double, Map<Id, Map<String, Double>>>();
 
-		for (Double endOfTimeInterval : time2linkId2splitLinkId2EmissionsMs.keySet()) {
-			Map<Id, Map<String, Map<String, Double>>> linkId2Emissions = time2linkId2splitLinkId2EmissionsMs.get(endOfTimeInterval);
-			Map<Id, Map<String, Map<String, Double>>> linkId2AggregateEmissions = new HashMap<Id, Map<String, Map<String, Double>>>();
+		for (Entry<Double, Map<Id, Map<String, Double>>> entry1: time2splitlinkId2emissions.entrySet()) {
+			double endOfTimeInterval = entry1.getKey();
+			Map<Id, Map<String, Double>> splitlinkId2Emissions = entry1.getValue();
+			Map<Id, Map<String, Double>> splitlinkId2AggregateEmissions = new HashMap<Id, Map<String, Double>>();
 
-			for (Entry<Id, Map<String, Map<String, Double>>> entry1 : linkId2Emissions.entrySet()) {
-				Id linkId = entry1.getKey();
-				Map<String, Map<String, Double>> linkId2SplitLinks = linkId2Emissions.get(linkId);
-				Map<String, Map<String, Double>> linkId2link2Emissions = new HashMap<String, Map<String, Double>>();
-
-				for (Entry<String, Map<String, Double>> entry2 : linkId2SplitLinks.entrySet()) {
-					String link = entry2.getKey();
-					Map<String, Double> emissionsAggregate = new HashMap<String, Double>();					
-					
-					if (!link.toString().contains("R")) {
-						String linkR = link + "R";
-					//	Id linkid = new IdImpl(linkR);
-	
-						if (linkId2SplitLinks.get(linkR) != null) {
-							Map<String, Double> emissionsSoFar = linkId2SplitLinks.get(linkR);
-								for (String pollutant : entry2.getValue().keySet()) {
-								Double emissions = entry2.getValue().get(pollutant);
-								Double previousValue = emissionsSoFar.get(pollutant);
-								Double newValue = previousValue + emissions;
-								emissionsAggregate.put(pollutant, newValue);
-								//if (link.equals("52799310"))
-								//	System.out.println("********wenn Richtung -rechts- vorhanden*********" + link+ " emissions " + emissions +" newValue "+newValue);
-							}
-							linkId2link2Emissions.put(link, emissionsAggregate);
-
-						} else {
-								for (String pollutant : entry2.getValue().keySet()) {
-									Double emissions = entry2.getValue().get(pollutant);
-									emissionsAggregate.put(pollutant, emissions);
-								}
-								linkId2link2Emissions.put(link,emissionsAggregate);
+			for (Entry<Id, Map<String, Double>> entry2 : splitlinkId2Emissions.entrySet()) {
+				Id splitlinkId = entry2.getKey();
+				Map<String, Double> emissionsAggregate = new HashMap<String, Double>();
+		
+				//	add a R to the link and check if this link+R exists in the map splitlinkId2Emissions
+				// if yes, add the emissions of the link+R to the emissions if the link
+				if (!splitlinkId.toString().contains("R")) {
+					String link = splitlinkId.toString();
+					String linkR = link + "R";
+					Id linkid = new IdImpl(linkR);
+					splitlinkId = linkid;
+				
+					if (splitlinkId2Emissions.get(splitlinkId) != null) {
+						Map<String, Double> emissionsSoFar = splitlinkId2Emissions.get(splitlinkId);
+						for (String pollutant : entry2.getValue().keySet()) {
+							Double emissions = entry2.getValue().get(pollutant);
+							Double previousValue = emissionsSoFar.get(pollutant);
+							Double newValue = previousValue + emissions;
+							emissionsAggregate.put(pollutant, newValue);
 						}
-					}
+						splitlinkId2AggregateEmissions.put(splitlinkId,emissionsAggregate);
+					} else {
 
-					else {
-						String linkL;
-						linkL = link.replaceAll("R", "");
-						if (linkId2SplitLinks.get(linkL) != null) {
-							Map<String, Double> emissionsSoFar = linkId2SplitLinks.get(linkL);
-
-							for (String pollutant : entry2.getValue().keySet()) {
-								Double emissions = entry2.getValue().get(pollutant);
-								Double previousValue = emissionsSoFar.get(pollutant);
-								Double newValue = previousValue + emissions;
-								emissionsAggregate.put(pollutant, newValue);
-							//	if (link.equals("586891439R"))
-							//	System.out.println("********wenn Richtung -links- vorhanden*********" + link + " emissions " + emissions +" newValue "+newValue);
-							}
-							linkId2link2Emissions.put(link, emissionsAggregate);
-						} else {
-								for (String pollutant : entry2.getValue().keySet()) {
-									Double emissions = entry2.getValue().get(pollutant);
-									emissionsAggregate.put(pollutant, emissions);
-								}
-								linkId2link2Emissions.put(link,emissionsAggregate);
+						for (String pollutant : entry2.getValue().keySet()) {
+							Double emissions = entry2.getValue().get(pollutant);
+							emissionsAggregate.put(pollutant, emissions);
 						}
+						splitlinkId2AggregateEmissions.put(splitlinkId,emissionsAggregate);
 					}
 				}
-				linkId2AggregateEmissions.put(linkId, linkId2link2Emissions);
+				//	delete the R of a link and check if this link-R exists in the map splitlinkId2Emissions
+				// if yes, add the emissions of the link+R to the emissions if the link
+				else {
+					String link = splitlinkId.toString();
+					String linkL = link.replaceAll("R", "");
+					Id linkid = new IdImpl(linkL);
+					splitlinkId = linkid;
+					if (splitlinkId2Emissions.get(splitlinkId) != null) {
+						Map<String, Double> emissionsSoFar = splitlinkId2Emissions.get(splitlinkId);
+
+						for (String pollutant : entry2.getValue().keySet()) {
+							Double emissions = entry2.getValue().get(pollutant);
+							Double previousValue = emissionsSoFar
+									.get(pollutant);
+							Double newValue = previousValue + emissions;
+							emissionsAggregate.put(pollutant, newValue);
+						}
+						splitlinkId2AggregateEmissions.put(splitlinkId,emissionsAggregate);
+					} else {
+						for (String pollutant : entry2.getValue().keySet()) {
+							Double emissions = entry2.getValue().get(pollutant);
+							emissionsAggregate.put(pollutant, emissions);
+						}
+						splitlinkId2AggregateEmissions.put(splitlinkId,emissionsAggregate);
+					}
+				}
 			}
-			time2linkId2AggregateEmissions.put(endOfTimeInterval,
-					linkId2AggregateEmissions);
+			if (splitlinkId2Emissions.size() !=splitlinkId2AggregateEmissions.size()){
+				throw new RuntimeException("The map splitlinkId2Emissions with size "+ splitlinkId2Emissions.size() +" has a different size than "+
+			"splitlinkId2AggregateEmissions with size " +splitlinkId2AggregateEmissions.size());
 		}
-		return time2linkId2AggregateEmissions;
+			time2SplitlinkId2AggregateEmissions.put(endOfTimeInterval, splitlinkId2AggregateEmissions);
+		}
+		return time2SplitlinkId2AggregateEmissions;
 	}
-			
+				
+	
+		
 	
 	private boolean isInMunichShape(Id linkId) {
 		boolean isInMunichShape = false;

@@ -20,32 +20,27 @@ public class EmissionWriter {
 
 	public void writeHour2Link2Emissions(
 			SortedSet<String> listOfPollutants,
-			Map<Double,Map<Id,Map<String,Map<String, Double>>>> time2EmissionMapToAnalyze,
+			Map<Double,Map<Id,Map<String, Double>>> time2EmissionMapToAnalyze,
 			Network network,
 			String outFile){
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.append("hour \t linkId \t link\t");
+			out.append("hour \t linkId \t");
 			for (String pollutant : listOfPollutants){
 				out.append(pollutant + "\t");
 			}
 			out.append("\n");
 			for (Double endOfTimeInterval : time2EmissionMapToAnalyze.keySet()){
-				Map<Id,Map<String,Map<String, Double>>> time2value = time2EmissionMapToAnalyze.get(endOfTimeInterval);
+				Map<Id,Map<String,Double>> time2value = time2EmissionMapToAnalyze.get(endOfTimeInterval);
 				for(Id linkId : time2value.keySet()){
-					Map<String,Map<String, Double>> linkId2value = time2value.get(linkId);
-					for (String link:linkId2value.keySet()){
-				
-						out.append(endOfTimeInterval/3600 +"\t"+ linkId +"\t" + link +"\t");
-
-							Map<String, Double> splitlink2value = linkId2value.get(link);
+					Map<String, Double> linkId2value = time2value.get(linkId);
+						out.append(endOfTimeInterval/3600 +"\t"+ linkId +"\t");
 							for(String pollutant : listOfPollutants){
-							out.append(splitlink2value.get(pollutant) + "\t");
+							out.append(linkId2value.get(pollutant) + "\t");
 							}
 							out.append("\n");
 					}	
-				}
 			}
 			//Close the output stream
 			out.close();
