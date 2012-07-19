@@ -13,9 +13,9 @@ distInfoBaCFile <- file.path(directory,"detailedCarDistanceInformation_baseCase_
 distInfoPriFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing.txt")
 distInfoZ30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30.txt")
 
-distInfoBaC <- read.table(file = distInfoBaCFile, header=T, sep = "\t")
-distInfoZ30 <- read.table(file = distInfoZ30File, header=T, sep = "\t")
-distInfoPri <- read.table(file = distInfoPriFile, header=T, sep = "\t")
+distInfoBaC <- read.table(file = distInfoBaCFile, header=T, sep = "\t", comment.char="")
+distInfoZ30 <- read.table(file = distInfoZ30File, header=T, sep = "\t", comment.char="")
+distInfoPri <- read.table(file = distInfoPriFile, header=T, sep = "\t", comment.char="")
 
 outFileUrban <- file.path(commandArgs()[4], "plotDetailedCarTripDistance_withoutOutline.pdf")
 
@@ -23,20 +23,20 @@ pdf(outFileUrban, width=7, height=7)
 
 for(group in groupOrder){
 
-distInfoBaCgroup<-distInfoBaC[(distInfoBaC$usergroup==group),]
-distInfoZ30group<-distInfoZ30[(distInfoZ30$usergroup==group),] 
-distInfoPrigroup<-distInfoPri[(distInfoPri$usergroup==group),]
+distInfoBaCgroup<-distInfoBaC[(distInfoBaC$user.group==group),]
+distInfoZ30group<-distInfoZ30[(distInfoZ30$user.group==group),] 
+distInfoPrigroup<-distInfoPri[(distInfoPri$user.group==group),]
 
 #base case
-boxplot(distInfoBaCgroup$totalcardistance, notch = F, outline = F, boxwex = 0.3, col=groupColors[1], 
+boxplot(distInfoBaCgroup$total.car.distance..km., notch = F, outline = F, boxwex = 0.3, col=groupColors[1], 
 main= "Car distance", xlab=c(paste("User group", group),"Base Case, Zone 30, Pricing"), ylab="distance in km", at=1:1-0.3)
-boxplot(distInfoZ30group$totalcardistance, notch = F, outline = F, boxwex = 0.3, col=groupColors[2], add=T, at=1:1+0.0)
-boxplot(distInfoPrigroup$totalcardistance, notch = F, outline = F, boxwex = 0.3, col=groupColors[3], add=T, at=1:1+0.3)
+boxplot(distInfoZ30group$total.car.distance..km., notch = F, outline = F, boxwex = 0.3, col=groupColors[2], add=T, at=1:1+0.0)
+boxplot(distInfoPrigroup$total.car.distance..km., notch = F, outline = F, boxwex = 0.3, col=groupColors[3], add=T, at=1:1+0.3)
 
 #means
-aline <- tapply(distInfoBaCgroup$totalcardistance, distInfoBaCgroup$usergroup==group ,mean)
-bline <- tapply(distInfoZ30group$totalcardistance, distInfoZ30group$usergroup==group ,mean)
-cline <- tapply(distInfoPrigroup$totalcardistance, distInfoPrigroup$usergroup==group ,mean)
+aline <- tapply(distInfoBaCgroup$total.car.distance..km., distInfoBaCgroup$user.group==group ,mean)
+bline <- tapply(distInfoZ30group$total.car.distance..km., distInfoZ30group$user.group==group ,mean)
+cline <- tapply(distInfoPrigroup$total.car.distance..km., distInfoPrigroup$user.group==group ,mean)
 
 #draw means as lines
 segments(seq(along = aline) - 0.4, aline, seq(along = aline) - 0.2, aline, lwd = 2, col = meanColor[1]) 
