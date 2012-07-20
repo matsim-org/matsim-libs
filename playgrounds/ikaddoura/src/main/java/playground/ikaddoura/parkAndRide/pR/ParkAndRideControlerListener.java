@@ -28,12 +28,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
+import playground.ikaddoura.parkAndRide.pRstrategy.PlanStrategyImpl_pr;
+import playground.ikaddoura.parkAndRide.pRstrategy.PlanStrategyImpl_work;
 import playground.ikaddoura.parkAndRide.pRstrategy.PrWeight;
 import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideAddRemoveStrategy;
 import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideChangeLocationStrategy;
@@ -72,17 +73,17 @@ public class ParkAndRideControlerListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		event.getControler().getEvents().addHandler(adaptiveControl);
 		
-		PlanStrategy strategyAddRemove = new PlanStrategyImpl(new RandomPlanSelector());
+		PlanStrategy strategyAddRemove = new PlanStrategyImpl_work(new RandomPlanSelector());
 		strategyAddRemove.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategyAddRemove.addStrategyModule(new ParkAndRideAddRemoveStrategy(controler, id2prFacility, personId2prWeights)); // only if car is available: P+R added (if plan doesn't contain P+R) or P+R removed (if plan contains P+R)
 		strategyAddRemove.addStrategyModule(new ReRoute(controler));
 		
-		PlanStrategy strategyChangeLocation = new PlanStrategyImpl(new RandomPlanSelector());
+		PlanStrategy strategyChangeLocation = new PlanStrategyImpl_pr(new RandomPlanSelector());
 		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
 		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights)); // if plan contains P+R: change to other P+R location
 		strategyChangeLocation.addStrategyModule(new ReRoute(controler));
 		
-		PlanStrategy strategyTimeAllocation = new PlanStrategyImpl(new RandomPlanSelector());
+		PlanStrategy strategyTimeAllocation = new PlanStrategyImpl_work(new RandomPlanSelector());
 		strategyTimeAllocation.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig())); // TimeAllocation, not changing "parkAndRide" and "pt interaction"
 		strategyTimeAllocation.addStrategyModule(new ReRoute(controler));
 
