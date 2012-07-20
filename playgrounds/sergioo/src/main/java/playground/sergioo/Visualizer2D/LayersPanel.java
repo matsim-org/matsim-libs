@@ -15,8 +15,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import org.matsim.api.core.v01.Coord;
-
 public abstract class LayersPanel extends JPanel {
 	
 	/**
@@ -26,15 +24,12 @@ public abstract class LayersPanel extends JPanel {
 	
 	//Attributes
 	protected Color backgroundColor = Color.WHITE;
-	protected final Camera camera;
+	protected Camera camera;
 	private final List<Layer> layers;
-	private int width;
-	private int height;
 	private double xMax;
 	private double yMax;
 	private double xMin;
 	private double yMin;
-	private int frameSize=10;
 	protected byte activeLayer = -1;
 	protected byte principalLayer = -1;
 	private int yAnt;
@@ -44,7 +39,7 @@ public abstract class LayersPanel extends JPanel {
 	//Methods
 	public LayersPanel() {
 		layers = new ArrayList<Layer>();
-		camera = new Camera();
+		camera = new Camera2D();
 	}
 	@Override
 	public void setBounds(int x, int y, int width, int height) {
@@ -57,8 +52,11 @@ public abstract class LayersPanel extends JPanel {
 	public Camera getCamera() {
 		return camera;
 	}
-	public void centerCamera(Coord coord) {
-		camera.centerCamera(coord.getX(), coord.getY());
+	public void setCamera(Camera camera) {
+		this.camera = camera;
+	}
+	public void centerCamera(double[] coord) {
+		camera.centerCamera(coord);
 	}
 	protected Collection<Layer> getAllLayers() {
 		return layers;
@@ -120,9 +118,6 @@ public abstract class LayersPanel extends JPanel {
 		layers.set(positionA, layers.get(positionB));
 		layers.set(positionB, temporalLayer);
 	}
-	public void setFrameSize(int frameSize) {
-		this.frameSize = frameSize;
-	}
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -134,11 +129,11 @@ public abstract class LayersPanel extends JPanel {
 				e.printStackTrace();
 			}
 	}
-	protected void calculateBoundaries(Collection<Coord> coords) {
+	protected void calculateBoundaries(Collection<double[]> coords) {
 		xMin=Double.POSITIVE_INFINITY; yMin=Double.POSITIVE_INFINITY; xMax=Double.NEGATIVE_INFINITY; yMax=Double.NEGATIVE_INFINITY;
-		for(Coord coord:coords) {
-			double x = coord.getX();
-			double y = coord.getY();
+		for(double[] coord:coords) {
+			double x = coord[0];
+			double y = coord[1];
 			if(x<xMin)
 				xMin = x;
 			if(x>xMax)
@@ -158,9 +153,7 @@ public abstract class LayersPanel extends JPanel {
 		setPreferredSize(new Dimension(widthInt, heightInt));
 	}
 	void setAspectRatio() {
-		width = getWidth()-2*frameSize;
-		height = getHeight()-2*frameSize;
-		double aspectRatioPanel = ((double)width)/((double)height);
+		double aspectRatioPanel = camera.setAspectRatio(getWidth(), getHeight());
 		double aspectRatioWorld = (xMax-xMin)/(yMax-yMin);
 		double cXMin = xMin, cYMin = yMin, cXMax = xMax, cYMax = yMax;
 		if(aspectRatioWorld>aspectRatioPanel) {
@@ -189,7 +182,7 @@ public abstract class LayersPanel extends JPanel {
 	}
 	protected void saveImage(String type, File file, int width, int height) {
 		Image windowImage = this.createImage(width, height);
-		Camera camera = new Camera();
+		Camera camera = new Camera2D();
 		camera.copyCamera(this.camera);
 		this.setSize(new Dimension(width, height));
 		this.camera.copyCamera(camera);
@@ -204,17 +197,14 @@ public abstract class LayersPanel extends JPanel {
 	public void viewAll() {
 		setAspectRatio();
 	}
-	public int getScreenX(double x) {
-		return (int) ((x-camera.getUpLeftCorner().getX())*width/camera.getSize().getX())+(getWidth()-width)/2;
+	public int[] getScreenXY(double[] point) {
+		return camera.getScreenXY(point);
 	}
-	public int getScreenY(double y) {
-		return (int) ((y-camera.getUpLeftCorner().getY())*height/camera.getSize().getY())+(getHeight()-height)/2;
+	public double[] getWorld(int x, int y) {
+		return camera.getWorld(x, y);
 	}
-	public double getWorldX(int x) {
-		return (x-(getWidth()-width)/2)*camera.getSize().getX()/width+camera.getUpLeftCorner().getX();
+	public double getWorldDistance(int d) {
+		return camera.getWorldDistance(d);
 	}
-	public double getWorldY(int y) {
-		return (y-(getHeight()-height)/2)*camera.getSize().getY()/height+camera.getUpLeftCorner().getY();
-	}
-	
+
 }

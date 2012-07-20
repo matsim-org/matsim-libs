@@ -15,6 +15,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -45,12 +46,14 @@ public class NetworksShpXmlMatcherMain {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		Network networkLowResolution = getNetworkFromShapeFileLength(args[1]);
-		Network networkHighResolution = scenario.getNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolution.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
+		new NetworkWriter(networkLowResolution).write("./data/forPieter.xml");
+		return;
+		/*Network networkHighResolution = scenario.getNetwork();
 		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", new NetworkNodesPainter(networkHighResolution, Color.BLACK, Color.CYAN), new NetworkNodesPainter(networkLowResolution, Color.BLACK, Color.CYAN));
-		windowHR.setVisible(true);*/
+		windowHR.setVisible(true);
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
 		MatchingProcess matchingProcess = new MatchingProcess(modes);
@@ -65,7 +68,7 @@ public class NetworksShpXmlMatcherMain {
 				e.printStackTrace();
 			}
 		matchingProcess.applyProperties(false);
-		System.out.println(networkHighResolution.getLinks().size()+" "+networkLowResolution.getLinks().size());
+		System.out.println(networkHighResolution.getLinks().size()+" "+networkLowResolution.getLinks().size());*/
 	}
 
 

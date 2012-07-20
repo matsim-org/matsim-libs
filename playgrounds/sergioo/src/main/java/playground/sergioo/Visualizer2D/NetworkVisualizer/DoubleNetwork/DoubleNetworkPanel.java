@@ -4,7 +4,6 @@ import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.Visualizer2D.Layer;
@@ -29,12 +28,12 @@ public class DoubleNetworkPanel extends LayersPanel {
 		setFocusable(true);
 	}
 	private void calculateBoundaries() {
-		Collection<Coord> coords = new ArrayList<Coord>();
+		Collection<double[]> coords = new ArrayList<double[]>();
 		for(Layer layer:getAllLayers())
 			for(Link link:((NetworkPainter)layer.getPainter()).getNetwork().getLinks().values()) {
 				if(link!=null) {
-					coords.add(link.getFromNode().getCoord());
-					coords.add(link.getToNode().getCoord());
+					coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
+					coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
 				}
 			}
 		super.calculateBoundaries(coords);

@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -194,7 +193,9 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 		this.weight = weight;
 	}
 	protected void paintLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, double pointSize, Color color) {
-		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()), stroke, color);
+		double[] from = new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()};
+		double[] to = new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()};
+		paintLine(g2, layersPanel, new Tuple<double[], double[]>(from, to), stroke, color);
 		//paintCircle(g2,link.getToNode().getCoord(), pointSize, color);
 	}
 	

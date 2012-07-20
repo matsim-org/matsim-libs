@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.sergioo.Visualizer2D.LayersPanel;
@@ -18,13 +17,13 @@ public class ArrowsPainter extends Painter {
 	
 	
 	//Attributes
-	private List<Tuple<Coord,Coord>> arrows = new ArrayList<Tuple<Coord,Coord>>();
+	private List<Tuple<double[], double[]>> arrows = new ArrayList<Tuple<double[], double[]>>();
 	private List<Color> colors = new ArrayList<Color>();
-	private double longArrow = 30;
+	private int longArrow = 5;
 	private double angle = Math.PI/6;
 	//Methods
-	public void addLine(Coord pointA, Coord pointB) {
-		arrows.add(new Tuple<Coord, Coord>(pointA, pointB));
+	public void addLine(double[] pointA, double[] pointB) {
+		arrows.add(new Tuple<double[], double[]>(pointA, pointB));
 	}
 	public void addColor(Color color) {
 		colors.add(color);
@@ -32,7 +31,7 @@ public class ArrowsPainter extends Painter {
 	public void clearLines() {
 		arrows.clear();
 	}
-	public void setLongArrow(double longArrow) {
+	public void setLongArrow(int longArrow) {
 		this.longArrow = longArrow;
 	}
 	public void setAngle(double angle) {
@@ -43,12 +42,12 @@ public class ArrowsPainter extends Painter {
 		Stroke stroke = new BasicStroke(0.5f);
 		if(colors.size() == arrows.size()) {
 			Iterator<Color> colorsI = colors.iterator();
-			for(Tuple<Coord, Coord> line:arrows)
-				paintArrow(g2, layersPanel, line, angle, longArrow, stroke, colorsI.next());
+			for(Tuple<double[], double[]> line:arrows)
+				paintArrow(g2, layersPanel, line, angle, layersPanel.getWorldDistance(longArrow), stroke, colorsI.next());
 		}
 		else
-			for(Tuple<Coord, Coord> line:arrows)
-				paintArrow(g2, layersPanel, line, angle, longArrow, stroke, Color.RED);
+			for(Tuple<double[], double[]> line:arrows)
+				paintArrow(g2, layersPanel, line, angle, layersPanel.getWorldDistance(longArrow), stroke, Color.RED);
 	}
 
 }

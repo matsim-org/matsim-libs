@@ -121,30 +121,35 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	public void selectLink(String id) {
 		Link link = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(id);
 		if(link!=null)
-			doubleNetworkWindow.centerCamera(link.getCoord());
+			doubleNetworkWindow.centerCamera(new double[]{link.getCoord().getX(), link.getCoord().getY()});
 	}
 	public void selectNode(String id) {
 		Node node = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(id);
 		if(node!=null)
-			doubleNetworkWindow.centerCamera(node.getCoord());
+			doubleNetworkWindow.centerCamera(new double[]{node.getCoord().getX(), node.getCoord().getY()});
 	}
 	public Collection<? extends Link> getLinks() {
 		return ((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).getLinks();
 	}
 	public void setLinksLayer(Set<Link> wrongLinks) {
 		((LinesPainter)getLayer(2).getPainter()).clearLines();
-		for(Link link: wrongLinks)
-			((LinesPainter)getLayer(2).getPainter()).addLine(link.getFromNode().getCoord(), link.getToNode().getCoord());
+		for(Link link: wrongLinks) {
+			Coord coord = link.getFromNode().getCoord();
+			double[] pointF = new double[]{coord.getX(), coord.getY()};
+			coord = link.getToNode().getCoord();
+			double[] pointT = new double[]{coord.getX(), coord.getY()};
+			((LinesPainter)getLayer(2).getPainter()).addLine(pointF, pointT);
+		}
 	}
 	public void clearNodesSelection() {
 		((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).clearNodesSelection();
 	}
 	private void calculateBoundaries() {
-		Collection<Coord> coords = new ArrayList<Coord>();
-		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetwork().getLinks().values()) {
+		Collection<double[]> coords = new ArrayList<double[]>();
+		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
-				coords.add(link.getFromNode().getCoord());
-				coords.add(link.getToNode().getCoord());
+				coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
+				coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
 			}
 		}
 		super.calculateBoundaries(coords);
@@ -168,11 +173,12 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		doubleNetworkWindow.setActivePanel(this);
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(p[0], p[1]);
 				doubleNetworkWindow.refreshLabel(Labels.LINK);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
@@ -180,19 +186,19 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 				doubleNetworkWindow.refreshLabel(Labels.LINK);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNearestNode(p[0], p[1]);
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNearestNode(p[0], p[1]);
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 				doubleNetworkWindow.cameraChange(camera);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3) {
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 				doubleNetworkWindow.cameraChange(camera);
 			}
 		}
@@ -220,7 +226,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
+		camera.move(iniX-e.getX(), iniY-e.getY());
 		iniX = e.getX();
 		iniY = e.getY();
 		doubleNetworkWindow.cameraChange(camera);
@@ -228,7 +234,8 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		doubleNetworkWindow.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+		double[] p = getWorld(e.getX(), e.getY());
+		doubleNetworkWindow.setCoords(p[0], p[1]);
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {

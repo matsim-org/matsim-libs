@@ -121,7 +121,7 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 	CoordinateTransformation coordinateTransformation;
 	
 	//Methods
-	public BusLaneAdderWindow(String title, Network network, File imageFile, Coord upLeft, Coord downRight, String finalNetworkFile, CoordinateTransformation coordinateTransformation) throws IOException {
+	public BusLaneAdderWindow(String title, Network network, File imageFile, double[] upLeft, double[] downRight, String finalNetworkFile, CoordinateTransformation coordinateTransformation) throws IOException {
 		setTitle(title);
 		this.finalNetworkFile = finalNetworkFile;
 		this.network = network;
@@ -281,7 +281,9 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
-		new BusLaneAdderWindow("Bus lanes adder", scenario.getNetwork(), new File(args[1]), coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[2]), Double.parseDouble(args[3]))), coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[4]), Double.parseDouble(args[5]))),args[6], coordinateTransformation).setVisible(true);
+		Coord c1 = coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[2]), Double.parseDouble(args[3])));
+		Coord c2 = coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[4]), Double.parseDouble(args[5])));
+		new BusLaneAdderWindow("Bus lanes adder", scenario.getNetwork(), new File(args[1]), new double[]{c1.getX(), c1.getY()}, new double[]{c2.getX(), c2.getY()}, args[6], coordinateTransformation).setVisible(true);
 	}
 
 }

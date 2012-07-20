@@ -43,7 +43,6 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -314,7 +313,7 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 					((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).selectNode(res);
 		}
 	}
-	public void centerCamera(Coord coord) {
+	public void centerCamera(double[] coord) {
 		layersPanels.get(PanelIds.A).centerCamera(coord);
 		layersPanels.get(PanelIds.B).centerCamera(coord);
 	}

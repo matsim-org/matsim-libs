@@ -30,8 +30,10 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.PersonEntersTransitVehicleEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersTransitVehicleEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -40,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.population.routes.GenericRoute;
 
 
-public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentStuckEventHandler {
+public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, PersonEntersVehicleEventHandler, PersonEntersTransitVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentStuckEventHandler {
 
 	//Constants
 	private static final NumberFormat numberFormat = new DecimalFormat("00.0");
@@ -50,7 +52,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	private EventsManager eventsManager;
 
 	//Constructors
-	public ActivitiesAnalyzer(String networkFile, String plansFile, String eventsFile, String noHomeFileLocation) throws FileNotFoundException {
+	public ChainsAnalyzer(String networkFile, String plansFile, String eventsFile, String noHomeFileLocation) throws FileNotFoundException {
 		activityChains = new HashMap<Id, List<String>>();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse(networkFile);
@@ -110,7 +112,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 			activityChain = new ArrayList<String>();
 			activityChains.put(event.getPersonId(), activityChain);
 		}
-		activityChain.add("-"+event.getActType());
+		activityChain.add("@"+event.getActType());
 	}
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
@@ -118,7 +120,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 		if(activityChain!=null || event.getActType().equals("home"))
 			if(activityChain==null) {
 				activityChain = new ArrayList<String>();
-				activityChain.add("-"+event.getActType()+"("+numberFormat.format(event.getTime()/3600)+")");
+				activityChain.add("@"+event.getActType()+"("+numberFormat.format(event.getTime()/3600)+")");
 				activityChains.put(event.getPersonId(), activityChain);
 			}
 			else {
@@ -159,8 +161,8 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 		if(activityChain!=null) {
 			String lastLeg = activityChain.get(activityChain.size()-1);
 			if(lastLeg.startsWith("*"))
-				if(lastLeg.endsWith("+"))
-					activityChain.set(activityChain.size()-1, lastLeg+"+");
+				if(lastLeg.endsWith("+") || lastLeg.endsWith("+t"))
+					activityChain.set(activityChain.size()-1, lastLeg+"-");
 				else
 					throw new RuntimeException("Leave vehicle without enter");
 			else
@@ -171,11 +173,26 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	}
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if(!(event instanceof PersonEntersTransitVehicleEvent)) {
+			List<String> activityChain = activityChains.get(event.getPersonId());
+			if(activityChain!=null) {
+				String lastLeg = activityChain.get(activityChain.size()-1);
+				if(lastLeg.startsWith("*"))
+					activityChain.set(activityChain.size()-1, lastLeg+"+");
+				else
+					throw new RuntimeException("Enter vehicle without departure");
+			}
+			else
+				throw new RuntimeException("Enter vehicle without person");
+		}
+	}
+	@Override
+	public void handleEvent(PersonEntersTransitVehicleEvent event) {
 		List<String> activityChain = activityChains.get(event.getPersonId());
 		if(activityChain!=null) {
 			String lastLeg = activityChain.get(activityChain.size()-1);
 			if(lastLeg.startsWith("*"))
-				activityChain.set(activityChain.size()-1, lastLeg+"+");
+				activityChain.set(activityChain.size()-1, lastLeg+"+t");
 			else
 				throw new RuntimeException("Enter vehicle without departure");
 		}
@@ -186,7 +203,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	public void handleEvent(AgentStuckEvent event) {
 		List<String> activityChain = activityChains.get(event.getPersonId());
 		if(activityChain!=null)
-			activityChain.add("%%%");
+			activityChain.add("%%%("+numberFormat.format(event.getTime()/3600)+")");
 		else
 			throw new RuntimeException("Enter vehicle without person");
 	}
@@ -200,7 +217,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	 * @throws FileNotFoundException 
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
-		new ActivitiesAnalyzer(args[0], args[1], args[2], args[3]);
+		new ChainsAnalyzer(args[0], args[1], args[2], args[3]);
 		/*Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse("./input/network/singapore6.xml");
 		System.out.println("Memory 1: "+(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()));

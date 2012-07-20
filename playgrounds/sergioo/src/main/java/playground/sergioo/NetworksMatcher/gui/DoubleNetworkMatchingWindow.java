@@ -405,7 +405,8 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 				else {
 					JOptionPane.showMessageDialog(this, "No, "+wrongLinks.size()+" links");
 					((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setLinksLayer(wrongLinks);
-					centerCamera(wrongLinks.iterator().next().getCoord());
+					Coord center = wrongLinks.iterator().next().getCoord();
+					centerCamera(new double[]{center.getX(), center.getY()});
 				}
 			}
 			else
@@ -436,7 +437,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		}
 		return null;
 	}
-	public void centerCamera(Coord coord) {
+	public void centerCamera(double[] coord) {
 		layersPanels.get(PanelIds.A).centerCamera(coord);
 		layersPanels.get(PanelIds.B).centerCamera(coord);
 	}

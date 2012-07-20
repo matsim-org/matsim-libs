@@ -33,8 +33,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.matsim.api.core.v01.Coord;
-
 import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
@@ -121,7 +119,7 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 		this.add(infoPanel, BorderLayout.SOUTH);
 		setSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 	}
-	public PublicTransportNetworkWindow(String title, NetworkPainter networkPainter, File imageFile, Coord upLeft, Coord downRight) throws IOException {
+	public PublicTransportNetworkWindow(String title, NetworkPainter networkPainter, File imageFile, double[] upLeft, double[] downRight) throws IOException {
 		setTitle(title);
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);

@@ -41,16 +41,18 @@ public class NetworkPainterManager {
 	}
 	public Collection<? extends Link> getNetworkLinks(Camera camera) throws Exception {
 		if(camera!=null) {
-			double xMin = camera.getUpLeftCorner().getX();
-			double yMin = camera.getUpLeftCorner().getY()+camera.getSize().getY();
-			double xMax = camera.getUpLeftCorner().getX()+camera.getSize().getX();
-			double yMax = camera.getUpLeftCorner().getY();
 			Collection<Link> links =  new HashSet<Link>();
+			double[] from = new double[2];
+			double[] to = new double[2];
+			double[] center = new double[2];
 			for(Link link:network.getLinks().values()) {
-				Coord from = link.getFromNode().getCoord();
-				Coord to = link.getToNode().getCoord();
-				Coord center = link.getCoord();
-				if((xMin<from.getX() && yMin<from.getY() && xMax>from.getX() && yMax>from.getY()) || (xMin<to.getX() && yMin<to.getY() && xMax>to.getX() && yMax>to.getY())|| (xMin<center.getX() && yMin<center.getY() && xMax>center.getX() && yMax>center.getY()))
+				from[0] = link.getFromNode().getCoord().getX();
+				from[1] = link.getFromNode().getCoord().getY();
+				to[0] = link.getToNode().getCoord().getX();
+				to[1] = link.getToNode().getCoord().getY();
+				center[0] = link.getCoord().getX();
+				center[1] = link.getCoord().getY();
+				if(camera.isInside(from) || camera.isInside(to) || camera.isInside(center))
 					links.add(link);
 			}
 			return links;
@@ -60,14 +62,10 @@ public class NetworkPainterManager {
 	}
 	public Collection<? extends Node> getNetworkNodes(Camera camera) throws Exception {
 		if(camera!=null) {
-			double xMin = camera.getUpLeftCorner().getX();
-			double yMin = camera.getUpLeftCorner().getY()+camera.getSize().getY();
-			double xMax = camera.getUpLeftCorner().getX()+camera.getSize().getX();
-			double yMax = camera.getUpLeftCorner().getY();
 			Collection<Node> nodes =  new HashSet<Node>();
 			for(Node node:network.getNodes().values()) {
-				Coord point = node.getCoord();
-				if(xMin<point.getX()&&yMin<point.getY()&&xMax>point.getX()&&yMax>point.getY())
+				double[] point = new double[]{node.getCoord().getX(), node.getCoord().getY()};
+				if(camera.isInside(point))
 					nodes.add(node);
 			}
 			return nodes;
@@ -170,6 +168,10 @@ public class NetworkPainterManager {
 	}
 	public void selectLinks(Collection<Link> links) {
 		selectedLinks.addAll(links);
+	}
+	public void selectLinkIds(Collection<Id> linkIds) {
+		for(Id linkId:linkIds)
+			selectedLinks.add(network.getLinks().get(linkId));
 	}
 	public void addLink(double x, double y) {
 		selectedLinks.add(network.getLinks().get(getIdNearestLink(x, y)));

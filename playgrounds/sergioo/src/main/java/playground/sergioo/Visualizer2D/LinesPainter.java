@@ -7,7 +7,6 @@ import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.sergioo.Visualizer2D.LayersPanel;
@@ -17,11 +16,11 @@ public class LinesPainter extends Painter {
 	
 	
 	//Attributes
-	private Collection<Tuple<Coord,Coord>> lines = new ArrayList<Tuple<Coord,Coord>>();
+	private Collection<Tuple<double[], double[]>> lines = new ArrayList<Tuple<double[], double[]>>();
 	
 	//Methods
-	public void addLine(Coord pointA, Coord pointB) {
-		lines.add(new Tuple<Coord, Coord>(pointA, pointB));
+	public void addLine(double[] pointA, double[] pointB) {
+		lines.add(new Tuple<double[], double[]>(pointA, pointB));
 	}
 	public void clearLines() {
 		lines.clear();
@@ -29,7 +28,7 @@ public class LinesPainter extends Painter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		Stroke stroke = new BasicStroke(2);
-		for(Tuple<Coord, Coord> line:lines)
+		for(Tuple<double[], double[]> line:lines)
 			paintLine(g2, layersPanel, line, stroke, Color.PINK);
 	}
 

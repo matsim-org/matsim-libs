@@ -1,22 +1,25 @@
-package playground.sergioo.passivePlanning.core.mobsim.passivePlanning;
+package playground.sergioo.passivePlanning.core.mobsim.passivePlanning.agents;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.households.Household;
 
 import playground.sergioo.passivePlanning.api.population.EmptyActivity;
 import playground.sergioo.passivePlanning.core.mobsim.passivePlanning.definitions.SinglePlannerAgentImpl;
 import playground.sergioo.passivePlanning.core.population.decisionMakers.SocialDecisionMaker;
 import playground.sergioo.passivePlanning.core.population.decisionMakers.types.DecisionMaker;
+import playground.sergioo.passivePlanning.core.scenario.ScenarioSimplerNetwork;
 
-public class SinglePlannerAgentSocial extends SinglePlannerAgentImpl {
+public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 
 	//Constructors
-	public SinglePlannerAgentSocial(SocialDecisionMaker socialDecisionMaker, Plan plan) {
-		super(new DecisionMaker[]{socialDecisionMaker}, plan);
+	public SinglePlannerSocialAgent(ScenarioSimplerNetwork scenario, Household household, IntermodalLeastCostPathCalculator leastCostPathCalculator, Plan plan) {
+		super(new DecisionMaker[]{new SocialDecisionMaker(scenario, household, leastCostPathCalculator)}, plan);
 	}
 
 	//Methods
@@ -34,7 +37,5 @@ public class SinglePlannerAgentSocial extends SinglePlannerAgentImpl {
 		activity.setEndTime(socialDecisionMaker.decideEndTime());
 		return new Tuple<Leg, Activity>(leg, activity);
 	}
-
-	
 
 }

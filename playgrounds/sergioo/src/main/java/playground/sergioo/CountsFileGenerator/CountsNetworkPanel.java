@@ -31,11 +31,12 @@ public class CountsNetworkPanel extends NetworkPanel {
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(p[0], p[1]);
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
@@ -43,7 +44,7 @@ public class CountsNetworkPanel extends NetworkPanel {
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(p[0], p[1]);
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
@@ -51,9 +52,9 @@ public class CountsNetworkPanel extends NetworkPanel {
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 		}
 		repaint();
 	}

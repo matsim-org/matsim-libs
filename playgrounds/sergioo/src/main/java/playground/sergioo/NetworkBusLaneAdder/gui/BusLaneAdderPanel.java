@@ -80,7 +80,7 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	private AddressLocator addressLocator;
 	
 	//Methods
-	public BusLaneAdderPanel(BusLaneAdderWindow busLaneAdderWindow, NetworkPainter networkPainter, File imageFile, Coord upLeft, Coord downRight, CoordinateTransformation coordinateTransformation) throws IOException {
+	public BusLaneAdderPanel(BusLaneAdderWindow busLaneAdderWindow, NetworkPainter networkPainter, File imageFile, double[] upLeft, double[] downRight, CoordinateTransformation coordinateTransformation) throws IOException {
 		super();
 		addressLocator = new AddressLocator(coordinateTransformation);
 		this.busLaneAdderWindow = busLaneAdderWindow;
@@ -124,11 +124,11 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 		dijkstra = new Dijkstra(busLaneAdderWindow.getNetwork(), travelMinCost, timeFunction, preProcessData);
 	}
 	private void calculateBoundaries() {
-		Collection<Coord> coords = new ArrayList<Coord>();
-		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetwork().getLinks().values()) {
+		Collection<double[]> coords = new ArrayList<double[]>();
+		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
-				coords.add(link.getFromNode().getCoord());
-				coords.add(link.getToNode().getCoord());
+				coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
+				coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
 			}
 		}
 		super.calculateBoundaries(coords);
@@ -152,7 +152,8 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 				JOptionPane.showMessageDialog(this, "Many results: "+addressLocator.getNumResults()+".");
 			try {
 				JOptionPane.showMessageDialog(this, addressLocator.getLocation(posLocation).toString());
-				centerCamera(addressLocator.getLocation(posLocation));
+				Coord c=addressLocator.getLocation(posLocation);
+				centerCamera(new double[]{c.getX(), c.getY()});
 			} catch (HeadlessException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
@@ -192,22 +193,23 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(busLaneAdderWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNearestNode(p[0], p[1]);
 				busLaneAdderWindow.refreshLabel(Labels.NODES);
 			}
 			else if(busLaneAdderWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkTwoNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNearestNode(p[0], p[1]);
 				busLaneAdderWindow.refreshLabel(Labels.NODES);
 			}
 			else if(busLaneAdderWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 			}
 			else if(busLaneAdderWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3) {
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 			}
 		}
 		repaint();
@@ -232,14 +234,15 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
+		camera.move(iniX-e.getX(), iniY-e.getY());
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		busLaneAdderWindow.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+		double[] p = getWorld(e.getX(), e.getY());
+		busLaneAdderWindow.setCoords(p[0], p[1]);
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
@@ -261,7 +264,8 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 				posLocation++;
 				if(posLocation==addressLocator.getNumResults())
 					posLocation = 0;
-				centerCamera(addressLocator.getLocation(posLocation));
+				Coord c = addressLocator.getLocation(posLocation);
+				centerCamera(new double[]{c.getX(), c.getY()});
 			}
 			break;
 		case '-':
@@ -269,7 +273,8 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 				posLocation--;
 				if(posLocation<0)
 					posLocation = addressLocator.getNumResults()-1;
-				centerCamera(addressLocator.getLocation(posLocation));
+				Coord c = addressLocator.getLocation(posLocation);
+				centerCamera(new double[]{c.getX(), c.getY()});
 			}
 			break;
 		}

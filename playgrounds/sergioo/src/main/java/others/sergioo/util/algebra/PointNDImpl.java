@@ -1,10 +1,16 @@
 package others.sergioo.util.algebra;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PointNDImpl<T> implements PointND<T>{
+public abstract class PointNDImpl<T> implements PointND<T>, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	//Attributes
 	protected List<T> elements;
 	
@@ -43,6 +49,11 @@ public abstract class PointNDImpl<T> implements PointND<T>{
 	public abstract PointND<T> clone();
 
 	public static class Double extends PointNDImpl<java.lang.Double> {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		
 		//Constructors
 		public Double(int dimension) {

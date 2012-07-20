@@ -34,16 +34,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
+import playground.sergioo.Visualizer2D.Camera2D;
+import playground.sergioo.Visualizer2D.Camera3D;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.SimpleSelectionNetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Labels;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Options;
 
@@ -58,6 +59,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	protected final LayersWindow window;
 	private int iniX;
 	private int iniY;
+	private int button;
 	
 	//Methods
 	public NetworkPanel(LayersWindow window, NetworkPainter networkPainter) {
@@ -74,22 +76,23 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		setFocusable(true);
 	}
 	private void calculateBoundaries() {
-		Collection<Coord> coords = new ArrayList<Coord>();
+		Collection<double[]> coords = new ArrayList<double[]>();
 		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
-				coords.add(link.getFromNode().getCoord());
-				coords.add(link.getToNode().getCoord());
+				coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
+				coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
 			}
 		}
 		super.calculateBoundaries(coords);
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(p[0], p[1]);
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
@@ -97,7 +100,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(p[0], p[1]);
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
@@ -105,25 +108,25 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.ADD_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addLink(p[0], p[1]);
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.ADD_LINK) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeLink(p[0], p[1]);
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.ADD_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addNode(p[0], p[1]);
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.ADD_NODE) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeNode(p[0], p[1]);
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 		}
 		repaint();
 	}
@@ -148,6 +151,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		this.requestFocus();
 		iniX = e.getX();
 		iniY = e.getY();
+		this.button = e.getButton();
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
@@ -163,14 +167,22 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
-		iniX = e.getX();
-		iniY = e.getY();
+		if(button==MouseEvent.BUTTON1) {
+			camera.move(iniX-e.getX(), iniY-e.getY());
+			iniX = e.getX();
+			iniY = e.getY();
+		}
+		else {
+			camera.move2(iniX-e.getX(), iniY-e.getY());
+			iniX = e.getX();
+			iniY = e.getY();
+		}
 		repaint();
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		window.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+		double[] p = getWorld(e.getX(), e.getY());
+		window.setCoords(p[0], p[1]);
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
@@ -186,9 +198,6 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		case 'n':
 			getActiveLayer().changeVisible();
 			break;
-		case 's':
-			((SimpleSelectionNetworkPainter)getPrincipalLayer().getPainter()).changeVisibleSelectedElements();
-			break;
 		case 'o':
 			((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().selectOppositeLink();
 			window.refreshLabel(Labels.LINK);
@@ -197,9 +206,17 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 			JFileChooser jFileChooser = new JFileChooser();
 			jFileChooser.showSaveDialog(this);
 			File file = jFileChooser.getSelectedFile();
-			saveImage(file.getName().split("\\.")[file.getName().split("\\.").length-1], file);
+			saveImage(file.getName().split("\\.")[file.getName().split("\\.").length-1], file, Integer.parseInt(JOptionPane.showInputDialog("Width", "12040")),  Integer.parseInt(JOptionPane.showInputDialog("Height", "6012")));
 			break;
 		case 'v':
+			viewAll();
+			break;
+		case '2':
+			this.setCamera(new Camera2D());
+			viewAll();
+			break;
+		case '3':
+			this.setCamera(new Camera3D());
 			viewAll();
 			break;
 		}

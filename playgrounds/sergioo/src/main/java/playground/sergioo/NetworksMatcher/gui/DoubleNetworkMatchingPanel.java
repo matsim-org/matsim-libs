@@ -86,21 +86,22 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkNodesPainterManager)((NetworkTwoNodesPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkTwoNodesPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNearestNode(p[0], p[1]);
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkNodesPainterManager)((NetworkTwoNodesPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkTwoNodesPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNearestNode(p[0], p[1]);
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 		}
 		repaint();
 	}
@@ -124,14 +125,15 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
+		camera.move(iniX-e.getX(), iniY-e.getY());
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		doubleNetworkWindow.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+		double[] p = getWorld(e.getX(), e.getY());
+		doubleNetworkWindow.setCoords(p[0], p[1]);
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {

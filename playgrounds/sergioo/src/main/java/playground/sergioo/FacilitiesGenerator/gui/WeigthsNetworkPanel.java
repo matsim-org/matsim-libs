@@ -73,7 +73,11 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 		ArrowsPainter arrowsPainter = new ArrowsPainter();
 		for(Entry<Tuple<Id, Id>, Tuple<Boolean, Double>> data:ids.entrySet()) {
 			if(data.getValue().getSecond()>0.01) {
-				arrowsPainter.addLine(stopsBase.get(data.getKey().getFirst().toString()),mPAreas.get(data.getKey().getSecond()).getCoord());
+				Coord coord = mPAreas.get(data.getKey().getSecond()).getCoord();
+				double[] point = new double[]{coord.getX(), coord.getY()};
+				coord = stopsBase.get(data.getKey().getFirst().toString());
+				double[] pointS = new double[]{coord.getX(), coord.getY()};
+				arrowsPainter.addLine(pointS, point);
 				float scale = 50;
 				if(data.getValue().getFirst())
 					arrowsPainter.addColor(new Color(-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,0,0));
@@ -95,11 +99,11 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 		return camera;
 	}
 	private void calculateBoundaries() {
-		Collection<Coord> coords = new ArrayList<Coord>();
+		Collection<double[]> coords = new ArrayList<double[]>();
 		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
-				coords.add(link.getFromNode().getCoord());
-				coords.add(link.getToNode().getCoord());
+				coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
+				coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
 			}
 		}
 		super.calculateBoundaries(coords);
@@ -107,13 +111,14 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 		}
 		repaint();
 	}
@@ -136,14 +141,15 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
+		camera.move(iniX-e.getX(), iniY-e.getY());
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		window.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+		double[] p = getWorld(e.getX(), e.getY());
+		window.setCoords(p[0], p[1]);
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {

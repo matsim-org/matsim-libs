@@ -37,7 +37,6 @@ import java.util.Collection;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.Visualizer2D.Camera;
@@ -76,7 +75,7 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	public PublicTransportNetworkPanel(PublicTransportNetworkWindow window, NetworkPainter networkPainter, File imageFile, Coord upLeft, Coord downRight) throws IOException {
+	public PublicTransportNetworkPanel(PublicTransportNetworkWindow window, NetworkPainter networkPainter, File imageFile, double[] upLeft, double[] downRight) throws IOException {
 		super();
 		this.window = window;
 		ImagePainter imagePainter = new ImagePainter(imageFile, this);
@@ -96,12 +95,12 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 		return camera;
 	}
 	private void calculateBoundaries() {
-		Collection<Coord> coords = new ArrayList<Coord>();
+		Collection<double[]> coords = new ArrayList<double[]>();
 		if(getNumLayers()<2)
 			for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 				if(link!=null) {
-					coords.add(link.getFromNode().getCoord());
-					coords.add(link.getToNode().getCoord());
+					coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
+					coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
 				}
 			}
 		else {
@@ -113,13 +112,14 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		this.requestFocus();
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 			else if(window.getOption().equals(Option.ZOOM) && e.getButton()==MouseEvent.BUTTON3)
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 		}
 		repaint();
 	}
@@ -142,14 +142,15 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
+		camera.move(iniX-e.getX(), iniY-e.getY());
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		window.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+		double[] p = getWorld(e.getX(), e.getY());
+		window.setCoords(p[0], p[1]);
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {

@@ -32,7 +32,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -91,22 +90,22 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 	public void selectLink(String id) {
 		Link link = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(id);
 		if(link!=null)
-			doubleNetworkWindow.centerCamera(link.getCoord());
+			doubleNetworkWindow.centerCamera(new double[]{link.getCoord().getX(), link.getCoord().getY()});
 	}
 	public void selectNode(String id) {
 		Node node = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(id);
 		if(node!=null)
-			doubleNetworkWindow.centerCamera(node.getCoord());
+			doubleNetworkWindow.centerCamera(new double[]{node.getCoord().getX(), node.getCoord().getY()});
 	}
 	public void setPathActive() {
 		activePath = true;
 	}
 	private void calculateBoundaries() {
-		Collection<Coord> coords = new ArrayList<Coord>();
-		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetwork().getLinks().values()) {
+		Collection<double[]> coords = new ArrayList<double[]>();
+		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
-				coords.add(link.getFromNode().getCoord());
-				coords.add(link.getToNode().getCoord());
+				coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
+				coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
 			}
 		}
 		super.calculateBoundaries(coords);
@@ -130,11 +129,12 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		doubleNetworkWindow.setActivePanel(this);
+		double[] p = getWorld(e.getX(), e.getY());
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
-			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
+			camera.centerCamera(p);
 		else {
 			if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectLink(p[0], p[1]);
 				doubleNetworkWindow.refreshLabel(Labels.LINK);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
@@ -142,7 +142,7 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 				doubleNetworkWindow.refreshLabel(Labels.LINK);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectNode(p[0], p[1]);
 				doubleNetworkWindow.refreshLabel(Labels.NODE);
 				if(activePath) {
 					doubleNetworkWindow.applyCapacityPath2();
@@ -154,11 +154,11 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 				doubleNetworkWindow.refreshLabel(Labels.NODE);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
-				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomIn(p[0], p[1]);
 				doubleNetworkWindow.cameraChange(camera);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON3) {
-				camera.zoomOut(getWorldX(e.getX()), getWorldY(e.getY()));
+				camera.zoomOut(p[0], p[1]);
 				doubleNetworkWindow.cameraChange(camera);
 			}
 		}
@@ -186,7 +186,7 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
+		camera.move(iniX-e.getX(), iniY-e.getY());
 		iniX = e.getX();
 		iniY = e.getY();
 		doubleNetworkWindow.cameraChange(camera);
@@ -194,7 +194,8 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		doubleNetworkWindow.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+		double[] p = getWorld(e.getX(), e.getY());
+		doubleNetworkWindow.setCoords(p[0], p[1]);
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {

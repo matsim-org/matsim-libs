@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -38,7 +39,7 @@ public class VisualizerRunner {
 		new MatsimNetworkReader(scenario).readFile(args[1]);
 		LayersWindow window = null;
 		if(args.length<3)
-			window = new SimpleNetworkWindow(args[0], new SimpleSelectionNetworkPainter(scenario.getNetwork(), Color.BLACK));
+			window = new SimpleNetworkWindow(args[0], new SimpleSelectionNetworkPainter(scenario.getNetwork()));
 		/*else if (args.length<4){
 			SimpleSelectionNetworkPainter networkPainter = new SimpleSelectionNetworkPainter(scenario.getNetwork(), Color.LIGHT_GRAY, new BasicStroke(0.5f), new Color(0.5f,0,0), Color.BLACK, new BasicStroke(2));
 			RoadPricingScheme roadPricingScheme = new RoadPricingScheme();
@@ -56,7 +57,9 @@ public class VisualizerRunner {
 				window = new PublicTransportNetworkWindow(args[0], new PublicTransportNetworkPainter(scenario.getNetwork(),((ScenarioImpl)scenario).getTransitSchedule()));
 			else {
 				CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
-				window = new PublicTransportNetworkWindow(args[0], new PublicTransportNetworkPainter(scenario.getNetwork(),((ScenarioImpl)scenario).getTransitSchedule()), new File(args[3]), coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[4]), Double.parseDouble(args[5]))), coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[6]), Double.parseDouble(args[7]))));
+				Coord upLeft = coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[4]), Double.parseDouble(args[5])));
+				Coord downRight = coordinateTransformation.transform(new CoordImpl(Double.parseDouble(args[6]), Double.parseDouble(args[7])));
+				window = new PublicTransportNetworkWindow(args[0], new PublicTransportNetworkPainter(scenario.getNetwork(),((ScenarioImpl)scenario).getTransitSchedule()), new File(args[3]), new double[]{upLeft.getX(), upLeft.getY()}, new double[]{downRight.getX(), downRight.getY()});
 			}
 		}
 		window.setVisible(true);
