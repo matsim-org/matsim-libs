@@ -53,7 +53,8 @@ public class ParkAndRidePlanMutateTimeAllocation implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		mutatePlan(plan);
+		
+			mutatePlan(plan);
 	}
 
 	private void mutatePlan(final Plan plan) {

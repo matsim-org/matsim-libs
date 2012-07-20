@@ -52,13 +52,6 @@ public class ParkAndRideTimeAllocationMutator extends AbstractMultithreadedModul
 	 */
 	public ParkAndRideTimeAllocationMutator(Config config) {
 		super(config.global());
-//		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
-//		if (range == null) {
-//			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
-//		} else {
-//			this.mutationRange = Integer.parseInt(range);
-//			log.info("mutation range = " + this.mutationRange);
-//		}
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
 			useActivityDurations = true ;
@@ -87,7 +80,7 @@ public class ParkAndRideTimeAllocationMutator extends AbstractMultithreadedModul
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TransitPlanMutateTimeAllocation pmta = new TransitPlanMutateTimeAllocation(this.mutationRange, MatsimRandom.getLocalInstance());
+		ParkAndRidePlanMutateTimeAllocation pmta = new ParkAndRidePlanMutateTimeAllocation(this.mutationRange, MatsimRandom.getLocalInstance());
 		pmta.setUseActivityDurations(this.useActivityDurations);
 		return pmta;
 	}
