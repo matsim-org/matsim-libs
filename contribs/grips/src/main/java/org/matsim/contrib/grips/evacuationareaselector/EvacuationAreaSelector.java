@@ -21,10 +21,14 @@
 package org.matsim.contrib.grips.evacuationareaselector;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -129,10 +133,10 @@ public class EvacuationAreaSelector implements ActionListener{
 	 */
 	private void initialize() {
 		this.frame = new JFrame();
-		this.frame.setBounds(100, 100, 800, 800);
+		this.frame.setSize(640, 640);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		this.frame.setResizable(false);
+		this.frame.setResizable(true);
 		
 		JPanel panel = new JPanel();
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
@@ -154,7 +158,33 @@ public class EvacuationAreaSelector implements ActionListener{
 		this.saveButton.addActionListener(this);
 		
 		this.frame.setTitle("Evacuation Area Selector");
+		
+		this.frame.setLocationRelativeTo(null);
+		
+		frame.addComponentListener(new ComponentListener() 
+		{  
+		        public void componentResized(ComponentEvent evt)
+		        {
+		            Component src = (Component)evt.getSource();
+		            Dimension newSize = src.getSize();
+		            updateMapViewerSize(newSize.width, newSize.height);
+		        }
+				@Override
+				public void componentMoved(ComponentEvent e) {}
+				@Override
+				public void componentShown(ComponentEvent e) {}
+				@Override
+				public void componentHidden(ComponentEvent e) {}
+		});
+		
 	}
+	
+	public void updateMapViewerSize(int width, int height)
+	{
+		if (this.jMapViewer!=null)
+			this.jMapViewer.setBounds(0, 0, width, height);
+	}
+
 	
 	public void addMapViewer(TileFactory tf) {
 		this.compositePanel.setLayout(null);
