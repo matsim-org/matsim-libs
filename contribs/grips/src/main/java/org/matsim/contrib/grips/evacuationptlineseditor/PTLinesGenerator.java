@@ -133,6 +133,10 @@ public class PTLinesGenerator {
 		modes.add("bus");
 		
 		for (Link l : links) {
+			Set<String> m = l.getAllowedModes();
+			for (String s : m) {
+				modes.add(s);
+			}
 			((LinkImpl)l).setAllowedModes(modes);
 			linkIds.add(l.getId());
 		}
