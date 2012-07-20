@@ -85,6 +85,7 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 				} else if ( pe instanceof Leg ) {
 					Leg leg = (Leg) pe ;
 					if ( config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+						leg.setDepartureTime(Time.UNDEFINED_TIME) ; // given by activity end time; everything else confuses
 						((LegImpl)leg).setArrivalTime(Time.UNDEFINED_TIME) ;
 					}
 				}

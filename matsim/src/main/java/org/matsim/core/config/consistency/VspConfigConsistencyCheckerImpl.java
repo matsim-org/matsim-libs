@@ -75,11 +75,17 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
 //			problem = true ;
-			log.warn("timeAllocationMutator mutationRange < 7200; vsp defaults is 7200.  This will be more strictly" +
+			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This will be more strictly" +
 					" enforced in the future. This means you have to add the following lines to your config file: ") ;
 			System.out.println("<module name=\"TimeAllocationMutator\">");
 			System.out.println("	<param name=\"mutationRange\" value=\"7200.0\" />");
 			System.out.println("</module>");
+		}
+		
+		if ( !config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+//			problem = true ;
+			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.  This will be more strictly" +
+					" enforced in the future.") ;
 		}
 		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
