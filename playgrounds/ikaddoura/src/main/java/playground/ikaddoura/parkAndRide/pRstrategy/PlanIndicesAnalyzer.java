@@ -26,6 +26,7 @@ package playground.ikaddoura.parkAndRide.pRstrategy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -37,6 +38,7 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
  *
  */
 public class PlanIndicesAnalyzer {
+	private static final Logger log = Logger.getLogger(PlanIndicesAnalyzer.class);
 
 	private List<PlanElement> planElements = new ArrayList<PlanElement>();
 	
@@ -48,9 +50,12 @@ public class PlanIndicesAnalyzer {
 	private List<Integer> pRplanElementIndex = new ArrayList<Integer>();
 	private List<Integer> actsplanElementIndex = new ArrayList<Integer>();
 	private List<Integer> workPlanElementIndex = new ArrayList<Integer>();
-	private int homeIndexBeforeWorkActivity = 0;
+	private List<Integer> homeBeforeWorkIndex = new ArrayList<Integer>();
+	private List<Integer> homeAfterWorkIndex = new ArrayList<Integer>();
+
+//	private int homeIndexBeforeWorkActivity = 0;
 	private int homeIndexTmp = 0;
-	private int homeIndexAfterWorkActivity = 0;
+//	private int homeIndexAfterWorkActivity = 0;
 	
 	public PlanIndicesAnalyzer(Plan plan) {
 		this.planElements = plan.getPlanElements();
@@ -85,11 +90,11 @@ public class PlanIndicesAnalyzer {
 	}
 
 	public int getHomeIndexBeforeWorkActivity() {
-		return homeIndexBeforeWorkActivity;
+		return this.homeBeforeWorkIndex.get(0);
 	}
 
 	public int getHomeIndexAfterWorkActivity() {
-		return homeIndexAfterWorkActivity;
+		return this.homeAfterWorkIndex.get(this.homeAfterWorkIndex.size()-1);
 	}
 	
 	public void setIndices(){
@@ -97,8 +102,11 @@ public class PlanIndicesAnalyzer {
 		this.actsplanElementIndex.clear();
 		this.pRplanElementIndex.clear();
 		this.workPlanElementIndex.clear();
-		this.homeIndexAfterWorkActivity = 0;
-		this.homeIndexBeforeWorkActivity = 0;
+		this.homeBeforeWorkIndex.clear();
+		this.homeAfterWorkIndex.clear();
+		
+//		this.homeIndexAfterWorkActivity = 0;
+//		this.homeIndexBeforeWorkActivity = 0;
 		
 		for (int i = 0; i < planElements.size(); i++) {
 			PlanElement pe = planElements.get(i);
@@ -112,18 +120,25 @@ public class PlanIndicesAnalyzer {
 					hasHomeActivity = true;
 					homeIndexTmp = i;
 					if (nextHomeIsFirstHomeAfterWork == true){
-						homeIndexAfterWorkActivity = i;
+//						homeIndexAfterWorkActivity = i;
+						homeAfterWorkIndex.add(i);
 						nextHomeIsFirstHomeAfterWork = false;
 					}						
 				} else if (act.toString().contains("work")){
-					homeIndexBeforeWorkActivity = homeIndexTmp;
+					homeBeforeWorkIndex.add(homeIndexTmp);
+//					homeIndexBeforeWorkActivity = homeIndexTmp;
 					hasWorkActivity = true;
 					nextHomeIsFirstHomeAfterWork = true;
 					workPlanElementIndex.add(i);
 				}
 			}
 		}
-		System.out.println("Indices set.");
+		
+		if (homeBeforeWorkIndex.size() > 1) {
+			log.warn("Activity pattern created: Home, P+R, Work, Home, Work, P+R, Home");
+		}
+		
+//		System.out.println("Indices set.");
 	}
 
 	public int getFirstWorkIndex() {
