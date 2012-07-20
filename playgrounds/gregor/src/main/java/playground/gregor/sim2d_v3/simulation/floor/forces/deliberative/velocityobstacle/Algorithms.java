@@ -28,7 +28,6 @@ import java.util.TreeMap;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.Tuple;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -380,6 +379,22 @@ public abstract class Algorithms {
 	 */
 	public static double isLeftOfLine(Coordinate c0, Coordinate c1, Coordinate c2) {
 		return (c2.x - c1.x)*(c0.y - c1.y) - (c0.x - c1.x) * (c2.y - c1.y);
+	}
+	
+	/**
+	 * tests whether coordinate x0,y0 is located left of the infinite vector that runs from x1,y1  to x2,y2
+	 * @param x0 the x-coordinate to test
+	 * @param y0 the y-coordinate to test
+	 * @param x1 first x-coordinate of the vector
+	 * @param y1 first y-coordinate of the vector
+	 * @param x2 second x-coordinate of the vector
+	 * @param y2 second y-coordinate of the vector
+	 * @return >0 if coordinate is left of the vector
+	 * 		  ==0 if coordinate is on the vector
+	 * 		   <0 if coordinate is right of the vector
+	 */
+	public static double isLeftOfLine(double x0, double y0, double x1, double y1, double x2, double y2) {
+		return (x2 - x1)*(y0 - y1) - (x0 - x1) * (y2 - y1);
 	}
 
 	/**
