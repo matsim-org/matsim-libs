@@ -66,6 +66,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -75,6 +77,7 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleWriterV1;
+
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -242,7 +245,7 @@ public class EvacuationPTLinesEditor implements ActionListener{
 	private void initialize()
 	{
 		this.frame = new JFrame();
-		this.frame.setBounds(100, 100, 1000, 800);
+		this.frame.setSize(800, 640);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.frame.setResizable(true);
@@ -427,6 +430,8 @@ public class EvacuationPTLinesEditor implements ActionListener{
 
 		this.openBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
+		
+		this.frame.setLocationRelativeTo(null);
 
 		this.frame.addComponentListener(new ComponentListener() 
 		{  
@@ -536,12 +541,39 @@ public class EvacuationPTLinesEditor implements ActionListener{
 		
 		
 		
+		
+		Config config = this.sc.getConfig();
+		
+		//settings to activate pt simulation
+		config.strategy().addParam("maxAgentPlanMemorySize", "3");
+		config.strategy().addParam("Module_1", "ReRoute");
+		config.strategy().addParam("ModuleProbability_1", "0.1");
+		config.strategy().addParam("Module_2", "ChangeExpBeta");
+		config.strategy().addParam("ModuleProbability_2", "0.3");
+		config.strategy().addParam("Module_3", "TransitChangeLegMode");
+		config.strategy().addParam("ModuleProbability_3", "0.3");
+		config.strategy().addParam("Module_4", "TransitTimeAllocationMutator");
+		config.strategy().addParam("ModuleProbability_4", "0.3");
+
+		config.setParam("qsim", "startTime", "00:00:00");
+		config.setParam("qsim", "endTime", "03:30:00");
+		config.setParam("changeLegMode", "modes", "car,pt");
+		
+		config.setParam("transit", "transitScheduleFile", this.scPath+"/transitSchedule.xml");
+		config.setParam("transit", "vehiclesFile", this.scPath+"/transitVehicles.xml");
+		config.setParam("transit", "transitModes", "pt");
+
+		config.scenario().setUseTransit(true);
+		config.scenario().setUseVehicles(true);
+		
+		new ConfigWriter(config).write(this.configFile);
+		
 		PTLinesGenerator gen = new PTLinesGenerator(this.sc,this.busStops);
 		TransitSchedule schedule = gen.getTransitSchedule();
 		
+		new NetworkWriter(this.sc.getNetwork()).write(this.sc.getConfig().network().getInputFile());
 		new TransitScheduleWriterV1(schedule).write(this.scPath+"/transitSchedule.xml");
 		new VehicleWriterV1(((ScenarioImpl)this.sc).getVehicles()).writeFile(this.scPath+"/transitVehicles.xml");
-		
 		
 	}
 
