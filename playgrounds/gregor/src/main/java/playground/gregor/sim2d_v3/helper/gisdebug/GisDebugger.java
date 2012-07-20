@@ -37,8 +37,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -91,6 +89,7 @@ public class GisDebugger {
 			it = strs.iterator();
 		}
 		for (Geometry geo : geos) {
+//			Algorithms.translate(5, 20, geo.getCoordinates());          
 			String str = "";
 			if (it != null) {
 				str = it.next();
@@ -165,20 +164,16 @@ public class GisDebugger {
 	public static void addCircle(Coordinate position, double r, String string) {
 		
 		Coordinate[] circle = new Coordinate[64];
-		double x = -r;
-		for (int i = 0; i < 32; i++) {
-			double y = Math.sqrt(r*r - x * x); 
-			circle[i] = new Coordinate(x,y);
-			x += r/15.5;
+		for (int pos = 0; pos < 63; pos ++) {
+			double alpha = pos * ((2*Math.PI) / 64);
+			double x = Math.cos(alpha) * (r)+position.x;
+			double y = Math.sin(alpha) * (r)+position.y;
+			Coordinate c = new Coordinate(x,y);
+			circle[pos] = c;
 		}
-		x = r;
-		for (int i = 32; i < 63; i++) {
-			double y = -Math.sqrt(r*r - x * x); 
-			circle[i] = new Coordinate(x,y);
-			x -= r/15.5;
-		}
+		
 		circle[63] = circle[0];
-		Algorithms.translate(position.x, position.y, circle);
+//		Algorithms.translate(position.x, position.y, circle);
 		addGeometry(geofac.createLineString(circle), string);
 		
 	}
