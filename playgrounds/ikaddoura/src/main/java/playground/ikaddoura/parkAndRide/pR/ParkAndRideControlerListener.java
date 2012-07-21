@@ -33,11 +33,9 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
-import playground.ikaddoura.parkAndRide.pRstrategy.PlanStrategyImpl_pr;
 import playground.ikaddoura.parkAndRide.pRstrategy.PlanStrategyImpl_work;
 import playground.ikaddoura.parkAndRide.pRstrategy.PrWeight;
 import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideAddRemoveStrategy;
-import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideChangeLocationStrategy;
 import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideTimeAllocationMutator;
 
 /**
@@ -78,10 +76,11 @@ public class ParkAndRideControlerListener implements StartupListener {
 		strategyAddRemove.addStrategyModule(new ParkAndRideAddRemoveStrategy(controler, id2prFacility, personId2prWeights)); // only if car is available: P+R added (if plan doesn't contain P+R) or P+R removed (if plan contains P+R)
 		strategyAddRemove.addStrategyModule(new ReRoute(controler));
 		
-		PlanStrategy strategyChangeLocation = new PlanStrategyImpl_pr(new RandomPlanSelector());
-		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights)); // if plan contains P+R: change to other P+R location
-		strategyChangeLocation.addStrategyModule(new ReRoute(controler));
+//		PlanStrategy strategyChangeLocation = new PlanStrategyImpl_pr(new RandomPlanSelector());
+//		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+//		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights)); // if plan contains P+R: change to other P+R location
+//		strategyChangeLocation.addStrategyModule(new ReRoute(controler));
+//		
 		
 		PlanStrategy strategyTimeAllocation = new PlanStrategyImpl_work(new RandomPlanSelector());
 		strategyTimeAllocation.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig())); // TimeAllocation, not changing "parkAndRide" and "pt interaction"
@@ -92,8 +91,8 @@ public class ParkAndRideControlerListener implements StartupListener {
 		manager.addStrategy(strategyAddRemove, this.addRemoveProb);
 		manager.addChangeRequest(this.addRemoveDisable, strategyAddRemove, 0.);
 				
-		manager.addStrategy(strategyChangeLocation, this.changeLocationProb);
-		manager.addChangeRequest(this.changeLocationDisable, strategyChangeLocation, 0.);
+//		manager.addStrategy(strategyChangeLocation, this.changeLocationProb);
+//		manager.addChangeRequest(this.changeLocationDisable, strategyChangeLocation, 0.);
 		
 		manager.addStrategy(strategyTimeAllocation, this.timeAllocationProb);
 		manager.addChangeRequest(this.timeAllocationDisable, strategyTimeAllocation, 0.);

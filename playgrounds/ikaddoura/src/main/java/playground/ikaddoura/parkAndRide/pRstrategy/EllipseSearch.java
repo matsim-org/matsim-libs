@@ -48,23 +48,9 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 public class EllipseSearch {
 	private static final Logger log = Logger.getLogger(EllipseSearch.class);
 
-	public List<PrWeight> getPrWeights(int nrPrFacilities, Network net, Map<Id, ParkAndRideFacility> id2prFacility, Plan plan) {
-		List <PrWeight> prWeights = new ArrayList<PrWeight>();
+	public List<PrWeight> getPrWeights(int nrPrFacilities, Network net, Map<Id, ParkAndRideFacility> id2prFacility, Coord homeCoord, Coord workCoord) {
 		
-		Coord homeCoord = null;
-		Coord workCoord = null;
-
-		for (PlanElement pE : plan.getPlanElements()){
-			if (pE instanceof Activity){
-				Activity act = (Activity) pE;
-				if (act.getType().toString().equals("home")){
-					homeCoord = act.getCoord();
-				}
-				if (act.getType().toString().equals("work")){
-					workCoord = act.getCoord();
-				}
-			}
-		}
+		List <PrWeight> prWeights = new ArrayList<PrWeight>();
 		
 		if (homeCoord == null || workCoord == null){
 			throw new RuntimeException("Plan doesn't have home or work activity. Aborting...");

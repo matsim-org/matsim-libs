@@ -45,24 +45,57 @@ public class PlanIndicesAnalyzer {
 	private boolean hasParkAndRide = false;
 	private boolean hasHomeActivity = false;
 	private boolean hasWorkActivity = false;
-	private boolean nextHomeIsFirstHomeAfterWork = false;
-	
-	private List<Integer> pRplanElementIndex = new ArrayList<Integer>();
-	private List<Integer> actsplanElementIndex = new ArrayList<Integer>();
-	private List<Integer> workPlanElementIndex = new ArrayList<Integer>();
-	private List<Integer> homeBeforeWorkIndex = new ArrayList<Integer>();
-	private List<Integer> homeAfterWorkIndex = new ArrayList<Integer>();
 
-//	private int homeIndexBeforeWorkActivity = 0;
-	private int homeIndexTmp = 0;
-//	private int homeIndexAfterWorkActivity = 0;
+	private List<Integer> homeActs = new ArrayList<Integer>();
+	private List<Integer> workActs = new ArrayList<Integer>();
+	private List<Integer> allActs = new ArrayList<Integer>();
+	private List<Integer> prActs = new ArrayList<Integer>();
 	
 	public PlanIndicesAnalyzer(Plan plan) {
 		this.planElements = plan.getPlanElements();
 	}
+	
+	public void setIndices(){
+		
+		this.allActs.clear();
+		this.homeActs.clear();
+		this.workActs.clear();
+		this.prActs.clear();
+		
+		for (int i = 0; i < planElements.size(); i++) {
+			PlanElement pe = planElements.get(i);
+			
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				this.allActs.add(i);
+				if (act.toString().contains(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
+					hasParkAndRide = true;
+					this.prActs.add(i);
+				} else if (act.toString().contains("home")){
+					hasHomeActivity = true;
+					this.homeActs.add(i);						
+				} else if (act.toString().contains("work")){
+					hasWorkActivity = true;
+					this.workActs.add(i);
+				}
+			}
+		}
+	}
 
-	public List<PlanElement> getPlanElements() {
-		return planElements;
+	public List<Integer> getHomeActs() {
+		return homeActs;
+	}
+
+	public List<Integer> getWorkActs() {
+		return workActs;
+	}
+
+	public List<Integer> getAllActs() {
+		return allActs;
+	}
+
+	public List<Integer> getPrActs() {
+		return prActs;
 	}
 
 	public boolean hasParkAndRide() {
@@ -76,76 +109,5 @@ public class PlanIndicesAnalyzer {
 	public boolean hasWorkActivity() {
 		return hasWorkActivity;
 	}
-
-	public List<Integer> getpRplanElementIndex() {
-		return pRplanElementIndex;
-	}
-
-	public List<Integer> getActsplanElementIndex() {
-		return actsplanElementIndex;
-	}
-
-	public List<Integer> getWorkPlanElementIndex() {
-		return workPlanElementIndex;
-	}
-
-	public int getHomeIndexBeforeWorkActivity() {
-		return this.homeBeforeWorkIndex.get(0);
-	}
-
-	public int getHomeIndexAfterWorkActivity() {
-		return this.homeAfterWorkIndex.get(this.homeAfterWorkIndex.size()-1);
-	}
 	
-	public void setIndices(){
-		
-		this.actsplanElementIndex.clear();
-		this.pRplanElementIndex.clear();
-		this.workPlanElementIndex.clear();
-		this.homeBeforeWorkIndex.clear();
-		this.homeAfterWorkIndex.clear();
-		
-//		this.homeIndexAfterWorkActivity = 0;
-//		this.homeIndexBeforeWorkActivity = 0;
-		
-		for (int i = 0; i < planElements.size(); i++) {
-			PlanElement pe = planElements.get(i);
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
-				actsplanElementIndex.add(i);
-				if (act.toString().contains(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
-					hasParkAndRide = true;
-					pRplanElementIndex.add(i);
-				} else if (act.toString().contains("home")){
-					hasHomeActivity = true;
-					homeIndexTmp = i;
-					if (nextHomeIsFirstHomeAfterWork == true){
-//						homeIndexAfterWorkActivity = i;
-						homeAfterWorkIndex.add(i);
-						nextHomeIsFirstHomeAfterWork = false;
-					}						
-				} else if (act.toString().contains("work")){
-					homeBeforeWorkIndex.add(homeIndexTmp);
-//					homeIndexBeforeWorkActivity = homeIndexTmp;
-					hasWorkActivity = true;
-					nextHomeIsFirstHomeAfterWork = true;
-					workPlanElementIndex.add(i);
-				}
-			}
-		}
-		
-		if (homeBeforeWorkIndex.size() > 1) {
-			log.warn("Activity pattern created: Home, P+R, Work, Home, Work, P+R, Home");
-		}
-		
-//		System.out.println("Indices set.");
-	}
-
-	public int getFirstWorkIndex() {
-		return this.workPlanElementIndex.get(0);
-	}
-
-	public int getLastWorkIndex() {
-		return this.workPlanElementIndex.get(workPlanElementIndex.size()-1);
-	}
 }
