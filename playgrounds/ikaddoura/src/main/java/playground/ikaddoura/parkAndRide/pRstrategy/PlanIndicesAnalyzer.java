@@ -109,5 +109,29 @@ public class PlanIndicesAnalyzer {
 	public boolean hasWorkActivity() {
 		return hasWorkActivity;
 	}
+
+	public int getMinHomeAfterWork(int workIndex) {
+		int minHomeAfterWork = 999999;
+		for (Integer homeIndex : this.getHomeActs()){
+			if (homeIndex > workIndex){
+				if (homeIndex < minHomeAfterWork){
+					minHomeAfterWork = homeIndex;
+				}
+			}
+		}
+		return minHomeAfterWork;
+	}
+
+	public int getMaxHomeBeforeWork(int workIndex) {
+		int maxHomeBeforeWork = 0;
+		for (Integer homeIndex : this.getHomeActs()){
+			if (homeIndex < workIndex){
+				if (homeIndex > maxHomeBeforeWork){
+					maxHomeBeforeWork = homeIndex;
+				}
+			}
+		}
+		return maxHomeBeforeWork;
+	}
 	
 }
