@@ -6,9 +6,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.events.TravelEventImpl;
+import org.matsim.core.events.TravelledEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
@@ -134,7 +132,7 @@ public class PassivePlannerAgent implements MobsimDriverAgent, HasBasePerson  {
 	@Override
 	public void notifyTeleportToLink(Id linkId) {
 		if(state == State.LEG)
-			simulation.getEventsManager().processEvent(new TravelEventImpl(simulation.getSimTimer().getTimeOfDay(), getId(), ((Leg)getCurrentPlanElement()).getRoute().getDistance()));
+			simulation.getEventsManager().processEvent(new TravelledEventImpl(simulation.getSimTimer().getTimeOfDay(), getId(), ((Leg)getCurrentPlanElement()).getRoute().getDistance()));
 	}
 	@Override
 	public Id getCurrentLinkId() {
