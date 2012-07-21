@@ -50,19 +50,15 @@ public class ParkAndRideControlerListener implements StartupListener {
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
 	private double addRemoveProb;
 	private int addRemoveDisable;
-	private double changeLocationProb;
-	private int changeLocationDisable;
 	private double timeAllocationProb;
 	private int timeAllocationDisable;
 	
-	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility, double addRemoveProb, int addRemoveDisable, double changeLocationProb, int changeLocationDisable, double timeAllocationProb, int timeAllocationDisable) {
+	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility, double addRemoveProb, int addRemoveDisable, double timeAllocationProb, int timeAllocationDisable) {
 		this.controler = ctl;
 		this.adaptiveControl = adaptiveControl;
 		this.id2prFacility = id2prFacility;
 		this.addRemoveProb = addRemoveProb;
 		this.addRemoveDisable = addRemoveDisable;
-		this.changeLocationProb = changeLocationProb;
-		this.changeLocationDisable = changeLocationDisable;
 		this.timeAllocationProb = timeAllocationProb;
 		this.timeAllocationDisable = timeAllocationDisable;
 	}
@@ -76,12 +72,6 @@ public class ParkAndRideControlerListener implements StartupListener {
 		strategyAddRemove.addStrategyModule(new ParkAndRideAddRemoveStrategy(controler, id2prFacility, personId2prWeights)); // only if car is available: P+R added (if plan doesn't contain P+R) or P+R removed (if plan contains P+R)
 		strategyAddRemove.addStrategyModule(new ReRoute(controler));
 		
-//		PlanStrategy strategyChangeLocation = new PlanStrategyImpl_pr(new RandomPlanSelector());
-//		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-//		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights)); // if plan contains P+R: change to other P+R location
-//		strategyChangeLocation.addStrategyModule(new ReRoute(controler));
-//		
-		
 		PlanStrategy strategyTimeAllocation = new PlanStrategyImpl_work(new RandomPlanSelector());
 		strategyTimeAllocation.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig())); // TimeAllocation, not changing "parkAndRide" and "pt interaction"
 		strategyTimeAllocation.addStrategyModule(new ReRoute(controler));
@@ -90,9 +80,6 @@ public class ParkAndRideControlerListener implements StartupListener {
 	
 		manager.addStrategy(strategyAddRemove, this.addRemoveProb);
 		manager.addChangeRequest(this.addRemoveDisable, strategyAddRemove, 0.);
-				
-//		manager.addStrategy(strategyChangeLocation, this.changeLocationProb);
-//		manager.addChangeRequest(this.changeLocationDisable, strategyChangeLocation, 0.);
 		
 		manager.addStrategy(strategyTimeAllocation, this.timeAllocationProb);
 		manager.addChangeRequest(this.timeAllocationDisable, strategyTimeAllocation, 0.);
