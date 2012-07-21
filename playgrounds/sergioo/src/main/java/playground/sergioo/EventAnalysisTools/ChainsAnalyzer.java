@@ -30,10 +30,8 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.PersonEntersTransitVehicleEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.handler.PersonEntersTransitVehicleEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -42,7 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.population.routes.GenericRoute;
 
 
-public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, PersonEntersVehicleEventHandler, PersonEntersTransitVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentStuckEventHandler {
+public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentStuckEventHandler {
 
 	//Constants
 	private static final NumberFormat numberFormat = new DecimalFormat("00.0");
@@ -173,26 +171,11 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 	}
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(!(event instanceof PersonEntersTransitVehicleEvent)) {
-			List<String> activityChain = activityChains.get(event.getPersonId());
-			if(activityChain!=null) {
-				String lastLeg = activityChain.get(activityChain.size()-1);
-				if(lastLeg.startsWith("*"))
-					activityChain.set(activityChain.size()-1, lastLeg+"+");
-				else
-					throw new RuntimeException("Enter vehicle without departure");
-			}
-			else
-				throw new RuntimeException("Enter vehicle without person");
-		}
-	}
-	@Override
-	public void handleEvent(PersonEntersTransitVehicleEvent event) {
 		List<String> activityChain = activityChains.get(event.getPersonId());
 		if(activityChain!=null) {
 			String lastLeg = activityChain.get(activityChain.size()-1);
 			if(lastLeg.startsWith("*"))
-				activityChain.set(activityChain.size()-1, lastLeg+"+t");
+				activityChain.set(activityChain.size()-1, lastLeg+"+");
 			else
 				throw new RuntimeException("Enter vehicle without departure");
 		}
