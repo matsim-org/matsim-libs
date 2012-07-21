@@ -21,7 +21,7 @@
 package playground.sergioo.passivePlanning.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scoring.OpeningTimesTollsFaresScoringFunctionFactory;
+import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.sergioo.passivePlanning.core.controler.PassivePlanningControler;
 import playground.sergioo.passivePlanning.core.mobsim.passivePlanning.PassivePlanningSocialFactory;
@@ -38,7 +38,8 @@ public class Controler {
 	
 	public Controler(final String[] args) {
 		this.controler = new PassivePlanningControler(args);
-		controler.setScoringFunctionFactory(new OpeningTimesTollsFaresScoringFunctionFactory(controler.getConfig().planCalcScore(), getScenario()));
+		//controler.setScoringFunctionFactory(new OpeningTimesTollsFaresScoringFunctionFactory(controler.getConfig().planCalcScore(), getScenario()));
+		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), getScenario()));
 		controler.setPassivePlaningSocial(true);
 	}
 	

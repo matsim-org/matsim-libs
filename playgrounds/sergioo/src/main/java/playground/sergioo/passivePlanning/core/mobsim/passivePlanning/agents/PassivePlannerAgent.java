@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -96,8 +97,7 @@ public class PassivePlannerAgent implements MobsimDriverAgent, HasBasePerson  {
 	private void initializeActivity(Activity act, double now) {
 		this.state = MobsimAgent.State.ACTIVITY;
 		this.simulation.getEventsManager().processEvent(this.simulation.getEventsManager().getFactory().createActivityStartEvent(now, this.getId(),  act.getLinkId(), act.getFacilityId(), act.getType()));
-		String activityDurationInterpretation = this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation();
-		activityEndTime = calculateDepartureTime(act, now, activityDurationInterpretation);
+		activityEndTime = calculateDepartureTime(act, now, "");
 	}
 	private void initializeLeg(Leg leg, double now) {
 		this.state = MobsimAgent.State.LEG ;			
@@ -110,46 +110,7 @@ public class PassivePlannerAgent implements MobsimDriverAgent, HasBasePerson  {
 			this.currentLinkIdIndex = 0;
 	}
 	private double calculateDepartureTime(Activity act, double now, String activityDurationInterpretation) {
-		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
-			return Double.POSITIVE_INFINITY ;
-		} else {
-			double departure = 0;
-			if (activityDurationInterpretation.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME)) {
-				// person stays at the activity either until its duration is over or until its end time, whatever comes first
-				if (act.getMaximumDuration() == Time.UNDEFINED_TIME) {
-					departure = act.getEndTime();
-				} else if (act.getEndTime() == Time.UNDEFINED_TIME) {
-					departure = now + act.getMaximumDuration();
-				} else {
-					departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());
-				}
-			} else if (activityDurationInterpretation.equals(VspExperimentalConfigGroup.END_TIME_ONLY )) {
-				if (act.getEndTime() != Time.UNDEFINED_TIME) {
-					departure = act.getEndTime();
-				} else {
-					throw new IllegalStateException("activity end time not set and using something else not allowed.");
-				}
-			} else if (activityDurationInterpretation.equals(VspExperimentalConfigGroup.TRY_END_TIME_THEN_DURATION )) {
-				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
-				if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
-					departure = act.getEndTime();
-				} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
-					departure = now + act.getMaximumDuration() ;
-				} else {
-					throw new IllegalStateException("neither activity end time nor activity duration defined; don't know what to do.");
-				}
-			} else {
-				throw new IllegalStateException("should not happen") ;
-			}
-	
-			if (departure < now) {
-				// we cannot depart before we arrived, thus change the time so the time stamp in events will be right
-				//			[[how can events not use the simulation time?  kai, aug'10]]
-				departure = now;
-				// actually, we will depart in (now+1) because we already missed the departing in this time step
-			}
-			return departure;
-		}
+		return 0;
 	}
 	protected PlanElement getCurrentPlanElement() {
 		return basePerson.getSelectedPlan().getPlanElements().get(currentPlanElementIndex);
