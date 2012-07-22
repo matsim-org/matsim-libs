@@ -43,11 +43,11 @@ public class ArrowsPainter extends Painter {
 		if(colors.size() == arrows.size()) {
 			Iterator<Color> colorsI = colors.iterator();
 			for(Tuple<double[], double[]> line:arrows)
-				paintArrow(g2, layersPanel, line, angle, layersPanel.getWorldDistance(longArrow), stroke, colorsI.next());
+				paintArrow(g2, layersPanel, line.getFirst(), line.getSecond(), angle, layersPanel.getWorldDistance(longArrow), stroke, colorsI.next());
 		}
 		else
 			for(Tuple<double[], double[]> line:arrows)
-				paintArrow(g2, layersPanel, line, angle, layersPanel.getWorldDistance(longArrow), stroke, Color.RED);
+				paintArrow(g2, layersPanel, line.getFirst(), line.getSecond(), angle, layersPanel.getWorldDistance(longArrow), stroke, Color.RED);
 	}
 
 }

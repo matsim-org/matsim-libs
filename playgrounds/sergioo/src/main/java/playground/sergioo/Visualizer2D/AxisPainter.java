@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
-import org.matsim.core.utils.collections.Tuple;
-
 public class AxisPainter extends Painter {
 
 	//Attributes
@@ -58,18 +56,18 @@ public class AxisPainter extends Painter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		double baseSize = layersPanel.getWorldDistance(5);
-		paintArrow(g2, layersPanel, new Tuple<double[], double[]>(new double[]{startXAxis, startYAxis}, new double[]{endXAxis, startYAxis}), Math.PI/6, baseSize*2, new BasicStroke(), color);
-		paintArrow(g2, layersPanel, new Tuple<double[], double[]>(new double[]{startXAxis, startYAxis}, new double[]{startXAxis, endYAxis}), Math.PI/6, baseSize*2, new BasicStroke(), color);
+		paintArrow(g2, layersPanel, new double[]{startXAxis, startYAxis}, new double[]{endXAxis, startYAxis}, Math.PI/6, baseSize*2, new BasicStroke(), color);
+		paintArrow(g2, layersPanel, new double[]{startXAxis, startYAxis}, new double[]{startXAxis, endYAxis}, Math.PI/6, baseSize*2, new BasicStroke(), color);
 		int fontSize = 14;
 		g2.setFont(new Font("Times New Roman", Font.PLAIN, fontSize));
 		for(double x=startXAxis; x<endXAxis; x+=deltaXAxis) {
-			paintLine(g2, layersPanel, new Tuple<double[], double[]>(new double[]{x, startYAxis}, new double[]{x, startYAxis-baseSize}), new BasicStroke(), color);
+			paintLine(g2, layersPanel, new double[]{x, startYAxis}, new double[]{x, startYAxis-baseSize}, new BasicStroke(), color);
 			String text = (int)(x/3600)+"";
 			int[] screenPoint = layersPanel.getScreenXY(new double[]{x-text.length()*baseSize/2, startYAxis-1.5*baseSize});
 			g2.drawString(text, screenPoint[0], screenPoint[1]+fontSize);
 		}
 		for(double y=startYAxis; y<endYAxis; y+=deltaYAxis) {
-			paintLine(g2, layersPanel, new Tuple<double[], double[]>(new double[]{startXAxis, y}, new double[]{startXAxis-baseSize, y}), new BasicStroke(), color);
+			paintLine(g2, layersPanel, new double[]{startXAxis, y}, new double[]{startXAxis-baseSize, y}, new BasicStroke(), color);
 			String text = (int)(y/3600)+"";
 			int[] screenPoint = layersPanel.getScreenXY(new double[]{startXAxis-1.5*baseSize, y});
 			g2.drawString(text, screenPoint[0]-(fontSize/2)*text.length(), screenPoint[1]+fontSize/2);

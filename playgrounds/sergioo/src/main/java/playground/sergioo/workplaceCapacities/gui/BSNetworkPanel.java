@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.Visualizer2D.NetworkVisualizer;
+package playground.sergioo.workplaceCapacities.gui;
 
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -48,7 +48,7 @@ import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.Network
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Labels;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Options;
 
-public class NetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public class BSNetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	
 	/**
 	 * 
@@ -62,7 +62,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	private int button;
 	
 	//Methods
-	public NetworkPanel(LayersWindow window, NetworkPainter networkPainter) {
+	public BSNetworkPanel(LayersWindow window, NetworkPainter networkPainter) {
 		super();
 		this.window = window;
 		addLayer(new Layer(networkPainter));
@@ -174,6 +174,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		}
 		else {
 			camera.move2(iniX-e.getX(), iniY-e.getY());
+			((WorkersBSPainter)getActiveLayer().getPainter()).getLinesPainter3D().refreshLinesOrder();
 			iniX = e.getX();
 			iniY = e.getY();
 		}

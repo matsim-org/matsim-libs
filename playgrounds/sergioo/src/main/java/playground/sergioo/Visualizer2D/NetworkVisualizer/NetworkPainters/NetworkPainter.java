@@ -9,7 +9,6 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.Painter;
@@ -83,12 +82,12 @@ public class NetworkPainter extends Painter {
 	protected void paintSimpleLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, Color color) {
 		double[] from = new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()};
 		double[] to = new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()};
-		paintLine(g2, layersPanel, new Tuple<double[], double[]>(from, to), stroke, color);
+		paintLine(g2, layersPanel, from, to, stroke, color);
 	}
 	protected void paintLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, double pointSize, Color color) {
 		double[] from = new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()};
 		double[] to = new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()};
-		paintArrow(g2, layersPanel, new Tuple<double[], double[]>(from, to), ANGLE_ARROW, LONG_ARROW*pointSize, stroke, color);
+		paintArrow(g2, layersPanel, from, to, ANGLE_ARROW, LONG_ARROW*pointSize, stroke, color);
 	}
 	
 }

@@ -75,9 +75,11 @@ import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
+import playground.sergioo.workplaceCapacities.gui.BSSimpleNetworkWindow;
 import playground.sergioo.workplaceCapacities.gui.ClustersWindow;
 import playground.sergioo.workplaceCapacities.gui.WeigthsNetworkWindow;
 import playground.sergioo.workplaceCapacities.gui.WorkersAreaPainter;
+import playground.sergioo.workplaceCapacities.gui.WorkersBSPainter;
 import playground.sergioo.workplaceCapacities.hits.PersonSchedule;
 import playground.sergioo.workplaceCapacities.hits.PointPerson;
 import playground.sergioo.workplaceCapacities.hits.Trip;
@@ -920,6 +922,7 @@ public class MainWorkplaceCapacities {
 		ResultSet buildingsR = dataBaseAux.executeQuery("SELECT objectid, mpb.x as xcoord, mpb.y as ycoord, perc_surf as area_perc, fea_id AS id_building, postal_code as postal_code FROM work_facilities_aux.masterplan_areas mpa LEFT JOIN work_facilities_aux.masterplan_building_perc mpb ON mpa.objectid = mpb.object_id  WHERE use_for_generation = 1");
 		facilities = new ActivityFacilitiesImpl();
 		int b=0;
+		Map<String, Double> scheduleCapacities = new HashMap<String, Double>();
 		while(buildingsR.next()) {
 			Id areaId =  new IdImpl(buildingsR.getString(1));
 			MPAreaData mPArea = dataMPAreas.get(areaId);
@@ -932,6 +935,10 @@ public class MainWorkplaceCapacities {
 			for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {
 				double capacity = activityOptionArea.getCapacity()*proportion;
 				if(capacity>0) {
+					Double scheduleCapacity = scheduleCapacities.get(activityOptionArea.getType());
+					if(scheduleCapacity==null)
+						scheduleCapacity = 0.0;
+					scheduleCapacities.put(activityOptionArea.getType(), scheduleCapacity+capacity);
 					ActivityOption activityOption = new ActivityOptionImpl(activityOptionArea.getType(), building);
 					activityOption.setCapacity(capacity);
 					activityOption.addOpeningTime(activityOptionArea.getOpeningTimes(DayType.wkday).first());
@@ -941,7 +948,27 @@ public class MainWorkplaceCapacities {
 			b++;
 		}
 		System.out.println(b + " buildings");
+		int numDesiredSchedules = 4;
+		String[] schedules = new String[numDesiredSchedules];
+		for(int n=0; n<schedules.length; n++) {
+			double maxCap = 0;
+			String maxSchedule = "";
+			for(Entry<String, Double> cap:scheduleCapacities.entrySet()) {
+				boolean in = false;
+				for(int c=0; c<n; c++)
+					if(schedules[c].equals(cap.getKey()))
+						in = true;
+				if(!in && cap.getValue()>maxCap) {
+					maxCap = cap.getValue();
+					maxSchedule = cap.getKey();
+				}
+			}
+			schedules[n] = maxSchedule;
+		}
 		capacitiesToIntegers(facilities);
+		WorkersBSPainter painter = new WorkersBSPainter(network);
+		painter.setData(facilities, schedules);
+		new BSSimpleNetworkWindow("Building capacities", painter).setVisible(true);
 		return facilities;
 	}
 	private static void capacitiesToIntegers(ActivityFacilities facilities) {

@@ -2,7 +2,7 @@ package playground.sergioo.Visualizer2D;
 
 import org.apache.commons.math.geometry.Vector3D;
 
-public class Camera3D extends Camera2D implements Camera {
+public class Camera3DOrtho extends Camera2D implements Camera {
 	
 	//Constantes
 	private static final double ZOOM_RATE = 5.0/4.0;
@@ -13,13 +13,13 @@ public class Camera3D extends Camera2D implements Camera {
 	private Vector3D h;
 	
 	//Methods
-	public Camera3D() {
+	public Camera3DOrtho() {
 		super();
-		l = new Vector3D(0, 0, 1);
-		d = new Vector3D(0, 0, -1);
-		h = new Vector3D(0, 1, 0);
+		l = new Vector3D(-1, -1, 1);
+		d = new Vector3D(1, 1, -1).normalize();
+		h = new Vector3D(1, 1, 2).normalize();
 	}
-	public Camera3D(Vector3D l, Vector3D d, Vector3D h) {
+	public Camera3DOrtho(Vector3D l, Vector3D d, Vector3D h) {
 		super();
 		this.l = l;
 		this.d = d;
@@ -58,8 +58,24 @@ public class Camera3D extends Camera2D implements Camera {
 	}
 	@Override
 	public void zoomOut() {
+		double[] center0 = getCenter();
 		l = l.subtract(d.scalarMultiply(ZOOM_RATE));
 		size.scale(ZOOM_RATE);
+		centerCamera(center0);
+	}
+	@Override
+	public void zoomIn(double x, double y) {
+		double[] center0 = new double[]{x, y, 0};
+		l = l.add(d.scalarMultiply(ZOOM_RATE));
+		size.scale(1/ZOOM_RATE);
+		centerCamera(center0);
+	}
+	@Override
+	public void zoomOut(double x, double y) {
+		double[] center0 = new double[]{x, y, 0};
+		l = l.subtract(d.scalarMultiply(ZOOM_RATE));
+		size.scale(ZOOM_RATE);
+		centerCamera(center0);
 	}
 	@Override
 	public void setBoundaries(double xMin, double yMin, double xMax, double yMax) {
@@ -68,8 +84,8 @@ public class Camera3D extends Camera2D implements Camera {
 		double[][] parameters = new double[][]{getParameters(points[0]), getParameters(points[1]), getParameters(points[2]), getParameters(points[3])};
 		xMin = Double.MAX_VALUE;
 		yMin = Double.MAX_VALUE;
-		xMax = 0;
-		yMax = 0;
+		xMax = -Double.MAX_VALUE;
+		yMax = -Double.MAX_VALUE;
 		int xMinI=0, yMaxI=0;
 		for(int i=0; i<parameters.length; i++) {
 			double[] p = parameters[i];
@@ -108,23 +124,26 @@ public class Camera3D extends Camera2D implements Camera {
 		Vector3D r = center.subtract(center0);
 		double azi = r.getAlpha()+dx*2*Math.PI/width;
 		double ele = r.getDelta()-dy*Math.PI/height;
-		if(ele<0)
-			ele = 0;
-		else if(ele>Math.PI)
-			ele = Math.PI;
+		if(ele<Math.PI/360)
+			ele = Math.PI/360;
+		else if(ele>179*Math.PI/360)
+			ele = 179*Math.PI/360;
 		Vector3D nr = new Vector3D(azi, ele).scalarMultiply(r.getNorm());
 		center = center0.add(nr);
 		d = nr.negate().normalize();
 		if(d.getZ()==1 || d.getZ()==-1)
-			h = new Vector3D(0, 1, 0);
+			h = new Vector3D(h.getX(), h.getY(), 0).normalize();
+		else if(d.getZ()==0)
+			h = new Vector3D(0, 0, 1);
 		else
 			h = new Vector3D(d.getX(), d.getY(), d.getZ()-(1/d.getZ())).normalize();
 		Vector3D u = Vector3D.crossProduct(d, h);
 		Vector3D v = h;
 		l = center.subtract(u.scalarMultiply(size.getX()/2).add(v.scalarMultiply(size.getY()/2)));
 	}
-	public void centerCamera(double x, double y) {
-		l = getPointInCamera(new double[]{x, y, 0});
+	@Override
+	public void centerCamera(double[] p) {
+		l = getPointInCamera(new double[]{p[0], p[1], 0});
 		l = getVector(-size.getX()/2, -size.getY()/2);
 	}
 	@Override
@@ -138,8 +157,11 @@ public class Camera3D extends Camera2D implements Camera {
 			p = new Vector3D(point[0], point[1], 0);
 		else
 			p = new Vector3D(point[0], point[1], point[2]);
-		double t = (Vector3D.dotProduct(d, l)-Vector3D.dotProduct(d, p));
+		double t = -getDistanceToCamera(p);
 		return d.scalarMultiply(t).add(p);
+	}
+	public double getDistanceToCamera(Vector3D p) {
+		return Vector3D.dotProduct(d, p)-Vector3D.dotProduct(d, l);
 	}
 	private double[] getParameters(double[] point) {
 		Vector3D s = getPointInCamera(point); 

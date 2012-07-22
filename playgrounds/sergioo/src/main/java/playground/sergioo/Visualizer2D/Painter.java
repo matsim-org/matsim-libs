@@ -8,18 +8,17 @@ import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.collections.Tuple;
 
 
 public abstract class Painter {
 
 	//Methods
 	public abstract void paint(Graphics2D g2, LayersPanel layersPanel);
-	protected void paintLine(Graphics2D g2, LayersPanel layersPanel, Tuple<double[], double[]> coords, Stroke stroke, Color color) {
+	protected void paintLine(Graphics2D g2, LayersPanel layersPanel, double[] pointA, double[] pointB, Stroke stroke, Color color) {
 		g2.setStroke(stroke);
 		g2.setColor(color);
-		int[] screenPointA = layersPanel.getScreenXY(coords.getFirst());
-		int[] screenPointB = layersPanel.getScreenXY(coords.getSecond());
+		int[] screenPointA = layersPanel.getScreenXY(pointA);
+		int[] screenPointB = layersPanel.getScreenXY(pointB);
 		g2.drawLine(screenPointA[0], screenPointA[1],screenPointB[0],screenPointB[1]);
 	}
 	protected void paintCircle(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
@@ -42,11 +41,11 @@ public abstract class Painter {
 		g2.drawLine(screenPoint[0]-(int)pointSize, screenPoint[1]+(int)pointSize, screenPoint[0]+(int)pointSize, screenPoint[1]-(int)pointSize);
 		g2.drawLine(screenPoint[0]-(int)pointSize, screenPoint[1]-(int)pointSize, screenPoint[0]+(int)pointSize, screenPoint[1]+(int)pointSize);
 	}
-	protected void paintArrow(Graphics2D g2, LayersPanel layersPanel, Tuple<double[], double[]> points, double angleArrow, double longArrow, Stroke stroke, Color color) {
-		double angle = Math.atan2(points.getSecond()[1]-points.getFirst()[1], points.getSecond()[0]-points.getFirst()[0]);
-		paintLine(g2, layersPanel, points, stroke, color);
-		paintLine(g2, layersPanel, new Tuple<double[], double[]>(points.getSecond(), new double[]{points.getSecond()[0]-longArrow*Math.sin(Math.PI/2-angle-angleArrow), points.getSecond()[1]-longArrow*Math.cos(Math.PI/2-angle-angleArrow)}), stroke, color);
-		paintLine(g2, layersPanel, new Tuple<double[], double[]>(points.getSecond(), new double[]{points.getSecond()[0]-longArrow*Math.sin(Math.PI/2-angle+angleArrow), points.getSecond()[1]-longArrow*Math.cos(Math.PI/2-angle+angleArrow)}), stroke, color);
+	protected void paintArrow(Graphics2D g2, LayersPanel layersPanel, double[] pointA, double[] pointB, double angleArrow, double longArrow, Stroke stroke, Color color) {
+		double angle = Math.atan2(pointB[1]-pointA[1], pointB[0]-pointA[0]);
+		paintLine(g2, layersPanel, pointA, pointB, stroke, color);
+		paintLine(g2, layersPanel, pointB, new double[]{pointB[0]-longArrow*Math.sin(Math.PI/2-angle-angleArrow), pointB[1]-longArrow*Math.cos(Math.PI/2-angle-angleArrow)}, stroke, color);
+		paintLine(g2, layersPanel, pointB, new double[]{pointB[0]-longArrow*Math.sin(Math.PI/2-angle+angleArrow), pointB[1]-longArrow*Math.cos(Math.PI/2-angle+angleArrow)}, stroke, color);
 	}
 	
 }

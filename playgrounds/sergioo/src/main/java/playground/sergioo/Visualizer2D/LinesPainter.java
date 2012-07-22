@@ -29,7 +29,7 @@ public class LinesPainter extends Painter {
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		Stroke stroke = new BasicStroke(2);
 		for(Tuple<double[], double[]> line:lines)
-			paintLine(g2, layersPanel, line, stroke, Color.PINK);
+			paintLine(g2, layersPanel, line.getFirst(), line.getSecond(), stroke, Color.PINK);
 	}
 
 }

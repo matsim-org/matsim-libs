@@ -19,7 +19,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -195,7 +194,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 	protected void paintLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, double pointSize, Color color) {
 		double[] from = new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()};
 		double[] to = new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()};
-		paintLine(g2, layersPanel, new Tuple<double[], double[]>(from, to), stroke, color);
+		paintLine(g2, layersPanel, from, to, stroke, color);
 		//paintCircle(g2,link.getToNode().getCoord(), pointSize, color);
 	}
 	

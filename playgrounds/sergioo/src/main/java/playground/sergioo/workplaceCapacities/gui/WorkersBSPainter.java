@@ -1,26 +1,27 @@
 package playground.sergioo.workplaceCapacities.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedMap;
+import java.awt.Stroke;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+
+import others.sergioo.visUtils.JetColor;
 
 import playground.sergioo.Visualizer2D.LayersPanel;
+import playground.sergioo.Visualizer2D.LinesPainter3D;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
-import playground.sergioo.workplaceCapacities.MPAreaData;
 
 public class WorkersBSPainter extends NetworkPainter {
 	
 	
+	private static final double MAX_HEIGHT = 500;
+	private static final Stroke STROKE = new BasicStroke(3);
 	//Attributes
-	private List<MPAreaData> dataMPAreas = new ArrayList<MPAreaData>();
-	private Color color = new Color(1,0,0,0.3f);
-	private double[] wTotals;
+	private LinesPainter3D linesPainter3D;
 	private double minCapacity;
 	private double maxCapacity;
 	
@@ -29,37 +30,42 @@ public class WorkersBSPainter extends NetworkPainter {
 		super(network);
 	}
 	public WorkersBSPainter(Network network, Color color) {
-		super(network);
-		this.color = color;
+		super(network, color);
 	}
-	public void setData(double[][][] matrixCapacities, SortedMap<Id, MPAreaData> dataMPAreas) {
+	public LinesPainter3D getLinesPainter3D() {
+		return linesPainter3D;
+	}
+	public void setData(ActivityFacilities facilities, String[] schedules) {
 		minCapacity = Double.MAX_VALUE;
 		maxCapacity = 0;
-		wTotals = new double[matrixCapacities[0].length];
-		for(int w=0; w<matrixCapacities[0].length; w++) {
-			double wTotal=0;
-			Iterator<MPAreaData> it = dataMPAreas.values().iterator();
-			while(it.hasNext())
-				this.dataMPAreas.add(it.next());
-			for(int s=0; s<matrixCapacities.length; s++)
-				for(int c=0; c<matrixCapacities[0][0].length; s++)
-					wTotal += matrixCapacities[s][w][c];
-			if(wTotal<minCapacity)
-				minCapacity = wTotal;
-			if(wTotal>maxCapacity)
-				maxCapacity = wTotal;
-			wTotals[w] = wTotal;
+		Color[] colors = new Color[schedules.length];
+		for(int c=0; c<schedules.length; c++)
+			colors[c] = JetColor.getJetColor((c+0.5f)/schedules.length);
+		for(ActivityFacility facility:facilities.getFacilities().values()) {
+			for(String schedule:schedules) {
+				double capacity = facility.getActivityOptions().get(schedule).getCapacity();
+				if(capacity<minCapacity)
+					minCapacity = capacity;
+				if(capacity>maxCapacity)
+					maxCapacity = capacity;
+			}
 		}
 		if(minCapacity==maxCapacity)
 			maxCapacity++;
+		for(ActivityFacility facility:facilities.getFacilities().values()) {
+			int c=0;
+			for(String schedule:schedules) {
+				double capacity = facility.getActivityOptions().get(schedule).getCapacity();
+				linesPainter3D.addLine(new double[]{facility.getCoord().getX(), facility.getCoord().getY(), 0}, new double[]{facility.getCoord().getX(), facility.getCoord().getY(), capacity*MAX_HEIGHT/maxCapacity}, colors[c], STROKE);
+				c++;
+			}
+		}
+		
 	}
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		super.paint(g2, layersPanel);
-		double maxSize = 10;
-		for(int w=0; w<wTotals.length; w++)
-			if(wTotals[w]>0)
-				paintCircle(g2, layersPanel, dataMPAreas.get(w).getCoord(), (wTotals[w]-minCapacity)*maxSize/(maxCapacity-minCapacity), color);
+		linesPainter3D.paint(g2, layersPanel);
 	}
 
 }
