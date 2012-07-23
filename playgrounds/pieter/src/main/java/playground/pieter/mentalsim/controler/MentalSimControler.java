@@ -10,6 +10,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -28,7 +30,7 @@ import playground.pieter.mentalsim.replanning.MentalSimSubSetSimulationStrategyM
  * @author fouriep
  * 
  */
-public class MentalSimControler extends Controler {
+public class MentalSimControler extends Controler implements StartupListener{
 	
 	private ObjectAttributes agentsMarkedForMentalSim = new ObjectAttributes();
 	public static String AGENT_ATT = "mentalsimAgent";
@@ -142,6 +144,16 @@ public class MentalSimControler extends Controler {
 
 		}
 		
+	}
+
+
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		String subsettrigger = this.getConfig().getParam("MentalSim", "simulateSubsetPersonsOnly");
+		if(subsettrigger != null){
+			this.setSimulateSubsetPersonsOnly(Boolean.parseBoolean(subsettrigger));
+		}
 	}
 
 }
