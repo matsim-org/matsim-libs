@@ -50,7 +50,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
@@ -68,7 +68,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 	private PlanStrategy delegate = null;
 
-	private MATSimUtilityModificationCalibrator<TransitStopFacility> calibrator = null;
+	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
 	private final SimResultsContainerImpl simResults;
 	private final double countsScaleFactor;
 	private final Counts occupCounts = new Counts();
@@ -161,7 +161,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 	/**
 	 * for testing purposes only
 	 */
-	/*package*/ MATSimUtilityModificationCalibrator<TransitStopFacility> getCalibrator() {
+	/*package*/ AnalyticalCalibrator<TransitStopFacility> getCalibrator() {
 		return this.calibrator;
 	}
 

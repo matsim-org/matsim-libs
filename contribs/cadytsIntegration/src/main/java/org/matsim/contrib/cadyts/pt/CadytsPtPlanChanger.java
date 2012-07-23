@@ -28,7 +28,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
 /**
  * @author nagel
@@ -41,11 +41,11 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 
 	private final PtPlanToPlanStepBasedOnEvents ptPlanToPlanStep;
 
-	private final MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator;
+	private final AnalyticalCalibrator<TransitStopFacility> matsimCalibrator;
 
 	private boolean cadCorrMessGiven = false;
 
-	/*package*/ CadytsPtPlanChanger(final PtPlanToPlanStepBasedOnEvents ptStep, final MATSimUtilityModificationCalibrator<TransitStopFacility> calib) {
+	/*package*/ CadytsPtPlanChanger(final PtPlanToPlanStepBasedOnEvents ptStep, final AnalyticalCalibrator<TransitStopFacility> calib) {
 		log.error("value for beta currently ignored (set to one)");
 		this.ptPlanToPlanStep = ptStep;
 		this.matsimCalibrator = calib;
@@ -71,11 +71,13 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 		}
 
 		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(currentPlan);
-		double currentPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(currentPlanSteps) / this.beta;
+//		double currentPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(currentPlanSteps) / this.beta;
+		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
 		double currentScore = currentPlan.getScore().doubleValue() + currentPlanCadytsCorrection;
 
 		cadyts.demand.Plan<TransitStopFacility> otherPlanSteps = this.ptPlanToPlanStep.getPlanSteps(otherPlan);
-		double otherPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps) / this.beta;
+//		double otherPlanCadytsCorrection = this.matsimCalibrator.getUtilityCorrection(otherPlanSteps) / this.beta;
+		double otherPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(otherPlanSteps) / this.beta;
 		double otherScore = otherPlan.getScore().doubleValue() + otherPlanCadytsCorrection;
 
 		if (currentPlanCadytsCorrection != otherPlanCadytsCorrection && !this.cadCorrMessGiven) {
@@ -99,7 +101,8 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 		// sampler.enforceNextAccept();
 		// sampler.isAccepted(this.ptPlanToPlanStep.getPlanSteps(selectedPlan));
 
-		this.matsimCalibrator.registerChoice(selectedPlanSteps);
+//		this.matsimCalibrator.registerChoice(selectedPlanSteps);
+		this.matsimCalibrator.addToDemand(selectedPlanSteps);
 
 		return selectedPlan;
 	}

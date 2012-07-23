@@ -30,7 +30,7 @@ import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 
@@ -44,31 +44,34 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		// private Constructor, should not be instantiated
 	}
 
-	/*package*/ static MATSimUtilityModificationCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts) {
-		CadytsPtConfigGroup config = (CadytsPtConfigGroup) sc.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts) {
+		return buildCalibrator(sc,occupCounts,3600) ;
+	}
+
+	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts, 
+			int timeBinSize_s ) {
+		CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) sc.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
 
 		if (occupCounts.getCounts().size() == 0) {
 			throw new RuntimeException("CadytsPt requires counts-data.");
 		}
 
-		double regressionInertia = config.getRegressionInertia();
+		AnalyticalCalibrator<TransitStopFacility> matsimCalibrator = new AnalyticalCalibrator<TransitStopFacility>(
+				sc.getConfig().controler().getOutputDirectory() + "/cadyts.log",
+				MatsimRandom.getLocalInstance().nextLong(),
+				timeBinSize_s ) ;
+		matsimCalibrator.setRegressionInertia(cadytsPtConfig.getRegressionInertia()) ;
 
-		MATSimUtilityModificationCalibrator<TransitStopFacility> matsimCalibrator =
-				new MATSimUtilityModificationCalibrator<TransitStopFacility>(
-						sc.getConfig().controler().getOutputDirectory() + "/cadyts.log",
-						MatsimRandom.getLocalInstance(),
-						regressionInertia);
-
-		matsimCalibrator.setMinStddev(config.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
-		matsimCalibrator.setFreezeIteration(config.getFreezeIteration());
-		matsimCalibrator.setPreparatoryIterations(config.getPreparatoryIterations());
-		matsimCalibrator.setVarianceScale(config.getVarianceScale());
-		matsimCalibrator.setBruteForce(config.useBruteForce());
+		matsimCalibrator.setMinStddev(cadytsPtConfig.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
+		matsimCalibrator.setFreezeIteration(cadytsPtConfig.getFreezeIteration());
+		matsimCalibrator.setPreparatoryIterations(cadytsPtConfig.getPreparatoryIterations());
+		matsimCalibrator.setVarianceScale(cadytsPtConfig.getVarianceScale());
+		matsimCalibrator.setBruteForce(cadytsPtConfig.useBruteForce());
 		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "/calibration-stats.txt");
 
 
-		int arStartTime = config.getStartHour();
-		int arEndTime = config.getEndHour();
+		int arStartTime = cadytsPtConfig.getStartHour();
+		int arEndTime = cadytsPtConfig.getEndHour();
 
 		TransitSchedule schedule = sc.getTransitSchedule();
 

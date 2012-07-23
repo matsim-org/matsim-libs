@@ -61,9 +61,16 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	private final Set<Id> calibratedLines;
 
 	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines) {
+		this(calibratedLines,3600) ;
+	}
+	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines, int timeBinSize_s ) {
 		this.calibratedLines = calibratedLines;
-		this.timeBinSize = 3600;
+		this.timeBinSize = timeBinSize_s ;
+
 		this.maxTime = 24 * 3600 - 1;
+		// (yy not completely clear if it might be better to use 24*this.timeBimSize, but it is overall not so great
+		// to have this hardcoded.  kai/manuel, jul'12)
+
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
 		this.occupancies = new HashMap<Id, int[]>();
 	}
