@@ -3,8 +3,10 @@ package playground.pieter.mentalsim.controler.listeners;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
@@ -89,4 +91,13 @@ public class MentalSimSubSetSimulationListener implements ControlerListener,
 		}
 
 	}
+
+
+//	@Override
+//	public void notifyStartup(StartupEvent event) {
+//		String subsettrigger = this.controler.getConfig().getParam("MentalSim", "simulateSubsetPersonsOnly");
+//		if(subsettrigger != null){
+//			this.controler.setSimulateSubsetPersonsOnly(Boolean.parseBoolean(subsettrigger));
+//		}
+//	}
 }

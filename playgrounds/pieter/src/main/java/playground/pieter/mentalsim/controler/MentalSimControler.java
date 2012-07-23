@@ -30,7 +30,7 @@ import playground.pieter.mentalsim.replanning.MentalSimSubSetSimulationStrategyM
  * @author fouriep
  * 
  */
-public class MentalSimControler extends Controler implements StartupListener{
+public class MentalSimControler extends Controler{
 	
 	private ObjectAttributes agentsMarkedForMentalSim = new ObjectAttributes();
 	public static String AGENT_ATT = "mentalsimAgent";
@@ -148,12 +148,6 @@ public class MentalSimControler extends Controler implements StartupListener{
 
 
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		String subsettrigger = this.getConfig().getParam("MentalSim", "simulateSubsetPersonsOnly");
-		if(subsettrigger != null){
-			this.setSimulateSubsetPersonsOnly(Boolean.parseBoolean(subsettrigger));
-		}
-	}
+
 
 }
