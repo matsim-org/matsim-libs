@@ -60,12 +60,13 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	private final Set<Id> transitVehicles = new HashSet<Id>();
 	private final Set<Id> calibratedLines;
 
-	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines) {
-		this(calibratedLines,3600) ;
-	}
+//	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines) {
+//		this(calibratedLines,3600) ;
+//	}
 	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines, int timeBinSize_s ) {
 		this.calibratedLines = calibratedLines;
 		this.timeBinSize = timeBinSize_s ;
+		System.err.println( "time bin size: " + this.timeBinSize ) ;
 
 		this.maxTime = 24 * 3600 - 1;
 		// (yy not completely clear if it might be better to use 24*this.timeBimSize, but it is overall not so great
@@ -174,7 +175,8 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		this.occupancies = occupancies;
 	}
 
-	private int getTimeSlotIndex(final double time) {
+	@Deprecated // try to use request that also contains time instead
+	int getTimeSlotIndex(final double time) {
 		if (time > this.maxTime) {
 			return this.maxSlotIndex;
 		}
@@ -187,9 +189,14 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	 *         {@code stopId} per time bin, starting with time bin 0 from 0 seconds to
 	 *         (timeBinSize-1)seconds.
 	 */
+	@Deprecated // try to use request that also contains time instead
 	public int[] getOccupancyVolumesForStop(final Id stopId) {
 		return this.occupancies.get(stopId);
 	}
+	 public int getOccupancyVolumeForStopAndTime(final Id stopId, final int time_s ) {
+		 int timeBinIndex = getTimeSlotIndex( time_s ) ;
+		 return this.occupancies.get(stopId)[timeBinIndex] ;
+	 }
 
 	public Set<Id> getOccupancyStopIds() {
 		return this.occupancies.keySet();
@@ -222,7 +229,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 			// get sim-Values
 			int[] ocuppancy = this.occupancies.get(stopId);
 			writer.write(stopId.toString() + TAB);
-			for (int i = 0; i < 24; i++) {
+			for (int i = 0; i < ocuppancy.length; i++) {
 				Volume v = count.getVolume(i + 1);
 				if (v != null) {
 					writer.write(v.getValue() + TAB);
@@ -230,7 +237,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 					writer.write("n/a" + TAB);
 				}
 			}
-			for (int i = 0; i < 24; i++) {
+			for (int i = 0; i < ocuppancy.length; i++) {
 				writer.write((ocuppancy != null ? ocuppancy[i] : 0) + TAB);
 			}
 			writer.write(count.getCoord().toString() + TAB + count.getCsId() + NL);

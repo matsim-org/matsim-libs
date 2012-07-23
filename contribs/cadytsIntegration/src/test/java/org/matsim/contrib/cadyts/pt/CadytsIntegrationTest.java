@@ -33,6 +33,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
@@ -153,6 +155,87 @@ public class CadytsIntegrationTest {
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6], MatsimTestUtils.EPSILON);
 		}
+	}
+
+	@Test
+	public final void testCalibrationTwo() throws IOException {
+		String inputDir = this.utils.getClassInputDirectory();
+		String outputDir = this.utils.getOutputDirectory();
+
+		String configFile = inputDir + "equil_config2.xml";
+		Config config = this.utils.loadConfig(configFile);
+
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
+		controler.setDumpDataAtEnd(true);
+		
+//		controler.addControlerListener( new StartupListener() {
+//			
+//			@Override
+//			public void notifyStartup(StartupEvent event) {
+//				CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) event.getControler().getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+//				cadytsPtConfig.setTimeBinSize(3600) ;
+//			}
+//		}) ;
+		
+		
+		controler.run();
+
+		//scenario data  test
+		Assert.assertNotNull("config is null" , controler.getConfig());
+		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
+		Assert.assertEquals("Different number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
+		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
+		Assert.assertEquals("Num. of trLines is wrong.", controler.getScenario().getTransitSchedule().getTransitLines().size() , 1);
+		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);
+		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
+		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
+		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//counts
+		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
+		Counts occupCounts = new Counts();
+		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
+		Count count =  occupCounts.getCount(new IdImpl("stop1"));
+		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
+		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
+
+		// test resulting simulation volumes
+		{
+			String outCounts = outputDir + "ITERS/it.10/10.simCountCompareOccupancy.txt";
+			CountsReader reader = new CountsReader(outCounts);
+			double[] simValues;
+			double[] realValues;
+			Id stopId;
+
+			stopId = new IdImpl("stop1");
+			simValues = reader.getSimulatedValues(stopId);
+			realValues= reader.getRealValues(stopId);
+			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
+
+			stopId = new IdImpl("stop2");
+			simValues = reader.getSimulatedValues(stopId);
+			realValues= reader.getRealValues(stopId);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
+
+			stopId = new IdImpl("stop6");
+			simValues = reader.getSimulatedValues(stopId);
+			realValues= reader.getRealValues(stopId);
+			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
+
+			stopId = new IdImpl("stop10");
+			simValues = reader.getSimulatedValues(stopId);
+			realValues= reader.getRealValues(stopId);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6], MatsimTestUtils.EPSILON);
+		}
 
 		// test calibration statistics
 		{
@@ -161,19 +244,19 @@ public class CadytsIntegrationTest {
 			new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
 
 			CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));
-//	old values, seem not to work
-//			Assert.assertEquals("different Count_ll", "-1.546875", outStatData.getCount_ll() );
-//			Assert.assertEquals("different Count_ll_pred_err",  "9.917082938182276E-8" , outStatData.getCount_ll_pred_err() );
-//			Assert.assertEquals("different Link_lambda_avg", "0.0013507168476099964", outStatData.getLink_lambda_avg() );
-//			Assert.assertEquals("different Link_lambda_max", "0.031434867572002166" , outStatData.getLink_lambda_max() );
-//			Assert.assertEquals("different Link_lambda_min", "0.0", outStatData.getLink_lambda_min() );
-//			Assert.assertEquals("different Link_lambda_stddev", "0.0058320747961925256" , outStatData.getLink_lambda_stddev());
-//			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
-//			Assert.assertEquals("different Plan_lambda_avg", "0.04322293912351989", outStatData.getPlan_lambda_avg() );
-//			Assert.assertEquals("different Plan_lambda_max", "0.04715229919344063" , outStatData.getPlan_lambda_max() );
-//			Assert.assertEquals("different Plan_lambda_min", "0.03929357905359915" , outStatData.getPlan_lambda_min() );
-//			Assert.assertEquals("different Plan_lambda_stddev", "0.004200662608832472" , outStatData.getPlan_lambda_stddev());
-//			Assert.assertEquals("different Total_ll", "-1.546875", outStatData.getTotal_ll() );
+			//	old values, seem not to work
+			//			Assert.assertEquals("different Count_ll", "-1.546875", outStatData.getCount_ll() );
+			//			Assert.assertEquals("different Count_ll_pred_err",  "9.917082938182276E-8" , outStatData.getCount_ll_pred_err() );
+			//			Assert.assertEquals("different Link_lambda_avg", "0.0013507168476099964", outStatData.getLink_lambda_avg() );
+			//			Assert.assertEquals("different Link_lambda_max", "0.031434867572002166" , outStatData.getLink_lambda_max() );
+			//			Assert.assertEquals("different Link_lambda_min", "0.0", outStatData.getLink_lambda_min() );
+			//			Assert.assertEquals("different Link_lambda_stddev", "0.0058320747961925256" , outStatData.getLink_lambda_stddev());
+			//			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
+			//			Assert.assertEquals("different Plan_lambda_avg", "0.04322293912351989", outStatData.getPlan_lambda_avg() );
+			//			Assert.assertEquals("different Plan_lambda_max", "0.04715229919344063" , outStatData.getPlan_lambda_max() );
+			//			Assert.assertEquals("different Plan_lambda_min", "0.03929357905359915" , outStatData.getPlan_lambda_min() );
+			//			Assert.assertEquals("different Plan_lambda_stddev", "0.004200662608832472" , outStatData.getPlan_lambda_stddev());
+			//			Assert.assertEquals("different Total_ll", "-1.546875", outStatData.getTotal_ll() );
 			Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
 			Assert.assertEquals("different Count_ll_pred_err",  "1.9637069748057535E-15" , outStatData.getCount_ll_pred_err() );
 			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );

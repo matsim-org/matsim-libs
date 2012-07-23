@@ -106,7 +106,7 @@ class CadytsPtCountsComparisonAlgorithm {
 			this.content.append(stopId.toString());
 			this.content.append(this.STR_HEAD);
 
-			for (int hour = 1; hour <= 24; hour++) {
+			for (int hour = 1; hour <= volumes.length; hour++) {
 				// real volumes:
 				Volume volume = count.getVolume(hour);
 				if (volume != null) {

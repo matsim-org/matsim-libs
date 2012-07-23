@@ -159,9 +159,9 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
 			TransitStopFacility stop= NewPtBsePlanStrategy.trSched.getFacilities().get(entry.getKey());
 			for (Volume volume : entry.getValue().getVolumes().values()){
-				if (volume.getHour() >= arStartTime && volume.getHour() <= arEndTime) {    //add volumes for each hour to calibrator
-					int start_s = (volume.getHour() - 1) * 3600;
-					int end_s = volume.getHour() * 3600 - 1;
+				if (volume.getTimeBinIndexStartingWithOne() >= arStartTime && volume.getTimeBinIndexStartingWithOne() <= arEndTime) {    //add volumes for each hour to calibrator
+					int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * 3600;
+					int end_s = volume.getTimeBinIndexStartingWithOne() * 3600 - 1;
 					double val_passager_h = volume.getValue();
 					matsimCalibrator.addMeasurement(stop, start_s, end_s, val_passager_h, SingleLinkMeasurement.TYPE.FLOW_VEH_H);
 				}

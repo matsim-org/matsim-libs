@@ -88,7 +88,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 		this.calibratedLines = cadytsConfig.getCalibratedLines();
 
-		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedLines());
+		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize() );
 		controler.getEvents().addHandler(this.cadytsPtOccupAnalyzer);
 
 		this.countsScaleFactor = controler.getConfig().ptCounts().getCountsScaleFactor();
@@ -102,7 +102,7 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario(), this.occupCounts);
+		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario(), this.occupCounts, cadytsConfig.getTimeBinSize() );
 
 		// finally, we create the PlanStrategy, with the cadyts-based plan selector:
 		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
@@ -279,7 +279,10 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 
 		@Override
 		public double getSimValue(final TransitStopFacility stop, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
-			int hour = startTime_s / 3600;
+
+//			int hour = startTime_s / 3600;
+			int hour = this.occupancyAnalyzer.getTimeSlotIndex(startTime_s) ;
+			
 			Id stopId = stop.getId();
 			int[] values = this.occupancyAnalyzer.getOccupancyVolumesForStop(stopId);
 

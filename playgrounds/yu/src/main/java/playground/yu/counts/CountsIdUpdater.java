@@ -87,7 +87,7 @@ public class CountsIdUpdater {
 							.getCount(newLinkId));
 				} else {
 					for (Volume volume : oldCount.getVolumes().values())
-						newCount.createVolume(volume.getHour(), volume
+						newCount.createVolume(volume.getTimeBinIndexStartingWithOne(), volume
 								.getValue());
 				}
 				newCount.setCoord(newNet.getLinks().get(newLinkId).getCoord());

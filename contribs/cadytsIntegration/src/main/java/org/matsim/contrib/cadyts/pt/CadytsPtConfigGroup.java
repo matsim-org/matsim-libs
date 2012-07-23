@@ -50,6 +50,7 @@ public class CadytsPtConfigGroup extends Module {
 	public static final String END_HOUR = "endHour";
 	public static final String WRITE_ANALYSIS_FILE = "writeAnalysisFile";
 	private static final String CALIBRATED_LINES = "calibratedLines";
+	private static final String TIME_BIN_SIZE = "timeBinSize" ;
 
 	private double regressionInertia = MATSimUtilityModificationCalibrator.DEFAULT_REGRESSION_INERTIA;
 	private double minFlowStddev = MATSimUtilityModificationCalibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H;
@@ -60,6 +61,7 @@ public class CadytsPtConfigGroup extends Module {
 	private boolean writeAnalysisFile = false;
 	private int startHour = 1;
 	private int endHour = 24;
+	private int timeBinSize = 3600 ;
 
 	private final Set<Id> calibratedLines = new HashSet<Id>();
 
@@ -87,6 +89,8 @@ public class CadytsPtConfigGroup extends Module {
 			setStartHour(Integer.parseInt(value));
 		} else if (END_HOUR.equals(paramName)) {
 			setEndHour(Integer.parseInt(value));
+		} else if ( TIME_BIN_SIZE.equals(paramName)) {
+			setTimeBinSize(Integer.parseInt(value)) ;
 		} else if (CALIBRATED_LINES.equals(paramName)) {
 			this.calibratedLines.clear();
 			for (String lineId : CollectionUtils.stringToArray(value)) {
@@ -104,6 +108,7 @@ public class CadytsPtConfigGroup extends Module {
 		comments.put(CALIBRATED_LINES, "Comma-separated list of transit lines to be calibrated.");
 		comments.put(START_HOUR, "The first hour of the day to be used for calibration (start counting hours with 1, not 0)");
 		comments.put(END_HOUR, "The last hour of the day to be used for calibration (start counting hours with 1, not 0)");
+		comments.put(TIME_BIN_SIZE, "Length of time bin for which counts are aggregated.  IN SECONDS!!!!  Default is 3600.") ;
 
 		return comments;
 	}
@@ -127,6 +132,7 @@ public class CadytsPtConfigGroup extends Module {
 		params.put(START_HOUR, Integer.toString(getStartHour()));
 		params.put(END_HOUR, Integer.toString(getStartHour()));
 		params.put(CALIBRATED_LINES, CollectionUtils.idSetToString(this.calibratedLines));
+		params.put(TIME_BIN_SIZE, Integer.toString(getTimeBinSize())) ;
 
 		return params;
 	}
@@ -211,5 +217,15 @@ public class CadytsPtConfigGroup extends Module {
 		this.calibratedLines.clear();
 		this.calibratedLines.addAll(lines);
 	}
+	
+	public int getTimeBinSize() {
+		return timeBinSize;
+	}
+
+	public void setTimeBinSize(int timeBinSize) {
+		this.timeBinSize = timeBinSize;
+	}
+
+
 
 }

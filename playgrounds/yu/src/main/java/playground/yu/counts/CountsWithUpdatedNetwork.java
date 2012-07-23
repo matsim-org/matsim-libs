@@ -94,7 +94,7 @@ public class CountsWithUpdatedNetwork {
 					oldCountLinkId.toString());
 			newCount.setCoord(oldCount.getCoord());
 			for (Volume v : oldCount.getVolumes().values())
-				newCount.createVolume(v.getHour(), v.getValue());
+				newCount.createVolume(v.getTimeBinIndexStartingWithOne(), v.getValue());
 		}
 
 		counts

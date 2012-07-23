@@ -329,10 +329,10 @@ public class BseUCControlerListener implements StartupListener,
 				linkIds.add(entry.getKey());
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : entry.getValue().getVolumes().values()) {
-					if (volume.getHour() >= arStartTime
-							&& volume.getHour() <= arEndTime) {
-						int start_s = (volume.getHour() - 1) * 3600;
-						int end_s = volume.getHour() * 3600 - 1;
+					if (volume.getTimeBinIndexStartingWithOne() >= arStartTime
+							&& volume.getTimeBinIndexStartingWithOne() <= arEndTime) {
+						int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * 3600;
+						int end_s = volume.getTimeBinIndexStartingWithOne() * 3600 - 1;
 						double val_veh_h = volume.getValue();
 						calibrator.addMeasurement(link, start_s, end_s,
 								val_veh_h, TYPE.FLOW_VEH_H);
@@ -377,10 +377,10 @@ public class BseUCControlerListener implements StartupListener,
 				linkIds.add(entry.getKey());
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : entry.getValue().getVolumes().values()) {
-					if (volume.getHour() >= arStartTime
-							&& volume.getHour() <= arEndTime) {
-						int start_s = (volume.getHour() - 1) * 3600;
-						int end_s = volume.getHour() * 3600 - 1;
+					if (volume.getTimeBinIndexStartingWithOne() >= arStartTime
+							&& volume.getTimeBinIndexStartingWithOne() <= arEndTime) {
+						int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * 3600;
+						int end_s = volume.getTimeBinIndexStartingWithOne() * 3600 - 1;
 						double val_veh_h = volume.getValue();
 						calibrator.addMeasurement(link, start_s, end_s,
 								val_veh_h, TYPE.FLOW_VEH_H

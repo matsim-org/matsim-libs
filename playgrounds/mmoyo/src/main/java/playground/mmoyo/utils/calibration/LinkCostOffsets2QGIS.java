@@ -97,7 +97,7 @@ public class LinkCostOffsets2QGIS {
 						Count linkCount = linkCounts.createCount(stop2LinkMap.get(stopCount.getLocId()), stopCount.getCsId());
 						linkCount.setCoord(stopCount.getCoord());
 						for(Volume vol : stopCount.getVolumes().values() ){
-							linkCount.createVolume(vol.getHour(), vol.getValue());
+							linkCount.createVolume(vol.getTimeBinIndexStartingWithOne(), vol.getValue());
 						}
 					}
 

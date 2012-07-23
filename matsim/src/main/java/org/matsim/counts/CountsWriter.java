@@ -99,7 +99,7 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 
 		@Override
 		public int compare(final Volume v1, final Volume v2) {
-			return Double.compare(v1.getHour(), v2.getHour());
+			return Double.compare(v1.getTimeBinIndexStartingWithOne(), v2.getTimeBinIndexStartingWithOne());
 		}
 	}
 	

@@ -66,7 +66,7 @@ import java.io.IOException;
 	@Override
 	public void startVolume(final Volume volume, final BufferedWriter out) throws IOException {
 		out.write("\t\t<volume");
-		out.write(" h=\"" + volume.getHour() + "\"");
+		out.write(" h=\"" + volume.getTimeBinIndexStartingWithOne() + "\"");
 		out.write(" val=\"" + volume.getValue() + "\"");
 		out.write(" />\n");
 	}

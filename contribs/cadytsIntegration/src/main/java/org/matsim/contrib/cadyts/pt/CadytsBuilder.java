@@ -44,9 +44,9 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		// private Constructor, should not be instantiated
 	}
 
-	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts) {
-		return buildCalibrator(sc,occupCounts,3600) ;
-	}
+//	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts) {
+//		return buildCalibrator(sc,occupCounts,3600) ;
+//	}
 
 	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts, 
 			int timeBinSize_s ) {
@@ -70,8 +70,9 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "/calibration-stats.txt");
 
 
-		int arStartTime = cadytsPtConfig.getStartHour();
-		int arEndTime = cadytsPtConfig.getEndHour();
+		int arStartTime_s = 3600*cadytsPtConfig.getStartHour()-3600 ;
+		int arEndTime_s = 3600*cadytsPtConfig.getEndHour()-1 ;
+		// yyyy would be better to fix this; see email to balmermi and rieser 23/jul/2012 by kai & manuel
 
 		TransitSchedule schedule = sc.getTransitSchedule();
 
@@ -79,11 +80,14 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
 			TransitStopFacility stop = schedule.getFacilities().get(entry.getKey());
 			for (Volume volume : entry.getValue().getVolumes().values()){
-				if (volume.getHour() >= arStartTime && volume.getHour() <= arEndTime) {    //add volumes for each hour to calibrator
-					int start_s = (volume.getHour() - 1) * 3600;
-					int end_s = volume.getHour() * 3600 - 1;
+				int startTimeOfBin_s = (volume.getTimeBinIndexStartingWithOne()-1)*timeBinSize_s ;
+				int endTimeOfBin_s   = volume.getTimeBinIndexStartingWithOne()*timeBinSize_s - 1 ;
+				if (startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) {    //add volumes for each bin to calibrator
+//					int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * timeBinSize_s ;
+//					int end_s = volume.getTimeBinIndexStartingWithOne() * timeBinSize_s - 1;
 					double val_passager_h = volume.getValue();
-					matsimCalibrator.addMeasurement(stop, start_s, end_s, val_passager_h, SingleLinkMeasurement.TYPE.FLOW_VEH_H);
+					matsimCalibrator.addMeasurement(stop, startTimeOfBin_s, endTimeOfBin_s, val_passager_h, 
+							SingleLinkMeasurement.TYPE.FLOW_VEH_H);
 				}
 			}
 		}
