@@ -27,7 +27,7 @@ import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityo
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-public class ORCAabTau {
+public class ORCAabTauDbg implements Constraint{
 
 
 	//TODO do we need them as member variables?
@@ -67,7 +67,17 @@ public class ORCAabTau {
 
 	private double vyA;
 
-	public ORCAabTau(Agent2D A, Agent2D B, double tau) {
+	private double p0x;
+
+	private double p0y;
+
+	private double p1x;
+
+	private double p1y;
+
+	private int sign;
+
+	public ORCAabTauDbg(Agent2D A, Agent2D B, double tau) {
 		construct(A,B,tau);
 	}
 
@@ -121,15 +131,31 @@ public class ORCAabTau {
 		}
 
 
+		calcORCA();
+		
+		
 	}
 
 	
+	private void calcORCA() {
+
+		double xBase = this.vxA + this.ux/2;
+		double yBase = this.vyA + this.uy/2;
+		this.p0x = xBase - this.sign*this.uy;
+		this.p0y = yBase + this.sign*this.ux;
+		this.p1x = xBase + 5*this.sign*this.uy;
+		this.p1y = yBase - 5*this.sign*this.ux;		
+		
+	}
+
 	private void computeVectorUForLeftTangent() {
 		computeVectorUFroTangent(this.tangents[0],this.tangents[1]);
+		this.sign = Algorithms.isLeftOfLine(this.vxAvxB, this.vyAvyB, 0, 0, this.tangents[0],this.tangents[1]) > 0 ? -1 : 1;
 		
 	}
 	private void computeVectorUForRightTangent() {
 		computeVectorUFroTangent(this.tangents[2],this.tangents[3]);
+		this.sign = Algorithms.isLeftOfLine(this.vxAvxB, this.vyAvyB, 0, 0, this.tangents[2],this.tangents[3]) < 0 ? -1 : 1;
 		
 	}
 
@@ -156,11 +182,15 @@ public class ORCAabTau {
 		//length of vector u
 		double norm = Math.sqrt(Math.pow(x, 2)+Math.pow(y, 2));
 		
-		double dx = - (x *this.tauR)/norm;
-		double dy = - (y *this.tauR)/norm;
+		this.sign = norm > this.tauR ? -1 : 1;
 		
-		this.ux = x + dx;
-		this.uy = y + dy;
+		this.ux = x / norm * (norm - this.tauR);
+		this.uy = y / norm * (norm - this.tauR);
+//		double dx = - (x *this.tauR)/norm;
+//		double dy = - (y *this.tauR)/norm;
+//		
+//		this.ux = x + dx;
+//		this.uy = y + dy;
 		
 		
 	}
@@ -221,8 +251,56 @@ public class ORCAabTau {
 		LineString vu = GisDebugger.geofac.createLineString(new Coordinate[]{new Coordinate(this.vxA,this.vyA), new Coordinate(this.vxA+this.ux/2,this.vyA+this.uy/2)});
 		GisDebugger.addGeometry(vu, "u/2");
 		
-		LineString ORCA = GisDebugger.geofac.createLineString(new Coordinate[]{new Coordinate(this.vxA+this.ux/2-10*this.uy,this.vyA+this.uy/2+10*this.ux),new Coordinate(this.vxA+this.ux/2+10*this.uy,this.vyA+this.uy/2-10*this.ux)});
+		LineString ORCA = GisDebugger.geofac.createLineString(new Coordinate[]{new Coordinate(this.p0x,this.p0y),new Coordinate(this.p1x,this.p1y)});
 		GisDebugger.addGeometry(ORCA, "ORCA");
+	}
+
+	@Override
+	public boolean solutionSatisfyConstraint(double x, double y) {
+		return Algorithms.isLeftOfLine(x, y, this.p0x, this.p0y, this.p1x, this.p1y) > 0;
+	}
+
+	@Override
+	public double getP0x() {
+		return this.p0x;
+	}
+
+	@Override
+	public void setP0x(double val) {
+		this.p0x = val;
+		
+	}
+
+	@Override
+	public double getP0y() {
+		return this.p0y;
+	}
+
+	@Override
+	public void setP0y(double val) {
+		this.p0y = val;
+		
+	}
+
+	@Override
+	public double getP1x() {
+		return this.p1x;
+	}
+
+	@Override
+	public void setP1x(double val) {
+		this.p1x = val;		
+	}
+
+	@Override
+	public double getP1y() {
+		return this.p1y;
+	}
+
+	@Override
+	public void setP1y(double val) {
+		this.p1y = val;
+		
 	}
 
 }

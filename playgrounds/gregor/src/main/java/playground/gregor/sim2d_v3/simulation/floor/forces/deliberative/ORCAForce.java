@@ -60,22 +60,22 @@ public class ORCAForce implements DynamicForceModule{
 	@Override
 	public void run(Agent2D agent, double time) {
 		// TODO Auto-generated method stub
-		List<ORCAabTau> contraints = getORCAs(agent);
-
+		List<ORCAabTauDbg> contraints = getORCAs(agent);
+		
 	}
 
-	private List<ORCAabTau> getORCAs(Agent2D agent) {
+	private List<ORCAabTauDbg> getORCAs(Agent2D agent) {
 
 		double sensingRange = agent.getSensingRange();
 		Collection<Agent2D> l = this.agentsQuad.get(agent.getPosition().x, agent.getPosition().y, sensingRange);
 
-		List<ORCAabTau> ret = new ArrayList<ORCAabTau>(l.size()-1);
+		List<ORCAabTauDbg> ret = new ArrayList<ORCAabTauDbg>(l.size()-1);
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
 			}
-			ORCAabTau orca = new ORCAabTau(agent,other,this.tau);
-
+			ORCAabTauDbg orca = new ORCAabTauDbg(agent,other,this.tau);
+			ret.add(orca);
 			if (agent.getDelegate().getId().toString().equals("g1")) {
 				orca.gisDump();
 				String num = null;
@@ -94,7 +94,7 @@ public class ORCAForce implements DynamicForceModule{
 		}
 
 
-		return null;
+		return ret;
 	}
 
 
