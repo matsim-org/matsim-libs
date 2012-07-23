@@ -2,15 +2,13 @@
 #IN: emissionInformation_policycase_pricing_ctd.txt
 #IN: emissionInformation_policycase_zone30_ctd.txt
 
-#TODO out schreiben
+#OUT: two plots side by side, differences in costs compared to base case
 
 rm(list = ls())		# Clear all variables  
 graphics.off()		# Close graphics windows
 
-#TODO comment
-#TODO farben sinnvoll waehlen, rausfinden ob die abhaengig vom wert sein koennen: +rot, - gruen
-groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #TODO erklaeren
-graphcolors<- c("red","green") #positive, negative
+groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #order of traffic groups
+plotColors<- c("green","red") #1. color used if difference to base case is negative, 2. else
 emissions <- c("CO","CO2_TOTAL","FC","HC","NMHC","NO2","NOX","PM","SO2")
 
 #input
@@ -26,7 +24,6 @@ basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 pricase <- read.table(file=priFile, header = T, sep = "\t", comment.char="")
 z30case <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
 
-#TODO soll das so ? oder ueberhaupt nur die aufschreiben, die betrachtet werden sollen?
 #CO	CO2_TOTAL	FC	HC	NMHC	NO2	NOX	PM	SO2
 emissionc<- matrix(nrow=1, ncol=(ncol(basecase)-1))
 colnames(emissionc)<- colnames(basecase[,2:ncol(basecase)])
@@ -39,8 +36,6 @@ emissionc[1,"NO2"]<-0.0
 emissionc[1,"NOX"]<-9600/1000/1000
 emissionc[1,"PM"]<-384500/1000/1000
 emissionc[1,"SO2"]<-11000/1000/1000
-
-print(emissionc)
 
 #rownames
 rownames(basecase)<-basecase$user.group
@@ -58,38 +53,43 @@ rownames(pridata)<-groupOrder
 z30data <- matrix(ncol=1, nrow=length(groupOrder))
 colnames(z30data)<-c("change")
 rownames(z30data)<-groupOrder
-pricolors<- matrix(ncol=1, nrow=length(groupOrder))
-z30colors<- matrix(ncol=1, nrow=length(groupOrder))
 
-print(basecase)
 for(i in groupOrder){
 	pritemp<-0
 	z30temp<-0
 	for(j in emissions){
-		#+= kosten der aktuellen emission * menge der aktuellen emission
+		#+= costs of actual emission * amount of actual emission
 		pritemp<-pritemp+ emissionc[1,j]*(pricase[i, j]-basecase[i,j])
 		z30temp<-z30temp+ emissionc[1,j]*(z30case[i, j]-basecase[i,j])
 		}
-		pridata[i,"change"]<- pritemp #produkt aus emissionen und kosten pricase[i, "user.logsum..EUR."]-basecase[i, "user.logsum..EUR."]
-		z30data[i,"change"]<- z30temp #produkt aus emissionen und kosten z30case[i, "user.logsum..EUR."]- basecase[i, "user.logsum..EUR."]
-
+		pridata[i,"change"]<- pritemp
+		z30data[i,"change"]<- z30temp 
 
 }
-
-print(pridata)
-print(z30data)
-#TODO berechnungen ueberpruefen/nachvollziehen
 
 #ylimits
 yminimum<-floor(min(z30data,pridata)) #rounded down minimum
 ymaximum<-ceiling(max(z30data, pridata)) #rounded up maximum
 ylimits<-c(yminimum-5,ymaximum+5)
 
-pdf(outFile, width=20, height=7)
+#colors depending on values
+z30colors<-rep(plotColors[1], length(groupOrder))
+pricolors<-rep(plotColors[1], length(groupOrder))
+for(i in 1 : length(groupOrder)){
+	if(pridata[(groupOrder[i]), "change"]>0){
+		pricolors[i]<-"red"
+	}
+	if(z30data[groupOrder[i],"change"]>0){
+		z30colors[i]<-"red"
+	}
+}
+
 #grafic parameters
+pdf(outFile, width=20, height=7)
 par(mfrow=c(1,2), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,2,2,2)) #three figures side by side
+
 #plots and legend
-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Zone 30", col=groupColors, ylab="EUR")
-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Pricing", col=groupColors, axes =F)
+barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Zone 30", col=z30colors, ylab="EUR")
+barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Pricing", col=pricolors, axes =F)
 
 dev.off()

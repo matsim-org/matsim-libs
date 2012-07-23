@@ -4,14 +4,13 @@ graphics.off()		# Close graphics windows
 emissioncolors <- c("black", "mediumblue", "limegreen", "yellow", "red")
 
 #relative paths
-#directory <- file.path(getwd(),"rFiles/plots/analyse")
 directory <- commandArgs()[3]
 baseFile <- file.path(directory,"emissionInformation_baseCase_ctd.txt")
 z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
 priFile <- file.path(directory, "emissionInformation_policyCase_pricing.txt")
 outFile <- file.path(commandArgs()[4], "plotC.pdf")
 
-#read files
+#read tables
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 policycasez30 <- read.table(file=z30File, header = T, sep = "\t", comment.char="")
 policycasePri <- read.table(file=priFile, header = T, sep = "\t", comment.char="")

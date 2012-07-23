@@ -30,9 +30,10 @@ ylimitmax<-max(c(max(distInfoBaCgroup$total.car.distance..km.),max(distInfoZ30gr
 
 #boxplots
 boxplot(distInfoBaCgroup$total.car.distance..km., notch = F, outline = T, boxwex = 0.3, col=groupColors[1], 
-main= "Car distance", xlab=c(paste("User group", group),"Base Case, Zone 30, Pricing"), ylab="distance in km", at=1:1-0.3, ylimits=c(0, ylimitmax))
+main= "Car distance", ylab="Distance in km", at=1:1-0.3, ylimits=c(0, ylimitmax))
 boxplot(distInfoZ30group$total.car.distance..km., notch = F, outline = T, boxwex = 0.3, col=groupColors[2], add=T, at=1:1+0.0)
 boxplot(distInfoPrigroup$total.car.distance..km., notch = F, outline = T, boxwex = 0.3, col=groupColors[3], add=T, at=1:1+0.3)
+axis(1, c(0.7,1,1.3), labels=c("Base Case","Zone 30","Pricing"), tick=F)
 
 #means
 aline <- tapply(distInfoBaCgroup$total.car.distance..km., distInfoBaCgroup$user.group==group ,mean)
