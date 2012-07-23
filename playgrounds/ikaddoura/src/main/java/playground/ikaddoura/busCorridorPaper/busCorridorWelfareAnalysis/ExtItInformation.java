@@ -49,6 +49,8 @@ public class ExtItInformation {
 	
 	private int noValidPlanScore;
 	
+	private double t0MinusTAct;
+	
 	private List <Double> waitingTimes = new ArrayList<Double>();
 	private List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private List <Double> waitingTimesNotMissed = new ArrayList<Double>();
@@ -262,6 +264,14 @@ public class ExtItInformation {
 
 	public Map <Id, List<Double>> getPersonId2waitingTimes() {
 		return personId2waitingTimes;
+	}
+
+	public void setT0MinusTAct(double t0MinusTAct) {
+		this.t0MinusTAct = t0MinusTAct;
+	}
+
+	public double getT0MinusTAct() {
+		return t0MinusTAct;
 	}
 		
 }

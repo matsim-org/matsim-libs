@@ -44,6 +44,7 @@ public class OperatorUserAnalysis {
 	LinksEventHandler linksHandler;
 	WaitingTimeHandler waitHandler;
 	PtLoadHandler ptLoadHandler;
+	CarCongestionHandler congestionHandler;
 	
 	private final String lastEventFile;
 	private final Network network;
@@ -65,6 +66,7 @@ public class OperatorUserAnalysis {
 		this.linksHandler = new LinksEventHandler(this.network);
 		this.waitHandler = new WaitingTimeHandler(headway);
 		this.ptLoadHandler = new PtLoadHandler(this.schedule);
+		this.congestionHandler = new CarCongestionHandler(this.network);
 		
 		events.addHandler(this.departureHandler);	
 		events.addHandler(this.moneyHandler);	
@@ -72,6 +74,7 @@ public class OperatorUserAnalysis {
 		events.addHandler(this.linksHandler);
 		events.addHandler(this.waitHandler);
 		events.addHandler(this.ptLoadHandler);
+		events.addHandler(this.congestionHandler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(this.lastEventFile);
@@ -111,6 +114,10 @@ public class OperatorUserAnalysis {
 
 	public PtLoadHandler getPtLoadHandler() {
 		return ptLoadHandler;
+	}
+
+	public CarCongestionHandler getCongestionHandler() {
+		return congestionHandler;
 	}
 	
 	

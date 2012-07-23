@@ -23,10 +23,10 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+//import java.util.ArrayList;
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -42,7 +42,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 public class LinksEventHandler implements LinkLeaveEventHandler, LinkEnterEventHandler {
 	private double vehicleKm;
 	private final Network network;
-	private final Map<Id, List<Double>> linkId2linkLeaveTime = new HashMap<Id, List<Double>>();
+//	private final Map<Id, List<Double>> linkId2linkLeaveTime = new HashMap<Id, List<Double>>();
 	
 	public LinksEventHandler(Network network) {
 		this.network = network;
@@ -63,17 +63,17 @@ public class LinksEventHandler implements LinkLeaveEventHandler, LinkEnterEventH
 			// vehicleKm
 			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength()/1000;
 			
-			// takt
-			if (this.linkId2linkLeaveTime.containsKey(event.getLinkId())){
-				List<Double> depTimes = this.linkId2linkLeaveTime.get(event.getLinkId());
-				depTimes.add(event.getTime());
-				this.linkId2linkLeaveTime.put(event.getLinkId(), depTimes);
-			}
-			else {
-				List<Double> depTimes = new ArrayList<Double>();
-				depTimes.add(event.getTime());
-				this.linkId2linkLeaveTime.put(event.getLinkId(), depTimes);
-			}
+//			// takt
+//			if (this.linkId2linkLeaveTime.containsKey(event.getLinkId())){
+//				List<Double> depTimes = this.linkId2linkLeaveTime.get(event.getLinkId());
+//				depTimes.add(event.getTime());
+//				this.linkId2linkLeaveTime.put(event.getLinkId(), depTimes);
+//			}
+//			else {
+//				List<Double> depTimes = new ArrayList<Double>();
+//				depTimes.add(event.getTime());
+//				this.linkId2linkLeaveTime.put(event.getLinkId(), depTimes);
+//			}
 		}
 		else {}		
 	}

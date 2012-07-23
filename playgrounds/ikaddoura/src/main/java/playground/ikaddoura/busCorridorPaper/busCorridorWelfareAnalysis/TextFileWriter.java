@@ -25,7 +25,7 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; AvgWaitingTimeAll (sec) ; AvgWaitingTimeNotMissing (sec) ; AvgWaitingTimeMissing (sec) ; NumberOfMissedBusTrips ; NumberOfNotMissedBusTrips ; MissedBusses ; NumberOfAgentsNoValidPlan";
+	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; AvgWaitingTimeAll (sec) ; AvgWaitingTimeNotMissing (sec) ; AvgWaitingTimeMissing (sec) ; NumberOfMissedBusTrips ; NumberOfNotMissedBusTrips ; MissedBusses ; t0MinusTAct ; NumberOfAgentsNoValidPlan";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -48,9 +48,10 @@ public class TextFileWriter {
 	    	double waitingTimeMoreThanHeadway = extIt2information.get(iteration).getMissedBusTrips();
 	    	double waitingTimeLessThanHeadway = extIt2information.get(iteration).getNotMissedBusTrips();
 	    	double missedBusses = extIt2information.get(iteration).getNumberOfMissedVehicles();
+	    	double t0MinustAct = extIt2information.get(iteration).getT0MinusTAct();
 	    	double numberOfAgentsNoValidPlan = extIt2information.get(iteration).getNoValidPlanScore();
 	    	
-	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+avgWaitTimeAll+" ; " +avgWaitTimeNotMissing+" ; "+avgWaitTimeMissing+" ; "+waitingTimeMoreThanHeadway+" ; "+waitingTimeLessThanHeadway+" ; "+missedBusses+ " ; "+numberOfAgentsNoValidPlan;
+	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+avgWaitTimeAll+" ; " +avgWaitTimeNotMissing+" ; "+avgWaitTimeMissing+" ; "+waitingTimeMoreThanHeadway+" ; "+waitingTimeLessThanHeadway+" ; "+missedBusses+ " ; "+t0MinustAct+" ; "+numberOfAgentsNoValidPlan;
 	
 	    	bw.write(zeile);
 	        bw.newLine();

@@ -63,8 +63,8 @@ class ExternalControler {
 		
 	public static void main(final String[] args) throws IOException {
 
-		configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_welfareBusCorridor_timeChoice.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/test";
+		configFile = "../../shared-svn/studies/ihab/busCorridor/input_Latsis/config_welfareBusCorridor_TC.xml";
+		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/carLegTest";
 		
 		lastExternalIterationParam1 = 0;
 		lastExternalIterationParam2 = 0;
@@ -153,7 +153,7 @@ class ExternalControler {
 				
 				operator.calculateCosts(analysis);
 				users.calculateLogsum();
-	
+					
 				ExtItInformation info = new ExtItInformation();
 				info.setFare(this.fare);
 				info.setCapacity(this.capacity);
@@ -175,6 +175,8 @@ class ExternalControler {
 				info.setId2facilityWaitInfo(analysis.getWaitHandler().getFacilityId2facilityInfos());
 				
 				info.setAnalysisPeriods(analysis.getPtLoadHandler().getAnalysisPeriods());
+				
+				info.setT0MinusTAct(analysis.getCongestionHandler().gettActMinusT0());
 				
 				this.extIt2information.put(extItParam1, info);
 				this.it2information.put(iterationCounter, info);
