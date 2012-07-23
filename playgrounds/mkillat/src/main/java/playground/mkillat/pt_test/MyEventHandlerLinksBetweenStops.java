@@ -53,14 +53,14 @@ public class MyEventHandlerLinksBetweenStops implements TransitDriverStartsEvent
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {		
-		if(event.getFacilityId().equals(stopIdA) && event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId)){
+		if(completeTransitRoutes.size()!=0 && event.getFacilityId().equals(stopIdA) && event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId)){
 			if(timeA==123456789.0){
 				timeA=event.getTime();
 
 			}
 			
 		}else{
-			if(event.getFacilityId().equals(stopIdB) && event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId)){
+			if(completeTransitRoutes.size()!=0 && event.getFacilityId().equals(stopIdB) && event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId)){
 				if(timeB==123456789.0){
 					timeB=event.getTime();
 				}}
@@ -70,7 +70,7 @@ public class MyEventHandlerLinksBetweenStops implements TransitDriverStartsEvent
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId) && event.getTime()>=timeA && event.getTime()<=timeB ){
+		if(completeTransitRoutes.size()!=0 && event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId) && event.getTime()>=timeA && event.getTime()<=timeB ){
 			linkIds.add(event.getLinkId());
 		}
 

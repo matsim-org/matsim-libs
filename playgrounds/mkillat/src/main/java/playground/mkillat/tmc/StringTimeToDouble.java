@@ -7,8 +7,8 @@ public class StringTimeToDouble {
 		String[] timeArray = time.split(":");
 		double hours = Double.parseDouble(timeArray[0]);
 		double minutes = Double.parseDouble(timeArray[1]);
-		double seconds = Double.parseDouble(timeArray[2]);
-		output = (3600 * hours) + (60 * minutes) + seconds;
+		output = (3600 * hours) + (60 * minutes);
+
 		
 		return output;
 	}

@@ -1,4 +1,4 @@
-package playground.mkillat.pt_test;
+package playground.mkillat.staedtebau;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -10,7 +10,8 @@ public class MyControlerPt {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String configFile = "./input/bus_berlin/config.xml" ;		
+//		String configFile = "./input/staedtebau/config.xml" ;
+		String configFile = "./input/staedtebau/configM.xml" ;
 //		String configFile = "./input/bus_test2/config.xml" ;
 		Controler controler1 = new Controler( configFile ) ;
 		controler1.setOverwriteFiles(true) ;

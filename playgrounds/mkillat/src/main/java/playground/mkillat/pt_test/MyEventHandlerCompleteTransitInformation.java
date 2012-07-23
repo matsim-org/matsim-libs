@@ -14,12 +14,16 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 public class MyEventHandlerCompleteTransitInformation implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 
 	private List <CompleteTransitRoute> completeTransitRoutes = new ArrayList <CompleteTransitRoute>();
+	private List <CompleteTransitRoute> platzhalter = new ArrayList<CompleteTransitRoute>();
+	private Id lineId;
+	private Id routeId;
 	private Scenario scenario;
-	private Id busId;
 	
-	public MyEventHandlerCompleteTransitInformation (Scenario scenario, Id id){
+	
+	public MyEventHandlerCompleteTransitInformation (Scenario scenario, Id lineId, Id routeId){
+		this.lineId = lineId;
+		this.routeId = routeId;
 		this.scenario = scenario;
-		this.busId = id;
 	}
 	
 	@Override
@@ -30,53 +34,70 @@ public class MyEventHandlerCompleteTransitInformation implements TransitDriverSt
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		if (event.getDriverId().equals(busId)){
+			if (event.getTransitLineId().equals(lineId) && event.getTransitRouteId().equals(routeId) && completeTransitRoutes.size()<3){
+				
+				List <Double> arrives= new ArrayList <Double> ();
+				List <Double> departures = new ArrayList <Double>();
+				
+				CompleteTransitRoute aa = new CompleteTransitRoute(event.getDriverId(), event.getVehicleId(), event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId(), event.getTime(), arrives, departures);
+				completeTransitRoutes.add(aa);
 
-			List <Double> arrives= new ArrayList <Double> ();
-			List <Double> departures = new ArrayList <Double>();
 			
-			CompleteTransitRoute aa = new CompleteTransitRoute(busId, event.getVehicleId(), event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId(), event.getTime(), arrives, departures);
-			completeTransitRoutes.add(aa);
+			}
+			if (completeTransitRoutes.size()!=0){
+				if(event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId) && event.getTime()> completeTransitRoutes.get(0).transitDriverStartTime){
+			
+				List <Double> arrives= new ArrayList <Double> ();
+				List <Double> departures = new ArrayList <Double>();
+			
+				CompleteTransitRoute aa = new CompleteTransitRoute(event.getDriverId(), event.getVehicleId(), event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId(), event.getTime(), arrives, departures);
+				platzhalter.add(aa);
 		}
+		}
+		
 		
 	}
 		@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-			for (int i = 0; i < completeTransitRoutes.size(); i++) {
-				if ((event.getVehicleId().equals(completeTransitRoutes.get(i).vehicleId)) && (event.getTime()>=completeTransitRoutes.get(i).transitDriverStartTime)){
-					if(completeTransitRoutes.size()!=i+1){
-						double eventTime = event.getTime();
-						double nextStartTime = completeTransitRoutes.get(i+1).transitDriverStartTime;
-						if (nextStartTime>eventTime){
-							completeTransitRoutes.get(i).arrives.add(eventTime);
+			if(completeTransitRoutes.size()!=0){
+				if ((event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId)) && (event.getTime()>=completeTransitRoutes.get(0).transitDriverStartTime) ){
+					if(completeTransitRoutes.size()!=1 && event.getTime()<completeTransitRoutes.get(1).transitDriverStartTime){
+						completeTransitRoutes.get(0).arrives.add(event.getTime());
+							
 						}
-					}else{
-						completeTransitRoutes.get(i).arrives.add(event.getTime());
-						
+				if(platzhalter.size()==0){
+						completeTransitRoutes.get(0).arrives.add(event.getTime());
+					
 					}
+				if(event.getVehicleId().equals(completeTransitRoutes.get(0).transitDriverStartTime) && event.getTime() < platzhalter.get(0).transitDriverStartTime){
+					completeTransitRoutes.get(0).arrives.add(event.getTime());
 				}
-				
+					}
 			}
+			
+				
+			
 		
 	}
 		
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		for (int i = 0; i < completeTransitRoutes.size(); i++) {
-			if ((event.getVehicleId().equals(completeTransitRoutes.get(i).vehicleId)) && (event.getTime()>=completeTransitRoutes.get(i).transitDriverStartTime)){
-				if(completeTransitRoutes.size()!=i+1){
-					double eventTime = event.getTime();
-					double nextStartTime = completeTransitRoutes.get(i+1).transitDriverStartTime;
-					if (nextStartTime>eventTime){
-						completeTransitRoutes.get(i).departures.add(eventTime);
+		if(completeTransitRoutes.size()!=0){
+			if ((event.getVehicleId().equals(completeTransitRoutes.get(0).vehicleId)) && (event.getTime()>=completeTransitRoutes.get(0).transitDriverStartTime) ){
+				if(completeTransitRoutes.size()!=1 && event.getTime()<completeTransitRoutes.get(1).transitDriverStartTime){
+					completeTransitRoutes.get(0).departures.add(event.getTime());
+						
 					}
-				}else{
-					completeTransitRoutes.get(i).departures.add(event.getTime());
-					
+			if(platzhalter.size()==0){
+					completeTransitRoutes.get(0).departures.add(event.getTime());
+				
 				}
+			if(event.getVehicleId().equals(completeTransitRoutes.get(0).transitDriverStartTime) && event.getTime() < platzhalter.get(0).transitDriverStartTime){
+				completeTransitRoutes.get(0).departures.add(event.getTime());
 			}
-			
+				}
 		}
+		
 	
 }
 

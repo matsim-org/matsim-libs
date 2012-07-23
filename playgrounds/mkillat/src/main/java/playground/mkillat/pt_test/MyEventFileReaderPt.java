@@ -17,16 +17,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class MyEventFileReaderPt {
 
-	public static List <CompleteTransitRoute> EventFileReader (String configFile, String inputFile){
-		
-		Id idBus = new IdImpl("pt_bus_1_line_Blue Line");
+	public static List <CompleteTransitRoute> EventFileReader (Id idLine, Id idRoute, String configFile, String inputFile){
 		
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		EventsManager events = new EventsUtils().createEventsManager();
-		MyEventHandlerCompleteTransitInformation handler = new MyEventHandlerCompleteTransitInformation(scenario, idBus);
+		MyEventHandlerCompleteTransitInformation handler = new MyEventHandlerCompleteTransitInformation(scenario, idLine, idRoute);
 		events.addHandler(handler);
 
 		
