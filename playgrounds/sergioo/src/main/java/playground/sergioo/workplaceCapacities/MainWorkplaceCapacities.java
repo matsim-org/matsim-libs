@@ -54,6 +54,7 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
@@ -148,7 +149,7 @@ public class MainWorkplaceCapacities {
 		boolean exception = true;
 		while(exception) {
 			System.out.println("Run the solver and press Enter when the file is copied in the folder");
-			new BufferedReader(new InputStreamReader(System.in)).readLine();
+			//new BufferedReader(new InputStreamReader(System.in)).readLine();
 			try {
 				fitCapacities2();
 			}
@@ -178,7 +179,6 @@ public class MainWorkplaceCapacities {
 		new ClustersWindow("Work times cluster PCA back: "+getClustersDeviations(clusters)+" "+getWeightedClustersDeviations(clusters), clusters).setVisible(true);
 		System.out.println("Clustering done!");
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
 		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
 		network = scenario.getNetwork();
 		setMPAreas();
@@ -870,23 +870,9 @@ public class MainWorkplaceCapacities {
 		}
 	}
 	private static void fitCapacities2() throws FileNotFoundException, IOException, ClassNotFoundException {
-		if(dataMPAreas.size()==0) {
-			try {
-				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(AREAS_MAP_FILE));
-				dataMPAreas = (SortedMap<Id, MPAreaData>)ois.readObject();
-				ois.close();
-			} catch(EOFException e) {
-				
-			}
-			System.out.println("Areas done!");
-		}
 		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(OUTPUT_FILE));
 		double[][] matrixCapacities = (double[][]) ois.readObject();
 		ois.close();
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
-		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
-		Network network = scenario.getNetwork();
 		WorkersAreaPainter workersPainter = new WorkersAreaPainter(network);
 		workersPainter.setData(matrixCapacities, dataMPAreas, stopsBase.values());
 		new SimpleNetworkWindow("Capacities", workersPainter).setVisible(true);
@@ -899,12 +885,22 @@ public class MainWorkplaceCapacities {
 			for(int i=0; i<2; i++)
 				center[i] /= clusters.get(c).getPoints().size();
 			int minStart = ((int) Math.round(((center[0]%3600.0)/60)/15))*15;
+			boolean oneHourMoreStart = false;
+			if(minStart==60) {
+				oneHourMoreStart = true;
+				minStart = 0;
+			}
 			int minDuration = ((int) Math.round(((center[1]%3600.0)/60)/15))*15;
+			boolean oneHourMoreDuration = false;
+			if(minDuration==60) {
+				oneHourMoreDuration = true;
+				minDuration = 0;
+			}
 			NumberFormat numberFormat = new DecimalFormat("00");
-			String optionText = "w_"+numberFormat.format(Math.floor(center[0]/3600))+numberFormat.format(minStart)+"_"+numberFormat.format(Math.floor(center[1]/3600))+numberFormat.format(minDuration);
+			String optionText = "w_"+numberFormat.format(Math.floor(center[0]/3600)+(oneHourMoreStart?1:0))+numberFormat.format(minStart)+"_"+numberFormat.format(Math.floor(center[1]/3600)+(oneHourMoreDuration?1:0))+numberFormat.format(minDuration);
 			OpeningTime openingTime = new OpeningTimeImpl(DayType.wkday, Math.round(center[0]/900)*900, Math.round((center[0]+center[1])/900)*900);
 			Iterator<MPAreaData> mPAreaI = dataMPAreas.values().iterator();
-			for(int w=0; w<matrixCapacities[0].length; w++) {
+			for(int w=0; w<matrixCapacities.length; w++) {
 				MPAreaData mPArea = mPAreaI.next();
 				double pTCapacityFO = matrixCapacities[w][c];
 				if(pTCapacityFO>0) {
@@ -922,6 +918,12 @@ public class MainWorkplaceCapacities {
 		ResultSet buildingsR = dataBaseAux.executeQuery("SELECT objectid, mpb.x as xcoord, mpb.y as ycoord, perc_surf as area_perc, fea_id AS id_building, postal_code as postal_code FROM work_facilities_aux.masterplan_areas mpa LEFT JOIN work_facilities_aux.masterplan_building_perc mpb ON mpa.objectid = mpb.object_id  WHERE use_for_generation = 1");
 		facilities = new ActivityFacilitiesImpl();
 		int b=0;
+		Collection<Link> noCarLinks = new ArrayList<Link>();
+		for(Link link:network.getLinks().values())
+			if(!link.getAllowedModes().contains("car"))
+				noCarLinks.add(link);
+		for(Link link:noCarLinks)
+			network.removeLink(link.getId());
 		Map<String, Double> scheduleCapacities = new HashMap<String, Double>();
 		while(buildingsR.next()) {
 			Id areaId =  new IdImpl(buildingsR.getString(1));
@@ -930,6 +932,7 @@ public class MainWorkplaceCapacities {
 			if(facilities.getFacilities().get(id)!=null)
 				continue;
 			ActivityFacilityImpl building = facilities.createFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
+			building.setLinkId(((NetworkImpl)network).getNearestLinkExactly(building.getCoord()).getId());
 			building.setDesc(buildingsR.getString(6)+":"+mPArea.getType().replaceAll("&", "AND"));
 			double proportion = buildingsR.getDouble(4);
 			for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {
@@ -965,7 +968,10 @@ public class MainWorkplaceCapacities {
 			}
 			schedules[n] = maxSchedule;
 		}
+		System.out.println(schedules[0]+" "+schedules[1]+" "+schedules[2]+" "+schedules[3]);
 		capacitiesToIntegers(facilities);
+		for(Link link:noCarLinks)
+			network.addLink(link);
 		WorkersBSPainter painter = new WorkersBSPainter(network);
 		painter.setData(facilities, schedules);
 		new BSSimpleNetworkWindow("Building capacities", painter).setVisible(true);

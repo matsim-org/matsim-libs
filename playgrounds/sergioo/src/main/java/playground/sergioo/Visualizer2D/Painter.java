@@ -3,6 +3,7 @@ package playground.sergioo.Visualizer2D;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
@@ -47,5 +48,13 @@ public abstract class Painter {
 		paintLine(g2, layersPanel, pointB, new double[]{pointB[0]-longArrow*Math.sin(Math.PI/2-angle-angleArrow), pointB[1]-longArrow*Math.cos(Math.PI/2-angle-angleArrow)}, stroke, color);
 		paintLine(g2, layersPanel, pointB, new double[]{pointB[0]-longArrow*Math.sin(Math.PI/2-angle+angleArrow), pointB[1]-longArrow*Math.cos(Math.PI/2-angle+angleArrow)}, stroke, color);
 	}
-	
+	protected void paintPolygon(Graphics2D g2, LayersPanel layersPanel, double[][] points, Color color) {
+		g2.setColor(color);
+		Polygon polygon = new Polygon();
+		for(double[] point:points) {
+			int[] screenPoint = layersPanel.getScreenXY(point);
+			polygon.addPoint(screenPoint[0], screenPoint[1]);
+		}
+		g2.fill(polygon);
+	}
 }

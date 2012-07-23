@@ -2,24 +2,28 @@ package playground.sergioo.Visualizer2D;
 
 import org.apache.commons.math.geometry.Vector3D;
 
-public class Camera3DOrtho extends Camera2D implements Camera {
+public class Camera3DPersp extends Camera2D implements Camera {
 	
 	//Constantes
 	private static final double ZOOM_RATE = 5.0/4.0;
+	private static final double WIDTH_CAM = 100;
 	
 	//Attributes
 	private Vector3D l;
 	private Vector3D d;
 	private Vector3D h;
-
+	private double teta;
 	//Methods
-	public Camera3DOrtho() {
+	public Camera3DPersp() {
 		super();
-		l = new Vector3D(-1, -1, 1);
+		size.setY(WIDTH_CAM/getAspectRatio());
+		size.setX(WIDTH_CAM);
+		l = new Vector3D(-100, -100, 100);
 		d = new Vector3D(1, 1, -1).normalize();
 		h = new Vector3D(1, 1, 2).normalize();
+		teta = Math.PI/3;
 	}
-	public Camera3DOrtho(Vector3D l, Vector3D d, Vector3D h) {
+	public Camera3DPersp(Vector3D l, Vector3D d, Vector3D h) {
 		super();
 		this.l = l;
 		this.d = d;
@@ -66,7 +70,7 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 	public void setBoundaries(double xMin, double yMin, double xMax, double yMax) {
 		double deltaXA=xMax-xMin, deltaYA=yMax-yMin;
 		double[][] points = new double[][]{new double[]{xMin,yMin,0}, new double[]{xMin,yMax,0}, new double[]{xMax,yMin,0}, new double[]{xMax,yMax,0}};
-		double[][] parameters = new double[][]{getParameters(points[0]), getParameters(points[1]), getParameters(points[2]), getParameters(points[3])};
+		double[][] parameters = new double[][]{getParametersPlane(points[0]), getParametersPlane(points[1]), getParametersPlane(points[2]), getParametersPlane(points[3])};
 		xMin = Double.MAX_VALUE;
 		yMin = Double.MAX_VALUE;
 		xMax = -Double.MAX_VALUE;
@@ -122,6 +126,7 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 	@Override
 	public void centerCamera(double[] p) {
 		l = getPointInCamera(new double[]{p[0], p[1], 0});
+		l = getVector(-size.getX()/2, -size.getY()/2);
 	}
 	@Override
 	public int[] getScreenXY(double[] point) {
@@ -134,14 +139,36 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 			p = new Vector3D(point[0], point[1], 0);
 		else
 			p = new Vector3D(point[0], point[1], point[2]);
+		double t = getDistanceToCamera(p);
+		return getOrigin().subtract(p).normalize().scalarMultiply(t).add(p);
+	}
+	private Vector3D getPointInCameraPlane(double[] point) {
+		Vector3D p;
+		if(point.length<3)
+			p = new Vector3D(point[0], point[1], 0);
+		else
+			p = new Vector3D(point[0], point[1], point[2]);
 		double t = -getDistanceToCamera(p);
 		return d.scalarMultiply(t).add(p);
 	}
 	public double getDistanceToCamera(Vector3D p) {
-		return Vector3D.dotProduct(d, p)-Vector3D.dotProduct(d, l);
+		return (Vector3D.dotProduct(d, l)-Vector3D.dotProduct(d, p))/Vector3D.dotProduct(d, getOrigin().subtract(p).normalize());
+	}
+	public Vector3D getOrigin() {
+		return d.scalarMultiply(-WIDTH_CAM/(2*Math.tan(teta/2))).add(l);
 	}
 	private double[] getParameters(double[] point) {
 		Vector3D s = getPointInCamera(point); 
+		Vector3D u = Vector3D.crossProduct(d, h);
+		Vector3D v = h;
+		Vector3D r = s.subtract(l);
+		double det = u.getX()*v.getY()-v.getX()*u.getY();
+		double xDet = -v.getX()*r.getY()+r.getX()*v.getY();
+		double yDet = u.getX()*r.getY()-r.getX()*u.getY();
+		return new double[]{xDet/det, yDet/det};
+	}
+	private double[] getParametersPlane(double[] point) {
+		Vector3D s = getPointInCameraPlane(point); 
 		Vector3D u = Vector3D.crossProduct(d, h);
 		Vector3D v = h;
 		Vector3D r = s.subtract(l);

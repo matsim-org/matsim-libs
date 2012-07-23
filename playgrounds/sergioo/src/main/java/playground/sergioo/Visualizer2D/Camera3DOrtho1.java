@@ -2,7 +2,7 @@ package playground.sergioo.Visualizer2D;
 
 import org.apache.commons.math.geometry.Vector3D;
 
-public class Camera3DOrtho extends Camera2D implements Camera {
+public class Camera3DOrtho1 extends Camera2D implements Camera {
 	
 	//Constantes
 	private static final double ZOOM_RATE = 5.0/4.0;
@@ -13,20 +13,22 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 	private Vector3D h;
 
 	//Methods
-	public Camera3DOrtho() {
+	public Camera3DOrtho1() {
 		super();
 		l = new Vector3D(-1, -1, 1);
 		d = new Vector3D(1, 1, -1).normalize();
 		h = new Vector3D(1, 1, 2).normalize();
 	}
-	public Camera3DOrtho(Vector3D l, Vector3D d, Vector3D h) {
+	public Camera3DOrtho1(Vector3D l, Vector3D d, Vector3D h) {
 		super();
 		this.l = l;
 		this.d = d;
 		this.h = h;
 	}
 	private Vector3D getCenterCamera() {
-		return l;
+		Vector3D u = Vector3D.crossProduct(d, h);
+		Vector3D v = h;
+		return u.scalarMultiply(size.getX()/2).add(v.scalarMultiply(size.getY()/2)).add(l);
 	}
 	@Override
 	public double[] getCenter() {
@@ -71,16 +73,21 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 		yMin = Double.MAX_VALUE;
 		xMax = -Double.MAX_VALUE;
 		yMax = -Double.MAX_VALUE;
+		int xMinI=0, yMaxI=0;
 		for(int i=0; i<parameters.length; i++) {
 			double[] p = parameters[i];
-			if(p[0]<xMin)
+			if(p[0]<xMin) {
 				xMin=p[0];
+				xMinI = i;
+			}
 			if(p[1]<yMin)
 				yMin=p[1];
 			if(p[0]>xMax)
 				xMax=p[0];
-			if(p[1]>yMax)
+			if(p[1]>yMax) {
 				yMax=p[1];
+				yMaxI = i;
+			}
 		}
 		double deltaX=xMax-xMin, deltaY=yMax-yMin;
 		if(deltaXA/deltaYA<=deltaX/deltaY) {
@@ -91,7 +98,7 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 			size.setX(deltaXA*deltaY/deltaYA);
 			size.setY(-deltaY);
 		}		
-		l = getVector(0, 0);
+		l = getVector(parameters[xMinI][0],parameters[yMaxI][1]);
 	}
 	@Override
 	public void move(int dx, int dy) {
@@ -117,11 +124,14 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 			h = new Vector3D(0, 0, 1);
 		else
 			h = new Vector3D(d.getX(), d.getY(), d.getZ()-(1/d.getZ())).normalize();
-		l = center;
+		Vector3D u = Vector3D.crossProduct(d, h);
+		Vector3D v = h;
+		l = center.subtract(u.scalarMultiply(size.getX()/2).add(v.scalarMultiply(size.getY()/2)));
 	}
 	@Override
 	public void centerCamera(double[] p) {
 		l = getPointInCamera(new double[]{p[0], p[1], 0});
+		l = getVector(-size.getX()/2, -size.getY()/2);
 	}
 	@Override
 	public int[] getScreenXY(double[] point) {

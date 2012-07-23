@@ -39,14 +39,15 @@ import javax.swing.JOptionPane;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.Visualizer2D.Camera2D;
-import playground.sergioo.Visualizer2D.Camera3DOrtho;
+import playground.sergioo.Visualizer2D.Camera3DOrtho1;
+import playground.sergioo.Visualizer2D.Camera3DPersp;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Labels;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Options;
+import playground.sergioo.workplaceCapacities.gui.BSSimpleNetworkWindow.Labels;
+import playground.sergioo.workplaceCapacities.gui.BSSimpleNetworkWindow.Options;
 
 public class BSNetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	
@@ -209,6 +210,9 @@ public class BSNetworkPanel extends LayersPanel implements MouseListener, MouseM
 			File file = jFileChooser.getSelectedFile();
 			saveImage(file.getName().split("\\.")[file.getName().split("\\.").length-1], file, Integer.parseInt(JOptionPane.showInputDialog("Width", "12040")),  Integer.parseInt(JOptionPane.showInputDialog("Height", "6012")));
 			break;
+		case 'd':
+			((WorkersBSPainter)getActiveLayer().getPainter()).getLinesPainter3D().refreshLinesOrder();
+			break;
 		case 'v':
 			viewAll();
 			break;
@@ -217,7 +221,11 @@ public class BSNetworkPanel extends LayersPanel implements MouseListener, MouseM
 			viewAll();
 			break;
 		case '3':
-			this.setCamera(new Camera3DOrtho());
+			this.setCamera(new Camera3DOrtho1());
+			viewAll();
+			break;
+		case '4':
+			this.setCamera(new Camera3DPersp());
 			viewAll();
 			break;
 		}
