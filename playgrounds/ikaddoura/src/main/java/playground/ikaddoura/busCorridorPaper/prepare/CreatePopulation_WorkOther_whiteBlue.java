@@ -64,7 +64,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(this.population, scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_Latsis/population_welfareBusCorridor_WorkOther_WhiteBlue.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_Latsis/population_welfareBusCorridor_WorkOther_Blue.xml");
 
 	}
 
@@ -75,8 +75,8 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 	}
 	
 	private void generatePopulation() {
-		createWorkTrips_whiteCollar(700);
-		createWorkTrips_blueCollar(700);
+//		createWorkTrips_whiteCollar(1400);
+		createWorkTrips_blueCollar(1400);
 		createOtherTrips(2600);
 	}
 	
@@ -155,8 +155,8 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 		for (int i=0; i<quantity; i++){
 			Coord homeLocation = getRndCoord();
 			Coord otherLocation = getRndCoord();
-//			double homeEndTimeRnd = calculateRandomlyDistributedValue(12.5 * 60*60, 4.5*60*60); // 8 - 17 Uhr
-			double homeEndTimeRnd = calculateRandomlyDistributedValue(14 * 60*60, 6*60*60); // 8 - 20 Uhr
+			double homeEndTimeRnd = calculateRandomlyDistributedValue(12.5 * 60*60, 4.5*60*60); // 8 - 17 Uhr
+//			double homeEndTimeRnd = calculateRandomlyDistributedValue(14 * 60*60, 6*60*60); // 8 - 20 Uhr
 
 			if (i <= ((double)quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_OtherPt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
