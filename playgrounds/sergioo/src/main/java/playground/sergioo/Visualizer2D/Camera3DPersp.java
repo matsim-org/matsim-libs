@@ -12,7 +12,7 @@ public class Camera3DPersp extends Camera2D implements Camera {
 	private Vector3D l;
 	private Vector3D d;
 	private Vector3D h;
-	private double teta;
+	private double tanTetaOverTwo;
 	//Methods
 	public Camera3DPersp() {
 		super();
@@ -21,13 +21,14 @@ public class Camera3DPersp extends Camera2D implements Camera {
 		l = new Vector3D(-100, -100, 100);
 		d = new Vector3D(1, 1, -1).normalize();
 		h = new Vector3D(1, 1, 2).normalize();
-		teta = Math.PI/3;
+		tanTetaOverTwo = Math.tan(Math.PI/3);
 	}
-	public Camera3DPersp(Vector3D l, Vector3D d, Vector3D h) {
+	public Camera3DPersp(Vector3D l, Vector3D d, Vector3D h, double teta) {
 		super();
 		this.l = l;
 		this.d = d;
 		this.h = h;
+		tanTetaOverTwo = Math.tan(teta/2);
 	}
 	private Vector3D getCenterCamera() {
 		return l;
@@ -44,15 +45,11 @@ public class Camera3DPersp extends Camera2D implements Camera {
 	}
 	@Override
 	public void zoomIn() {
-		double[] center0 = getCenter();
-		size.scale(1/ZOOM_RATE);
-		centerCamera(center0);
+		l = l.add(d.scalarMultiply(ZOOM_RATE));
 	}
 	@Override
 	public void zoomOut() {
-		double[] center0 = getCenter();
-		size.scale(ZOOM_RATE);
-		centerCamera(center0);
+		l = l.subtract(d.scalarMultiply(ZOOM_RATE));
 	}
 	@Override
 	public void zoomIn(double x, double y) {
@@ -68,38 +65,46 @@ public class Camera3DPersp extends Camera2D implements Camera {
 	}
 	@Override
 	public void setBoundaries(double xMin, double yMin, double xMax, double yMax) {
-		double deltaXA=xMax-xMin, deltaYA=yMax-yMin;
 		double[][] points = new double[][]{new double[]{xMin,yMin,0}, new double[]{xMin,yMax,0}, new double[]{xMax,yMin,0}, new double[]{xMax,yMax,0}};
 		double[][] parameters = new double[][]{getParametersPlane(points[0]), getParametersPlane(points[1]), getParametersPlane(points[2]), getParametersPlane(points[3])};
 		xMin = Double.MAX_VALUE;
 		yMin = Double.MAX_VALUE;
 		xMax = -Double.MAX_VALUE;
 		yMax = -Double.MAX_VALUE;
+		int xMinI = 0, xMaxI=0;
 		for(int i=0; i<parameters.length; i++) {
 			double[] p = parameters[i];
-			if(p[0]<xMin)
-				xMin=p[0];
+			if(p[0]<xMin) {
+				xMin = p[0];
+				xMinI = i;
+			}
+			if(p[0]>xMax) {
+				xMax = p[0];
+				xMaxI = i;
+			}
 			if(p[1]<yMin)
-				yMin=p[1];
-			if(p[0]>xMax)
-				xMax=p[0];
+				yMin = p[1];
 			if(p[1]>yMax)
-				yMax=p[1];
+				yMax = p[1];
 		}
 		double deltaX=xMax-xMin, deltaY=yMax-yMin;
-		if(deltaXA/deltaYA<=deltaX/deltaY) {
-			size.setX(deltaX);
-			size.setY(-deltaYA*deltaX/deltaXA);
-		}
-		else {
-			size.setX(deltaXA*deltaY/deltaYA);
-			size.setY(-deltaY);
-		}		
-		l = getVector(0, 0);
+		size.setX(WIDTH_CAM);
+		size.setY(-deltaY*WIDTH_CAM/deltaX);
+		Vector3D pA = new Vector3D(points[xMinI][0], points[xMinI][1], points[xMinI][2]);
+		Vector3D pC = new Vector3D(points[xMaxI][0], points[xMaxI][1], points[xMaxI][2]);
+		double xB = (pC.getX()*h.getY()/h.getX()+pA.getX()*h.getX()/h.getY()-pC.getY()+pA.getY())/(h.getY()/h.getX()+h.getX()/h.getY());
+		double yB = -h.getY()*xB/h.getX()+pA.getY()+pA.getX()*h.getX()/h.getY();
+		Vector3D pB = new Vector3D(xB, yB, 0);
+		Vector3D m = pA.add(pB.subtract(pA).scalarMultiply(0.5));
+		double r = m.getNorm()/tanTetaOverTwo;
+		Vector3D o = new Vector3D(m.getX()-r*Math.sin(h.getDelta())*Math.cos(d.getAlpha()), m.getY()-r*Math.sin(h.getDelta())*Math.sin(d.getAlpha()), r*Math.cos(h.getDelta()));
+		l = o.add(d.scalarMultiply(WIDTH_CAM/(2*tanTetaOverTwo)));
 	}
 	@Override
 	public void move(int dx, int dy) {
-		l = getVector(dx*size.getX()/width,dy*size.getY()/height);
+		double[] center = getCenter();
+		double ratio = new Vector3D(center[0],center[1],0).subtract(getOrigin()).getNorm()/l.subtract(getOrigin()).getNorm();
+		l = getVector(dx*size.getX()*ratio/width, dy*size.getY()*ratio/height);
 	}
 	@Override
 	public void move2(int dx, int dy) {
@@ -126,7 +131,6 @@ public class Camera3DPersp extends Camera2D implements Camera {
 	@Override
 	public void centerCamera(double[] p) {
 		l = getPointInCamera(new double[]{p[0], p[1], 0});
-		l = getVector(-size.getX()/2, -size.getY()/2);
 	}
 	@Override
 	public int[] getScreenXY(double[] point) {
@@ -155,7 +159,7 @@ public class Camera3DPersp extends Camera2D implements Camera {
 		return (Vector3D.dotProduct(d, l)-Vector3D.dotProduct(d, p))/Vector3D.dotProduct(d, getOrigin().subtract(p).normalize());
 	}
 	public Vector3D getOrigin() {
-		return d.scalarMultiply(-WIDTH_CAM/(2*Math.tan(teta/2))).add(l);
+		return d.scalarMultiply(-WIDTH_CAM/(2*tanTetaOverTwo)).add(l);
 	}
 	private double[] getParameters(double[] point) {
 		Vector3D s = getPointInCamera(point); 
@@ -178,7 +182,7 @@ public class Camera3DPersp extends Camera2D implements Camera {
 		return new double[]{xDet/det, yDet/det};
 	}
 	private int[] getScreenXY(double u, double v) {
-		return new int[]{(int)(u*width/size.getX())+frameSize, (int)(v*height/size.getY())+frameSize};
+		return new int[]{(int)(u*width/size.getX())+width/2+frameSize, (int)(v*height/size.getY())+height/2+frameSize};
 	}
 	private Vector3D getVector(double paramU, double paramV) {
 		Vector3D u = Vector3D.crossProduct(d, h);
@@ -187,14 +191,14 @@ public class Camera3DPersp extends Camera2D implements Camera {
 	}
 	@Override
 	public double[] getWorld(int x, int y) {
-		Vector3D s = getVector((x-frameSize)*size.getX()/width,(y-frameSize)*size.getY()/height);
+		Vector3D s = getVector((x-width/2-frameSize)*size.getX()/width,(y-height/2-frameSize)*size.getY()/height);
 		Vector3D s0 = d.scalarMultiply(-s.getZ()/d.getZ()).add(s);
 		return new double[]{s0.getX(), s0.getY(), s0.getZ()};
 	}
 	@Override
 	public boolean isInside(double[] point) {
 		double[] params = getParameters(point);
-		return params[0]<size.getX() && params[0]>0 && params[1]>size.getY() && params[1]<0;
+		return params[0]<size.getX()/2 && params[0]>-size.getX()/2 && params[1]>size.getY()/2 && params[1]<-size.getY()/2;
 	}
 
 }

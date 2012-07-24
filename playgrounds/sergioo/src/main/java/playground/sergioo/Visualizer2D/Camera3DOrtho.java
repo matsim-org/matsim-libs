@@ -74,13 +74,13 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 		for(int i=0; i<parameters.length; i++) {
 			double[] p = parameters[i];
 			if(p[0]<xMin)
-				xMin=p[0];
+				xMin = p[0];
 			if(p[1]<yMin)
-				yMin=p[1];
+				yMin = p[1];
 			if(p[0]>xMax)
-				xMax=p[0];
+				xMax = p[0];
 			if(p[1]>yMax)
-				yMax=p[1];
+				yMax = p[1];
 		}
 		double deltaX=xMax-xMin, deltaY=yMax-yMin;
 		if(deltaXA/deltaYA<=deltaX/deltaY) {
@@ -91,7 +91,7 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 			size.setX(deltaXA*deltaY/deltaYA);
 			size.setY(-deltaY);
 		}		
-		l = getVector(0, 0);
+		l = getVector((xMin+xMax)/2, (yMin+yMax)/2);
 	}
 	@Override
 	public void move(int dx, int dy) {
@@ -151,7 +151,7 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 		return new double[]{xDet/det, yDet/det};
 	}
 	private int[] getScreenXY(double u, double v) {
-		return new int[]{(int)(u*width/size.getX())+frameSize, (int)(v*height/size.getY())+frameSize};
+		return new int[]{(int)(u*width/size.getX())+width/2+frameSize, (int)(v*height/size.getY())+height/2+frameSize};
 	}
 	private Vector3D getVector(double paramU, double paramV) {
 		Vector3D u = Vector3D.crossProduct(d, h);
@@ -160,14 +160,14 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 	}
 	@Override
 	public double[] getWorld(int x, int y) {
-		Vector3D s = getVector((x-frameSize)*size.getX()/width,(y-frameSize)*size.getY()/height);
+		Vector3D s = getVector((x-width/2-frameSize)*size.getX()/width,(y-height/2-frameSize)*size.getY()/height);
 		Vector3D s0 = d.scalarMultiply(-s.getZ()/d.getZ()).add(s);
 		return new double[]{s0.getX(), s0.getY(), s0.getZ()};
 	}
 	@Override
 	public boolean isInside(double[] point) {
 		double[] params = getParameters(point);
-		return params[0]<size.getX() && params[0]>0 && params[1]>size.getY() && params[1]<0;
+		return params[0]<size.getX()/2 && params[0]>-size.getX()/2 && params[1]>size.getY()/2 && params[1]<-size.getY()/2;
 	}
 
 }

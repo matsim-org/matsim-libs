@@ -39,7 +39,9 @@ import javax.swing.JOptionPane;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.Visualizer2D.Camera2D;
+import playground.sergioo.Visualizer2D.Camera3DOrtho;
 import playground.sergioo.Visualizer2D.Camera3DOrtho1;
+import playground.sergioo.Visualizer2D.Camera3DPersp;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.LayersWindow;
@@ -216,6 +218,14 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 			viewAll();
 			break;
 		case '3':
+			this.setCamera(new Camera3DOrtho());
+			viewAll();
+			break;
+		case '4':
+			this.setCamera(new Camera3DPersp());
+			viewAll();
+			break;
+		case '5':
 			this.setCamera(new Camera3DOrtho1());
 			viewAll();
 			break;

@@ -73,21 +73,16 @@ public class Camera3DOrtho1 extends Camera2D implements Camera {
 		yMin = Double.MAX_VALUE;
 		xMax = -Double.MAX_VALUE;
 		yMax = -Double.MAX_VALUE;
-		int xMinI=0, yMaxI=0;
 		for(int i=0; i<parameters.length; i++) {
 			double[] p = parameters[i];
-			if(p[0]<xMin) {
+			if(p[0]<xMin)
 				xMin=p[0];
-				xMinI = i;
-			}
 			if(p[1]<yMin)
 				yMin=p[1];
 			if(p[0]>xMax)
 				xMax=p[0];
-			if(p[1]>yMax) {
+			if(p[1]>yMax)
 				yMax=p[1];
-				yMaxI = i;
-			}
 		}
 		double deltaX=xMax-xMin, deltaY=yMax-yMin;
 		if(deltaXA/deltaYA<=deltaX/deltaY) {
@@ -98,7 +93,7 @@ public class Camera3DOrtho1 extends Camera2D implements Camera {
 			size.setX(deltaXA*deltaY/deltaYA);
 			size.setY(-deltaY);
 		}		
-		l = getVector(parameters[xMinI][0],parameters[yMaxI][1]);
+		l = getVector(xMin, yMax);
 	}
 	@Override
 	public void move(int dx, int dy) {
