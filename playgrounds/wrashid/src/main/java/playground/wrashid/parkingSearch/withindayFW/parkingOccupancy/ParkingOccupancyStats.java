@@ -25,6 +25,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
@@ -32,15 +33,25 @@ import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 public class ParkingOccupancyStats {
 
+	private int numberOfMaximumParkingCapacitConstraintViolations=0;
 	public HashMap<Id, ParkingOccupancyBins> parkingOccupancies = new HashMap<Id, ParkingOccupancyBins>();
 	
-	public void updateParkingOccupancy(Id parkingFacilityId, Double arrivalTime, Double departureTime) {
+	public void updateParkingOccupancy(Id parkingFacilityId, Double arrivalTime, Double departureTime, ParkingInfrastructure parkingInfrastructure) {
 		if (!parkingOccupancies.containsKey(parkingFacilityId)) {
 			parkingOccupancies.put(parkingFacilityId, new ParkingOccupancyBins());
 		}
-		
+
 		ParkingOccupancyBins parkingOccupancyBins = parkingOccupancies.get(parkingFacilityId);
 		parkingOccupancyBins.inrementParkingOccupancy(arrivalTime, departureTime);
+		
+		int parkingCapacity = parkingInfrastructure.getFacilityCapacities().get(parkingFacilityId);
+		//parkingOccupancyBins.removeBlurErrors(parkingCapacity);
+		
+		if (parkingOccupancyBins.isMaximumCapacityConstraintViolated(parkingCapacity)){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+			setNumberOfMaximumParkingCapacitConstraintViolations(getNumberOfMaximumParkingCapacitConstraintViolations() + 1);
+			//System.out.println(numberOfMaximumParkingCapacitConstraintViolations);
+		}
 	}
 	
 	
@@ -67,7 +78,7 @@ public class ParkingOccupancyStats {
 			row = new StringBuffer(parkingFacilityId.toString());
 
 			row.append("\t");
-			row.append(parkingOccupancyBins.getOccupancy(parkingInfrastructure.getFacilityCapacities().get(parkingFacilityId)));
+			row.append(parkingInfrastructure.getFacilityCapacities().get(parkingFacilityId));
 			
 			for (int i = 0; i < 96; i++) {
 				row.append("\t");
@@ -105,5 +116,15 @@ public class ParkingOccupancyStats {
 		}
 		
 		GeneralLib.writeGraphic(fileName, matrix, title, xLabel, yLabel, seriesLabels, xValues);
+	}
+
+
+	public int getNumberOfMaximumParkingCapacitConstraintViolations() {
+		return numberOfMaximumParkingCapacitConstraintViolations;
+	}
+
+
+	public void setNumberOfMaximumParkingCapacitConstraintViolations(int numberOfMaximumParkingCapacitConstraintViolations) {
+		this.numberOfMaximumParkingCapacitConstraintViolations = numberOfMaximumParkingCapacitConstraintViolations;
 	}
 }

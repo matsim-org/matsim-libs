@@ -16,6 +16,61 @@ public class ParkingOccupancyBins {
 	int numberOfBins=96;
 	private int[] occupancy = null;
 
+	
+	/**
+	 * As bin size is 15min, at the borders of two parking activities.
+	 * 
+	 * attention: this algorithm is not able to remove blur errors, if max capacity is not yet reached.
+	 */
+	public void removeBlurErrors(int maxCapacity){
+		for (int i = 0; i < numberOfBins; i++) {
+			if (occupancy[i]>maxCapacity){
+				if (i!=0 && i!=numberOfBins-1){
+					if (occupancy[i-1]!=occupancy[i] && occupancy[i]!=occupancy[i+1]){
+						occupancy[i]=maxCapacity;
+					} else {
+						DebugLib.emptyFunctionForSettingBreakPoint();
+					}
+				} else if(i==0) {
+					if (occupancy[numberOfBins-1]!=occupancy[i] && occupancy[i]!=occupancy[i+1]){
+						occupancy[i]=maxCapacity;
+					} else {
+						DebugLib.emptyFunctionForSettingBreakPoint();
+					}
+				} else if(i==numberOfBins-1){
+					if (occupancy[i-1]!=occupancy[i] && occupancy[i]!=occupancy[0]){
+						occupancy[i]=maxCapacity;
+					} else {
+						DebugLib.emptyFunctionForSettingBreakPoint();
+					}
+				} else {
+					DebugLib.stopSystemAndReportInconsistency();
+				}
+			}
+		}
+	}
+	
+	public boolean isMaximumCapacityConstraintViolated(int maxCapacity){
+		for (int i = 0; i < numberOfBins; i++) {
+			if (occupancy[i]>maxCapacity){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isMaximumCapacityConstraintViolatedForFirstTime(int maxCapacity){
+		for (int i = 0; i < numberOfBins; i++) {
+			if (occupancy[i]>maxCapacity+1){
+				return false;
+			}
+			if (occupancy[i]==maxCapacity+1){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public int[] getOccupancy() {
 		return occupancy;
 	}
@@ -67,12 +122,12 @@ public class ParkingOccupancyBins {
 				occupancy[i]++;
 			}
 
-			for (int i = 0; i <= endBinIndex; i++) {
+			for (int i = 0; i < endBinIndex; i++) {
 				occupancy[i]++;
 			}
 
 		} else {
-			for (int i = startBinIndex; i <= endBinIndex; i++) {
+			for (int i = startBinIndex; i < endBinIndex; i++) {
 				occupancy[i]++;
 			}
 		}

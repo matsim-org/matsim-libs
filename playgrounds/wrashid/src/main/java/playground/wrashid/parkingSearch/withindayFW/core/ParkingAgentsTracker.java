@@ -74,6 +74,8 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.HashMapHashSetConcat;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.lib.obj.Pair;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.event.EventHandlerCodeSeparator;
 import playground.wrashid.parkingChoice.ParkingManager;
@@ -146,6 +148,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	private CaptureLastActivityDurationOfDay durationOfLastActivityOfDay;
 	private CaptureFirstCarDepartureTimeOfDay firstCarDepartureTimeOfDay;
+	
+	private LinkedListValueHashMap<Id, Pair<Id,Double>> parkingWalkTimesLog;
 
 	/**
 	 * Tracks agents' car legs and check whether they have to start their
@@ -183,6 +187,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		this.lastCarMovementRegistered = new HashMap<Id, Double>();
 		this.endTimeOfPreviousActivity = new HashMap<Id, Double>();
 		this.didUseCarOnce = new HashSet<Id>();
+		this.parkingWalkTimesLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
 
 	}
 
@@ -496,6 +501,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		firstParkingActivityPlanElemIndex.clear();
 		lastParkingActivityPlanElemIndex.clear();
 		parkingOccupancy = new ParkingOccupancyStats();
+		parkingWalkTimesLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
 	}
 
 	public Map<Id, Activity> getNextNonParkingActivity() {
@@ -614,8 +620,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		// reset search time
 		getSearchStartTime().remove(personId);
 
-		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime);
-
+		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingSearchTimeInMinutes));
+		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime,parkingInfrastructure);
 	}
 
 	private double getParkingSearchTimeInMinutes(Id personId, double parkingArrivalTime) {
@@ -717,6 +723,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			scoringFunction.addMoney(amount);
 		}
 		
+		log.info("parking capacity constraint violations:" + parkingOccupancy.getNumberOfMaximumParkingCapacitConstraintViolations());
+		
 		if (parkingOccupancyHandler==null){
 			parkingOccupancyHandler=new ParkingOccupancyHandler(event.getControler());
 		}
@@ -766,8 +774,11 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		parkingStrategyManager.getCurrentlySelectedParkingStrategies().get(personId, lastCarLegIndexOfDay)
 				.putScore(personId, lastCarLegIndexOfDay, parkingScore);
 
+		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingSearchTimeInMinutes));
 		
-		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, parkingArrivalTime, parkingArrivalTime+lastParkingActivityDurationOfDay);
+		//double firstDepartureTimeOfDay=durationOfLastParkingOfDay.getFirstDepartureTimeOfDay(personId);
+		
+		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, parkingArrivalTime, parkingArrivalTime+lastParkingActivityDurationOfDay, parkingInfrastructure);
 	}
 
 	private Integer getLastCarLegIndexOfDay(Id personId) {

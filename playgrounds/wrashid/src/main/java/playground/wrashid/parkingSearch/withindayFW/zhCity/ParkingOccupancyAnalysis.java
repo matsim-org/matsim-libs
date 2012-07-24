@@ -51,6 +51,8 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 	private final Controler controler;
 	private final ParkingInfrastructure parkingInfrastructure;
 
+	private double countsScalingFactor;
+
 	public ParkingOccupancyAnalysis(Controler controler, ParkingInfrastructure parkingInfrastructure) {
 		super(controler);
 		this.controler = controler;
@@ -60,7 +62,7 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 
 	public void initializeParkingCounts(Controler controler) {
 		String baseFolder = null;
-		Double countsScalingFactor = Double.parseDouble(controler.getConfig().findParam("parking", "countsScalingFactor"));
+		countsScalingFactor = Double.parseDouble(controler.getConfig().findParam("parking", "countsScalingFactor"));
 
 		if (ParkingHerbieControler.isRunningOnServer) {
 			baseFolder = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/counts/";
@@ -89,7 +91,8 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 		}
 	}
 
-	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(ParkingOccupancyStats parkingOccupancy) {
+	// TODO: remove parkingInfrasturcutre variable (use this.parkingInfrastructure instead)
+	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure) {
 		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
 				"parkingOccupancyCountsComparison.png");
 		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
@@ -98,11 +101,16 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 		HashMap<String, String> mappingOfParkingNameToParkingId = SingleDayGarageParkingsCount
 				.getMappingOfParkingNameToParkingId();
 		int[] sumOfSelectedParkingSimulatedCounts = new int[96];
-		int numberOfColumns = 2;
+		int[] sumSimulatedParkingCapacities = new int[96];
+		int[] sumRealParkingCapacities = new int[96];
+		int numberOfColumns = 4;
 		for (String parkingName : selectedParkings) {
-			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancy.parkingOccupancies.get(new IdImpl(
-					mappingOfParkingNameToParkingId.get(parkingName)));
+			IdImpl parkingId = new IdImpl(
+					mappingOfParkingNameToParkingId.get(parkingName));
+			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancy.parkingOccupancies.get(parkingId);
 
+			
+			
 			if (parkingOccupancyBins == null) {
 				continue;
 			}
@@ -110,6 +118,8 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 			int[] occupancy = parkingOccupancyBins.getOccupancy();
 			for (int i = 0; i < 96; i++) {
 				sumOfSelectedParkingSimulatedCounts[i] += occupancy[i];
+				sumSimulatedParkingCapacities[i] += parkingInfrastructure.getFacilityCapacities().get(parkingId);
+				sumRealParkingCapacities[i] += countsScalingFactor * SingleDayGarageParkingsCount.getParkingCapacities().get(parkingName);
 			}
 		}
 
@@ -118,14 +128,18 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 		for (int i = 0; i < 96; i++) {
 			matrix[i][0] = sumOfSelectedParkingSimulatedCounts[i];
 			matrix[i][1] = sumOfOccupancyCountsOfSelectedParkings[i];
+			matrix[i][2] = sumSimulatedParkingCapacities[i];
+			matrix[i][3] = sumRealParkingCapacities[i];
 		}
 
 		String title = "Parking Garage Counts Comparison";
 		String xLabel = "time (15min-bin)";
 		String yLabel = "# of occupied parkings";
-		String[] seriesLabels = new String[2];
+		String[] seriesLabels = new String[numberOfColumns];
 		seriesLabels[0] = "simulated counts";
 		seriesLabels[1] = "real counts";
+		seriesLabels[2] = "simulated max. capacity";
+		seriesLabels[3] = "real max. capacity";
 		double[] xValues = new double[96];
 
 		for (int i = 0; i < 96; i++) {
@@ -198,7 +212,7 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy,
 			ParkingInfrastructure parkingInfrastructure) {
 		super.updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure);
-		writeOutGraphComparingSumOfSelectedParkingsToCounts(parkingOccupancy);
+		writeOutGraphComparingSumOfSelectedParkingsToCounts(parkingOccupancy, parkingInfrastructure);
 		writeOutGraphParkingTypeOccupancies(parkingOccupancy);
 
 		logPeakUsageOfParkingTypes(parkingOccupancy, parkingInfrastructure);
@@ -217,6 +231,7 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 	// each parking during day]/[number of parking of that type]
 	// this can be used during calibration to find out, how saturated a certain
 	// parking type is
+	// TODO: remove parkingInfrasturcutre variable (use this.parkingInfrastructure instead)
 	private void logPeakUsageOfParkingTypes(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure) {
 
 		int numberOfStreetParking = 0;
@@ -240,13 +255,14 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 			if (parkingId.toString().contains("stp") || parkingId.toString().contains("gp")
 					|| parkingId.toString().contains("private")) {
 
-				int[] occupancy = parkingOccupancy.parkingOccupancies.get(parkingId).getOccupancy();
-
-				for (int i = 0; i < 96; i++) {
-					if (peakUsageOfParking.get(parkingId) < occupancy[i]) {
-						peakUsageOfParking.set(parkingId, occupancy[i]);
-					}
+				int peakOccupancy=parkingOccupancy.parkingOccupancies.get(parkingId).getPeakOccupanyOfDay();
+				
+				// remove over usage of parking
+				if (peakOccupancy>facilityCapacities.get(parkingId)){
+					peakOccupancy=facilityCapacities.get(parkingId);
 				}
+				
+				peakUsageOfParking.set(parkingId, peakOccupancy);
 			}
 		}
 		
@@ -269,7 +285,7 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 		log.info("peak usage private parking:" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking);
 		
 		// remove zero occupancy parking (probably has to do with population scaling artifects)
-		for (Id parkingId : peakUsageOfParking.getKeySet()) {
+		for (Id parkingId : facilityCapacities.getKeySet()) {
 			if (parkingId.toString().contains("stp")) {
 				if (peakUsageOfParking.get(parkingId)==0){
 					numberOfStreetParking-=facilityCapacities.get(parkingId);
@@ -285,9 +301,9 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 			}
 		}
 		
-		log.info("peak usage street parking (non used parking removed):" + numberOfPeakStreetParking/1.0/numberOfStreetParking);
-		log.info("peak usage garage parking (non used parking removed):" + numberOfPeakGarageParking/1.0/numberOfGarageParking);
-		log.info("peak usage private parking (non used parking removed):" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking);
+		log.info("peak usage street parking (not used parking removed):" + numberOfPeakStreetParking/1.0/numberOfStreetParking);
+		log.info("peak usage garage parking (not used parking removed):" + numberOfPeakGarageParking/1.0/numberOfGarageParking);
+		log.info("peak usage private parking (not used parking removed):" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking);
 		
 	}
 

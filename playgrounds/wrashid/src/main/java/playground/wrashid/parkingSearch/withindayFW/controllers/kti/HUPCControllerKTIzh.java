@@ -309,14 +309,14 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 				"publicParkingsCalibrationFactorOutsideZHCity"));
 
 		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity(controler,parkingDataBase);
-		String streetParkingsFile = null;
+		String parkingsFile = null;
 		//if (isKTIMode) {
-			streetParkingsFile = parkingDataBase + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml";
+			parkingsFile = parkingDataBase + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml";
 		//} else {
 		//	streetParkingsFile = parkingDataBase + "publicParkingsOutsideZHCity_v0.xml";
 		//}
 
-		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile, parkingCollection);
+		readParkings(parkingsOutsideZHCityScaling, parkingsFile, parkingCollection);
 
 		int numberOfStreetParking=0;
 		int numberOfGarageParking=0;

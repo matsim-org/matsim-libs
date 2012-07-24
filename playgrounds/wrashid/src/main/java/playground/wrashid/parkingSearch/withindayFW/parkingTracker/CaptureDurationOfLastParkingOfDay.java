@@ -63,4 +63,8 @@ public class CaptureDurationOfLastParkingOfDay implements AgentDepartureEventHan
 		}
 	}
 
+	public double getFirstDepartureTimeOfDay(Id personId) {
+		return firstDepartureTimeOfDay.get(personId);
+	}
+
 }

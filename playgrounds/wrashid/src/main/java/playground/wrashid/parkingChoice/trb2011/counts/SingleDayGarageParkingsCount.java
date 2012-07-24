@@ -245,7 +245,7 @@ public class SingleDayGarageParkingsCount {
 		return null;
 	}
 
-	private static HashMap<String, Double> getParkingCapacities() {
+	public static HashMap<String, Double> getParkingCapacities() {
 		HashMap<String, Double> parkingCapacities = new HashMap<String, Double>();
 
 		parkingCapacities.put("Parkhaus Utoquai / Färberstrasse 6", 175.0);
