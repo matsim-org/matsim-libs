@@ -272,6 +272,9 @@ public class ExtItInformation {
 	}
 
 	public double getAvgT0MinusTActPerPerson() {
+		if (Math.abs(this.avgT0MinusTActPerPerson) < 0.0001){
+			this.avgT0MinusTActPerPerson = 0.;
+		}
 		return avgT0MinusTActPerPerson;
 	}
 
