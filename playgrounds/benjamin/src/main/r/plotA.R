@@ -64,6 +64,5 @@ for(i in 1: length(emissions)){
 	emissionsLegend[i]<-paste(emissionsLegend[i]," [ g x ",relativmatrix[1,i], "]")
 }
 
-#legend(3.2,1,c("group A", "group B"), pch = c(1,2), lty = c(1,2))
 legend(5,300, emissionsLegend, fill = emissioncolors, title = "Emission", cex=0.8)
 dev.off()
