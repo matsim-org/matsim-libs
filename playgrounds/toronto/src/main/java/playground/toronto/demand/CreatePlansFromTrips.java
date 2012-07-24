@@ -20,9 +20,14 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -93,6 +98,10 @@ public class CreatePlansFromTrips {
 	private HashSet<Id> unusableTripChains;
 	private HashSet<Id> nonHouseholdTripChains;
 	private HashSet<Id> chainsWithNoZones;
+	//TODO remove this once mixed mode trips are implemented.
+	private HashSet<Id> personsWithMixedModeTrips;
+	
+	
 	
 	private double expansionFactorFactor = 0; // All weights will be multiplied by this factor. 
 	private boolean isUsingMixedModeTrips = false;
@@ -164,7 +173,6 @@ public class CreatePlansFromTrips {
 		
 		long tripNum = 0;
 		while (tr.next()){
-			
 			//Puts the household factor into the map.
 			householdWeights = new HashMap<String, Double>();
 			householdWeights.put(tr.current().get("hhid"), 
@@ -201,11 +209,7 @@ public class CreatePlansFromTrips {
 		
 		log.info("Trips file opened successfully. " + scenario.getPopulation().getPersons().size() + " persons were recognized.");
 	}
-	
-	private void readStations(String filename){
-		//TODO read optional stations file.
-	}
-	
+		
 	private void writePlans(String filename){
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		writer.writeStartPlans(filename);
@@ -260,6 +264,9 @@ public class CreatePlansFromTrips {
 		nonHouseholdTripChains = new HashSet<Id>();
 		chainsWithNoZones = new HashSet<Id>();
 		
+		//TODO remove this once mixed mode trips are implemented.
+		personsWithMixedModeTrips = new HashSet<Id>();		
+		
 		for (Person P : scenario.getPopulation().getPersons().values()){
 			ArrayList<Trip> pTrips = new ArrayList<CreatePlansFromTrips.Trip>();
 			for (Id i : personTripsMap.get(P.getId())) pTrips.add(trips.get(i));
@@ -267,6 +274,15 @@ public class CreatePlansFromTrips {
 			//Sort trips in order of start time
 			sortTrips(pTrips);
 
+			//TODO Currently skips all trips of type '2'
+			//Check for persons with a 'type 2 trip'
+			for (Trip T : pTrips) {
+				if (T.type.equals("2")){
+					personsWithMixedModeTrips.add(P.getId());
+					continue;
+				}
+			}
+			
 			//Check the consistency of the trip chain
 			int state = checkTripChain(pTrips);
 			if(state == 5){
@@ -338,6 +354,10 @@ public class CreatePlansFromTrips {
 			
 			if (unusableTripChains.contains(P.getId())) continue; //skips persons with incomplete trips.
 			if (chainsWithNoZones.contains(P.getId())) continue;
+			
+			//TODO remove this once mixed mode trips are implemented.
+			if (personsWithMixedModeTrips.contains(P.getId())) continue;
+			
 			
 			ArrayList<Trip> pTrips = new ArrayList<CreatePlansFromTrips.Trip>();
 			for (Id i : personTripsMap.get(P.getId())) pTrips.add(trips.get(i));
@@ -572,6 +592,72 @@ public class CreatePlansFromTrips {
 		
 	}
 	
+	/**
+	 * Assigns activities 
+	 * 
+	 * @param networkFileName
+	 */
+	private void assignActsToNearestLink(){
+		
+		log.info("Assigning activities to nearest link...");
+		
+		//Open network file.
+		String networkFileName = "";
+		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(new FileFilter() {
+			@Override
+			public String getDescription() {return "MATSim network in *.xml format.";}
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
+			}
+		});	
+		fc.setDialogTitle("Please select a network file");
+		int state = fc.showOpenDialog(null);
+		if (state == JFileChooser.APPROVE_OPTION){
+			networkFileName = fc.getSelectedFile().getAbsolutePath();
+		}else if (state == JFileChooser.CANCEL_OPTION) return;
+		if (networkFileName == "" || networkFileName == null) return;
+		
+		//Load the network
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFileName);
+		
+		//Remove highway links and non-car links from the network. DON'T EXPORT!!!
+		HashSet<Id> linksToRemove = new HashSet<Id>();
+		for (Link l : network.getLinks().values()){
+			LinkImpl L = (LinkImpl) l;
+			
+			if (L.getType() == null) continue; //Assumes that links without a type are OK.
+			
+			//Highway links (& on/off ramps)
+			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") 
+					|| L.getType().equals("On/Off Ramp") || 
+					L.getType().equals("LOOP")) linksToRemove.add(L.getId());
+			
+			//Transit EX-ROW links
+			if (!L.getAllowedModes().contains("Car") || !L.getAllowedModes().contains("car")) linksToRemove.add(L.getId());
+			
+		}
+		for (Id i : linksToRemove) network.removeLink(i);
+		
+		//Remove nodes with degree 0;
+		HashSet<Id> nodestoRemove = new HashSet<Id>();
+		for (Node N : network.getNodes().values()){
+			if (N.getInLinks().size() == 0 && N.getOutLinks().size() == 0) nodestoRemove.add(N.getId());
+		}
+		for (Id i : nodestoRemove) network.removeNode(i);
+		
+		//Assign activities to nearest node.
+		for (Person P : scenario.getPopulation().getPersons().values()){
+			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
+			
+			ActivityImpl a = (ActivityImpl) plan.getFirstActivity();
+			LinkImpl nearestLink = network.getNearestLink(a.getCoord());
+			a.setLinkId(nearestLink.getId());
+		}
+	}
+	
 	// ////////////////////////////////////////////////////////////////////
 	// main method
 	// ////////////////////////////////////////////////////////////////////
@@ -632,9 +718,6 @@ public class CreatePlansFromTrips {
 		
 		try {
 			converter.readTrips(file);
-			
-			
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -644,7 +727,11 @@ public class CreatePlansFromTrips {
 		
 		if(!converter.checkPopConsistency()) return;
 				
+		////////////////////////
 		converter.createPlans();
+		////////////////////////
+		converter.assignActsToNearestLink();
+		//////////////////////
 		
 		if (basefolder != ""){
 			fc = new JFileChooser(basefolder);
