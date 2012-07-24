@@ -102,7 +102,7 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 		}
 	}
 
-	public double getAvgTActMinusT0PerPerson() {
+	public double getTActMinusT0Sum() {
 		double diffSum = 0;
 		for (Double diff : this.personId2t0MinusTAkt.values()){
 			diffSum = diffSum + diff;
@@ -110,7 +110,7 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 		return diffSum;
 	}
 	
-	public double getTActMinusT0Sum() {
+	public double getAvgTActMinusT0PerPerson() {
 		int n = 0;
 		double diffSum = 0;
 		for (Double diff : this.personId2t0MinusTAkt.values()){
