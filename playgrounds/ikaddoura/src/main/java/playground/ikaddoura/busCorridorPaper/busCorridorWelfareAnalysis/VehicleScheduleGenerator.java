@@ -92,7 +92,7 @@ public class VehicleScheduleGenerator {
 	Vehicles veh = VehicleUtils.createVehiclesContainer();
 
 	public void createSchedule() throws IOException {
-			
+		
 		Map<Id,List<Id>> routeID2linkIDs = getIDs();
 		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs);
 		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
@@ -104,17 +104,28 @@ public class VehicleScheduleGenerator {
 		}
 		
 	private Map<Id,List<Id>> getIDs() {
+		List <Link> busLinks = new ArrayList<Link>();
 		Map<Id, List<Id>> routeID2linkIDs = new HashMap<Id, List<Id>>();
 		List<Id> linkIDsRoute1 = new LinkedList<Id>();
 		List<Id> linkIDsRoute2 = new LinkedList<Id>();
 		
+		// take busLinks and put them in a Map
+		for (Link link : this.network.getLinks().values()){
+			if (link.getAllowedModes().contains("bus") && !link.getAllowedModes().contains("car")){
+//			if (link.getAllowedModes().contains("bus")){
+				busLinks.add(link);
+			}
+		}
+		
+		if (busLinks.isEmpty()) throw new RuntimeException("No bus links found. Link IDs have to contain [bus] in order to create the schedule. Aborting...");
+		
 		// one direction
 		int fromNodeIdRoute1 = 0;
 		int toNodeIdRoute1 = 0;
-		for (int ii = 0; ii <= this.network.getLinks().size(); ii++){
+		for (int ii = 0; ii <= busLinks.size(); ii++){
 			fromNodeIdRoute1 = ii;
 			toNodeIdRoute1 = ii + 1;
-			for (Link link : this.network.getLinks().values()){
+			for (Link link : busLinks){
 				if (Integer.parseInt(link.getFromNode().getId().toString()) == fromNodeIdRoute1 && Integer.parseInt(link.getToNode().getId().toString()) == toNodeIdRoute1){			
 					linkIDsRoute1.add(link.getId());
 				}
@@ -126,10 +137,10 @@ public class VehicleScheduleGenerator {
 		// other direction
 		int fromNodeIdRoute2 = 0;
 		int toNodeIdRoute2 = 0;
-		for (int ii = 0; ii <= this.network.getLinks().size(); ii++){
+		for (int ii = 0; ii <= busLinks.size(); ii++){
 			fromNodeIdRoute2 = ii;
 			toNodeIdRoute2 = ii - 1;
-			for (Link link : this.network.getLinks().values()){
+			for (Link link : busLinks){
 				if (Integer.parseInt(link.getFromNode().getId().toString())==fromNodeIdRoute2 && Integer.parseInt(link.getToNode().getId().toString())==toNodeIdRoute2){			
 					linkIDsRoute2.add(link.getId());
 				}
