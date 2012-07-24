@@ -46,7 +46,7 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 	private final static Logger log = Logger.getLogger(CarCongestionHandler.class);
 	private final Network network;
 	private Map<Id, Double> personId2enteringTime = new HashMap<Id, Double>();
-	private double tActMinusT0;
+	private Map<Id, Double> personId2t0MinusTAkt = new HashMap<Id, Double>();
 	
 	public CarCongestionHandler(Network network) {
 		this.network = network;
@@ -55,7 +55,7 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 	@Override
 	public void reset(int iteration) {
 		this.personId2enteringTime.clear();
-		this.tActMinusT0 = 0.;
+		this.personId2t0MinusTAkt.clear();
 	}
 	
 	@Override
@@ -63,8 +63,7 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 
 			if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("person")){
 				// a car is entering a link
-				this.personId2enteringTime.put(event.getPersonId(), event.getTime());
-				
+				this.personId2enteringTime.put(event.getPersonId(), event.getTime());				
 			}
 		}
 	
@@ -91,17 +90,34 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 					diff = 0;
 				}
 							
-				log.warn("diff: " + diff);
-				log.warn(event.getLinkId() + " " + event.getPersonId());
-				tActMinusT0 = tActMinusT0 + diff;
+				if (this.personId2t0MinusTAkt.get(event.getPersonId()) == null){
+					this.personId2t0MinusTAkt.put(event.getPersonId(), diff);
+				} else {
+					double diffSumThisPerson = this.personId2t0MinusTAkt.get(event.getPersonId());
+					this.personId2t0MinusTAkt.put(event.getPersonId(), diffSumThisPerson + diff);
+				}
 				
 				this.personId2enteringTime.put(event.getPersonId(), null);
 			}
 		}
 	}
 
-	public double gettActMinusT0() {
-		return tActMinusT0;
+	public double getAvgTActMinusT0PerPerson() {
+		double diffSum = 0;
+		for (Double diff : this.personId2t0MinusTAkt.values()){
+			diffSum = diffSum + diff;
+		}
+		return diffSum;
+	}
+	
+	public double getTActMinusT0Sum() {
+		int n = 0;
+		double diffSum = 0;
+		for (Double diff : this.personId2t0MinusTAkt.values()){
+			diffSum = diffSum + diff;
+			n++;
+		}
+		return diffSum / n;
 	}
 
 	@Override

@@ -176,7 +176,8 @@ class ExternalControler {
 				
 				info.setAnalysisPeriods(analysis.getPtLoadHandler().getAnalysisPeriods());
 				
-				info.setT0MinusTAct(analysis.getCongestionHandler().gettActMinusT0());
+				info.setAvgT0MinusTActPerPerson(analysis.getCongestionHandler().getAvgTActMinusT0PerPerson());
+				info.setT0MinusTActSum(analysis.getCongestionHandler().getTActMinusT0Sum());
 				
 				this.extIt2information.put(extItParam1, info);
 				this.it2information.put(iterationCounter, info);

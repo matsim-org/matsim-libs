@@ -25,7 +25,7 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; AvgWaitingTimeAll (sec) ; AvgWaitingTimeNotMissing (sec) ; AvgWaitingTimeMissing (sec) ; NumberOfMissedBusTrips ; NumberOfNotMissedBusTrips ; MissedBusses ; t0MinusTAct ; NumberOfAgentsNoValidPlan";
+	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; AvgWaitingTimeAll (sec) ; AvgWaitingTimeNotMissing (sec) ; AvgWaitingTimeMissing (sec) ; NumberOfMissedBusTrips ; NumberOfNotMissedBusTrips ; MissedBusses ; t0MinusTActSum (sec) ; avgT0MinusTActPerPerson (sec) ; NumberOfAgentsNoValidPlan";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -48,10 +48,11 @@ public class TextFileWriter {
 	    	double waitingTimeMoreThanHeadway = extIt2information.get(iteration).getMissedBusTrips();
 	    	double waitingTimeLessThanHeadway = extIt2information.get(iteration).getNotMissedBusTrips();
 	    	double missedBusses = extIt2information.get(iteration).getNumberOfMissedVehicles();
-	    	double t0MinustAct = extIt2information.get(iteration).getT0MinusTAct();
+	    	double t0MinustActSum = extIt2information.get(iteration).getT0MinusTActSum();
+	    	double avgT0MinustActPerPerson = extIt2information.get(iteration).getAvgT0MinusTActPerPerson();
 	    	double numberOfAgentsNoValidPlan = extIt2information.get(iteration).getNoValidPlanScore();
 	    	
-	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+avgWaitTimeAll+" ; " +avgWaitTimeNotMissing+" ; "+avgWaitTimeMissing+" ; "+waitingTimeMoreThanHeadway+" ; "+waitingTimeLessThanHeadway+" ; "+missedBusses+ " ; "+t0MinustAct+" ; "+numberOfAgentsNoValidPlan;
+	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+avgWaitTimeAll+" ; " +avgWaitTimeNotMissing+" ; "+avgWaitTimeMissing+" ; "+waitingTimeMoreThanHeadway+" ; "+waitingTimeLessThanHeadway+" ; "+missedBusses+ " ; " +t0MinustActSum+ " ; " +avgT0MinustActPerPerson+ " ; " +numberOfAgentsNoValidPlan;
 	
 	    	bw.write(zeile);
 	        bw.newLine();
@@ -63,30 +64,79 @@ public class TextFileWriter {
     
 	    } catch (IOException e) {}		
 	}
-
+	
 	public void writeMatrices(String directoryExtItParam, SortedMap<Integer, ExtItInformation> it2information) {
 		
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2welfare = new TreeMap<Integer, SortedMap<Double, Double>>();
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2profit = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2userLogsum = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2carLegs = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2ptLegs = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2avgT0MinusTAktPerPerson = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2numberOfMissedBusTrips = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2avgWaitingTimeMissing = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2avgWaitingTimeNotMissing = new TreeMap<Integer, SortedMap<Double, Double>>();
+
+		// ...
 
 		// Sort data
 		for (Integer it1 : it2information.keySet()){
 			double numberOfBuses = it2information.get(it1).getNumberOfBuses();
 			SortedMap<Double, Double> fare2welfare = new TreeMap<Double, Double>();
 			SortedMap<Double, Double> fare2profit = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2userLogsum = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2carLegs = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2ptLegs = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2avgT0MinusTAktPerPerson = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2numberOfMissedBusTrips = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2avgWaitingTimeMissing = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2avgWaitingTimeNotMissing = new TreeMap<Double, Double>();
+
+			// ...
+			
 			for (Integer it2 : it2information.keySet()){
 				if (it2information.get(it2).getNumberOfBuses() == numberOfBuses){
 					fare2welfare.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getWelfare());
 					fare2profit.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getOperatorProfit());
+					fare2userLogsum.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getUsersLogSum());
+					fare2carLegs.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getNumberOfCarLegs());
+					fare2ptLegs.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getNumberOfPtLegs());
+					fare2avgT0MinusTAktPerPerson.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getAvgT0MinusTActPerPerson());
+					fare2numberOfMissedBusTrips.put(it2information.get(it2).getFare()*(-1), (double) it2information.get(it2).getMissedBusTrips());
+					fare2avgWaitingTimeMissing.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getAvgWaitingTimeMissingBus());
+					fare2avgWaitingTimeNotMissing.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getAvgWaitingTimeNotMissingBus());
+
+					// ...
+
 				}
+				
 			busNumber2fare2welfare.put((int) numberOfBuses, fare2welfare);
 			busNumber2fare2profit.put((int) numberOfBuses, fare2profit);
+			busNumber2fare2userLogsum.put((int) numberOfBuses, fare2userLogsum);
+			busNumber2fare2carLegs.put((int) numberOfBuses, fare2carLegs);
+			busNumber2fare2ptLegs.put((int) numberOfBuses, fare2ptLegs);
+			busNumber2fare2avgT0MinusTAktPerPerson.put((int) numberOfBuses, fare2avgT0MinusTAktPerPerson);
+			busNumber2fare2numberOfMissedBusTrips.put((int) numberOfBuses, fare2numberOfMissedBusTrips);
+			busNumber2fare2avgWaitingTimeMissing.put((int) numberOfBuses, fare2avgWaitingTimeMissing);
+			busNumber2fare2avgWaitingTimeNotMissing.put((int) numberOfBuses, fare2avgWaitingTimeNotMissing);
+			
+			// ...
+			
 			}
 	    }
 		
 		// Write sorted data to text file
 		writeMatrix(busNumber2fare2welfare, directoryExtItParam, "matrix_welfare.txt", "Welfare (AUD)");
 		writeMatrix(busNumber2fare2profit, directoryExtItParam, "matrix_profit.txt", "Profit (AUD)");
+		writeMatrix(busNumber2fare2userLogsum, directoryExtItParam, "matrix_userLogsum.txt", "UserLogSum (AUD)");
+		writeMatrix(busNumber2fare2carLegs, directoryExtItParam, "matrix_carLegs.txt", "Number of Car Legs");
+		writeMatrix(busNumber2fare2ptLegs, directoryExtItParam, "matrix_ptLegs.txt", "Number of Pt Legs");
+		writeMatrix(busNumber2fare2avgT0MinusTAktPerPerson, directoryExtItParam, "matrix_car_avgT0MinusTAktPerPerson.txt", "avg t0-tAkt per car-user (sec)");
+		writeMatrix(busNumber2fare2numberOfMissedBusTrips, directoryExtItParam, "matrix_pt_numberOfMissedBusTrips.txt", "Number of Trips when a bus was missed");
+		writeMatrix(busNumber2fare2avgWaitingTimeMissing, directoryExtItParam, "matrix_pt_avgWaitingTimeMissing.txt", "avg waiting time per pt-user when a bus was missed (sec)");
+		writeMatrix(busNumber2fare2avgWaitingTimeNotMissing, directoryExtItParam, "matrix_pt_avgWaitingTimeNotMissing.txt", "avg waiting time per pt-user when person got the first arriving bus (sec)");
+		
+		// ...
 	}
 	
 	private void writeMatrix(SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2value, String directoryExtItParam, String filename, String title) {
@@ -99,7 +149,8 @@ public class TextFileWriter {
 	    bw.write(zeile1);
 	    bw.newLine();
 	    
-		String zeile = "BusNumber / Fare (AUD) ";
+//		String zeile = "BusNumber / Fare (AUD) ";
+	    String zeile = "";
 		for (Double fare : busNumber2fare2value.get(busNumber2fare2value.firstKey()).keySet()){
 		   zeile = zeile + " ; " + fare.toString();
 		}

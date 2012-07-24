@@ -49,7 +49,8 @@ public class ExtItInformation {
 	
 	private int noValidPlanScore;
 	
-	private double t0MinusTAct;
+	private double avgT0MinusTActPerPerson;
+	private double t0MinusTActSum;
 	
 	private List <Double> waitingTimes = new ArrayList<Double>();
 	private List <Double> waitingTimesMissed = new ArrayList<Double>();
@@ -266,12 +267,20 @@ public class ExtItInformation {
 		return personId2waitingTimes;
 	}
 
-	public void setT0MinusTAct(double t0MinusTAct) {
-		this.t0MinusTAct = t0MinusTAct;
+	public void setAvgT0MinusTActPerPerson(double avgT0MinusTAct) {
+		this.avgT0MinusTActPerPerson = avgT0MinusTAct;
 	}
 
-	public double getT0MinusTAct() {
-		return t0MinusTAct;
+	public double getAvgT0MinusTActPerPerson() {
+		return avgT0MinusTActPerPerson;
+	}
+
+	public void setT0MinusTActSum(double t0MinusTActSum) {
+		this.t0MinusTActSum = t0MinusTActSum;
+	}
+
+	public double getT0MinusTActSum() {
+		return t0MinusTActSum;
 	}
 		
 }
