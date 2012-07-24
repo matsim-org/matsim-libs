@@ -36,20 +36,19 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 
 	public class ParkingCostCalculatorZH implements ParkingCostCalculator {
 
-		private final HashMap<String, HashSet<Id>> parkingTypes;
 		private final CityZones zones;
 		private final ScenarioImpl scenario;
 		private HighStreetTariffZonesZHCity highTariffParkingZone;
 		private HashSet<Id> paidStreetParking;
 
-		public ParkingCostCalculatorZH(HashMap<String, HashSet<Id>> parkingTypes, CityZones zones, ScenarioImpl scenario, LinkedList<Parking> parkings) {
-			this.parkingTypes = parkingTypes;
+		public ParkingCostCalculatorZH(CityZones zones, ScenarioImpl scenario, LinkedList<Parking> parkings) {
 			this.zones = zones;
 			this.scenario = scenario;
 			this.highTariffParkingZone=new HighStreetTariffZonesZHCity();
 			
 			this.paidStreetParking=new HashSet<Id>();
 			
+			// define for steet parking, if it is paid parking or not.
 			for (Parking parking:parkings){
 				if (parking.getId().toString().contains("sp")){
 					CityZone closestZone = zones.getClosestZone(parking.getCoord());

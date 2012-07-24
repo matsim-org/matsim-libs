@@ -33,18 +33,23 @@ import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyHandler;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
+import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 
 public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 
 	private Set<String> selectedParkings;
 	private double[] sumOfOccupancyCountsOfSelectedParkings;
 	private final Controler controler;
+	private final ParkingInfrastructure parkingInfrastructure;
 
-	public ParkingOccupancyAnalysis(Controler controler){
+	public ParkingOccupancyAnalysis(Controler controler, ParkingInfrastructure parkingInfrastructure){
 		super(controler);
 		this.controler = controler;
+		this.parkingInfrastructure = parkingInfrastructure;
 		initializeParkingCounts(controler);
 	}
 	
@@ -192,6 +197,14 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 		super.updateParkingOccupancyStatistics(parkingOccupancy);
 		writeOutGraphComparingSumOfSelectedParkingsToCounts(parkingOccupancy);
 		writeOutGraphParkingTypeOccupancies(parkingOccupancy);
+		
+		if (GlobalParkingSearchParams.getScenarioId()==2){
+			ParkingCostCalculatorZHPerStreetOptimizedPrice parkingCostCalculator = (ParkingCostCalculatorZHPerStreetOptimizedPrice) this.parkingInfrastructure.getParkingCostCalculator();
+			
+			parkingCostCalculator.logParkingPriceStats(controler);
+			parkingCostCalculator.updatePrices(parkingOccupancy);
+		}
+		
 	}
 	
 }

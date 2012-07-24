@@ -282,7 +282,15 @@ public class ParkingInfrastructure  {
 	}
 
 	//TODO: rename to include world free
-	public Id getClosestParkingFacility(Coord coord) {		
+	public Id getClosestParkingFacility(Coord coord) {
+		if (nonFullPublicParkingFacilities.size()==0){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
+		if (coord==null){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY()).getId();
 	}
 	

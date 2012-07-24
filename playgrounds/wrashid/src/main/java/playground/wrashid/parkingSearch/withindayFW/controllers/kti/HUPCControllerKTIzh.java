@@ -34,6 +34,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -46,6 +47,7 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
@@ -54,9 +56,12 @@ import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivityMapperFW;
+import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
+import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZH;
+import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZHPerStreetOptimizedPrice;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingOccupancyAnalysis;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructureZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCIdentifier;
@@ -79,6 +84,9 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	
 	@Override
 	protected void startUpBegin() {
+		String scenarioIdString = this.getConfig().findParam("parking", "scenarioId");
+		GlobalParkingSearchParams.setScenarioId(Integer.parseInt(scenarioIdString));
+		
 		HashMap<String, HashSet<Id>> parkingTypes=new HashMap<String, HashSet<Id>>();
 		initParkingInfrastructure(this,parkingTypes);
 		
@@ -92,11 +100,17 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		} else {
 			cityZonesFilePath = "H:/data/experiments/TRBAug2012/parkings/zones.csv";
 		}
-		parkingInfrastructure=new ParkingInfrastructureZH(this.scenarioData,parkingTypes, new ParkingCostCalculatorZH(parkingTypes, new CityZones(cityZonesFilePath), scenarioData,parkings),parkings);
 		
+		ParkingCostCalculator parkingCostCalculator=null;
+		if (GlobalParkingSearchParams.getScenarioId()==1){
+			parkingCostCalculator=new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), scenarioData,parkings);
+		} else if (GlobalParkingSearchParams.getScenarioId()==2) {
+			parkingCostCalculator=new ParkingCostCalculatorZHPerStreetOptimizedPrice(parkings);
+		} else {
+			DebugLib.stopSystemAndReportInconsistency("sceanrio unknown");
+		}
 		
-		
-		
+		parkingInfrastructure=new ParkingInfrastructureZH(this.scenarioData,parkingTypes, parkingCostCalculator,parkings);
 		
 	}
 
@@ -108,7 +122,9 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	@Override
 	protected void startUpFinishing() {
 		
-		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, null);
+		
+		HashMap<Id, Double> houseHoldIncome = getHouseHoldIncomeCantonZH();
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, houseHoldIncome);
 
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
 		Collection<ParkingStrategy> parkingStrategies = new LinkedList<ParkingStrategy>();
@@ -185,8 +201,37 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		cleanNetwork();
 		
-		parkingAgentsTracker.setParkingOccupancyHandler(new ParkingOccupancyAnalysis(this));
+		parkingAgentsTracker.setParkingOccupancyHandler(new ParkingOccupancyAnalysis(this,parkingInfrastructure));
 		
+	}
+
+	private HashMap<Id, Double> getHouseHoldIncomeCantonZH() {
+		HashMap<Id, Double> houseHoldIncome=new HashMap<Id, Double>();
+		
+		for (Id personId : this.scenarioData.getPopulation().getPersons().keySet()) {
+			double rand = MatsimRandom.getRandom().nextDouble();
+			if (rand<0.032) {
+				houseHoldIncome.put(personId, 1000+MatsimRandom.getRandom().nextDouble()*1000);
+			} else if (rand<0.206) {
+				houseHoldIncome.put(personId, 2000+MatsimRandom.getRandom().nextDouble()*2000);
+			} else if (rand<0.471) {
+				houseHoldIncome.put(personId, 4000+MatsimRandom.getRandom().nextDouble()*2000);
+			} else if (rand<0.674) {
+				houseHoldIncome.put(personId, 6000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.803) {
+				houseHoldIncome.put(personId, 8000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.885) {
+				houseHoldIncome.put(personId, 10000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.927) {
+				houseHoldIncome.put(personId, 12000+MatsimRandom.getRandom().nextDouble()*2000);
+			}else if (rand<0.952) {
+				houseHoldIncome.put(personId, 14000+MatsimRandom.getRandom().nextDouble()*2000);
+			} else {
+				houseHoldIncome.put(personId, 16000+MatsimRandom.getRandom().nextDouble()*16000);
+			}
+		}
+		
+		return houseHoldIncome;
 	}
 
 	private void cleanNetwork() {
