@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -70,7 +71,8 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCReplannerFac
 public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	private LinkedList<Parking> parkings;
 
-
+	protected static final Logger log = Logger.getLogger(HUPCControllerKTIzh.class);
+	
 
 
 
@@ -316,6 +318,34 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 
 		readParkings(parkingsOutsideZHCityScaling, streetParkingsFile, parkingCollection);
 
+		int numberOfStreetParking=0;
+		int numberOfGarageParking=0;
+		int numberOfPrivateParking=0;
+		
+		for (Parking parking:parkingCollection){
+			if (parking.getId().toString().contains("stp")){
+				numberOfStreetParking+=parking.getCapacity();
+			} else if (parking.getId().toString().contains("gp")){
+				numberOfGarageParking+=parking.getCapacity();
+			} else if (parking.getId().toString().contains("private")){
+				numberOfPrivateParking+=parking.getCapacity();
+			}
+		}
+		
+		double totalNumberOfParkingZH=numberOfStreetParking+numberOfGarageParking+numberOfPrivateParking;
+		
+		log.info("numberOfStreetParking (%): " + numberOfStreetParking/totalNumberOfParkingZH*100 + " - ref: 18.5");
+		log.info("numberOfGarageParking (%):" + numberOfGarageParking/totalNumberOfParkingZH*100 + " - ref: 6.1");
+		log.info("numberOfPrivateParking (%):" + numberOfPrivateParking/totalNumberOfParkingZH*100 + " - ref: 75.4");
+		
+		double countsScalingFactor = Double.parseDouble(controler.getConfig().findParam("parking",
+				"countsScalingFactor"));
+		
+		log.info("totalNumberOfParkingZH: " + Math.round(totalNumberOfParkingZH/1000) + "k - ref: "+267000/countsScalingFactor/1000 + "k");
+		
+		//TODO: instead of using countsScalingFactor, include separate parameter for population share
+		log.info("attention: this calculation is done using countsScalingFactor=" + countsScalingFactor + ", meaning this is the population share, that is beeing simulated");
+		
 		return parkingCollection;
 	}
 	

@@ -53,7 +53,7 @@ public class ParkingInfrastructure  {
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
 	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
 	private IntegerValueHashMap<Id> reservedCapacities;	// number of reserved parkings
-	private IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
+	private IntegerValueHashMap<Id> facilityCapacities;	
 	private final HashMap<String, HashSet<Id>> parkingTypes;
 	private final ParkingCostCalculator parkingCostCalculator;
 	protected final Scenario scenario;

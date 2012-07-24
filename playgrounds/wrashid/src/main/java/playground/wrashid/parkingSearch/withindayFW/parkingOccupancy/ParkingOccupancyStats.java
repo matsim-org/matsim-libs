@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
+import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
 public class ParkingOccupancyStats {
 
@@ -43,17 +44,31 @@ public class ParkingOccupancyStats {
 	}
 	
 	
-	public void writeOutParkingOccupanciesTxt(Controler controler) {
+	public void writeOutParkingOccupanciesTxt(Controler controler, ParkingInfrastructure parkingInfrastructure) {
 		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
 				"parkingOccupancy.txt");
 
 		ArrayList<String> list = new ArrayList<String>();
 
+		// create header line
+		StringBuffer row = new StringBuffer("name\tcapacity");
+		
+		for (int i = 0; i < 96; i++) {
+			row.append("\t");
+			row.append("bin-"+i);
+		}
+		
+		list.add(row.toString());
+		
+		// content
 		for (Id parkingFacilityId : parkingOccupancies.keySet()) {
 
 			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancies.get(parkingFacilityId);
-			StringBuffer row = new StringBuffer(parkingFacilityId.toString());
+			row = new StringBuffer(parkingFacilityId.toString());
 
+			row.append("\t");
+			row.append(parkingOccupancyBins.getOccupancy(parkingInfrastructure.getFacilityCapacities().get(parkingFacilityId)));
+			
 			for (int i = 0; i < 96; i++) {
 				row.append("\t");
 				row.append(parkingOccupancyBins.getOccupancy(i * 900));

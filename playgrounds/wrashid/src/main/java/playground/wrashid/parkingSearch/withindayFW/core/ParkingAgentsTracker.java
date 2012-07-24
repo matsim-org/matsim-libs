@@ -721,7 +721,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			parkingOccupancyHandler=new ParkingOccupancyHandler(event.getControler());
 		}
 		
-		parkingOccupancyHandler.updateParkingOccupancyStatistics(parkingOccupancy);
+		parkingOccupancyHandler.updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure);
 		
 		
 		

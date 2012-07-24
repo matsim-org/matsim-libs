@@ -17,24 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW.parkingOccupancy;
+package playground.wrashid.lib.tools.log;
 
-import org.matsim.core.controler.Controler;
+import java.util.LinkedList;
 
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+import playground.wrashid.lib.GeneralLib;
 
+public class FilterConsoleOutput {
 
-public class ParkingOccupancyHandler {
-
-	private final Controler controler;
-
-	public ParkingOccupancyHandler(Controler controler){
-		this.controler = controler;
-	}
-	
-	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure){
-		parkingOccupancy.writeOutParkingOccupanciesTxt(controler,parkingInfrastructure);
-		parkingOccupancy.writeOutParkingOccupancySumPng(controler);
+	public static void main(String[] args) {
+		//LinkedList<String> readFileRows = GeneralLib.readFileRows("H:/data/experiments/TRBAug2012/runs/run1/log outputs/ivtch-1.log");
+		LinkedList<String> readFileRows = GeneralLib.readFileRows("H:/data/experiments/TRBAug2012/runs/run1/output/ITERS/it.0/0.parkingOccupancy.txt");
+		
+		
+		
+		int i=0;
+		while (i<readFileRows.size()){
+			String line = readFileRows.get(i);
+			//if (line.contains("ParkingCostCalculatorZHPerStreetOptimizedPrice") && line.contains("average garage parking")){
+			//if (line.contains("LegHistogramListener:83 number of car legs")){
+			if (line.contains("stp")){
+			System.out.println(line);
+			}
+			i++;
+		}
 	}
 	
 }
