@@ -48,6 +48,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.TeleportationVisData.Cache;
 
 public class OTFVisMobsimFeature implements VisMobsimFeature, MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener,
 AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
@@ -67,6 +68,12 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 	private final Set<Id> trackedAgents = new HashSet<Id>();
 
 	private Scenario scenario;
+
+	/**
+	 * I need a cache in TeleportationVisData that is not per Object, but for the run, and I don't want to use a 
+	 * static variable.  Thus this cache.  kai, jul'12
+	 */
+	private Cache cache = null ;
 
 	public OTFVisMobsimFeature(Scenario scenario, OnTheFlyServer server, VisMobsim queueSimulation) {
 		this.scenario = scenario;
@@ -145,7 +152,7 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 		Link currLink = this.scenario.getNetwork().getLinks().get( ev.getLinkId() ) ;
 		Link destLink = this.scenario.getNetwork().getLinks().get( ev.getDestinationLinkId() ) ;
 		double travTime = ev.getTravelTime() ;
-		TeleportationVisData agentInfo = new TeleportationVisData( now, agentId, currLink, destLink, travTime );
+		TeleportationVisData agentInfo = new TeleportationVisData( now, agentId, currLink, destLink, travTime, this.cache  );
 		this.teleportationData.put( agentId , agentInfo );
 	}
 

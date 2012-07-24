@@ -21,6 +21,7 @@ package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  *
@@ -28,6 +29,10 @@ import org.matsim.api.core.v01.network.Link;
  *
  */
 public class TeleportationVisData implements AgentSnapshotInfo {
+	
+	public static class Cache {
+		public double euclideanUnitsPerMeter ;
+	}
 
 	private double stepsize;
 	private double startX;
@@ -42,8 +47,12 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private int type;
 	private double colorval;
 	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE ;
+	Cache cache ;
+	private int intX;
+	private int intY;
+	private static int offset = 100 ;
 
-	public TeleportationVisData(double now, Id personId, Link fromLink, Link toLink, double travelTime ) {
+	public TeleportationVisData(double now, Id personId, Link fromLink, Link toLink, double travelTime, Cache cache ) {
 		this.starttime = now;
 		this.agentId = personId ;
 		this.startX = fromLink.getToNode().getCoord().getX();
@@ -52,12 +61,37 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		double endY = toLink.getToNode().getCoord().getY();
 		double dX = endX - startX;
 		double dY = endY - startY;
-		double length = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
-		this.stepsize = length / travelTime;
-		this.normalX = dX / length;
-		this.normalY = dY / length;
+		double euclideanLength = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+		this.stepsize = euclideanLength / travelTime;
+		this.normalX = dX / euclideanLength;
+		this.normalY = dY / euclideanLength;
 		this.currentX = startX;
 		this.currentY = startY;
+		
+		this.cache = cache ;
+		if ( this.cache == null ) {
+			this.cache = new Cache() ;
+			Link link = toLink ;
+			if ( fromLink.getLength() > toLink.getLength() ) {
+				link = fromLink ;
+			}
+			double fromX = link.getFromNode().getCoord().getX();
+			double fromY = link.getFromNode().getCoord().getY();
+			double toX   = link.getToNode().getCoord().getX() ;
+			double toY   = link.getToNode().getCoord().getY() ;
+			
+			double dx2 = fromX - toX ;
+			double dy2 = fromY - toY ;
+			
+			this.cache.euclideanUnitsPerMeter = Math.sqrt( Math.pow(dx2, 2) + Math.pow(dy2 , 2) ) / link.getLength() ;
+		}
+		
+		String idstr = personId.toString() ;
+		int hashCode = idstr.hashCode() ;
+		intX = hashCode%offset ;
+		hashCode -= intX ;
+		hashCode /= offset ;
+		intY = hashCode%offset ;
 	}
 
 	@Override
@@ -77,8 +111,8 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 
 	public void calculatePosition(double time) {
 		double step = (time - starttime) * this.stepsize;
-		this.currentX = this.startX + (step * this.normalX);
-		this.currentY = this.startY  + (step * this.normalY);
+		this.currentX = this.startX + (step * this.normalX) + 0.1*(intX-offset/2) ;
+		this.currentY = this.startY  + (step * this.normalY) + 0.1*(intY-offset/2) ;
 	}
 
 	@Override
