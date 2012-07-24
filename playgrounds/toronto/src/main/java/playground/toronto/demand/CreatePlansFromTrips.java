@@ -653,7 +653,7 @@ public class CreatePlansFromTrips {
 			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
 			
 			ActivityImpl a = (ActivityImpl) plan.getFirstActivity();
-			LinkImpl nearestLink = network.getNearestLink(a.getCoord());
+			Link nearestLink = network.getNearestLink(a.getCoord());
 			a.setLinkId(nearestLink.getId());
 		}
 	}
