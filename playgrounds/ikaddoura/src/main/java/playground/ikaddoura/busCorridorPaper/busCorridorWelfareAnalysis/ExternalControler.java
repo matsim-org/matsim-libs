@@ -63,12 +63,12 @@ class ExternalControler {
 		
 	public static void main(final String[] args) throws IOException {
 
-		configFile = "../../shared-svn/studies/ihab/busCorridor/input_Latsis/config_welfareBusCorridor_TC.xml";
-		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/carLegTest";
-		
-		lastExternalIterationParam1 = 0;
-		lastExternalIterationParam2 = 0;
-		
+//		configFile = "../../shared-svn/studies/ihab/busCorridor/input_Latsis/config_welfareBusCorridor_TC.xml";
+//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/carLegTest";
+//		
+//		lastExternalIterationParam1 = 2;
+//		lastExternalIterationParam2 = 2;
+//		
 		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
 		op2 = OptimizationParameter2.FARE;
 				
@@ -78,11 +78,11 @@ class ExternalControler {
 		
 		// ************************************************
 		
-//		configFile = args[0];
-//		outputExternalIterationDirPath = args[1];
-//		
-//		lastExternalIterationParam1 = Integer.parseInt(args[2]);
-//		lastExternalIterationParam2 = Integer.parseInt(args[3]);
+		configFile = args[0];
+		outputExternalIterationDirPath = args[1];
+		
+		lastExternalIterationParam1 = Integer.parseInt(args[2]);
+		lastExternalIterationParam2 = Integer.parseInt(args[3]);
 //		
 //		String op1String = args[4];
 //
