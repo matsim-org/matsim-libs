@@ -43,10 +43,16 @@ public abstract class ControlerEvent {
 	 * not as powerful.
 	 * <li> If you need access to internals of the controler inside the ControlerListener, put it into the constructor
 	 * of the ControlerListener.  This will also clarify much more what you need.
+	 * <li> NEW (jul'12): We think that it makes more sense to in fact attach some objects to the controler event.  Obvious
+	 * candidates are getScenario(), getEvents(), getControlerIO(), some mobsim listener infrastructure.  A probable 
+	 * transition would be to rename controlerEvent.getControler().getScenario() to 
+	 * controlerEvent.getControlerListenerInfrastructure().getScenario().  For that reason, getControler() is no longer deprecated
+	 * ... but you should try to restrict yourself to getControler().getScenario(), getControler().getEvents(), 
+	 * getControler.getControlerIO().  kai/dominik, jul'12
 	 * </ul>
 	 * @return the Controler instance which fired the event
 	 */
-	@Deprecated // jun'12.  See above  
+//	@Deprecated // jun'12.  See above  
 	public Controler getControler() {
 		return this.controler;
 	}
