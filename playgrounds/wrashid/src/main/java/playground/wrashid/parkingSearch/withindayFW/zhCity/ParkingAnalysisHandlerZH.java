@@ -282,9 +282,9 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			}
 		}
 		log.info("iteration-" + controler.getIterationNumber());
-		log.info("peak usage street parking:" + numberOfPeakStreetParking/1.0/numberOfStreetParking);
-		log.info("peak usage garage parking:" + numberOfPeakGarageParking/1.0/numberOfGarageParking);
-		log.info("peak usage private parking:" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking);
+		log.info("peak usage street parking:" + numberOfPeakStreetParking/1.0/numberOfStreetParking + " - [" + numberOfPeakStreetParking + "]");
+		log.info("peak usage garage parking:" + numberOfPeakGarageParking/1.0/numberOfGarageParking + " - [" + numberOfPeakGarageParking + "]");
+		log.info("peak usage private parking:" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking + " - [" + numberOfPeakPrivateParking + "]");
 		
 		// remove zero occupancy parking (probably has to do with population scaling artifects)
 		for (Id parkingId : facilityCapacities.getKeySet()) {
@@ -303,9 +303,9 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			}
 		}
 		
-		log.info("peak usage street parking (not used parking removed):" + numberOfPeakStreetParking/1.0/numberOfStreetParking);
-		log.info("peak usage garage parking (not used parking removed):" + numberOfPeakGarageParking/1.0/numberOfGarageParking);
-		log.info("peak usage private parking (not used parking removed):" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking);
+		log.info("peak usage street parking (not used parking removed):" + numberOfPeakStreetParking/1.0/numberOfStreetParking + " - [" + numberOfPeakStreetParking + "]");
+		log.info("peak usage garage parking (not used parking removed):" + numberOfPeakGarageParking/1.0/numberOfGarageParking+ " - [" + numberOfPeakGarageParking + "]");
+		log.info("peak usage private parking (not used parking removed):" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking+ " - [" + numberOfPeakPrivateParking + "]");
 		
 	}
 

@@ -26,7 +26,7 @@ import playground.wrashid.lib.GeneralLib;
 public class ConsoleOutputAnalysis {
 
 	public static void main(String[] args) {
-		LinkedList<String> readFileRows = GeneralLib.readFileRows("H:/data/experiments/TRBAug2012/runs/run22/output/logfile.log");
+		LinkedList<String> readFileRows = GeneralLib.readFileRows("H:/data/experiments/TRBAug2012/runs/run23/output/logfile.log");
 
 		int i = 0;
 		while (i < readFileRows.size()) {
