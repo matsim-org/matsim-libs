@@ -220,7 +220,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		logPeakUsageOfParkingTypes(parkingOccupancy, parkingInfrastructure);
 
 		if (GlobalParkingSearchParams.getScenarioId() == 2) {
-			ParkingCostCalculatorZHPerStreetOptimizedPrice parkingCostCalculator = (ParkingCostCalculatorZHPerStreetOptimizedPrice) this.parkingInfrastructure
+			ParkingCostOptimizerZH parkingCostCalculator = (ParkingCostOptimizerZH) this.parkingInfrastructure
 					.getParkingCostCalculator();
 
 			parkingCostCalculator.logParkingPriceStats(controler);

@@ -34,22 +34,33 @@ import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
+import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
+
 import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 
-public class ParkingCostCalculatorZHPerStreetOptimizedPrice implements ParkingCostCalculator {
+public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
-	protected static final Logger log = Logger.getLogger(ParkingCostCalculatorZHPerStreetOptimizedPrice.class);
+	protected static final Logger log = Logger.getLogger(ParkingCostOptimizerZH.class);
 	
 	private final LinkedList<Parking> parkings;
 	private DoubleValueHashMap<Id> publicParkingPricePerHourInTheMorning;
 	private DoubleValueHashMap<Id> publicParkingPricePerHourInTheAfternoon;
+	double priceIncValue;
+	double targetOccupancy;
 
-	public ParkingCostCalculatorZHPerStreetOptimizedPrice(LinkedList<Parking> parkings) {
+	public ParkingCostOptimizerZH(LinkedList<Parking> parkings, Controler controler) {
 		this.parkings = parkings;
+		
+		String tmpString = controler.getConfig().findParam("parking", "ParkingCostOptimizerZH.priceIncValue");
+		priceIncValue=Double.parseDouble(tmpString);
+		
+		tmpString = controler.getConfig().findParam("parking", "ParkingCostOptimizerZH.targetOccupancy");
+		targetOccupancy=Double.parseDouble(tmpString);
 
 		publicParkingPricePerHourInTheMorning=new DoubleValueHashMap<Id>();
 		publicParkingPricePerHourInTheAfternoon=new DoubleValueHashMap<Id>();
@@ -101,8 +112,7 @@ public class ParkingCostCalculatorZHPerStreetOptimizedPrice implements ParkingCo
 	
 
 	public void updatePrices(ParkingOccupancyStats parkingOccupancy) {
-		double priceIncValue = 0.25;
-		double targetOccupancy = 0.85;
+
 		
 		for (Parking parking : parkings) {
 			if (parkingOccupancy.parkingOccupancies.get(parking.getId())==null){

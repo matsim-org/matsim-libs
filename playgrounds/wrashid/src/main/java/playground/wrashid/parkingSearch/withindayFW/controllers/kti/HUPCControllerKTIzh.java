@@ -62,7 +62,7 @@ import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchPara
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZH;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZHPerStreetOptimizedPrice;
+import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostOptimizerZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingAnalysisHandlerZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructureZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCIdentifier;
@@ -115,7 +115,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		if (GlobalParkingSearchParams.getScenarioId()==1){
 			parkingCostCalculator=new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), scenarioData,parkings);
 		} else if (GlobalParkingSearchParams.getScenarioId()==2) {
-			parkingCostCalculator=new ParkingCostCalculatorZHPerStreetOptimizedPrice(parkings);
+			parkingCostCalculator=new ParkingCostOptimizerZH(parkings,this);
 		} else {
 			DebugLib.stopSystemAndReportInconsistency("sceanrio unknown");
 		}
