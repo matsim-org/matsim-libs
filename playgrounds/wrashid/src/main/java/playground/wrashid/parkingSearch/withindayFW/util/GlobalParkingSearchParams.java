@@ -24,9 +24,19 @@ import playground.wrashid.lib.DebugLib;
 public class GlobalParkingSearchParams {
 
 	private static int scenarioId=-1;
+	private static double populationPercentage;
+	private static double parkingScoreWeight;
 
 	public static int getScenarioId() {
 		return scenarioId;
+	}
+	
+	public static double getPopulationPercentage() {
+		return populationPercentage;
+	}
+	
+	public static double getParkingScoreWeight() {
+		return parkingScoreWeight;
 	}
 
 	public static void setScenarioId(int scenarioId) {
@@ -35,6 +45,14 @@ public class GlobalParkingSearchParams {
 		}
 		
 		GlobalParkingSearchParams.scenarioId = scenarioId;
+	}
+
+	public static void setPopulationPercentage(double populationPercentage) {
+		GlobalParkingSearchParams.populationPercentage = populationPercentage;
+	}
+
+	public static void setParkingScoreWeight(double parkingScoreWeight) {
+		GlobalParkingSearchParams.parkingScoreWeight = parkingScoreWeight;
 	}
 	
 }

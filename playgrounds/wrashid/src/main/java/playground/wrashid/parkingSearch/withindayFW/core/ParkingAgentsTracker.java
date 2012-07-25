@@ -89,6 +89,7 @@ import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CapturePrevio
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.CaptureWalkDurationOfFirstAndLastOfDay;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateEndTimeOfPreviousActivity;
 import playground.wrashid.parkingSearch.withindayFW.parkingTracker.UpdateLastParkingArrivalTime;
+import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
@@ -733,7 +734,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 			ScoringFunction scoringFunction = event.getControler().getPlansScoring().getScoringFunctionForAgent(personId);
 			
-			double amount = parkingIterationScoreSum.get(personId);
+			double amount = GlobalParkingSearchParams.getParkingScoreWeight() *  parkingIterationScoreSum.get(personId);
 			scoringFunction.addMoney(amount);
 		}
 		

@@ -86,8 +86,16 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	
 	@Override
 	protected void startUpBegin() {
+		//TODO: read all parameters from module parking at one place!
 		String scenarioIdString = this.getConfig().findParam("parking", "scenarioId");
 		GlobalParkingSearchParams.setScenarioId(Integer.parseInt(scenarioIdString));
+		
+		String tmpString = this.getConfig().findParam("parking", "populationPercentage");
+		GlobalParkingSearchParams.setPopulationPercentage(Double.parseDouble(tmpString));
+		
+		tmpString = this.getConfig().findParam("parking", "parkingScoreWeight");
+		GlobalParkingSearchParams.setParkingScoreWeight(Double.parseDouble(tmpString));
+		
 		
 		HashMap<String, HashSet<Id>> parkingTypes=new HashMap<String, HashSet<Id>>();
 		initParkingInfrastructure(this,parkingTypes);
@@ -338,14 +346,9 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		log.info("numberOfGarageParking (%):" + numberOfGarageParking/totalNumberOfParkingZH*100 + " - ref: 6.1");
 		log.info("numberOfPrivateParking (%):" + numberOfPrivateParking/totalNumberOfParkingZH*100 + " - ref: 75.4");
 		
+		double populationScalingFactor = GlobalParkingSearchParams.getPopulationPercentage();
 		
-		double countsScalingFactor = Double.parseDouble(controler.getConfig().findParam("parking",
-				"countsScalingFactor"));
-		
-		log.info("totalNumberOfParkingZH: " + Math.round(totalNumberOfParkingZH/1000) + "k - ref: "+267000/countsScalingFactor/1000 + "k");
-		
-		//TODO: instead of using countsScalingFactor, include separate parameter for population share
-		log.info("attention: this calculation is done using countsScalingFactor=" + countsScalingFactor + ", meaning this is the population share, that is beeing simulated");
+		log.info("totalNumberOfParkingZH: " + Math.round(totalNumberOfParkingZH/1000) + "k - ref: "+267000/populationScalingFactor/1000 + "k");
 		
 		return parkingCollection;
 	}
