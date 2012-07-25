@@ -632,7 +632,7 @@ public class CreatePlansFromTrips {
 			
 			//Highway links (& on/off ramps)
 			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") 
-					|| L.getType().equals("On/Off Ramp") || 
+					|| L.getType().equals("On/Off Ramp") || L.getType().equals("Turn") ||
 					L.getType().equals("LOOP")) linksToRemove.add(L.getId());
 			
 			//Transit EX-ROW links
