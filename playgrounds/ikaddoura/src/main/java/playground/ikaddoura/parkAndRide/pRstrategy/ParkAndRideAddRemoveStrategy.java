@@ -248,22 +248,23 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 					workIndex = planIndices.getWorkActs().get(rndWork);					
 					minHomeAfterWork = planIndices.getMinHomeAfterWork(workIndex);
 					maxHomeBeforeWork = planIndices.getMaxHomeBeforeWork(workIndex);
-					
-					String modes = sc.getConfig().multiModal().getSimulatedModes();
+										
 					List<String> availableModes = new ArrayList<String>();
 					availableModes.add(TransportMode.car);
 					availableModes.add(TransportMode.pt);
 					
-					if (modes != null) {
-						String[] parts = StringUtils.explode(modes, ',');
-						for (int i = 0, n = parts.length; i < n; i++) {
-							String mode = parts[i].trim().intern();
-							if (availableModes.contains(mode)){
-							} else {
-								availableModes.add(mode);
-							}
-						}
-					}
+//					String modes = sc.getConfig().multiModal().getSimulatedModes();
+//					if (modes != null) {
+//						String[] parts = StringUtils.explode(modes, ',');
+//						for (int i = 0, n = parts.length; i < n; i++) {
+//							String mode = parts[i].trim().intern();
+//							if (availableModes.contains(mode)){
+//							} else {
+//								availableModes.add(mode);
+//							}
+//						}
+//					}
+					
 					log.info("Chosing mode from: " + availableModes);
 					int rndModeIndex = (int)(MatsimRandom.getRandom().nextDouble() * availableModes.size());
 					String mode = availableModes.get(rndModeIndex);
@@ -283,6 +284,8 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 					planElements.remove(remove0);
 					planElements.remove(remove0);
 					
+					// legs vor/nach anderen Aktivitäten innerhalb der HWH-Sequenz --> rndLegMode!
+					// ...
 				}
 						
 			} else {
