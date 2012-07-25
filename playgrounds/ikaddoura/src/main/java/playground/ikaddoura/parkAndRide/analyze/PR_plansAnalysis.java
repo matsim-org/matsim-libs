@@ -27,6 +27,7 @@ public class PR_plansAnalysis {
 	static String plansFile2;
 	static String netFile;
 	static String outputFile;
+	static double tolerance;
 			
 	public static void main(String[] args) throws IOException {
 		
@@ -34,6 +35,7 @@ public class PR_plansAnalysis {
 		plansFile2 = args[1];
 		netFile = args[2];
 		outputFile = args[3];
+		tolerance = Double.parseDouble(args[4]);
 		
 		PR_plansAnalysis analyse = new PR_plansAnalysis();
 		analyse.run();
@@ -45,36 +47,53 @@ public class PR_plansAnalysis {
 		Population population2 = getPopulation(netFile, plansFile2);
 		List <Id> personIds = new ArrayList<Id>();
 		
+		int n = 0;
+		
 		for (Person person1 : population1.getPersons().values()){
 			for (Plan plan1 : person1.getPlans()){
-				double score1 = plan1.getScore();
-				Id personId1 = person1.getId();
-				
-				Person person2 = population2.getPersons().get(personId1);
-				for (Plan plan2 : person2.getPlans()){
-					boolean plan2HasPR = false;
-					double score2 = plan2.getScore();
-					if (score2 > score1) {
-						for (PlanElement pE : plan2.getPlanElements()){
-							if (pE instanceof Activity){
-								Activity act = (Activity) pE;
-								if (act.toString().contains("parkAndRide")){
-									plan2HasPR = true;
+				if (plan1.getScore()==null){
+					System.out.println("Plan1 hat keinen Score...");
+				} else {
+					double score1 = plan1.getScore();
+					Id personId1 = person1.getId();
+					
+					if (population2.getPersons().get(personId1)==null){
+						System.out.println("Person in population2 nicht enthalten.");
+					} else {
+						Person person2 = population2.getPersons().get(personId1);
+						for (Plan plan2 : person2.getPlans()){
+							boolean plan2HasPR = false;
+							
+							if (plan2.getScore()==null){
+								System.out.println("Plan2 hat keinen Score...");
+							} else {
+								double score2 = plan2.getScore();
+								if (score2 > score1 + tolerance) {
+									for (PlanElement pE : plan2.getPlanElements()){
+										if (pE instanceof Activity){
+											Activity act = (Activity) pE;
+											if (act.toString().contains("parkAndRide")){
+												plan2HasPR = true;
+											}
+										}
+									}
+									if (plan2HasPR){
+//										System.out.println(person2.getId() + " hat in planFile2 einen Park'n'Ride-Plan mit höherem Score.");
+									} else {
+										System.out.println(person2.getId() + " hat in planFile2 einen Plan mit höherem Score, der kein Park'n'Ride enthält!!!");
+										System.out.println("Verbesserung nicht aufgrund von Park'n'Ride!");
+										personIds.add(person2.getId());
+										n++;
+									}
 								}
-							}
+							}	
 						}
-						if (plan2HasPR){
-//							System.out.println(person2.getId() + " hat in planFile2 einen Park'n'Ride-Plan mit höherem Score.");
-						} else {
-							System.out.println(person2.getId() + " hat in planFile2 einen Plan mit höherem Score, der kein Park'n'Ride enthält!!!");
-							System.out.println("Verbesserung nicht aufgrund von Park'n'Ride!");
-							personIds.add(person2.getId());
-						}
-					}	
+					}
 				}
 			}
 		}
 		System.out.println("done.");
+		System.out.println("result: " + n);
 		
 		TextFileWriter writer = new TextFileWriter();
 		writer.writeFile(personIds, outputFile);
