@@ -17,12 +17,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 
 public class NoiseTool {
-	private static String runDirectory = "/mobilTUMrunsKuhmo/output/output_baseCase_ctd/";
-	private static String eventsFile = "../../mobilTUMrunsKuhmo/output/output_baseCase_ctd/ITERS/it.1500/1500.events.xml.gz";
-	private static String netfile = "../../mobilTUMrunsKuhmo/output/output_baseCase_ctd/output_network.xml.gz";
+	
+	
+	
+	
+	private static String runDirectory = "../../detEval/kuhmo/output/output_baseCase_ctd/";
+	private static String eventsFile =  runDirectory + "ITERS/it.1500/1500.events.xml.gz";
+	private static String netfile = runDirectory + "output_network.xml.gz";
 	private final Scenario scenario;
 	
-	String outputfile = "../mobilTUM/OutputTests/noiseEvents.xml";
+	String outputfile = "../noiseEvents/noiseEvents.xml";
 
 	
 	public NoiseTool() {
@@ -62,17 +66,18 @@ public class NoiseTool {
 		NoiseEmissionCalculation calculation = new NoiseEmissionCalculation();
 		
 		//die folgende Zeile wurde auskommentiert, weil fehlerhaft (Cannot make a static reference to the non-static method calLmeCarHdvHour(Map<Id,Map<Double,double[]>>) from the type NoiseEmissionCalculation)
-		//Map <Id,Map<Double,Double>> calLmeCarHdvHour = NoiseEmissionCalculation.calLmeCarHdvHour(linkInfos);
+		//calculation statt NoiseEmissionCalculation  nehmen
+		Map <Id,Map<Double,Double>> calLmeCarHdvHour = calculation.calLmeCarHdvHour(linkInfos);
 		
 		//die folgende Zeile wurde auskommentiert, weil fehlerhaft (calLmeCarHdvHour fehlt)
-		//Map <Id,Double> linkId2Lden = calculation.cal_lden(calLmeCarHdvHour);
+		Map <Id,Double> linkId2Lden = calculation.cal_lden(calLmeCarHdvHour);
 		
 		//die folgende Zeile wurde auskommentiert, weil fehlerhaft (The constructor NoiseWriter(Map<Id,Map<Double,double[]>>, Map<Id,Double>) is undefined)
-		//NoiseWriter writer = new NoiseWriter (linkInfos,linkId2Lden);
+		NoiseWriter writer = new NoiseWriter (calLmeCarHdvHour,linkId2Lden);
 		//die fehlerhafte Zeile wurde ersetzt durch die folgende, um zumindest die beiden Textdateien zu schreiben:
-		NoiseWriter writer = new NoiseWriter ();
+	//	NoiseWriter writer = new NoiseWriter ();
 		
-		//writer.writeEvents();
+		writer.writeEvents();
 		
 		
 		try { // write the TrafficInfos per hour for every link 

@@ -26,8 +26,8 @@ public class NoiseEmissionCalculation {
 				double [] hourInfos = element.getValue();
 				// we collect now the parameter
 				double maxSpeed = hourInfos [0]; //freespeed
-				double total = 10.0 * hourInfos [1]; //cars+hdv
-				double hdv = 10.0 * hourInfos [2]; //HDV
+				double total = 100.0 * hourInfos [1]; //cars+hdv
+				double hdv = 100.0 * hourInfos [2]; //HDV
 				//double total = car + hdv;
 						
 				double p = hdv/total*100; //share HDV
@@ -48,7 +48,7 @@ public class NoiseEmissionCalculation {
 	}
 	
 	/*FH Code, slightly modified by Regine
-	/* algorithm to calculate noise emissions 
+	 algorithm to calculate noise emissions 
 	public Map<Id,Map<String,Double>> calculate_lme (Map<Id,Map<String, double[]>> linkInfos){ 
 		/*Methode calculate_lme, return value linkInfos, used in NoiseTool
 		 * linkInfos is computed in handler.getlinkId2timePeriod2TrafficInfo()
