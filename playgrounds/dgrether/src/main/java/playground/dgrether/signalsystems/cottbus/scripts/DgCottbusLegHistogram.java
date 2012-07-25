@@ -35,7 +35,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.events.handlers.DgLegHistogram;
+import playground.dgrether.events.handlers.DgGeoFilteredLegHistogram;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 
@@ -65,7 +65,7 @@ public class DgCottbusLegHistogram {
 		
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		DgLegHistogram histo = new DgLegHistogram(network, netCrs, 300);
+		DgGeoFilteredLegHistogram histo = new DgGeoFilteredLegHistogram(network, netCrs, 300);
 		histo.addCrsFeatureTuple(cottbusFeatureTuple);
 		events.addHandler(histo);
 

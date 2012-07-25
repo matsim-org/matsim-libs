@@ -59,7 +59,7 @@ import playground.dgrether.events.GeospatialEventTools;
  * @author dgrether
  *
  */
-public class DgLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
+public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
 
 	private Map<Id, LinkEnterEvent> firstTimeSeenMap;
 	private Map<Id, LinkLeaveEvent> lastTimeSeenMap;
@@ -69,7 +69,7 @@ public class DgLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHand
 	private final int nofBins;
 	private ModeData allModesData = null;
 	
-	public DgLegHistogram(Network network, CoordinateReferenceSystem networkCrs, final int binSizeSeconds, final int nofBins){
+	public DgGeoFilteredLegHistogram(Network network, CoordinateReferenceSystem networkCrs, final int binSizeSeconds, final int nofBins){
 		this.geospatialTools = new GeospatialEventTools(network, networkCrs);
 		this.binSizeSeconds = binSizeSeconds;
 		this.nofBins = nofBins;
@@ -78,7 +78,7 @@ public class DgLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHand
 		reset(0);
 	}
 
-	public DgLegHistogram(Network network, CoordinateReferenceSystem networkCrs, final int binSizeSeconds){
+	public DgGeoFilteredLegHistogram(Network network, CoordinateReferenceSystem networkCrs, final int binSizeSeconds){
 		this(network, networkCrs, binSizeSeconds, 30*3600/binSizeSeconds + 1);
 	}
 

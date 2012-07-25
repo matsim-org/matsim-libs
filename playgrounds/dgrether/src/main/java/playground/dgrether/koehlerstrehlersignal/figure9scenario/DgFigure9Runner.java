@@ -58,10 +58,14 @@ public class DgFigure9Runner {
 
 	public static final String signalsConfigSol800 = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals_signal_control_solution_figure9_from_matsim_population_800.xml";
 
-	private String configFile = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario5/config_signals_coordinated.xml";
+//	private String configFile = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario5/config_signals_coordinated.xml";
+	
+	private String configFile = DgPaths.STUDIESDG + "koehlerStrehler2010/scenario5/config_testing.xml";
 
 	private TTInOutflowEventHandler handler23, handler27, handler54, handler58;
 
+	private DgMfd mfdHandler;
+	
 	private void runFromConfig(String conf) {
 		String c = null;
 		if (conf == null){
@@ -79,18 +83,23 @@ public class DgFigure9Runner {
 
 
 	private void addControlerListener(Controler c) {
+		
 		//add some EventHandler to the EventsManager after the controler is started
 		handler23 = new TTInOutflowEventHandler(new IdImpl("23"));
 		handler27 = new TTInOutflowEventHandler(new IdImpl("27"));
 		handler54 = new TTInOutflowEventHandler(new IdImpl("54"));
 		handler58 = new TTInOutflowEventHandler(new IdImpl("58"));
-
+		
+		
 		c.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent e) {
+				mfdHandler = new DgMfd(e.getControler().getScenario());
 				e.getControler().getEvents().addHandler(handler23);
 				e.getControler().getEvents().addHandler(handler27);
 				e.getControler().getEvents().addHandler(handler54);
 				e.getControler().getEvents().addHandler(handler58);
+				
+				e.getControler().getEvents().addHandler(mfdHandler);
 			}
 		});
 
@@ -135,6 +144,9 @@ public class DgFigure9Runner {
 					chart.addCountEventHandler(handler54);
 					chart.addCountEventHandler(handler58);
 					DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
+				
+				
+					mfdHandler.writeFile(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "mfd.txt"));
 				}
 			}
 		});
