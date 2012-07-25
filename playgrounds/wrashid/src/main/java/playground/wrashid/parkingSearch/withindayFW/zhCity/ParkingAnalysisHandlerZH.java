@@ -20,6 +20,7 @@
 package playground.wrashid.parkingSearch.withindayFW.zhCity;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -29,32 +30,33 @@ import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.lib.obj.Pair;
 import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
+import playground.wrashid.parkingSearch.withindayFW.analysis.ParkingAnalysisHandler;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
-import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyHandler;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 
-public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
+public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
-	protected static final Logger log = Logger.getLogger(ParkingOccupancyAnalysis.class);
+	protected static final Logger log = Logger.getLogger(ParkingAnalysisHandlerZH.class);
 	
 	private Set<String> selectedParkings;
 	private double[] sumOfOccupancyCountsOfSelectedParkings;
-	private final Controler controler;
 	private final ParkingInfrastructure parkingInfrastructure;
 
 	private double countsScalingFactor;
 
-	public ParkingOccupancyAnalysis(Controler controler, ParkingInfrastructure parkingInfrastructure) {
-		super(controler);
+	public ParkingAnalysisHandlerZH(Controler controler, ParkingInfrastructure parkingInfrastructure) {
 		this.controler = controler;
 		this.parkingInfrastructure = parkingInfrastructure;
 		initializeParkingCounts(controler);
@@ -305,6 +307,85 @@ public class ParkingOccupancyAnalysis extends ParkingOccupancyHandler {
 		log.info("peak usage garage parking (not used parking removed):" + numberOfPeakGarageParking/1.0/numberOfGarageParking);
 		log.info("peak usage private parking (not used parking removed):" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking);
 		
+	}
+
+	@Override
+	public void processParkingWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog) {
+		// TODO Auto-generated method stub
+		LinkedList<Double> streetParkingWalkLegTimes = new LinkedList<Double>();
+		LinkedList<Double> garageParkingWalkLegTimes = new LinkedList<Double>();
+
+		for (Id personnId : parkingWalkTimesLog.getKeySet()) {
+			for (Pair<Id, Double> pair : parkingWalkTimesLog.get(personnId)) {
+				Id parkingFacilityId = pair.getFistValue();
+				double walkingTime = pair.getSecondValue();
+
+				if (parkingFacilityId.toString().contains("stp")) {
+					// need to count the leg twice
+					streetParkingWalkLegTimes.add(walkingTime / 2);
+					streetParkingWalkLegTimes.add(walkingTime / 2);
+				} else if (parkingFacilityId.toString().contains("gp")) {
+					garageParkingWalkLegTimes.add(walkingTime / 2);
+					garageParkingWalkLegTimes.add(walkingTime / 2);
+				}
+			}
+		}
+
+		double[] values = Collections.convertDoubleCollectionToArray(streetParkingWalkLegTimes);
+
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				"walkingDistanceHistogrammStp.png");
+
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram Street Parking Walk Time - It." + controler.getIterationNumber(), "walk time [min]",
+				"number of walk legs");
+
+		values = Collections.convertDoubleCollectionToArray(garageParkingWalkLegTimes);
+
+		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				"walkingDistanceHistogrammGp.png");
+
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram Garage Parking Walk Time - It." + controler.getIterationNumber(), "walk time [min]",
+				"number of walk legs");
+	}
+
+	@Override
+	public void processParkingSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog) {
+		// TODO Auto-generated method stub
+		LinkedList<Double> streetParkingSearchTimes = new LinkedList<Double>();
+		LinkedList<Double> garageParkingSearchTimes = new LinkedList<Double>();
+
+		for (Id personnId : parkingSearchTimeLog.getKeySet()) {
+			for (Pair<Id, Double> pair : parkingSearchTimeLog.get(personnId)) {
+				Id parkingFacilityId = pair.getFistValue();
+				double searchTime = pair.getSecondValue();
+
+				if (parkingFacilityId.toString().contains("stp")) {
+					streetParkingSearchTimes.add(searchTime);
+				} else if (parkingFacilityId.toString().contains("gp")) {
+					garageParkingSearchTimes.add(searchTime);
+				}
+			}
+		}
+
+		double[] values = Collections.convertDoubleCollectionToArray(streetParkingSearchTimes);
+
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				"searchTimeHistogrammStp.png");
+
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram Street Parking Search Time - It." + controler.getIterationNumber(), "search time [min]",
+				"number of parking searches");
+
+		values = Collections.convertDoubleCollectionToArray(garageParkingSearchTimes);
+
+		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				"searchTimeHistogrammGp.png");
+
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram Garage Parking Search Time - It." + controler.getIterationNumber(), "search time [min]",
+				"number of parking searches");
 	}
 
 }

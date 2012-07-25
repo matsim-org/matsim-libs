@@ -63,7 +63,7 @@ import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZHPerStreetOptimizedPrice;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingOccupancyAnalysis;
+import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingAnalysisHandlerZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructureZH;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCReplannerFactory;
@@ -203,8 +203,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		cleanNetwork();
 		
-		parkingAgentsTracker.setParkingOccupancyHandler(new ParkingOccupancyAnalysis(this,parkingInfrastructure));
-		
+		parkingAgentsTracker.setParkingAnalysisHandler(new ParkingAnalysisHandlerZH(this,parkingInfrastructure));
 	}
 
 	private HashMap<Id, Double> getHouseHoldIncomeCantonZH() {

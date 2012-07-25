@@ -17,24 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wrashid.parkingSearch.withindayFW.parkingOccupancy;
+package playground.wrashid.parkingSearch.withindayFW.analysis;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
+import playground.wrashid.lib.obj.Pair;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 
+public abstract class ParkingAnalysisHandler {
 
-public class ParkingOccupancyHandler {
-
-	private final Controler controler;
-
-	public ParkingOccupancyHandler(Controler controler){
-		this.controler = controler;
-	}
+	protected Controler controler;
 	
 	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure){
 		parkingOccupancy.writeOutParkingOccupanciesTxt(controler,parkingInfrastructure);
 		parkingOccupancy.writeOutParkingOccupancySumPng(controler);
 	}
+	
+	public abstract void processParkingWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog);
+	
+	public abstract void processParkingSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog);
 	
 }
