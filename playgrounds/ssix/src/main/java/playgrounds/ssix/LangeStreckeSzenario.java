@@ -34,14 +34,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-//import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-//import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.LinkFactoryImpl;
@@ -58,8 +56,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-//import org.matsim.vis.otfvis.OTFClientLive;
-//import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import playgrounds.ssix.LinkStatusSpy;
 
 /**
  * Class doing a simple one road straight line simulation.
@@ -71,6 +69,7 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
  * 
  * @author ssix
  */
+
 public class LangeStreckeSzenario {
 	
 	/**
@@ -99,15 +98,21 @@ public class LangeStreckeSzenario {
 
 	
 	public static void main(String[] args) {
-		int[] capacities = {1500};//must have a size of numberOfLinks!
-		new LangeStreckeSzenario(10000.0,1,capacities).run();
+		int[] capacities = {1000};//must have a size of numberOfLinks!
+		new LangeStreckeSzenario(5000.0,1,capacities).run();
 
 	}
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)2000, 5);
-		runqsim();
+		createPopulation((long)5000, 2);
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		LinkStatusSpy linkSpy = new LinkStatusSpy(/*this.scenario,*/ (Id) new IdImpl((long)(1)));
+		events.addHandler(linkSpy);
+		
+		runqsim(events);
+		//System.out.println("Same Leaving Order as Entering Order? "+handler.sameLeavingOrderAsEnteringOrder());
 	}
 	
 	private void fillNetworkData(){
@@ -118,7 +123,7 @@ public class LangeStreckeSzenario {
 			if (capacities[j]>capmax)
 				capmax=capacities[j];
 		}
-		int capMax = 3*capmax;
+		int capMax = 10*capmax;
 		
 		//nodes
 		for (int i = 0; i<numberOfLinks+1; i++){
@@ -192,8 +197,7 @@ public class LangeStreckeSzenario {
 		//writer.write("./input/plans.xml");
 	}
 	
-	private void runqsim(){
-		EventsManager events = EventsUtils.createEventsManager();
+	private void runqsim(EventsManager events){
 		Netsim qSim = new QSimFactory().createMobsim(scenario, events);
 		prepareForSim();
 		
