@@ -1,0 +1,48 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.wrashid.parkingSearch.withindayFW.analysis;
+
+import java.util.LinkedList;
+
+import playground.wrashid.lib.GeneralLib;
+
+public class ConsoleOutputAnalysis {
+
+	public static void main(String[] args) {
+		LinkedList<String> readFileRows = GeneralLib.readFileRows("H:/data/experiments/TRBAug2012/runs/run22/output/logfile.log");
+
+		int i = 0;
+		while (i < readFileRows.size()) {
+			String line = readFileRows.get(i);
+			// if
+			// (line.contains("ParkingCostCalculatorZHPerStreetOptimizedPrice")
+			// && line.contains("average garage parking")){
+			// if (line.contains("LegHistogramListener:83 number of car legs")){
+			// if (line.contains("parking") || line.contains("Parking")){
+			if (line.contains("HUPCControllerKTIzh") || line.contains("ParkingAnalysisHandlerZH")
+					|| line.contains("ParkingAgentsTracker")) {
+
+				System.out.println(line);
+			}
+			i++;
+		}
+	}
+
+}

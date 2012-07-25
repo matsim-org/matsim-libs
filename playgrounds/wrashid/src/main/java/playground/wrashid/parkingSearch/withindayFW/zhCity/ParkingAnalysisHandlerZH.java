@@ -281,7 +281,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 				numberOfPeakPrivateParking += peakUsageOfParking.get(parkingId);
 			}
 		}
-		
+		log.info("iteration-" + controler.getIterationNumber());
 		log.info("peak usage street parking:" + numberOfPeakStreetParking/1.0/numberOfStreetParking);
 		log.info("peak usage garage parking:" + numberOfPeakGarageParking/1.0/numberOfGarageParking);
 		log.info("peak usage private parking:" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking);

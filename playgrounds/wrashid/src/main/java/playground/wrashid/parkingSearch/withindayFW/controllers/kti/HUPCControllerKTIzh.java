@@ -341,14 +341,14 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		double totalNumberOfParkingZH=numberOfStreetParking+numberOfGarageParking+numberOfPrivateParking;
 		
-		log.info("streetParking to garageParking (%):" + numberOfStreetParking/numberOfGarageParking + " - ref: 3.03");
+		log.info("streetParking to garageParking (%): " + numberOfStreetParking/numberOfGarageParking + " - ref: 3.03");
 		log.info("numberOfStreetParking (%): " + numberOfStreetParking/totalNumberOfParkingZH*100 + " - ref: 18.5");
 		log.info("numberOfGarageParking (%):" + numberOfGarageParking/totalNumberOfParkingZH*100 + " - ref: 6.1");
 		log.info("numberOfPrivateParking (%):" + numberOfPrivateParking/totalNumberOfParkingZH*100 + " - ref: 75.4");
 		
 		double populationScalingFactor = GlobalParkingSearchParams.getPopulationPercentage();
 		
-		log.info("totalNumberOfParkingZH: " + Math.round(totalNumberOfParkingZH/1000) + "k - ref: "+267000/populationScalingFactor/1000 + "k");
+		log.info("totalNumberOfParkingZH: " + Math.round(totalNumberOfParkingZH/1000) + "k - ref: "+267000*populationScalingFactor/1000 + "k");
 		
 		return parkingCollection;
 	}
