@@ -614,6 +614,10 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		double parkingSearchTimeInMinutes = getParkingSearchTimeInMinutes(personId, parkingArrivalTime);
 
+		if (parkingFacilityId.toString().contains("gp") && parkingSearchTimeInMinutes>0){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		double searchTimeScore = getSearchTimeScore(personId, activityDuration, parkingSearchTimeInMinutes);
 		parkingScore += searchTimeScore;
 

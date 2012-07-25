@@ -178,8 +178,15 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 						priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, walkScore + costScore + searchTimeScore));
 					}
 
-					ActivityFacility bestParkingFacility = priorityQueue.poll().getKey();
+					SortableMapObject<ActivityFacility> poll = priorityQueue.poll();
+					ActivityFacility bestParkingFacility = poll.getKey();
+					double bestParkingScore=poll.getScore();
 
+					if (bestParkingScore<-1000){
+						DebugLib.emptyFunctionForSettingBreakPoint();
+					}
+					
+					
 					parkingFacilityId = bestParkingFacility.getId();
 					
 					
@@ -217,15 +224,18 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		if (sumFreeCapacity==0){
 			// this means, probably outside of city
 			// this value is actually irrelevant (using mean value).
-			return 90/60.0;
+			return 30.0/60.0;
 		}
 		
-		double epsilonToAvoidDivZero = 0.0001;
+		if (sumFreeCapacity==sumParkingCapacity){
+			return 0.0;
+		}
 		
-		estimatedParkingSearchTimeInMinutes=searchTimeEstimationConstantForHUPC/(sumFreeCapacity/sumParkingCapacity+epsilonToAvoidDivZero)-searchTimeEstimationConstantForHUPC;
+		
+		estimatedParkingSearchTimeInMinutes=(searchTimeEstimationConstantForHUPC/(sumFreeCapacity/sumParkingCapacity)-searchTimeEstimationConstantForHUPC)/60.0;
 		// => for 10% free parking, we have 180 seconds search time
 		// => for 100% free parking, we have 0 seconds search time
-		return estimatedParkingSearchTimeInMinutes/60.0;
+		return estimatedParkingSearchTimeInMinutes;
 	}
 
 	private boolean privateParkingAvailable(ActivityFacility freePrivateParking) {
@@ -256,9 +266,9 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	}
 
 	private void markFlagForNoSearchTime(Id agentId) {
-		if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)) {
+		//if (!parkingAgentsTracker.getSearchStartTime().containsKey(agentId)) {
 			parkingAgentsTracker.getSearchStartTime().put(agentId, Double.NEGATIVE_INFINITY);
-		}
+		//}
 	}
 
 	/*
