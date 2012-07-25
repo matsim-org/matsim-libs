@@ -61,24 +61,28 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 		}
 		
 		@Override
-		public Double getParkingCost(Id parkingFacilityId, double arrivalTime, double parkingDuration) {
+		public Double getParkingCost(Id parkingFacilityId, double arrivalTime, double parkingDurationInSeconds) {
+			if (parkingFacilityId.toString().contains("gp") || parkingFacilityId.toString().contains("stp")){
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
+			
 			ActivityFacility parkingFacility = scenario.getActivityFacilities().getFacilities().get(parkingFacilityId);
 			
 			if (parkingFacilityId.toString().contains("private") || parkingFacilityId.toString().contains("OutsideCity")){
 				return 0.0;
 			} else if(parkingFacilityId.toString().contains("gp")){
 				// TODO: make this more detailed also for garage parking
-				return zones.getClosestZone(parkingFacility.getCoord()).getParkingGarageFee2h()/(3600*2);
+				return zones.getClosestZone(parkingFacility.getCoord()).getParkingGarageFee2h()/2*parkingDurationInSeconds/3600;
 			} else if(parkingFacilityId.toString().contains("stp")){
 				if (paidStreetParking.contains(parkingFacilityId)){
 					if (highTariffParkingZone.isInHighTariffZone(parkingFacility.getCoord())){
-						if (parkingDuration<30*60){
+						if (parkingDurationInSeconds<30*60){
 							return 0.50;
 						} else {
-							return 0.5 + Math.ceil(parkingDuration/(30*60))*1.5;
+							return 0.5 + Math.ceil(parkingDurationInSeconds/(30*60))*1.5;
 						}
 					} else {
-						return Math.ceil(parkingDuration/(60*60))*0.5;
+						return Math.ceil(parkingDurationInSeconds/(60*60))*0.5;
 					}
 				} else {
 					return 0.0;

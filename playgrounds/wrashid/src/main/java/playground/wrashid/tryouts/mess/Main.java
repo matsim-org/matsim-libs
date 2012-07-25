@@ -20,24 +20,19 @@ import playground.wrashid.lib.GeneralLib;
 public class Main {
 
 	public static void main(String[] args) {
-		
-		
-		
-		if (-28800.121845080957 > 0.31){
-			System.out.println("bad");
-		} else {
-			System.out.println("good");
-		}
-		
-		Evaluator eval=new Evaluator();
-		
-		try {
-			System.out.println(eval.evaluate("1+1"));
-		} catch (EvaluationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+
+		double activityDurationInSeconds = 7200;
+		double isMale = 1;
+		double age = 30;
+		double income = 7000;
+		System.out.println("walk time beta :" + -0.108 * 60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)
+				* (1 + (0.021 * isMale)) * Math.pow(age / 40.0, 0.236));
+
+		System.out.println("search time beta :" + -0.135 * 60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)
+				* (1 + (-0.102 * isMale)));
+
+		System.out.println("cost beta :" + -0.135 *60* Math.pow((income / 7000), -0.1));
+
 	}
 
 }

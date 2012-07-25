@@ -55,7 +55,8 @@ public class ParkingPersonalBetas {
 		// person.getSex();
 
 		double income = houseHoldIncome.get(personId);
-		return -1.0* -0.135 * (-0.1) / -0.056 * -0.135 * Math.pow((income / 7000), -0.1);
+		//return -1.0* -0.135 * (-0.1) / -0.056 * -0.135 * Math.pow((income / 7000), -0.1);
+		return -0.135 *60* Math.pow((income / 7000), -0.1);
 	}
 
 	public double getParkingSearchTimeBeta(Id personId, double activityDurationInSeconds) {
@@ -65,7 +66,8 @@ public class ParkingPersonalBetas {
 		if (person.getSex()!=null){
 			isMale=!person.getSex().contains("f")?1:0;
 		}
-		return -1.0*-0.135 * (-0.1) / -0.056 * -0.135 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.1012*isMale));
+		//return -1.0*-0.135 * (-0.1) / -0.056 * -0.135 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.1012*isMale));
+		return -0.135 * 60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.102*isMale));
 	}
 
 	public double getParkingWalkTimeBeta(Id personId, double activityDurationInSeconds) {
@@ -76,7 +78,8 @@ public class ParkingPersonalBetas {
 			isMale=!person.getSex().contains("f")?1:0;
 		}
 		int age=person.getAge();
-		return -1.0*-0.108 * (-0.1) / -0.056 * -0.108*60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236);
+		//return -1.0*-0.108 * (-0.1) / -0.056 * -0.108*60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236);
+		return -0.108 *60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236);
 	}
 
 }

@@ -575,15 +575,19 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				parkingDepartureTime);
 		double activityDuration = previousActivityDurationDuringDay.getDuration(personId);
 		Id parkingFacilityId = event.getFacilityId();
+		
+		
+		
 
 		// parking cost scoring
-
-		parkingScore += getParkingCostScore(personId, parkingArrivalTime, parkingDuration, parkingFacilityId);
+		double costScore=getParkingCostScore(personId, parkingArrivalTime, parkingDuration, parkingFacilityId);
+		parkingScore += costScore;
 
 		// parking walk time
 
 		double walkingTimeTotalInMinutes = parkingWalkTimesDuringDay.getSumBothParkingWalkDurationsInSecond(personId) / 60.0;
-		parkingScore += getWalkScore(personId, activityDuration, walkingTimeTotalInMinutes);
+		double walkScore = getWalkScore(personId, activityDuration, walkingTimeTotalInMinutes);
+		parkingScore += walkScore;
 
 		// parking search time
 
@@ -609,7 +613,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		double parkingSearchTimeInMinutes = getParkingSearchTimeInMinutes(personId, parkingArrivalTime);
 
-		parkingScore += getSearchTimeScore(personId, activityDuration, parkingSearchTimeInMinutes);
+		double searchTimeScore = getSearchTimeScore(personId, activityDuration, parkingSearchTimeInMinutes);
+		parkingScore += searchTimeScore;
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 
@@ -627,6 +632,10 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, walkingTimeTotalInMinutes));
 		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingSearchTimeInMinutes));
 		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime,parkingInfrastructure);
+	
+		if (parkingFacilityId.toString().contains("gp") || parkingFacilityId.toString().contains("stp")){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
 	}
 
 	private double getParkingSearchTimeInMinutes(Id personId, double parkingArrivalTime) {

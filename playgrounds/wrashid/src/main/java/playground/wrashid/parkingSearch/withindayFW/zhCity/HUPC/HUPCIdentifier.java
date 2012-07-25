@@ -144,7 +144,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 
 					for (ActivityFacility parkingFacility : parkings) {
 						
-						if (parkingFacility.getId().toString().contains("gp")){
+						if (parkingFacility.getId().toString().contains("gp") || parkingFacility.getId().toString().contains("stp")){
 							DebugLib.emptyFunctionForSettingBreakPoint();
 						}
 						
