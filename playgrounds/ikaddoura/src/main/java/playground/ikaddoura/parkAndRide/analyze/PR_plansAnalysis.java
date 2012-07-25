@@ -1,5 +1,6 @@
 package playground.ikaddoura.parkAndRide.analyze;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,13 +28,15 @@ public class PR_plansAnalysis {
 	static String netFile;
 	static String outputFile;
 			
-	public static void main(String[] args) {
-		PR_plansAnalysis analyse = new PR_plansAnalysis();
-		analyse.run();
+	public static void main(String[] args) throws IOException {
+		
 		plansFile1 = args[0];
 		plansFile2 = args[1];
 		netFile = args[2];
 		outputFile = args[3];
+		
+		PR_plansAnalysis analyse = new PR_plansAnalysis();
+		analyse.run();
 	}
 	
 	public void run() {
