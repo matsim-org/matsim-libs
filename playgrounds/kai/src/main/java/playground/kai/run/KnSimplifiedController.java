@@ -231,5 +231,10 @@ public class KnSimplifiedController extends AbstractController {
 		controller.run() ;
 	}
 
+	public void setRoutingBuilder(RoutingBuilder routingBuilder) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
