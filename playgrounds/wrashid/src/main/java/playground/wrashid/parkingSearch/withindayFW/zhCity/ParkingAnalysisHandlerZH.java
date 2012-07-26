@@ -260,9 +260,9 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 				int peakOccupancy=parkingOccupancy.parkingOccupancies.get(parkingId).getPeakOccupanyOfDay();
 				
 				// remove over usage of parking
-				if (peakOccupancy>facilityCapacities.get(parkingId)){
-					peakOccupancy=facilityCapacities.get(parkingId);
-				}
+				//if (peakOccupancy>facilityCapacities.get(parkingId)){
+				//	peakOccupancy=facilityCapacities.get(parkingId);
+				//}
 				
 				peakUsageOfParking.set(parkingId, peakOccupancy);
 			}
