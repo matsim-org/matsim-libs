@@ -22,7 +22,6 @@ package playground.southafrica.utilities.openstreetmap.network;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -42,8 +41,9 @@ public class RoadTypeParser {
 		}
 
 		RoadTypeSink rts = new RoadTypeSink();
-		XmlReader xr = new XmlReader(f, false, CompressionMethod.None);
+		XmlReader xr = new XmlReader(f, false, CompressionMethod.GZip);
 		xr.setSink(rts);
+		log.info("Parsing road types from " + file);
 		xr.run();
 		
 		return rts.getHighwayTypeMap();

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.misc.Counter;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
@@ -39,14 +40,19 @@ public class RoadTypeSink implements Sink {
 	private final Logger log = Logger.getLogger(RoadTypeSink.class);
 	private Map<Long, WayContainer> wayMap;
 	private Map<Long, String> highwayTypeMap;
+	private Counter wayCounter = new Counter("  ways # ");
+	private Counter processCounter = new Counter("  processed # ");
 	
 	public RoadTypeSink() {
 		this.wayMap = new HashMap<Long, WayContainer>();
 		this.highwayTypeMap = new HashMap<Long, String>();
+		log.info("RoadTypeSink instantiated.");
 	}
 
 	@Override
 	public void complete() {
+		wayCounter.printCounter();
+		log.info("Finished reading ways. Processing...");
 		Map<String, Integer> types = new HashMap<String, Integer>();
 		for(long w : wayMap.keySet()){
 			Way way = wayMap.get(w).getEntity();
@@ -62,12 +68,14 @@ public class RoadTypeSink implements Sink {
 					types.put(highwayType, oldValue+1);
 				}
 			}
+			processCounter.incCounter();
 		}
+		processCounter.printCounter();
 		
 		wayMap = null;
 		
 		/* Report on the number of observed road types. */
-		log.info("--  Summary of road types parsed  -----------------------------");
+		log.info("--- Summary of road types parsed ------------------------------");
 		for(String s : types.keySet()){
 			log.info("  " + s + ": " + types.get(s));
 		}
@@ -91,6 +99,7 @@ public class RoadTypeSink implements Sink {
 			@Override
 			public void process(WayContainer wayContainer) {
 				wayMap.put(wayContainer.getEntity().getId(), wayContainer);
+				wayCounter.incCounter();
 			}
 			
 			@Override
