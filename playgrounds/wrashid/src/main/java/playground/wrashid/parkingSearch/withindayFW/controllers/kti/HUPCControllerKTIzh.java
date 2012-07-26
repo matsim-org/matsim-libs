@@ -341,7 +341,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		double totalNumberOfParkingZH=numberOfStreetParking+numberOfGarageParking+numberOfPrivateParking;
 		
-		log.info("streetParking to garageParking (%): " + numberOfStreetParking/numberOfGarageParking + " - ref: 3.03");
+		log.info("streetParking to garageParking (%): " + numberOfStreetParking/1.0/numberOfGarageParking + " - ref: 3.03");
 		log.info("numberOfStreetParking (%): " + numberOfStreetParking/totalNumberOfParkingZH*100 + " - ref: 18.5 - [" + numberOfStreetParking + "]");
 		log.info("numberOfGarageParking (%):" + numberOfGarageParking/totalNumberOfParkingZH*100 + " - ref: 6.1 - [" + numberOfGarageParking + "]");
 		log.info("numberOfPrivateParking (%):" + numberOfPrivateParking/totalNumberOfParkingZH*100 + " - ref: 75.4 - [" + numberOfPrivateParking + "]");

@@ -26,7 +26,7 @@ import playground.wrashid.lib.GeneralLib;
 public class ConsoleOutputAnalysis {
 
 	public static void main(String[] args) {
-		LinkedList<String> readFileRows = GeneralLib.readFileRows("H:/data/experiments/TRBAug2012/runs/run26/output/logfile.log");
+		LinkedList<String> readFileRows = GeneralLib.readFileRows("H:/data/experiments/TRBAug2012/runs/run22/output/logfile.log");
 
 		int i = 0;
 		while (i < readFileRows.size()) {
@@ -34,7 +34,7 @@ public class ConsoleOutputAnalysis {
 			// if
 			// (line.contains("ParkingCostCalculatorZHPerStreetOptimizedPrice")
 			// && line.contains("average garage parking")){
-			// if (line.contains("LegHistogramListener:83 number of car legs")){
+			// if (line.contains("ParkingCostOptimizerZH")){
 			// if (line.contains("parking") || line.contains("Parking")){
 			if (line.contains("HUPCControllerKTIzh") || line.contains("ParkingAnalysisHandlerZH")
 					|| line.contains("ParkingAgentsTracker")) {

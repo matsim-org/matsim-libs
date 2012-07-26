@@ -264,6 +264,9 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 				//	peakOccupancy=facilityCapacities.get(parkingId);
 				//}
 				
+				// although, this can result in peak usage of more than 1 in the output, but this
+				// is more precise!
+				
 				peakUsageOfParking.set(parkingId, peakOccupancy);
 			}
 		}

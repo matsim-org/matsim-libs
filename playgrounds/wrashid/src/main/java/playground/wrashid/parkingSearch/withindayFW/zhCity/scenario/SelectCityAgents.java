@@ -48,7 +48,9 @@ public class SelectCityAgents {
 		// 8km=max. radius zh city= study area
 		int scenarioAreaRadius = 8000;
 		
-		String outputPlansFile = "C:/eTmp/census2000v2_8kmCut_5pct_no_network_info.xml.gz";
+		double outputFraction = 1.0;
+		
+		String outputPlansFile = "C:/eTmp/census2000v2_8kmCut_10pct_no_network_info.xml.gz";
 
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
 
@@ -91,7 +93,8 @@ public class SelectCityAgents {
 			}
 		}
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), 0.5).write(outputPlansFile);
+		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), outputFraction).write(outputPlansFile);
 	}
 
 }
