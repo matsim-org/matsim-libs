@@ -47,7 +47,6 @@ public class LinkStatusSpy implements LinkEnterEventHandler, LinkLeaveEventHandl
 	private Map<Double, Id> LeavingAgents;
 	//private int enteringCount = 0;
 	//private int leavingCount = 0;
-
 	
 	public LinkStatusSpy (/*Scenario scenario,*/ Id linkId){
 		//this.scenario = scenario;
@@ -157,6 +156,11 @@ public class LinkStatusSpy implements LinkEnterEventHandler, LinkLeaveEventHandl
 		this.LeavingAgents.clear();
 		//this.enteringCount = 0;
 		//this.leavingCount = 0;
+	}
+
+
+	public Id getLinkId() {
+		return linkId;
 	}
 
 }

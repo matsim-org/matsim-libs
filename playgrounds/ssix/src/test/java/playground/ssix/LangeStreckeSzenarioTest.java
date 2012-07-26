@@ -69,7 +69,8 @@ import playgrounds.ssix.LinkStatusSpy;
  * 
  * @author ssix
  */
-public class LangeStreckeSzenario {
+
+public class LangeStreckeSzenarioTest {
 	
 	/**
 	 * @param args
@@ -81,7 +82,7 @@ public class LangeStreckeSzenario {
 	private int numberOfLinks;
 	private int[] capacities;
 	
-	public LangeStreckeSzenario(double length, int numberOfLinks, int[] capacities){
+	public LangeStreckeSzenarioTest(double length, int numberOfLinks, int[] capacities){
 		this.length = length;
 		this.numberOfLinks =numberOfLinks;
 		if (capacities.length == numberOfLinks) {
@@ -98,7 +99,7 @@ public class LangeStreckeSzenario {
 	
 	public static void main(String[] args) {
 		int[] capacities = {1000};//must have a size of numberOfLinks!
-		new LangeStreckeSzenario(5000.0,1,capacities).run();
+		new LangeStreckeSzenarioTest(5000.0,1,capacities).run();
 
 	}
 	
@@ -107,10 +108,16 @@ public class LangeStreckeSzenario {
 		createPopulation((long)5000, 2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		LinkStatusSpy handler = new LinkStatusSpy(this.scenario, (Id) new IdImpl((long)(1)));
-		events.addHandler(handler);
+		LinkStatusSpy linkSpy = new LinkStatusSpy(/*this.scenario,*/ (Id) new IdImpl((long)(1)));
+		Link link = scenario.getNetwork().getLinks().get(linkSpy.getLinkId());
+		VelocityFundamentalDiagramOTF fundi = new VelocityFundamentalDiagramOTF(scenario, link.getId());
+		
+		events.addHandler(linkSpy);
+		events.addHandler(fundi);
+		
 		runqsim(events);
-		System.out.println("Same Leaving Order as Entering Order? "+handler.sameLeavingOrderAsEnteringOrder());
+		//System.out.println("Same Leaving Order as Entering Order? "+linkSpy.sameLeavingOrderAsEnteringOrder());
+		fundi.saveAsPng("./output");
 	}
 	
 	private void fillNetworkData(){
@@ -121,7 +128,7 @@ public class LangeStreckeSzenario {
 			if (capacities[j]>capmax)
 				capmax=capacities[j];
 		}
-		int capMax = 3*capmax;
+		int capMax = 10*capmax;
 		
 		//nodes
 		for (int i = 0; i<numberOfLinks+1; i++){
