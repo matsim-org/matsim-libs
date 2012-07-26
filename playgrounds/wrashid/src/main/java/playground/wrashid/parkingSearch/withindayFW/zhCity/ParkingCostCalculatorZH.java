@@ -52,7 +52,7 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 			
 			// define for steet parking, if it is paid parking or not.
 			for (Parking parking:parkings){
-				if (parking.getId().toString().contains("sp")){
+				if (parking.getId().toString().contains("stp")){
 					//TODO: to be more precise, I should weight the parking according to their capacity
 					// but this could also work fine, because there are quite a lot of street parking facilities.
 					CityZone closestZone = zones.getClosestZone(parking.getCoord());
@@ -62,6 +62,7 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 					}
 				}
 			}
+			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 		
 		@Override
