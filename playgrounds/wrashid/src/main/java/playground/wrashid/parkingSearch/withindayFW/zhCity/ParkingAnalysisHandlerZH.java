@@ -19,6 +19,7 @@
 
 package playground.wrashid.parkingSearch.withindayFW.zhCity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
@@ -351,6 +352,45 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		GeneralLib.generateHistogram(fileName, values, 10,
 				"Histogram Garage Parking Walk Time - It." + controler.getIterationNumber(), "walk time [min]",
 				"number of walk legs");
+		
+		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())){
+			writeWalkTimes(parkingWalkTimesLog);
+		}
+	}
+
+	private void writeWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog) {
+		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog=parkingWalkTimesLog;
+		
+		String headerLine = "personId\tparkingFacilityId\tbothWayWalkTimeInMinutes";
+		String outputFileName="walkTimes.txt";
+		
+		writeParkingLog(inputLog, headerLine, outputFileName);
+	}
+
+	private void writeParkingLog(LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog, String headerLine, String outputFileName) {
+		ArrayList<String> list = new ArrayList<String>();
+		list.add(headerLine);
+		
+		for (Id personnId : inputLog.getKeySet()) {
+			for (Pair<Id, Double> pair : inputLog.get(personnId)) {
+				Id parkingFacilityId = pair.getFistValue();
+				double value = pair.getSecondValue();
+
+					StringBuffer stringBuffer = new StringBuffer();
+					
+					stringBuffer.append(personnId);
+					stringBuffer.append("\t");
+					stringBuffer.append(parkingFacilityId);
+					stringBuffer.append("\t");
+					stringBuffer.append(value);
+					list.add(stringBuffer.toString());
+				}
+			}
+		
+		
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				outputFileName);
+		GeneralLib.writeList(list, fileName);
 	}
 
 	@Override
@@ -389,6 +429,71 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		GeneralLib.generateHistogram(fileName, values, 10,
 				"Histogram Garage Parking Search Time - It." + controler.getIterationNumber(), "search time [min]",
 				"number of parking searches");
+		
+		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())){
+			writeSearchTimes(parkingSearchTimeLog);
+		}
+	}
+
+	private void writeSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog) {
+		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog=parkingSearchTimeLog;
+		
+		String headerLine = "personId\tparkingFacilityId\tsearchTimeInMinutes";
+		String outputFileName="searchTimes.txt";
+		
+		writeParkingLog(inputLog, headerLine, outputFileName);		
+	}
+
+	@Override
+	public void processParkingCost(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog) {
+		// TODO Auto-generated method stub
+				LinkedList<Double> streetParkingCost = new LinkedList<Double>();
+				LinkedList<Double> garageParkingCost = new LinkedList<Double>();
+
+				for (Id personnId : parkingCostLog.getKeySet()) {
+					for (Pair<Id, Double> pair : parkingCostLog.get(personnId)) {
+						Id parkingFacilityId = pair.getFistValue();
+						double cost = pair.getSecondValue();
+
+						if (parkingFacilityId.toString().contains("stp")) {
+							streetParkingCost.add(cost);
+						} else if (parkingFacilityId.toString().contains("gp")) {
+							garageParkingCost.add(cost);
+						}
+					}
+				}
+
+				double[] values = Collections.convertDoubleCollectionToArray(streetParkingCost);
+
+				String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+						"parkingCostHistogrammStp.png");
+
+				GeneralLib.generateHistogram(fileName, values, 10,
+						"Histogram Street Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
+						"number of parking operations");
+
+				values = Collections.convertDoubleCollectionToArray(garageParkingCost);
+
+				fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+						"parkingCostHistogrammGp.png");
+
+				GeneralLib.generateHistogram(fileName, values, 10,
+						"Histogram Garage Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
+						"number of parking operations");
+				
+				if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())){
+					writeParkingCostDetails(parkingCostLog);
+				}
+		
+	}
+	
+	private void writeParkingCostDetails(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog) {
+		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog=parkingCostLog;
+		
+		String headerLine = "personId\tparkingFacilityId\tcost[chf]";
+		String outputFileName="parkingCostLog.txt";
+		
+		writeParkingLog(inputLog, headerLine, outputFileName);		
 	}
 
 }

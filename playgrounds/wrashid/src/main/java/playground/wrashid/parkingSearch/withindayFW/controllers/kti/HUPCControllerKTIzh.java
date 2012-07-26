@@ -96,6 +96,11 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		tmpString = this.getConfig().findParam("parking", "parkingScoreWeight");
 		GlobalParkingSearchParams.setParkingScoreWeight(Double.parseDouble(tmpString));
 		
+		tmpString = this.getConfig().findParam("parking", "detailedOutputAfterIteration");
+		GlobalParkingSearchParams.setDetailedOutputAfterIteration(Integer.parseInt(tmpString));
+		
+		
+		
 		
 		HashMap<String, HashSet<Id>> parkingTypes=new HashMap<String, HashSet<Id>>();
 		initParkingInfrastructure(this,parkingTypes);
@@ -115,7 +120,8 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		if (GlobalParkingSearchParams.getScenarioId()==1){
 			parkingCostCalculator=new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), scenarioData,parkings);
 		} else if (GlobalParkingSearchParams.getScenarioId()==2) {
-			parkingCostCalculator=new ParkingCostOptimizerZH(parkings,this);
+			ParkingCostCalculatorZH parkingCostCalculatorZH = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), scenarioData,parkings);
+			parkingCostCalculator=new ParkingCostOptimizerZH(parkingCostCalculatorZH,this);
 		} else {
 			DebugLib.stopSystemAndReportInconsistency("sceanrio unknown");
 		}
@@ -134,6 +140,9 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		
 		HashMap<Id, Double> houseHoldIncome = getHouseHoldIncomeCantonZH();
+		
+		writeoutHouseholdIncome(houseHoldIncome);
+		
 		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, houseHoldIncome);
 
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
@@ -212,6 +221,11 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		cleanNetwork();
 		
 		parkingAgentsTracker.setParkingAnalysisHandler(new ParkingAnalysisHandlerZH(this,parkingInfrastructure));
+	}
+
+	private void writeoutHouseholdIncome(HashMap<Id, Double> houseHoldIncome) {
+		String fileName = this.getControlerIO().getOutputFilename("houseHoldIncome.txt");
+		GeneralLib.writeHashMapToFile(houseHoldIncome,"personId\tIncome",fileName);
 	}
 
 	private HashMap<Id, Double> getHouseHoldIncomeCantonZH() {

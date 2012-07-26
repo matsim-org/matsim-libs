@@ -153,6 +153,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	// persondId, <parkingFacilityId,walkTimeForBothParkingLegsInMinutes>
 	private LinkedListValueHashMap<Id, Pair<Id,Double>> parkingWalkTimesLog;
 	private LinkedListValueHashMap<Id, Pair<Id,Double>> parkingSearchTimesLog;
+	private LinkedListValueHashMap<Id, Pair<Id,Double>> parkingCostLog;
 
 	/**
 	 * Tracks agents' car legs and check whether they have to start their
@@ -192,6 +193,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		this.didUseCarOnce = new HashSet<Id>();
 		this.parkingWalkTimesLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
 		this.parkingSearchTimesLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
+		this.parkingCostLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
 
 	}
 
@@ -507,6 +509,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		parkingOccupancy = new ParkingOccupancyStats();
 		parkingWalkTimesLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
 		parkingSearchTimesLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
+		parkingCostLog=new LinkedListValueHashMap<Id, Pair<Id,Double>>();
 	}
 
 	public Map<Id, Activity> getNextNonParkingActivity() {
@@ -581,7 +584,13 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		
 
 		// parking cost scoring
-		double costScore=getParkingCostScore(personId, parkingArrivalTime, parkingDuration, parkingFacilityId);
+		Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, parkingFacilityId);
+
+		if (parkingCost == null) {
+			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
+		}
+		
+		double costScore=getParkingCostScore(personId,parkingCost);
 		parkingScore += costScore;
 
 		// parking walk time
@@ -636,6 +645,9 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, walkingTimeTotalInMinutes));
 		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingSearchTimeInMinutes));
+		
+		parkingCostLog.put(personId, new Pair<Id, Double>(parkingFacilityId, parkingCost));
+		
 		parkingOccupancy.updateParkingOccupancy(parkingFacilityId, parkingArrivalTime, parkingDepartureTime,parkingInfrastructure);
 	
 		if (parkingFacilityId.toString().contains("gp") || parkingFacilityId.toString().contains("stp")){
@@ -719,16 +731,33 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	}
 
+	
+	
+	
 	public double getParkingCostScore(Id personId, double parkingArrivalTime, double parkingDuration, Id facilityId) {
-		ParkingPersonalBetas parkingPersonalBetas = parkingStrategyManager.getParkingPersonalBetas();
-
-		Double parkingCost = getParkingInfrastructure().getParkingCostCalculator().getParkingCost(facilityId, parkingArrivalTime,
-				parkingDuration);
+		Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, facilityId);
 
 		if (parkingCost == null) {
 			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
 		}
+		
+		return getParkingCostScore(personId,parkingCost);
+	}
+	
+	public double getParkingCostScore(Id personId,Double parkingCost) {
+		ParkingPersonalBetas parkingPersonalBetas = parkingStrategyManager.getParkingPersonalBetas();
+		
+		if (parkingCost == null) {
+			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
+		}
+		
 		return parkingPersonalBetas.getParkingCostBeta(personId) * parkingCost;
+	}
+	
+
+	private Double getParkingCost(double parkingArrivalTime, double parkingDuration, Id facilityId) {
+		return getParkingInfrastructure().getParkingCostCalculator().getParkingCost(facilityId, parkingArrivalTime,
+				parkingDuration);
 	}
 
 	@Override
@@ -748,6 +777,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			getParkingAnalysisHandler().updateParkingOccupancyStatistics(parkingOccupancy, parkingInfrastructure);
 			getParkingAnalysisHandler().processParkingWalkTimes(parkingWalkTimesLog);
 			getParkingAnalysisHandler().processParkingSearchTimes(parkingSearchTimesLog);
+			getParkingAnalysisHandler().processParkingCost(parkingCostLog);
 		}
 		
 		IntegerValueHashMap<ParkingStrategy> numberOfTimesStrategyUser=new IntegerValueHashMap<ParkingStrategy>();
@@ -772,8 +802,17 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		// parking cost scoring
 
 		Id lastParkingFacilityIdOfDay = getLastParkingFacilityIdOfDay(personId);
-		parkingScore += getParkingCostScore(personId, parkingArrivalTime, lastParkingActivityDurationOfDay,
-				lastParkingFacilityIdOfDay);
+		
+		
+		Double parkingCost = getParkingCost(parkingArrivalTime, lastParkingActivityDurationOfDay, lastParkingFacilityIdOfDay);
+
+		if (parkingCost == null) {
+			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
+		}
+		
+		double costScore=getParkingCostScore(personId,parkingCost);
+		
+		parkingScore += costScore;
 
 		// parking walk time
 
@@ -793,6 +832,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		parkingWalkTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, walkingTimeTotalInMinutes));
 		parkingSearchTimesLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingSearchTimeInMinutes));
+		
+		parkingCostLog.put(personId, new Pair<Id, Double>(lastParkingFacilityIdOfDay, parkingCost));
 		
 		//double firstDepartureTimeOfDay=durationOfLastParkingOfDay.getFirstDepartureTimeOfDay(personId);
 		

@@ -48,6 +48,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -80,13 +81,14 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
+import playground.wrashid.lib.obj.Pair;
 import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.lib.obj.StringMatrixFilter;
 import playground.wrashid.lib.obj.list.Lists;
 
 public class GeneralLib {
 
-	public static final double numberOfSecondsInDay=86400;
+	public static final double numberOfSecondsInDay = 86400;
 	public static String eclipseLocalTempPath = "C:/eTmp";
 	public static Controler controler;
 
@@ -470,9 +472,9 @@ public class GeneralLib {
 
 		}
 	}
-	
-	public static void generateSimpleHistogram(String fileName, double[] value,int numberOfBins){
-		generateHistogram(fileName,value,numberOfBins,"","","");
+
+	public static void generateSimpleHistogram(String fileName, double[] value, int numberOfBins) {
+		generateHistogram(fileName, value, numberOfBins, "", "", "");
 	}
 
 	public static void printGraphicDataToConsole(String fileName, double[][] matrix, String title, String xLabel, String yLabel,
@@ -537,10 +539,10 @@ public class GeneralLib {
 	public static double projectTimeWithin24Hours(double time) {
 		double secondsInOneDay = 60 * 60 * 24;
 
-		if (time==Double.NEGATIVE_INFINITY || time==Double.POSITIVE_INFINITY){
+		if (time == Double.NEGATIVE_INFINITY || time == Double.POSITIVE_INFINITY) {
 			DebugLib.stopSystemAndReportInconsistency("time is not allowed to be minus or plus infinity");
 		}
-		
+
 		while (time < 0) {
 			time += secondsInOneDay;
 		}
@@ -691,17 +693,16 @@ public class GeneralLib {
 	// playground.wrashid.PSF.data.HubLinkMapping and HubPriceInfo, which could
 	// be refactored by calling this method.
 	public static StringMatrix readStringMatrix(String fileName) {
-		return readStringMatrix(fileName,null);
+		return readStringMatrix(fileName, null);
 	}
-	
-	public static LinkedList<String> readFileRows(String fileName){
-		LinkedList<String> list=new LinkedList<String>();
-		
+
+	public static LinkedList<String> readFileRows(String fileName) {
+		LinkedList<String> list = new LinkedList<String>();
+
 		try {
 
 			FileInputStream fis = new FileInputStream(fileName);
-			InputStreamReader isr = new InputStreamReader(fis,
-								      "ISO-8859-1");
+			InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-1");
 
 			BufferedReader br = new BufferedReader(isr);
 			String line;
@@ -714,24 +715,20 @@ public class GeneralLib {
 			e.printStackTrace();
 			DebugLib.stopSystemAndReportInconsistency();
 		}
-		
+
 		return list;
 	}
-	
-	
-	public static StringMatrix readStringMatrix(String fileName, String delim, StringMatrixFilter filter){
+
+	public static StringMatrix readStringMatrix(String fileName, String delim, StringMatrixFilter filter) {
 		StringMatrix matrix = new StringMatrix();
 
 		try {
 
-			//FileReader fr = new FileReader(fileName);
+			// FileReader fr = new FileReader(fileName);
 
 			FileInputStream fis = new FileInputStream(fileName);
-			InputStreamReader isr = new InputStreamReader(fis,
-								      "ISO-8859-1");
+			InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-1");
 
-			
-			
 			BufferedReader br = new BufferedReader(isr);
 			String line;
 			StringTokenizer tokenizer;
@@ -739,22 +736,21 @@ public class GeneralLib {
 			while (line != null) {
 				ArrayList<String> row = new ArrayList<String>();
 
-				if (delim==null){
+				if (delim == null) {
 					tokenizer = new StringTokenizer(line);
 				} else {
-					tokenizer = new StringTokenizer(line,delim);
+					tokenizer = new StringTokenizer(line, delim);
 				}
 
 				while (tokenizer.hasMoreTokens()) {
 					row.add(tokenizer.nextToken());
 				}
 
-				if (filter!=null && filter.removeLine(line)){
-					
+				if (filter != null && filter.removeLine(line)) {
+
 				} else {
 					matrix.addRow(row);
 				}
-				
 
 				line = br.readLine();
 			}
@@ -766,12 +762,10 @@ public class GeneralLib {
 
 		return matrix;
 	}
-	
-	
-	
+
 	// TODO: move implementation to String matrix class...
 	public static StringMatrix readStringMatrix(String fileName, String delim) {
-		return readStringMatrix(fileName,delim,null);
+		return readStringMatrix(fileName, delim, null);
 	}
 
 	/**
@@ -819,21 +813,24 @@ public class GeneralLib {
 		}
 		return false;
 	}
-	
-	public static double getWalkingTravelDuration(double distance){
-		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getWalkSpeed();
+
+	public static double getWalkingTravelDuration(double distance) {
+		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
+				/ controler.getConfig().plansCalcRoute().getWalkSpeed();
 	}
-	
-	public static double getWalkingSpeed(){
+
+	public static double getWalkingSpeed() {
 		return controler.getConfig().plansCalcRoute().getWalkSpeed();
 	}
-	
-	public static double getPtTravelDuration(double distance){
-		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getPtSpeed();
+
+	public static double getPtTravelDuration(double distance) {
+		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
+				/ controler.getConfig().plansCalcRoute().getPtSpeed();
 	}
-	
-	public static double getBikeTravelDuration(double distance){
-		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor() / controler.getConfig().plansCalcRoute().getBikeSpeed();
+
+	public static double getBikeTravelDuration(double distance) {
+		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
+				/ controler.getConfig().plansCalcRoute().getBikeSpeed();
 	}
 
 	public static boolean isInZHCityRectangle(Coord coord) {
@@ -845,37 +842,52 @@ public class GeneralLib {
 
 		return false;
 	}
-	
-	public static void writeArrayToFile(double[] array, String fileName, String headerLine){
-		double matrix[][]=new double[array.length][1];
-		
-		for (int i=0;i<array.length;i++){
-			matrix[i][0]=array[i];
+
+	public static void writeArrayToFile(double[] array, String fileName, String headerLine) {
+		double matrix[][] = new double[array.length][1];
+
+		for (int i = 0; i < array.length; i++) {
+			matrix[i][0] = array[i];
 		}
-		
+
 		GeneralLib.writeMatrix(matrix, fileName, headerLine);
 	}
-	
-	public static LinkedList<String> convertStringArrayToList(String[] array){
-		LinkedList<String> list=new LinkedList<String>();
-		for (int i=0;i<array.length;i++){
+
+	public static LinkedList<String> convertStringArrayToList(String[] array) {
+		LinkedList<String> list = new LinkedList<String>();
+		for (int i = 0; i < array.length; i++) {
 			String trimedString = array[i].trim();
-			if (trimedString.length()>0){
+			if (trimedString.length() > 0) {
 				list.add(trimedString);
 			}
 		}
 		return list;
 	}
-	
-	public static ArrayList<String> convertStringArrayToArrayList(String[] array){
-		ArrayList<String> list=new ArrayList<String>();
-		for (int i=0;i<array.length;i++){
+
+	public static ArrayList<String> convertStringArrayToArrayList(String[] array) {
+		ArrayList<String> list = new ArrayList<String>();
+		for (int i = 0; i < array.length; i++) {
 			String trimedString = array[i].trim();
-			if (trimedString.length()>0){
+			if (trimedString.length() > 0) {
 				list.add(trimedString);
 			}
 		}
 		return list;
-	} 
-	
+	}
+
+	public static void writeHashMapToFile(HashMap hm, String headerLine, String fileName) {
+		ArrayList<String> list = new ArrayList<String>();
+		list.add(headerLine);
+
+		for (Object key : hm.keySet()) {
+			StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append(key.toString());
+			stringBuffer.append("\t");
+			stringBuffer.append(hm.get(key).toString());
+			list.add(stringBuffer.toString());
+		}
+
+		GeneralLib.writeList(list, fileName);
+	}
+
 }

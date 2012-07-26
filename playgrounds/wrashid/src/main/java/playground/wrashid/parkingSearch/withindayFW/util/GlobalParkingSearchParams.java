@@ -26,7 +26,8 @@ public class GlobalParkingSearchParams {
 	private static int scenarioId=-1;
 	private static double populationPercentage;
 	private static double parkingScoreWeight;
-
+	private static int detailedOutputAfterIteration;
+	
 	public static int getScenarioId() {
 		return scenarioId;
 	}
@@ -53,6 +54,18 @@ public class GlobalParkingSearchParams {
 
 	public static void setParkingScoreWeight(double parkingScoreWeight) {
 		GlobalParkingSearchParams.parkingScoreWeight = parkingScoreWeight;
+	}
+
+	public static boolean writeDetailedOutput(int iterationNumber) {
+		if (detailedOutputAfterIteration<=0){
+			return false;
+		}
+		
+		return iterationNumber%detailedOutputAfterIteration==0;
+	}
+
+	public static void setDetailedOutputAfterIteration(int detailedOutputAfterIteration) {
+		GlobalParkingSearchParams.detailedOutputAfterIteration = detailedOutputAfterIteration;
 	}
 	
 }
