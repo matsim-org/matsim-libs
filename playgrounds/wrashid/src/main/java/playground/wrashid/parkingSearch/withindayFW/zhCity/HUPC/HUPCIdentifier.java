@@ -170,7 +170,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 						double searchTimeScore = 0; 
 						
 						if (parkingFacility.getId().toString().contains("stp")){
-							searchTimeScore+=parkingAgentsTracker.getSearchTimeScore(personId, activityDuration, estimatedParkingSearchTimeInMinutes);;
+								searchTimeScore+=parkingAgentsTracker.getSearchTimeScore(personId, activityDuration, estimatedParkingSearchTimeInMinutes);;
 						}
 						
 						
@@ -192,8 +192,8 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 					
 				}
 				
-				if (parkingFacilityId.toString().contains("stp")){
-					parkingAgentsTracker.getSearchStartTime().put(agentId, -1*estimatedParkingSearchTimeInMinutes*60);
+				if (parkingFacilityId.toString().contains("stp") && estimatedParkingSearchTimeInMinutes!=0.0){
+						parkingAgentsTracker.getSearchStartTime().put(agentId, -1*estimatedParkingSearchTimeInMinutes*60);
 				} else {
 					markFlagForNoSearchTime(agentId);
 				}
