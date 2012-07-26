@@ -34,5 +34,9 @@ public interface TourActivity {
 	public abstract int getCurrentLoad();
 	
 	public abstract void setCurrentLoad(int load);
+	
+	public abstract double getCurrentCost();
+	
+	public abstract void setCurrentCost(double cost);
 
 }

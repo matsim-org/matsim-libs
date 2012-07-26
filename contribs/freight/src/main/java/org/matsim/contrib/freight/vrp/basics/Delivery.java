@@ -24,6 +24,8 @@ public class Delivery implements TourActivity, JobActivity{
 
 	private int currentLoad;
 	
+	private double currentCost;
+	
 	public Delivery(Shipment shipment) {
 		super();
 		this.shipment = shipment;
@@ -95,6 +97,16 @@ public class Delivery implements TourActivity, JobActivity{
 			return "oo";
 		}
 		return "" + Math.round(time);
+	}
+
+	@Override
+	public double getCurrentCost() {
+		return currentCost;
+	}
+
+	@Override
+	public void setCurrentCost(double cost) {
+		currentCost=cost;
 	}
 
 

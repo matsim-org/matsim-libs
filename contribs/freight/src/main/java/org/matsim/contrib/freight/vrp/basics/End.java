@@ -23,6 +23,8 @@ public class End implements TourActivity{
 	private double practical_latestArrivalTime;
 
 	private int currentLoad;
+
+	private double currentCost;
 	
 	public End(String locationId) {
 		super();
@@ -77,5 +79,15 @@ public class End implements TourActivity{
 	
 	public String toString(){
 		return getType() + " @ "+ getLocationId();
+	}
+
+	@Override
+	public double getCurrentCost() {
+		return currentCost;
+	}
+
+	@Override
+	public void setCurrentCost(double cost) {
+		this.currentCost = cost;
 	}
 }

@@ -23,6 +23,8 @@ public class Pickup implements TourActivity, JobActivity{
 	private double practical_latestArrivalTime;
 
 	private int currentLoad;
+
+	private double currentCost;
 	
 	public Pickup(Shipment shipment) {
 		super();
@@ -94,5 +96,15 @@ public class Pickup implements TourActivity, JobActivity{
 			return "oo";
 		}
 		return "" + Math.round(time);
+	}
+
+	@Override
+	public double getCurrentCost() {
+		return currentCost;
+	}
+
+	@Override
+	public void setCurrentCost(double cost) {
+		this.currentCost = cost;
 	}
 }

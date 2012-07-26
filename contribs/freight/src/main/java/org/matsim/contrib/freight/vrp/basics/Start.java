@@ -23,6 +23,8 @@ public class Start implements TourActivity{
 	private double practical_latestArrivalTime;
 
 	private int currentLoad;
+
+	private double currentCost;
 	
 	public Start(String locationId) {
 		super();
@@ -77,5 +79,15 @@ public class Start implements TourActivity{
 	
 	public String toString(){
 		return getType() + " @ "+ getLocationId();
+	}
+
+	@Override
+	public double getCurrentCost() {
+		return currentCost;
+	}
+
+	@Override
+	public void setCurrentCost(double cost) {
+		currentCost = cost;
 	}
 }
