@@ -111,13 +111,16 @@ public class LangeStreckeSzenarioTest {
 		LinkStatusSpy linkSpy = new LinkStatusSpy(/*this.scenario,*/ (Id) new IdImpl((long)(1)));
 		Link link = scenario.getNetwork().getLinks().get(linkSpy.getLinkId());
 		VelocityFundamentalDiagramOTF fundi = new VelocityFundamentalDiagramOTF(scenario, link.getId());
+		FlowFundamentalDiagramOTF fundi2 = new FlowFundamentalDiagramOTF(scenario, link.getId());
 		
 		events.addHandler(linkSpy);
 		events.addHandler(fundi);
+		events.addHandler(fundi2);
 		
 		runqsim(events);
 		//System.out.println("Same Leaving Order as Entering Order? "+linkSpy.sameLeavingOrderAsEnteringOrder());
 		fundi.saveAsPng("./output");
+		fundi2.saveAsPng("./output");
 	}
 	
 	private void fillNetworkData(){
