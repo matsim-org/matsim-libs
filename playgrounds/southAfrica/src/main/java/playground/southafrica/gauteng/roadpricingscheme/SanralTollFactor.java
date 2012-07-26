@@ -25,8 +25,12 @@ import org.matsim.api.core.v01.population.Person;
 public abstract class SanralTollFactor {
 	private final static int carStartId = 0;
 	private final static int carEndId = 157517;
-	private final static int comStartId = 1000000;
-	private final static int comEndId = 1009999;
+	private final static int comIntraStartId = 1100000;
+	private final static int comIntraEndId = 1199999;
+	private final static int comInterInOutStartId = 1200000;
+	private final static int comInterInOutEndId = 1299999;
+	private final static int comInterOutInStartId = 1300000;
+	private final static int comInterOutInEndId = 1399999;
 	private final static int busStartId = 2000000;
 	private final static int busEndId = 2000209;
 	private final static int taxiStartId = 3000000;
@@ -34,8 +38,11 @@ public abstract class SanralTollFactor {
 	private final static int extStartId = 4000000;
 	private final static int extEndId = 4020181;
 	
-	public enum Type { carWithTag, carWithoutTag,  commercialClassCWithTag,  commercialClassBWithTag,  commercialClassCWithoutTag, 
-		 commercialClassBWithoutTag,  busWithTag,  busWithoutTag,  taxiWithTag,  taxiWithoutTag,  extWithTag,  extWithoutTag } ;
+	public enum Type { carWithTag, carWithoutTag,  
+		commercialClassAWithTag, commercialClassAWithoutTag,
+		commercialClassBWithTag, commercialClassBWithoutTag,
+		commercialClassCWithTag, commercialClassCWithoutTag,
+		busWithTag,  busWithoutTag,  taxiWithTag,  taxiWithoutTag,  extWithTag,  extWithoutTag } ;
 
     public static Type typeOf ( Id idObj ) {
 		long id = Long.parseLong(idObj.toString());
@@ -46,18 +53,36 @@ public abstract class SanralTollFactor {
 		} else if (id <= carEndId) {
 			/* It is a private car without a tag. */
 			return Type.carWithoutTag ;
-		} else if (id < comStartId + fractionClassB*((comEndId - comStartId)*TagPenetration.COMMERCIAL)){
+		} else if(id < comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId)*TagPenetration.COMMERCIAL ||
+				id < comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId)*TagPenetration.COMMERCIAL ||
+				id < comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId)*TagPenetration.COMMERCIAL ){
+			/* It is a Class A commercial vehicle with a tag. */
+			return Type.commercialClassAWithTag;
+		} else if(id < comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId) ||
+				id < comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId) ||
+				id < comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId) ){
+			/* It is a Class A commercial vehicle without a tag. */
+			return Type.commercialClassAWithoutTag;
+		} else if(id < (comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId)) + fractionCommercialClassBIntra*(comIntraEndId - comIntraStartId)*TagPenetration.COMMERCIAL ||
+				  id < (comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId)) + fractionCommercialClassBInter*(comInterInOutEndId - comInterInOutStartId)*TagPenetration.COMMERCIAL ||
+				  id < (comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId)) + fractionCommercialClassBInter*(comInterOutInEndId - comInterOutInStartId)*TagPenetration.COMMERCIAL ){
 			/* It is a Class B commercial vehicle with a tag. */
-			return Type.commercialClassBWithTag ;
-		} else if (id < comStartId + (comEndId - comStartId)*TagPenetration.COMMERCIAL){
-			/* It is a Class C commercial vehicle with a tag. */
-			return Type.commercialClassCWithTag ;
-		} else if (id < comEndId - (comEndId - comStartId)*(1-TagPenetration.COMMERCIAL)*fractionClassB){
+			return Type.commercialClassBWithTag;
+		} else if(id < (comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId)) + fractionCommercialClassBIntra*(comIntraEndId - comIntraStartId) ||
+				id < (comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId)) + fractionCommercialClassBInter*(comInterInOutEndId - comInterInOutStartId) ||
+				id < (comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId)) + fractionCommercialClassBInter*(comInterOutInEndId - comInterOutInStartId) ){
 			/* It is a Class B commercial vehicle without a tag. */
-			return Type.commercialClassBWithoutTag ;
-		} else if (id <= comEndId){
+			return Type.commercialClassBWithoutTag;
+		} else if(id < (comIntraStartId + (fractionCommercialClassAIntra + fractionCommercialClassBIntra)*(comIntraEndId - comIntraStartId)) + fractionCommercialClassCIntra*(comIntraEndId - comIntraStartId)*TagPenetration.COMMERCIAL ||
+				id < (comInterInOutStartId + (fractionCommercialClassAInter + fractionCommercialClassBInter)*(comInterInOutEndId - comInterInOutStartId)) + fractionCommercialClassCInter*(comInterInOutEndId - comInterInOutStartId)*TagPenetration.COMMERCIAL ||
+				id < (comInterOutInStartId + (fractionCommercialClassAInter + fractionCommercialClassBInter)*(comInterOutInEndId - comInterOutInStartId)) + fractionCommercialClassCInter*(comInterOutInEndId - comInterOutInStartId)*TagPenetration.COMMERCIAL ){
+			/* It is a Class C commercial vehicle with a tag. */
+			return Type.commercialClassCWithTag;
+		} else if(id <= comIntraEndId ||
+				  id <= comInterInOutEndId ||
+				  id <= comInterOutInEndId){
 			/* It is a Class C commercial vehicle without a tag. */
-			return Type.commercialClassCWithoutTag ;
+			return Type.commercialClassCWithoutTag;
 		} else if (id < busStartId + (busEndId - busStartId)*TagPenetration.BUS) {
 			/* It is a bus with a tag. */
 			return Type.busWithTag ;
@@ -80,11 +105,18 @@ public abstract class SanralTollFactor {
 
 	}
     
+    
 	
 	/* From the counting station data I've inferred that the split between 
 	 * Class B and C is about 50:50, assuming that `Short' represents Class B, 
 	 * and `Medium' and `Long' combined represent Class C vehicles. */
-	private final static double fractionClassB = 0.50;
+	private final static double fractionCommercialClassAIntra = 0.50;
+	private final static double fractionCommercialClassBIntra = 0.30;
+	private final static double fractionCommercialClassCIntra = 0.20;
+
+	private final static double fractionCommercialClassAInter = 0.30;
+	private final static double fractionCommercialClassBInter = 0.40;
+	private final static double fractionCommercialClassCInter = 0.30;
 	
 	
 	public static double getTollFactor(final Id vehicleId, final Id linkId, final double time){		
@@ -100,16 +132,22 @@ public abstract class SanralTollFactor {
 		case carWithoutTag:
 			// nothing
 			break ;
+		case commercialClassAWithTag:
+			tagDiscount = 0.25;
+			break;
+		case commercialClassAWithoutTag:
+			// nothing
+			break ;
 		case commercialClassBWithTag:
 			sizeFactor = 3;
 			tagDiscount = 0.25;
 			break ;
+		case commercialClassBWithoutTag:
+			sizeFactor = 3;
+			break ;
 		case commercialClassCWithTag:
 			sizeFactor = 6;
 			tagDiscount = 0.25;
-			break ;
-		case commercialClassBWithoutTag:
-			sizeFactor = 3;
 			break ;
 		case commercialClassCWithoutTag:
 			sizeFactor = 6;
