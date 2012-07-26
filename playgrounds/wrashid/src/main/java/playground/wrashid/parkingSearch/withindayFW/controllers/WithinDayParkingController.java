@@ -173,7 +173,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		startUpBegin();
-		
+		//TODO: clean this out! => nothing from test/zürich scenario should be here.
 		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(event);
 		
 		// connect facilities to network
