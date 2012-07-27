@@ -24,7 +24,7 @@ public class Main {
 		double activityDurationInSeconds = 7200;
 		double isMale = 1;
 		double age = 30;
-		double income = 7000;
+		double income = 15000;
 		System.out.println("walk time beta :" + -0.108 * 60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)
 				* (1 + (0.021 * isMale)) * Math.pow(age / 40.0, 0.236));
 

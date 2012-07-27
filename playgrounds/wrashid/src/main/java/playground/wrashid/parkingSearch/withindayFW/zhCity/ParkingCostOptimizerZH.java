@@ -149,6 +149,54 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		inputValues = publicParkingPricePerHourInTheAfternoon;
 		outputFileName = "publicParkingPricePerHourInTheAfternoon.txt";
 		outputParkingPrices(controler, inputValues, outputFileName);
+		
+		printParkingPriceHistograms(controler);
+	}
+
+	private void printParkingPriceHistograms(Controler controler) {
+		double[] values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheMorning,"stp"));
+		String timeOfDay="Morning";
+		String parkingType="street";
+		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+		
+		values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheAfternoon,"stp"));
+		timeOfDay="Afternoon";
+		parkingType="street";
+		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+		
+		values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheMorning,"gp"));
+		timeOfDay="Morning";
+		parkingType="garage";
+		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+		
+		values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheAfternoon,"gp"));
+		timeOfDay="Afternoon";
+		parkingType="garage";
+		outputPriceHistorgram(controler, values, timeOfDay, parkingType);
+	}
+
+	private void outputPriceHistorgram(Controler controler, double[] values, String timeOfDay, String parkingType) {
+		String outputFileName = parkingType + "ParkingPricePerHourInThe" + timeOfDay + ".png";
+		
+		
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				outputFileName);
+
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram " + parkingType + " Pricing Price Per Hour In the " + timeOfDay + " - It." + controler.getIterationNumber(), "price [chf]",
+				"number of parkings");
+	}
+	
+	private Collection<Double> filterParkingPrices(DoubleValueHashMap<Id> prices, String filter){
+		LinkedList<Double> result=new LinkedList<Double>();
+		
+		for (Id id:prices.keySet()){
+			if (id.toString().contains(filter)){
+				result.add(prices.get(id));
+			}
+		}
+		
+		return result;
 	}
 
 	private void outputParkingPrices(Controler controler, DoubleValueHashMap<Id> inputValues, String outputFileName) {

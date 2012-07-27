@@ -1,5 +1,6 @@
 package playground.wrashid.lib.obj;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
@@ -17,6 +18,10 @@ import playground.wrashid.lib.GeneralLib;
 public class DoubleValueHashMap<KeyClass> {
 
 	private HashMap<KeyClass, Double> hm = new HashMap<KeyClass, Double>();
+	
+	public Collection<Double> values(){
+		return hm.values();
+	}
 	
 	public Set<KeyClass> keySet(){
 		return hm.keySet();
