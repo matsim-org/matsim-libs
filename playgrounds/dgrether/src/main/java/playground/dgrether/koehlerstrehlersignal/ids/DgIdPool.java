@@ -39,7 +39,7 @@ public class DgIdPool {
 
 	private static final Logger log = Logger.getLogger(DgIdPool.class);
 	
-	private int currentId = 100;
+	private int currentId = 10000; // < 10000 reserved for default ids
 	
 	private Map<String, Integer> ids = new HashMap<String, Integer>();
 	private Map<Integer, String> intStringMap = new HashMap<Integer, String>();

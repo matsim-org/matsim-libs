@@ -39,16 +39,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.signalsystems.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.FeatureNetworkLinkStartEndCoordFilter;
-import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 import playground.dgrether.utils.DgNet2Shape;
 
@@ -71,7 +68,7 @@ public class DgCottbusSmallNetworkGenerator {
 
 	private Network shrinkedNetwork;
 	
-	public Network createSmallNetwork(String networkFile, String signalSystemsFile, double offset){
+	public Network createSmallNetwork(String networkFile, String outputDirectory, String signalSystemsFile, double offset){
 		Config c1 = ConfigUtils.createConfig();
 		c1.network().setInputFile(networkFile);
 		c1.scenario().setUseSignalSystems(true);
@@ -80,10 +77,10 @@ public class DgCottbusSmallNetworkGenerator {
 		SignalsData signalsdata = scenario.getScenarioElement(SignalsData.class);
 		Network net = scenario.getNetwork();
 		
-		Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature(DgPaths.REPOS
-				 + "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
-		Feature cottbusFeature = cottbusFeatureTuple.getSecond();
-		CoordinateReferenceSystem cottbusFeatureCrs = cottbusFeatureTuple.getFirst();
+//		Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature(DgPaths.REPOS
+//				 + "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
+//		Feature cottbusFeature = cottbusFeatureTuple.getSecond();
+//		CoordinateReferenceSystem cottbusFeatureCrs = cottbusFeatureTuple.getFirst();
 		
 		
 		//get all signalized link ids
@@ -101,13 +98,13 @@ public class DgCottbusSmallNetworkGenerator {
 //		NetworkCleaner netCleaner = new NetworkCleaner();
 //		netCleaner.run(newNetwork);
 		
-		String output = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/network";
+		String output = outputDirectory + "network_small";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		new DgNet2Shape().write(newNetwork, output + ".shp", crs);
 		
 		Collection<Feature> boundingBoxCollection = new ArrayList<Feature>();
 		boundingBoxCollection.add(boundingboxFeature);
-		ShapeFileWriter.writeGeometries(boundingBoxCollection, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_small/bounding_box.shp");
+		ShapeFileWriter.writeGeometries(boundingBoxCollection, outputDirectory + "bounding_box.shp");
 
 		
 		this.shrinkedNetwork = newNetwork;
@@ -182,7 +179,7 @@ public class DgCottbusSmallNetworkGenerator {
 
 
 	public static void main(String[] args){
-		new DgCottbusSmallNetworkGenerator().createSmallNetwork(args[0], args[1], Double.valueOf(args[2]));
+		new DgCottbusSmallNetworkGenerator().createSmallNetwork(args[0], args[1], args[2], Double.valueOf(args[3]));
 	}
 	
 }

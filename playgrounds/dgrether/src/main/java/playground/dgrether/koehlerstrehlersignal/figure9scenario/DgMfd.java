@@ -68,6 +68,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	private int currentBinIndex;
 	private GeospatialEventTools geospatialTools = null;
 	private Data data = new Data();
+	private double vehicleSize = 7.5;
 
 	
 	public DgMfd(Scenario scenario){
@@ -179,7 +180,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			departures = this.data.getDeparturesBySlot().get(e.getKey());
 			arrivals = e.getValue();
 			noVehicles = noVehicles + departures - arrivals;
-			density = noVehicles / this.networkLength;
+			density = noVehicles * this.vehicleSize / this.networkLength;
 
 			StringBuffer line = new StringBuffer();
 			line.append(e.getKey());

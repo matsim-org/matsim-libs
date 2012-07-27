@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.commuterdemand;
 
+import java.io.File;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -49,14 +50,22 @@ public class CommuterGenerator {
 	public static void main(String[] args) throws Exception {
 		
 		String networkFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
+		boolean useLanduse = true;
+				String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
+				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage_landuse/";
 //		String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
-//				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage_landuse/";
-		String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
-				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage/";
+//				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage/";
 
+		String shapesOutputDirectory = populationOutputDirectory + "shapes/";
+		
 		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_car_only.xml.gz";
 //		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_all_modes.xml.gz";
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(populationOutputDirectory);
+
+		File shapes = new File(shapesOutputDirectory);
+		if (! shapes.exists() ) {
+			shapes.mkdir();
+		}
 		
 		Config config1 = ConfigUtils.createConfig();
 		config1.network().setInputFile(networkFile);
@@ -72,16 +81,18 @@ public class CommuterGenerator {
 		ShapeFileReader gemeindenReader = new ShapeFileReader();
 		Set<Feature> gemeindenFeatures = gemeindenReader.readFileAndInitialize(gemeindenBrandenburgShapeFile);
 		
-		DgLanduseReader landuseReader = new DgLanduseReader();
-		Tuple<Set<Feature>,CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
-		Tuple<Set<Feature>,CoordinateReferenceSystem> workLanduse = landuseReader.readLanduseDataWork();
 		
 		
 		CommuterDemandWriter cdw = new CommuterDemandWriter(gemeindenFeatures, gemeindenReader.getCoordinateSystem(), 
 				cdr.getCommuterRelations(), MGC.getCRS(TransformationFactory.WGS84_UTM33N));
 		//landuse
-//		cdw.addLanduse("home", homeLanduse);
-//		cdw.addLanduse("work", workLanduse);
+		if (useLanduse){
+			DgLanduseReader landuseReader = new DgLanduseReader();
+			Tuple<Set<Feature>,CoordinateReferenceSystem> homeLanduse = landuseReader.readLanduseDataHome();
+			Tuple<Set<Feature>,CoordinateReferenceSystem> workLanduse = landuseReader.readLanduseDataWork();
+			cdw.addLanduse("home", homeLanduse);
+			cdw.addLanduse("work", workLanduse);
+		}
 //		
 		cdw.setScalefactor(1.0); // all modes
 		cdw.setScalefactor(0.55); //car mode share
@@ -100,10 +111,10 @@ public class CommuterGenerator {
 		config.plans().setInputFile(populationOutputFile);
 		Scenario baseScenario = ScenarioUtils.loadScenario(config);
 		
-		String shapeFilename = populationOutputDirectory + "shapes/commuter_population_home.shp";
+		String shapeFilename = shapesOutputDirectory + "commuter_population_home.shp";
 		new DgPopulation2ShapeWriter(baseScenario.getPopulation(),	MGC.getCRS(TransformationFactory.WGS84_UTM33N))
 			.write("home", shapeFilename, MGC.getCRS(TransformationFactory.WGS84_UTM33N));
-		shapeFilename = populationOutputDirectory + "shapes/commuter_population_work.shp";
+		shapeFilename = shapesOutputDirectory + "commuter_population_work.shp";
 		new DgPopulation2ShapeWriter(baseScenario.getPopulation(),	MGC.getCRS(TransformationFactory.WGS84_UTM33N))
 		.write("work", shapeFilename, MGC.getCRS(TransformationFactory.WGS84_UTM33N));
 		

@@ -142,10 +142,13 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	}
 
 	
-	private void convertNodes2Crossings(DgKSNetwork dgnet, Network net){
+	private void convertNodes2Crossings(DgKSNetwork ksNet, Network net){
 		for (Node node : net.getNodes().values()){
 			DgCrossing crossing = new DgCrossing(this.idConverter.convertNodeId2CrossingId(node.getId()));
-			dgnet.addCrossing(crossing);
+			ksNet.addCrossing(crossing);
+			DgProgram program = new DgProgram(this.defaultProgramId);
+			program.setCycle(this.cycle);
+			crossing.addProgram(program);
 		}
 	}
 	
@@ -227,6 +230,10 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	 */
 	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, 
 			LanesToLinkAssignment20 l2l, SignalSystemData system, SignalsData signalsData) {
+		//remove default program
+		if ( crossing.getPrograms().containsKey(this.defaultProgramId)) {
+			crossing.getPrograms().remove(this.defaultProgramId);
+		}
 		//create program if not existing...
 		DgProgram program = null;
 		if (! crossing.getPrograms().containsKey(system.getId())){
@@ -303,13 +310,12 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
 			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment20 l2l) {
 		DgProgram program = null;
-		if (! crossing.getPrograms().containsKey(this.defaultProgramId)){
-			program = new DgProgram(this.defaultProgramId);
-			program.setCycle(this.cycle);
-			crossing.addProgram(program);
+		if (crossing.getPrograms().containsKey(this.defaultProgramId)){
+			program = crossing.getPrograms().get(this.defaultProgramId);
 		}
 		else {
-			program = crossing.getPrograms().get(this.defaultProgramId);
+			log.error("Link: " + link.getId() + " fromNode: " + link.getFromNode().getId() + " toNode: " + link.getToNode().getId());
+			throw new IllegalStateException("Default program must exist at not signalized crossing: " + crossing.getId());
 		}
 		if (l2l == null){
 			List<Id> toLinks = this.getTurningMoves4LinkWoLanes(link);
