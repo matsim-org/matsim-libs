@@ -111,11 +111,13 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 
 			if (agents.get(personId).getCurrentPlanElementIndex() == 33) {
 
-				DebugLib.traceAgent(personId, 10);
+				
 
 				// DebugLib.traceAgent(personId);
 			}
 
+			DebugLib.traceAgent(personId, 22);
+			
 			/*
 			 * If the agent has not selected a parking facility yet.
 			 */
@@ -180,9 +182,11 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 								searchTimeScore+=parkingAgentsTracker.getSearchTimeScore(personId, activityDuration, estimatedParkingSearchTimeInMinutes);;
 						}
 						
-						
+						if (walkScore>0 || costScore>0 || searchTimeScore>0){
+							DebugLib.stopSystemAndReportInconsistency();
+						}
 
-						priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, walkScore + costScore + searchTimeScore));
+						priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, -(walkScore + costScore + searchTimeScore)));
 					}
 
 					SortableMapObject<ActivityFacility> poll = priorityQueue.poll();
