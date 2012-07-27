@@ -26,6 +26,40 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 public class SummaryStatistics {
 
+	public class LinkStatsComparison {
+
+		private double dailyRmsd;
+		private double hourlyRmsd;
+		private ArrayList<Double> dailyDeltas;
+		public double getDailyRmsd() {
+			return dailyRmsd;
+		}
+
+		public double getHourlyRmsd() {
+			return hourlyRmsd;
+		}
+
+		public ArrayList<Double> getDailyDeltas() {
+			return dailyDeltas;
+		}
+
+		public ArrayList<Double> getHourlyDeltas() {
+			return hourlyDeltas;
+		}
+
+		private ArrayList<Double> hourlyDeltas;
+
+		public LinkStatsComparison(double dailyRmsd, double hourlyRmsd,
+				ArrayList<Double> dailyDeltas, ArrayList<Double> hourlyDeltas) {
+			this.dailyRmsd = dailyRmsd;
+			this.hourlyRmsd = hourlyRmsd;
+			this.dailyDeltas = dailyDeltas;
+			this.hourlyDeltas = hourlyDeltas;
+			
+		}
+
+	}
+
 	private int referenceIter;
 	private String referencePath;
 
@@ -38,7 +72,7 @@ public class SummaryStatistics {
 	 *            Whether the RMSD should track daily or hourly volumes on links
 	 */
 	public void linkStatsRMSDeltaPlot(String simulationPath, int startIter,
-			int endIter, boolean dailyVolumes) {
+			int endIter) {
 		ArrayList<String> files = new ArrayList<String>();
 		// create a list of file names to use in the comparison
 		ArrayList<Integer> relevantIters = new ArrayList<Integer>();
@@ -63,21 +97,64 @@ public class SummaryStatistics {
 		for (int iter = 0; iter < relevantIters.size(); iter++) {
 			iters[iter] = relevantIters.get(iter);
 		}
-		double[] valuesVsReference = new double[relevantIters.size()];
+		BufferedWriter dailyWriter = IOUtils.getBufferedWriter(simulationPath+"/dailyDeltas.txt");
+		BufferedWriter hourlyWriter = IOUtils.getBufferedWriter(simulationPath+"/hourlyDeltas.txt");
+		ArrayList<ArrayList<Double>> dailyDeltas = new ArrayList<ArrayList<Double>>();
+		ArrayList<ArrayList<Double>> hourlyDeltas = new ArrayList<ArrayList<Double>>();
+		double[] dailyValuesVsReference = new double[relevantIters.size()];
+		double[] hourlyValuesVsReference = new double[relevantIters.size()];
+		try {
+			for (int i = 0; i < files.size(); i++) {
+				String secondFileName = files.get(i);
 
-		for (int i = 0; i < files.size(); i++) {
-			String secondFileName = files.get(i);
-
-			valuesVsReference[i] = getLinkStatsRMSDelta(reference,
-					secondFileName, dailyVolumes);
+				LinkStatsComparison linkStatsComparison = getLinkStatsComparison(
+						reference, secondFileName);
+				dailyValuesVsReference[i] = linkStatsComparison.getDailyRmsd();
+				hourlyValuesVsReference[i] = linkStatsComparison
+						.getHourlyRmsd();
+				dailyDeltas.add( linkStatsComparison.getDailyDeltas());
+				hourlyDeltas.add(linkStatsComparison.getHourlyDeltas());
+			}
+			writeDeltas(iters, dailyWriter, dailyDeltas);
+			writeDeltas(iters, hourlyWriter, hourlyDeltas);
+			dailyWriter.close();
+			hourlyWriter.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		String[] pathComponents = simulationPath.split("/");
 		String runID = pathComponents[pathComponents.length - 1];
 
-		plotLinkStatsRMSDelta(iters, valuesVsReference, simulationPath,
-				"Linkstats change vs start for " + runID
-						+ (dailyVolumes ? " (daily volumes)" : ""),
-				dailyVolumes, true);
+		plotLinkStatsRMSDelta(iters, dailyValuesVsReference, simulationPath,
+				"Linkstats change vs ref. for " + runID
+						+  " (daily volumes)" ,
+				true, true);
+		plotLinkStatsRMSDelta(iters, hourlyValuesVsReference, simulationPath,
+				"Linkstats change vs ref. for " + runID
+						+  " (hourly volumes)" ,
+				false, true);
+	}
+
+	private void writeDeltas(double[] iters, BufferedWriter writer,
+			ArrayList<ArrayList<Double>> allDeltas) throws IOException {
+		String outString = "";
+		for (double iter : iters) {
+			outString += String.format("it_%0000d\t", (int)iter);
+		}
+		outString = outString.trim();
+		outString += "\n";
+		writer.write(outString.toString());
+		writer.flush();
+		for (int i = 0; i < allDeltas.get(0).size(); i++) {
+			outString = "";
+			for (ArrayList<Double> delta : allDeltas) {
+				outString += String.format("%f\t", delta.get(i));
+			}
+			outString = outString.trim();
+			outString += "\n";
+			writer.write(outString.toString());
+			writer.flush();
+		}
 	}
 
 	public void departuresAndModeShareRMSDeltaPlot(String simulationPath,
@@ -273,7 +350,7 @@ public class SummaryStatistics {
 			return qsimIters;
 		} catch (UncheckedIOException fe) {
 			for (int iter = 0; iter < 20000; iter++) {
-				String fileName = getLinkStatsFileName(simulationPath, iter);
+				String fileName = getDepartureStatsFileName(simulationPath, iter);
 				if (fileName == null)
 					continue;
 				else {
@@ -289,8 +366,77 @@ public class SummaryStatistics {
 		return null;
 	}
 
-	private double getLinkStatsRMSDelta(String firstFileName,
+	private LinkStatsComparison getLinkStatsComparison(String reference,
+			String secondFileName) {
+		ArrayList<Double> dailyDeltas = new ArrayList<Double>();
+		ArrayList<Double> hourlyDeltas = new ArrayList<Double>();
+		double dailyRmsd = 0;
+		double hourlyRmsd = 0;
+		try {
+			BufferedReader refReader = IOUtils
+					.getBufferedReader(reference);
+			BufferedReader secondReader = IOUtils
+					.getBufferedReader(secondFileName);
+			String[] headings = refReader.readLine().split("\t");
+			// need the secondReader to progress past the headings as well
+			secondReader.readLine();
+			int[] countColumns = new int[24];
+			int dailyVolumeColumn = 0;
+			int indexCounter = 0;
+			for (int column = 0; column < headings.length; column++) {
+				String heading = headings[column];
+				if (heading.startsWith("HRS") && heading.endsWith("avg")) {
+					if (indexCounter < 24)
+						countColumns[indexCounter] = column;
+					else
+						dailyVolumeColumn = column;
+					indexCounter++;
+				}
+			}
+			// read the lines, and perform the rmsdelta calc
+			int rowCount = 0;
+			double sumDailyDeltaSquared = 0;
+			double sumHourlyDeltaSquared = 0;
+			while (rowCount >= 0) {
+				String refLine = refReader.readLine();
+				String secondLine = secondReader.readLine();
+				if (refLine == null || secondLine == null)
+					break;
+				else
+					rowCount++;
+				String[] refBits = refLine.split("\t");
+				String[] secondBits = secondLine.split("\t");
+				// go through all columns of counts or only through the total
+				// daily volume
+					double refDaily = Double.parseDouble(refBits[dailyVolumeColumn]);
+					double secondDaily = Double.parseDouble(secondBits[dailyVolumeColumn]);
+					sumDailyDeltaSquared += Math.pow(refDaily-secondDaily,2);
+					dailyDeltas.add(refDaily-secondDaily);
+				
+					for (int column : countColumns) {
+						double refHourly = Double.parseDouble(refBits[column]);
+						double secondHourly = Double.parseDouble(secondBits[column]);
+						sumHourlyDeltaSquared += Math.pow(refHourly-secondHourly, 2);
+						hourlyDeltas.add(refHourly-secondHourly);
+					}
+				
+			}
+			dailyRmsd = Math.pow(sumDailyDeltaSquared / dailyDeltas.size(), 0.5);
+			hourlyRmsd = Math.pow(sumHourlyDeltaSquared / hourlyDeltas.size(), 0.5);
+			refReader.close();
+			secondReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Daily link RMSD: "+dailyRmsd+", Hourly RMSD: "+hourlyRmsd);
+		LinkStatsComparison linkStatsComp = new LinkStatsComparison(dailyRmsd,hourlyRmsd,dailyDeltas,hourlyDeltas);
+		return linkStatsComp;
+
+	}
+	private double getLinkStatsDelta(String firstFileName,
 			String secondFileName, boolean dailyVolumes) {
+		ArrayList<Double> deltas = new ArrayList<Double>(); 
+		
 		double rmsd = 0;
 		try {
 			BufferedReader firstReader = IOUtils
@@ -343,6 +489,9 @@ public class SummaryStatistics {
 						sumDeltaSquared += Math.pow(Double
 								.parseDouble(firstBits[column])
 								- Double.parseDouble(secondBits[column]), 2);
+						deltas.add(Double
+								.parseDouble(firstBits[column])
+								- Double.parseDouble(secondBits[column]));
 					}
 				}
 			}
@@ -356,7 +505,6 @@ public class SummaryStatistics {
 		return rmsd;
 
 	}
-
 	private void plotLinkStatsRMSDelta(double[] iters, double[] values,
 			String simulationPath, String title, boolean dailyVolumes,
 			boolean vIter) {
@@ -479,13 +627,13 @@ public class SummaryStatistics {
 		// if we managed to get this far, I suppose we can go ahead and iterate
 		// through the subdirs
 		if (useOnlyCurrentDir) {
-			this.linkStatsRMSDeltaPlot(simPath, 0, 10000, true);
-			this.linkStatsRMSDeltaPlot(simPath, 0, 10000, false);
+			this.linkStatsRMSDeltaPlot(simPath, 0, 10000);
+//			this.linkStatsRMSDeltaPlot(simPath, 0, 10000, false);
 			this.departuresAndModeShareRMSDeltaPlot(simPath, 0, 10000, true);
 		} else {
 			for (File file : files) {
-				this.linkStatsRMSDeltaPlot(file.toString(), 0, 10000, true);
-				this.linkStatsRMSDeltaPlot(file.toString(), 0, 10000, false);
+				this.linkStatsRMSDeltaPlot(file.toString(), 0, 10000);
+//				this.linkStatsRMSDeltaPlot(file.toString(), 0, 10000, false);
 				this.departuresAndModeShareRMSDeltaPlot(file.toString(), 0, 10000, true);
 			}
 		}

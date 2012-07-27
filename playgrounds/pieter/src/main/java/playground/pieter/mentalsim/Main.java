@@ -27,8 +27,8 @@ public class Main {
 		c.setSimulateSubsetPersonsOnly(true);
 		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
 //		execution order of these iteration start listeners is in reverse order of adding them to the controler
-		PlanSelector mentalPlanSelector = new ExpBetaPlanSelector(new PlanCalcScoreConfigGroup());
-//		PlanSelector mentalPlanSelector = new BestPlanSelector();
+//		PlanSelector mentalPlanSelector = new ExpBetaPlanSelector(new PlanCalcScoreConfigGroup());
+		PlanSelector mentalPlanSelector = new BestPlanSelector();
 		c.addControlerListener(new MentalSimSubSetSimulationListener(c,mentalPlanSelector));
 		c.addControlerListener(new SimpleAnnealer());
 		c.addControlerListener(new MobSimSwitcher(c));
