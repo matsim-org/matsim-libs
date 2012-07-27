@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
@@ -48,6 +49,7 @@ import playground.wrashid.artemis.smartCharging.ChargingTime;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.SortableMapObject;
+import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
@@ -59,12 +61,19 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructureZH parkingInfrastructure;
 	private final Map<Id, PlanBasedWithinDayAgent> agents;
-	private double searchTimeEstimationConstantForHUPC;
+	private double searchTimeEstimationConstant;
+	private double initialParkingSetRadiusInMeters;
 
-	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure, double searchTimeEstimationConstantForHUPC) {
+	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure, Controler controler) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkingInfrastructure = parkingInfrastructure;
-		this.searchTimeEstimationConstantForHUPC = searchTimeEstimationConstantForHUPC;
+		
+		String searchTimeEstimationConstantString = controler.getConfig().findParam("parking", "HUPCIdentifier.searchTimeEstimationConstant");
+		searchTimeEstimationConstant=Double.parseDouble(searchTimeEstimationConstantString);
+		
+		String initialParkingSetRadiusInMetersHUPCString = controler.getConfig().findParam("parking", "HUPCIdentifier.initialParkingSetRadiusInMeters");
+		initialParkingSetRadiusInMeters=Double.parseDouble(initialParkingSetRadiusInMetersHUPCString);
+		
 
 		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
 	}
@@ -125,9 +134,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 				if (privateParkingAvailable(freePrivateParking)) {
 					parkingFacilityId = freePrivateParking.getId();
 				} else {
-					// search for parking in public domain
-					//TODO: set distance for search area externally
-					Collection<ActivityFacility> parkings = parkingInfrastructure.getAllFreeParkingWithinDistance(1000,
+					Collection<ActivityFacility> parkings = parkingInfrastructure.getAllFreeParkingWithinDistance(initialParkingSetRadiusInMeters,
 							nextNonParkingAct.getCoord());
 					if (parkings.size() == 0) {
 						parkings.add(parkingInfrastructure.getClosestFreeParkingFacility(nextNonParkingAct.getCoord()));
@@ -232,7 +239,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		}
 		
 		
-		estimatedParkingSearchTimeInMinutes=(searchTimeEstimationConstantForHUPC/(sumFreeCapacity/sumParkingCapacity)-searchTimeEstimationConstantForHUPC)/60.0;
+		estimatedParkingSearchTimeInMinutes=(searchTimeEstimationConstant/(sumFreeCapacity/sumParkingCapacity)-searchTimeEstimationConstant)/60.0;
 		// => for 10% free parking, we have 180 seconds search time
 		// => for 100% free parking, we have 0 seconds search time
 		return estimatedParkingSearchTimeInMinutes;

@@ -188,9 +188,11 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getReplanningManager(),
 				router, 1.0, this.scenarioData, parkingAgentsTracker);
 		
-		String searchTimeEstimationConstantForHUPCString = this.getConfig().findParam("parking", "searchTimeEstimationConstantForHUPC");
-		double searchTimeEstimationConstantForHUPC=Double.parseDouble(searchTimeEstimationConstantForHUPCString);
-		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, (ParkingInfrastructureZH) parkingInfrastructure, searchTimeEstimationConstantForHUPC);
+		
+		
+		
+		
+		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, (ParkingInfrastructureZH) parkingInfrastructure, this);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
