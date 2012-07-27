@@ -22,6 +22,9 @@ package playground.dgrether;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
+
 
 /**
  * @author dgrether
@@ -35,6 +38,9 @@ public class DgController {
 	public static void main(String[] args) {
 		Controler c = new Controler(args[0]);
 		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+		c.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(sylviaConfig));
+		c.setOverwriteFiles(true);
 		c.run();
 	}
 
