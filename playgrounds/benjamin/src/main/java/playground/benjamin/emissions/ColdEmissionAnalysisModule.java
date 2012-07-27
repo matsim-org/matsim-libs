@@ -73,6 +73,7 @@ public class ColdEmissionAnalysisModule {
 	final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 	
 	final EventsManager eventsManager;
+	final Double emissionEfficiencyFactor;
 	
 	int vehInfoWarnHDVCnt = 0;
 	int vehAttributesNotSpecifiedCnt = 0;
@@ -94,11 +95,12 @@ public class ColdEmissionAnalysisModule {
 
 	public ColdEmissionAnalysisModule(
 			ColdEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager) {
+			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
 		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;
 		this.eventsManager = emissionEventsManager;
+		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 	}
 
 	public void reset() {
@@ -130,8 +132,26 @@ public class ColdEmissionAnalysisModule {
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		coldEmissions = calculateColdEmissions(personId, parkingDuration, accumulatedDistance, vehicleInformationTuple);
+
+//		logger.debug("Original cold emissions: " + coldEmissions);
+		// a basic apporach to introduce emission reduced cars:
+		if(emissionEfficiencyFactor != null){
+			coldEmissions = rescaleColdEmissions(coldEmissions);
+//			logger.debug("Original cold emissions have been rescaled to: " + coldEmissions);
+		}
 		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, coldEmissionEventLinkId, personId, coldEmissions);
 		this.eventsManager.processEvent(coldEmissionEvent);
+	}
+
+	private Map<ColdPollutant, Double> rescaleColdEmissions(Map<ColdPollutant, Double> coldEmissions) {
+		Map<ColdPollutant, Double> rescaledColdEmissions = new HashMap<ColdPollutant, Double>();
+		
+		for(ColdPollutant wp : coldEmissions.keySet()){
+			Double orgValue = coldEmissions.get(wp);
+			Double rescaledValue = emissionEfficiencyFactor * orgValue;
+			rescaledColdEmissions.put(wp, rescaledValue);
+		}
+		return rescaledColdEmissions;
 	}
 
 	private Map<ColdPollutant, Double> calculateColdEmissions(

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.kuhmo;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -70,9 +71,12 @@ public class MultiAnalyzer {
 	private static String emissionEventsFile;
 
 	private final MultiAnalyzerWriter writer;
+	private final Map<String, Map<Id, Double>> case2personId2carDistance;
+
 
 	MultiAnalyzer(){
 		this.writer = new MultiAnalyzerWriter(runDirectoryStub + cases[0] + "/");
+		this.case2personId2carDistance = new HashMap<String, Map<Id,Double>>();
 	}
 
 	private void run() {
@@ -86,9 +90,41 @@ public class MultiAnalyzer {
 			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
 			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
 			
-			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
+//			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
 			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
-			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
+//			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
+		}
+		calculateDistanceTimeStatisticsByUserGroupDifferences(case2personId2carDistance);
+	}
+
+	private void calculateDistanceTimeStatisticsByUserGroupDifferences(Map<String, Map<Id, Double>> case2personId2carDistance) {
+		
+		Map<Id, Double> personId2carDistanceBaseCase = case2personId2carDistance.get(cases[0]);
+		
+		for(int i=1; i<cases.length; i++){
+			Map<Id, Double> personId2carDistanceDiff = new HashMap<Id, Double>();
+			Map<Id, Double> personId2carDistancePolicyCase = case2personId2carDistance.get(cases[i]);
+			
+			for(Id personId : personId2carDistanceBaseCase.keySet()){
+				Double baseCaseDist = personId2carDistanceBaseCase.get(personId);
+				Double policyCaseDist;
+				
+				if(personId2carDistancePolicyCase.get(personId) == null){
+					policyCaseDist = 0.0;
+				} else {
+					policyCaseDist = personId2carDistancePolicyCase.get(personId);
+				}
+				Double distDiff = policyCaseDist - baseCaseDist;
+				personId2carDistanceDiff.put(personId, distDiff);
+			}
+			for(Id personId : personId2carDistancePolicyCase.keySet()){
+				if(personId2carDistanceBaseCase.get(personId) == null){
+					Double policyCaseDist = personId2carDistancePolicyCase.get(personId);
+					personId2carDistanceDiff.put(personId, policyCaseDist);
+				}
+			}
+			writer.setRunName(cases[i] + "-" + cases[0]);
+			writer.writeDetailedCarDistanceInformation(personId2carDistanceDiff);
 		}
 	}
 
@@ -149,6 +185,8 @@ public class MultiAnalyzer {
 		Map<UserGroup, Double> userGroup2carTrips = carDistanceEventHandler.getUserGroup2carTrips();
 		Map<String, Map<Id, Double>> mode2personId2TravelTime = ttHandler.getMode2personId2TravelTime();
 		Map<UserGroup, Map<String, Double>> userGroup2mode2noOfTrips = ttHandler.getUserGroup2mode2noOfTrips();
+		
+		case2personId2carDistance.put(runName, personId2carDistance);
 		
 		logger.warn(runName + ": number of car users in distance map (users with departure events): " + personId2carDistance.size());
 //		int depArrOnSameLinkCnt = carDistanceEventHandler.getDepArrOnSameLinkCnt().size();

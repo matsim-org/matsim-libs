@@ -68,11 +68,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 			Vehicles emissionVehicles,
 			final Network network, 
 			WarmEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager) {
+			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 		
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
-		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager);	
+		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);	
 	}
 	
 	@Override

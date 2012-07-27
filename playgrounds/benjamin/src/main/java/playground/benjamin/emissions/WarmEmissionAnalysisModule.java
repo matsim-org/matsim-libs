@@ -54,6 +54,7 @@ public class WarmEmissionAnalysisModule {
 	final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 
 	final EventsManager eventsManager;
+	final Double emissionEfficiencyFactor;
 
 	int vehAttributesNotSpecifiedCnt = 0;
 	final int maxWarnCnt = 3;
@@ -68,6 +69,7 @@ public class WarmEmissionAnalysisModule {
 	double kmCounter = 0.0;
 	double freeFlowKmCounter = 0.0;
 	double stopGoKmCounter = 0.0;
+
 
 	public static class WarmEmissionAnalysisModuleParameter {
 
@@ -87,12 +89,13 @@ public class WarmEmissionAnalysisModule {
 
 	public WarmEmissionAnalysisModule(
 			WarmEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager) {
+			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		this.roadTypeMapping = parameterObject.roadTypeMapping;
 		this.avgHbefaWarmTable = parameterObject.avgHbefaWarmTable;
 		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
+		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 	}
 
 	public void reset() {
@@ -138,9 +141,27 @@ public class WarmEmissionAnalysisModule {
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
+		
+//		logger.debug("Original warm emissions: " + warmEmissions);
+		// a basic apporach to introduce emission reduced cars:
+		if(emissionEfficiencyFactor != null){
+			warmEmissions = rescaleWarmEmissions(warmEmissions);
+//			logger.debug("Original warm emissions have been rescaled to: " + warmEmissions);
+		}
 		return warmEmissions;
 	}
 	
+	private Map<WarmPollutant, Double> rescaleWarmEmissions(Map<WarmPollutant, Double> warmEmissions) {
+		Map<WarmPollutant, Double> rescaledWarmEmissions = new HashMap<WarmPollutant, Double>();
+		
+		for(WarmPollutant wp : warmEmissions.keySet()){
+			Double orgValue = warmEmissions.get(wp);
+			Double rescaledValue = emissionEfficiencyFactor * orgValue;
+			rescaledWarmEmissions.put(wp, rescaledValue);
+		}
+		return rescaledWarmEmissions;
+	}
+
 	private Map<WarmPollutant, Double> calculateWarmEmissions(
 			Id personId,
 			Double travelTime,

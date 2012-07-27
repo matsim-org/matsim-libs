@@ -59,6 +59,7 @@ public class EmissionModule {
 	WarmEmissionHandler warmEmissionHandler;
 	ColdEmissionHandler coldEmissionHandler;
 	EventsManager emissionEventsManager;
+	Double emissionEfficiencyFactor;
 
 	//===
 	static String roadTypeMappingFile;
@@ -79,6 +80,7 @@ public class EmissionModule {
 
 	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+
 
 	public EmissionModule(Scenario scenario) {
 		this.scenario = scenario;
@@ -133,8 +135,8 @@ public class EmissionModule {
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager);
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager);
+		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, emissionEfficiencyFactor);
+		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -412,6 +414,16 @@ public class EmissionModule {
 
 	public Vehicles getEmissionVehicles() {
 		return emissionVehicles;
+	}
+
+	public Double getEmissionEfficiencyFactor() {
+		return emissionEfficiencyFactor;
+	}
+
+	public void setEmissionEfficiencyFactor(Double emissionEfficiencyFactor) {
+		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+		logger.info("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
+//		logger.warn("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
 	}
 
 	public void writeEmissionInformation(String emissionEventOutputFile) {

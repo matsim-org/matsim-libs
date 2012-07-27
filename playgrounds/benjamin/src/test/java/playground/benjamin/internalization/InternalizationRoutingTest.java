@@ -74,8 +74,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private EmissionCostModule emissionCostModule;
 
 	public void testEmissionRouting() {
-		this.config = new Config();
-		this.config.addCoreModules();
+		this.config = super.loadConfig(null); // automatically sets the correct output directory
+//		this.config.addCoreModules();
 
 		this.scenario = ScenarioUtils.createScenario(this.config);
 
@@ -87,6 +87,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
+//		emissionModule.setEmissionEfficiencyFactor(0.8);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
@@ -98,6 +99,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
 		installEmissionDisutilityCalculatorFactory();
+		installEmissionInternalizationListener();
 		
 		//link 9 time, link 11 distance, link 13 emissions and time and distance
 		int expectedRoad = 13;
@@ -111,13 +113,12 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		};
 
 		this.controler.addControlerListener(startupListener);
-		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
 		assertTrue("Person was expected to be routed through link " + expectedRoad + ", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 
 	}
 
-	public void testDistanceRouting() {
+		public void testDistanceRouting() {
 		this.config = super.loadConfig(null); // automatically sets the correct output directory
 		this.scenario = ScenarioUtils.createScenario(this.config);
 
@@ -178,19 +179,17 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		};
 
 		this.controler.addControlerListener(startupListener);
-		this.controler.setDumpDataAtEnd(true);
 		this.controler.run();
 		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 
+	private void installEmissionInternalizationListener() {
+		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+	}
+	
 	private void installEmissionDisutilityCalculatorFactory() {
 		EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissiondcf);
-	}
-
-	private void installScoringFunctionFactory() {
-		EmissionScoringFunctionFactory emissionSff = new EmissionScoringFunctionFactory(controler);
-		controler.setScoringFunctionFactory(emissionSff);
 	}
 
 	private void specifyControler() {

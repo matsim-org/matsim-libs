@@ -70,11 +70,11 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			Vehicles emissionVehicles,
 			Network network,
 			ColdEmissionAnalysisModuleParameter parameterObject2,
-			EventsManager emissionEventsManager ){
+			EventsManager emissionEventsManager, Double emissionEfficiencyFactor ){
 		
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
-		this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager);
+		this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
 	}
 
 	@Override
