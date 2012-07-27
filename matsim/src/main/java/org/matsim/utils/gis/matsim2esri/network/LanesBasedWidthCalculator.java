@@ -36,7 +36,13 @@ public class LanesBasedWidthCalculator implements WidthCalculator {
 	 */
 	public LanesBasedWidthCalculator(final NetworkImpl network, final Double coef) {
 		double w = network.getEffectiveLaneWidth();
-		this.effectiveLaneWidth = w;
+		if (Double.isNaN(w)) {
+			log.warn("Effective lane width in network is set to Double.NaN. Set a real value in your network.xml to make this tool work with this value. Using 3.75 as effective lane width...");
+			this.effectiveLaneWidth = 3.75;
+		}
+		else {
+			this.effectiveLaneWidth = w;
+		}
 		this.widthCoefficient = coef;
 	}
 
