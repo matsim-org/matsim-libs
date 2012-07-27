@@ -18,6 +18,18 @@ public class Collections {
 		return doubleArray;
 	}
 	
+	public static double[] convertIntegerCollectionToDoubleArray(Collection<Integer> values){
+		double[] doubleArray= new double[values.size()];
+		
+		int i=0;
+		for (double collectionValue:values){
+			doubleArray[i]=collectionValue;
+			i++;
+		}
+		
+		return doubleArray;
+	}
+	
 	public static List getSortedKeySet(Collection keySet){
 		List keys = new ArrayList(keySet); 
 		keys.remove(null);

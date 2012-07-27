@@ -1,5 +1,6 @@
 package playground.wrashid.lib.obj;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -20,9 +21,13 @@ public class IntegerValueHashMap<KeyClass> {
 	private HashMap<KeyClass, Integer> hm = new HashMap<KeyClass, Integer>();
 	private int defaultStartValue=0;
 	
-	public IntegerValueHashMap() {
-		
+	public IntegerValueHashMap(){}
+	
+	public Collection<Integer> values(){
+		return hm.values();
 	}
+	
+	
 	
 	public IntegerValueHashMap(int defaultStartValue) {
 		this.defaultStartValue=defaultStartValue;

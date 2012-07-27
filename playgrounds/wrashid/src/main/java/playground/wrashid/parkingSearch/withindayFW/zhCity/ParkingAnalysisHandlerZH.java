@@ -56,7 +56,7 @@ import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchPara
 public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 	protected static final Logger log = Logger.getLogger(ParkingAnalysisHandlerZH.class);
-	
+
 	private Set<String> selectedParkings;
 	private double[] sumOfOccupancyCountsOfSelectedParkings;
 	private final ParkingInfrastructure parkingInfrastructure;
@@ -100,8 +100,10 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		}
 	}
 
-	// TODO: remove parkingInfrasturcutre variable (use this.parkingInfrastructure instead)
-	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure) {
+	// TODO: remove parkingInfrasturcutre variable (use
+	// this.parkingInfrastructure instead)
+	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(ParkingOccupancyStats parkingOccupancy,
+			ParkingInfrastructure parkingInfrastructure) {
 		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
 				"parkingOccupancyCountsComparison.png");
 		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
@@ -114,12 +116,9 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		int[] sumRealParkingCapacities = new int[96];
 		int numberOfColumns = 4;
 		for (String parkingName : selectedParkings) {
-			IdImpl parkingId = new IdImpl(
-					mappingOfParkingNameToParkingId.get(parkingName));
+			IdImpl parkingId = new IdImpl(mappingOfParkingNameToParkingId.get(parkingName));
 			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancy.parkingOccupancies.get(parkingId);
 
-			
-			
 			if (parkingOccupancyBins == null) {
 				continue;
 			}
@@ -128,7 +127,8 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			for (int i = 0; i < 96; i++) {
 				sumOfSelectedParkingSimulatedCounts[i] += occupancy[i];
 				sumSimulatedParkingCapacities[i] += parkingInfrastructure.getFacilityCapacities().get(parkingId);
-				sumRealParkingCapacities[i] += countsScalingFactor * SingleDayGarageParkingsCount.getParkingCapacities().get(parkingName);
+				sumRealParkingCapacities[i] += countsScalingFactor
+						* SingleDayGarageParkingsCount.getParkingCapacities().get(parkingName);
 			}
 		}
 
@@ -234,13 +234,60 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			parkingCostCalculator.updatePrices(parkingOccupancy);
 		}
 
+		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
+			writeUnusedParking(parkingOccupancy, parkingInfrastructure);
+		}
+
+	}
+
+	private void writeUnusedParking(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure2) {
+		IntegerValueHashMap<Id> unusedCapacityStreetParking = new IntegerValueHashMap<Id>();
+		IntegerValueHashMap<Id> unusedCapacityGarageParking = new IntegerValueHashMap<Id>();
+		IntegerValueHashMap<Id> unusedCapacityPrivateParking = new IntegerValueHashMap<Id>();
+
+		IntegerValueHashMap<Id> facilityCapacities = parkingInfrastructure.getFacilityCapacities();
+		for (Id parkingId : facilityCapacities.getKeySet()) {
+			String parkingIdString = parkingId.toString();
+			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancy.parkingOccupancies.get(parkingId);
+			
+			int peakOccupancy=0;
+			if (parkingOccupancyBins!=null){
+				peakOccupancy = parkingOccupancyBins.getPeakOccupanyOfDay();
+			}
+			
+			int unusedParkingCapacity = facilityCapacities.get(parkingId) - peakOccupancy;
+
+			if (parkingIdString.contains("stp")) {
+				unusedCapacityStreetParking.set(parkingId, unusedParkingCapacity);
+			} else if (parkingIdString.contains("gp")) {
+				unusedCapacityGarageParking.set(parkingId, unusedParkingCapacity);
+			} else if (parkingIdString.contains("private")) {
+				unusedCapacityPrivateParking.set(parkingId, unusedParkingCapacity);
+			}
+		}
+		
+		writeUnusedParkingHistogram("StreetParking", unusedCapacityStreetParking);
+		writeUnusedParkingHistogram("GarageParking", unusedCapacityGarageParking);
+		writeUnusedParkingHistogram("PrivateParking", unusedCapacityPrivateParking);
+	}
+
+	private void writeUnusedParkingHistogram(String parkingType, IntegerValueHashMap<Id> unusedParkingCapacity) {
+		double[] values = Collections.convertIntegerCollectionToDoubleArray(unusedParkingCapacity.values());
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				"unusedParkingHistogramm"+ parkingType + ".png");
+
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram "+ parkingType + " Unused Parking - It." + controler.getIterationNumber(), "number of unused Parking",
+				"number of parking facilities");
+		
 	}
 
 	// log peak usage of garage and street parking defined as [peak usage of
 	// each parking during day]/[number of parking of that type]
 	// this can be used during calibration to find out, how saturated a certain
 	// parking type is
-	// TODO: remove parkingInfrasturcutre variable (use this.parkingInfrastructure instead)
+	// TODO: remove parkingInfrasturcutre variable (use
+	// this.parkingInfrastructure instead)
 	private void logPeakUsageOfParkingTypes(ParkingOccupancyStats parkingOccupancy, ParkingInfrastructure parkingInfrastructure) {
 
 		int numberOfStreetParking = 0;
@@ -264,24 +311,25 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			if (parkingId.toString().contains("stp") || parkingId.toString().contains("gp")
 					|| parkingId.toString().contains("private")) {
 
-				int peakOccupancy=parkingOccupancy.parkingOccupancies.get(parkingId).getPeakOccupanyOfDay();
-				
+				int peakOccupancy = parkingOccupancy.parkingOccupancies.get(parkingId).getPeakOccupanyOfDay();
+
 				// remove over usage of parking
-				//if (peakOccupancy>facilityCapacities.get(parkingId)){
-				//	peakOccupancy=facilityCapacities.get(parkingId);
-				//}
-				
-				// although, this can result in peak usage of more than 1 in the output, but this
+				// if (peakOccupancy>facilityCapacities.get(parkingId)){
+				// peakOccupancy=facilityCapacities.get(parkingId);
+				// }
+
+				// although, this can result in peak usage of more than 1 in the
+				// output, but this
 				// is more precise!
-				
+
 				peakUsageOfParking.set(parkingId, peakOccupancy);
 			}
 		}
-		
+
 		int numberOfPeakStreetParking = 0;
 		int numberOfPeakGarageParking = 0;
 		int numberOfPeakPrivateParking = 0;
-		
+
 		for (Id parkingId : peakUsageOfParking.getKeySet()) {
 			if (parkingId.toString().contains("stp")) {
 				numberOfPeakStreetParking += peakUsageOfParking.get(parkingId);
@@ -292,31 +340,38 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 			}
 		}
 		log.info("iteration-" + controler.getIterationNumber());
-		log.info("peak usage street parking:" + numberOfPeakStreetParking/1.0/numberOfStreetParking + " - [" + numberOfPeakStreetParking + "]");
-		log.info("peak usage garage parking:" + numberOfPeakGarageParking/1.0/numberOfGarageParking + " - [" + numberOfPeakGarageParking + "]");
-		log.info("peak usage private parking:" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking + " - [" + numberOfPeakPrivateParking + "]");
-		
-		// remove zero occupancy parking (probably has to do with population scaling artifects)
+		log.info("peak usage street parking:" + numberOfPeakStreetParking / 1.0 / numberOfStreetParking + " - ["
+				+ numberOfPeakStreetParking + "]");
+		log.info("peak usage garage parking:" + numberOfPeakGarageParking / 1.0 / numberOfGarageParking + " - ["
+				+ numberOfPeakGarageParking + "]");
+		log.info("peak usage private parking:" + numberOfPeakPrivateParking / 1.0 / numberOfPrivateParking + " - ["
+				+ numberOfPeakPrivateParking + "]");
+
+		// remove zero occupancy parking (probably has to do with population
+		// scaling artifects)
 		for (Id parkingId : facilityCapacities.getKeySet()) {
 			if (parkingId.toString().contains("stp")) {
-				if (peakUsageOfParking.get(parkingId)==0){
-					numberOfStreetParking-=facilityCapacities.get(parkingId);
+				if (peakUsageOfParking.get(parkingId) == 0) {
+					numberOfStreetParking -= facilityCapacities.get(parkingId);
 				}
 			} else if (parkingId.toString().contains("gp")) {
-				if (peakUsageOfParking.get(parkingId)==0){
-					numberOfGarageParking-=facilityCapacities.get(parkingId);
+				if (peakUsageOfParking.get(parkingId) == 0) {
+					numberOfGarageParking -= facilityCapacities.get(parkingId);
 				}
 			} else if (parkingId.toString().contains("private")) {
-				if (peakUsageOfParking.get(parkingId)==0){
-					numberOfPrivateParking-=facilityCapacities.get(parkingId);
+				if (peakUsageOfParking.get(parkingId) == 0) {
+					numberOfPrivateParking -= facilityCapacities.get(parkingId);
 				}
 			}
 		}
-		
-		log.info("peak usage street parking (not used parking removed):" + numberOfPeakStreetParking/1.0/numberOfStreetParking + " - [" + numberOfPeakStreetParking + "]");
-		log.info("peak usage garage parking (not used parking removed):" + numberOfPeakGarageParking/1.0/numberOfGarageParking+ " - [" + numberOfPeakGarageParking + "]");
-		log.info("peak usage private parking (not used parking removed):" + numberOfPeakPrivateParking/1.0/numberOfPrivateParking+ " - [" + numberOfPeakPrivateParking + "]");
-		
+
+		log.info("peak usage street parking (not used parking removed):" + numberOfPeakStreetParking / 1.0
+				/ numberOfStreetParking + " - [" + numberOfPeakStreetParking + "]");
+		log.info("peak usage garage parking (not used parking removed):" + numberOfPeakGarageParking / 1.0
+				/ numberOfGarageParking + " - [" + numberOfPeakGarageParking + "]");
+		log.info("peak usage private parking (not used parking removed):" + numberOfPeakPrivateParking / 1.0
+				/ numberOfPrivateParking + " - [" + numberOfPeakPrivateParking + "]");
+
 	}
 
 	@Override
@@ -358,44 +413,42 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		GeneralLib.generateHistogram(fileName, values, 10,
 				"Histogram Garage Parking Walk Time - It." + controler.getIterationNumber(), "walk time [min]",
 				"number of walk legs");
-		
-		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())){
+
+		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
 			writeWalkTimes(parkingWalkTimesLog);
 		}
 	}
 
 	private void writeWalkTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingWalkTimesLog) {
-		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog=parkingWalkTimesLog;
-		
+		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog = parkingWalkTimesLog;
+
 		String headerLine = "personId\tparkingFacilityId\tbothWayWalkTimeInMinutes";
-		String outputFileName="walkTimes.txt";
-		
+		String outputFileName = "walkTimes.txt";
+
 		writeParkingLog(inputLog, headerLine, outputFileName);
 	}
 
 	private void writeParkingLog(LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog, String headerLine, String outputFileName) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(headerLine);
-		
+
 		for (Id personnId : inputLog.getKeySet()) {
 			for (Pair<Id, Double> pair : inputLog.get(personnId)) {
 				Id parkingFacilityId = pair.getFistValue();
 				double value = pair.getSecondValue();
 
-					StringBuffer stringBuffer = new StringBuffer();
-					
-					stringBuffer.append(personnId);
-					stringBuffer.append("\t");
-					stringBuffer.append(parkingFacilityId);
-					stringBuffer.append("\t");
-					stringBuffer.append(value);
-					list.add(stringBuffer.toString());
-				}
+				StringBuffer stringBuffer = new StringBuffer();
+
+				stringBuffer.append(personnId);
+				stringBuffer.append("\t");
+				stringBuffer.append(parkingFacilityId);
+				stringBuffer.append("\t");
+				stringBuffer.append(value);
+				list.add(stringBuffer.toString());
 			}
-		
-		
-		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
-				outputFileName);
+		}
+
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), outputFileName);
 		GeneralLib.writeList(list, fileName);
 	}
 
@@ -429,99 +482,97 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 		values = Collections.convertDoubleCollectionToArray(garageParkingSearchTimes);
 
-		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
-				"searchTimeHistogrammGp.png");
+		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "searchTimeHistogrammGp.png");
 
 		GeneralLib.generateHistogram(fileName, values, 10,
 				"Histogram Garage Parking Search Time - It." + controler.getIterationNumber(), "search time [min]",
 				"number of parking searches");
-		
-		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())){
+
+		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
 			writeSearchTimes(parkingSearchTimeLog);
 		}
 	}
 
 	private void writeSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog) {
-		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog=parkingSearchTimeLog;
-		
+		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog = parkingSearchTimeLog;
+
 		String headerLine = "personId\tparkingFacilityId\tsearchTimeInMinutes";
-		String outputFileName="searchTimes.txt";
-		
-		writeParkingLog(inputLog, headerLine, outputFileName);		
+		String outputFileName = "searchTimes.txt";
+
+		writeParkingLog(inputLog, headerLine, outputFileName);
 	}
 
 	@Override
 	public void processParkingCost(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog) {
 		// TODO Auto-generated method stub
-				LinkedList<Double> streetParkingCost = new LinkedList<Double>();
-				LinkedList<Double> garageParkingCost = new LinkedList<Double>();
+		LinkedList<Double> streetParkingCost = new LinkedList<Double>();
+		LinkedList<Double> garageParkingCost = new LinkedList<Double>();
 
-				for (Id personnId : parkingCostLog.getKeySet()) {
-					for (Pair<Id, Double> pair : parkingCostLog.get(personnId)) {
-						Id parkingFacilityId = pair.getFistValue();
-						double cost = pair.getSecondValue();
+		for (Id personnId : parkingCostLog.getKeySet()) {
+			for (Pair<Id, Double> pair : parkingCostLog.get(personnId)) {
+				Id parkingFacilityId = pair.getFistValue();
+				double cost = pair.getSecondValue();
 
-						if (parkingFacilityId.toString().contains("stp")) {
-							streetParkingCost.add(cost);
-						} else if (parkingFacilityId.toString().contains("gp")) {
-							garageParkingCost.add(cost);
-						}
-					}
+				if (parkingFacilityId.toString().contains("stp")) {
+					streetParkingCost.add(cost);
+				} else if (parkingFacilityId.toString().contains("gp")) {
+					garageParkingCost.add(cost);
 				}
+			}
+		}
 
-				double[] values = Collections.convertDoubleCollectionToArray(streetParkingCost);
+		double[] values = Collections.convertDoubleCollectionToArray(streetParkingCost);
 
-				String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
-						"parkingCostHistogrammStp.png");
+		String fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+				"parkingCostHistogrammStp.png");
 
-				GeneralLib.generateHistogram(fileName, values, 10,
-						"Histogram Street Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
-						"number of parking operations");
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram Street Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
+				"number of parking operations");
 
-				values = Collections.convertDoubleCollectionToArray(garageParkingCost);
+		values = Collections.convertDoubleCollectionToArray(garageParkingCost);
 
-				fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
-						"parkingCostHistogrammGp.png");
+		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(), "parkingCostHistogrammGp.png");
 
-				GeneralLib.generateHistogram(fileName, values, 10,
-						"Histogram Garage Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
-						"number of parking operations");
-				
-				if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())){
-					writeParkingCostDetails(parkingCostLog);
-				}
-		
+		GeneralLib.generateHistogram(fileName, values, 10,
+				"Histogram Garage Parking Cost - It." + controler.getIterationNumber(), "cost [chf]",
+				"number of parking operations");
+
+		if (GlobalParkingSearchParams.writeDetailedOutput(controler.getIterationNumber())) {
+			writeParkingCostDetails(parkingCostLog);
+		}
+
 	}
-	
+
 	private void writeParkingCostDetails(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog) {
-		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog=parkingCostLog;
-		
+		LinkedListValueHashMap<Id, Pair<Id, Double>> inputLog = parkingCostLog;
+
 		String headerLine = "personId\tparkingFacilityId\tcost[chf]";
-		String outputFileName="parkingCostLog.txt";
-		
-		writeParkingLog(inputLog, headerLine, outputFileName);		
+		String outputFileName = "parkingCostLog.txt";
+
+		writeParkingLog(inputLog, headerLine, outputFileName);
 	}
 
 	@Override
 	public void printShareOfCarUsers() {
 		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
-		int numberOfPerson=persons.size();
-		int numberOfCarUsers=0;
-		for (Person person:persons.values()){
-			for (PlanElement pe: person.getSelectedPlan().getPlanElements()){
-				if (pe instanceof Leg){
-					Leg leg=(Leg) pe;
-					
-					if (leg.getMode().equals(TransportMode.car)){
+		int numberOfPerson = persons.size();
+		int numberOfCarUsers = 0;
+		for (Person person : persons.values()) {
+			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+
+					if (leg.getMode().equals(TransportMode.car)) {
 						numberOfCarUsers++;
 						break;
 					}
-					
+
 				}
 			}
 		}
-		
-		log.info("share of car users:" + numberOfCarUsers/1.0/numberOfPerson);
+
+		log.info("share of car users:" + numberOfCarUsers / 1.0 / numberOfPerson);
 	}
 
 }
