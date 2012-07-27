@@ -22,10 +22,16 @@ package playground.wrashid.parkingSearch.withindayFW.zhCity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
@@ -494,6 +500,28 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		String outputFileName="parkingCostLog.txt";
 		
 		writeParkingLog(inputLog, headerLine, outputFileName);		
+	}
+
+	@Override
+	public void printShareOfCarUsers() {
+		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
+		int numberOfPerson=persons.size();
+		int numberOfCarUsers=0;
+		for (Person person:persons.values()){
+			for (PlanElement pe: person.getSelectedPlan().getPlanElements()){
+				if (pe instanceof Leg){
+					Leg leg=(Leg) pe;
+					
+					if (leg.getMode().equals(TransportMode.car)){
+						numberOfCarUsers++;
+						break;
+					}
+					
+				}
+			}
+		}
+		
+		log.info("share of car users:" + numberOfCarUsers/1.0/numberOfPerson);
 	}
 
 }

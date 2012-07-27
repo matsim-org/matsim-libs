@@ -778,6 +778,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			getParkingAnalysisHandler().processParkingWalkTimes(parkingWalkTimesLog);
 			getParkingAnalysisHandler().processParkingSearchTimes(parkingSearchTimesLog);
 			getParkingAnalysisHandler().processParkingCost(parkingCostLog);
+			getParkingAnalysisHandler().printShareOfCarUsers();
 		}
 		
 		IntegerValueHashMap<ParkingStrategy> numberOfTimesStrategyUser=new IntegerValueHashMap<ParkingStrategy>();

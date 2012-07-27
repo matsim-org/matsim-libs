@@ -40,4 +40,6 @@ public abstract class ParkingAnalysisHandler {
 	
 	public abstract void processParkingSearchTimes(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingSearchTimeLog);
 	public abstract void processParkingCost(LinkedListValueHashMap<Id, Pair<Id, Double>> parkingCostLog);
+
+	public abstract void printShareOfCarUsers(); 
 }
