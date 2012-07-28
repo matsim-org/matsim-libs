@@ -73,6 +73,11 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		for (Parking parking : parkings) {
 			Id parkingId = parking.getId();
 			if (parkingId.toString().contains("stp") || parkingId.toString().contains("gp")) {
+				
+				if (parkingId.toString().contains("gp-31")){
+					DebugLib.emptyFunctionForSettingBreakPoint();
+				}
+				
 				tmpString = controler.getConfig().findParam("parking", "ParkingCostOptimizerZH.warmStartOfPrice");
 				boolean warmStartOfPrice = Boolean.parseBoolean(tmpString);
 
@@ -94,7 +99,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		for (Parking parking : parkings) {
 			Id parkingId = parking.getId();
 			if (parkingId.toString().contains("stp") || parkingId.toString().contains("gp")) {
-				twoHourParkingCost.put(parkingId, parkingCostCalculatorZH.getParkingCost(parkingId, 0.0, 3600));
+				twoHourParkingCost.put(parkingId, parkingCostCalculatorZH.getParkingCost(parkingId, 0.0, 7200));
 			}
 		}
 
@@ -276,19 +281,81 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 	@Override
 	public Double getParkingCost(Id parkingFacilityId, double arrivalTime, double parkingDuration) {
-
+		double totalCost=0;
+		boolean isAfternoonTariff=false;;
 		if (parkingFacilityId.toString().contains("private") || parkingFacilityId.toString().contains("OutsideCity")) {
-			return 0.0;
+			return totalCost;
 		} else if (parkingFacilityId.toString().contains("gp") || parkingFacilityId.toString().contains("stp")) {
-			if (arrivalTime < 3600 * 12) {
-				return publicParkingPricePerHourInTheMorning.get(parkingFacilityId) * Math.ceil(parkingDuration / (30 * 60));
+			arrivalTime = GeneralLib.projectTimeWithin24Hours(arrivalTime);
+			
+			double restParkingDuration=parkingDuration;
+			
+			if (arrivalTime<3600 * 12){
+				double morningParkingInterval = GeneralLib.getIntervalDuration(arrivalTime, 3600 * 12);
+				if (morningParkingInterval>parkingDuration){
+					totalCost+=getPublicParkingPricePerHourInTheMorning(parkingFacilityId,parkingDuration);
+					return totalCost;
+				} else {
+					totalCost+=getPublicParkingPricePerHourInTheMorning(parkingFacilityId,morningParkingInterval);
+				
+					restParkingDuration-=morningParkingInterval;
+					
+					isAfternoonTariff=true;
+					
+				}
 			} else {
-				return publicParkingPricePerHourInTheAfternoon.get(parkingFacilityId) * Math.ceil(parkingDuration / (30 * 60));
+				double afterNoonParkingInterval = GeneralLib.getIntervalDuration(arrivalTime, 3600 * 24);
+				if (afterNoonParkingInterval>parkingDuration){
+					totalCost+=getPublicParkingPricePerHourInTheAfternoon(parkingFacilityId,parkingDuration);
+					return totalCost;
+				} else {
+					totalCost+=getPublicParkingPricePerHourInTheAfternoon(parkingFacilityId,afterNoonParkingInterval);
+				
+					restParkingDuration-=afterNoonParkingInterval;
+					
+					isAfternoonTariff=false;
+					
+					
+				}
 			}
+		
+			while (restParkingDuration>0){
+				if (restParkingDuration>3600 * 12){
+					restParkingDuration-=3600 * 12;
+					
+					if (isAfternoonTariff){
+						totalCost+=getPublicParkingPricePerHourInTheAfternoon(parkingFacilityId,3600 * 12);
+					} else {
+						totalCost+=getPublicParkingPricePerHourInTheMorning(parkingFacilityId,3600 * 12);
+					}
+				} else {
+					if (isAfternoonTariff){
+						totalCost+=getPublicParkingPricePerHourInTheAfternoon(parkingFacilityId,restParkingDuration);
+					} else {
+						totalCost+=getPublicParkingPricePerHourInTheMorning(parkingFacilityId,restParkingDuration);
+					}
+					
+					restParkingDuration=0;
+				}
+				
+				isAfternoonTariff=!isAfternoonTariff;
+			}
+			
+			
+			return totalCost;
 		}
 
 		DebugLib.stopSystemAndReportInconsistency("parking id:" + parkingFacilityId);
 
 		return null;
 	}
+	
+	public double getPublicParkingPricePerHourInTheMorning(Id parkingFacilityId, double parkingDuration){
+		return publicParkingPricePerHourInTheMorning.get(parkingFacilityId) * Math.ceil(parkingDuration / (60 * 60));
+	}
+	
+	public double getPublicParkingPricePerHourInTheAfternoon(Id parkingFacilityId, double parkingDuration){
+		return publicParkingPricePerHourInTheAfternoon.get(parkingFacilityId) * Math.ceil(parkingDuration / (60 * 60));
+	}
+	
 }

@@ -119,7 +119,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 			}
 
 			if (time==14004.0){
-				DebugLib.traceAgent(personId, 22);
+				
 			}
 			
 			/*
@@ -168,6 +168,8 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 						if (isLastParkingOfDay(personId)) {
 							parkingDuration = ActivityDurationEstimator.estimateActivityDurationLastParkingOfDay(time,
 									parkingAgentsTracker.getFirstCarDepartureTimeOfDay().getTime(agentId));
+							
+							DebugLib.traceAgent(personId, 22);
 						} else {
 							parkingDuration = ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time,
 									planElements, currentPlanElementIndex);
@@ -191,6 +193,9 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 						}
 
 						priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, -(walkScore + costScore + searchTimeScore)));
+					
+					
+					
 					}
 
 					SortableMapObject<ActivityFacility> poll = priorityQueue.poll();
@@ -258,6 +263,9 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	}
 
 	private boolean isLastParkingOfDay(Id personId) {
+		DebugLib.traceAgent(personId, 23);
+		
+		
 		PlanBasedWithinDayAgent agent = this.agents.get(personId);
 
 		List<PlanElement> planElements = agent.getSelectedPlan().getPlanElements();
@@ -267,12 +275,18 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 			if (planElements.get(i) instanceof Leg) {
 				Leg leg = (Leg) planElements.get(i);
 
-				if (leg.getMode().equals(TransportMode.car) && i == currentPlanElementIndex) {
-					return true;
+				if (leg.getMode().equals(TransportMode.car)) {
+					if (i > currentPlanElementIndex){
+						return false;
+					} else {
+						return true;
+					}
 				}
 			}
 		}
 
+		DebugLib.stopSystemAndReportInconsistency();
+		
 		return false;
 	}
 

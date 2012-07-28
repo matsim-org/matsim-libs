@@ -84,7 +84,7 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 						if (parkingDurationInSeconds<30*60){
 							return 0.50;
 						} else {
-							return 0.5 + Math.ceil(parkingDurationInSeconds/(30*60))*1.5;
+							return 0.5 + Math.ceil((parkingDurationInSeconds-(30*60))/(30*60))*1.5;
 						}
 					} else {
 						return Math.ceil(parkingDurationInSeconds/(60*60))*0.5;

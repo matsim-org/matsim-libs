@@ -586,11 +586,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		// parking cost scoring
 		Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, parkingFacilityId);
 
-		if (parkingFacilityId.toString().contains("gp") || parkingFacilityId.toString().contains("stp")){
-			if (parkingCost>100){
-				DebugLib.emptyFunctionForSettingBreakPoint();
-			}
-		}
+		forSettingBreakPoint(parkingFacilityId, parkingCost);
 		
 		
 		if (parkingCost == null) {
@@ -746,6 +742,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	public double getParkingCostScore(Id personId, double parkingArrivalTime, double parkingDuration, Id facilityId) {
 		Double parkingCost = getParkingCost(parkingArrivalTime, parkingDuration, facilityId);
 
+		//forSettingBreakPoint(facilityId, parkingCost);
+		
 		if (parkingCost == null) {
 			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
 		}
@@ -816,11 +814,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		
 		Double parkingCost = getParkingCost(parkingArrivalTime, lastParkingActivityDurationOfDay, lastParkingFacilityIdOfDay);
 
-		if (lastParkingFacilityIdOfDay.toString().contains("gp") || lastParkingFacilityIdOfDay.toString().contains("stp")){
-			if (parkingCost>100){
-				DebugLib.emptyFunctionForSettingBreakPoint();
-			}
-		}
+		forSettingBreakPoint(lastParkingFacilityIdOfDay, parkingCost);
 		
 		if (parkingCost == null) {
 			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
@@ -860,6 +854,14 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		//double firstDepartureTimeOfDay=durationOfLastParkingOfDay.getFirstDepartureTimeOfDay(personId);
 		
 		parkingOccupancy.updateParkingOccupancy(lastParkingFacilityIdOfDay, parkingArrivalTime, parkingArrivalTime+lastParkingActivityDurationOfDay, parkingInfrastructure);
+	}
+
+	private void forSettingBreakPoint(Id parkingFacilityId, Double parkingCost) {
+		if (parkingFacilityId.toString().contains("gp") || parkingFacilityId.toString().contains("stp")){
+			if (parkingCost>70){
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
+		}
 	}
 
 	private Integer getLastCarLegIndexOfDay(Id personId) {
