@@ -100,6 +100,8 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		} else {
 			// System.out.println();
 		}
+		
+		
 
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
 			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
@@ -116,7 +118,9 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 				// DebugLib.traceAgent(personId);
 			}
 
-			DebugLib.traceAgent(personId, 22);
+			if (time==14004.0){
+				DebugLib.traceAgent(personId, 22);
+			}
 			
 			/*
 			 * If the agent has not selected a parking facility yet.
@@ -265,13 +269,9 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 
 				if (leg.getMode().equals(TransportMode.car) && i == currentPlanElementIndex) {
 					return true;
-				} else {
-					return false;
 				}
 			}
 		}
-
-		DebugLib.stopSystemAndReportInconsistency("assumption broken");
 
 		return false;
 	}

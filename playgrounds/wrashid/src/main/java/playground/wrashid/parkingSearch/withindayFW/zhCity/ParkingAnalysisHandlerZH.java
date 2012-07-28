@@ -405,6 +405,10 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 				"Histogram Street Parking Walk Time - It." + controler.getIterationNumber(), "walk time [min]",
 				"number of walk legs");
 
+		//TODO: attention error can occur here, if you have totally strange scenario and values are empty
+		// => holds also for the other histograms! => perhaps handle it directly in 
+		// the function GeneralLib.generateHistogram
+		
 		values = Collections.convertDoubleCollectionToArray(garageParkingWalkLegTimes);
 
 		fileName = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),

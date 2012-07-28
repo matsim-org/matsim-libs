@@ -636,6 +636,10 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		
 		double searchTimeScore = getSearchTimeScore(personId, activityDuration, parkingSearchTimeInMinutes);
 		parkingScore += searchTimeScore;
+		
+		if (walkScore>0 || costScore>0 || searchTimeScore>0){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
 
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 
@@ -829,13 +833,19 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		// parking walk time
 
 		double walkingTimeTotalInMinutes = walkDurationFirstAndLastOfDay.getSumBothParkingWalkDurationsInSecond(personId) / 60.0;
-		parkingScore += getWalkScore(personId, lastParkingActivityDurationOfDay, walkingTimeTotalInMinutes);
+		double walkScore = getWalkScore(personId, lastParkingActivityDurationOfDay, walkingTimeTotalInMinutes);
+		parkingScore += walkScore;
 
 		// parking search time
 		double parkingSearchTimeInMinutes=getParkingSearchTimeInMinutes(personId, parkingArrivalTime);
 		
-		parkingScore += getSearchTimeScore(personId, lastParkingActivityDurationOfDay, parkingSearchTimeInMinutes);
+		double searchTimeScore = getSearchTimeScore(personId, lastParkingActivityDurationOfDay, parkingSearchTimeInMinutes);
+		parkingScore += searchTimeScore;
 
+		if (walkScore>0 || costScore>0 || searchTimeScore>0){
+			DebugLib.stopSystemAndReportInconsistency();
+		}
+		
 		parkingIterationScoreSum.incrementBy(personId, parkingScore);
 
 		Integer lastCarLegIndexOfDay = getLastCarLegIndexOfDay(personId);
