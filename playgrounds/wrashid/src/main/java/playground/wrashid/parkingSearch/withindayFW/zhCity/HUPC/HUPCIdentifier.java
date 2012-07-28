@@ -118,15 +118,15 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 				// DebugLib.traceAgent(personId);
 			}
 
-			if (time==14004.0){
-				
+			if (time==15395.0){
+				DebugLib.traceAgent(personId, 24);
 			}
 			
 			/*
 			 * If the agent has not selected a parking facility yet.
 			 */
 			if (requiresReplanning(agent)) {
-				
+				double parkingDuration=0;
 				double estimatedParkingSearchTimeInMinutes=0;
 
 				// get all parking within 1000m (of destination) or at least on
@@ -140,17 +140,18 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 				if (privateParkingAvailable(freePrivateParking)) {
 					parkingFacilityId = freePrivateParking.getId();
 				} else {
+					double radius=initialParkingSetRadiusInMeters;
 					Collection<ActivityFacility> parkings = parkingInfrastructure.getAllFreeParkingWithinDistance(initialParkingSetRadiusInMeters,
 							nextNonParkingAct.getCoord());
-					if (parkings.size() == 0) {
-						parkings.add(parkingInfrastructure.getClosestFreeParkingFacility(nextNonParkingAct.getCoord()));
+					while (parkings.size() == 0) {
+						radius*=2;
+						parkings=parkingInfrastructure.getAllFreeParkingWithinDistance(radius,
+								nextNonParkingAct.getCoord());
+						//parkings.add(parkingInfrastructure.getClosestFreeParkingFacility(nextNonParkingAct.getCoord()));
 					}
-
 					
 					//estimate parking street search time
 					estimatedParkingSearchTimeInMinutes= estimateParkingSearchTime(parkings);
-					
-					
 					
 					// get best parking
 					PriorityQueue<SortableMapObject<ActivityFacility>> priorityQueue = new PriorityQueue<SortableMapObject<ActivityFacility>>();
@@ -164,19 +165,18 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 						
 						double walkingDistance = GeneralLib.getDistance(parkingFacility.getCoord(), nextNonParkingAct.getCoord());
 
-						double parkingDuration;
+						
 						if (isLastParkingOfDay(personId)) {
 							parkingDuration = ActivityDurationEstimator.estimateActivityDurationLastParkingOfDay(time,
 									parkingAgentsTracker.getFirstCarDepartureTimeOfDay().getTime(agentId));
 							
-							DebugLib.traceAgent(personId, 22);
+							
 						} else {
 							parkingDuration = ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time,
 									planElements, currentPlanElementIndex);
 						}
 
-						double activityDuration = ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time,
-								planElements, currentPlanElementIndex);
+						double activityDuration = parkingDuration;
 						double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration,
 								GeneralLib.getWalkingTravelDuration(walkingDistance)/60);
 						double costScore = parkingAgentsTracker.getParkingCostScore(personId, time, parkingDuration,
@@ -202,7 +202,17 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 					ActivityFacility bestParkingFacility = poll.getKey();
 					double bestParkingScore=poll.getScore();
 
-					if (bestParkingScore<-1000){
+					if (bestParkingScore>1000){
+						
+						
+						double walkingDistance = GeneralLib.getDistance(bestParkingFacility.getCoord(), nextNonParkingAct.getCoord());
+						
+						double activityDuration = parkingDuration;
+						double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration,
+								GeneralLib.getWalkingTravelDuration(walkingDistance)/60);
+						double costScore = parkingAgentsTracker.getParkingCostScore(personId, time, parkingDuration,
+								bestParkingFacility.getId());
+						
 						DebugLib.emptyFunctionForSettingBreakPoint();
 					}
 					

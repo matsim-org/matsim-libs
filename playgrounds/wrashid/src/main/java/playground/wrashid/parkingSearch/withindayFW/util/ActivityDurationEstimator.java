@@ -49,7 +49,7 @@ public class ActivityDurationEstimator {
 				double endTime = act.getEndTime();
 				double maximumDuration = act.getMaximumDuration();
 				if (endTime != Double.NEGATIVE_INFINITY) {
-					estimatedActduration += GeneralLib.getIntervalDuration(currentTime, endTime);
+					estimatedActduration += GeneralLib.getIntervalDuration(currentTime+estimatedActduration, endTime);
 				} else {
 					estimatedActduration += maximumDuration;
 				}
