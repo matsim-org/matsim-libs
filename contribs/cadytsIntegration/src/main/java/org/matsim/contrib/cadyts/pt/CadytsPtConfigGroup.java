@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.misc.Time;
 
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 
@@ -46,8 +47,8 @@ public class CadytsPtConfigGroup extends Module {
 	public static final String PREPARATORY_ITERATIONS = "preparatoryIterations";
 	public static final String VARIANCE_SCALE = "varianceScale";
 	public static final String USE_BRUTE_FORCE = "useBruteForce";
-	public static final String START_HOUR = "startHour";
-	public static final String END_HOUR = "endHour";
+	public static final String START_TIME = "startTime";
+	public static final String END_TIME = "endTime";
 	public static final String WRITE_ANALYSIS_FILE = "writeAnalysisFile";
 	private static final String CALIBRATED_LINES = "calibratedLines";
 	private static final String TIME_BIN_SIZE = "timeBinSize" ;
@@ -59,8 +60,8 @@ public class CadytsPtConfigGroup extends Module {
 	private double varianceScale = MATSimUtilityModificationCalibrator.DEFAULT_VARIANCE_SCALE;
 	private boolean bruteForce = MATSimUtilityModificationCalibrator.DEFAULT_BRUTE_FORCE;
 	private boolean writeAnalysisFile = false;
-	private int startHour = 1;
-	private int endHour = 24;
+	private int startTime = 0;
+	private int endTime = (int)Time.MIDNIGHT-1;
 	private int timeBinSize = 3600 ;
 
 	private final Set<Id> calibratedLines = new HashSet<Id>();
@@ -85,10 +86,12 @@ public class CadytsPtConfigGroup extends Module {
 			setUseBruteForce(Boolean.parseBoolean(value));
 		} else if (WRITE_ANALYSIS_FILE.equals(paramName)) {
 			setWriteAnalysisFile(Boolean.parseBoolean(value));
-		} else if (START_HOUR.equals(paramName)) {
-			setStartHour(Integer.parseInt(value));
-		} else if (END_HOUR.equals(paramName)) {
-			setEndHour(Integer.parseInt(value));
+		} else if (START_TIME.equals(paramName)) {
+			//setStartTime(Integer.parseInt(value));
+			setStartTime((int)Time.parseTime(value));   //convert from "00:00" format  to seconds after midnight
+		} else if (END_TIME.equals(paramName)) {
+			//setEndTime(Integer.parseInt(value));
+			setEndTime((int)Time.parseTime(value));	//convert from "00:00" format  to seconds after midnight
 		} else if ( TIME_BIN_SIZE.equals(paramName)) {
 			setTimeBinSize(Integer.parseInt(value)) ;
 		} else if (CALIBRATED_LINES.equals(paramName)) {
@@ -106,8 +109,8 @@ public class CadytsPtConfigGroup extends Module {
 		Map<String, String> comments = super.getComments();
 
 		comments.put(CALIBRATED_LINES, "Comma-separated list of transit lines to be calibrated.");
-		comments.put(START_HOUR, "The first hour of the day to be used for calibration (start counting hours with 1, not 0)");
-		comments.put(END_HOUR, "The last hour of the day to be used for calibration (start counting hours with 1, not 0)");
+		comments.put(START_TIME, "The first second of the day to be used for calibration (start counting hours with 1, not 0)");
+		comments.put(END_TIME, "The last second of the day to be used for calibration (start counting hours with 1, not 0)");
 		comments.put(TIME_BIN_SIZE, "Length of time bin for which counts are aggregated.  IN SECONDS!!!!  Default is 3600.") ;
 
 		return comments;
@@ -129,8 +132,8 @@ public class CadytsPtConfigGroup extends Module {
 		params.put(VARIANCE_SCALE, Double.toString(getVarianceScale()));
 		params.put(USE_BRUTE_FORCE, Boolean.toString(useBruteForce()));
 		params.put(WRITE_ANALYSIS_FILE, Boolean.toString(isWriteAnalysisFile()));
-		params.put(START_HOUR, Integer.toString(getStartHour()));
-		params.put(END_HOUR, Integer.toString(getStartHour()));
+		params.put(START_TIME, Integer.toString(getStartTime()));
+		params.put(END_TIME, Integer.toString(getStartTime()));
 		params.put(CALIBRATED_LINES, CollectionUtils.idSetToString(this.calibratedLines));
 		params.put(TIME_BIN_SIZE, Integer.toString(getTimeBinSize())) ;
 
@@ -193,20 +196,20 @@ public class CadytsPtConfigGroup extends Module {
 		return this.writeAnalysisFile;
 	}
 
-	public void setStartHour(final int startHour) {
-		this.startHour = startHour;
+	public void setStartTime(final int startTime) {
+		this.startTime = startTime;
 	}
 
-	public int getStartHour() {
-		return this.startHour;
+	public int getStartTime() {
+		return this.startTime;
 	}
 
-	public void setEndHour(final int endHour) {
-		this.endHour = endHour;
+	public void setEndTime(final int endTime) {
+		this.endTime = endTime;
 	}
 
-	public int getEndHour() {
-		return this.endHour;
+	public int getEndTime() {
+		return this.endTime;
 	}
 
 	public Set<Id> getCalibratedLines() {

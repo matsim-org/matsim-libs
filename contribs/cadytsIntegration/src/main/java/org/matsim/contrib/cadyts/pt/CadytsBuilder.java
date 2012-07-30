@@ -24,6 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -48,18 +49,26 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 //		return buildCalibrator(sc,occupCounts,3600) ;
 //	}
 
-	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts, 
-			int timeBinSize_s ) {
+	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts 
+			/*, int timeBinSize_s*/ ) {
 		CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) sc.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
 
+		int timeBinSize_s = cadytsPtConfig.getTimeBinSize();
+		//validate timeBinSize_s?
+		if ((Time.MIDNIGHT % timeBinSize_s)!= 0 ){
+			throw new RuntimeException("Cadyts requieres a divisor of 86400 as time bin size value .");
+		}
+		
 		if (occupCounts.getCounts().size() == 0) {
 			throw new RuntimeException("CadytsPt requires counts-data.");
 		}
+				
 
+		
 		AnalyticalCalibrator<TransitStopFacility> matsimCalibrator = new AnalyticalCalibrator<TransitStopFacility>(
 				sc.getConfig().controler().getOutputDirectory() + "/cadyts.log",
-				MatsimRandom.getLocalInstance().nextLong(),
-				timeBinSize_s ) ;
+				MatsimRandom.getLocalInstance().nextLong(),timeBinSize_s
+				 ) ;
 		matsimCalibrator.setRegressionInertia(cadytsPtConfig.getRegressionInertia()) ;
 
 		matsimCalibrator.setMinStddev(cadytsPtConfig.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
@@ -70,10 +79,17 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "/calibration-stats.txt");
 
 
-		int arStartTime_s = 3600*cadytsPtConfig.getStartHour()-3600 ;
-		int arEndTime_s = 3600*cadytsPtConfig.getEndHour()-1 ;
+		//int arStartTime_s = 3600*cadytsPtConfig.getStartTime()-3600 ;
+		//int arEndTime_s = 3600*cadytsPtConfig.getEndTime()-1 ;
 		// yyyy would be better to fix this; see email to balmermi and rieser 23/jul/2012 by kai & manuel
-
+		
+		int arStartTime_s = cadytsPtConfig.getStartTime();
+		int arEndTime_s = cadytsPtConfig.getEndTime() ;
+		
+		//System.out.println("arStartTime_s  " + arStartTime_s);
+		//System.out.println("arEndTime_s  " + arEndTime_s);
+		//System.exit(0);
+		
 		TransitSchedule schedule = sc.getTransitSchedule();
 
 		//add counts data into calibrator

@@ -102,8 +102,8 @@ public class CadytsPtPlanStrategy implements PlanStrategy, IterationEndsListener
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario(), this.occupCounts, cadytsConfig.getTimeBinSize() );
-
+		this.calibrator = CadytsBuilder.buildCalibrator(controler.getScenario(), this.occupCounts /*, cadytsConfig.getTimeBinSize()*/);
+		
 		// finally, we create the PlanStrategy, with the cadyts-based plan selector:
 		this.cadytsPtPlanChanger = new CadytsPtPlanChanger(ptStep, this.calibrator);
 		this.delegate = new PlanStrategyImpl(this.cadytsPtPlanChanger);

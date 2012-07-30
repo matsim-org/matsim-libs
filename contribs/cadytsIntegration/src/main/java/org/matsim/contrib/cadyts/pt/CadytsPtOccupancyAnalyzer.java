@@ -39,6 +39,7 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -68,7 +69,7 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 		this.timeBinSize = timeBinSize_s ;
 		System.err.println( "time bin size: " + this.timeBinSize ) ;
 
-		this.maxTime = 24 * 3600 - 1;
+		this.maxTime = Time.MIDNIGHT-1; //24 * 3600 - 1;
 		// (yy not completely clear if it might be better to use 24*this.timeBimSize, but it is overall not so great
 		// to have this hardcoded.  kai/manuel, jul'12)
 
