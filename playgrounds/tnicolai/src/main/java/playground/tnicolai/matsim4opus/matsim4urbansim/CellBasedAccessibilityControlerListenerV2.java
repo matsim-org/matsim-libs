@@ -96,6 +96,9 @@ import com.vividsolutions.jts.geom.Point;
  * - using network.getNearestLinkExactly instead of network.getNearestLink. 
  *   the new entry does not use nearest nodes to determine the link it directly detects the nearest link. 
  *   This avoids some artifacts in accessibility computation (like selective fluctuation in accessibility )
+ *   
+ * improvements / changes july'12 
+ * - fixed error: used pre-factor (1/beta scale) in deterrence function instead of beta scale (fixed now!) 
  * 
  * @author thomas
  * 
@@ -217,7 +220,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				double offsetWalkTime2Node_h 				= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
 				double carTravelTime_meterpersec			= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime);
-				double freeSpeedTravelTime_meterpersec 		= nearestLink.getLength() / nearestLink.getFreespeed();
+				double freeSpeedTravelTime_meterpersec 		= nearestLink.getFreespeed();
 				
 				double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
 				double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
@@ -272,7 +275,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					freeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 					
 					sumFREESPEED += opportunityWeight
-								  * Math.exp(logitScaleParameterPreFactor *
+								  * Math.exp(logitScaleParameter *
 										    (freeTT + 
 										     freeTTPower +
 										     freeLnTT +
@@ -298,7 +301,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					
 					// sum congested travel times
 					sumCAR += opportunityWeight
-							* Math.exp(logitScaleParameterPreFactor *
+							* Math.exp(logitScaleParameter *
 									  (carTT +
 									   carTTPower +
 									   carLnTT +
@@ -324,7 +327,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					
 					// sum congested travel times
 					sumBIKE += opportunityWeight
-							* Math.exp(logitScaleParameterPreFactor *
+							* Math.exp(logitScaleParameter *
 									  (bikeTT +
 									   bikeTTPower +
 									   bikeLnTT +
@@ -350,7 +353,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 
 					// sum walk travel times (substitute for distances)
 					sumWALK += opportunityWeight
-							* Math.exp(logitScaleParameterPreFactor *
+							* Math.exp(logitScaleParameter *
 									(walkTT +
 									 walkTTPower +
 									 walkLnTT +
