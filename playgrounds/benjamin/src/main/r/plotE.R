@@ -2,13 +2,13 @@
 #IN: welfareTollinformation_policycase_pricing_ctd.txt
 #IN: welfareTollinformation_policycase_zone30_ctd.txt
 
-#TODO out schreiben
+#OUT: Absollute changes in user benefits (logsum), redistributed toll payments and sum by subpopulation
 
 rm(list = ls())		# Clear all variables  
 graphics.off()		# Close graphics windows
 
 #vector of emissions which will be displayed
-groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #TODO erklaeren
+groupOrder <- c("URBAN", "COMMUTER","REV_COMMUTER","FREIGHT") #order of user groups
 groupColors<- c("yellow","mediumblue","red")
 
 #input
@@ -51,16 +51,15 @@ for(i in groupOrder){
 
 }
 
-#TODO berechnungen ueberpruefen/nachvollziehen
-
 #ylimits
 yminimum<-floor(min(z30data,pridata)) #rounded down minimum
 ymaximum<-ceiling(max(z30data, pridata)) #rounded up maximum
 ylimits<-c(yminimum-5000,ymaximum+5000)
 
-pdf(outFile, width=20, height=7)
+pdf(outFile, width=15, height=7)
 #grafic parameters
-par(mfrow=c(1,3), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,2,2,2)) #three figures side by side
+layout(matrix(c(1,1,2,2,3),1,5))
+#par(mfrow=c(1,3), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,2,2,2)) #three figures side by side
 #plots and legend
 barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Zone 30", col=groupColors, ylab="EUR")
 barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Pricing", col=groupColors, axes =F)

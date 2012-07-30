@@ -89,7 +89,7 @@ pdf(outFile, width=20, height=7)
 par(mfrow=c(1,2), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,2,2,2)) #three figures side by side
 
 #plots and legend
-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Zone 30", col=z30colors, ylab="EUR")
-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Pricing", col=pricolors, axes =F)
+barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Zone 30", col=z30colors, ylab="EUR", space=c(1,0.2)) #first argument of 'space' unused in this plot
+barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Pricing", col=pricolors, axes =F, space=c(1,0.2))
 
 dev.off()

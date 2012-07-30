@@ -67,7 +67,9 @@ changematrixPri <- changematrixPri[, colnames(changematrixPri) %in% emissions]
 #graphic parameters
 #dev.new(width=14, height=7) 
 pdf(outFile, width=14, height=7)
-par(mfrow=c(1,3), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,0,0,0)) #three figures side by side
+layout(matrix(c(1,1,2,2,3),1,5))
+#par(mfrow=c(1,3), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,0,0,0)) #three figures side by side
+par(xpd=T, cex=1, oma=c(0,2,2,0), mar=c(5,2,0,0))
 #pdf(outFile, width=10, height=7)
 #par(mfrow=c(1,3), xpd=T, cex=1.2) #three figures side by side
 

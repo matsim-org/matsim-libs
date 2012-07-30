@@ -28,30 +28,49 @@ BaCmodes<-tapply(BaC[,"departures"],BaC[,"mode"],sum)
 Primodes<-tapply(Pri[,"departures"],Pri[,"mode"],sum)
 Z30modes<-tapply(Z30[,"departures"],Z30[,"mode"],sum)
 
+#generate new matrix, columns "case" "user group" 
+
 pdf(outputFile)
 par(mar=c(12,5,5,2)) #bottom,left,top,right
 
 #V1: barplot eleven groups
-barplot(BaC[,"departures"], names.arg=rownames(BaC), las=2, cex.lab=0.5, main="Modal split per trips base case", col=colors )
-barplot(Pri[,"departures"], names.arg=rownames(Pri), las=2, cex.lab=0.5, main="Modal split per trips policy case pricing", col=colors )
-barplot(Z30[,"departures"], names.arg=rownames(Z30), las=2, cex.lab=0.5, main="Modal split per trips policy case zone 30", col=colors )
+barplot(BaC[,"departures"], names.arg=rownames(BaC), las=2, cex.lab=0.5, main="Number of trips base case", col=colors )
+barplot(Pri[,"departures"], names.arg=rownames(Pri), las=2, cex.lab=0.5, main="Number of trips policy case pricing", col=colors )
+barplot(Z30[,"departures"], names.arg=rownames(Z30), las=2, cex.lab=0.5, main="Number of trips policy case zone 30", col=colors )
 
 #comparative plots
-barplot(Z30[,"departures"]-BaC[,"departures"], names.arg=rownames(Z30), las=2, cex.lab=0.5, main="Modal split: Diffence zone 30 to base case", col=colors )
-barplot(Pri[,"departures"]-BaC[,"departures"], names.arg=rownames(Pri), las=2, cex.lab=0.5, main="Modal split: Diffence pricing to base case", col=colors )
-barplot(Pri[,"departures"]-Z30[,"departures"], names.arg=rownames(Pri), las=2, cex.lab=0.5, main="Modal split: Diffence pricing to zone 30", col=colors )
+barplot(Z30[,"departures"]-BaC[,"departures"], names.arg=rownames(Z30), las=2, cex.lab=0.5, main="Number of trips: Diffence zone 30 to base case", col=colors )
+barplot(Pri[,"departures"]-BaC[,"departures"], names.arg=rownames(Pri), las=2, cex.lab=0.5, main="Number of trips: Diffence pricing to base case", col=colors )
 
+#comparative plots by usergroups
+diffZ30<- subset(Z30[,"departures"]-BaC[,"departures"],Z30$user.group=="URBAN")
+rownamesdiffZ30<-rownames(subset(Z30, Z30$user.group=="URBAN"))
+barplot(diffZ30, names.arg=rownamesdiffZ30, las=2, cex.lab=0.5, main="Number of trips: Diffence zone 30 to base case, URBAN", col=colors )
+diffZ30n<- subset(Z30[,"departures"]-BaC[,"departures"],Z30$user.group!="URBAN")
+rownamesdiffZ30n<-rownames(subset(Z30, Z30$user.group!="URBAN"))
+barplot(diffZ30n, names.arg=rownamesdiffZ30n, las=2, cex.lab=0.5, main="Number of trips: Diffence zone 30 to base case, not URBAN", col=colors )
+
+#pie charts
 #set new margins
-par(mar=c(0,2,2,7))
+par(mar=c(0,4,2,7), mfrow=c(1,1))
 
 pie.data <- BaC[,"departures"]
 names(pie.data)<- rownames(BaC)
 pie(pie.data, main="Base case") #rotate with  'init.angle=45' #set colors with 'col=colors'
 
 par(mfrow=c(2,2), oma=c(0,0,0,0), mar=c(2,2,4,2))
-pie(BaCmodes, main="Base case")
-pie(Primodes, main="Pricing")
-pie(Z30modes, main="Zone 30")
+#pie(BaCmodes, main="Base case")
+#pie(Primodes, main="Pricing")
+#pie(Z30modes, main="Zone 30")
+levelsUrb<- subset(BaC[,"mode"], BaC$user.group=="URBAN")
+levelsCom<- subset(BaC[,"mode"], BaC$user.group=="COMMUTER")
+levelsRev<- subset(BaC[,"mode"], BaC$user.group=="REV_COMMUTER")
+levelsFre<- subset(BaC[,"mode"], BaC$user.group=="FREIGHT")
+
+pie(subset(BaC[,"departures"], BaC$user.group=="URBAN"), labels=levelsUrb, main="URBAN")
+pie(subset(BaC[,"departures"], BaC$user.group=="COMMUTER"), labels=levelsCom, main="COMMUTER")
+pie(subset(BaC[,"departures"], BaC$user.group=="REV_COMMUTER"), labels=levelsRev, main="REV_COMMUTER")
+pie(subset(BaC[,"departures"], BaC$user.group=="FREIGHT"), labels=levelsFre, main="FREIGHT")
 
 dev.off()
 
