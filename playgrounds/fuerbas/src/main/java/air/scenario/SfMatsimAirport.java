@@ -250,7 +250,7 @@ public class SfMatsimAirport {
 			Coord coordStar = new CoordImpl(coordRunwayEnd.getX()-DgCreateFlightScenario.stars.get(idApron.toString()).getLength(), coordRunwayEnd.getY());
 			Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
 			network.addNode(nodeStar);
-			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunway);
+			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeTaxiOut);
 			linkStarIn.setAllowedModes(allowedModes);
 			linkStarIn.setLength(DgCreateFlightScenario.stars.get(idApron.toString()).getLength());
 			linkStarIn.setCapacity(network.getCapacityPeriod() * DgCreateFlightScenario.stars.get(idApron.toString()).getCapacity());
@@ -262,7 +262,7 @@ public class SfMatsimAirport {
 			Coord coordStar = new CoordImpl(coordRunwayEnd.getX()-DgCreateFlightScenario.DEFAULTSTAR.getLength(), coordRunwayEnd.getY());
 			Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
 			network.addNode(nodeStar);
-			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunway);
+			Link linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeTaxiOut);
 			linkStarIn.setAllowedModes(allowedModes);
 			linkStarIn.setLength(DgCreateFlightScenario.DEFAULTSTAR.getLength());
 			linkStarIn.setCapacity(network.getCapacityPeriod() * DgCreateFlightScenario.DEFAULTSTAR.getCapacity());
