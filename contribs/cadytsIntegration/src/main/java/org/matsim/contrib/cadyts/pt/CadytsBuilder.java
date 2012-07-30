@@ -58,6 +58,10 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		if ((Time.MIDNIGHT % timeBinSize_s)!= 0 ){
 			throw new RuntimeException("Cadyts requieres a divisor of 86400 as time bin size value .");
 		}
+		if ( (timeBinSize_s % 3600) != 0 ) {
+			throw new RuntimeException("At this point, time bin sizes need to be multiples of 3600.  This is not a restriction " +
+					"of Cadyts, but of the counts file format, which only allows for hourly inputs") ;
+		}
 		
 		if (occupCounts.getCounts().size() == 0) {
 			throw new RuntimeException("CadytsPt requires counts-data.");
@@ -91,20 +95,35 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		//System.exit(0);
 		
 		TransitSchedule schedule = sc.getTransitSchedule();
+		
+		int multiple = timeBinSize_s / 3600 ; // e.g. "3" when timeBinSize_s = 3*3600 = 10800
 
 		//add counts data into calibrator
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
 			TransitStopFacility stop = schedule.getFacilities().get(entry.getKey());
+			int timeBinIndex = 0 ; // starting with zero which is different from the counts file!!!
+			int startTimeOfBin_s = -1 ;
+			double val_passager_h = -1 ;
 			for (Volume volume : entry.getValue().getVolumes().values()){
-				int startTimeOfBin_s = (volume.getTimeBinIndexStartingWithOne()-1)*timeBinSize_s ;
-				int endTimeOfBin_s   = volume.getTimeBinIndexStartingWithOne()*timeBinSize_s - 1 ;
-				if (startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) {    //add volumes for each bin to calibrator
-//					int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * timeBinSize_s ;
-//					int end_s = volume.getTimeBinIndexStartingWithOne() * timeBinSize_s - 1;
-					double val_passager_h = volume.getValue();
-					matsimCalibrator.addMeasurement(stop, startTimeOfBin_s, endTimeOfBin_s, val_passager_h, 
-							SingleLinkMeasurement.TYPE.FLOW_VEH_H);
+				if ( timeBinIndex%multiple == 0 ) {
+					startTimeOfBin_s = (volume.getHourOfDayStartingWithOne()-1)*3600 ;
+					val_passager_h = 0 ;
 				}
+				val_passager_h += volume.getValue() ;
+				if ( (timeBinIndex%multiple) == (multiple-1) ) {
+					int endTimeOfBin_s   = volume.getHourOfDayStartingWithOne()*3600 - 1 ;
+					if (startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) {    //add volumes for each bin to calibrator
+						//					int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * timeBinSize_s ;
+						//					int end_s = volume.getTimeBinIndexStartingWithOne() * timeBinSize_s - 1;
+						double val = val_passager_h/multiple ;
+						matsimCalibrator.addMeasurement(stop, startTimeOfBin_s, endTimeOfBin_s, val, 
+								SingleLinkMeasurement.TYPE.FLOW_VEH_H);
+//								SingleLinkMeasurement.TYPE.COUNT_VEH);
+						// changed this from FLOW_VEH_H to COUNT_VEH on 30/jul/2012 since this is no longer "hourly".  
+						// kai/manuel, jul'12
+					}
+				}
+				timeBinIndex++ ;
 			}
 		}
 

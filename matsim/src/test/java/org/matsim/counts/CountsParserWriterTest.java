@@ -67,7 +67,7 @@ public class CountsParserWriterTest {
 			Iterator<Volume> vol_it = c.getVolumes().values().iterator();
 			while (vol_it.hasNext()) {
 				Volume v = vol_it.next();
-				Assert.assertTrue(v.getTimeBinIndexStartingWithOne()>0);
+				Assert.assertTrue(v.getHourOfDayStartingWithOne()>0);
 				Assert.assertTrue(v.getValue()>=0.0);
 			}//while
 		}//while

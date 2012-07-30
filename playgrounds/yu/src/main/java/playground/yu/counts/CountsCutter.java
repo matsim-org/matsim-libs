@@ -113,7 +113,7 @@ public class CountsCutter {
 			countsCounter[idx]++;
 			count.setCoord(net.getLinks().get(linkId).getCoord());
 			for (Volume vol : originalCount.getVolumes().values())
-				count.createVolume(vol.getTimeBinIndexStartingWithOne(), vol.getValue());
+				count.createVolume(vol.getHourOfDayStartingWithOne(), vol.getValue());
 			validCountsstationNo++;
 		}
 

@@ -93,7 +93,7 @@
 	</module>
 
 	<module name="cadytsPt">
-		<param name="startTime" value="05:00:00" />
+		<param name="startTime" value="04:00:00" />
 		<param name="endTime" value="20:00:00" />
 		<param name="regressionInertia" value="0.95" />
 		<param name="minFlowStddevVehH" value="8.0" />  <!-- 8,9,10 -->

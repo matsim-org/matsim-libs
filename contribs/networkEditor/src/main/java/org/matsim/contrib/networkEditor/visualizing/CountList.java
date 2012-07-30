@@ -330,7 +330,7 @@ class CountTableModel extends AbstractTableModel {
             System.out.println(aValue.toString());
             double val = Double.parseDouble(aValue.toString());
             table[rowIndex][columnIndex] = val;
-            int h = counts.getVolumes().get(Integer.valueOf(table[rowIndex][0].toString())).getTimeBinIndexStartingWithOne();
+            int h = counts.getVolumes().get(Integer.valueOf(table[rowIndex][0].toString())).getHourOfDayStartingWithOne();
             counts.getVolumes().remove(h);
             counts.createVolume(h, val);
         }

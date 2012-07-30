@@ -100,7 +100,7 @@
 		<param name="useBruteForce" value="true" />
 		<param name="preparatoryIterations" value="1" />
 		<param name="calibratedLines" value="M44" />
-		<param name="timeBinSize" value="7200" />
+		<param name="timeBinSize" value="3600" />
 	</module>
 
 	<module name="ptCounts">

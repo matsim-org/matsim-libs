@@ -30,7 +30,7 @@ public class CountTest extends MatsimTestCase {
 	public void testCreateVolume() {
 		Count count = new Count(new IdImpl(0), "1");
 		Volume volume = count.createVolume(1, 100.0);
-		assertTrue("Creation and initialization of volume failed", volume.getTimeBinIndexStartingWithOne()==1);
+		assertTrue("Creation and initialization of volume failed", volume.getHourOfDayStartingWithOne()==1);
 		assertTrue("Creation and initialization of volume failed", volume.getValue()==100.0);
 	}
 

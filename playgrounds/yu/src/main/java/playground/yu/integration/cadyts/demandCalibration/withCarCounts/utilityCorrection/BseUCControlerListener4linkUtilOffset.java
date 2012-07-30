@@ -402,10 +402,10 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 				linkIds.add(entry.getKey());
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : entry.getValue().getVolumes().values()) {
-					if (volume.getTimeBinIndexStartingWithOne() >= arStartTime
-							&& volume.getTimeBinIndexStartingWithOne() <= arEndTime) {
-						int start_s = (volume.getTimeBinIndexStartingWithOne() - 1) * 3600;
-						int end_s = volume.getTimeBinIndexStartingWithOne() * 3600 - 1;
+					if (volume.getHourOfDayStartingWithOne() >= arStartTime
+							&& volume.getHourOfDayStartingWithOne() <= arEndTime) {
+						int start_s = (volume.getHourOfDayStartingWithOne() - 1) * 3600;
+						int end_s = volume.getHourOfDayStartingWithOne() * 3600 - 1;
 						double val_veh_h = volume.getValue();
 						calibrator.addMeasurement(link, start_s, end_s,
 								val_veh_h, TYPE.FLOW_VEH_H);

@@ -45,7 +45,7 @@ public class Volume {
 		this.val_ = val;
 	}
 
-	public final int getTimeBinIndexStartingWithOne() {
+	public final int getHourOfDayStartingWithOne() {
 		return this.h_;
 	}
 	public final double getValue() {

@@ -393,7 +393,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 						// ---------GUNNAR'S CODES---------------------
 						for (Volume volume : entry.getValue().getVolumes()
 								.values()) {
-							int hour = volume.getTimeBinIndexStartingWithOne();
+							int hour = volume.getHourOfDayStartingWithOne();
 							if (hour >= caliStartTime && hour <= caliEndTime) {
 								// int start_s = (hour - 1) * 3600;
 								// int end_s = hour * 3600 - 1;
@@ -590,7 +590,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				// ---------GUNNAR'S CODES---------------------
 				for (Volume volume : countsMap.get(countId).getVolumes()
 						.values()) {
-					int hour = volume.getTimeBinIndexStartingWithOne();
+					int hour = volume.getHourOfDayStartingWithOne();
 					if (hour >= caliStartTime && hour <= caliEndTime) {
 						int start_s = (hour - 1) * 3600;
 						int end_s = hour * 3600 - 1;

@@ -107,7 +107,7 @@ public class SimCntLogLikelihoodCtlListenerWithUnitiveVar implements
 					int[] linkVols = volumes.getVolumesForLink(countId);
 					// ---------GUNNAR'S CODES---------------------
 					for (Volume volume : entry.getValue().getVolumes().values()) {
-						int hour = volume.getTimeBinIndexStartingWithOne();
+						int hour = volume.getHourOfDayStartingWithOne();
 						if (hour >= caliStartTime && hour <= caliEndTime) {
 							double cntVal = volume.getValue();
 							double simVal = 0d;

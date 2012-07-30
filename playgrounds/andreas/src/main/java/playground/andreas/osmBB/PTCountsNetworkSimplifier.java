@@ -393,7 +393,7 @@ public class PTCountsNetworkSimplifier {
 							Count newCount = this.outCounts.getCount(linkToBlock.getId());
 							newCount.setCoord(oldCount.getCoord());
 							for (Volume volume : oldCount.getVolumes().values()) {
-								newCount.createVolume(volume.getTimeBinIndexStartingWithOne(), volume.getValue());
+								newCount.createVolume(volume.getHourOfDayStartingWithOne(), volume.getValue());
 							}
 						}
 					}
