@@ -22,5 +22,7 @@ R --slave $dataDir $dataDir < plotF.R
 echo "created plot F in directory " $dataDir
 R --slave $dataDir $dataDir < modalsplit.R
 echo "created plot of the modal split in directory " $dataDir
+R --slave $dataDir $dataDir < modalsplitbygroups.R
+echo "created plot of the modal split in directory " $dataDir
 R --slave $dataDir $dataDir < compareDistance.R
 echo "created plot of individual distance differences in directory " $dataDir
