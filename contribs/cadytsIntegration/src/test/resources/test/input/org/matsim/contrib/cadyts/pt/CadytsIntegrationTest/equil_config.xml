@@ -93,13 +93,14 @@
 	</module>
 
 	<module name="cadytsPt">
-		<param name="startHour" value="5" />
-		<param name="endHour" value="20" />
+		<param name="startTime" value="05:00:00" />    <!--It must be in "00:00" format !! -->
+		<param name="endTime" value="20:00:00" />		<!--It must be in "00:00" format !! -->
 		<param name="regressionInertia" value="0.95" />
 		<param name="minFlowStddevVehH" value="8.0" />  <!-- 8,9,10 -->
 		<param name="useBruteForce" value="true" />
 		<param name="preparatoryIterations" value="1" />
 		<param name="calibratedLines" value="M44" />
+		<param name="timeBinSize" value="3600" />
 	</module>
 
 	<module name="ptCounts">

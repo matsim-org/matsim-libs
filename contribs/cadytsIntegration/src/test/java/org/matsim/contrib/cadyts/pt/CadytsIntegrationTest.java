@@ -33,21 +33,22 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 import utilities.io.tabularfileparser.TabularFileParser;
+import utilities.misc.DynamicData;
 import cadyts.measurements.SingleLinkMeasurement;
 
 public class CadytsIntegrationTest {
-
+	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -76,7 +77,7 @@ public class CadytsIntegrationTest {
 			}
 		}
 		Assert.assertNotNull("CadytsPtPlanStrategy could not be found.", cadytsStrategy);
-
+		
 		//test calibration settings
 		Assert.assertEquals(true, cadytsStrategy.getCalibrator().getBruteForce());
 		Assert.assertEquals(false, cadytsStrategy.getCalibrator().getCenterRegression());
@@ -85,6 +86,8 @@ public class CadytsIntegrationTest {
 		Assert.assertEquals(1, cadytsStrategy.getCalibrator().getPreparatoryIterations());
 		Assert.assertEquals(0.95, cadytsStrategy.getCalibrator().getRegressionInertia(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1.0, cadytsStrategy.getCalibrator().getVarianceScale(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(3600.0, cadytsStrategy.getCalibrator().getTimeBinSize_s(), MatsimTestUtils.EPSILON);
+
 	}
 
 	@Test
@@ -100,7 +103,8 @@ public class CadytsIntegrationTest {
 		controler.setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.run();
-
+		
+		
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
 		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
@@ -129,35 +133,36 @@ public class CadytsIntegrationTest {
 			CountsReader reader = new CountsReader(outCounts);
 			double[] simValues;
 			double[] realValues;
-			Id stopId;
 
-			stopId = new IdImpl("stop1");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId1 = new IdImpl("stop1");
+			simValues = reader.getSimulatedValues(stopId1);
+			realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			stopId = new IdImpl("stop2");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId2 = new IdImpl("stop2");
+			simValues = reader.getSimulatedValues(stopId2);
+			realValues= reader.getRealValues(stopId2);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
-			stopId = new IdImpl("stop6");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId6 = new IdImpl("stop6");
+			simValues = reader.getSimulatedValues(stopId6);
+			realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			stopId = new IdImpl("stop10");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId10 = new IdImpl("stop10");
+			simValues = reader.getSimulatedValues(stopId10);
+			realValues= reader.getRealValues(stopId10);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6], MatsimTestUtils.EPSILON);
+	    
 		}
 	}
 
-	@Test
+	
+	@Test 
 	public final void testCalibrationTwo() throws IOException {
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
@@ -205,40 +210,37 @@ public class CadytsIntegrationTest {
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
 		// test resulting simulation volumes
-		{
 			String outCounts = outputDir + "ITERS/it.10/10.simCountCompareOccupancy.txt";
 			CountsReader reader = new CountsReader(outCounts);
 			double[] simValues;
 			double[] realValues;
-			Id stopId;
 
-			stopId = new IdImpl("stop1");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId1 = new IdImpl("stop1");
+			simValues = reader.getSimulatedValues(stopId1);
+			realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			stopId = new IdImpl("stop2");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId2 = new IdImpl("stop2");
+			simValues = reader.getSimulatedValues(stopId2);
+			realValues= reader.getRealValues(stopId2);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
-			stopId = new IdImpl("stop6");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId6 = new IdImpl("stop6");
+			simValues = reader.getSimulatedValues(stopId6);
+			realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			stopId = new IdImpl("stop10");
-			simValues = reader.getSimulatedValues(stopId);
-			realValues= reader.getRealValues(stopId);
+			Id stopId10 = new IdImpl("stop10");
+			simValues = reader.getSimulatedValues(stopId10);
+			realValues= reader.getRealValues(stopId10);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6], MatsimTestUtils.EPSILON);
-		}
+	
 
 		// test calibration statistics
-		{
 			String testCalibStatPath = outputDir + "calibration-stats.txt";
 			CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 			new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
@@ -259,20 +261,127 @@ public class CadytsIntegrationTest {
 			//			Assert.assertEquals("different Total_ll", "-1.546875", outStatData.getTotal_ll() );
 			Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
 			Assert.assertEquals("different Count_ll_pred_err",  "1.9637069748057535E-15" , outStatData.getCount_ll_pred_err() );
-			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
+			Assert.assertEquals("different Link_lambda_avg", /*"-2.2604922388914356E-10"*/ "-2.411191721484198E-10", outStatData.getLink_lambda_avg() );
 			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
 			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
-			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9" , outStatData.getLink_lambda_stddev());
+			Assert.assertEquals("different Link_lambda_stddev", /*"1.261054219517188E-9"*/ "1.301180101697312E-9" , outStatData.getLink_lambda_stddev());
 			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
 			Assert.assertEquals("different Plan_lambda_avg", "-7.233575164452594E-9", outStatData.getPlan_lambda_avg() );
 			Assert.assertEquals("different Plan_lambda_max", "-7.233575164452593E-9" , outStatData.getPlan_lambda_max() );
 			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
 			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
 			Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
-		}
-
+		
+			
+		//test link offsets
+		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
+		String linkOffsetFile = outputDir + "ITERS/it.10/10.linkCostOffsets.xml";
+		CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
+		DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
+	
+		TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
+		TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
+		TransitStopFacility stop6 = schedule.getFacilities().get(stopId6);
+		TransitStopFacility stop10 = schedule.getFacilities().get(stopId10);
+	
+		//find first offset value different from null to compare. Useful to test with different time bin sizes
+		int binIndex=-1;
+		boolean isZero;
+		do {
+			binIndex++;
+			isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
+		}while (isZero && binIndex<86400);
+		
+		Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
+		Assert.assertEquals("Wrong link offset of stop 10", -7.231566167513828E-9, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 2", -7.231566167513828E-9, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
 	}
 
+
+	//test with time bin size = 2hrs 
+	@Test 
+	public final void testCalibrationLinkOffsets() throws IOException {
+		String inputDir = this.utils.getClassInputDirectory();
+		String outputDir = this.utils.getOutputDirectory();
+
+		String configFile = inputDir + "equil_configLinkOffsets.xml";
+		Config config = this.utils.loadConfig(configFile);
+		
+		final Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
+		controler.setWriteEventsInterval(0);
+		controler.setDumpDataAtEnd(true);
+		
+		
+//		controler.addControlerListener( new StartupListener() {
+//			
+//			@Override
+//			public void notifyStartup(StartupEvent event) {
+//				CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) event.getControler().getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+//				cadytsPtConfig.setTimeBinSize(3600) ;
+//			}
+//		}) ;
+		
+		controler.run();
+
+		// test resulting simulation volumes
+			String outCounts = outputDir + "ITERS/it.10/10.simCountCompareOccupancy.txt";
+			CountsReader reader = new CountsReader(outCounts);
+			double[] simValues;
+			double[] realValues;
+
+			Id stopId1 = new IdImpl("stop1");
+			simValues = reader.getSimulatedValues(stopId1);
+			realValues= reader.getRealValues(stopId1);
+			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
+
+			Id stopId2 = new IdImpl("stop2");
+			simValues = reader.getSimulatedValues(stopId2);
+			realValues= reader.getRealValues(stopId2);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
+
+			Id stopId6 = new IdImpl("stop6");
+			simValues = reader.getSimulatedValues(stopId6);
+			realValues= reader.getRealValues(stopId6);
+			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
+
+			Id stopId10 = new IdImpl("stop10");
+			simValues = reader.getSimulatedValues(stopId10);
+			realValues= reader.getRealValues(stopId10);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6], MatsimTestUtils.EPSILON);
+		
+
+		//test link offsets
+		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
+		String linkOffsetFile = outputDir + "ITERS/it.10/10.linkCostOffsets.xml";
+		CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
+		DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
+	
+		TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
+		TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
+		TransitStopFacility stop6 = schedule.getFacilities().get(stopId6);
+		TransitStopFacility stop10 = schedule.getFacilities().get(stopId10);
+	
+		//find first offset value different from null to compare. Useful to test with different time bin sizes
+		int binIndex=-1;
+		boolean isZero;
+		do {
+			binIndex++;
+			isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
+		}while (isZero && binIndex<86400);
+		
+		Assert.assertEquals("Wrong Bin index for first link offset", 3, binIndex);
+		Assert.assertEquals("Wrong link offset of stop 1", -2.8926267665165917E-8, stopOffsets.getBinValue(stop1 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 2", -1.446313233891264E-8, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 10", -1.446313233891264E-8, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+	}
+
+	
+	
 	private static class DummyMobsim implements Mobsim {
 		public DummyMobsim() {
 		}
