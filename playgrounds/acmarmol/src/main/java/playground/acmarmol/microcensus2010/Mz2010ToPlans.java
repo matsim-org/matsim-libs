@@ -19,7 +19,8 @@ public class Mz2010ToPlans {
 	Population plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 	System.out.println("  done.");
 		
-	new HouseholdsFromMZ("input/Microcensus2010/haushalte.dat").run();
+	throw new RuntimeException("the following line did not compile; commented it out.  kai, 30/jul/2012") ;
+//	new HouseholdsFromMZ("input/Microcensus2010/haushalte.dat").run();
 	
 	
 	}
