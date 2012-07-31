@@ -67,7 +67,6 @@ public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandle
 	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines, int timeBinSize_s ) {
 		this.calibratedLines = calibratedLines;
 		this.timeBinSize = timeBinSize_s ;
-		System.err.println( "time bin size: " + this.timeBinSize ) ;
 
 		this.maxTime = Time.MIDNIGHT-1; //24 * 3600 - 1;
 		// (yy not completely clear if it might be better to use 24*this.timeBimSize, but it is overall not so great

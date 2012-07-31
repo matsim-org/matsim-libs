@@ -317,18 +317,18 @@ public class CadytsIntegrationTest {
 			//			Assert.assertEquals("different Plan_lambda_min", "0.03929357905359915" , outStatData.getPlan_lambda_min() );
 			//			Assert.assertEquals("different Plan_lambda_stddev", "0.004200662608832472" , outStatData.getPlan_lambda_stddev());
 			//			Assert.assertEquals("different Total_ll", "-1.546875", outStatData.getTotal_ll() );
-			Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
-			Assert.assertEquals("different Count_ll_pred_err",  "1.9637069748057535E-15" , outStatData.getCount_ll_pred_err() );
-			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
+			Assert.assertEquals("different Count_ll", "-0.07421875", outStatData.getCount_ll() );
+			Assert.assertEquals("different Count_ll_pred_err",  "3.913536161803677E-15" , outStatData.getCount_ll_pred_err() );
+			Assert.assertEquals("different Link_lambda_avg", "-1.8081427328702926E-9", outStatData.getLink_lambda_avg() );
 			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
-			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
-			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9" , outStatData.getLink_lambda_stddev());
+			Assert.assertEquals("different Link_lambda_min", "-1.4465142715757458E-8", outStatData.getLink_lambda_min() );
+			Assert.assertEquals("different Link_lambda_stddev", "4.501584893410135E-9" , outStatData.getLink_lambda_stddev());
 			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
-			Assert.assertEquals("different Plan_lambda_avg", "-7.233575164452594E-9", outStatData.getPlan_lambda_avg() );
-			Assert.assertEquals("different Plan_lambda_max", "-7.233575164452593E-9" , outStatData.getPlan_lambda_max() );
-			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
-			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
-			Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
+			Assert.assertEquals("different Plan_lambda_avg", "-2.5313998260184097E-8", outStatData.getPlan_lambda_avg() );
+			Assert.assertEquals("different Plan_lambda_max", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_max() );
+			Assert.assertEquals("different Plan_lambda_min", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_min() );
+			Assert.assertEquals("different Plan_lambda_stddev", "NaN" , outStatData.getPlan_lambda_stddev());
+			Assert.assertEquals("different Total_ll", "-0.07421875", outStatData.getTotal_ll() );
 		
 			
 		//test link offsets
@@ -339,10 +339,10 @@ public class CadytsIntegrationTest {
 	
 		TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
 		TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
-		TransitStopFacility stop6 = schedule.getFacilities().get(stopId6);
+		//TransitStopFacility stop6 = schedule.getFacilities().get(stopId6);
 		TransitStopFacility stop10 = schedule.getFacilities().get(stopId10);
 	
-		//find first offset value different from null to compare. Useful to test with different time bin sizes
+		//find first offset value different from zero to compare. Useful to test with different time bin sizes
 		int binIndex=-1;
 		boolean isZero;
 		do {
@@ -350,14 +350,15 @@ public class CadytsIntegrationTest {
 			isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
 		}while (isZero && binIndex<86400);
 		
-		Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
-		Assert.assertEquals("Wrong link offset of stop 10", -7.231566167513828E-9, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong link offset of stop 2", -7.231566167513828E-9, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong Bin index for first link offset", 3, binIndex); // bin size = 3600; fix! yyyy  //done manuel jul.2012
+		Assert.assertEquals("Wrong link offset of stop 1", -1.4463133832582958E-8, stopOffsets.getBinValue(stop1 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 2", -1.084734925418448E-8, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 10", -1.084734925418448E-8, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
 	}
 
 
 	/** 
-	 * test with time bin size = 2hrs 
+	 * test with time bin size = 1hr 
 	 * @author mmoyo
 	 */
 	@Test 
@@ -372,17 +373,6 @@ public class CadytsIntegrationTest {
 		controler.setCreateGraphs(false);
 		controler.setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
-		
-		
-//		controler.addControlerListener( new StartupListener() {
-//			
-//			@Override
-//			public void notifyStartup(StartupEvent event) {
-//				CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) event.getControler().getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
-//				cadytsPtConfig.setTimeBinSize(3600) ;
-//			}
-//		}) ;
-		
 		controler.run();
 
 		// test resulting simulation volumes
@@ -422,9 +412,9 @@ public class CadytsIntegrationTest {
 		CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 	
-		TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
+		//TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
+		//TransitStopFacility stop6 = schedule.getFacilities().get(stopId6);
 		TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
-		TransitStopFacility stop6 = schedule.getFacilities().get(stopId6);
 		TransitStopFacility stop10 = schedule.getFacilities().get(stopId10);
 	
 		//find first offset value different from null to compare. Useful to test with different time bin sizes
@@ -435,10 +425,9 @@ public class CadytsIntegrationTest {
 			isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
 		}while (isZero && binIndex<86400);
 		
-		Assert.assertEquals("Wrong Bin index for first link offset", 6, binIndex); // bin size = 3600; fix! yyyy
-//		Assert.assertEquals("Wrong link offset of stop 1", -2.8926267665165917E-8, stopOffsets.getBinValue(stop1 , binIndex), MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Wrong link offset of stop 2", -1.446313233891264E-8, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Wrong link offset of stop 10", -1.446313233891264E-8, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
+		Assert.assertEquals("Wrong link offset of stop 10", -7.231566167513828E-9, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link offset of stop 2", -7.231566167513828E-9, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
 	}
 
 	

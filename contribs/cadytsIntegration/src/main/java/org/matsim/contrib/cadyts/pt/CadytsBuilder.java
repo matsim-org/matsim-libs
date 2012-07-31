@@ -21,6 +21,7 @@ package org.matsim.contrib.cadyts.pt;
 
 import java.util.Map;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
@@ -45,16 +46,11 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		// private Constructor, should not be instantiated
 	}
 
-//	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts) {
-//		return buildCalibrator(sc,occupCounts,3600) ;
-//	}
-
-	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts 
-			/*, int timeBinSize_s*/ ) {
+	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts ) {
 		CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) sc.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
 
+		//get timeBinSize_s and validate it
 		int timeBinSize_s = cadytsPtConfig.getTimeBinSize();
-		//validate timeBinSize_s?
 		if ((Time.MIDNIGHT % timeBinSize_s)!= 0 ){
 			throw new RuntimeException("Cadyts requieres a divisor of 86400 as time bin size value .");
 		}
@@ -66,15 +62,13 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		if (occupCounts.getCounts().size() == 0) {
 			throw new RuntimeException("CadytsPt requires counts-data.");
 		}
-				
-
 		
 		AnalyticalCalibrator<TransitStopFacility> matsimCalibrator = new AnalyticalCalibrator<TransitStopFacility>(
 				sc.getConfig().controler().getOutputDirectory() + "/cadyts.log",
 				MatsimRandom.getLocalInstance().nextLong(),timeBinSize_s
 				 ) ;
-		matsimCalibrator.setRegressionInertia(cadytsPtConfig.getRegressionInertia()) ;
 
+		matsimCalibrator.setRegressionInertia(cadytsPtConfig.getRegressionInertia()) ;
 		matsimCalibrator.setMinStddev(cadytsPtConfig.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
 		matsimCalibrator.setFreezeIteration(cadytsPtConfig.getFreezeIteration());
 		matsimCalibrator.setPreparatoryIterations(cadytsPtConfig.getPreparatoryIterations());
@@ -86,13 +80,8 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		//int arStartTime_s = 3600*cadytsPtConfig.getStartTime()-3600 ;
 		//int arEndTime_s = 3600*cadytsPtConfig.getEndTime()-1 ;
 		// yyyy would be better to fix this; see email to balmermi and rieser 23/jul/2012 by kai & manuel
-		
-		int arStartTime_s = cadytsPtConfig.getStartTime();
+		int arStartTime_s = cadytsPtConfig.getStartTime(); // this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig 
 		int arEndTime_s = cadytsPtConfig.getEndTime() ;
-		
-		//System.out.println("arStartTime_s  " + arStartTime_s);
-		//System.out.println("arEndTime_s  " + arEndTime_s);
-		//System.exit(0);
 		
 		TransitSchedule schedule = sc.getTransitSchedule();
 		

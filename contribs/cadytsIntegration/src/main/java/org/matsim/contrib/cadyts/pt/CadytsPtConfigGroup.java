@@ -87,11 +87,11 @@ public class CadytsPtConfigGroup extends Module {
 		} else if (WRITE_ANALYSIS_FILE.equals(paramName)) {
 			setWriteAnalysisFile(Boolean.parseBoolean(value));
 		} else if (START_TIME.equals(paramName)) {
-			//setStartTime(Integer.parseInt(value));
-			setStartTime((int)Time.parseTime(value));   //convert from "00:00" format  to seconds after midnight
+			//setStartTime(Integer.parseInt(value));	//original
+			setStartTime((int)Time.parseTime(value));   //The "hh:mm:ss" format is converted here to seconds after midnight
 		} else if (END_TIME.equals(paramName)) {
-			//setEndTime(Integer.parseInt(value));
-			setEndTime((int)Time.parseTime(value));	//convert from "00:00" format  to seconds after midnight
+			//setEndTime(Integer.parseInt(value));		//original
+			setEndTime((int)Time.parseTime(value));		//The "hh:mm:ss" format is converted here to seconds after midnight
 		} else if ( TIME_BIN_SIZE.equals(paramName)) {
 			setTimeBinSize(Integer.parseInt(value)) ;
 		} else if (CALIBRATED_LINES.equals(paramName)) {
@@ -228,7 +228,5 @@ public class CadytsPtConfigGroup extends Module {
 	public void setTimeBinSize(int timeBinSize) {
 		this.timeBinSize = timeBinSize;
 	}
-
-
 
 }
