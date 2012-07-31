@@ -40,7 +40,7 @@ public class DgCreateFlightScenario {
 		filter.put("MUC", Direction.BOTH);
 	}
 	
-	public static final int NUMBER_OF_RUNWAYS = 1;
+	public static final int NUMBER_OF_RUNWAYS = 2;
 	
 	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 100000.0, 1./60., 463./3.6);	//default speed below FL100: 250 knots = 463km/h 
 	
@@ -84,11 +84,11 @@ public class DgCreateFlightScenario {
 	}
 	
 	public static void createEuropeanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
-		String baseDirectory = "/media/data/work/repos/"
-				+ "shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
+		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\eu\\flight\\sf_oag_flight_model\\";
+		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.EURO_COUNTRIES, SfAirScheduleBuilder.UTC_OFFSET_FILE);
+		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.EURO_COUNTRIES, utcOffsetfile);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
 		String outputOsmAirportsFilename = baseDirectory + SfAirScheduleBuilder.AIRPORTS_OUTPUT_FILE;
@@ -153,7 +153,7 @@ public class DgCreateFlightScenario {
 		createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 		//EUROPEAN AIR TRAFFIC
-//		createEuropeanFlightScenario(inputOsmFilename, inputOagFilename);
+		createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 		// GERMAN AIR TRAFFIC
 //		createGermanFlightScenario(inputAirportsFilename, inputOagFilename);

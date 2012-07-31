@@ -99,7 +99,7 @@ public class SfAirScheduleBuilder {
 				String originAirport = lineEntries[4];
 				
 				if ((countries==null && this.utcOffset.containsKey(originAirport)) 
-						|| (checkOriginCountry(originCountry, countries) && checkDestinationCountry(destinationCountry, countries) 
+						|| (checkOriginCountry(originCountry, countries) || checkDestinationCountry(destinationCountry, countries) 	// either origin country or destination country
 								&& this.utcOffset.containsKey(originAirport))) {
 			
 					//filter codeshare flights (see WW_DBF_With_Frequency.DOC from OAG input data)
