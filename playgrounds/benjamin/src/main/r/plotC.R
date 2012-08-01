@@ -65,13 +65,9 @@ changematrixZ30 <- changematrixZ30[, colnames(changematrixZ30) %in% emissions]
 changematrixPri <- changematrixPri[, colnames(changematrixPri) %in% emissions] 
 
 #graphic parameters
-#dev.new(width=14, height=7) 
-pdf(outFile, width=14, height=7)
-layout(matrix(c(1,1,2,2,3),1,5))
-#par(mfrow=c(1,3), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,0,0,0)) #three figures side by side
-par(xpd=T, cex=1, oma=c(0,2,2,0), mar=c(5,2,0,0))
-#pdf(outFile, width=10, height=7)
-#par(mfrow=c(1,3), xpd=T, cex=1.2) #three figures side by side
+pdf(outFile, width=15, height=10) #height was 7 as in plotB, plotF
+layout(matrix(c(1,1,1,1,2,2,2,2,3),1,9))
+par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(10,0,1,0), las=2)
 
 #ylimits for the plot depending on matrix entries
 #this works fine if there is at least on value greater 1 or less than -1
@@ -80,10 +76,11 @@ ymaximum<-ceiling(max(changematrixPri, changematrixZ30)) #rounded up maximum
 ylimits<-c(yminimum-1,ymaximum+1)
 
 #plots
-barplot(t(changematrixZ30), legend=F, col=emissioncolors, ylim=ylimits, xlab="Zone 30", beside=T, cex.names=0.6)
+barplot(t(changematrixZ30), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="zone 30",beside=T, cex.names=1.2)
+axis(2, at=c(-7:2), labels=c("-7.00%", "-6.00%", "-5.00%", "-4.00%","-3.00%", "-2.00%","-1.00%", "0.00%","1.00%","2.00%"), tick=TRUE)
 
-barplot(t(changematrixPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, xlab="Pricing", beside=T, cex.names=0.6)
+barplot(t(changematrixPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="internalization", beside=T, cex.names=1.2)
 plot.new()
-emissionsLegend <- emissions
-legend(0.1,0.9, emissionsLegend, fill = emissioncolors, title = "Emissions")
+emissions<-sub("_TOTAL","", emissions, fixed=T)
+legend(-0.1,0.9, emissions, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
 dev.off()

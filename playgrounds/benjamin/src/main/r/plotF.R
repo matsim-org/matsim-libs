@@ -85,11 +85,14 @@ for(i in 1 : length(groupOrder)){
 }
 
 #grafic parameters
-pdf(outFile, width=20, height=7)
-par(mfrow=c(1,2), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,2,2,2)) #three figures side by side
+pdf(outFile, width=15, height=7)
+layout(matrix(c(1,1,1,1,2,2,2,2),1,8))
+par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(10,0,1,0), las=2)
 
 #plots and legend
-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Zone 30", col=z30colors, ylab="EUR", space=c(1,0.2)) #first argument of 'space' unused in this plot
-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Pricing", col=pricolors, axes =F, space=c(1,0.2))
+barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="zone 30", col=z30colors, axes=F, space=c(1,0.2)) #first argument of 'space' unused in this plot
+axis(2, at=seq(-150,50,by=20), labels=seq(-150,50,by=20), tick=TRUE)
+mtext("EUR", outer=F, side=2, at= -175, cex=1.7, adj=1)
+barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="internalization", col=pricolors, axes =F, space=c(1,0.2))
 
 dev.off()

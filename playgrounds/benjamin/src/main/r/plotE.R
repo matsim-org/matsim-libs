@@ -46,7 +46,7 @@ for(i in groupOrder){
 		pridata[i,"sum"]<- pridata[i,"changeinuserlogsum"]+pridata[i,"changeintollpayments"]
 		z30data[i,"changeinuserlogsum"]<- z30case[i, "user.logsum..EUR."]- basecase[i, "user.logsum..EUR."]
 		z30data[i,"changeintollpayments"]<-z30case[i, "toll.payments..EUR."]-basecase[i, "toll.payments..EUR."]
-		z30data[i,"sum"]<- z30data[i,"changeinuserlogsum"]+pridata[i,"changeintollpayments"]
+		z30data[i,"sum"]<- z30data[i,"changeinuserlogsum"]+z30data[i,"changeintollpayments"]
 
 
 }
@@ -56,13 +56,17 @@ yminimum<-floor(min(z30data,pridata)) #rounded down minimum
 ymaximum<-ceiling(max(z30data, pridata)) #rounded up maximum
 ylimits<-c(yminimum-5000,ymaximum+5000)
 
-pdf(outFile, width=15, height=7)
+pdf(outFile, width=15, height=11) #was 7
 #grafic parameters
-layout(matrix(c(1,1,2,2,3),1,5))
-#par(mfrow=c(1,3), xpd=T, cex=1, oma=c(2.1,3.1,2.1,0), mar=c(2,2,2,2)) #three figures side by side
+layout(matrix(c(1,1,1,1,3,2,2,2,2,3),5,2))
+par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(5,0,1,0), las=2)
+
 #plots and legend
-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Zone 30", col=groupColors, ylab="EUR")
-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="Policy case Pricing", col=groupColors, axes =F)
+barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="zone 30", col=groupColors, axes=F)
+axis(2, at=seq(-25000,25000,by=10000), labels=seq(-25000,25000,by=10000), tick=TRUE)
+mtext("EUR", outer=F, side=2, at= -29000, cex=1.7, adj=1)
+barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="internalization", col=groupColors, axes =F)
 plot.new()
-legend(0.1,0.7, c("change in user logsum","change in toll payments","sum"), fill=groupColors)
+par(mar=c(5,0,2,0))
+legend(0.0,-12.0, c("change in user logsum","change in toll payments","sum"), fill=groupColors, cex=1.2, bty="n", y.intersp=2, horiz =TRUE)
 dev.off()
