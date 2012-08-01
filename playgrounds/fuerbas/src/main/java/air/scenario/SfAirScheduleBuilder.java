@@ -123,6 +123,7 @@ public class SfAirScheduleBuilder {
 								+ Double.parseDouble(lineEntries[10].substring(0, 2)) * 3600;
 						
 //						Getting UTC Offset from separate file which need to be created with SfUtcOffset
+						log.debug("originAirport: " + originAirport);
 						double utcOffset = this.utcOffset.get(originAirport);
 						departureInSec = departureInSec - utcOffset;
 
@@ -280,6 +281,7 @@ public class SfAirScheduleBuilder {
 	}
 	
 	private void loadUtcOffsets(String inputfile) throws Exception, IOException {
+		log.debug("Loading utc offsets from file: " + inputfile);
 		BufferedReader brUtc = new BufferedReader(new FileReader(new File(inputfile)));
 		while (brUtc.ready()) {
 			String line = brUtc.readLine();
@@ -289,6 +291,7 @@ public class SfAirScheduleBuilder {
 			this.utcOffset.put(airportCode, offset);
 		}
 		brUtc.close();
+		log.debug("loaded " + this.utcOffset.size() + " utc offsets ");
 	}
 
 	private double getOffsetUTC(String originCountry) {
