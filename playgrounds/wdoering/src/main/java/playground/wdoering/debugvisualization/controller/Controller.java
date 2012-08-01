@@ -1,30 +1,24 @@
 package playground.wdoering.debugvisualization.controller;
 
 
-import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-
-import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.wdoering.debugvisualization.gui.GUI;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
-import playground.wdoering.debugvisualization.model.Scene;
 import playground.wdoering.debugvisualization.model.XYVxVyAgent;
 import playground.wdoering.debugvisualization.model.XYVxVyDataPoint;
-import playground.wdoering.debugvisualization.gui.*;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 
@@ -311,7 +305,7 @@ public class Controller {
 	public void updateAgentData(String ID, Double posX, Double posY, double vX, double vY, Double time)
 	{
 		//Daten werden gelesen
-		isReadingData = true;
+		this.isReadingData = true;
 		
 //		gui.suspendRenderThread();
 
@@ -393,7 +387,7 @@ public class Controller {
 						
 						XYVxVyDataPoint currentDataPoint = agent.getCurrentDataPoint();
 						
-						if (currentDataPoint.getTime() < currentTime-1)
+						if (currentDataPoint.getTime() < this.currentTime-1)
 						{
 							agentsIterator.remove();
 						}
@@ -457,10 +451,10 @@ public class Controller {
 
 		}
 
-		isReadingData = false;
+		this.isReadingData = false;
 //		gui.resumeRenderThread();
 		
-		agentDataController.setAgents(agents);
+		this.agentDataController.setAgents(this.agents);
 
 
 
@@ -468,13 +462,13 @@ public class Controller {
 
 	public boolean isReadingAgentData()
 	{
-		return isReadingData;
+		return this.isReadingData;
 	}
 
 	public void updateAgentLink(String ID, String linkID)
 	{
 //		gui.suspendRenderThread();
-		isReadingData = true;
+		this.isReadingData = true;
 	
 		//on the first run in live mode the agents hashmap is still empty
 		if (this.agents == null)
@@ -491,26 +485,26 @@ public class Controller {
 		updateAgent.setCurrentLinkID(linkID);
 		
 		//update agent in hashmap
-		agents.put(ID, updateAgent);
+		this.agents.put(ID, updateAgent);
 		
-		agentDataController.setAgents(agents);
+		this.agentDataController.setAgents(this.agents);
 		
 		
 		//update view
-		this.gui.updateView(currentTime, this.agents);
+		this.gui.updateView(this.currentTime, this.agents);
 		
-		isReadingData = false;
+		this.isReadingData = false;
 //		gui.resumeRenderThread();
 	}
 
 	
 	public synchronized HashMap<String,Agent> getAgentHashMap()
 	{
-		return agents;
+		return this.agents;
 	}
 
 	public AgentDataController getAgentDataController() {
-		return agentDataController;
+		return this.agentDataController;
 	}
 
 	public void setAgentDataController(AgentDataController agentDataController) {
@@ -520,11 +514,11 @@ public class Controller {
 	public ArrayList<Geometry> getGeometries()
 	{
 		// TODO Auto-generated method stub
-		return geometries;
+		return this.geometries;
 	}
 
 	public void setOffset(int x, int y) {
-		gui.setOffset(x, y);
+		this.gui.setOffset(x, y);
 		
 	}
 

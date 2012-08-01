@@ -1,28 +1,13 @@
 package playground.wdoering.debugvisualization.controller;
-import java.awt.Point;
-import java.io.File;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
-import javax.management.AttributeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
-import playground.gregor.sim2d_v2.scenario.DenseMultiPointFromGeometries;
-import playground.wdoering.debugvisualization.model.Agent;
-import playground.wdoering.debugvisualization.model.DataPoint;
-
-import net.opengis.wfs.v_1_1_0.GetGmlObjectType;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
@@ -31,17 +16,19 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
+import playground.wdoering.debugvisualization.model.Agent;
+import playground.wdoering.debugvisualization.model.DataPoint;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPoint;
 
 
 public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Runnable {
@@ -282,12 +269,12 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				{
 					Geometry geo = ft.getDefaultGeometry();
 					//System.out.println(ft.getFeatureType());
-					geometries.add(geo);
+					this.geometries.add(geo);
 				}
 				
 				
 				int j = 0;			
-				for (Geometry geo : geometries)
+				for (Geometry geo : this.geometries)
 				{
 					
 					System.out.println(geo.toText());
@@ -326,7 +313,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 	
 	public ArrayList<Geometry> getGeometries()
 	{
-		return geometries;
+		return this.geometries;
 	}
 
 	public HashMap<String, Agent> importAgentData()

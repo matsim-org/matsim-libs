@@ -30,8 +30,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -212,7 +212,7 @@ public class Bottleneck
 		for (int i = 0; i < persons; i++)
 		{
 
-			double step = ((float)(((i % personsPerRow) + 0.01f) / (float)personsPerRow) );
+			double step = (((i % personsPerRow) + 0.01f) / personsPerRow);
 			double x = (-waitingAreaWidth/2) + ( step * (float)waitingAreaWidth) + 0.45d;
 			double y = (Math.floor((i+0.01)/personsPerRow));
 			

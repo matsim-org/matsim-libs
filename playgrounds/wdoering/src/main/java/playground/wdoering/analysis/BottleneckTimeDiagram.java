@@ -2,15 +2,12 @@ package playground.wdoering.analysis;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -25,19 +22,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEvent;
+import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEventHandler;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-
-import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
-import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
-import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
-import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueStringKeyAtCoordinateEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler{
 
@@ -104,14 +98,14 @@ public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueSt
 				
 				//System.out.println(event.getPersonId() + ": (c0x: " + c0.x + ", c1x:" + c1.x + ") | (c0y:" + c0.y + ", c1y:" + c1.y +")");
 				
-				if ((c1.y > fl0.y) && (c0.y <= fl0.y))
+				if ((c1.y > this.fl0.y) && (c0.y <= this.fl0.y))
 				{
 					//System.out.println("!");
 					this.flow ++;
 				}
 				else
 				{
-					System.out.println("c0y: " + c0.y + "|fl0y: " + fl0.y + "_c1y: " + c1.y);
+					System.out.println("c0y: " + c0.y + "|fl0y: " + this.fl0.y + "_c1y: " + c1.y);
 				}
 				
 //				if ((!Algorithms.isAbove(c0, this.fl0, this.fl1))  && (!Algorithms.isBelow(c1, this.fl0, this.fl1))) {
@@ -714,21 +708,21 @@ public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueSt
 			
 		if (personCount > 0)
 		{
-			if (arrivalCount==0)
+			if (this.arrivalCount==0)
 			{
 				System.err.println("t-"+ event.getTime() + ": starting measurement");
 				personsPerTimeList = new LinkedList<PersonsPerTime>();
 			}
 			
-			arrivalCount++;
+			this.arrivalCount++;
 			
-			personsPerTimeList.add(new PersonsPerTime(event.getTime(), arrivalCount));
+			personsPerTimeList.add(new PersonsPerTime(event.getTime(), this.arrivalCount));
 			
-			if (arrivalCount==personCount)
+			if (this.arrivalCount==personCount)
 			{
 				System.err.println("t-"+ event.getTime() + ": all agents arrived");
-				measurementEndTime = event.getTime();
-				arrivalCount = 0;
+				this.measurementEndTime = event.getTime();
+				this.arrivalCount = 0;
 				personCount = 0;
 			}
 		}
@@ -743,10 +737,10 @@ public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueSt
 	{
 		
 		
-		if ((!measurementInterval) && (event.getLinkId().equals(bottleneckEnterLink)))
+		if ((!this.measurementInterval) && (event.getLinkId().equals(bottleneckEnterLink)))
 		{
-			measurementInterval = true;
-			measurementStartTime = event.getTime();
+			this.measurementInterval = true;
+			this.measurementStartTime = event.getTime();
 		}
 		
 	}
@@ -769,25 +763,25 @@ class ChartData
 	private String dataString;
 	
 	public String getxAxisString() {
-		return xAxisString;
+		return this.xAxisString;
 	}
 	public void setxAxisString(String xAxisString) {
 		this.xAxisString = xAxisString;
 	}
 	public String getyAxisString() {
-		return yAxisString;
+		return this.yAxisString;
 	}
 	public void setyAxisString(String yAxisString) {
 		this.yAxisString = yAxisString;
 	}
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 	public void setTitle(String title) {
 		this.title = title;
 	}
 	public String getDataString() {
-		return dataString;
+		return this.dataString;
 	}
 	public void setDataString(String dataString) {
 		this.dataString = dataString;
@@ -817,7 +811,7 @@ class PersonsPerTime
 	}
 
 	public double getTime() {
-		return time;
+		return this.time;
 	}
 
 	public void setTime(double time) {
@@ -825,7 +819,7 @@ class PersonsPerTime
 	}
 
 	public int getPersons() {
-		return persons;
+		return this.persons;
 	}
 
 	public void setPersons(int persons) {
@@ -843,19 +837,19 @@ class Series
 	private String name;
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
 	public double[] getXs() {
-		return xs;
+		return this.xs;
 	}
 	public void setXs(double[] xs) {
 		this.xs = xs;
 	}
 	public double[] getYs() {
-		return ys;
+		return this.ys;
 	}
 	public void setYs(double[] ys) {
 		this.ys = ys;
