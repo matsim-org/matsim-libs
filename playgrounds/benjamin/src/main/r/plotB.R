@@ -72,6 +72,6 @@ barplot(t(relPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, xlab="Pri
 
 emissionsLegend <- emissions
 plot.new()
-legend(-0.2,0.8, emissions, fill = emissioncolors, title = "Emissions")
+legend(-0.2,0.8, emissions, fill = emissioncolors)
 
 dev.off()
