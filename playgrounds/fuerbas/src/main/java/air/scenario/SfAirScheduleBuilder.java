@@ -97,10 +97,11 @@ public class SfAirScheduleBuilder {
 				String originCountry = lineEntries[6];
 				String destinationCountry = lineEntries[9];
 				String originAirport = lineEntries[4];
+				String destinationAirport = lineEntries[7];
 				
 				if ((countries==null && this.utcOffset.containsKey(originAirport)) 
 						|| (checkOriginCountry(originCountry, countries) || checkDestinationCountry(destinationCountry, countries) 	// either origin country or destination country
-								&& this.utcOffset.containsKey(originAirport))) {
+								&& this.utcOffset.containsKey(originAirport) && this.utcOffset.containsKey(destinationAirport))) {
 			
 					//filter codeshare flights (see WW_DBF_With_Frequency.DOC from OAG input data)
 					// either "operating marker" set, "shared airline designator" not set or "duplicate" not set
@@ -110,7 +111,7 @@ public class SfAirScheduleBuilder {
 						String flightNumber = lineEntries[1].replaceAll(" ", "0");
 						String flightDesignator = carrier + flightNumber;
 
-						String destinationAirport = lineEntries[7];
+
 						String route = originAirport + "_" + destinationAirport;
 						double flightDistance = Integer.parseInt(lineEntries[42]) * 1.609344; // statute miles to kilometers
 						
