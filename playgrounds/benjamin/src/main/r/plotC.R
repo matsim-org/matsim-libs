@@ -5,10 +5,10 @@ emissioncolors <- c("black", "mediumblue", "limegreen", "yellow", "red")
 
 #relative paths
 directory <- commandArgs()[3]
-baseFile <- file.path(directory,"emissionInformation_baseCase_ctd.txt")
+baseFile <- file.path(directory,"emissionInformation_baseCase_ctd_newCode.txt")
 z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
-priFile <- file.path(directory, "emissionInformation_policyCase_pricing.txt")
-outFile <- file.path(commandArgs()[4], "plotC.pdf")
+priFile <- file.path(directory, "emissionInformation_policyCase_pricing_newCode.txt")
+outFile <- file.path(commandArgs()[4], "PlotC.pdf")
 
 #read tables
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")

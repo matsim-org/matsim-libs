@@ -11,8 +11,8 @@ colors<-c(1:11) #colors for eleven groups - will be repeated if necessary
 #read files and set directories
 directory <- commandArgs()[3]
 
-BaCFile <- file.path(directory,"avgTTInformation_baseCase_ctd.txt")
-PriFile <- file.path(directory,"avgTTInformation_policyCase_pricing.txt")
+BaCFile <- file.path(directory,"avgTTInformation_baseCase_ctd_newCode.txt")
+PriFile <- file.path(directory,"avgTTInformation_policyCase_pricing_newCode.txt")
 Z30File <- file.path(directory,"avgTTInformation_policyCase_zone30.txt")
 
 BaC <- read.table(file = BaCFile, header=T, sep = "\t", comment.char="")

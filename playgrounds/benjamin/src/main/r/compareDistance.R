@@ -12,8 +12,8 @@ groups<-c("URBAN","COMMUTER","REV_COMMUTER","FREIGHT")
 
 #read files and set directories
 directory <- commandArgs()[3]
-priFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing-baseCase_ctd.txt")
-z30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30-baseCase_ctd.txt")
+priFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing_newCode-baseCase_ctd_newCode.txt")
+z30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30-baseCase_ctd_newCode.txt")
 z30 <- read.table(file = z30File, header=T, sep = "\t", comment.char="")
 pri <- read.table(file = priFile, header=T, sep = "\t", comment.char="")
 outFile <- file.path(commandArgs()[4], "distanceDifference.pdf")

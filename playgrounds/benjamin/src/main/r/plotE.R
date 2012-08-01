@@ -13,8 +13,8 @@ groupColors<- c("yellow","mediumblue","red")
 
 #input
 directory <- commandArgs()[3]
-baseFile <- file.path(directory, "welfareTollInformation_baseCase_ctd.txt")
-priFile <- file.path(directory, "welfareTollInformation_policyCase_pricing.txt")
+baseFile <- file.path(directory, "welfareTollInformation_baseCase_ctd_newCode.txt")
+priFile <- file.path(directory, "welfareTollInformation_policyCase_pricing_newCode.txt")
 z30File <- file.path(directory, "welfareTollInformation_policyCase_zone30.txt")
 
 outFile <- file.path(commandArgs()[4], "PlotE.pdf")

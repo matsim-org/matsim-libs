@@ -9,8 +9,8 @@ meanColor <- c("darkgrey","black","green")
 
 directory <- commandArgs()[3]
 #read files and set directories
-distInfoBaCFile <- file.path(directory,"detailedCarDistanceInformation_baseCase_ctd.txt")
-distInfoPriFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing.txt")
+distInfoBaCFile <- file.path(directory,"detailedCarDistanceInformation_baseCase_ctd_newCode.txt")
+distInfoPriFile <- file.path(directory,"detailedCarDistanceInformation_policyCase_pricing_newCode.txt")
 distInfoZ30File <- file.path(directory,"detailedCarDistanceInformation_policyCase_zone30.txt")
 
 distInfoBaC <- read.table(file = distInfoBaCFile, header=T, sep = "\t", comment.char="")

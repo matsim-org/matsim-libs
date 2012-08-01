@@ -14,8 +14,8 @@ emissions <- c("CO","CO2_TOTAL","FC","HC","NMHC","NO2","NOX","PM","SO2")
 #input
 directory <- commandArgs()[3]
 
-baseFile <- file.path(directory, "emissionInformation_baseCase_ctd.txt")
-priFile <- file.path(directory, "emissionInformation_policyCase_pricing.txt")
+baseFile <- file.path(directory, "emissionInformation_baseCase_ctd_newCode.txt")
+priFile <- file.path(directory, "emissionInformation_policyCase_pricing_newCode.txt")
 z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
 
 outFile <- file.path(commandArgs()[4], "PlotF.pdf")
