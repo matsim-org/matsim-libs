@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.gregor.sim2d_v2.events.TickEvent;
-import playground.gregor.sim2d_v2.events.TickEventHandler;
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v3.events.TickEvent;
+import playground.gregor.sim2d_v3.events.TickEventHandler;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
 
 /**
  * @author droeder
