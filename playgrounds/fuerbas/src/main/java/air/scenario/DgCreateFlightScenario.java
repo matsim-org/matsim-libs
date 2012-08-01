@@ -44,6 +44,7 @@ public class DgCreateFlightScenario {
 	
 	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 100000.0, 1./60., 463./3.6);	//default speed below FL100: 250 knots = 463km/h 
 	
+	public static final boolean createStars = true;
 	public static final Map<String, DgStarinfo> stars = new HashMap<String, DgStarinfo>();	
 	static {
 		stars.put("default", DEFAULTSTAR);
@@ -57,14 +58,22 @@ public class DgCreateFlightScenario {
 		STARoffset.put("MUC", stars.get("MUC").getLength()/stars.get("MUC").getFreespeed());
 	}
 	
+	private static String utcOffsetfile = "/media/data/work/repos/shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
+	private static String dataBaseDirectory = "/media/data/work/repos/";
+	private static String inputAirportsFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
+	private static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
+//	private static String inputAirportsFilename = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\worldwide_airports_with_coords.csv";
+//	private static String inputOagFilename = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\oag_rohdaten\\OAGSEP09.CSV";
+
+	
+	
 	public static void createWorldFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception {
 //		String baseDirectory = "/media/data/work/repos/"
 //				+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/";
 //		String utcOffsetfile = "/media/data/work/repos/"
 //		+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 		
-		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\";
-		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
+		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/world/flight/sf_oag_flight_model/";
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, utcOffsetfile);
@@ -84,8 +93,7 @@ public class DgCreateFlightScenario {
 	}
 	
 	public static void createEuropeanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
-		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\eu\\flight\\sf_oag_flight_model\\";
-		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
+		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.EURO_COUNTRIES, utcOffsetfile);
@@ -106,8 +114,7 @@ public class DgCreateFlightScenario {
 	
 	public static void createGermanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
 		
-		String baseDirectory = "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\";
-		String utcOffsetfile = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\utc_offsets.txt";
+		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/de/flight/sf_oag_flight_model/";
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.GERMAN_COUNTRIES, utcOffsetfile);
 
@@ -127,8 +134,8 @@ public class DgCreateFlightScenario {
 
 	public static void writeShape(String baseDirectory, String networkFilename){
 		
-		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395\\"; //for windows file systems
-//		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395/";
+//		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395\\"; //for windows file systems
+		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395/";
 
 		File shapeFileDirectory = new File(shapeFileDirectoryname);
 		if (shapeFileDirectory.exists()){
@@ -142,21 +149,14 @@ public class DgCreateFlightScenario {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-//		String inputOsmFilename = "/home/dgrether/shared-svn/projects/throughFlightData/osm_daten/2010-12-28_aeroway_nodes.osm";
-//		String inputOagFilename = "/media/data/work/repos/"
-//				+ "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
-		
-		String inputAirportsFilename = "Z:\\WinHome\\shared-svn\\studies\\countries\\world\\flight\\sf_oag_flight_model\\worldwide_airports_with_coords.csv";
-		String inputOagFilename = "Z:\\WinHome\\shared-svn\\projects\\throughFlightData\\oag_rohdaten\\OAGSEP09.CSV";
-
 		//WORLD WIDE AIR TRAFFIC
-		createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
+//		createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 		//EUROPEAN AIR TRAFFIC
-		createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
+//		createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 		// GERMAN AIR TRAFFIC
-//		createGermanFlightScenario(inputAirportsFilename, inputOagFilename);
+		createGermanFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 	}
 
