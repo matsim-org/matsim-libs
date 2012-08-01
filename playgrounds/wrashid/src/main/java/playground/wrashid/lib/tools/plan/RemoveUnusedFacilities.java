@@ -41,12 +41,12 @@ import playground.wrashid.lib.GeneralLib;
 public class RemoveUnusedFacilities {
 
 	public static void main(String[] args) {
-		String inputPlansFile="H:/data/experiments/TRBAug2012/input/census2000v2_ZhCut8km_25pct_no_network_info.xml.gz";
+		String inputPlansFile="H:/data/experiments/TRBAug2012/input/census2000v2_ZhCut8km_10pct_no_network_info.xml.gz";
 		String inputNetworkFile="P:/Projekte/matsim/data/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
 		String inputFacilities="P:/Projekte/matsim/data/switzerland/facilities/facilities.xml.gz";
 		
 		
-		String outputFacilitiesFile="H:/data/experiments/TRBAug2012/input/facilties_8kmCut_25pct.xml.gz";	
+		String outputFacilitiesFile="H:/data/experiments/TRBAug2012/input/facilties_8kmCut_10pct.xml.gz";	
 	
 		ScenarioImpl scenario= (ScenarioImpl) GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
 		

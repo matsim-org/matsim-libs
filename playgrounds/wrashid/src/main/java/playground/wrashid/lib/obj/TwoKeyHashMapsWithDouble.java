@@ -46,6 +46,10 @@ private HashMap<ClassKey1, DoubleValueHashMap<ClassKey2>> hashMap=new HashMap<Cl
 		hashMap.get(key1).incrementBy(key2, incValue);
 	}
 	
+	public void increment(ClassKey1 key1, ClassKey2 key2){
+		incrementBy(key1,key2,1.0);
+	}
+	
 	public DoubleValueHashMap<ClassKey2> get(ClassKey1 key1){
 		return hashMap.get(key1);
 	}

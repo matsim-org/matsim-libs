@@ -238,6 +238,14 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 		for (Parking parking : parkings) {
 			if (parkingOccupancy.parkingOccupancies.get(parking.getId()) == null) {
+				// no demand at parking
+				if (publicParkingPricePerHourInTheMorning.get(parking.getId()) >= priceIncValue) {
+					publicParkingPricePerHourInTheMorning.decrementBy(parking.getId(), priceIncValue);
+				}
+				
+				if (publicParkingPricePerHourInTheAfternoon.get(parking.getId()) >= priceIncValue) {
+					publicParkingPricePerHourInTheAfternoon.decrementBy(parking.getId(), priceIncValue);
+				}
 				continue;
 			}
 
@@ -245,6 +253,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 			boolean parking85PercentReached = false;
 			if (parking.getId().toString().contains("stp") || parking.getId().toString().contains("gp")) {
 
+				
 				for (int i = 0; i <= 47; i++) {
 					if (occupancy[i] > parking.getCapacity() * targetOccupancy) {
 						publicParkingPricePerHourInTheMorning.incrementBy(parking.getId(), priceIncValue);
@@ -256,10 +265,11 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 				if (!parking85PercentReached) {
 					if (publicParkingPricePerHourInTheMorning.get(parking.getId()) >= priceIncValue) {
 						publicParkingPricePerHourInTheMorning.decrementBy(parking.getId(), priceIncValue);
-
 					}
 				}
 
+				
+				
 				parking85PercentReached = false;
 
 				for (int i = 48; i < 96; i++) {
