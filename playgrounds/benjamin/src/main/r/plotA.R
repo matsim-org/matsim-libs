@@ -31,7 +31,7 @@ colnames(relativmatrix)<-colnames(basecase.mat)
 for(i in 1:numberCol){
 	#if column maximum > 1000 
 	#or if column minimum < -1000
-	while (abs(max(as.numeric(basecase.mat[,i])))>1000){
+	while (abs(max(as.numeric(basecase.mat[,i])))>200){
 		basecase.mat[,i]<-0.1*as.numeric(basecase.mat[,i])
 		actualEmission<-colnames(basecase.mat)[i]
 		relativmatrix[1,actualEmission]<-relativmatrix[1,actualEmission]*10
@@ -39,7 +39,7 @@ for(i in 1:numberCol){
 
 	#if column maximum <100
 	#or if column minimum >-100
-	while (abs(max(as.numeric(basecase.mat[,i])))<100 && 
+	while (abs(max(as.numeric(basecase.mat[,i])))<20 && 
 		(abs(min(as.numeric(basecase.mat[,i]))))>0){ #string to numeric
 		basecase.mat[,i]<-10*as.numeric(basecase.mat[,i])
 		actualEmission<-colnames(basecase.mat)[i]
@@ -53,16 +53,33 @@ basecase.mat<-basecase.mat[,colnames(basecase.mat) %in% emissions]
 
 #number of colors needs to equal number of emissions
 
-pdf(outFile, width=10)
-par(xpd=T, mar=par()$mar+c(0,0,0,10))
-barplot(t(basecase.mat), legend=F, col = emissioncolors)
-emissionsLegend <- emissions
+#pdf(outFile, width=10)
+#par(xpd=T, mar=par()$mar+c(0,0,0,10))
+#barplot(t(basecase.mat), legend=F, col = emissioncolors)
+emissionsLegend <- sub("_TOTAL","", emissions, fixed=T)
 
+########
+pdf(outFile, width=15, height=7)
+layout(matrix(c(1,1,1,1,1,2),1,6))
+par(xpd=T, cex=1.7, mar=c(2,4,1,0), las=1)
+
+emP<-""
 #write legend with relative factors
 for(i in 1: length(emissions)){
+	emP<-paste(emP, emissionsLegend[i],"[ g x ",relativmatrix[1,i], "]")
 	#example: SO2 [g x 1000]
-	emissionsLegend[i]<-paste(emissionsLegend[i]," [ g x ",relativmatrix[1,i], "]")
+	emissionsLegend[i]<-paste(emissionsLegend[i],"\n [ g x ",relativmatrix[1,i], "]")
+	
 }
+print(emP)
+#mtext(emissionsLegend, outer=F, side=1, cex=1.7, adj=1,padj=1)
+par(cex=0.9)
+barplot(t(basecase.mat), legend=F, col = emissioncolors, ylab=emP, cex.axis=1.3, cex.names=1.7)
+par(cex=1.7)
 
-legend(5,300, emissionsLegend, fill = emissioncolors, cex=0.8)
+plot.new()
+par(las=0)
+#emissions<-sub("_TOTAL","", emissions, fixed=T)
+legend(-1.3,0.8, emissionsLegend, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
+
 dev.off()
