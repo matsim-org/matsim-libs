@@ -12,12 +12,13 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
-import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 
 /**
  * 

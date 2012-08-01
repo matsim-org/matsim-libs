@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
-import playground.gregor.sim2d_v2.helper.GEO;
+import playground.gregor.sim2d_v3.helper.GEO;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

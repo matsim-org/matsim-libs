@@ -32,7 +32,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.gregor.sim2d_v2.trafficmonitoring.MSATravelTimeCalculatorFactory;
+import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
+
 
 public class Controller extends Controler {
 

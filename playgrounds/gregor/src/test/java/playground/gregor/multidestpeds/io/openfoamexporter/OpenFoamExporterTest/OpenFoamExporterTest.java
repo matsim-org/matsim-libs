@@ -17,11 +17,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import playground.gregor.multidestpeds.io.openfoamexport.OpenFoamExporter;
 import playground.gregor.multidestpeds.io.openfoamexport.PedestrianGroup;
-import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
+import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEvent;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class OpenFoamExporterTest {
 

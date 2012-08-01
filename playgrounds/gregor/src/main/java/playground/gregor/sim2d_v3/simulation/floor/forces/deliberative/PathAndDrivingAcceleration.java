@@ -37,7 +37,7 @@ public class PathAndDrivingAcceleration {
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	// Mauron constant
-	private static final double Apath =10;
+	private static final double Apath =50;
 
 
 

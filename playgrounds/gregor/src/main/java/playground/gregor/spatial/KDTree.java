@@ -28,7 +28,13 @@ import java.util.List;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
+
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 //import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 //
@@ -51,7 +57,7 @@ public class KDTree {
 
 	public KDTree(List<double[]> points) {
 
-		//		Envelope e = new Envelope();
+				Envelope e = new Envelope();
 
 		List<Integer> x = new ArrayList<Integer>();
 		List<Integer> y = new ArrayList<Integer>();
@@ -59,15 +65,15 @@ public class KDTree {
 			x.add(i);
 			y.add(i);
 
-			//			Coordinate c = new Coordinate(points.get(i)[0],points.get(i)[1]);
-			//			e.expandToInclude(c);
+						Coordinate c = new Coordinate(points.get(i)[0],points.get(i)[1]);
+						e.expandToInclude(c);
 		}
 
 		Collections.sort(x, new XComp(points));
 		Collections.sort(y, new YComp(points));
 		this.points = points;
-		//		P p = new P(x,y,e);
-		P p = new P(x,y);
+				P p = new P(x,y,e);
+//		P p = new P(x,y);
 
 		int splitPoint = x.size()/2;
 		double splitVal = this.points.get(x.get(splitPoint))[0];
@@ -75,7 +81,7 @@ public class KDTree {
 
 		buildKDTree(this.root,0);
 		//		System.out.println(this.root.left.p.x.size()+ "  " + this.root.right.p.x.size());
-		//		GisDebugger.dump("/Users/laemmel/tmp/!KDP.shp");
+				GisDebugger.dump("/Users/laemmel/tmp/!KDP.shp");
 	}
 
 	public KDNode getRoot() {
@@ -181,11 +187,11 @@ public class KDTree {
 
 	private KDNode buildKDTree(KDNode current, int i) {
 
-		//		Envelope e = current.p.getEnvelope();
-		//		Coordinate [] coords = {new Coordinate(e.getMinX(),e.getMinY()),new Coordinate(e.getMaxX(),e.getMinY()),new Coordinate(e.getMaxX(),e.getMaxY()), new Coordinate(e.getMinX(),e.getMaxY()),new Coordinate(e.getMinX(),e.getMinY())};
-		//		GeometryFactory geofac = new GeometryFactory();
-		//		LineString ls = geofac.createLineString(coords);
-		//		GisDebugger.addGeometry(ls,i+"");
+				Envelope e = current.p.getEnvelope();
+				Coordinate [] coords = {new Coordinate(e.getMinX(),e.getMinY()),new Coordinate(e.getMaxX(),e.getMinY()),new Coordinate(e.getMaxX(),e.getMaxY()), new Coordinate(e.getMinX(),e.getMaxY()),new Coordinate(e.getMinX(),e.getMinY())};
+				GeometryFactory geofac = new GeometryFactory();
+				LineString ls = geofac.createLineString(coords);
+				GisDebugger.addGeometry(ls,i+"");
 
 
 		if (current.p.isLeaf()) {
@@ -233,8 +239,8 @@ public class KDTree {
 
 
 			splitVal = this.points.get(x.get(splitPoint))[0];
-			//			Envelope eLeft = new Envelope(e.getMinX(),splitVal,e.getMinY(),e.getMaxY());
-			//			Envelope eRight = new Envelope(splitVal,e.getMaxX(),e.getMinY(),e.getMaxY());
+						Envelope eLeft = new Envelope(e.getMinX(),splitVal,e.getMinY(),e.getMaxY());
+						Envelope eRight = new Envelope(splitVal,e.getMaxX(),e.getMinY(),e.getMaxY());
 			//			p1 = new P(xLeft,yLeft,eLeft);
 			//			p2 = new P(xRight,yRight,eRight);
 
@@ -243,8 +249,8 @@ public class KDTree {
 			splitR = this.points.get(yRight.get(splitPointR))[1];
 			splitL = this.points.get(yLeft.get(splitPointL))[1];
 
-			p1 = new P(xLeft,yLeft);
-			p2 = new P(xRight,yRight);
+			p1 = new P(xLeft,yLeft,eLeft);
+			p2 = new P(xRight,yRight,eRight);
 
 		} else { // y-split
 
@@ -277,8 +283,8 @@ public class KDTree {
 
 
 			splitVal = this.points.get(y.get(splitPoint))[1];
-			//			Envelope eLeft = new Envelope(e.getMinX(),e.getMaxX(),e.getMinY(),splitVal);
-			//			Envelope eRight = new Envelope(e.getMinX(),e.getMaxX(),splitVal,e.getMaxY());
+						Envelope eLeft = new Envelope(e.getMinX(),e.getMaxX(),e.getMinY(),splitVal);
+						Envelope eRight = new Envelope(e.getMinX(),e.getMaxX(),splitVal,e.getMaxY());
 			//			p1 = new P(xLeft,yLeft,eLeft);
 			//			p2 = new P(xRight,yRight,eRight);
 
@@ -288,8 +294,8 @@ public class KDTree {
 			splitR = this.points.get(xRight.get(splitPointR))[0];
 			splitL = this.points.get(xLeft.get(splitPointL))[0];
 
-			p1 = new P(xLeft,yLeft);
-			p2 = new P(xRight,yRight);
+			p1 = new P(xLeft,yLeft,eLeft);
+			p2 = new P(xRight,yRight,eRight);
 		}
 		i++;
 
@@ -325,20 +331,20 @@ public class KDTree {
 
 		private final List<Integer> x;
 		private final List<Integer> y;
-		//		private final Envelope e;
-		//
-		//		public P(List<Integer> x2, List<Integer> y2, Envelope e) {
-		//			this.x = x2;
-		//			this.y = y2;
-		//			this.e = e;
-		//		}
-		public P(List<Integer> x2, List<Integer> y2) {
-			this.x = x2;
-			this.y = y2;
-		}
-		//		public Envelope getEnvelope() {
-		//			return this.e;
-		//		}
+				private final Envelope e;
+		
+				public P(List<Integer> x2, List<Integer> y2, Envelope e) {
+					this.x = x2;
+					this.y = y2;
+					this.e = e;
+				}
+//		public P(List<Integer> x2, List<Integer> y2) {
+//			this.x = x2;
+//			this.y = y2;
+//		}
+				public Envelope getEnvelope() {
+					return this.e;
+				}
 
 		public List<Integer> getXs() {
 			return this.x;
@@ -406,10 +412,10 @@ public class KDTree {
 			System.out.println();
 			List<double []> points = new ArrayList<double[]>();
 			Envelope e = new Envelope();
-			for (int i = 0; i < 5000; i++) {
+			for (int i = 0; i < 50; i++) {
 				double offset = 0;
 				if (MatsimRandom.getRandom().nextBoolean()) {
-					offset = 10000000*MatsimRandom.getRandom().nextDouble();
+					offset = 10*MatsimRandom.getRandom().nextDouble();
 				}
 				double x = 4*MatsimRandom.getRandom().nextDouble() + offset;
 				double y = 4*MatsimRandom.getRandom().nextDouble() + offset;
@@ -440,12 +446,12 @@ public class KDTree {
 				//		points.add(new double[]{1.25,0.5});
 				//		points.add(new double[]{0.25,0.75});
 
-				//		GeometryFactory geofac = new GeometryFactory();
-				//		for (double [] p : points) {
-				//			Point point = geofac.createPoint(new Coordinate(p[0],p[1]));
-				//			GisDebugger.addGeometry(point);
-				//		}
-				//		GisDebugger.dump("/Users/laemmel/tmp/!points.shp");
+						GeometryFactory geofac = new GeometryFactory();
+						for (double [] p : points) {
+							Point point = geofac.createPoint(new Coordinate(p[0],p[1]));
+							GisDebugger.addGeometry(point);
+						}
+						GisDebugger.dump("/Users/laemmel/tmp/!points.shp");
 
 
 				System.gc();
@@ -522,6 +528,7 @@ public class KDTree {
 				stop = System.currentTimeMillis();
 				
 				System.out.println("kdtree queries took:" + (stop-start) + " ms");		
+				break;
 		}
 		//		double x = 1.25;
 		//		double y = 2.95;

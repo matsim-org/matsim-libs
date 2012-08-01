@@ -44,8 +44,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

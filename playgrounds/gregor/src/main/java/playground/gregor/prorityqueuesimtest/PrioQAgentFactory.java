@@ -8,7 +8,8 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v3.simulation.floor.Agent2D;
+
 
 public class PrioQAgentFactory implements AgentFactory {
 
@@ -26,8 +27,8 @@ public class PrioQAgentFactory implements AgentFactory {
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
 		MobsimDriverAgent pda = this.defaultAgentFactory.createMobsimAgentFromPerson(p);
-		Agent2D agent = new Agent2D(pda, null, null, null);
-		return agent;
+		Agent2D agent = new Agent2D(pda, null, null, null, null);
+		return (MobsimAgent) agent;
 	}
 
 }

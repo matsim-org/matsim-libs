@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controller2DTest.java
+ * GuiDebuggerFrame.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.controller;
 
-import junit.framework.Assert;
+package playground.gregor.sim2d_v3.helper.guidebugger;
 
-import org.apache.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import java.awt.BorderLayout;
 
-import playground.gregor.sim2d_v3.controller.Controller2D;
+import javax.swing.JFrame;
 
-/**
- * @author laemmel
- * 
- */
-public class Controller2DTest {
-	private static final Logger log = Logger.getLogger(Controller2DTest.class);
-
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Test
-	public void testController2D() {
-		String testEventsFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
-		String configFile = this.utils.getInputDirectory() + "config2d.xml";
-		Controller2D c = new Controller2D(new String[] { configFile });
-		c.run();
-		String refEventsFile = this.utils.getInputDirectory() + "10.events.xml.gz";
-		log.info("comparing events files: ");
-		log.info(refEventsFile);
-		log.info(testEventsFile);
-		int i = EventsFileComparator.compare(refEventsFile, testEventsFile);
-		Assert.assertEquals("different events-files in iteration 10", 0, i);
+public class GuiDebuggerFrame extends JFrame {
+	
+	
+	public GuiDebuggerFrame() {
+		setSize(1000, 1000);
+		GuiDebugger dbg = new GuiDebugger();
+		add(dbg,BorderLayout.CENTER);
+		dbg.init();
 	}
+
 }

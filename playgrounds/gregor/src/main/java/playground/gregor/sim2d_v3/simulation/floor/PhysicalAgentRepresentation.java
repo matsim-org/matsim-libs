@@ -1,7 +1,5 @@
 package playground.gregor.sim2d_v3.simulation.floor;
 
-import org.matsim.core.gbl.MatsimRandom;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public abstract class PhysicalAgentRepresentation {
@@ -13,7 +11,7 @@ public abstract class PhysicalAgentRepresentation {
 
 	public PhysicalAgentRepresentation() {
 		super();
-		this.diameter = 0.4 + 0.1*MatsimRandom.getRandom().nextDouble();
+		this.diameter = .4;//0.4 + 0.2*MatsimRandom.getRandom().nextDouble();
 	}
 
 	abstract public void update(double v, double alpha, Coordinate pos);

@@ -36,8 +36,6 @@ import org.matsim.core.mobsim.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v3.controller.PedestrianSignal;
 import playground.gregor.sim2d_v3.simulation.floor.Agent2D;
@@ -47,6 +45,8 @@ import playground.gregor.sim2d_v3.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v3.simulation.floor.VelocityCalculator;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.LinkSwitcher;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.MentalLinkSwitcher;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author laemmel
@@ -100,11 +100,11 @@ public class Sim2DEngine implements MobsimEngine {
 		/*
 		 * Moved here from Sim2DAgentFactory which is not necessary anymore.
 		 */
-		this.velocityCalculator = new DefaultVelocityCalculator(scenario.getConfig().plansCalcRoute());
-		Sim2DConfigGroup s2d = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
+		this.velocityCalculator = new DefaultVelocityCalculator(this.scenario.getConfig().plansCalcRoute());
+		Sim2DConfigGroup s2d = (Sim2DConfigGroup) this.scenario.getConfig().getModule("sim2d");
 		
 		if (s2d.isEnableMentalLinkSwitch()){
-			this.mlsw = new MentalLinkSwitcher(scenario);
+			this.mlsw = new MentalLinkSwitcher(this.scenario);
 		} else {
 			this.mlsw = new LinkSwitcher() {
 				@Override
@@ -154,7 +154,7 @@ public class Sim2DEngine implements MobsimEngine {
 			
 			if (mobsimAgent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
-				Agent2D agent = agents2D.get(mobsimAgent.getId());
+				Agent2D agent = this.agents2D.get(mobsimAgent.getId());
 				this.floor.agentDepart(agent);
 			} else {
 				return;
@@ -187,7 +187,7 @@ public class Sim2DEngine implements MobsimEngine {
 		this.floor.init();
 		
 		// infoTime may be < simStartTime, this ensures to print out the info at the very first timestep already
-		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
+		this.infoTime = Math.floor(this.internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
 	}
 
 	public void putDepartingAgentInLimbo(MobsimDriverAgent agent) {

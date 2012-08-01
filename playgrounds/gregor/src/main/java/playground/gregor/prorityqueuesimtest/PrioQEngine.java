@@ -12,8 +12,9 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.simulation.floor.Agent2D;
+
 
 public class PrioQEngine implements MobsimEngine {
 
@@ -102,7 +103,7 @@ public class PrioQEngine implements MobsimEngine {
 			Agent2D agent = this.activityEndsList.peek();
 			if (agent.getRealActivityEndTime() <= time) {
 				this.activityEndsList.poll();
-				this.simNetwork.agentDepart(agent);
+				this.simNetwork.agentDepart(agent.getDelegate());
 			} else {
 				return;
 			}
@@ -122,7 +123,7 @@ public class PrioQEngine implements MobsimEngine {
 			int cmp = Double.compare(agent1.getRealActivityEndTime(), agent2.getRealActivityEndTime());
 			if (cmp == 0) {
 				// Both depart at the same time -> let the one with the larger id be first (=smaller)
-				return agent2.getId().compareTo(agent1.getId());
+				return agent2.getDelegate().getId().compareTo(agent1.getDelegate().getId());
 			}
 			return cmp;
 		}

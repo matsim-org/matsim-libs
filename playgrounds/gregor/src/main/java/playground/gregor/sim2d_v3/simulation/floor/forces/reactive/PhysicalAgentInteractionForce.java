@@ -65,9 +65,9 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 
 			double dist = other.getPosition().distance(agent.getPosition());
 			
-			double dv_max = agent.getDesiredVelocity() * this.s2d.getTau() * this.s2d.getTimeStepSize();
+//			double dv_max = agent.getDesiredVelocity() * this.s2d.getTau() * this.s2d.getTimeStepSize();
 			double csoR = other.getPhysicalAgentRepresentation().getAgentDiameter()/2 + agent.getPhysicalAgentRepresentation().getAgentDiameter()/2;
-			if (dist + dv_max > csoR+0.01) {
+			if (dist > csoR+0.01) {
 				continue;
 			}
 			double dx = (agent.getPosition().x - other.getPosition().x) / dist;

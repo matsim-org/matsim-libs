@@ -2,20 +2,19 @@ package playground.gregor.multidestpeds.io;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
+
 
 public class ASCIITableWriter implements XYVxVyEventsHandler {
 
@@ -45,9 +44,9 @@ public class ASCIITableWriter implements XYVxVyEventsHandler {
 			init();
 		}
 
-		if (this.handledIds.contains(event.getPersonId())) {
-			return;
-		}
+//		if (this.handledIds.contains(event.getPersonId())) {
+//			return;
+//		}
 
 
 		try {

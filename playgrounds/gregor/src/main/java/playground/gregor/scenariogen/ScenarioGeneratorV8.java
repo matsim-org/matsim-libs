@@ -2,13 +2,14 @@ package playground.gregor.scenariogen;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,8 +32,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -40,26 +41,26 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class ScenarioGeneratorV8 {
 
-	private enum SC {Helbing,Zanlungo,vanDenBerg};
+	private enum SC {Helbing,Zanlungo,vanDenBerg,none};
 	private static int persId = 0;
 
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/8/";
 		String inputDir = scDir + "/input/";
-		SC model = SC.Helbing;
+		SC model = SC.none;
 
 //		double length = 6;
-		double r = 5;
-		double width = 2.;
+		double l = 5;
+		double d = 2.;
 
 
 		Config c = ConfigUtils.createConfig();
 
 		Scenario sc = ScenarioUtils.createScenario(c);
 
-		createAndSaveEnvironment(inputDir,r, width);
+		createAndSaveEnvironment(inputDir,l, d);
 
-		List<Link> links = createNetwork(sc,inputDir,r,width);
+		List<Link> links = createNetwork(sc,inputDir,l,d);
 
 		createPop(sc,inputDir, links);
 
@@ -107,11 +108,22 @@ public class ScenarioGeneratorV8 {
 			s2d.setEnableDrivingForceModule("false");
 			s2d.setEnableVelocityObstacleModule("true");
 			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		} else {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("false");
+			s2d.setEnableDrivingForceModule("false");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");	
 		}
 
+		s2d.setEnableMentalLinkSwitch("true");
+		
 //		s2d.setTimeStepSize(""+0.1);
 		QSimConfigGroup qsim = new QSimConfigGroup();
-		qsim.setEndTime(300);
+		qsim.setEndTime(600);
 		//				qsim.setTimeStepSize(1./25.);
 		c.addModule("qsim", qsim);
 		
@@ -132,7 +144,8 @@ public class ScenarioGeneratorV8 {
 		Leg leg = pb.createLeg("walk2d");
 		plan.addLeg(leg);
 		Link l1 = links.get(links.size()-1);
-		Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
+		ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("h", l1.getId());
+		act2.setCoord(l1.getCoord());
 		act2.setEndTime(0);
 		plan.addActivity(act2);
 		plan.setScore(0.);
@@ -167,8 +180,10 @@ public class ScenarioGeneratorV8 {
 			double dx = posOnLink*(clink.getToNode().getCoord().getX() - clink.getFromNode().getCoord().getX())/clink.getLength();
 			double dy = posOnLink*(clink.getToNode().getCoord().getY() - clink.getFromNode().getCoord().getY())/clink.getLength();
 
-			double x = +0.1*(MatsimRandom.getRandom().nextDouble()-.5)*clink.getFromNode().getCoord().getX() + dx;
-			double y = +0.1*(MatsimRandom.getRandom().nextDouble()-.5)*clink.getFromNode().getCoord().getY() + dy;
+//			double x = +0.1*(MatsimRandom.getRandom().nextDouble()-.5)*clink.getFromNode().getCoord().getX() + dx;
+//			double y = +0.1*(MatsimRandom.getRandom().nextDouble()-.5)*clink.getFromNode().getCoord().getY() + dy;
+			double x = 0.1*(MatsimRandom.getRandom().nextDouble()-.5)+clink.getFromNode().getCoord().getX() + dx;
+			double y = 0.1*(MatsimRandom.getRandom().nextDouble()-.5)+clink.getFromNode().getCoord().getY() + dy;
 
 			//			Point p = geofac.createPoint(new Coordinate(x,y));
 			//			GisDebugger.addGeometry(p, ""+i);
@@ -207,7 +222,7 @@ public class ScenarioGeneratorV8 {
 //		//		createPersons(sc,pb,pop,links,1,435*60);
 //		//		createPersons(sc,pb,pop,links,107,440*60);
 
-				createPersons(sc,pb,pop,links,1,0*60);
+				createPersons(sc,pb,pop,links,80,0*60);
 //				createPersons(sc,pb,pop,links,72,120*60);
 //				createPersons(sc,pb,pop,links,59,180*60);
 //				createPersons(sc,pb,pop,links,49,240*60);
@@ -264,15 +279,29 @@ public class ScenarioGeneratorV8 {
 		double xm = r;
 		double ym = 0;
 		List<Coordinate> oval = get8(r,width);
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
-//		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
+		oval.addAll(get8(r,width));
 		for (Coordinate coord : oval) {
 			Id nid = new IdImpl(nodeId++);
 			CoordImpl c = new CoordImpl(coord.x,coord.y);
@@ -282,6 +311,9 @@ public class ScenarioGeneratorV8 {
 		}
 
 		int linkId = 0;
+		
+		Set<String> modes = new HashSet<String>();
+		modes.add("walk2d");
 		for (int i = 0; i < nodes.size()-1; i++) {
 			NodeImpl n0 = nodes.get(i);
 			NodeImpl n1 = nodes.get(i+1);
@@ -289,7 +321,8 @@ public class ScenarioGeneratorV8 {
 
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
-			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, 1, 1);
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, r*1.33, 1);
+			l.setAllowedModes(modes);
 			sc.getNetwork().addLink(l);
 			links.add(l);
 		}
@@ -299,13 +332,14 @@ public class ScenarioGeneratorV8 {
 		Id lid = new IdImpl(linkId++);
 		Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 		Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
-		Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, 1, 1);
+		Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, r*1.33, 1);
 		sc.getNetwork().addLink(l);
 		links.add(l);
 
 		String networkOutputFile = dir+"/network.xml";
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
+		((NetworkImpl)sc.getNetwork()).setCapacityPeriod(1);
 		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
 		sc.getConfig().network().setInputFile(networkOutputFile);
 
@@ -318,7 +352,7 @@ public class ScenarioGeneratorV8 {
 		
 		coords.add(new Coordinate(0,0));
 		coords.add(new Coordinate(d+l,0));
-		coords.add(new Coordinate(d+l,-d/2));
+//		coords.add(new Coordinate(d+l,-d/2));
 		double incr = 2 * Math.PI / 64;
 		for (double alpha = 0; alpha > .99*-0.5*Math.PI; alpha -= incr) {
 			double x = Math.cos(alpha) * (d/2+l)+d/2;
@@ -330,7 +364,7 @@ public class ScenarioGeneratorV8 {
 		}
 		coords.add(new Coordinate(0,-d-l));
 		coords.add(new Coordinate(0,d+l));
-		coords.add(new Coordinate(-d/2,d+l));
+//		coords.add(new Coordinate(-d/2,d+l));
 		for (double alpha = Math.PI/2; alpha < 1.01*Math.PI; alpha += incr) {
 			double x = Math.cos(alpha) * (l+d/2)-d/2;
 			double y = Math.sin(alpha) * (l+d/2)+d/2;
@@ -385,7 +419,7 @@ public class ScenarioGeneratorV8 {
 		
 		coords.add(new Coordinate(d/2,d/2));
 		coords.add(new Coordinate(d/2+l+d,d/2));
-		coords.add(new Coordinate(d/2+l+d,-d/2));
+//		coords.add(new Coordinate(d/2+l+d,-d/2));
 		
 		
 		double r0=l+d;
@@ -402,7 +436,7 @@ public class ScenarioGeneratorV8 {
 		
 		coords.add(new Coordinate(-d/2,-d/2));
 		coords.add(new Coordinate(-d/2-l-d,-d/2));
-		coords.add(new Coordinate(-d/2-l-d,d/2));
+//		coords.add(new Coordinate(-d/2-l-d,d/2));
 		for (double alpha = Math.PI; alpha >= .99*.5*Math.PI; alpha -= incr) {
 			double x = Math.cos(alpha) * r0-d/2;
 			double y = Math.sin(alpha) * r0+d/2;

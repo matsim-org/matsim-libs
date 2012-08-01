@@ -11,7 +11,17 @@ public class MyDataContainer {
 
 	private QuadTree<Coordinate> quad;
 	private QuadTree<CCWPolygon> segQuad;
-
+	private QuadTree<float[]> floatSegQuad;
+	
+	
+	public void setFloatSegQuad(QuadTree<float[]> q) {
+		this.floatSegQuad = q;
+	}
+	
+	public QuadTree<float[]> getFloatSegQuad(){
+		return this.floatSegQuad;
+	}
+	
 	public void setDenseCoordsQuadTree(QuadTree<Coordinate> quad) {
 		this.quad = quad;
 	}

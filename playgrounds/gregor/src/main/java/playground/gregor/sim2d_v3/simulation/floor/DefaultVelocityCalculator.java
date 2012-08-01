@@ -81,22 +81,23 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 		double linkFactor = calculateLinkFactor(link);
 		
 		double personWalkVelocity = this.referenceWalkSpeed * personFactor * linkFactor;
-		return personWalkVelocity;
+//		return personWalkVelocity;
+		return 1.34;
 	}
 	
 	private void incGenderWarnCount(String text) {
-		genderWarnCount++;
-		if (warnGender) {
-			printWarning(text, genderWarnCount);
-			if (genderWarnCount >= 10) warnGender = false;
+		this.genderWarnCount++;
+		if (this.warnGender) {
+			printWarning(text, this.genderWarnCount);
+			if (this.genderWarnCount >= 10) this.warnGender = false;
 		}
 	}
 
 	private void incAgeWarnCount(String text) {
-		ageWarnCount++;
-		if (warnAge) {
-			printWarning(text, ageWarnCount);
-			if (ageWarnCount >= 10) warnAge = false;
+		this.ageWarnCount++;
+		if (this.warnAge) {
+			printWarning(text, this.ageWarnCount);
+			if (this.ageWarnCount >= 10) this.warnAge = false;
 		}
 	}
 	
@@ -112,15 +113,15 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 		double genderFactor = 1.0;
 
 		// calculate scatter factor
-		random.setSeed(person.getId().toString().hashCode());
-		for (int i = 0; i < 5; i++) random.nextDouble();
+		this.random.setSeed(person.getId().toString().hashCode());
+		for (int i = 0; i < 5; i++) this.random.nextDouble();
 		
 		// limit scatter factor to +/- 4 times the standard deviation
-		double scatterSpeed = random.nextGaussian() * scatterStandardDeviation + referenceWalkSpeed;
-		if (scatterSpeed < referenceWalkSpeed - 4 * scatterStandardDeviation) {
-			scatterSpeed = referenceWalkSpeed - 4 * scatterStandardDeviation;
-		} else if (scatterSpeed > referenceWalkSpeed + 4 * scatterStandardDeviation) {
-			scatterSpeed = referenceWalkSpeed + 4 * scatterStandardDeviation;
+		double scatterSpeed = this.random.nextGaussian() * this.scatterStandardDeviation + this.referenceWalkSpeed;
+		if (scatterSpeed < this.referenceWalkSpeed - 4 * this.scatterStandardDeviation) {
+			scatterSpeed = this.referenceWalkSpeed - 4 * this.scatterStandardDeviation;
+		} else if (scatterSpeed > this.referenceWalkSpeed + 4 * this.scatterStandardDeviation) {
+			scatterSpeed = this.referenceWalkSpeed + 4 * this.scatterStandardDeviation;
 		}
 		scatterFactor = this.referenceWalkSpeed / scatterSpeed;
 		
@@ -129,13 +130,13 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 			
 			// get gender factor
 			if (p.getSex() == null) {
-				if (genderWarnCount < 10) {
+				if (this.genderWarnCount < 10) {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
-			} else if (p.getSex().equalsIgnoreCase("m")) genderFactor = maleScaleFactor;
-			else if (p.getSex().equalsIgnoreCase("f")) genderFactor = femaleScaleFactor;
+			} else if (p.getSex().equalsIgnoreCase("m")) genderFactor = this.maleScaleFactor;
+			else if (p.getSex().equalsIgnoreCase("f")) genderFactor = this.femaleScaleFactor;
 			else {
-				if (genderWarnCount < 10) {
+				if (this.genderWarnCount < 10) {
 					incGenderWarnCount("Person's gender is not defined correct - expected 'm' or 'f' but found " +
 							p.getSex() + ". Ignoring gender dependent walk speed factor.");
 				}
@@ -145,22 +146,22 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 			
 			// by default, age is set to Integer.MIN_VALUE in PersonImpl  
 			if (age == Integer.MIN_VALUE) {
-				if (ageWarnCount < 10) {
+				if (this.ageWarnCount < 10) {
 					incAgeWarnCount("Person's age is not defined. Ignoring age dependent walk speed factor.");
 				}
 			}
 			else if (age < 0) {
-				if (ageWarnCount < 10) {
+				if (this.ageWarnCount < 10) {
 					incAgeWarnCount("Person's age is out of expected range (0 .. 100). Founde age of " + age + ". Use 0 instead.");
 				}
-				ageFactor = ageFactors[0];
+				ageFactor = this.ageFactors[0];
 			} else if (age > 100) {
-				if (ageWarnCount < 10) {
+				if (this.ageWarnCount < 10) {
 					incAgeWarnCount("Person's age is out of expected range (0 .. 100). Founde age of " + age + ". Use 100 instead.");
 				}
-				ageFactor = ageFactors[100];
+				ageFactor = this.ageFactors[100];
 			} else {
-				ageFactor = ageFactors[p.getAge()];
+				ageFactor = this.ageFactors[p.getAge()];
 			}
 		}
 		

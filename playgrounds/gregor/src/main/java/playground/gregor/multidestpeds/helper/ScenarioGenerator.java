@@ -1,6 +1,7 @@
 package playground.gregor.multidestpeds.helper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,8 +27,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.multidestpeds.io.Mat2XYVxVyEvents;
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -36,7 +37,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class ScenarioGenerator {
 
 
-	private enum SC {Helbing,Zanlungo,vanDenBerg};
+	private enum SC {Helbing,Zanlungo,vanDenBerg,none};
 
 	private static final String MODE = "walk2d";
 
@@ -45,7 +46,7 @@ public class ScenarioGenerator {
 
 	public static void main(String [] args) {
 
-		SC model = SC.vanDenBerg;
+		SC model = SC.Helbing;
 
 		String inputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/joined/gr90.mat";
 		//		String inputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/simulated/gr90_vo.mat";
@@ -94,6 +95,15 @@ public class ScenarioGenerator {
 			s2d.setEnableDrivingForceModule("false");
 			s2d.setEnableVelocityObstacleModule("true");
 			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		} else {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("false");
+			s2d.setEnableDrivingForceModule("false");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");				
 		}
 		s2d.setTimeStepSize(""+(1/25.));
 		s2d.setEnableMentalLinkSwitch("false");
@@ -162,6 +172,12 @@ public class ScenarioGenerator {
 		createTopToBottom6(sc,set);
 		createTopToBottom7(sc,set);
 
+		Set<String> modes = new HashSet<String>();
+		modes.add("walk2d");
+		for (Link link : sc.getNetwork().getLinks().values()) {
+			link.setAllowedModes(modes);
+		}
+		
 		String networkOutputFile = dir+"/network.xml";
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
@@ -208,7 +224,8 @@ public class ScenarioGenerator {
 			nodes.add(n);
 		}
 
-
+		Set<String> modes = new HashSet<String>();
+		modes.add("walkd2d");
 		for (int i = 0; i < nodes.size()-1; i++) {
 			NodeImpl n0 = nodes.get(i);
 			NodeImpl n1 = nodes.get(i+1);
@@ -228,6 +245,7 @@ public class ScenarioGenerator {
 			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
 			sc.getNetwork().addLink(l);
 			links.add(l);
+			l.setAllowedModes(modes);
 		}
 
 		//		NodeImpl n0 = nodes.get(nodes.size()-1);
@@ -280,6 +298,9 @@ public class ScenarioGenerator {
 			}
 			nodes.add(n);
 		}
+		
+		Set<String> modes = new HashSet<String>();
+		modes.add("walkd2d");
 		for (int i = 0; i < nodes.size()-1; i++) {
 			NodeImpl n0 = nodes.get(i);
 			NodeImpl n1 = nodes.get(i+1);
@@ -296,6 +317,7 @@ public class ScenarioGenerator {
 			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
 			sc.getNetwork().addLink(l);
 			links.add(l);
+			l.setAllowedModes(modes);
 		}
 	}
 	
@@ -338,6 +360,9 @@ public class ScenarioGenerator {
 			}
 			nodes.add(n);
 		}
+		
+		Set<String> modes = new HashSet<String>();
+		modes.add("walkd2d");
 		for (int i = 0; i < nodes.size()-1; i++) {
 			NodeImpl n0 = nodes.get(i);
 			NodeImpl n1 = nodes.get(i+1);
@@ -354,6 +379,7 @@ public class ScenarioGenerator {
 			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), length, freespeed,cap , lanes);
 			sc.getNetwork().addLink(l);
 			links.add(l);
+			l.setAllowedModes(modes);
 		}
 	}
 	

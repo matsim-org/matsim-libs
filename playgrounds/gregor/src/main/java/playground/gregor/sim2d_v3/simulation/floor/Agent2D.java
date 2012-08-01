@@ -80,12 +80,12 @@ public class Agent2D {
 		this.par = par;
 
 		// TODO think about this
-		this.desiredVelocity = 1.34; //1.29+(MatsimRandom.getRandom().nextDouble() - 0.5) / 5;
+//		this.desiredVelocity = 0.25;//1.29+(MatsimRandom.getRandom().nextDouble() - 0.5) / 5;
 		if (velocityCalculator != null) {
 			Link currentLink = sc.getNetwork().getLinks().get(pda.getCurrentLinkId());
 			Person person = ((PersonDriverAgentImpl) pda).getPerson(); 
 			this.desiredVelocity = velocityCalculator.getVelocity(person, currentLink);			
-		} else this.desiredVelocity = 1.34;	// workaround for PhantomAgent2D
+		} else this.desiredVelocity = 1.34;	// workaround for PhantomAgent2
 		this.currentDesiredVelocity = this.desiredVelocity;
 	}
 
@@ -125,7 +125,7 @@ public class Agent2D {
 		
 		this.par.update(this.v,this.alpha, this.currentPosition);
 
-		this.mentalLinkSwitcher.checkForMentalLinkSwitch(pda.getCurrentLinkId(), pda.chooseNextLinkId(), this);
+		this.mentalLinkSwitcher.checkForMentalLinkSwitch(this.pda.getCurrentLinkId(), this.pda.chooseNextLinkId(), this);
 	}
 
 	/**
@@ -157,8 +157,8 @@ public class Agent2D {
 	public void notifyMoveOverNode(Id newLinkId, double time) {
 		this.pda.notifyMoveOverNode(newLinkId);
 		Link currentLink = this.sc.getNetwork().getLinks().get(newLinkId);
-		Person person = ((PersonDriverAgentImpl) pda).getPerson(); 
-		this.desiredVelocity = velocityCalculator.getVelocity(person, currentLink);
+		Person person = ((PersonDriverAgentImpl) this.pda).getPerson(); 
+		this.desiredVelocity = this.velocityCalculator.getVelocity(person, currentLink);
 		double sp = currentLink.getFreespeed(time);
 		this.currentDesiredVelocity = Math.min(this.desiredVelocity, sp);
 		this.mentalSwitched = false;
@@ -168,7 +168,7 @@ public class Agent2D {
 		if (red == SignalGroupState.RED) {
 			this.currentDesiredVelocity = 0.000001; //FIXME can't use 0 here, since we get NaNs in force modules if v0=0;
 		} else {
-			double sp = this.sc.getNetwork().getLinks().get(pda.getCurrentLinkId()).getFreespeed(time);
+			double sp = this.sc.getNetwork().getLinks().get(this.pda.getCurrentLinkId()).getFreespeed(time);
 			this.currentDesiredVelocity = Math.min(this.desiredVelocity, sp);
 		}		
 	}
@@ -183,9 +183,9 @@ public class Agent2D {
 
 	public Id getMentalLink() {
 		if (this.mentalSwitched) {
-			return pda.chooseNextLinkId();
+			return this.pda.chooseNextLinkId();
 		}
-		return pda.getCurrentLinkId();
+		return this.pda.getCurrentLinkId();
 	}
 
 	public void setEarliestUpdate(double time) {

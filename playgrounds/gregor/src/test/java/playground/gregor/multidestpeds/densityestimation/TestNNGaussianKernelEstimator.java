@@ -13,12 +13,13 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEvent;
+import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEventHandler;
+import playground.gregor.sim2d_v3.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v3.scenario.MyDataContainer;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
-import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
-import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
-import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 
 public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoordinateEventHandler{
 

@@ -30,14 +30,14 @@ import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
-
-import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 
 public class ScenarioLoader2DImpl  {
 
@@ -81,8 +81,11 @@ public class ScenarioLoader2DImpl  {
 		this.scenarioData.addScenarioElement(reader);
 		generateDenseCoords(reader);
 
-		QuadTree<CCWPolygon> q = new SegmentsFromGeometries(reader).getQuadTree();
+		SegmentsFromGeometries segs = new SegmentsFromGeometries(reader);
+		QuadTree<CCWPolygon> q = segs.getQuadTree();
 		this.c.setSegmentsQuadTree(q);
+		
+		this.c.setFloatSegQuad(segs.getFloatSegQuadTree());
 	}
 
 

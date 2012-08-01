@@ -2,7 +2,7 @@ package playground.gregor;
 
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
+import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

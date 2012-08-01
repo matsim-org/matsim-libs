@@ -7,8 +7,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
-import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
+
 
 public class Test {
 

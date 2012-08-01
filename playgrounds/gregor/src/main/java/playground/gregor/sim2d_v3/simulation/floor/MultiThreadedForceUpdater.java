@@ -76,17 +76,18 @@ public class MultiThreadedForceUpdater implements Runnable {
 				/*
 				 * The Threads wait at the startBarrier until they are triggered.
 				 */
-				startBarrier.await();
+				this.startBarrier.await();
 
 				/*
 				 * Check if Simulation is still running. Otherwise print CPU usage and end Thread.
 				 */
-				if (!simulationRunning) {
+				if (!this.simulationRunning) {
 					Gbl.printCurrentThreadCpuTime();
 					return;
 				}
 
-				for (Agent2D agent : agents) {
+				for (Agent2D agent : this.agents) {
+					
 					for (ForceModule m : this.dynamicForceModules) {
 						m.run(agent, this.time);
 					}
@@ -94,13 +95,13 @@ public class MultiThreadedForceUpdater implements Runnable {
 						m.run(agent, this.time);
 					}					
 				}
-				agents.clear();
+				this.agents.clear();
 				
 				/*
 				 * The End of the Moving is synchronized with the endBarrier. If 
 				 * all Threads reach this Barrier the main Thread can go on.
 				 */
-				endBarrier.await();
+				this.endBarrier.await();
 			} catch (InterruptedException e) {
 				Gbl.errorMsg(e);
 			} catch (BrokenBarrierException e) {

@@ -78,8 +78,8 @@ import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -1291,19 +1291,19 @@ public class PED12ScenarioGen {
 			this.dy = dy;
 			this.da = da;
 			
-			cosA = Math.cos(da * Math.PI / 180);
-			sinA = Math.sin(da * Math.PI / 180);
+			this.cosA = Math.cos(da * Math.PI / 180);
+			this.sinA = Math.sin(da * Math.PI / 180);
 		}
 		
 		public Coord transformCoord(double x, double y) {
 			
 			// rotate coordinate
-			double X = (x * cosA - y * sinA);
-			double Y = (x * sinA + y * cosA);
+			double X = (x * this.cosA - y * this.sinA);
+			double Y = (x * this.sinA + y * this.cosA);
 			
 			// move coordinate
-			X += dx;
-			Y += dy;
+			X += this.dx;
+			Y += this.dy;
 			
 			return new CoordImpl(X,Y);
 		}
@@ -1313,12 +1313,12 @@ public class PED12ScenarioGen {
 			Coordinate coordinate = new Coordinate(x,y);
 			
 			// rotate coordinate
-			coordinate.x = (x * cosA - y * sinA);
-			coordinate.y = (x * sinA + y * cosA);
+			coordinate.x = (x * this.cosA - y * this.sinA);
+			coordinate.y = (x * this.sinA + y * this.cosA);
 			
 			// move coordinate
-			coordinate.x += dx;
-			coordinate.y += dy;
+			coordinate.x += this.dx;
+			coordinate.y += this.dy;
 			
 			return coordinate;
 		}

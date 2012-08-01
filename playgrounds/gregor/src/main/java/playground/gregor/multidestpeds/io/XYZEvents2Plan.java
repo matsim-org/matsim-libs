@@ -47,9 +47,9 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.xml.sax.SAXException;
 
 import playground.gregor.multidestpeds.helper.QueueSimDepartCalculator;
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

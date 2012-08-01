@@ -41,8 +41,9 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
+
 
 public class OTFVisMobsimFeature implements XYVxVyEventsHandler, VisMobsimFeature, MobsimInitializedListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener,
 AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler{
@@ -52,7 +53,7 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler{
 
 	private OTFAgentsListHandler.Writer walk2dWriter;
 	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
 
 	public OTFVisMobsimFeature(VisMobsim queueSimulation, Scenario scenario, EventsManager eventsManager) {
 		this.queueSimulation = queueSimulation;

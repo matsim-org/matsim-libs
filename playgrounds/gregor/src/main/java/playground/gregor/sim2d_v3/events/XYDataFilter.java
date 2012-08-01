@@ -37,26 +37,26 @@ public class XYDataFilter {
 
 	static final Logger log = Logger.getLogger(XYDataFilter.class);
 	
-	private final double dTolerance = 0.50;	// absolute distance
+	private final double dTolerance = 0.050;	// absolute distance
 	private final double vTolerance = 1.25;	// relative speed
-	private final double tTolerance = 5.0;	// time
+	private final double tTolerance = .04;	// time
 	
 	private final Map<Id, XYVxVyEvent> recentEvents = new ConcurrentHashMap<Id, XYVxVyEvent>();
 	
-	private AtomicLong processedEvents = new AtomicLong(0);
-	private AtomicLong skippedEvents = new AtomicLong(0);
+	private final AtomicLong processedEvents = new AtomicLong(0);
+	private final AtomicLong skippedEvents = new AtomicLong(0);
 	
 	public boolean processXYVxVyEvent(XYVxVyEvent event) {
 		
-		XYVxVyEvent recentEvent = recentEvents.get(event.getPersonId());
+		XYVxVyEvent recentEvent = this.recentEvents.get(event.getPersonId());
 		boolean processEvent = checkEvent(event, recentEvent);
 		
 		if (processEvent) {
 			// process event, therefore save it as new recently processed event
 			this.recentEvents.put(event.getPersonId(), event);
-			processedEvents.incrementAndGet();
+			this.processedEvents.incrementAndGet();
 		} else {
-			skippedEvents.incrementAndGet();			
+			this.skippedEvents.incrementAndGet();			
 		}
 		
 		return processEvent;
@@ -66,14 +66,14 @@ public class XYDataFilter {
 		if (recentEvent != null) {
 			
 			// check time tolerance
-			if (event.getTime() > recentEvent.getTime() + tTolerance) return true;
+			if (event.getTime() > recentEvent.getTime() + this.tTolerance) return true;
 			
 			// check position tolerance
 			double xRecent = recentEvent.getX();
 			double yRecent = recentEvent.getY();
 			
-			if (Math.abs(event.getX() - xRecent) > dTolerance) return true;
-			else if (Math.abs(event.getY() - yRecent) > dTolerance) return true;
+			if (Math.abs(event.getX() - xRecent) > this.dTolerance) return true;
+			else if (Math.abs(event.getY() - yRecent) > this.dTolerance) return true;
 			
 //			// check speed tolerance
 //			double vx = event.getVX();
@@ -93,8 +93,8 @@ public class XYDataFilter {
 	}
 	
 	public void afterSim() {
-		log.info("Processed events: " + processedEvents.get());
-		log.info("Skipped events: " + skippedEvents.get());
+		log.info("Processed events: " + this.processedEvents.get());
+		log.info("Skipped events: " + this.skippedEvents.get());
 		
 		this.recentEvents.clear();
 		this.processedEvents.set(0);

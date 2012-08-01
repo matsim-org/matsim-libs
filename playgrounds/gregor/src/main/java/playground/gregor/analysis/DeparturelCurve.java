@@ -5,24 +5,24 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
-public class ArrivalCurve implements AgentArrivalEventHandler{
+public class DeparturelCurve implements AgentDepartureEventHandler{
 
 	int time = 0;
 	int arrived = 0;
 	private final BufferedWriter w;
 	
-	public ArrivalCurve(BufferedWriter w) {
+	public DeparturelCurve(BufferedWriter w) {
 		this.w = w;
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(AgentDepartureEvent event) {
 		int intTime = (int) (event.getTime() + 0.5);
 		
 		if (intTime > this.time) {
@@ -32,7 +32,7 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 		this.arrived++;
 	}
 	
-	private void dump() {
+	public void dump() {
 		try {
 			this.w.append(this.time/3600. + "\t" + this.arrived + "\n");
 		} catch (IOException e) {
@@ -56,13 +56,13 @@ public class ArrivalCurve implements AgentArrivalEventHandler{
 		
 		BufferedWriter w = null;
 		try {
-			w = new BufferedWriter(new FileWriter(new File(base + "/analysis/arrival")));
+			w = new BufferedWriter(new FileWriter(new File(base + "/analysis/departure")));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		ArrivalCurve arrv = new ArrivalCurve(w);
+		DeparturelCurve arrv = new DeparturelCurve(w);
 		mgr.addHandler(arrv);
 		new EventsReaderXMLv1(mgr).parse(events);
 		arrv.dump();

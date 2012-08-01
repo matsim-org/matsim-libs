@@ -2,8 +2,10 @@ package playground.gregor.scenariogen;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,8 +32,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
+import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -39,13 +41,13 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class ScenarioGeneratorVCircle {
 
-	private enum SC {Helbing,Zanlungo,vanDenBerg};
+	private enum SC {Helbing,Zanlungo,vanDenBerg,none};
 	private static int persId = 0;
 
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/circle/";
 		String inputDir = scDir + "/input/";
-		SC model = SC.vanDenBerg;
+		SC model = SC.none;
 
 //		double length = 6;
 		double r = 5;
@@ -106,6 +108,15 @@ public class ScenarioGeneratorVCircle {
 			s2d.setEnableDrivingForceModule("false");
 			s2d.setEnableVelocityObstacleModule("true");
 			s2d.setEnablePhysicalEnvironmentForceModule("false");			
+		} else {
+			s2d.setEnableCircularAgentInterActionModule("false");
+			s2d.setEnableEnvironmentForceModule("false");
+			s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+			s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+			s2d.setEnablePathForceModule("false");
+			s2d.setEnableDrivingForceModule("false");
+			s2d.setEnableVelocityObstacleModule("false");
+			s2d.setEnablePhysicalEnvironmentForceModule("false");
 		}
 
 //		s2d.setTimeStepSize(""+0.1);
@@ -281,6 +292,9 @@ public class ScenarioGeneratorVCircle {
 		}
 
 		int linkId = 0;
+		
+		Set<String> modes = new HashSet<String>();
+		modes.add("walk2d");
 		for (int i = 0; i < nodes.size()-1; i++) {
 			NodeImpl n0 = nodes.get(i);
 			NodeImpl n1 = nodes.get(i+1);
@@ -288,9 +302,10 @@ public class ScenarioGeneratorVCircle {
 
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
-			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, 1, 1);
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, width*1.33, 1);
 			sc.getNetwork().addLink(l);
 			links.add(l);
+			l.setAllowedModes(modes);
 		}
 		
 		NodeImpl n0 = nodes.get(nodes.size()-1);
@@ -298,13 +313,15 @@ public class ScenarioGeneratorVCircle {
 		Id lid = new IdImpl(linkId++);
 		Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 		Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
-		Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, 1, 1);
+		Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, width*1.33, 1);
 		sc.getNetwork().addLink(l);
 		links.add(l);
+		l.setAllowedModes(modes);
 
 		String networkOutputFile = dir+"/network.xml";
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
+		((NetworkImpl)sc.getNetwork()).setCapacityPeriod(1);
 		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
 		sc.getConfig().network().setInputFile(networkOutputFile);
 

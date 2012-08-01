@@ -10,10 +10,11 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v3.events.XYVxVyEvent;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
 
 import com.jmatio.io.MatFileWriter;
 import com.jmatio.types.MLArray;
@@ -159,13 +160,18 @@ public class XYVXVYEvents2Mat implements XYVxVyEventsHandler{
 
 	
 	public static void main(String [] args) {
-		String events = "/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz";
-		String outputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/simulated/gr90_van_den_Berg.mat";
+		String events = "/Users/laemmel/devel/8/output/ITERS/it.0/0.events.xml.gz";
+		String outputMat = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/8/simulated/8_vandenberg_l3m_d2m.mat";
 		
 		EventsManager mgr = EventsUtils.createEventsManager();
 		XYVXVYEvents2Mat handler = new XYVXVYEvents2Mat();
 		mgr.addHandler(handler);
-		new XYVxVyEventsFileReader(mgr).parse(events);
+		try {
+			new XYVxVyEventsFileReader(mgr).parse(events);
+		} catch (UncheckedIOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		handler.write(outputMat);
 	}
 	

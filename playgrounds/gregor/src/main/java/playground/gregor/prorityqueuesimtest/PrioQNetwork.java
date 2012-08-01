@@ -25,9 +25,9 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 
 import playground.gregor.microcalibratedqsim.LinkVelocityClassifier;
 import playground.gregor.microcalibratedqsim.WekaEstimator;
-import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
-import playground.gregor.sim2d_v2.statistics.OnLinkStatistics;
-import playground.gregor.sim2d_v2.statistics.OnLinkStatistics.AgentInfo;
+import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v3.statistics.OnLinkStatistics;
+import playground.gregor.sim2d_v3.statistics.OnLinkStatistics.AgentInfo;
 
 public class PrioQNetwork {
 

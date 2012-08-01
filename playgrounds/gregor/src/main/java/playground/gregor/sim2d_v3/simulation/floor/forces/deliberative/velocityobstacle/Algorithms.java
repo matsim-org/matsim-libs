@@ -607,7 +607,7 @@ public abstract class Algorithms {
 		double b = (a1.x - a0.x) * (a0.y - b0.y) - (a1.y - a0.y) * (a0.x - b0.x);
 		double denom = (b1.y - b0.y) * (a1.x - a0.x) - (b1.x - b0.x) * (a1.y - a0.y);
 
-		//conincident
+		//coincident
 		if (Math.abs(a) < epsilon && Math.abs(b) < epsilon && Math.abs(denom) < epsilon) {
 			intersectionCoordinate.x = (a0.x+a1.x) /2;
 			intersectionCoordinate.y = (a0.y+a1.y) /2;
