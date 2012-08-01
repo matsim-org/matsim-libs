@@ -48,7 +48,7 @@ import playground.droeder.realTimeNavigation.movingObjects.MovingAgentImpl;
 import playground.droeder.realTimeNavigation.movingObjects.MovingObject;
 import playground.droeder.realTimeNavigation.velocityObstacles.ReciprocalVelocityObstacleImpl;
 import playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle;
-import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v3.events.XYVxVyEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
