@@ -36,10 +36,14 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkQuadTree;
@@ -324,6 +328,36 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			Graphics2D g2D = (Graphics2D) g;     
 			g2D.setStroke(new BasicStroke(5F));
 
+			
+			if (!evacSel.getRoadClosures().isEmpty())
+			{
+				g.setColor(Color.RED);
+				
+				Iterator<Entry<Id, String>> it = evacSel.getRoadClosures().entrySet().iterator();
+				
+				while (it.hasNext())
+			    {
+			        Map.Entry pairs = (Map.Entry)it.next();
+			        Id id = (Id)pairs.getKey();
+			        
+			        Link link = evacSel.getRoadClosure(id);
+			        
+			        Coord from = this.ctInverse.transform(link.getFromNode().getCoord());
+					Coord to = this.ctInverse.transform(link.getToNode().getCoord());
+
+					Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(from.getY(),from.getX()), this.getZoom());
+					Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(to.getY(),to.getX()), this.getZoom());
+
+					int x1 = (int) (from2D.getX()-b.x);
+					int y1 = (int) (from2D.getY()-b.y);
+					int x2 = (int) (to2D.getX()-b.x);
+					int y2 = (int) (to2D.getY()-b.y);			        
+			        
+					g.drawLine(x1,y1,x2,y2);
+			        
+			    }
+				
+			}			
 
 
 			if ((!this.freezeMode)&&(this.currentHoverLinks.size()>0))
@@ -362,6 +396,10 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				//				if (this.evacSel.hasLink(fromToIds[2]))
 				//					g.setColor(Color.blue);
 				//				else
+				
+
+
+				
 				g.setColor(new Color(255,255,0,100));
 
 				int x = (x2-x1);

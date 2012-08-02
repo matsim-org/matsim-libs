@@ -59,6 +59,7 @@ import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.config.Config;
@@ -497,6 +498,8 @@ public class RoadClosuresEditor implements ActionListener{
 			} else {
 				writer.write(fileName + ".xml", evs);		
 			}
+			
+			System.out.println("saved road closures");
 		}
 
 
@@ -642,6 +645,11 @@ public class RoadClosuresEditor implements ActionListener{
 	public synchronized HashMap<Id, String> getRoadClosures()
 	{
 		return this.roadClosures;
+	}
+	
+	public synchronized Link getRoadClosure(Id linkId)
+	{
+		return this.sc.getNetwork().getLinks().get(linkId);
 	}
 
 	class TypeHour implements KeyListener 
