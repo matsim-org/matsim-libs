@@ -19,16 +19,8 @@ basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 #sort basecase by user group 
 basecase$user.group <- ordered(basecase$user.group, levels = groupOrder)
 
-#pdf(outFile)
 pdf(outFile, width=15, height=7)
-
 par(xpd=T, cex=1.7, mar=c(4,4,1,0), las=1)
-#barplot(t(basecase.mat), legend=F, col = emissioncolors)
-#par(las=3)
-
 
 barplot((basecase$user.logsum..EUR./1000000), names.arg = groupOrder, beside=T, xlab= "base case", ylab="user benefit [million EUR]", col=groupColors)
-#par(xpd=TRUE,las=1)
-#text(-0.1,4,labels="user benefit [million EUR]", adj=c(0,0), srt=90)
-
 dev.off()

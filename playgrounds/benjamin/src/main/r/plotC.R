@@ -1,6 +1,7 @@
 rm(list = ls())		# Clear all variables  
 graphics.off()		# Close graphics windows
 
+emissions<-c("CO2_TOTAL","NMHC","NOX","PM","SO2")
 emissioncolors <- c("black", "mediumblue", "limegreen", "yellow", "red")
 
 #relative paths
@@ -60,7 +61,6 @@ for(i in 1:numberRow){
 }
 
 #delete unwanted rows/columns in matrices
-emissions<-c("CO2_TOTAL","NMHC","NOX","PM","SO2")
 changematrixZ30 <- changematrixZ30[, colnames(changematrixZ30) %in% emissions]
 changematrixPri <- changematrixPri[, colnames(changematrixPri) %in% emissions] 
 
