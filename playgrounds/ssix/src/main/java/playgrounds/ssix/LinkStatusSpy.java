@@ -21,19 +21,15 @@
 package playgrounds.ssix;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-//import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-//import org.matsim.api.core.v01.Scenario;
-//import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author ssix
@@ -41,105 +37,77 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 public class LinkStatusSpy implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	
+	private Logger log = Logger.getLogger(LinkStatusSpy.class);
+	
 	//private Scenario scenario;
 	private Id linkId;
-	private Map<Double, Id> EnteringAgents;
-	private Map<Double, Id> LeavingAgents;
+	private List<Tuple<Double,Id>> EnteringAgents;
+	private List<Tuple<Double,Id>> LeavingAgents;
 	//private int enteringCount = 0;
 	//private int leavingCount = 0;
 	
 	public LinkStatusSpy (/*Scenario scenario,*/ Id linkId){
 		//this.scenario = scenario;
 		this.linkId = linkId;
-		this.EnteringAgents = new HashMap<Double,Id>();
-		this.LeavingAgents = new HashMap<Double,Id>(); 
+		this.EnteringAgents = new ArrayList<Tuple<Double,Id>>();
+		this.LeavingAgents = new ArrayList<Tuple<Double,Id>>(); 
 	}
 
 	
 	public boolean sameLeavingOrderAsEnteringOrder(){
 		//System.out.println(enteringCount+" <> "+leavingCount);
-		//Construction of two ArrayLists<Person>, that contain respectively entering and leaving agents chronologically ordered.
-		SortedSet<Double> sortedKeys = new TreeSet<Double>();
-		sortedKeys.addAll(EnteringAgents.keySet());
-		//System.out.println("Put "+sortedKeys.size()+" times in the sorted set.");
-		ArrayList<Id> EnteringAgentsOrdered = new ArrayList<Id>();
-		/*
-		//Method 1
-		Iterator<Double> it = sortedKeys.iterator();//is supposed to iterate going chronologically forward...
-		while (it.hasNext()){
-			Double key = it.next();
-			EnteringAgentsOrdered.add(EnteringAgents.get(key));
-		}
-		sortedKeys.clear();
-		sortedKeys.addAll(LeavingAgents.keySet());
-		it=sortedKeys.iterator();
-		ArrayList<Person> LeavingAgentsOrdered = new ArrayList<Person>();
-		while (it.hasNext()){
-			Double key = it.next();
-			LeavingAgentsOrdered.add(LeavingAgents.get(key));
-		}
-		*/
-		/*Method 2*/
-		Double[] keySortedArray = (Double[]) sortedKeys.toArray(new Double[sortedKeys.size()]);
-		for (int i = 0; i < keySortedArray.length; i++){
-			Double time = keySortedArray[i];
-			EnteringAgentsOrdered.add(EnteringAgents.get(time));
-		}
-		//System.out.println("Put "+EnteringAgentsOrdered.size()+" agents in EnteringAgentsOrdered");
-		System.out.println("EnteringAgentsOrdered: "+EnteringAgentsOrdered.toString());
-		sortedKeys.clear();
-		sortedKeys.addAll(LeavingAgents.keySet());
-		ArrayList<Id> LeavingAgentsOrdered = new ArrayList<Id>();
-		keySortedArray = (Double[]) sortedKeys.toArray(new Double[sortedKeys.size()]);
-		for (int i = 0; i < keySortedArray.length; i++){
-			Double time = keySortedArray[i];
-			LeavingAgentsOrdered.add(LeavingAgents.get(time));
-		}
-		System.out.println("Put "+LeavingAgentsOrdered.size()+" agents in LeavingAgentsOrdered:");
-		//System.out.println("LeavingAgentsOrdered: "+LeavingAgentsOrdered.toString());
-		//*/
-		
-		//Comparing those two ordered lists in order to find out the wanted result		
+	
+		//Comparing two ordered lists in order to find out the wanted result		
 		if (LeavingAgents.size() != EnteringAgents.size()){
-			System.out.println("Some Agents have been lost or not yet accounted for. Different numbers of cars have entered and left the link!");
+			log.info("Some Agents have been lost or not yet accounted for. Different numbers of cars have entered and left the link!");
 			return false;
 		} else {
-			for (int i=0; i<EnteringAgentsOrdered.size(); i++){
-				if (!(EnteringAgentsOrdered.get(i).equals(LeavingAgentsOrdered.get(i))))
-					return false; 
+			for (int i=0; i<EnteringAgents.size(); i++){
+				if (!(EnteringAgents.get(i).getSecond().equals(LeavingAgents.get(i).getSecond()))){//Comparing Ids
+					log.info("Not the same entering order as leaving order on link "+linkId.toString()+". Some agents have overtaken others.");
+					return false;
+				}
 			}
+			log.info("Same entering order as leaving order on link "+linkId.toString()+".");
+			return true;
 		}
-		return true;
 	}
 	
 	public boolean didXLeaveLinkBeforeY(Id x, Id y){
-		if ((LeavingAgents.containsValue(x)) && (LeavingAgents.containsValue(y))){
-			Double keyX = new Double("0");
-			Double keyY = new Double("0");
-			for (Double key : LeavingAgents.keySet()){
-				if (LeavingAgents.get(key).equals(x)){
-					keyX = key;
-				} else if (LeavingAgents.get(key).equals(y)) {
-					keyY = key;
-				} else {
-					//Do nothing
-				}
-			}
-			if (Double.compare(keyX, keyY) == -1){
+		//NB: This function is meant for post-processing, once EnteringAgents and LeavingAgents are completely filled.
+		boolean containsX = false;
+		boolean containsY = false;
+		Double xLeavingTime = new Double("0");
+		Double yLeavingTime = new Double("0");
+		
+		for (Tuple<Double, Id> t : LeavingAgents){
+			if (t.getSecond().equals(x)){
+				containsX = true;
+				xLeavingTime = t.getFirst();
+			}	
+		}
+		for (Tuple<Double, Id> t : LeavingAgents){
+			if (t.getSecond().equals(y))
+				containsY = true;
+				yLeavingTime = t.getFirst();
+		}
+		
+		if ((containsX) && (containsY)){
+			if (Double.compare(xLeavingTime, yLeavingTime) == -1){
 				return true;
+			} else {
+				return false;
 			}
 		} else {
-			System.out.println("The Person arguments do not belong to the simulation.");
+			log.info("The specified Identifiers do not exist in this simulation.");
 			return false;
 		}
-		return false;
 	}
 	
 	public void handleEvent(LinkEnterEvent event){
 		if (event.getLinkId().equals(this.linkId)){
 			//enteringCount++;
-			//System.out.println("Time an agent enters: "+event.getTime());
-			this.EnteringAgents.put(new Double(event.getTime()), event.getPersonId());
+			this.EnteringAgents.add(new Tuple<Double, Id>(event.getTime(), event.getPersonId()));
 		}
 
 	}
@@ -147,7 +115,7 @@ public class LinkStatusSpy implements LinkEnterEventHandler, LinkLeaveEventHandl
 	public void handleEvent(LinkLeaveEvent event){
 		if (event.getLinkId().equals(this.linkId)){
 			//leavingCount++;
-			this.LeavingAgents.put(new Double(event.getTime()),event.getPersonId());
+			this.LeavingAgents.add(new Tuple<Double, Id>(event.getTime(), event.getPersonId()));
 		}
 	}
 	
@@ -157,7 +125,6 @@ public class LinkStatusSpy implements LinkEnterEventHandler, LinkLeaveEventHandl
 		//this.enteringCount = 0;
 		//this.leavingCount = 0;
 	}
-
 
 	public Id getLinkId() {
 		return linkId;

@@ -84,7 +84,7 @@ public class LangeStreckeSzenario {
 	
 	public LangeStreckeSzenario(double length, int numberOfLinks, int[] capacities){
 		this.length = length;
-		this.numberOfLinks =numberOfLinks;
+		this.numberOfLinks = numberOfLinks;
 		if (capacities.length == numberOfLinks) {
 			this.capacities = capacities;
 		} else {
@@ -116,7 +116,7 @@ public class LangeStreckeSzenario {
 		events.addHandler(fundi);
 		
 		runqsim(events);
-		//System.out.println("Same Leaving Order as Entering Order? "+linkSpy.sameLeavingOrderAsEnteringOrder());
+		linkSpy.sameLeavingOrderAsEnteringOrder();
 		fundi.saveAsPng("./output");
 	}
 	
@@ -182,6 +182,7 @@ public class LangeStreckeSzenario {
 	}
 
 	private void createPopulation(long anzahl, int sekundenFrequenz){
+		//TODO:make it more flexible
 		Population population = scenario.getPopulation();
 		
 		for (long i = 0; i<anzahl; i++){
@@ -213,20 +214,27 @@ public class LangeStreckeSzenario {
 	}
 	
 	private Activity createHome(int sekundenFrequenz, long identifier){
-		Id linkId = new IdImpl(0);
-		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", linkId);
+		Id homeLinkId = new IdImpl(0);
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
 		
 		Random r = new Random();
+		/*Method 1: The order of leaving people is guaranteed by the minimum time step between people: first person 1 leaves, then 2, then 3 etc...
 		long plannedEndTime = 6*3600 + (identifier-1)*sekundenFrequenz;
 		double endTime = plannedEndTime - sekundenFrequenz/2.0 + r.nextDouble()*sekundenFrequenz;
+		*/
+		///*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
+		long TimeChunkSize = scenario.getPopulation().getPersons().size() * sekundenFrequenz;
+		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
+		//*/
+		//NB:Method 2 is significantly better for the quality of fundamental diagrams;
 		activity.setEndTime(endTime);
 		
 		return activity;
 	}
 	
 	private Activity createWork(){
-		Id id = new IdImpl(numberOfLinks+1);
-		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", id);
+		Id workLinkId = new IdImpl(numberOfLinks+1);
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", workLinkId);
 		return activity;
 	}
 	
