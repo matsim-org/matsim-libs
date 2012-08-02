@@ -99,10 +99,13 @@ public class SfAirScheduleBuilder {
 				String originAirport = lineEntries[4];
 				String destinationAirport = lineEntries[7];
 				
-				if ((countries==null && this.utcOffset.containsKey(originAirport)) 
-						|| (checkOriginCountry(originCountry, countries) || checkDestinationCountry(destinationCountry, countries) 	// either origin country or destination country
-								&& this.utcOffset.containsKey(originAirport) && this.utcOffset.containsKey(destinationAirport))) {
+				if (countries==null || (checkOriginCountry(originCountry, countries) || checkDestinationCountry(destinationCountry, countries)) ) 	// either origin country or destination country
+				{
 			
+					if (! (this.utcOffset.containsKey(originAirport) && this.utcOffset.containsKey(destinationAirport)) ) {
+						continue;
+					}
+									
 					//filter codeshare flights (see WW_DBF_With_Frequency.DOC from OAG input data)
 					// either "operating marker" set, "shared airline designator" not set or "duplicate" not set
 					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("") || lineEntries[49].equalsIgnoreCase("")) 
