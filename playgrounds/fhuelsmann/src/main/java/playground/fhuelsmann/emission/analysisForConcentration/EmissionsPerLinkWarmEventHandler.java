@@ -87,15 +87,15 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 					
 					if(warmEmissionsTotal.get(linkId) != null){
 						Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
+						Map<WarmPollutant, Double> newWarmEmissionsSoFar = new HashMap<WarmPollutant, Double>();
 						for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
 							WarmPollutant pollutant = entry.getKey();
 							Double eventValue = entry.getValue();
-
 							Double previousValue = warmEmissionsSoFar.get(pollutant);
 							Double newValue = previousValue + eventValue;
-							warmEmissionsSoFar.put(pollutant, newValue);
+							newWarmEmissionsSoFar.put(pollutant, newValue);
 						}
-						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
+						warmEmissionsTotal.put(linkId, newWarmEmissionsSoFar);
 						double countsSoFar = countTotal.get(linkId);
 						double newValue = countsSoFar + 1.;
 						countTotal.put(linkId, newValue);
@@ -125,15 +125,16 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 						
 						if(warmEmissionsTotal.get(linkId) != null){
 							Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
+							Map<WarmPollutant, Double> newWarmEmissionsSoFar = new HashMap<WarmPollutant, Double>();
 							for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
 								WarmPollutant pollutant = entry.getKey();
 								Double eventValue = entry.getValue();
 
 								Double previousValue = warmEmissionsSoFar.get(pollutant);
 								Double newValue = previousValue + eventValue;
-								warmEmissionsSoFar.put(pollutant, newValue);
+								newWarmEmissionsSoFar.put(pollutant, newValue);
 							}
-							warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
+							warmEmissionsTotal.put(linkId, newWarmEmissionsSoFar);
 							double countsSoFar = countTotal.get(linkId);
 							double newValue = countsSoFar + 1.;
 							countTotal.put(linkId, newValue);
