@@ -28,7 +28,7 @@ distInfoPrigroup<-distInfoPri[(distInfoPri$user.group==group),]
 
 #boxplot
 boxplot(distInfoBaCgroup$total.car.distance..km., notch = T, outline = F, boxwex = 0.3, col=groupColors[1], 
-main= "Car distance", ylab="Distance in km", at=1:1-0.3)
+main= paste("Car distance for", group), ylab="Distance in km", at=1:1-0.3)
 boxplot(distInfoZ30group$total.car.distance..km., notch = T, outline = F, boxwex = 0.3, col=groupColors[2], add=T, at=1:1+0.0)
 boxplot(distInfoPrigroup$total.car.distance..km., notch = T, outline = F, boxwex = 0.3, col=groupColors[3], add=T, at=1:1+0.3)
 axis(1, c(0.7,1,1.3), labels=c("Base Case","Zone 30","Pricing"), tick=F)

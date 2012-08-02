@@ -7,6 +7,7 @@ rm(list=ls())
 graphics.off()
 
 colors<-c(1:11) #colors for eleven groups - will be repeated if necessary
+#use colours()[1:11] for the other color package - colors nows only 8 colors
 
 #read files and set directories
 directory <- commandArgs()[3]

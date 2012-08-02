@@ -53,8 +53,9 @@ for (i in groups){
 groupZ30<- subset(z30, z30$user.group==i)
 groupPri<- subset(pri, pri$user.group==i)
 groupMain <- paste("Difference to base case for user group", i)
+
 boxplot(groupZ30[,"total.car.distance..km."], notch=T, outline=F, boxwex = 0.3, col=groupColors[1], 
-main= groupMain, ylab="Distance [km]", at=1:1-0.3)
+main= groupMain, ylab="Distance [km]", at=1:1-0.3, range=1)
 boxplot(groupPri[,"total.car.distance..km."], notch=T, outline=F, boxwex = 0.3, col=groupColors[2], add=T, at=1:1+0.3)
 
 #means
