@@ -8,8 +8,6 @@ modeOrder<- c("ride", "car", "bike", "undefined", "pt", "walk")
 groupOrder<- c("URBAN", "COMMUTER", "REV_COMMUTER", "FREIGHT")
 caseOrder<- c("BaseCase", "Internalization", "Zone30")
 
-nmodes<-length(modeOrder);ngroups<- length(groupOrder); ncases<-length(caseOrder)
-
 #read files and set directories
 directory <- commandArgs()[3]
 
@@ -27,7 +25,7 @@ rownames(Pri)<-paste(Pri[,"mode"], Pri[,"user.group"])
 rownames(Z30)<-paste(Z30[,"mode"], Z30[,"user.group"])
 
 #organise needed data as array
-data<- array(dim=c(nmodes, ncases, ngroups), dimnames=list(modeOrder, caseOrder, groupOrder)) 
+data<- array(dim=c(length(modeOrder), length(caseOrder), length(groupOrder)), dimnames=list(modeOrder, caseOrder, groupOrder)) 
 
 for (case in caseOrder){
 	for (group in groupOrder){
@@ -70,26 +68,18 @@ layout(m)
 #header
 plot.new();text(0.5,0.5,"Modal split by groups", cex=4)
 #barplots
-#TODO achsen fuer den ersten plot mit axisbefehl?
 axisF<-TRUE
 for (group in groupOrder){
 for (case in caseOrder){
-		currData<-cbind(data[,case,group]); #print(myvex)
+		currData<-cbind(data[,case,group])
 		barplot(currData, beside=F, axes=axisF, axisnames=T, names.arg= c(case), col=colors)
 		axisF<-FALSE #axis only for first plot
 	}
 }
 
 #legend
-plot.new()
-par(cex=2)
-text(0.08,0.9, "URBAN")
-text(0.37,0.9, "COMMUTER")
-text(0.64,0.9, "REV_COMMUTER")
-text(0.92,0.9, "FREIGHT")
+plot.new(); par(cex=2);
+text(0.08,0.9, "URBAN"); text(0.37,0.9, "COMMUTER"); text(0.64,0.9, "REV_COMMUTER"); text(0.92,0.9, "FREIGHT")
 legend(0.08,0.5, modeOrder, fill=colors, horiz=T, bty="n")
 
 dev.off()
-
-#################################
-
