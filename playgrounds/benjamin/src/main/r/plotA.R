@@ -87,6 +87,6 @@ par(cex=1.7)
 plot.new()
 par(las=0)
 #emissions<-sub("_TOTAL","", emissions, fixed=T)
-legend(-0.0,0.8, emissions, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
+legend(-0.0,0.8, sub("_TOTAL","", emissions, fixed=T), fill = emissioncolors, cex=1, bty="n", y.intersp=2)
 
 dev.off()
