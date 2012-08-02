@@ -80,7 +80,6 @@ public class Agent2D {
 		this.par = par;
 
 		// TODO think about this
-//		this.desiredVelocity = 0.25;//1.29+(MatsimRandom.getRandom().nextDouble() - 0.5) / 5;
 		if (velocityCalculator != null) {
 			Link currentLink = sc.getNetwork().getLinks().get(pda.getCurrentLinkId());
 			Person person = ((PersonDriverAgentImpl) pda).getPerson(); 
@@ -222,10 +221,6 @@ public class Agent2D {
 	public MobsimDriverAgent getDelegate() {
 		return this.pda;
 	}
-
-//	public CCWPolygon getGeometry() {
-//		return this.par.getGeometry();
-//	}
 
 	public PhysicalAgentRepresentation getPhysicalAgentRepresentation() {
 		return this.par;

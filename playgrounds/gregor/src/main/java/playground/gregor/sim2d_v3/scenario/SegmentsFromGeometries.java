@@ -4,8 +4,6 @@ import org.geotools.feature.Feature;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -18,13 +16,11 @@ public class SegmentsFromGeometries {
 
 	private static double SUSPENSION_POINTS_MAX_DIST = .5;
 
-	private final QuadTree<CCWPolygon> quad;
 
 	private final QuadTree<float[]> floatSegQuad;
 
 	public SegmentsFromGeometries(ShapeFileReader reader) {
 		Envelope e = reader.getBounds();
-		this.quad = new QuadTree<CCWPolygon>(e.getMinX()-1000,e.getMinY()-1000,e.getMaxX()+1000,e.getMaxY()+1000);
 		this.floatSegQuad = new QuadTree<float[]>(e.getMinX()-1000,e.getMinY()-1000,e.getMaxX()+1000,e.getMaxY()+1000);
 		for (Feature ft : reader.getFeatureSet()){
 			Geometry geo = ft.getDefaultGeometry();
@@ -69,7 +65,6 @@ public class SegmentsFromGeometries {
 	}
 
 	private void handleSegment(Coordinate c0, Coordinate c1) {
-		CCWPolygon ccwp = new CCWPolygon(new Coordinate[]{c0,c1,c0},new Coordinate(0,0),0);
 		
 		
 		
@@ -78,7 +73,6 @@ public class SegmentsFromGeometries {
 		double dy = SUSPENSION_POINTS_MAX_DIST*(c1.y-c0.y)/length;
 		int increments = (int) (length/SUSPENSION_POINTS_MAX_DIST);
 
-		this.quad.put(c0.x, c0.y, ccwp);
 		float xold = (float) c0.x;
 		float yold = (float) c0.y;
 		float[] seg = {xold,yold,(float) c1.x,(float) c1.y};
@@ -86,16 +80,11 @@ public class SegmentsFromGeometries {
 		for (int i = 1; i <= increments; i++) {
 			double x = c0.x + i*dx;
 			double y = c0.y + i*dy;
-			this.quad.put(x, y, ccwp);
 			this.floatSegQuad.put(x, y, seg);
 		}
-		this.quad.put(c1.x, c1.y, ccwp);
 		this.floatSegQuad.put(c1.x, c1.y, seg);
 	}
 
-	public QuadTree<CCWPolygon> getQuadTree() {
-		return this.quad;
-	}
 
 	public QuadTree<float[]> getFloatSegQuadTree() {
 		return this.floatSegQuad;

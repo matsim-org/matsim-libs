@@ -634,31 +634,4 @@ public abstract class Algorithms {
 		return true;
 	}
 
-	public static boolean testForCollision(VelocityObstacle info, Coordinate c) {
-//		if (info.getCollTime() <= 0) {
-//			return true;
-//		}
-		Coordinate[] vo = info.getVo();
-		boolean leftOfLeft = Algorithms.isLeftOfLine(c, vo[0], vo[1]) > 0;
-		boolean rightOfRight = Algorithms.isLeftOfLine(c, vo[0], vo[2]) < 0;
-		if (leftOfLeft && rightOfRight) {
-			if (info.getCollTime() == 0) {
-				return false;
-			}
-			return true;
-		}
-		if (info.getCollTime() == 0) {
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean testForCollision(List<? extends VelocityObstacle> infos, Coordinate c) {
-		for (VelocityObstacle info : infos) {
-			if (testForCollision(info,c)) {
-				return true;
-			}
-		}
-		return false;
-	}	
 }

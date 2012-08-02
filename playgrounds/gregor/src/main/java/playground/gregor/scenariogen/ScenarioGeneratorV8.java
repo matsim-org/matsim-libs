@@ -47,7 +47,7 @@ public class ScenarioGeneratorV8 {
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/8/";
 		String inputDir = scDir + "/input/";
-		SC model = SC.none;
+		SC model = SC.vanDenBerg;
 
 //		double length = 6;
 		double l = 5;

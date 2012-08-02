@@ -61,12 +61,11 @@ import playground.gregor.sim2d_v3.simulation.floor.forces.Force;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.CollisionPredictionAgentInteractionModule;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.CollisionPredictionEnvironmentForceModule;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.DrivingForceModule;
+import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.ORCAForce;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.PathForceModule;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.SignalsPerception;
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.VelocityObstacleForceII;
 import playground.gregor.sim2d_v3.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v3.simulation.floor.forces.reactive.EnvironmentForceModuleII;
-import playground.gregor.sim2d_v3.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -121,9 +120,7 @@ public class PhysicalFloor implements Floor {
 		calculateEnvelope();
 
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
-			this.forceUpdater.addDynamicForceModule(new VelocityObstacleForceII(this, this.scenario));
-			this.forceUpdater.addDynamicForceModule(new PhysicalAgentInteractionForce(this, this.scenario));
-			//			this.forceUpdater.addForceModule(new PhysicalEnvironmentForce(this, this.scenario));
+			this.forceUpdater.addDynamicForceModule(new ORCAForce(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
@@ -155,15 +152,6 @@ public class PhysicalFloor implements Floor {
 		if (this.sim2DConfig.isEnablePathForceModule()){
 			this.forceUpdater.addForceModule(new PathForceModule(this, this.scenario));
 		}
-
-		//testing only
-		//				this.forceUpdater.addForceModule(new PhysicalEnvironmentForce(this, this.scenario));
-//		this.forceUpdater.addDynamicForceModule(new ORCAForce(this, this.scenario));
-//		this.forceUpdater.addDynamicForceModule(new PhysicalAgentInteractionForce(this, this.scenario));
-//		this.forceUpdater.addForceModule(new PhysicalEnvironmentForce(this, this.scenario));
-//		this.forceUpdater.addForceModule(new DrivingForceModule(this, this.scenario));
-//		this.forceUpdater.addForceModule(new PathForceModule(this, this.scenario));
-
 
 		this.forceUpdater.init();
 
