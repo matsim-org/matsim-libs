@@ -61,7 +61,6 @@ import playground.gregor.sim2d_v3.simulation.floor.forces.Force;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.CollisionPredictionAgentInteractionModule;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.CollisionPredictionEnvironmentForceModule;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.DrivingForceModule;
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.ORCAForce;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.PathForceModule;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.SignalsPerception;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.VelocityObstacleForceII;
@@ -159,7 +158,7 @@ public class PhysicalFloor implements Floor {
 
 		//testing only
 		//				this.forceUpdater.addForceModule(new PhysicalEnvironmentForce(this, this.scenario));
-		this.forceUpdater.addDynamicForceModule(new ORCAForce(this, this.scenario));
+//		this.forceUpdater.addDynamicForceModule(new ORCAForce(this, this.scenario));
 //		this.forceUpdater.addDynamicForceModule(new PhysicalAgentInteractionForce(this, this.scenario));
 //		this.forceUpdater.addForceModule(new PhysicalEnvironmentForce(this, this.scenario));
 //		this.forceUpdater.addForceModule(new DrivingForceModule(this, this.scenario));
