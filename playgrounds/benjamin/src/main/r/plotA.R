@@ -60,26 +60,33 @@ emissionsLegend <- sub("_TOTAL","", emissions, fixed=T)
 
 ########
 pdf(outFile, width=15, height=7)
-layout(matrix(c(1,1,1,1,1,2),1,6))
-par(xpd=T, cex=1.7, mar=c(2,4,1,0), las=1)
-
+layout(matrix(c(1,2,2,2,2,3),1,6))
+par(xpd=T, cex=1.7, oma=c(0,0,1,0), mar=c(4,0,0,0), las=1) #left margin different to other plots (4,4,1,0)
 emP<-""
 #write legend with relative factors
 for(i in 1: length(emissions)){
 	emP<-paste(emP, emissionsLegend[i],"[ g x ",relativmatrix[1,i], "]")
+	if(i%%3==0){emp<-paste(emP, "\n")}
 	#example: SO2 [g x 1000]
-	emissionsLegend[i]<-paste(emissionsLegend[i],"\n [ g x ",relativmatrix[1,i], "]")
+	emissionsLegend[i]<-paste(emissionsLegend[i]," [ g x ",relativmatrix[1,i], "]")
 	
 }
 print(emP)
-#mtext(emissionsLegend, outer=F, side=1, cex=1.7, adj=1,padj=1)
-par(cex=0.9)
-barplot(t(basecase.mat), legend=F, col = emissioncolors, ylab=emP, cex.axis=1.3, cex.names=1.7)
-par(cex=1.7)
 
+#par(cex=0.9)
+#ylab=emP
+plot.new()
+par(cex=1.7, srt=90)
+text(0.1,0, paste(emissionsLegend[1],emissionsLegend[2]), outer=T, cex=1, adj=0,padj=0)
+text(0.25,0,paste(emissionsLegend[3],emissionsLegend[4]), outer=T, cex=1, adj=0,padj=0)
+text(0.40,0,paste(emissionsLegend[5]), outer=T, cex=1, adj=0,padj=0)
+par(las=1, srt=0)
+barplot(t(basecase.mat), legend=F, col = emissioncolors, cex.axis=1, cex.names=1, xlab= "base case")
+par(cex=1.7)
+#mtext(emP, outer=F, side=2, cex=1.7, adj=0,padj=0)
 plot.new()
 par(las=0)
 #emissions<-sub("_TOTAL","", emissions, fixed=T)
-legend(-1.3,0.8, emissionsLegend, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
+legend(-0.0,0.8, emissions, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
 
 dev.off()
