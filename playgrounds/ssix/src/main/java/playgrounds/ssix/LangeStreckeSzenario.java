@@ -98,7 +98,7 @@ public class LangeStreckeSzenario {
 
 	
 	public static void main(String[] args) {
-		int[] capacities = {1000};//must have a size of numberOfLinks!
+		int[] capacities = {500};//must have a size of numberOfLinks!
 		new LangeStreckeSzenario(5000.0,1,capacities).run();
 
 	}
@@ -109,10 +109,15 @@ public class LangeStreckeSzenario {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		LinkStatusSpy linkSpy = new LinkStatusSpy(/*this.scenario,*/ (Id) new IdImpl((long)(1)));
+		Link link = scenario.getNetwork().getLinks().get(linkSpy.getLinkId());
+		FundamentalDiagrams fundi = new FundamentalDiagrams(scenario, link.getId());
+		
 		events.addHandler(linkSpy);
+		events.addHandler(fundi);
 		
 		runqsim(events);
-		//System.out.println("Same Leaving Order as Entering Order? "+handler.sameLeavingOrderAsEnteringOrder());
+		//System.out.println("Same Leaving Order as Entering Order? "+linkSpy.sameLeavingOrderAsEnteringOrder());
+		fundi.saveAsPng("./output");
 	}
 	
 	private void fillNetworkData(){

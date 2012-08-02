@@ -18,14 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ssix;
+package playgrounds.ssix;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -36,6 +36,8 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
 public class FundamentalDiagrams implements LinkLeaveEventHandler, LinkEnterEventHandler{
+	
+	private static final Logger log = Logger.getLogger(FundamentalDiagrams.class);
 	
 	private Scenario scenario;
 	
@@ -102,49 +104,95 @@ public class FundamentalDiagrams implements LinkLeaveEventHandler, LinkEnterEven
 	}
 	
 	public void saveAsPng(String dir){
-		List<Tuple<Double, Double>> l = collectData();
-		XYLineChart chart1 = new XYLineChart("Flow Fundamental diagram", "velocity m/s", "flow p/s");
-		double [] xs = new double[l.size()];
-		double [] ys = new double[l.size()];
-		int pos = 0;
-		for (Tuple<Double, Double> t : l) {
-
-			xs[pos] = t.getFirst();
-			ys[pos++] = t.getSecond();
-		}
-
-		chart1.addSeries("model", xs, ys);
-		chart1.saveAsPng(dir + "/fndflow.png", 800, 400);
 		
-		XYLineChart chart2 = new XYLineChart("Density Fundamental diagram", "density p/m", "velocity m/s");
-		//TODO:complete that function once the triplet structure has been found.
+		log.info("Saving charts for fundamental diagrams...");
+		
+		Map<Double, Tuple<Double, Double>> m = collectData();
+		XYLineChart chart_v_k = new XYLineChart("Speed-Density Fundamental diagram", "density p/m", "velocity m/s");
+		double [] xs = new double[m.size()];
+		double [] ys = new double[m.size()];
+		int pos = 0;
+		Iterator<Double> it = m.keySet().iterator();
+		while (it.hasNext()) {
+			double speedKey = it.next();
+			xs[pos] = m.get(speedKey).getFirst();
+			ys[pos++] = speedKey;
+		}
+		chart_v_k.addSeries("model", xs, ys);
+		chart_v_k.saveAsPng(dir + "/fnd_v_k.png", 800, 400);
+		
+		XYLineChart chart_q_v = new XYLineChart("Flow-Speed Fundamental diagram", "velocity m/s", "flow p/s");
+		pos = 0;
+		it = m.keySet().iterator();
+		while (it.hasNext()) {
+			double speedKey = it.next();
+			xs[pos] = speedKey;
+			ys[pos++] = m.get(speedKey).getSecond();
+		}
+		chart_q_v.addSeries("model", xs, ys);
+		chart_q_v.saveAsPng(dir + "/fnd_q_v.png", 800, 400);
+		
+		XYLineChart chart_k_q = new XYLineChart("Flow-Density Fundamental diagram", "density p/m", "flow p/s");
+		pos = 0;
+		it = m.keySet().iterator();
+		while (it.hasNext()) {
+			double speedKey = it.next();
+			xs[pos] = m.get(speedKey).getFirst();
+			ys[pos++] = m.get(speedKey).getSecond();
+		}
+		chart_k_q.addSeries("model", xs, ys);
+		chart_k_q.saveAsPng(dir + "/fnd_k_q.png", 800, 400);
+		
+		log.info("Done!");
 	}
 	
-	private List<Tuple<Double, Double>> collectData() {
+	private Map<Double, Tuple<Double, Double>> collectData() {
 		
-		List<Tuple<Double,Double>> ret = new ArrayList<Tuple<Double,Double>>();//TODO:find a structure allowing use of triplets
+		Map<Double, Tuple<Double,Double>> ret = new TreeMap<Double, Tuple<Double,Double>>();
 		
 		//fill timeVelo: associating one unique velocity to each time with a density
+		//Method 1 (used): for a density entry, taking the average speed of all people present on the link at that time
+		//Method 2 (commented/imports necessary): taking the median of all speeds of all people present on the link at that time
 		for (double time : timeDens.keySet()){
+			///*
 			int denom = 0;
-			double sum = 0.;//calculating the mean speed on the link at that time!
+			double sum = 0.;
+			//*/
+			/*
+			List<Double> velo = new ArrayList<Double>();
+			*/
 			for (Id personId : personSpeed.keySet()){
-				if ((personEnteringTime.get(personId)<time) && (personLeavingTime.get(personId)>time)){
+				if ((personEnteringTime.get(personId)<=time) && (personLeavingTime.get(personId)>time)){
 					//that means he was on the link at that time
+					///*
 					denom += 1;
 					sum += personSpeed.get(personId);
+					//*/
+					/*
+					velo.add(personSpeed.get(personId));
+					*/
 				}
 			}
+			///*
 			timeVelo.put(time, sum/denom);
 			timeFlow.put(time, sum/denom*timeDens.get(time));
+			//*/
+			//TODO: Is there a more intelligent and more direct way to compute this?
+			//The problem is: how to compute space-related figures (speed, flow) with time-related figures (density)?
+			/*
+			Collections.sort(velo);
+			timeVelo.put(time, velo.get(velo.size()/2));
+			timeFlow.put(time, timeVelo.get(time)*timeDens.get(time));
+			*/
 		}
 		
 		//now for the data collecting part:
 		for (Entry<Double, Double> flowEntry : this.timeFlow.entrySet()) {
 			double flow = flowEntry.getValue();
 			double speed = this.timeVelo.get(flowEntry.getKey());
-			Tuple<Double, Double> t = new Tuple<Double, Double>(speed, flow);
-			ret.add(t);
+			double dens = flow/speed;//NB: exactly the same as timeDens.get(flowEntry.getKey())
+			Tuple<Double, Double> t = new Tuple<Double, Double>(dens, flow);
+			ret.put(speed, t);
 		}
 		return ret;
 	}

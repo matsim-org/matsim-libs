@@ -57,6 +57,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 
+import playgrounds.ssix.FundamentalDiagrams;
 import playgrounds.ssix.LinkStatusSpy;
 
 /**
@@ -98,7 +99,7 @@ public class LangeStreckeSzenarioTest {
 
 	
 	public static void main(String[] args) {
-		int[] capacities = {1000};//must have a size of numberOfLinks!
+		int[] capacities = {500};//must have a size of numberOfLinks!
 		new LangeStreckeSzenarioTest(5000.0,1,capacities).run();
 
 	}
@@ -110,17 +111,14 @@ public class LangeStreckeSzenarioTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		LinkStatusSpy linkSpy = new LinkStatusSpy(/*this.scenario,*/ (Id) new IdImpl((long)(1)));
 		Link link = scenario.getNetwork().getLinks().get(linkSpy.getLinkId());
-		VelocityFundamentalDiagramOTF fundi = new VelocityFundamentalDiagramOTF(scenario, link.getId());
-		FlowFundamentalDiagramOTF fundi2 = new FlowFundamentalDiagramOTF(scenario, link.getId());
+		FundamentalDiagrams fundi = new FundamentalDiagrams(scenario, link.getId());
 		
 		events.addHandler(linkSpy);
 		events.addHandler(fundi);
-		events.addHandler(fundi2);
 		
 		runqsim(events);
 		//System.out.println("Same Leaving Order as Entering Order? "+linkSpy.sameLeavingOrderAsEnteringOrder());
 		fundi.saveAsPng("./output");
-		fundi2.saveAsPng("./output");
 	}
 	
 	private void fillNetworkData(){
