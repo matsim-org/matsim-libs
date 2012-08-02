@@ -58,14 +58,34 @@ ylimits<-c(yminimum-5000,ymaximum+5000)
 
 #grafic parameters
 pdf(outFile, width=15, height=11)
-layout(matrix(c(1,1,1,1,3,2,2,2,2,3),5,2))
-par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(5,0,1,0), las=2)
+layout(matrix(c(1,1,1,1,1,1,3,2,2,2,2,2,2,3),7,2))
+par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(0,0,10,0), las=2)
+
+#labels for the plot
+glabels<- rep("", times=ncol(pridata)*length(groupOrder))
+glabels[2]<-groupOrder[1]
+glabels[5]<-groupOrder[2]
+glabels[8]<-groupOrder[3]
+glabels[11]<-groupOrder[4]
 
 #plots and legend
-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="zone 30", col=groupColors, axes=F)
+barL<-barplot(t(z30data), beside=T, ylim=ylimits, col=groupColors, axes=F, names.arg=c("","","",""))
+par(srt=90)
+text(x=barL, y=27000, label=glabels, pos=4)
+par(srt=0, font=2)
+text(x=7, y=60000, label="zone 30")
+par(font=1)
 axis(2, at=seq(-25000,25000,by=10000), labels=seq(-25000,25000,by=10000), tick=TRUE)
 mtext("EUR", outer=F, side=2, at= -29000, cex=1.7, adj=1)
-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="internalization", col=groupColors, axes =F)
-plot.new(); par(mar=c(5,0,2,0))
-legend(0.0,-12.0, c("change in user logsum","change in toll payments","sum"), fill=groupColors, cex=1.2, bty="n", y.intersp=2, horiz =TRUE)
+barR<-barplot(t(pridata), beside=T, ylim=ylimits, col=groupColors, axes =F, names.arg=c("","","",""))
+par(srt=90)
+text(x=barR, y=27000, label=glabels, pos=4)
+par(srt=0, font=2)
+text(x=7, y=60000, label="internalization")
+par(font=1)
+par(mar=c(0,0,0,0));plot.new(); 
+legend(0.0,0.8, c("change in user logsum","change in toll payments","sum"), fill=groupColors, cex=1.2, bty="n", y.intersp=2, horiz =TRUE)
 dev.off()
+
+###############
+

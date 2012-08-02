@@ -87,12 +87,21 @@ for(i in 1 : length(groupOrder)){
 #grafic parameters
 pdf(outFile, width=15, height=7)
 layout(matrix(c(1,1,1,1,2,2,2,2),1,8))
-par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(10,0,1,0), las=2)
+par(xpd=T, cex=1.7, oma=c(0,4,0,0), mar=c(0,0,9,0), las=2)
 
 #plots and legend
-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, main="zone 30", col=z30colors, axes=F, space=c(1,0.2)) #first argument of 'space' unused in this plot
+barL<-barplot(t(z30data), beside=T, ylim=ylimits, names.arg= groupOrder, col=z30colors, axes=F, space=c(1,0.2)) #first argument of 'space' unused in this plot
+par(srt=90)
+text(x=barL, y=60, label=groupOrder, pos=4)
+par(srt=0, font=2)
+text(x=2.5, y=230, label="zone 30")
+par(font=1)
 axis(2, at=seq(-150,50,by=20), labels=seq(-150,50,by=20), tick=TRUE)
-mtext("EUR", outer=F, side=2, at= -175, cex=1.7, adj=1)
-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, main="internalization", col=pricolors, axes =F, space=c(1,0.2))
-
+mtext("EUR", outer=F, side=2, at= 70, cex=1.7, adj=1)
+barR<-barplot(t(pridata), beside=T, ylim=ylimits, names.arg= groupOrder, col=pricolors, axes =F, space=c(1,0.2))
+par(srt=90)
+text(x=barR, y=60, label=groupOrder, pos=4)
+par(srt=0, font=2)
+text(x=2.5, y=230, label="internalization")
+par(font=1)
 dev.off()

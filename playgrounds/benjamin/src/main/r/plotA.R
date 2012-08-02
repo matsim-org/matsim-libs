@@ -16,7 +16,6 @@ basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 
 basecase.mat <- as.matrix(basecase)[,2:ncol(basecase)]
 rownames(basecase.mat) <- basecase$user.group
-print(basecase.mat)
 numberCol <- ncol(basecase.mat)
 
 #scaling: multiply with 10^x or 0.1^x
