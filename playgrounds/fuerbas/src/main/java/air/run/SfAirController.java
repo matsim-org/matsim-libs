@@ -22,6 +22,7 @@ package air.run;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 
 public class SfAirController {
@@ -32,7 +33,12 @@ public class SfAirController {
 	 */
 	public static void main(String[] args) {
 
-		Controler con = new Controler("Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\air_config.xml");		//args: configfile
+//		String config = "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\air_config.xml";
+//		String config = "/media/data/work/repos/shared-svn/studies/countries/de/flight/sf_oag_flight_model/air_config.xml";
+//		Controler con = new Controler(config);		//args: configfile
+
+		Controler con = new Controler(args[0]);		//args: configfile
+		con.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		con.setOverwriteFiles(true);
 		ControlerListener lis = new SfFlightTimeControlerListener();
 		con.addControlerListener(lis);

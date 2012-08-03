@@ -145,7 +145,6 @@ public class DgCreateFlightScenario {
 		
 //		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395\\"; //for windows file systems
 		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395/";
-
 		File shapeFileDirectory = new File(shapeFileDirectoryname);
 		if (shapeFileDirectory.exists()){
 			shapeFileDirectory.delete();

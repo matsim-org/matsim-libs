@@ -75,11 +75,13 @@ public class SfAirNetworkBuilder {
 			String origin = airportCodes[0];
 			String destination = airportCodes[1];
 			
-			Id originRunway;
-			if (DgCreateFlightScenario.NUMBER_OF_RUNWAYS==2)
-				originRunway = new IdImpl(origin+"runwayOutbound");
-			else
-				originRunway = new IdImpl(origin+"runway");
+			Id originRunwayOutNodeId;
+			if (DgCreateFlightScenario.NUMBER_OF_RUNWAYS==2) {
+				originRunwayOutNodeId = new IdImpl(origin+"runwayOutbound");
+			}
+			else {
+				originRunwayOutNodeId = new IdImpl(origin+"runway");
+			}
 			
 			Node destinationNode = null;
 			if (DgCreateFlightScenario.doCreateStars) {
@@ -87,9 +89,16 @@ public class SfAirNetworkBuilder {
 				destinationNode = network.getNodes().get(destinationStar);
 			}
 			else {
-				destinationNode = network.getNodes().get(new IdImpl(destination));
+				if (DgCreateFlightScenario.NUMBER_OF_RUNWAYS == 2){
+					destinationNode = network.getNodes().get(new IdImpl(destination + "runwayInbound"));
+				}
+				else {
+					destinationNode = network.getNodes().get(new IdImpl(destination + "runway"));
+				}
 			}
-			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), destinationNode);
+			
+			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), 
+					network.getNodes().get(originRunwayOutNodeId), destinationNode);
 			originToDestination.setAllowedModes(allowedModes);
 
 			originToDestination.setCapacity(1.0*CAP_PERIOD);
