@@ -43,7 +43,7 @@ public class DgCreateFlightScenario {
 	public static final int NUMBER_OF_RUNWAYS = 2;
 	
 	
-	public static final boolean createStars = false;
+	public static final boolean doCreateStars = false;
 	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 100000.0, 1./60., 463./3.6);	//default speed below FL100: 250 knots = 463km/h 
 	public static final Map<String, DgStarinfo> stars = new HashMap<String, DgStarinfo>();	
 	static {

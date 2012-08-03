@@ -136,7 +136,7 @@ public class SfTransitBuilder {
 				linkList.add(new IdImpl(origin+"taxiOutbound"));
 				linkList.add(new IdImpl(origin+"runwayOutbound"));
 				linkList.add(new IdImpl(origin+destination));
-				if (DgCreateFlightScenario.createStars) {
+				if (DgCreateFlightScenario.doCreateStars) {
 					linkList.add(new IdImpl(destination+"star"));
 				}
 				linkList.add(new IdImpl(destination+"runwayInbound"));
@@ -148,7 +148,7 @@ public class SfTransitBuilder {
 				linkList.add(new IdImpl(origin+"taxiOutbound"));
 				linkList.add(new IdImpl(origin+"runway"));
 				linkList.add(new IdImpl(origin+destination));
-				if (DgCreateFlightScenario.createStars) {
+				if (DgCreateFlightScenario.doCreateStars) {
 					linkList.add(new IdImpl(destination+"star"));
 				}
 				linkList.add(new IdImpl(destination+"runway"));

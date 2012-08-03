@@ -170,7 +170,7 @@ public class SfAirScheduleBuilder {
 						) { // desired values for STARs can be defined in DgCreateFlightScenario, otherwise default values will be
 								// used
 
-							if (DgCreateFlightScenario.createStars) {
+							if (DgCreateFlightScenario.doCreateStars) {
 								if (DgCreateFlightScenario.STARoffset.containsKey(destinationAirport))
 									duration = duration - (DgCreateFlightScenario.STARoffset.get(destinationAirport));
 								else

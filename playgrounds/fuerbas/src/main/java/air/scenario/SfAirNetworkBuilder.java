@@ -79,7 +79,7 @@ public class SfAirNetworkBuilder {
 				originRunway = new IdImpl(origin+"runway");
 			
 			Node destinationNode = null;
-			if (DgCreateFlightScenario.createStars) {
+			if (DgCreateFlightScenario.doCreateStars) {
 				Id destinationStar = new IdImpl(destination+"star");
 				destinationNode = network.getNodes().get(destinationStar);
 			}

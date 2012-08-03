@@ -137,7 +137,7 @@ public class SfMatsimAirport {
 		
 //		add STAR to network
 
-		if (DgCreateFlightScenario.createStars) {
+		if (DgCreateFlightScenario.doCreateStars) {
 			Id idStar = new IdImpl(this.id.toString()+"star");						//Id for STAR route
 			if (DgCreateFlightScenario.stars.containsKey(idApron.toString())) {
 				Coord coordStar = new CoordImpl(coordRunwayInEnd.getX()-DgCreateFlightScenario.stars.get(idApron.toString()).getLength(), coordRunwayInEnd.getY());
@@ -245,7 +245,7 @@ public class SfMatsimAirport {
 //		add STAR to network
 
 		Id idStar = new IdImpl(this.id.toString()+"star");						//Id for STAR route
-		if (DgCreateFlightScenario.createStars) {
+		if (DgCreateFlightScenario.doCreateStars) {
 			if (DgCreateFlightScenario.stars.containsKey(idApron.toString())) {
 				Coord coordStar = new CoordImpl(coordRunwayEnd.getX()-DgCreateFlightScenario.stars.get(idApron.toString()).getLength(), coordRunwayEnd.getY());
 				Node nodeStar = network.getFactory().createNode(idStar, coordStar);						//start of STAR 
