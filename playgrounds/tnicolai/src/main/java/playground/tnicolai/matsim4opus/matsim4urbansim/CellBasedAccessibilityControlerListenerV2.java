@@ -163,7 +163,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		double logitScaleParameterPreFactor = 1/(logitScaleParameter);
+		double inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");
@@ -368,16 +368,16 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				// aggregated value
 				double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility;
 				if(!useRawSum){ 	// get log sum
-					freeSpeedAccessibility = logitScaleParameterPreFactor * Math.log( sumFREESPEED );
-					carAccessibility = logitScaleParameterPreFactor * Math.log( sumCAR );
-					bikeAccessibility= logitScaleParameterPreFactor * Math.log( sumBIKE );
-					walkAccessibility= logitScaleParameterPreFactor * Math.log( sumWALK );
+					freeSpeedAccessibility = inverseOfLogitScaleParameter * Math.log( sumFREESPEED );
+					carAccessibility = inverseOfLogitScaleParameter * Math.log( sumCAR );
+					bikeAccessibility= inverseOfLogitScaleParameter * Math.log( sumBIKE );
+					walkAccessibility= inverseOfLogitScaleParameter * Math.log( sumWALK );
 				}
 				else{ 				// get raw sum
-					freeSpeedAccessibility = logitScaleParameterPreFactor * sumFREESPEED;
-					carAccessibility = logitScaleParameterPreFactor * sumCAR;
-					bikeAccessibility= logitScaleParameterPreFactor * sumBIKE;
-					walkAccessibility= logitScaleParameterPreFactor * sumWALK;
+					freeSpeedAccessibility = inverseOfLogitScaleParameter * sumFREESPEED;
+					carAccessibility = inverseOfLogitScaleParameter * sumCAR;
+					bikeAccessibility= inverseOfLogitScaleParameter * sumBIKE;
+					walkAccessibility= inverseOfLogitScaleParameter * sumWALK;
 				}
 				
 				// assign log sums to current starZone object and spatial grid
