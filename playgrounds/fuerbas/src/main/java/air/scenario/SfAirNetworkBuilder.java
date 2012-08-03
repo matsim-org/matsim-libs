@@ -12,6 +12,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -76,8 +77,16 @@ public class SfAirNetworkBuilder {
 				originRunway = new IdImpl(origin+"runwayOutbound");
 			else
 				originRunway = new IdImpl(origin+"runway");
-			Id destinationStar = new IdImpl(destination+"star");
-			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), network.getNodes().get(destinationStar));
+			
+			Node destinationNode = null;
+			if (DgCreateFlightScenario.createStars) {
+				Id destinationStar = new IdImpl(destination+"star");
+				destinationNode = network.getNodes().get(destinationStar);
+			}
+			else {
+				destinationNode = network.getNodes().get(new IdImpl(destination));
+			}
+			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), network.getNodes().get(originRunway), destinationNode);
 			originToDestination.setAllowedModes(allowedModes);
 
 			originToDestination.setCapacity(1.0*CAP_PERIOD);

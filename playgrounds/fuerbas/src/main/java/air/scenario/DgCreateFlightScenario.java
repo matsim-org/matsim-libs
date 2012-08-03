@@ -37,14 +37,14 @@ public class DgCreateFlightScenario {
 	
 	public static final Map<String, Direction> filter = new HashMap<String, Direction>();
 	static {
-		filter.put("MUC", Direction.BOTH);
+//		filter.put("MUC", Direction.BOTH);
 	}
 	
 	public static final int NUMBER_OF_RUNWAYS = 2;
 	
-	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 100000.0, 1./60., 463./3.6);	//default speed below FL100: 250 knots = 463km/h 
 	
-	public static final boolean createStars = true;
+	public static final boolean createStars = false;
+	public static final DgStarinfo DEFAULTSTAR = new DgStarinfo("default", 100000.0, 1./60., 463./3.6);	//default speed below FL100: 250 knots = 463km/h 
 	public static final Map<String, DgStarinfo> stars = new HashMap<String, DgStarinfo>();	
 	static {
 		stars.put("default", DEFAULTSTAR);
@@ -153,7 +153,7 @@ public class DgCreateFlightScenario {
 //		createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 		//EUROPEAN AIR TRAFFIC
-//		createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
+		createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 		// GERMAN AIR TRAFFIC
 		createGermanFlightScenario(inputAirportsFilename, inputOagFilename);

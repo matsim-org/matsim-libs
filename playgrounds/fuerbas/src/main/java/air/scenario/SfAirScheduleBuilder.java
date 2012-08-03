@@ -55,28 +55,29 @@ public class SfAirScheduleBuilder {
 	public static final String OAG_FLIGHTS_OUTPUT_FILENAME = "oag_flights.txt";
 
 	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
-	
+
 	public static final String UTC_OFFSET_FILE = "utc_offsets.txt";
-	
+
 	protected Map<String, Coord> airports = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
 	protected Map<String, Double> routes = new HashMap<String, Double>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
-	
-	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory, String utcOffsetInputfile) throws Exception {
+
+	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory,
+			String utcOffsetInputfile) throws Exception {
 		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, utcOffsetInputfile);
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public void filter(String inputAirportListFile, String inputOagFile, String outputDirectory,
 			String[] countries, String utcOffsetInputfile) throws Exception {
 		String outputOagFile = outputDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		this.loadAirportList(inputAirportListFile);
-		
+
 		this.loadUtcOffsets(utcOffsetInputfile);
-		
+
 		int counter = 0;
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
 		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOagFile)));
@@ -98,26 +99,28 @@ public class SfAirScheduleBuilder {
 				String destinationCountry = lineEntries[9];
 				String originAirport = lineEntries[4];
 				String destinationAirport = lineEntries[7];
-				
-				if (countries==null || (checkOriginCountry(originCountry, countries) || checkDestinationCountry(destinationCountry, countries)) ) 	// either origin country or destination country
+
+				if (countries == null
+						|| (checkOriginCountry(originCountry, countries) || checkDestinationCountry(
+								destinationCountry, countries))) // either origin country or destination country
 				{
-			
-					if (! (this.utcOffset.containsKey(originAirport) && this.utcOffset.containsKey(destinationAirport)) ) {
+
+					if (!(this.utcOffset.containsKey(originAirport) && this.utcOffset
+							.containsKey(destinationAirport))) {
 						continue;
 					}
-									
-					//filter codeshare flights (see WW_DBF_With_Frequency.DOC from OAG input data)
+
+					// filter codeshare flights (see WW_DBF_With_Frequency.DOC from OAG input data)
 					// either "operating marker" set, "shared airline designator" not set or "duplicate" not set
-					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("") || lineEntries[49].equalsIgnoreCase("")) 
-					{	
+					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")
+							|| lineEntries[49].equalsIgnoreCase("")) {
 						String carrier = lineEntries[0];
 						String flightNumber = lineEntries[1].replaceAll(" ", "0");
 						String flightDesignator = carrier + flightNumber;
 
-
 						String route = originAirport + "_" + destinationAirport;
 						double flightDistance = Integer.parseInt(lineEntries[42]) * 1.609344; // statute miles to kilometers
-						
+
 						String hours = lineEntries[13].substring(0, 3);
 						String minutes = lineEntries[13].substring(3);
 						double durationMinutes = Double.parseDouble(minutes) * 60; // convert flight dur minutes into seconds
@@ -125,8 +128,8 @@ public class SfAirScheduleBuilder {
 						double duration = durationHours + durationMinutes;
 						double departureInSec = Double.parseDouble(lineEntries[10].substring(2)) * 60
 								+ Double.parseDouble(lineEntries[10].substring(0, 2)) * 3600;
-						
-//						Getting UTC Offset from separate file which need to be created with SfUtcOffset
+
+						// Getting UTC Offset from separate file which need to be created with SfUtcOffset
 						log.debug("originAirport: " + originAirport);
 						double utcOffset = this.utcOffset.get(originAirport);
 						departureInSec = departureInSec - utcOffset;
@@ -135,61 +138,70 @@ public class SfAirScheduleBuilder {
 							departureInSec += 86400.0; // shifting flights with departure on previous day in UTC time +24 hours
 						double stops = Double.parseDouble(lineEntries[15]);
 						String fullRouting = lineEntries[40];
-						
+
 						String aircraftType = lineEntries[21];
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
-						
-						//some error correction code
-						if ( 
-//								lineEntries[14].contains("2") && //filter for Tuesday flights only
-								!flights.containsKey(flightDesignator)
-								&& seatsAvail > 0 //filter for flights with 1 PAX or more only
+
+						// some error correction code
+						if (
+						// lineEntries[14].contains("2") && //filter for Tuesday flights only
+						!flights.containsKey(flightDesignator)
+								&& seatsAvail > 0 // filter for flights with 1 PAX or more only
 								&& !originAirport.equalsIgnoreCase(destinationAirport)
 								&& this.airports.containsKey(originAirport)
 								&& this.airports.containsKey(destinationAirport)
-								&& !aircraftType.equalsIgnoreCase("BUS") //filter busses
-								&& !aircraftType.equalsIgnoreCase("RFS") //filter bus/train
-								&& !aircraftType.equalsIgnoreCase("TRN") //filter trains
+								&& !aircraftType.equalsIgnoreCase("BUS") // filter busses
+								&& !aircraftType.equalsIgnoreCase("RFS") // filter bus/train
+								&& !aircraftType.equalsIgnoreCase("TRN") // filter trains
 								&& (stops < 1)
 								&& (fullRouting.length() <= 6)
-								&& (	//filter for desired airports that may be set in DgCreateFlightScenario
-									(DgCreateFlightScenario.filter.containsKey(destinationAirport) && (DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.INBOUND)))
-									|| (DgCreateFlightScenario.filter.containsKey(originAirport) && (DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.OUTBOUND)))
-									|| (DgCreateFlightScenario.filter.containsKey(originAirport)) && (DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.BOTH))
-									|| (DgCreateFlightScenario.filter.containsKey(destinationAirport)) && (DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.BOTH))
-									|| (DgCreateFlightScenario.filter==null)
-									)
+								&& ( // filter for desired airports that may be set in DgCreateFlightScenario
+								(DgCreateFlightScenario.filter.containsKey(destinationAirport) && (DgCreateFlightScenario.filter
+										.get(destinationAirport).equals(DgCreateFlightScenario.Direction.INBOUND)))
+										|| (DgCreateFlightScenario.filter.containsKey(originAirport) && (DgCreateFlightScenario.filter
+												.get(originAirport).equals(DgCreateFlightScenario.Direction.OUTBOUND)))
+										|| (DgCreateFlightScenario.filter.containsKey(originAirport))
+										&& (DgCreateFlightScenario.filter.get(originAirport)
+												.equals(DgCreateFlightScenario.Direction.BOTH))
+										|| (DgCreateFlightScenario.filter.containsKey(destinationAirport))
+										&& (DgCreateFlightScenario.filter.get(destinationAirport)
+												.equals(DgCreateFlightScenario.Direction.BOTH)) || (DgCreateFlightScenario.filter == null))
 
-								) {		//desired values for STARs can be defined in DgCreateFlightScenario, otherwise default values will be used
-										if (DgCreateFlightScenario.STARoffset.containsKey(destinationAirport)) duration = duration-(DgCreateFlightScenario.STARoffset.get(destinationAirport));
-										else duration = duration-DgCreateFlightScenario.STARoffset.get("default");
-										
-										if (!this.routes.containsKey(route)) {
-											this.routes.put(route, duration);
-										}
-			
-										this.cityPairDistance.put(route, flightDistance);
-			
-										if ((flightDistance * 1000 / duration) <= 40.)
-											log.debug("too low speed :" + flightDesignator);
-										
-										bwOag.write(route + "\t" + // TransitRoute
-												route + "_" + carrier + "\t" + // TransitLine
-												flightDesignator + "\t" + // vehicleId
-												departureInSec + "\t" + // departure time in seconds
-												duration + "\t" + // journey time in seconds
-												aircraftType + "\t" + // aircraft type
-												seatsAvail + "\t" + // seats avail
-												flightDistance); // distance in km
-										flights.put(flightDesignator, "");
-										bwOag.newLine();
-										counter++;
-										this.airportsInOag.put(originAirport, this.airports.get(originAirport));
-										this.airportsInOag
-												.put(destinationAirport, this.airports.get(destinationAirport));
-									}
+						) { // desired values for STARs can be defined in DgCreateFlightScenario, otherwise default values will be
+								// used
+
+							if (DgCreateFlightScenario.createStars) {
+								if (DgCreateFlightScenario.STARoffset.containsKey(destinationAirport))
+									duration = duration - (DgCreateFlightScenario.STARoffset.get(destinationAirport));
+								else
+									duration = duration - DgCreateFlightScenario.STARoffset.get("default");
+							}
+
+							if (!this.routes.containsKey(route)) {
+								this.routes.put(route, duration);
+							}
+
+							this.cityPairDistance.put(route, flightDistance);
+
+							if ((flightDistance * 1000 / duration) <= 40.)
+								log.debug("too low speed :" + flightDesignator);
+
+							bwOag.write(route + "\t" + // TransitRoute
+									route + "_" + carrier + "\t" + // TransitLine
+									flightDesignator + "\t" + // vehicleId
+									departureInSec + "\t" + // departure time in seconds
+									duration + "\t" + // journey time in seconds
+									aircraftType + "\t" + // aircraft type
+									seatsAvail + "\t" + // seats avail
+									flightDistance); // distance in km
+							flights.put(flightDesignator, "");
+							bwOag.newLine();
+							counter++;
+							this.airportsInOag.put(originAirport, this.airports.get(originAirport));
+							this.airportsInOag.put(destinationAirport, this.airports.get(destinationAirport));
+						}
 					}
-				}	
+				}
 			}
 			lines++;
 		}
@@ -232,34 +244,37 @@ public class SfAirScheduleBuilder {
 		bwcityPairs.close();
 		br.close();
 	}
-	
+
 	private static boolean checkOriginCountry(String originCountry, String[] countries) {
-		boolean check=false;
+		boolean check = false;
 		if (countries != null) {
 			for (int ii = 0; ii < countries.length; ii++) {
 				if (originCountry.equalsIgnoreCase(countries[ii]))
-					check=true;
-				else check=false;
-				}
+					check = true;
+				else
+					check = false;
+			}
 		}
-			else check=true;
+		else
+			check = true;
 		return check;
 	}
-	
+
 	private static boolean checkDestinationCountry(String destinationCountry, String[] countries) {
-		boolean check=false;
+		boolean check = false;
 		if (countries != null) {
 			for (int ii = 0; ii < countries.length; ii++) {
 				if (destinationCountry.equalsIgnoreCase(countries[ii]))
-					check=true;
-				else check=false;
-				}
+					check = true;
+				else
+					check = false;
+			}
 		}
-			else check=true;
+		else
+			check = true;
 		return check;
 	}
-	
-	
+
 	private void getUtcOffsetMap(String inputfile) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputfile)));
 		while (br.ready()) {
@@ -270,8 +285,8 @@ public class SfAirScheduleBuilder {
 		}
 		br.close();
 	}
-	
-	private void loadAirportList(String inputfile) throws Exception{
+
+	private void loadAirportList(String inputfile) throws Exception {
 		BufferedReader brAirports = new BufferedReader(new FileReader(new File(inputfile)));
 		while (brAirports.ready()) {
 			String line = brAirports.readLine();
@@ -279,11 +294,11 @@ public class SfAirScheduleBuilder {
 			String airportCode = entries[0];
 			String xCoord = entries[1];
 			String yCoord = entries[2];
-			this.airports.put(airportCode, new CoordImpl(xCoord,yCoord));
+			this.airports.put(airportCode, new CoordImpl(xCoord, yCoord));
 		}
 		brAirports.close();
 	}
-	
+
 	private void loadUtcOffsets(String inputfile) throws Exception, IOException {
 		log.debug("Loading utc offsets from file: " + inputfile);
 		BufferedReader brUtc = new BufferedReader(new FileReader(new File(inputfile)));
@@ -441,6 +456,5 @@ public class SfAirScheduleBuilder {
 		builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES, UTC_OFFSET_FILE);
 
 	}
-
 
 }
