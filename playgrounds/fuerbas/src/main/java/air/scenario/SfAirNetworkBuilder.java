@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +23,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
 public class SfAirNetworkBuilder {
-
+	
+	private static final Logger log = Logger.getLogger(SfAirNetworkBuilder.class);
+	
 	public static final String NETWORK_FILENAME = "air_network.xml";
 	private static final double MACH_2 = 686.0;
 	public static final double CAP_PERIOD = 3600.0;
@@ -97,10 +100,11 @@ public class SfAirNetworkBuilder {
 		}
 			
 		new NetworkWriter(network).write(networkOutputFilename);
-		System.out.println("Done! Unprocessed MATSim Network saved as " + networkOutputFilename);
 		
-		System.out.println("Anzahl Flughäfen: "+airportcounter);
-		System.out.println("Anzahl Links: "+linkcounter);
+		log.info("Done! Unprocessed MATSim Network saved as " + networkOutputFilename);
+		
+		log.info("Anzahl Flughäfen: "+airportcounter);
+		log.info("Anzahl Links: "+linkcounter);
 		
 		brAirports.close();
 		brRoutes.close();

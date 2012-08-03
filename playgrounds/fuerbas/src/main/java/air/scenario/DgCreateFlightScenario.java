@@ -24,6 +24,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.core.controler.OutputDirectoryLogging;
+
 import air.analysis.DgNet2Shape;
 
 /**
@@ -33,11 +35,11 @@ import air.analysis.DgNet2Shape;
 
 public class DgCreateFlightScenario {
 	
+	public static final boolean doApplyFilter = false;
 	public static enum Direction {INBOUND, OUTBOUND, BOTH};
-	
 	public static final Map<String, Direction> filter = new HashMap<String, Direction>();
 	static {
-//		filter.put("MUC", Direction.BOTH);
+		filter.put("MUC", Direction.BOTH);
 	}
 	
 	public static final int NUMBER_OF_RUNWAYS = 2;
@@ -74,6 +76,7 @@ public class DgCreateFlightScenario {
 //		+ "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 		
 		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/world/flight/sf_oag_flight_model/";
+		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, utcOffsetfile);
@@ -90,10 +93,12 @@ public class DgCreateFlightScenario {
 		transitBuilder.createSchedule(baseDirectory + SfAirScheduleBuilder.OAG_FLIGHTS_OUTPUT_FILENAME, inputNetworkFile, baseDirectory);
 	
 		writeShape(baseDirectory, inputNetworkFile);
+		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 	
 	public static void createEuropeanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
 		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
+		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.EURO_COUNTRIES, utcOffsetfile);
@@ -110,11 +115,14 @@ public class DgCreateFlightScenario {
 		transitBuilder.createSchedule(baseDirectory + SfAirScheduleBuilder.OAG_FLIGHTS_OUTPUT_FILENAME, inputNetworkFile, baseDirectory);
 
 		writeShape(baseDirectory, inputNetworkFile);
+		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 	
 	public static void createGermanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
 		
 		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/de/flight/sf_oag_flight_model/";
+		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
+
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
 		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.GERMAN_COUNTRIES, utcOffsetfile);
 
@@ -130,6 +138,7 @@ public class DgCreateFlightScenario {
 		transitBuilder.createSchedule(baseDirectory + SfAirScheduleBuilder.OAG_FLIGHTS_OUTPUT_FILENAME, inputNetworkFile, baseDirectory);
 	
 		writeShape(baseDirectory, inputNetworkFile);
+		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 
 	public static void writeShape(String baseDirectory, String networkFilename){
@@ -150,7 +159,7 @@ public class DgCreateFlightScenario {
 	 */
 	public static void main(String[] args) throws Exception {
 		//WORLD WIDE AIR TRAFFIC
-//		createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
+		createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
 		
 		//EUROPEAN AIR TRAFFIC
 		createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
