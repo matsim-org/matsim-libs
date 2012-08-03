@@ -39,6 +39,9 @@ import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
  * 
  *  improvements april'12
  *  - accessibility calculation uses configurable betas (coming from UrbanSim) for car/walk travel times, -distances and -costs
+ *  
+ * improvements / changes july'12 
+ * - fixed error: used pre-factor (1/beta scale) in deterrence function instead of beta scale (fixed now!)
  * 
  * @author thomas
  *
@@ -188,7 +191,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					freeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 					
 					sumFREESPEED += opportunityWeight
-								  * Math.exp(logitScaleParameterPreFactor *
+								  * Math.exp(logitScaleParameter *
 										    (freeTT + 
 										     freeTTPower +
 										     freeLnTT +
@@ -214,7 +217,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					
 					// sum congested travel times
 					sumCAR += opportunityWeight
-							* Math.exp(logitScaleParameterPreFactor *
+							* Math.exp(logitScaleParameter *
 									  (carTT +
 									   carTTPower +
 									   carLnTT +
@@ -240,7 +243,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 
 					// sum walk travel times (substitute for distances)
 					sumWALK += opportunityWeight
-							* Math.exp(logitScaleParameterPreFactor *
+							* Math.exp(logitScaleParameter *
 									(walkTT +
 									 walkTTPower +
 									 walkLnTT +
