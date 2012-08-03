@@ -24,9 +24,9 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.LegScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
@@ -38,14 +38,14 @@ import playground.thibautd.hitchiking.HitchHikingConstants;
  */
 public class PlanBasedLegScoringFunction implements BasicScoring, LegScoring {
 	private final Plan plan;
-	private final LegScoringFunction delegate;
+	private final CharyparNagelLegScoring delegate;
 	private PlanElement currentLeg = null;
 	private int legsToSkip = 0;
 	private Iterator<PlanElement> planIterator = null;
 
 	public PlanBasedLegScoringFunction(
 			final Plan plan,
-			final LegScoringFunction delegate) {
+			final CharyparNagelLegScoring delegate) {
 		this.plan = plan;
 		this.delegate = delegate;
 		reset();

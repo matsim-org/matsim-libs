@@ -35,15 +35,15 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.utils.misc.RouteUtils;
 
 /**
@@ -66,21 +66,21 @@ public class MyControler extends Controler {
 		public ScoringFunction createNewScoringFunction(Plan plan) {
 			ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 			scoringFunctionAccumulator
-					.addScoringFunction(new ActivityScoringFunction(getParams()));
+					.addScoringFunction(new CharyparNagelActivityScoring(getParams()));
 			scoringFunctionAccumulator
 					.addScoringFunction(new MyLegScoringFunction(plan,
 							getParams(), network));
 			scoringFunctionAccumulator
-					.addScoringFunction(new MoneyScoringFunction(getParams()));
+					.addScoringFunction(new CharyparNagelMoneyScoring(getParams()));
 			scoringFunctionAccumulator
-					.addScoringFunction(new AgentStuckScoringFunction(
+					.addScoringFunction(new CharyparNagelAgentStuckScoring(
 							getParams()));
 			return scoringFunctionAccumulator;
 		}
 
 	}
 
-	private static class MyLegScoringFunction extends LegScoringFunction {
+	private static class MyLegScoringFunction extends CharyparNagelLegScoring {
 		private final static Logger log = Logger
 				.getLogger(MyLegScoringFunction.class);
 		private static int distanceWrnCnt = 0;

@@ -21,7 +21,7 @@
 package playground.sergioo.passivePlanning.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.sergioo.passivePlanning.core.controler.PassivePlanningControler;
 import playground.sergioo.passivePlanning.core.mobsim.passivePlanning.PassivePlanningSocialFactory;

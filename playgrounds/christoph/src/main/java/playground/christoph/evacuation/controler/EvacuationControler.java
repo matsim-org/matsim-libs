@@ -62,7 +62,7 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.households.Household;
 //import org.matsim.utils.eventsfilecomparison.OnlineEventsComparator;

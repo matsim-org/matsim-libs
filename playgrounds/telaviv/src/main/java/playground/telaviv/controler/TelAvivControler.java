@@ -23,8 +23,8 @@ package playground.telaviv.controler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.telaviv.replanning.TTAStrategyManager;
 

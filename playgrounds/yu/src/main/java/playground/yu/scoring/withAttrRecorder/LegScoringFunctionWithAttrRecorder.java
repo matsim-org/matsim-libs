@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
 
-public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
+public class LegScoringFunctionWithAttrRecorder extends CharyparNagelLegScoring {
 	private final static Logger log = Logger
 			.getLogger(LegScoringFunctionWithAttrRecorder.class);
 	private double travTimeAttrCar/* [h] */= 0d, travTimeAttrPt/* [h] */= 0d,

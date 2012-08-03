@@ -12,14 +12,14 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.ciarif.flexibletransports.router.FtCarSharingRoute;
 import playground.ciarif.flexibletransports.router.PlansCalcRouteFT;
 
-public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction
+public class LegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring
 {
 	private final FtConfigGroup ftConfigGroup;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;

@@ -26,12 +26,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 /**
@@ -85,9 +85,9 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					params,
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new MoneyScoringFunction( params ));
+				new CharyparNagelMoneyScoring( params ));
 		scoringFunctionAccumulator.addScoringFunction(
-				new AgentStuckScoringFunction( params ));
+				new CharyparNagelAgentStuckScoring( params ));
 
 		return scoringFunctionAccumulator;
 	}

@@ -27,14 +27,14 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.interfaces.ActivityScoring;
-import org.matsim.core.scoring.interfaces.AgentStuckScoring;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.LegScoring;
-import org.matsim.core.scoring.interfaces.MoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 
 /**
  * @author yu
@@ -170,7 +170,7 @@ public class ScoringFunctionAccumulatorWithAttrRecorder extends
 				perfAttr = params.marginalUtilityOfPerforming_s != 0d ? fracScore
 						/ (params.marginalUtilityOfPerforming_s * 3600d)
 						: 0d;
-			} else if (basicScoringFunction instanceof LegScoringFunction) {
+			} else if (basicScoringFunction instanceof CharyparNagelLegScoring) {
 				LegScoringFunctionWithAttrRecorder legScoringFunction = (LegScoringFunctionWithAttrRecorder) basicScoringFunction;
 
 				travTimeAttrCar = legScoringFunction.getTravTimeAttrCar();

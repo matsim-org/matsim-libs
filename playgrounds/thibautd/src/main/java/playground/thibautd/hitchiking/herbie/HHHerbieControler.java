@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.router.TransitRouterConfig;
 
 import herbie.running.config.HerbieConfigGroup;

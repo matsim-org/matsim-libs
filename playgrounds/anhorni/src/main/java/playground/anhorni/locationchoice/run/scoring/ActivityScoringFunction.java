@@ -37,7 +37,7 @@ import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
  * This class implements the activity scoring as used in Year 3 of the KTI project.
@@ -56,7 +56,7 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
  * @author meisterk
  *
  */
-public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
+public class ActivityScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 
 	static final Logger log = Logger.getLogger(ActivityScoringFunction.class);
 

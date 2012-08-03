@@ -23,16 +23,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 
 /**
- * Scoring function accumulator using {@link BvgLegScoringFunction} instead of {@link LegScoringFunction}
+ * Scoring function accumulator using {@link BvgLegScoringFunction} instead of {@link CharyparNagelLegScoring}
  *
  * @author aneumann
  *
@@ -59,8 +59,8 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunction(plan, this.charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunction(plan, this.charyparNagelConfigParameters, this.bvgParameters, this.utilityOfLineSwitch, this.network));
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(this.charyparNagelConfigParameters));
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(this.charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.charyparNagelConfigParameters));
 		return scoringFunctionAccumulator;
 	}
 

@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
@@ -35,7 +35,7 @@ import org.matsim.households.Income.IncomePeriod;
  * @author dgrether
  *
  */
-public class BKickLegScoring extends LegScoringFunction {
+public class BKickLegScoring extends CharyparNagelLegScoring {
 
 	private static final Logger log = Logger.getLogger(BKickLegScoring.class);
 

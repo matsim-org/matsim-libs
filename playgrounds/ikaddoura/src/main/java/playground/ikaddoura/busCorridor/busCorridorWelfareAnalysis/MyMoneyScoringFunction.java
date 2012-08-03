@@ -20,9 +20,9 @@
 
 package playground.ikaddoura.busCorridor.busCorridorWelfareAnalysis;
 
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.MoneyScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class MyMoneyScoringFunction implements MoneyScoring, BasicScoring {
 

@@ -20,8 +20,8 @@
 
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import org.matsim.core.scoring.interfaces.AgentStuckScoring;
-import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 
 public class MyAgentStuckScoringFunction implements AgentStuckScoring, BasicScoring {
 

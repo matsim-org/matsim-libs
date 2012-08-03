@@ -32,14 +32,14 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
 import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
 
-public class SurpriceActivityScoringFunction extends ActivityScoringFunction {
+public class SurpriceActivityScoringFunction extends CharyparNagelActivityScoring {
 	
 	private CharyparNagelScoringParameters params;
 	private double income;

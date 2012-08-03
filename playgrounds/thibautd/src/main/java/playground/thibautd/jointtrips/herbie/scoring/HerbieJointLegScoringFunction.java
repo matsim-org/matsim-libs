@@ -30,8 +30,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import herbie.running.config.HerbieConfigGroup;
@@ -43,7 +43,7 @@ import playground.thibautd.jointtrips.population.JointActingTypes;
 /**
  * @author thibautd
  */
-public class HerbieJointLegScoringFunction extends LegScoringFunction {
+public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 
 	private final HerbieConfigGroup ktiConfigGroup;
 	private final Config config;

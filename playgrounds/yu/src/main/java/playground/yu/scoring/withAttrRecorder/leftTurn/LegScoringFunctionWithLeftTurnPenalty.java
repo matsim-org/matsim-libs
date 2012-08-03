@@ -20,7 +20,7 @@ package playground.yu.scoring.withAttrRecorder.leftTurn;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.yu.scoring.withAttrRecorder.LegScoringFunctionWithAttrRecorder;
 import playground.yu.utils.LeftTurnIdentifier;

@@ -22,12 +22,12 @@ package playground.yu.scoring.withAttrRecorder;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 
 public class CharyparNagelScoringFunctionFactory4AttrRecorder extends
 		CharyparNagelScoringFunctionFactory {
@@ -43,15 +43,15 @@ public class CharyparNagelScoringFunctionFactory4AttrRecorder extends
 		ScoringFunctionAccumulatorWithAttrRecorder scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithAttrRecorder(
 				params);
 		scoringFunctionAccumulator
-				.addScoringFunction(new ActivityScoringFunction(params));
+				.addScoringFunction(new CharyparNagelActivityScoring(params));
 		scoringFunctionAccumulator
 				.addScoringFunction(new LegScoringFunctionWithAttrRecorder(
 				// plan,
 						params, network));
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(
 				params));
 		scoringFunctionAccumulator
-				.addScoringFunction(new AgentStuckScoringFunction(params));
+				.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 		return scoringFunctionAccumulator;
 	}
 }

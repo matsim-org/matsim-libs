@@ -20,7 +20,7 @@
 
 package playground.christoph.socialcosts;
 
-import org.matsim.core.scoring.OnlyTimeDependentScoringFunction;
+import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunction;
 
 /**
  * Also the scoring function has to take social costs into account. Otherwise

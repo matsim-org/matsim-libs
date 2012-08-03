@@ -20,7 +20,7 @@
 package playground.wrashid.scoring;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 
 public class Main {

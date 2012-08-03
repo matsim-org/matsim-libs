@@ -22,7 +22,7 @@ package herbie.running.scoring;
 
 import herbie.running.config.HerbieConfigGroup;
 
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 
 /**

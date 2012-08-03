@@ -32,14 +32,14 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
@@ -140,9 +140,9 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
 		//scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 		return scoringFunctionAccumulator;
 	}
 

@@ -27,17 +27,17 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.LegScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.pt.PtConstants;
 
 /**
  *
  * Scoring function featuring offsets and distance costs for the modes car, pt, ride, bike, walk and transit_walk
  *
- * @author aneumann roughly based on {@link LegScoringFunction}
+ * @author aneumann roughly based on {@link CharyparNagelLegScoring}
  *
  */
 public class BvgLegScoringFunction implements LegScoring, BasicScoring {

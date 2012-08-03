@@ -2,13 +2,13 @@ package playground.ikaddoura.parkAndRide.pRscoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.PtConstants;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
 
-public class BvgActivityScoringFunctionPR extends ActivityScoringFunction {
+public class BvgActivityScoringFunctionPR extends CharyparNagelActivityScoring {
 
 	private CharyparNagelScoringParameters params;
 	private BvgScoringFunctionParametersPR bvgParams;

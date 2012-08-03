@@ -38,7 +38,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -64,7 +64,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
  * @author bvitins, anhorni
  *
  */
-public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction {
+public class LegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
 
 	private final HerbieConfigGroup ktiConfigGroup;
 	private Config config;

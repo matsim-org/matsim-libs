@@ -1,6 +1,6 @@
 package playground.benjamin.scoring.income.old;
 
-import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 
 public class ScoringFromDailyIncome implements BasicScoring {
 

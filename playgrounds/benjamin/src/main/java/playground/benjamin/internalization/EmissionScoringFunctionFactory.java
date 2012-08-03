@@ -23,13 +23,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 
 /**
  * @author benjamin
@@ -61,9 +61,9 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 		
 		ScoringFunctionAccumulator accumulator = new ScoringFunctionAccumulator();
 		
-		accumulator.addScoringFunction(new ActivityScoringFunction(params));
-		accumulator.addScoringFunction(new LegScoringFunction(params, network));
-		accumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+		accumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
+		accumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
+		accumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 		
 		accumulator.addScoringFunction(this.scoringFromEmissions);
 

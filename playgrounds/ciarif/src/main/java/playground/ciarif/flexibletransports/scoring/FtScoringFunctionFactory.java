@@ -9,9 +9,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.meisterk.kti.scoring.ActivityScoringFunction;
@@ -48,8 +48,8 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
       super.getParams(), 
       this.config, 
       this.ftConfigGroup, network));
-    scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(super.getParams()));
-    scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(super.getParams()));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 
     return scoringFunctionAccumulator;
   }

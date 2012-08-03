@@ -28,8 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 
 /**
  * @author Ihab

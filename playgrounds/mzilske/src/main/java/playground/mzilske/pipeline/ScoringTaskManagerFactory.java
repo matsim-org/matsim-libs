@@ -2,7 +2,7 @@ package playground.mzilske.pipeline;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 public class ScoringTaskManagerFactory extends TaskManagerFactory {
 

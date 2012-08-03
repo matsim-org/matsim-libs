@@ -32,7 +32,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
 
-public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
+public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 
 	private ActivityScoringFunction scoringFunction = null;
 	private ShoppingScoreAdditionals shoppingScoreAdditionals;
@@ -94,11 +94,11 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.charyparNagel.LegScoringFunction(super.getParams(), controler.getNetwork()));
+				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(super.getParams(), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
+				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
+				new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(super.getParams()));
 
 		return scoringFunctionAccumulator;
 	}

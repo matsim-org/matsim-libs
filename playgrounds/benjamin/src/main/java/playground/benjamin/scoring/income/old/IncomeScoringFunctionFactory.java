@@ -24,15 +24,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.households.Income;
-import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.households.PersonHouseholdMapping;
 
 /**
  * @author dgrether
@@ -67,7 +67,7 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromDailyIncome(householdIncomePerDay));
 
 		//utility earned from activities
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
 
 		//utility spend for traveling (in this case: travel time and distance costs)
 		scoringFunctionAccumulator.addScoringFunction(new ScoringFromLeg(plan, params, this.network, householdIncomePerDay ));
@@ -78,7 +78,7 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 		}
 		
 		//utility spend for being stuck
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 		return scoringFunctionAccumulator;
 

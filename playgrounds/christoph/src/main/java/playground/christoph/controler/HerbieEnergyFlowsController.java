@@ -30,7 +30,7 @@ import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.christoph.energyflows.controller.EnergyFlowsController;
 

@@ -43,8 +43,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
@@ -54,7 +54,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 /*
  * Scoring function taking agent interaction into account
  */
-public class AgentInteractionScoringFunction extends ActivityScoringFunction {
+public class AgentInteractionScoringFunction extends CharyparNagelActivityScoring {
 	private CharyparNagelScoringParameters params;
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies;
 	private ObjectAttributes attributes;

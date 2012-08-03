@@ -27,8 +27,8 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.thibautd.jointtrips.population.JointActingTypes;
@@ -36,7 +36,7 @@ import playground.thibautd.jointtrips.population.JointActingTypes;
 /**
  * @author thibautd
  */
-public class CarPoolingLegScoringFunction extends LegScoringFunction {
+public class CarPoolingLegScoringFunction extends CharyparNagelLegScoring {
 	private static final Logger log =
 		Logger.getLogger(CarPoolingLegScoringFunction.class);
 

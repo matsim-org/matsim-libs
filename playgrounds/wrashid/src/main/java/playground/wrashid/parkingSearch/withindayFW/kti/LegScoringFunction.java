@@ -36,7 +36,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
@@ -59,7 +59,7 @@ import playground.meisterk.kti.router.PlansCalcRouteKti;
  * @author meisterk
  *
  */
-public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction {
+public class LegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
 
 	private final KtiConfigGroup ktiConfigGroup;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;

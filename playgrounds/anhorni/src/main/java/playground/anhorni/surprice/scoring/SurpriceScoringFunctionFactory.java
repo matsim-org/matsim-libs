@@ -25,11 +25,12 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.anhorni.surprice.AgentMemories;
 
-public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory{
+public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory{
 	
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
@@ -65,7 +66,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.char
 				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"),
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), this.day)));
 		
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;
 	}
 }

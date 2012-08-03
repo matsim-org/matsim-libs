@@ -22,18 +22,19 @@ package playground.ikaddoura.parkAndRide.pRscoring;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 
 /**
  * Scoring function accumulator using...
- * {@link BvgLegScoringFunctionPR} instead of {@link LegScoringFunction} and
- * {@link BvgActivityScoringFunctionPR} instead of {@link ActivityScoringFunction}
+ * {@link BvgLegScoringFunctionPR} instead of {@link CharyparNagelLegScoring} and
+ * {@link BvgActivityScoringFunctionPR} instead of {@link CharyparNagelActivityScoring}
  *
  * @author ikaddoura
  *
@@ -57,8 +58,8 @@ public class BvgScoringFunctionFactoryPR implements ScoringFunctionFactory {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunctionPR(plan, this.charyparNagelConfigParameters, this.bvgParameters));
 		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunctionPR(plan, this.charyparNagelConfigParameters, this.bvgParameters, this.utilityOfLineSwitch, this.network));
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(this.charyparNagelConfigParameters));
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(this.charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.charyparNagelConfigParameters));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.charyparNagelConfigParameters));
 		return scoringFunctionAccumulator;
 	}
 

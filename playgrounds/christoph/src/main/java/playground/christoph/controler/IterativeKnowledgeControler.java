@@ -38,7 +38,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityC
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
 import playground.christoph.network.SubNetwork;

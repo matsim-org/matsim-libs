@@ -20,18 +20,17 @@
 package playground.southafrica.gauteng.scoring;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.MoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
@@ -62,9 +61,9 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.ActivityScoringFunction(params));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.LegScoringFunction(params, network));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelActivityScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelLegScoring(params, network));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(params));
 
 		// person-dependent money scoring function (standard implementation contains person-indep scoring function):
 		double utilityOfMoney_normally_positive = this.utlOfMon.getUtilityOfMoney_normally_positive(plan.getPerson().getId());

@@ -21,13 +21,13 @@ package playground.benjamin.scoring.income.old;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
-import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
-import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.households.PersonHouseholdMapping;
 
 
@@ -54,13 +54,13 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
 
 		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(plan, params, this.hhdb, network));
 
-		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
 
-		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 		return scoringFunctionAccumulator;
 	

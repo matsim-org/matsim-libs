@@ -41,8 +41,8 @@ import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
@@ -74,7 +74,7 @@ import playground.thibautd.jointtrips.population.JointActingTypes;
  * @author thibautd
  *
  */
-public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScoringFunction {
+public class CarPoolingOpeningTimesActivityScoringFunction extends CharyparNagelActivityScoring {
 	private static final Logger log =
 		Logger.getLogger( CarPoolingOpeningTimesActivityScoringFunction.class );
 

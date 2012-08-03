@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.LegScoringFunction;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -27,22 +31,19 @@ import java.util.TreeMap;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.junit.Test;
-
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -59,10 +60,10 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.Desires;
@@ -70,10 +71,6 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.LegScoringFunction;
 
 import playground.thibautd.jointtrips.herbie.scoring.HerbieJointLegScoringFunction;
 

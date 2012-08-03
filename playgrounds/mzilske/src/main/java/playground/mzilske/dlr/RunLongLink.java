@@ -47,7 +47,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs;
-import org.matsim.core.scoring.LegHandler;
+import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.otfvis.FacilityDrawer;

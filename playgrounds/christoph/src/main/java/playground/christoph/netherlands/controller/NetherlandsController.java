@@ -21,8 +21,8 @@
 package playground.christoph.netherlands.controller;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 public class NetherlandsController extends Controler {
 

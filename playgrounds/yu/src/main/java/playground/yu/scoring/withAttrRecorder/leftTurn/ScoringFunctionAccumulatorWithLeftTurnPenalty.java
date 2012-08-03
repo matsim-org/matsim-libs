@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.yu.scoring.withAttrRecorder.leftTurn;
 
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
-import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 
 import playground.yu.scoring.withAttrRecorder.ScoringFunctionAccumulatorWithAttrRecorder;
 
@@ -44,7 +44,7 @@ public class ScoringFunctionAccumulatorWithLeftTurnPenalty extends
 	@Override
 	public double getScore() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
-			if (basicScoringFunction instanceof LegScoringFunction) {
+			if (basicScoringFunction instanceof CharyparNagelLegScoring) {
 				LegScoringFunctionWithLeftTurnPenalty legScoringFunction = (LegScoringFunctionWithLeftTurnPenalty) basicScoringFunction;
 				nbOfLeftTurnAttrCar = legScoringFunction
 						.getNbOfLeftTurnAttrCar();

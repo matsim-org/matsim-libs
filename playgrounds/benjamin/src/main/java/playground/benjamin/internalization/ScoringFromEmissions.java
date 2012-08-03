@@ -20,8 +20,8 @@
 package playground.benjamin.internalization;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.benjamin.emissions.events.ColdEmissionEvent;
 import playground.benjamin.emissions.events.ColdEmissionEventHandler;

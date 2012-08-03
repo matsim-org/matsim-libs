@@ -33,7 +33,7 @@ import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 
-public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
+public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 
     private final Scenario scenario;
 	private final KtiConfigGroup ktiConfigGroup;
@@ -68,8 +68,8 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 				scenario.getConfig(),
                 scenario.getNetwork(),
 				this.ktiConfigGroup));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(super.getParams()));
 		
 		return scoringFunctionAccumulator;
 	}
