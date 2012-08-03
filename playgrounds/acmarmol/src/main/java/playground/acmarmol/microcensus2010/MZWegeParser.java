@@ -1,5 +1,24 @@
-package playground.acmarmol.microcensus2010;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
+
+package playground.acmarmol.microcensus2010;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -10,15 +29,27 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+/**
+ * 
+ * Parses the wege.dat file from MZ2010 and  fills matsim population with activities' and legs' information.
+ *
+ * @author acmarmol
+ * 
+ */
 
 public class MZWegeParser {
 
@@ -31,6 +62,7 @@ public class MZWegeParser {
 	private Population population;
 	private ObjectAttributes populationAttributes;
 	
+	
 	private static final String HOME = "home";
 
 //////////////////////////////////////////////////////////////////////
@@ -42,7 +74,6 @@ public class MZWegeParser {
 		this.households = households;
 		this.householdAttributes = householdAttributes;
 		this.population = population;
-		this.populationAttributes = populationAttributes;
 	}	
 
 
@@ -78,8 +109,7 @@ public class MZWegeParser {
 			//wege number
 			String wegnr = entries[3].trim();
 			
-			//store home coord for future consistency check
-			CoordImpl homeCoord = (CoordImpl)householdAttributes.getAttribute(hhnr, "coord");
+			Id wid = new IdImpl((hhnr.concat(zielpnr)).concat(wegnr));
 			
 			//mode
 			String mode = entries[80].trim();
@@ -95,22 +125,13 @@ public class MZWegeParser {
 			else if(mode.equals("-99")){mode = "Pseudoetappe";}
 			else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
 			
-			//start coordinate (round to hectare) - WGS84 (22,23) & CH1903 (24,25)
+			//start coordinate - WGS84 (22,23) & CH1903 (24,25)
 			Coord start_coord = new CoordImpl(entries[24].trim(),entries[25].trim());
-			//start_coord.setX(Math.round(start_coord.getX()/10.0)*10);
-			//start_coord.setY(Math.round(start_coord.getY()/10.0)*10);
+			
 					
 			//end coordinate (round to hectare) - WGS84 (42,43) & CH1903 (44,45)
 			Coord end_coord = new CoordImpl(entries[44].trim(),entries[45].trim());
-			//end_coord.setX(Math.round(end_coord.getX()/10.0)*10);
-			//end_coord.setY(Math.round(end_coord.getY()/10.0)*10);
 				
-				// negative coord check
-				if(start_coord.getX()<0 || start_coord.getY()<0 || end_coord.getX()<0 || end_coord.getY()<0){
-					if(!neg_coord_pids.contains(pid)){neg_coord_pids.add(pid);}
-				}
-			
-			
 			// departure time (min => sec.)
 			int departure = Integer.parseInt(entries[5].trim())*60;
 			
@@ -136,7 +157,10 @@ public class MZWegeParser {
 			String purpose ="";
 			
 					
-			if(wzweck2.equals("1") || ausnr.equals("-98") ){//hinweg or last wege of incomplete ausgaenge
+			if(wzweck2.equals("1") || ausnr.equals("-98")){
+			//hinweg or last wege of incomplete ausgaenge: for some reason with incomplete ausgaenges,
+			// if wzweck = "2" doesnt necesarilly implies a Nachhauseweg  (maybe explained somewhere in documentation?)
+				
 			if(wzweck1.equals("1")){wzweck1 = "Change, change of transport, car park";}
 			else if(wzweck1.equals("2")){purpose = "work";}else if(wzweck1.equals("3")){purpose = "education, school";}
 			else if(wzweck1.equals("4")){purpose = "shopping";}else if(wzweck1.equals("5")){purpose = "errands and use of services";}
@@ -144,18 +168,14 @@ public class MZWegeParser {
 			else if(wzweck1.equals("8")){purpose = "leisure";}else if(wzweck1.equals("9")){purpose = "accompanying (children)";}
 			else if(wzweck1.equals("10")){purpose = "accompanying (not children)";}else if(wzweck1.equals("11")){purpose= "foreign property";}
 			else if(wzweck1.equals("12")){purpose = "other";}
+			else if(wzweck1.equals("13")){purpose = "border crossing";}
 			else if(wzweck1.equals("-99")){purpose = "Pseudoetappe";}
 			else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 			}else if(wzweck2.equals("2") || wzweck2.equals("3") ){// Nachhauseweg or Weg von zu Hause nach Hause
 				purpose = HOME;	}
 			else Gbl.errorMsg("This should never happen!  Purpose wzweck2: " +  wzweck2 + " doesn't exist");
 			
-				//home  coord consisteny check
-				if(purpose.equals(HOME) & (end_coord.getX()!= homeCoord.getX() || end_coord.getY()!= homeCoord.getY())){
-					home_coord_pids.add(pid);
-				}
-					
-					
+		
 			// creating/getting plan
 			PersonImpl person = (PersonImpl) population.getPersons().get(pid);
 			Plan plan = person.getSelectedPlan();
@@ -174,10 +194,10 @@ public class MZWegeParser {
 				leg.setDepartureTime(departure);
 				leg.setTravelTime(arrival-departure);
 				leg.setArrivalTime(arrival);
-				//NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-				//leg.setRoute(route);
-				//route.setDistance(distance);
-				//route.setTravelTime(leg.getTravelTime());
+				GenericRouteImpl route = new GenericRouteImpl(null, null);
+				leg.setRoute(route);
+				route.setDistance(distance);
+				route.setTravelTime(leg.getTravelTime());
 				ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(purpose,end_coord);
 				act.setStartTime(arrival);
 			
@@ -196,22 +216,23 @@ public class MZWegeParser {
 			
 				
 			}
-			else {//first trip (from home, or from other place different than home if ausnr == -98!)
+			else {//first trip: usually from home unless its part of an incomplete ausgaenge (ausnr=-98)
+				  //here a mistake could be done if the person is at home and the ausgaenge is incomplete because the ausgaenge
+				  //finishes away. These cases are corrected lately by MZPopulationUtils.setHomeLocations
 				
 				ActivityImpl firstAct;
 				if(!ausnr.equals("-98")){ firstAct = ((PlanImpl) plan).createAndAddActivity(HOME,start_coord);
-				}else if(mode.equals("plane")){
-					  firstAct = ((PlanImpl) plan).createAndAddActivity("airport",start_coord);
-				}else if(mode.equals("train")){ firstAct = ((PlanImpl) plan).createAndAddActivity("train station",start_coord);
-				}else if(mode.equals("ship")){ firstAct = ((PlanImpl) plan).createAndAddActivity("harbor",start_coord);
-				}else if(wzweck1.equals("11")){ firstAct = ((PlanImpl) plan).createAndAddActivity("slept away from home/foreign property",start_coord);
-				}else firstAct = ((PlanImpl) plan).createAndAddActivity("slept away from home/foreign property",start_coord);
+				}else firstAct = ((PlanImpl) plan).createAndAddActivity("overnight away",start_coord);
 								
 				firstAct.setEndTime(departure);
-				LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
+				LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);				
 				leg.setDepartureTime(departure);
 				leg.setTravelTime(arrival-departure);
 				leg.setArrivalTime(arrival);
+				GenericRouteImpl route = new GenericRouteImpl(null, null);
+				leg.setRoute(route);
+				route.setDistance(distance);
+				route.setTravelTime(leg.getTravelTime());
 				ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(purpose,end_coord);
 				act.setStartTime(arrival);
 			}

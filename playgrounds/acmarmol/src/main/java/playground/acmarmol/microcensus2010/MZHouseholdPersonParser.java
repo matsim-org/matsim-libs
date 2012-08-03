@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.acmarmol.microcensus2010;
 
 import java.io.BufferedReader;
@@ -9,7 +28,13 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-
+/**
+* 
+* Parses the haushaltepersonen.dat file from MZ2010,  and adds member ids to matsim households.
+*
+* @author acmarmol
+* 
+*/
 public class MZHouseholdPersonParser {
 	
 //////////////////////////////////////////////////////////////////////

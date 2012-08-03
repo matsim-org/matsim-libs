@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.acmarmol.microcensus2010;
 
 import java.io.BufferedReader;
@@ -12,6 +31,17 @@ import org.matsim.households.IncomeImpl;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+/**
+* 
+* Parses the haushalte.dat file from MZ2010, creates matsim households, and
+* fills the households attributes with the microcensus information.
+* 
+* @see org.matsim.utils.objectattributes 
+*
+* @author acmarmol
+* 
+*/
+
 public class MZHouseholdParser {
 
 //////////////////////////////////////////////////////////////////////
@@ -23,6 +53,7 @@ public class MZHouseholdParser {
 	
 	private static final String NO_ANSWER = "no answer";
 	private static final String NOT_KNOWN = "not known";
+	private static final String UNSPECIFIED = "unspecified";
 
 //////////////////////////////////////////////////////////////////////
 //constructors
@@ -73,10 +104,27 @@ public class MZHouseholdParser {
 		//location.setY(Math.round(location.getY()/10.0)*10);
 		householdAttributes.putAttribute(hhnr, "coord", location);
 		
+		//Kanton
+		String kanton =  entries[17].trim();
+		if(kanton.equals("1")){kanton = "zürich";}						else if(kanton.equals("2")){kanton = "bern";}
+		else if(kanton.equals("3")){kanton = "luzern";}					else if(kanton.equals("4")){kanton = "uri";}
+		else if(kanton.equals("5")){kanton = "schwyz";}					else if(kanton.equals("6")){kanton = "obwalden";}
+		else if(kanton.equals("7")){kanton = "nidwalden";}				else if(kanton.equals("8")){kanton = "glarus";}
+		else if(kanton.equals("9")){kanton = "zug";}					else if(kanton.equals("10")){kanton = "fribourg";}
+		else if(kanton.equals("11")){kanton = "solothurn";}				else if(kanton.equals("12")){kanton = "basel stadt";}
+		else if(kanton.equals("13")){kanton = "basel land";}			else if(kanton.equals("14")){kanton = "schaffhausen";}
+		else if(kanton.equals("15")){kanton = "appenzell ausserrhoden";}else if(kanton.equals("16")){kanton = "appenzell innerrhoden";}
+		else if(kanton.equals("17")){kanton = "st. gallen";}			else if(kanton.equals("18")){kanton = "graubünden";}
+		else if(kanton.equals("19")){kanton = "aargau";}				else if(kanton.equals("20")){kanton = "thurgau";}
+		else if(kanton.equals("21")){kanton = "ticino";}				else if(kanton.equals("22")){kanton = "vaud";}
+		else if(kanton.equals("23")){kanton = "valais";}				else if(kanton.equals("24")){kanton = "neuchâtel";}
+		else if(kanton.equals("25")){kanton = "genève";}				else if(kanton.equals("26")){kanton = "jura";}
+		else if(kanton.equals("-97")){kanton = UNSPECIFIED;}		
+		householdAttributes.putAttribute(hhnr, "kanton", kanton);
+		
 		//municipality BFS number
 		String municipality =  entries[10].trim();
 		householdAttributes.putAttribute(hhnr, "municipality", municipality);
-		
 		
 		//number of cars
 		String nr_cars = entries[77];

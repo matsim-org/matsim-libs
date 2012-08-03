@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.acmarmol.microcensus2010;
 
 import java.util.HashSet;
@@ -18,6 +37,15 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+/**
+* 
+* Helper class to filter the population
+* 
+*
+* @author acmarmol
+* 
+*/
 
 public class MZPopulationUtils {
 	
@@ -88,10 +116,12 @@ private static final String WORK = "work";
 	Set<Id> ids = new HashSet<Id>();
 	for (Person person : population.getPersons().values()) {
 		Plan plan = person.getSelectedPlan();
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				if ((leg.getMode().equals(TransportMode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(person.getId()); }
+		if(plan!=null){ //avoid persons without activities
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if ((leg.getMode().equals(TransportMode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(person.getId()); }
+				}
 			}
 		}
 	}
@@ -162,7 +192,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 					for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
-					if ((act.getCoord().getX() == -97) || (act.getCoord().getY() == -97)) { ids.add(person.getId()); }
+						if (((act.getCoord().getX() == -97) || (act.getCoord().getY() == -97))) {
+							ids.add(person.getId());
+							}
 					}
 				}
 			}
@@ -170,7 +202,23 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	return ids;
 }	
 		
-	
+//////////////////////////////////////////////////////////////////////
+
+public static Set<Id> identifyPlansWithoutBestPrecision(final Population population) {
+	Set<Id> ids = new HashSet<Id>();
+	for (Person person : population.getPersons().values()) {	
+		Plan plan = person.getSelectedPlan();
+		if(plan!=null){ //avoid persons without activities
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if (leg.getRoute().getDistance() == -99000) { ids.add(person.getId()); }
+				}
+			}
+		}
+	}
+	return ids;
+}	
 	
 	
 	

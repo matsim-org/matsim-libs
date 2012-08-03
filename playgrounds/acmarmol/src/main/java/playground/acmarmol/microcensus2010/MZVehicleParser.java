@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.acmarmol.microcensus2010;
 
 import java.io.BufferedReader;
@@ -11,8 +30,20 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.Vehicles;
 
+/**
+* 
+* Parses the fahrzeuge.dat file from MZ2010, creates matsim vehicles and adds them to matsim households.
+* Also fills the vehicle attributes with the microcensus information.
+* 
+* @see org.matsim.utils.objectattributes 
+*
+* @author acmarmol
+* 
+*/
+
 public class MZVehicleParser {
 	
+
 //////////////////////////////////////////////////////////////////////
 //member variables
 //////////////////////////////////////////////////////////////////////

@@ -41,6 +41,15 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.acmarmol.utils.CoordConverter;
 
+/**
+* 
+* Creates MATSim-DB xml files from Microcensus2010 database.
+* 
+*
+* @author acmarmol
+* 
+*/
+
 public class MZ2010ToXmlFiles {
 
 	private final static Logger log = Logger.getLogger(MZ2010ToXmlFiles.class);
@@ -103,7 +112,7 @@ public class MZ2010ToXmlFiles {
 		log.info("outputBase: "+outputBase);
 		System.out.println("\n");
 		
-
+		
 		// you will need to create households, persons and vehicles, incl. additional object attributes
 		ScenarioImpl scenario = (ScenarioImpl)ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseHouseholds(true);
@@ -114,7 +123,7 @@ public class MZ2010ToXmlFiles {
 		ObjectAttributes householdAttributes = new ObjectAttributes();
 		Vehicles vehicles = scenario.getVehicles();
 		ObjectAttributes vehiclesAttributes = new ObjectAttributes();
-		
+				
 		Gbl.printElapsedTime();
 		
 		// use the logger to print messages
@@ -138,6 +147,7 @@ public class MZ2010ToXmlFiles {
 		log.info("done. (writing)");
 				
 		Gbl.printElapsedTime();
+		Gbl.printMemoryUsage();
 
 //////////////////////////////////////////////////////////////////////	
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
@@ -146,6 +156,7 @@ public class MZ2010ToXmlFiles {
 		log.info("done. (parsing haushaltspersonenFile)");
 				
 		Gbl.printElapsedTime();
+		Gbl.printMemoryUsage();
 
 		// write intermediate results
 		log.info("writing intermediate files...");
@@ -154,6 +165,7 @@ public class MZ2010ToXmlFiles {
 		log.info("done. (writing)");
 		
 		Gbl.printElapsedTime();
+		Gbl.printMemoryUsage();
 		
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
@@ -192,6 +204,8 @@ public class MZ2010ToXmlFiles {
 		population_axmlw.putAttributeConverter(CoordImpl.class, new CoordConverter());
 		population_axmlw.writeFile(outputBase+"/populationAttributes.03.xml");
 		log.info("done. (writing)");
+		
+		int original_pop_size = population.getPersons().size();
 		
 		Gbl.printElapsedTime();
 		
@@ -240,7 +254,7 @@ public class MZ2010ToXmlFiles {
 			MZPopulationUtils.removePlans(population, coord_err_pids);
 			System.out.println("      done.");
 			System.out.println("      Total persons removed: " +  coord_err_pids.size());
-			System.out.println("      Remaining population size: " + population.getPersons().size());
+			System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 			System.out.println("      Writing population without coord. inconsistencies xml file \n");	
 			new PopulationWriter(population, null).write(outputBase+"population.07.xml");
 			System.out.println("  done.");
@@ -255,7 +269,7 @@ public class MZ2010ToXmlFiles {
 		MZPopulationUtils.removePlans(population, time_err_pids);
 		System.out.println("      done.");
 		System.out.println("      Total persons removed: " + time_err_pids.size());
-		System.out.println("      Remaining population size: " + population.getPersons().size());
+		System.out.println("      Remaining population size: " + population.getPersons().size()+" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 		System.out.println("      Writing population without time  inconsistencies xml file \n");	
 		new PopulationWriter(population, null).write(outputBase+"population.08.xml");
 		System.out.println("  done.");
@@ -263,20 +277,54 @@ public class MZ2010ToXmlFiles {
 		}else{System.out.println("      NO PEOPLE WITH TIME INCONSISTENCIES \n");}
 
 //////////////////////////////////////////////////////////////////////
-		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("removing persons with undefined negative coords...");
-		Set<Id> undef_neg_pids = MZPopulationUtils.identifyPlansWithUndefinedNegCoords(population);
-		if(undef_neg_pids.size()>0){
-//		MZPopulationUtils.removePlans(population, time_err_pids);
+//		System.out.println("-----------------------------------------------------------------------------------------------------------");
+//		log.info("removing persons with undefined negative coords...");
+//		Set<Id> undef_neg_pids = MZPopulationUtils.identifyPlansWithUndefinedNegCoords(population);
+//		if(undef_neg_pids.size()>0){
+//		MZPopulationUtils.removePlans(population, undef_neg_pids);
 //		System.out.println("      done.");
-//		System.out.println("      Total persons removed: " + time_err_pids.size());
-//		System.out.println("      Remaining population size: " + population.getPersons().size());
-//		System.out.println("      Writing population without time  inconsistencies xml file \n");	
-//		new PopulationWriter(population, null).write(outputBase+"population.08.xml");
-			System.out.println("NUMBER OF UNDEFINED NEGATIVE COORDS "+undef_neg_pids.size());
+//		System.out.println("      Total persons removed: " + undef_neg_pids.size());
+//		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
+//		System.out.println("      Writing population without undefined coords xml file \n");	
+//		new PopulationWriter(population, null).write(outputBase+"population.09.xml");
+//			System.out.println("NUMBER OF UNDEFINED NEGATIVE COORDS "+undef_neg_pids.size());
+//		System.out.println("  done.");
+//		
+//		}else{System.out.println("      NO PEOPLE WITH TIME INCONSISTENCIES \n");}
+
+//////////////////////////////////////////////////////////////////////
+		System.out.println("----	-------------------------------------------------------------------------------------------------------");
+		log.info("removing persons without best coordinate precision...");
+		Set<Id> neg_dist_pids = MZPopulationUtils.identifyPlansWithoutBestPrecision(population);
+		if(neg_dist_pids.size()>0){
+		MZPopulationUtils.removePlans(population, neg_dist_pids);
+		System.out.println("      done.");
+		System.out.println("      Total persons removed: " + neg_dist_pids.size());
+		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
+		System.out.println("      Writing population without negative route distances xml file \n");	
+		new PopulationWriter(population, null).write(outputBase+"population.10.xml");
+		System.out.println("NUMBER OF PLANS WITHOUTH BEST COORDINATE PRECISION "+neg_dist_pids.size());
 		System.out.println("  done.");
 		
-		}else{System.out.println("      NO PEOPLE WITH TIME INCONSISTENCIES \n");}
+		}else{System.out.println("      NO PLANS WITHOUTH BEST COORDINATE PRECISION \n");}		
+		
+		
+		
+//////////////////////////////////////////////////////////////////////
+		System.out.println("-----------------------------------------------------------------------------------------------------------");
+		log.info("removing persons with too long walk trips...");
+		Set<Id> long_walk_pids = MZPopulationUtils.identifyPlansWithTooLongWalkTrips(population);
+		if(long_walk_pids.size()>0){
+		MZPopulationUtils.removePlans(population, long_walk_pids);
+		System.out.println("      done.");
+		System.out.println("      Total persons removed: " + long_walk_pids.size());
+		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
+		System.out.println("      Writing population without long walk trips xml file \n");	
+		new PopulationWriter(population, null).write(outputBase+"population.11.xml");
+		System.out.println("NUMBER OF PEOPLE WITH TOO LONG WALK COORDS "+long_walk_pids.size());
+		System.out.println("  done.");
+		
+		}else{System.out.println("      NO PEOPLE WITH TOO LONK WALK TRIPS \n");}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -288,21 +336,13 @@ public class MZ2010ToXmlFiles {
 		// and you do not need to instantiate this.
 		// use it only for the main routine
 //		 createMZ2Plans(config);
-			
-		// that whole thing makes it a little bit more modular, so that in future just some of the input files will change the spec
-		// you do not need to change the whole process but just the classes that are involved
-				
-		// hope that helped a bit.
-				
-		// have fun
-		System.out.println(pids.get(2).size());
+
 		System.out.println("#################################################################################\n" +
 				   		   "################################FINISHED#########################################\n" +
 						   "#################################################################################");	
 		Gbl.printElapsedTime();
 		
-		System.out.println(pids.get(3).size());
-		
+	
 	}//end main		
 
 

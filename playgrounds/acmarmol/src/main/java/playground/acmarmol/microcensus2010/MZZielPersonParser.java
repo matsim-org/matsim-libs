@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.acmarmol.microcensus2010;
 
 import java.io.BufferedReader;
@@ -8,6 +27,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
@@ -15,8 +35,20 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class MZZielPersonParser {
 
+/**
+* 
+* Parses the zielpersonen.dat file from MZ2010, creates matsim persons and adds them to the matsim population.
+* Also fills the population attributes with the microcensus information.
+* 
+* @see org.matsim.utils.objectattributes 
+*
+* @author acmarmol
+* 
+*/
+	
+public class MZZielPersonParser {
+	
 //////////////////////////////////////////////////////////////////////
 //member variables
 //////////////////////////////////////////////////////////////////////
@@ -56,9 +88,9 @@ public class MZZielPersonParser {
 //private methods
 //////////////////////////////////////////////////////////////////////
 	
-	public void parse(String haushaltspersonenFile) throws Exception{
+	public void parse(String zielpersonenFile) throws Exception{
 		
-		FileReader fr = new FileReader(haushaltspersonenFile);
+		FileReader fr = new FileReader(zielpersonenFile);
 		BufferedReader br = new BufferedReader(fr);
 		String curr_line = br.readLine(); // Skip header
 				
@@ -89,9 +121,9 @@ public class MZZielPersonParser {
 		//day of week
 		String dow = entries[10];
 		if(dow.equals("1")){dow = "monday";}
-		else if(dow.equals("2")){dow = "tuesday";}else if(dow.equals("3")){dow = "wednesday";}
-		else if(dow.equals("4")){dow = "thurdsday";}else if(dow.equals("5")){dow = "friday";}
-		else if(dow.equals("6")){dow = "saturday";}else if(dow.equals("7")){dow = "sunday";}
+		else if(dow.equals("2")){dow = "tuesday";}		else if(dow.equals("3")){dow = "wednesday";}
+		else if(dow.equals("4")){dow = "thurdsday";}	else if(dow.equals("5")){dow = "friday";}
+		else if(dow.equals("6")){dow = "saturday";}		else if(dow.equals("7")){dow = "sunday";}
 		else Gbl.errorMsg("This should never happen!  Day of week: " + dow + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), "day of week", dow);
 
@@ -110,15 +142,15 @@ public class MZZielPersonParser {
 		else if(employment_status.equals("6")){employment_status = "not in labor force";}				else if(employment_status.equals("7")){employment_status = "retired";}
 		else if(employment_status.equals("8")){employment_status = "disabled";}							else if(employment_status.equals("9")){employment_status = "housewife/hosehusband";}
 		else if(employment_status.equals("10")){employment_status = "other inactive";}					else if(employment_status.equals(" ")){employment_status = "unspecified";}
-		else Gbl.errorMsg("This should never happen! Employment Status: " + employment_status + " doesn't exist");
+		else Gbl.errorMsg("This should ne ver happen! Employment Status: " + employment_status + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), "work: employment status", employment_status);
 		
 		//level of employment
 		String level_employment = entries[179];
 		if(level_employment.equals("1")){level_employment = "90-100%";}
-		else if(level_employment.equals("2")){level_employment = "70-89%";}			else if(level_employment.equals("3")){level_employment = "50-69%";}
-		else if(level_employment.equals("4")){level_employment = "less than 50%";}	else if(level_employment.equals("99")){level_employment = "part-time unspecified";}
-		else if(level_employment.equals("999")){level_employment = "unemployed";}	else if(level_employment.equals(" ")){level_employment = UNSPECIFIED;}
+		else if(level_employment.equals("2")){level_employment = "70-89%";}								else if(level_employment.equals("3")){level_employment = "50-69%";}
+		else if(level_employment.equals("4")){level_employment = "less than 50%";}						else if(level_employment.equals("99")){level_employment = "part-time unspecified";}
+		else if(level_employment.equals("999")){level_employment = "unemployed";}						else if(level_employment.equals(" ")){level_employment = UNSPECIFIED;}
 		else Gbl.errorMsg("This should never happen! Level of Employment: " + level_employment + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), "work: level of employment", level_employment);
 		
