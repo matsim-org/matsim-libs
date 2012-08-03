@@ -32,10 +32,10 @@ import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 public class PriceChangeBetweenIterations {
 
 	public static void main(String[] args) {
-		String basePath="H:/data/experiments/TRBAug2012/runs/run91/output/ITERS/";
+		String basePath="H:/data/experiments/TRBAug2012/runs/run99/output/ITERS/";
 		int firstIteration=1;
 		int outputInterval=1;
-		int lastIteration=100;
+		int lastIteration=18;
 		
 		String fileName= basePath + "it.0/0.publicParkingPricePerHourInTheMorning.txt";
 		DoubleValueHashMap<Id> oldPrices = readPrices(fileName);
@@ -79,7 +79,7 @@ public class PriceChangeBetweenIterations {
 						numberOfStableGarageParkingPrices++;
 					}
 				} else {
-					DebugLib.stopSystemAndReportInconsistency();
+					//DebugLib.stopSystemAndReportInconsistency();
 				}
 			}
 			

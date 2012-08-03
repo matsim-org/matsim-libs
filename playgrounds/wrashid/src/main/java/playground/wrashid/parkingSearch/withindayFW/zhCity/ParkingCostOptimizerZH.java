@@ -237,22 +237,22 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 	public void updatePrices(ParkingOccupancyStats parkingOccupancy) {
 
 		for (Parking parking : parkings) {
-			if (parkingOccupancy.parkingOccupancies.get(parking.getId()) == null) {
-				// no demand at parking
-				if (publicParkingPricePerHourInTheMorning.get(parking.getId()) >= priceIncValue) {
-					publicParkingPricePerHourInTheMorning.decrementBy(parking.getId(), priceIncValue);
-				}
-				
-				if (publicParkingPricePerHourInTheAfternoon.get(parking.getId()) >= priceIncValue) {
-					publicParkingPricePerHourInTheAfternoon.decrementBy(parking.getId(), priceIncValue);
-				}
-				continue;
-			}
-
-			int[] occupancy = parkingOccupancy.parkingOccupancies.get(parking.getId()).getOccupancy();
-			boolean parking85PercentReached = false;
+			
 			if (parking.getId().toString().contains("stp") || parking.getId().toString().contains("gp")) {
+				if (parkingOccupancy.parkingOccupancies.get(parking.getId()) == null) {
+					// no demand at parking
+					if (publicParkingPricePerHourInTheMorning.get(parking.getId()) >= priceIncValue) {
+						publicParkingPricePerHourInTheMorning.decrementBy(parking.getId(), priceIncValue);
+					}
+					
+					if (publicParkingPricePerHourInTheAfternoon.get(parking.getId()) >= priceIncValue) {
+						publicParkingPricePerHourInTheAfternoon.decrementBy(parking.getId(), priceIncValue);
+					}
+					continue;
+				}
 
+				int[] occupancy = parkingOccupancy.parkingOccupancies.get(parking.getId()).getOccupancy();
+				boolean parking85PercentReached = false;
 				
 				for (int i = 0; i <= 47; i++) {
 					if (occupancy[i] > parking.getCapacity() * targetOccupancy) {
