@@ -30,12 +30,12 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringFunction {
+public class MixedActivityScoringFunction extends CharyparNagelOpenTimesActivityScoring {
 	static final Logger log = Logger.getLogger(MixedActivityScoringFunction.class);
 	private final ActivityFacilities facilities;
 	

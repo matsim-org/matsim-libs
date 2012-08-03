@@ -26,6 +26,16 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * 
+ * An adapter from the old ScoringFunction interface to the new one.
+ * Do not use for new things. Just implement ScoringFunction.
+ * 
+ * @author michaz
+ *
+ */
+
+@Deprecated
 public abstract class ScoringFunctionAdapter implements ScoringFunction {
 
     public final void handleActivity(Activity activity) {

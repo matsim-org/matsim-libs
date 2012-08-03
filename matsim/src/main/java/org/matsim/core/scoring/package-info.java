@@ -6,7 +6,7 @@
  * the score of a plan based on information about how long an activity was
  * executed or how much time an agent spent traveling. MATSim provides a
  * default scoring function,
- * {@link org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory}, which takes
+ * {@link org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory}, which takes
  * performing activities and traveling into account for the calculation of the
  * score. Advanced scoring functions could be thought of where where the
  * distance, people traveling along, people met at activities etc. have an
@@ -46,7 +46,7 @@
  * Scoring functions should listen for <code>AgentUtilityEvent</code>s and just
  * add the utility amount specified in the event to the agent's score.
  *
- * As an example, the roadpricing-package makes use of <code>AgentUtilityEvent</code>s:
+ * As an example, the roadpricing-package makes use of <code>AgentMoneyEvent</code>s:
  * An event-handler listens for agents entering and leaving links and thus
  * calculates how much toll an agent pays. After the iteration, the event
  * handler generates events itself: for each agent that must pay some toll, an

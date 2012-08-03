@@ -10,9 +10,20 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
+import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.collections.Tuple;
 
-public class PlanElementsToScore implements ActivityHandler, LegHandler{
+/**
+ * 
+ * This is an intermediate step from when we rebuilt the Scoring so it does not read Plans anymore. 
+ * It helps EventsToScore by dispatching things. It does not do anything independently useful.
+ * Do not make it public, please.
+ * 
+ * @author michaz
+ *
+ */
+class PlanElementsToScore implements ActivityHandler, LegHandler {
 	
 	private Scenario scenario = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
@@ -78,8 +89,6 @@ public class PlanElementsToScore implements ActivityHandler, LegHandler{
         }
     }
     
-    
-
 	public void finish() {
 		for (Map.Entry<Id, Tuple<Plan, ScoringFunction>> entry : this.agentScorers.entrySet()) {
 			Plan plan = entry.getValue().getFirst();

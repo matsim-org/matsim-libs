@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.TravelledEventImpl;
+import org.matsim.core.scoring.EventsToLegs.LegHandler;
 
 public class EventsToLegsTest {
 

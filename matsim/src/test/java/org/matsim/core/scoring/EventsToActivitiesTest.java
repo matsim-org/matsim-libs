@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.utils.misc.Time;
 
 public class EventsToActivitiesTest {

@@ -113,7 +113,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -1063,6 +1063,11 @@ public class Controler extends AbstractController {
 		return this.simulationListener;
 	}
 
+	@Deprecated
+	/**
+	 * This method exposes something which is definitely private to the Controler,
+	 * bypassing all the interfaces.
+	 */
 	public PlansScoring getPlansScoring() {
 		return this.plansScoring;
 	}

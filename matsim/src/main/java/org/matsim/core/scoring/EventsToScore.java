@@ -38,19 +38,21 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.TravelledEvent;
 import org.matsim.core.events.TravelEventHandler;
+import org.matsim.core.events.TravelledEvent;
 
 /**
  * Calculates the score of the selected plans of a given scenario
- * based on events.<br>
- * Departure- and Arrival-Events *must* be provided to calculate the score,
- * AgentStuck-Events are used if available to add a penalty to the score. The
- * final score are written to the selected plans of each person in the
+ * based on events. The final scores are written to the selected plans of each person in the
  * scenario.
  * 
- * If you want your own way to reproduce plan elements from Events to get scored,
- * build your own class like this.
+ * This class is the bridge between a stream of Events, the ScoringFunctionFactory and the Plan database.
+ * This mechanism is considered core to MATSim, and changing it is not supported, except of course
+ * by providing your own ScoringFunctionFactory.
+ * 
+ * Therefore, this class is instantiated and used by the Controler. Create your own instance if you want
+ * to compute scores from an Event file, for example. You will still need a Scenario with proper selected
+ * Plans, though. This is not yet fully decoupled.
  *
  * @author mrieser, michaz
  */

@@ -24,13 +24,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.population.ActivityImpl;
 
+/**
+ * 
+ * Converts a stream of Events into a stream of Activities. Passes Activities to a single ActivityHandler which must be registered with this class.
+ * Mainly intended for scoring, but can be used for any kind of Activity related statistics. Essentially, it allows you to read
+ * Activities from the simulation like you would read Activities from Plans, except that the Plan does not even need to exist.
+ * 
+ * Note that the instances of Activity passed to the LegHandler will never be identical to those in the Scenario! Even
+ * in a "no-op" simulation which only reproduces the Plan, new instances will be created. So if you attach your own data
+ * to the Activities in the Scenario, that's your own lookout.
+ * 
+ * @author michaz
+ *
+ */
 public class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
+	
+	public interface ActivityHandler {
+	    void handleActivity(Id agentId, Activity activity);
+	}
 
     private Map<Id, ActivityImpl> activities = new HashMap<Id, ActivityImpl>();
     private ActivityHandler activityHandler = null;

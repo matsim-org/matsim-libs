@@ -20,7 +20,6 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,8 +43,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener {
 
-	private final static Logger log = Logger.getLogger(PlansScoring.class);
-
 	private EventsToScore eventsToScore;
 
 	private Scenario sc;
@@ -62,22 +59,18 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-//		this.eventsToScore = new EventsToScore(event.getControler().getScenario(), event.getControler().getScoringFunctionFactory(), 
-//				event.getControler().getConfig().planCalcScore().getLearningRate());
-//		event.getControler().getEvents().addHandler(this.eventsToScore);
-		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, 
-				this.sc.getConfig().planCalcScore().getLearningRate() );
+		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
 		this.events.addHandler(this.eventsToScore);
-	}
-
-	@Override
-	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.events.removeHandler(this.eventsToScore);
 	}
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
 		this.eventsToScore.finish();
+	}
+	
+	@Override
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		this.events.removeHandler(this.eventsToScore);
 	}
 
 	/** 

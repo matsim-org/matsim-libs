@@ -25,18 +25,53 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.scoring.interfaces.ActivityScoring;
-import org.matsim.core.scoring.interfaces.AgentStuckScoring;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.LegScoring;
-import org.matsim.core.scoring.interfaces.MoneyScoring;
+import org.matsim.core.utils.misc.Time;
 
 /**
- * The accumulator adds up the different parts of the score.
+ * 
+ * This is a scoring function which is configurable with sum terms for Activities, Legs, money spent, and becoming stuck.
+ * You can create an instance of this class from your own ScoringFunctionFactory and add different sum terms to it,
+ * for example depending on a configuration option.
+ * 
+ * The sum terms are instances which implement BasicScoring as well as one of ActivityScoring, LegScoring, MoneyScoring or
+ * AgentStuckScoring. They are notified about these events, and after finish() is called on them, they must be able to answer
+ * getScore(). Instances of BasicScoring, like ScoringFunctions, must be able to reset() themselves between iterations, though 
+ * this is currently not used (fresh instances are created).
+ * 
+ * Note that the startActivity() and endActivity() as well as starLeg() and endLeg() are redundant. The start time as well as
+ * the end time is contained in the Activity and the Leg. This is for historical reasons, when the Activity and the Leg which 
+ * were passed were instances from the Plan.
+ * 
+ * It is by no means necessary to use this class for a ScoringFunction. You are encouraged to just implement ScoringFunction.
+ * 
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class ScoringFunctionAccumulator extends ScoringFunctionAdapter {
+public class ScoringFunctionAccumulator implements ScoringFunction {
+	
+	public interface BasicScoring {
+		public void finish();
+		public double getScore();
+		public void reset();
+	}
+	
+	public interface ActivityScoring {
+		void startActivity(final double time, final Activity act);
+		void endActivity(final double time, final Activity act);
+	}
+
+	public interface LegScoring {
+		void startLeg(final double time, final Leg leg);
+		void endLeg(final double time);
+	}
+	
+	public interface MoneyScoring {
+		void addMoney(final double amount);
+	}
+
+	public interface AgentStuckScoring {
+		void agentStuck(final double time);
+	}
 	
 	private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
 
@@ -46,6 +81,20 @@ public class ScoringFunctionAccumulator extends ScoringFunctionAdapter {
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
 
+	public final void handleActivity(Activity activity) {
+        if (activity.getStartTime() != Time.UNDEFINED_TIME) {
+            startActivity(activity.getStartTime(), activity);
+        }
+        if (activity.getEndTime() != Time.UNDEFINED_TIME) {
+            endActivity(activity.getEndTime(), activity);
+        }
+    }
+
+    public final void handleLeg(Leg leg) {
+        startLeg(leg.getDepartureTime(), leg);
+        endLeg(leg.getDepartureTime() + leg.getTravelTime());
+    }
+	
 	@Override
 	public void addMoney(double amount) {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
@@ -60,35 +109,30 @@ public class ScoringFunctionAccumulator extends ScoringFunctionAdapter {
 		}
 	}
 
-	@Override
 	public void startActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.startActivity(time, act);
 		}
 	}
 
-	@Override
 	public void endActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
 			activityScoringFunction.endActivity(time, act);
 		}
 	}
 
-	@Override
 	public void startLeg(double time, Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.startLeg(time, leg);
 		}
 	}
 
-	@Override
 	public void endLeg(double time) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.endLeg(time);
 		}
 	}
 
-	@Override
 	public void finish() {
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
 			basicScoringFunction.finish();

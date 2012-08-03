@@ -42,7 +42,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAdapter;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
@@ -246,7 +246,7 @@ public class Planomat implements PlanAlgorithm {
 		for (int geneIndex = 1; geneIndex <= numLegs; geneIndex++) {
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
-				((ScoringFunctionAdapter) scoringFunction).endActivity(now, origin);
+				((ScoringFunctionAccumulator) scoringFunction).endActivity(now, origin);
 			}
 			now = Math.max(oldNow + 1.0, now);
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
@@ -260,7 +260,7 @@ public class Planomat implements PlanAlgorithm {
 			destination = ((PlanImpl) plan).getNextActivity(leg);
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
-				((ScoringFunctionAdapter) scoringFunction).startLeg(now, leg);
+				((ScoringFunctionAccumulator) scoringFunction).startLeg(now, leg);
 			}
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				leg.setDepartureTime(now);
@@ -287,7 +287,7 @@ public class Planomat implements PlanAlgorithm {
 			now += anticipatedTravelTime;
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
-				((ScoringFunctionAdapter) scoringFunction).endLeg(now);
+				((ScoringFunctionAccumulator) scoringFunction).endLeg(now);
 			}
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				leg.setTravelTime(anticipatedTravelTime);
@@ -305,7 +305,7 @@ public class Planomat implements PlanAlgorithm {
 			// - minimum 1 second (no negative activity durations will be produced)
 			///////////////////////////////////////////////////////////////////////////////////////////
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
-				((ScoringFunctionAdapter) scoringFunction).startActivity(now, destination);
+				((ScoringFunctionAccumulator) scoringFunction).startActivity(now, destination);
 			}
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				destination.setStartTime(now);
