@@ -43,6 +43,8 @@ public class OTFVisVisualization {
 	private static final Logger log = Logger.getLogger(OTFVisVisualization.class);
 	private final String config;
 	private final int it;
+	private String baseURL = null;
+	private String layer = null;
 	
 	
 	public OTFVisVisualization(String string, int i) {
@@ -50,6 +52,12 @@ public class OTFVisVisualization {
 		this.it = i;
 	}
 
+	public OTFVisVisualization(String string, int i, String baseURL, String layer) {
+		this.config = string;
+		this.it = i;
+		this.baseURL = baseURL;
+		this.layer = layer;
+	}
 
 	public void run() {
 		log.info("preparing JOGL");
@@ -86,7 +94,11 @@ public class OTFVisVisualization {
 		}
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config,scenario, events, qSim);
-		OTFClientLive.run(config, server);
+		if (this.baseURL != null && this.layer != null ) {
+			OTFClientLiveWMS.run(config, server, this.baseURL, this.layer); 
+		} else {
+			OTFClientLive.run(config, server);
+		}
 
 		qSim.run();
 		

@@ -50,7 +50,7 @@ public abstract class TileFactoryBuilder {
 		
 		WMSService service = new WMSService(baseURL, layer);
 		
-		return new WMSTileFactory(service,20);
+		return new WMSTileFactory(service,17);
 		
 	}
 
