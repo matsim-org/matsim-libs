@@ -90,9 +90,10 @@ public class CreatePlansFromTrips {
 	
 	private HashMap<Id, String> personHouseholdMap; //person id, hhid
 	private HashMap<Id, Trip> trips; //trip_id, attributes
-	private HashMap<Id, List<Id>> personTripsMap; //person id, list of trip ids.
+	private HashMap<Id, HashSet<Id>> personTripsMap; //person id, list of trip ids.
 	private HashMap<Id, Coord> stations; //station id, location
 	private HashMap<String, Double> householdWeights; //hhid, expansionfactor
+	
 	
 	private HashMap<String, Coord> householdCoords;
 	private HashSet<Id> unusableTripChains;
@@ -101,9 +102,6 @@ public class CreatePlansFromTrips {
 	//TODO remove this once mixed mode trips are implemented.
 	private HashSet<Id> personsWithMixedModeTrips;
 	
-	
-	
-	private double expansionFactorFactor = 0; // All weights will be multiplied by this factor. 
 	private boolean isUsingMixedModeTrips = false;
 	
 	// ////////////////////////////////////////////////////////////////////
@@ -118,14 +116,6 @@ public class CreatePlansFromTrips {
 	// get / set methods
 	// ////////////////////////////////////////////////////////////////////
 	
-	public double getExpansionFactorFactor() {
-		return expansionFactorFactor;
-	}
-
-	public void setExpansionFactorFactor(double expansionFactorFactor) {
-		this.expansionFactorFactor = expansionFactorFactor;
-	}
-
 	public boolean isUsingMixedModeTrips() {
 		return isUsingMixedModeTrips;
 	}
@@ -159,7 +149,7 @@ public class CreatePlansFromTrips {
 		log.info("Zones file opened successfully.");
 	}
 	
-	private void readTrips(String filename) throws IOException{
+	private void readTrips(String filename) throws IOException{	
 		log.info("Opening " + filename + " as a trips file.");
 		
 		TableReader tr = new TableReader(filename);
@@ -169,12 +159,12 @@ public class CreatePlansFromTrips {
 		
 		this.personHouseholdMap = new HashMap<Id, String>();
 		this.trips = new HashMap<Id, CreatePlansFromTrips.Trip>();
-		this.personTripsMap = new HashMap<Id, List<Id>>();
+		this.personTripsMap = new HashMap<Id, HashSet<Id>>();
+		this.householdWeights = new HashMap<String, Double>();
 		
 		long tripNum = 0;
 		while (tr.next()){
 			//Puts the household factor into the map.
-			householdWeights = new HashMap<String, Double>();
 			householdWeights.put(tr.current().get("hhid"), 
 					new Double( tr.current().get("weight")));
 			
@@ -186,7 +176,8 @@ public class CreatePlansFromTrips {
 				P = new PersonImpl(pid);
 				scenario.getPopulation().addPerson(P);
 				personHouseholdMap.put(pid, tr.current().get("hhid"));
-				personTripsMap.put(pid, new ArrayList<Id>());
+								
+				personTripsMap.put(pid, new HashSet<Id>());
 			}
 			else{
 				P = (PersonImpl) scenario.getPopulation().getPersons().get(pid);
@@ -335,10 +326,159 @@ public class CreatePlansFromTrips {
 	}
 	
 	/**
+	 * A function for expanding the population by a given factor. USE BEFORE CREATING TRIPS.
+	 */
+	private void expandPopulation(){
+		
+		log.info("Starting the population expansion procedure...");
+		
+		double weightFactor = 0;
+		String message = "Please enter the weight factor. Household weights (ie, expansion factors)\n" +
+				"will be multiplied by this value. For example, to generate a full population,\n" +
+				"enter '1.0'. To generate a population with a 1:1 matching of the sample data\n" +
+				"enter '0', or leave this field blank.\n" +
+				"Default value = 0.0";
+		String s = JOptionPane.showInputDialog(message);
+		try {
+			weightFactor = Double.parseDouble(s);
+			
+		} catch (NumberFormatException e) {
+			log.info("Expansion factor factor set to 0.");
+		}		
+		
+		if (weightFactor > 0.2){
+			message = "WARNING: Using the expansion factor will\n" +
+					"significantly increase the size of the\n" +
+					"population. The time required to create\n" +
+					"plans for all agents will increase\n" +
+					"accordingly.";
+			JOptionPane.showMessageDialog(null, message, "WARNING", JOptionPane.WARNING_MESSAGE);
+		}
+		
+		int originalPopulation = 0;
+		int personsAdded = 0;
+				
+		//Build original households by inverting the personHouseholdMap
+		HashMap<String, HashSet<Id>> oldHouseholds = new HashMap<String, HashSet<Id>>();
+		for (Entry<Id, String> e : personHouseholdMap.entrySet()){
+			String hhid = e.getValue();
+			Id pid = e.getKey();
+			if (!oldHouseholds.containsKey(hhid)) oldHouseholds.put(hhid, new HashSet<Id>());
+			
+			oldHouseholds.get(hhid).add(pid);
+			originalPopulation++;
+		}
+		
+		//Iterate through oldHouseholds
+		for (Entry<String, HashSet<Id>> e : oldHouseholds.entrySet()){
+			
+			double weight = householdWeights.get(e.getKey()) * weightFactor;
+			
+			// iterate over the household weight.
+			for (int i = 1; i < weight; i++){
+				String newHhId = e.getKey() + "(" + i + ")";
+				for (Id pid : e.getValue()){
+					
+					//Skip non-usable people. There is no need to copy them and waste memory.
+					if (unusableTripChains.contains(pid) || 
+							personsWithMixedModeTrips.contains(pid) || //TODO: remove this once mixed mode trips are implemented.
+							chainsWithNoZones.contains(pid)) continue;
+					
+					//Create the new person
+					IdImpl newPid = new IdImpl(newHhId + "-" + pid.toString().split("-")[1]); //Assumes that person Ids are formatted as "[hhid]-[person#]"
+					personHouseholdMap.put(newPid, newHhId); //Map the new person to the new household
+					Person P = new PersonImpl(newPid);
+					scenario.getPopulation().addPerson(P);
+					personsAdded++;
+					
+					//Copy original's set of trips
+					HashSet<Id> newTrips = new HashSet<Id>();
+					for (Id j : personTripsMap.get(pid)) newTrips.add(j);
+					personTripsMap.put(newPid, newTrips);
+				}
+			}
+		}
+		
+		log.info(personsAdded + " persons created, increasing the final population to " + (personsAdded + originalPopulation) + " from " + originalPopulation);	
+	}
+	
+
+	private void assignActsToNearestLink(){
+		
+		log.info("Assigning activities to nearest link...");
+		
+		//Open network file.
+		String networkFileName = "";
+		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(new FileFilter() {
+			@Override
+			public String getDescription() {return "MATSim network in *.xml format.";}
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
+			}
+		});	
+		fc.setDialogTitle("Please select a network file");
+		int state = fc.showOpenDialog(null);
+		if (state == JFileChooser.APPROVE_OPTION){
+			networkFileName = fc.getSelectedFile().getAbsolutePath();
+		}else if (state == JFileChooser.CANCEL_OPTION) return;
+		if (networkFileName == "" || networkFileName == null) return;
+		
+		//Load the network
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(networkFileName);
+		
+		
+		//Remove highway links and non-car links from the network. DON'T EXPORT!!!
+		HashSet<Id> linksToRemove = new HashSet<Id>();
+		for (Link l : network.getLinks().values()){
+			LinkImpl L = (LinkImpl) l;
+			
+			if (L.getType() == null) continue; //Assumes that links without a type are OK.
+			
+			//Highway links (& on/off ramps)
+			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") 
+					|| L.getType().equals("On/Off Ramp") || L.getType().equals("Turn") ||
+					L.getType().equals("LOOP")) linksToRemove.add(new IdImpl(L.getId().toString()));
+			
+			//Transit EX-ROW links
+			if (!L.getAllowedModes().contains("Car") || !L.getAllowedModes().contains("car")) linksToRemove.add(L.getId());
+			
+		}
+		for (Id i : linksToRemove) network.removeLink(i);
+		
+		//Remove nodes with degree 0;
+		HashSet<Id> nodestoRemove = new HashSet<Id>();
+		for (Node N : network.getNodes().values()){
+			if (N.getInLinks().size() == 0 && N.getOutLinks().size() == 0) nodestoRemove.add(N.getId());
+		}
+		for (Id i : nodestoRemove) network.removeNode(i);
+		
+		/*
+		MultimodalNetworkCleaner mmnc = new MultimodalNetworkCleaner(network);
+		HashSet<String> modes = new HashSet<String>();
+		modes.add("Subway"); modes.add("Car"); modes.add("Train"); modes.add("Streetcar"); modes.add("Bus");
+		modes.add("Walk");
+		mmnc.run(modes);
+		*/
+		
+		//Assign activities to nearest node.
+		for (Person P : scenario.getPopulation().getPersons().values()){
+			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
+			
+			ActivityImpl a = (ActivityImpl) plan.getFirstActivity();
+			Link nearestLink = network.getNearestLink(a.getCoord());
+			
+			a.setLinkId(nearestLink.getId());
+		}
+	}
+	
+	/**
 	 * This is the primary logic of this class. Converts an ordered list of trips into a person's activity plan.
 	 * 
 	 */
-	private void createPlans(){
+	private void run(){
 		
 		log.info("Creating plans from trips...");
 		log.warn("This program does not currenlty handle auto-access/egress transit trips. Please contact author for details.");
@@ -494,10 +634,16 @@ public class CreatePlansFromTrips {
 	// utility functions
 	// ////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * "Pulls" a random coordinate within a circle around a zone's centroid. 
+	 * @param zoneId
+	 * @return
+	 */
 	private Coord getRandomCoordInZone(final Id zoneId) {
 		return WorldUtils.getRandomCoordInZone(
 				(Zone) this.zones.getLocation(zoneId), this.zones);
 	}
+	
 	
 	private static double convertTime(final String time) throws NumberFormatException {
 		int timeAsInt = Integer.parseInt(time);
@@ -510,6 +656,18 @@ public class CreatePlansFromTrips {
 		Collections.sort(a);
 	}	
 	
+	/**
+	 * Categorizes a trip-chain. Currently, the categories are as follows:
+	 *  5 - could not find zone
+	 *  4 - only one trip in the trip-chain
+	 *  3 - activity location/type mismatch between two subsequent trips
+	 *  2 - (not used) final activity != first activity
+	 *  1 - does not have a home activity
+	 *  0 - none of the above (ie, trip chain is OK) 
+	 * 
+	 * @param a
+	 * @return
+	 */
 	private int checkTripChain(List<Trip> a){
 		
 		for (Trip T : a) if ((zones.getLocation(new IdImpl(T.zone_o)) == null) 
@@ -534,129 +692,7 @@ public class CreatePlansFromTrips {
 		if (!hasHomeEpisode) return 1; //Does not have home activity.
 		
 		return 0;
-	}
-	
-	private void expandPopulation(){
-		
-		double weightFactor = 0;
-		String message = "Please enter the weight factor. Household weights (ie, expansion factors)\n" +
-				"will be multiplied by this value. For example, to generate a full population,\n" +
-				"enter '1.0'. To generate a population with a 1:1 matching of the sample data\n" +
-				"enter '0', or leave this field blank.\n" +
-				"Default value = 0.0";
-		String s = JOptionPane.showInputDialog(message);
-		try {
-			weightFactor = Double.parseDouble(s);
-		} catch (NumberFormatException e) {
-			log.info("Expansion factor factor set to 0.");
-		}		
-		
-		if (weightFactor > 0.2){
-			message = "WARNING: Using the expansion factor will\n" +
-					"significantly increase the size of the\n" +
-					"population. The time required to create\n" +
-					"plans for all agents will increase\n" +
-					"accordingly.";
-			JOptionPane.showMessageDialog(null, message, "WARNING", JOptionPane.WARNING_MESSAGE);
-		}
-		
-		//Figure out which persons to create.
-		HashMap<Id, List<Id>> personNewPersonMap = new HashMap<Id, List<Id>>();
-		for (Person P : scenario.getPopulation().getPersons().values()){
-			Id pid = P.getId();
-			Double weight = householdWeights.get(personHouseholdMap.get(pid)) * weightFactor;
-			Integer additonalClones = weight.intValue();
-			List<Id> newPersons = new ArrayList<Id>();
-			for (int i = 0; i < additonalClones; i++){
-				newPersons.add(new IdImpl(pid.toString() + "_" + i));  
-			}
-			personNewPersonMap.put(pid, newPersons);
-		}
-		
-		for (Entry<Id, List<Id>> e : personNewPersonMap.entrySet()){
-			for (Id i : e.getValue()){
-				scenario.getPopulation().addPerson(new PersonImpl(i));
-				
-			}
-			
-			/*
-			P = new PersonImpl(pid);
-			scenario.getPopulation().addPerson(P);
-			personHouseholdMap.put(pid, tr.current().get("hhid"));
-			personTripsMap.put(pid, new ArrayList<Id>());
-			*/
-			
-		}
-		
-		
-		
-	}
-	
-	/**
-	 * Assigns activities 
-	 * 
-	 * @param networkFileName
-	 */
-	private void assignActsToNearestLink(){
-		
-		log.info("Assigning activities to nearest link...");
-		
-		//Open network file.
-		String networkFileName = "";
-		JFileChooser fc = new JFileChooser();
-		fc.setFileFilter(new FileFilter() {
-			@Override
-			public String getDescription() {return "MATSim network in *.xml format.";}
-			@Override
-			public boolean accept(File f) {
-				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
-			}
-		});	
-		fc.setDialogTitle("Please select a network file");
-		int state = fc.showOpenDialog(null);
-		if (state == JFileChooser.APPROVE_OPTION){
-			networkFileName = fc.getSelectedFile().getAbsolutePath();
-		}else if (state == JFileChooser.CANCEL_OPTION) return;
-		if (networkFileName == "" || networkFileName == null) return;
-		
-		//Load the network
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFileName);
-		
-		//Remove highway links and non-car links from the network. DON'T EXPORT!!!
-		HashSet<Id> linksToRemove = new HashSet<Id>();
-		for (Link l : network.getLinks().values()){
-			LinkImpl L = (LinkImpl) l;
-			
-			if (L.getType() == null) continue; //Assumes that links without a type are OK.
-			
-			//Highway links (& on/off ramps)
-			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") 
-					|| L.getType().equals("On/Off Ramp") || L.getType().equals("Turn") ||
-					L.getType().equals("LOOP")) linksToRemove.add(L.getId());
-			
-			//Transit EX-ROW links
-			if (!L.getAllowedModes().contains("Car") || !L.getAllowedModes().contains("car")) linksToRemove.add(L.getId());
-			
-		}
-		for (Id i : linksToRemove) network.removeLink(i);
-		
-		//Remove nodes with degree 0;
-		HashSet<Id> nodestoRemove = new HashSet<Id>();
-		for (Node N : network.getNodes().values()){
-			if (N.getInLinks().size() == 0 && N.getOutLinks().size() == 0) nodestoRemove.add(N.getId());
-		}
-		for (Id i : nodestoRemove) network.removeNode(i);
-		
-		//Assign activities to nearest node.
-		for (Person P : scenario.getPopulation().getPersons().values()){
-			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
-			
-			ActivityImpl a = (ActivityImpl) plan.getFirstActivity();
-			Link nearestLink = network.getNearestLink(a.getCoord());
-			a.setLinkId(nearestLink.getId());
-		}
-	}
+	}	
 	
 	// ////////////////////////////////////////////////////////////////////
 	// main method
@@ -728,9 +764,11 @@ public class CreatePlansFromTrips {
 		if(!converter.checkPopConsistency()) return;
 				
 		////////////////////////
-		converter.createPlans();
+		converter.expandPopulation();
 		////////////////////////
-		converter.assignActsToNearestLink();
+		converter.run();
+		////////////////////////
+		//converter.assignActsToNearestLink();
 		//////////////////////
 		
 		if (basefolder != ""){
@@ -766,7 +804,7 @@ public class CreatePlansFromTrips {
 		public String start_time;
 		public String type;
 		
-		//Additional attributes for mixed-mode trips
+		//Additional attributes for mixed-mode trips?
 		public String zone_a; //access zone to transit
 		public String zone_e; //egress zone from transit
 		public String mode_a; //access mode to transit

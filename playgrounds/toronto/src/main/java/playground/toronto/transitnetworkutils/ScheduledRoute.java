@@ -1,11 +1,8 @@
 package playground.toronto.transitnetworkutils;
 
-import playground.toronto.transitnetworkutils.ScheduledStop;
-
 import java.util.ArrayList;
 
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * A data structure to represent a stop-name-agnostic transit route object. 
@@ -21,7 +18,7 @@ public class ScheduledRoute {
 	public String direction;
 	public String mode;
 	
-	private ArrayList<ScheduledStop> stops;
+	public ArrayList<ScheduledStop> stops;
 	
 	public ScheduledRoute(){
 		this.stops = new ArrayList<ScheduledStop>();

@@ -8,8 +8,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+
+import javax.swing.JOptionPane;
 
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 
 /**
@@ -61,7 +65,6 @@ public class ScheduleParser {
 		
 		final String COMMA = ",";
 		final String ROUTE = "ROUTE";
-		final String PERIOD = ".";
 		
 		Integer currentBranchNumber = 0;
 		String currentRouteName = "";
@@ -105,9 +108,11 @@ public class ScheduleParser {
 	
 					//--------------------------------------
 					if (!(SearchForStopSequence(tempStops))){
-						// No match. Create new 'route' object (with new branch #)
+						// No match. Create new 'route' object (with new branch #)						
 						ScheduledRoute newRoute = new ScheduledRoute(currentRouteName, currentDirection, "" + currentBranchNumber++, tempStops);
 		
+						ArrayList<String> checkstops = newRoute.getStopSequence();
+						
 						int currentStopIndex = 0;
 						for (int i=0; i<cells.length; i++){
 							
@@ -117,17 +122,20 @@ public class ScheduleParser {
 									newRoute.mode = "train";
 									parsedArrivalTime[0] = cells[i].replace("t", "");
 								}
-								if (parsedArrivalTime[0].contains("a") && parsedArrivalTime[0].contains("d")){
-									parsedArrivalTime = cells[i].split(PERIOD);
-									parsedArrivalTime[0].replace("a", "");
-									parsedArrivalTime[1].replace("d", "");
+								if (parsedArrivalTime[0].contains(".")){
+									parsedArrivalTime = cells[i].split("\\.");
 								}
-								newRoute.getStop(currentStopIndex++).AddTime(new Tuple<String,String>(parsedArrivalTime[0], parsedArrivalTime[1]));
+								if (parsedArrivalTime[0].contains("v")){
+									newRoute.getStop(currentStopIndex++).isVIA = true;
+									continue;
+								}
 								
+								newRoute.getStop(currentStopIndex++).AddTime(new Tuple<String,String>(parsedArrivalTime[0], parsedArrivalTime[1]));
 							}
 						}
 						
 						this.routes.add(newRoute);
+						
 						
 					}
 					else {
@@ -136,14 +144,21 @@ public class ScheduleParser {
 						
 						int currentStopIndex = 0;
 						for (int i=0; i<cells.length; i++){
-							String parsedArrivalTime = cells[i];
-							if (parsedArrivalTime.contains("t")){
-								parsedArrivalTime = cells[i].replace("t", "");
+							
+							//if (parsedArrivalTime[0].contains("v")) newRoute.getStop(currentStopIndex).isVIA = true;
+							
+							String[] parsedArrivalTime = {cells[i],""};
+							if (parsedArrivalTime[0].contains("t")){
+								parsedArrivalTime[0] = cells[i].replace("t", "");
 							}
+							if (parsedArrivalTime[0].contains(".")){
+								parsedArrivalTime = cells[i].split("\\.");
+							}
+							if (parsedArrivalTime[0].contains("v")) continue;
 							
 							if(!(emptyCells[i])) {
 								this.routes.get(currentRouteIndex).getStop(currentStopIndex++)
-								.AddTime(new Tuple<String,String>(parsedArrivalTime, ""));
+								.AddTime(new Tuple<String,String>(parsedArrivalTime[0],parsedArrivalTime[1]));
 							}
 						}
 					}
@@ -394,6 +409,124 @@ public class ScheduleParser {
 	}
 	
 	/**
+	 * Converts the schedule files into GTFS files. Does not handle stops (as geographic data is not present).
+	 * 
+	 * @param foldername: The folder to export to.
+	 * @throws IOException 
+	 */
+	public void ExportGtfsFiles(String foldername) throws IOException{
+		
+				
+		BufferedWriter wRoutes = new BufferedWriter(new FileWriter(foldername + "/routes.txt"));
+		BufferedWriter wStopTimes = new BufferedWriter(new FileWriter(foldername + "/stop_times.txt"));
+		BufferedWriter wTrips = new BufferedWriter(new FileWriter(foldername + "/trips.txt"));
+		BufferedWriter wFrequencies = new BufferedWriter(new FileWriter(foldername + "/frequencies.txt"));
+	
+		wRoutes.write("route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color");
+		wStopTimes.write("trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type");
+		wTrips.write("route_id,service_id,trip_id,trip_headsign,direction_id,shape_id");
+		wFrequencies.write("trip_id,start_time,end_time,headway_secs,exact_times");
+		
+		int currentRoute = 0;
+		int currentTrip = 0;
+		HashSet<String> routesExported = new HashSet<String>();
+		HashMap<String, HashSet<String>> routeDirectionsMap = new HashMap<String, HashSet<String>>();
+		HashMap<String, Integer> routeCurrentDirectionMap = new HashMap<String, Integer>();
+		for (ScheduledRoute R : this.routes){
+			
+			String routeId = (currentRoute < 100) ? (currentRoute < 10) ? ("00" + currentRoute) : ("0" + currentRoute) : (currentRoute + "");
+			String sname = R.routename.substring(0, 2);
+			
+			//Write to routes.txt file
+			if (!routesExported.contains(R.routename)){
+				routesExported.add(R.routename);
+				currentRoute++;
+				
+				String lname = R.routename.substring(2);
+				int type = R.mode.equals("train") ? 2 : 3; //TODO: Need to migrate train trips as separate routes.
+				
+				//route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+				wRoutes.write("\n" + routeId + ",," + sname + "," + lname + ",," + type + ",,");
+							
+				//Initialize the upper-level maps which keep track of current direction and current branch
+				routeDirectionsMap.put(R.routename, new HashSet<String>());
+				routeDirectionsMap.get(R.routename).add(R.direction);
+				routeCurrentDirectionMap.put(R.routename, new Integer(0));
+			}
+				
+			//Write to trips file. There is a 1:1 relationship between 'routes' as defined in this class, and 'trips' as used in our GTFS files
+			{
+				String tripId = sname + R.direction + "_" + R.branch;
+				
+				if (!routeDirectionsMap.get(R.routename).contains(R.direction)){
+					//New direction
+					routeDirectionsMap.get(R.routename).add(R.direction);
+					routeCurrentDirectionMap.put(R.routename, routeCurrentDirectionMap.get(R.routename) + 1);
+				}
+				
+				//route_id,service_id,trip_id,trip_headsign,direction_id,shape_id
+				wTrips.write("\n" + routeId + ",1," + tripId + ",," + routeCurrentDirectionMap.get(R.routename) + ",");
+				
+				//Write to stop_times and frequencies files.
+				{
+					int numberOfDepartures = R.stops.get(0).getTimes().size();
+					if (numberOfDepartures == 1){
+						//Only one departure. No frequency entry will be created for this trip; also, stop_times will be exactly the offset
+						for (int i = 0; i < R.stops.size(); i++){
+							ScheduledStop S = R.stops.get(i);
+							if (S.isVIA) continue;
+							
+							//trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
+							wStopTimes.write("\n" + tripId + S.getTimes().get(0).getFirst() + "," + S.getTimes().get(0).getSecond()
+									+ "," + S.getId() + "," + (i + 1) + ",0,0,");
+						}
+					}else{
+						//Write the average stop times
+						for (int i = 0; i < R.stops.size(); i++){
+							ScheduledStop S = R.stops.get(i);
+							if (S.isVIA) continue;
+							
+							wStopTimes.write("\n" + tripId + S.getAvgArrTime() + "," + S.getAvgDepTime()
+									+ "," + S.getId() + "," + (i + 1) + ",0,0,");
+						}
+						
+						//Create headway frequencies
+						ArrayList<Tuple<Double, Double>> departures = R.stops.get(0).getTimes();
+						double startTime = departures.get(0).getSecond();
+						double prevDep = departures.get(1).getSecond();
+						int prevHdwy = (int) (prevDep - startTime);
+						double dep = 0;
+						for (int i = 2; i < departures.size(); i++){
+							dep = departures.get(i).getSecond();
+							int hdwy = (int) (dep - prevDep);
+							if (hdwy != prevHdwy){
+								//trip_id,start_time,end_time,headway_secs,exact_times
+								wFrequencies.write("\n" + tripId + "," + startTime + "," + dep + "," + prevHdwy+ ",0");
+								startTime = dep;
+								prevHdwy = hdwy;
+							}
+							prevDep = dep;
+						}
+						wFrequencies.write("\n" + tripId + "," + startTime + "," + dep + "," + prevHdwy+ ",0");
+					}	
+				}
+				
+			}
+			
+			System.out.println("Completed " + R.id);
+		}
+		
+		//All routes done.
+		wRoutes.close();
+		wTrips.close();
+		wStopTimes.close();
+		wFrequencies.close();
+		
+		
+		
+	}
+	
+	/**
 	 * Exports a summary of branches and directions per route. Each summary lincludes a list of
 	 * all stops serviced, and a list of route-branches which fully ennumerate all stops.
 	 * 
@@ -480,25 +613,59 @@ public class ScheduleParser {
 		
 	}
 	
-
-	//==============================================================================
 	/**
-	 * Master function for exporting a formatted transitschedule.xml to MATSim. A lot of stuff
-	 * going on in this function. Most information is encoded in the schedule (already imported
-	 * to ScheduleConverter), but two additional mapping files are required to establish the
-	 * network: 
-	 * 1. Stop-Link Map: A four-column file - StopName, X, Y, LinkRefId. StopName should be
-	 * 		indexed to the list of stops present in the schedule file (use ExportStopList).
-	 * 2. Route Link Profile: TODO determine the format of this file
-	 * 
-	 * @param stopLinkMapName
-	 * @param routeLinkProfileMapName
-	 * @param outfileName
-	 * @throws IOException
+	 * Checks that all routes have ordered times.
 	 */
-	public void ExportToMatsim(String stopLinkMapName, String routeLinkProfileMapName, String outfileName) throws IOException{
-		
-		//1. EXPORT LIST OF STOPS
+	public void ValidateSchedule(String newScheduleFile){
+		for (ScheduledRoute R : this.routes){
+			
+			//Iterate through all departures.
+			double prevDep = 0;
+			for (int currentDepIndex = 0; currentDepIndex < R.getStop(0).getTimes().size(); currentDepIndex++){
+				double currentDep = R.getStop(0).getTimes().get(currentDepIndex).getSecond();
+				double prevStopDep = 0;
+				for (int i = 0; i < R.getStopSequence().size(); i++){
+					double stopDep = R.getStop(i).getTimes().get(currentDepIndex).getSecond();
+					if (stopDep <= prevStopDep){
+						
+						String msg = "Route \"" + R.id + "\" has a stop congruency error.\n\n" +
+								"Please enter a new time for the previous stop (" + R.getStop(i - 1).getId() + "):\n";
+						for (int j = 0; j < R.getStopLength(); j++) msg += "\n" + R.getStop(j).getId() + "     " + 
+								Time.writeTime(R.getStop(j).getTimes().get(currentDepIndex).getSecond());
+						msg += "\n\nFormat: hhmm";
+						String s = JOptionPane.showInputDialog(msg);
+						Double first = new Double(ScheduledStop.parseTime(s));
+						
+						R.getStop(i - 1).setTime(currentDepIndex, new Tuple<Double,Double>(first, first));
+						
+						msg = "Please enter a new time for the current stop (" + R.getStop(i).getId() + "):\n";
+						for (int j = 0; j < R.getStopLength(); j++) msg += "\n" + R.getStop(j).getId() + "     " + 
+								Time.writeTime(R.getStop(j).getTimes().get(currentDepIndex).getSecond());
+						msg += "\n\nFormat: hhmm";
+						
+						s = JOptionPane.showInputDialog(msg);
+						Double second = new Double(ScheduledStop.parseTime(s));
+						
+						R.getStop(i).setTime(currentDepIndex, new Tuple<Double,Double>(second, second));
+
+					}	
+					prevStopDep = stopDep;
+				}
+				
+				if (currentDep <= prevDep){
+					System.out.println("Departures for route \"" + R.id + "\" are out of order!");
+				}
+				
+			}
+			
+			
+		}
+	}
+	
+	/*
+	private void readOverrides(String filename){
 		
 	}
+	*/
+	
 }

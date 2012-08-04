@@ -61,6 +61,7 @@ public class CreateGTFSFrequencies {
 		//Load routes.txt
 		tr = new TableReader(folder + "/routes.txt");
 		tr.open();
+		tr.ignoreTrailingBlanks(true);
 		while (tr.next()) routeIdNameMap.put(new IdImpl(tr.current().get("route_id")), tr.current().get("route_short_name"));
 		tr.close();
 		log.info("routes.txt loaded.");
@@ -68,6 +69,7 @@ public class CreateGTFSFrequencies {
 		//Load trips.txt
 		tr = new TableReader(folder + "/trips.txt");
 		tr.open();
+		tr.ignoreTrailingBlanks(true);
 		while (tr.next()){
 			Trip T = new Trip(new IdImpl(tr.current().get("trip_id")));
 			T.dir = tr.current().get("direction_id");
@@ -346,6 +348,8 @@ public class CreateGTFSFrequencies {
 			e.printStackTrace();
 			return;
 		}
+		
+		System.exit(0);
 	}
 	
 	private static HashMap<IdImpl, Tuple<Double,Double>> generateAverageStopTimes(ArrayList<Trip> a){

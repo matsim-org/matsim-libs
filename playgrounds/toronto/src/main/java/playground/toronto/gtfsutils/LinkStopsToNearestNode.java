@@ -119,7 +119,7 @@ public class LinkStopsToNearestNode {
 			}
 			
 			if(!loopedNodes.contains(N.getId())){//Loop link DNE
-				LinkImpl l = (LinkImpl) factory.createLink(new IdImpl(N.getId() + " LOOP"), N, N, (Network) network, 0.0, 10.0, 999.0, 1.0);
+				LinkImpl l = (LinkImpl) factory.createLink(new IdImpl(N.getId() + "_LOOP"), N, N, (Network) network, 0.0, 10.0, 999.0, 1.0);
 				l.setType("LOOP");
 				
 				/*if(!modes.isEmpty()){
@@ -134,7 +134,7 @@ public class LinkStopsToNearestNode {
 				loopedNodes.add(N.getId());
 			}
 
-			fixedStopsWriter.write(network.getLinks().get(new IdImpl(N.getId().toString() + " LOOP")).getId().toString() + "\n");
+			fixedStopsWriter.write(network.getLinks().get(new IdImpl(N.getId().toString() + "_LOOP")).getId().toString() + "\n");
 			exportForEsriWriter.write(id + "," + stopLon + "," + stopLat + "," + N.getId().toString() + "," + N.getCoord().getX() + "," + N.getCoord().getY() + "\n");
 		}
 		
