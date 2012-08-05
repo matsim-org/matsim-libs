@@ -118,10 +118,6 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 		return this.scheme;
 	}
 
-	public CalcPaidToll getPaidTolls() {
-		return this.tollCalc;
-	}
-
 	public double getAllAgentsToll() {
 		return this.tollCalc.getAllAgentsToll();
 	}

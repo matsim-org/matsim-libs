@@ -55,7 +55,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double baseCost = this.costHandler.getLinkTravelDisutility(link, time, person, vehicle);
-		double tollCost = this.tollCostHandler.getTollCost(link, time);
+		double tollCost = this.tollCostHandler.getTollCost(link, time, person);
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
 			Logger.getLogger(this.getClass()).warn("this package assumes a utility of money equal to one.  " +
@@ -70,13 +70,13 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	}
 
 	private interface TollRouterBehaviour {
-		public double getTollCost(Link link, double time);
+		public double getTollCost(Link link, double time, Person person);
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time) {
-			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+		public double getTollCost(final Link link, final double time, Person person) {
+			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
 			if (cost_per_m == null) {
 				return 0.0;
 			}
@@ -88,8 +88,8 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+		public double getTollCost(final Link link, final double time, Person person) {
+			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
 			if (cost == null) {
 				return 0.0;
 			}
@@ -107,8 +107,8 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time) {
-			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+		public double getTollCost(final Link link, final double time, Person person) {
+			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
 			if (cost == null) {
 				return 0.0;
 			}

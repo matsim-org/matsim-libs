@@ -29,12 +29,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
@@ -52,7 +50,7 @@ import org.matsim.roadpricing.RoadPricingScheme.Cost;
  *
  * @author mrieser
  */
-public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventHandler,  AgentArrivalEventHandler {
+public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventHandler {
 
 	static class AgentTollInfo {
 		public double toll = 0.0;
@@ -64,7 +62,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	private final Network network;
 	private final Population population ;
 
-	private TollBehaviourI handler = null;
+	private final TollBehaviourI handler;
 
 	/**
      * Design comments:<ul>
@@ -107,15 +105,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		Person person = this.population.getPersons().get(event.getPersonId()) ;
 		this.handler.handleEvent(event, link, person);
 	}
-	
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		
-	}
 
-
-
-//	private static int cnt = 0 ;
 	/**
 	 * Sends {@link AgentMoneyEventImpl}s for all agents that must pay a toll.
 	 * This method should usually be called at the end before of an iteration.
@@ -130,35 +120,12 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	public void sendMoneyEvents(final double time, final EventsManager events) {
 		for (Map.Entry<Id, AgentTollInfo> entries : this.agents.entrySet()) {
 			events.processEvent(new AgentMoneyEventImpl(time, entries.getKey(), -entries.getValue().toll));
-//			if ( cnt < 10 ) {
-//				cnt++ ;
-//				Logger.getLogger(this.getClass()).info("toll paid: " + entries.getValue().toll ) ;
-//				if (cnt==10 ) {
-//					Logger.getLogger(this.getClass()).info(Gbl.FUTURE_SUPPRESSED) ;
-//				}
-//			}
-
 		}
 	}
 
 	@Override
 	public void reset(final int iteration) {
 		this.agents.clear();
-	}
-
-	/**
-	 * Returns the toll the specified agent has paid in the course of the
-	 * simulation so far.
-	 *
-	 * @param agentId
-	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
-	 */
-	public double getAgentToll(final Id agentId) {
-		AgentTollInfo info = this.agents.get(agentId);
-		if (info == null) {
-			return 0.0;
-		}
-		return info.toll;
 	}
 
 	/**
