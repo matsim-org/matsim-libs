@@ -41,10 +41,11 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 public class MyTollPotentialCalculator {
 	private final static Logger log = Logger.getLogger(MyTollPotentialCalculator.class);
-	private final RoadPricingScheme scheme;
+	private final RoadPricingSchemeImpl scheme;
 
 	/**
 	 * Implementing the class to calculate the potential toll. 
@@ -118,7 +119,7 @@ public class MyTollPotentialCalculator {
 
 	
 	public MyTollPotentialCalculator() {
-		scheme = new RoadPricingScheme();
+		scheme = new RoadPricingSchemeImpl();
 	}
 	
 	
@@ -127,7 +128,7 @@ public class MyTollPotentialCalculator {
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(scheme);
 		rpr.parse(roadpricingFilename);		
 		List<Id> list = new ArrayList<Id>();
-		for(Id i : this.scheme.getLinkIdSet()){
+		for(Id i : this.scheme.getTolledLinkIds()){
 			list.add(i);
 		}
 		log.info("Read " + list.size() + " tolled link Ids");
@@ -144,7 +145,7 @@ public class MyTollPotentialCalculator {
 	 * @param breakList a {@link List} of {@link Person} {@link Id}s that mark 
 	 * 		the upper limit (not including) of the category of agents. (JJ, I 
 	 * 		guess we assume the list is sorted in ascending order).  
-	 * @param scheme the {@link RoadPricingScheme} 
+	 * @param scheme the {@link RoadPricingSchemeImpl} 
 	 * @return a {@link List} of {@link Map}s (one for each agent category) of 
 	 * 		people that entered (one or more times) an observed link, as well as 
 	 * 		the	<i>number</i> of times that agent entered observed links.

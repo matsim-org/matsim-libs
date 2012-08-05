@@ -36,6 +36,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.PieChart;
@@ -181,7 +182,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 
-		RoadPricingScheme tollScheme = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl tollScheme = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(tollScheme);
 		tollReader.parse(tollFilename);
 

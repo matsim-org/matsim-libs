@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 
 public class AreaTollSCWriter {
@@ -17,7 +18,7 @@ public class AreaTollSCWriter {
 	private static final double SECS2CHF = 600;
 	
 	public static void main(String[] args) throws IOException {
-		RoadPricingScheme roadPricingScheme = new RoadPricingScheme();
+		RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl();
 		roadPricingScheme.setName("Social Cost Toll");
 		roadPricingScheme.setDescription("According to the social cost of Nash equilibrium iteration a toll is applied to every link.");
 		roadPricingScheme.setType(RoadPricingScheme.TOLL_TYPE_AREA);

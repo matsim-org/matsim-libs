@@ -33,6 +33,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.benjamin.BkPaths;
 import playground.benjamin.scenarios.zurich.analysis.charts.BkAvgTollPaidQuantilesChart;
@@ -183,7 +184,7 @@ if(config.scenario().isUseRoadpricing()){
 }
 	
   private static RoadPricingScheme loadTollLinksFile(String tollLinksFilePath) {
-		RoadPricingScheme scheme = new RoadPricingScheme();
+		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 	  RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
 		reader.parse(tollLinksFilePath);
 		return scheme;

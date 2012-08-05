@@ -38,7 +38,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.xml.sax.SAXException;
 
 /**
@@ -184,7 +184,7 @@ public class MyPatronComparator {
 	
 	
 	/**
-	 * Reads a {@link RoadPricingScheme} from file, and uses the tolled link
+	 * Reads a {@link RoadPricingSchemeImpl} from file, and uses the tolled link
 	 * Ids as links to observe.
 	 * @param linksFile
 	 * @return {@link List} of {@link Id}s of {@link Link}s to observe.
@@ -192,10 +192,10 @@ public class MyPatronComparator {
 	public List<Id> readLinksFromRoadPicing(String linksFile){
 		log.info("Reading tolled links to compare from " + linksFile);		
 		List<Id> list = new ArrayList<Id>();
-		RoadPricingScheme rps = new RoadPricingScheme();
+		RoadPricingSchemeImpl rps = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(rps);
 		rpr.parse(linksFile);
-		for(Id i : rps.getLinkIdSet()){
+		for(Id i : rps.getTolledLinkIds()){
 			list.add(i);
 		}
 		log.info("Read " + list.size() + " tolled link Ids");

@@ -32,16 +32,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeI;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * @author nagel
  *
  */
-public class GautengRoadPricingScheme implements RoadPricingSchemeI {
-	private RoadPricingSchemeI delegate = null ;
+public class GautengRoadPricingScheme implements RoadPricingScheme {
+	private RoadPricingScheme delegate = null ;
 	private Network network;
 	private Population population ;
 	private  double FACTOR = 1. ;
@@ -56,7 +56,7 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 				"toll for the time being.  needs to be debugged?!?!  kai, mar'12") ;
 		
 		// read the road pricing scheme from file
-		RoadPricingScheme scheme = new RoadPricingScheme();
+		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
 			rpReader.parse( config.roadpricing().getTollLinksFile());
@@ -88,12 +88,8 @@ public class GautengRoadPricingScheme implements RoadPricingSchemeI {
 		return new Cost( baseToll.startTime, baseToll.endTime, FACTOR * baseToll.amount * tollFactor );
 	}
 
-	public Map<Id, List<Cost>> getLinkIds() {
-		return delegate.getLinkIds();
-	}
-
-	public Set<Id> getLinkIdSet() {
-		return delegate.getLinkIdSet();
+	public Set<Id> getTolledLinkIds() {
+		return delegate.getTolledLinkIds();
 	}
 
 	public String getName() {

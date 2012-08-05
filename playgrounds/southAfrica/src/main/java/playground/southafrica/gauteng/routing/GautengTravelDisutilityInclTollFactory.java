@@ -26,9 +26,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
-import org.matsim.roadpricing.RoadPricingSchemeI;
 import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
@@ -39,10 +38,10 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
  */
 public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityFactory {
 
-	final private RoadPricingSchemeI scheme;
+	final private RoadPricingScheme scheme;
 	private final UtilityOfMoneyI utlOfMon ;
 
-	public GautengTravelDisutilityInclTollFactory( RoadPricingSchemeI scheme, UtilityOfMoneyI utlOfMon ) {
+	public GautengTravelDisutilityInclTollFactory( RoadPricingScheme scheme, UtilityOfMoneyI utlOfMon ) {
 		this.scheme = scheme ;
 		this.utlOfMon = utlOfMon ;
 	}
@@ -51,7 +50,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, 
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		final TravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
-		final RoadPricingSchemeI localScheme = this.scheme ;
+		final RoadPricingScheme localScheme = this.scheme ;
 		final UtilityOfMoneyI localUtlOfMon = this.utlOfMon ;
 		
 		return new TravelDisutility() {

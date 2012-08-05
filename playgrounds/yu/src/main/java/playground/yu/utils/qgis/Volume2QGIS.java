@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 /**
  * @author yu
@@ -97,18 +97,18 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 		mn2q.readEvents("../runs-svn/run950/it.1000/950.1000.events.txt.gz",
 				new EventHandler[] { va });
-		RoadPricingScheme rps = new RoadPricingScheme();
+		RoadPricingSchemeImpl rps = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(rps);
 		tollReader.parse(tollFilename);
 
-		Collection<Id> linkIds = rps.getLinkIdSet();
+		Collection<Id> linkIds = rps.getTolledLinkIds();
 		List<Map<Id, Integer>> vols = createVolumes(linkIds, va);
 		List<Map<Id, Double>> sls = SaturationLevel2QGIS
 				.createSaturationLevels(net, rps, va);
 
 		for (int i = 0; i < 24; i++) {
 			Volume2QGIS v2q = new Volume2QGIS(netFilename, ch1903);
-			v2q.setLinkIds(rps.getLinkIdSet());
+			v2q.setLinkIds(rps.getTolledLinkIds());
 			v2q.addParameter("vol", Integer.class, vols.get(i));
 			v2q.addParameter("sl", Double.class, sls.get(i));
 			v2q

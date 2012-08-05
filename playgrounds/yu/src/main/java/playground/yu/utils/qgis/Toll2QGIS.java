@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.LinearRing;
@@ -63,7 +64,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 			}
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 
-			for (Id linkId : toll.getLinkIdSet()) {
+			for (Id linkId : toll.getTolledLinkIds()) {
 				Link link = network.getLinks().get(linkId);
 				// if (link != null) {
 				LinearRing lr = getLinearRing(link);
@@ -101,7 +102,7 @@ public class Toll2QGIS extends MATSimNet2QGIS {
 
 		Toll2QGIS t2q = new Toll2QGIS(netFilename, ch1903);
 
-		RoadPricingScheme scheme = new RoadPricingScheme();
+		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scheme);
 		tollReader.parse(tollFilename);
 

@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
@@ -115,7 +115,7 @@ public class AnalysisTest4Zrh implements Analysis4Zrh {
 			new MatsimFacilitiesReader(s).readFile(facilitiesFilename);
 		}
 		// toll
-		RoadPricingScheme toll = null;
+		RoadPricingSchemeImpl toll = null;
 		if (scenario.equals(KANTON_ZURICH)) {
 			s.getConfig().scenario().setUseRoadpricing(true);
 			toll = s.getRoadPricingScheme();

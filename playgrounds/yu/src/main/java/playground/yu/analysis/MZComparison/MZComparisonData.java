@@ -46,7 +46,7 @@ public class MZComparisonData extends AbstractPersonAlgorithm implements
 		// throw new RuntimeException("linkId == null");
 		// if (toll.getLinkIdSet() == null)
 		// throw new RuntimeException("toll.getLinkIdSet() == null");
-		return toll.getLinkIdSet().contains(linkId);
+		return toll.getTolledLinkIds().contains(linkId);
 	}
 
 	private double carDist, ptDist, wlkDist,

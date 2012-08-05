@@ -16,7 +16,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.RoadPricingSchemeI;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.southafrica.gauteng.GautengTollStatistics;
 
@@ -30,7 +30,7 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 	final CalcAverageTolledTripLength cattl ;
 	final GautengTollStatistics gautengTollStatistics ;
 	
-	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingSchemeI vehDepScheme ) {
+	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingScheme vehDepScheme ) {
 		calcPaidToll = new CalcPaidToll(network, vehDepScheme, population ) ;
 		cattl = new CalcAverageTolledTripLength(network, vehDepScheme );
 		gautengTollStatistics = new GautengTollStatistics() ;

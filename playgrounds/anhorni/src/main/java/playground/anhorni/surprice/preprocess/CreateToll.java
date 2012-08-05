@@ -22,7 +22,7 @@ package playground.anhorni.surprice.preprocess;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import playground.anhorni.surprice.preprocess.miniscenario.Zone;
 
@@ -31,7 +31,7 @@ public class CreateToll {
 	private final static Logger log = Logger.getLogger(CreateToll.class);
 	       
     public void create(String path, Zone tollZone, double startTime, double endTime, double amount, String type, String desc) { 	    	
-    	RoadPricingScheme scheme = new RoadPricingScheme();
+    	RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
     	scheme.setType(type);
     	scheme.setName("surprice");
     	scheme.setDescription(desc); 	

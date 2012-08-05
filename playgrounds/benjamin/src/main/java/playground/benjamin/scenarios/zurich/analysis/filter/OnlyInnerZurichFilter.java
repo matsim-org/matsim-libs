@@ -43,7 +43,7 @@ public class OnlyInnerZurichFilter implements DgAnalysisReaderFilter {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
             if (pe instanceof Activity) {
                 Activity act = (Activity) pe;
-			if (this.tollLinks.getLinkIdSet().contains(act.getLinkId())) {
+			if (this.tollLinks.getTolledLinkIds().contains(act.getLinkId())) {
 				return true;
             }
             }

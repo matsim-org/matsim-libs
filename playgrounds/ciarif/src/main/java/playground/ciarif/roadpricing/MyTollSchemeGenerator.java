@@ -31,7 +31,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
@@ -179,7 +179,7 @@ public class MyTollSchemeGenerator {
 		writeKml(tollNetwork, this.usedOut);
 
 		//create the road pricing scheme
-		RoadPricingScheme pricingScheme = this.createRoadPricingScheme(tollNetwork);
+		RoadPricingSchemeImpl pricingScheme = this.createRoadPricingScheme(tollNetwork);
 		//write it to file
 		writeRoadPricingScheme(pricingScheme);
 
@@ -226,14 +226,14 @@ public class MyTollSchemeGenerator {
 
 	}
 
-	private void writeRoadPricingScheme(RoadPricingScheme pricingScheme) {
+	private void writeRoadPricingScheme(RoadPricingSchemeImpl pricingScheme) {
 		RoadPricingWriterXMLv1 pricingSchemeWriter = new RoadPricingWriterXMLv1(pricingScheme);
 		pricingSchemeWriter.writeFile(this.usedSchemeOut);
 		log.info("RoadPricingScheme written to: "  + this.usedSchemeOut);
 	}
 
-	private RoadPricingScheme createRoadPricingScheme(NetworkImpl tollNetwork) {
-		RoadPricingScheme scheme = new RoadPricingScheme();
+	private RoadPricingSchemeImpl createRoadPricingScheme(NetworkImpl tollNetwork) {
+		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		for (Link l : tollNetwork.getLinks().values()) {
 			scheme.addLink(l.getId());
 		}

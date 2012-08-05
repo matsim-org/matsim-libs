@@ -40,6 +40,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 /**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
@@ -134,8 +135,8 @@ public class PtcheckControler extends Controler {
 									+ cas.getNetAvgSpeed()
 									+ "\t"
 									+ (rp != null
-											&& rp.getRoadPricingScheme() != null ? rp
-											.getRoadPricingScheme()
+											&& rp.getRoadPricingScheme() != null ? ((RoadPricingSchemeImpl) rp
+											.getRoadPricingScheme())
 											.getCostArray()[0].amount
 											+ "\t"
 											+ rp.getAllAgentsToll()

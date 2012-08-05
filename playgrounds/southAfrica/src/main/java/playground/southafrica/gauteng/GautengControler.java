@@ -10,7 +10,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.roadpricing.RoadPricingSchemeI;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.kai.run.KaiAnalysisListener;
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
@@ -88,7 +88,7 @@ class GautengControler {
 
 		
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
-		RoadPricingSchemeI vehDepScheme = 
+		RoadPricingScheme vehDepScheme = 
 			new GautengRoadPricingScheme( sc.getConfig(), sc.getNetwork() , sc.getPopulation() );
 
 		// CONSTRUCT UTILITY OF MONEY:

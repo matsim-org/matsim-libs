@@ -131,7 +131,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		this(network);
 		this.toll = toll;
 		if (toll != null) {
-			interestLinks = new HashSet<Id>(toll.getLinkIdSet());
+			interestLinks = new HashSet<Id>(toll.getTolledLinkIds());
 		}
 	}
 

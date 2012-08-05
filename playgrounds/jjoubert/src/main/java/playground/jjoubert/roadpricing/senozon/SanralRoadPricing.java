@@ -38,6 +38,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.jjoubert.roadpricing.senozon.routing.SanralTravelDisutilityIncludingToll;
 import playground.jjoubert.roadpricing.senozon.scoring.SanralCalcPaidToll;
@@ -49,7 +50,7 @@ import playground.jjoubert.roadpricing.senozon.scoring.SanralCalcPaidToll;
  */
 public class SanralRoadPricing implements StartupListener, AfterMobsimListener, IterationEndsListener {
 
-	private RoadPricingScheme scheme = null;
+	private RoadPricingSchemeImpl scheme = null;
 	private SanralCalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
 
@@ -62,7 +63,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 			throw new RuntimeException("roadpricing must not be enabled in config.scenario in order to use special road pricing features!");
 		}
 		// read the road pricing scheme from file
-		this.scheme = new RoadPricingScheme();
+		this.scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
 		try {
 			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());

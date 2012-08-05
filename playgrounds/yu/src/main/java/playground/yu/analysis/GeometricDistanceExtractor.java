@@ -42,6 +42,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.utils.TollTools;
 import playground.yu.utils.charts.DoubleBarChart;
@@ -321,7 +322,7 @@ public class GeometricDistanceExtractor extends AbstractPersonAlgorithm
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingScheme scheme = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl scheme = scenario.getRoadPricingScheme();
 		new RoadPricingReaderXMLv1(scheme).parse(tollFilename);
 
 		GeometricDistanceExtractor lde = new GeometricDistanceExtractor(scheme,

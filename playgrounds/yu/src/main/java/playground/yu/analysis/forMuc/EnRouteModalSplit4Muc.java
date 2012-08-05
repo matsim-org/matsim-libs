@@ -47,6 +47,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.analysis.EnRouteModalSplit;
 import playground.yu.utils.TollTools;
@@ -336,7 +337,7 @@ public class EnRouteModalSplit4Muc extends EnRouteModalSplit implements
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingScheme toll = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl toll = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
 		tollReader.parse(tollFilename);
 

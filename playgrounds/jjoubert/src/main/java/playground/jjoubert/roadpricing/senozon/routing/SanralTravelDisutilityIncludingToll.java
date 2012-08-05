@@ -24,7 +24,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
@@ -84,7 +85,7 @@ public class SanralTravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, final Person person) {
-			RoadPricingScheme.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+			RoadPricingSchemeImpl.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
 			if (cost == null) {
 				return 0.0;
 			}
@@ -98,7 +99,7 @@ public class SanralTravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, final Person person) {
-			RoadPricingScheme.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+			RoadPricingSchemeImpl.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
 			if (cost == null) {
 				return 0.0;
 			}

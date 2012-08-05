@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.analysis.LegTravelTimeModalSplit;
 import playground.yu.analysis.PlanModeJudger;
@@ -198,7 +199,7 @@ public class LegTravelTimeModalSplit4Muc extends LegTravelTimeModalSplit
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingScheme toll = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl toll = scenario.getRoadPricingScheme();
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
 		tollReader.parse(tollFilename);
 

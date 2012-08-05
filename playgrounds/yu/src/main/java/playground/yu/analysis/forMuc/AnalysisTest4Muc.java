@@ -34,7 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
@@ -101,7 +101,7 @@ public class AnalysisTest4Muc implements Analysis4Muc {
 		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		// toll
-		RoadPricingScheme toll = null;
+		RoadPricingSchemeImpl toll = null;
 		if (withToll) {
 			sc.getConfig().scenario().setUseRoadpricing(true);
 			toll = sc.getRoadPricingScheme();

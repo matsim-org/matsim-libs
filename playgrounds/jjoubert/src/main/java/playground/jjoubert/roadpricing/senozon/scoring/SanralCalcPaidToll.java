@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
 
