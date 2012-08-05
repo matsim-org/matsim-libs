@@ -27,18 +27,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
- * Writes a {@link RoadPricingScheme} to a file according to <code>roadpricing_v1.dtd</code>.
+ * Writes a {@link RoadPricingSchemeImpl} to a file according to <code>roadpricing_v1.dtd</code>.
  *
  * @author mrieser
  */
 public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 
-	private final RoadPricingScheme scheme;
+	private final RoadPricingSchemeImpl scheme;
 
-	public RoadPricingWriterXMLv1(final RoadPricingScheme scheme) {
+	public RoadPricingWriterXMLv1(final RoadPricingSchemeImpl scheme) {
 		this.scheme = scheme;
 	}
 
@@ -59,8 +59,8 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 	
 			// links
 			this.writer.write("\t<links>\n");
-			for (Id linkId : this.scheme.getLinkIds().keySet()) {
-			  List<Cost> cs = this.scheme.getLinkIds().get(linkId);
+			for (Id linkId : this.scheme.getCostsForLink().keySet()) {
+			  List<Cost> cs = this.scheme.getCostsForLink().get(linkId);
 			  this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
 			  if (cs == null) {
 			    this.writer.write("/>\n");
@@ -84,7 +84,7 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 				this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
 			}
 	
-			for (RoadPricingScheme.Cost cost : this.scheme.getCosts()) {
+			for (RoadPricingSchemeImpl.Cost cost : this.scheme.getCosts()) {
 			  this.writeCost(cost);
 			}
 	

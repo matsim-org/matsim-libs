@@ -41,7 +41,7 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -58,8 +58,8 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme();
-		toll.setType("distance");
+		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
+		toll.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));
 		Fixture.createPopulation2(scenario);
@@ -107,14 +107,69 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) leg.getRoute());
 	}
 
+	public void testLinkTollRouter() {
+		Config config = loadConfig(null);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Fixture.createNetwork2(scenario);
+		Network network = scenario.getNetwork();
+		// a basic toll where only the morning hours are tolled
+		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
+		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
+		toll.addLink(scenario.createId("5"));
+		toll.addLink(scenario.createId("11"));
+		Fixture.createPopulation2(scenario);
+		Population population = scenario.getPopulation();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
+		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll); // we use freespeedTravelCosts as base costs
+
+		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
+
+		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
+		commonRouterData.run(network);
+
+		Person person1 = population.getPersons().get(new IdImpl("1"));
+		LegImpl leg = ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1)));
+
+		// 1st case: without toll, agent chooses shortest path
+		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc, new DijkstraFactory(), routeFactory).run(population);
+		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		assertNull(leg.getRoute()); // make sure the cleaning worked. we do this only once, then we believe it.
+		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc, routerFactory, routeFactory).run(population);
+		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg.getRoute());
+
+		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.06); // 0.06, which is slightly below the threshold of 0.0666
+		// 2nd case: with a low toll, agent still chooses shortest path
+		clearRoutes(population);
+		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc, routeFactory).run(population);
+		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg.getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc, routerFactory, routeFactory).run(population);
+		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg.getRoute());
+
+		// 3rd case: with a higher toll, agent decides to drive around tolled link
+		toll.removeCost(morningCost);
+		toll.addCost(6*3600, 10*3600, 0.07); // new morning toll, this should be slightly over the threshold
+		clearRoutes(population);
+		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc, routeFactory).run(population);
+		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) leg.getRoute());
+		// also test it with A*-Landmarks
+		clearRoutes(population);
+		new PlansCalcRoute(config.plansCalcRoute(), network, costCalc, timeCostCalc, routerFactory, routeFactory).run(population);
+		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) leg.getRoute());
+	}
+	
 	public void testCordonTollRouter() {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme();
-		toll.setType("cordon");
+		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
+		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));
 		Fixture.createPopulation2(scenario);

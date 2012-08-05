@@ -39,6 +39,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 
 /**
@@ -48,7 +49,7 @@ import org.matsim.roadpricing.TravelDisutilityIncludingToll;
  */
 public class RoadPricing implements StartupListener, AfterMobsimListener, IterationEndsListener {
 
-	private RoadPricingScheme scheme = null;
+	private RoadPricingSchemeImpl scheme = null;
 	private CalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
 

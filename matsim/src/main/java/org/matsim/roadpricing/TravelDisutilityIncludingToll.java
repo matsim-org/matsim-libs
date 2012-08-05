@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -34,19 +34,23 @@ import org.matsim.vehicles.Vehicle;
  */
 public class TravelDisutilityIncludingToll implements TravelDisutility {
 
-	/*package*/ final RoadPricingSchemeI scheme;
+	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility costHandler;
 
-	public TravelDisutilityIncludingToll(final TravelDisutility costCalculator, final RoadPricingSchemeI scheme) {
+	public TravelDisutilityIncludingToll(final TravelDisutility costCalculator, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.costHandler = costCalculator;
-
-		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) this.tollCostHandler = new DistanceTollCostBehaviour();
-		else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) this.tollCostHandler = new AreaTollCostBehaviour();
-		else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) this.tollCostHandler = new CordonTollCostBehaviour();
-		else {
-			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme + "\" is not supported.");
+		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
+			this.tollCostHandler = new DistanceTollCostBehaviour();
+		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
+			this.tollCostHandler = new AreaTollCostBehaviour();
+		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
+			this.tollCostHandler = new CordonTollCostBehaviour();
+		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_LINK) {
+			this.tollCostHandler = new LinkTollCostBehaviour();
+		} else {
+			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
 		}
 	}
 	
@@ -89,7 +93,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, Person person) {
-			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
+			RoadPricingSchemeImpl.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
 			if (cost == null) {
 				return 0.0;
 			}
@@ -108,11 +112,22 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, Person person) {
-			RoadPricingScheme.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
+			RoadPricingSchemeImpl.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
 			if (cost == null) {
 				return 0.0;
 			}
 			return cost.amount;
+		}
+	}
+	
+	class LinkTollCostBehaviour implements TollRouterBehaviour {
+		@Override
+		public double getTollCost(final Link link, final double time, Person person) {
+			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
+			if (cost_per_m == null) {
+				return 0.0;
+			}
+			return cost_per_m.amount;
 		}
 	}
 

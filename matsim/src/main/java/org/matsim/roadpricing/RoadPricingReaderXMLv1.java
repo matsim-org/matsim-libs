@@ -29,7 +29,7 @@ import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
 /**
- * Reads XML files containing a {@link RoadPricingScheme} according to <code>roadpricing_v1.dtd</code>.
+ * Reads XML files containing a {@link RoadPricingSchemeImpl} according to <code>roadpricing_v1.dtd</code>.
  *
  * @author mrieser
  */
@@ -47,13 +47,13 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	private final static String ATTR_END_TIME = "end_time";
 	private final static String ATTR_AMOUNT = "amount";
 
-	private RoadPricingScheme scheme = null;
+	private RoadPricingSchemeImpl scheme = null;
 
 	private Id currentLinkId = null;
 
 	private boolean hasLinkCosts = false;
 
-	public RoadPricingReaderXMLv1(RoadPricingScheme scheme){
+	public RoadPricingReaderXMLv1(RoadPricingSchemeImpl scheme){
 	  this.scheme = scheme;
 	}
 

@@ -34,7 +34,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -55,7 +55,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme();
+		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType("area");
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));
@@ -115,7 +115,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme();
+		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType("area");
 		toll.addLink(scenario.createId("7"));
 		toll.addCost(6*3600, 10*3600, 0.06);
@@ -147,7 +147,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme();
+		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType("area");
 		toll.addLink(scenario.createId("3"));
 		toll.addLink(scenario.createId("5"));
@@ -176,7 +176,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingScheme toll = new RoadPricingScheme();
+		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType("area");
 		toll.addLink(scenario.createId("5"));
 		toll.addLink(scenario.createId("11"));

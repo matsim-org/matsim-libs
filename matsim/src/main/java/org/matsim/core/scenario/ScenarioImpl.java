@@ -45,7 +45,7 @@ import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -73,7 +73,7 @@ public class ScenarioImpl implements Scenario {
 
 	//non-mandatory attributes
 	private LaneDefinitions laneDefinitions;
-	private RoadPricingScheme roadPricingScheme;
+	private RoadPricingSchemeImpl roadPricingScheme;
 	private TransitSchedule transitSchedule = null;
 
 	private Households households;
@@ -127,7 +127,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	protected void createRoadPricingScheme() {
-		this.roadPricingScheme = new RoadPricingScheme();
+		this.roadPricingScheme = new RoadPricingSchemeImpl();
 	}
 
 	protected void createLaneDefinitionsContainer() {
@@ -188,7 +188,7 @@ public class ScenarioImpl implements Scenario {
 		return laneDefinitions;
 	}
 
-	public RoadPricingScheme getRoadPricingScheme() {
+	public RoadPricingSchemeImpl getRoadPricingScheme() {
 		if ((this.roadPricingScheme == null) && this.config.scenario().isUseRoadpricing()){
 			this.createRoadPricingScheme();
 		}

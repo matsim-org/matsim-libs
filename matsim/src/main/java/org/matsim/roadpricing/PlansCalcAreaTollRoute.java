@@ -52,7 +52,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 
-	private final RoadPricingScheme scheme;
+	private final RoadPricingSchemeImpl scheme;
 	private final TravelTime timeCalculator;
 	private final LeastCostPathCalculator tollRouter;
 
@@ -65,7 +65,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param scheme
 	 */
 	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
-			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingScheme scheme) {
+			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingSchemeImpl scheme) {
 		super(configGroup, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;

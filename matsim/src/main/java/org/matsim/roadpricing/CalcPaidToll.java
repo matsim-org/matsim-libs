@@ -37,16 +37,14 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.roadpricing.RoadPricingScheme.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
- * Calculates the toll agents pay during a simulation by analyzing events. To
- * fully function, add an instance of this class as EventHandler to your Events
- * object.
- * <br/>
- * This class and its methods will pass the person to the toll calculation ...
- * ... but the toll calculation must in fact use the person.  Standard RoadPricingScheme objects
- * which are read from xml will not and in the current design cannot do this.  kai, mar'12
+ * Calculates the toll agents pay during a simulation by analyzing events. Add an instance of this class as an EventHandler.
+ * 
+ * Users of this class can get to the amounts which have to be paid by the agents by using the getter methods
+ * and/or by asking for a stream of AgentMoneyEvent instances.
+ *
  *
  * @author mrieser
  */
@@ -57,7 +55,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		public boolean insideCordonArea = true;
 	}
 
-	final RoadPricingSchemeI scheme;
+	final RoadPricingScheme scheme;
 	final TreeMap<Id, AgentTollInfo> agents = new TreeMap<Id, AgentTollInfo>();
 	private final Network network;
 	private final Population population ;
@@ -65,12 +63,12 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	private final TollBehaviourI handler;
 
 	/**
-     * Design comments:<ul>
-     * <li> yy I don't think that we really need Population.  kai, mar'12
-     * <li> yyyy However, would need EventsManager if toll is sent to agent at arrival. kai, mar'12
-     * </ul>
+	 * Design comments:<ul>
+	 * <li> yy I don't think that we really need Population.  kai, mar'12
+	 * <li> yyyy However, would need EventsManager if toll is sent to agent at arrival. kai, mar'12
+	 * </ul>
 	 */
-	public CalcPaidToll(final Network network, final RoadPricingSchemeI scheme, Population population) {
+	public CalcPaidToll(final Network network, final RoadPricingScheme scheme, Population population) {
 		super();
 		this.network = network;
 		this.population = population ;
@@ -111,7 +109,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * This method should usually be called at the end before of an iteration.
 	 *
 	 * <strong>Important note: </strong>Do not call this method twice without
-	 * calling {@link #reset(int)} in between. Otherwise the toll-disutility
+	 * calling {@link #reset(int)} in between. Otherwise modules listening to
+	 * AgentMoneyEvents will hear them twice, i.e. the toll-disutility
 	 * may be added twice to the agents' score!
 	 *
 	 * @param time the current time the generated events are associated with
@@ -126,6 +125,22 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	@Override
 	public void reset(final int iteration) {
 		this.agents.clear();
+	}
+
+
+	/**
+	 * Returns the toll the specified agent has paid in the course of the
+	 * simulation so far.
+	 *
+	 * @param agentId
+	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
+	 */
+	public double getAgentToll(final Id agentId) {
+		AgentTollInfo info = this.agents.get(agentId);
+		if (info == null) {
+			return 0.0;
+		}
+		return info.toll;
 	}
 
 	/**
@@ -146,7 +161,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 		int dwCnt = 0;
 		for (AgentTollInfo ai : this.agents.values()) {
 			if ((ai != null) && (ai.toll > 0.0)) {
-					dwCnt++;
+				dwCnt++;
 			}
 		}
 		return dwCnt;
