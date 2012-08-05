@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansCalcAreaTollRouteTest.java
+ * PlansCalcRouteWithTollOrNotTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -38,11 +38,11 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * Tests {@link PlansCalcAreaTollRoute} as isolated as possible.
+ * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
  *
  * @author mrieser
  */
-public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
+public class PlansCalcRouteWithTollOrNotTest extends MatsimTestCase {
 
 	/**
 	 * Tests a few cases where the router can decide if it is better to pay the toll or not.
@@ -76,20 +76,20 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
 		// case 1: toll only in morning, it is cheaper to drive around
-		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
+		new PlansCalcRouteWithTollOrNot(config, config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) leg1.getRoute());
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
 		Cost afternoonCost = toll.addCost(14*3600, 18*3600, 0.12);
-		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
+		new PlansCalcRouteWithTollOrNot(config, config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg1.getRoute());
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
 		String oldMode = leg2.getMode();
 		leg2.setMode(TransportMode.pt);
-		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
+		new PlansCalcRouteWithTollOrNot(config, config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) leg1.getRoute());
 		// and change the mode back
 		leg2.setMode(oldMode);
@@ -100,7 +100,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		toll.addCost(6*3600, 10*3600, 0.7);
 		toll.addCost(14*3600, 18*3600, 0.7);
 		// the agent should now decide to drive around
-		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
+		new PlansCalcRouteWithTollOrNot(config, config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) leg1.getRoute());
 	}
 
@@ -130,7 +130,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
 		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
-		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
+		new PlansCalcRouteWithTollOrNot(config, config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg1.getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
 	}
@@ -163,7 +163,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
 		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
-		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
+		new PlansCalcRouteWithTollOrNot(config, config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg1.getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
 	}
@@ -192,7 +192,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		LegImpl leg1 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
 		LegImpl leg2 = (LegImpl) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
 
-		new PlansCalcAreaTollRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
+		new PlansCalcRouteWithTollOrNot(config, config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, factory, routeFactory, toll).run(population);
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg1.getRoute()); // agent should take shortest route, as tolls are not active at that time
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
 	}
