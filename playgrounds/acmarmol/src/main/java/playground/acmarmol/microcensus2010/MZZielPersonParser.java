@@ -126,7 +126,7 @@ public class MZZielPersonParser {
 		else if(dow.equals("6")){dow = "saturday";}		else if(dow.equals("7")){dow = "sunday";}
 		else Gbl.errorMsg("This should never happen!  Day of week: " + dow + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), "day of week", dow);
-
+		
 		
 		//employment status
 		boolean employed = true;		

@@ -4,8 +4,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
-
-	
 	/**
 	 * @author acmarmol
 	 */

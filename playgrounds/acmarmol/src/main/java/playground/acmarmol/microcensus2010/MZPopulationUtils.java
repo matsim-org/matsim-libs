@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -204,7 +205,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 //////////////////////////////////////////////////////////////////////
 
-public static Set<Id> identifyPlansWithoutBestPrecision(final Population population) {
+	public static Set<Id> identifyPlansWithoutBestPrecision(final Population population) {
 	Set<Id> ids = new HashSet<Id>();
 	for (Person person : population.getPersons().values()) {	
 		Plan plan = person.getSelectedPlan();
@@ -222,8 +223,32 @@ public static Set<Id> identifyPlansWithoutBestPrecision(final Population populat
 	
 	
 	
-	
-	
-	
-	
+//////////////////////////////////////////////////////////////////////
+//
+//	public static void HandleBorderCrossingTrips(final Population population, final ObjectAttributes wegeAttributes, Set<Id> border_crossing_wids) {	
+//		
+//	for(Id wid: border_crossing_wids){
+//		
+//	Id pid = new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')));
+//	int legNumber = Integer.parseInt(wid.toString().substring(wid.toString().indexOf('-')+1));
+//	
+//	String sland = wegeAttributes.getAttribute(wid, attribute)
+//	
+//	
+//	Plan plan = population.getPersons().get(pid).getSelectedPlan();
+//	Leg leg = (Leg) plan.getPlanElements().get(2*legNumber-1);
+//	
+//			
+//	System.out.println(pid);
+//		
+//		
+//		
+//	}
+//		
+//		
+//		
+//	}
+//	
+//	
+//	
 }

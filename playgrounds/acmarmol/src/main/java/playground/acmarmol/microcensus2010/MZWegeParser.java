@@ -57,10 +57,9 @@ public class MZWegeParser {
 //member variables
 //////////////////////////////////////////////////////////////////////
 
-	private Households households;
-	private ObjectAttributes householdAttributes;
+	private ObjectAttributes wegeAttributes;
 	private Population population;
-	private ObjectAttributes populationAttributes;
+	
 	
 	
 	private static final String HOME = "home";
@@ -69,10 +68,9 @@ public class MZWegeParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZWegeParser(Population population, ObjectAttributes populationAttributes,  Households households, ObjectAttributes householdAttributes) {
+	public MZWegeParser(Population population, ObjectAttributes wegeAttributes) {
 		super();
-		this.households = households;
-		this.householdAttributes = householdAttributes;
+		this.wegeAttributes = wegeAttributes;
 		this.population = population;
 	}	
 
@@ -86,7 +84,7 @@ public class MZWegeParser {
 		Set<Id> coord_err_pids = new HashSet<Id>();
 		Set<Id> time_err_pids = new HashSet<Id>();
 		Set<Id> neg_coord_pids = new HashSet<Id>();
-		Set<Id> home_coord_pids = new HashSet<Id>();
+		Set<Id> border_crossing_pids = new HashSet<Id>();
 		
 		FileReader fr = new FileReader(wegeFile);
 		BufferedReader br = new BufferedReader(fr);
@@ -108,8 +106,11 @@ public class MZWegeParser {
 			
 			//wege number
 			String wegnr = entries[3].trim();
+			Id wid = new IdImpl(pid.toString().concat("-").concat(wegnr));
+			wegeAttributes.putAttribute(wid.toString(), "number", Integer.parseInt(wegnr));
 			
-			Id wid = new IdImpl((hhnr.concat(zielpnr)).concat(wegnr));
+			// initialize number of etappen
+			wegeAttributes.putAttribute(wid.toString(), "number of etappen", 0); //initialize
 			
 			//mode
 			String mode = entries[80].trim();
@@ -124,20 +125,39 @@ public class MZWegeParser {
 			else if(mode.equals("16")){mode = "skateboard/skates";}else if(mode.equals("17")){mode = "other";}
 			else if(mode.equals("-99")){mode = "Pseudoetappe";}
 			else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+			wegeAttributes.putAttribute(wid.toString(), "principal mode", mode);
 			
 			//start coordinate - WGS84 (22,23) & CH1903 (24,25)
 			Coord start_coord = new CoordImpl(entries[24].trim(),entries[25].trim());
 			
-					
+							
 			//end coordinate (round to hectare) - WGS84 (42,43) & CH1903 (44,45)
 			Coord end_coord = new CoordImpl(entries[44].trim(),entries[45].trim());
+			
+			//starting and ending country ( == 8100 for switzerland)
+			String sland = entries[36].trim();
+			String zland = entries[56].trim();
+			if(!sland.equals("8100") || !zland.equals("8100")){
+				if((!sland.equals("8100") && !zland.equals("8100"))){
+					wegeAttributes.putAttribute(wid.toString(), "Out of border type", "completely out");	
+				} //completely out of CH
+				else if((sland.equals("8100") && !zland.equals("8100"))){
+					wegeAttributes.putAttribute(wid.toString(), "Out of border type", "out");	
+				}  //going-out of CH
+				else if((!sland.equals("8100") && zland.equals("8100"))){
+					wegeAttributes.putAttribute(wid.toString(), "Out of border type", "in");					
+				} //entering CH
+			border_crossing_pids.add(wid);}
+			
 				
 			// departure time (min => sec.)
 			int departure = Integer.parseInt(entries[5].trim())*60;
+			wegeAttributes.putAttribute(wid.toString(), "departure", departure);
 			
 			// arrival time (min => sec.)
 			int arrival = Integer.parseInt(entries[6].trim())*60;
-			
+			wegeAttributes.putAttribute(wid.toString(), "arrival", arrival);
+						
 				// time consistency check N°1
 				if(arrival<departure){
 					if(!time_err_pids.contains(pid)){time_err_pids.add(pid);}
@@ -147,6 +167,10 @@ public class MZWegeParser {
 			//bee-line distance (km => m)
 			double distance = Double.parseDouble(entries[85].trim())*1000.0;
 			entries[21] = Double.toString(distance);
+			
+			
+			
+			
 			
 			//ausgaenge number (=-98 if ausgaenge is imcomplete)
 			String ausnr = entries[86].trim();
@@ -182,6 +206,7 @@ public class MZWegeParser {
 			if (plan == null) {
 				person.createAndAddPlan(true);
 				plan = person.getSelectedPlan();
+				
 			}
 			
 			// adding acts/legs
@@ -194,10 +219,6 @@ public class MZWegeParser {
 				leg.setDepartureTime(departure);
 				leg.setTravelTime(arrival-departure);
 				leg.setArrivalTime(arrival);
-				GenericRouteImpl route = new GenericRouteImpl(null, null);
-				leg.setRoute(route);
-				route.setDistance(distance);
-				route.setTravelTime(leg.getTravelTime());
 				ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(purpose,end_coord);
 				act.setStartTime(arrival);
 			
@@ -250,7 +271,7 @@ public class MZWegeParser {
 		err_pids.add(coord_err_pids);
 		err_pids.add(time_err_pids);
 		err_pids.add(neg_coord_pids);
-		err_pids.add(home_coord_pids);
+		err_pids.add(border_crossing_pids);
 		
 		return err_pids;
 			
