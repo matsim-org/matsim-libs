@@ -558,6 +558,7 @@ public class EvacuationPTLinesEditor implements ActionListener{
 		config.setParam("qsim", "startTime", "00:00:00");
 		config.setParam("qsim", "endTime", "30:00:00");
 		config.setParam("changeLegMode", "modes", "car,pt");
+		config.setParam("changeLegMode", "ignoreCarAvailability", "false");
 		
 		config.setParam("transit", "transitScheduleFile", this.scPath+"/transitSchedule.xml");
 		config.setParam("transit", "vehiclesFile", this.scPath+"/transitVehicles.xml");

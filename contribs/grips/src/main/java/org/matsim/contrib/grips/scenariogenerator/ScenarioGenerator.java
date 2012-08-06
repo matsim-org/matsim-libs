@@ -165,6 +165,8 @@ public class ScenarioGenerator {
 		this.c.strategy().addParam("ModuleProbability_1", "0.1");
 		this.c.strategy().addParam("Module_2", "ChangeExpBeta");
 		this.c.strategy().addParam("ModuleProbability_2", "0.9");
+		
+	
 
 		this.c.simulation().setRemoveStuckVehicles(false);
 		
@@ -238,7 +240,8 @@ public class ScenarioGenerator {
 		sc.getConfig().planCalcScore().addActivityParams(post);
 		
 		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);
-
+		sc.getConfig().planCalcScore().setPerforming_utils_hr(0.);
+		
 		//		sc.getConfig().planCalcScore().addParam("activityPriority_0", "1");
 		//		sc.getConfig().planCalcScore().addParam("activityTypicalDuration_0", "00:00:49");
 		//		sc.getConfig().planCalcScore().addParam("activityMinimalDuration_0", "00:00:49");

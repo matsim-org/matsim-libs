@@ -253,7 +253,7 @@
 		<param name="monetaryDistanceCostRatePt" value="0.0" />
 
 		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing. -->
-		<param name="performing" value="6.0" />
+		<param name="performing" value="0.0" />
 
 		<!-- [utils/hr] additional marginal utility of traveling by car.  normally negative.  this comes on top of the opportunity cost of time -->
 		<param name="traveling" value="-6.0" />
