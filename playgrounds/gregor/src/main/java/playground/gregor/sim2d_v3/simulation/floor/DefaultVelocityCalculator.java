@@ -81,8 +81,7 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 		double linkFactor = calculateLinkFactor(link);
 		
 		double personWalkVelocity = this.referenceWalkSpeed * personFactor * linkFactor;
-//		return personWalkVelocity;
-		return 1.34;
+		return personWalkVelocity;
 	}
 	
 	private void incGenderWarnCount(String text) {
