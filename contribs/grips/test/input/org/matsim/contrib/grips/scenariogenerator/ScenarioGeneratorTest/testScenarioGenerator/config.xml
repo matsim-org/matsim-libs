@@ -7,7 +7,7 @@
 	<module name="TimeAllocationMutator" >
 
 		<!-- Defines how many seconds a time mutation can maximally shift a time. -->
-		<param name="mutationRange" value="1800.0" />
+		<param name="mutationRange" value="0.0" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -18,7 +18,7 @@
 		<!-- Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (','). -->
 		<param name="eventsFileFormat" value="xml" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="500" />
+		<param name="lastIteration" value="100" />
 
 		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation qsim JDEQSim multimodalQSim  -->
 		<param name="mobsim" value="null" />
@@ -234,7 +234,7 @@
 		<param name="earlyDeparture" value="-0.0" />
 
 		<!-- [utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative -->
-		<param name="lateArrival" value="-18.0" />
+		<param name="lateArrival" value="0.0" />
 
 		<!-- new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence -->
 		<param name="learningRate" value="1.0" />
@@ -419,7 +419,7 @@
 		<param name="ExternalExeTmpFileRootDir" value="null" />
 
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
-		<param name="ModuleDisableAfterIteration_1" value="250" />
+		<param name="ModuleDisableAfterIteration_1" value="75" />
 
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
 		<param name="ModuleDisableAfterIteration_2" value="null" />
