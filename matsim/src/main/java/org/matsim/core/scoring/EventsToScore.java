@@ -20,8 +20,11 @@
 
 package org.matsim.core.scoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -62,11 +65,15 @@ LinkEnterEventHandler, TravelEventHandler {
 
 	private EventsToActivities eventsToActivities;
 	private EventsToLegs eventsToLegs;
-	private PlanElementsToScore handler;
+	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	private Scenario scenario;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private double learningRate;
 	private boolean finished = false;
+
+	private double scoreSum = 0.0;
+	private long scoreCount = 0;
+	
 
 	/**
 	 * Initializes EventsToScore with a learningRate of 1.0.
@@ -88,10 +95,10 @@ LinkEnterEventHandler, TravelEventHandler {
 	private void initHandlers(final Scenario scenario,
 			final ScoringFunctionFactory factory, final double learningRate) {
 		this.eventsToActivities = new EventsToActivities();
-		this.handler = new PlanElementsToScore(scenario, factory, learningRate);
-		this.eventsToActivities.setActivityHandler(this.handler);
+		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(scenario, factory);
+		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
 		this.eventsToLegs = new EventsToLegs();
-		this.eventsToLegs.setLegHandler(this.handler);
+		this.eventsToLegs.setLegHandler(this.scoringFunctionsForPopulation);
 	}
 
 	@Override
@@ -149,12 +156,35 @@ LinkEnterEventHandler, TravelEventHandler {
 	/**
 	 * Finishes the calculation of the plans' scores and assigns the new scores
 	 * to the plans.
+	 * I think this should be split into two methods: One can want to close the ScoringFunctions to look
+	 * at scores WITHOUT wanting something to be written into Plans.
+	 * Actually, I think the two belong in different classes. michaz '12
 	 */
 	public void finish() {
-		eventsToActivities.finish();
-		handler.finish();
+		eventsToActivities.finish();	
+		scoringFunctionsForPopulation.finishScoringFunctions();
+		assignNewScores();
 		finished = true;
 	}
+
+	private void assignNewScores() {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
+			double score = sf.getScore();
+			Plan plan = person.getSelectedPlan();
+			Double oldScore = plan.getScore();
+			if (oldScore == null) {
+				plan.setScore(score);
+			} else {
+				plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
+			}
+
+			this.scoreSum += score;
+			this.scoreCount++;
+		}
+	}
+
+	
 
 	/**
 	 * Returns the actual average plans' score before it was assigned to the
@@ -164,10 +194,10 @@ LinkEnterEventHandler, TravelEventHandler {
 	 *         (learningrate)
 	 */
 	public double getAveragePlanPerformance() {
-		if (!finished) {
-			throw new IllegalStateException("Must call finish first.");
-		}
-		return handler.getAveragePlanPerformance();
+		if (this.scoreSum == 0)
+			return Double.NaN;
+		else
+			return (this.scoreSum / this.scoreCount);
 	}
 
 	/**
@@ -197,7 +227,7 @@ LinkEnterEventHandler, TravelEventHandler {
 	}
 
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
-		return handler.getScoringFunctionForAgent(agentId);
+		return scoringFunctionsForPopulation.getScoringFunctionForAgent(agentId);
 	}
 
 }
