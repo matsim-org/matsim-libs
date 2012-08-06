@@ -25,7 +25,6 @@ import java.util.TreeMap;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.scoring.ActivityUtilityParameters;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();

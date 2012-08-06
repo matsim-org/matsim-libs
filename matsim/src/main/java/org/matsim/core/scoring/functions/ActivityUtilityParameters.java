@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.scoring;
+package org.matsim.core.scoring.functions;
 
 import org.matsim.core.api.internal.MatsimParameters;
 

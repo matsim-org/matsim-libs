@@ -25,7 +25,6 @@ import org.matsim.core.utils.collections.Tuple;
  */
 class PlanElementsToScore implements ActivityHandler, LegHandler {
 	
-	private Scenario scenario = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 	private final double learningRate;
 
@@ -37,22 +36,12 @@ class PlanElementsToScore implements ActivityHandler, LegHandler {
 	private static Logger logger = Logger.getLogger(PlanElementsToScore.class);
 
 	public PlanElementsToScore(Scenario scenario, ScoringFunctionFactory scoringFunctionFactory, double learningRate) {
-		this.scenario = scenario;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
-	}
-
-	private Tuple<Plan, ScoringFunction> getPlanAndScoringFunctionForAgent(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = this.agentScorers.get(agentId);
-		if (data == null) {
-			Person person = this.scenario.getPopulation().getPersons().get(agentId);
-			if (person == null) {
-				return null;
-			}
-			data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(), this.scoringFunctionFactory.createNewScoringFunction(person.getSelectedPlan()));
-			this.agentScorers.put(agentId, data);
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Tuple<Plan, ScoringFunction> data = new Tuple<Plan, ScoringFunction>(person.getSelectedPlan(), this.scoringFunctionFactory.createNewScoringFunction(person.getSelectedPlan()));
+			this.agentScorers.put(person.getId(), data);
 		}
-		return data;
 	}
 
 	/**
@@ -66,7 +55,7 @@ class PlanElementsToScore implements ActivityHandler, LegHandler {
 	 * @return The scoring function for the specified agent.
 	 */
 	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = this.getPlanAndScoringFunctionForAgent(agentId);
+		Tuple<Plan, ScoringFunction> data = this.agentScorers.get(agentId);
 		if (data == null) {
 			return null;
 		}
