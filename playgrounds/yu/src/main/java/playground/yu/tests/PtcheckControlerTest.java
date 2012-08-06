@@ -40,6 +40,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.analysis.CalcLinksAvgSpeed;
 import playground.yu.analysis.CalcNetAvgSpeed;
@@ -131,8 +132,8 @@ public class PtcheckControlerTest extends Controler {
 									+ this.cas.getNetAvgSpeed()
 									+ "\t"
 									+ (((this.rp != null) && (this.rp
-											.getRoadPricingScheme() != null)) ? this.rp
-											.getRoadPricingScheme()
+											.getRoadPricingScheme() != null)) ? ((RoadPricingSchemeImpl) this.rp
+											.getRoadPricingScheme())
 											.getCostArray()[0].amount
 											+ "\t"
 											+ this.rp.getAllAgentsToll()
