@@ -65,7 +65,7 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private ActivityImpl prevAct = null;
+	private ActivityImpl prevAct;
 	private Scenario scenario;
 	private Population plans;
 	private Network network;
@@ -76,6 +76,8 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
+		
+		
 		
 	}
 	
@@ -104,7 +106,7 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 
 	XMLInputFactory xmlif = this.createXmlInputFactory();
 
-	long starttime = System.currentTimeMillis();
+//	long starttime = System.currentTimeMillis();
 	try {
 		XMLStreamReader xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(file));
 		int eventType = xmlr.getEventType();
@@ -127,6 +129,8 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 				 
 				 else if ("person".compareTo(name ) == 0){
 					 String id = xmlr.getAttributeValue(""	, "id");
+//					 log.info("person: "+id);
+					 this.prevAct=null;
 					 this.currperson = new PersonImpl(new IdImpl(id));
 					 
 					String sex = xmlr.getAttributeValue(""	, "sex");
@@ -166,15 +170,18 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 					 
 				 }
 				 else if ("act".compareTo(name ) == 0){
-					 
+					 this.prevAct=this.curract;
+					 this.curract=null;
+//					 log.info("encountered activity start el");
 					 Coord coord = null;
 					 if (xmlr.getAttributeValue(""	, "link") != null) {
 							Id linkId = this.scenario.createId(xmlr.getAttributeValue(""	, "link"));
-							this.curract = this.currplan.createAndAddActivity(
-									xmlr.getAttributeValue(""	, "type"), linkId);
+							this.curract = this.currplan.createAndAddActivity(xmlr.getAttributeValue(""	, "type"), linkId);
+//							 log.info("created link act "+this.curract.getLinkId());
+
 							
 							if ((xmlr.getAttributeValue(""	, "x") != null) && (xmlr.getAttributeValue(""	, "y") != null)) {
-								coord = new CoordImpl(xmlr.getAttributeValue(""	, "x"), xmlr.getAttributeValue(""	, "y"));
+								coord = new CoordImpl(xmlr.getAttributeValue("", "x"), xmlr.getAttributeValue("", "y"));
 								this.curract.setCoord(coord);
 							}
 						} else if ((xmlr.getAttributeValue(""	, "x") != null) && (xmlr.getAttributeValue(""	, "y") != null)) {
@@ -208,7 +215,8 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 				} 
 				 
 				else if ("route".compareTo(name ) == 0){ 
-					
+//					 log.info("encountered route start");
+
 					
 					
 					this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(this.currleg.getMode(), null, null);
@@ -222,22 +230,27 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 					this.routeDescription = xmlr.getElementText();
 					if (this.routeDescription != null) {
 						Id startLinkId = null;
+						
+						try{
 						if (this.prevAct.getLinkId() != null) {
 							startLinkId = this.prevAct.getLinkId();
-						}
+						}}catch (NullPointerException e){
+//							log.info("npe");
+							}
 						Id endLinkId = null;
+//						 log.info("ecountered curract.getlink = " + this.curract.getLinkId());
+
 						if (this.curract.getLinkId() != null) {
 							endLinkId = this.curract.getLinkId();
 						}
+						
+				
 						if (this.currRoute instanceof GenericRoute) {
 							((GenericRoute) this.currRoute).setRouteDescription(
 									startLinkId, this.routeDescription.trim(), endLinkId);
 						} else if (this.currRoute instanceof NetworkRoute) {
 							((NetworkRoute) this.currRoute).setLinkIds(startLinkId,
-									NetworkUtils.getLinkIds(RouteUtils
-											.getLinksFromNodes(NetworkUtils.getNodes(
-													this.network, this.routeDescription))),
-									endLinkId);
+									NetworkUtils.getLinkIds(RouteUtils.getLinksFromNodes(NetworkUtils.getNodes(this.network, this.routeDescription))),endLinkId);
 						} else {
 							throw new RuntimeException("unknown route type: "
 									+ this.currRoute.getClass().getName());
@@ -260,8 +273,9 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 				
 				 }
 				 else if ("act".compareTo(name) == 0){
-					 this.prevAct=this.curract;
-					 this.curract=null;
+//					 log.info("act end");
+//					 this.prevAct=this.curract;
+//					 this.curract=null;
 				
 				 }
 				 
@@ -277,8 +291,8 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 	} catch (Exception ex) {
 		ex.printStackTrace();
 	}
-	long endtime = System.currentTimeMillis();
-	log.info(" Parsing Time = " + (endtime - starttime));
+//	long endtime = System.currentTimeMillis();
+//	log.info(" Parsing Time = " + (endtime - starttime));
 
 }
 }
