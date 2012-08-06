@@ -32,7 +32,7 @@ public class OTFVisVisulalization {
 	public static void main(String [] args) {
 		if (args.length == 2) {
 			new org.matsim.contrib.grips.visualization.OTFVisVisualization(args[0],Integer.parseInt(args[1])).run();
-		}if (args.length == 6){
+		}else if (args.length == 6){
 			String config = args[0];
 			int it = Integer.parseInt(args[1]);
 			String wms = null;

@@ -78,7 +78,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleWriterV1;
 
-
 import com.vividsolutions.jts.geom.Envelope;
 
 public class EvacuationPTLinesEditor implements ActionListener{
@@ -549,14 +548,15 @@ public class EvacuationPTLinesEditor implements ActionListener{
 		config.strategy().addParam("Module_1", "ReRoute");
 		config.strategy().addParam("ModuleProbability_1", "0.1");
 		config.strategy().addParam("Module_2", "ChangeExpBeta");
-		config.strategy().addParam("ModuleProbability_2", "0.3");
+		config.strategy().addParam("ModuleProbability_2", "0.8");
 		config.strategy().addParam("Module_3", "TransitChangeLegMode");
-		config.strategy().addParam("ModuleProbability_3", "0.3");
-		config.strategy().addParam("Module_4", "TransitTimeAllocationMutator");
-		config.strategy().addParam("ModuleProbability_4", "0.3");
+		config.strategy().addParam("ModuleProbability_3", "0.4");
+		config.strategy().addParam("ModuleDisableAfterIteration_3", "50");
+//		config.strategy().addParam("Module_4", "TransitTimeAllocationMutator");
+//		config.strategy().addParam("ModuleProbability_4", "0.3");
 
 		config.setParam("qsim", "startTime", "00:00:00");
-		config.setParam("qsim", "endTime", "03:30:00");
+		config.setParam("qsim", "endTime", "30:00:00");
 		config.setParam("changeLegMode", "modes", "car,pt");
 		
 		config.setParam("transit", "transitScheduleFile", this.scPath+"/transitSchedule.xml");
@@ -611,7 +611,7 @@ public class EvacuationPTLinesEditor implements ActionListener{
 			else {
 				
 				this.currentBusStop = new BusStop();
-				currentBusStop.id = id;
+				this.currentBusStop.id = id;
 				this.busStops.put(id, this.currentBusStop);
 				updateControlPanel(this.currentBusStop);
 			}

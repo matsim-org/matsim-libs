@@ -63,7 +63,7 @@ public class PTLinesGenerator {
 	private final Map<Id, BusStop> busStops;
 	private final Dijkstra dijkstra;
 	private final TransitScheduleFactoryImpl fac;
-	private TransitStopFacility safeFacility;
+	private Id safeId;
 
 	public PTLinesGenerator(Scenario sc, Map<Id, BusStop> busStops) {
 		this.sc = sc;
@@ -92,13 +92,13 @@ public class PTLinesGenerator {
 		this.schedule = this.fac.createTransitSchedule();
 		
 		
-		Id id = this.sc.getNetwork().getLinks().get(new IdImpl("el1")).getId();
-		Coord c = this.sc.getNetwork().getLinks().get(id).getCoord();
-		this.safeFacility = this.fac.createTransitStopFacility(id,c,false);
-		this.safeFacility.setLinkId(id);
+		Link safeLink = this.sc.getNetwork().getLinks().get(new IdImpl("el1"));
+
+		TransitStopFacility safeFacility = this.fac.createTransitStopFacility(safeLink.getId(),safeLink.getToNode().getCoord(),false);
+		safeFacility.setLinkId(safeLink.getId());
+		this.schedule.addStopFacility(safeFacility);
 		
-		this.schedule.addStopFacility(this.safeFacility);
-		
+		this.safeId = safeLink.getId();
 		for (BusStop stop : this.busStops.values()) {
 			createTransitLine(stop);
 		}
@@ -119,14 +119,26 @@ public class PTLinesGenerator {
 		this.schedule.addStopFacility(facility);
 		TransitRouteStop rs = this.fac.createTransitRouteStop(facility, 0, 0); //what does arrival and departure delay mean? 
 		stops.add(rs);
-		TransitRouteStop safeStop = this.fac.createTransitRouteStop(this.safeFacility, 0, 0);
-		stops.add(safeStop);
 		
 		Node start = link.getToNode(); 
-		Node end = this.sc.getNetwork().getLinks().get(this.safeFacility.getLinkId()).getFromNode();
-		
+		Node end = this.sc.getNetwork().getLinks().get(this.safeId).getFromNode();
 		Path p = this.dijkstra.calcLeastCostPath(start, end, 0, null, null);
-		List<Link> links = p.links;
+		List<Link> links = p.links.subList(0, p.links.size()-1);
+		
+		Link safeLink = p.links.get(p.links.size()-1);
+		
+		TransitStopFacility safeFacility = this.schedule.getFacilities().get(safeLink.getId());
+		
+		if ( safeFacility == null) {
+			safeFacility = this.fac.createTransitStopFacility(safeLink.getId(),safeLink.getToNode().getCoord(),false);
+			safeFacility.setLinkId(safeLink.getId());
+			this.schedule.addStopFacility(safeFacility);
+		}
+		
+		TransitRouteStop safeStop = this.fac.createTransitRouteStop(safeFacility, 0, 0);
+		stops.add(safeStop);
+		
+		
 		
 		List<Id> linkIds = new ArrayList<Id>();
 		Set<String> modes  = new HashSet<String>();
@@ -142,8 +154,8 @@ public class PTLinesGenerator {
 		}
 		
 		TransitLine line = this.fac.createTransitLine(id);
-		NetworkRoute route = new LinkNetworkRouteImpl(id,this.safeFacility.getLinkId());
-		route.setLinkIds(id, linkIds, this.safeFacility.getLinkId());
+		NetworkRoute route = new LinkNetworkRouteImpl(id,safeFacility.getLinkId());
+		route.setLinkIds(id, linkIds, safeFacility.getLinkId());
 		TransitRoute tr = this.fac.createTransitRoute(id, route, stops, "bus");
 		
 		//Vehicles
@@ -168,6 +180,7 @@ public class PTLinesGenerator {
 			Departure dep = this.fac.createDeparture(new IdImpl(id.toString() + "_dep_" +i), depTime);
 			dep.setVehicleId(veh.getId());
 			tr.addDeparture(dep);
+			depTime += 5*30;
 		}
 		line.addRoute(tr);
 		this.schedule.addTransitLine(line);

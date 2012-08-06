@@ -89,7 +89,10 @@ public class EvacuationNetworkGenerator {
 	 */
 	private void createEvacuationNodsAndLinks() {
 
-		Coord safeCoord = MGC.coordinate2Coord(this.evacuationArea.getCentroid().getCoordinate());
+		Coordinate cc = this.evacuationArea.getCentroid().getCoordinate();
+		cc.x += 10000;
+		cc.y += 10000;
+		Coord safeCoord = MGC.coordinate2Coord(cc);
 
 		Node safeNodeA = this.network.getFactory().createNode(this.safeNodeAId, safeCoord);
 		this.network.addNode(safeNodeA);

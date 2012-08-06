@@ -121,6 +121,9 @@ public class ScenarioGenerator {
 		this.c.addSimulationConfigGroup(new SimulationConfigGroup());
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		
+		this.c.timeAllocationMutator().setMutationRange(0.);
+		
 		this.sc = ScenarioUtils.createScenario(this.c);
 		this.safeLinkId = this.sc.createId("el1");
 
@@ -151,12 +154,12 @@ public class ScenarioGenerator {
 
 		this.c.otfVis().setMapOverlayMode(true);
 
-		this.c.controler().setLastIteration(500);
+		this.c.controler().setLastIteration(100);
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
 
 		this.c.strategy().setMaxAgentPlanMemorySize(3);
 
-		this.c.strategy().addParam("ModuleDisableAfterIteration_1", "250");
+		this.c.strategy().addParam("ModuleDisableAfterIteration_1", "75");
 		this.c.strategy().addParam("maxAgentPlanMemorySize", "3");
 		this.c.strategy().addParam("Module_1", "ReRoute");
 		this.c.strategy().addParam("ModuleProbability_1", "0.1");
@@ -233,6 +236,8 @@ public class ScenarioGenerator {
 		post.setOpeningTime(49);
 		sc.getConfig().planCalcScore().addActivityParams(pre);
 		sc.getConfig().planCalcScore().addActivityParams(post);
+		
+		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);
 
 		//		sc.getConfig().planCalcScore().addParam("activityPriority_0", "1");
 		//		sc.getConfig().planCalcScore().addParam("activityTypicalDuration_0", "00:00:49");

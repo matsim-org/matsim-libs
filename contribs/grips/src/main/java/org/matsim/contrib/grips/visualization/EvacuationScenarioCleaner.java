@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,6 +36,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class EvacuationScenarioCleaner {
 
@@ -67,6 +70,22 @@ public class EvacuationScenarioCleaner {
 		}
 		
 		
+		if (this.scenario.getTransitSchedule() != null) {
+			TransitSchedule t = this.scenario.getTransitSchedule();
+			for (TransitStopFacility f : t.getFacilities().values()){
+				handle(f);
+			}
+		}
+		
+		
+	}
+
+	private void handle(TransitStopFacility f) {
+	  Id lid = f.getId();
+	  if (lid.toString().contains("el")){
+		  Coord c = this.scenario.getNetwork().getLinks().get(lid).getFromNode().getCoord();
+		  f.getCoord().setXY(c.getX(), c.getY());
+	  }
 	}
 
 	private void handle(Link link) {
@@ -101,7 +120,7 @@ public class EvacuationScenarioCleaner {
 			if (pel instanceof LegImpl) {
 				actLink = handle((LegImpl)pel);
 			}
-			if (pel instanceof ActivityImpl) {
+			if (pel instanceof ActivityImpl && actLink != null) {
 				Id id = ((ActivityImpl)pel).getLinkId();
 				if (id.toString().contains("el")) {
 					handle((ActivityImpl)pel,actLink);
@@ -116,8 +135,9 @@ public class EvacuationScenarioCleaner {
 		Id endLinkId;
 		
 		String m = l.getMode();
-		if (m.equals("transit_walk")) {
-			throw new RuntimeException("not implemented yet!");
+		if (!m.equals("car")) {
+//			throw new RuntimeException("not implemented yet!");
+			return null;
 		}
 		
 		Route r = l.getRoute();
