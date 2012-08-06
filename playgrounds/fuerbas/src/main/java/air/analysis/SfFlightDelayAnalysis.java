@@ -47,10 +47,17 @@ public class SfFlightDelayAnalysis {
 	private static final int MIN_MAX_DELAY = 60;	//set desired min./max. delay
 	private static final int DELAY_OUTPUT_INTERVAL = 5;		//set interval for delay accumulation
 	
-	private static String actualTimes = "Z:\\WinHome\\munich_output\\ITERS\\it.0\\0.statistic.csv";
-	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\oag_flights.txt";
-	private static String delayOutput = "Z:\\WinHome\\munich_output\\delay.csv";
-	private static String delayOutputAcc = "Z:\\WinHome\\munich_output\\delay_acc.csv";
+//	private static String actualTimes = "Z:\\WinHome\\munich_output\\ITERS\\it.0\\0.statistic.csv";
+//	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\oag_flights.txt";
+//	private static String delayOutput = "Z:\\WinHome\\munich_output\\delay.csv";
+//	private static String delayOutputAcc = "Z:\\WinHome\\munich_output\\delay_acc.csv";
+//	private static String delaySingleFlight = "";
+	
+	private static String scheduledTimes= "/media/data/work/repos/shared-svn/studies/countries/eu/flight/sf_oag_flight_model/oag_flights.txt";
+	private static String actualTimes = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.statistic.csv";
+	private static String delayOutput = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.delay.csv";
+	private static String delayOutputAcc = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.delay_acc.csv";
+	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.delay_by_flight.csv";
 	
 	public SfFlightDelayAnalysis() {
 		this.actualArrival = new HashMap<String, Double>(); 
@@ -75,7 +82,7 @@ public class SfFlightDelayAnalysis {
 		BufferedReader brScheduled = new BufferedReader(new FileReader(new File(scheduledTimes)));
 		BufferedWriter bwDelay = new BufferedWriter(new FileWriter(new File(delayOutput)));
 		BufferedWriter bwDelayAcc = new BufferedWriter(new FileWriter(new File(delayOutputAcc)));
-		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File("Z:\\WinHome\\munich_output\\delayByFlight.csv")));
+		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File(delaySingleFlight)));
 		
 		for (int kk=0; kk<=(MIN_MAX_DELAY+1); kk++) {
 			this.delay.put(kk, 0);
