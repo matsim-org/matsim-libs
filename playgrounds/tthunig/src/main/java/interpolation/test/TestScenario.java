@@ -22,8 +22,8 @@ public class TestScenario {
 	private static final Logger log = Logger.getLogger(Interpolation.class);
 	
 	//information about the given data
-	private static String filename_data100 = "zurich_carAccessibility_grid_cellsize100m";
-	private static String filename_data200 = "zurich_carAccessibility_grid_cellsize200m";
+	private static String filename_data100 = "zurich_carAccessibility_grid_cellsize100m_shp";
+	private static String filename_data200 = "zurich_carAccessibility_grid_cellsize200m_shp";
 	
 	//variables to save comparison results
 	private static double interpolationTime_bilinear = Double.MAX_VALUE;
@@ -107,6 +107,7 @@ public class TestScenario {
 	 */
 	private static double differenceComputation(SpatialGrid sg100, SpatialGrid sg200_interpolated){
 		double differenceToOriginalSG = 0;
+//		double quadDiffToOriginalSG = 0;
 		//sum difference at all coordinates where interpolated values are known
 		for (double y = sg200_interpolated.getYmin(); y <= sg200_interpolated.getYmax(); y += sg200_interpolated.getResolution()){
 			for (double x = sg200_interpolated.getXmin(); x <= sg200_interpolated.getXmax(); x += sg200_interpolated.getResolution()){
@@ -115,6 +116,7 @@ public class TestScenario {
 				//calculate difference only in the zurich area
 				if(!Double.isNaN(value100) && !Double.isNaN(value200)){
 					differenceToOriginalSG += Math.abs(value100 - value200);
+//					quadDiffToOriginalSG += Math.sqrt((value100 - value200)*(value100 - value200));
 				}
 			}
 		}

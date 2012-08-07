@@ -49,6 +49,7 @@ class BiLinearInterpolator {
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
 		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
 		
+		//corner coordinates of the grid cell
 		double x1= xCoord-xDif;
 		double x2= x1+sg.getResolution();
 		double y1= yCoord-yDif;
@@ -57,19 +58,21 @@ class BiLinearInterpolator {
 		double xWeight= xDif/sg.getResolution();
 		double yWeight= yDif/sg.getResolution();
 		
+		//case differentiation important for boundary data of shapefiles, because of neighboring NaN values
 		if (xDif==0){
 			if (yDif==0){
-				//xWeigt=yWeight=0
+				//known value
 				return sg.getValue(xCoord, yCoord);
 			}
-			//xWeight=0
+			//point to interpolate lies on the grid cell boundary
 			return sg.getValue(x1, y1)*(1-yWeight) + sg.getValue(x1, y2)*yWeight;
 		}
 		if (yDif==0){
-			//yWeight=0
+			//point to interpolate lies on the grid cell boundary
 			return sg.getValue(x1, y1)*(1-xWeight) + sg.getValue(x2, y1)*xWeight;
 		}
 		
+		//interpolates first in y-direction then in x-direction with linear splines
 		return (sg.getValue(x1, y1)*(1-yWeight) + sg.getValue(x1, y2)*yWeight) * (1-xWeight) + (sg.getValue(x2, y1)*(1-yWeight) + sg.getValue(x2, y2)*yWeight) * xWeight;
 	}
 }
