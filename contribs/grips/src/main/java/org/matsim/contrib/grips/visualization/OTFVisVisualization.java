@@ -75,9 +75,9 @@ public class OTFVisVisualization {
 		
 		//MODIFY SCENARIO HERE
 		new EvacuationScenarioCleaner(scenario).run();
-		
 		//
 		
+		System.gc();
 		if (config.getQSimConfigGroup() == null){
 			log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
 					"Fixing this by adding default config module for QSim. " +

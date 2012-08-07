@@ -59,6 +59,11 @@ public class OTFClientLiveWMS {
 			@Override
 			public void run() {
 				OTFConnectionManager connectionManager = new OTFConnectionManager();
+				if (config.scenario().isUseTransit()) {
+					connectionManager.connectWriterToReader(FacilityDrawer.Writer.class, FacilityDrawer.Reader.class);
+					connectionManager.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);
+					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
+				}
 				connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
@@ -68,11 +73,6 @@ public class OTFClientLiveWMS {
 				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 				connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
 				
-				if (config.scenario().isUseTransit()) {
-					connectionManager.connectWriterToReader(FacilityDrawer.Writer.class, FacilityDrawer.Reader.class);
-					connectionManager.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);
-					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
-				}
 				
 				if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
 					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);

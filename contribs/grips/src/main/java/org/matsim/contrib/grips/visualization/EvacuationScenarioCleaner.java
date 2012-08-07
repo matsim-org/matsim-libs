@@ -33,9 +33,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -84,13 +86,16 @@ public class EvacuationScenarioCleaner {
 	  Id lid = f.getId();
 	  if (lid.toString().contains("el")){
 		  Coord c = this.scenario.getNetwork().getLinks().get(lid).getFromNode().getCoord();
-		  f.getCoord().setXY(c.getX(), c.getY());
+		  Coord cc = f.getCoord();
+		  cc.setXY(c.getX(), c.getY());
+		  f.setLinkId(new IdImpl("bus_stop_"+lid.toString()));
 	  }
 	}
 
 	private void handle(Link link) {
 		Id id = this.scenario.createId("en"+link.getId().toString());
-		Node n = this.scenario.getNetwork().getFactory().createNode(id, link.getFromNode().getCoord());
+		CoordImpl cc = new CoordImpl(link.getFromNode().getCoord().getX()+10, link.getFromNode().getCoord().getY());
+		Node n = this.scenario.getNetwork().getFactory().createNode(id, cc);
 		this.scenario.getNetwork().addNode(n);
 		link.setToNode(n);
 	}
@@ -158,6 +163,7 @@ public class EvacuationScenarioCleaner {
 
 	private void handle(ActivityImpl pel, Id actLink) {
 		pel.setLinkId(actLink);
+		pel.setCoord(this.scenario.getNetwork().getLinks().get(actLink).getFromNode().getCoord());
 	}
 
 }
