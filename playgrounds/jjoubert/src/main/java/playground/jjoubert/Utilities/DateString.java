@@ -27,12 +27,12 @@ public class DateString extends GregorianCalendar{
 	/**
 	 * A small utility class that extends the <code>GregorianCalendar</code> and overwrites
 	 * the <code>toString</code> method to return the current time, in the form 
-	 * <code>YYYYMMDDHHMMSS</code> as a <code>String</code>.
+	 * <code>YYYYMMDDHHMMSSsss</code> as a <code>String</code>.
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Returns the date of the class in the form YYYYMMDDHHMMSS.
+	 * Returns the date of the class in the form YYYYMMDDHHMMSSsss.
 	 */
 	@Override
 	public String toString(){
@@ -43,15 +43,11 @@ public class DateString extends GregorianCalendar{
 		int hour = this.get(HOUR_OF_DAY);
 		int minute = this.get(MINUTE);
 		int second = this.get(SECOND);
-		
-		String monthAdd = (month < 10) ? "0" : "";
-		String dayAdd =  (day < 10) ? "0" : "";
-		String hourAdd = (hour < 10) ? "0" : "";
-		String minuteAdd = (minute < 10) ? "0" : "";
-		String secondAdd = (second < 10) ? "0" : "";
-		
-		result = year + monthAdd + month + dayAdd + day + hourAdd + hour + minuteAdd + minute + secondAdd + second;
-		
+		int millisecond = this.get(MILLISECOND);
+			
+		result = String.format("%04d%02d%02d%02d%02d%02d%03d", 
+				year, month, day,
+				hour, minute, second, millisecond);
 		return result;
 	}
 }
