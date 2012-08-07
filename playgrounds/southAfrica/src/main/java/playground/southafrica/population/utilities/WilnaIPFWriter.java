@@ -37,33 +37,42 @@ public class WilnaIPFWriter {
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			bw.write(String.format("HHNR\tHHS\tLQ\tPOP\tINC\tPNR\tAGE\tGEN\tREL\tEMPL\tSCH\n"));
+			bw.write(String.format("HHNR\tPNR\tHHS\tLQ\tPOP\tINC\tPNR\tAGE\tGEN\tREL\tEMPL\tSCH\n"));
+			int personNumber = 1;
 			for(Id personId : population.getPersons().keySet()){
+				
 				Id householdId = new IdImpl(personId.toString().split("_")[0]);
-				bw.write(householdId.toString());
-				bw.write("\t");
-				bw.write(String.valueOf(households.getHouseholds().get(householdId).getMemberIds().size()));
-				bw.write("\t");
-				bw.write(String.valueOf(getDwellingCode((String) householdAttributes.getAttribute(householdId.toString(), "dwellingType"))));
-				bw.write("\t");
-				bw.write(String.valueOf(getPopulationCode((String) householdAttributes.getAttribute(householdId.toString(), "population"))));
-				bw.write("\t");
-				bw.write(String.valueOf(getHouseholdIncomeCode(households.getHouseholds().get(householdId).getIncome() ) ) );
-				bw.write("\t");
-				bw.write(personId.toString().split("_")[1]);
-				bw.write("\t");
-				bw.write(String.valueOf(((PersonImpl) population.getPersons().get(personId)).getAge()));
-				bw.write("\t");
-				int gender = ((PersonImpl) population.getPersons().get(personId)).getSex().equalsIgnoreCase("m") ? 1 : 2;
-				bw.write(String.valueOf(gender));
-				bw.write("\t");
-				bw.write(String.valueOf(getRelationshipCode((String) personAttributes.getAttribute(personId.toString(), "relationship"))));
-				bw.write("\t");
-				int employed = ((PersonImpl) population.getPersons().get(personId)).isEmployed() ? 1 : 0;
-				bw.write(String.valueOf(employed));
-				bw.write("\t");
-				bw.write(String.valueOf(getSchoolCode((String) personAttributes.getAttribute(personId.toString(), "school"))));
-				bw.newLine();
+
+				/* Only add the person if the income class is NOT 13, i.e. unknown. */
+				int incomeCode = getHouseholdIncomeCode(households.getHouseholds().get(householdId).getIncome() );
+				if(incomeCode != 13){
+					bw.write(householdId.toString());
+					bw.write("\t");
+					bw.write(String.valueOf(personNumber++));
+					bw.write("\t");
+					bw.write(String.valueOf(households.getHouseholds().get(householdId).getMemberIds().size()));
+					bw.write("\t");
+					bw.write(String.valueOf(getDwellingCode((String) householdAttributes.getAttribute(householdId.toString(), "dwellingType"))));
+					bw.write("\t");
+					bw.write(String.valueOf(getPopulationCode((String) householdAttributes.getAttribute(householdId.toString(), "population"))));
+					bw.write("\t");
+					bw.write(String.valueOf( incomeCode ) );
+					bw.write("\t");
+					bw.write(personId.toString().split("_")[1]);
+					bw.write("\t");
+					bw.write(String.valueOf(((PersonImpl) population.getPersons().get(personId)).getAge()));
+					bw.write("\t");
+					int gender = ((PersonImpl) population.getPersons().get(personId)).getSex().equalsIgnoreCase("m") ? 1 : 2;
+					bw.write(String.valueOf(gender));
+					bw.write("\t");
+					bw.write(String.valueOf(getRelationshipCode((String) personAttributes.getAttribute(personId.toString(), "relationship"))));
+					bw.write("\t");
+					int employed = ((PersonImpl) population.getPersons().get(personId)).isEmployed() ? 1 : 0;
+					bw.write(String.valueOf(employed));
+					bw.write("\t");
+					bw.write(String.valueOf(getSchoolCode((String) personAttributes.getAttribute(personId.toString(), "school"))));
+					bw.newLine();
+				}
 			}
 			
 		} catch (IOException e) {
