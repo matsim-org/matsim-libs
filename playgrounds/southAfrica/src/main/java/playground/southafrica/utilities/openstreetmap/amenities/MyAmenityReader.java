@@ -200,7 +200,7 @@ public class MyAmenityReader {
 		log.info("Writing facility coordinates to " + file);
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try{
-			bw.write("FacilityId,Long,Lat");
+			bw.write("FacilityId,Long,Lat,Type");
 			bw.newLine();
 			for(Id id : this.amenities.getFacilities().keySet()){
 				ActivityFacility facility = this.amenities.getFacilities().get(id);

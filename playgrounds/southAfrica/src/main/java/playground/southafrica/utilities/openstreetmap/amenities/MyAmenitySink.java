@@ -70,6 +70,8 @@ public class MyAmenitySink implements Sink {
 	private int leisureCounter = 0;
 	private int shoppingCounter = 0;
 	private int otherCounter = 0;
+	private int policeCounter = 0;
+	private int healthcareCounter = 0;
 	
 	public MyAmenitySink(CoordinateTransformation ct) {
 		this.ct = ct;
@@ -109,7 +111,7 @@ public class MyAmenitySink implements Sink {
 				String name = tags.get("name");
 				if(name != null){
 					/* Check education level. */
-					if(activityType.equalsIgnoreCase("education")){
+					if(activityType.equalsIgnoreCase("e")){
 						getEducationLevel(name);
 					}					
 				} else{
@@ -224,7 +226,7 @@ public class MyAmenitySink implements Sink {
 				String name = tags.get("name");
 				if(name != null){
 					/* Check education level. */
-					if(activityType.equalsIgnoreCase("education")){
+					if(activityType.equalsIgnoreCase("e")){
 						getEducationLevel(name);
 					}					
 				} else{
@@ -276,10 +278,12 @@ public class MyAmenitySink implements Sink {
 		log.info("  relations: " + relationFacilities);
 		log.info("------------------------------------------------");
 		log.info("Done creating facilities.");
-		log.info("  education: " + educationCounter);
-		log.info("  leisure  : " + leisureCounter);
-		log.info("  shopping : " + shoppingCounter);
-		log.info("  other    : " + otherCounter);
+		log.info("  education  : " + educationCounter);
+		log.info("  leisure    : " + leisureCounter);
+		log.info("  shopping   : " + shoppingCounter);		
+		log.info("  healthcare : " + healthcareCounter);
+		log.info("  police     : " + policeCounter);
+		log.info("  other      : " + otherCounter);
 		log.info("------------------------------------------------");
 		log.info("Level of education:");
 		log.info(" primary  : " + educationLevelMap.get(new IdImpl("primary")) );
@@ -561,6 +565,21 @@ public class MyAmenitySink implements Sink {
 					amenity.equalsIgnoreCase("brothel")){
 			leisureCounter++;
 			return "l";
+		}else if(
+				amenity.equalsIgnoreCase("clinic") ||
+				amenity.equalsIgnoreCase("dentist") ||
+				amenity.equalsIgnoreCase("doctors") ||
+				amenity.equalsIgnoreCase("hospital") ||
+				amenity.equalsIgnoreCase("nursing_home") ||
+				amenity.equalsIgnoreCase("pharmacy")
+				){
+			healthcareCounter++;
+			return "m";
+		} else if(
+				amenity.equalsIgnoreCase("police")
+				){
+			policeCounter++;
+			return "p";
 		/* OTHER */
 		} else if(
 				amenity.equalsIgnoreCase("library") ||
@@ -569,16 +588,9 @@ public class MyAmenitySink implements Sink {
 				amenity.equalsIgnoreCase("atm") ||
 				amenity.equalsIgnoreCase("bank") ||
 				amenity.equalsIgnoreCase("bureau_de_change") ||
-				amenity.equalsIgnoreCase("clinic") ||
-				amenity.equalsIgnoreCase("dentist") ||
-				amenity.equalsIgnoreCase("doctors") ||
-				amenity.equalsIgnoreCase("hospital") ||
-				amenity.equalsIgnoreCase("nursing_home") ||
-				amenity.equalsIgnoreCase("pharmacy") ||
 				amenity.equalsIgnoreCase("social_centre") ||
 				amenity.equalsIgnoreCase("marketplace") ||
 				amenity.equalsIgnoreCase("place_of_worship") ||
-				amenity.equalsIgnoreCase("police") ||
 				amenity.equalsIgnoreCase("post_office") ||
 				amenity.equalsIgnoreCase("townhall")						
 				){
