@@ -5,6 +5,7 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.analysis.BivariateRealFunction;
 import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
 import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
+import org.apache.log4j.Logger;
 
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
@@ -20,6 +21,8 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
  */
 class BiCubicInterpolator {
 
+	private static final Logger log = Logger.getLogger(BiCubicInterpolator.class);
+	
 	private BivariateRealFunction interpolatingFunction = null;
 	
 	private SpatialGrid sg = null;
@@ -32,6 +35,7 @@ class BiCubicInterpolator {
 	 */
 	BiCubicInterpolator(SpatialGrid sg){
 		this.sg= sg;
+		sgNaNcheck();
 		
 		//create default coordinates for interpolation and compatible array of values
 		double[] x_default= coord(0, sg.getNumCols(0)-1, 1);
@@ -46,6 +50,17 @@ class BiCubicInterpolator {
 		} 
 	}
 	
+	private void sgNaNcheck() {
+		for (double y = this.sg.getYmin(); y <= this.sg.getYmax(); y += this.sg.getResolution()) {
+			for (double x = this.sg.getXmin(); x <= this.sg.getXmax(); x += this.sg.getResolution()) {
+				if (Double.isNaN(this.sg.getValue(x, y))){
+					log.error("Bicubic spline interpolation is not usefull for shapefile data, because it doesn't work with NaN entries. Please use bounding box data without NaN entries.");
+					return;
+				}
+			}
+		}
+	}
+
 	/**
 	 * Interpolates the value on a arbitrary point with bicubic spline interpolation from apache.
 	 * 
@@ -89,23 +104,6 @@ class BiCubicInterpolator {
 			coord[i] = min + i * resolution;
 		}
 		return coord;
-	}
-	
-	/**
-	 * Flips the given matrix horizontal.
-	 * 
-	 * @param matrix
-	 * @return the horizontal mirrored matrix
-	 */
-	@Deprecated
-	private static double[][] flip(double[][] matrix) {
-		double[][] flip= new double[matrix.length][matrix[0].length];
-		for (int i=0; i<flip.length; i++){
-			for (int j=0; j<flip[0].length; j++){
-				flip[i][j]= matrix[matrix.length-1-i][j];
-			}
-		}
-		return flip;
 	}
 	
 }

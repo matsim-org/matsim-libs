@@ -30,7 +30,7 @@ class InverseDistanceWeighting {
 	
 	/**
 	 * Interpolates the value on a arbitrary point with inverse distance weighting.
-	 * Considers only four neighboring values because this method needs less time for calculation than considering all known values and the result is not much different.
+	 * Considers only four neighboring values because this method needs less time for calculation than considering all known values and the result is even more suitable for accessibility interpolation.
 	 * 
 	 * @param xCoord the x-coordinate of the point to interpolate
 	 * @param yCoord the y-coordinate of the point to interpolate
@@ -54,11 +54,10 @@ class InverseDistanceWeighting {
 	static double fourNeighborsIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
 		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
-		if (xDif==0){
-			if (yDif==0){
-				//known value
-				return sg.getValue(xCoord, yCoord);
-			}
+		
+		//known value
+		if (xDif==0 && yDif==0){
+			return sg.getValue(xCoord, yCoord);
 		}
 		
 		double x1= xCoord-xDif;
@@ -66,6 +65,7 @@ class InverseDistanceWeighting {
 		double y1= yCoord-yDif;
 		double y2= y1+sg.getResolution();
 		
+		//calculate distances to the 4 neighbors
 		double d11= Math.pow(distance(x1, y1, xCoord, yCoord), exp);
 		double d12= Math.pow(distance(x1, y2, xCoord, yCoord), exp);
 		double d21= Math.pow(distance(x2, y1, xCoord, yCoord), exp);
@@ -73,17 +73,17 @@ class InverseDistanceWeighting {
 		
 		//interpolation on the boundary
 		if (xCoord == sg.getXmax()){
-			//consider only 2 neighbors (left and right)
+			//consider only 2 neighbors (up and down)
 			return (sg.getValue(x1, y1)/d11 + sg.getValue(x1, y2)/d12) / (1/d11 + 1/d12);
 		}
 		if (yCoord == sg.getYmax()){
-			//consider only 2 neighbors (up and down)
-			return (sg.getValue(x1, y1)/d11 + sg.getValue(x2, y1)/d21) / 1/11 + 1/d21;
+			//consider only 2 neighbors (left and right)
+			return (sg.getValue(x1, y1)/d11 + sg.getValue(x2, y1)/d21) / (1/d11 + 1/d21);
 		}
 		
-		double value= (sg.getValue(x1, y1)/d11 + sg.getValue(x1, y2)/d12 + sg.getValue(x2, y1)/d21 + sg.getValue(x2, y2)/d22) 
+		//interpolation with 4 neighbors
+		return (sg.getValue(x1, y1)/d11 + sg.getValue(x1, y2)/d12 + sg.getValue(x2, y1)/d21 + sg.getValue(x2, y2)/d22) 
 				/ (1/d11 + 1/d12 + 1/d21 + 1/d22);
-		return value;
 	}
 	
 	/**
@@ -100,9 +100,11 @@ class InverseDistanceWeighting {
 	}
 	
 	/**
+	 * Attention: Experimental version. Not tested sufficiently.
+	 * 
 	 * Interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights:
 	 * z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp).
-	 * Needs more time for calculation than fourNeighborsIDW and the result is not much different.
+	 * Needs more time for calculation than fourNeighborsIDW and the result is even less suitable for accessibility interpolation.
 	 * 
 	 * @param sg the SpatialGrid with the known values
 	 * @param xCoord
@@ -110,28 +112,28 @@ class InverseDistanceWeighting {
 	 * @param exp the exponent for the weights. standard values are one or two.
 	 * @return interpolated value at (xCoord, yCoord)
 	 */
+	@Deprecated
 	static double allValuesIDW(SpatialGrid sg, double xCoord, double yCoord, double exp) {
 		double xDif= (xCoord-sg.getXmin()) % sg.getResolution();
 		double yDif= (yCoord-sg.getYmin()) % sg.getResolution();
-		if (xDif==0){
-			if (yDif==0){
-				//known value
-				return sg.getValue(xCoord, yCoord);
-			}
+		
+		//known value
+		if (xDif==0 && yDif==0){
+			return sg.getValue(xCoord, yCoord);
 		}
 		
-		//z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp)
-		double value=0;
+		//interpolation with all neighbors
+		double distanceSum=0;
 		double currentWeight=1;
-		double weightsum=0;
-		for (int row=0; row<sg.getNumRows(); row++){
-			for (int col=0; col<sg.getNumCols(0); col++){
-				currentWeight= Math.pow(distance(sg.getXmin()+col*sg.getResolution(), sg.getYmax()-row*sg.getResolution(), xCoord, yCoord), exp);
-				value+= sg.getValue(xCoord, yCoord)/currentWeight;
-				weightsum+= 1/currentWeight;
+		double weightSum=0;
+		for (double y = sg.getYmin(); y <= sg.getYmax(); y += sg.getResolution()){
+			for (double x = sg.getXmin(); x <= sg.getXmax(); x += sg.getResolution()){
+				currentWeight= Math.pow(distance(x, y, xCoord, yCoord), exp);
+				distanceSum+= sg.getValue(x, y)/currentWeight;
+				weightSum+= 1/currentWeight;
 			}
 		}
-		return value/weightsum;		
+		return distanceSum/weightSum;		
 	}
 	
 }
