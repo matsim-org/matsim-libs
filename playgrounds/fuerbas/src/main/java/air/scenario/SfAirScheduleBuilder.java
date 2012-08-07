@@ -27,8 +27,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -53,8 +53,6 @@ public class SfAirScheduleBuilder {
 
 	public static final String AIRPORTS_OUTPUT_FILE = "airports.txt";
 
-	public static final String OAG_FLIGHTS_OUTPUT_FILENAME = "oag_flights.txt";
-
 	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
 
 	public static final String UTC_OFFSET_FILE = "utc_offsets.txt";
@@ -63,20 +61,20 @@ public class SfAirScheduleBuilder {
 
 	protected Map<String, Coord> airports = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
-	protected Map<String, Double> routes = new HashMap<String, Double>();
+	protected Map<String, Double> routeDurationMap = new HashMap<String, Double>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
 
 	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory,
-			String utcOffsetInputfile) throws Exception {
+			String utcOffsetInputfile, String oagFlightsOutputFilename) throws Exception {
 		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, utcOffsetInputfile);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public void filter(String inputAirportListFile, String inputOagFile, String outputDirectory,
-			String[] countries, String utcOffsetInputfile) throws Exception {
-		String outputOagFile = outputDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
-
+	public DgOagFlightsData filter(String inputAirportListFile, String inputOagFile, String outputDirectory,
+			String[] countries, String utcOffsetInputfile, String oagFlightsOutputFilename) throws Exception {
+		String outputOagFile = oagFlightsOutputFilename;
+		DgOagFlightsData data = new DgOagFlightsData();
 		this.loadAirportList(inputAirportListFile);
 
 		this.loadUtcOffsets(utcOffsetInputfile);
@@ -166,11 +164,11 @@ public class SfAirScheduleBuilder {
 								&& (fullRouting.length() <= 6) ) {
 								
 							if  // filter for desired airports that may be set in DgCreateFlightScenario
-								(  (! DgCreateFlightScenario.doApplyFilter )
-										|| ( DgCreateFlightScenario.filter.containsKey(destinationAirport) && DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.INBOUND))
-										|| ( DgCreateFlightScenario.filter.containsKey(originAirport) && DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.OUTBOUND))
-										|| ( DgCreateFlightScenario.filter.containsKey(originAirport) && DgCreateFlightScenario.filter.get(originAirport).equals(DgCreateFlightScenario.Direction.BOTH))
-										|| ( DgCreateFlightScenario.filter.containsKey(destinationAirport)	&& DgCreateFlightScenario.filter.get(destinationAirport).equals(DgCreateFlightScenario.Direction.BOTH)) 
+								(  (! DgCreateSfFlightScenario.doApplyFilter )
+										|| ( DgCreateSfFlightScenario.filter.containsKey(destinationAirport) && DgCreateSfFlightScenario.filter.get(destinationAirport).equals(DgCreateSfFlightScenario.Direction.INBOUND))
+										|| ( DgCreateSfFlightScenario.filter.containsKey(originAirport) && DgCreateSfFlightScenario.filter.get(originAirport).equals(DgCreateSfFlightScenario.Direction.OUTBOUND))
+										|| ( DgCreateSfFlightScenario.filter.containsKey(originAirport) && DgCreateSfFlightScenario.filter.get(originAirport).equals(DgCreateSfFlightScenario.Direction.BOTH))
+										|| ( DgCreateSfFlightScenario.filter.containsKey(destinationAirport)	&& DgCreateSfFlightScenario.filter.get(destinationAirport).equals(DgCreateSfFlightScenario.Direction.BOTH)) 
 									)
 						 { 
 
@@ -180,18 +178,18 @@ public class SfAirScheduleBuilder {
 								}
 
 								
-								if (DgCreateFlightScenario.doCreateStars) {
+								if (DgCreateSfFlightScenario.doCreateStars) {
 							// desired values for STARs can be defined in DgCreateFlightScenario, otherwise default values will be
 								// used
 
-								if (DgCreateFlightScenario.STARoffset.containsKey(destinationAirport))
-									duration = duration - (DgCreateFlightScenario.STARoffset.get(destinationAirport));
+								if (DgCreateSfFlightScenario.STARoffset.containsKey(destinationAirport))
+									duration = duration - (DgCreateSfFlightScenario.STARoffset.get(destinationAirport));
 								else
-									duration = duration - DgCreateFlightScenario.STARoffset.get("default");
+									duration = duration - DgCreateSfFlightScenario.STARoffset.get("default");
 							}
 
-							if (!this.routes.containsKey(route)) {
-								this.routes.put(route, duration);
+							if (!this.routeDurationMap.containsKey(route)) {
+								this.routeDurationMap.put(route, duration);
 							}
 
 							this.cityPairDistance.put(route, flightDistance);
@@ -207,6 +205,19 @@ public class SfAirScheduleBuilder {
 									aircraftType + "\t" + // aircraft type
 									seatsAvail + "\t" + // seats avail
 									flightDistance); // distance in km
+							DgOagFlight dgf = new DgOagFlight(flightDesignator);
+							dgf.setAircraftType(aircraftType);
+							dgf.setCarrier(carrier);
+							dgf.setDepartureTime(departureInSec);
+							dgf.setDuration(duration);
+							dgf.setAircraftType(aircraftType);
+							dgf.setSeatsAvailable(seatsAvail);
+							dgf.setRoute(route);
+							dgf.setDistanceKm(flightDistance);
+							dgf.setOriginCode(originAirport);
+							dgf.setDestinationCode(destinationAirport);
+							data.addFlight(dgf);
+							
 							flights.put(flightDesignator, "");
 							bwOag.newLine();
 							counter++;
@@ -229,25 +240,23 @@ public class SfAirScheduleBuilder {
 		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputAirportFile)));
 		BufferedWriter bwcityPairs = new BufferedWriter(new FileWriter(new File(cityPairsFile)));
 
-		Iterator it = this.airportsInOag.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it.next();
+		
+		for (Entry<String, Coord> pairs : this.airportsInOag.entrySet()) {
 			bwOsm.write(pairs.getKey().toString() + "\t" + this.airportsInOag.get(pairs.getKey()).getX()
 					+ "\t" + this.airportsInOag.get(pairs.getKey()).getY());
 			bwOsm.newLine();
 		}
 
-		Iterator it3 = this.routes.entrySet().iterator();
-		while (it3.hasNext()) {
-			Map.Entry pairs = (Map.Entry) it3.next();
+		for (Entry<String, Double> pairs : this.routeDurationMap.entrySet()){
 			bwcityPairs.write(pairs.getKey().toString() + "\t"
 					+ this.cityPairDistance.get(pairs.getKey().toString()) + "\t"
-					+ this.routes.get(pairs.getKey().toString()));
+					+ this.routeDurationMap.get(pairs.getKey().toString()));
 			bwcityPairs.newLine();
 		}
+		
 
 		log.info("Anzahl der Airports: " + this.airportsInOag.size());
-		log.info("Anzahl der City Pairs: " + this.routes.size());
+		log.info("Anzahl der City Pairs: " + this.routeDurationMap.size());
 		log.info("Anzahl der Flüge: " + counter);
 		log.info("Anzahl der Zeilen die durch den Länderfilter gefiltert wurden: " + this.filteredDueToCountry);
 		log.info("Anzahl der Zeilen mit Flügen: " + (lines - 1));
@@ -256,6 +265,7 @@ public class SfAirScheduleBuilder {
 		bwcityPairs.flush();
 		bwcityPairs.close();
 		br.close();
+		return data;
 	}
 
 	private static boolean checkCountry(String originCountry, String[] countries) {
@@ -438,16 +448,20 @@ public class SfAirScheduleBuilder {
 				+ "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
 		String outputDirectory = "/media/data/work/repos/"
 				+ "shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
-
-		builder.filter(osmFile, oagFile, outputDirectory, EURO_COUNTRIES, UTC_OFFSET_FILE);
+		
+//		builder.filter(osmFile, oagFile, outputDirectory, EURO_COUNTRIES, UTC_OFFSET_FILE);
 
 		// GERMAN AIR TRAFFIC ONLY BELOW
 
 		outputDirectory = "/media/data/work/repos/"
 				+ "shared-svn/studies/countries/de/flight/sf_oag_flight_model/";
 		builder = new SfAirScheduleBuilder();
-		builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES, UTC_OFFSET_FILE);
+//		builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES, UTC_OFFSET_FILE);
 
+	}
+
+	public Map<String, Coord> getAirportCoordMap() {
+		return this.airportsInOag;
 	}
 
 }

@@ -38,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -48,6 +49,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -74,7 +76,7 @@ public class SfTransitBuilder {
 	
 	
 	public void createSchedule(String inputOagFlights, String inputNetworkFile, String outputDirectory) throws IOException {
-		Scenario scen = this.loadScenario(inputNetworkFile);
+		ScenarioImpl scen = (ScenarioImpl) this.loadScenario(inputNetworkFile);
 		Network network = scen.getNetwork();
 		scen.getConfig().scenario().setUseTransit(true);
 		scen.getConfig().scenario().setUseVehicles(true);
@@ -102,8 +104,9 @@ public class SfTransitBuilder {
 			String transitLine = lineEntries[1];
 			double departureTime = Double.parseDouble(lineEntries[3]);
 			double duration = Double.parseDouble(lineEntries[4]);
-			double distance = 1000*(Double.parseDouble(lineEntries[7])); //km to m
-			double vehicleSpeed =(100*Math.round(distance/(duration-TAXI_TOL_TIME)))/100.;
+			double distance = 1000.0 * (Double.parseDouble(lineEntries[7])); //km to m
+//			double vehicleSpeed =(100*Math.round(distance/(duration-TAXI_TOL_TIME)))/100.;
+			double vehicleSpeed = distance / (duration - TAXI_TOL_TIME);
 			Id originId = new IdImpl(origin);
 			Id destinationId = new IdImpl(destination);
 			Id routeId = new IdImpl(transitRoute);	//origin IATA code + destination IATA code
@@ -132,11 +135,11 @@ public class SfTransitBuilder {
 				
 			//nur ausführen, wenn linkListMap noch keinen entsprechenden key enthält
 			
-			if (!linkListMap.containsKey(routeId) && DgCreateFlightScenario.NUMBER_OF_RUNWAYS==2) {
+			if (!linkListMap.containsKey(routeId) && DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==2) {
 				linkList.add(new IdImpl(origin+"taxiOutbound"));
 				linkList.add(new IdImpl(origin+"runwayOutbound"));
 				linkList.add(new IdImpl(origin+destination));
-				if (DgCreateFlightScenario.doCreateStars) {
+				if (DgCreateSfFlightScenario.doCreateStars) {
 					linkList.add(new IdImpl(destination+"star"));
 				}
 				linkList.add(new IdImpl(destination+"runwayInbound"));
@@ -144,11 +147,11 @@ public class SfTransitBuilder {
 				linkListMap.put(routeId, linkList);
 			}
 			
-			if (!linkListMap.containsKey(routeId) && DgCreateFlightScenario.NUMBER_OF_RUNWAYS==1) {
+			if (!linkListMap.containsKey(routeId) && DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==1) {
 				linkList.add(new IdImpl(origin+"taxiOutbound"));
 				linkList.add(new IdImpl(origin+"runway"));
 				linkList.add(new IdImpl(origin+destination));
-				if (DgCreateFlightScenario.doCreateStars) {
+				if (DgCreateSfFlightScenario.doCreateStars) {
 					linkList.add(new IdImpl(destination+"star"));
 				}
 				linkList.add(new IdImpl(destination+"runway"));
@@ -177,16 +180,17 @@ public class SfTransitBuilder {
 				schedule.addTransitLine(transLine);
 			}
 			
-			if (!veh.getVehicleTypes().containsKey(vehTypeId)) {
-				VehicleType type = veh.getFactory().createVehicleType(vehTypeId);
+			VehicleType type = veh.getVehicleTypes().get(vehTypeId);
+			if (type == null) {
+				type = veh.getFactory().createVehicleType(vehTypeId);
 				VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
 				cap.setSeats(aircraftCapacity);
 				type.setCapacity(cap);
 				type.setMaximumVelocity(vehicleSpeed);
 				veh.getVehicleTypes().put(vehTypeId, type); 
 			}
-			
-			veh.getVehicles().put(flightNumber, veh.getFactory().createVehicle(flightNumber, veh.getVehicleTypes().get(vehTypeId)));
+			Vehicle vehicle = veh.getFactory().createVehicle(flightNumber, type); 
+			veh.getVehicles().put(flightNumber, vehicle);
 			
 		}
 		

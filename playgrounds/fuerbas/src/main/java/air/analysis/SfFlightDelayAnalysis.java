@@ -25,183 +25,142 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
+/**
+ * When using SfAirController flight delays can be analyzed using this class. Range of delays may be determined by
+ * MIN_MAX_DELAY, any delays larger (or smaller for negative values) will be accumulated. DELAY_OUTPUT_INTERVAL can be
+ * used to define an interval within which delay will be accumulated.
+ * 
+ * @author fuerbas
+ * @author dgrether
+ * 
+ */
 public class SfFlightDelayAnalysis {
 
-	/**
-	 * @author fuerbas
-	 * When using SfAirController flight delays can be analyzed using this class. Range of delays may be determined by
-	 * MIN_MAX_DELAY, any delays larger (or smaller for negative values) will be accumulated. DELAY_OUTPUT_INTERVAL
-	 * can be used to define an interval within which delay will be accumulated.
-	 */
+	private static final Logger log = Logger.getLogger(SfFlightDelayAnalysis.class);
+
+	private static final int DELAY_OUTPUT_INTERVAL = 5; // set interval for delay accumulation
+
+	// private static String actualTimes = "Z:\\WinHome\\munich_output\\ITERS\\it.0\\0.statistic.csv";
+	// private static String scheduledTimes=
+	// "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\oag_flights.txt";
+	// private static String delayOutput = "Z:\\WinHome\\munich_output\\delay.csv";
+	// private static String delayOutputAcc = "Z:\\WinHome\\munich_output\\delay_acc.csv";
+	// private static String delaySingleFlight = "";
+
+//	private static String scheduledTimes = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/sf_oag_flight_model/oag_flights.txt";
+//	private static String actualTimes = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/1801.0.statistic.csv";
+//	private static String delayOutput = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/1801.0.delay.csv";
+//	// private static String delayOutputAcc = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.delay_acc.csv";
+//	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/1801.0.delay_by_flight.csv";
+
+//	private static String scheduledTimes = "/media/data/work/repos/shared-svn/studies/countries/de/flight/sf_oag_flight_model/oag_flights.txt";
+//	private static String actualTimes = "/media/data/work/matsim/matsimOutput/run1802/ITERS/it.0/1802.0.statistic.csv";
+//	private static String delayOutput = "/media/data/work/matsim/matsimOutput/run1802/ITERS/it.0/1802.0.delay.csv";
+//	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/run1802/ITERS/it.0/1802.0.delay_by_flight.csv";
+
+	private static String scheduledTimes = "/media/data/work/repos/shared-svn/studies/countries/de/flight/sf_oag_flight_model/oag_flights.txt";
+	private static String actualTimes = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.statistic.csv";
+	private static String delayOutput = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.delay.csv";
+	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.delay_by_flight.csv";
+
 	
-	private Map<String, Double> actualArrival;
-	private Map<String, Double> scheduledArrival;
-	private Map<Integer, Integer> delay;
-	private Map<Integer, Integer> delayAcc;
-	
-	private static final int MIN_MAX_DELAY = 60;	//set desired min./max. delay
-	private static final int DELAY_OUTPUT_INTERVAL = 5;		//set interval for delay accumulation
-	
-//	private static String actualTimes = "Z:\\WinHome\\munich_output\\ITERS\\it.0\\0.statistic.csv";
-//	private static String scheduledTimes= "Z:\\WinHome\\shared-svn\\studies\\countries\\de\\flight\\sf_oag_flight_model\\munich\\flight_model_muc_all_flights\\oag_flights.txt";
-//	private static String delayOutput = "Z:\\WinHome\\munich_output\\delay.csv";
-//	private static String delayOutputAcc = "Z:\\WinHome\\munich_output\\delay_acc.csv";
-//	private static String delaySingleFlight = "";
-	
-	private static String scheduledTimes= "/media/data/work/repos/shared-svn/studies/countries/eu/flight/sf_oag_flight_model/oag_flights.txt";
-	private static String actualTimes = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.statistic.csv";
-	private static String delayOutput = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.delay.csv";
-	private static String delayOutputAcc = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.delay_acc.csv";
-	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/run1801/ITERS/it.0/0.delay_by_flight.csv";
-	
-	public SfFlightDelayAnalysis() {
-		this.actualArrival = new HashMap<String, Double>(); 
-		this.scheduledArrival = new HashMap<String, Double>();
-		this.delay = new TreeMap<Integer, Integer>();
-		this.delayAcc = new TreeMap<Integer, Integer>();
+	private Map<String, Double> readActualArrivals(String filename) throws IOException {
+		Map<String, Double> map = new HashMap<String, Double>();
+		BufferedReader brActual = new BufferedReader(new FileReader(new File(filename)));
+		int lines = 0;
+		while (brActual.ready()) {
+			String line = brActual.readLine();
+			String[] entries = line.split("\t");
+			String flightNumber = entries[0];
+			if (lines > 0) {
+				Double arrival = Double.parseDouble(entries[1]) / 60;
+				map.put(flightNumber, arrival);
+			}
+			lines++;
+		}
+		brActual.close();
+		return map;
 	}
-	
+
+	private void analyzeDelays() throws Exception {
+		SortedMap<Integer, Integer> delay = new TreeMap<Integer, Integer>();
+		Map<String, Double> actualArrival = new HashMap<String, Double>();
+		Map<String, Double> scheduledArrival = new HashMap<String, Double>();
+
+		BufferedReader brScheduled = new BufferedReader(new FileReader(new File(scheduledTimes)));
+		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File(
+				delaySingleFlight)));
+		actualArrival = this.readActualArrivals(actualTimes);
+
+		while (brScheduled.ready()) {
+			String line = brScheduled.readLine();
+			String[] entries = line.split("\t");
+			String flightNumber = entries[2];
+
+			if (actualArrival.containsKey(flightNumber)) {
+				Double arrival = Double.parseDouble(entries[3]) + Double.parseDouble(entries[4]);
+				scheduledArrival.put(flightNumber, arrival / 60);
+				Integer flightDelay = (int) Math.round(actualArrival.get(flightNumber)
+						- scheduledArrival.get(flightNumber));
+
+				bwDelaySingleFlights.write(flightNumber + "\t" + actualArrival.get(flightNumber) + "\t"
+						+ flightDelay);
+				bwDelaySingleFlights.newLine();
+
+				if (!delay.containsKey(flightDelay)) {
+					delay.put(flightDelay, 0);
+				}
+				int soFar = delay.get(flightDelay);
+				soFar++;
+				delay.put(flightDelay, soFar);
+			}
+			else {
+				log.warn("No actual arrival for scheduled flight nr " + flightNumber);
+			}
+		}
+
+		brScheduled.close();
+		bwDelaySingleFlights.close();
+
+		this.writeDelays(delay, delayOutput);
+
+	}
+
+	private void writeDelays(SortedMap<Integer, Integer> delay, String filename) throws IOException {
+		BufferedWriter bwDelay = new BufferedWriter(new FileWriter(new File(filename)));
+		bwDelay.write("Delay in minutes \t Number of Delays");
+		bwDelay.newLine();
+
+		for (int i = delay.firstKey() - 2; i < delay.lastKey() + 2; i ++) {
+			Integer numberFlights = delay.get(i);
+			if (numberFlights == null) {
+				numberFlights = 0;
+			}
+			bwDelay.write(Integer.toString(i) +"\t" + numberFlights);
+			bwDelay.newLine();
+		}
+
+		bwDelay.flush();
+		bwDelay.close();
+	}
+
 	public static void main(String[] args) {
 
-		SfFlightDelayAnalysis ana = new SfFlightDelayAnalysis();	
+		SfFlightDelayAnalysis ana = new SfFlightDelayAnalysis();
+		log.info("done!");
 		try {
 			ana.analyzeDelays();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private void analyzeDelays() throws Exception {
-		
-		BufferedReader brActual = new BufferedReader(new FileReader(new File(actualTimes)));
-		BufferedReader brScheduled = new BufferedReader(new FileReader(new File(scheduledTimes)));
-		BufferedWriter bwDelay = new BufferedWriter(new FileWriter(new File(delayOutput)));
-		BufferedWriter bwDelayAcc = new BufferedWriter(new FileWriter(new File(delayOutputAcc)));
-		BufferedWriter bwDelaySingleFlights = new BufferedWriter(new FileWriter(new File(delaySingleFlight)));
-		
-		for (int kk=0; kk<=(MIN_MAX_DELAY+1); kk++) {
-			this.delay.put(kk, 0);
-			this.delay.put(-kk, 0);
-		}
-		
-		for (int kk=0; kk<=(MIN_MAX_DELAY+1); kk++) {
-			if (kk%DELAY_OUTPUT_INTERVAL == 0) {
-				this.delayAcc.put(kk, 0);
-				this.delayAcc.put(-kk, 0);			
-			}
-			else if (kk == (MIN_MAX_DELAY+1)) {
-				this.delayAcc.put(kk, 0);
-				this.delayAcc.put(-kk, 0);
-			}
-		}
-		
-		int lines = 0;
-			
-		while (brActual.ready()) {
-			
-				String line = brActual.readLine();
-				String[] entries = line.split("\t");
-				String flightNumber = entries[0];
-				if (lines>0) {
-				Double arrival = Double.parseDouble(entries[1])/60;
-				this.actualArrival.put(flightNumber, arrival);
-			}
-			lines++;
-		}
-		
-		brActual.close();
-			
-		while (brScheduled.ready()) {
-			String line = brScheduled.readLine();
-			String[] entries = line.split("\t");
-			String flightNumber = entries[2];
-			if (this.actualArrival.containsKey(flightNumber)) {
-			Double arrival = Double.parseDouble(entries[3])+Double.parseDouble(entries[4]);
-			this.scheduledArrival.put(flightNumber, arrival/60);
-			long flightDelay = Math.round(this.actualArrival.get(flightNumber)-this.scheduledArrival.get(flightNumber));
-			
-			bwDelaySingleFlights.write(flightNumber+"\t"+this.actualArrival.get(flightNumber)+"\t"+flightDelay);
-			bwDelaySingleFlights.newLine();
-			
-				if (flightDelay==0) {
-					int soFar = this.delay.get(0);
-					soFar++;
-					this.delay.put(0, soFar);
-					this.delayAcc.put(0, soFar);
-				}
-			
-				for (int ii=1; ii<=MIN_MAX_DELAY; ii++) {
-					if (flightDelay == ii) {
-						int soFar = this.delay.get(ii);
-						soFar++;
-						this.delay.put(ii, soFar);
-						int delay;
-						if (ii%DELAY_OUTPUT_INTERVAL == 0) delay = ii;
-						else delay = ii - (ii%DELAY_OUTPUT_INTERVAL) + DELAY_OUTPUT_INTERVAL;
-						int soFarAcc = this.delayAcc.get(delay);
-						soFarAcc++;
-						this.delayAcc.put(delay, soFarAcc);
-					}
-					else if (flightDelay>MIN_MAX_DELAY) {
-						int soFar = this.delay.get(MIN_MAX_DELAY+1);
-						soFar++;
-						this.delay.put(MIN_MAX_DELAY+1, soFar);
-						this.delayAcc.put(MIN_MAX_DELAY+1, soFar);
-						break;
-					}
-				}
-				
-				for (int jj=1; jj<=MIN_MAX_DELAY; jj++) {
-					if (flightDelay == (-jj)) {
-						int soFar = this.delay.get(-jj);
-						soFar++;
-						this.delay.put(-jj, soFar);
-						int delay;
-						if (jj%DELAY_OUTPUT_INTERVAL == 0) delay = -jj;
-						else delay = -(jj - (jj%DELAY_OUTPUT_INTERVAL) + DELAY_OUTPUT_INTERVAL);
-						int soFarAcc = this.delayAcc.get(delay);
-						soFarAcc++;
-						this.delayAcc.put(delay, soFarAcc);
-					}
-					else if (flightDelay<-MIN_MAX_DELAY) {
-						int soFar = this.delay.get(-(MIN_MAX_DELAY+1));
-						soFar++;
-						this.delay.put(-(MIN_MAX_DELAY+1), soFar);
-						this.delayAcc.put(-(MIN_MAX_DELAY+1), soFar);
-						break;
-					}
-				}
-			}
-		}
-		brScheduled.close();
-		bwDelaySingleFlights.close();
-		bwDelay.write("Delay in minutes \t Number of Delays");
-		bwDelay.newLine();
-		bwDelayAcc.write("Delay in minutes \t Number of Delays");
-		bwDelayAcc.newLine();
-		
-		Iterator it = this.delay.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)it.next();
-	        bwDelay.write(pairs.getKey().toString()+"\t"+pairs.getValue());
-	        bwDelay.newLine();
-	    }
-	    
-		Iterator it2 = this.delayAcc.entrySet().iterator();
-	    while (it2.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)it2.next();
-	        bwDelayAcc.write(pairs.getKey().toString()+"\t"+pairs.getValue());
-	        bwDelayAcc.newLine();
-	    }
-	    bwDelay.flush();
-	    bwDelay.close();
-	    bwDelayAcc.flush();
-	    bwDelayAcc.close();
 	}
 
 }

@@ -58,7 +58,7 @@ public class SfAirNetworkBuilder {
 			Coord coord = new CoordImpl(xValue, yValue);
 			Coord airportCoord = coordtransform.transform(coord);
 			airportcounter++;
-			if (DgCreateFlightScenario.NUMBER_OF_RUNWAYS==2)
+			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==2)
 				new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createTwoRunways(network);
 			else
 				new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createOneRunway(network);
@@ -76,7 +76,7 @@ public class SfAirNetworkBuilder {
 			String destination = airportCodes[1];
 			
 			Id originRunwayOutNodeId;
-			if (DgCreateFlightScenario.NUMBER_OF_RUNWAYS==2) {
+			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==2) {
 				originRunwayOutNodeId = new IdImpl(origin+"runwayOutbound");
 			}
 			else {
@@ -84,12 +84,12 @@ public class SfAirNetworkBuilder {
 			}
 			
 			Node destinationNode = null;
-			if (DgCreateFlightScenario.doCreateStars) {
+			if (DgCreateSfFlightScenario.doCreateStars) {
 				Id destinationStar = new IdImpl(destination+"star");
 				destinationNode = network.getNodes().get(destinationStar);
 			}
 			else {
-				if (DgCreateFlightScenario.NUMBER_OF_RUNWAYS == 2){
+				if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS == 2){
 					destinationNode = network.getNodes().get(new IdImpl(destination + "runwayInbound"));
 				}
 				else {
