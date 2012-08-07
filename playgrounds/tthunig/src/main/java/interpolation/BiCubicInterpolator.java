@@ -106,21 +106,4 @@ class BiCubicInterpolator {
 		return coord;
 	}
 	
-	/**
-	 * Flips the given matrix horizontal.
-	 * 
-	 * @param matrix
-	 * @return the horizontal mirrored matrix
-	 */
-	@Deprecated
-	private static double[][] flip(double[][] matrix) {
-		double[][] flip= new double[matrix.length][matrix[0].length];
-		for (int i=0; i<flip.length; i++){
-			for (int j=0; j<flip[0].length; j++){
-				flip[i][j]= matrix[matrix.length-1-i][j];
-			}
-		}
-		return flip;
-	}
-	
 }
