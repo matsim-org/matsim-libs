@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CoordI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,28 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.api.core.v01;
+package org.matsim.utils.objectattributes.attributeconverters;
+
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 /**
- * In MATSim, generally Cartesian Coordinates are used, with x increasing
- * to the right, and y increasing to the top:
- * <pre>
- *     ^
- *   y |
- *     |     x
- *   (0/0) ---->
- * </pre>
+ * @author mrieser
  */
-public interface Coord {
+public class LongConverter implements AttributeConverter<Long> {
+	@Override
+	public Long convert(String value) {
+		return Long.valueOf(value);
+	}
 
-	public void setX(final double x); 
-
-	public void setY(final double y);
-
-	public void setXY(final double x, final double y);
-
-	public double getX();
-
-	public double getY();
-
+@Override
+	public String convertToString(Object o) {
+		return ((Long) o).toString();
+	}
 }

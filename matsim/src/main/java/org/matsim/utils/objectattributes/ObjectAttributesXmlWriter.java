@@ -34,6 +34,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
 import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
 import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
+import org.matsim.utils.objectattributes.attributeconverters.LongConverter;
 import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
 
 /**
@@ -56,6 +57,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 	private static final IntegerConverter INTEGER_Converter = new IntegerConverter();
 	private static final DoubleConverter DOUBLE_Converter = new DoubleConverter();
 	private static final BooleanConverter BOOLEAN_Converter = new BooleanConverter();
+	private static final LongConverter LONG_Converter = new LongConverter();
 
 	private final ObjectAttributes attributes;
 	private final Map<String, AttributeConverter<? extends Object>> converters = new HashMap<String, AttributeConverter<? extends Object>>();
@@ -67,6 +69,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 		this.converters.put(Integer.class.getCanonicalName(), INTEGER_Converter);
 		this.converters.put(Double.class.getCanonicalName(), DOUBLE_Converter);
 		this.converters.put(Boolean.class.getCanonicalName(), BOOLEAN_Converter);
+		this.converters.put(Long.class.getCanonicalName(), LONG_Converter);
 	}
 
 	public void writeFile(final String filename) throws UncheckedIOException {
