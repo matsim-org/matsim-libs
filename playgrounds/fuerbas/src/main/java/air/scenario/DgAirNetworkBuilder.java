@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 /**
  * @author dgrether
@@ -51,14 +52,18 @@ public class DgAirNetworkBuilder {
 
 	private Map<Id, SfMatsimAirport> airportMap;
 
-	public DgAirNetworkBuilder(Scenario scenario) {
+	private CoordinateTransformation transform;
+
+	public DgAirNetworkBuilder(Scenario scenario, CoordinateTransformation transform) {
 		this.scenario = scenario;
+		this.transform = transform;
 	}
 
 	private Map<Id, SfMatsimAirport> createAndAddAirports(Map<String, Coord> airports, Network network){
 		Map<Id, SfMatsimAirport> airportMap = new HashMap<Id, SfMatsimAirport>();
 		for (Entry<String, Coord> e : airports.entrySet()) {
-			SfMatsimAirport airport = new SfMatsimAirport(new IdImpl(e.getKey()), e.getValue());
+			Coord transformedCoord = this.transform.transform(e.getValue());
+			SfMatsimAirport airport = new SfMatsimAirport(new IdImpl(e.getKey()), transformedCoord);
 			airportMap.put(airport.getId(), airport);
 			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS == 2) {
 				airport.createTwoRunways(network);

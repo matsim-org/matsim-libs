@@ -74,7 +74,7 @@ public class DgTransitBuilder {
 		TransitScheduleFactory sf = schedule.getFactory();
 		
 		for (DgOagFlight flight : flightsData.getFlightDesignatorFlightMap().values()){
-			Id lineId = new IdImpl(flight.getOriginCode() + "_" + flight.getDestinationCode());
+			Id lineId = new IdImpl(flight.getOriginCode() + "_" + flight.getDestinationCode() + "_" + flight.getCarrier());
 			TransitLine line = schedule.getTransitLines().get(lineId);
 			if (line == null) {
 				line = sf.createTransitLine(lineId);

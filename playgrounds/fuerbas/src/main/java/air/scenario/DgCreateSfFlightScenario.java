@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import air.analysis.DgNet2Shape;
 
@@ -156,7 +158,8 @@ public class DgCreateSfFlightScenario {
 			shapeFileDirectory.delete();
 		}
 		shapeFileDirectory.mkdir();
-		DgNet2Shape.writeNetwork2Shape(networkFilename, shapeFileDirectoryname + SfAirNetworkBuilder.NETWORK_FILENAME + ".shp");
+		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:3395");
+		DgNet2Shape.writeNetwork2Shape(networkFilename, crs, shapeFileDirectoryname + SfAirNetworkBuilder.NETWORK_FILENAME + ".shp");
 	}
 
 	/**
