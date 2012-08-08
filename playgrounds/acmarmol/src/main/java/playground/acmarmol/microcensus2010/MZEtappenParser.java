@@ -78,24 +78,24 @@ public class MZEtappenParser {
 				
 				//wege mode
 				String mode = entries[7].trim();
-				if(mode.equals("1")){mode = "walk";}
-				else if(mode.equals("2")){mode = "bicycle";}
-				else if(mode.equals("3")){mode = "mofa";}
-				else if(mode.equals("4") || mode.equals("5") || mode.equals("6")){mode = "motorcycle";}
-				else if(mode.equals("7") || mode.equals("8")){mode = "car";}
-				else if(mode.equals("9")){mode = "train";}
-				else if(mode.equals("10")){mode = "postauto";}
-				else if(mode.equals("11")){mode = "bus";}
-				else if(mode.equals("12")){mode = "tram";}
-				else if(mode.equals("13")){mode = "taxi";}
-				else if(mode.equals("14")){mode = "reisecar";}
-				else if(mode.equals("15")){mode = "truck";}
-				else if(mode.equals("16")){mode = "ship";}
-				else if(mode.equals("17")){mode = "plane";}
-				else if(mode.equals("18") || mode.equals("20")){mode = "other";}
-				else if(mode.equals("19")){mode = "plane";}
-				else if(mode.equals("20")){mode = "skateboard/skates";}
-				else if(mode.equals("-99")){mode = "Pseudoetappe";}
+				int modeInt = 0; //save mode as integer to be able to use hierarchy
+				if(mode.equals("1")){modeInt = 15;}
+				else if(mode.equals("2")){modeInt = 14;}
+				else if(mode.equals("3")){modeInt = 13;}
+				else if(mode.equals("4") || mode.equals("5") || mode.equals("6")){modeInt = 12;}
+				else if(mode.equals("7") || mode.equals("8")){modeInt = 9;}
+				else if(mode.equals("9")){modeInt = 2;}
+				else if(mode.equals("10")){modeInt = 3;}
+				else if(mode.equals("11")){modeInt = 6;}
+				else if(mode.equals("12")){modeInt = 5;}
+				else if(mode.equals("13")){modeInt = 11;}
+				else if(mode.equals("14")){modeInt = 8;}
+				else if(mode.equals("15")){modeInt = 10;}
+				else if(mode.equals("16")){modeInt = 4;}
+				else if(mode.equals("17")){modeInt = 1;}
+				else if(mode.equals("18") || mode.equals("20")){modeInt = 17;}
+				else if(mode.equals("19")){modeInt = 16;}
+				else if(mode.equals("-99")){modeInt = 99;}
 				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 				//car type
@@ -123,8 +123,14 @@ public class MZEtappenParser {
 				// arrival time (min => sec.)
 				int arrival = Integer.parseInt(entries[14].trim())*60;
 				
+				
+				//start country and end country (for cross-border handling)
+				String sland = entries[43].trim();
+				String zland = entries[63].trim();
+				
+				
 				int nr_etappen = (Integer) wegeAttributes.getAttribute(wid.toString(),"number of etappen")+1;
-				this.wegeAttributes.putAttribute(wid.toString(), "etappe".concat( String.valueOf(nr_etappen)) , new Etappe(departure, arrival, start_coord, end_coord, mode));
+				this.wegeAttributes.putAttribute(wid.toString(), "etappe".concat( String.valueOf(nr_etappen)) , new Etappe(departure, arrival, start_coord, end_coord, modeInt, sland,zland));
 				this.wegeAttributes.putAttribute(wid.toString(), "number of etappen", nr_etappen);
 				
 				

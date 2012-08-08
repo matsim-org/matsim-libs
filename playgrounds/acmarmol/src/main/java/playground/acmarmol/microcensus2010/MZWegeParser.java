@@ -84,7 +84,7 @@ public class MZWegeParser {
 		Set<Id> coord_err_pids = new HashSet<Id>();
 		Set<Id> time_err_pids = new HashSet<Id>();
 		Set<Id> neg_coord_pids = new HashSet<Id>();
-		Set<Id> border_crossing_pids = new HashSet<Id>();
+		
 		
 		FileReader fr = new FileReader(wegeFile);
 		BufferedReader br = new BufferedReader(fr);
@@ -137,17 +137,8 @@ public class MZWegeParser {
 			//starting and ending country ( == 8100 for switzerland)
 			String sland = entries[36].trim();
 			String zland = entries[56].trim();
-			if(!sland.equals("8100") || !zland.equals("8100")){
-				if((!sland.equals("8100") && !zland.equals("8100"))){
-					wegeAttributes.putAttribute(wid.toString(), "Out of border type", "completely out");	
-				} //completely out of CH
-				else if((sland.equals("8100") && !zland.equals("8100"))){
-					wegeAttributes.putAttribute(wid.toString(), "Out of border type", "out");	
-				}  //going-out of CH
-				else if((!sland.equals("8100") && zland.equals("8100"))){
-					wegeAttributes.putAttribute(wid.toString(), "Out of border type", "in");					
-				} //entering CH
-			border_crossing_pids.add(wid);}
+			wegeAttributes.putAttribute(wid.toString(), "start land", sland);
+			wegeAttributes.putAttribute(wid.toString(), "end land", zland);
 			
 				
 			// departure time (min => sec.)
@@ -212,7 +203,7 @@ public class MZWegeParser {
 			// adding acts/legs
 			if (plan.getPlanElements().size() != 0) { // already lines parsed and added (not first wege)
 				ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
-			
+				
 				LegImpl previous_leg = (LegImpl)plan.getPlanElements().get(plan.getPlanElements().size()-2);
 				from_act.setEndTime(departure);
 				LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
@@ -250,10 +241,10 @@ public class MZWegeParser {
 				leg.setDepartureTime(departure);
 				leg.setTravelTime(arrival-departure);
 				leg.setArrivalTime(arrival);
-				GenericRouteImpl route = new GenericRouteImpl(null, null);
-				leg.setRoute(route);
-				route.setDistance(distance);
-				route.setTravelTime(leg.getTravelTime());
+				//GenericRouteImpl route = new GenericRouteImpl(null, null);
+				//leg.setRoute(route);
+				//route.setDistance(distance);
+				//route.setTravelTime(leg.getTravelTime());
 				ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(purpose,end_coord);
 				act.setStartTime(arrival);
 			}
@@ -271,8 +262,7 @@ public class MZWegeParser {
 		err_pids.add(coord_err_pids);
 		err_pids.add(time_err_pids);
 		err_pids.add(neg_coord_pids);
-		err_pids.add(border_crossing_pids);
-		
+			
 		return err_pids;
 			
 	}
