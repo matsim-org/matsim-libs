@@ -227,6 +227,9 @@ public class SfAirScheduleBuilder {
 					}
 					}
 			}
+			if (lines % 10000 == 0){
+				log.info("Read " + lines +  " lines of oag data...");
+			}
 		}
 
 		bwOag.flush();

@@ -60,7 +60,7 @@ public class DgTransitBuilder {
 		TransitScheduleFactory sf = schedule.getFactory();
 		
 		for (SfMatsimAirport airport : airportMap.values()){
-			TransitStopFacility transitStopFacility = sf.createTransitStopFacility(airport.getId(), airport.coord, false);
+			TransitStopFacility transitStopFacility = sf.createTransitStopFacility(airport.getId(), airport.coordApronEnd, false);
 			transitStopFacility.setLinkId(airport.getStopFacilityLinkId());
 			schedule.addStopFacility(transitStopFacility);
 		}

@@ -150,7 +150,7 @@ public class DgCreateDgFlightScenario {
 	 */
 	public static void main(String[] args) throws Exception {
 		//WORLD WIDE AIR TRAFFIC
-			createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
+//			createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
 
 		//EUROPEAN AIR TRAFFIC
 //			createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
