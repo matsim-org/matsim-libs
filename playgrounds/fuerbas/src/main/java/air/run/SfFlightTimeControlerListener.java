@@ -36,7 +36,11 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 
 
-
+/**
+ * @author fuerbas
+ * @author dgrether
+ *
+ */
 public class SfFlightTimeControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private SfFlightTimeEventHandler flightTimeHandler;
@@ -52,17 +56,18 @@ public class SfFlightTimeControlerListener implements StartupListener, Iteration
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
 		this.writeStats(event);
-		
+		this.computeAndWriteDelay(event);
 	}
 	
+	private void computeAndWriteDelay(IterationEndsEvent event) {
+		
+	}
+
 	
 	private void writeStats(IterationEndsEvent event){
 		try {
@@ -90,8 +95,6 @@ public class SfFlightTimeControlerListener implements StartupListener, Iteration
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	

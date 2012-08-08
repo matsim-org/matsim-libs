@@ -19,11 +19,35 @@
  * *********************************************************************** */
 package air.scenario;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * @author dgrether
  *
  */
-public class DgAirportCapacityData {
+public class DgAirportsCapacityData {
 
+		private Map<String, DgAirportCapacity> airportMap = new HashMap<String, DgAirportCapacity>();
+
+		private DgAirportCapacity defaultAirportCapacity;
+	
+		public DgAirportsCapacityData(double capacityPeriodSeconds){
+			this.defaultAirportCapacity = new DgAirportCapacity("default", capacityPeriodSeconds);
+		}
+		
+		
+		public DgAirportCapacity getAirportCapacity(String airportCode){
+			DgAirportCapacity airportCapacity = this.airportMap.get(airportCode);
+			 if (airportCapacity != null) {
+				 return airportCapacity;
+			 }
+			 return defaultAirportCapacity;
+		}
+	
+		public void addAirportCapacity(DgAirportCapacity airportCapacity){
+			this.airportMap.put(airportCapacity.getAirportCode(), airportCapacity);
+		}
+		
 }

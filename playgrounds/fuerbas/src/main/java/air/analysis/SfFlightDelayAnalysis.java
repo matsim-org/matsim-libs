@@ -66,7 +66,7 @@ public class SfFlightDelayAnalysis {
 //	private static String delayOutput = "/media/data/work/matsim/matsimOutput/run1802/ITERS/it.0/1802.0.delay.csv";
 //	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/run1802/ITERS/it.0/1802.0.delay_by_flight.csv";
 
-	private static String scheduledTimes = "/media/data/work/repos/shared-svn/studies/countries/de/flight/sf_oag_flight_model/oag_flights.txt";
+	private static String scheduledTimes = "/media/data/work/repos/shared-svn/studies/countries/de/flight/dg_oag_flight_model_no_cap_constraints/oag_flights.txt";
 	private static String actualTimes = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.statistic.csv";
 	private static String delayOutput = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.delay.csv";
 	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.delay_by_flight.csv";

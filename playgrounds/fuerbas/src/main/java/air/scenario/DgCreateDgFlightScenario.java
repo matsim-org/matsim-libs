@@ -22,12 +22,14 @@ package air.scenario;
 import java.io.File;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -44,34 +46,40 @@ import air.analysis.DgNet2Shape;
  */
 public class DgCreateDgFlightScenario {
 
-	private static String utcOffsetfile = "/media/data/work/repos/shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
-	private static String dataBaseDirectory = "/media/data/work/repos/";
-	private static String inputAirportsFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
-	private static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
+	private static final Logger log = Logger.getLogger(DgCreateDgFlightScenario.class);
+	
+	private static final double CAPACITY_PERIOD = 3600.0;
+	
 	private static final String OAG_FLIGHTS_OUTPUT_FILENAME = "oag_flights.txt";
-	private static final String flightScenarioName = "dg_oag_flight_model_no_cap_constraints/";
-
 	private static final String FLIGHT_TRANSIT_SCHEDULE = "flight_transit_schedule.xml";
-	
 	private static final String FLIGHT_TRANSIT_VEHICLES = "flight_transit_vehicles.xml";
-	private static final CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
-	private static final CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
-	
 
-	private static ScenarioImpl initScenario(){
+	private String dataBaseDirectory = "/media/data/work/repos/";
+	private String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
+	private String inputAirportsCoordinatesFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
+	private String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
+	private String flightScenarioDirectoryName = "dg_oag_flight_model_no_cap_constraints/";
+	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
+	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
+	private DgFlightScenarioDefaults defaults = new DgFlightScenarioDefaults(CAPACITY_PERIOD);
+
+	private ScenarioImpl initScenario(){
 		Config conf = ConfigUtils.createConfig();
 		conf.scenario().setUseTransit(true);
 		conf.scenario().setUseVehicles(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
+		((NetworkImpl)scenario.getNetwork()).setCapacityPeriod(CAPACITY_PERIOD);
 		return scenario;
 	}
 
 
 
-	private static void createScenario(String baseDirectory, DgOagFlightsData flightsData, Map<String, Coord> airports){
+	private void createScenario(String baseDirectory, DgOagFlightsData flightsData, Map<String, Coord> airports){
+		log.info("Coordinate system is: "); 
+		log.info(targetCrs.getCoordinateSystem().getRemarks());
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
 		ScenarioImpl scenario = initScenario();
-		DgAirNetworkBuilder networkBuilder = new DgAirNetworkBuilder(scenario, transform);
+		DgAirNetworkBuilder networkBuilder = new DgAirNetworkBuilder(scenario, transform, defaults);
 		networkBuilder.createNetwork(flightsData, airports, outputNetworkFilename);
 		Map<Id, SfMatsimAirport> airportMap = networkBuilder.getAirportMap();
 		//
@@ -83,9 +91,9 @@ public class DgCreateDgFlightScenario {
 		
 	}
 
-	private static void createWorldFlightScenario(String inputOsmFilename,
+	public void createWorldFlightScenario(String inputOsmFilename,
 			String inputOagFilename) throws Exception {
-		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/" + flightScenarioName;
+		String baseDirectory = dataBaseDirectory + "shared-svn/studies/countries/world/flight/" + flightScenarioDirectoryName;
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 		
@@ -99,8 +107,8 @@ public class DgCreateDgFlightScenario {
 	}	
 
 	
-	public static void createEuropeanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
-		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/" + flightScenarioName;
+	public void createEuropeanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
+		String baseDirectory = dataBaseDirectory + "shared-svn/studies/countries/eu/flight/" + flightScenarioDirectoryName;
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
@@ -116,8 +124,8 @@ public class DgCreateDgFlightScenario {
 	}
 
 	
-	public static void createGermanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
-		String baseDirectory = "/media/data/work/repos/shared-svn/studies/countries/de/flight/" + flightScenarioName;
+	public void createGermanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
+		String baseDirectory = dataBaseDirectory + "shared-svn/studies/countries/de/flight/" + flightScenarioDirectoryName;
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
@@ -131,7 +139,7 @@ public class DgCreateDgFlightScenario {
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 
-	private static void writeConnectionData(String baseDirectory, Scenario scenario, Map<String, Coord> airports,
+	private void writeConnectionData(String baseDirectory, Scenario scenario, Map<String, Coord> airports,
 			DgOagFlightsData flightsData, CoordinateReferenceSystem crs) {
 		String shapeFileDirectoryname = baseDirectory + "shape_epsg_3395/";
 		File shapeFileDirectory = new File(shapeFileDirectoryname);
@@ -148,15 +156,15 @@ public class DgCreateDgFlightScenario {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws Exception {
+	public void main(String[] args) throws Exception {
 		//WORLD WIDE AIR TRAFFIC
-//			createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
+//			new DgCreateDgFlightScenario().createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
 
 		//EUROPEAN AIR TRAFFIC
-//			createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
+//			new DgCreateDgFlightScenario().createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
 
 		// GERMAN AIR TRAFFIC
-		createGermanFlightScenario(inputAirportsFilename, inputOagFilename);
+		new DgCreateDgFlightScenario().createGermanFlightScenario(inputAirportsCoordinatesFilename, inputOagFilename);
 	}
 
 

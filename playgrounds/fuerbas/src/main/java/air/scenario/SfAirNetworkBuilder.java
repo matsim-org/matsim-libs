@@ -59,9 +59,9 @@ public class SfAirNetworkBuilder {
 			Coord airportCoord = coordtransform.transform(coord);
 			airportcounter++;
 			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==2)
-				new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createTwoRunways(network);
+				new SfMatsimAirport(new IdImpl(airportCode), airportCoord, null).createTwoRunways(network);
 			else
-				new SfMatsimAirport(new IdImpl(airportCode), airportCoord).createOneRunway(network);
+				new SfMatsimAirport(new IdImpl(airportCode), airportCoord, null).createOneRunway(network);
 		}
 		
 		while (brRoutes.ready()) {

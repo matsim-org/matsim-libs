@@ -54,16 +54,20 @@ public class DgAirNetworkBuilder {
 
 	private CoordinateTransformation transform;
 
-	public DgAirNetworkBuilder(Scenario scenario, CoordinateTransformation transform) {
+	private DgFlightScenarioDefaults modelConfig;
+
+	public DgAirNetworkBuilder(Scenario scenario, CoordinateTransformation transform, DgFlightScenarioDefaults modelConfig) {
 		this.scenario = scenario;
 		this.transform = transform;
+		this.modelConfig = modelConfig;
 	}
 
 	private Map<Id, SfMatsimAirport> createAndAddAirports(Map<String, Coord> airports, Network network){
 		Map<Id, SfMatsimAirport> airportMap = new HashMap<Id, SfMatsimAirport>();
 		for (Entry<String, Coord> e : airports.entrySet()) {
 			Coord transformedCoord = this.transform.transform(e.getValue());
-			SfMatsimAirport airport = new SfMatsimAirport(new IdImpl(e.getKey()), transformedCoord);
+			DgAirportCapacity capacityData = modelConfig.getAirportCapacityData(e.getKey());
+			SfMatsimAirport airport = new SfMatsimAirport(new IdImpl(e.getKey()), transformedCoord, capacityData);
 			airportMap.put(airport.getId(), airport);
 			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS == 2) {
 				airport.createTwoRunways(network);

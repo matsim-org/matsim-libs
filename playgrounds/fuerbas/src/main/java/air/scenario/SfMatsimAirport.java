@@ -77,10 +77,12 @@ public class SfMatsimAirport {
 	private Link linkRunwayOutbound;
 	private Link linkRunwayInbound;
 	private Coord coord;
+	private DgAirportCapacity capacityData;
 
-	public SfMatsimAirport(Id id, Coord coord) {
+	public SfMatsimAirport(Id id, Coord coord, DgAirportCapacity capacityData) {
 		this.id = id;
 		this.coord = coord;
+		this.capacityData = capacityData;
 		allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
 		allowedModes.add("car");
@@ -118,17 +120,16 @@ public class SfMatsimAirport {
 	}
 
 	private void createApron(Network network) {
-		Id idApron = this.id; // Id for apron link and central airport node
-		Id idApronEnd = new IdImpl(this.id + "apron"); // Id for end of apron node
-		nodeApronStart = network.getFactory().createNode(idApron, this.coordApronEnd); // central node of any airport
-		nodeApronEnd = network.getFactory().createNode(idApronEnd, coordApronStart); // end of apron node, apron is used for
-																																								// parking and as transit stop
+		Id idApron = this.id; 
+		Id idApronEnd = new IdImpl(this.id + "apron"); 
+		nodeApronStart = network.getFactory().createNode(idApron, this.coordApronEnd); 
+		nodeApronEnd = network.getFactory().createNode(idApronEnd, coordApronStart); 
 		network.addNode(nodeApronStart);
 		network.addNode(nodeApronEnd);
 		Link linkApron = network.getFactory().createLink(idApron, nodeApronStart, nodeApronEnd);
 		this.transitStopFacilityId = linkApron.getId();
 		linkApron.setAllowedModes(allowedModes);
-		linkApron.setCapacity(10. * network.getCapacityPeriod());
+		linkApron.setCapacity(this.capacityData.getApronFlowCapacityCarEquivPerHour());
 		linkApron.setLength(taxiwayLength);
 		linkApron.setFreespeed(taxiwayFreespeed);
 		network.addLink(linkApron);
@@ -166,11 +167,11 @@ public class SfMatsimAirport {
 		linkTaxiOutbound = network.getFactory().createLink(idNodeTaxiOutStart, nodeApronEnd, nodeTaxiOutboundEnd);
 		linkTaxiInbound.setAllowedModes(allowedModes);
 		linkTaxiOutbound.setAllowedModes(allowedModes);
-		linkTaxiInbound.setCapacity(10. * network.getCapacityPeriod());
+		linkTaxiInbound.setCapacity(this.capacityData.getInboundTaxiwayFlowCapacityCarEquivPerHour());
 		// linkTaxiIn.setNumberOfLanes(0.015);
-		linkTaxiInbound.setNumberOfLanes(4.0);
+		linkTaxiInbound.setNumberOfLanes(1.0);
 		// linkTaxiOut.setCapacity((1./60.)*network.getCapacityPeriod());
-		linkTaxiOutbound.setCapacity(10. * network.getCapacityPeriod());
+		linkTaxiOutbound.setCapacity(this.capacityData.getOutboundTaxiwayFlowCapacityCarEquivPerHour());
 		linkTaxiInbound.setLength(taxiwayLength);
 		linkTaxiOutbound.setLength(taxiwayLength);
 		linkTaxiInbound.setFreespeed(taxiwayFreespeed);
@@ -192,16 +193,20 @@ public class SfMatsimAirport {
 		linkRunwayInbound.setAllowedModes(allowedModes);
 		linkRunwayInbound.setFreespeed(runwayFreespeed);
 		linkRunwayInbound.setLength(runwayLength);
-		linkRunwayInbound.setCapacity(10. * network.getCapacityPeriod());
+		linkRunwayInbound.setCapacity(this.capacityData.getRunwayInboundFlowCapacityCarEquivPerHour());
+		// c_s = link_length * nr_lanes / 7.5 -> nr_lanes = c_s /link_length * 7.5, using c_s = 1
+		linkRunwayInbound.setNumberOfLanes(1.0 / runwayLength * 7.5);
 
 		linkRunwayOutbound = network.getFactory().createLink(idRunwayOut, nodeTaxiOutboundEnd,
 				nodeRunwayOutboundEnd);
 		linkRunwayOutbound.setAllowedModes(allowedModes);
 		linkRunwayOutbound.setLength(runwayLength);
 		linkRunwayOutbound.setFreespeed(runwayFreespeed);
-		linkRunwayOutbound.setCapacity((10.) * network.getCapacityPeriod());
-		linkRunwayOutbound.setNumberOfLanes(4.0);
-
+		linkRunwayOutbound.setCapacity(this.capacityData.getRunwayOutboundFlowCapacity_CarEquivPerHour());
+		// c_s = link_length * nr_lanes / 7.5 -> nr_lanes = c_s /link_length * 7.5, using c_s = 1
+		linkRunwayOutbound.setNumberOfLanes(1.0 / runwayLength * 7.5);
+		
+		
 		network.addLink(linkRunwayInbound);
 		network.addLink(linkRunwayOutbound);
 
@@ -216,14 +221,16 @@ public class SfMatsimAirport {
 		linkRunwayInbound = network.getFactory()
 				.createLink(idRunwayIn, nodeTaxiOutboundEnd, nodeTaxiInboundStart);
 		linkRunwayInbound.setAllowedModes(allowedModes);
-		linkRunwayInbound.setCapacity((1.) * network.getCapacityPeriod());
+		linkRunwayInbound.setCapacity(this.capacityData.getRunwayInboundFlowCapacityCarEquivPerHour() 
+				+	this.capacityData.getRunwayOutboundFlowCapacity_CarEquivPerHour());
 		linkRunwayInbound.setLength(runwayLength);
 		linkRunwayInbound.setFreespeed(runwayFreespeed);
+		// c_s = link_length * nr_lanes / 7.5 -> nr_lanes = c_s /link_length * 7.5, using c_s = 1
+		linkRunwayInbound.setNumberOfLanes(1.0 / runwayLength * 7.5);
 		network.addLink(linkRunwayInbound);
 		this.incomingFlightsNodeId = linkRunwayInbound.getFromNode().getId();
 		this.outgoingFlightsNodeId = linkRunwayInbound.getToNode().getId();
 		linkRunwayOutbound = linkRunwayInbound;
-
 	}
 
 	private void createDepartureLinkIdList() {
