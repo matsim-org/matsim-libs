@@ -39,7 +39,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.misc.StringUtils;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
@@ -48,8 +47,8 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  * @author Ihab
  *
  */
-public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
-	private static final Logger log = Logger.getLogger(ParkAndRideAddRemoveStrategy.class);
+public class ParkAndRideAddStrategy implements PlanStrategyModule {
+	private static final Logger log = Logger.getLogger(ParkAndRideAddStrategy.class);
 
 	private ScenarioImpl sc;
 	private Network net;
@@ -58,7 +57,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
 	private int nrOfPrFacilitiesForReplanning = 0; // 0 means all P+R-Facilities are used for replanning
 	
-	public ParkAndRideAddRemoveStrategy(Controler controler, Map<Id, ParkAndRideFacility> id2prFacility, Map<Id, List<PrWeight>> personId2prWeights) {
+	public ParkAndRideAddStrategy(Controler controler, Map<Id, ParkAndRideFacility> id2prFacility, Map<Id, List<PrWeight>> personId2prWeights) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
@@ -85,46 +84,41 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 				log.info("Plan contains Home and Work Activity. Proceeding...");
 
 					final int rndWork = (int)(MatsimRandom.getRandom().nextDouble() * planIndices.getWorkActs().size());
-					log.info("PlanElements of possible Work Activities: " + planIndices.getWorkActs() + ". Creating / Removing Park'n'Ride before and after Work Activity " + planIndices.getWorkActs().get(rndWork) + "...");
+					log.info("PlanElements of possible Work Activities: " + planIndices.getWorkActs() + ". Creating Park'n'Ride before and after Work Activity " + planIndices.getWorkActs().get(rndWork) + "...");
 					
 					int workIndex;
 					int maxHomeBeforeWork;
 					int minHomeAfterWork;
 
-					// Checks if HWH-Sequence has Park'n'Ride /////////////////////////////
-					System.out.println(">>>> P+R Check...");
+					// Check if home-work-home sequence contains park-and-ride
+					
 					planIndices.setIndices();
 					
 					workIndex = planIndices.getWorkActs().get(rndWork);					
 					minHomeAfterWork = planIndices.getMinHomeAfterWork(workIndex);
 					maxHomeBeforeWork = planIndices.getMaxHomeBeforeWork(workIndex);
 
-					List<Integer> prIndicesToRemove = new ArrayList<Integer>();
+					List<Integer> indicesPRact = new ArrayList<Integer>();
 					for (Integer prIndex : planIndices.getPrActs()){
 						if (prIndex > maxHomeBeforeWork && prIndex < minHomeAfterWork){
-							prIndicesToRemove.add(prIndex);
+							indicesPRact.add(prIndex);
 						}
 					}
-					System.out.println("Park'n'Ride indices: " + prIndicesToRemove);
 					
-					if (prIndicesToRemove.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities in this Home-Work-Home Sequence. Aborting...");
+					if (indicesPRact.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities in this Home-Work-Home Sequence. Aborting...");
 					
-					if (prIndicesToRemove.isEmpty()){
+					if (indicesPRact.isEmpty()){
 						
-						log.info("Home-Work-Home sequence doesn't contain Park'n'Ride. Adding Park'n'Ride...");
+						log.info("Home-Work-Home sequence doesn't contain Park'n'Ride. Adding Park'n'Ride to this Home-Work-Home sequence...");
 						
 						// create ParkAndRideActivity
 						planIndices.setIndices();
 						Activity parkAndRide = createParkAndRideActivity(planIndices, planIndices.getWorkActs().get(rndWork), plan);
 						
-						// First P+R //////////////////////////////
-						System.out.println(">>>> First P+R Leg...");
+						// First P+R activity //////////////////////////////
 						planIndices.setIndices();
 						workIndex = planIndices.getWorkActs().get(rndWork);
-						System.out.println("work: " + workIndex);
-
 						maxHomeBeforeWork = planIndices.getMaxHomeBeforeWork(workIndex);
-						System.out.println("home (before work): " + maxHomeBeforeWork);
 
 						int transformIntoPRLeg1 = 0;
 
@@ -132,7 +126,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 							// no activities between home and work
 							transformIntoPRLeg1 = maxHomeBeforeWork + 1;
 						} else {
-							// activities between home and work, randomly chose a leg
+							// activities between home and work, randomly choose a leg
 							List<Integer> legIndex = new ArrayList<Integer>();
 							for (Integer actIndex : planIndices.getAllActs()){
 								if (actIndex > maxHomeBeforeWork && actIndex < workIndex){
@@ -160,21 +154,18 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 						planElements.add(transformIntoPRLeg1 + 1, parkAndRide);
 						planElements.add(transformIntoPRLeg1 + 2, pop.getFactory().createLeg(TransportMode.pt));
 						
-						// Second P+R /////////////////////////////////
+						// Second P+R activity /////////////////////////////////
 						System.out.println(">>>> Second P+R Leg...");
 						planIndices.setIndices();
-						workIndex = planIndices.getWorkActs().get(rndWork);
-						System.out.println("work: " + workIndex);
-						
+						workIndex = planIndices.getWorkActs().get(rndWork);						
 						minHomeAfterWork = planIndices.getMinHomeAfterWork(workIndex);
-						System.out.println("home (after work): " + minHomeAfterWork);
 												
 						int transformIntoPRLeg2 = 0;
 						if ((minHomeAfterWork - workIndex) == 2){
 							// no activities between home and work
 							transformIntoPRLeg2 = minHomeAfterWork - 1;
 						} else {
-							// activities between home and work, randomly chose a leg
+							// activities between home and work, randomly choose a leg
 							List<Integer> legIndex = new ArrayList<Integer>();
 							for (Integer actIndex : planIndices.getAllActs()){
 								if (actIndex < minHomeAfterWork && actIndex > workIndex){
@@ -202,17 +193,12 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 						planElements.add(transformIntoPRLeg2 + 1, parkAndRide);
 						planElements.add(transformIntoPRLeg2 + 2, pop.getFactory().createLeg(TransportMode.car));
 						
-						// adjust leg modes /////////////////////////////
-						System.out.println(">>>> Adjust leg modes for:");
+						// adjust leg modes
 						planIndices.setIndices();
 						
-						workIndex = planIndices.getWorkActs().get(rndWork);
-						System.out.println(" - work: " + workIndex);
-						
+						workIndex = planIndices.getWorkActs().get(rndWork);						
 						minHomeAfterWork = planIndices.getMinHomeAfterWork(workIndex);
 						maxHomeBeforeWork = planIndices.getMaxHomeBeforeWork(workIndex);
-						System.out.println(" - home (before work): " + maxHomeBeforeWork);
-						System.out.println(" - home (after work): " + minHomeAfterWork);
 
 						List<Integer> prIndices = new ArrayList<Integer>();
 						for (Integer prIndex : planIndices.getPrActs()){
@@ -220,7 +206,6 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 								prIndices.add(prIndex);
 							}
 						}
-						System.out.println(" - Park'n'Ride: " + prIndices);
 						
 						if (prIndices.size() > 2) throw new RuntimeException("More than two ParkAndRide Activities in this Home-Work-Home Sequence. Aborting...");
 						
@@ -238,54 +223,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 						}
 				}
 				else {
-					log.info("Home-Work-Home sequence contains a ParkAndRide Activity. Removing the ParkAndRide Activity and randomly chose a leg Mode for the remaining leg.");
-
-					int remove0 = prIndicesToRemove.get(0);
-					int remove1 = prIndicesToRemove.get(1);
-					
-					// adjust leg modes in this home-work-home sequence
-					planIndices.setIndices();
-					workIndex = planIndices.getWorkActs().get(rndWork);					
-					minHomeAfterWork = planIndices.getMinHomeAfterWork(workIndex);
-					maxHomeBeforeWork = planIndices.getMaxHomeBeforeWork(workIndex);
-										
-					List<String> availableModes = new ArrayList<String>();
-					availableModes.add(TransportMode.car);
-					availableModes.add(TransportMode.pt);
-					
-//					String modes = sc.getConfig().multiModal().getSimulatedModes();
-//					if (modes != null) {
-//						String[] parts = StringUtils.explode(modes, ',');
-//						for (int i = 0, n = parts.length; i < n; i++) {
-//							String mode = parts[i].trim().intern();
-//							if (availableModes.contains(mode)){
-//							} else {
-//								availableModes.add(mode);
-//							}
-//						}
-//					}
-					
-					log.info("Chosing mode from: " + availableModes);
-					int rndModeIndex = (int)(MatsimRandom.getRandom().nextDouble() * availableModes.size());
-					String mode = availableModes.get(rndModeIndex);
-					log.info("Chosen mode: " + mode);
-					for (int i = 0; i < planElements.size(); i++) {
-						PlanElement pe = planElements.get(i);
-						if (i == remove0-1 || i == remove0+1 || i == remove1-1 || i == remove1+1){
-							// legs before / after P+R
-							Leg leg = (Leg) pe;
-							leg.setMode(mode);
-						}
-					}
-					
-					planElements.remove(remove1 - 1);
-					planElements.remove(remove1 - 1);
-					
-					planElements.remove(remove0);
-					planElements.remove(remove0);
-					
-					// legs vor/nach anderen Aktivitäten innerhalb der HWH-Sequenz --> rndLegMode!
-					// ...
+					log.info("Home-Work-Home sequence contains a ParkAndRide Activity. Not modifying the plan...");
 				}
 						
 			} else {
@@ -313,7 +251,7 @@ public class ParkAndRideAddRemoveStrategy implements PlanStrategyModule {
 			prWeights = this.personId2prWeights.get(plan.getPerson().getId());
 		}
 		
-		log.info("Chose ParkAndRide Facility depending on weight...");
+		log.info("Choose ParkAndRide Facility depending on weight...");
 		Link rndPrLink = ellipseSearch.getRndPrLink(this.net, this.id2prFacility, prWeights);
 		
 		Activity parkAndRide = new ActivityImpl(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPrLink.getToNode().getCoord(), rndPrLink.getId()); 
