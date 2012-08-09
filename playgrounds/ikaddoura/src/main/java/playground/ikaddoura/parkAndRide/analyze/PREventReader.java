@@ -44,13 +44,13 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  */
 public class PREventReader {
 	
-	static String prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRfacilities_berlin.txt";
-	static String networkFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlin/PRnetwork_berlin.xml";
-	static String eventFile = "../../shared-svn/studies/ihab/parkAndRide/outputBerlin/testAgent_commuter/1.events.xml.gz";
+	static String prFacilityFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/input/PRfacilities_berlin.txt";
+	static String networkFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/input/PRnetwork_berlin.xml";
+	static String eventFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/berlin_run1_transferPenalty0/ITERS/it.100/100.events.xml.gz";
 	
 	// output
-	static String prTimesFile = "../../shared-svn/studies/ihab/parkAndRide/outputBerlin/testAgent_commuter/prTimes.txt";
-	static String prUsersFile = "../../shared-svn/studies/ihab/parkAndRide/outputBerlin/testAgent_commuter/prUsers.txt";
+	static String prTimesFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/PRana_times_run1.txt";
+	static String prUsersFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/PRana_users_run1.txt";
 	
 	public static void main(String[] args) {
 		PREventReader reader = new PREventReader();
