@@ -65,10 +65,6 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
 
-	public DgOagFlightsData filter(String inputOsmFilename, String inputOagFilename, String outputDirectory,
-			String utcOffsetInputfile, String oagFlightsOutputFilename) throws Exception {
-		return this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, utcOffsetInputfile);
-	}
 
 	@SuppressWarnings("rawtypes")
 	public DgOagFlightsData filter(String inputAirportListFile, String inputOagFile, String outputDirectory,

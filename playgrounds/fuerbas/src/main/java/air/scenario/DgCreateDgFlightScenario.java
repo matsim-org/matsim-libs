@@ -98,7 +98,7 @@ public class DgCreateDgFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, utcOffsetfile, oagFlightsFilename);
+		DgOagFlightsData flightsData = airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);

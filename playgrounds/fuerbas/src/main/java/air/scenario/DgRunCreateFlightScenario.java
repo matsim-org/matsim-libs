@@ -32,8 +32,8 @@ public class DgRunCreateFlightScenario {
 	public static void main(String[] args) throws Exception {
 		//WORLD WIDE AIR TRAFFIC
 		new DgCreateDgFlightScenario().createWorldFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, DgCreateDgFlightScenario.inputOagFilename);
-
-	//EUROPEAN AIR TRAFFIC
+//
+//	//EUROPEAN AIR TRAFFIC
 		new DgCreateDgFlightScenario().createEuropeanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, DgCreateDgFlightScenario.inputOagFilename);
 
 	// GERMAN AIR TRAFFIC
