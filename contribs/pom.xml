@@ -89,6 +89,7 @@
 		<module>matsim4urbansim</module>
 		<module>networkEditor</module>
 		<module>otfvis</module>
+		<module>transEnergySim</module>
 	</modules>
 	<repositories>
 		<repository>
