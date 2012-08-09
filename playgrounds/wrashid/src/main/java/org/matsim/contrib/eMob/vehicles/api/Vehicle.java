@@ -24,6 +24,6 @@ import org.matsim.contrib.eMob.vehicles.energyConsumption.EnergyConsumptionModel
 
 public interface Vehicle {
 
-	public void updateEnergyUse(Link link, double averageSpeedDriven);
+	public void updateEnergyUse(Link link, double averageSpeedDrivenInMetersPerSecond);
 	
 }

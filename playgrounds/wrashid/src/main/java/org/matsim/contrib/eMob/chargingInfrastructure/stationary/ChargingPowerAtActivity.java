@@ -17,43 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.eMob.vehicles.api;
+package org.matsim.contrib.eMob.chargingInfrastructure.stationary;
 
-import org.matsim.api.core.v01.network.Link;
+public class ChargingPowerAtActivity {
 
-import playground.wrashid.lib.DebugLib;
-
-/**
- * vehicle has only battery (no combustion engine)
- * 
- * @author wrashid
- * 
- */
-public abstract class BatteryElectricVehicle extends VehicleWithBattery {
-
-	/**
-	 * as electric vehicles can run out of battery during the simulation, this
-	 * has also to be taken into account
-	 */
-	private boolean didRunOutOfBattery=false;
 	
-	@Override
-	public void useBattery(double energyConsumptionInJoule){
-		super.useBattery(energyConsumptionInJoule);
+	
+	public double getAvailableChargingPower(String activityLocation){
 		
-		if (socInJoules<0){
-			didRunOutOfBattery=true;
-		}
-	}
-	
-	
-	
-	public void updateEnergyUse(Link link, double averageSpeedDriven){
-		double energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
+		return 0;
 		
-		useBattery(energyConsumptionForLinkInJoule);
 	}
-			
-	
 	
 }

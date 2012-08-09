@@ -17,8 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.eMob.vehicles.api;
+package org.matsim.contrib.eMob.chargingInfrastructure.stationary;
 
-public interface ChargingPlug {
+import org.matsim.api.core.v01.Id;
 
+public interface ChargingPowerAtLink {
+
+	public double getAvailableChargingPowerInWatt(Id linkId);
+	
 }
