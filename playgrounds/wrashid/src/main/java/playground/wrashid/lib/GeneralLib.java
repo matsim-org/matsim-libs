@@ -571,7 +571,6 @@ public class GeneralLib {
 		} else {
 			return endIntervalTime + (secondsInOneDay - startIntervalTime);
 		}
-
 	}
 
 	/**

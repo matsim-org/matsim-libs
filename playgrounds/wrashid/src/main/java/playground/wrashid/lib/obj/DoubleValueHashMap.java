@@ -19,6 +19,10 @@ public class DoubleValueHashMap<KeyClass> {
 
 	private HashMap<KeyClass, Double> hm = new HashMap<KeyClass, Double>();
 	
+	public boolean containsKey(KeyClass id){
+		return hm.containsKey(id);
+	}
+	
 	public Collection<Double> values(){
 		return hm.values();
 	}
