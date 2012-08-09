@@ -19,9 +19,18 @@
 
 package org.matsim.contrib.eMob.controllers;
 
-public class EMobInductiveChargingControler {
+import org.matsim.core.controler.Controler;
+
+public class EMobInductiveChargingControler extends Controler {
+
+	public EMobInductiveChargingControler(String[] args) {
+		super(args);
+		// TODO Auto-generated constructor stub
+	}
 
 	public static void main(String[] args) {
+		new EMobInductiveChargingControler(args).run();
+		
 		
 	}
 	
