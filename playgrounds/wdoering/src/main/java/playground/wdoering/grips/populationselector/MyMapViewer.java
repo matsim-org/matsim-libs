@@ -36,6 +36,10 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -61,7 +65,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private GeoPosition c0;
 	private GeoPosition c1;
 	
-	private ArrayList<GeoPosition> newLine = null;
 
 	private ShapeToStreetSnapperThreadWrapper snapper;
 
@@ -69,8 +72,19 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	private Polygon areaPolygon;
 
-	public MyMapViewer() {
+	private int currentIndex;
+	
+	private PopulationAreaSelector populationAreaSelector;
+
+	private int selectedAreaId = -1;
+
+	private boolean drawing = false;
+
+	public MyMapViewer(PopulationAreaSelector populationAreaSelector) {
 		super();
+		
+		this.populationAreaSelector = populationAreaSelector;
+		
 		this.m = super.getMouseListeners();
 		for (MouseListener l : this.m) {
 			super.removeMouseListener(l);
@@ -92,6 +106,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
 		this.addKeyListener(this);
+		
+		this.currentIndex = 0;
 	}
 
 	@Override
@@ -135,7 +151,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			Point p0 = e.getPoint();
 			Point wldPoint = new Point(p0.x+b.x,p0.y+b.y);
 			this.c0 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
-			this.newLine = new ArrayList<GeoPosition>();
 		}
 		
 		if (!this.editMode) {
@@ -159,11 +174,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			Rectangle b = this.getViewportBounds();
 			Point wldPoint = new Point(p1.x+b.x,p1.y+b.y);
 			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
-			this.snapper.setCoordinates(this.c0,this.c1);
+			
+			this.snapper.setIndexAndCoordinates(this.currentIndex, this.c0,this.c1);
+			
+			this.currentIndex++;
 //			this.thread.interrupt();
 			this.thread = new Thread(this.snapper);
 			this.thread.start();
-			this.newLine=null;
 //			this.thread.
 			repaint();
 		}
@@ -218,7 +235,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			Rectangle b = this.getViewportBounds();
 			Point wldPoint = new Point(p.x+b.x,p.y+b.y);
 			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
-			this.newLine.add(c1);
 			repaint();
 		}
 		
@@ -234,9 +250,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	}
 
 	@Override
-	public void paint(Graphics g) {
+	public void paint(Graphics g)
+	{
 		
 		super.paint(g);
+		
+		//set drawing boolean (to avoid race conditions (polygon hashmap))
+		drawing = true;
+		
 		Rectangle b = this.getViewportBounds();
 
 		//draw area polygon
@@ -260,67 +281,99 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			g.fillPolygon(x, y, areaPolygon.getExteriorRing().getNumPoints());
 		}
 		
+		//draw population polygon(s)
 		if (this.c0 != null && this.c1 != null)
 		{
-			g.setColor(Color.magenta);
+			g.setColor(Color.red);
 			Graphics2D g2D = (Graphics2D) g;     
 			g2D.setStroke(new BasicStroke(2F));
 			
 
-			
-			
-			Polygon p = this.snapper.getPolygon();
-			if (p != null) {
-				int [] x = new int[p.getExteriorRing().getNumPoints()];
-				int [] y = new int[p.getExteriorRing().getNumPoints()];
-				for (int i = 0; i < p.getExteriorRing().getNumPoints(); i++) {
-					Coordinate c = p.getExteriorRing().getCoordinateN(i);
-					Point2D wldPoint = this.getTileFactory().geoToPixel(new GeoPosition(c.y,c.x), this.getZoom());
-					x[i] = (int) (wldPoint.getX()-b.x);
-					y[i] = (int) (wldPoint.getY()-b.y);
-					if (i > 0) {
-						g.drawLine(x[i-1], y[i-1], x[i], y[i]);
-					}
-				}
-				g.setColor(new Color(255,0,0,128));
-				g.fillPolygon(x, y, p.getExteriorRing().getNumPoints());
-				
-				
-			} else if (newLine!=null) {
-				
-				//first point
-				Point2D wldPoint0 = this.getTileFactory().geoToPixel(this.c0, this.getZoom());
-				Point sc0 = new Point((int)(wldPoint0.getX() - b.x), (int)(wldPoint0.getY() - b.y));
-				
-				//draw from first point to second
-				Point2D wldPoint = this.getTileFactory().geoToPixel(newLine.get(0), this.getZoom());
-				Point sc = new Point((int)(wldPoint.getX() - b.x), (int)(wldPoint.getY() - b.y));
-				Point lastSc = (Point) sc.clone();
-				
-				g.drawLine(sc0.x, sc0.y, sc.x, sc.y);
-				
-				for (GeoPosition gp : newLine)
-				{
-					wldPoint = this.getTileFactory().geoToPixel(gp, this.getZoom());
-					sc = new Point((int)(wldPoint.getX() - b.x), (int)(wldPoint.getY() - b.y));
-					
-					g.drawLine(lastSc.x, lastSc.y, sc.x, sc.y);
-					
-					lastSc = (Point) sc.clone();
-					
-				}
-				
-//				int r = (int) (Math.sqrt(Math.pow(sc0.x-sc1.x, 2)+Math.pow(sc0.y-sc1.y, 2))+0.5);
-//				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
-//				g.setColor(new Color(255,0,0,128));
-//				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
+			//get already selected areas
+			HashMap<Integer, Polygon> polys = null;
+			try
+			{
+				polys = this.snapper.getPolygons();
 			}
+			catch (ConcurrentModificationException e) {}
+			
+			
+			if (polys != null)
+			{
+				
+				Iterator it = polys.entrySet().iterator();
+				while (it.hasNext())
+				{
+					Map.Entry<Integer,Polygon> pairs = (Map.Entry)it.next();
+					int id = pairs.getKey();
+					Polygon p = pairs.getValue();
+					
+					int [] x = new int[p.getExteriorRing().getNumPoints()];
+					int [] y = new int[p.getExteriorRing().getNumPoints()];
+					for (int i = 0; i < p.getExteriorRing().getNumPoints(); i++) {
+						Coordinate c = p.getExteriorRing().getCoordinateN(i);
+						Point2D wldPoint = this.getTileFactory().geoToPixel(new GeoPosition(c.y,c.x), this.getZoom());
+						x[i] = (int) (wldPoint.getX()-b.x);
+						y[i] = (int) (wldPoint.getY()-b.y);
+						if (i > 0) {
+							g.drawLine(x[i-1], y[i-1], x[i], y[i]);
+						}
+					}
+					if (selectedAreaId==id)
+						g.setColor(new Color(255,0,0,128));
+					else
+						g.setColor(new Color(180,127,0,128));
+					
+					g.fillPolygon(x, y, p.getExteriorRing().getNumPoints());
+					
+					
+//					com.vividsolutions.jts.geom.Point c = p.getCentroid();
+//					Point2D centerPoint = this.getTileFactory().geoToPixel(new GeoPosition(c.getY(),c.getX()), this.getZoom());
+//					g.setColor(Color.black);
+//					
+//					g.drawString(""+id, (int)(centerPoint.getX()-b.x), (int)(centerPoint.getY()-b.y));
+				}
+				
+				
+			}
+			
+			if (editMode)
+			{
+				Point2D wldPoint0 = this.getTileFactory().geoToPixel(this.c0, this.getZoom());
+				Point2D wldPoint1 = this.getTileFactory().geoToPixel(this.c1, this.getZoom());
+				
+				Point sc0 = new Point((int)(wldPoint0.getX() - b.x), (int)(wldPoint0.getY() - b.y));
+				Point sc1 = new Point((int)(wldPoint1.getX() - b.x), (int)(wldPoint1.getY() - b.y));
+
+				int r = (int) (Math.sqrt(Math.pow(sc0.x-sc1.x, 2)+Math.pow(sc0.y-sc1.y, 2))+0.5);
+				g.setColor(new Color(255,127,0,255));
+				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
+				g.setColor(new Color(255,127,0,128));
+				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
+			}
+
 		}
+		drawing = false;
 	}
 
 	public void setSnapper(ShapeToStreetSnapperThreadWrapper snapper) {
 		this.snapper = snapper;
 		this.snapper.setView(this);		
+		
+	}
+
+	public void setSelectedArea(int id)
+	{
+		selectedAreaId  = id;
+		
+	}
+
+	public void removeArea(int id)
+	{
+		while(drawing)
+			continue;
+		
+		this.snapper.getPolygons().remove(id);
 		
 	}
 

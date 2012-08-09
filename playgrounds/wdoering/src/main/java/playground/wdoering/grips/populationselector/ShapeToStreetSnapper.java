@@ -93,7 +93,12 @@ public class ShapeToStreetSnapper {
 	}
 
 	public Polygon run(Polygon p) {
+		
 		List<Node> nodes  = getBoundaryNodes(p);
+		
+		if (nodes.size()<1)
+			return null;
+		
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
 		TravelDisutility cost = new TravelCost(p);
 		LeastCostPathCalculator dijkstra = new Dijkstra(this.sc.getNetwork(), cost, fs);
@@ -116,6 +121,9 @@ public class ShapeToStreetSnapper {
 		if (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * ((CoordImpl)nn0.getCoord()).calcDistance(nn1.getCoord()) ){
 			finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 		}
+		
+		if (finalNodes.size()<2)
+			return null;
 
 		Set<Integer> rmIdxs = new HashSet<Integer>();
 		for (int i = 0; i < finalNodes.size()-2; i++) {

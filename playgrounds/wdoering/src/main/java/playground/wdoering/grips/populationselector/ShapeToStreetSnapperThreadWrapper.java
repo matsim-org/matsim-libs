@@ -22,6 +22,10 @@ package playground.wdoering.grips.populationselector;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.table.DefaultTableModel;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
@@ -66,6 +70,10 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 
 	private Polygon p;
 	private Polygon areaPolygon;
+	
+	private HashMap<Integer, Polygon> polygons;
+
+	
 	private GeoPosition c0;
 	private GeoPosition c1;
 	private String targetS;
@@ -74,13 +82,16 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	private GeoPosition center;
 	private MyMapViewer mapViewer;
 	private final String net;
-	private final PopulationAreaSelector evacuationAreaSelector;
+	private final PopulationAreaSelector populationAreaSelector;
+	private MathTransform transform;
+	private int currentPolyIndex;
+	
 
 	public ShapeToStreetSnapperThreadWrapper(String osm, PopulationAreaSelector evacuationAreaSelector) {
 		this.net = osm;
 		
 		//TODO HACK to enable saveBtn - class should fire action events instead (see AbstractButton.java) 
-		this.evacuationAreaSelector = evacuationAreaSelector;
+		this.populationAreaSelector = evacuationAreaSelector;
 		
 		init();
 	}
@@ -88,8 +99,13 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	public ShapeToStreetSnapperThreadWrapper(String osm, PopulationAreaSelector evacuationAreaSelector, String ShapeFileString) {
 		readShapeFile(ShapeFileString);
 		this.net = osm;
-		this.evacuationAreaSelector = evacuationAreaSelector;
+		this.populationAreaSelector = evacuationAreaSelector;
 		init();
+	}
+	
+	public synchronized HashMap<Integer, Polygon> getPolygons()
+	{
+		return polygons;
 	}
 	
 	public void readShapeFile(String shapeFileString)
@@ -97,6 +113,8 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 			ShapeFileReader shapeFileReader = new ShapeFileReader();
 			shapeFileReader.readFileAndInitialize(shapeFileString);
 	
+//			shapeFileReader.g
+			
 			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
 			for (Feature ft : shapeFileReader.getFeatureSet())
 			{
@@ -147,15 +165,13 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 
 	@Override
 	public void run() {
-		CoordinateReferenceSystem sourceCRS = MGC.getCRS("EPSG:4326");
-//		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:3395");
-		CoordinateReferenceSystem targetCRS = MGC.getCRS(this.targetS);
-		MathTransform transform = null;
-		try {
-			transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
-		} catch (FactoryException e) {
-			throw new RuntimeException(e);
-		}
+		
+		if (transform==null)
+			getTransform();
+		
+		if (polygons==null)
+			polygons = new HashMap<Integer, Polygon>();
+		
 		Coordinate c0 = new Coordinate(this.c0.getLongitude(),this.c0.getLatitude());
 		Coordinate c1 = new Coordinate(this.c1.getLongitude(),this.c1.getLatitude());
 		PolygonalCircleApproximation.transform(c0,transform);
@@ -165,17 +181,42 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		
 		p = this.snapper.run(p);
 		
-		try {
-			p = (Polygon) PolygonalCircleApproximation.transform(p, transform.inverse());
-		} catch (NoninvertibleTransformException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if ((p!=null) && (!p.isEmpty()))
+		{
+			
+			try {
+				p = (Polygon) PolygonalCircleApproximation.transform(p, transform.inverse());
+			} catch (NoninvertibleTransformException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			this.polygons.put(currentPolyIndex, p);
+			this.populationAreaSelector.addNewArea(this.currentPolyIndex);
+
 		}
 		
-		this.setPolygon(p);
-		this.mapViewer.repaint();
-		this.evacuationAreaSelector.setSaveButtonEnabled(true);
+//		if (lassoPolygon!=null)
+//		{
+//			this.setPolygon(p);
+//		}
 		
+		this.mapViewer.repaint();
+		this.populationAreaSelector.setSaveButtonEnabled(true);
+		
+	}
+
+	private void getTransform()
+	{
+		CoordinateReferenceSystem sourceCRS = MGC.getCRS("EPSG:4326");
+//		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:3395");
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(this.targetS);
+		transform = null;
+		try {
+			transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
+		} catch (FactoryException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Polygon getAreaPolygon()
@@ -191,8 +232,9 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		return this.p;
 	}
 	
-	public synchronized void setCoordinates(GeoPosition c0, GeoPosition c1) {
-		this.evacuationAreaSelector.setSaveButtonEnabled(false);
+	public synchronized void setIndexAndCoordinates(int index, GeoPosition c0, GeoPosition c1) {
+		this.currentPolyIndex = index;
+		this.populationAreaSelector.setSaveButtonEnabled(false);
 		this.p = null;
 		this.c0 = c0;
 		this.c1 = c1;
@@ -200,7 +242,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	}
 	
 	public synchronized void reset() {
-		this.evacuationAreaSelector.setSaveButtonEnabled(false);
+		this.populationAreaSelector.setSaveButtonEnabled(false);
 		this.p = null;
 	}
 
@@ -213,7 +255,15 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		
 	}
 	
-	public synchronized void savePolygon(String dest) {
+	public synchronized void savePolygon(String dest)
+	{
+		if (this.polygons.size()==0)
+			return;
+		
+//		Polygon[] polygonArray = new Polygon[polygons.size()];
+//		for (int i = 0; i < polygons.size(); i++)
+//			polygonArray[i] = polygons.get(i);
+		
 		if (!dest.endsWith("shp")) {
 			dest = dest +".shp";
 		}
@@ -222,13 +272,42 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
 		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"name", String.class);
-		try {
-			FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
-			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{this.p});
-			Feature f = ft.create(new Object[]{mp,"EvacuationArea"});
+				"persons", Long.class);
+		try
+		{
+			
 			Collection<Feature> fts = new ArrayList<Feature>();
-			fts.add(f);
+//			for (int i = 0; i < polygons.size(); i++)
+			
+			
+			for (Map.Entry<Integer, Polygon> entry : polygons.entrySet())
+			{
+			    int id = entry.getKey();
+			    Polygon currentPolygon = entry.getValue();
+
+				
+				DefaultTableModel defModel = (DefaultTableModel)populationAreaSelector.getAreaTable().getModel();
+				
+				int pop = 23;
+				for (int j = 0; j < defModel.getRowCount(); j++)
+				{
+					if ((Integer) populationAreaSelector.getAreaTable().getModel().getValueAt(j, 0) == id)
+						pop = Integer.valueOf((String)populationAreaSelector.getAreaTable().getModel().getValueAt(j, 1));
+				}
+				
+				FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
+				MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{currentPolygon});
+				Feature f = ft.create(new Object[]{mp,pop});
+				fts.add(f);
+			}
+			
+			
+//			FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
+//			MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(polygonArray);
+//			Feature f = ft.create(new Object[]{mp,"EvacuationArea"});
+			
+			
+			
 			ShapeFileWriter.writeGeometries(fts, dest);
 		} catch (FactoryRegistryException e) {
 			e.printStackTrace();
@@ -238,4 +317,51 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 			e.printStackTrace();
 		}
 	}
+
+//	public void setLasso(ArrayList<GeoPosition> newLine)
+//	{
+//		System.out.println("elem:" + newLine.size());
+//		if (newLine.size()<3)
+//			return;
+//		
+//		int length = newLine.size();
+//		int step = (int)(length*0.1);
+//		
+//		System.out.println("step:"+step);
+//		
+//		if (step<3)
+//			step = 1;
+//		
+//		if (transform==null)
+//			getTransform();
+//		
+//		GeometryFactory geofac = new GeometryFactory();
+//		
+//		Coordinate [] coords = new Coordinate[(length/step)+1];
+//		
+//		int idx = 0;
+//		
+//		for (int i = 0; i < newLine.size(); i+=step)
+//		{
+//			GeoPosition currentGeoPos = newLine.get(i);
+//			Coordinate currentPoint = new Coordinate(currentGeoPos.getLongitude(),currentGeoPos.getLatitude());
+//			PolygonalCircleApproximation.transform(currentPoint,transform);
+//			coords[idx] = currentPoint; 
+//			idx++;
+//		}
+//		
+//		coords[coords.length-1] = coords[0];
+//		
+//		System.out.println("length of new polygon: " + coords.length + " | idx:" + idx);
+//		
+//		LinearRing ls = geofac.createLinearRing(coords);
+//		lassoPolygon = geofac.createPolygon(ls,null);		
+//		
+////		Coordinate c = new Coordinate(tmpX+c0.x,tmpY+c0.y);
+////		coords[idx++]=c;
+////		}
+////		coords[idx] = coords[0];
+////		
+//		
+//	}
 }

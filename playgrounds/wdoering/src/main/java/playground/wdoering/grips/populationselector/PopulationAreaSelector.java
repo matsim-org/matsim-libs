@@ -21,22 +21,35 @@
 package playground.wdoering.grips.populationselector;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -72,12 +85,47 @@ public class PopulationAreaSelector implements ActionListener{
 	private final String layer;
 
 	private String configFile;
-
 	private String scPath;
-
 	private Scenario sc;
 
 	private GeoPosition networkCenter;
+	
+	private JTable areaTable;
+	private Object[][] areaTableData;
+	
+	private int selectedAreaID = -1;
+	private String selectedAreaPop = "100";
+
+	private JTextField popInput;
+	private JButton popDeleteBt;
+	private JLabel popLabel;
+
+	protected boolean editing = false;
+	
+	public void setSelectedAreaID(int selectedAreaID)
+	{
+		this.selectedAreaID = selectedAreaID;
+		if (selectedAreaID>-1)
+		{
+			popLabel.setEnabled(true);
+			popInput.setEnabled(true);
+			popDeleteBt.setEnabled(true);
+		}
+	}
+	
+	public void setSelectedAreaPop(String selectedAreaPop) {
+		this.selectedAreaPop = selectedAreaPop;
+		popInput.setText(selectedAreaPop);
+	}
+	
+	public int getSelectedAreaID() {
+		return selectedAreaID;
+	}
+	
+	public String getSelectedAreaPop() {
+		return selectedAreaPop;
+	}
+	
 
 	/**
 	 * Launch the application.
@@ -154,16 +202,137 @@ public class PopulationAreaSelector implements ActionListener{
 	 */
 	private void initialize() {
 		this.frame = new JFrame();
-		this.frame.setSize(640, 640);
+		this.frame.setSize(960, 640);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.frame.setResizable(true);
 		
 		JPanel panel = new JPanel();
+		
+		JPanel tools = new JPanel(new BorderLayout());
+		this.frame.getContentPane().add(tools, BorderLayout.EAST);
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		this.openBtn = new JButton("Open");
 		panel.add(this.openBtn);
+		
+		
+		
+		Object[] columnNames = {"area id", "population"};
+		DefaultTableModel tableModel = new DefaultTableModel()
+		{
+			@Override
+			public boolean isCellEditable(int row, int column)
+			{
+				return false;
+			}
+		};
+		
+		areaTableData = new Object[][]{};
+//		areaTableData = new Object[][]{{0,1},{1,2}};
+		
+		tableModel.setDataVector(areaTableData, columnNames);
+		areaTable = new JTable();
+		areaTable.setModel(tableModel);
+		
+		
+		areaTable.getSelectionModel().addListSelectionListener(new SelectionListener(this));
+		areaTable.setSelectionBackground(Color.blue);
+		areaTable.setSelectionForeground(Color.white);		
+		areaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		
+		JPanel editAreaPanel = new JPanel(new GridLayout(0,3));
+		
+		popLabel = new JLabel("population:");
+		
+		popInput = new JTextField();
+		popInput.addKeyListener(new KeyListener()
+		{
+			
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+				if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
+					e.consume();
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				
+				int i = -1;
+				while (i<areaTable.getRowCount())
+				{
+					i++;
+					int id = (Integer)(areaTable.getModel()).getValueAt(i, 0);
+					if (id==selectedAreaID)
+						break;
+				}
+				((DefaultTableModel)areaTable.getModel()).setValueAt(popInput.getText(), i, 1);
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {}
+		});
+		
+		
+		
+		popDeleteBt = new JButton("delete area");
+		popDeleteBt.addActionListener(new ActionListener()
+		{
+			
+
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				int sel = areaTable.getSelectedRow();
+				
+				if (sel>-1)
+				{
+					editing =true;
+					DefaultTableModel defModel = (DefaultTableModel)areaTable.getModel();
+					
+					if (areaTable.getSelectedRow() <= defModel.getRowCount())
+					{
+						int id = (Integer)(areaTable.getModel()).getValueAt(sel, 0);
+						jMapViewer.removeArea(id);
+
+						//delete action/weight (row) in table
+						((DefaultTableModel)areaTable.getModel()).removeRow(areaTable.getSelectedRow());
+						
+						jMapViewer.repaint();
+						
+					}
+					
+					if (defModel.getRowCount()==0)
+					{
+						popDeleteBt.setEnabled(false);
+						popInput.setEnabled(false);
+						popLabel.setEnabled(false);
+					}
+					
+					editing=false;
+				}	
+			}
+		});
+		
+		
+		popLabel.setEnabled(false);
+		popInput.setEnabled(false);
+		popDeleteBt.setEnabled(false);
+		
+		editAreaPanel.add(popLabel);
+		editAreaPanel.add(popInput);
+		editAreaPanel.add(popDeleteBt);
+		
+		tools.add(new JScrollPane(areaTable), BorderLayout.CENTER);
+		tools.add(editAreaPanel, BorderLayout.SOUTH);
+		
+		tools.setPreferredSize(new Dimension(320, 640));
+		tools.setBorder(BorderFactory.createTitledBorder("population areas"));
+		
 		
 		
 		this.saveButton = new JButton("Save");
@@ -171,7 +340,7 @@ public class PopulationAreaSelector implements ActionListener{
 		this.saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
 		panel.add(this.saveButton);
 		this.compositePanel = new JPanel();
-		this.compositePanel.setBounds(new Rectangle(0, 0, 640, 640));
+//		this.compositePanel.setBounds(new Rectangle(0, 0, 640, 640));
 		this.frame.getContentPane().add(this.compositePanel, BorderLayout.CENTER);
 		this.compositePanel.setLayout(new BorderLayout(0, 0));
 
@@ -209,8 +378,8 @@ public class PopulationAreaSelector implements ActionListener{
 	
 	public void addMapViewer(TileFactory tf) {
 		this.compositePanel.setLayout(null);
-		this.jMapViewer = new MyMapViewer();
-		this.jMapViewer.setBounds(0, 0, 800, 800);
+		this.jMapViewer = new MyMapViewer(this);
+		this.jMapViewer.setBounds(0, 0, 1024, 800);
 		this.jMapViewer.setTileFactory(tf);
 		this.jMapViewer.setPanEnabled(true);
 		this.jMapViewer.setZoomEnabled(true);
@@ -234,6 +403,9 @@ public class PopulationAreaSelector implements ActionListener{
 		
 		if (e.getActionCommand() == "Open") {
 			final JFileChooser fc = new JFileChooser();
+			
+//			fc.setCurrentDirectory(new File("C:/temp/!matsimfiles/hh/demo/output/"));
+			
 			fc.setFileFilter(new FileFilter() {
 
 				@Override
@@ -260,6 +432,8 @@ public class PopulationAreaSelector implements ActionListener{
 				log.info("Opening: " + file.getAbsolutePath() + ".");
 				this.configFile = file.getAbsolutePath();
 				this.scPath = file.getParent();
+				
+				
 				Config c = ConfigUtils.loadConfig(this.configFile);
 				this.sc = ScenarioUtils.loadScenario(c);
 				
@@ -329,4 +503,65 @@ public class PopulationAreaSelector implements ActionListener{
 			}
 		}
 	}
+	
+	public JTable getAreaTable() {
+		return areaTable;
+	}
+	
+	public MyMapViewer getjMapViewer() {
+		return jMapViewer;
+	}
+
+	public void addNewArea(int index)
+	{
+		editing = true;
+		((DefaultTableModel)areaTable.getModel()).addRow(new Object[]{index, 100});
+		if (!popInput.isEnabled())
+		{
+			popInput.setEnabled(true);
+			popLabel.setEnabled(true);
+			popDeleteBt.setEnabled(true);
+		}
+		editing = false;
+		
+	}
 }
+
+class SelectionListener implements ListSelectionListener
+{
+
+	PopulationAreaSelector populationAreaSelector;
+	
+	public SelectionListener(PopulationAreaSelector dialog)
+	{
+		this.populationAreaSelector = dialog;
+	}
+	
+	@Override
+	public synchronized void valueChanged(ListSelectionEvent e)
+	{
+		
+		if (!populationAreaSelector.editing)
+		{
+			int sel = populationAreaSelector.getAreaTable().getSelectedRow();
+			int id = (Integer)(populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 0);
+			String pop = String.valueOf((populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 1));
+			
+			populationAreaSelector.setSelectedAreaID(id);
+			populationAreaSelector.setSelectedAreaPop(pop);
+			
+			MyMapViewer mapViewer = populationAreaSelector.getjMapViewer();
+			if (mapViewer!=null)
+			{
+				mapViewer.setSelectedArea(id);
+				mapViewer.repaint();
+			}
+
+		}
+		
+		
+	}
+
+}
+
+

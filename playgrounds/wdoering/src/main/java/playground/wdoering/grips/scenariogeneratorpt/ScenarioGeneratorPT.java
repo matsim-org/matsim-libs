@@ -166,6 +166,8 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 	private void createPTSchedule() {
 		
 		Network network = this.sc.getNetwork();
+		
+		System.exit(4711);
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
@@ -175,10 +177,11 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		TransitSchedule schedule = fac.createTransitSchedule();
 
 		
-		String dir = "/Users/laemmel/devel/pt_evac_demo/input/transitStops.shp"; //TODO put it in the grips config group
+		String dir = "C:/temp/pt_evac_demo/input/transitStops.shp"; //TODO put it in the grips config group
 		ShapeFileReader r = new ShapeFileReader();
 		r.readFileAndInitialize(dir);
 		Set<Feature> fts = r.getFeatureSet();
+		
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		for (Feature ft : fts) {
 			long id = (Long)ft.getAttribute("id");
