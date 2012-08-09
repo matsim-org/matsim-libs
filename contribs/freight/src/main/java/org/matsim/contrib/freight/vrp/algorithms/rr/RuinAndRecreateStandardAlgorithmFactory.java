@@ -27,9 +27,11 @@ import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
-public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateFactory {
+public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateFactory, VehicleRoutingProblemSolverFactory {
 
 	private static Logger logger = Logger.getLogger(RuinAndRecreateStandardAlgorithmFactory.class);
 
@@ -145,6 +147,11 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 			rrSolution.setScore((-1)*initialSolution.getScore());
 			return rrSolution;
 	
+	}
+
+	@Override
+	public VehicleRoutingProblemSolver createSolver(VehicleRoutingProblem vrp) {
+		return createAlgorithm(vrp);
 	}
 	
 }

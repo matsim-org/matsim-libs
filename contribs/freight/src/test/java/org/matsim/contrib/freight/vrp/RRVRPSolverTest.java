@@ -24,7 +24,7 @@ import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Tour;
-import org.matsim.contrib.freight.vrp.basics.VRPSchema;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
@@ -40,7 +40,7 @@ public class RRVRPSolverTest extends TestCase{
 
 		@Override
 		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
-			ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+			ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemTypes.CVRPTW);
 			MatsimVrpSolver solver = new MatsimVrpSolver(shipments, carrierVehicles,costs);
 			RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);

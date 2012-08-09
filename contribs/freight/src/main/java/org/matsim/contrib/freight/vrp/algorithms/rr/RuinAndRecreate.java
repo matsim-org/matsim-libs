@@ -32,7 +32,10 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.listener.WarmupStartsListene
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingSolution;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -46,7 +49,7 @@ import org.matsim.core.utils.collections.Tuple;
  *
  */
 
-public final class RuinAndRecreate {
+public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	
 	private static Logger logger = Logger.getLogger(RuinAndRecreate.class);
 	
@@ -111,6 +114,32 @@ public final class RuinAndRecreate {
 
 	public void setRuinStrategyManager(RuinStrategyManager ruinStrategyManager) {
 		this.ruinStrategyManager = ruinStrategyManager;
+	}
+
+	@Override
+	public VehicleRoutingSolution solve() {
+		run();
+		return createSolution();
+	}
+
+	private VehicleRoutingSolution createSolution() {
+		final Collection<VehicleRoute> routes = new ArrayList<VehicleRoute>();
+		for(ServiceProviderAgent spa : currentSolution.getTourAgents()){
+			routes.add(new VehicleRoute(spa.getTour(),spa.getVehicle()));
+		}
+		
+		return new VehicleRoutingSolution() {
+			
+			@Override
+			public Collection<VehicleRoute> getRoutes() {
+				return routes;
+			}
+
+			@Override
+			public double getTotalCost() {
+				return currentSolution.getResult();
+			}
+		};
 	}
 
 	public void run(){

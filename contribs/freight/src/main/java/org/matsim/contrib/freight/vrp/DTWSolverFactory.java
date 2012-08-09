@@ -15,7 +15,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgor
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
-import org.matsim.contrib.freight.vrp.basics.VRPSchema;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -30,7 +30,7 @@ public class DTWSolverFactory implements VRPSolverFactory{
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
 		verifyDistributionProblem(shipments,carrierVehicles);
-		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemTypes.CVRPTW);
 		MatsimVrpSolver rrSolver = new MatsimVrpSolver(shipments, carrierVehicles, costs);
 		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
 		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);

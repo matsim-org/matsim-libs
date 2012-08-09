@@ -1,6 +1,6 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
-import org.matsim.contrib.freight.vrp.basics.VRPSchema;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
 public class ServiceProviderAgentFactoryFinder {
@@ -18,10 +18,10 @@ public class ServiceProviderAgentFactoryFinder {
 	}
 
 	public ServiceProviderAgentFactory getFactory(String agentType){
-		if(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS.equals(agentType)){
+		if(VehicleRoutingProblemTypes.CVRPTW.equals(agentType)){
 			return new SingleDepotDistribTWSPFactory(tourCost,vehicleRoutingCost);
 		}
-		else if(VRPSchema.SINGLEDEPOT_DISTRIBUTION.equals(agentType)){
+		else if(VehicleRoutingProblemTypes.CVRP.equals(agentType)){
 			return new SingleDepotDistribSPFactory(tourCost,vehicleRoutingCost);
 		}
 		else{

@@ -33,7 +33,7 @@ import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
-import org.matsim.contrib.freight.vrp.basics.VRPSchema;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
@@ -75,7 +75,7 @@ public class BestInsertionTest extends VRPTestCase{
 			}
 			
 		};
-		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, vrp.getCosts()).getFactory(VRPSchema.SINGLEDEPOT_DISTRIBUTION_TIMEWINDOWS);
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, vrp.getCosts()).getFactory(VehicleRoutingProblemTypes.CVRPTW);
 		
 		tourAgent1 = spFactory.createAgent(vrp.getVehicles().iterator().next(), new Driver(){}, tourBuilder.build());
 		
