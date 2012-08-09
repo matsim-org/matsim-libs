@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.eMob.chargingInfrasruture.inductive.roads;
+package org.matsim.contrib.eMob.chargingInfrastructure.inductive.roads;
 
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
