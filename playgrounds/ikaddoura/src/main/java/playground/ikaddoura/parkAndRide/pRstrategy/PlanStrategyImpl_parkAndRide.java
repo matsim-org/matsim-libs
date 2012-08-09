@@ -36,7 +36,7 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
- * Only modifying plans if person has a work activity.
+ * Only modifying plans if plan contains a park-and-ride activity.
  *
  * @author mrieser, modified by ikaddoura
  * @see org.matsim.core.replanning
@@ -79,21 +79,6 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 	@Override
 	public void run(final Person person) {
 		
-		// checks if person has a work activity
-		boolean hasPRAct = false;
-		for (Plan plan : person.getPlans()){
-			for (PlanElement pe: plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl)pe;
-					if (act.getType().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
-						hasPRAct = true;
-					}
-				}
-			}
-		}
-		
-		// if person has a park-and-ride activity proceed with strategy modules...
-		if (hasPRAct){
 			this.counter++;
 			
 			// if there is at least one unscored plan, find that one:
@@ -104,22 +89,36 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 				plan = this.planSelector.selectPlan(person);
 			}
 			
-			// "select" that plan:
-			((PersonImpl) person).setSelectedPlan(plan);
-			
-			// if there is a "module" (i.e. "innovation"):
-			if (this.firstModule != null) {
-				
-				// set the working plan to a copy of the selected plan:
-				plan = ((PersonImpl) person).copySelectedPlan();
-				// (this makes, as a side effect, the _new_ plan selected)
-				
-				// add new plan to container that contains the plans that are handled by this PlanStrategy:
-				this.plans.add(plan);
-	
-				// start working on this new plan:
-				this.firstModule.handlePlan(plan);
+			// checks if this plan contains parkAndRide
+			boolean hasPRAct = false;
+			for (PlanElement pe: plan.getPlanElements()) {
+				if (pe instanceof ActivityImpl) {
+					ActivityImpl act = (ActivityImpl)pe;
+					if (act.getType().equals(ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE)){
+						hasPRAct = true;
+					}
+				}
 			}
+			
+			// if person has a park-and-ride activity proceed with strategy modules...
+			if (hasPRAct){
+				
+				// "select" that plan:
+				((PersonImpl) person).setSelectedPlan(plan);
+				
+				// if there is a "module" (i.e. "innovation"):
+				if (this.firstModule != null) {
+					
+					// set the working plan to a copy of the selected plan:
+					plan = ((PersonImpl) person).copySelectedPlan();
+					// (this makes, as a side effect, the _new_ plan selected)
+					
+					// add new plan to container that contains the plans that are handled by this PlanStrategy:
+					this.plans.add(plan);
+		
+					// start working on this new plan:
+					this.firstModule.handlePlan(plan);
+				}
 		}
 	}
 
