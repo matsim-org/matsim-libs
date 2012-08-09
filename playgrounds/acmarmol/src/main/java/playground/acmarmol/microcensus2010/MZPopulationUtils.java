@@ -203,8 +203,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 					for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
-					System.out.println(person.getId());
-						if (((act.getCoord().getX() == -97) || (act.getCoord().getY() == -97))) {
+							if (((act.getCoord().getX() == -97) || (act.getCoord().getY() == -97))) {
 							ids.add(person.getId());
 							}
 					}
@@ -236,33 +235,229 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	
 //////////////////////////////////////////////////////////////////////
 
-	@SuppressWarnings("deprecation")
-	public static void HandleBorderCrossingTrips(final Population population, final ObjectAttributes wegeAttributes, Set<Id> border_crossing_wids) {	
+	public static void HandleBorderCrossingTrips(final Population population, final ObjectAttributes wegeAttributes, Set<Id> border_crossing_wids, String countryCode) {	
 		
-	
-	HashMap<Id, Tuple<Integer, PlanElement>> toAdd =  new HashMap<Id, Tuple<Integer, PlanElement>>();
+	final String COUNTRY = countryCode;
+	HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>> toAdd =  new HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>>();
 	HashMap<Id,ArrayList<PlanElement>> toRemove = 	new HashMap<Id,ArrayList<PlanElement>>();
-	Set<Id> overnigth_pids = new HashSet<Id>();
+	Set<Id> overnight_pids = new HashSet<Id>();
 		
 	for(Id wid: border_crossing_wids){
 		
-		ArrayList<PlanElement> elementsToRemove = null;
-		Id pid = new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim());
-		overnigth_pids.add(pid);
+	String sland = (String) wegeAttributes.getAttribute(wid.toString(), "start land");
+	String zland = (String) wegeAttributes.getAttribute(wid.toString(), "end land");
 
+		if(sland.equals(COUNTRY) &&  !zland.equals(COUNTRY)){
+			handleTripGoingOutOfCountry(population, wid, COUNTRY, wegeAttributes);
+			overnight_pids.add(new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim()));
+		}else if(!sland.equals(COUNTRY) &&  zland.equals(COUNTRY)){
+			handleTripEnteringCountry(population, wid, COUNTRY, wegeAttributes, toAdd, toRemove);
+			overnight_pids.remove(new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim()));
+		}else{Gbl.errorMsg("This should never happen! Wege "+ wid+ " doesn't cross the border");}
+		
+		
+	 }//end loop for all wids
+	
+	addPlanElements(population,toAdd);
+	removePlanElements(population, toRemove);
+	removePlanElementsAfterLastBorderCrossing(population, overnight_pids);
+	
+	}//end method
+//////////////////////////////////////////////////////////////////////
+/**
+*  
+* This method goes through the stages of the leg, identifies 
+* the border crossing , and modifies the leg start_time so that
+* it only considers the data after the border crossing.
+* It also eliminates all previous activities and legs that
+* are executed outside the country.
+*<p> 
+*For cases of people that are re-entering the country (went out in the same plan),
+*if the border crossings are different, then adds a virtual new leg with mode
+*"abroad: teleport" between both border locations/activities
+*
+*
+*
+* @param  population the population 
+* @param  wid the id of the leg going out of the country
+* @param  country the country code  
+* @param  wegeAttributes attributes of the leg and it's stages
+*/	
+
+	@SuppressWarnings("deprecation")
+	private static void handleTripEnteringCountry(Population population, Id wid, String country, ObjectAttributes wegeAttributes, HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>> toAdd, HashMap<Id,ArrayList<PlanElement>> toRemove){
+	
+		Id pid = new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim());
 		int legNumber = Integer.parseInt(wid.toString().substring(wid.toString().indexOf('-')+1));
 		//maybe legNumber is not the best way to index, because some planElements are deleted (the ones outside Switzerland)
 		// to overcome this issue, all plan elements are stored first in toRemove, and only in the end are deleted.
-
+		ArrayList<PlanElement> elementsToRemove = null;
+		
 		List<PlanElement> planElements = population.getPersons().get(pid).getSelectedPlan().getPlanElements();
 		LegImpl leg = (LegImpl) planElements.get(2*legNumber-1);
-		ActivityImpl nextActivity = (ActivityImpl) planElements.get(2*legNumber);
 		ActivityImpl previousActivity = (ActivityImpl) planElements.get(2*legNumber-2);
 		
-	
-		//HANDLING OF TRIPS GOING OUT OF SWITZERLAND
-		if(wegeAttributes.getAttribute(wid.toString(), "start land").equals("8100") &&  !wegeAttributes.getAttribute(wid.toString(), "end land").equals("8100")){
+		boolean immediate_return = false;
 		
+		String type = previousActivity.getType();
+		//if goes in via plane, specify previous activity as airport, otherwise as border
+		if(leg.getMode().equals("plane")){
+			if(!previousActivity.getType().contains("airport") && !previousActivity.getType().contains("border")){
+				previousActivity.setType("airport: ".concat(type));
+			}else immediate_return = true;
+		}else{
+			if(!previousActivity.getType().contains("airport") && !previousActivity.getType().contains("border")){
+				previousActivity.setType("border: ".concat(type));
+			}else immediate_return = true;
+		}
+		
+		
+		int curr_mode = Integer.MAX_VALUE;
+		Coord curr_start_coord = null;
+		boolean start = false;
+		
+		for(int i=1; i<= (Integer) wegeAttributes.getAttribute(wid.toString(), "number of etappen"); i++){
+						
+			Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), "etappe".concat(String.valueOf(i)));
+			
+			if(!etappe.getStartCountry().equals(country) && etappe.getEndCountry().equals(country)){
+				leg.setDepartureTime(etappe.getDepartureTime());
+				leg.setTravelTime(etappe.getArrivalTime()-leg.getDepartureTime());
+				previousActivity.setEndTime(leg.getDepartureTime());
+				curr_start_coord = (etappe.getStartCoord());
+				start = true;
+			}
+			else if(start){
+				if(etappe.getModeInteger()<curr_mode){
+				curr_mode = etappe.getModeInteger();
+				leg.setMode(etappe.getMode());
+				}
+				leg.setArrivalTime(etappe.getArrivalTime());
+				leg.setTravelTime(etappe.getArrivalTime()-leg.getDepartureTime());
+				curr_start_coord = (etappe.getStartCoord());
+			}
+		}	
+		
+		
+		//identify if out and in - border crossings are the same, otherwise it necessary to create new virtual activity. 
+		boolean different_border_crossing = false;
+		if(immediate_return && !curr_start_coord.equals(previousActivity.getCoord())){
+			different_border_crossing = true;				
+		}else{
+			previousActivity.setCoord(curr_start_coord);
+		}
+		
+	
+		
+			int index = planElements.indexOf(previousActivity);
+			String crossing_type = previousActivity.getType().substring(0, previousActivity.getType().indexOf(':')).trim();
+							
+			if(toRemove.containsKey(pid)){
+				elementsToRemove = toRemove.get(pid);
+			}
+			else{
+				elementsToRemove = new ArrayList<PlanElement>(10);
+			}
+							
+						
+			if(index>0){
+				boolean cont = true;
+				if(immediate_return){
+				//immediate return, only do something if different border crossing is used
+				// if different border crossing is used, a new virtual activity is created with a connecting teleport leg
+					if(different_border_crossing){
+						LegImpl teleportLeg = new LegImpl(leg);
+						teleportLeg.setDepartureTime(previousActivity.getEndTime());
+						teleportLeg.setArrivalTime(previousActivity.getEndTime());
+						teleportLeg.setTravelTime(0);
+						teleportLeg.setMode("abroad: teleport");
+						
+						if(toAdd.get(pid) == null){ toAdd.put(pid, new ArrayList<Tuple<Integer,PlanElement>>());}	
+						toAdd.get(pid).add(new Tuple<Integer, PlanElement>(index+1, teleportLeg));
+						
+						ActivityImpl virtualActivity = new ActivityImpl(previousActivity);
+						virtualActivity.setStartTime(previousActivity.getEndTime());
+						virtualActivity.setCoord(curr_start_coord);
+						toAdd.get(pid).add(new Tuple<Integer, PlanElement>(index+2, virtualActivity));
+												
+					}
+					
+					
+				}else{
+				//not immediate return, therefore there are activities and legs outside switzerland that need to be eliminated
+				//remove previous plan elements (executed outside switzerland) until "airport" or "border" activity is found 
+				// Possibilities:	
+				//1) all previous activities and legs are outside switzerland -> remove all
+				//2) there's a previous "airport" or "border" activity, thus the person left and entered switzerland on the same plan. 
+				//	2.1) if the coords of these two match (same airport or border pass) merge both activities and fix start and end times accordingly
+				//  2.2) if the coords don't match, create intermediate leg with mode "teleport" two keep consistency on plan.
+					
+						for (int j=index-1; cont && j>=0 ;j--) {
+							
+							boolean delete = true;
+							PlanElement pe = planElements.get(j);
+							if(pe instanceof Activity){
+								Activity activity = (Activity) pe;
+								if(activity.getType().contains("airport") || activity.getType().contains("border")){
+									
+									//going in to switzerland via the same path that went out -> merge activites  (2.1)
+									if(activity.getType().contains(crossing_type) && activity.getCoord().equals(previousActivity.getCoord())){ 
+									previousActivity.setStartTime(activity.getStartTime());
+									cont = false;
+									
+									}else{
+									//going in to switzerland via other path -> create "teleport" leg  (2.2)
+									LegImpl teleportLeg = new LegImpl(leg);
+									teleportLeg.setDepartureTime(activity.getEndTime());
+									teleportLeg.setArrivalTime(previousActivity.getStartTime());
+									teleportLeg.setMode("abroad: teleport");
+									if(toAdd.get(pid) == null){ toAdd.put(pid, new ArrayList<Tuple<Integer,PlanElement>>());}	
+									toAdd.get(pid).add(new Tuple<Integer, PlanElement>(index, teleportLeg));
+									delete = false; 
+									cont = false;
+										
+									}
+								}
+							}
+							if(delete){elementsToRemove.add(pe);}
+						
+						}
+					}
+				
+			}
+		
+			toRemove.put(pid, elementsToRemove);
+	}
+		
+
+//////////////////////////////////////////////////////////////////////
+	/**
+	 *  
+	 * This method goes through the stages of the leg, identifies 
+	 * the border crossing , and modifies the leg end_time so that
+	 * it only considers the data before the border crossing.
+	 * It also adds at the beginning of next activity's type,
+	 * either if the person it's at an "aiport" (if leg's mode is plane)
+	 * or at a "border" (for any other mode).
+	 *
+	 * @param  population the population 
+	 * @param  wid the id of the leg going out of the country
+	 * @param  country the country code  
+	 * @param  wegeAttributes attributes of the leg and it's stages
+	 */	
+	
+	
+	private static void handleTripGoingOutOfCountry(Population population, Id wid, String country, ObjectAttributes wegeAttributes){
+	
+			Id pid = new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim());
+			int legNumber = Integer.parseInt(wid.toString().substring(wid.toString().indexOf('-')+1));
+			//maybe legNumber is not the best way to index, because some planElements are deleted (the ones outside Switzerland)
+			// to overcome this issue, all plan elements are stored first in toRemove, and only in the end are deleted.
+			
+			List<PlanElement> planElements = population.getPersons().get(pid).getSelectedPlan().getPlanElements();
+			LegImpl leg = (LegImpl) planElements.get(2*legNumber-1);
+			ActivityImpl nextActivity = (ActivityImpl) planElements.get(2*legNumber);
+			
 			boolean cont = true;
 			int etappen = 1;
 			int curr_mode = Integer.MAX_VALUE;
@@ -284,7 +479,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 			
 				Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), "etappe".concat(String.valueOf(etappen)));
 				
-				if(etappe.getStartCountry().equals("8100") && etappe.getEndCountry().equals("8100")){
+				if(etappe.getStartCountry().equals(country) && etappe.getEndCountry().equals(country)){
 					if(etappe.getModeInteger()<curr_mode){// && (leg.getMode().equals("plane")? !etappe.getMode().equals("plane"):true)){
 						curr_mode = etappe.getModeInteger();
 						leg.setMode(etappe.getMode());
@@ -300,159 +495,52 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 				
 				etappen++;
 			}
-			
-		
-		//HANDLING OF TRIPS ENTERING SWITZERLAND
-		}else if(!wegeAttributes.getAttribute(wid.toString(), "start land").equals("8100") &&  wegeAttributes.getAttribute(wid.toString(), "end land").equals("8100")){
-			
-			boolean immediate_return = false;
-			if(!overnigth_pids.contains(pid)){overnigth_pids.remove(pid);}
-			String type = previousActivity.getType();
-			//if goes in via plane, specify previous activity as airport, otherwise as border
-			if(leg.getMode().equals("plane")){
-				if(!previousActivity.getType().contains("airport") && !previousActivity.getType().contains("border")){
-					previousActivity.setType("airport: ".concat(type));
-				}else immediate_return = true;
-			}else{
-				if(!previousActivity.getType().contains("airport") && !previousActivity.getType().contains("border")){
-					previousActivity.setType("border: ".concat(type));
-				}else immediate_return = true;
-			}
-			
-			
-			int curr_mode = Integer.MAX_VALUE;
-			Coord curr_start_coord = null;
-			boolean start = false;
-			
-			for(int i=1; i<= (Integer) wegeAttributes.getAttribute(wid.toString(), "number of etappen"); i++){
-							
-				Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), "etappe".concat(String.valueOf(i)));
 				
-				if(!etappe.getStartCountry().equals("8100") && etappe.getEndCountry().equals("8100")){
-					leg.setDepartureTime(etappe.getDepartureTime());
-					leg.setTravelTime(etappe.getArrivalTime()-leg.getDepartureTime());
-					previousActivity.setEndTime(leg.getDepartureTime());
-					curr_start_coord = (etappe.getStartCoord());
-					start = true;
-				}
-				else if(start){
-					if(etappe.getModeInteger()<curr_mode){
-					curr_mode = etappe.getModeInteger();
-					leg.setMode(etappe.getMode());
-					}
-					leg.setArrivalTime(etappe.getArrivalTime());
-					leg.setTravelTime(etappe.getArrivalTime()-leg.getDepartureTime());
-					curr_start_coord = (etappe.getStartCoord());
-				}
-			}	
-			
-			
-			//identify if out and in - border crossings are the same, otherwise it necessary to create new virtual activity. 
-			boolean different_border_crossing = false;
-			if(immediate_return && !curr_start_coord.equals(previousActivity.getCoord())){
-				different_border_crossing = true;				
-			}else{
-				previousActivity.setCoord(curr_start_coord);
-			}
-			
-		
-			
-				int index = planElements.indexOf(previousActivity);
-				String crossing_type = previousActivity.getType().substring(0, previousActivity.getType().indexOf(':')).trim();
-								
-				if(toRemove.containsKey(pid)){
-					elementsToRemove = toRemove.get(pid);
-				}
-				else{
-					elementsToRemove = new ArrayList<PlanElement>(10);
-				}
-								
-							
-				if(index>0){
-					boolean cont = true;
-					if(immediate_return){
-					//immediate return, only do something if different border crossing is used
-					// if different border crossing is used, a new virtual activity is created with a connecting teleport leg
-						if(different_border_crossing){
-							LegImpl teleportLeg = new LegImpl(leg);
-							teleportLeg.setDepartureTime(previousActivity.getEndTime());
-							teleportLeg.setArrivalTime(previousActivity.getEndTime());
-							teleportLeg.setTravelTime(0);
-							teleportLeg.setMode("abroad: teleport");
-							toAdd.put(pid, new Tuple<Integer, PlanElement>(index+1, teleportLeg));      
-							
-							ActivityImpl virtualActivity = new ActivityImpl(previousActivity);
-							virtualActivity.setStartTime(previousActivity.getEndTime());
-							virtualActivity.setCoord(curr_start_coord);
-							toAdd.put(pid, new Tuple<Integer, PlanElement>(index+2, teleportLeg));  
-							
-							
-						}
-						
-						
-					}else{
-					//not immediate return, therefore there are activities and legs outside switzerland that need to be eliminated
-					//remove previous plan elements (executed outside switzerland) until "airport" or "border" activity is found 
-					// Possibilities:	
-					//1) all previous activities and legs are outside switzerland -> remove all
-					//2) there's a previous "airport" or "border" activity, thus the person left and entered switzerland on the same plan. 
-					//	2.1) if the coords of these two match (same airport or border pass) merge both activities and fix start and end times accordingly
-					//  2.2) if the coords don't match, create intermediate leg with mode "teleport" two keep consistency on plan.
-						
-							for (int j=index-1; cont && j>=0 ;j--) {
-								
-								boolean delete = true;
-								PlanElement pe = planElements.get(j);
-								if(pe instanceof Activity){
-									Activity activity = (Activity) pe;
-									if(activity.getType().contains("airport") || activity.getType().contains("border")){
-										
-										//going in to switzerland via the same path that went out -> merge activites  (2.1)
-										if(activity.getType().contains(crossing_type) && activity.getCoord().equals(previousActivity.getCoord())){ 
-										previousActivity.setStartTime(activity.getStartTime());
-										cont = false;
-										
-										}else{
-										//going in to switzerland via other path -> create "teleport" leg  (2.2)
-										LegImpl teleportLeg = new LegImpl(leg);
-										teleportLeg.setDepartureTime(activity.getEndTime());
-										teleportLeg.setArrivalTime(previousActivity.getStartTime());
-										teleportLeg.setMode("abroad: teleport");
-										toAdd.put(pid, new Tuple<Integer, PlanElement>(index, teleportLeg));
-										delete = false; 
-										cont = false;
-											
-										}
-									}
-								}
-								if(delete){elementsToRemove.add(pe);}
-							
-							}
-						}
-					
-				}
-			
-				toRemove.put(pid, elementsToRemove);
-		}// end handling out border
 		
 		
-	 }//end loop for all wids
-	
-	addPlanElements(population,toAdd);
-	removePlanElements(population, toRemove);
-	
-	
-	
-	}//end method
+		
+	}
 
 //////////////////////////////////////////////////////////////////////
 	
-	private static void addPlanElements(Population population,  HashMap<Id, Tuple<Integer, PlanElement>> toAdd){
+	private static void removePlanElementsAfterLastBorderCrossing(Population population, Set<Id> overnight_pids){
+		
+		for(Id id: overnight_pids){
+			List<PlanElement> planElements = population.getPersons().get(id).getSelectedPlan().getPlanElements();
+			
+			boolean cont = true;
+			
+			for(int i=planElements.size()-1; cont; i--){
+
+				PlanElement pe = planElements.get(i);
+				
+				if(planElements.get(i) instanceof Activity){
+					Activity activity = (Activity) pe;
+					if(activity.getType().contains("border") || activity.getType().contains("airport")){
+						cont = false;
+					}else{planElements.remove(i);}
+					
+				}else{planElements.remove(i);}
+				
+			}
+		}
+	}
+	
+//////////////////////////////////////////////////////////////////////
+	
+	private static void addPlanElements(Population population,  HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>> toAdd){
 
 		for(Id id: toAdd.keySet()){
-
+			
+			ArrayList<Tuple<Integer, PlanElement>> elementsToAdd = toAdd.get(id);
 			Person person = population.getPersons().get(id);
-			person.getSelectedPlan().getPlanElements().add(toAdd.get(id).getFirst(), toAdd.get(id).getSecond());
+			
+			for(Tuple<Integer, PlanElement> pair : elementsToAdd){
+				person.getSelectedPlan().getPlanElements().add(pair.getFirst(), pair.getSecond());
+			}
+
+			
+			
 		
 		}
 	
@@ -554,8 +642,6 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						
 						Leg leg = (Leg) pe;
 						Activity act = (Activity) plan.getPlanElements().get(i+1);
-						
-						System.out.println(wid);
 						
 						String sland = (String) wegeAttributes.getAttribute(wid,"start land");
 						String zland = (String) wegeAttributes.getAttribute(wid,"end land");

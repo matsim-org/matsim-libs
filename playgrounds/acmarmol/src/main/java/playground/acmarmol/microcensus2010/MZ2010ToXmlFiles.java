@@ -316,7 +316,7 @@ public class MZ2010ToXmlFiles {
 		ArrayList<Set<Id>> border_crossing_plane_ids = MZPopulationUtils.identifyCrossBorderWeges(population, wegeAttributes);
 		Set<Id> border_crossing_wids = border_crossing_plane_ids.get(1);
 		if(border_crossing_wids.size()>0){
-		MZPopulationUtils.HandleBorderCrossingTrips(population, wegeAttributes, border_crossing_wids);
+		MZPopulationUtils.HandleBorderCrossingTrips(population, wegeAttributes, border_crossing_wids, "8100");
 		System.out.println("      done.");
 		System.out.println("      Total trips handled: " + border_crossing_wids.size());
 		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
@@ -326,20 +326,10 @@ public class MZ2010ToXmlFiles {
 	
 		}else{System.out.println("      NO BORDER CROSSING TRIPS \n");}
 		
-//////////////////////////////////////////////////////////////////////
-		
-		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("removing trips outside switzerland...");
-		Set<Id> border_crossing_plane_pids = border_crossing_plane_ids.get(0);
-		if(border_crossing_wids.size()>0){
-		//MZPopulationUtils.removeWegesOutsideSwitzerland(population, border_crossing_plane_pids, wegeAttributes);
-		new PopulationWriter(population, null).write(outputBase+"population.099.xml");
-				
-		}else{System.out.println("      NO BORDER CROSSING TRIPS \n");}
 
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("removing persons with undefined negative coords...");
+		log.info("removing persons with undefined coords...");
 		Set<Id> undef_neg_pids = MZPopulationUtils.identifyPlansWithUndefinedNegCoords(population);
 		if(undef_neg_pids.size()>0){
 		MZPopulationUtils.removePlans(population, undef_neg_pids);
@@ -348,27 +338,27 @@ public class MZ2010ToXmlFiles {
 		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 		System.out.println("      Writing population without undefined coords xml file \n");	
 		//new PopulationWriter(population, null).write(outputBase+"population.10.xml");
-			System.out.println("NUMBER OF UNDEFINED NEGATIVE COORDS "+undef_neg_pids.size());
+			System.out.println("NUMBER OF UNDEFINED  COORDS "+undef_neg_pids.size());
 		System.out.println("  done.");
 	
-		}else{System.out.println("      NO PEOPLE WITH TIME INCONSISTENCIES \n");}
+		}else{System.out.println("      NO PEOPLE WITH UNDEFINED COORDS \n");}
 
 //////////////////////////////////////////////////////////////////////
 
-//		System.out.println("-----------------------------------------------------------------------------------------------------------");
-//		log.info("removing persons with too long walk trips...");
-//		Set<Id> long_walk_pids = MZPopulationUtils.identifyPlansWithTooLongWalkTrips(population);
-//		if(long_walk_pids.size()>0){
-//		MZPopulationUtils.removePlans(population, long_walk_pids);
-//		System.out.println("      done.");
-//		System.out.println("      Total persons removed: " + long_walk_pids.size());
-//		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
-//		System.out.println("      Writing population without long walk trips xml file \n");	
-//		new PopulationWriter(population, null).write(outputBase+"population.11.xml");
-//		System.out.println("NUMBER OF PEOPLE WITH TOO LONG WALK COORDS "+long_walk_pids.size());
-//		System.out.println("  done.");
-//		
-//		}else{System.out.println("      NO PEOPLE WITH TOO LONK WALK TRIPS \n");}
+		System.out.println("-----------------------------------------------------------------------------------------------------------");
+		log.info("removing persons with negative coords...");
+		Set<Id> neg_coord_pids = MZPopulationUtils.identifyPlansWithNegCoords(population);
+		if(neg_coord_pids.size()>0){
+		MZPopulationUtils.removePlans(population, neg_coord_pids);
+		System.out.println("      done.");
+		System.out.println("      Total persons removed: " + neg_coord_pids.size());
+		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
+		System.out.println("      Writing population without negative coords xml file \n");	
+		new PopulationWriter(population, null).write(outputBase+"population.11.xml");
+		System.out.println("NUMBER OF PEOPLE WITH NEGATIVE COORDS "+neg_coord_pids.size());
+		System.out.println("  done.");
+		
+		}else{System.out.println("      NO PEOPLE WITH NEGATIVE COORDS \n");}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -386,9 +376,7 @@ public class MZ2010ToXmlFiles {
 						   "#################################################################################");	
 		Gbl.printElapsedTime();
 		
-	Set<Id> aa = MZPopulationUtils.identifyPlansWithNegCoords(population);
-	System.out.println(aa.size());
-	System.out.println(border_crossing_wids.size());
+
 	}//end main		
 
 
