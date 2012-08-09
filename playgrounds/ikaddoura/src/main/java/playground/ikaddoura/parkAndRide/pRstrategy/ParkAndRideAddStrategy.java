@@ -144,10 +144,9 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 								}
 							}
 							int index = (int)(MatsimRandom.getRandom().nextDouble()*legIndex.size());
-							System.out.println("Possible legs: " + legIndex);
 							transformIntoPRLeg1 = legIndex.get(index);
 						}
-						System.out.println("Leg Index to be transformed into P+R (1): " + transformIntoPRLeg1);
+//						System.out.println("Leg Index to be transformed into P+R (1): " + transformIntoPRLeg1);
 
 						planElements.remove(transformIntoPRLeg1);
 						planElements.add(transformIntoPRLeg1, pop.getFactory().createLeg(TransportMode.car));
@@ -155,7 +154,6 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 						planElements.add(transformIntoPRLeg1 + 2, pop.getFactory().createLeg(TransportMode.pt));
 						
 						// Second P+R activity /////////////////////////////////
-						System.out.println(">>>> Second P+R Leg...");
 						planIndices.setIndices();
 						workIndex = planIndices.getWorkActs().get(rndWork);						
 						minHomeAfterWork = planIndices.getMinHomeAfterWork(workIndex);
@@ -186,7 +184,7 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 							System.out.println("Possible legs: " + legIndex);
 							transformIntoPRLeg2 = legIndex.get(index);
 						}
-						System.out.println("Leg Index to be transformed into P+R (2): " + transformIntoPRLeg2);
+//						System.out.println("Leg Index to be transformed into P+R (2): " + transformIntoPRLeg2);
 
 						planElements.remove(transformIntoPRLeg2);
 						planElements.add(transformIntoPRLeg2, pop.getFactory().createLeg(TransportMode.pt));

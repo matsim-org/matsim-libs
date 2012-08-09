@@ -64,7 +64,7 @@ public class EllipseSearch {
 				double weight = calculateWeight(homeCoord, workCoord, prCoord);
 				prWeights.add(new PrWeight(pr.getId(), weight));
 				
-				System.out.println(pr.getId() + ": " + weight);
+//				System.out.println(pr.getId() + ": " + weight);
 			}
 		} else {
 			
@@ -130,9 +130,9 @@ public class EllipseSearch {
 		}
 		Collections.sort(prWeights);
 
-		for (PrWeight prWeight : prWeights) {
-			System.out.println("id / value: " + prWeight.getId() + " / " + prWeight.getWeight());
-		}
+//		for (PrWeight prWeight : prWeights) {
+//			System.out.println("id / value: " + prWeight.getId() + " / " + prWeight.getWeight());
+//		}
 		
 		double weightSum = 0.0;
 		for (PrWeight prWeight : prWeights){

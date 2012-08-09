@@ -68,10 +68,13 @@ public class ParkAndRideMain {
 		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
 		prCapacity = 100;
 		
-		addPRProb = 0.;
+		addPRProb = 100.;
 		addPRDisable = 500;
 		
-		timeAllocationProb = 100.;
+		changeLocationProb = 0.;
+		changeLocationDisable = 500;
+		
+		timeAllocationProb = 0.;
 		timeAllocationDisable = 500;
 		
 //		**************************************************
@@ -107,7 +110,7 @@ public class ParkAndRideMain {
 		
 		controler.setScoringFunctionFactory(new BvgScoringFunctionFactoryPR(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroupPR(controler.getConfig()), controler.getNetwork()));
 
-		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addPRProb, addPRDisable, timeAllocationProb, timeAllocationDisable));
+		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addPRProb, addPRDisable, changeLocationProb, changeLocationDisable, timeAllocationProb, timeAllocationDisable));
 		
 		final MobsimFactory mf = new QSimFactory();
 		controler.setMobsimFactory(new MobsimFactory() {
