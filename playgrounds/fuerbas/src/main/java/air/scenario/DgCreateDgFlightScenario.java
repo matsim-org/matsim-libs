@@ -54,10 +54,10 @@ public class DgCreateDgFlightScenario {
 	private static final String FLIGHT_TRANSIT_SCHEDULE = "flight_transit_schedule.xml";
 	private static final String FLIGHT_TRANSIT_VEHICLES = "flight_transit_vehicles.xml";
 
-	private String dataBaseDirectory = "/media/data/work/repos/";
-	private String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
-	private String inputAirportsCoordinatesFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
-	private String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
+	private static String dataBaseDirectory = "/media/data/work/repos/";
+	private static String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
+	public static String inputAirportsCoordinatesFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
+	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
 	private String flightScenarioDirectoryName = "dg_oag_flight_model_no_cap_constraints/";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
@@ -158,10 +158,10 @@ public class DgCreateDgFlightScenario {
 	 */
 	public void main(String[] args) throws Exception {
 		//WORLD WIDE AIR TRAFFIC
-//			new DgCreateDgFlightScenario().createWorldFlightScenario(inputAirportsFilename, inputOagFilename);
+			new DgCreateDgFlightScenario().createWorldFlightScenario(inputAirportsCoordinatesFilename, inputOagFilename);
 
 		//EUROPEAN AIR TRAFFIC
-//			new DgCreateDgFlightScenario().createEuropeanFlightScenario(inputAirportsFilename, inputOagFilename);
+			new DgCreateDgFlightScenario().createEuropeanFlightScenario(inputAirportsCoordinatesFilename, inputOagFilename);
 
 		// GERMAN AIR TRAFFIC
 		new DgCreateDgFlightScenario().createGermanFlightScenario(inputAirportsCoordinatesFilename, inputOagFilename);

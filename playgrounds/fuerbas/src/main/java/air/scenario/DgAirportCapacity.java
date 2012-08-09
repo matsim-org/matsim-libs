@@ -30,7 +30,7 @@ public class DgAirportCapacity {
 	private double inboundTaxiwayFlowCapacityCarEquivPerHour = 3600.0;
 	private double outboundTaxiwayFlowCapacityCarEquivPerHour = 3600.0;
 	private double apronFlowCapacityCarEquivPerHour = outboundTaxiwayFlowCapacityCarEquivPerHour;
-	private double runwayInboundFlowCapacityCarEquivPerHour = 60.0;
+	private double runwayInboundFlowCapacityCarEquivPerHour = 3600.0;
 	private double runwayOutboundFlowCapacityCarEquivPerHour = 3600.0;
 	private String airportCode;
 	
