@@ -58,7 +58,7 @@ public class DgCreateDgFlightScenario {
 	private static String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 	public static String inputAirportsCoordinatesFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
 	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
-	private String flightScenarioDirectoryName = "dg_oag_flight_model_no_cap_constraints/";
+	private String flightScenarioDirectoryName = "dg_oag_flight_model_2_runways_60vph/";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioDefaults defaults = new DgFlightScenarioDefaults(CAPACITY_PERIOD);
