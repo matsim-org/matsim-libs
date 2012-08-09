@@ -19,6 +19,54 @@
 
 package org.matsim.contrib.eMob.chargingInfrasruture.inductive.roads;
 
-public class InductiveStreetCharger  {
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+
+import playground.wrashid.lib.obj.DoubleValueHashMap;
+
+/**
+ * This class should work both with jdeqsim and mobsim.
+ * @author wrashid
+ *
+ */
+public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler  {
+
+	private double chargingPowerOfStreetInWatt=3500;
+	
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		
+		
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
