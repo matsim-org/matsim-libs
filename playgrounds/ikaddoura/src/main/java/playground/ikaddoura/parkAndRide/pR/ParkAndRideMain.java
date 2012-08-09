@@ -53,8 +53,8 @@ public class ParkAndRideMain {
 	
 	static int prCapacity;
 	
-	static double addRemoveProb;
-	static int addRemoveDisable;
+	static double addPRProb;
+	static int addPRDisable;
 	
 	static double changeLocationProb;
 	static int changeLocationDisable;
@@ -64,28 +64,27 @@ public class ParkAndRideMain {
 	
 	public static void main(String[] args) throws IOException {
 		
-//		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
-//		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
-//		prCapacity = 100;
-//		
-//		addRemoveProb = 100.;
-//		addRemoveDisable = 500;
-//		
-//		timeAllocationProb = 0.;
-//		timeAllocationDisable = 500;
+		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
+		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
+		prCapacity = 100;
 		
+		addPRProb = 0.;
+		addPRDisable = 500;
+		
+		timeAllocationProb = 100.;
+		timeAllocationDisable = 500;
 		
 //		**************************************************
 		
-		configFile = args[0];
-		prFacilityFile = args[1];
-		prCapacity = Integer.parseInt(args[2]);
-		
-		addRemoveProb = Double.parseDouble(args[3]);
-		addRemoveDisable = Integer.parseInt(args[4]);
-		
-		timeAllocationProb = Double.parseDouble(args[5]);
-		timeAllocationDisable = Integer.parseInt(args[6]);
+//		configFile = args[0];
+//		prFacilityFile = args[1];
+//		prCapacity = Integer.parseInt(args[2]);
+//		
+//		addRemoveProb = Double.parseDouble(args[3]);
+//		addRemoveDisable = Integer.parseInt(args[4]);
+//		
+//		timeAllocationProb = Double.parseDouble(args[5]);
+//		timeAllocationDisable = Integer.parseInt(args[6]);
 	
 		ParkAndRideMain main = new ParkAndRideMain();
 		main.run();
@@ -102,14 +101,13 @@ public class ParkAndRideMain {
 
 		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(id2prFacility, prCapacity);
 				
-		// add "pt interaction" cause controler.init() is called too late and in a protected way
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		controler.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
 		controler.setScoringFunctionFactory(new BvgScoringFunctionFactoryPR(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroupPR(controler.getConfig()), controler.getNetwork()));
 
-		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addRemoveProb, addRemoveDisable, timeAllocationProb, timeAllocationDisable));
+		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addPRProb, addPRDisable, timeAllocationProb, timeAllocationDisable));
 		
 		final MobsimFactory mf = new QSimFactory();
 		controler.setMobsimFactory(new MobsimFactory() {
