@@ -226,9 +226,9 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 						
 			} else {
 				if (hasWorkActivity == false){
-					log.warn("Plan doesn't contain Work Activity. This should not be possible. Not adding Park'n'Ride...");
+					log.warn("Plan doesn't contain Work Activity. This should not be possible. Not modifying the plan...");
 				} else if (hasHomeActivity == false){
-					log.info("Plan doesn't contain Home Activity. Not adding Park'n'Ride...");
+					log.warn("Plan doesn't contain Home Activity. This should not be possible. Not modifiying the plan...");
 				}
 			}	
 	}
