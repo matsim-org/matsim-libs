@@ -92,19 +92,25 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 		
 		// checks if person has a work activity
 		boolean hasWorkAct = false;
+		boolean hasHomeAct = false;
 		for (PlanElement pe: plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl)pe;
 				if (act.getType().equals("work")){
 					hasWorkAct = true;
 				}
+				if (act.getType().equals("home")){
+					hasHomeAct = true;
+				}
 			}
 		}
 		
 		if (hasWorkAct == false) {
-			log.info("Person doesn't have a work activity...");
-		} else {
-			log.info("Person has a work activity. Proceeding...");
+			log.info("Plan doesn't contain a work activity...");
+		} else if (hasHomeAct == false) {
+			log.info("Plan doesn't contain a home activity...");
+		} else if (hasWorkAct == true && hasHomeAct == true) {
+			log.info("Plan contains a home and work activity. Proceeding...");
 						
 			// if there is a "module" (i.e. "innovation"):
 			if (this.firstModule != null) {
