@@ -66,10 +66,10 @@ public class SfFlightDelayAnalysis {
 //	private static String delayOutput = "/media/data/work/matsim/matsimOutput/run1802/ITERS/it.0/1802.0.delay.csv";
 //	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/run1802/ITERS/it.0/1802.0.delay_by_flight.csv";
 
-	private static String scheduledTimes = "/media/data/work/repos/shared-svn/studies/countries/de/flight/dg_oag_flight_model_no_cap_constraints/oag_flights.txt";
-	private static String actualTimes = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.statistic.csv";
-	private static String delayOutput = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.delay.csv";
-	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/flight_model_de/ITERS/it.0/0.delay_by_flight.csv";
+	private static String scheduledTimes = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph/oag_flights.txt";
+	private static String actualTimes = "/media/data/work/matsim/matsimOutput/flight_model_eu/ITERS/it.0/0.statistic.csv";
+	private static String delayOutput = "/media/data/work/matsim/matsimOutput/flight_model_eu/ITERS/it.0/0.delay.csv";
+	private static String delaySingleFlight = "/media/data/work/matsim/matsimOutput/flight_model_eu/ITERS/it.0/0.delay_by_flight.csv";
 
 	
 	private Map<String, Double> readActualArrivals(String filename) throws IOException {
@@ -90,7 +90,7 @@ public class SfFlightDelayAnalysis {
 		return map;
 	}
 
-	private void analyzeDelays() throws Exception {
+	public void analyzeDelays(String scheduledTimes, String actualTimes, String delayOutput, String delaySingleFlight) throws Exception {
 		SortedMap<Integer, Integer> delay = new TreeMap<Integer, Integer>();
 		Map<String, Double> actualArrival = new HashMap<String, Double>();
 		Map<String, Double> scheduledArrival = new HashMap<String, Double>();
@@ -131,7 +131,7 @@ public class SfFlightDelayAnalysis {
 		bwDelaySingleFlights.close();
 
 		this.writeDelays(delay, delayOutput);
-
+		log.info("done!");
 	}
 
 	private void writeDelays(SortedMap<Integer, Integer> delay, String filename) throws IOException {
@@ -152,15 +152,9 @@ public class SfFlightDelayAnalysis {
 		bwDelay.close();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		SfFlightDelayAnalysis ana = new SfFlightDelayAnalysis();
-		log.info("done!");
-		try {
-			ana.analyzeDelays();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			ana.analyzeDelays(scheduledTimes, actualTimes, delayOutput, delaySingleFlight);
 	}
-
 }
