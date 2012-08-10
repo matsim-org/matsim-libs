@@ -34,7 +34,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
- * Only modifying plans if person has a work activity.
+ * Only modifying plans if person has a work and home activity.
  *
  * @author mrieser, modified by ikaddoura
  * @see org.matsim.core.replanning
