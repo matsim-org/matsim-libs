@@ -69,14 +69,6 @@
 		<param name="travelingWalk" value="1e-9" />
 		<param name="waiting" value="1e-9" />
 
-		<!-- <param name="lateArrival" value="-18" />
-		<param name="earlyDeparture" value="-0" />
-		<param name="performing" value="+6" />
-		<param name="traveling" value="-6" />
-		<param name="travelingPt" value="-3" />
-		<param name="travelingWalk" value="-18" />
-		<param name="waiting" value="-0" /> -->
-
 		<param name="activityType_0" value="h" /> <!-- home -->
 		<param name="activityPriority_0" value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
@@ -93,7 +85,7 @@
 	</module>
 
 	<module name="cadytsPt">
-		<param name="startTime" value="05:00:00" />    <!--It must be in "00:00" format !! -->
+		<param name="startTime" value="04:00:00" />    <!--It must be in "00:00" format !! -->
 		<param name="endTime" value="20:00:00" />		<!--It must be in "00:00" format !! -->
 		<param name="regressionInertia" value="0.95" />
 		<param name="minFlowStddevVehH" value="8.0" />  <!-- 8,9,10 -->
