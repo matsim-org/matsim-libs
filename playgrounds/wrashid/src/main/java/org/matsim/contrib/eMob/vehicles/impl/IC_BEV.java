@@ -33,5 +33,5 @@ public class IC_BEV extends BatteryElectricVehicle implements InductivlyChargabl
 	public IC_BEV(EnergyConsumptionModel ecm){
 		this.electricDriveEnergyConsumptionModel=ecm;
 	}
-	
+	 
 }
