@@ -48,7 +48,7 @@ public class PreProcessDijkstra {
 	private boolean containsData = false;
 
 	protected Map<Node, DeadEndData> nodeData = null;
-	
+
 	public void run(final Network network) {
 		markDeadEnds(network);
 		this.containsData = true;
@@ -62,12 +62,12 @@ public class PreProcessDijkstra {
 		long now = System.currentTimeMillis();
 
 		/*
-		 * We use a concurrentHashMap because if FastRouters are used for the re-routing, 
-		 * their parallel initialization in multiple threads may result in concurrent 
+		 * We use a concurrentHashMap because if FastRouters are used for the re-routing,
+		 * their parallel initialization in multiple threads may result in concurrent
 		 * calls to getNodeData(...).
 		 */
 		this.nodeData = new ConcurrentHashMap<Node, DeadEndData>(network.getNodes().size());
-		
+
 		DeadEndData role;
 		for (Node node : network.getNodes().values()) {
 			role = getNodeData(node);
@@ -119,14 +119,14 @@ public class PreProcessDijkstra {
 				+ " (total nodes: " + network.getNodes().size() + "). Done in "
 				+ (System.currentTimeMillis() - now) + " ms");
 	}
-	
+
 	private static Map<Id, Node> getIncidentNodes(Node node) {
 		Map<Id, Node> nodes = new TreeMap<Id, Node>();
 		for (Link link : node.getInLinks().values()) {
-			nodes.put(link.getFromNode().getId(), node);
+			nodes.put(link.getFromNode().getId(), link.getFromNode());
 		}
 		for (Link link : node.getOutLinks().values()) {
-			nodes.put(link.getToNode().getId(), node);
+			nodes.put(link.getToNode().getId(), link.getToNode());
 		}
 		return nodes;
 	}
