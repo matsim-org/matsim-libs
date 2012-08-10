@@ -68,13 +68,13 @@ public class ParkAndRideMain {
 		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
 		prCapacity = 100;
 		
-		addPRProb = 0.5;
+		addPRProb = 100.;
 		addPRDisable = 500;
 		
-		changeLocationProb = 0.5;
+		changeLocationProb = 0.;
 		changeLocationDisable = 500;
 		
-		timeAllocationProb = 0.5;
+		timeAllocationProb = 0.;
 		timeAllocationDisable = 500;
 		
 //		**************************************************

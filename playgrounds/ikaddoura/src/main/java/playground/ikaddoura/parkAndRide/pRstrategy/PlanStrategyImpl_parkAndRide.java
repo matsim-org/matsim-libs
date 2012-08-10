@@ -80,7 +80,7 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 	public void run(final Person person) {
 		
 			this.counter++;
-			
+					
 			// if there is at least one unscored plan, find that one:
 			Plan plan = ((PersonImpl) person).getRandomUnscoredPlan();
 			
@@ -88,6 +88,9 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 			if (plan == null) {
 				plan = this.planSelector.selectPlan(person);
 			}
+			
+			// "select" that plan:
+			((PersonImpl) person).setSelectedPlan(plan);
 			
 			// checks if this plan contains parkAndRide
 			boolean hasPRAct = false;
@@ -100,11 +103,11 @@ public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {
 				}
 			}
 			
-			// if person has a park-and-ride activity proceed with strategy modules...
-			if (hasPRAct){
-				
-				// "select" that plan:
-				((PersonImpl) person).setSelectedPlan(plan);
+			if (hasPRAct==false) {
+				log.info("Selected Plan doesn't contain park-and-ride...");
+			}
+			else {
+				log.info("Selected Plan contains park-and-ride. Proceeding...");
 				
 				// if there is a "module" (i.e. "innovation"):
 				if (this.firstModule != null) {

@@ -77,34 +77,35 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 	@Override
 	public void run(final Person person) {
 		
+		this.counter++;
+		
+		// if there is at least one unscored plan, find that one:
+		Plan plan = ((PersonImpl) person).getRandomUnscoredPlan();
+		
+		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
+		if (plan == null) {
+			plan = this.planSelector.selectPlan(person);
+		}
+		
+		// "select" that plan:
+		((PersonImpl) person).setSelectedPlan(plan);
+		
 		// checks if person has a work activity
 		boolean hasWorkAct = false;
-		for (Plan plan : person.getPlans()){
-			for (PlanElement pe: plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl)pe;
-					if (act.getType().equals("work")){
-						hasWorkAct = true;
-					}
+		for (PlanElement pe: plan.getPlanElements()) {
+			if (pe instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl)pe;
+				if (act.getType().equals("work")){
+					hasWorkAct = true;
 				}
 			}
 		}
 		
-		// if person has a work activity proceed with strategy modules...
-		if (hasWorkAct){
-			this.counter++;
-			
-			// if there is at least one unscored plan, find that one:
-			Plan plan = ((PersonImpl) person).getRandomUnscoredPlan();
-			
-			// otherwise, find one according to selector (often defined in PlanStrategy ctor):
-			if (plan == null) {
-				plan = this.planSelector.selectPlan(person);
-			}
-			
-			// "select" that plan:
-			((PersonImpl) person).setSelectedPlan(plan);
-			
+		if (hasWorkAct == false) {
+			log.info("Person doesn't have a work activity...");
+		} else {
+			log.info("Person has a work activity. Proceeding...");
+						
 			// if there is a "module" (i.e. "innovation"):
 			if (this.firstModule != null) {
 				
