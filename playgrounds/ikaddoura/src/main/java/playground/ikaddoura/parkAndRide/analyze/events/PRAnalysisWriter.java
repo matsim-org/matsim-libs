@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.parkAndRide.analyze;
+package playground.ikaddoura.parkAndRide.analyze.events;
 
 import java.io.BufferedWriter;
 import java.io.File;
