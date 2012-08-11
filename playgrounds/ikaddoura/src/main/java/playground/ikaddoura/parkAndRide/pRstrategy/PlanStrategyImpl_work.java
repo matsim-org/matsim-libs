@@ -99,9 +99,11 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 
 		if (hasWorkAct == false) {
 			log.info("Plan doesn't contain a work activity...");
-		} else if (hasHomeAct == false) {
+		}
+		if (hasHomeAct == false) {
 			log.info("Plan doesn't contain a home activity...");
-		} else if (hasWorkAct == true && hasHomeAct == true) {
+		}
+		if (hasWorkAct == true && hasHomeAct == true) {
 			log.info("Plan contains a home and work activity. Proceeding...");
 			
 			// check if at least one home-work-home sequence without Park'n'Ride

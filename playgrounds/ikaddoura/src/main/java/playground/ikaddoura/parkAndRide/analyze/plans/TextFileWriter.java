@@ -10,6 +10,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
+
 public class TextFileWriter {
 
 	public void writeFile1(List<Id> idList, String outputFile){
@@ -80,13 +82,13 @@ public class TextFileWriter {
 	    } catch (IOException e) {}
 	}
 
-	public void writeFile3(Map<Id, Integer> prLinkId2prActs, String outputFile) {
+	public void writeFile3(Map<Id, Integer> prLinkId2prActs, Map<Id, ParkAndRideFacility> id2prFacilities, String outputFile) {
 		File file = new File(outputFile);
 		   
 	    try {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 	    
-        String zeile11 = "LinkId ; Usage (pr Activities: 2 per user)";
+        String zeile11 = "LinkId ; TransitStop ; Usage (pr Activities: 2 per user)";
     	bw.write(zeile11);
         bw.newLine();
       
@@ -94,7 +96,14 @@ public class TextFileWriter {
 	
 	    for (Id linkId : prLinkId2prActs.keySet()){
 	    	
-	    	String zeile1 = linkId.toString() + " ; " + prLinkId2prActs.get(linkId);
+	    	String name = "unknown";
+			for (ParkAndRideFacility pr : id2prFacilities.values()){
+				if (pr.getPrLink3in().equals(linkId)){
+					name = pr.getStopFacilityName();
+				}
+			}
+	    	
+	    	String zeile1 = linkId.toString() + " ; " + name + " ; " + prLinkId2prActs.get(linkId);
 	
 	    	bw.write(zeile1);
 	        bw.newLine();

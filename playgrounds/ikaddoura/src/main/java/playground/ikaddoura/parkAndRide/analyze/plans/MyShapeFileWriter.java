@@ -46,6 +46,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -80,10 +82,10 @@ public class MyShapeFileWriter {
 		}
 	}
 	
-	public void writeShapeFilePRUsage(Scenario scenario, Map<Id, Integer> prLinkId2prActs, String outputFile) {
+	public void writeShapeFilePRUsage(Scenario scenario, Map<Id, ParkAndRideFacility> id2prFacilities, Map<Id, Integer> prLinkId2prActs, String outputFile) {
 		
 		initFeatureType3();
-		Collection<Feature> features = createFeatures3(scenario, prLinkId2prActs);
+		Collection<Feature> features = createFeatures3(scenario, id2prFacilities, prLinkId2prActs);
 		ShapeFileWriter.writeGeometries(features, outputFile);
 		System.out.println("ShapeFile geschrieben (PRUsage)");			
 	}
@@ -117,10 +119,12 @@ public class MyShapeFileWriter {
 	}
 	
 	private void initFeatureType3() {
-		AttributeType [] attribs = new AttributeType[3];
+		AttributeType [] attribs = new AttributeType[4];
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("LineString",LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
 		attribs[1] = AttributeTypeFactory.newAttributeType("ID", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("Users", Integer.class);
+		attribs[2] = AttributeTypeFactory.newAttributeType("Stop", String.class);
+		attribs[3] = AttributeTypeFactory.newAttributeType("Users", Integer.class);
+
 
 		try {
 		this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "link");
@@ -147,10 +151,19 @@ public class MyShapeFileWriter {
 		return liste;
 	}
 	
-	private Collection<Feature> createFeatures3(Scenario scenario, Map<Id, Integer> prLinkId2prActs) {
+	private Collection<Feature> createFeatures3(Scenario scenario, Map<Id, ParkAndRideFacility> id2prFacilities, Map<Id, Integer> prLinkId2prActs) {
 		ArrayList<Feature> liste = new ArrayList<Feature>();
+		System.out.println("start");
 		for (Link link : scenario.getNetwork().getLinks().values()){
-			liste.add(getFeature3(link,prLinkId2prActs.get(link.getId())));
+			
+			String name = "";
+			for (ParkAndRideFacility pr : id2prFacilities.values()){
+				if (pr.getPrLink3in().equals(link.getId())){
+					name = pr.getStopFacilityName();
+				}
+			}
+			
+			liste.add(getFeature3(link, name, prLinkId2prActs.get(link.getId())));
 		}
 		return liste;
 	}
@@ -182,12 +195,13 @@ public class MyShapeFileWriter {
 		}
 	}
 	
-	private Feature getFeature3(Link link, Integer prUsers) {
+	private Feature getFeature3(Link link, String transitStopName, Integer prUsers) {
 		LineString ls = this.geometryFactory.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())});
-		Object [] attribs = new Object[3];
+		Object [] attribs = new Object[4];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
-		attribs[2] = prUsers;
+		attribs[2] = transitStopName;
+		attribs[3] = prUsers;
 		
 		try {
 			return this.featureType.create(attribs);

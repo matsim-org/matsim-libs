@@ -23,24 +23,28 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
+import playground.ikaddoura.parkAndRide.pR.PRFileReader;
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 public class PRPlansReader {
 	
 	private static final Logger log = Logger.getLogger(PRPlansReader.class);
 
-	static String plansFile1; // initial Plans
+//	static String plansFile1; // initial Plans
 	static String plansFile2; // output Plans
 	static String netFile;
+	static String prFacilitiesFile;
 	static String outputPath;
 	
 	TextFileWriter writer = new TextFileWriter();
 			
 	public static void main(String[] args) throws IOException {
 		
-		plansFile1 = "/Users/Ihab/Desktop/test/population1.xml";
+//		plansFile1 = "/Users/Ihab/Desktop/test/population1.xml";
 		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
 		netFile = "/Users/Ihab/Desktop/test/network.xml";
+		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
 		outputPath = "/Users/Ihab/Desktop/test/";
 		
 		// ****************************
@@ -67,17 +71,19 @@ public class PRPlansReader {
 	
 	public void run() {
 		
-		Scenario scenario1 = getScenario(netFile, plansFile1);
+//		Scenario scenario1 = getScenario(netFile, plansFile1);
 		Scenario scenario2 = getScenario(netFile, plansFile2);
+		PRFileReader prFileReader = new PRFileReader(prFacilitiesFile);		
+		Map<Id, ParkAndRideFacility> id2PRFacilities = prFileReader.getId2prFacility();
 		
 		System.out.println("-------------------------------------------------------");
 		
-		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), 1.0); // Verbesserungen mit / ohne P+R
-		analyzePR(scenario2); // selected Plans mit PR
+//		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), 1.0); // Verbesserungen mit / ohne P+R
+		analyzePR(scenario2, id2PRFacilities); // selected Plans mit PR
 
 	}
 
-	private void analyzePR(Scenario scenario2) {
+	private void analyzePR(Scenario scenario2, Map<Id, ParkAndRideFacility> id2prFacilities) {
 		
 		List<Person> personsPR = new ArrayList<Person>();
 		List<Person> personsHomeWork = new ArrayList<Person>();
@@ -151,8 +157,8 @@ public class PRPlansReader {
 			}
 		}
 		
-		writer.writeFile3(prLinkId2prActs, outputPath+"prUsage.txt");
-		shapeFileWriter.writeShapeFilePRUsage(scenario2, prLinkId2prActs, outputPath + "shapeFiles/prUsage.shp");
+		writer.writeFile3(prLinkId2prActs, id2prFacilities, outputPath+"prUsage.txt");
+		shapeFileWriter.writeShapeFilePRUsage(scenario2, id2prFacilities, prLinkId2prActs, outputPath + "shapeFiles/prUsage.shp");
 		
 	}
 
