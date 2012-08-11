@@ -1,4 +1,4 @@
-package playground.toronto.analysis;
+package playground.toronto.analysis.handlers;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -31,6 +31,7 @@ public class CheckTransitScheduleConsistency {
 		String scheduleFile = args[1];
 		String vehiclesFile = args[2];
 		String reportFile = args[3];
+		String stopLinkGeometryFile = args[4];
 		
 		Config config = ConfigUtils.createConfig();
 		config.setParam("scenario", "useTransit", "true");
@@ -43,6 +44,9 @@ public class CheckTransitScheduleConsistency {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(reportFile));
 		writer.write("Transit Schedule Consistency Check Report\n" +
 				"=================================================\n\n");
+		
+		BufferedWriter writer2 = new BufferedWriter(new FileWriter(stopLinkGeometryFile));
+		writer2.write("stop_id,stop_x,stop_y,to_node_id,to_node_x,to_node_y");
 		
 		//Check stop link references
 		log.info("Checking stops...");
@@ -57,6 +61,10 @@ public class CheckTransitScheduleConsistency {
 				writer.write("\n\tStop id=\"" + stop.getId().toString() + "\" does not reference a valid link.");
 				badStops++;
 			}else{
+				writer2.write("\n" + stop.getId() + "," + 
+						stop.getCoord().getX() + "," + stop.getCoord().getY() + ","
+						+ link.getToNode().getId() + "," + link.getToNode().getCoord().getX()
+						+ "," + link.getToNode().getCoord().getY());
 				goodStops++;
 			}
 		}

@@ -35,6 +35,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
 import playground.balmermi.world.WorldUtils;
@@ -53,6 +54,9 @@ import playground.toronto.demand.util.TableReader;
  * 
  * A bunch of added functionality, including a consistency checker,
  * and some simple GUIs for opening/saving files.
+ * 
+ * Also includes a getter of trips for a given person-id, for use
+ * in post-process-analysis.
  * 
  * @author pkucirek
  *
@@ -116,6 +120,28 @@ public class CreatePlansFromTrips {
 	// get / set methods
 	// ////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Returns the list of trips as Tuple<origin_zone, dest_zone> for a given personId.
+	 * 
+	 * @param personId - The Id of the person to look up.
+	 * @return
+	 */
+	public List<Tuple<String,String>> getTrips(Id personId){
+		if (!personTripsMap.containsKey(personId)) throw new IllegalArgumentException("Could not find person " + personId);
+		
+		ArrayList<Trip> tps =  new ArrayList<CreatePlansFromTrips.Trip>();
+		for (Id i : personTripsMap.get(personId)) tps.add(trips.get(i));
+		sortTrips(tps);
+		
+		List<Tuple<String, String>> result = new ArrayList<Tuple<String,String>>();
+		for (Trip t : tps){
+			Tuple<String, String> tup = new Tuple<String, String>(t.zone_o, t.zone_d);
+			result.add(tup);
+		}
+		
+		return result;
+	}
+	
 	public boolean isUsingMixedModeTrips() {
 		return isUsingMixedModeTrips;
 	}
@@ -128,7 +154,34 @@ public class CreatePlansFromTrips {
 	// IO functions
 	// ////////////////////////////////////////////////////////////////////
 	
-	private void readZones(String filename) throws IOException{
+	public boolean loadZones(){
+		String file = "";
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Please select a zones file");
+		fc.setFileFilter(new FileFilter() {
+			@Override
+			public String getDescription() {return "Table of zones in *.txt format.";}
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".txt" );
+			}
+		});		
+		int state = fc.showOpenDialog(null);
+		if (state == JFileChooser.APPROVE_OPTION){
+			file = fc.getSelectedFile().getAbsolutePath();
+		}else if (state == JFileChooser.CANCEL_OPTION) return false;
+		if (file == "" || file == null) return false;
+		
+		try {
+			this.loadZones(file);
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private void loadZones(String filename) throws IOException{
 		
 		log.info("Opening " + filename + " as a zones file.");
 		
@@ -149,7 +202,34 @@ public class CreatePlansFromTrips {
 		log.info("Zones file opened successfully.");
 	}
 	
-	private void readTrips(String filename) throws IOException{	
+	public boolean loadTrips(){
+		String file = "";
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Please select a trips file");
+		fc.setFileFilter(new FileFilter() {
+			@Override
+			public String getDescription() {return "Table of trip records in *.txt format.";}
+			@Override
+			public boolean accept(File f) {
+				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".txt" );
+			}
+		});
+		int state = fc.showOpenDialog(null);
+		if (state == JFileChooser.APPROVE_OPTION){
+			file = fc.getSelectedFile().getAbsolutePath();
+		}else if (state == JFileChooser.CANCEL_OPTION) return false;
+		if (file.equals("") || file == null) return false;
+		
+		try {
+			this.loadTrips(file);
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private void loadTrips(String filename) throws IOException{	
 		log.info("Opening " + filename + " as a trips file.");
 		
 		TableReader tr = new TableReader(filename);
@@ -727,7 +807,7 @@ public class CreatePlansFromTrips {
 		if (file == "" || file == null) return;
 		
 		try {
-			converter.readZones(file);
+			converter.loadZones(file);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
@@ -753,7 +833,7 @@ public class CreatePlansFromTrips {
 
 		
 		try {
-			converter.readTrips(file);
+			converter.loadTrips(file);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;

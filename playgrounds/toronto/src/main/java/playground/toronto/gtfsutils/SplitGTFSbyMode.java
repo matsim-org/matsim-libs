@@ -39,6 +39,7 @@ public class SplitGTFSbyMode {
 		String routesFile = args[0].replace("\\", "/") + "/routes.txt";
 		String tripsFiles = args[0].replace("\\", "/") + "/trips.txt";
 		String stoptimesFile = args[0].replace("\\", "/") + "/stop_times.txt";
+		String stopsFile = args[0].replace("\\", "/") + "/stops.txt";
 		String service = args[5];
 		
 		HashMap<String, Integer> routeIdModeMap = new HashMap<String, Integer>();
@@ -91,7 +92,7 @@ public class SplitGTFSbyMode {
 			String rtId = cells[rtCol];
 			if (!sv.equals(service)){
 				skippedTrips.put(tpId, true);
-				continue; //skips trips that aren't in the speicifed service schedule.
+				continue; //skips trips that aren't in the specified service schedule.
 			}
 			skippedTrips.put(tpId, false);
 

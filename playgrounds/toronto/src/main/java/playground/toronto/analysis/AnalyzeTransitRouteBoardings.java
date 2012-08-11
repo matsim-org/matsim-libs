@@ -19,6 +19,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import playground.toronto.analysis.handlers.VehicleBoardingHandler;
+
 
 
 public class AnalyzeTransitRouteBoardings {
