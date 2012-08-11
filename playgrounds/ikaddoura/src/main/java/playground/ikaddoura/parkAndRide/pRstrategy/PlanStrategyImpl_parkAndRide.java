@@ -38,7 +38,7 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
  * A strategy defines how an agent can be modified during re-planning.
  * Only modifying plans if plan contains a park-and-ride activity.
  *
- * @author mrieser, modified by ikaddoura
+ * @author ikaddoura, based on mrieser
  * @see org.matsim.core.replanning
  */
 public final class PlanStrategyImpl_parkAndRide implements PlanStrategy {

@@ -21,22 +21,21 @@
 package playground.ikaddoura.parkAndRide.pRstrategy;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
- * Only modifying plans if person has a work and home activity.
+ * Only proceeding with strategy modules if the plan contains a work and home activity and if at least one home-work-home sequency has no Park'n'Ride
  *
- * @author mrieser, modified by ikaddoura
+ * @author ikaddoura, based on mrieser
  * @see org.matsim.core.replanning
  */
 public final class PlanStrategyImpl_work implements PlanStrategy {
@@ -90,40 +89,60 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 		// "select" that plan:
 		((PersonImpl) person).setSelectedPlan(plan);
 		
-		// checks if person has a work activity
-		boolean hasWorkAct = false;
-		boolean hasHomeAct = false;
-		for (PlanElement pe: plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl)pe;
-				if (act.getType().equals("work")){
-					hasWorkAct = true;
-				}
-				if (act.getType().equals("home")){
-					hasHomeAct = true;
-				}
-			}
-		}
+		PlanIndicesAnalyzer planIndices = new PlanIndicesAnalyzer(plan);
+		planIndices.setIndices();
 		
+		// checks if person has a home / work activity
+		boolean hasHomeAct = planIndices.hasHomeActivity();
+		boolean hasWorkAct = planIndices.hasWorkActivity();
+		boolean sequenceWithoutPR = false;
+
 		if (hasWorkAct == false) {
 			log.info("Plan doesn't contain a work activity...");
 		} else if (hasHomeAct == false) {
 			log.info("Plan doesn't contain a home activity...");
 		} else if (hasWorkAct == true && hasHomeAct == true) {
 			log.info("Plan contains a home and work activity. Proceeding...");
-						
-			// if there is a "module" (i.e. "innovation"):
-			if (this.firstModule != null) {
+			
+			// check if at least one home-work-home sequence without Park'n'Ride
+			int maxHomeBeforeWork;
+			int minHomeAfterWork;
+			
+			for (Integer workIndex : planIndices.getWorkActs()){
+				minHomeAfterWork = planIndices.getMinHomeAfterWork(workIndex);
+				maxHomeBeforeWork = planIndices.getMaxHomeBeforeWork(workIndex);
 				
-				// set the working plan to a copy of the selected plan:
-				plan = ((PersonImpl) person).copySelectedPlan();
-				// (this makes, as a side effect, the _new_ plan selected)
-				
-				// add new plan to container that contains the plans that are handled by this PlanStrategy:
-				this.plans.add(plan);
-	
-				// start working on this new plan:
-				this.firstModule.handlePlan(plan);
+				List<Integer> indicesPRact = new ArrayList<Integer>();
+				for (Integer prIndex : planIndices.getPrActs()){
+					if (prIndex > maxHomeBeforeWork && prIndex < minHomeAfterWork){
+						// go through all park-and-ride activities of this home-work-home sequence
+						indicesPRact.add(prIndex);
+					}
+				}
+				if (indicesPRact.isEmpty()){
+					System.out.println("home-work-home sequence doesn't contain Park'n'Ride.");
+					sequenceWithoutPR = true;
+				}
+			}
+			
+			if (sequenceWithoutPR == false) {
+				log.info("No home-work-home sequence without Park'n'Ride...");
+			} else if (sequenceWithoutPR) {
+				log.info("At least one home-work-home sequence without Park'n'Ride. Proceeding...");
+
+				// if there is a "module" (i.e. "innovation"):
+				if (this.firstModule != null) {
+					
+					// set the working plan to a copy of the selected plan:
+					plan = ((PersonImpl) person).copySelectedPlan();
+					// (this makes, as a side effect, the _new_ plan selected)
+					
+					// add new plan to container that contains the plans that are handled by this PlanStrategy:
+					this.plans.add(plan);
+		
+					// start working on this new plan:
+					this.firstModule.handlePlan(plan);
+				}
 			}
 		}
 	}
