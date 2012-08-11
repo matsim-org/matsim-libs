@@ -14,16 +14,19 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 public class TextFileWriter {
 
-	public void writeFile1(List<Id> idList, String outputFile){
+	public void writeFile1(List<Id> idList, int numberOfPlans, String outputFile){
 		File file = new File(outputFile);
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile0 = "Anzahl Agenten mit verbessertem Plan ohne Park'n'Ride: " + idList.size();
+	    String zeile0 = "number of agents: " + idList.size();
     	bw.write(zeile0);
         bw.newLine();
+	    String zeile00 = "number of plans: " + numberOfPlans;
+    	bw.write(zeile00);
+        bw.newLine();
 	    
-	    String zeile = "PersonIDs mit verbessertem Plan ohne Park'n'Ride:";
+	    String zeile = "PersonIDs:";
 		
     	bw.write(zeile);
         bw.newLine();
@@ -49,19 +52,19 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile0 = "Anzahl ausgewählter Pläne mit Home und Work Activity: " + personsHomeWork.size();
+	    String zeile0 = "number of selected plans with a home and work activity: " + personsHomeWork.size();
     	bw.write(zeile0);
         bw.newLine();
-        String zeile00 = "Anzahl ausgewählter Pläne mit Park'n'Ride Activity: " + personsHomeWork.size();
+        String zeile00 = "number of selected plans with a Park'n'Ride activity: " + personsHomeWork.size();
     	bw.write(zeile00);
         bw.newLine();
-        String zeile11 = "Park'n'Ride-Anteil: " + personsPR.size()/personsHomeWork.size()*100+"%";
+        String zeile11 = "Park'n'Ride share: " + personsPR.size()/personsHomeWork.size()*100+"%";
     	bw.write(zeile11);
         bw.newLine();
       
         bw.newLine();
 	    
-	    String zeile = "Agenten mit Park'n'Ride im ausgewählten Plan:";
+	    String zeile = "Agents with selected Park'n'Ride plan:";
 		
     	bw.write(zeile);
         bw.newLine();
@@ -91,9 +94,7 @@ public class TextFileWriter {
         String zeile11 = "LinkId ; TransitStop ; Usage (pr Activities: 2 per user)";
     	bw.write(zeile11);
         bw.newLine();
-      
-        bw.newLine();
-	
+      	
 	    for (Id linkId : prLinkId2prActs.keySet()){
 	    	
 	    	String name = "unknown";

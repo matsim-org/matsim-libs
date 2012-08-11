@@ -31,7 +31,7 @@ public class PRPlansReader {
 	
 	private static final Logger log = Logger.getLogger(PRPlansReader.class);
 
-//	static String plansFile1; // initial Plans
+	static String plansFile1; // initial Plans
 	static String plansFile2; // output Plans
 	static String netFile;
 	static String prFacilitiesFile;
@@ -42,28 +42,18 @@ public class PRPlansReader {
 	public static void main(String[] args) throws IOException {
 		
 //		plansFile1 = "/Users/Ihab/Desktop/test/population1.xml";
-		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
-		netFile = "/Users/Ihab/Desktop/test/network.xml";
-		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
-		outputPath = "/Users/Ihab/Desktop/test/";
-		
-		// ****************************
-		
-//		plansFile2 = "/Users/Ihab/Desktop/testBerlin/pop.gz";
-//		netFile = "/Users/Ihab/Desktop/testBerlin/net.xml";
-//		outputPath = "/Users/Ihab/Desktop/testBerlin/";
-//		
-//		plansFile1 = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/berlin_run4_transferPenalty-5/ITERS/it.0/0.plans.xml.gz";
-//		plansFile2 = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/berlin_run4_transferPenalty-5/ITERS/it.20/20.plans.xml.gz";
-//		netFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/input/PRnetwork_berlin.xml";
+//		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
+//		netFile = "/Users/Ihab/Desktop/test/network.xml";
+//		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
 //		outputPath = "/Users/Ihab/Desktop/test/";
 
 		// ****************************
 		
-//		plansFile1 = args[0];
-//		plansFile2 = args[1];
-//		netFile = args[2];
-//		outputPath = args[3];
+		plansFile1 = args[0];
+		plansFile2 = args[1];
+		netFile = args[2];
+		prFacilitiesFile = args[3];
+		outputPath = args[4];
 		
 		PRPlansReader analysis = new PRPlansReader();
 		analysis.run();
@@ -71,15 +61,15 @@ public class PRPlansReader {
 	
 	public void run() {
 		
-//		Scenario scenario1 = getScenario(netFile, plansFile1);
+		Scenario scenario1 = getScenario(netFile, plansFile1);
 		Scenario scenario2 = getScenario(netFile, plansFile2);
 		PRFileReader prFileReader = new PRFileReader(prFacilitiesFile);		
 		Map<Id, ParkAndRideFacility> id2PRFacilities = prFileReader.getId2prFacility();
 		
 		System.out.println("-------------------------------------------------------");
 		
-//		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), 1.0); // Verbesserungen mit / ohne P+R
-		analyzePR(scenario2, id2PRFacilities); // selected Plans mit PR
+		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), 1.0); // all plans
+		analyzePR(scenario2, id2PRFacilities); // selected Plans
 
 	}
 
@@ -180,12 +170,16 @@ public class PRPlansReader {
 	}
 	
 	
-	// -----------------------------------------------
+	//------------------------------------------------------------------------------------------------------------------------
 
 	private void compareScores(Population population1, Population population2, double tolerance) {
-		List <Id> personIds = new ArrayList<Id>();
-		
-		int n = 0;
+		List <Id> personIdsWithImprovedPlanWithoutPR = new ArrayList<Id>();
+		List <Id> personIdsWithImprovedPlanWithPR = new ArrayList<Id>();
+		List <Id> personIdsWithWorsePlan = new ArrayList<Id>();
+
+		int plansImprovedWithoutPR = 0;
+		int plansImprovedWithPR = 0;
+		int plansWorse = 0;
 		
 		for (Person person1 : population1.getPersons().values()){
 			for (Plan plan1 : person1.getPlans()){
@@ -215,13 +209,26 @@ public class PRPlansReader {
 										}
 									}
 									if (plan2HasPR){
-//										System.out.println(person2.getId() + " hat in planFile2 einen Park'n'Ride-Plan mit höherem Score.");
+										plansImprovedWithPR++;
+										if (personIdsWithImprovedPlanWithPR.contains(person2.getId())){
+										} else {
+											personIdsWithImprovedPlanWithPR.add(person2.getId());
+										}
 									} else {
-										log.info(person2.getId() + " hat in planFile2 einen Plan mit höherem Score, der kein Park'n'Ride enthält!!!");
-										log.info("Verbesserung nicht aufgrund von Park'n'Ride!");
-										personIds.add(person2.getId());
-										n++;
+										plansImprovedWithoutPR++;
+										if (personIdsWithImprovedPlanWithoutPR.contains(person2.getId())){
+										} else {
+											personIdsWithImprovedPlanWithoutPR.add(person2.getId());
+										}
 									}
+								} else if(score1 > score2 + tolerance) {
+									plansWorse++;
+									if (personIdsWithWorsePlan.contains(person2.getId())){
+									} else {
+										personIdsWithWorsePlan.add(person2.getId());
+									}
+								} else {
+									// unchanged score
 								}
 							}	
 						}
@@ -229,9 +236,11 @@ public class PRPlansReader {
 				}
 			}
 		}
-		log.info("Verbesserte Pläne nicht aufgrund von Park'n'Ride: " + n);
-		
-		writer.writeFile1(personIds, outputPath+"verbessertOhnePR.txt");		
+
+		writer.writeFile1(personIdsWithImprovedPlanWithoutPR, plansImprovedWithoutPR, outputPath+"improvedPlan_WithoutPR.txt");
+		writer.writeFile1(personIdsWithImprovedPlanWithPR, plansImprovedWithPR, outputPath+"improvedPlan_WithPR.txt");		
+		writer.writeFile1(personIdsWithWorsePlan, plansWorse, outputPath+"worsePlan.txt");		
+
 	}
 
 //------------------------------------------------------------------------------------------------------------------------
