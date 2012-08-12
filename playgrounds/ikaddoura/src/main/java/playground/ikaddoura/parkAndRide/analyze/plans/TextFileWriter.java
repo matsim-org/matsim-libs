@@ -14,15 +14,12 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 public class TextFileWriter {
 
-	public void writeFile1(List<Id> idList, int numberOfPlans, String outputFile){
+	public void writeFile1(List<Id> idList, int numberOfAgents, String outputFile){
 		File file = new File(outputFile);
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile0 = "number of agents: " + idList.size();
-    	bw.write(zeile0);
-        bw.newLine();
-	    String zeile00 = "number of plans: " + numberOfPlans;
+	    String zeile00 = "number of agents: " + numberOfAgents;
     	bw.write(zeile00);
         bw.newLine();
 	    
@@ -58,7 +55,7 @@ public class TextFileWriter {
         String zeile00 = "number of selected plans with a Park'n'Ride activity: " + personsHomeWork.size();
     	bw.write(zeile00);
         bw.newLine();
-        String zeile11 = "Park'n'Ride share: " + personsPR.size()/personsHomeWork.size()*100+"%";
+        String zeile11 = "Park'n'Ride share: " + (double) personsPR.size() / (double) personsHomeWork.size()*100+"%";
     	bw.write(zeile11);
         bw.newLine();
       

@@ -36,6 +36,7 @@ public class PRPlansReader {
 	static String netFile;
 	static String prFacilitiesFile;
 	static String outputPath;
+	static double tolerance;
 	
 	TextFileWriter writer = new TextFileWriter();
 			
@@ -54,6 +55,7 @@ public class PRPlansReader {
 		netFile = args[2];
 		prFacilitiesFile = args[3];
 		outputPath = args[4];
+		tolerance = Double.parseDouble(args[5]);
 		
 		PRPlansReader analysis = new PRPlansReader();
 		analysis.run();
@@ -61,14 +63,14 @@ public class PRPlansReader {
 	
 	public void run() {
 		
-//		Scenario scenario1 = getScenario(netFile, plansFile1);
+		Scenario scenario1 = getScenario(netFile, plansFile1);
 		Scenario scenario2 = getScenario(netFile, plansFile2);
 		PRFileReader prFileReader = new PRFileReader(prFacilitiesFile);		
 		Map<Id, ParkAndRideFacility> id2PRFacilities = prFileReader.getId2prFacility();
 		
 		System.out.println("-------------------------------------------------------");
 		
-//		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), 1.0); // all plans
+		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), tolerance); // all plans
 		analyzePR(scenario2, id2PRFacilities); // selected Plans
 
 	}
@@ -110,7 +112,7 @@ public class PRPlansReader {
 		}
 		log.info("PRPlans: " + personsPR.size());
 		log.info("WorkPlans: " + personsHomeWork.size());
-		log.info("Park'n'Ride-Anteil: " + personsPR.size()/personsHomeWork.size()*100+"%");
+		log.info("Park'n'Ride-Anteil: " + (double) personsPR.size() / (double) personsHomeWork.size()*100+"%");
 		
 		writer.writeFile2(personsPR, personsHomeWork, outputPath+"prPlans.txt");
 		
@@ -173,73 +175,111 @@ public class PRPlansReader {
 	//------------------------------------------------------------------------------------------------------------------------
 
 	private void compareScores(Population population1, Population population2, double tolerance) {
-		List <Id> personIdsWithImprovedPlanWithoutPR = new ArrayList<Id>();
-		List <Id> personIdsWithImprovedPlanWithPR = new ArrayList<Id>();
-		List <Id> personIdsWithWorsePlan = new ArrayList<Id>();
+		
+		List <Id> improvedPlanPersonIDs = new ArrayList<Id>();
+		List <Id> worsePlanPersonIDs = new ArrayList<Id>();
+		List <Id> equalPlanPersonIDs = new ArrayList<Id>();
 
-		int plansImprovedWithoutPR = 0;
-		int plansImprovedWithPR = 0;
-		int plansWorse = 0;
+		// for selected plans
 		
 		for (Person person1 : population1.getPersons().values()){
-			for (Plan plan1 : person1.getPlans()){
-				if (plan1.getScore()==null){
-					log.info("Plan1 hat keinen Score...");
+			Plan plan1 = person1.getSelectedPlan();
+			if (plan1.getScore() == null){
+				log.info("Plan1 hat keinen Score. Skipping this plan...");
+			} else {
+				double score1 = plan1.getScore();
+				Id personId1 = person1.getId();
+				if (population2.getPersons().get(personId1) == null){
 				} else {
-					double score1 = plan1.getScore();
-					Id personId1 = person1.getId();
-					
-					if (population2.getPersons().get(personId1)==null){
+					Person person2 = population2.getPersons().get(personId1);
+					Plan plan2 = person2.getSelectedPlan();
+					if (plan2.getScore()==null){
+						log.info("Plan2 hat keinen Score. Skipping this plan...");
 					} else {
-						Person person2 = population2.getPersons().get(personId1);
-						for (Plan plan2 : person2.getPlans()){
-							boolean plan2HasPR = false;
-							
-							if (plan2.getScore()==null){
-								log.info("Plan2 hat keinen Score...");
-							} else {
-								double score2 = plan2.getScore();
-								if (score2 > score1 + tolerance) {
-									for (PlanElement pE : plan2.getPlanElements()){
-										if (pE instanceof Activity){
-											Activity act = (Activity) pE;
-											if (act.toString().contains("parkAndRide")){
-												plan2HasPR = true;
-											}
-										}
-									}
-									if (plan2HasPR){
-										plansImprovedWithPR++;
-										if (personIdsWithImprovedPlanWithPR.contains(person2.getId())){
-										} else {
-											personIdsWithImprovedPlanWithPR.add(person2.getId());
-										}
-									} else {
-										plansImprovedWithoutPR++;
-										if (personIdsWithImprovedPlanWithoutPR.contains(person2.getId())){
-										} else {
-											personIdsWithImprovedPlanWithoutPR.add(person2.getId());
-										}
-									}
-								} else if(score1 > score2 + tolerance) {
-									plansWorse++;
-									if (personIdsWithWorsePlan.contains(person2.getId())){
-									} else {
-										personIdsWithWorsePlan.add(person2.getId());
-									}
-								} else {
-									// unchanged score
-								}
-							}	
+						double score2 = plan2.getScore();
+						if (score2 > score1 + tolerance) {
+							improvedPlanPersonIDs.add(person2.getId());
+						} else if ( score1 > score2 + tolerance){
+							worsePlanPersonIDs.add(person2.getId());
+						} else {
+							equalPlanPersonIDs.add(person2.getId());
 						}
+
 					}
 				}
 			}
 		}
+		
+		writer.writeFile1(improvedPlanPersonIDs, improvedPlanPersonIDs.size(), outputPath + "improvedPersons.txt");
+		writer.writeFile1(worsePlanPersonIDs, worsePlanPersonIDs.size(), outputPath + "worsePersons.txt");
+		writer.writeFile1(equalPlanPersonIDs, equalPlanPersonIDs.size(), outputPath + "equalPersons.txt");
 
-		writer.writeFile1(personIdsWithImprovedPlanWithoutPR, plansImprovedWithoutPR, outputPath+"improvedPlan_WithoutPR.txt");
-		writer.writeFile1(personIdsWithImprovedPlanWithPR, plansImprovedWithPR, outputPath+"improvedPlan_WithPR.txt");		
-		writer.writeFile1(personIdsWithWorsePlan, plansWorse, outputPath+"worsePlan.txt");		
+//		List <Id> personIdsWithImprovedPlanWithoutPR = new ArrayList<Id>();
+//		List <Id> personIdsWithImprovedPlanWithPR = new ArrayList<Id>();
+//		List <Id> personIdsWithWorsePlan = new ArrayList<Id>();
+//
+//		int plansImprovedWithoutPR = 0;
+//		int plansImprovedWithPR = 0;
+//		int plansWorse = 0;
+//		
+//		for (Person person1 : population1.getPersons().values()){
+//			for (Plan plan1 : person1.getPlans()){
+//				if (plan1.getScore()==null){
+//					log.info("Plan1 hat keinen Score...");
+//				} else {
+//					double score1 = plan1.getScore();
+//					Id personId1 = person1.getId();
+//					
+//					if (population2.getPersons().get(personId1)==null){
+//					} else {
+//						Person person2 = population2.getPersons().get(personId1);
+//						for (Plan plan2 : person2.getPlans()){
+//							boolean plan2HasPR = false;
+//							
+//							if (plan2.getScore()==null){
+//								log.info("Plan2 hat keinen Score...");
+//							} else {
+//								double score2 = plan2.getScore();
+//								if (score2 > score1 + tolerance) {
+//									for (PlanElement pE : plan2.getPlanElements()){
+//										if (pE instanceof Activity){
+//											Activity act = (Activity) pE;
+//											if (act.toString().contains("parkAndRide")){
+//												plan2HasPR = true;
+//											}
+//										}
+//									}
+//									if (plan2HasPR){
+//										plansImprovedWithPR++;
+//										if (personIdsWithImprovedPlanWithPR.contains(person2.getId())){
+//										} else {
+//											personIdsWithImprovedPlanWithPR.add(person2.getId());
+//										}
+//									} else {
+//										plansImprovedWithoutPR++;
+//										if (personIdsWithImprovedPlanWithoutPR.contains(person2.getId())){
+//										} else {
+//											personIdsWithImprovedPlanWithoutPR.add(person2.getId());
+//										}
+//									}
+//								} else if(score1 > score2 + tolerance) {
+//									plansWorse++;
+//									if (personIdsWithWorsePlan.contains(person2.getId())){
+//									} else {
+//										personIdsWithWorsePlan.add(person2.getId());
+//									}
+//								} else {
+//									// unchanged score
+//								}
+//							}	
+//						}
+//					}
+//				}
+//			}
+//		}
+//		writer.writeFile1(personIdsWithImprovedPlanWithoutPR, plansImprovedWithoutPR, outputPath+"improvedPlan_WithoutPR.txt");
+//		writer.writeFile1(personIdsWithImprovedPlanWithPR, plansImprovedWithPR, outputPath+"improvedPlan_WithPR.txt");		
+//		writer.writeFile1(personIdsWithWorsePlan, plansWorse, outputPath+"worsePlan.txt");		
 
 	}
 
