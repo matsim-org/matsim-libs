@@ -61,14 +61,14 @@ public class PRPlansReader {
 	
 	public void run() {
 		
-		Scenario scenario1 = getScenario(netFile, plansFile1);
+//		Scenario scenario1 = getScenario(netFile, plansFile1);
 		Scenario scenario2 = getScenario(netFile, plansFile2);
 		PRFileReader prFileReader = new PRFileReader(prFacilitiesFile);		
 		Map<Id, ParkAndRideFacility> id2PRFacilities = prFileReader.getId2prFacility();
 		
 		System.out.println("-------------------------------------------------------");
 		
-		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), 1.0); // all plans
+//		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), 1.0); // all plans
 		analyzePR(scenario2, id2PRFacilities); // selected Plans
 
 	}

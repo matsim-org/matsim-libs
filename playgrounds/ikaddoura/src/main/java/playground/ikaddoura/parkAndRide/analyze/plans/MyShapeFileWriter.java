@@ -153,17 +153,16 @@ public class MyShapeFileWriter {
 	
 	private Collection<Feature> createFeatures3(Scenario scenario, Map<Id, ParkAndRideFacility> id2prFacilities, Map<Id, Integer> prLinkId2prActs) {
 		ArrayList<Feature> liste = new ArrayList<Feature>();
-		System.out.println("start");
-		for (Link link : scenario.getNetwork().getLinks().values()){
+		for (Id linkId : prLinkId2prActs.keySet()){
 			
 			String name = "";
 			for (ParkAndRideFacility pr : id2prFacilities.values()){
-				if (pr.getPrLink3in().equals(link.getId())){
+				if (pr.getPrLink3in().equals(linkId)){
 					name = pr.getStopFacilityName();
 				}
 			}
 			
-			liste.add(getFeature3(link, name, prLinkId2prActs.get(link.getId())));
+			liste.add(getFeature3(scenario.getNetwork().getLinks().get(linkId), name, prLinkId2prActs.get(linkId)));
 		}
 		return liste;
 	}
