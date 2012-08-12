@@ -64,10 +64,10 @@ public class ParkAndRideMain {
 	
 	public static void main(String[] args) throws IOException {
 		
-		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
-		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
-		prCapacity = 100;
-		
+//		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
+//		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
+//		prCapacity = 100;
+//		
 //		addPRProb = 0.3;
 //		addPRDisable = 500;
 //		
