@@ -227,7 +227,7 @@ public class GTFS2MATSimTransitSchedule {
 						line = reader.readLine();
 						Method processMethod = GTFS2MATSimTransitSchedule.class.getMethod(gtfs.getFunction(), new Class[] {String[].class, int[].class, int.class});
 						while(line!=null) {
-							String[] parts = line.split(",");
+							String[] parts = getParts(line);
 							processMethod.invoke(this, new Object[]{parts, indices, publicSystemNumber});
 							line = reader.readLine();
 						}
@@ -251,6 +251,46 @@ public class GTFS2MATSimTransitSchedule {
 		}
 	}
 
+	private String[] getParts(String line) {
+		List<String> partsList = new ArrayList<String>();
+		boolean inQ = false;
+		String part = "";
+		for(int i=0; i<line.length(); i++) {
+			boolean processed = false;
+			if(line.charAt(i)==',') {
+				if(!inQ) {
+					partsList.add(part);
+					part = "";
+					processed = true;
+				}
+			}
+			else if(line.charAt(i)=='"')
+				if(!inQ && part.equals("")) {
+					inQ = true;
+					processed = true;
+				}
+				else if(inQ && (i==line.length()-1 || line.charAt(i+1)!='"')) {
+					inQ = false;
+					processed = true;
+				}
+				else if(inQ && line.charAt(i+1)=='"')
+					i++;
+			if(!processed)
+				part += line.charAt(i);
+		}
+		partsList.add(part);
+		int i=0;
+		String[] parts = new String[partsList.size()];
+		for(String partL:partsList)
+			parts[i++] = partL;
+		return parts;
+	}
+	/*public static void main(String[] args) {
+		String[] parts = getParts("aaa,aaa\"bbb\"aaa,\"ssd\"\"sdsd\"esew\"");
+		parts = getParts("\"\"\"ccc\",bbb,ccc\"ss,dd\"");
+		parts = getParts("\"sss\"ddd,\"sss\"\"ss\"\"fff,sss\",hhh");
+		System.out.println();
+	}*/
 	/**
 	 * Methods for processing one line of each file
 	 * @param parts
