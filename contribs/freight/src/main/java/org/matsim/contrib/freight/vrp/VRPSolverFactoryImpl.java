@@ -9,15 +9,15 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
-import org.matsim.contrib.freight.vrp.basics.VrpType;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 
 public class VRPSolverFactoryImpl implements VRPSolverFactory{
 	
 	private RuinAndRecreateFactory rrFactory;
 	
-	private VrpType vrpType;
+	private VehicleRoutingProblemType vrpType;
 
-	public VRPSolverFactoryImpl(RuinAndRecreateFactory rrFactory, VrpType vrpType) {
+	public VRPSolverFactoryImpl(RuinAndRecreateFactory rrFactory, VehicleRoutingProblemType vrpType) {
 		super();
 		this.rrFactory = rrFactory;
 		this.vrpType = vrpType;
@@ -32,7 +32,7 @@ public class VRPSolverFactoryImpl implements VRPSolverFactory{
 	}
 
 	protected void verifyVehicleRouteProblem(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles) {
-		if(vrpType.equals(VrpType.SINGLE_DEPOT_DISTRIBUTION)){
+		if(vrpType.equals(VehicleRoutingProblemType.CVRP) || vrpType.equals(VehicleRoutingProblemType.CVRPTW) || vrpType.equals(VehicleRoutingProblemType.TDCVRPTW)){
 			Id location = null;
 			for(CarrierVehicle v : carrierVehicles){
 				if(location == null){

@@ -7,7 +7,7 @@ import java.util.Random;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateControlerListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.VrpType;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -31,7 +31,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 	
 	private Collection<RuinAndRecreateControlerListener> contolerListeners = new ArrayList<RuinAndRecreateControlerListener>();
 	
-	private VrpType vrpType;
+	private VehicleRoutingProblemType vrpType;
 
 	public void setThresholdFunction(ThresholdFunction thresholdFunction) {
 		this.thresholdFunction = thresholdFunction;
@@ -53,7 +53,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 		this.contolerListeners.add(l);
 	}
 	
-	public void setProblemType(VrpType vrpType){
+	public void setProblemType(VehicleRoutingProblemType vrpType){
 		this.vrpType = vrpType;
 	}
 	

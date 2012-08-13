@@ -33,10 +33,10 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProvi
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Tour;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.utils.VrpBuilder;
 import org.matsim.contrib.freight.vrp.utils.VrpUtils;
@@ -138,7 +138,7 @@ public class RuinAndRecreateTest extends TestCase{
 			
 		};
 		
-		spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemTypes.CVRP);
+		spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemType.CVRP);
 		
 //		RuinAndRecreateConfig.RadialRuinConfig.jobDistance = RuinAndRecreateConfig.RadialRuinConfig.VRPCOST;
 		

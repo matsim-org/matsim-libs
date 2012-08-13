@@ -33,10 +33,10 @@ import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 import org.matsim.contrib.freight.vrp.utils.VrpBuilder;
 import org.matsim.contrib.freight.vrp.utils.VrpUtils;
 
@@ -134,7 +134,7 @@ public class VRPTestCase extends TestCase{
 			}
 			
 		};
-		return new InitialSolutionBestInsertion(new ServiceProviderAgentFactoryFinder(tourCost,vrp.getCosts()).getFactory(VehicleRoutingProblemTypes.CVRPTW)).createInitialSolution(vrp);
+		return new InitialSolutionBestInsertion(new ServiceProviderAgentFactoryFinder(tourCost,vrp.getCosts()).getFactory(VehicleRoutingProblemType.CVRPTW)).createInitialSolution(vrp);
 	}
 	
 	protected ServiceProviderAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
@@ -146,7 +146,7 @@ public class VRPTestCase extends TestCase{
 			}
 			
 		};
-		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, vrp.getCosts()).getFactory(VehicleRoutingProblemTypes.CVRPTW);
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, vrp.getCosts()).getFactory(VehicleRoutingProblemType.CVRPTW);
 		return spFactory.createAgent(vehicle, new Driver(){}, tour1);
 	}
 	

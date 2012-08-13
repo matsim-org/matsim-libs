@@ -1,7 +1,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 
 public class ServiceProviderAgentFactoryFinder {
 	
@@ -9,23 +9,21 @@ public class ServiceProviderAgentFactoryFinder {
 	
 	private VehicleRoutingCosts vehicleRoutingCost;
 
-
-	public ServiceProviderAgentFactoryFinder(TourCost tourCost,
-			VehicleRoutingCosts vehicleRoutingCost) {
+	public ServiceProviderAgentFactoryFinder(TourCost tourCost,VehicleRoutingCosts vehicleRoutingCost) {
 		super();
 		this.tourCost = tourCost;
 		this.vehicleRoutingCost = vehicleRoutingCost;
 	}
 
-	public ServiceProviderAgentFactory getFactory(String agentType){
-		if(VehicleRoutingProblemTypes.CVRPTW.equals(agentType)){
+	public ServiceProviderAgentFactory getFactory(VehicleRoutingProblemType problemType){
+		if(VehicleRoutingProblemType.CVRPTW.equals(problemType)){
 			return new SingleDepotDistribTWSPFactory(tourCost,vehicleRoutingCost);
 		}
-		else if(VehicleRoutingProblemTypes.CVRP.equals(agentType)){
+		else if(VehicleRoutingProblemType.CVRP.equals(problemType)){
 			return new SingleDepotDistribSPFactory(tourCost,vehicleRoutingCost);
 		}
 		else{
-			throw new IllegalStateException("does not support agentType " + agentType);
+			throw new IllegalStateException("does not support agentType " + problemType);
 		}
 	}
 
