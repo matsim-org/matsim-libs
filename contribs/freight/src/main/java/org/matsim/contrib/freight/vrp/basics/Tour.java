@@ -14,8 +14,6 @@ package org.matsim.contrib.freight.vrp.basics;
 
 import java.util.LinkedList;
 
-import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
-
 /**
  * 
  * @author stefan schroeder
@@ -42,12 +40,9 @@ public class Tour {
 	public TourData tourData = new TourData();
 	
 	public Tour(Tour tour2copy){
-		VrpTourBuilder tourBuilder = new VrpTourBuilder();
 		for(TourActivity tourAct : tour2copy.getActivities()){
-			tourBuilder.copyAndScheduleActivity(tourAct);
+			this.tourActivities.add(tourAct.duplicate());
 		}
-		Tour t = tourBuilder.build();
-		this.tourActivities.addAll(t.getActivities());
 		this.tourData.transportCosts = tour2copy.tourData.transportCosts;
 		this.tourData.transportTime = tour2copy.tourData.transportTime;
 		this.tourData.totalLoad = tour2copy.tourData.totalLoad;
@@ -69,7 +64,7 @@ public class Tour {
 	public String toString() {
 		String tour = "";
 		for(TourActivity c : tourActivities){
-			tour += "[" + c.getType() + "@" + c.getLocationId() + "@" + c.getEarliestOperationStartTime() + "-" + c.getLatestOperationStartTime() + "]";
+			tour += "[" + c.getClass().getSimpleName() + "@" + c.getLocationId() + "@" + c.getEarliestOperationStartTime() + "-" + c.getLatestOperationStartTime() + "]";
 		}
 		tour += "[transportTime=" + tourData.transportTime +  
 			"][transportCosts=" + tourData.transportCosts + "]"; 

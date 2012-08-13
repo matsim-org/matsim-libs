@@ -14,28 +14,34 @@ package org.matsim.contrib.freight.vrp.basics;
 
 
 
-public class Pickup implements TourActivity, JobActivity{
+public class Pickup implements TourActivity, JobActivity, TourState{
 
 	private Shipment shipment;
 	
-	private double practical_earliestArrivalTime;
+	private double practical_earliestOperationStartTime;
 	
-	private double practical_latestArrivalTime;
+	private double practical_latestOperationStartTime;
 
 	private int currentLoad;
 
 	private double currentCost;
+
+	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
 	
 	public Pickup(Shipment shipment) {
 		super();
 		this.shipment = shipment;
-		practical_earliestArrivalTime = shipment.getPickupTW().getStart();
-		practical_latestArrivalTime = shipment.getPickupTW().getEnd();
+		practical_earliestOperationStartTime = shipment.getPickupTW().getStart();
+		practical_latestOperationStartTime = shipment.getPickupTW().getEnd();
 	}
 	
-	@Override
-	public String getType() {
-		return "Pickup";
+	public Pickup(Pickup pickup){
+		this.shipment = (Shipment) pickup.getJob();
+		practical_earliestOperationStartTime = pickup.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = pickup.getLatestOperationStartTime();
+		this.currentLoad = pickup.getCurrentLoad();
+		this.currentCost = pickup.getCurrentCost();
+		this.tourStateSnapshot = new TourStateSnapshot(pickup.getTourStateSnapshot());
 	}
 
 	public int getCapacityDemand(){
@@ -53,22 +59,22 @@ public class Pickup implements TourActivity, JobActivity{
 	
 	@Override
 	public void setEarliestOperationStartTime(double early) {
-		practical_earliestArrivalTime = early;
+		practical_earliestOperationStartTime = early;
 	}
 
 	@Override
 	public double getEarliestOperationStartTime() {
-		return practical_earliestArrivalTime;
+		return practical_earliestOperationStartTime;
 	}
 
 	@Override
 	public double getLatestOperationStartTime() {
-		return practical_latestArrivalTime;
+		return practical_latestOperationStartTime;
 	}
 
 	@Override
 	public void setLatestOperationStartTime(double late) {
-		practical_latestArrivalTime = late;
+		practical_latestOperationStartTime = late;
 	}
 
 	@Override
@@ -87,8 +93,8 @@ public class Pickup implements TourActivity, JobActivity{
 	}
 	
 	public String toString(){
-		return getType() + " of " + shipment.getSize() + " units @ "+ getLocationId()  + " @ practTW(" + round(practical_earliestArrivalTime) + "," +
-			round(practical_latestArrivalTime) + ") theoreticalTW(" + round(shipment.getPickupTW().getStart()) + "," + round(shipment.getPickupTW().getEnd()) + ")";
+		return "Pickup" + " of " + shipment.getSize() + " units @ "+ getLocationId()  + " @ practTW(" + round(practical_earliestOperationStartTime) + "," +
+			round(practical_latestOperationStartTime) + ") theoreticalTW(" + round(shipment.getPickupTW().getStart()) + "," + round(shipment.getPickupTW().getEnd()) + ")";
 	}
 
 	private String round(double time) {
@@ -106,5 +112,20 @@ public class Pickup implements TourActivity, JobActivity{
 	@Override
 	public void setCurrentCost(double cost) {
 		this.currentCost = cost;
+	}
+
+	@Override
+	public TourStateSnapshot getTourStateSnapshot() {
+		return this.tourStateSnapshot;
+	}
+
+	@Override
+	public void setTourStateSnapshot(TourStateSnapshot snapshot) {
+		this.tourStateSnapshot = snapshot;
+	}
+
+	@Override
+	public TourActivity duplicate() {
+		return new Pickup(this);
 	}
 }

@@ -52,7 +52,7 @@ class TourCostAndTWProcessor extends TourStatusProcessor{
 
 	@Override
 	boolean process(Tour tour, Vehicle vehicle, Driver driver) {
-		counter.incCounter();
+//		counter.incCounter();
 //		counter.printCounter();
 		reset(tour);
 		if(tour.isEmpty()){

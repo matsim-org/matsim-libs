@@ -14,66 +14,95 @@ package org.matsim.contrib.freight.vrp.basics;
 
 
 
-public class Delivery implements TourActivity, JobActivity{
+public class Delivery implements TourActivity, JobActivity, TourState{
 	
-	private Shipment shipment;
+	private final Job job;
+	
+	private final String locationId;
 
-	private double practical_earliestArrivalTime;
+	private double practical_earliestOperationStartTime;
 	
-	private double practical_latestArrivalTime;
+	private double practical_latestOperationStartTime;
 
 	private int currentLoad;
 	
 	private double currentCost;
 	
+	private final int demand;
+	
+	private final double serviceTime;
+
+	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
+	
 	public Delivery(Shipment shipment) {
 		super();
-		this.shipment = shipment;
-		practical_earliestArrivalTime = shipment.getDeliveryTW().getStart();
-		practical_latestArrivalTime = shipment.getDeliveryTW().getEnd();
+		this.job = shipment;
+		this.locationId = shipment.getToId();
+		this.demand = shipment.getSize();
+		this.serviceTime = shipment.getDeliveryServiceTime();
+		practical_earliestOperationStartTime = shipment.getDeliveryTW().getStart();
+		practical_latestOperationStartTime = shipment.getDeliveryTW().getEnd();
 	}
 	
-	@Override
-	public String getType() {
-		return "Delivery";
+	public Delivery(Service deliveryService){
+		this.job = deliveryService;
+		this.locationId = deliveryService.getLocationId();
+		this.demand = deliveryService.getDemand();
+		this.serviceTime = deliveryService.getServiceTime();
+		practical_earliestOperationStartTime = deliveryService.getEarliestServiceTime();
+		practical_latestOperationStartTime = deliveryService.getLatestServiceTime();
 	}
+	
+	public Delivery(Delivery delivery){
+		this.job = delivery.getJob();
+		this.locationId = delivery.getLocationId();
+		this.demand = delivery.getCapacityDemand()*-1;
+		this.serviceTime = delivery.getOperationTime();
+		practical_earliestOperationStartTime = delivery.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = delivery.getLatestOperationStartTime();
+		this.currentLoad = delivery.getCurrentLoad();
+		this.currentCost = delivery.getCurrentCost();
+		this.tourStateSnapshot = new TourStateSnapshot(delivery.getTourStateSnapshot());
+	}
+	
+	
 
 	public int getCapacityDemand(){
-		return -1*shipment.getSize();
+		return -1*demand;
 	}
 
 	@Override
 	public double getOperationTime() {
-		return shipment.getDeliveryServiceTime();
+		return serviceTime;
 	}
 
 	public String getLocationId() {
-		return shipment.getToId();
+		return locationId;
 	}
 	
 	@Override
 	public void setEarliestOperationStartTime(double early) {
-		practical_earliestArrivalTime = early;
+		practical_earliestOperationStartTime = early;
 	}
 
 	@Override
 	public double getEarliestOperationStartTime() {
-		return practical_earliestArrivalTime;
+		return practical_earliestOperationStartTime;
 	}
 
 	@Override
 	public double getLatestOperationStartTime() {
-		return practical_latestArrivalTime;
+		return practical_latestOperationStartTime;
 	}
 
 	@Override
 	public void setLatestOperationStartTime(double late) {
-		practical_latestArrivalTime = late;
+		practical_latestOperationStartTime = late;
 	}
 
 	@Override
 	public Job getJob() {
-		return shipment;
+		return job;
 	}
 
 	@Override
@@ -88,8 +117,8 @@ public class Delivery implements TourActivity, JobActivity{
 	}
 
 	public String toString(){
-		return getType() + " of " + shipment.getSize() + " units @ "+ getLocationId()  + " @ practTW(" + round(practical_earliestArrivalTime) + "," +
-			round(practical_latestArrivalTime) + ") theoreticalTW(" + round(shipment.getDeliveryTW().getStart()) + "," + round(shipment.getDeliveryTW().getEnd()) + ")";
+		return "Delivery" + " of " + demand + " units @ "+ getLocationId()  + " @ practTW(" + round(practical_earliestOperationStartTime) + "," +
+			round(practical_latestOperationStartTime) + ")";
 	}
 
 	private String round(double time) {
@@ -109,5 +138,18 @@ public class Delivery implements TourActivity, JobActivity{
 		currentCost=cost;
 	}
 
+	@Override
+	public TourActivity duplicate() {
+		return new Delivery(this);
+	}
 
+	@Override
+	public TourStateSnapshot getTourStateSnapshot() {
+		return this.tourStateSnapshot;
+	}
+
+	@Override
+	public void setTourStateSnapshot(TourStateSnapshot snapshot) {
+		this.tourStateSnapshot = snapshot;
+	}
 }

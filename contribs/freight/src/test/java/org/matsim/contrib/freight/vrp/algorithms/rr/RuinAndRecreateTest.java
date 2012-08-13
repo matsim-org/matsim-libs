@@ -88,7 +88,13 @@ public class RuinAndRecreateTest extends TestCase{
 			
 			@Override
 			public double getTransportTime(String fromId, String toId, double time, Driver driver, Vehicle vehicle) {
-				int fromInt = Integer.parseInt(fromId);
+				int fromInt = 0;
+				try{
+					fromInt = Integer.parseInt(fromId);
+				}
+				catch(NumberFormatException e){
+					System.out.println("foo");
+				}
 				int toInt = Integer.parseInt(toId);
 				if(fromInt >= toInt){
 					return distanceMatrix.get(fromInt).get(toInt).doubleValue();

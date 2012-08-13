@@ -23,6 +23,7 @@ import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
+import org.matsim.contrib.freight.vrp.basics.Service;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
@@ -145,16 +146,27 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	public void offerGranted(Job job) {
 		if(offerMemory.containsKey(job.getId())){
 			jobs.put(job.getId(), job);
-			Shipment shipment = (Shipment) job;
-			TourData id = offerMemory.get(job.getId());
-			tour.getActivities().add(id.deliveryInsertionIndex, new Delivery(shipment));
-			tour.getActivities().add(id.pickupInsertionIndex, new Pickup(shipment));
+			insert(job);
 			tourStatusOutOfSync = true;
 			syncTour();
 			offerMemory.clear();
 		}
 		else {
 			throw new IllegalStateException("cannot grant offer where no offer has been given");
+		}
+	}
+
+	private void insert(Job job) {
+		if(job instanceof Shipment){
+			Shipment shipment = (Shipment) job;
+			TourData id = offerMemory.get(job.getId());
+			tour.getActivities().add(id.deliveryInsertionIndex, new Delivery(shipment));
+			tour.getActivities().add(id.pickupInsertionIndex, new Pickup(shipment));
+		}
+		else{
+			Service service = (Service) job;
+			TourData id = offerMemory.get(job.getId());
+			tour.getActivities().add(id.deliveryInsertionIndex, new Delivery(service));
 		}
 	}
 

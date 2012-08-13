@@ -24,19 +24,21 @@ public interface TourActivity {
 	public abstract double getLatestOperationStartTime();
 
 	public abstract void setLatestOperationStartTime(double late);
-
-	public abstract String toString();
 	
 	public double getOperationTime();
-
-	public abstract String getType();
 	
+	public TourActivity duplicate();
+	
+	@Deprecated
 	public abstract int getCurrentLoad();
 	
+	@Deprecated
 	public abstract void setCurrentLoad(int load);
 	
+	@Deprecated
 	public abstract double getCurrentCost();
 	
+	@Deprecated
 	public abstract void setCurrentCost(double cost);
 
 }

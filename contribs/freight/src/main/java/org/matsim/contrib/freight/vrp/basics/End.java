@@ -14,46 +14,52 @@ package org.matsim.contrib.freight.vrp.basics;
 
 
 
-public class End implements TourActivity{
+public class End implements TourActivity, TourState{
 	
 	private String locationId;
 	
-	private double practical_earliestArrivalTime;
+	private double practical_earliestOperationStartTime;
 
-	private double practical_latestArrivalTime;
+	private double practical_latestOperationStartTime;
 
 	private int currentLoad;
 
 	private double currentCost;
+
+	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
 	
 	public End(String locationId) {
 		super();
 		this.locationId = locationId;
 	}
 
-	@Override
-	public String getType() {
-		return "End";
+	public End(End end) {
+		this.locationId = end.getLocationId();
+		practical_earliestOperationStartTime = end.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = end.getLatestOperationStartTime();
+		this.currentLoad = end.getCurrentLoad();
+		this.currentCost = end.getCurrentCost();
+		this.tourStateSnapshot = new TourStateSnapshot(end.getTourStateSnapshot());
 	}
 
 	@Override
 	public void setEarliestOperationStartTime(double early) {
-		practical_earliestArrivalTime = early;	
+		practical_earliestOperationStartTime = early;	
 	}
 
 	@Override
 	public double getEarliestOperationStartTime() {
-		return practical_earliestArrivalTime;
+		return practical_earliestOperationStartTime;
 	}
 
 	@Override
 	public double getLatestOperationStartTime() {
-		return practical_latestArrivalTime;
+		return practical_latestOperationStartTime;
 	}
 
 	@Override
 	public void setLatestOperationStartTime(double late) {
-		practical_latestArrivalTime = late;
+		practical_latestOperationStartTime = late;
 	}
 
 	@Override
@@ -78,7 +84,7 @@ public class End implements TourActivity{
 	}
 	
 	public String toString(){
-		return getType() + " @ "+ getLocationId();
+		return "End" + " @ "+ getLocationId();
 	}
 
 	@Override
@@ -90,4 +96,21 @@ public class End implements TourActivity{
 	public void setCurrentCost(double cost) {
 		this.currentCost = cost;
 	}
+
+	@Override
+	public TourActivity duplicate() {
+		return new End(this);
+	}
+
+	@Override
+	public TourStateSnapshot getTourStateSnapshot() {
+		return this.tourStateSnapshot;
+	}
+
+	@Override
+	public void setTourStateSnapshot(TourStateSnapshot snapshot) {
+		this.tourStateSnapshot = snapshot;
+		
+	}
+
 }

@@ -95,32 +95,14 @@ public class VrpTourBuilder {
 		return delivery;
 	}
 	
-	public void scheduleService(Service service){
-		
+	public Pickup schedulePickupService(Service service){
+		return null;
 	}
 	
-	public TourActivity copyAndScheduleActivity(TourActivity activity){
-		TourActivity ta = null;
-		if(activity instanceof Start){
-			ta = scheduleStart(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
-		}
-		else if(activity instanceof End){
-			ta = scheduleEnd(activity.getLocationId(), activity.getEarliestOperationStartTime(), activity.getLatestOperationStartTime());
-		}
-		else if(activity instanceof Pickup){
-			ta = schedulePickup((Shipment)((Pickup) activity).getJob());
-		}
-		else if(activity instanceof Delivery){
-			ta = scheduleDelivery((Shipment)((Delivery) activity).getJob());
-		}
-		else{
-			throw new IllegalStateException("does not support tourActivity " + activity.toString());
-		}
-		ta.setEarliestOperationStartTime(activity.getEarliestOperationStartTime());
-		ta.setLatestOperationStartTime(activity.getLatestOperationStartTime());
-		ta.setCurrentLoad(activity.getCurrentLoad());
-		return ta;
-		
+	public Delivery scheduleDeliveryService(Service service){
+		Delivery delivery = new Delivery(service);
+		tour.getActivities().add(delivery);
+		return delivery;
 	}
 	
 	public Tour build(){

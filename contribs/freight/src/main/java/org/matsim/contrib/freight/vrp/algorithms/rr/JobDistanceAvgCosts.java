@@ -13,6 +13,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.Service;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
@@ -41,6 +42,16 @@ public class JobDistanceAvgCosts implements JobDistance{
 				double cost_i2_j1 = calcDist(s_i.getToId(),s_j.getFromId());
 				double cost_i2_j2 = calcDist(s_i.getToId(),s_j.getToId());
 				avgCost = (cost_i1_j1 + cost_i1_j2 + cost_i2_j1 + cost_i2_j2)/4;
+			}
+		}
+		else if(i instanceof Service && j instanceof Service){
+			if(i.equals(j)){
+				avgCost = 0.0;
+			}
+			else{
+				Service s_i = (Service)i;
+				Service s_j = (Service)j;
+				avgCost = calcDist(s_i.getLocationId(), s_j.getLocationId());
 			}
 		}
 		else{

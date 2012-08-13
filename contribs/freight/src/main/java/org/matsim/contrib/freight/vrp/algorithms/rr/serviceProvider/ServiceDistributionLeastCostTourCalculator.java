@@ -1,0 +1,85 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Stefan Schroeder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Stefan Schroeder - initial API and implementation
+ ******************************************************************************/
+package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
+
+import java.util.Iterator;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.basics.Delivery;
+import org.matsim.contrib.freight.vrp.basics.Driver;
+import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.Service;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
+
+class ServiceDistributionLeastCostTourCalculator extends LeastCostTourCalculator{
+	
+	private static Logger logger = Logger.getLogger(ServiceDistributionLeastCostTourCalculator.class);
+	
+	private LeastCostInsertionCalculator marginalInsertionCostCalculator;
+
+	public void setMarginalCostCalculator(LeastCostInsertionCalculator marginalInsertionCostCalculator){
+		this.marginalInsertionCostCalculator = marginalInsertionCostCalculator;
+	}
+
+	@Override
+	TourData calculateLeastCostTour(Job job, Vehicle vehicle, Tour tour, Driver driver, double bestKnownCosts) {
+		Double bestPenalty = bestKnownCosts;
+		Service service = (Service)job;
+		if(!checkCapacity(tour,service.getDemand(),vehicle)){
+			return new TourData(Double.MAX_VALUE, null, null);
+		}
+		Tour tourCopy = tour;
+		Delivery deliveryAct = new Delivery(service);
+		Integer insertionIndex = null;
+		Iterator<TourActivity> actIter = tourCopy.getActivities().iterator();
+		TourActivity prevAct = actIter.next();
+		while(actIter.hasNext()){
+			TourActivity currAct = actIter.next();
+			if(!checkTimeWindowConstraints(prevAct,currAct,deliveryAct)){
+				prevAct = currAct;
+				continue;
+			}
+			double mc = marginalInsertionCostCalculator.calculateLeastCost(tourCopy, prevAct, currAct, deliveryAct, driver, vehicle);			
+			double penalty = mc;
+			if(penalty < bestPenalty){
+				bestPenalty = penalty;
+				insertionIndex = tourCopy.getActivities().indexOf(currAct);
+			}
+			prevAct = currAct;
+		}
+		if(insertionIndex == null){
+			return new TourData(Double.MAX_VALUE, null, null);
+		}
+		int finalInsertionIndex = insertionIndex;
+		return new TourData(bestPenalty, 1, finalInsertionIndex);
+	}
+
+	private boolean checkCapacity(Tour tour, int demand, Vehicle vehicle) {
+		if(tour.tourData.totalLoad + demand > vehicle.getCapacity()){
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean checkTimeWindowConstraints(TourActivity prevAct, TourActivity currAct, TourActivity deliveryAct) {
+		if(deliveryAct.getLatestOperationStartTime() < prevAct.getEarliestOperationStartTime()){
+			return false;
+		}
+		if(deliveryAct.getEarliestOperationStartTime() > currAct.getLatestOperationStartTime()){
+			return false;
+		}
+		return true;
+	}
+}

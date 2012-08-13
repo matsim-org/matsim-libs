@@ -14,6 +14,7 @@ package org.matsim.contrib.freight.vrp.utils;
 
 
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
+import org.matsim.contrib.freight.vrp.basics.Service;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.TimeWindow;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -57,6 +58,10 @@ public class VrpUtils {
 		s.setPickupTW(pickupTW);
 		s.setDeliveryTW(deliverTW);
 		return s;
+	}
+	
+	public static Service createService(String id, String locationId, int demand, double serviceTime, double earliestOperationStartTime, double latestOperationStartTime){
+		return new Service(id,locationId,demand,serviceTime,earliestOperationStartTime,latestOperationStartTime);
 	}
 	
 	
