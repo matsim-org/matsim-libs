@@ -13,7 +13,6 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgor
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemTypes;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 
