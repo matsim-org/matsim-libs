@@ -66,5 +66,22 @@ public class DgDefaultMatsimBuilderRegistry implements DgMATSimBuilderRegistry {
 		this.scoringBuilder = scoringBuilder;
 	}
 
+	@Override
+	public void addCustomModelBuilder(Object o) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public boolean removeCustomModelBuilder(Object o) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public <T> T getCustomModelBuilder(Class<? extends T> klass) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }

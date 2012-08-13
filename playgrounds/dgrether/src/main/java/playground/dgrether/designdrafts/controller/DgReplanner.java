@@ -29,7 +29,9 @@ import org.matsim.api.core.v01.population.Person;
  *
  */
 public interface DgReplanner {
-	
+	/**
+	 * Even better would be replan(Agent a)
+	 */
 	public void replan(Person p);
 
 }

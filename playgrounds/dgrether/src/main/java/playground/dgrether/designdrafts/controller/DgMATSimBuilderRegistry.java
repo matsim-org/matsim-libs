@@ -38,7 +38,12 @@ public interface DgMATSimBuilderRegistry {
 
 	public  DgMobsimBuilder getMobsimBuilder();
 	
-	
+	/**
+	 * Same as for scenario, we need a way to plug in more than the above
+	 */
+	public void addCustomModelBuilder(Object o );
+	public boolean removeCustomModelBuilder(Object o);
+	public <T> T getCustomModelBuilder(Class<? extends T> klass);
 	
 	
 
