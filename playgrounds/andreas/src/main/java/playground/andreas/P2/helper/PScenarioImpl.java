@@ -46,10 +46,10 @@ public class PScenarioImpl extends ScenarioImpl{
 	@Override
 	public TransitSchedule getTransitSchedule() {
 		if(pTransitSchedule == null){
-			log.info("returning old transit schedule");
+			log.warn("returning old transit schedule");
 			return super.getTransitSchedule();
 		} else {
-			log.info("returning new transit schedule");
+//			log.info("returning new transit schedule");
 			return this.pTransitSchedule;
 		}
 	}
@@ -57,10 +57,10 @@ public class PScenarioImpl extends ScenarioImpl{
 	@Override
 	public Vehicles getVehicles() {
 		if(pVehicles == null){
-			log.info("returning old vehicles");
+			log.warn("returning old vehicles");
 			return super.getVehicles();
 		} else {
-			log.info("returning new vehicles");
+//			log.info("returning new vehicles");
 			return this.pVehicles;
 		}
 	}
