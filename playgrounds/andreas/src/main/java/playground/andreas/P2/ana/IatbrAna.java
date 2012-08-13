@@ -59,6 +59,7 @@ public class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVe
 	private final String trainIdentifier;
 	
 	private int numberOfTripsServedByTrain = 0;
+	private int numberOfTripsServedByMinibus = 0;
 	private Set<Id> minibusesWithAtLeastOneTrip = new TreeSet<Id>();
 	private double kmTravelledByMinibuses = 0.0;
 	private double passengerKmMinibus = 0.0;
@@ -93,7 +94,7 @@ public class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVe
 		
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(resultsFile)));
-			writer.write("# scenarioId\tnumberOfTripsTrain\tnumberOfMinibusesWithAtLeastOneTrip\tkmTravlledByAllMinibuses\tpassengerKmMinibus\tnumberOfPassengersUsingTrainAndMinibus"); writer.newLine();
+			writer.write("# scenarioId\tnumberOfTripsTrain\tnumberOfTripsMinibus\tnumberOfMinibusesWithAtLeastOneTrip\tkmTravlledByAllMinibuses\tpassengerKmMinibus\tnumberOfPassengersUsingTrainAndMinibus"); writer.newLine();
 			
 			for (String scenarioId : scenarioIds) {
 				ana.reset(0);
@@ -112,13 +113,14 @@ public class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVe
 	}
 
 	private void writeToFile(BufferedWriter writer, String scenarioId) throws IOException {
-		writer.write(scenarioId + "\t" + this.numberOfTripsServedByTrain + "\t" + this.minibusesWithAtLeastOneTrip.size() + "\t" + this.kmTravelledByMinibuses + "\t" + this.passengerKmMinibus + "\t" + this.numberOfPassengersUsingTrainAndMinibus); writer.newLine();
+		writer.write(scenarioId + "\t" + this.numberOfTripsServedByTrain + "\t" + this.numberOfTripsServedByMinibus + "\t" + this.minibusesWithAtLeastOneTrip.size() + "\t" + this.kmTravelledByMinibuses + "\t" + this.passengerKmMinibus + "\t" + this.numberOfPassengersUsingTrainAndMinibus); writer.newLine();
 		writer.flush();
 	}
 
 	@Override
 	public void reset(int iteration) {
 		this.numberOfTripsServedByTrain = 0;
+		this.numberOfTripsServedByMinibus = 0;
 		this.minibusesWithAtLeastOneTrip = new TreeSet<Id>();
 		this.kmTravelledByMinibuses = 0.0;
 		this.passengerKmMinibus = 0.0;
@@ -153,6 +155,7 @@ public class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVe
 			
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				this.minibusesWithAtLeastOneTrip.add(event.getVehicleId());
+				this.numberOfTripsServedByMinibus++;
 
 				this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() + 1));
 				
