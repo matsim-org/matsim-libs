@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgScoringBuilder
+ * DgCottbusDaganzoDemand
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.designdrafts.controller;
-
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scoring.ScoringFunction;
+package playground.dgrether.signalsystems.cottbus.scripts;
 
 
 /**
  * @author dgrether
  *
  */
-public interface DgScoringBuilder {
+public class DgCottbusDaganzoDemand {
 
 	/**
-	 * Even better would be createScoringFunction(Agent agent);
+	 * @param args
 	 */
-	public ScoringFunction createScoringFunction(final Person person);
-	
+	public static void main(String[] args) {
+		//start at link id 5655
+		//go to link id 3553
+	}
+
 }

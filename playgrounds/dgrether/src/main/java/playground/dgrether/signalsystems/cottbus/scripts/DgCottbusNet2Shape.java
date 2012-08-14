@@ -24,7 +24,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
+import org.matsim.utils.gis.matsim2esri.network.FreespeedBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
+
+import playground.dgrether.visualization.KmlNetworkVisualizer;
 
 
 /**
@@ -36,14 +45,44 @@ public class DgCottbusNet2Shape {
 	public static void main(String[] args) {
 		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network net = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
 //		NetworkCleaner nc = new NetworkCleaner();
 //		nc.run(net);
 //		NetworkWriter writer = new NetworkWriter(net);
 //		writer.write(netFile);
-		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shape_network_wgs84_utm33n/network_wgs84_utm33n.shp", "WGS84_UTM33N").write();
+		
+		String outputDirectory = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shape_network_wgs84_utm33n/";
+		String outputFile = outputDirectory + "network_wgs84_utm33n_lanebasedwidth.shp";
+		String crsString = "WGS84_UTM33N";
+		
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, crsString);
+		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		builder.setWidthCoefficient(1.5);
+		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
+		new Links2ESRIShape(network,outputFile, builder).write();
+
+		
+		outputFile = outputDirectory + "network_wgs84_utm33n_capacitybasedwidth.shp";
+		builder = new FeatureGeneratorBuilderImpl(network, crsString);
+		builder.setWidthCoefficient(0.003);
+		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
+		new Links2ESRIShape(network,outputFile, builder).write();
+
+
+		outputFile = outputDirectory + "network_wgs84_utm33n_freespeedbasedwidth.shp";
+		builder = new FeatureGeneratorBuilderImpl(network, crsString);
+		builder.setWidthCoefficient(0.003);
+		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		builder.setWidthCalculatorPrototype(FreespeedBasedWidthCalculator.class);
+		new Links2ESRIShape(network,outputFile, builder).write();
+
+		
+		CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(crsString, TransformationFactory.WGS84);
+		new KmlNetworkVisualizer(network).write(outputDirectory + "network_wgs84_utm33n.kml", transform);
+		
 		
 		
 	}

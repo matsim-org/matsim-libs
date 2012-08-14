@@ -29,7 +29,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,6 +36,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -69,10 +69,10 @@ public class DgMatsimPopulation2Zones {
 	private FeatureType featureType;
 
 	//FIXME remove shape file writer
-	public List<DgZone> convert2Zones(Scenario scenario, List<DgZone> cells, Envelope networkBoundingBox, double startTime, double endTime) {
+	public List<DgZone> convert2Zones(Network network, Population pop, List<DgZone> cells, Envelope networkBoundingBox, double startTime, double endTime) {
 		this.cells = cells;
 		this.initShapeFileWriter();
-		this.convertPopulation2OD(scenario, networkBoundingBox, startTime, endTime);
+		this.convertPopulation2OD(network, pop, networkBoundingBox, startTime, endTime);
 		this.writeShape();
 		return cells;
 	}
@@ -95,8 +95,8 @@ public class DgMatsimPopulation2Zones {
 	}
 
 	
-	private void convertPopulation2OD(Scenario scenario, Envelope networkBoundingBox, double startTime, double endTime) {
-		for (Person person : scenario.getPopulation().getPersons().values()) {
+	private void convertPopulation2OD(Network net, Population pop, Envelope networkBoundingBox, double startTime, double endTime) {
+		for (Person person : pop.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			Activity startAct = null;
 			Activity targetAct = null;
@@ -109,7 +109,7 @@ public class DgMatsimPopulation2Zones {
 					else if (targetAct == null) {
 						targetAct = (Activity) pe;
 						if (startTime <= startAct.getEndTime() && startAct.getEndTime() <= endTime) {
-							processLeg(scenario.getNetwork(), startAct, leg, targetAct, networkBoundingBox);
+							processLeg(net, startAct, leg, targetAct, networkBoundingBox);
 						}
 						startAct = targetAct;
 						targetAct = null;
