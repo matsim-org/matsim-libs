@@ -56,9 +56,9 @@ public class CommuterGenerator {
 //		String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
 //				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage/";
 
-		String shapesOutputDirectory = populationOutputDirectory + "shapes/";
+		String shapesOutputDirectory = populationOutputDirectory + "shapes_all_modes/";
 		
-		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_car_only.xml.gz";
+		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n.xml.gz";
 //		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_all_modes.xml.gz";
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(populationOutputDirectory);
 
@@ -95,7 +95,7 @@ public class CommuterGenerator {
 		}
 //		
 		cdw.setScalefactor(1.0); // all modes
-		cdw.setScalefactor(0.55); //car mode share
+//		cdw.setScalefactor(0.55); //car mode share
 //		cdw.setScalefactor(0.1); //testing
 		
 		cdw.computeDemand(sc);
