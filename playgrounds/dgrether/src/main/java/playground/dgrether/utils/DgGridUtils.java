@@ -22,6 +22,7 @@ package playground.dgrether.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -29,8 +30,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.dgrether.koehlerstrehlersignal.DgMATSimScenario2KoehlerStrehler2010;
 
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -41,6 +40,7 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class DgGridUtils {
 
+	private static final Logger log = Logger.getLogger(DgGridUtils.class);
 	
 	public static void writeGrid2Shapefile(DgGrid grid, CoordinateReferenceSystem crs, String shapeFilename){
 		Collection<Feature> featureCollection = new ArrayList<Feature>();
@@ -50,7 +50,7 @@ public class DgGridUtils {
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, "grid_cell");
 			for (Polygon p : grid){
-				DgMATSimScenario2KoehlerStrehler2010.log.info("Grid cell: " + p);
+				log.info("Grid cell: " + p);
 				Feature feature = featureType.create(new Object[] {p});
 				featureCollection.add(feature);
 			}		
