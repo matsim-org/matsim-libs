@@ -22,6 +22,7 @@ package playground.dgrether.signalsystems.cottbus.scripts;
 import org.matsim.api.core.v01.Scenario;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.koehlerstrehlersignal.DgMATSimScenario2KoehlerStrehler2010;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
 
 

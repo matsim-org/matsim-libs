@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Scenario;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.koehlerstrehlersignal.DgMATSimScenario2KoehlerStrehler2010;
 
 
 /**

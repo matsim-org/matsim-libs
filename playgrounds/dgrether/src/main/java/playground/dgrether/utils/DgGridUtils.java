@@ -30,7 +30,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.signalsystems.cottbus.scripts.DgMATSimScenario2KoehlerStrehler2010;
+import playground.dgrether.koehlerstrehlersignal.DgMATSimScenario2KoehlerStrehler2010;
 
 import com.vividsolutions.jts.geom.Polygon;
 
