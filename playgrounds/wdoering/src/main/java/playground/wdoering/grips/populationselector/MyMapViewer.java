@@ -41,8 +41,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
+import org.matsim.contrib.grips.algorithms.PolygonalCircleApproximation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
@@ -66,7 +73,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private GeoPosition c1;
 	
 
-	private ShapeToStreetSnapperThreadWrapper snapper;
 
 	private Thread thread;
 
@@ -79,6 +85,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private int selectedAreaId = -1;
 
 	private boolean drawing = false;
+
+	private MathTransform transform;
+
+	private String targetS;
+
+	private HashMap<Integer, Polygon> polygons;
 
 	public MyMapViewer(PopulationAreaSelector populationAreaSelector) {
 		super();
@@ -146,7 +158,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 //				System.out.println("interrupt");
 				this.thread.stop();
 			}
-			this.snapper.reset();
 			Rectangle b = this.getViewportBounds();
 			Point p0 = e.getPoint();
 			Point wldPoint = new Point(p0.x+b.x,p0.y+b.y);
@@ -175,15 +186,64 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			Point wldPoint = new Point(p1.x+b.x,p1.y+b.y);
 			this.c1 = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
 			
-			this.snapper.setIndexAndCoordinates(this.currentIndex, this.c0,this.c1);
+			//TODO
+//			this.snapper.setIndexAndCoordinates(this.currentIndex, this.c0,this.c1);
 			
 			this.currentIndex++;
-//			this.thread.interrupt();
-			this.thread = new Thread(this.snapper);
-			this.thread.start();
-//			this.thread.
+			addArea();
 			repaint();
 		}
+	}
+
+	private void addArea()
+	{
+		
+		if (transform==null)
+			getTransform();
+		
+		if (polygons==null)
+			polygons = new HashMap<Integer, Polygon>();
+		
+		Coordinate c0 = new Coordinate(this.c0.getLongitude(),this.c0.getLatitude());
+		Coordinate c1 = new Coordinate(this.c1.getLongitude(),this.c1.getLatitude());
+		PolygonalCircleApproximation.transform(c0,transform);
+		PolygonalCircleApproximation.transform(c1,transform);
+		
+		Polygon p = PolygonalCircleApproximation.getPolygonFromGeoCoords(c0, c1);
+		
+		if ((p!=null) && (!p.isEmpty()))
+		{
+			try {
+				p = (Polygon) PolygonalCircleApproximation.transform(p, transform.inverse());
+			} catch (NoninvertibleTransformException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+					
+			this.polygons.put(currentIndex, p);
+			this.populationAreaSelector.addNewArea(currentIndex);
+
+		}
+	
+		repaint();
+		this.populationAreaSelector.setSaveButtonEnabled(true);		
+		
+	}
+
+	private void getTransform()
+	{
+		if (this.targetS==null)
+			this.targetS = populationAreaSelector.getTargetSystem();
+
+		CoordinateReferenceSystem sourceCRS = MGC.getCRS("EPSG:4326");
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(this.targetS);
+		transform = null;
+		try {
+			transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
+		} catch (FactoryException e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 
 	@Override
@@ -262,7 +322,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 		//draw area polygon
 		if (areaPolygon == null)
-			areaPolygon = this.snapper.getAreaPolygon();
+			areaPolygon = this.populationAreaSelector.getAreaPolygon();
+		
 		if (areaPolygon != null)
 		{
 			
@@ -289,19 +350,19 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			g2D.setStroke(new BasicStroke(2F));
 			
 
-			//get already selected areas
-			HashMap<Integer, Polygon> polys = null;
-			try
-			{
-				polys = this.snapper.getPolygons();
-			}
-			catch (ConcurrentModificationException e) {}
+//			//get already selected areas
+//			HashMap<Integer, Polygon> polys = null;
+//			try
+//			{
+//				polys = getPolygons();
+//			}
+//			catch (ConcurrentModificationException e) {}
 			
 			
-			if (polys != null)
+			if (polygons != null)
 			{
 				
-				Iterator it = polys.entrySet().iterator();
+				Iterator it = polygons.entrySet().iterator();
 				while (it.hasNext())
 				{
 					Map.Entry<Integer,Polygon> pairs = (Map.Entry)it.next();
@@ -356,12 +417,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		drawing = false;
 	}
 
-	public void setSnapper(ShapeToStreetSnapperThreadWrapper snapper) {
-		this.snapper = snapper;
-		this.snapper.setView(this);		
-		
-	}
-
 	public void setSelectedArea(int id)
 	{
 		selectedAreaId  = id;
@@ -373,8 +428,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		while(drawing)
 			continue;
 		
-		this.snapper.getPolygons().remove(id);
+		this.polygons.remove(id);
 		
+	}
+	
+	public HashMap<Integer, Polygon> getPolygons() {
+		return polygons;
 	}
 
 }

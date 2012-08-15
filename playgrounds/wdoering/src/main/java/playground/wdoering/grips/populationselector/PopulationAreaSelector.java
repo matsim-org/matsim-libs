@@ -34,6 +34,11 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -52,11 +57,23 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.log4j.Logger;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultAttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
+import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.grips.config.GripsConfigModule;
+import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -65,8 +82,20 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class PopulationAreaSelector implements ActionListener{
 
@@ -78,7 +107,6 @@ public class PopulationAreaSelector implements ActionListener{
 	private JButton saveButton;
 	private JButton openBtn;
 
-	private ShapeToStreetSnapperThreadWrapper snapper;
 
 	private final String wms;
 
@@ -101,6 +129,15 @@ public class PopulationAreaSelector implements ActionListener{
 	private JLabel popLabel;
 
 	protected boolean editing = false;
+
+	private Polygon areaPolygon;
+
+	private String targetSystem;
+
+	private MathTransform transform;
+
+	private String popshp;
+
 	
 	public void setSelectedAreaID(int selectedAreaID)
 	{
@@ -388,17 +425,9 @@ public class PopulationAreaSelector implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand() == "Save") {
-			final JFileChooser fc = new JFileChooser();
-			int retVal = fc.showSaveDialog(this.frame);
-			if (retVal == JFileChooser.APPROVE_OPTION) {
-				File f = fc.getSelectedFile();
-	            log.info("Saving file to: " + f.getAbsolutePath() + ".");
-				this.snapper.savePolygon(f.getAbsolutePath());
-				
-			} else {
-				 log.info("Save command cancelled by user.");
-			}
+		if (e.getActionCommand() == "Save")
+		{
+            savePolygon(popshp);
 		}
 		
 		if (e.getActionCommand() == "Open") {
@@ -425,7 +454,9 @@ public class PopulationAreaSelector implements ActionListener{
 				}
 			});
 			int returnVal = fc.showOpenDialog(this.frame);
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
+			
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
 				this.openBtn.setEnabled(false);
 				this.saveButton.setEnabled(true);
 				File file = fc.getSelectedFile();
@@ -434,15 +465,45 @@ public class PopulationAreaSelector implements ActionListener{
 				this.scPath = file.getParent();
 				
 				
-				Config c = ConfigUtils.loadConfig(this.configFile);
-				this.sc = ScenarioUtils.loadScenario(c);
 				
-				String osm = this.sc.getConfig().getModule("grips").getValue("networkFile");
-				String shp = this.sc.getConfig().getModule("grips").getValue("evacuationAreaFile");
+				GripsConfigModule gcm = null;
+				Config c = null;
+				try
+				{
+					c = ConfigUtils.createConfig();
+					gcm = new GripsConfigModule("grips");
+					c.addModule("grips", gcm);
+					c.global().setCoordinateSystem("EPSG:3395");
+					
+					GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
+					parser.readFile(this.configFile);
+				}
+				catch(Exception ee)
+				{
+					log.warn("File is not a  grips config file. Guessing it is a common MATSim config file");
+					c = ConfigUtils.loadConfig(this.configFile);
+				}
 				
-				this.snapper = new ShapeToStreetSnapperThreadWrapper(osm, this, shp);
-				loadMapView();
-				this.jMapViewer.setSnapper(this.snapper);
+				if (gcm!=null)
+				{
+				
+					this.sc = ScenarioUtils.loadScenario(c);				
+					String osm = this.sc.getConfig().getModule("grips").getValue("networkFile");
+					String shp = gcm.getEvacuationAreaFileName();
+					popshp = gcm.getPopulationFileName();
+
+					this.targetSystem = c.global().getCoordinateSystem();
+					
+					readShapeFile(shp);
+					
+
+					
+	//				this.snapper = new ShapeToStreetSnapperThreadWrapper(osm, this, shp);
+					loadMapView();
+				}
+				else
+					System.err.println("could not read shape file");
+				
 				this.compositePanel.repaint();				
 			} else {
 				log.info("Open command cancelled by user.");
@@ -450,6 +511,11 @@ public class PopulationAreaSelector implements ActionListener{
 		}
 
 		
+	}
+	
+	public String getTargetSystem()
+	{
+		return targetSystem;
 	}
 	
 	private void loadMapView() {
@@ -462,27 +528,47 @@ public class PopulationAreaSelector implements ActionListener{
 		this.jMapViewer.setZoom(2);
 	}	
 	
-	private GeoPosition getNetworkCenter() {
-		if (this.networkCenter != null) {
+	private GeoPosition getNetworkCenter()
+	{
+		if (this.networkCenter != null)
 			return this.networkCenter;
-		}
 		
+//		Envelope e = new Envelope();
+//		for (Node node : this.sc.getNetwork().getNodes().values()) {
+//			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
+//		}
+//		Envelope e = areaPolygon.getEnvelope();
+//		Geometry g = areaPolygon.getBoundary();
+//		System.out.println(		"C:"+g.getCoordinates().length );
+//		for (int i = 0; i < g.getCoordinates().length; i++)
+//			System.out.println("i:"+i+": "+g.getCoordinates()[i].x + "|" + g.getCoordinates()[i].y);
+//		System.out.println("cent:" + areaPolygon.getCentroid().getX() + "|" + areaPolygon.getCentroid().getY());
+//		Coord centerC = new CoordImpl(areaPolygon.getCentroid().getX(), areaPolygon.getCentroid().getY());
+//		CoordinateTransformation ct2 =  new GeotoolsTransformation(this.sc.getConfig().global().getCoordinateSystem(),"EPSG:4326");
+//		centerC = ct2.transform(centerC);
 		
-		
-		Envelope e = new Envelope();
-		for (Node node : this.sc.getNetwork().getNodes().values()) {
-			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
-		}
-		Coord centerC = new CoordImpl((e.getMaxX()+e.getMinX())/2, (e.getMaxY()+e.getMinY())/2);
-		CoordinateTransformation ct2 =  new GeotoolsTransformation(this.sc.getConfig().global().getCoordinateSystem(),"EPSG:4326");
-		centerC = ct2.transform(centerC);
-		this.networkCenter = new GeoPosition(centerC.getY(),centerC.getX());
+		//TODO: transformation Ã¼berflÃ¼ssig? zu klÃ¤ren
+		this.networkCenter = new GeoPosition(areaPolygon.getCentroid().getY(),areaPolygon.getCentroid().getX());
+//		this.networkCenter = new GeoPosition(centerC.getY(),centerC.getX());
 
 		return this.networkCenter;
 	}	
 	
 	public void setSaveButtonEnabled(boolean enabled) {
 		this.saveButton.setEnabled(enabled);
+	}
+	
+	public void getTransform()
+	{
+		CoordinateReferenceSystem sourceCRS = MGC.getCRS("EPSG:4326");
+		CoordinateReferenceSystem targetCRS = MGC.getCRS(this.targetSystem);
+		transform = null;
+		try {
+			transform = CRS.findMathTransform(sourceCRS, targetCRS,true);
+		} catch (FactoryException e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 	
 	private static final class Runner implements Runnable {
@@ -525,6 +611,89 @@ public class PopulationAreaSelector implements ActionListener{
 		editing = false;
 		
 	}
+
+	public Polygon getAreaPolygon()
+	{
+		return areaPolygon;
+	}
+
+
+	
+
+	
+	public void readShapeFile(String shapeFileString)
+	{
+			ShapeFileReader shapeFileReader = new ShapeFileReader();
+			shapeFileReader.readFileAndInitialize(shapeFileString);
+	
+			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
+			for (Feature ft : shapeFileReader.getFeatureSet())
+			{
+				Geometry geo = ft.getDefaultGeometry();
+				//System.out.println(ft.getFeatureType());
+				geometries.add(geo);
+			}
+			
+			int j = 0;			
+			Coordinate [] coords = geometries.get(0).getCoordinates();
+			coords[coords.length-1] = coords[0];
+			
+			GeometryFactory geofac = new GeometryFactory();
+			
+			LinearRing shell = geofac.createLinearRing(coords);
+			
+			areaPolygon = geofac.createPolygon(shell, null);		
+			
+	}
+	
+	public synchronized void savePolygon(String dest)
+	{
+		HashMap<Integer, Polygon> polygons = jMapViewer.getPolygons();
+		
+		if ((popshp == "") || (polygons.size()==0))
+			return;
+			
+		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
+		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
+				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
+		AttributeType t = AttributeTypeFactory.newAttributeType(
+				"persons", Long.class);
+		try
+		{
+			Collection<Feature> fts = new ArrayList<Feature>();
+			
+			for (Map.Entry<Integer, Polygon> entry : polygons.entrySet())
+			{
+			    int id = entry.getKey();
+			    Polygon currentPolygon = entry.getValue();
+
+				
+				DefaultTableModel defModel = (DefaultTableModel)areaTable.getModel();
+				
+				int pop = 23;
+				for (int j = 0; j < defModel.getRowCount(); j++)
+				{
+					if ((Integer) areaTable.getModel().getValueAt(j, 0) == id)
+						pop = Integer.valueOf((String)areaTable.getModel().getValueAt(j, 1));
+				}
+				
+				FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");
+				MultiPolygon mp = new GeometryFactory(new PrecisionModel(2)).createMultiPolygon(new Polygon[]{currentPolygon});
+				Feature f = ft.create(new Object[]{mp,pop});
+				fts.add(f);
+			}
+
+			ShapeFileWriter.writeGeometries(fts, popshp);
+		} catch (FactoryRegistryException e) {
+			e.printStackTrace();
+		} catch (SchemaException e) {
+			e.printStackTrace();
+		} catch (IllegalAttributeException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 }
 
 class SelectionListener implements ListSelectionListener
