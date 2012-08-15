@@ -1,5 +1,7 @@
 package org.matsim.contrib.freight.vrp.algorithms;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolutionBestInsertion;
@@ -11,6 +13,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.RuinRadial;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinRandom;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinStrategyManager;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ThresholdFunctionSchrimpf;
+import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.SingleDepotDistribTWSPFactory;
@@ -34,10 +37,13 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver{
 	private int iterations = 100;
 	
 	private int warmupIterations = 10;
+
+	private Collection<RuinAndRecreateListener> listener;
 	
 	public CVRPTWSolver(final VehicleRoutingProblem vrp) {
 		super();
 		this.vrp = vrp;
+		listener = Collections.EMPTY_LIST;
 	}
 
 	@Override
@@ -67,7 +73,11 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver{
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(radialRuin, 0.5);
 		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(randomRuin, 0.5);
 		
-		ruinAndRecreateAlgo.setThresholdFunction(new ThresholdFunctionSchrimpf(0.1));	
+		ruinAndRecreateAlgo.setThresholdFunction(new ThresholdFunctionSchrimpf(0.1));
+		
+		for(RuinAndRecreateListener l : listener){
+			ruinAndRecreateAlgo.getControlerListeners().add(l);
+		}
 
 		return ruinAndRecreateAlgo.solve();
 	}
@@ -123,6 +133,11 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver{
 
 	public void setWarmupIterations(int warmupIterations) {
 		this.warmupIterations = warmupIterations;
+	}
+
+	public void setListener(Collection<RuinAndRecreateListener> listener) {
+		this.listener = listener;
+		
 	}
 
 }
