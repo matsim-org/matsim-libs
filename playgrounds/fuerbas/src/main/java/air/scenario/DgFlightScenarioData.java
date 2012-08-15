@@ -24,16 +24,16 @@ package air.scenario;
  * @author dgrether
  *
  */
-public class DgFlightScenarioDefaults {
+public class DgFlightScenarioData {
 	
 	private DgAirportsCapacityData airportsCapacity;
 
-	public DgFlightScenarioDefaults(double capacityPeriod){
+	public DgFlightScenarioData(double capacityPeriod){
 		this.airportsCapacity = new DgAirportsCapacityData(capacityPeriod);
 	}
-
-	public DgAirportCapacity getAirportCapacityData(String airportcode) {
-		return this.airportsCapacity.getAirportCapacity(airportcode);
+	
+	public DgAirportsCapacityData getAirportsCapacityData(){
+		return this.airportsCapacity;
 	}
 	
 }

@@ -58,11 +58,13 @@ public class DgCreateDgFlightScenario {
 	private static String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 	public static String inputAirportsCoordinatesFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
 	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
-	private String flightScenarioDirectoryName = "dg_oag_flight_model_2_runways_3600vph/";
+	private String flightScenarioDirectoryName = "dg_oag_flight_model_2_runways_airport_capacities_www/";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
-	private DgFlightScenarioDefaults defaults = new DgFlightScenarioDefaults(CAPACITY_PERIOD);
-
+	private DgFlightScenarioData scenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
+	private boolean useAirportCapacities = true;
+	private String airportCapacityFile = dataBaseDirectory + "shared-svn/projects/throughFlightData/airportCapacityData/2012-08-14_airport_capacity_from_www.csv";
+	
 	private ScenarioImpl initScenario(){
 		Config conf = ConfigUtils.createConfig();
 		conf.scenario().setUseTransit(true);
@@ -72,14 +74,21 @@ public class DgCreateDgFlightScenario {
 		return scenario;
 	}
 
-
+	private void readAirportCapacities(DgFlightScenarioData scenarioData){
+		new DgAirportCapacityReader(scenarioData.getAirportsCapacityData()).readFile(airportCapacityFile);
+	}
+	
 
 	private void createScenario(String baseDirectory, DgOagFlightsData flightsData, Map<String, Coord> airports){
 		log.info("Coordinate system is: "); 
 		log.info(targetCrs.getCoordinateSystem().getRemarks());
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
 		ScenarioImpl scenario = initScenario();
-		DgAirNetworkBuilder networkBuilder = new DgAirNetworkBuilder(scenario, transform, defaults);
+		if (this.useAirportCapacities){
+			this.readAirportCapacities(scenarioData);
+		}
+		
+		DgAirNetworkBuilder networkBuilder = new DgAirNetworkBuilder(scenario, transform, scenarioData);
 		networkBuilder.createNetwork(flightsData, airports, outputNetworkFilename);
 		Map<Id, SfMatsimAirport> airportMap = networkBuilder.getAirportMap();
 		//

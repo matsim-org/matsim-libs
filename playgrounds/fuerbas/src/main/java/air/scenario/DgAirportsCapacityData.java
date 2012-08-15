@@ -33,8 +33,15 @@ public class DgAirportsCapacityData {
 
 		private DgAirportCapacity defaultAirportCapacity;
 	
+		private double capacityPeriodSeconds;
+		
 		public DgAirportsCapacityData(double capacityPeriodSeconds){
+			this.capacityPeriodSeconds = capacityPeriodSeconds;
 			this.defaultAirportCapacity = new DgAirportCapacity("default", capacityPeriodSeconds);
+		}
+		
+		public double getCapacityPeriodSeconds(){
+			return this.capacityPeriodSeconds;
 		}
 		
 		
