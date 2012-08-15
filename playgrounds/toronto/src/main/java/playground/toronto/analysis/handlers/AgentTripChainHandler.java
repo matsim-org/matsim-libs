@@ -6,8 +6,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -19,6 +23,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
+import playground.toronto.analysis.tripchains.ActivityComponent;
 import playground.toronto.analysis.tripchains.AutoDriveComponent;
 import playground.toronto.analysis.tripchains.InTransitVehicleComponent;
 import playground.toronto.analysis.tripchains.TripChainComponent;
@@ -39,7 +44,7 @@ import playground.toronto.analysis.tripchains.WalkComponent;
  * @author pkucirek
  *
  */
-public class AgentTripChainHandler implements 
+public class AgentTripChainHandler implements ActivityStartEventHandler, ActivityEndEventHandler,
 	AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentArrivalEventHandler{
 
 	private static final Logger log = Logger.getLogger(AgentTripChainHandler.class);
@@ -168,12 +173,40 @@ public class AgentTripChainHandler implements
 		}
 	}
 	
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		Id pid = event.getPersonId();
+		String type = event.getActType();
+		if (type.equals(LegModes.interactionAct)) return;
+		
+		TripChainComponent tcc = this.currentComponents.get(pid);
+		if (tcc != null){
+			ActivityComponent atcc = (ActivityComponent) tcc;
+			atcc.finishComponent(event.getTime());
+			this.addTripComponent(pid, atcc);
+			this.currentComponents.remove(pid);
+		}
+		
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		Id pid = event.getPersonId();
+		String type = event.getActType();
+		if (type.equals(LegModes.interactionAct)) return;
+		ActivityComponent atcc = new ActivityComponent(event.getTime(), event.getActType());
+		this.currentComponents.put(pid, atcc);
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////
 	private static final class LegModes{
 		public static final String transitWalkMode = "transit_walk";
 		public static final String inVehicleMode = "pt";
 		public static final String carMode = "car";
+		public static final String interactionAct = "pt interaction";
 	}
+
+
+	
 	
 }
