@@ -25,7 +25,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.listener.IterationStartListe
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.MainRunStartsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RecreationEndsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RecreationStartsListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateControlerListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinEndsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinStartsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.WarmupStartsListener;
@@ -75,7 +75,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	
 	private InitialSolutionFactory initialSolutionFactory;
 	
-	private Collection<RuinAndRecreateControlerListener> controlerListeners = new ArrayList<RuinAndRecreateControlerListener>();
+	private Collection<RuinAndRecreateListener> controlerListeners = new ArrayList<RuinAndRecreateListener>();
 	
 	private int lastPrint = 1;
 
@@ -125,7 +125,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	private VehicleRoutingSolution createSolution() {
 		final Collection<VehicleRoute> routes = new ArrayList<VehicleRoute>();
 		for(ServiceProviderAgent spa : currentSolution.getTourAgents()){
-			routes.add(new VehicleRoute(spa.getTour(),spa.getVehicle()));
+			if(spa.isActive()) routes.add(new VehicleRoute(spa.getTour(),spa.getVehicle()));
 		}
 		
 		return new VehicleRoutingSolution() {
@@ -181,7 +181,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informMainRunStarts() {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof MainRunStartsListener){
 				((MainRunStartsListener) l).informMainRunStarts();
 			}
@@ -189,7 +189,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informIterationEnds(int currentIteration, RuinAndRecreateSolution awardedSolution, RuinAndRecreateSolution rejectedSolution) {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof IterationEndsListener){
 				((IterationEndsListener) l).informIterationEnds(currentIteration,awardedSolution,rejectedSolution);
 			}
@@ -197,7 +197,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informAlgoEnds(RuinAndRecreateSolution currentSolution) {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof AlgorithmEndsListener){
 				((AlgorithmEndsListener) l).informAlgorithmEnds(currentSolution);
 			}
@@ -205,19 +205,19 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informIterationStarts(int currentIteration, RuinAndRecreateSolution currentSolution) {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof IterationStartListener){
 				((IterationStartListener) l).informIterationStarts(currentIteration, currentSolution);
 			}
 		}
 	}
 
-	public Collection<RuinAndRecreateControlerListener> getControlerListeners() {
+	public Collection<RuinAndRecreateListener> getControlerListeners() {
 		return controlerListeners;
 	}
 
 	private void informWarmupStarts() {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof WarmupStartsListener){
 				((WarmupStartsListener) l).informWarmupStarts(currentSolution);
 			}
@@ -225,7 +225,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informAlgoStarts() {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof AlgorithmStartsListener){
 				((AlgorithmStartsListener) l).informAlgorithmStarts();
 			}
@@ -273,7 +273,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informRecreationEnds(RuinAndRecreateSolution solution) {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof RecreationEndsListener){
 				((RecreationEndsListener)l).informRecreationEnds(solution);
 			}
@@ -281,7 +281,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informRecreationStarts(RuinAndRecreateSolution solution, Collection<Job> unassignedJobs) {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof RecreationStartsListener){
 				((RecreationStartsListener)l).informRecreationStarts(solution,unassignedJobs);
 			}
@@ -289,7 +289,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informRuinEnds(RuinAndRecreateSolution solution) {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof RuinEndsListener){
 				((RuinEndsListener)l).informRuinEnds(solution);
 			}
@@ -297,7 +297,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informRuinStarts(RuinAndRecreateSolution solution) {
-		for(RuinAndRecreateControlerListener l : controlerListeners){
+		for(RuinAndRecreateListener l : controlerListeners){
 			if(l instanceof RuinStartsListener){
 				((RuinStartsListener)l).informRuinStarts(solution);
 			}

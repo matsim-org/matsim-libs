@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateControlerListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
@@ -29,7 +29,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 	
 	private ThresholdFunction thresholdFunction = new ThresholdFunctionSchrimpf(0.1);
 	
-	private Collection<RuinAndRecreateControlerListener> contolerListeners = new ArrayList<RuinAndRecreateControlerListener>();
+	private Collection<RuinAndRecreateListener> contolerListeners = new ArrayList<RuinAndRecreateListener>();
 	
 	private VehicleRoutingProblemType vrpType;
 
@@ -49,7 +49,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 		this.vrp = vrp;
 	}
 		
-	public void addControlerListener(RuinAndRecreateControlerListener l){
+	public void addControlerListener(RuinAndRecreateListener l){
 		this.contolerListeners.add(l);
 	}
 	
@@ -96,7 +96,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 		rr.setRuinStrategyManager(ruinStrategyManager);
 		rr.setTourAgentFactory(serviceProviderAgentFactory);
 		rr.setThresholdFunction(thresholdFunction);
-		for(RuinAndRecreateControlerListener l : contolerListeners){
+		for(RuinAndRecreateListener l : contolerListeners){
 			rr.getControlerListeners().add(l);
 		}
 		

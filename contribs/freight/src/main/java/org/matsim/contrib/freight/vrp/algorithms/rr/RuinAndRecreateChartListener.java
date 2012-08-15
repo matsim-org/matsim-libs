@@ -39,8 +39,16 @@ public class RuinAndRecreateChartListener implements IterationEndsListener, Algo
 	
 	private List<Double> tentativeResultList = new ArrayList<Double>();
 	
-	private String filename = null;
+	private String filename;
 	
+	public RuinAndRecreateChartListener(String filename) {
+		super();
+		this.filename = filename;
+	}
+	
+	public RuinAndRecreateChartListener() {
+	}
+
 	public void setFilename(String filename) {
 		this.filename = filename;
 	}

@@ -6,13 +6,13 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
 
-class SingleDepotDistribTWSPFactory implements ServiceProviderAgentFactory{
+public class SingleDepotDistribTWSPFactory implements ServiceProviderAgentFactory{
 
 	private VehicleRoutingCosts vehicleRoutingCost;
 	
 	private TourCost tourCost;
 	
-	SingleDepotDistribTWSPFactory(TourCost tourCost, VehicleRoutingCosts vehicleRoutingCost) {
+	public SingleDepotDistribTWSPFactory(TourCost tourCost, VehicleRoutingCosts vehicleRoutingCost) {
 		super();
 		this.tourCost = tourCost;
 		this.vehicleRoutingCost = vehicleRoutingCost;
