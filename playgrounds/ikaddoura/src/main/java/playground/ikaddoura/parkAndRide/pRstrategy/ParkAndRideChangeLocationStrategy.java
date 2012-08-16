@@ -136,9 +136,9 @@ public class ParkAndRideChangeLocationStrategy implements PlanStrategyModule {
 		List<PrWeight> prWeights;
 		EllipseSearch ellipseSearch = new EllipseSearch();
 		
-		Activity firstHomeAct = (Activity) plan.getPlanElements().get(planIndices.getHomeActs().get(0));
+		Activity firstHomeAct = (Activity) plan.getPlanElements().get(planIndices.getHomeActs().get(0)); // assuming that if an agent has more than one home activity, it always have the same coordinates...
 		Activity workAct = (Activity) plan.getPlanElements().get(workIndex);
-		log.info("Create Park'n'Ride Activity for planElements (home: " + planIndices.getHomeActs().get(0) + " / work: " + workIndex +"): " + firstHomeAct.getCoord() + " / " + workAct.getCoord());
+		log.info("Create Park'n'Ride Activity for planElements (homeIndex: " + planIndices.getHomeActs().get(0) + " / workIndex: " + workIndex +"): " + firstHomeAct.getCoord() + " / " + workAct.getCoord());
 		if (planIndices.getWorkActs().size() > 1 || this.personId2prWeights.get(plan.getPerson().getId()) == null){
 			log.info("Weights for ParkAndRide Facilities for person " + plan.getPerson().getId().toString() + " not calculated before / More than one work Activity. Calculating Weights...");
 			prWeights = ellipseSearch.getPrWeights(this.nrOfPrFacilitiesForReplanning, this.net, this.id2prFacility, firstHomeAct.getCoord(), workAct.getCoord(), this.gravity);

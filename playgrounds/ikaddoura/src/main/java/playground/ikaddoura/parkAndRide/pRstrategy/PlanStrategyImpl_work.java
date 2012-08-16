@@ -122,7 +122,7 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 					}
 				}
 				if (indicesPRact.isEmpty()){
-					System.out.println("home-work-home sequence doesn't contain Park'n'Ride.");
+//					System.out.println("home-work-home sequence doesn't contain Park'n'Ride.");
 					sequenceWithoutPR = true;
 				}
 			}

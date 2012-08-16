@@ -28,13 +28,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
@@ -77,8 +77,7 @@ public class EllipseSearch {
 			List<Id> insertedPrIds = new ArrayList<Id>();
 			for (int n = 0; n < nrPrFacilities; ){
 			
-				Random rnd = new Random();
-				int rndKey = (int) (rnd.nextDouble() * prFacilities.size());
+				int rndKey = (int) (MatsimRandom.getRandom().nextDouble() * prFacilities.size());
 				ParkAndRideFacility pr = prFacilityList.get(rndKey);
 				
 				if (insertedPrIds.contains(pr.getId())){
@@ -110,7 +109,9 @@ public class EllipseSearch {
 		double distWorkToPR = getHyp(xWorkToPR, yWorkToPR);
 
 		double r = (distHomeToPR + distWorkToPR) / 1000.0;
+		System.out.println("home-->P+R-->work: " + homeCoord.toString() + " --> " + prCoord.toString() + " --> " + workCoord.toString() + " = distance [km]: " + r);
 		double weight = 1 / Math.pow(r, gravity);
+		System.out.println("calculated weight: "+ weight);
 
 		return weight;
 	}
@@ -135,9 +136,12 @@ public class EllipseSearch {
 		for (PrWeight prWeight : prWeights){
 			weightSum = weightSum + prWeight.getWeight();
 		}
+		
+//		for (PrWeight prWeight : prWeights) {
+//			System.out.println("id / weight / probability: " + prWeight.getId() + " / " + prWeight.getWeight() + " / " + prWeight.getWeight() / weightSum);
+//		}
 
-		Random random = new Random();
-		double rnd = random.nextDouble() * weightSum;
+		double rnd = MatsimRandom.getRandom().nextDouble() * weightSum;
 
 		Id chosenPrId = null;
 		double cumulatedWeight = 0.0;
