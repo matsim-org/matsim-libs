@@ -63,6 +63,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PQSimFactory;
 import playground.andreas.P2.schedule.PTransitRouterImplFactory;
+import playground.droeder.southAfrica.FixedPtSubModeControler;
 
 /**
  * @author droeder
@@ -101,7 +102,7 @@ public class RunRsaMultiModalTest {
 		
 //		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(conf));
 	
-		Controler controler = new Controler(scenario);
+		Controler controler = new FixedPtSubModeControler(scenario);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		

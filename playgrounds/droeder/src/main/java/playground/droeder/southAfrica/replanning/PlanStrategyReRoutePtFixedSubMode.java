@@ -44,8 +44,13 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	private List<Plan> plans;
 	private ArrayList<PlanStrategyModule> modules;
 
+	/**
+	 * This Strategy reroutes every single leg, as <code>ReRoute</code> would do, but with
+	 * a special behavior for pt. As pt consists of many submodes (e.g. bus, train, ...) the 
+	 * rerouting is done within the submode defined in a leg.
+	 * @param c
+	 */
 	public PlanStrategyReRoutePtFixedSubMode(Controler c){
-//		throw new RuntimeException("just a test");
 		this.c = c;
 		this.selector = new RandomPlanSelector();
 	}
@@ -69,12 +74,12 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		if(p == null){
 			p = this.selector.selectPlan(person);
 		}
-		// 
+		// maybe not necessary, check anyway
 		if(p == null){
 			log.error("Person " + person.getId() + ". can not select a plan for replanning. this should NEVER happen...");
 			return;
 		}
-		//make the chosen Plan selected and create a deep copy
+		//make the chosen Plan selected and create a deep copy. The copied plan will be selected automatically.
 		((PersonImpl)person).setSelectedPlan(p);
 		this.plans.add(((PersonImpl)person).copySelectedPlan());
 	}
@@ -83,13 +88,13 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	public void init() {
 		this.plans = new ArrayList<Plan>();
 		this.modules = new ArrayList<PlanStrategyModule>();
-		this.modules.add(new MyPtInteractionRemoverStrategy(this.c));
+		this.modules.add(new FixedSubModePtInteractionRemoverStrategy(this.c));
 		this.modules.add(new ReRouteFixedPtSubMode(this.c));
 	}
 
 	@Override
 	public void finish() {
-		//run every module for every plan
+		//run every module for every plan in the order the modules are added to the list
 		for(PlanStrategyModule module : this.modules){
 			module.prepareReplanning();
 			for(Plan plan : this.plans){

@@ -76,6 +76,8 @@ public class CreateTestScenario {
 	public static void main(String[] args) {
 		new CreateTestScenario().run();
 	}
+
+	private int numAgents = 1000;
 	
 	public CreateTestScenario(){
 		
@@ -426,8 +428,7 @@ public class CreateTestScenario {
 		Double end2 = 16*3600.;
 		Activity h1, w, h2;
 		Leg l;
-		int numAgents = 1000;
-		for(int i = 0; i < numAgents; i++){
+		for(int i = 0; i < this.numAgents ; i++){
 			rnd = MatsimRandom.getRandom().nextDouble();
 			if(rnd < 0.2){
 				mode = "bus";
@@ -439,7 +440,6 @@ public class CreateTestScenario {
 				mode = "train";
 			}
 			l = pFac.createLeg(mode);
-//			l.setRoute(new Experiment)
 			
 			h1 = pFac.createActivityFromLinkId("h", sc.createId("A-A"));
 			((ActivityImpl) h1).setCoord(sc.getNetwork().getLinks().get(h1.getLinkId()).getToNode().getCoord());

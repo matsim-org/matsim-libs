@@ -16,50 +16,60 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica;
+package playground.droeder.southAfrica.replanning;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author droeder
  *
  */
-public class PlansCalcSubModeDependendTransitRoute implements PlanAlgorithm {
-
+public class FixedSubModePtInteractionRemoverStrategy implements PlanStrategyModule {
+	
 	/**
-	 * @param plansCalcRoute
-	 * @param network
-	 * @param travelCosts
-	 * @param travelTimes
-	 * @param leastCostPathCalculatorFactory
-	 * @param routeFactory
-	 * @param transit
-	 * @param createTransitRouter
-	 * @param transitSchedule
+	 * This class provides a strategy to remove pt-interactions from the plan, but changes the 
+	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>
+	 * @param c
 	 */
-	public PlansCalcSubModeDependendTransitRoute(
-			PlansCalcRouteConfigGroup plansCalcRoute, Network network,
-			TravelDisutility travelCosts, PersonalizableTravelTime travelTimes,
-			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
-			ModeRouteFactory routeFactory, TransitConfigGroup transit,
-			TransitRouter createTransitRouter, TransitSchedule transitSchedule) {
-		// TODO Auto-generated constructor stub
+	public FixedSubModePtInteractionRemoverStrategy(Controler c){
+//		super(c.getConfig().global());
+	}
+//
+//	@Override
+//	public PlanAlgorithm getPlanAlgoInstance() {
+//		return new FixedPtSubModePtInteractionRemover();
+//	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#prepareReplanning()
+	 */
+	@Override
+	public void prepareReplanning() {
+		// TODO Auto-generated method stub
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#handlePlan(org.matsim.api.core.v01.population.Plan)
+	 */
 	@Override
-	public void run(Plan plan) {
+	public void handlePlan(Plan plan) {
 		// TODO Auto-generated method stub
+		new FixedPtSubModePtInteractionRemover().run(plan);
+		
+	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#finishReplanning()
+	 */
+	@Override
+	public void finishReplanning() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

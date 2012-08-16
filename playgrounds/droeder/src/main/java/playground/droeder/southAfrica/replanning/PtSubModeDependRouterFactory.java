@@ -18,22 +18,35 @@
  * *********************************************************************** */
 package playground.droeder.southAfrica.replanning;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author droeder
  *
  */
 public class PtSubModeDependRouterFactory implements TransitRouterFactory {
+	
+	private boolean routeOnSameMode;
+	private Scenario sc;
 
-	/* (non-Javadoc)
-	 * @see org.matsim.pt.router.TransitRouterFactory#createTransitRouter()
+	/**
+	 * Factory to create the <code>PtSubModeDependendRouter</code>
+	 * @param sc
+	 * @param routeOnSameMode
 	 */
+	public PtSubModeDependRouterFactory(Scenario sc, boolean routeOnSameMode) {
+		this.sc = sc;
+		this.routeOnSameMode = routeOnSameMode;
+	}
+
 	@Override
 	public TransitRouter createTransitRouter() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PtSubModeDependendRouter(this.sc, this.routeOnSameMode);
 	}
 
 }
