@@ -38,6 +38,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import air.demand.FlightDemandReader.FlightODRelation;
+
 
 
 /**
@@ -45,7 +47,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Creates a population based on the Data of DeStatis Passagierzahlen September 2010
  * 
  * @author treczka
- * 
+ * @author dgrether
  *
  */
 public class PopulationGenerator {
@@ -87,74 +89,54 @@ public class PopulationGenerator {
 		/*
 		 * Eingangsdaten importieren
 		 */
-		EingangsdatenParser eingang;
-		eingang = new EingangsdatenParser();
-		List<String> airportdaten = null;
+		FlightDemandReader eingang;
+		eingang = new FlightDemandReader();
+		List<FlightODRelation> airportdaten = null;
 		try {
-			airportdaten = eingang.readFlightODData(inputFlightOdDemand);
+			airportdaten = eingang.readFlightODDataPerMonth(inputFlightOdDemand);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
 
-			
-		int eingangsdatearraynindex = 0;
-		int personid_zaehler = 0;
-		for (int j=0; j< airportdaten.size()/3 ; j++){	//für alle Datensätze
-			String linkIdStringStart = airportdaten.get(eingangsdatearraynindex + 0);	// Startflughafen ID
-			Id linkId = sc.createId(linkIdStringStart);
-			Link link = sc.getNetwork().getLinks().get(linkId);
-			if (link == null) {
-				log.warn("Link id " + linkIdStringStart + " not found in network!");
+		int personid_zaehler = 1;
+		for (FlightODRelation od : airportdaten){	//für alle Datensätze
+			String fromLinkIdString = od.getFromAirportCode();
+			Id fromLinkId = sc.createId(fromLinkIdString);
+			Link fromLink = sc.getNetwork().getLinks().get(fromLinkId);
+			if (fromLink == null) {
+				log.warn("Link id " + fromLinkIdString + " not found in network!");
 				continue;
 			}
 			
-			int aktuellepassagierzahl = Integer.valueOf((airportdaten.get(eingangsdatearraynindex+2))); // aktuelle Passagieranzahl in Variable schreiben
+			int aktuellepassagierzahl = od.getNumberOfTrips() / 30;
 			
-			for ( int k=0; k< aktuellepassagierzahl; k++){		// eingangsdatearraynindex+2 ist aktuelle Passagieranzahl
-				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personid_zaehler + k)));	// ID für aktuellen Passagier
-				/*
-				 * Create a of Plan for the Person
-				 */
-				Plan plan = populationFactory.createPlan();
-				/*
-				 * Create a "home" Activity for the Person. In order to have the Person end its day at the same location,
-				 * we keep the home coordinates for later use (see below).
-				 */
-//				Activity activity1 = populationFactory.createActivityFromCoord("home", link.getCoord());
-				ActivityImpl activity1 = (ActivityImpl) populationFactory.createActivityFromLinkId("home", link.getId());
-				activity1.setCoord(link.getCoord());
-				plan.addActivity(activity1); // add the Activity to the Plan
-				
-				double actstart = random.nextDouble() * airportoffen + startzeit;
-				activity1.setEndTime(actstart); // zufällig generierte ActivityStartTime als Endzeit gesetzt
-
-				/*
-				 * Create a Leg. A Leg initially hasn't got many attributes. It just says that a pt will be used.
-				 */
-				plan.addLeg(populationFactory.createLeg("pt"));
-				/*
-				 * Create another Activity, at a different location.
-				 */
-				String linkIdString2 = airportdaten.get(eingangsdatearraynindex + 1);		// ZielfLughafen ID
-				Id linkId2 = sc.createId(linkIdString2);
-				Link destinationLink = sc.getNetwork().getLinks().get(linkId2);
+			for ( int i=0; i< aktuellepassagierzahl; i++){		// eingangsdatearraynindex+2 ist aktuelle Passagieranzahl
+				String toLinkIdString = od.getToAirportCode();
+				Id toLinkId = sc.createId(toLinkIdString);
+				Link destinationLink = sc.getNetwork().getLinks().get(toLinkId);
 				if (destinationLink == null) {	// abfangen von Flughäfen die in den Passagierdaten von DeStatis vorkommen, allerdings nicht im verwendeten Flugnetzwerk vorkommen
-					log.warn("Link id " + linkIdStringStart + " not found in network!");
+					log.warn("Link id " + fromLinkIdString + " not found in network!");
 					continue;
 				}
-
-				ActivityImpl activity2 = (ActivityImpl) populationFactory.createActivityFromLinkId("home", destinationLink.getId());
-				activity2.setCoord(destinationLink.getCoord());
-				plan.addActivity(activity2);
-				/*
-				 * Wichtig! Fuege Plaene und Personen hinzu
-				 */
+				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personid_zaehler)));	// ID für aktuellen Passagier
+				Plan plan = populationFactory.createPlan();
 				person.addPlan(plan);
+				personid_zaehler++;
 				population.addPerson(person);
+
+				ActivityImpl activity1 = (ActivityImpl) populationFactory.createActivityFromLinkId("home", fromLink.getId());
+				activity1.setCoord(fromLink.getCoord());
+				plan.addActivity(activity1); // add the Activity to the Plan
+				
+				double firstActEndTime = random.nextDouble() * airportoffen + startzeit;
+				activity1.setEndTime(firstActEndTime); // zufällig generierte ActivityStartTime als Endzeit gesetzt
+
+				plan.addLeg(populationFactory.createLeg("pt"));
+
+				ActivityImpl destinationActivity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", destinationLink.getId());
+				destinationActivity.setCoord(destinationLink.getCoord());
+				plan.addActivity(destinationActivity);
 			}
-			
-			personid_zaehler = personid_zaehler + Integer.valueOf(airportdaten.get(eingangsdatearraynindex+2)); //ID Zaehler hochsetzen mit akt. Passagierzahlen
-			eingangsdatearraynindex= eingangsdatearraynindex+3;		// Wichtig damit der korrekte Wert in der Arraylist angesprochen wird
 		}
 		/*
 		 * Write the population  to a file.
