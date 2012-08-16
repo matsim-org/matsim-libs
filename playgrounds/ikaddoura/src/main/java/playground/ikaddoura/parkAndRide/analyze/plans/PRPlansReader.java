@@ -70,8 +70,8 @@ public class PRPlansReader {
 		
 		System.out.println("-------------------------------------------------------");
 		
-		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), tolerance); // all plans
-		analyzePR(scenario2, id2PRFacilities); // selected Plans
+		compareScores(scenario1.getPopulation(), scenario2.getPopulation(), tolerance);
+		analyzePR(scenario2, id2PRFacilities);
 
 	}
 

@@ -62,35 +62,42 @@ public class ParkAndRideMain {
 	static double timeAllocationProb;
 	static int timeAllocationDisable;
 	
+	static int gravity;
+	
 	public static void main(String[] args) throws IOException {
 		
-//		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
-//		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
-//		prCapacity = 100;
-//		
-//		addPRProb = 0.3;
-//		addPRDisable = 500;
-//		
-//		changeLocationProb = 0.3;
-//		changeLocationDisable = 500;
-//		
-//		timeAllocationProb = 0.3;
-//		timeAllocationDisable = 500;
+		configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
+		prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
+		prCapacity = 100;
+		
+		addPRProb = 100;
+		addPRDisable = 500;
+		
+		changeLocationProb = 0.;
+		changeLocationDisable = 500;
+		
+		timeAllocationProb = 0.;
+		timeAllocationDisable = 500;
+		
+		gravity = 2;
+		
 		
 //		**************************************************
 		
-		configFile = args[0];
-		prFacilityFile = args[1];
-		prCapacity = Integer.parseInt(args[2]);
-		
-		addPRProb = Double.parseDouble(args[3]);
-		addPRDisable = Integer.parseInt(args[4]);
-		
-		changeLocationProb = Double.parseDouble(args[5]);
-		changeLocationDisable = Integer.parseInt(args[6]);
-		
-		timeAllocationProb = Double.parseDouble(args[7]);
-		timeAllocationDisable = Integer.parseInt(args[8]);
+//		configFile = args[0];
+//		prFacilityFile = args[1];
+//		prCapacity = Integer.parseInt(args[2]);
+//		
+//		addPRProb = Double.parseDouble(args[3]);
+//		addPRDisable = Integer.parseInt(args[4]);
+//		
+//		changeLocationProb = Double.parseDouble(args[5]);
+//		changeLocationDisable = Integer.parseInt(args[6]);
+//		
+//		timeAllocationProb = Double.parseDouble(args[7]);
+//		timeAllocationDisable = Integer.parseInt(args[8]);
+//		
+//		gravity = Integer.parseInt(args[9]);
 	
 		ParkAndRideMain main = new ParkAndRideMain();
 		main.run();
@@ -113,7 +120,7 @@ public class ParkAndRideMain {
 		
 		controler.setScoringFunctionFactory(new BvgScoringFunctionFactoryPR(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroupPR(controler.getConfig()), controler.getNetwork()));
 
-		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addPRProb, addPRDisable, changeLocationProb, changeLocationDisable, timeAllocationProb, timeAllocationDisable));
+		controler.addControlerListener(new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, addPRProb, addPRDisable, changeLocationProb, changeLocationDisable, timeAllocationProb, timeAllocationDisable, gravity));
 		
 		final MobsimFactory mf = new QSimFactory();
 		controler.setMobsimFactory(new MobsimFactory() {

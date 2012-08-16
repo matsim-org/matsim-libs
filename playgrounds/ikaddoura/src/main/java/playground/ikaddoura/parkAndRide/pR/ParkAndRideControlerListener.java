@@ -59,8 +59,9 @@ public class ParkAndRideControlerListener implements StartupListener {
 //	private int removePRDisable = 0;
 	private double timeAllocationProb;
 	private int timeAllocationDisable;
+	private int gravity;
 	
-	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility, double addPRProb, int addPRDisable, double changeLocationProb, int changeLocationDisable ,double timeAllocationProb, int timeAllocationDisable) {
+	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility, double addPRProb, int addPRDisable, double changeLocationProb, int changeLocationDisable ,double timeAllocationProb, int timeAllocationDisable, int gravity) {
 		this.controler = ctl;
 		this.adaptiveControl = adaptiveControl;
 		this.id2prFacility = id2prFacility;
@@ -73,6 +74,8 @@ public class ParkAndRideControlerListener implements StartupListener {
 		
 		this.timeAllocationProb = timeAllocationProb;
 		this.timeAllocationDisable = timeAllocationDisable;
+		
+		this.gravity = gravity;
 	}
 
 	@Override
@@ -81,12 +84,12 @@ public class ParkAndRideControlerListener implements StartupListener {
 		
 		PlanStrategy strategyAddPR = new PlanStrategyImpl_work(new RandomPlanSelector());
 		strategyAddPR.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategyAddPR.addStrategyModule(new ParkAndRideAddStrategy(controler, id2prFacility, personId2prWeights)); // adds P+R to a randomly chosen home-work-home sequence
+		strategyAddPR.addStrategyModule(new ParkAndRideAddStrategy(controler, id2prFacility, personId2prWeights, gravity)); // adds P+R to a randomly chosen home-work-home sequence
 		strategyAddPR.addStrategyModule(new ReRoute(controler));
 		
 		PlanStrategy strategyChangeLocation = new PlanStrategyImpl_parkAndRide(new RandomPlanSelector());
 		strategyChangeLocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights)); // change the P+R location of a randomly chosen home-work-home sequence
+		strategyChangeLocation.addStrategyModule(new ParkAndRideChangeLocationStrategy(controler, id2prFacility, personId2prWeights, gravity)); // change the P+R location of a randomly chosen home-work-home sequence
 		strategyChangeLocation.addStrategyModule(new ReRoute(controler));
 		
 		PlanStrategy strategyTimeAllocation = new PlanStrategyImpl_parkAndRide(new RandomPlanSelector());

@@ -56,13 +56,15 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
 	private int nrOfPrFacilitiesForReplanning = 0; // 0 means all P+R-Facilities are used for replanning
+	private int gravity;
 	
-	public ParkAndRideAddStrategy(Controler controler, Map<Id, ParkAndRideFacility> id2prFacility, Map<Id, List<PrWeight>> personId2prWeights) {
+	public ParkAndRideAddStrategy(Controler controler, Map<Id, ParkAndRideFacility> id2prFacility, Map<Id, List<PrWeight>> personId2prWeights, int gravity) {
 		this.sc = controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 		this.id2prFacility = id2prFacility;
 		this.personId2prWeights = personId2prWeights;
+		this.gravity = gravity;
 	}
 
 	@Override
@@ -242,7 +244,7 @@ public class ParkAndRideAddStrategy implements PlanStrategyModule {
 		log.info("Create Park'n'Ride Activity for planElements (home: " + planIndices.getHomeActs().get(0) + " / work: " + workIndex +"): " + firstHomeAct.getCoord() + " / " + workAct.getCoord());
 		if (planIndices.getWorkActs().size() > 1 || this.personId2prWeights.get(plan.getPerson().getId()) == null){
 			log.info("Weights for ParkAndRide Facilities for person " + plan.getPerson().getId().toString() + " not calculated before / More than one work Activity. Calculating Weights...");
-			prWeights = ellipseSearch.getPrWeights(this.nrOfPrFacilitiesForReplanning, this.net, this.id2prFacility, firstHomeAct.getCoord(), workAct.getCoord());
+			prWeights = ellipseSearch.getPrWeights(this.nrOfPrFacilitiesForReplanning, this.net, this.id2prFacility, firstHomeAct.getCoord(), workAct.getCoord(), this.gravity);
 			this.personId2prWeights.put(plan.getPerson().getId(), prWeights);
 		} else {
 			log.info("Weights for ParkAndRide Facilities for person " + plan.getPerson().getId().toString() + " already calculated before. Only one work Activity.");

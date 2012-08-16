@@ -35,9 +35,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
@@ -48,7 +45,7 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 public class EllipseSearch {
 	private static final Logger log = Logger.getLogger(EllipseSearch.class);
 
-	public List<PrWeight> getPrWeights(int nrPrFacilities, Network net, Map<Id, ParkAndRideFacility> id2prFacility, Coord homeCoord, Coord workCoord) {
+	public List<PrWeight> getPrWeights(int nrPrFacilities, Network net, Map<Id, ParkAndRideFacility> id2prFacility, Coord homeCoord, Coord workCoord, int gravity) {
 		
 		List <PrWeight> prWeights = new ArrayList<PrWeight>();
 		
@@ -61,7 +58,7 @@ public class EllipseSearch {
 			for (ParkAndRideFacility pr : id2prFacility.values()) {
 				Id prLinkId = pr.getPrLink3in();
 				Coord prCoord = net.getLinks().get(prLinkId).getToNode().getCoord();
-				double weight = calculateWeight(homeCoord, workCoord, prCoord);
+				double weight = calculateWeight(homeCoord, workCoord, prCoord, gravity);
 				prWeights.add(new PrWeight(pr.getId(), weight));
 				
 //				System.out.println(pr.getId() + ": " + weight);
@@ -91,7 +88,7 @@ public class EllipseSearch {
 
 					Id prLinkId = pr.getPrLink3in();
 					Coord prCoord = net.getLinks().get(prLinkId).getToNode().getCoord();
-					double weight = calculateWeight(homeCoord, workCoord, prCoord);
+					double weight = calculateWeight(homeCoord, workCoord, prCoord, gravity);
 					
 					prWeights.add(new PrWeight(pr.getId(), weight));
 					insertedPrIds.add(pr.getId());
@@ -102,7 +99,7 @@ public class EllipseSearch {
 		return prWeights;
 	}
 
-	private double calculateWeight(Coord homeCoord, Coord workCoord, Coord prCoord) {
+	private double calculateWeight(Coord homeCoord, Coord workCoord, Coord prCoord, int gravity) {
 
 		double xHomeToPR = Math.abs(homeCoord.getX() - prCoord.getX());
 		double yHomeToPR = Math.abs(homeCoord.getY() - prCoord.getY());
@@ -113,7 +110,7 @@ public class EllipseSearch {
 		double distWorkToPR = getHyp(xWorkToPR, yWorkToPR);
 
 		double r = (distHomeToPR + distWorkToPR) / 1000.0;
-		double weight = 1 / Math.pow(r, 2);
+		double weight = 1 / Math.pow(r, gravity);
 
 		return weight;
 	}
