@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package air.demand;
 
 import java.io.IOException;
@@ -30,6 +48,11 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  */
 public class PopulationGenerator {
+	
+	public static final String repos = "/media/data/work/repos/";
+	
+	public static final String inputFile = repos + "shared-svn/studies/countries/de/flight/ct_demand/";
+	public static final String outputPopulation = repos + "shared-svn/studies/countries/de/flight/ct_demand/";
 	
 	public static void main(String[] args) {
 					
@@ -69,8 +92,8 @@ public class PopulationGenerator {
 		/*
 		 * Eingangsdaten importieren
 		 */
-		Eingangsdaten_parser eingang;
-		eingang = new Eingangsdaten_parser();
+		EingangsdatenParser eingang;
+		eingang = new EingangsdatenParser();
 		List<String> airportdaten = null;
 		
 		try {
