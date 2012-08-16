@@ -113,6 +113,9 @@ public class PopulationGenerator {
 			for ( int i=0; i< aktuellepassagierzahl; i++){		// eingangsdatearraynindex+2 ist aktuelle Passagieranzahl
 				String toLinkIdString = od.getToAirportCode();
 				Id toLinkId = sc.createId(toLinkIdString);
+				if (fromLinkIdString.compareTo(toLinkIdString) == 0) {
+					continue;
+				}
 				Link destinationLink = sc.getNetwork().getLinks().get(toLinkId);
 				if (destinationLink == null) {	// abfangen von Flughäfen die in den Passagierdaten von DeStatis vorkommen, allerdings nicht im verwendeten Flugnetzwerk vorkommen
 					log.warn("Link id " + fromLinkIdString + " not found in network!");
