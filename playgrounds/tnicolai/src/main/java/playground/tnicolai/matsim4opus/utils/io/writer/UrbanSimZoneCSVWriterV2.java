@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
+import playground.tnicolai.matsim4opus.gis.Zone;
 
 /**
  * This writer produces an UrbanSim input data for the zones dataset 
@@ -35,6 +36,7 @@ public class UrbanSimZoneCSVWriterV2 {
 			zoneWriter.write( InternalConstants.ZONE_ID + "," +
 							  InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 							  InternalConstants.ACCESSIBILITY_BY_CAR + "," +
+							  InternalConstants.ACCESSIBILITY_BY_BIKE + "," +
 							  InternalConstants.ACCESSIBILITY_BY_WALK);
 			zoneWriter.newLine();
 			
@@ -46,21 +48,26 @@ public class UrbanSimZoneCSVWriterV2 {
 	}
 	
 	/**
-	 * writing the zone data (accessibilities) to csv file
-	 * @param node
+	 * writing the accessibility measures into csv file
+	 * 
+	 * @param startZone
+	 * @param freeSpeedAccessibility
 	 * @param carAccessibility
+	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public static void write(Id zoneID,
+	public static synchronized void write(Zone<Id> startZone,
 							 double freeSpeedAccessibility,
 							 double carAccessibility, 
+							 double bikeAccessibility,
 							 double walkAccessibility){
 		
 		try{
 			assert(UrbanSimZoneCSVWriterV2.zoneWriter != null);
-			zoneWriter.write( zoneID + "," + 
+			zoneWriter.write( ((Id)startZone.getAttribute()).toString() + "," + 
 							  freeSpeedAccessibility + "," + 
 							  carAccessibility + "," + 
+							  bikeAccessibility + "," +
 							  walkAccessibility );
 			zoneWriter.newLine();
 		}

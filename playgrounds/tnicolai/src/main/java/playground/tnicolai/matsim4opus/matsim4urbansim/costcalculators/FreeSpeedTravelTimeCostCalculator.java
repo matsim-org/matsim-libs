@@ -19,6 +19,7 @@
 
 package playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
@@ -33,14 +34,22 @@ import org.matsim.vehicles.Vehicle;
  */
 public class FreeSpeedTravelTimeCostCalculator implements TravelDisutility {
 	
+	private static final Logger log = Logger.getLogger(FreeSpeedTravelTimeCostCalculator.class);
+	
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		return link.getLength() / link.getFreespeed();
+		if(link!=null)
+			return link.getLength() / link.getFreespeed();
+		log.warn("Link is null. Returned 0 as walk time.");
+		return 0.;
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return link.getLength() / link.getFreespeed();
+		if(link!=null)
+			return link.getLength() / link.getFreespeed();
+		log.warn("Link is null. Returned 0 as walk time.");
+		return 0.;
 	}
 
 }

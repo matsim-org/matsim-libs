@@ -199,45 +199,6 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 																						this.scenario));
 		}
 		
-		// tnicolai: this is implemented for testing and visualization purposes (remove for final release)
-//		if(computeCellBasedAccessibility){
-//			SpatialGrid carGrid;	// matrix for car related accessibility measure. based on the boundary (above) and grid size
-//			SpatialGrid walkGrid;	// matrix for walk related accessibility measure. based on the boundary (above) and grid size
-//			ZoneLayer<CounterObject>  measuringPoints;
-//			String fileExtension;
-//			
-//			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
-//			if(aggregatedOpportunities == null)
-//				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
-//			
-//			if(computeCellBasedAccessibilitiesNetwork){
-//				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
-//				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-//																			   nwBoundaryBox.getBoundingBox(),
-//																			   srid);
-//				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-//			}
-//			else{
-//				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;
-//				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
-//				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-//																				   boundary, 
-//																				   srid);
-//				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-//			}
-//			
-//			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
-//																						 aggregatedOpportunities,
-//																						 zones,
-//																						 carGrid,
-//																						 walkGrid, 
-//																						 fileExtension, 
-//																						 benchmark, 
-//																						 this.scenario));
-//		}
-		
 		if(dumpPopulationData)
 			readFromUrbansim.readAndDumpPersons2CSV(zones, 
 												 	controler.getNetwork());

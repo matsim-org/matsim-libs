@@ -42,15 +42,21 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.CreateHomeWorkHomePlan;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
-import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.misc.RandomLocationDistributor;
+import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
+ * improvements aug'12
+ * - In AggregateObject2NearestNode: the euclidian distance between an opportunity and its nearest 
+ *   node on the network is measured and stored in the jobClusterArray. This is used to determine 
+ *   the total costs cij in the accessibility measure
+ * 
+ * 
  * @author nagel
  * @author thomas
  */
@@ -661,59 +667,6 @@ public class ReadFromUrbanSimModel {
 		}
 	}
 	
-	/**
-	 * Reads in the job table from urbansim that contains for every "job_id" the corresponded "parcel_id_work" and "zone_id_work"
-	 * and returns an HashMap with the number of job for each zone.
-	 * 
-	 * This is usually used for aggregated accessibility computations, e. g. zone-to-zone impedance matrix
-	 * 
-	 * @return HashMap
-	 */
-	@Deprecated
-	public Map<Id,CounterObject> readZoneBasedWorkplaces(){
-		
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
-		
-		log.info( "Starting to read jobs table from " + filename );
-
-		Map<Id,CounterObject> numberOfWorkplacesPerZone = new HashMap<Id,CounterObject>();
-		
-		try {
-			BufferedReader reader = IOUtils.getBufferedReader( filename );
-			
-			// reading header
-			String line = reader.readLine();
-			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB );
-			final int indexZoneID_WORK	   = idxFromKey.get( InternalConstants.ZONE_ID_WORK );
-			
-			ZoneId zone_ID;
-			CounterObject workObj;
-			
-			while ( (line=reader.readLine()) != null ) {
-				String[] parts = line.split( InternalConstants.TAB );
-				
-				// get zone ID
-				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID_WORK ] );
-				zone_ID = new ZoneId( zoneIdAsLong );
-				
-				// each zone ID indicates a job
-				workObj = numberOfWorkplacesPerZone.get(zone_ID);
-				if( workObj == null){
-					workObj = new CounterObject();
-					numberOfWorkplacesPerZone.put(zone_ID, workObj);
-				}
-				workObj.counter++;
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return numberOfWorkplacesPerZone;
-	}
 
 	/**
 	 * Aggregates jobs with the same parcel ID 
@@ -734,13 +687,14 @@ public class ReadFromUrbanSimModel {
 			
 			if( jobClusterMap.containsKey( jo.getParcelID() ) ){
 				AggregateObject2NearestNode jco = jobClusterMap.get( jo.getParcelID() );
-				jco.addObject( jo.getObjectID() );
+				jco.addObject( jo.getObjectID(), 0. );
 			}
 			else
-				jobClusterMap.put( jo.getParcelID(), new AggregateObject2NearestNode(jo.getObjectID(),
-																		  jo.getParcelID(),
-																		  jo.getZoneID(),
-																		  jo.getCoord() ) );
+				jobClusterMap.put(
+						jo.getParcelID(),
+						new AggregateObject2NearestNode(jo.getObjectID(), jo
+								.getParcelID(), jo.getZoneID(), jo.getCoord(),
+								0.));
 		}
 		
 		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ jobClusterMap.size() ];
@@ -776,7 +730,7 @@ public class ReadFromUrbanSimModel {
 		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
 		
 		ProgressBar bar = new ProgressBar( jobSampleList.size() );
-		
+
 		for(int i = 0; i < jobSampleList.size(); i++){
 			bar.update();
 			
@@ -784,20 +738,25 @@ public class ReadFromUrbanSimModel {
 			assert( jo.getCoord() != null );
 			Node nearestNode = network.getNearestNode( jo.getCoord() );
 			assert( nearestNode != null );
-			
+
+			// get euclidian distance to nearest node
+			double distance = NetworkUtil.getEuclidianDistance(jo.getCoord(), nearestNode.getCoord());
 			
 			if( jobClusterMap.containsKey( nearestNode.getId() ) ){
 				AggregateObject2NearestNode jco = jobClusterMap.get( nearestNode.getId() );
-				jco.addObject( jo.getObjectID() );
+				jco.addObject( jo.getObjectID(), distance );
 			}
 			else
-				jobClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(jo.getObjectID(),
-																		  jo.getParcelID(),
-																		  jo.getZoneID(),
-																		  nearestNode.getCoord(),
-																		  nearestNode) );
+				jobClusterMap.put(
+						nearestNode.getId(),
+						new AggregateObject2NearestNode(jo.getObjectID(), 
+														jo.getParcelID(), 
+														jo.getZoneID(), 
+														nearestNode.getCoord(), 
+														nearestNode, 
+														distance));
 		}
-		
+
 		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ jobClusterMap.size() ];
 		Iterator<AggregateObject2NearestNode> jobClusterIterator = jobClusterMap.values().iterator();
 
@@ -1093,14 +1052,15 @@ public class ReadFromUrbanSimModel {
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){
 								AggregateObject2NearestNode co = personClusterMap.get( nearestNode.getId() );
-								co.addObject( personId );
+								co.addObject( personId, 0. );
 							}
 							else
 								personClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(personId,
 																							 homeParcelId,
 																						  	 null,
 																						  	 nearestNode.getCoord(),
-																						  	 nearestNode) );
+																						  	 nearestNode,
+																						  	0.) );
 						}
 					}
 				}

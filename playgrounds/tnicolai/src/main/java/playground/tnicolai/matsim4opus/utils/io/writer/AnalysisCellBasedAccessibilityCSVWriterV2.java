@@ -5,23 +5,23 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.Zone;
-import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 
 public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	
 	private static final Logger log = Logger.getLogger(AnalysisCellBasedAccessibilityCSVWriterV2.class);
 	private static BufferedWriter accessibilityDataWriter = null;
-	public static final String FILE_NAME= "accessibility_indicators_ersa.csv";
+	public static final String FILE_NAME= "accessibility_indicators.csv";
 	
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public AnalysisCellBasedAccessibilityCSVWriterV2(String fileExtension){
+	public static void initAnalysisCellBasedAccessibilityCSVWriterV2(String fileExtension){
 		try{
 			log.info("Initializing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
 			accessibilityDataWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + fileExtension + FILE_NAME );
@@ -48,12 +48,16 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	
 	/**
 	 * writing the accessibility measures into csv file
+	 * 
+	 * @param startZone
+	 * @param coordFromZone
 	 * @param node
+	 * @param freeSpeedAccessibility
 	 * @param carAccessibility
-	 * @param freespeedTravelTimesCarLogSum
+	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public void write(Zone<CounterObject> startZone, 
+	public static void write(Zone<Id> startZone, 
 							 Coord coordFromZone,
 							 Node node, 
 							 double freeSpeedAccessibility,
@@ -63,7 +67,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 		
 		try{
 			assert(AnalysisCellBasedAccessibilityCSVWriterV2.accessibilityDataWriter != null);
-			accessibilityDataWriter.write( startZone.getAttribute().getCounter() + "," +
+			accessibilityDataWriter.write( ((Id)startZone.getAttribute()) + "," +
 										   coordFromZone.getX() + "," +
 										   coordFromZone.getY() + "," +
 										   node.getId() + "," + 
@@ -83,7 +87,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	/**
 	 * finalize and close csv file
 	 */
-	public void close(){
+	public static void close(){
 		try {
 			log.info("Closing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
 			assert(AnalysisCellBasedAccessibilityCSVWriterV2.accessibilityDataWriter != null);

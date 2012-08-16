@@ -100,7 +100,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		double logitScaleParameterPreFactor = 1/(logitScaleParameter);
+		double inverseOfLogitScaleParameter = 1/(logitScaleParameter);
 		
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
@@ -112,25 +112,31 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 			
 			ProgressBar bar = new ProgressBar( zones.length );
 			
-			// iterating over all zones as starting points calculating their workplace accessibility
+			GeneralizedCostSum gcs = new GeneralizedCostSum();
+			
+			// iterating over all zones as starting points calculating their work place accessibility
 			for(int fromIndex= 0; fromIndex < zones.length; fromIndex++){
 				
 				bar.update();
 				
 				// get coordinate from origin (start point)
 				Coord coordFromZone = zones[fromIndex].getZoneCoordinate();
-				// get nearest network node and zone id for origin zone
-				Node fromNode = zones[fromIndex].getNearestNode();
-				assert( fromNode != null );
+				assert( coordFromZone!=null );
 				Id originZoneID = zones[fromIndex].getZoneID();
-				// run dijkstra on network
-				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
-				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);
-				lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				Link nearestLink = network.getNearestLink(coordFromZone);
+				// captures the distance (as walk time) between a zone centroid and the road network
+				Link nearestLink = network.getNearestLinkExactly(coordFromZone);
+
+				// determine nearest network node (from- or toNode) based on the link 
+				Node fromNode = NetworkUtil.getNearestNode(coordFromZone, nearestLink);
+				assert( fromNode != null );
+				// run dijkstra on network
+				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
+				lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
+				lcptTravelDistance.calculate(network, fromNode, depatureTime);
+				
 				// captures the distance (as walk time) between a zone centroid and its nearest node
 				
 				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, coordFromZone, fromNode);
@@ -140,10 +146,12 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				
 				double offsetWalkTime2Node_h 				= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
 				double carTravelTime_meterpersec			= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime);
-				double freeSpeedTravelTime_meterpersec 		= nearestLink.getLength() / nearestLink.getFreespeed();
+				double freeSpeedTravelTime_meterpersec 		= nearestLink.getFreespeed();
 				
-				double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
 				double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
+				double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
+				double offsetBikeTime_h						= distanceRoad2Node_meter / this.bikeSpeedMeterPerHour;
+				
 				
 				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
 				// Euclidean Distance (measuring point 2 nearest node):
@@ -153,133 +161,72 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 				// double walkTimeOffset_min = (nearestLink.calcDistance( coordFromZone ) / this.walkSpeedMeterPerMin); 
 				// or use NetworkUtil.getOrthogonalDistance(link, point) instead!
 				
-				double sumFREESPEED = 0.;
-				double sumCAR = 0.;
-				double sumWALK= 0.;	
+				gcs.reset();
 				
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
-				for ( int toIndex = 0; toIndex < this.aggregatedOpportunities.length; toIndex++ ) {
+				for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
+					
+					// add the avg. distance of all aggregated opportunities (euclidiean distance from nearest node to opportunity)
+					double averageDistanceRoad2Opportunitiy_meter = this.aggregatedOpportunities[i].getAverageDistance();
+					double offsetWalkTime2Opportunity_h = averageDistanceRoad2Opportunitiy_meter / this.walkSpeedMeterPerHour;
 					
 					// get stored network node (this is the nearest node next to an aggregated workplace)
-					Node destinationNode = this.aggregatedOpportunities[toIndex].getNearestNode();
+					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					
 					// using number of aggregated workplaces as weight for log sum measure
-					int opportunityWeight = this.aggregatedOpportunities[toIndex].getNumberOfObjects();
+					int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
 
 					// free speed car travel times in hours
 					double freeSpeedTravelTime_h = (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
 					// travel distance in meter
 					double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
+					// bike travel times in hours
+					double bikeTravelTime_h 	= (travelDistance_meter / this.bikeSpeedMeterPerHour) + offsetBikeTime_h; // using a constant speed of 15km/h
 					// walk travel times in hours
 					double walkTravelTime_h		= travelDistance_meter / this.walkSpeedMeterPerHour;
 					// congested car travel times in hours
 					double arrivalTime = lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime(); // may also use .getCost() !!!
 					double congestedCarTravelTime_h = (arrivalTime - depatureTime) / 3600. + offsetCongestedCarTime_h;
 
-					// for debugging freespeed accessibility
-					freeTT = getAsUtilCar(betaCarTT, freeSpeedTravelTime_h, betaWalkTT, offsetWalkTime2Node_h);
-					freeTTPower = getAsUtilCar(betaCarTTPower, freeSpeedTravelTime_h * freeSpeedTravelTime_h, betaWalkTTPower, offsetWalkTime2Node_h * offsetWalkTime2Node_h);
-					freeLnTT = getAsUtilCar(betaCarLnTT, Math.log(freeSpeedTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node_h));
-					
-					freeTD = getAsUtilCar(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter);
-					freeTDPower = getAsUtilCar(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
-					freeLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
-					
-					freeTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
-					freeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
-					freeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
-					
-					sumFREESPEED += opportunityWeight
-								  * Math.exp(logitScaleParameter *
-										    (freeTT + 
-										     freeTTPower +
-										     freeLnTT +
-										     freeTD +
-										     freeTDPower +
-										     freeLnTD +
-										     freeTC +
-										     freeTCPower + 
-										     freeLnTC));
-					
-					// for debugging car accessibility
-					carTT = getAsUtilCar(betaCarTT, congestedCarTravelTime_h, betaWalkTT, offsetWalkTime2Node_h);
-					carTTPower = getAsUtilCar(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, offsetWalkTime2Node_h * offsetWalkTime2Node_h);
-					carLnTT	= getAsUtilCar(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node_h));
-					
-					carTD = getAsUtilCar(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); // carOffsetWalkTime2NearestLink_meter
-					carTDPower = getAsUtilCar(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
-					carLnTD = getAsUtilCar(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
-					
-					carTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
-					carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs jet 
-					carLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
-					
-					// sum congested travel times
-					sumCAR += opportunityWeight
-							* Math.exp(logitScaleParameter *
-									  (carTT +
-									   carTTPower +
-									   carLnTT +
-									   carTD + 
-									   carTDPower + 
-									   carLnTD +
-									   carTC + 
-									   carTCPower + 
-									   carLnTC ));
-					
-					// for debugging walk accessibility
-					walkTT = getAsUtilWalk(betaWalkTT, walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour));
-					walkTTPower = getAsUtilWalk(betaWalkTTPower, Math.pow(walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour), 2) );
-					walkLnTT = getAsUtilWalk(betaWalkLnTT, Math.log( walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour) ));
-					
-					walkTD = getAsUtilWalk(betaWalkTD, travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter);
-					walkTDPower = getAsUtilWalk(betaWalkTDPower, Math.pow(travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter, 2));
-					walkLnTD = getAsUtilWalk(betaWalkLnTD, Math.log(travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter));
-					
-					walkTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
-					walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
-					walkLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
-
-					// sum walk travel times (substitute for distances)
-					sumWALK += opportunityWeight
-							* Math.exp(logitScaleParameter *
-									(walkTT +
-									 walkTTPower +
-									 walkLnTT +
-									 walkTD +
-									 walkTDPower +
-									 walkLnTD + 
-									 walkTC +
-									 walkTCPower +
-									 walkLnTC ));
+					sumGeneralizedCosts(gcs, 
+							distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
+							distanceRoad2Node_meter, 
+							offsetWalkTime2Node_h + offsetWalkTime2Opportunity_h,
+							opportunityWeight, freeSpeedTravelTime_h,
+							travelDistance_meter, bikeTravelTime_h,
+							walkTravelTime_h, congestedCarTravelTime_h);
 				}
 				
 				// aggregated value
-				double freeSpeedAccessibility, carAccessibility, walkAccessibility;
+				double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility;
 				if(!useRawSum){ 	// get log sum
-					freeSpeedAccessibility = logitScaleParameterPreFactor * Math.log( sumFREESPEED );
-					carAccessibility = logitScaleParameterPreFactor * Math.log( sumCAR );
-					walkAccessibility= logitScaleParameterPreFactor * Math.log( sumWALK );
+					freeSpeedAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() );
+					carAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() );
+					bikeAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() );
+					walkAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() );
 				}
 				else{ 				// get raw sum
-					freeSpeedAccessibility = logitScaleParameterPreFactor * sumFREESPEED;
-					carAccessibility = logitScaleParameterPreFactor * sumCAR;
-					walkAccessibility= logitScaleParameterPreFactor * sumWALK;
+					freeSpeedAccessibility = inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();
+					carAccessibility = inverseOfLogitScaleParameter * gcs.getCarSum();
+					bikeAccessibility= inverseOfLogitScaleParameter * gcs.getBikeSum();
+					walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
 				}
 
-				// writing accessibility measures of current node in csv format (UrbanSim input)
-				UrbanSimZoneCSVWriterV2.write(originZoneID,
-												freeSpeedAccessibility,
-												carAccessibility, 
-												walkAccessibility);
-				// writing complete zones information for further analysis
-				AnalysisZoneCSVWriterV2.write(originZoneID, 
-											zones[fromIndex].getZoneCoordinate(), 
-											fromNode.getCoord(), 
-											freeSpeedAccessibility,
-											carAccessibility,
-											walkAccessibility);
+//				// writing accessibility measures of current node in csv format (UrbanSim input)
+//				UrbanSimZoneCSVWriterV2.write(originZoneID,
+//												freeSpeedAccessibility,
+//												carAccessibility,
+//												bikeAccessibility,
+//												walkAccessibility);
+//				// writing complete zones information for further analysis
+//				AnalysisZoneCSVWriterV2.write(originZoneID, 
+//											zones[fromIndex].getZoneCoordinate(), 
+//											fromNode.getCoord(), 
+//											freeSpeedAccessibility,
+//											carAccessibility,
+//											bikeAccessibility,
+//											walkAccessibility);
 			}
 			System.out.println("");
 			// finalizing/closing csv file containing accessibility measures

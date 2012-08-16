@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.tnicolai.matsim4opus.matsim4urbansim.archive.MATSim4UrbanSim;
+import playground.tnicolai.matsim4opus.matsim4urbansim.MATSim4UrbanSimParcel;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
 
 
@@ -100,8 +100,8 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		String [] args = new String[]{matsimConfigPath}; // create program arguments for MATSim
 		
 		
-		MATSim4UrbanSim.main(args);
-		boolean status = MATSim4UrbanSim.getRunStatus();
+		MATSim4UrbanSimParcel.main(args);
+		boolean status = MATSim4UrbanSimParcel.getRunStatus();
 		
 		return status;
 	}

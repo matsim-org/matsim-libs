@@ -4,14 +4,19 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
 import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
-import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 
@@ -60,7 +65,7 @@ public class GridUtils {
 	 * @param boundary
 	 * @return
 	 */
-	public static ZoneLayer<CounterObject> createGridLayerByGridSizeByShapeFile(double gridSize, Geometry boundary, int srid) {
+	public static ZoneLayer<Id> createGridLayerByGridSizeByShapeFile(double gridSize, Geometry boundary, int srid) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -69,7 +74,7 @@ public class GridUtils {
 		
 		GeometryFactory factory = new GeometryFactory();
 		
-		Set<Zone<CounterObject>> zones = new HashSet<Zone<CounterObject>>();
+		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
 		Envelope env = boundary.getEnvelopeInternal();
 		
 		ProgressBar bar = new ProgressBar( (env.getMaxX()-env.getMinX())/gridSize );
@@ -101,8 +106,8 @@ public class GridUtils {
 					Polygon polygon = factory.createPolygon(linearRing, null);
 					polygon.setSRID( srid ); 
 					
-					Zone<CounterObject> zone = new Zone<CounterObject>(polygon);
-					zone.setAttribute( new CounterObject( setPoints ) );
+					Zone<Id> zone = new Zone<Id>(polygon);
+					zone.setAttribute( new IdImpl( setPoints ) );
 					zones.add(zone);
 					
 					setPoints++;
@@ -114,7 +119,7 @@ public class GridUtils {
 		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
 		log.info("Done with setting starting points!");
 		
-		ZoneLayer<CounterObject> layer = new ZoneLayer<CounterObject>(zones);
+		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
 		return layer;
 	}
 	
@@ -126,7 +131,7 @@ public class GridUtils {
 	 * @param boundary
 	 * @return
 	 */
-	public static ZoneLayer<CounterObject> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox, int srid) {
+	public static ZoneLayer<Id> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox, int srid) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -135,7 +140,7 @@ public class GridUtils {
 		
 		GeometryFactory factory = new GeometryFactory();
 		
-		Set<Zone<CounterObject>> zones = new HashSet<Zone<CounterObject>>();
+		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
 
 		double xmin = boundingBox[0];
 		double ymin = boundingBox[1];
@@ -173,8 +178,8 @@ public class GridUtils {
 					Polygon polygon = factory.createPolygon(linearRing, null);
 					polygon.setSRID( srid ); 
 					
-					Zone<CounterObject> zone = new Zone<CounterObject>(polygon);
-					zone.setAttribute( new CounterObject( setPoints ) );
+					Zone<Id> zone = new Zone<Id>(polygon);
+					zone.setAttribute( new IdImpl( setPoints ) );
 					zones.add(zone);
 					
 					setPoints++;
@@ -186,7 +191,51 @@ public class GridUtils {
 		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
 		log.info("Done with setting starting points!");
 		
-		ZoneLayer<CounterObject> layer = new ZoneLayer<CounterObject>(zones);
+		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
+		return layer;
+	}
+	
+	/**
+	 * Converting zones (or zone centroids) of type ActivityFacilitiesImpl into a ZoneLayer
+	 * 
+	 * @param facility
+	 * @param srid
+	 * @return
+	 */
+	public static ZoneLayer<Id> convertActivityFacilities2ZoneLayer(ActivityFacilitiesImpl facility, int srid){
+		
+		int setPoints = 0;
+		
+		GeometryFactory factory = new GeometryFactory();
+		
+		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
+
+		Iterator<ActivityFacility> facilityIterator =  facility.getFacilities().values().iterator();
+		
+		while(facilityIterator.hasNext()){
+			
+			ActivityFacility af = facilityIterator.next();
+
+			Coord coord = af.getCoord();
+			// Point defines the artificial zone centroid
+			Point point = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
+			point.setSRID(srid);
+			
+			Zone<Id> zone = new Zone<Id>(point);
+			zone.setAttribute( af.getId() );
+			zones.add(zone);
+			
+			setPoints++;
+		}
+		
+		log.info("Having " + setPoints + " 'ActivityFacilitiesImpl' items converted into 'ZoneLayer' format");
+		log.info("Done with conversion!");
+		
+		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
+
+		if(!checkConversion(facility, layer))
+			log.error("Conversion error: Either not all items are converted or coordinates are wrong!");
+		
 		return layer;
 	}
 	
@@ -226,7 +275,7 @@ public class GridUtils {
 	 * @param grid
 	 * @param fileName
 	 */
-	public static void writeKMZFiles(ZoneLayer<CounterObject> measuringPoints, SpatialGrid grid, String fileName) {
+	public static void writeKMZFiles(ZoneLayer<Id> measuringPoints, SpatialGrid grid, String fileName) {
 		log.info("Writing Google Erath file " + fileName + " ...");
 		
 		FeatureKMLWriter writer = new FeatureKMLWriter();
@@ -234,7 +283,7 @@ public class GridUtils {
 		
 		TObjectDoubleHashMap<Geometry> kmzData = new TObjectDoubleHashMap<Geometry>();
 		
-		for(Zone<CounterObject> zone : measuringPoints.getZones()) {
+		for(Zone<Id> zone : measuringPoints.getZones()) {
 			Geometry geometry = zone.getGeometry();
 			geometries.add(geometry);
 			kmzData.put( geometry, grid.getValue(geometry.getCentroid()) );
@@ -244,5 +293,33 @@ public class GridUtils {
 		writer.setColorizable(new MyColorizer(kmzData));
 		writer.write(geometries, fileName);
 		log.info("... done!");
+	}
+	
+	private static boolean checkConversion(ActivityFacilitiesImpl facility, ZoneLayer<Id> layer){
+		
+		boolean isEqual = true;
+
+		Iterator<Zone<Id>> layerIterator = layer.getZones().iterator();
+		
+		while(layerIterator.hasNext()){
+			
+			Zone<Id> zone = layerIterator.next();
+			Point centroid = zone.getGeometry().getCentroid();
+			
+			ActivityFacility af = facility.getFacilities().get(zone.getAttribute());
+			if(af == null){
+				isEqual = false;
+				break;
+			}
+			
+			if(af.getCoord().getX() == centroid.getX() && 
+			   af.getCoord().getY() == centroid.getY())
+				continue;
+			else{
+				isEqual = false;
+				break;
+			}
+		}
+		return isEqual;
 	}
 }

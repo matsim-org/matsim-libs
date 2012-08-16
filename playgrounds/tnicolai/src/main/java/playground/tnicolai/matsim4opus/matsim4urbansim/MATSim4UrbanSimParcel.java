@@ -25,6 +25,7 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Module;
@@ -35,11 +36,9 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule;
-import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV2;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
@@ -47,12 +46,13 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.CounterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -297,11 +297,13 @@ public class MATSim4UrbanSimParcel {
 		
 		if(computeZoneBasedAccessibilities){
 			
+			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones, srid);
+			
 			// init aggregatedWorkplaces
 			if(aggregatedOpportunities == null)
 				aggregatedOpportunities = readUrbansimJobs(parcels, destinationSampleRate);
 			// creates zone based table of log sums (workplace accessibility)
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV2(zones, 				
+			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, 				
 																						aggregatedOpportunities, 
 																						benchmark,
 																						this.scenario));
@@ -314,7 +316,7 @@ public class MATSim4UrbanSimParcel {
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			
-			ZoneLayer<CounterObject>  measuringPoints;
+			ZoneLayer<Id>  measuringPoints;
 			String fileExtension;
 			
 			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
@@ -343,7 +345,7 @@ public class MATSim4UrbanSimParcel {
 				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			}
 			
-			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV2(measuringPoints, 
+			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV3(measuringPoints, 
 																						 aggregatedOpportunities,
 																						 parcels,
 																						 freeSpeedGrid,

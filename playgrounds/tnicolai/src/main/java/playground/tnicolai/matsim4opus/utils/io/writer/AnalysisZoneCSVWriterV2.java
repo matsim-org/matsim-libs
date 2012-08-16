@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
+import playground.tnicolai.matsim4opus.gis.Zone;
 
 public class AnalysisZoneCSVWriterV2 {
 
@@ -33,6 +34,7 @@ public class AnalysisZoneCSVWriterV2 {
 								 InternalConstants.NEARESTNODE_Y_COORD + "," +
 								 InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
 								 InternalConstants.ACCESSIBILITY_BY_CAR + "," +
+								 InternalConstants.ACCESSIBILITY_BY_BIKE + "," +
 								 InternalConstants.ACCESSIBILITY_BY_WALK);
 			zoneCSVWriter.newLine();
 			
@@ -46,28 +48,31 @@ public class AnalysisZoneCSVWriterV2 {
 	/**
 	 * writing the accessibility measures into csv file
 	 * 
-	 * @param zoneID
+	 * @param startZone
 	 * @param zoneCentroid
 	 * @param nearestNode
 	 * @param carAccessibility
+	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public static void write(Id zoneID,
+	public static void write(Zone<Id> startZone,
 							 Coord zoneCentroid,
 							 Coord nearestNode,
 							 double freeSpeedAccessibility,
 							 double carAccessibility, 
+							 double bikeAccessibility,
 							 double walkAccessibility){
 		
 		try{
 			assert(AnalysisZoneCSVWriterV2.zoneCSVWriter != null);
-			zoneCSVWriter.write( zoneID + "," + 
+			zoneCSVWriter.write( ((Id)startZone.getAttribute()) + "," + 
 								 zoneCentroid.getX() + "," + 
 								 zoneCentroid.getY() + "," + 
 								 nearestNode.getX() + "," + 
 								 nearestNode.getY() + "," + 
 								 freeSpeedAccessibility + "," +
 								 carAccessibility + "," + 
+								 bikeAccessibility + "," +
 								 walkAccessibility );
 			zoneCSVWriter.newLine();
 		}

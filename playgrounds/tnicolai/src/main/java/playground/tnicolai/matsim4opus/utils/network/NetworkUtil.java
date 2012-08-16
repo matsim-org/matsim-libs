@@ -233,7 +233,6 @@ public class NetworkUtil {
 		
 //		double distancePoint2Link = Math.sqrt( (pointx-intersectionx)*(pointx-intersectionx) + (pointy-intersectiony)*(pointy-intersectiony));
 //		double distanceIntersection2Node = Math.sqrt( (intersectionx - destinationNode.getCoord().getX())*(intersectionx - destinationNode.getCoord().getX()) + (intersectiony - destinationNode.getCoord().getY())*(intersectiony - destinationNode.getCoord().getY()) );
-//		
 //		return distancePoint2Link + distanceIntersection2Node;
 	}
 
@@ -296,6 +295,26 @@ public class NetworkUtil {
 		d.setDisatancePoint2Road(distance);
 		
 		return d;
+	}
+	
+	/**
+	 * This method expects the nearest link to a given measure point. 
+	 * It calculates the euclidian distance for both nodes of the link, 
+	 * "fromNode" and "toNode" and returns the node with shorter distance
+	 * 
+	 * @param coordFromZone
+	 * @param nearestLink
+	 */
+	public static Node getNearestNode(Coord coordFromZone, Link nearestLink) {
+		Node toNode = nearestLink.getToNode();
+		Node fromNode= nearestLink.getFromNode();
+		
+		double distanceToNode = getEuclidianDistance(coordFromZone, toNode.getCoord());
+		double distanceFromNode= getEuclidianDistance(coordFromZone, fromNode.getCoord());
+		
+		if(distanceToNode < distanceFromNode)
+			return toNode;
+		return fromNode;
 	}
 	
 	
