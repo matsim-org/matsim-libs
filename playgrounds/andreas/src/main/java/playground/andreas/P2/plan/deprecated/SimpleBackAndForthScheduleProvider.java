@@ -21,11 +21,14 @@ package playground.andreas.P2.plan.deprecated;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -63,12 +66,14 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	private Network net;
 	private TransitSchedule scheduleWithStopsOnly;
 	private RandomStopProvider randomStopProvider;
+	private String transportMode;
 	
-	public SimpleBackAndForthScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration) {
+	public SimpleBackAndForthScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, String transportMode) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		this.randomStopProvider = randomStopProvider;
+		this.transportMode = transportMode;
 	}
 
 	@Override
@@ -118,6 +123,12 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
 		LeastCostPathCalculator routingAlgo = new Dijkstra(this.net, tC, tC);
+		@SuppressWarnings("serial")
+		Set<String> modes =  new HashSet<String>(){{
+			// this is the networkmode and explicitly not the transportmode
+				add(TransportMode.car);
+			}};
+		((Dijkstra) routingAlgo).setModeRestriction(modes);
 		
 		Node startNode = this.net.getLinks().get(startStop.getLinkId()).getToNode();
 		Node endNode = this.net.getLinks().get(endStop.getLinkId()).getFromNode();
@@ -152,7 +163,7 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		stops.add(routeStop);
 		
 		// register departure
-		TransitRoute transitRoute = this.scheduleWithStopsOnly.getFactory().createTransitRoute(routeID, route, stops, "pt");
+		TransitRoute transitRoute = this.scheduleWithStopsOnly.getFactory().createTransitRoute(routeID, route, stops, this.transportMode);
 		
 		return transitRoute;
 	}
