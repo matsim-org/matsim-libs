@@ -199,13 +199,13 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pConfig, population, pStopsOnly, outputDir);
 		
 		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
-			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0);
+			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0, pConfig.getMode());
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
-			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0);
+			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0, pConfig.getMode());
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)){
-			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getPlanningSpeedFactor());
+			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getPlanningSpeedFactor(), pConfig.getMode());
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(TimeAwareComplexCircleScheduleProvider.NAME)){
-			return new TimeAwareComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getPlanningSpeedFactor(), pConfig.getPIdentifier(), eventsManager);
+			return new TimeAwareComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getPlanningSpeedFactor(), pConfig.getPIdentifier(), eventsManager, pConfig.getMode());
 		} else {
 			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
 			return null;
@@ -298,7 +298,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	public Vehicles getVehicles(){		
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
 		VehiclesFactory vehFactory = vehicles.getFactory();
-		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("p"));
+		VehicleType vehType = vehFactory.createVehicleType(new IdImpl(this.pConfig.getPIdentifier()));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(this.pConfig.getPaxPerVehicle() + 1)); // july 2011 the driver takes one seat
 		capacity.setStandingRoom(Integer.valueOf(0));

@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.StringUtils;
@@ -86,6 +87,7 @@ public class PConfigGroup extends Module{
 	private static final String PASSENGERS_BOARD_EVERY_LINE = "passengersBoardEveryLine";
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
 	private static final String PT_ENABLER = "ptEnabler";
+	private static final String OPERATIONMODE = "OperationMode";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -126,6 +128,7 @@ public class PConfigGroup extends Module{
 	private boolean passengersBoardEveryLine = false;
 	private String transitScheduleToStartWith = null;
 	private String ptEnabler = null;
+	private String operationMode = TransportMode.pt;
 
 	// Strategies
 	private final LinkedHashMap<Id, PStrategySettings> strategies = new LinkedHashMap<Id, PStrategySettings>();
@@ -209,6 +212,8 @@ public class PConfigGroup extends Module{
 			this.transitScheduleToStartWith = value;
 		} else if (PT_ENABLER.equals(key)){
 			this.ptEnabler = value;
+		} else if(OPERATIONMODE.equals(key)){
+			this.operationMode = value;
 		} else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE.length())), true);
 			settings.setModuleName(value);
@@ -262,6 +267,7 @@ public class PConfigGroup extends Module{
 		map.put(REROUTE_AGENTS_STUCK, Boolean.toString(this.reRouteAgentsStuck));
 		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
+		map.put(OPERATIONMODE, this.operationMode);
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
@@ -309,6 +315,7 @@ public class PConfigGroup extends Module{
 		map.put(REROUTE_AGENTS_STUCK, "All agents stuck will be rerouted at the beginning of an iteration, if set to true.");
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one cooperative for each transit line with the given time of operation and number of vehicles");
+		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
@@ -453,6 +460,10 @@ public class PConfigGroup extends Module{
 	
 	public String getPtEnabler() {
 		return this.ptEnabler;
+	}
+
+	public String getMode() {
+		return this.operationMode;
 	}
 
 	public Collection<PStrategySettings> getStrategySettings() {

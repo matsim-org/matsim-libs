@@ -22,8 +22,10 @@ package playground.andreas.P2.plan;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -62,12 +64,19 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	private RandomStopProvider randomStopProvider;
 	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
 	private double planningSpeedFactor;
+	private String transportMode;
 	
-	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double planningSpeedFactor) {
+	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double planningSpeedFactor, final String transportMode) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
 		this.routingAlgo = new Dijkstra(this.net, tC, tC);
+		@SuppressWarnings("serial")
+		Set<String> modes =  new HashSet<String>(){{
+			// this is the networkmode and explicitly not the transportmode
+			add(TransportMode.car);
+			}};
+		((Dijkstra)this.routingAlgo).setModeRestriction(modes);
 		
 		// register all stops by their corresponding link id
 		this.linkId2StopFacilityMap = new HashMap<Id, TransitStopFacility>();
@@ -81,6 +90,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		
 		this.randomStopProvider = randomStopProvider;
 		this.planningSpeedFactor = planningSpeedFactor;
+		this.transportMode = transportMode;
 	}
 
 	@Override
@@ -171,7 +181,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(tempStopsToBeServed.get(0), runningTime, runningTime);
 		stops.add(routeStop);
 		
-		TransitRoute transitRoute = this.scheduleWithStopsOnly.getFactory().createTransitRoute(routeID, route, stops, TransportMode.pt);
+		TransitRoute transitRoute = this.scheduleWithStopsOnly.getFactory().createTransitRoute(routeID, route, stops, this.transportMode);
 		return transitRoute;
 	}
 

@@ -21,8 +21,10 @@ package playground.andreas.P2.plan;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -61,12 +63,23 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 	private Network net;
 	private TransitSchedule scheduleWithStopsOnly;
 	private RandomStopProvider randomStopProvider;
+	private String transportMode;
+	private LeastCostPathCalculator routingAlgo;
 	
-	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration) {
+	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, final String transportMode) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		this.randomStopProvider = randomStopProvider;
+		this.transportMode = transportMode;
+		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
+		this.routingAlgo = new Dijkstra(this.net, tC, tC);
+		@SuppressWarnings("serial")
+		Set<String> modes =  new HashSet<String>(){{
+			// this is the networkmode and explicitly not the transportmode
+				add(TransportMode.car);
+			}};
+		((Dijkstra)this.routingAlgo).setModeRestriction(modes);
 	}
 
 	@Override
@@ -103,8 +116,8 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 
 	private TransitRoute createRoute(Id routeID, TransitStopFacility startStop, TransitStopFacility endStop, double startTime){
 		
-		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
-		LeastCostPathCalculator routingAlgo = new Dijkstra(this.net, tC, tC);
+//		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
+//		LeastCostPathCalculator routingAlgo = new Dijkstra(this.net, tC, tC);
 		
 		Node startNode = this.net.getLinks().get(startStop.getLinkId()).getToNode();
 		Node endNode = this.net.getLinks().get(startStop.getLinkId()).getFromNode();
@@ -113,8 +126,8 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		
 		// get Route
 //		Path
-		Path forth = routingAlgo.calcLeastCostPath(startNode, intermediateEndNode, startTime, null, null);
-		Path back = routingAlgo.calcLeastCostPath(intermediateStartNode, endNode, startTime + forth.travelTime, null, null);
+		Path forth = this.routingAlgo.calcLeastCostPath(startNode, intermediateEndNode, startTime, null, null);
+		Path back = this.routingAlgo.calcLeastCostPath(intermediateStartNode, endNode, startTime + forth.travelTime, null, null);
 		
 		List<Link> completeLinkList = new LinkedList<Link>();
 		completeLinkList.addAll(forth.links);
@@ -148,7 +161,7 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(startStop, runningTime, runningTime);
 		stops.add(routeStop);
 		
-		TransitRoute transitRoute = this.scheduleWithStopsOnly.getFactory().createTransitRoute(routeID, route, stops, TransportMode.pt);
+		TransitRoute transitRoute = this.scheduleWithStopsOnly.getFactory().createTransitRoute(routeID, route, stops, this.transportMode);
 		
 		return transitRoute;
 	}
