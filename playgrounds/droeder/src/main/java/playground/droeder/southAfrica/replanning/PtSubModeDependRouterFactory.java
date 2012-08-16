@@ -20,10 +20,7 @@ package playground.droeder.southAfrica.replanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author droeder

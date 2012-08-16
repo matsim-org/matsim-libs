@@ -26,13 +26,13 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -47,20 +47,21 @@ public class PtSubModeDependendRouter implements TransitRouter{
 	private static final Logger log = Logger
 			.getLogger(PtSubModeDependendRouter.class);
 	
-	private TransitRouterNetworkTravelTimeAndDisutility travelTime;
+//	private TransitRouterNetworkTravelTimeAndDisutility travelTime;
 	private TransitRouterConfig config;
-	private TransitRouterNetworkTravelTimeAndDisutility travelDisutility;
-	private Object transitNetwork;
+//	private TransitRouterNetworkTravelTimeAndDisutility travelDisutility;
 	private TransitRouter completeRouter;
 	private HashMap<String, TransitRouter> modeRouter = null;
 
 	public PtSubModeDependendRouter(Scenario sc, boolean routeOnSameMode){
 		this.config = new TransitRouterConfig(sc.getConfig());
-		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
-		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
-		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
+//		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
+//		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
+//		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
 		this.completeRouter = new TransitRouterImpl(this.config, sc.getTransitSchedule()); 
 		this.initTransitRouter(sc, routeOnSameMode);
+		// this should be handled different. Currently don't know how...
+		this.modeRouter.put(TransportMode.pt, this.completeRouter);
 	}
 	
 	

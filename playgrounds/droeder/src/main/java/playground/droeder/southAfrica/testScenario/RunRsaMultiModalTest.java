@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +35,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -122,45 +120,6 @@ public class RunRsaMultiModalTest {
 		controler.run();
 	}
 	
-//	private static void liveVis(String conf){
-//		Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(conf));
-//		ParallelPersonAlgorithmRunner.run(sc.getPopulation(), sc.getConfig().global().getNumberOfThreads(),
-//				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-//			@Override
-//			public AbstractPersonAlgorithm getPersonAlgorithm() {
-//				return new PersonPrepareForSim((new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork()), (ScenarioImpl) sc);
-//			}
-//		});
-//		
-//		EventsManager events = EventsUtils.createEventsManager();
-//		QSim qSim1 = new QSim(sc, events);
-//		ActivityEngine activityEngine = new ActivityEngine();
-//		qSim1.addMobsimEngine(activityEngine);
-//		qSim1.addActivityHandler(activityEngine);
-//		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
-//		qSim1.addMobsimEngine(netsimEngine);
-//		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-//		TeleportationEngine teleportationEngine = new TeleportationEngine();
-//		qSim1.addMobsimEngine(teleportationEngine);
-//        QSim qSim = qSim1;
-//        AgentFactory agentFactory;
-//            agentFactory = new TransitAgentFactory(qSim);
-//            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-//            transitEngine.setUseUmlaeufe(true);
-//            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//            qSim.addDepartureHandler(transitEngine);
-//            qSim.addAgentSource(transitEngine);
-//            qSim.addMobsimEngine(transitEngine);
-//        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-//        qSim.addAgentSource(agentSource);
-//        QSim sim = qSim;
-//		transitEngine.setUseUmlaeufe(true);
-//
-//		
-//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, sim);
-//		OTFClientLive.run(sc.getConfig(), server);
-//		sim.run();
-//	}
 	
 	private static void playOutputConfig(String configfile) throws FileNotFoundException, IOException {
 		log.info("using " + configfile + " ...");

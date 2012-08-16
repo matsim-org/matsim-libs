@@ -77,7 +77,7 @@ public class CreateTestScenario {
 		new CreateTestScenario().run();
 	}
 
-	private int numAgents = 1000;
+	private int numAgents = 10000;
 	
 	public CreateTestScenario(){
 		
@@ -260,11 +260,11 @@ public class CreateTestScenario {
 		NetworkRoute route = new LinkNetworkRouteImpl(sc.createId("A-A"), sc.createId("A-A"));
 		
 		List<Id> linkIds = new ArrayList<Id>(){{
-			add(new IdImpl("A-B1"));
-			add(new IdImpl("B1-C"));
+			add(new IdImpl("A-B3"));
+			add(new IdImpl("B3-C"));
 			add(new IdImpl("C-C"));
-			add(new IdImpl("C-B1"));
-			add(new IdImpl("B1-A"));
+			add(new IdImpl("C-B3"));
+			add(new IdImpl("B3-A"));
 		}};
 		route.setLinkIds(route.getStartLinkId(), linkIds, route.getEndLinkId());
 		

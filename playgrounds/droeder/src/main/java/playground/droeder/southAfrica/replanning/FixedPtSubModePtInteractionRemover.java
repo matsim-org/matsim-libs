@@ -67,17 +67,22 @@ public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
 						}
 						// this is "pt-chain". Throw away all unnecessary pt legs and activities...
 						else{
-							for(PlanElement ee: temp){
-								if(ee instanceof Activity){
-									if(!((Activity) ee).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-										newPlanElements.add(ee);
-									}
-								}else if(ee instanceof Leg){
-									if(!((Leg) ee).getMode().equals(TransportMode.transit_walk)){
-										newPlanElements.add(ee);
+							PlanElement delegate = null;
+							// find the one leg which is not a transitWalk. ignore the activities
+							for(int ii = 0; ii < temp.size() - 2; ii++ ){
+								if(temp.get(ii) instanceof Leg){
+									if(!((Leg) temp.get(ii)).getMode().equals(TransportMode.transit_walk)){
+										if(delegate == null){
+											delegate = temp.get(ii);
+										}else{
+											//TODO probably check if mode is equal...
+										}
 									}
 								}
 							}
+							//add the non-transit_walk-leg and the last activity - which must not be an "pt interaction"
+							newPlanElements.add(delegate);
+							newPlanElements.add(temp.get(temp.size() - 1));
 						}
 						// clear the temp-list, because all temp-PlanElements are added to the new PlanElements
 						temp.clear();
