@@ -30,8 +30,10 @@ public class FixedSubModePtInteractionRemoverStrategy implements PlanStrategyMod
 	
 	//TODO make it multithreadded again!
 	/**
-	 * This class provides a strategy to remove pt-interactions from the plan, but changes the 
-	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>
+	 * This class provides a strategy to remove pt-interactions from a plan, but changes the 
+	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>. Instead it keeps the 
+	 * original mode
+	 * 
 	 * @param c
 	 */
 	public FixedSubModePtInteractionRemoverStrategy(Controler c){

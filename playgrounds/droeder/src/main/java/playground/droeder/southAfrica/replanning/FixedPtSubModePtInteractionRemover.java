@@ -93,30 +93,30 @@ public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
 		plan.getPlanElements().clear();
 		plan.getPlanElements().addAll(newPlanElements);
 		
-		//TODO does not work currently!!!
-		//check if the legModes are still fixed...
-		if(plan.getPerson().getCustomAttributes().containsKey(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES)){
-			@SuppressWarnings("unchecked")
-			List<String> legModes = (List<String>) plan.getPerson().getCustomAttributes().
-					get(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
-			
-			if(((legModes.size() * 2) + 1) != plan.getPlanElements().size()){
-				log.warn("Person " + plan.getPerson().getId() + " is probably no longer using original pt-subModes. " +
-						" Removing OriginalLegmodes...");
-				plan.getPerson().getCustomAttributes().remove(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
-			}else{
-				//modify the planElements
-				for(int i = 1; i < plan.getPlanElements().size(); i += 2){
-					Leg l = (Leg) plan.getPlanElements().get(i);
-					String mode = legModes.get(i/2);
-					if(!l.getMode().equals(mode)){
-						log.info("Changing Legmode for person " + plan.getPerson().getId() + " from " + l.getMode() 
-								+ " to " + mode + ".");
-						l.setMode(mode);
-					}
-				}
-			}
-		}
+//		//TODO does not work currently!!!
+//		//check if the legModes are still fixed...
+//		if(plan.getPerson().getCustomAttributes().containsKey(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES)){
+//			@SuppressWarnings("unchecked")
+//			List<String> legModes = (List<String>) plan.getPerson().getCustomAttributes().
+//					get(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
+//			
+//			if(((legModes.size() * 2) + 1) != plan.getPlanElements().size()){
+//				log.warn("Person " + plan.getPerson().getId() + " is probably no longer using original pt-subModes. " +
+//						" Removing OriginalLegmodes...");
+//				plan.getPerson().getCustomAttributes().remove(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
+//			}else{
+//				//modify the planElements
+//				for(int i = 1; i < plan.getPlanElements().size(); i += 2){
+//					Leg l = (Leg) plan.getPlanElements().get(i);
+//					String mode = legModes.get(i/2);
+//					if(!l.getMode().equals(mode)){
+//						log.info("Changing Legmode for person " + plan.getPerson().getId() + " from " + l.getMode() 
+//								+ " to " + mode + ".");
+//						l.setMode(mode);
+//					}
+//				}
+//			}
+//		}
 	}
 
 }

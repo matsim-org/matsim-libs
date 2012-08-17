@@ -28,7 +28,7 @@ import playground.droeder.southAfrica.FixedPtSubModeControler;
  * @author droeder
  *
  */
-public class ReRouteFixedPtSubMode implements PlanStrategyModule{
+public class ReRouteFixedPtSubModeStrategy implements PlanStrategyModule{
 	private Controler c;
 	
 	//TODO make it multithreadded again!
@@ -37,7 +37,7 @@ public class ReRouteFixedPtSubMode implements PlanStrategyModule{
 	 * Aborts if the controler is not an instance of instance of <code>FixedPtSubModeControler</code>
 	 * @param c
 	 */
-	public ReRouteFixedPtSubMode(Controler c) {
+	public ReRouteFixedPtSubModeStrategy(Controler c) {
 //		super(c.getConfig().global());
 		if(!(c instanceof FixedPtSubModeControler)){
 			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the FixedPtSubModeControler...");

@@ -39,8 +39,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
 import playground.droeder.southAfrica.replanning.PlanStrategyReRoutePtFixedSubMode;
-import playground.droeder.southAfrica.replanning.PlansCalcSubModeDependendTransitRoute;
-import playground.droeder.southAfrica.replanning.PtSubModeDependRouterFactory;
+import playground.droeder.southAfrica.routing.PlansCalcSubModeDependendTransitRoute;
+import playground.droeder.southAfrica.routing.PtSubModeDependRouterFactory;
 
 /**
  * @author droeder

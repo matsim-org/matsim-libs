@@ -59,10 +59,8 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
-import playground.andreas.P2.hook.PQSimFactory;
 import playground.andreas.P2.schedule.PTransitRouterImplFactory;
 import playground.droeder.southAfrica.FixedPtSubModeControler;
-import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimEngine;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
 
 /**
@@ -124,6 +122,7 @@ public class RunRsaMultiModalTest {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private static void playOutputConfig(String configfile) throws FileNotFoundException, IOException {
 		log.info("using " + configfile + " ...");
 //		String currentDirectory = configfile.substring(0, configfile.lastIndexOf("/") + 1);

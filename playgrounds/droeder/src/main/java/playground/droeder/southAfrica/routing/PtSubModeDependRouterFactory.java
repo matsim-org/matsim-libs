@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning;
+package playground.droeder.southAfrica.routing;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.router.TransitRouter;

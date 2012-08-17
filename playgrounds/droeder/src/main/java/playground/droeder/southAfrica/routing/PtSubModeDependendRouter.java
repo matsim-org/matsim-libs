@@ -16,12 +16,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning;
+package playground.droeder.southAfrica.routing;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,21 +27,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
-import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -65,6 +53,8 @@ public class PtSubModeDependendRouter implements TransitRouter{
 	private TransitRouter completeRouter;
 	private HashMap<String, TransitRouter> modeRouter = null;
 
+	private boolean routeOnSameMode;
+
 	public PtSubModeDependendRouter(Scenario sc, boolean routeOnSameMode){
 		this.config = new TransitRouterConfig(sc.getConfig());
 //		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
@@ -74,6 +64,7 @@ public class PtSubModeDependendRouter implements TransitRouter{
 		this.initTransitRouter(sc, routeOnSameMode);
 		// this should be handled different. Currently don't know how...
 		this.modeRouter.put(TransportMode.pt, this.completeRouter);
+		this.routeOnSameMode = routeOnSameMode;
 	}
 	
 	
@@ -151,6 +142,14 @@ public class PtSubModeDependendRouter implements TransitRouter{
 		}else{
 			return this.modeRouter.get(leg.getMode()).calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime, person);
 		}
+	}
+
+
+	/**
+	 * @return
+	 */
+	public boolean routeOnSameMode() {
+		return this.routeOnSameMode;
 	}
 }
 

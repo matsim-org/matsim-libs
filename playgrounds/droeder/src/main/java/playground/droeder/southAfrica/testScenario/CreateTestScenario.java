@@ -136,10 +136,12 @@ public class CreateTestScenario {
 		Network net = sc.getNetwork();
 		NetworkFactory factory = net.getFactory();
 		
+		@SuppressWarnings("serial")
 		Set<String> train = new HashSet<String>(){{
 			add("train");
 		}};
 		
+		@SuppressWarnings("serial")
 		Set<String> busCarTaxi= new HashSet<String>(){{
 			add("bus");
 			add("car");
@@ -259,6 +261,7 @@ public class CreateTestScenario {
 		TransitLine l = f.createTransitLine(sc.createId(mode));
 		NetworkRoute route = new LinkNetworkRouteImpl(sc.createId("A-A"), sc.createId("A-A"));
 		
+		@SuppressWarnings("serial")
 		List<Id> linkIds = new ArrayList<Id>(){{
 			add(new IdImpl("A-B3"));
 			add(new IdImpl("B3-C"));
@@ -345,6 +348,7 @@ public class CreateTestScenario {
 		TransitLine l = f.createTransitLine(sc.createId(mode));
 		NetworkRoute route = new LinkNetworkRouteImpl(sc.createId("B2-A"), sc.createId("B2-A"));
 		
+		@SuppressWarnings("serial")
 		List<Id> linkIds = new ArrayList<Id>(){{
 			add(new IdImpl("A-B2"));
 			add(new IdImpl("B2-C"));
