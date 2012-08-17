@@ -58,15 +58,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		
 		FixedPtSubModePtInteractionRemover strategy = new FixedPtSubModePtInteractionRemover();
 		
-//		for(PlanElement p : plan.getPlanElements()){
-//			System.out.println(p.toString());
-//		}
-//		System.out.println("\n");
-//		strategy.run(plan);
-//		for(PlanElement p : plan.getPlanElements()){
-//			System.out.println(p.toString());
-//		}
-//		System.out.println("--------------");
+		strategy.run(plan);
 		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
 		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
 		Assert.assertEquals("expecting legmode 'bus'", "bus", ((Leg)plan.getPlanElements().get(1)).getMode());
