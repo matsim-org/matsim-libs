@@ -62,6 +62,8 @@ import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PQSimFactory;
 import playground.andreas.P2.schedule.PTransitRouterImplFactory;
 import playground.droeder.southAfrica.FixedPtSubModeControler;
+import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimEngine;
+import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
 
 /**
  * @author droeder
@@ -113,7 +115,8 @@ public class RunRsaMultiModalTest {
 		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(controler);
 		controler.addControlerListener(pFact);		
 		controler.setTransitRouterFactory(pFact);
-		controler.setMobsimFactory(new PQSimFactory());
+		//set mobsimFactory
+		controler.setMobsimFactory(new TransitSubModeQSimFactory());
 		controler.addControlerListener(new WriteSelectedPlansAfterIteration());
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 

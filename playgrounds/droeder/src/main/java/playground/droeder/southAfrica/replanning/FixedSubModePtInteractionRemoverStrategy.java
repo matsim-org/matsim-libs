@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
  */
 public class FixedSubModePtInteractionRemoverStrategy implements PlanStrategyModule {
 	
+	//TODO make it multithreadded again!
 	/**
 	 * This class provides a strategy to remove pt-interactions from the plan, but changes the 
 	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>

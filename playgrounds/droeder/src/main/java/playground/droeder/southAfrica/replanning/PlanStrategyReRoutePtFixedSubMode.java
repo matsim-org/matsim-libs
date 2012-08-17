@@ -43,6 +43,8 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	private RandomPlanSelector selector;
 	private List<Plan> plans;
 	private List<PlanStrategyModule> modules;
+	
+	public static final String ORIGINALLEGMODES = "originalLegModes";
 
 	/**
 	 * This Strategy reroutes every single leg, as <code>ReRoute</code> would do, but with

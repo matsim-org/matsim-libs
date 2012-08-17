@@ -18,18 +18,16 @@
  * *********************************************************************** */
 package playground.droeder.southAfrica.replanning;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -45,8 +43,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  *
  */
 public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute{
-	private static final Logger log = Logger
-			.getLogger(PlansCalcSubModeDependendTransitRoute.class);
+//	private static final Logger log = Logger
+//			.getLogger(PlansCalcSubModeDependendTransitRoute.class);
 	
 	private FixedPtSubModePtInteractionRemover remover = new FixedPtSubModePtInteractionRemover();
 	private PtSubModeDependendRouter router;
@@ -81,24 +79,14 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 	
 	@Override
 	protected void handlePlan(Person person, final Plan plan) {
-		List<PlanElement> peTemp = new ArrayList<PlanElement>(plan.getPlanElements());
 		this.remover.run(plan);
-		if(plan.getPlanElements().size() % 2 != 1){
-			log.error("wrong number of planELements");
-			for(PlanElement pe:plan.getPlanElements()){
-				log.error(person.getId()  + "\t" + pe.toString());
-			}
-			for(PlanElement pe: peTemp){
-				log.warn(person.getId()  + "\t" + pe.toString());
-			}
-			System.out.println("\n");
-			throw new RuntimeException("debug");
-		}
+		// modify LegMode to original...
 		super.handlePlan(person, plan);
 	}
 
 	@Override
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+		//use own method if leg is a transi-tleg (not only pt)
 		if (this.config.getTransitModes().contains(leg.getMode())) {
 			List<Leg> legs= this.router.calcRoute(person, leg, fromAct, toAct, depTime);
 			for(int i = 0; i < legs.size(); i++) {
@@ -116,6 +104,7 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 			}
 			return travelTime;
 		}
+		//otherwise use original
 		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 }

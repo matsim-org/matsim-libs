@@ -30,7 +30,8 @@ import playground.droeder.southAfrica.FixedPtSubModeControler;
  */
 public class ReRouteFixedPtSubMode implements PlanStrategyModule{
 	private Controler c;
-
+	
+	//TODO make it multithreadded again!
 	/**
 	 * Main <code>PlanStrategyModule</code> for <code>PlanStrategy</code> <code>PlanStrategyReRoutePtFixedSubMode</code>.
 	 * Aborts if the controler is not an instance of instance of <code>FixedPtSubModeControler</code>

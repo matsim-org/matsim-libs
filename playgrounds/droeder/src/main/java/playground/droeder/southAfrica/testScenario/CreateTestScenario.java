@@ -77,7 +77,7 @@ public class CreateTestScenario {
 		new CreateTestScenario().run();
 	}
 
-	private int numAgents = 10000;
+	private int numAgents = 1000;
 	
 	public CreateTestScenario(){
 		
