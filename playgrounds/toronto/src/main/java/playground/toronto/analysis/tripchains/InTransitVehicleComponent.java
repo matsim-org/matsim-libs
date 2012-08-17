@@ -2,7 +2,7 @@ package playground.toronto.analysis.tripchains;
 
 import org.matsim.api.core.v01.Id;
 
-public class InTransitVehicleComponent implements TripChainComponent {
+public class InTransitVehicleComponent implements TripComponent {
 	private double startTime;
 	private double endTime;
 	private Id transitLineId;
@@ -22,7 +22,7 @@ public class InTransitVehicleComponent implements TripChainComponent {
 	}
 	
 	@Override
-	public int compareTo(TripChainComponent o) {
+	public int compareTo(TripComponent o) {
 		if (this.overlaps(o)) return 0;
 		else if (o.getStartTime() < this.startTime) return 1;
 		else if (o.getStartTime() > this.startTime) return -1;
@@ -37,7 +37,7 @@ public class InTransitVehicleComponent implements TripChainComponent {
 		return this.endTime;
 	}
 	@Override
-	public boolean overlaps(TripChainComponent t) {
+	public boolean overlaps(TripComponent t) {
 		return (t.getEndtime() > this.startTime && t.getEndtime() < this.endTime) ||
 				(t.getStartTime() > this.startTime && t.getStartTime() < this.endTime);
 	}

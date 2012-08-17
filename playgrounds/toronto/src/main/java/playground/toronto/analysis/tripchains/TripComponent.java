@@ -1,9 +1,9 @@
 package playground.toronto.analysis.tripchains;
 
 
-public interface TripChainComponent extends Comparable<TripChainComponent> {
+public interface TripComponent extends Comparable<TripComponent> {
 	public double getStartTime();
 	public double getEndtime();
-	public boolean overlaps(TripChainComponent t);
+	public boolean overlaps(TripComponent t);
 	public void finishComponent(double endTime);
 }
