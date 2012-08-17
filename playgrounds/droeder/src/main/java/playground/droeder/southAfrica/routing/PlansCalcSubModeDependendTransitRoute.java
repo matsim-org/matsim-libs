@@ -39,13 +39,14 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.droeder.southAfrica.replanning.FixedPtSubModePtInteractionRemover;
-import playground.droeder.southAfrica.replanning.PlanStrategyReRoutePtFixedSubMode;
 
 /**
  * @author droeder
  *
  */
 public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute{
+
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(PlansCalcSubModeDependendTransitRoute.class);
 	
