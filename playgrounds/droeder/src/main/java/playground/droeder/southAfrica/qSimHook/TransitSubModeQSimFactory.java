@@ -44,6 +44,8 @@ import playground.andreas.P2.hook.PTransitAgentFactory;
 
 /**
  * @author droeder
+ * copy and paste from PQSimFactory (aneumann)
+ * changes are marked
  *
  */
 public class TransitSubModeQSimFactory implements MobsimFactory {

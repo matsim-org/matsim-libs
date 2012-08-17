@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * @author droeder based on mrieser
+ * @author droeder based on TransitQSimEngine (mrieser)
  * 
  * just changed handleDeparture-Method, but need to copy-paste handleAgentPTDeparture because it's private
  *

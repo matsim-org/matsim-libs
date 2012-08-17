@@ -48,6 +48,7 @@ public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
 		newPlanElements.add( plan.getPlanElements().get(0));
 		List<PlanElement> temp = new ArrayList<PlanElement>();
 		PlanElement e;
+		// TODO[dr] very complex. easier way?
 		for(int i = 1; i < plan.getPlanElements().size(); i++){
 			e = plan.getPlanElements().get(i);
 			temp.add(e);
@@ -68,14 +69,16 @@ public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
 						// this is "pt-chain". Throw away all unnecessary pt legs and activities...
 						else{
 							PlanElement delegate = null;
-							// find the one leg which is not a transitWalk. ignore the activities
+							// find (at least) the one leg which is not a transitWalk. ignore the activities
 							for(int ii = 0; ii < temp.size() - 2; ii++ ){
+								// TODO[dr] necessary probably (ii += 2) might be easier
 								if(temp.get(ii) instanceof Leg){
 									if(!((Leg) temp.get(ii)).getMode().equals(TransportMode.transit_walk)){
 										if(delegate == null){
 											delegate = temp.get(ii);
 										}else{
-											//TODO probably check if mode is equal...
+											//TODO[dr] probably check if there are different modes in this-leg-sequence
+											//if so, set mode to pt!?
 										}
 									}
 								}
@@ -93,7 +96,7 @@ public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
 		plan.getPlanElements().clear();
 		plan.getPlanElements().addAll(newPlanElements);
 		
-//		//TODO does not work currently!!!
+//		//TODO[dr] does not work currently!!! make a strategy-module out of it!
 //		//check if the legModes are still fixed...
 //		if(plan.getPerson().getCustomAttributes().containsKey(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES)){
 //			@SuppressWarnings("unchecked")

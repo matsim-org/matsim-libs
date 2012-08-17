@@ -42,6 +42,7 @@ import playground.droeder.southAfrica.replanning.PlanStrategyReRoutePtFixedSubMo
 import playground.droeder.southAfrica.routing.PlansCalcSubModeDependendTransitRoute;
 import playground.droeder.southAfrica.routing.PtSubModeDependRouterFactory;
 
+// TODO[dr] fixed or not fixed should be set in configFile!!!
 /**
  * @author droeder
  *
@@ -59,6 +60,7 @@ public class FixedPtSubModeControler extends Controler {
 		super(configFile);
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
 		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(super.scenarioData, true));
+		// TODO[dr] check if this is really necessary
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-transitWalk"-legs
 		((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 				setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
@@ -78,6 +80,7 @@ public class FixedPtSubModeControler extends Controler {
 		super(sc);
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
 		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(super.scenarioData, true));
+		//TODO[dr] check if this is really necessary
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-tansitWalk"-legs
 		((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 				setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
@@ -91,10 +94,12 @@ public class FixedPtSubModeControler extends Controler {
 	@Override
 	public void run(){
 		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(super.scenarioData, true));
+		// TODO[dr] move this. should be configurable
 		this.storeOriginalLegModes();
 		super.run();
 	}
 	
+
 	private void storeOriginalLegModes() {
 		for(Person p: this.scenarioData.getPopulation().getPersons().values()){
 			List<String> legModes = new ArrayList<String>();

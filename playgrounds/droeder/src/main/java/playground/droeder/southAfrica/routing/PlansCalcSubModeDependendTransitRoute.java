@@ -85,14 +85,9 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 	protected void handlePlan(Person person, final Plan plan) {
 		this.remover.run(plan);
 		super.handlePlan(person, plan);
-		/*
-		 *  modify LegMode to original... should be moved to the 'remover' but needs to be called here,
-		 *  because the a different 'remover'-class is called in super-class.
-		 */
-//		this.changeModesToOriginal(plan);
 	}
 
-//	/**
+//	/**// TODO[dr] remove this to. Probably to another strategy...
 //	 * @param plan
 //	 */
 //	private void changeModesToOriginal(Plan plan) {
@@ -125,11 +120,11 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 
 	@Override
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		//use own method if leg is a transit-leg (not only pt)
+		//use own method if leg is a transit-leg (not only pt!)
 		if (this.config.getTransitModes().contains(leg.getMode())) {
 			List<Leg> legs= this.router.calcRoute(person, leg, fromAct, toAct, depTime);
 			for(int i = 0; i < legs.size(); i++) {
-				//not very nice, but legMode needs to be replaced here, because it's hardcoded in TransitRouterImpl... 
+				//not very nice, but legMode needs to be replaced here, because TransportMode.pt is 'hardcoded' in TransitRouterImpl... 
 				if(!legs.get(i).getMode().equals(TransportMode.transit_walk)){
 					legs.get(i).setMode(leg.getMode());
 				}

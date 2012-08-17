@@ -92,7 +92,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		this.modules = new ArrayList<PlanStrategyModule>();
 		this.modules.add(new FixedSubModePtInteractionRemoverStrategy(this.c));
 		this.modules.add(new ReRouteFixedPtSubModeStrategy(this.c));
-		// TODO 'return to old modes'-strategy
+		// TODO[dr] 'return to old modes'-strategy
 	}
 
 	@Override

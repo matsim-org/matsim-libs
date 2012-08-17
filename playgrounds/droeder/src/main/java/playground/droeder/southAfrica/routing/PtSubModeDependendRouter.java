@@ -55,6 +55,15 @@ public class PtSubModeDependendRouter implements TransitRouter{
 
 	private boolean routeOnSameMode;
 
+	/**
+	 * This router got two functionalities
+	 * <ul>
+	 *	<li>it keeps the pt-'submodes' like train/bus/tram</li>
+	 *	<li>it can route a leg on the (sub-)mode specified in it
+	 *</ul>
+	 * @param sc
+	 * @param routeOnSameMode
+	 */
 	public PtSubModeDependendRouter(Scenario sc, boolean routeOnSameMode){
 		this.config = new TransitRouterConfig(sc.getConfig());
 //		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
@@ -62,7 +71,7 @@ public class PtSubModeDependendRouter implements TransitRouter{
 //		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
 		this.completeRouter = new TransitRouterImpl(this.config, sc.getTransitSchedule()); 
 		this.initTransitRouter(sc, routeOnSameMode);
-		// this should be handled different. Currently don't know how...
+		//TODO[dr] this should be handled different. Currently don't know how. Is the default really necessary?
 		this.modeRouter.put(TransportMode.pt, this.completeRouter);
 		this.routeOnSameMode = routeOnSameMode;
 	}
@@ -82,14 +91,14 @@ public class PtSubModeDependendRouter implements TransitRouter{
 		}
 		
 		String mode = null;
-		//parse all line
+		//parse all lines
 		for(TransitLine line : sc.getTransitSchedule().getTransitLines().values()){
 			// check mode of routes (in my opinion mode should be pushed up to line!)
 			for(TransitRoute route: line.getRoutes().values()){
 				if(mode == null){
 					mode = route.getTransportMode();
 				}else{
-					// abort if a route line contains a route of different modes
+					// abort if a route line contains a route of different modes. In my opinion this really makes no sense [dr]
 					if(mode != route.getTransportMode()){
 						throw new IllegalArgumentException("one line must not operate on different transport-modes. ABORT...");
 					}
@@ -108,6 +117,7 @@ public class PtSubModeDependendRouter implements TransitRouter{
 					}
 				}
 			}else{
+				//the mode of a line/route should be available to the agents
 				throw new IllegalArgumentException("mode " + mode + " of transitline " + line.getId() + " not specified in pt-module. ABORT!");
 			}
 			mode = null;

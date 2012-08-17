@@ -28,7 +28,7 @@ import org.matsim.core.controler.Controler;
  */
 public class FixedSubModePtInteractionRemoverStrategy implements PlanStrategyModule {
 	
-	//TODO make it multithreadded again!
+	//TODO[dr] make it multithreaded again!
 	/**
 	 * This class provides a strategy to remove pt-interactions from a plan, but changes the 
 	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>. Instead it keeps the 
@@ -45,31 +45,19 @@ public class FixedSubModePtInteractionRemoverStrategy implements PlanStrategyMod
 //		return new FixedPtSubModePtInteractionRemover();
 //	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#prepareReplanning()
-	 */
 	@Override
 	public void prepareReplanning() {
-		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#handlePlan(org.matsim.api.core.v01.population.Plan)
-	 */
 	@Override
 	public void handlePlan(Plan plan) {
-		// TODO Auto-generated method stub
 		new FixedPtSubModePtInteractionRemover().run(plan);
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#finishReplanning()
-	 */
 	@Override
 	public void finishReplanning() {
-		// TODO Auto-generated method stub
 		
 	}
 

@@ -31,7 +31,7 @@ import playground.droeder.southAfrica.FixedPtSubModeControler;
 public class ReRouteFixedPtSubModeStrategy implements PlanStrategyModule{
 	private Controler c;
 	
-	//TODO make it multithreadded again!
+	//TODO[dr] make it multithreadded again!
 	/**
 	 * Main <code>PlanStrategyModule</code> for <code>PlanStrategy</code> <code>PlanStrategyReRoutePtFixedSubMode</code>.
 	 * Aborts if the controler is not an instance of instance of <code>FixedPtSubModeControler</code>
@@ -40,7 +40,7 @@ public class ReRouteFixedPtSubModeStrategy implements PlanStrategyModule{
 	public ReRouteFixedPtSubModeStrategy(Controler c) {
 //		super(c.getConfig().global());
 		if(!(c instanceof FixedPtSubModeControler)){
-			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the FixedPtSubModeControler...");
+			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler...");
 		}
 		this.c = c;
 	}
@@ -50,26 +50,17 @@ public class ReRouteFixedPtSubModeStrategy implements PlanStrategyModule{
 //		return this.c.createRoutingAlgorithm();
 //	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#prepareReplanning()
-	 */
 	@Override
 	public void prepareReplanning() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#handlePlan(org.matsim.api.core.v01.population.Plan)
-	 */
 	@Override
 	public void handlePlan(Plan plan) {
 		this.c.createRoutingAlgorithm().run(plan);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.replanning.PlanStrategyModule#finishReplanning()
-	 */
 	@Override
 	public void finishReplanning() {
 		// TODO Auto-generated method stub
