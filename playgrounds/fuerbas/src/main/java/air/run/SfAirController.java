@@ -37,8 +37,8 @@ public class SfAirController {
 //		String config = "/media/data/work/repos/shared-svn/studies/countries/de/flight/sf_oag_flight_model/air_config.xml";
 //		Controler con = new Controler(config);		//args: configfile
 
-		args[0] = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph/air_config.xml";
-		
+//		args[0] = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph/air_config.xml";
+//		args[0] = "/home/dgrether/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml";
 		Controler con = new Controler(args[0]);		//args: configfile
 		con.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		con.setOverwriteFiles(true);
