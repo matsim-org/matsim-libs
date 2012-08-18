@@ -67,27 +67,30 @@ public class MyShapeFileWriter {
 		initFeatureType1();
 		Collection<Feature> features = createFeatures1(scenario);
 		ShapeFileWriter.writeGeometries(features, outputFile);
-		System.out.println("ShapeFile geschrieben (Netz)");			
+		System.out.println("ShapeFile " + outputFile + " written.");	
 	}
 	
 	public void writeShapeFilePoints(Scenario scenario, SortedMap<Id,Coord> koordinaten, String outputFile) {
 		if (koordinaten.isEmpty() == true){
-			System.out.println("Empty Map!");
+			System.out.println("Map is empty, shapeFile " + outputFile + " not written!");
 		}
 		else {
 			initFeatureType2();
 			Collection<Feature> features = createFeatures2(scenario, koordinaten);
 			ShapeFileWriter.writeGeometries(features,  outputFile);
-			System.out.println("ShapeFile geschrieben (Points)");	
+			System.out.println("ShapeFile " + outputFile + " written.");	
 		}
 	}
 	
 	public void writeShapeFilePRUsage(Scenario scenario, Map<Id, ParkAndRideFacility> id2prFacilities, Map<Id, Integer> prLinkId2prActs, String outputFile) {
+		if (prLinkId2prActs.isEmpty() == true){
+			System.out.println("Map is empty, shapeFile " + outputFile + " not written!");
+		}
 		
 		initFeatureType3();
 		Collection<Feature> features = createFeatures3(scenario, id2prFacilities, prLinkId2prActs);
 		ShapeFileWriter.writeGeometries(features, outputFile);
-		System.out.println("ShapeFile geschrieben (PRUsage)");			
+		System.out.println("ShapeFile " + outputFile + " written.");	
 	}
 
 	private void initFeatureType1() {

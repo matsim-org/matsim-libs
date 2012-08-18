@@ -4,85 +4,46 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 public class TextFileWriter {
 
-	public void writeFile1(List<Id> idList, int numberOfAgents, String outputFile){
-		File file = new File(outputFile);
-		   
-	    try {
-	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile00 = "number of agents: " + numberOfAgents;
-    	bw.write(zeile00);
-        bw.newLine();
-	    
-	    String zeile = "PersonIDs:";
+	public void writeFile2(int personsPR, int personsHomeWork, String outputFile) {
 		
-    	bw.write(zeile);
-        bw.newLine();
-	
-	    for (Id id : idList){
-	    	String personId = id.toString();
-	    	
-	    	String zeile1 = personId;
-	
-	    	bw.write(zeile1);
-	        bw.newLine();
-	        }
-	
-	    bw.flush();
-	    bw.close();
-	    System.out.println("File "+file.toString()+" geschrieben");
-    
-	    } catch (IOException e) {}
-	}
-
-	public void writeFile2(List<Person> personsPR, List<Person> personsHomeWork, String outputFile) {
 		File file = new File(outputFile);
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile0 = "number of selected plans with a home and work activity: " + personsHomeWork.size();
+	    
+	    String zeile0 = "number of selected plans with a home and work activity: " + String.valueOf(personsHomeWork);
     	bw.write(zeile0);
         bw.newLine();
-        String zeile00 = "number of selected plans with a Park'n'Ride activity: " + personsHomeWork.size();
+        
+        String zeile00 = "number of selected plans with a Park'n'Ride activity: " + String.valueOf(personsPR);
     	bw.write(zeile00);
         bw.newLine();
-        String zeile11 = "Park'n'Ride share: " + (double) personsPR.size() / (double) personsHomeWork.size()*100+"%";
+        
+        double prShare = (double) personsPR / (double) personsHomeWork;
+        String prShareString = String.valueOf(prShare * 100);
+        String zeile11 = "Park'n'Ride share: " + prShareString+"%";
     	bw.write(zeile11);
+    	
         bw.newLine();
-      
-        bw.newLine();
-	    
-	    String zeile = "Agents with selected Park'n'Ride plan:";
-		
-    	bw.write(zeile);
-        bw.newLine();
-	
-	    for (Person person : personsPR){
-	    	String personId = person.getId().toString();
-	    	
-	    	String zeile1 = personId;
-	
-	    	bw.write(zeile1);
-	        bw.newLine();
-	        }
-	
+ 
 	    bw.flush();
 	    bw.close();
-	    System.out.println("File "+file.toString()+" geschrieben");
-    
+	    
+	    System.out.println("File "+file.toString()+" written");
+
 	    } catch (IOException e) {}
 	}
 
 	public void writeFile3(Map<Id, Integer> prLinkId2prActs, Map<Id, ParkAndRideFacility> id2prFacilities, String outputFile) {
+		
 		File file = new File(outputFile);
 		   
 	    try {
@@ -105,12 +66,41 @@ public class TextFileWriter {
 	
 	    	bw.write(zeile1);
 	        bw.newLine();
-	        }
-	
+	    }
+	    	
 	    bw.flush();
 	    bw.close();
-	    System.out.println("File "+file.toString()+" geschrieben");
+	    System.out.println("File "+file.toString()+" written");
     
+	    } catch (IOException e) {}
+	}
+
+	public void writeFile1(int equalPlanPersonIDs, int improvedPlanPersonIDs, int worsePlanPersonIDs, int improvedPRPlanPersonIDs, String outputFile) {
+		
+		File file = new File(outputFile);
+		   
+	    try {
+	    	
+		    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		    
+		    String zeile0 = "number of selected plans with an equal score: " + String.valueOf(equalPlanPersonIDs);
+	    	bw.write(zeile0);
+	        bw.newLine();
+	        String zeile1 = "number of selected plans with a higher score: " + String.valueOf(improvedPlanPersonIDs);
+	    	bw.write(zeile1);
+	        bw.newLine();
+	        String zeile2 = "number of selected plans with a lower score: " + String.valueOf(worsePlanPersonIDs);
+	    	bw.write(zeile2);
+	        bw.newLine();
+	        String zeile3 = "number of selected plans with Park'n'Ride and a higher score: " + String.valueOf(improvedPRPlanPersonIDs);
+	    	bw.write(zeile3);
+	        bw.newLine();
+		
+		    bw.flush();
+		    bw.close();
+		    
+		    System.out.println("File "+file.toString()+" written");
+
 	    } catch (IOException e) {}
 	}
 }

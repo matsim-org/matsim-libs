@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -39,7 +40,7 @@ import org.matsim.core.basic.v01.IdImpl;
  *
  */
 public class PRFileReader {
-	
+	private static final Logger log = Logger.getLogger(PRFileReader.class);
 	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private String prFacilityFile;
 
@@ -49,7 +50,7 @@ public class PRFileReader {
 
 	public Map<Id, ParkAndRideFacility> getId2prFacility() {
 		
-		System.out.println("Trying to read Facilities from file "+this.prFacilityFile);
+		log.info("Reading Facilities from file " + this.prFacilityFile);
 		
 		 BufferedReader br = null;
 	        try {
@@ -87,6 +88,7 @@ public class PRFileReader {
 	                }
 	            }
 	        }
+	        log.info("Done.");
 			return this.id2prFacility;
 	}
 }
