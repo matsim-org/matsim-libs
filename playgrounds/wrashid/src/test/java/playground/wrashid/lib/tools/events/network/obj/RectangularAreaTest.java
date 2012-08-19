@@ -13,7 +13,7 @@ public class RectangularAreaTest extends TestCase {
 		assertTrue(rectangleOne.isInArea(new CoordImpl(1.5, 1.5)));
 		
 		assertFalse(rectangleOne.isInArea(new CoordImpl(-1.0, 1.5)));
-		assertFalse(rectangleOne.isInArea(new CoordImpl(2.0, 1.5)));
+		assertTrue(rectangleOne.isInArea(new CoordImpl(2.0, 1.5)));
 		assertFalse(rectangleOne.isInArea(new CoordImpl(1.5, 2.5)));
 		assertFalse(rectangleOne.isInArea(new CoordImpl(2.0, 0.5)));
 		assertFalse(rectangleOne.isInArea(new CoordImpl(2.5, 2.5)));
