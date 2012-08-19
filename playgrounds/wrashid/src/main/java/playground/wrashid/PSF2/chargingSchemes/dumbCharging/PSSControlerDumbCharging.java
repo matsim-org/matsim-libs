@@ -170,8 +170,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent event) {
 				
-				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getControler().getControlerIO()
-						.getOutputFilename("PSFGeneralLog.txt")));
+				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getControler(),"PSFGeneralLog.txt"));
 				
 				String pathToEnergyConsumptionTable = event.getControler().getConfig().getParam("PSF", "pathToEnergyConsumptionTable");
 				
@@ -190,8 +189,8 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 		controler.addControlerListener(new BeforeMobsimListener() {
 			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-				ParametersPSF2.setPSFIterationLog(new GeneralLogObject(event.getControler().getControlerIO()
-						.getIterationFilename(event.getControler().getIterationNumber(), "PSFIterationLog.txt")));
+				GeneralLogObject iterationLog = new GeneralLogObject(event.getControler(), "PSFIterationLog.txt");
+				ParametersPSF2.setPSFIterationLog(iterationLog);
 			}
 		});
 

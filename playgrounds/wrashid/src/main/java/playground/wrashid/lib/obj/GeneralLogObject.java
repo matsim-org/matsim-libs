@@ -26,6 +26,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.matsim.core.controler.Controler;
+
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.list.Lists;
 
@@ -34,8 +36,10 @@ public class GeneralLogObject {
 	private String outputFile;
 	private boolean fileClosed = false;
 	private HashMap<String, ArrayList<String>> logGroups = new HashMap<String, ArrayList<String>>();
+	private final Controler controler;
 
-	public GeneralLogObject(String outputFile) {
+	public GeneralLogObject(Controler controler, String outputFile) {
+		this.controler = controler;
 		this.outputFile = outputFile;
 	}
 
@@ -65,8 +69,11 @@ public class GeneralLogObject {
 		if (!fileClosed) {
 			ArrayList<String> outputList = new ArrayList<String>();
 
+			String outputFileName= controler.getControlerIO()
+			.getIterationFilename(controler.getIterationNumber(), this.outputFile);
+			
 			try {
-				FileOutputStream fos = new FileOutputStream(outputFile);
+				FileOutputStream fos = new FileOutputStream(outputFileName);
 				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
 
 				for (String logGroupName : logGroups.keySet()) {
