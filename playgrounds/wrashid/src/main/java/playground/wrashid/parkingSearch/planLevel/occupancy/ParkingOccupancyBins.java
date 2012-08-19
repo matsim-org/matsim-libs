@@ -112,6 +112,7 @@ public class ParkingOccupancyBins {
 		return occupancy[binIndex];
 	}
 
+	// TODO: look at this again: we count the first bin, but not the last...
 	public void inrementParkingOccupancy(double startTime, double endTime) {
 		int startBinIndex = getBinIndex(startTime);
 		int endBinIndex = getBinIndex(endTime);

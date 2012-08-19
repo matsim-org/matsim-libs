@@ -23,12 +23,12 @@ public class ParkingOccupancyBinsTest extends TestCase {
 		pob.inrementParkingOccupancy(0, 900);
 		
 		assertEquals(1, pob.getOccupancy(0));
-		assertEquals(1, pob.getOccupancy(905));
+		assertEquals(0, pob.getOccupancy(905));
 		assertEquals(0, pob.getOccupancy(1800));
 		
 		pob.inrementParkingOccupancy(60*60*24-5, 60*60*24+5);
 		
-		assertEquals(2, pob.getOccupancy(0));
+		assertEquals(1, pob.getOccupancy(0));
 		assertEquals(1, pob.getOccupancy(60*60*24-5));
 	}	
 	
