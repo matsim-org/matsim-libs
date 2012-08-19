@@ -26,13 +26,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.households.algorithms.HouseholdAlgorithm;
 
 
 /**
  * @author dgrether
  *
  */
-public class HouseholdsWriterV10 extends MatsimXmlWriter {
+public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlgorithm{
 
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private Households households;
@@ -54,9 +56,12 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter {
 		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
 		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "households_v1.0.xsd"));
 		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLDS, atts);
+		Counter counter = new Counter("[HouseholdsWriter] dumped household # ");
 		for (Household h : basicHouseholds.getHouseholds().values()) {
 			this.writeHousehold(h);
+			counter.incCounter();
 		}
+		counter.printCounter();
 		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLDS);
 	}
 
@@ -101,6 +106,11 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter {
 			this.writeStartTag(HouseholdsSchemaV10Names.PERSONID, atts, true);
 		}
 		this.writeEndTag(HouseholdsSchemaV10Names.MEMBERS);
+	}
+
+	@Override
+	public void run(Household household) {
+		writeHousehold(household);
 	}
 
 

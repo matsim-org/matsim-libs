@@ -63,6 +63,7 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 	
 	public void readFile(String filename) throws UncheckedIOException {
 		parse(filename);
+		((HouseholdsImpl) this.households).printCounter();
 	}
 	
 	/**
@@ -72,7 +73,7 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
 			this.currentHousehold = createHousehold(this.currentHhId, this.currentmembers, this.currentVehicleIds);
-			this.households.getHouseholds().put(this.currentHhId, this.currentHousehold);
+			((HouseholdsImpl)this.households).addHousehold(this.currentHousehold);
 			this.currentHousehold.setIncome(this.currentincome);
 			this.currentHhId = null;
 			this.currentVehicleIds = null;
