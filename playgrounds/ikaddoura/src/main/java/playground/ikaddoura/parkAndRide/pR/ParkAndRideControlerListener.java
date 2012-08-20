@@ -32,9 +32,11 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
+import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 //import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideRemoveStrategy;
 import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideChangeLocationStrategy;
+import playground.ikaddoura.parkAndRide.pRstrategy.ParkAndRideRemoveStrategy;
 import playground.ikaddoura.parkAndRide.pRstrategy.PlanStrategyImpl_parkAndRide;
 import playground.ikaddoura.parkAndRide.pRstrategy.PlanStrategyImpl_work;
 import playground.ikaddoura.parkAndRide.pRstrategy.PrWeight;
@@ -51,31 +53,75 @@ public class ParkAndRideControlerListener implements StartupListener {
 	AdaptiveCapacityControl adaptiveControl;
 	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
 	private Map<Id, List<PrWeight>> personId2prWeights = new HashMap<Id, List<PrWeight>>();
-	private double addPRProb;
-	private int addPRDisable;
-	private double changeLocationProb;
-	private int changeLocationDisable;
-//	private double removePRProb = 0.;
-//	private int removePRDisable = 0;
-	private double timeAllocationProb;
-	private int timeAllocationDisable;
+	
+	private double addPRProb = 0.;
+	private int addPRDisable = 0;
+	private double changeLocationProb = 0.;
+	private int changeLocationDisable = 0;
+	private double removePRProb = 0.;
+	private int removePRDisable = 0;
+	private double timeAllocationProb = 0.;
+	private int timeAllocationDisable = 0;
+	private double addPRtimeAllocationProb = 0.;
+	private int addPRtimeAllocationDisable = 0;
+	private double reRouteProb = 0.;
+	private int reRouteDisable = 0;
+
 	private int gravity;
 	
-	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility, double addPRProb, int addPRDisable, double changeLocationProb, int changeLocationDisable ,double timeAllocationProb, int timeAllocationDisable, int gravity) {
+	ParkAndRideControlerListener(Controler ctl, AdaptiveCapacityControl adaptiveControl, Map<Id, ParkAndRideFacility> id2prFacility, int gravity) {
 		this.controler = ctl;
 		this.adaptiveControl = adaptiveControl;
 		this.id2prFacility = id2prFacility;
-		
-		this.addPRProb = addPRProb;
-		this.addPRDisable = addPRDisable;
-		
-		this.changeLocationProb = changeLocationProb;
-		this.changeLocationDisable = changeLocationDisable;
-		
-		this.timeAllocationProb = timeAllocationProb;
-		this.timeAllocationDisable = timeAllocationDisable;
-		
 		this.gravity = gravity;
+	}
+
+	public void setAddPRProb(double addPRProb) {
+		this.addPRProb = addPRProb;
+	}
+
+	public void setAddPRDisable(int addPRDisable) {
+		this.addPRDisable = addPRDisable;
+	}
+
+	public void setChangeLocationProb(double changeLocationProb) {
+		this.changeLocationProb = changeLocationProb;
+	}
+
+	public void setChangeLocationDisable(int changeLocationDisable) {
+		this.changeLocationDisable = changeLocationDisable;
+	}
+
+	public void setRemovePRProb(double removePRProb) {
+		this.removePRProb = removePRProb;
+	}
+
+	public void setRemovePRDisable(int removePRDisable) {
+		this.removePRDisable = removePRDisable;
+	}
+
+	public void setTimeAllocationProb(double timeAllocationProb) {
+		this.timeAllocationProb = timeAllocationProb;
+	}
+
+	public void setTimeAllocationDisable(int timeAllocationDisable) {
+		this.timeAllocationDisable = timeAllocationDisable;
+	}
+	
+	public void setAddPRtimeAllocationProb(double addPRtimeAllocationProb) {
+		this.addPRtimeAllocationProb = addPRtimeAllocationProb;
+	}
+
+	public void setAddPRtimeAllocationDisable(int addPRtimeAllocationDisable) {
+		this.addPRtimeAllocationDisable = addPRtimeAllocationDisable;
+	}
+
+	public void setReRouteProb(double reRouteProb) {
+		this.reRouteProb = reRouteProb;
+	}
+
+	public void setReRouteDisable(int reRouteDisable) {
+		this.reRouteDisable = reRouteDisable;
 	}
 
 	@Override
@@ -96,11 +142,20 @@ public class ParkAndRideControlerListener implements StartupListener {
 		strategyTimeAllocation.addStrategyModule(new ParkAndRideTimeAllocationMutator(controler.getConfig())); // TimeAllocation, not changing "parkAndRide" and "pt interaction"
 		strategyTimeAllocation.addStrategyModule(new ReRoute(controler));
 		
-//		PlanStrategy strategyRemovePR = new PlanStrategyImpl_work(new RandomPlanSelector());
-//		strategyRemovePR.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-//		strategyRemovePR.addStrategyModule(new ParkAndRideRemoveStrategy(controler)); // removes P+R from a randomly chosen home-work-home sequence
-//		strategyRemovePR.addStrategyModule(new ReRoute(controler));
-
+		PlanStrategy strategyRemovePR = new PlanStrategyImpl_work(new RandomPlanSelector());
+		strategyRemovePR.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+		strategyRemovePR.addStrategyModule(new ParkAndRideRemoveStrategy(controler)); // removes P+R from a randomly chosen home-work-home sequence
+		strategyRemovePR.addStrategyModule(new ReRoute(controler));
+		
+		PlanStrategy strategyAddPRTimeAllocation = new PlanStrategyImpl_work(new RandomPlanSelector());
+		strategyAddPRTimeAllocation.addStrategyModule(new TransitTimeAllocationMutator(controler.getConfig()));
+		strategyAddPRTimeAllocation.addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+		strategyAddPRTimeAllocation.addStrategyModule(new ParkAndRideAddStrategy(controler, id2prFacility, personId2prWeights, gravity)); // adds a P+R to a randomly chosen home-work-home sequence
+		strategyAddPRTimeAllocation.addStrategyModule(new ReRoute(controler));
+		
+		PlanStrategy strategyReRoute = new PlanStrategyImpl_work(new RandomPlanSelector());
+		strategyReRoute.addStrategyModule(new ReRoute(controler));
+		
 		StrategyManager manager = this.controler.getStrategyManager() ;
 	
 		manager.addStrategy(strategyAddPR, this.addPRProb);
@@ -112,8 +167,14 @@ public class ParkAndRideControlerListener implements StartupListener {
 		manager.addStrategy(strategyTimeAllocation, this.timeAllocationProb);
 		manager.addChangeRequest(this.timeAllocationDisable, strategyTimeAllocation, 0.);
 		
-//		manager.addStrategy(strategyRemovePR, this.removePRProb);
-//		manager.addChangeRequest(this.removePRDisable, strategyRemovePR, 0.);
+		manager.addStrategy(strategyRemovePR, this.removePRProb);
+		manager.addChangeRequest(this.removePRDisable, strategyRemovePR, 0.);
+		
+		manager.addStrategy(strategyAddPRTimeAllocation, this.addPRtimeAllocationProb);
+		manager.addChangeRequest(this.addPRtimeAllocationDisable, strategyAddPRTimeAllocation, 0.);
+		
+		manager.addStrategy(strategyReRoute, this.reRouteProb);
+		manager.addChangeRequest(this.reRouteDisable, strategyReRoute, 0.);
 		
 	}
 
