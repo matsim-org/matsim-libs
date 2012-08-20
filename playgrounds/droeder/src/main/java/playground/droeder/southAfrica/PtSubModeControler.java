@@ -20,17 +20,10 @@
 package playground.droeder.southAfrica;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -38,29 +31,26 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
-import playground.droeder.southAfrica.replanning.PlanStrategyReRoutePtFixedSubMode;
 import playground.droeder.southAfrica.routing.PlansCalcSubModeDependendTransitRoute;
 import playground.droeder.southAfrica.routing.PtSubModeDependRouterFactory;
 
-// TODO[dr] fixed or not fixed should be set in configFile!!!
 /**
  * @author droeder
  *
  */
-public class FixedPtSubModeControler extends Controler {
+public class PtSubModeControler extends Controler {
 	private static final Logger log = Logger
-			.getLogger(FixedPtSubModeControler.class);
+			.getLogger(PtSubModeControler.class);
 	
 	/**
 	 * This class is a extension of the original MATSim-Controler. It will only work with an enabled pt-simulation.
 	 * It uses an own implementation of the TransitRouter and will work with the strategy-module <code>ReRouteFixedPtSubMode</code>. 
 	 * @param configFile
 	 */
-	public FixedPtSubModeControler(String configFile) {
+	public PtSubModeControler(String configFile, boolean routeOnSameMode) {
 		super(configFile);
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
-		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(super.scenarioData, true));
-		// TODO[dr] check if this is really necessary
+		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(this, routeOnSameMode));
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-transitWalk"-legs
 		((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 				setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
@@ -76,11 +66,10 @@ public class FixedPtSubModeControler extends Controler {
 	 * It uses an own implementation of the TransitRouter and will work with the strategy-module <code>ReRouteFixedPtSubMode</code>. 
 	 * @param configFile
 	 */
-	public FixedPtSubModeControler(Scenario sc) {
+	public PtSubModeControler(Scenario sc, boolean routeOnSameMode) {
 		super(sc);
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
-		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(super.scenarioData, true));
-		//TODO[dr] check if this is really necessary
+		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(this, routeOnSameMode));
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-tansitWalk"-legs
 		((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 				setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
@@ -93,23 +82,10 @@ public class FixedPtSubModeControler extends Controler {
 	
 	@Override
 	public void run(){
-		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(super.scenarioData, true));
-		// TODO[dr] move this. should be configurable
-		this.storeOriginalLegModes();
-		super.run();
-	}
-	
-
-	private void storeOriginalLegModes() {
-		for(Person p: this.scenarioData.getPopulation().getPersons().values()){
-			List<String> legModes = new ArrayList<String>();
-			for(PlanElement pe: p.getSelectedPlan().getPlanElements()){
-				if(pe instanceof Leg){
-					legModes.add(new String(((Leg) pe).getMode()));
-				}
-			}
-			((PersonImpl) p).getCustomAttributes().put(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES, legModes);
+		if(!(super.getTransitRouterFactory() instanceof PtSubModeDependRouterFactory)){
+			throw new IllegalArgumentException("TransitRouterFactory needs to be instance of PtSubModeDependRouterFactory..."); 
 		}
+		super.run();
 	}
 
 	@Override

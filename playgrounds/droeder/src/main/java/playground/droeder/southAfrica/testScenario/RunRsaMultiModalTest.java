@@ -60,7 +60,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.schedule.PTransitRouterImplFactory;
-import playground.droeder.southAfrica.FixedPtSubModeControler;
+import playground.droeder.southAfrica.PtSubModeControler;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
 
 /**
@@ -100,7 +100,7 @@ public class RunRsaMultiModalTest {
 		
 //		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(conf));
 	
-		Controler controler = new FixedPtSubModeControler(scenario);
+		Controler controler = new PtSubModeControler(scenario, true);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		
@@ -110,9 +110,12 @@ public class RunRsaMultiModalTest {
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
+		// TODO[dr] this is very confusing, but the PTransitRouterFactory needs to be registered as controlerListener, because it provides
+		//some essential functionality to the P-module
 		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(controler);
+//		PtSubModeDependRouterFactory pFact = new PtSubModeDependRouterFactory(controler, true);
 		controler.addControlerListener(pFact);		
-		controler.setTransitRouterFactory(pFact);
+//		controler.setTransitRouterFactory(pFact);
 		//set mobsimFactory
 		controler.setMobsimFactory(new TransitSubModeQSimFactory());
 		controler.addControlerListener(new WriteSelectedPlansAfterIteration());

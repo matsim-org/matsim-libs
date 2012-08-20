@@ -18,47 +18,50 @@
  * *********************************************************************** */
 package playground.droeder.southAfrica.replanning;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.droeder.southAfrica.PtSubModeControler;
 
 /**
  * @author droeder
  *
  */
-public class FixedSubModePtInteractionRemoverStrategy implements PlanStrategyModule {
+public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
+	private Controler c;
 	
-	//TODO[dr] make it multithreaded again!
 	/**
-	 * This class provides a strategy to remove pt-interactions from a plan, but changes the 
-	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>. Instead it keeps the 
-	 * original mode
-	 * 
+	 * <code>PlanStrategyModule</code> which reroutes pt-legs and stores pt-submodes.
+	 * Aborts if the controler is not an instance of instance of <code>PtSubModeControler</code>
 	 * @param c
 	 */
-	public FixedSubModePtInteractionRemoverStrategy(Controler c){
-//		super(c.getConfig().global());
+	public ReRoutePtSubModeStrategy(Controler c) {
+		super(c.getConfig().global());
+		if(!(c instanceof PtSubModeControler)){
+			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler...");
+		}
+		this.c = c;
 	}
+
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return this.c.createRoutingAlgorithm();
+	}
+
+//	@Override
+//	public void prepareReplanning() {
+//		
+//	}
 //
 //	@Override
-//	public PlanAlgorithm getPlanAlgoInstance() {
-//		return new FixedPtSubModePtInteractionRemover();
+//	public void handlePlan(Plan plan) {
+//		this.c.createRoutingAlgorithm().run(plan);
 //	}
-
-	@Override
-	public void prepareReplanning() {
-		
-	}
-
-	@Override
-	public void handlePlan(Plan plan) {
-		new FixedPtSubModePtInteractionRemover().run(plan);
-		
-	}
-
-	@Override
-	public void finishReplanning() {
-		
-	}
+//
+//	@Override
+//	public void finishReplanning() {
+//		
+//	}
 
 }

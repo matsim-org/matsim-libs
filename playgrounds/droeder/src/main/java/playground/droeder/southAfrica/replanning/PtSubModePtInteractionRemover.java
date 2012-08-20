@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.LegImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 
@@ -34,11 +35,11 @@ import org.matsim.pt.PtConstants;
  * @author droeder
  *
  */
-public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
+public class PtSubModePtInteractionRemover implements PlanAlgorithm {
 	private static final Logger log = Logger
-			.getLogger(FixedPtSubModePtInteractionRemover.class);
+			.getLogger(PtSubModePtInteractionRemover.class);
 	
-	public FixedPtSubModePtInteractionRemover(){
+	public PtSubModePtInteractionRemover(){
 		//do nothing
 	}
 
@@ -70,15 +71,14 @@ public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
 						else{
 							PlanElement delegate = null;
 							// find (at least) the one leg which is not a transitWalk. ignore the activities
-							for(int ii = 0; ii < temp.size() - 2; ii++ ){
-								// TODO[dr] necessary probably (ii += 2) might be easier
-								if(temp.get(ii) instanceof Leg){
-									if(!((Leg) temp.get(ii)).getMode().equals(TransportMode.transit_walk)){
-										if(delegate == null){
-											delegate = temp.get(ii);
-										}else{
-											//TODO[dr] probably check if there are different modes in this-leg-sequence
-											//if so, set mode to pt!?
+							for(int ii = 0; ii < temp.size() - 1; ii += 2 ){
+								if(!((Leg) temp.get(ii)).getMode().equals(TransportMode.transit_walk)){
+									if(delegate == null){
+										delegate = temp.get(ii);
+									}else{
+										// if more modes used than one, assume there is no fixed mode. Thus set TransportMode.pt
+										if(!((Leg) temp.get(ii)).getMode().equals(((Leg) delegate).getMode())){
+											delegate = new LegImpl(TransportMode.pt);
 										}
 									}
 								}
@@ -95,31 +95,6 @@ public class FixedPtSubModePtInteractionRemover implements PlanAlgorithm {
 		}
 		plan.getPlanElements().clear();
 		plan.getPlanElements().addAll(newPlanElements);
-		
-//		//TODO[dr] does not work currently!!! make a strategy-module out of it!
-//		//check if the legModes are still fixed...
-//		if(plan.getPerson().getCustomAttributes().containsKey(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES)){
-//			@SuppressWarnings("unchecked")
-//			List<String> legModes = (List<String>) plan.getPerson().getCustomAttributes().
-//					get(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
-//			
-//			if(((legModes.size() * 2) + 1) != plan.getPlanElements().size()){
-//				log.warn("Person " + plan.getPerson().getId() + " is probably no longer using original pt-subModes. " +
-//						" Removing OriginalLegmodes...");
-//				plan.getPerson().getCustomAttributes().remove(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
-//			}else{
-//				//modify the planElements
-//				for(int i = 1; i < plan.getPlanElements().size(); i += 2){
-//					Leg l = (Leg) plan.getPlanElements().get(i);
-//					String mode = legModes.get(i/2);
-//					if(!l.getMode().equals(mode)){
-//						log.info("Changing Legmode for person " + plan.getPerson().getId() + " from " + l.getMode() 
-//								+ " to " + mode + ".");
-//						l.setMode(mode);
-//					}
-//				}
-//			}
-//		}
 	}
 
 }

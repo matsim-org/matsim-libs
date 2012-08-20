@@ -50,10 +50,10 @@ public class PtSubModeDependendRouter implements TransitRouter{
 //	private TransitRouterNetworkTravelTimeAndDisutility travelTime;
 	private TransitRouterConfig config;
 //	private TransitRouterNetworkTravelTimeAndDisutility travelDisutility;
-	private TransitRouter completeRouter;
+//	private TransitRouter completeRouter;
 	private HashMap<String, TransitRouter> modeRouter = null;
 
-	private boolean routeOnSameMode;
+//	private boolean routeOnSameMode;
 
 	/**
 	 * This router got two functionalities
@@ -66,14 +66,10 @@ public class PtSubModeDependendRouter implements TransitRouter{
 	 */
 	public PtSubModeDependendRouter(Scenario sc, boolean routeOnSameMode){
 		this.config = new TransitRouterConfig(sc.getConfig());
-//		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
-//		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
-//		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
-		this.completeRouter = new TransitRouterImpl(this.config, sc.getTransitSchedule()); 
+		this.modeRouter = new HashMap<String, TransitRouter>();
 		this.initTransitRouter(sc, routeOnSameMode);
-		//TODO[dr] this should be handled different. Currently don't know how. Is the default really necessary?
-		this.modeRouter.put(TransportMode.pt, this.completeRouter);
-		this.routeOnSameMode = routeOnSameMode;
+		//use TransportMode.pt as default
+		this.modeRouter.put(TransportMode.pt, new TransitRouterImpl(this.config, sc.getTransitSchedule()));
 	}
 	
 	
@@ -84,7 +80,7 @@ public class PtSubModeDependendRouter implements TransitRouter{
 	private void initTransitRouter(Scenario sc, boolean routeOnSameSubMode) {
 		if(!routeOnSameSubMode) return; //create additional router only if necessary
 		log.info("separating lines by mode from transitSchedule...");
-		// create one empty schedule per mode
+		// create an empty schedule per mode
 		Map<String, TransitSchedule> temp = new HashMap<String, TransitSchedule>();
 		for(String s: sc.getConfig().transit().getTransitModes()){
 			temp.put(s, new TransitScheduleFactoryImpl().createTransitSchedule());
@@ -124,7 +120,6 @@ public class PtSubModeDependendRouter implements TransitRouter{
 		}
 		log.info("finished...");
 		log.info("creating mode-dependend transitRouter for: " + temp.keySet().toString());
-		this.modeRouter = new HashMap<String, TransitRouter>();
 		//create ModeDependendRouter
 		for(Entry<String, TransitSchedule> e: temp.entrySet()){
 			this.modeRouter.put(e.getKey(), new TransitRouterImpl(this.config, e.getValue()));
@@ -147,19 +142,28 @@ public class PtSubModeDependendRouter implements TransitRouter{
 	 * @return
 	 */
 	public List<Leg> calcRoute(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
-		if(this.modeRouter == null){
-			return this.completeRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime, person);
-		}else{
+		if(this.modeRouter.containsKey(leg.getMode())){
 			return this.modeRouter.get(leg.getMode()).calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime, person);
+		}else{
+			return this.modeRouter.get(TransportMode.pt).calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime, person);
 		}
 	}
 
 
 	/**
+	 * @param mode
 	 * @return
 	 */
-	public boolean routeOnSameMode() {
-		return this.routeOnSameMode;
+	public boolean calculatedRouteForMode(String mode) {
+		return this.modeRouter.containsKey(mode);
 	}
+
+//
+//	/**
+//	 * @return
+//	 */
+//	public boolean routeOnSameMode() {
+//		return this.routeOnSameMode;
+//	}
 }
 

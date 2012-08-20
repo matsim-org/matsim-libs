@@ -38,7 +38,7 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.droeder.southAfrica.replanning.FixedPtSubModePtInteractionRemover;
+import playground.droeder.southAfrica.replanning.PtSubModePtInteractionRemover;
 
 /**
  * @author droeder
@@ -50,7 +50,7 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 	private static final Logger log = Logger
 			.getLogger(PlansCalcSubModeDependendTransitRoute.class);
 	
-	private FixedPtSubModePtInteractionRemover remover = new FixedPtSubModePtInteractionRemover();
+	private PtSubModePtInteractionRemover remover = new PtSubModePtInteractionRemover();
 	private PtSubModeDependendRouter router;
 	private TransitConfigGroup config;
 
@@ -87,37 +87,6 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 		super.handlePlan(person, plan);
 	}
 
-//	/**// TODO[dr] remove this to. Probably to another strategy...
-//	 * @param plan
-//	 */
-//	private void changeModesToOriginal(Plan plan) {
-////		if(this.router.routeOnSameMode()) return;
-//		//change legModes to original if 'routeOnSameMode' is not active
-//		if(this.router.routeOnSameMode() &&
-//				plan.getPerson().getCustomAttributes().containsKey(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES)){
-//			@SuppressWarnings("unchecked")
-//			List<String> legModes = (List<String>) plan.getPerson().getCustomAttributes().
-//					get(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
-//			
-//			if(((legModes.size() * 2) + 1) != plan.getPlanElements().size()){
-//				log.warn("Person " + plan.getPerson().getId() + " is probably no longer using original pt-subModes. " +
-//						" Removing OriginalLegmodes...");
-//				plan.getPerson().getCustomAttributes().remove(PlanStrategyReRoutePtFixedSubMode.ORIGINALLEGMODES);
-//			}else{
-//				//modify the planElements
-//				for(int i = 1; i < plan.getPlanElements().size(); i += 2){
-//					Leg l = (Leg) plan.getPlanElements().get(i);
-//					String mode = legModes.get(i/2);
-//					if(!l.getMode().equals(mode)){
-//						log.info("Changing Legmode for person " + plan.getPerson().getId() + " from " + l.getMode() 
-//								+ " to " + mode + ".");
-//						l.setMode(mode);
-//					}
-//				}
-//			}
-//		}
-//	}
-
 	@Override
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		//use own method if leg is a transit-leg (not only pt!)
@@ -125,7 +94,7 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 			List<Leg> legs= this.router.calcRoute(person, leg, fromAct, toAct, depTime);
 			for(int i = 0; i < legs.size(); i++) {
 				//not very nice, but legMode needs to be replaced here, because TransportMode.pt is 'hardcoded' in TransitRouterImpl... 
-				if(!legs.get(i).getMode().equals(TransportMode.transit_walk)){
+				if(!legs.get(i).getMode().equals(TransportMode.transit_walk) && this.router.calculatedRouteForMode(leg.getMode())){
 					legs.get(i).setMode(leg.getMode());
 				}
 			}

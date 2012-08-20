@@ -19,6 +19,7 @@
 package playground.droeder.southAfrica.routing;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.Controler;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
 
@@ -26,7 +27,7 @@ import org.matsim.pt.router.TransitRouterFactory;
  * @author droeder
  *
  */
-public class PtSubModeDependRouterFactory implements TransitRouterFactory {
+public class PtSubModeDependRouterFactory implements TransitRouterFactory{
 	
 	private boolean routeOnSameMode;
 	private Scenario sc;
@@ -36,12 +37,12 @@ public class PtSubModeDependRouterFactory implements TransitRouterFactory {
 	 * @param sc
 	 * @param routeOnSameMode
 	 */
-	public PtSubModeDependRouterFactory(Scenario sc, boolean routeOnSameMode) {
-		this.sc = sc;
+	public PtSubModeDependRouterFactory(Controler c, boolean routeOnSameMode) {
+//		super(c);
+		this.sc = c.getScenario();
 		this.routeOnSameMode = routeOnSameMode;
 	}
 
-	@Override
 	public TransitRouter createTransitRouter() {
 		return new PtSubModeDependendRouter(this.sc, this.routeOnSameMode);
 	}

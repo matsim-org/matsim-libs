@@ -18,53 +18,46 @@
  * *********************************************************************** */
 package playground.droeder.southAfrica.replanning;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
-
-import playground.droeder.southAfrica.FixedPtSubModeControler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author droeder
  *
  */
-public class ReRouteFixedPtSubModeStrategy implements PlanStrategyModule{
-	private Controler c;
+public class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule {
 	
-	//TODO[dr] make it multithreadded again!
 	/**
-	 * Main <code>PlanStrategyModule</code> for <code>PlanStrategy</code> <code>PlanStrategyReRoutePtFixedSubMode</code>.
-	 * Aborts if the controler is not an instance of instance of <code>FixedPtSubModeControler</code>
+	 * This class provides a strategy to remove pt-interactions from a plan, but changes the 
+	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>. Instead it keeps the 
+	 * original mode
+	 * 
 	 * @param c
 	 */
-	public ReRouteFixedPtSubModeStrategy(Controler c) {
-//		super(c.getConfig().global());
-		if(!(c instanceof FixedPtSubModeControler)){
-			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler...");
-		}
-		this.c = c;
+	public PtSubModePtInteractionRemoverStrategy(Controler c){
+		super(c.getConfig().global());
 	}
 //
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new PtSubModePtInteractionRemover();
+	}
+
 //	@Override
-//	public PlanAlgorithm getPlanAlgoInstance() {
-//		return this.c.createRoutingAlgorithm();
+//	public void prepareReplanning() {
+//		
 //	}
-
-	@Override
-	public void prepareReplanning() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void handlePlan(Plan plan) {
-		this.c.createRoutingAlgorithm().run(plan);
-	}
-
-	@Override
-	public void finishReplanning() {
-		// TODO Auto-generated method stub
-		
-	}
+//
+//	@Override
+//	public void handlePlan(Plan plan) {
+//		new FixedPtSubModePtInteractionRemover().run(plan);
+//		
+//	}
+//
+//	@Override
+//	public void finishReplanning() {
+//		
+//	}
 
 }

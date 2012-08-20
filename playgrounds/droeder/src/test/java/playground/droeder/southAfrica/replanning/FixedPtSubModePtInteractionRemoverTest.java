@@ -56,7 +56,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		plan.addLeg(leg);
 		plan.addActivity(work);
 		
-		FixedPtSubModePtInteractionRemover strategy = new FixedPtSubModePtInteractionRemover();
+		PtSubModePtInteractionRemover strategy = new PtSubModePtInteractionRemover();
 		
 		strategy.run(plan);
 		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
@@ -98,7 +98,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		plan.addLeg(walk);
 		plan.addActivity(seven);
 		
-		FixedPtSubModePtInteractionRemover strategy = new FixedPtSubModePtInteractionRemover();
+		PtSubModePtInteractionRemover strategy = new PtSubModePtInteractionRemover();
 		
 		strategy.run(plan);
 
@@ -125,7 +125,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		plan.addLeg(leg);
 		plan.addActivity(work);
 		
-		FixedPtSubModePtInteractionRemover strategy = new FixedPtSubModePtInteractionRemover();
+		PtSubModePtInteractionRemover strategy = new PtSubModePtInteractionRemover();
 		
 		strategy.run(plan);
 		
@@ -153,13 +153,42 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		plan.addLeg(bus);
 		plan.addActivity(three);
 
-		FixedPtSubModePtInteractionRemover strategy = new FixedPtSubModePtInteractionRemover();
+		PtSubModePtInteractionRemover strategy = new PtSubModePtInteractionRemover();
 		
 		strategy.run(plan);
 		
 		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
 		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
 		Assert.assertEquals("expecting legmode 'bus'", "bus", ((Leg)plan.getPlanElements().get(1)).getMode());
+		Assert.assertEquals("expecting activity work", "work", ((Activity)plan.getPlanElements().get(2)).getType());
+	}
+	
+	@Test
+	public final void testLineSwitch2Modes() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationFactory factory = sc.getPopulation().getFactory();
+		
+		Plan plan = factory.createPlan();
+		Activity one, two, three;
+		one = factory.createActivityFromCoord("home", sc.createCoord(0, 0));
+		two = factory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, sc.createCoord(0, 0));
+		three = factory.createActivityFromCoord("work", sc.createCoord(0, 0));
+		Leg bus = factory.createLeg("bus");
+		Leg train = factory.createLeg("train");
+		
+		plan.addActivity(one);
+		plan.addLeg(bus);
+		plan.addActivity(two);
+		plan.addLeg(train);
+		plan.addActivity(three);
+
+		PtSubModePtInteractionRemover strategy = new PtSubModePtInteractionRemover();
+		
+		strategy.run(plan);
+		
+		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
+		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
+		Assert.assertEquals("expecting legmode 'pt'", TransportMode.pt, ((Leg)plan.getPlanElements().get(1)).getMode());
 		Assert.assertEquals("expecting activity work", "work", ((Activity)plan.getPlanElements().get(2)).getType());
 	}
 

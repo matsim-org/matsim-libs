@@ -19,11 +19,16 @@
 package playground.droeder.southAfrica.replanning;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
@@ -43,6 +48,8 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	private RandomPlanSelector selector;
 	private List<Plan> plans;
 	private List<PlanStrategyModule> modules;
+
+	private Map<Id, List<String>> originalModes;
 	
 	public static final String ORIGINALLEGMODES = "originalLegModes";
 
@@ -55,6 +62,8 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	public PlanStrategyReRoutePtFixedSubMode(Controler c){
 		this.c = c;
 		this.selector = new RandomPlanSelector();
+		// call in constructor, because should be done only once...
+		this.storeOriginalLegModes();
 	}
 
 
@@ -90,9 +99,22 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	public void init() {
 		this.plans = new ArrayList<Plan>();
 		this.modules = new ArrayList<PlanStrategyModule>();
-		this.modules.add(new FixedSubModePtInteractionRemoverStrategy(this.c));
-		this.modules.add(new ReRouteFixedPtSubModeStrategy(this.c));
-		// TODO[dr] 'return to old modes'-strategy
+		this.modules.add(new PtSubModePtInteractionRemoverStrategy(this.c));
+		this.modules.add(new ReturnToOldModesStrategy(this.c, this.originalModes));
+		this.modules.add(new ReRoutePtSubModeStrategy(this.c));
+	}
+	
+	private void storeOriginalLegModes() {
+		this.originalModes = new HashMap<Id, List<String>>();
+		for(Person p: this.c.getScenario().getPopulation().getPersons().values()){
+			List<String> legModes = new ArrayList<String>();
+			for(PlanElement pe: p.getSelectedPlan().getPlanElements()){
+				if(pe instanceof Leg){
+					legModes.add(new String(((Leg) pe).getMode()));
+				}
+			}
+			this.originalModes.put(p.getId(), legModes);
+		}
 	}
 
 	@Override
