@@ -57,7 +57,7 @@ public class CottbusTramLinkCreator {
 	public static void main(String[] args) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		String netfile = "E:\\Cottbus\\cottbus\\cottbus_feb_fix\\network.xml.gz";
+		String netfile = "\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\network_wgs84_utm33n.xml.gz";
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -69,7 +69,7 @@ public class CottbusTramLinkCreator {
 		FileReader fr;
 		FileReader frr;
 		try {
-			fr = new FileReader(new File ("E:\\Cottbus\\Cottbus_pt\\Linien\\ptadditions.csv"));
+			fr = new FileReader(new File ("\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\lines\\ptadditions.csv"));
 		
 			BufferedReader br = new BufferedReader(fr);
 			String line = null;
@@ -94,7 +94,7 @@ public class CottbusTramLinkCreator {
 			
 			    }}
 			br.close();			
-			frr = new FileReader(new File ("E:\\Cottbus\\Cottbus_pt\\Linien\\ptadditions.csv"));	
+			frr = new FileReader(new File ("\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\lines\\ptadditions.csv"));	
 			BufferedReader brr = new BufferedReader(frr);
 			String ine = null;
 			int i = 0;
@@ -185,7 +185,7 @@ public class CottbusTramLinkCreator {
 			network.addLink(l);
 			
 			
-			new NetworkWriter(network).write("E:\\Cottbus\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\network_pt.xml"); 
+			new NetworkWriter(network).write("\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\network_pt.xml"); 
 		}
 			
 		catch (Exception e){

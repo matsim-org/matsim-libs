@@ -50,8 +50,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * @author fuerbas
@@ -75,13 +77,16 @@ public class SfCottbusPtSchedule {
 	private HashMap<Id, Id> ptLinkList;
 	private List<Id> ptFacList;
 	private Vehicles vehicles;
+	private final String ptdir = "\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\";
+	
 	
 	
 	public SfCottbusPtSchedule() {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
-		this.LINES = "E:\\Cottbus\\Cottbus_pt\\lines\\lines.csv";
-		this.NETWORK = "E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml";
+		
+		this.LINES = ptdir+"lines\\lines.csv";
+		this.NETWORK = ptdir+"network_pt.xml";
 		this.config.network().setInputFile(this.NETWORK);
 		ScenarioUtils.loadScenario(this.scenario);
 		this.network = this.scenario.getNetwork();
@@ -106,6 +111,7 @@ public class SfCottbusPtSchedule {
 		cottbus.schedulefactory = new TransitScheduleFactoryImpl();
 		cottbus.schedule = cottbus.schedulefactory.createTransitSchedule();
 		
+		
 //		Linienliste einlesen, Linien als Strings speichern, über alle Linien gleiches Schema ausführen...
 		
 		String[] lines = cottbus.getLineNumbers(cottbus.LINES);
@@ -113,20 +119,29 @@ public class SfCottbusPtSchedule {
 		for(int nLines = 0; nLines<24; nLines++) {
 			List<String> transitStopIdStrings = new ArrayList<String>();
 			List<String> stopLinkString = new ArrayList<String>();
+			List<Integer> offset = new ArrayList<Integer>();		
+			List<Integer> stoptime = new ArrayList<Integer>();
 			String lineName = lines[nLines];
 			double firstDep = 0.;
 			double freq = 0.;
 			int counter = 0;
-			String linesfile = "E:\\Cottbus\\Cottbus_pt\\lines\\all\\"+lineName+".csv";
+			String linesfile = cottbus.ptdir+"lines\\all\\"+lineName+".csv";
 			BufferedReader br = new BufferedReader(new FileReader(linesfile));
 			if (nLines <=7) cottbus.pt_mode="tram";
 			else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
 			else cottbus.pt_mode="train";
+			System.out.println("parsing line" + lineName);
 				
 				while(br.ready()) {
 					String[] lineEntries = br.readLine().split(";");
 					transitStopIdStrings.add(lineEntries[1]);
 					stopLinkString.add(lineEntries[6].replaceAll("\"",""));
+					
+					offset.add(Integer.parseInt(lineEntries[4]));
+					stoptime.add(Integer.parseInt(lineEntries[5]));
+					
+						
+							
 					if (counter==0) {
 						lineEntries[7] = lineEntries[7].replaceAll("\"", "");
 						String[] time = lineEntries[7].split(":");
@@ -138,11 +153,12 @@ public class SfCottbusPtSchedule {
 				}
 				br.close();
 				
-			List<TransitRouteStop> stopList = cottbus.createTransitStopFacilities(transitStopIdStrings, stopLinkString);
+			List<TransitRouteStop> stopList = cottbus.createTransitStopFacilities(transitStopIdStrings, stopLinkString, offset,stoptime);
 
 			
-			String lineroutes = "E:\\Cottbus\\Cottbus_pt\\lines\\all\\"+lineName+"_links.csv";
+			String lineroutes = cottbus.ptdir+"lines\\all\\"+lineName+"_links.csv";
 			List<String> routeLinks = cottbus.createRouteLinks(lineroutes);
+			//todo
 			
 			String[] routes = routeLinks.toArray(new String[routeLinks.size()]);
 			
@@ -150,7 +166,8 @@ public class SfCottbusPtSchedule {
 			
 			TransitRoute transRoute = cottbus.createTransitRoute(lineName, netRoute, stopList);
 			
-			cottbus.addDeparturesToRoute(transRoute, firstDep, freq);
+			
+			cottbus.addDeparturesToRoute(transRoute, firstDep, freq, lineName);
 			
 			TransitLine transLine = cottbus.createTransitLine(transRoute, lineName);
 			
@@ -158,18 +175,18 @@ public class SfCottbusPtSchedule {
 		}
 		
 		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(cottbus.schedule);
-		String outputfile = "E:\\Cottbus\\Cottbus_pt\\lines\\schedule.xml";
+		String outputfile = cottbus.ptdir+"lines\\schedule.xml";
 		scheduleWriter.write(outputfile);
 		
 		System.out.println("Schedule written to: "+outputfile);
 		
 		NetworkWriter networkwriter = new NetworkWriter(cottbus.scenario.getNetwork());
-		networkwriter.write("E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml");
+		networkwriter.write(cottbus.ptdir+"network_pt.xml");
 		
-		System.out.println("Network written to: "+"E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\network_pt.xml");
+		System.out.println("Network written to: "+cottbus.ptdir+"network_pt.xml");
 		
 		VehicleWriterV1 writer = new VehicleWriterV1(cottbus.vehicles);
-		writer.writeFile("E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\transitVehicles.xml");
+		writer.writeFile(cottbus.ptdir+"transitVehicles.xml");
 		
 	}
 	
@@ -198,32 +215,47 @@ public class SfCottbusPtSchedule {
 			else ;
 		}
 		
-		return null;
+		return routeLinks;
 	}
 
 	private Vehicles createVehicles() {
-		Vehicles veh = this.vehicles;
+		
+		Vehicles veh = VehicleUtils.createVehiclesContainer();
 		VehicleCapacity cap93 = veh.getFactory().createVehicleCapacity();
 		VehicleCapacity cap90 = veh.getFactory().createVehicleCapacity();
 		VehicleCapacity cap64 = veh.getFactory().createVehicleCapacity();
+		VehicleCapacity cap72 = veh.getFactory().createVehicleCapacity();
+		
 		cap93.setSeats(52);
 		cap93.setStandingRoom(93);
 		cap90.setSeats(52);
 		cap90.setStandingRoom(90);
 		cap64.setSeats(35);
 		cap64.setStandingRoom(64);
+		
+		cap72.setSeats(72);
+		cap72.setStandingRoom(30);
+		
+		
 		Id tram_93pax = new IdImpl("tram_93pax");
 		Id bus_90pax = new IdImpl("bus_90pax");
 		Id bus_64pax = new IdImpl("bus_64pax");
+		Id train = new IdImpl("train");
+		
 		veh.getVehicleTypes().put(tram_93pax, veh.getFactory().createVehicleType(tram_93pax));
 		veh.getVehicleTypes().put(bus_90pax, veh.getFactory().createVehicleType(bus_90pax));
 		veh.getVehicleTypes().put(bus_64pax, veh.getFactory().createVehicleType(bus_64pax));
+		veh.getVehicleTypes().put(train, veh.getFactory().createVehicleType(train));
 		veh.getVehicleTypes().get(tram_93pax).setCapacity(cap93);
 		veh.getVehicleTypes().get(bus_90pax).setCapacity(cap90);
 		veh.getVehicleTypes().get(bus_64pax).setCapacity(cap64);
+		veh.getVehicleTypes().get(train).setCapacity(cap72);
 		veh.getVehicleTypes().get(tram_93pax).setLength(28.0);
 		veh.getVehicleTypes().get(bus_90pax).setLength(18.0);
 		veh.getVehicleTypes().get(bus_64pax).setLength(12.0);
+		veh.getVehicleTypes().get(train).setLength(25.5);
+		
+		
 		return veh;
 	}
 	
@@ -248,16 +280,27 @@ public class SfCottbusPtSchedule {
 		return transitLine;
 	}
 	
-	private void addDeparturesToRoute (TransitRoute transitRoute, double firstDep, double frequency) {
+	private void addDeparturesToRoute (TransitRoute transitRoute, double firstDep, double frequency, String lineName) {
 		double lastDep = 22.0 * 3600;
 		double currentDep = firstDep;
+		int vehid = 0;
+		for (int i = 0; i<5;i++){
+			Id vd = new IdImpl(lineName+"_"+i);
+		if (this.pt_mode.equals("pt")) this.vehicles.getVehicles().put(vd, this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("bus_90pax"))));
+		if (this.pt_mode.equals("tram")) this.vehicles.getVehicles().put(vd, this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("tram_93pax"))));
+		if (this.pt_mode.equals("train")) this.vehicles.getVehicles().put(vd, this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("train"))));
+		
+		}
 		while (currentDep <= lastDep) {
+			if (vehid==5) vehid = 0;
+			
 			Departure dep = this.schedulefactory.createDeparture(new IdImpl(transitRoute.getId().toString()+"_"+currentDep), currentDep);
-			dep.setVehicleId(dep.getId());
+			dep.setVehicleId(new IdImpl(lineName+"_"+vehid));
+			vehid++;
+			
 			transitRoute.addDeparture(dep);
 			currentDep+=frequency;
-			if (this.pt_mode.equals("pt")) this.vehicles.getVehicles().put(dep.getId(), this.vehicles.getFactory().createVehicle(dep.getId(), this.vehicles.getVehicleTypes().get(new IdImpl("bus_90pax"))));
-			if (this.pt_mode.equals("tram")) this.vehicles.getVehicles().put(dep.getId(), this.vehicles.getFactory().createVehicle(dep.getId(), this.vehicles.getVehicleTypes().get(new IdImpl("tram_93pax"))));
+			
 
 		}
 	}
@@ -267,12 +310,13 @@ public class SfCottbusPtSchedule {
 		return transitRoute;
 	}
 	
-	private List<TransitRouteStop> createTransitStopFacilities(List<String> ids, List<String> links) {
+	private List<TransitRouteStop> createTransitStopFacilities(List<String> ids, List<String> links, List<Integer> offsets, List<Integer> stoptime) {
 		
 		List<Id> linkList = new ArrayList<Id>();
 		List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();
 		List<TransitStopFacility> facilList = new ArrayList<TransitStopFacility>();
 		TransitStopFacility trastofac = null;
+		Integer offsetsum = 0;
 		
 		
 		for(int index = 0; index<links.size(); index++)	{
@@ -280,6 +324,8 @@ public class SfCottbusPtSchedule {
 //			eine facility mit mehreren stops erstellen
 			Id facilId = new IdImpl(ids.get(index));
 			Id linkId = new IdImpl(links.get(index));
+			int currOffset = offsetsum + offsets.get(index);
+			offsetsum =  currOffset + stoptime.get(index);
 			
 			if (!this.ptLinkList.containsKey(linkId)) {
 				linkList.add(linkId);
@@ -319,9 +365,22 @@ public class SfCottbusPtSchedule {
 			
 			if (!linkList.contains(linkId))
 				trastofac.setLinkId(linkId);
-				TransitRouteStop transStop = this.schedule.getFactory().createTransitRouteStop(trastofac, 0, 0);
+			
+			    if  (stoptime.get(index)==0){
+			    	int offset = 20;
+			    	if (index == 0) offset = 0;
+					TransitRouteStop transStop = this.schedule.getFactory().createTransitRouteStop(trastofac, currOffset*60, offset);
+					stopList.add(transStop);
+
+			    }
+			    else{
+					TransitRouteStop transStop = this.schedule.getFactory().createTransitRouteStop(trastofac, currOffset*60, offsetsum*60);
+					stopList.add(transStop);
+
+			    }
+			    
+			    
 				linkList.add(linkId);
-				stopList.add(transStop);
 		}
 		
 		return stopList;
