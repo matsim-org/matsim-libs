@@ -21,25 +21,20 @@
 package playground.wrashid.parkingSearch.withindayFW.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -47,7 +42,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 
 public class InsertParkingActivities implements PlanAlgorithm {
@@ -176,32 +170,28 @@ public class InsertParkingActivities implements PlanAlgorithm {
 				ActivityImpl act=(ActivityImpl) planElements.get(i);
 				
 				if (act.getType().equalsIgnoreCase("parking")){
-					synchronized(parkingInfrastructure){
-					HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent = parkingInfrastructure.getInitialParkingFacilityOfAgent();
-					Id personId = plan.getPerson().getId();
-					ActivityFacility parkingFacility = initialParkingFacilityOfAgent.get(personId);
-					
-					act.setLinkId(parkingFacility.getLinkId());
-					act.setFacilityId(parkingFacility.getId());
+					synchronized(parkingInfrastructure) {
+						HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent = parkingInfrastructure.getInitialParkingFacilityOfAgent();
+						Id personId = plan.getPerson().getId();
+						ActivityFacility parkingFacility = initialParkingFacilityOfAgent.get(personId);
+						
+						act.setLinkId(parkingFacility.getLinkId());
+						act.setFacilityId(parkingFacility.getId());
 					}
 					
 					updateSecondParkingActivityLinkOfDayIfNeeded(parkingInfrastructure,plan,scenario);
 					
 					synchronized(this){
-					EditRoutes editRoutes=new EditRoutes();
-					
-					
-					
-					//update walk leg
-					editRoutes.replanFutureLegRoute(plan, i-1, routingAlgorithm);
-					//update car leg
-					
-					
-					EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
-					
-					
-					//editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
-					editPartialRoute.replanFutureCarLegRoute(plan, i+1);
+						EditRoutes editRoutes=new EditRoutes();
+												
+						//update walk leg
+						editRoutes.replanFutureLegRoute(plan, i-1, routingAlgorithm);
+						//update car leg
+												
+						EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
+												
+						//editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
+						editPartialRoute.replanFutureCarLegRoute(plan, i+1);
 					}
 					
 					break;

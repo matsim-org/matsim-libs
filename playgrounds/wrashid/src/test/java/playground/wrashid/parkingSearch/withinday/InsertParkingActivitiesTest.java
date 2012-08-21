@@ -20,8 +20,12 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -32,10 +36,23 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -51,8 +68,11 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingPopulationAgentSource;
+import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
 
 public class InsertParkingActivitiesTest extends MatsimTestCase {
 
@@ -111,8 +131,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
 			}
 		}
-		
-		
+				
 		assertEquals(9, plan.getPlanElements().size());
 		
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl();
@@ -125,12 +144,55 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		// initialize routes
 		new PersonPrepareForSim(plansAlgorithm, (ScenarioImpl) sc).run(sc.getPopulation());
 
-		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc,null,null);
+//		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc, null, null);
+		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();
+		HashSet<Id> streetParking = new HashSet<Id>();
+		HashSet<Id> garageParking = new HashSet<Id>();
+		parkingTypes.put("streetParking", streetParking);
+		parkingTypes.put("garageParking", garageParking);
+		
+		for (ActivityFacility facility : ((ScenarioImpl) sc).getActivityFacilities().getFacilities().values()) {
+			// if the facility offers a parking activity
+			if (facility.getActivityOptions().containsKey("parking")) {
+				if (MatsimRandom.getRandom().nextBoolean()){
+					streetParking.add(facility.getId());
+				} else {
+					garageParking.add(facility.getId());
+				}
+			}
+		}
+		
+		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc, parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
+
 		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(sc, plansAlgorithm, parkingInfrastructure);
 		
-		ExperimentalBasicWithindayAgent agent = ExperimentalBasicWithindayAgent
-				.createExperimentalBasicWithindayAgent(person, null);
-		insertParkingActivities.run(agent.getSelectedPlan());
+		// init parking facility capacities
+		IntegerValueHashMap<Id> facilityCapacities = new IntegerValueHashMap<Id>();
+		parkingInfrastructure.setFacilityCapacities(facilityCapacities);
+		for (ActivityFacility parkingFacility : parkingInfrastructure.getParkingFacilities()) {
+			facilityCapacities.incrementBy(parkingFacility.getId(), 10);
+		}
+
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		QSim qSim = new QSim(sc, eventsManager);
+		QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+		qSim.addMobsimEngine(netsimEngine);
+        AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+        AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
+        		insertParkingActivities, parkingInfrastructure, 1);
+        qSim.addAgentSource(agentSource);
+		
+        agentSource.insertAgentsIntoMobsim(); 
+        ExperimentalBasicWithindayAgent agent = null;
+        for (MobsimAgent a : qSim.getAgents()) {
+        	agent = (ExperimentalBasicWithindayAgent) a;
+        	break;
+        }
+        
+//		ExperimentalBasicWithindayAgent agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
+//		insertParkingActivities.run(agent.getSelectedPlan());
 		
 		assertEquals(17, agent.getSelectedPlan().getPlanElements().size());
 		
@@ -148,8 +210,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		plan.addLeg(factory.createLeg(TransportMode.car));
 		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
 		
-		agent = ExperimentalBasicWithindayAgent
-				.createExperimentalBasicWithindayAgent(person, null);
+		agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
 		try {
 			insertParkingActivities.run(agent.getSelectedPlan());
 			Assert.fail("Expected RuntimeException, but there was none.");

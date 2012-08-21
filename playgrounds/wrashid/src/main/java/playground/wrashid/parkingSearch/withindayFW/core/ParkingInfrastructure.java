@@ -33,17 +33,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 
 public class ParkingInfrastructure  {
@@ -76,8 +73,10 @@ public class ParkingInfrastructure  {
 		this.parkingCostCalculator = parkingCostCalculator;
 		facilityCapacities = new IntegerValueHashMap<Id>();
 		reservedCapacities = new IntegerValueHashMap<Id>();
-	//	facilityToLinkMapping = new HashMap<Id, Id>();
+	//	facilityToLinkMapping = new HashMap<Id, Id>(); 
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
+		
+		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(((ScenarioImpl) scenario).getActivityFacilities(), (NetworkImpl) scenario.getNetwork());
 		
 		// Create a quadtree containing all parking facilities
 		double minx = Double.POSITIVE_INFINITY;
@@ -143,6 +142,8 @@ public class ParkingInfrastructure  {
 
 	private Id getOppositeDirectionLinkId(Id linkId, Scenario scenario) {
 		Link link = scenario.getNetwork().getLinks().get(linkId);
+		if (link == null)
+			link = null;
 		Node toNode = link.getToNode();
 		Node fromNode = link.getFromNode();
 		
@@ -154,8 +155,6 @@ public class ParkingInfrastructure  {
 		
 		return null;
 	}
-
-	
 	
 	public int getFreeCapacity(Id facilityId) {
 		int freeCapacity = getFacilityCapacities().get(facilityId)-reservedCapacities.get(facilityId);
@@ -197,8 +196,6 @@ public class ParkingInfrastructure  {
 		}
 	}
 	
-
-
 	private void markFacilityAsNonFull(Id facilityId) {
 		ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
 		nonFullPublicParkingFacilities.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), activityFacility);
