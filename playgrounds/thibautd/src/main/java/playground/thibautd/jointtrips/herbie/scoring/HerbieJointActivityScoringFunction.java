@@ -317,7 +317,7 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 	public double getLineSwitchPenaltyScore(){
 		double lineSwitchPenalty = 0.0;
 		if (this.lineSwitchPenalty) {			
-			lineSwitchPenalty =  config.planCalcScore().getUtilityOfLineSwitch();
+			lineSwitchPenalty = config.planCalcScore().getUtilityOfLineSwitch();
 		}
 		return lineSwitchPenalty;
 	}

@@ -85,11 +85,8 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 		else if (TransportMode.pt.equals(leg.getMode())) {
 			Route route = leg.getRoute();
 
-			double distance = route instanceof ExperimentalTransitRoute ?
-					DistanceCalculations.getLegDistance((ExperimentalTransitRoute) route , network) :
-					DistanceCalculations.getWalkDistance((GenericRoute) route , network)
-								* this.config.plansCalcRoute().getBeelineDistanceFactor();
-			
+			double distance = DistanceCalculations.getLegDistance(route, network);
+		
 			double distanceCost = 0.0;
 			TreeSet<String> travelCards = ((PersonImpl) this.plan.getPerson()).getTravelcards();
 			if (travelCards == null) {
