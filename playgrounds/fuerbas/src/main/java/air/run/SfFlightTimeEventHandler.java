@@ -49,23 +49,25 @@ public class SfFlightTimeEventHandler implements AgentArrivalEventHandler,
 		this.flightTime.put(event.getPersonId(), event.getTime()-this.departureTime.get(event.getPersonId()));
 	}
 
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		this.departureTime.put(event.getPersonId(), event.getTime());
 	}
-	
+
+	@Override
+	public void reset(int iteration) {
+		this.arrivalTime.clear();
+		this.departureTime.clear();
+		this.flightTime.clear();
+	}
+
 	public Map<Id, Double> returnArrival() {
 		return this.arrivalTime;	
 	}
 
 	public Map<Id, Double> returnDeparture() {
-		return this.arrivalTime;		
+		return this.departureTime;		
 	}
 	
 	public Map<Id, Double> returnFlightTime() {

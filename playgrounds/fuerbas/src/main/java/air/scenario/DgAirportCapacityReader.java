@@ -68,7 +68,9 @@ public class DgAirportCapacityReader {
 					totalCapacityPerHour = Double.parseDouble(s[4]);
 				}
 				String source = s[5];
-				if (departureCapacityPerHour != null && arrivalCapacityPerHour != null) {
+				
+				if (departureCapacityPerHour != null && arrivalCapacityPerHour != null
+						&& "LED".compareTo(code) != 0) { //LED has some wrong capacity information
 					DgAirportCapacity ac = new DgAirportCapacity(code, this.capacityData.getCapacityPeriodSeconds());
 					ac.setRunwayInboundFlowCapacityCarEquivPerHour(arrivalCapacityPerHour);
 					ac.setRunwayOutboundFlowCapacityCarEquivPerHour(departureCapacityPerHour);
@@ -91,7 +93,12 @@ public class DgAirportCapacityReader {
 					builder.append(sep);
 					builder.append(arrivalCapacityPerHour);
 					builder.append(sep);
-					builder.append(totalCapacityPerHour);
+					if (totalCapacityPerHour == null) {
+						builder.append("n/a");
+					}
+					else {
+						builder.append(totalCapacityPerHour);
+					}
 					builder.append(sep);
 					builder.append("\\url{");
 					builder.append(source.replace("%", "\\%"));
@@ -100,7 +107,6 @@ public class DgAirportCapacityReader {
 					System.out.println(builder.toString());
 					lines.add(builder.toString());
 				}
-				
 				line = br.readLine();
 			}
 			System.out.println();

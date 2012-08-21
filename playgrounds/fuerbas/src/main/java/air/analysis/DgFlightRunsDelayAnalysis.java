@@ -26,11 +26,12 @@ package air.analysis;
  */
 public class DgFlightRunsDelayAnalysis {
 
-	public static void main(String[] args) throws Exception {
+	public void runSfDelayAnalysis() throws Exception{
 		String baseDirectory = "/media/data/work/repos/";
 		String[] runs = {
-				 "1804", 
-				"1805"
+//				 "1804", 
+//				"1805",
+				 "1807"
 				};
 		String euTimesBase = baseDirectory + "shared-svn/studies/countries/eu/flight/";
 		String[] scheduledTimes = {
@@ -46,6 +47,37 @@ public class DgFlightRunsDelayAnalysis {
 			new SfFlightDelayAnalysis().analyzeDelays(scheduledTimes[i], actualTimes, delayOutput, delaySingleFlight);
 		}
 		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		String baseDirectory = "/media/data/work/repos/";
+		String[] runs = {
+				 "1804", 
+//				"1805",
+				 "1807"
+				};
+		String euTimesBase = baseDirectory + "shared-svn/studies/countries/eu/flight/";
+		String[] scheduledTimes = {
+				euTimesBase + "dg_oag_flight_model_2_runways_3600vph/oag_flights.txt",
+				euTimesBase + "dg_oag_flight_model_2_runways_60vph/oag_flights.txt",
+		};
+		
+		for (int i = 0; i < runs.length; i++){
+			String rundir = baseDirectory + "runs-svn/run" + runs[i] + "/";
+			String eventsFilename = rundir + "ITERS/it.0/" + runs[i] + ".0.events.xml.gz";
+			String delayOutput = rundir + "ITERS/it.0/" + runs[i] + ".0.dgdelay.csv";
+			String delaySingleFlight = rundir + "ITERS/it.0/" + runs[i] + ".0.dgdelay_by_flight.csv";
+			String arrivalDelayByOriginAirport = rundir + "ITERS/it.0/" + runs[i] + ".0.arrival_delay_by_origin_airport.csv";
+			String arrivalDelayByDestinationAirport = rundir + "ITERS/it.0/" + runs[i] + ".0.arrival_delay_by_destination_airport.csv";
+			DgDelayAnalysis ana = new DgDelayAnalysis();
+			ana.analyzeDelays(scheduledTimes[i], eventsFilename);
+			ana.writeArrivalDelaysByMinutes(delayOutput);
+			ana.writeArrivalDelaysByOriginAirport(arrivalDelayByOriginAirport);
+			ana.writeArrivalDelaysByOriginAirport(arrivalDelayByDestinationAirport);
+			ana.writeDelayByFlight(delaySingleFlight);
+			
+		}
+
 		
 	}
 

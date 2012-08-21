@@ -98,7 +98,7 @@ public class DgAirNetworkBuilder {
 			originToDestination.setCapacity(1.0*CAP_PERIOD);
 			originToDestination.setLength(flight.getDistanceKm()  * 1000.0);
 			
-			double speed = flight.getDistanceKm() * 1000.0 / ( flight.getDuration() - oa.getTaxiTimeOutbound() - da.getTaxiTimeInbound());
+			double speed = flight.getDistanceKm() * 1000.0 / ( flight.getScheduledDuration() - oa.getTaxiTimeOutbound() - da.getTaxiTimeInbound());
 			originToDestination.setFreespeed(speed);
 			if (! network.getLinks().containsKey(linkId)) {
 				network.addLink(originToDestination);

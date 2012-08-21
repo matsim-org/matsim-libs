@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOagFlightsReader
+ * DgAnalysisTransitSchedule
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,56 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
+package air.analysis;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-
-import org.matsim.core.utils.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgOagFlightsReader {
+public class DgAnalysisTransitSchedule {
+
+	private static final Logger log = Logger.getLogger(DgAnalysisTransitSchedule.class);
+
+	private TransitSchedule schedule;
+
+	public DgAnalysisTransitSchedule (TransitSchedule schedule){
+		this.schedule = schedule;
+
+	}
 	
-	private DgOagFlightsData data;
+	public double getScheduledArrival(Id vehicleId, Id stopId){
+		/*
+		 * <event time="56.0" type="VehicleArrivesAtFacility" vehicle="A90704" facility="DXB" delay="0.0"  />
+        <event time="56.0" type="VehicleDepartsAtFacility" vehicle="A90704" facility="DXB" delay="0.0"  />
 
-	public DgOagFlightsReader(DgOagFlightsData data){
-		this.data = data;
-	}
+		 */
 
-	public void readFile(String filename){
-		BufferedReader reader = IOUtils.getBufferedReader(filename);
-		try {
-			String line = reader.readLine();
-			while (line != null) {
-				String[] e = line.split("\t"); //rename to entries
-				DgOagFlight flight = new DgOagFlight(e[2]);
-				String routeString = e[0];
-				String[] lineStringArray = routeString.split("_");
-				flight.setRoute(routeString);
-				flight.setOriginCode(lineStringArray[0]);
-				flight.setDestinationCode(lineStringArray[1]);
-				
-				String carrier = e[1].split("_")[2];
-				flight.setCarrier(carrier);
-				flight.setDepartureTime(Double.parseDouble(e[3]));
-				flight.setDuration(Double.parseDouble(e[4]));
-				flight.setAircraftType(e[5]);
-				flight.setSeatsAvailable(Integer.parseInt(e[6]));
-				flight.setDistanceKm(Double.parseDouble(e[7]));
-				this.data.addFlight(flight);
-				line = reader.readLine();
-			}
-		
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
+		return 0.0;
 	}
+	
+	public double getScheduledDeparture(Id vehicleId, Id stopId){
+		return 0.0;
+	}
+	
 	
 }

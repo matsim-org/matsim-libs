@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgOagFlightsReader
+ * DgFlightDelay
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,56 +17,67 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scenario;
+package air.analysis;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-
-import org.matsim.core.utils.io.IOUtils;
+import air.scenario.DgOagFlight;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgOagFlightsReader {
-	
-	private DgOagFlightsData data;
+public class DgFlightDelay {
 
-	public DgOagFlightsReader(DgOagFlightsData data){
-		this.data = data;
-	}
 
-	public void readFile(String filename){
-		BufferedReader reader = IOUtils.getBufferedReader(filename);
-		try {
-			String line = reader.readLine();
-			while (line != null) {
-				String[] e = line.split("\t"); //rename to entries
-				DgOagFlight flight = new DgOagFlight(e[2]);
-				String routeString = e[0];
-				String[] lineStringArray = routeString.split("_");
-				flight.setRoute(routeString);
-				flight.setOriginCode(lineStringArray[0]);
-				flight.setDestinationCode(lineStringArray[1]);
-				
-				String carrier = e[1].split("_")[2];
-				flight.setCarrier(carrier);
-				flight.setDepartureTime(Double.parseDouble(e[3]));
-				flight.setDuration(Double.parseDouble(e[4]));
-				flight.setAircraftType(e[5]);
-				flight.setSeatsAvailable(Integer.parseInt(e[6]));
-				flight.setDistanceKm(Double.parseDouble(e[7]));
-				this.data.addFlight(flight);
-				line = reader.readLine();
-			}
-		
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
+	private DgOagFlight flight;
+	private Double departureDelay = null;
+	private Double arrivalDelay = null;
+	private double actualDepartureTime;
+	private double actualArrivalTime;
+
+	public DgFlightDelay(DgOagFlight flight) {
+		this.flight = flight;
 	}
 	
+	public void setDepartureDelay(Double departureDelay){
+		this.departureDelay = departureDelay;
+	}
+	
+	public void setArrivalDelay(Double arrivalDelay){
+		this.arrivalDelay  = arrivalDelay;
+	}
+
+	
+	public DgOagFlight getFlight() {
+		return flight;
+	}
+
+	
+	public Double getDepartureDelay() {
+		return departureDelay;
+	}
+
+	
+	public Double getArrivalDelay() {
+		return arrivalDelay;
+	}
+
+	public void setActualDepartureTime(double timeSec) {
+		this.actualDepartureTime = timeSec;
+	}
+
+	public void setActualArrivalTime(double timeSec) {
+		this.actualArrivalTime = timeSec;
+	}
+
+	
+	public double getActualDepartureTime() {
+		return actualDepartureTime;
+	}
+
+	
+	public double getActualArrivalTime() {
+		return actualArrivalTime;
+	}
+
 }

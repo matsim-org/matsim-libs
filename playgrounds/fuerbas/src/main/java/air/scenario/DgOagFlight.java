@@ -41,6 +41,9 @@ public class DgOagFlight {
 		this.flightDesignator = flightDesignator;
 	}
 	
+	/**
+	 * as we don't have lines in this context route is a od pair,e.g. FRA_BER
+	 */
 	public String getRoute() {
 		return route;
 	}
@@ -69,7 +72,7 @@ public class DgOagFlight {
 		this.departureTime = departureTime;
 	}
 	
-	public double getDuration() {
+	public double getScheduledDuration() {
 		return duration;
 	}
 	
