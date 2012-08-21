@@ -339,7 +339,7 @@ public class SfCottbusPtSchedule {
 					System.out.println("FACIL ID: "+facilId);
 					System.out.println("LINK ID: "+linkId);
 					this.ptLinkList.put(linkId, facilId);
-					trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), true);
+					trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), false);
 					facilList.add(trastofac);
 					trastofac.setLinkId(linkId);
 					this.schedule.addStopFacility(trastofac);
@@ -351,7 +351,7 @@ public class SfCottbusPtSchedule {
 					System.out.println("FACIL ID: "+facilId);
 					System.out.println("LINK ID: "+linkId);
 					this.ptLinkList.put(linkId, facilId);
-					trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), true);
+					trastofac = this.schedule.getFactory().createTransitStopFacility(facilId, this.network.getLinks().get(linkId).getCoord(), false);
 					facilList.add(trastofac);
 					trastofac.setLinkId(linkId);
 					this.schedule.addStopFacility(trastofac);
@@ -369,12 +369,15 @@ public class SfCottbusPtSchedule {
 			    if  (stoptime.get(index)==0){
 			    	int offset = 20;
 			    	if (index == 0) offset = 0;
-					TransitRouteStop transStop = this.schedule.getFactory().createTransitRouteStop(trastofac, currOffset*60, offset);
+					TransitRouteStop transStop = this.schedule.getFactory().createTransitRouteStop(trastofac, currOffset*60, currOffset*60+offset);
+					transStop.setAwaitDepartureTime(true);
 					stopList.add(transStop);
 
 			    }
 			    else{
 					TransitRouteStop transStop = this.schedule.getFactory().createTransitRouteStop(trastofac, currOffset*60, offsetsum*60);
+					transStop.setAwaitDepartureTime(true);
+
 					stopList.add(transStop);
 
 			    }
