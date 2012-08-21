@@ -40,6 +40,8 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.mapviewer.TileFactory;
+import org.matsim.contrib.grips.config.GripsConfigModule;
+import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 
 public class EvacuationAreaSelector implements ActionListener{
@@ -57,6 +59,8 @@ public class EvacuationAreaSelector implements ActionListener{
 	private final String wms;
 
 	private final String layer;
+
+	private GripsConfigModule gcm;
 
 	/**
 	 * Launch the application.
@@ -161,9 +165,10 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 		this.frame.setLocationRelativeTo(null);
 		
-		frame.addComponentListener(new ComponentListener() 
+		this.frame.addComponentListener(new ComponentListener() 
 		{  
-		        public void componentResized(ComponentEvent evt)
+		        @Override
+				public void componentResized(ComponentEvent evt)
 		        {
 		            Component src = (Component)evt.getSource();
 		            Dimension newSize = src.getSize();
@@ -199,16 +204,8 @@ public class EvacuationAreaSelector implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand() == "Save") {
-			final JFileChooser fc = new JFileChooser();
-			int retVal = fc.showSaveDialog(this.frame);
-			if (retVal == JFileChooser.APPROVE_OPTION) {
-				File f = fc.getSelectedFile();
-	            log.info("Saving file to: " + f.getAbsolutePath() + ".");
-				this.snapper.savePolygon(f.getAbsolutePath());
-				
-			} else {
-				 log.info("Save command cancelled by user.");
-			}
+			log.info("Saving file to: " + this.gcm.getEvacuationAreaFileName() + ".");
+			this.snapper.savePolygon(this.gcm.getEvacuationAreaFileName());
 		}
 		
 		if (e.getActionCommand() == "Open") {
@@ -217,7 +214,7 @@ public class EvacuationAreaSelector implements ActionListener{
 				
 				@Override
 				public String getDescription() {
-					return "OSM XML File";
+					return "GRIPS config file";
 				}
 				
 				@Override
@@ -225,7 +222,7 @@ public class EvacuationAreaSelector implements ActionListener{
 					if (f.isDirectory()) {
 						return true;
 					}
-					if (f.getName().endsWith("osm")){
+					if (f.getName().endsWith("xml")){
 						return true;
 					}
 					return false;
@@ -236,7 +233,20 @@ public class EvacuationAreaSelector implements ActionListener{
 		        	this.openBtn.setEnabled(false);
 		        	File file = fc.getSelectedFile();
 		            log.info("Opening: " + file.getAbsolutePath() + ".");
-		            loadMapView(file.getAbsolutePath());
+		            
+		            
+					this.gcm = null;
+					try
+					{
+						this.gcm = new GripsConfigModule("grips");
+						GripsConfigDeserializer parser = new GripsConfigDeserializer(this.gcm);
+						parser.readFile(file.getAbsolutePath());
+					}
+					catch(Exception ee)
+					{
+						throw new RuntimeException("File is not a  grips config file! Exiting!");
+					}
+		            loadMapView(this.gcm.getNetworkFileName());
 		        } else {
 		            log.info("Open command cancelled by user.");
 		        }
