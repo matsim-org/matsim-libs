@@ -126,7 +126,9 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		
 		Polygon p = PolygonalCircleApproximation.getPolygonFromGeoCoords(c0, c1);
 		
-		p = this.snapper.run(p);
+		
+		//snapper is deactivated for now!
+//		p = this.snapper.run(p);
 		
 		try {
 			p = (Polygon) PolygonalCircleApproximation.transform(p, transform.inverse());
