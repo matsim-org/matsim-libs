@@ -54,14 +54,18 @@ public class MultiAnalyzer {
 
 
 	private static String [] cases = {
-		"baseCase_ctd" ,
+		"baseCase_ctd_newCode" ,
 		"policyCase_zone30" ,
-		"policyCase_pricing" ,
-//		"policyCase_pricing_x5" ,
-//		"policyCase_pricing_x10" ,
+//		"policyCase_pricing_modeOnly",
+		"policyCase_pricing_newCode",
+		"policyCase_pricing_fuelEff_2.5pct",
+		"policyCase_pricing_fuelEff_5pct",
+		"policyCase_pricing_fuelEff_7.5pct",
+		"policyCase_pricing_fuelEff_10pct",
+		"policyCase_pricing_fuelEff_20pct"
 	};
 	
-	private static String runDirectoryStub = "../../runs-svn/detEval/kuhmo/output/output_";
+	private static String runDirectoryStub = "../../runs-svn/detEval/latsis/output/output_";
 //	private static String initialIterationNo = "1000";
 	private static String finalIterationNo = "1500";
 	private static String netFile;
@@ -90,9 +94,9 @@ public class MultiAnalyzer {
 			eventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".events.xml.gz";
 			emissionEventsFile = runDirectory + "ITERS/it." + finalIterationNo + "/" + finalIterationNo + ".emission.events.xml.gz";
 			
-//			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
+			calculateUserWelfareAndTollRevenueStatisticsByUserGroup(netFile, configFile, plansFile, eventsFile, caseName);
 			calculateDistanceTimeStatisticsByUserGroup(netFile, eventsFile, caseName);
-//			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
+			calculateEmissionStatisticsByUserGroup(emissionEventsFile, caseName);
 		}
 		calculateDistanceTimeStatisticsByUserGroupDifferences(case2personId2carDistance);
 	}

@@ -114,8 +114,8 @@ public class WarmEmissionAnalysisModule {
 		stopGoKmCounter = 0.0;
 	}
 
-	public void throwWarmEmissionEvent(double enterTime, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions){
-		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, vehicleId, warmEmissions);
+	public void throwWarmEmissionEvent(double leaveTime, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions){
+		Event warmEmissionEvent = new WarmEmissionEventImpl(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 

@@ -42,6 +42,7 @@ public class EmissionCostModule {
 	private final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
 	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
 	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
+
 	
 	public EmissionCostModule(double emissionCostFactor, boolean considerCO2Costs) {
 		this.emissionCostFactor = emissionCostFactor;

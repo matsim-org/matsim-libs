@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
@@ -41,10 +43,12 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 
 	EventsManager eventsManager;
 	EmissionCostModule emissionCostModule;
+	Set<Id> hotspotLinks;
 
-	public EmissionInternalizationHandler(Controler controler, EmissionCostModule emissionCostModule) {
+	public EmissionInternalizationHandler(Controler controler, EmissionCostModule emissionCostModule, Set<Id> hotspotLinks) {
 		this.eventsManager = controler.getEvents();
 		this.emissionCostModule = emissionCostModule;
+		this.hotspotLinks = hotspotLinks;
 	}
 
 	@Override
@@ -54,22 +58,52 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
+		Id linkId = event.getLinkId();
+		if(hotspotLinks == null){
+			// pricing applies for all links
+			calculateWarmEmissionCostsAndThrowEvent(event);
+		} else {
+			// pricing applies for the current link
+			if(hotspotLinks.contains(linkId)){
+				calculateWarmEmissionCostsAndThrowEvent(event);
+			}
+			// pricing applies not for the current link
+			else ;
+		}
+	}
+
+	@Override
+	public void handleEvent(ColdEmissionEvent event) {
+		Id linkId = event.getLinkId();
+		if(hotspotLinks == null){
+			// pricing applies for all links
+			calculateColdEmissionCostsAndThrowEvent(event);
+		} else {
+			// pricing applies for the current link
+			if(hotspotLinks.contains(linkId)){
+				calculateColdEmissionCostsAndThrowEvent(event);
+			}
+			// pricing applies not for the current link
+			else ;
+		}
+	}
+
+	private void calculateColdEmissionCostsAndThrowEvent(ColdEmissionEvent event) {
 		Id personId = event.getVehicleId();
 		double time = event.getTime();
-		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
-		double amount2Pay = - warmEmissionCosts;
+		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
+		double amount2Pay = - coldEmissionCosts;
 		
 		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);
 		
 		eventsManager.processEvent(moneyEvent);
 	}
 
-	@Override
-	public void handleEvent(ColdEmissionEvent event) {
+	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
 		Id personId = event.getVehicleId();
 		double time = event.getTime();
-		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
-		double amount2Pay = - coldEmissionCosts;
+		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
+		double amount2Pay = - warmEmissionCosts;
 		
 		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);
 		

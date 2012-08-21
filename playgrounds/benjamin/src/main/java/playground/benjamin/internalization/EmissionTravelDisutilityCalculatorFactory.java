@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -37,6 +40,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 
 	private final EmissionModule emissionModule;
 	private final EmissionCostModule emissionCostModule;
+	private Set<Id> hotspotLinks;
 
 	public EmissionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
 		this.emissionModule = emissionModule;
@@ -45,7 +49,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 
 	@Override
 	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
-		final EmissionTravelDisutilityCalculator etdc = new EmissionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule);
+		final EmissionTravelDisutilityCalculator etdc = new EmissionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule, hotspotLinks);
 
 		return new TravelDisutility(){
 
@@ -60,6 +64,10 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 				return etdc.getLinkMinimumTravelDisutility(link);
 			}
 		};
+	}
+
+	public void setHotspotLinks(Set<Id> hotspotLinks) {
+		this.hotspotLinks = hotspotLinks;
 	}
 
 }

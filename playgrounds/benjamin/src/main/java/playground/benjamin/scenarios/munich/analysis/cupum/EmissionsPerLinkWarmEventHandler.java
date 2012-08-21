@@ -84,6 +84,9 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 
 							Double previousValue = warmEmissionsSoFar.get(pollutant);
 							Double newValue = previousValue + eventValue;
+							
+							/*Is there a bug here?
+							See playground.fhuelsmann.emission.analysisForConcentration.EmissionsPerLinkWarmEventHandler.java*/
 							warmEmissionsSoFar.put(pollutant, newValue);
 						}
 						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);

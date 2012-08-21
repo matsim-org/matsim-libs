@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -47,10 +50,12 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
+	Set<Id> hotspotLinks;
 	
 	int iteration;
 	int firstIt;
 	int lastIt;
+
 
 
 	public InternalizeEmissionsControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
@@ -75,7 +80,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		iteration = event.getIteration();
 
 		logger.info("creating new emission internalization handler...");
-		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule);
+		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks);
 		logger.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
 
@@ -105,6 +110,10 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+	}
+
+	public void setHotspotLinks(Set<Id> hotspotLinks) {
+		this.hotspotLinks = hotspotLinks;
 	}
 
 }

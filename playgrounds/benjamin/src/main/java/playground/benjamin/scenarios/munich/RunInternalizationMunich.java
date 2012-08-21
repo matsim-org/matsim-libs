@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.benjamin.emissions.EmissionModule;
 import playground.benjamin.internalization.EmissionCostModule;
@@ -73,6 +74,7 @@ public class RunInternalizationMunich {
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 	}
 }
