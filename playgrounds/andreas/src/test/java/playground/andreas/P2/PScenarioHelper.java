@@ -56,6 +56,7 @@ import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.plan.RandomStopProvider;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.schedule.CreatePStops;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 
 /**
@@ -71,9 +72,10 @@ public class PScenarioHelper {
 		
 		PConfigGroup pC = new PConfigGroup();
 		Cooperative coop = new BasicCooperative(new IdImpl(pC.getPIdentifier() + 1), pC, new PFranchise(pC.getUseFranchise()));
-		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, sC.getPopulation(), sC.getTransitSchedule(), null);
+		TransitSchedule sched = CreatePStops.createPStops(sC.getNetwork(), pC);
+		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, sC.getPopulation(), sched, null);
 		
-		PRouteProvider rP = new ComplexCircleScheduleProvider(sC.getTransitSchedule(), sC.getNetwork(), randomStopProvider, 0, pC.getPlanningSpeedFactor(), pC.getMode());
+		PRouteProvider rP = new ComplexCircleScheduleProvider(sched, sC.getNetwork(), randomStopProvider, 0, pC.getPlanningSpeedFactor(), pC.getMode());
 		
 		coop.init(rP, new CreateNewPlan(new ArrayList<String>()), 0, 0.0);
 		

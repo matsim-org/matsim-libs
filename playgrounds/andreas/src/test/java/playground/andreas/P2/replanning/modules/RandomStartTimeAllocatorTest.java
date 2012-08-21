@@ -65,6 +65,7 @@ public class RandomStartTimeAllocatorTest {
 		Assert.assertEquals("Compare start time", 1200.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 982.4141207607663, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 1166.0115599115245, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+
 	}
 }

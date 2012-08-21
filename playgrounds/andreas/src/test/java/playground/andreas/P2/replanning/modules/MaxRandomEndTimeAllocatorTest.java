@@ -79,6 +79,6 @@ public class MaxRandomEndTimeAllocatorTest {
 		Assert.assertEquals("Compare start time", 40000.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare end time", 40654.032396527284, testPlan.getEndTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare end time", 40074.474191341884, testPlan.getEndTime(), MatsimTestUtils.EPSILON);
 	}
 }
