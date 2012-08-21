@@ -62,8 +62,8 @@ public class PopulationFromESRIShapeFileGenerator {
 
 	private static final Logger log = Logger.getLogger(PopulationFromESRIShapeFileGenerator.class);
 
-	private static final int RAND_SAMPLES = 1000;
-	private static final double CUTOFF = 5.;
+	private static final int RAND_SAMPLES = 1000; // the number of random numbers generated for the lookup table
+	private static final double CUTOFF = 1.0; // 
 
 	private final String populationShapeFile;
 	protected final Scenario scenario;
@@ -75,6 +75,7 @@ public class PopulationFromESRIShapeFileGenerator {
 
 	private List<Double> depTimeLookup;
 
+	// Konstruktor mit Scenario, PopFile, Senke
 	public PopulationFromESRIShapeFileGenerator(Scenario sc, String populationFile, Id safeLinkId) {
 		log.warn("This implementation is a only a proof of concept!");
 		this.scenario = sc;
@@ -118,6 +119,8 @@ public class PopulationFromESRIShapeFileGenerator {
 
 	}
 
+	// Hier werden this.RAND_SAMPLES Zufallszahlen erzeugt, aus denen dann gezogen wird
+
 	private void genDepTimeLookup() {
 		DepartureTimeDistributionType depTimeDistr = this.gcm.getDepartureTimeDistribution();
 		if (depTimeDistr == null) {
@@ -129,23 +132,32 @@ public class PopulationFromESRIShapeFileGenerator {
 
 		List<Double> randVariables = new ArrayList<Double>();
 
-		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) {
-			double mu = depTimeDistr.getMu();
-			double sigma = depTimeDistr.getSigma();
+    double min = depTimeDistr.getEarliest();
+    double max = depTimeDistr.getLatest();
+		if (depTimeDistr.getDistribution() == DistributionType.LOG_NORMAL) { // 
+			double mu_h = Math.log(depTimeDistr.getMu()/3600.0);
+			double sigma_h = Math.log(depTimeDistr.getSigma()/3600.0);
 			for (int i = 0; i < RAND_SAMPLES; i ++) {
-				double val;
+				double sec, hrs;
 				do {
 					double r = MatsimRandom.getRandom().nextGaussian();
-					val = Math.exp(mu + sigma*r);
-				} while(val > CUTOFF);
-				randVariables.add(val);
+					// eine Zahl zwischen -inf und +inf, normal-verteilt
+					// besser mit Stunden rechnen!
+					hrs = Math.exp(mu_h + sigma_h*r);
+					sec = hrs*3600.0;
+				} while(sec < min || sec > max);
+				randVariables.add(sec);
 			}
 		} else if(depTimeDistr.getDistribution() == DistributionType.NORMAL) {
 			double mu = depTimeDistr.getMu();
 			double sigma = depTimeDistr.getSigma();
 			for (int i = 0; i < RAND_SAMPLES; i ++) {
-				double r = MatsimRandom.getRandom().nextGaussian();
-				randVariables.add(mu + sigma*r);
+			    double r=0.0, sec=0.0;
+			    do{
+			      r = MatsimRandom.getRandom().nextGaussian();
+			      sec=mu+sigma*r;
+			    } while(sec < min || sec > max);
+				randVariables.add(sec);
 			}
 		} else if (depTimeDistr.getDistribution() == DistributionType.DIRAC_DELTA) {
 			this.depTimeLookup = new ArrayList<Double>();
@@ -155,15 +167,13 @@ public class PopulationFromESRIShapeFileGenerator {
 			throw new RuntimeException("unknown distribution type:" + depTimeDistr.getDistribution());
 		}
 
-		double latest = depTimeDistr.getLatest();
-		double earliest = depTimeDistr.getEarliest();
 		Collections.sort(randVariables);
 		this.depTimeLookup = randVariables;
-		double coef = (latest-earliest)/CUTOFF;
 		double offset = this.depTimeLookup.get(0);
+		// offset >= earliest // otherwise throw Exception?
 		for (int i = 0; i < this.depTimeLookup.size(); i++) {
-			double rand = this.depTimeLookup.get(i)-offset;
-			double depTime = rand * coef + earliest;
+			double depTime = this.depTimeLookup.get(i)-offset;
+			// departure time relative to the first agent, i.e. the start of the simulation
 			this.depTimeLookup.set(i, depTime);
 		}
 		Collections.shuffle(this.depTimeLookup);
@@ -183,7 +193,8 @@ public class PopulationFromESRIShapeFileGenerator {
 			Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
 			((ActivityImpl)act).setCoord(c);
 			double departureTime = getDepartureTime();
-			act.setEndTime(departureTime);
+			act.setEndTime(departureTime); 
+			// hier wird die Departur Time gesetzt
 			plan.addActivity(act);
 			Leg leg = pb.createLeg("car");
 			plan.addLeg(leg);
