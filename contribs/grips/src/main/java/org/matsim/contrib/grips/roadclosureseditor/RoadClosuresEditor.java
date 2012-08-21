@@ -481,8 +481,9 @@ public class RoadClosuresEditor implements ActionListener{
 				try {
 					double time = Time.parseTime(timeString);
 					NetworkChangeEvent ev = fac.createNetworkChangeEvent(time);
-					ev.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
-
+//					ev.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
+					ev.setFlowCapacityChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
+					
 					ev.addLink(this.sc.getNetwork().getLinks().get(currentId));
 					evs.add(ev);
 				} catch (Exception e) {
