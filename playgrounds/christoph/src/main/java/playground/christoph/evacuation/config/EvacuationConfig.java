@@ -61,14 +61,14 @@ public class EvacuationConfig {
 	
 	/*
 	 * survey based model parameter
-	 */
+	 */	
 	public static double pickupModelAlwaysConst = 2.67;
 	public static double pickupModelAlwaysAge31to60 = -0.71;
 	public static double pickupModelAlwaysAge61to70 = -0.71;
 	public static double pickupModelAlwaysAge71plus = 6.08;
 	public static double pickupModelAlwaysHasChildren = 1.66;
 	public static double pickupModelAlwaysHasDrivingLicence = 1.54;
-	public static double pickupModelAlwaysIsMale = -0.65;	// TODO: check if this is true
+	public static double pickupModelAlwaysIsFemale = -0.65;
 	
 	public static double pickupModelIfSpaceConst = 0.92;
 	public static double pickupModelIfSpaceAge31to60 = -0.81;
@@ -76,10 +76,21 @@ public class EvacuationConfig {
 	public static double pickupModelIfSpaceAge71plus = 6.43;
 	public static double pickupModelIfSpaceHasChildren = 1.57;
 	public static double pickupModelIfSpaceHasDrivingLicence = 3.00;
-	public static double pickupModelIfSpaceIsMale = -0.47;	// TODO: check if this is true
+	public static double pickupModelIfSpaceIsFemale = -0.47;
 
+	/*
+	 * These two values are fixed so far. They might be changed in another study.
+	 */
+	public enum PreEvacuationTime {TIME0, TIME8, TIME16};
+	public enum EvacuationReason {WATER, FIRE, CHEMICAL, ATOMIC};
+	public static PreEvacuationTime leaveModelPreEvacuationTime = PreEvacuationTime.TIME0;
+	public static EvacuationReason leaveModelEvacuationReason = EvacuationReason.ATOMIC;
+	
+	public static double leaveModelHasChildren = 0.60;
+	public static double leaveModelHasDrivingLicense = 0.52;
+	
 	public static double leaveModelImmediatelyConst = 4.10;
-	public static double leaveModelImmediatelyChemistry = 1.61;
+	public static double leaveModelImmediatelyChemical = 1.61;
 	public static double leaveModelImmediatelyAtomic = 2.08;
 	public static double leaveModelImmediatelyFire = 0.59;
 	public static double leaveModelImmediatelyAge31to60 = -3.12;
@@ -89,11 +100,8 @@ public class EvacuationConfig {
 	public static double leaveModelImmediatelyTime16 = -1.99;
 	public static double leaveModelImmediatelyHouseholdUnited2 = -0.33;
 	
-	public static double leaveModelImmediatelyHasChildren = 0.60;
-	public static double leaveModelImmediatelyHasDrivingLicense = 0.52;
-
 	public static double leaveModelLaterConst = 3.36;
-	public static double leaveModelLaterChemistry = 0.982;
+	public static double leaveModelLaterChemical = 0.982;
 	public static double leaveModelLaterAtomic = 0.777;
 	public static double leaveModelLaterFire = 0.297;
 	public static double leaveModelLaterAge31to60 = -1.9;
