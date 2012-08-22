@@ -41,8 +41,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**As stated in the package info, this class is an <i>untested</i> design suggestion.  Comments are welcome.  kai, dec'10
@@ -54,11 +54,11 @@ public class MyWithinDayMobsimListener implements MobsimListener, MobsimBeforeSi
 
 
 	private TravelDisutility travCostCalc;
-	private PersonalizableTravelTime travTimeCalc;
+	private TravelTime travTimeCalc;
 	private PlansCalcRoute routeAlgo;
 	private Scenario scenario;
 
-	MyWithinDayMobsimListener (TravelDisutility travelCostCalculator, PersonalizableTravelTime travelTimeCalculator) {
+	MyWithinDayMobsimListener (TravelDisutility travelCostCalculator, TravelTime travelTimeCalculator) {
 		this.travCostCalc = travelCostCalculator;
 		this.travTimeCalc = travelTimeCalculator;
 	}

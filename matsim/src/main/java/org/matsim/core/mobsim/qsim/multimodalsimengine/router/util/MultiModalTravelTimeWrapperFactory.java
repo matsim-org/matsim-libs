@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTimeFactory;
 
 /**
  * Factory for a MultiModalTravelTimeWrapper. Uses PersonalizableTravelTimeFactory
@@ -38,31 +38,31 @@ public class MultiModalTravelTimeWrapperFactory implements MultiModalTravelTimeF
 
 	private static final Logger log = Logger.getLogger(MultiModalTravelTimeWrapperFactory.class);
 	
-	private final Map<String, PersonalizableTravelTimeFactory> travelTimeFactories;
+	private final Map<String, TravelTimeFactory> travelTimeFactories;
 	
 	public MultiModalTravelTimeWrapperFactory() {
-		this.travelTimeFactories = new HashMap<String, PersonalizableTravelTimeFactory>();
+		this.travelTimeFactories = new HashMap<String, TravelTimeFactory>();
 	}
 	
 	@Override
 	public MultiModalTravelTimeWrapper createTravelTime() {
 		MultiModalTravelTimeWrapper wrapper = new MultiModalTravelTimeWrapper();
 		
-		for (Entry<String, PersonalizableTravelTimeFactory> entry : travelTimeFactories.entrySet()) {
-			wrapper.setPersonalizableTravelTime(entry.getKey(), entry.getValue().createTravelTime());
+		for (Entry<String, TravelTimeFactory> entry : travelTimeFactories.entrySet()) {
+			wrapper.setTravelTime(entry.getKey(), entry.getValue().createTravelTime());
 		}
 		
 		return wrapper;
 	}
 	
-	public void setPersonalizableTravelTimeFactory(String transportMode, PersonalizableTravelTimeFactory factory) {
+	public void setPersonalizableTravelTimeFactory(String transportMode, TravelTimeFactory factory) {
 		if (this.travelTimeFactories.containsKey(transportMode)) {
 			log.warn("A PersonalizableTravelTimeFactory for transport mode " + transportMode + " already exists. Replacing it!");
 		}
 		this.travelTimeFactories.put(transportMode, factory);
 	}
 
-	public Map<String, PersonalizableTravelTimeFactory> getPersonalizableTravelTimeFactories() {
+	public Map<String, TravelTimeFactory> getTravelTimeFactories() {
 		return Collections.unmodifiableMap(travelTimeFactories);
 	}
 

@@ -25,8 +25,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.Planomat;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -42,7 +42,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlanomatModule extends AbstractMultithreadedModule {
 
 	private final TravelDisutility travelCost;
-	private final PersonalizableTravelTime travelTime;
+	private final TravelTime travelTime;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Controler controler;
 	private final PlanomatConfigGroup config;
@@ -57,7 +57,7 @@ public class PlanomatModule extends AbstractMultithreadedModule {
 			Network network,
 			ScoringFunctionFactory scoringFunctionFactory,
 			TravelDisutility travelCost, 
-			PersonalizableTravelTime travelTime) {
+			TravelTime travelTime) {
 		super(controler.getConfig().global());
 		this.controler = controler;
 		this.scoringFunctionFactory = scoringFunctionFactory;

@@ -43,9 +43,9 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.NetworkInverter;
 import org.matsim.core.router.util.NetworkTurnInfoBuilder;
-import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimesInvertedNetProxy;
@@ -84,7 +84,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 				.getModeRouteFactory();
 		this.network = sc.getNetwork();
 
-		if (!(travelTimes instanceof PersonalizableLinkToLinkTravelTime)) {
+		if (!(travelTimes instanceof LinkToLinkTravelTime)) {
 			throw new IllegalStateException(
 					"If link to link travel times should be used for routing the TravelTime instance must be an instance of PersonalizableLinkToLinkTravelTime"
 							+ " but is an instance of "
@@ -106,7 +106,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		}
 
 		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network,
-				(PersonalizableLinkToLinkTravelTime) travelTimes);
+				(LinkToLinkTravelTime) travelTimes);
 		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
 				travelTimesProxy, cnScoringGroup);
 

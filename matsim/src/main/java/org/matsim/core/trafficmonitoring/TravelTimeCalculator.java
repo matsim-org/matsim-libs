@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -43,8 +42,8 @@ import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -65,7 +64,7 @@ import org.matsim.core.utils.collections.Tuple;
  * @author mrieser
  */
 public class TravelTimeCalculator
-		implements PersonalizableTravelTime, PersonalizableLinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
+		implements TravelTime, LinkToLinkTravelTime, LinkEnterEventHandler, LinkLeaveEventHandler, 
 		AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
 		AgentStuckEventHandler {
 	
@@ -362,8 +361,4 @@ public class TravelTimeCalculator
 		}
 	}
 
-	@Override
-	public void setPerson(Person person) {
-		// nothing to do here
-	}
 }

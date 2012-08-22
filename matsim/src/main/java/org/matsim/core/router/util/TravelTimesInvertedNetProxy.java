@@ -21,7 +21,6 @@ package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 
 
 /**
@@ -31,13 +30,13 @@ import org.matsim.api.core.v01.population.Person;
  * @see org.matsim.core.route.util.NetworkInverter
  *
  */
-public class TravelTimesInvertedNetProxy implements PersonalizableTravelTime {
+public class TravelTimesInvertedNetProxy implements TravelTime {
 
 	private Network originalNetwork;
 	
-	private PersonalizableLinkToLinkTravelTime linkToLinkTravelTime;
+	private LinkToLinkTravelTime linkToLinkTravelTime;
 
-	public TravelTimesInvertedNetProxy(Network originalNet, PersonalizableLinkToLinkTravelTime l2ltt){
+	public TravelTimesInvertedNetProxy(Network originalNet, LinkToLinkTravelTime l2ltt){
 		this.linkToLinkTravelTime = l2ltt;
 		this.originalNetwork = originalNet;
 	}
@@ -51,11 +50,6 @@ public class TravelTimesInvertedNetProxy implements PersonalizableTravelTime {
 		Link fromLink = this.originalNetwork.getLinks().get(link.getFromNode().getId());
 		Link toLink = this.originalNetwork.getLinks().get(link.getToNode().getId());
 		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		this.linkToLinkTravelTime.setPerson(person);
 	}
 
 }

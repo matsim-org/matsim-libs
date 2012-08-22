@@ -20,13 +20,13 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 
-public class FreeSpeedTravelTimeCalculatorFactory implements PersonalizableTravelTimeFactory {
+public class FreeSpeedTravelTimeCalculatorFactory implements TravelTimeFactory {
 
 	@Override
-	public PersonalizableTravelTime createTravelTime() {
+	public TravelTime createTravelTime() {
 		return new FreeSpeedTravelTimeCalculator();
 	}
 }

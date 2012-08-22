@@ -48,8 +48,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -293,7 +293,7 @@ public class PlanomatTest extends MatsimTestCase {
 		testChromosome = new Chromosome(jgapConfiguration, testGenes);
 
 		// init LegTravelTimeEstimator
-		PersonalizableTravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
+		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
 		TravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 

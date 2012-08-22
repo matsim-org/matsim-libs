@@ -38,6 +38,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -90,7 +91,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	protected final Network network;
 
-	private final PersonalizableTravelTime timeCalculator;
+	private final TravelTime timeCalculator;
 
 	private PlansCalcRouteData data = new PlansCalcRouteData();
 
@@ -103,7 +104,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 */
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
 			final TravelDisutility costCalculator,
-			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory, ModeRouteFactory routeFactory) {
+			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory, ModeRouteFactory routeFactory) {
 		this.routeAlgo = factory.createPathCalculator(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
@@ -138,7 +139,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * <li> sets configGroup to <tt>group</tt> but it is not clear where this will be used.
 	 * </ul>
 	 */
-	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator, ModeRouteFactory routeFactory) {
+	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final TravelDisutility costCalculator, final TravelTime timeCalculator, ModeRouteFactory routeFactory) {
 		this(group, network, costCalculator, timeCalculator, new DijkstraFactory(), routeFactory);
 	}
 
@@ -167,8 +168,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	protected void handlePlan(Person person, final Plan plan) {
-		if (timeCalculator != null) {
-			timeCalculator.setPerson(person);
+		if (timeCalculator instanceof PersonalizableTravelTime) {
+			((PersonalizableTravelTime) timeCalculator).setPerson(person);
 		}
 		data.routePlan(person, plan);
 	}

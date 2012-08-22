@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**<p>
@@ -43,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
  * @author mrieser
  * @author dgrether
  */
-public class FreespeedTravelTimeAndDisutility implements TravelDisutility, PersonalizableTravelTime, LinkToLinkTravelTime {
+public class FreespeedTravelTimeAndDisutility implements TravelDisutility, TravelTime, LinkToLinkTravelTime {
 	
 	private static final Logger log = Logger.getLogger(FreespeedTravelTimeAndDisutility.class);
 
@@ -104,11 +104,6 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Perso
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
 		return link.getLength() / link.getFreespeed(time);
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		// This cost function doesn't change with persons.
 	}
 
 	/**

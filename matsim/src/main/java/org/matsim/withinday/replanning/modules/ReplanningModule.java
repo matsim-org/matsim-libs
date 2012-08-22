@@ -33,9 +33,9 @@ import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ReplanningModule extends AbstractMultithreadedModule {
@@ -43,12 +43,12 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 	protected Config config;
 	protected Network network;
 	protected TravelDisutilityFactory travelCostFactory;
-	protected PersonalizableTravelTimeFactory travelTimeFactory;
+	protected TravelTimeFactory travelTimeFactory;
 	protected LeastCostPathCalculatorFactory pathFactory;
 	private final ModeRouteFactory routeFactory;
 	
 	public ReplanningModule(Config config, Network network,
-			TravelDisutilityFactory costFactory, PersonalizableTravelTimeFactory timeFactory,
+			TravelDisutilityFactory costFactory, TravelTimeFactory timeFactory,
 			LeastCostPathCalculatorFactory pathFactory, ModeRouteFactory routeFactory) {
 		super(config.global());
 
@@ -62,7 +62,7 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		PersonalizableTravelTime travelTime = travelTimeFactory.createTravelTime();
+		TravelTime travelTime = travelTimeFactory.createTravelTime();
 		TravelDisutility travelCost = travelCostFactory.createTravelDisutility(travelTime, config.planCalcScore());
 		
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, pathFactory, this.routeFactory);

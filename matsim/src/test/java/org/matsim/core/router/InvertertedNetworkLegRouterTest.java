@@ -38,11 +38,11 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -117,7 +117,7 @@ public class InvertertedNetworkLegRouterTest {
 		
 	}
 
-	private static class LinkToLinkTravelTimeStub implements PersonalizableLinkToLinkTravelTime {
+	private static class LinkToLinkTravelTimeStub implements LinkToLinkTravelTime {
 
 		private double turningMoveCosts34;
 		private double turningMoveCosts35;
@@ -149,9 +149,6 @@ public class InvertertedNetworkLegRouterTest {
 			return tt;
 		}
 
-		@Override
-		public void setPerson(Person person) {
-		}
 	}
 
 	

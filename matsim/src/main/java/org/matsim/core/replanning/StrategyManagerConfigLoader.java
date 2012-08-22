@@ -51,8 +51,8 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 import org.matsim.pt.replanning.TransitTimeAllocationMutator;
@@ -143,7 +143,7 @@ public final class StrategyManagerConfigLoader {
 	protected static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategyConfigGroup.StrategySettings settings) {
 		Network network = controler.getNetwork();
 		TravelDisutility travelCostCalc = controler.createTravelCostCalculator();
-		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory();
 		
 		PlanStrategy strategy = null;

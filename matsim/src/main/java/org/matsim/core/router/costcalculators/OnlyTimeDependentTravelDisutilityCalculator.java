@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -38,9 +39,9 @@ public class OnlyTimeDependentTravelDisutilityCalculator implements TravelDisuti
 
 	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelDisutilityCalculator.class);
 	
-	protected final PersonalizableTravelTime travelTime;
+	protected final TravelTime travelTime;
 
-	public OnlyTimeDependentTravelDisutilityCalculator(final PersonalizableTravelTime travelTime) {
+	public OnlyTimeDependentTravelDisutilityCalculator(final TravelTime travelTime) {
 		if (travelTime == null) {
 			log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
 			this.travelTime = new FreeSpeedTravelTimeCalculator();
@@ -49,7 +50,10 @@ public class OnlyTimeDependentTravelDisutilityCalculator implements TravelDisuti
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		this.travelTime.setPerson(person);
+		if (this.travelTime instanceof PersonalizableTravelTime) {
+			((PersonalizableTravelTime) this.travelTime).setPerson(person);
+		}
+		
 		return this.travelTime.getLinkTravelTime(link, time);
 	}
 

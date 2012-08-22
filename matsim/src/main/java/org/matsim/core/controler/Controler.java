@@ -108,8 +108,8 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -836,7 +836,7 @@ public class Controler extends AbstractController {
 				this.travelTimeCalculator, this.config.planCalcScore());
 	}
 
-	public final PersonalizableTravelTime getTravelTimeCalculator() {
+	public final TravelTime getTravelTimeCalculator() {
 		return this.travelTimeCalculator;
 	}
 
@@ -911,7 +911,7 @@ public class Controler extends AbstractController {
 	 *         be used by a single thread, use multiple instances for multiple
 	 *         threads!
 	 */
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 

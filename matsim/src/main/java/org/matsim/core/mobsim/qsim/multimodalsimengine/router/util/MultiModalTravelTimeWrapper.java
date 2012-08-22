@@ -40,24 +40,28 @@ public class MultiModalTravelTimeWrapper implements MultiModalTravelTime {
 
 	private static final Logger log = Logger.getLogger(MultiModalTravelTimeWrapper.class);
 	
-	private final Map<String, PersonalizableTravelTime> travelTimes;
+	private final Map<String, TravelTime> travelTimes;
 	private TravelTime modeTravelTime;
 	
 	// use the factory
 	/*package*/ MultiModalTravelTimeWrapper() {
-		this.travelTimes = new HashMap<String, PersonalizableTravelTime>();
+		this.travelTimes = new HashMap<String, TravelTime>();
 	}
 	
-	/*package*/ void setPersonalizableTravelTime(String transportMode, PersonalizableTravelTime travelTime) {
+	/*package*/ void setTravelTime(String transportMode, TravelTime travelTime) {
 		if (this.travelTimes.containsKey(transportMode)) {
-			log.warn("A PersonalizableTravelTime calculator for transport mode " + transportMode + " already exists. Replacing it!");
+			log.warn("A TravelTime calculator for transport mode " + transportMode + " already exists. Replacing it!");
 		}
 		this.travelTimes.put(transportMode, travelTime);
 	}
 	
 	@Override
 	public void setPerson(Person person) {
-		for (PersonalizableTravelTime travelTime : travelTimes.values()) travelTime.setPerson(person);
+		for (TravelTime travelTime : travelTimes.values()) {
+			if (travelTime instanceof PersonalizableTravelTime) {
+				((PersonalizableTravelTime) travelTime).setPerson(person);
+			}
+		}
 	}
 
 	@Override

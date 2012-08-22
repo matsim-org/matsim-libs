@@ -31,22 +31,22 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PlansCalcRouteWithTollOrNot extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private RoadPricingSchemeImpl scheme;
-	private PersonalizableTravelTime timeCalculator;
+	private TravelTime timeCalculator;
 	private ModeRouteFactory routeFactory;
 	private TravelDisutility timeCostCalc;
 	private Network network;
 	private Config config;
 	private LeastCostPathCalculatorFactory factory;
 
-	public PlansCalcRouteWithTollOrNot(Config config, PlansCalcRouteConfigGroup configGroup, final Network network, final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
+	public PlansCalcRouteWithTollOrNot(Config config, PlansCalcRouteConfigGroup configGroup, final Network network, final TravelDisutility costCalculator, final TravelTime timeCalculator,
 			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingSchemeImpl scheme) {
 		this.config = config;
 		this.network = network;
@@ -65,13 +65,13 @@ public class PlansCalcRouteWithTollOrNot extends AbstractPersonAlgorithm impleme
 	}
 
 	private void handlePlan(Person person, Plan plan) {
-		new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, (PersonalizableTravelTime) timeCostCalc, factory, routeFactory).run(plan);
+		new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, (TravelTime) timeCostCalc, factory, routeFactory).run(plan);
 		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + scheme.getCosts().iterator().next().amount;
 		new PlansCalcRoute(config.plansCalcRoute(), network, new TravelDisutilityIncludingToll(timeCostCalc, scheme), timeCalculator, factory, routeFactory).run(plan);
 		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
 		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
 			// Change the plan back to the one without toll
-			new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, (PersonalizableTravelTime) timeCostCalc, factory, routeFactory).run(plan);
+			new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, (TravelTime) timeCostCalc, factory, routeFactory).run(plan);
 		}
 	}
 

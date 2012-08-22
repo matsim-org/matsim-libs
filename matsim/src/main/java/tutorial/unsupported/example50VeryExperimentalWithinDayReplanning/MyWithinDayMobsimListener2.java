@@ -44,8 +44,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.utils.EditRoutes;
 
 
@@ -58,11 +58,11 @@ public class MyWithinDayMobsimListener2 implements MobsimListener, MobsimBeforeS
 
 	
 	private TravelDisutility travCostCalc;
-	private PersonalizableTravelTime travTimeCalc;
+	private TravelTime travTimeCalc;
 	private PlansCalcRoute routeAlgo ;
 	private Scenario scenario;
 
-	MyWithinDayMobsimListener2 (TravelDisutility travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+	MyWithinDayMobsimListener2 (TravelDisutility travelCostCalculator, TravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}

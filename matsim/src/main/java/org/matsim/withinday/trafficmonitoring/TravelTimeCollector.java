@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -59,7 +58,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 
@@ -72,7 +71,7 @@ import org.matsim.core.utils.misc.Time;
  * 
  * @author cdobler
  */
-public class TravelTimeCollector implements PersonalizableTravelTime,
+public class TravelTimeCollector implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, AgentStuckEventHandler,
 		AgentArrivalEventHandler, AgentDepartureEventHandler,
 		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
@@ -310,11 +309,6 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 			this.nextInfoTime += this.infoTimeStep;
 		}
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		// nothing to do here
 	}
 
 	private static class TripBin {

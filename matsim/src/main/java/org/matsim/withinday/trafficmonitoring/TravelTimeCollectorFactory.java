@@ -24,10 +24,10 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 
-public class TravelTimeCollectorFactory implements PersonalizableTravelTimeFactory {
+public class TravelTimeCollectorFactory implements TravelTimeFactory {
 
 	private TravelTimeCollector travelTime;
 	
@@ -41,13 +41,8 @@ public class TravelTimeCollectorFactory implements PersonalizableTravelTimeFacto
 		return travelTime;
 	}
 	
-	/**
-	 * Since the TravelTimeCollector is not *really* personalizable (travel time
-	 * calculation is not person specific so far), we can reuse one instance multiple
-	 * times.
-	 */
 	@Override
-	public PersonalizableTravelTime createTravelTime() {
+	public TravelTime createTravelTime() {
 		return travelTime;
 	}
 }
