@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -73,7 +73,7 @@ public class CalculateDestinationChoice {
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		log.info("done");
 		
-		PersonalizableTravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		
 		CalculateDestinationChoice cdc = new CalculateDestinationChoice(scenario);
 		
@@ -134,7 +134,7 @@ public class CalculateDestinationChoice {
 	/*
 	 * Time depending Travel Times
 	 */
-	public void calculateDynamicFactors(PersonalizableTravelTime travelTime) {
+	public void calculateDynamicFactors(TravelTime travelTime) {
 
 		log.info("Creating OD Travel Time Matrix");
 		CreateODTravelTimeMatrices creator = new CreateODTravelTimeMatrices(scenario, zoneMapping, travelTime);

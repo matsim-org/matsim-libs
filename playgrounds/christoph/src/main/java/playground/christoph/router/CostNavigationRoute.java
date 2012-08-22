@@ -41,8 +41,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 public class CostNavigationRoute extends WithinDayDuringLegReplanner {
@@ -56,11 +56,11 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
 	protected TravelDisutilityFactory travelCostFactory;
 	protected TravelDisutility travelCost;
-	protected PersonalizableTravelTime travelTime;
+	protected TravelTime travelTime;
 		
 	/*package*/ CostNavigationRoute(Id id, Scenario scenario, InternalInterface internalInterface, Network network,
 			CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, TravelDisutilityFactory travelCostFactory,
-			PersonalizableTravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
+			TravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
 		super(id, scenario, internalInterface);
 		
 		this.network = network;

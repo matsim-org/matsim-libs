@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.pieter.mentalsim.controler.MentalSimControler;
 
@@ -16,9 +16,9 @@ import playground.pieter.mentalsim.controler.MentalSimControler;
  *
  */
 public class MentalSimFactory implements MobsimFactory {
-	PersonalizableTravelTime ttcalc;
+	TravelTime ttcalc;
 	MentalSimControler controler;
-	public MentalSimFactory(PersonalizableTravelTime ttcalc, MentalSimControler controler) {
+	public MentalSimFactory(TravelTime ttcalc, MentalSimControler controler) {
 		this.ttcalc = ttcalc;
 		this.controler = controler;
 	}

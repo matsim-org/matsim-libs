@@ -19,23 +19,22 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.herbie;
 
-import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.pt.router.TransitRouterConfig;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import herbie.running.scoring.TravelScoringFunction;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.pt.router.TransitRouterConfig;
 
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
@@ -87,7 +86,7 @@ public class HHHerbieControler extends HitchHikingControler {
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		PersonalizableTravelTime timeCalculator = super.getTravelTimeCalculator();
+		TravelTime timeCalculator = super.getTravelTimeCalculator();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 		

@@ -24,8 +24,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -48,7 +48,7 @@ import playground.thibautd.planomat.config.Planomat2ConfigGroup;
  */
 public class PlanomatBasicModule extends AbstractMultithreadedModule {
 	private final TravelDisutility travelCost;
-	private final PersonalizableTravelTime travelTime;
+	private final TravelTime travelTime;
 	private final Controler controler;
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final Planomat2ConfigGroup configGroup;

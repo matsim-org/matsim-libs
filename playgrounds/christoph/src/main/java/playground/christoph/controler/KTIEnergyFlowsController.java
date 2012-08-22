@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -149,7 +149,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 	}
 	
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 
 		PlanAlgorithm router = null;
 

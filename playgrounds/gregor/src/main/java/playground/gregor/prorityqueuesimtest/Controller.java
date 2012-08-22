@@ -27,8 +27,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -58,7 +58,7 @@ public class Controller extends Controler {
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(
 			TravelDisutility travelCosts,
-			PersonalizableTravelTime travelTimes) {
+			TravelTime travelTimes) {
 		PlansCalcRoute a = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory());
 		a.addLegHandler("walkprioq", new NetworkLegRouter(this.network, a.getLeastCostPathCalculator(), a.getRouteFactory()));
 		return a;

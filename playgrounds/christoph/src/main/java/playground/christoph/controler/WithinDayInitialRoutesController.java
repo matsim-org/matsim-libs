@@ -51,7 +51,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayController;
@@ -68,6 +68,7 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
  * Creates initial routes using within-day replanning. Doing so should hopefully
@@ -217,11 +218,11 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 								
 		// create a copy of the MultiModalTravelTimeWrapperFactory...
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+		for (Entry<String, TravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getTravelTimeFactories().entrySet()) {
 			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());			
 		}
 		// ... and set the TravelTimeCollector for car mode
-		PersonalizableTravelTimeFactory carTravelTimeFactory = this.getTravelTimeCollectorFactory();
+		TravelTimeCollectorFactory carTravelTimeFactory = this.getTravelTimeCollectorFactory();
 		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, carTravelTimeFactory);
 
 //		PersonalizableTravelTimeFactory timeFactory = this.getTravelTimeCollectorFactory();

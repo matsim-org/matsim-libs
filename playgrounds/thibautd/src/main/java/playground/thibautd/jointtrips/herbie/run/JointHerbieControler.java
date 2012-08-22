@@ -19,32 +19,20 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.herbie.run;
 
-import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.router.TransitRouterConfig;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-import herbie.running.controler.listeners.ScoreElements;
-import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
-import herbie.running.scoring.TravelScoringFunction;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
-import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
 import playground.thibautd.jointtrips.run.JointControler;
-import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
 
 /**
@@ -89,7 +77,7 @@ public class JointHerbieControler extends JointControler {
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		PersonalizableTravelTime timeCalculator = super.getTravelTimeCalculator();
+		TravelTime timeCalculator = super.getTravelTimeCalculator();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 		

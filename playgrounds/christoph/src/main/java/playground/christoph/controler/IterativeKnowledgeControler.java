@@ -36,8 +36,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 
 import playground.christoph.knowledge.container.MapKnowledgeDB;
@@ -86,7 +86,7 @@ public class IterativeKnowledgeControler extends Controler{
 
 			@Override
 			public TravelDisutility createTravelDisutility(
-					PersonalizableTravelTime timeCalculator,
+					TravelTime timeCalculator,
 					PlanCalcScoreConfigGroup cnScoringGroup) {
 				return travelCostWrapper;
 			}
@@ -112,7 +112,7 @@ public class IterativeKnowledgeControler extends Controler{
 		/*
 		 * We don't use the knowledge here - the initial routes will be anyway on the shortest path.
 		 */
-		PersonalizableTravelTime travelTime = new FreespeedTravelTimeAndDisutility(this.config.planCalcScore());
+		FreespeedTravelTimeAndDisutility travelTime = new FreespeedTravelTimeAndDisutility(this.config.planCalcScore());
 		OnlyTimeDependentTravelDisutilityCalculator travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTime);
 		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, routeFactory);
 		

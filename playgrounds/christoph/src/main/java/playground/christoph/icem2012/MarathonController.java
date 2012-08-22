@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
@@ -80,6 +80,8 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -100,8 +102,6 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -124,8 +124,8 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLe
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v3.events.XYDataWriter;
+import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v3.router.Walk2DLegRouter;
 import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v3.simulation.HybridQ2DMobsimFactory;
@@ -134,6 +134,8 @@ import playground.gregor.sim2d_v3.simulation.Sim2DEngine;
 import playground.gregor.sim2d_v3.simulation.floor.DefaultVelocityCalculator;
 import playground.gregor.sim2d_v3.simulation.floor.VelocityCalculator;
 import playground.meisterk.kti.config.KtiConfigGroup;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class MarathonController extends WithinDayController implements StartupListener, 
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
@@ -340,7 +342,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	}
 	
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, PersonalizableTravelTime travelTimes) {
+	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 		
 		PlansCalcRoute plansCalcRoute = (PlansCalcRoute) super.createRoutingAlgorithm(travelCosts, travelTimes);
 		
@@ -764,7 +766,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 
 		// create a copy of the MultiModalTravelTimeWrapperFactory...
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+		for (Entry<String, TravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getTravelTimeFactories().entrySet()) {
 			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());			
 		}
 		// ... and set the TravelTimeCollector for car mode
@@ -833,7 +835,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set a FreeSpeedTravelTimeCalculator for car mode
 		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+		for (Entry<String, TravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getTravelTimeFactories().entrySet()) {
 			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
 		}
 

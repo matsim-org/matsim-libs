@@ -34,7 +34,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
@@ -48,10 +48,10 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 public class MyMobsimFactory implements MobsimFactory {
 	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 	private TravelDisutilityFactory travCostCalc;
-	private PersonalizableTravelTime travTimeCalc;
+	private TravelTime travTimeCalc;
 	private ReplanningManager replanningManager;
 	
-	MyMobsimFactory( TravelDisutilityFactory travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+	MyMobsimFactory( TravelDisutilityFactory travelCostCalculator, TravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}

@@ -10,7 +10,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.pieter.mentalsim.controler.MentalSimControler;
@@ -104,7 +104,7 @@ public class MobSimSwitcher implements ControlerListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		PersonalizableTravelTime ttcalc = controler.getTravelTimeCalculator();
+		TravelTime ttcalc = controler.getTravelTimeCalculator();
 
 		if (checkExpensiveIter(event.getIteration())) {
 			log.warn("Running an expensive iteration with full queue simulation");

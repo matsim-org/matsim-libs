@@ -29,7 +29,7 @@ import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.christoph.energyflows.controller.EnergyFlowsController;
@@ -72,7 +72,7 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		PersonalizableTravelTime timeCalculator = super.getTravelTimeCalculator();
+		TravelTime timeCalculator = super.getTravelTimeCalculator();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 		this.setTravelDisutilityFactory(costCalculatorFactory);

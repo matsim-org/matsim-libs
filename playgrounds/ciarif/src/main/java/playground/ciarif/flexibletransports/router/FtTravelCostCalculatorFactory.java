@@ -21,8 +21,8 @@ package playground.ciarif.flexibletransports.router;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 
@@ -39,7 +39,7 @@ public class FtTravelCostCalculatorFactory implements TravelDisutilityFactory {
 	//@Override
 	@Override
 	public TravelDisutility createTravelDisutility(
-			PersonalizableTravelTime timeCalculator,
+			TravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		return new FtTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, this.ftConfigGroup);
 	}

@@ -28,15 +28,13 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
 
-public class LookupTravelTime implements PersonalizableTravelTime, MobsimBeforeSimStepListener {
+public class LookupTravelTime implements TravelTime, MobsimBeforeSimStepListener {
 	
 	private LookupNetwork lookupNetwork;
 	private TravelTime travelTime;
@@ -80,11 +78,6 @@ public class LookupTravelTime implements PersonalizableTravelTime, MobsimBeforeS
 			// parallel Execution
 			this.run(e.getSimulationTime());			
 		}		
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		// nothing to do here		
 	}
 
 	/*

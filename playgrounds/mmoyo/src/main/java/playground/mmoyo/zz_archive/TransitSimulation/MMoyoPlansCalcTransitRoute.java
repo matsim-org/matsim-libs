@@ -23,8 +23,8 @@ import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitActsRemover;
@@ -50,7 +50,7 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
 	public MMoyoPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
-			final TravelDisutility costCalculator, final PersonalizableTravelTime timeCalculator,
+			final TravelDisutility costCalculator, final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig) {
 		super(config, network, costCalculator, timeCalculator, factory, routeFactory);

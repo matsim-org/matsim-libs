@@ -24,10 +24,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
@@ -47,7 +47,7 @@ public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityF
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(PersonalizableTravelTime timeCalculator, 
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, 
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		final TravelDisutility delegate = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
 		final RoadPricingScheme localScheme = this.scheme ;

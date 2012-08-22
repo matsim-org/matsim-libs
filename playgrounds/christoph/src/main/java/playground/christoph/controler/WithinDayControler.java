@@ -31,7 +31,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
@@ -81,7 +81,7 @@ public class WithinDayControler extends WithinDayController {
 	 */
 	protected int numReplanningThreads = 2;
 
-	protected PersonalizableTravelTime travelTime;
+	protected TravelTime travelTime;
 
 	protected InitialIdentifier initialIdentifier;
 	protected DuringActivityIdentifier duringActivityIdentifier;

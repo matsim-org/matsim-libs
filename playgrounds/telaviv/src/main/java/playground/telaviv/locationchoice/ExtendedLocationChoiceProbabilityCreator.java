@@ -22,7 +22,7 @@ package playground.telaviv.locationchoice;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
 /*
@@ -34,7 +34,7 @@ public class ExtendedLocationChoiceProbabilityCreator {
 	private static final Logger log = Logger.getLogger(ExtendedLocationChoiceProbabilityCreator.class);
 	
 	private Scenario scenario;
-	private PersonalizableTravelTime travelTime;
+	private TravelTime travelTime;
 	private CalculateDestinationChoice calculateDestinationChoice;
 		
 	public static void main(String[] args) {
@@ -48,9 +48,9 @@ public class ExtendedLocationChoiceProbabilityCreator {
 //		log.info("Sum Probabilities = " + sum);
 	}
 	
-	public ExtendedLocationChoiceProbabilityCreator(Scenario scenario, PersonalizableTravelTime travelTime) {		
+	public ExtendedLocationChoiceProbabilityCreator(Scenario scenario, TravelTime travelTimeCalc) {		
 		this.scenario = scenario;
-		this.travelTime = travelTime;
+		this.travelTime = travelTimeCalc;
 		
 		log.info("Creating constant probabilities...");
 		calculateConstantProbabilities();

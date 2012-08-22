@@ -21,6 +21,10 @@
 package playground.kai.run;
 
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -51,7 +55,12 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
+import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.PlansCalcRouteData;
+import org.matsim.core.router.PseudoTransitLegRouter;
+import org.matsim.core.router.TeleportationLegRouter;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -60,7 +69,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -86,6 +94,8 @@ public class KnSimplifiedController extends AbstractController {
 
 	private Network network  ;
 	private Population population  ;
+	
+	private RoutingBuilder routingBuilder = new DefaultRoutingBuilder();
 
 	private CalcLegTimes legTimes;
 
@@ -171,7 +181,7 @@ public class KnSimplifiedController extends AbstractController {
 	}
 
 
-	private PlansCalcRoute createRoutingAlgorithm() {
+	private PlansCalcRouteData createRoutingAlgorithm() {
 		// factory to generate routes:
 		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
@@ -180,14 +190,28 @@ public class KnSimplifiedController extends AbstractController {
 
 		// travel disutility (generalized cost)
 		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		
+		final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 
 		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
 		// times (e.g. for car router, pt router, ...)
 		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
 
 		// plug it together
-		final PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelDisutility, 
-				travelTime, leastCostPathFactory, routeFactory);
+		final PlansCalcRouteData plansCalcRoute = new PlansCalcRouteData();
+		
+		Collection<String> networkModes = this.config.plansCalcRoute().getNetworkModes();
+		for (String mode : networkModes) {
+			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime), routeFactory));
+		}
+		Map<String, Double> teleportedModeSpeeds = this.config.plansCalcRoute().getTeleportedModeSpeeds();
+		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
+			plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor()));
+		}
+		Map<String, Double> teleportedModeFreespeedFactors = this.config.plansCalcRoute().getTeleportedModeFreespeedFactors();
+		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
+			plansCalcRoute.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.network, leastCostPathFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc), entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
+		}
 		
 		// return it:
 		return plansCalcRoute;

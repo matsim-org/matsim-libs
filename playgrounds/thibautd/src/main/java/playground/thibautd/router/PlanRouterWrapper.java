@@ -32,8 +32,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -65,7 +65,7 @@ public class PlanRouterWrapper extends PlansCalcRoute {
 			final PlansCalcRouteConfigGroup group,
 			final Network network,
 			final TravelDisutility costCalculator,
-			final PersonalizableTravelTime timeCalculator,
+			final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory,
 			final ModeRouteFactory routeFactory,
 			// this argument is the only one really used!
@@ -81,7 +81,7 @@ public class PlanRouterWrapper extends PlansCalcRoute {
 			final PlansCalcRouteConfigGroup group,
 			final Network network,
 			final TravelDisutility costCalculator,
-			final PersonalizableTravelTime timeCalculator,
+			final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory,
 			final ModeRouteFactory routeFactory,
 			// this argument is the only one really used!

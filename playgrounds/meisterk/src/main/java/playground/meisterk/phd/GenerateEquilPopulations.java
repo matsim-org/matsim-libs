@@ -42,8 +42,8 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -159,7 +159,7 @@ public class GenerateEquilPopulations {
 
 		// initial routes = free speed routes
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		PersonalizableTravelTime travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
+		TravelTime travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
 				network,
 				scenario.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();

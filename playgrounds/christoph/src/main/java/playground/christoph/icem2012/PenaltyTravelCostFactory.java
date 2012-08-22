@@ -22,8 +22,8 @@ package playground.christoph.icem2012;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 
@@ -38,7 +38,7 @@ public class PenaltyTravelCostFactory implements TravelDisutilityFactory {
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(PersonalizableTravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
 		TravelDisutility travelCost = this.costFactory.createTravelDisutility(travelTime, cnScoringGroup);
 		return new PenaltyTravelCost(travelCost, coordAnalyzer.createInstance());
 	}

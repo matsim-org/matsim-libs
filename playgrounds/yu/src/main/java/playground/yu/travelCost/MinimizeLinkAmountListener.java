@@ -32,7 +32,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -52,7 +51,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 
 		@Override
 		public TravelDisutility createTravelDisutility(
-				PersonalizableTravelTime timeCalculator,
+				TravelTime timeCalculator,
 				PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new MinimizeLinkAmountTravelCostCalculator(timeCalculator);
 		}

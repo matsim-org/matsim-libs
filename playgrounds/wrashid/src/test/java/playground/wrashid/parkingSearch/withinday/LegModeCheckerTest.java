@@ -42,8 +42,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
@@ -96,7 +96,7 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		/*
 		 * Create PlansCalcRoute object to reroute legs with adapted mode 
 		 */
-		PersonalizableTravelTime travelTimes = new FreeSpeedTravelTimeCalculatorFactory().createTravelTime();
+		TravelTime travelTimes = new FreeSpeedTravelTimeCalculatorFactory().createTravelTime();
 		TravelDisutility travelCosts = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimes, config.planCalcScore());
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastDijkstraFactory();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (sc.getPopulation().getFactory())).getModeRouteFactory();

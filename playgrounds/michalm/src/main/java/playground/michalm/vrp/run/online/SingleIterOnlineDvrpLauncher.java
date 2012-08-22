@@ -218,7 +218,7 @@ public class SingleIterOnlineDvrpLauncher
 
         scenario.getConfig().travelTimeCalculator().setTraveltimeBinSize(travelTimeBinSize);
 
-        PersonalizableTravelTime ttimeCalc;
+        TravelTime ttimeCalc;
         TravelDisutility tcostCalc;
 
         switch (algorithmConfig.ttimeSource) {

@@ -22,15 +22,15 @@ package playground.thibautd.parknride.routingapproach;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author thibautd
  */
-public class ParkAndRideTravelTimeCost implements TravelDisutility, PersonalizableTravelTime {
+public class ParkAndRideTravelTimeCost implements TravelDisutility, TravelTime {
 	private final TransitRouterConfig config;
 	private final PlanCalcScoreConfigGroup scoreConfig;
 
@@ -70,9 +70,5 @@ public class ParkAndRideTravelTimeCost implements TravelDisutility, Personalizab
 		return distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
 	}
 
-	@Override
-	public void setPerson(final Person person) {
-		// nothing to do here
-	}
 }
 

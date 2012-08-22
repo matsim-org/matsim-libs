@@ -45,7 +45,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -91,7 +90,7 @@ public class MentalSim implements Mobsim {
 	}
 
 	public MentalSim(Scenario sc2, EventsManager eventsManager,
-			PersonalizableTravelTime ttcalc, MentalSimControler c) {
+			TravelTime ttcalc, MentalSimControler c) {
 		this(sc2, eventsManager);
 		this.linkTravelTimes = (TravelTimeCalculator) ttcalc;
 		this.controler = c;

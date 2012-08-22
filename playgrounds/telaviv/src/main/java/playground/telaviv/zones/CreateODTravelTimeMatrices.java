@@ -37,7 +37,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -68,16 +67,16 @@ public class CreateODTravelTimeMatrices {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		ZoneMapping zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
-		PersonalizableTravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());		
+		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());		
 		new CreateODTravelTimeMatrices(scenario, zoneMapping, travelTime).calculateODMatrices();
 	}
 	
-	public CreateODTravelTimeMatrices(Scenario scenario, ZoneMapping zoneMapping, PersonalizableTravelTime travelTime) {
+	public CreateODTravelTimeMatrices(Scenario scenario, ZoneMapping zoneMapping, TravelTime travelTime2) {
 		this.scenario = scenario;
 		this.zoneMapping = zoneMapping;
-		this.travelTime = travelTime;
+		this.travelTime = travelTime2;
 		
-		travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());	
+		travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime2, scenario.getConfig().planCalcScore());	
 		getConnectorNodes();
 	}
 	

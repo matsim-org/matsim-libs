@@ -35,7 +35,7 @@ public class PlanInitializationUtils
     /**
      * This was used when empty plans (without routes) were read from file. Now it is useless.
      */
-    public static void initEmptyRoutes(final Scenario scenario, PersonalizableTravelTime ttimeCalc,
+    public static void initEmptyRoutes(final Scenario scenario, TravelTime ttimeCalc,
             TravelDisutility tcostCalc)
     {
         DijkstraFactory leastCostPathCalculatorFactory = new DijkstraFactory();

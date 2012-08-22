@@ -24,8 +24,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -40,7 +40,7 @@ public class PersonPrepareForSimTask implements ScenarioSinkSource {
 	
 	private TravelDisutility travelCosts;
 	
-	private PersonalizableTravelTime travelTimes;
+	private TravelTime travelTimes;
 
 	@Override
 	public void initialize(Scenario scenario) {

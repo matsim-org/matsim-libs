@@ -29,8 +29,8 @@ import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -207,7 +207,7 @@ public class JointControler extends MultiLegRoutingControler {
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(
 			final TravelDisutility travelCosts,
-			final PersonalizableTravelTime travelTimes) {
+			final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();

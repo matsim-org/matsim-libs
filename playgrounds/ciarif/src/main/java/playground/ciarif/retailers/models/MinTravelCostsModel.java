@@ -25,8 +25,8 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -83,7 +83,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       for (PersonPrimaryActivity ppa : primaryActivities)
       {
         Network network = this.controler.getNetwork();
-        PersonalizableTravelTime travelTime = this.controler.getTravelTimeCalculator();
+        TravelTime travelTime = this.controler.getTravelTimeCalculator();
         TravelDisutility travelCost = this.controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.controler.getConfig().planCalcScore());
 
         LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);

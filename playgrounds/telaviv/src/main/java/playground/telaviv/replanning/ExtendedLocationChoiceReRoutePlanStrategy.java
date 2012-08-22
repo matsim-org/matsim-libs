@@ -29,7 +29,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.telaviv.locationchoice.ExtendedLocationChoicePlanModule;
 
@@ -46,7 +46,7 @@ public class ExtendedLocationChoiceReRoutePlanStrategy implements PlanStrategy {
 	public ExtendedLocationChoiceReRoutePlanStrategy(Controler controler) {
 		
 		Scenario scenario = controler.getScenario();
-		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
+		TravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new ExtendedLocationChoicePlanModule(scenario, travelTimeCalc));

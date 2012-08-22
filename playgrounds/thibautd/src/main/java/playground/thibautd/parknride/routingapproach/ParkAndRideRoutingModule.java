@@ -46,8 +46,8 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -108,10 +108,10 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final ParkAndRideFacilities parkAndRideFacilities,
 			final TransitRouterConfig transitRouterConfig,
 			final TravelDisutility carCost,
-			final PersonalizableTravelTime carTime,
+			final TravelTime carTime,
 			final TransitRouterNetworkTravelTimeAndDisutility ptTimeCost,
 			final TravelDisutility pnrCost,
-			final PersonalizableTravelTime pnrTime) {
+			final TravelTime pnrTime) {
 		this.transitSchedule = schedule;
 		this.facilities = parkAndRideFacilities;
 		this.routeFactory = routeFactory;

@@ -36,7 +36,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
@@ -144,7 +143,7 @@ public class Template implements MatsimModule {
 
 			@Override
 			public TravelDisutility createTravelDisutility(
-					final PersonalizableTravelTime timeCalculator,
+					final TravelTime timeCalculator,
 					final PlanCalcScoreConfigGroup cnScoringGroup) {
 				return new TravelDisutility() {
 

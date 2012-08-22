@@ -9,7 +9,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
@@ -66,7 +66,7 @@ public class TravelTimeCalculatorTask implements ScenarioSinkSource, LinkEnterEv
 		travelTimeCalculator.reset(iteration);
 	}
 
-	public PersonalizableTravelTime getTravelTimeCalculator() {
+	public TravelTime getTravelTimeCalculator() {
 		return travelTimeCalculator;
 	}
 

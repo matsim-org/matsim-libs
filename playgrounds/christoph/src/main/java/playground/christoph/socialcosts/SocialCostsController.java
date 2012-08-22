@@ -41,6 +41,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -151,10 +152,10 @@ public class SocialCostsController {
 	
 	private static class SocialCostTravelDisutility implements TravelDisutility {
 
-		private final PersonalizableTravelTime travelTime;
+		private final TravelTime travelTime;
 		private final SocialCostCalculator scc;
 		
-		public SocialCostTravelDisutility(PersonalizableTravelTime travelTime, SocialCostCalculator scc) {
+		public SocialCostTravelDisutility(TravelTime travelTime, SocialCostCalculator scc) {
 			this.travelTime = travelTime;
 			this.scc = scc;
 		}
@@ -162,7 +163,10 @@ public class SocialCostsController {
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double disutility = 0.0;
-			this.travelTime.setPerson(person);
+			if (this.travelTime instanceof PersonalizableTravelTime) {
+				((PersonalizableTravelTime) this.travelTime).setPerson(person);
+			}
+			
 			disutility += this.travelTime.getLinkTravelTime(link, time);
 			disutility += this.scc.getLinkTravelDisutility(link, time, person, vehicle); 
 			return disutility;
@@ -185,7 +189,7 @@ public class SocialCostsController {
 		}
 		
 		@Override
-		public TravelDisutility createTravelDisutility(PersonalizableTravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public TravelDisutility createTravelDisutility(TravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
 			return new SocialCostTravelDisutility(travelTime, scc);
 		}
 	}

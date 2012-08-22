@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -59,7 +60,7 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 	private Map<Id, List<Integer>> workActivities = null;	// <PersonId, List<Index in the Plan's PlanElementsList>
 	private Map<Id, List<Integer>> educationActivities = null;	// <PersonId, List<Index in the Plan's PlanElementsList>
 		
-	public ExtendedLocationChoicePlanModule(Scenario scenario, PersonalizableTravelTime travelTime) {
+	public ExtendedLocationChoicePlanModule(Scenario scenario, TravelTime travelTimeCalc) {
 		super(scenario.getConfig().global());
 		this.scenario = scenario;
 		
@@ -72,7 +73,7 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 		log.info("done.");
 		
 		log.info("Creating ExtendedLocationChoiceProbabilityCreator...");
-		extendedLocationChoiceProbabilityCreator = new ExtendedLocationChoiceProbabilityCreator(scenario, travelTime);
+		extendedLocationChoiceProbabilityCreator = new ExtendedLocationChoiceProbabilityCreator(scenario, travelTimeCalc);
 		log.info("done.");
 		
 		log.info("Parsing population file...");
