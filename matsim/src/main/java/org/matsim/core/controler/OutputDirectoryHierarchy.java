@@ -42,23 +42,29 @@ public class OutputDirectoryHierarchy {
 	private boolean overwriteFiles = false;
 	
 	public OutputDirectoryHierarchy(String outputPath, boolean overwriteFiles) {
-		this(outputPath, null, overwriteFiles);
+		this(outputPath, null, overwriteFiles, true);
 	}
 	
+	public OutputDirectoryHierarchy(String outputPath, String runId, boolean overwriteFiles) {
+		this(outputPath, runId, overwriteFiles, true);
+	}	
 	/**
 	 * 
 	 * @param runId the runId, may be null
 	 * @param overwriteFiles overwrite existing files instead of crashing
 	 * @param outputDirectory the path to the output directory
+	 * @param createDirectories create the directories or abort if they exist
 	 */
-	public OutputDirectoryHierarchy(String outputPath, String runId, boolean overwriteFiles){
+	public OutputDirectoryHierarchy(String outputPath, String runId, boolean overwriteFiles, boolean createDirectories){
 		this.overwriteFiles = overwriteFiles;
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
 		this.outputPath = outputPath;
 		this.runId = runId;	
-		this.createDirectories();
+		if (createDirectories){
+			this.createDirectories();
+		}
 	}
 		
 	/**
