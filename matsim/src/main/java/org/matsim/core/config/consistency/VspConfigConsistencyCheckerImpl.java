@@ -88,6 +88,14 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 					" enforced in the future.") ;
 		}
 		
+		if (VspExperimentalConfigGroup.ActivityDurationInterpretation.endTimeOnly
+				.compareTo(config.vspExperimental().getActivityDurationInterpretation()) == 0 
+				&& config.scenario().isUseTransit()) {
+			problem = true;
+			log.error("You are using " + config.vspExperimental().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +
+			"conjunction with the matsim transit module. This is not working at all as pt interaction activities will never end!");
+		}
+		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
 		// todo
 		

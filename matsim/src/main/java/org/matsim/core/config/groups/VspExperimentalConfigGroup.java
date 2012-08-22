@@ -425,6 +425,14 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	public void setActivityDurationInterpretation(final ActivityDurationInterpretation activityDurationInterpretation) {
+		if (VspExperimentalConfigGroup.ActivityDurationInterpretation.endTimeOnly
+		.compareTo(activityDurationInterpretation) == 0 ){
+			/*
+			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
+			 */
+			log.warn("You are using " + activityDurationInterpretation + " as activityDurationInterpretation. " +
+					"This is not working in conjunction with the pt module as pt interaction activities will never end!");
+		}
 		this.activityDurationInterpretation = activityDurationInterpretation;
 	}
 
