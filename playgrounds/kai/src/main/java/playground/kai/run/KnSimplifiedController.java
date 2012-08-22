@@ -33,9 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -52,12 +50,12 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.core.router.NetworkLegRouter;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.ModularPlanRouter;
+import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PseudoTransitLegRouter;
 import org.matsim.core.router.TeleportationLegRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -65,7 +63,6 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -73,6 +70,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
@@ -86,18 +84,18 @@ public class KnSimplifiedController extends AbstractController {
 
 	public static Logger log = Logger.getLogger(KnSimplifiedController.class);
 
-	public Config config;
+	private Config config;
 
-	private Scenario scenarioData = null ;	
+	private final Scenario scenarioData;	
 
 	private EventsManager eventsManager;
 
 	private Network network  ;
 	private Population population  ;
-	
-	private RoutingBuilder routingBuilder = new DefaultRoutingBuilder();
 
 	private CalcLegTimes legTimes;
+
+	private TravelTimeCalculator travelTime;
 
 	// ############################################################################################################################
 	// ############################################################################################################################
@@ -105,12 +103,13 @@ public class KnSimplifiedController extends AbstractController {
 
 
 	
+	public KnSimplifiedController(Scenario sc) {
+		this.scenarioData = sc;
+	}
+
 	public void run() {
-		this.config = ConfigUtils.createConfig() ;
-		this.config.addQSimConfigGroup(new QSimConfigGroup());
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
-		this.scenarioData = ScenarioUtils.loadScenario(this.config) ;
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 		this.eventsManager = EventsUtils.createEventsManager(config); 
@@ -118,6 +117,8 @@ public class KnSimplifiedController extends AbstractController {
 		this.eventsManager.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.legTimes = new CalcLegTimes();
 		this.eventsManager.addHandler(legTimes);
+		this.travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.eventsManager.addHandler(travelTime);
 		super.run(config);
 	}
 
@@ -174,7 +175,14 @@ public class KnSimplifiedController extends AbstractController {
 		}
 		{
 			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-			strategy.addStrategyModule(wrapPlanAlgo( this.createRoutingAlgorithm(), this.scenarioData.getConfig().global().getNumberOfThreads() )) ;
+			strategy.addStrategyModule( new AbstractMultithreadedModule(this.scenarioData.getConfig().global().getNumberOfThreads()) {
+
+				@Override
+				public PlanAlgorithm getPlanAlgoInstance() {
+					return createRoutingAlgorithm();
+				}
+				
+			}) ;
 			strategyManager.addStrategy(strategy, 0.1) ;
 		}
 		return strategyManager ;
@@ -185,8 +193,6 @@ public class KnSimplifiedController extends AbstractController {
 		// factory to generate routes:
 		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
-		final TravelTimeCalculator travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.eventsManager.addHandler(travelTime);
 
 		// travel disutility (generalized cost)
 		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
@@ -247,18 +253,5 @@ public class KnSimplifiedController extends AbstractController {
 		Mobsim sim = simulation;
 		sim.run();
 	}
-
-	// ############################################################################################################################
-	// ############################################################################################################################
-	public static void main( String[] args ) {
-		KnSimplifiedController controller = new KnSimplifiedController() ;
-		controller.run() ;
-	}
-
-	public void setRoutingBuilder(RoutingBuilder routingBuilder) {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 }
