@@ -31,8 +31,7 @@ public class KnUserController {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final Config config = ConfigUtils.loadConfig("xxx") ;
-		config.addQSimConfigGroup(new QSimConfigGroup());
+		final Config config = ConfigUtils.loadConfig("examples/config/daganzo-config.xml") ;
 		final Scenario sc = ScenarioUtils.loadScenario(config) ;
 		KnSimplifiedController ctrl = new KnSimplifiedController(sc) ;
 		ctrl.run();
