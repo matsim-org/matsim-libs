@@ -14,20 +14,23 @@ import org.matsim.households.Households;
 import org.matsim.households.Income;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.southafrica.population.containers.LivingQuarterType;
+import playground.southafrica.population.containers.Race;
+import playground.southafrica.population.containers.Schooling;
 import playground.southafrica.utilities.Header;
 
-public class WilnaIPFWriter {
-	private final static Logger LOG = Logger.getLogger(WilnaIPFWriter.class);
+public class IpfWriter {
+	private final static Logger LOG = Logger.getLogger(IpfWriter.class);
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(WilnaIPFWriter.class.toString(), args);
+		Header.printHeader(IpfWriter.class.toString(), args);
 		String inputFolder = args[0];
 		String outputFile = args[1];
 		
-		Census2001SampleReader cr = new Census2001SampleReader();
+		ComprehensivePopulationReader cr = new ComprehensivePopulationReader();
 		cr.parse(inputFolder);
 		Population population = cr.getScenario().getPopulation();
 		LOG.info("Number of people in population: " + population.getPersons().size());
@@ -52,9 +55,9 @@ public class WilnaIPFWriter {
 					bw.write("\t");
 					bw.write(String.valueOf(households.getHouseholds().get(householdId).getMemberIds().size()));
 					bw.write("\t");
-					bw.write(String.valueOf(getDwellingCode((String) householdAttributes.getAttribute(householdId.toString(), "dwellingType"))));
+					bw.write(String.valueOf(LivingQuarterType.getCode((String) householdAttributes.getAttribute(householdId.toString(), "dwellingType"))));
 					bw.write("\t");
-					bw.write(String.valueOf(getPopulationCode((String) householdAttributes.getAttribute(householdId.toString(), "population"))));
+					bw.write(String.valueOf(Race.getCode((String) householdAttributes.getAttribute(householdId.toString(), "population"))));
 					bw.write("\t");
 					bw.write(String.valueOf( incomeCode ) );
 					bw.write("\t");
@@ -70,11 +73,10 @@ public class WilnaIPFWriter {
 					int employed = ((PersonImpl) population.getPersons().get(personId)).isEmployed() ? 1 : 0;
 					bw.write(String.valueOf(employed));
 					bw.write("\t");
-					bw.write(String.valueOf(getSchoolCode((String) personAttributes.getAttribute(personId.toString(), "school"))));
+					bw.write(String.valueOf(Schooling.getCode((String) personAttributes.getAttribute(personId.toString(), "school"))));
 					bw.newLine();
 				}
 			}
-			
 		} catch (IOException e) {
 			Gbl.errorMsg("Could not write to BufferedWriter " + outputFile);
 		} finally{
@@ -87,37 +89,8 @@ public class WilnaIPFWriter {
 		Header.printFooter();
 	}
 
-	private static int getDwellingCode(String type){
-		if(type.equalsIgnoreCase("House")){
-			return 1;
-		} else if(type.equalsIgnoreCase("Hotel")){
-			return 2;
-		} else if(type.equalsIgnoreCase("StudentResidence")){
-			return 3;
-		} else if(type.equalsIgnoreCase("OldAgeHome")){
-			return 4;
-		} else if(type.equalsIgnoreCase("Hostel")){
-			return 5;
-		} else{
-			return 6;
-		}
-	}
-
-	private static int getPopulationCode(String type){
-		if(type.equalsIgnoreCase("Black")){
-			return 1;
-		} else if(type.equalsIgnoreCase("Coloured")){
-			return 2;
-		} else if(type.equalsIgnoreCase("Indian-Asian")){
-			return 3;
-		}else if(type.equalsIgnoreCase("White")){
-			return 4;
-		} else{
-			return 5;			
-		}
-	}
 	
-	private static int getHouseholdIncomeCode(Income income){
+	public static int getHouseholdIncomeCode(Income income){
 		if(income != null){
 			double incomeDouble = income.getIncome();
 			if(incomeDouble == 0){
@@ -165,22 +138,5 @@ public class WilnaIPFWriter {
 		}
 	}
 	
-	private static int getSchoolCode(String type){
-		if(type.equalsIgnoreCase("None")){
-			return 1;
-		} else if(type.equalsIgnoreCase("PreSchool")){
-			return 2;
-		} else if(type.equalsIgnoreCase("School")){
-			return 3;
-		} else if(type.equalsIgnoreCase("Tertiary")){
-			return 6;
-		} else if(type.equalsIgnoreCase("AdultEducation")){
-			return 7;
-		} else{
-			return 8;
-		}
-	}
-
-
 
 }

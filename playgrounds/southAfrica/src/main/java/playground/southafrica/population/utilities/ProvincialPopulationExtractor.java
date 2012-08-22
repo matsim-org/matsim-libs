@@ -57,7 +57,7 @@ public class ProvincialPopulationExtractor {
 	}
 	
 	public void extractProvince(String network, List<String> provincialCodes, String inputFolder, String outputFolder){
-		Census2001SampleReader cr = new Census2001SampleReader();
+		ComprehensivePopulationReader cr = new ComprehensivePopulationReader();
 		cr.parse(inputFolder);
 		
 		/* Read the network */

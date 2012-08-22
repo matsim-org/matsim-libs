@@ -174,6 +174,7 @@ public class NmbmSurveyParser {
 	 * 	<li> Gender
 	 * 	<li> Age
 	 * 	<li> Occupation - 6 months (code)
+	 *  <li> Vehicle for errands
 	 * 	<li> ErrandNo
 	 * 	<li> From - indicating the activity type at origin
 	 * 	<li> To - indicating the activity type at the destination
@@ -203,6 +204,8 @@ public class NmbmSurveyParser {
 				String gender = sa[3].equalsIgnoreCase("Male") ? "m" : "f";
 				int age = Integer.parseInt(sa[4]);
 				boolean isEmployed = this.isEmployed(Integer.parseInt(sa[5]));
+				
+				
 				String hasCar = sa[6].equalsIgnoreCase("Yes") ? "always" : "never";
 				int legNumber = Integer.parseInt(sa[7]);
 				String activityTypeOrigin = getActivityTypeFromCode(Integer.parseInt(sa[8]));
@@ -218,6 +221,21 @@ public class NmbmSurveyParser {
 				String mode = getMode(Integer.parseInt(sa[14]));
 
 				Id personId = new IdImpl(String.format("%03d%03d%03d", enu, hhn, hhPerson));
+				
+				/* ========== Perform some validation. ==========*/
+				/* Warn if kids are working. Change status to unemployed. */
+				if(age < 12 && isEmployed){
+					LOG.warn("Person " + personId.toString() + " is a minor and working. Changing employment status to unemployed.");
+					isEmployed = false;
+				}
+				/* Change education to work if employed and older than 23. */
+				if(activityTypeOrigin.equalsIgnoreCase("e1") && age >= 23 && isEmployed){
+					activityTypeOrigin = "w";
+				}
+				if(activityTypeDestination.equalsIgnoreCase("e1") && age >= 23 && isEmployed){
+					activityTypeDestination = "w";
+				}
+				
 
 				/* Process person if it doesn't yet exist TODO This must be fixed - should not occur. */
 				if(!population.getPersons().containsKey(personId)){
@@ -237,7 +255,9 @@ public class NmbmSurveyParser {
 						/* Create new person. */
 						person = (PersonImpl) population.getFactory().createPerson(personId);
 						person.setSex(gender);
-						person.setAge(age);
+						if(age > 0){
+							person.setAge(age);
+						}
 						person.setEmployed(isEmployed);
 						person.setCarAvail(hasCar);
 						plan = (PlanImpl) population.getFactory().createPlan();

@@ -12,27 +12,36 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.southafrica.utilities.Header;
 
-public class Census2001SampleReader {
+public class ComprehensivePopulationReader {
 	private static final Logger LOG = Logger.getLogger(Census2001SampleParser.class);
 	private Scenario sc;
 	private HouseholdsImpl households = new HouseholdsImpl();
 	private ObjectAttributes householdAttributes = new ObjectAttributes();
 	private ObjectAttributes personAttributes = new ObjectAttributes();
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		Header.printHeader(Census2001SampleReader.class.toString(), args);
+		Header.printHeader(ComprehensivePopulationReader.class.toString(), args);
 		
 		String inputFolder = args[0];
-		Census2001SampleReader csr = new Census2001SampleReader();
+		ComprehensivePopulationReader csr = new ComprehensivePopulationReader();
 		csr.parse(inputFolder);
 		
 		Header.printFooter();
 	}
 	
-	public Census2001SampleReader() {
+	/**
+	 * Class to read a set of four population-related files:
+	 * <ol>
+	 * 		<li> <code>Population.xml</code>
+	 * 		<li> <code>PersonAttributes.xml</code>
+	 * 		<li> <code>Households.xml</code>
+	 * 		<li> <code>HouseholdAttributes.xml</code>
+	 * </ol>
+	 * These files are usually the result from census or travel survey data, 
+	 * for example using {@link Census2001SampleParser} or {@link NmbmSurveyParser}.
+	 * @param args
+	 */
+	public ComprehensivePopulationReader() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 	
