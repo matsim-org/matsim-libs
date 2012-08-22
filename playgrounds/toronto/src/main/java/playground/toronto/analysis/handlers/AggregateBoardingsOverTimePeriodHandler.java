@@ -61,6 +61,8 @@ public class AggregateBoardingsOverTimePeriodHandler implements PersonEntersVehi
 		this.schedule = schedule;
 		this.periodBoardings = new HashMap<Id, Integer>();
 		this.activeVehicles = new HashSet<Id>();
+		
+		this.buildVehIdLineIdMap();
 	}
 	
 	public void printResults(){
