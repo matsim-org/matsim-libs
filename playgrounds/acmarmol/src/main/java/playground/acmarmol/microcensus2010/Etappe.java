@@ -23,7 +23,7 @@ public class Etappe {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public Etappe(int departureTime, int arrivalTime, Coord startCoord, Coord endCoord, int modeInteger, String startCountry, String endCountry) {
+	public Etappe(int departureTime, int arrivalTime, Coord startCoord, Coord endCoord, int modeInteger, String startCountry, String endCountry, String carType) {
 
 	this.arrivalTime = arrivalTime;
 	this.departureTime = departureTime;
@@ -32,6 +32,7 @@ public class Etappe {
 	this.modeInteger = modeInteger;
 	this.startCountry = startCountry;
 	this.endCountry = endCountry;
+	this.carType = carType;
 		
 		
 	}

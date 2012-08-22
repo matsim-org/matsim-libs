@@ -59,12 +59,8 @@ public class MZWegeParser {
 
 	private ObjectAttributes wegeAttributes;
 	private Population population;
-	
-	
-	
-	private static final String HOME = "home";
 
-//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 //constructors
 //////////////////////////////////////////////////////////////////////
 
@@ -110,22 +106,30 @@ public class MZWegeParser {
 			wegeAttributes.putAttribute(wid.toString(), "number", Integer.parseInt(wegnr));
 			
 			// initialize number of etappen
-			wegeAttributes.putAttribute(wid.toString(), "number of etappen", 0); //initialize
+			wegeAttributes.putAttribute(wid.toString(), MZConstants.NUMBER_STAGES, 0); //initialize
 			
 			//mode
 			String mode = entries[80].trim();
-			if(mode.equals("1")){mode = "plane";}
-			else if(mode.equals("2")){mode = "train";}else if(mode.equals("3")){mode = "postauto";}
-			else if(mode.equals("4")){mode = "ship";}else if(mode.equals("5")){mode = "tram";}
-			else if(mode.equals("6")){mode = "bus";}else if(mode.equals("7")){mode = "sonstigerOeV";}
-			else if(mode.equals("8")){mode = "reisecar";}else if(mode.equals("9")){mode = "car";}
-			else if(mode.equals("10")){mode = "truck";}else if(mode.equals("11")){mode = "taxi";}
-			else if(mode.equals("12")){mode = "motorcycle";}else if(mode.equals("13")){mode = "mofa";}
-			else if(mode.equals("14")){mode = "bicycle";}else if(mode.equals("15")){mode = "walk";}
-			else if(mode.equals("16")){mode = "skateboard/skates";}else if(mode.equals("17")){mode = "other";}
-			else if(mode.equals("-99")){mode = "Pseudoetappe";}
+			if(mode.equals("1")){mode =  MZConstants.PLANE;}
+			else if(mode.equals("2")){mode =  MZConstants.TRAIN;}
+			else if(mode.equals("3")){mode =  MZConstants.POSTAUTO;}
+			else if(mode.equals("4")){mode =  MZConstants.SHIP;}
+			else if(mode.equals("5")){mode =  MZConstants.TRAM;}
+			else if(mode.equals("6")){mode =  MZConstants.BUS;}
+			else if(mode.equals("7")){mode =  MZConstants.SONSTINGER_OEV;}
+			else if(mode.equals("8")){mode =  MZConstants.REISECAR;}
+			else if(mode.equals("9")){mode =  MZConstants.CAR;}
+			else if(mode.equals("10")){mode =  MZConstants.TRUCK;}
+			else if(mode.equals("11")){mode =  MZConstants.TAXI;}
+			else if(mode.equals("12")){mode =  MZConstants.MOTORCYCLE;}
+			else if(mode.equals("13")){mode =  MZConstants.MOFA;}
+			else if(mode.equals("14")){mode =  MZConstants.BYCICLE;}
+			else if(mode.equals("15")){mode =  MZConstants.WALK;}
+			else if(mode.equals("16")){mode =  MZConstants.SKATEBOARD;}
+			else if(mode.equals("17")){mode =  MZConstants.OTHER;}
+			else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;}
 			else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
-			wegeAttributes.putAttribute(wid.toString(), "principal mode", mode);
+			wegeAttributes.putAttribute(wid.toString(), MZConstants.PRINCIPAL_MODE, mode);
 			
 			//start coordinate - WGS84 (22,23) & CH1903 (24,25)
 			Coord start_coord = new CoordImpl(entries[24].trim(),entries[25].trim());
@@ -137,17 +141,17 @@ public class MZWegeParser {
 			//starting and ending country ( == 8100 for switzerland)
 			String sland = entries[36].trim();
 			String zland = entries[56].trim();
-			wegeAttributes.putAttribute(wid.toString(), "start land", sland);
-			wegeAttributes.putAttribute(wid.toString(), "end land", zland);
+			wegeAttributes.putAttribute(wid.toString(), MZConstants.START_COUNTRY, sland);
+			wegeAttributes.putAttribute(wid.toString(), MZConstants.END_COUNTRY, zland);
 			
 				
 			// departure time (min => sec.)
 			int departure = Integer.parseInt(entries[5].trim())*60;
-			wegeAttributes.putAttribute(wid.toString(), "departure", departure);
+			wegeAttributes.putAttribute(wid.toString(), MZConstants.DEPARTURE, departure);
 			
 			// arrival time (min => sec.)
 			int arrival = Integer.parseInt(entries[6].trim())*60;
-			wegeAttributes.putAttribute(wid.toString(), "arrival", arrival);
+			wegeAttributes.putAttribute(wid.toString(), MZConstants.ARRIVAL, arrival);
 						
 				// time consistency check N°1
 				if(arrival<departure){
@@ -176,18 +180,23 @@ public class MZWegeParser {
 			//hinweg or last wege of incomplete ausgaenge: for some reason with incomplete ausgaenges,
 			// if wzweck = "2" doesnt necesarilly implies a Nachhauseweg  (maybe explained somewhere in documentation?)
 				
-			if(wzweck1.equals("1")){wzweck1 = "Change, change of transport, car park";}
-			else if(wzweck1.equals("2")){purpose = "work";}else if(wzweck1.equals("3")){purpose = "education, school";}
-			else if(wzweck1.equals("4")){purpose = "shopping";}else if(wzweck1.equals("5")){purpose = "errands and use of services";}
-			else if(wzweck1.equals("6")){purpose = "business";}else if(wzweck1.equals("7")){purpose = "dienstfahrt";}
-			else if(wzweck1.equals("8")){purpose = "leisure";}else if(wzweck1.equals("9")){purpose = "accompanying (children)";}
-			else if(wzweck1.equals("10")){purpose = "accompanying (not children)";}else if(wzweck1.equals("11")){purpose= "foreign property";}
-			else if(wzweck1.equals("12")){purpose = "other";}
-			else if(wzweck1.equals("13")){purpose = "border crossing";}
-			else if(wzweck1.equals("-99")){purpose = "Pseudoetappe";}
+			if(wzweck1.equals("1")){wzweck1 = MZConstants.CHANGE ;}
+			else if(wzweck1.equals("2")){purpose =  MZConstants.WORK;}
+			else if(wzweck1.equals("3")){purpose =  MZConstants.EDUCATION;}
+			else if(wzweck1.equals("4")){purpose =  MZConstants.SHOPPING;}
+			else if(wzweck1.equals("5")){purpose =  MZConstants.ERRANDS;}
+			else if(wzweck1.equals("6")){purpose =  MZConstants.BUSINESS;}
+			else if(wzweck1.equals("7")){purpose =  MZConstants.DIENSTFAHRT;}
+			else if(wzweck1.equals("8")){purpose =  MZConstants.LEISURE;}
+			else if(wzweck1.equals("9")){purpose =  MZConstants.ACCOMPANYING_CHILDREN;}
+			else if(wzweck1.equals("10")){purpose = MZConstants.ACCOMPANYING_NOT_CHILDREN;}
+			else if(wzweck1.equals("11")){purpose=  MZConstants.FOREING_PROPERTY;}
+			else if(wzweck1.equals("12")){purpose =  MZConstants.OTHER;}
+			//else if(wzweck1.equals("13")){purpose = "border crossing";}
+			else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;}
 			else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 			}else if(wzweck2.equals("2") || wzweck2.equals("3") ){// Nachhauseweg or Weg von zu Hause nach Hause
-				purpose = HOME;	}
+				purpose =  MZConstants.HOME;	}
 			else Gbl.errorMsg("This should never happen!  Purpose wzweck2: " +  wzweck2 + " doesn't exist");
 			
 		
@@ -233,8 +242,8 @@ public class MZWegeParser {
 				  //finishes away. These cases are corrected lately by MZPopulationUtils.setHomeLocations
 				
 				ActivityImpl firstAct;
-				if(!ausnr.equals("-98")){ firstAct = ((PlanImpl) plan).createAndAddActivity(HOME,start_coord);
-				}else firstAct = ((PlanImpl) plan).createAndAddActivity("overnight away",start_coord);
+				if(!ausnr.equals("-98")){ firstAct = ((PlanImpl) plan).createAndAddActivity(MZConstants.HOME,start_coord);
+				}else firstAct = ((PlanImpl) plan).createAndAddActivity(MZConstants.OVERNIGHT,start_coord);
 								
 				firstAct.setEndTime(departure);
 				LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);				

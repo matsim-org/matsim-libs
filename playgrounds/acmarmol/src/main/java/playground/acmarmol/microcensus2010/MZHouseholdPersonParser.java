@@ -44,8 +44,6 @@ public class MZHouseholdPersonParser {
 	private Households households;
 	private ObjectAttributes householdAttributes;
 	
-	private static final String NOT_KNOWN = "not known";
-	private static final String UNSPECIFIED = "unspecified";
 
 //////////////////////////////////////////////////////////////////////
 //constructors

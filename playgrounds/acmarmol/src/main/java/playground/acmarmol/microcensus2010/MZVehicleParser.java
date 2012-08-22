@@ -53,8 +53,6 @@ public class MZVehicleParser {
 	private Vehicles vehicles;
 	private ObjectAttributes vehiclesAttributes;
 
-	private static final String NOT_KNOWN = "not known";
-	private static final String UNSPECIFIED = "unspecified";
 
 //////////////////////////////////////////////////////////////////////
 //constructors
@@ -92,43 +90,48 @@ public class MZVehicleParser {
 			
 			//type
 			String type = entries[3].trim();
-			if(type.equals("1")){type = "Auto";}
-			else if(type.equals("2")){type = "Motorcycle";}
+			if(type.equals("1")){type = MZConstants.CAR;}
+			else if(type.equals("2")){type = MZConstants.MOTORCYCLE;}
 			else Gbl.errorMsg("This should never happen!  Vehicle type: " + type+ " doesn't exist");
-	
-			vehiclesAttributes.putAttribute(hhnr.concat(fznr), "type", type);
+			vehiclesAttributes.putAttribute(hhnr.concat(fznr), MZConstants.TYPE, type);
 			
 			//type of fuel
 			String fuel = entries[4].trim();
-			if(fuel.equals("1")){fuel = "benzin";}
-			else if(fuel.equals("2")){fuel = "diesel";}
-			else if(fuel.equals("3")){fuel = "hybridE85Gas";}
-			else if(fuel.equals("4")){fuel = "other";}
-			else if(fuel.equals("-98")){fuel = UNSPECIFIED;}
-			else if(fuel.equals("-97")){fuel = NOT_KNOWN;}
-			else if(fuel.equals("-99")){fuel = "FrageNurBeiAuto";} // -review
+			if(fuel.equals("1")){fuel = MZConstants.BENZIN;}
+			else if(fuel.equals("2")){fuel = MZConstants.DIESEL;}
+			else if(fuel.equals("3")){fuel = MZConstants.HYBRIDE85GAS;}
+			else if(fuel.equals("4")){fuel = MZConstants.OTHER;}
+			else if(fuel.equals("-98")){fuel = MZConstants.UNSPECIFIED;}
+			else if(fuel.equals("-97")){fuel = MZConstants.NOT_KNOWN;}
+			else if(fuel.equals("-99")){fuel = MZConstants.JUST_FOR_CAR;}
 			else Gbl.errorMsg("This should never happen!  Fuel type: " + fuel+ " doesn't exist");
-			vehiclesAttributes.putAttribute(hhnr.concat(fznr), "fuel type", fuel);
+			vehiclesAttributes.putAttribute(hhnr.concat(fznr), MZConstants.FUEL_TYPE, fuel);
 			
 			//year of registration
 			String year = entries[6].trim();
-			if(year.equals("-98")){year = UNSPECIFIED;}
-			else if(year.equals("-97")){year = NOT_KNOWN;}
-			vehiclesAttributes.putAttribute(hhnr.concat(fznr), "year of registration", year);
+			if(year.equals("-98")){year = MZConstants.UNSPECIFIED;}
+			else if(year.equals("-97")){year = MZConstants.NOT_KNOWN;}
+			vehiclesAttributes.putAttribute(hhnr.concat(fznr), MZConstants.YEAR_REGISTRATION, year);
 			
 			//month of registration
 			String month = entries[7].trim();
-			if(month.equals("1")){month = "january";}else if(month.equals("2")){month = "febrary";}
-			else if(month.equals("3")){month = "march";}else if(month.equals("4")){month = "april";}
-			else if(month.equals("5")){month = "may";}else if(month.equals("6")){month = "june";}
-			else if(month.equals("7")){month = "july";}else if(month.equals("8")){month = "august";}
-			else if(month.equals("9")){month = "september";}else if(month.equals("10")){month = "october";}
-			else if(month.equals("11")){month = "november";}else if(month.equals("12")){month = "december";}
-			else if(month.equals("-98")){month = UNSPECIFIED;} 
-			else if(month.equals("-97")){month = NOT_KNOWN;}
+			if(month.equals("1")){month = MZConstants.JANUARY;}
+			else if(month.equals("2")){month = MZConstants.FEBRUARY;}
+			else if(month.equals("3")){month = MZConstants.MARCH;}
+			else if(month.equals("4")){month = MZConstants.APRIL;}
+			else if(month.equals("5")){month = MZConstants.MAY;}
+			else if(month.equals("6")){month = MZConstants.JUNE;}
+			else if(month.equals("7")){month = MZConstants.JULY;}
+			else if(month.equals("8")){month = MZConstants.AUGUST;}
+			else if(month.equals("9")){month = MZConstants.SEPTEMBER;}
+			else if(month.equals("10")){month = MZConstants.OCTOBER;}
+			else if(month.equals("11")){month = MZConstants.NOVEMBER;}
+			else if(month.equals("12")){month = MZConstants.DECEMBER;}
+			else if(month.equals("-98")){month = MZConstants.UNSPECIFIED;} 
+			else if(month.equals("-97")){month = MZConstants.NOT_KNOWN;}
 			else if(month.equals("-99")){month = "NichtÜberMofis";} // -review
 			else Gbl.errorMsg("This should never happen!  Month: " + month+ " doesn't exist");
-			vehiclesAttributes.putAttribute(hhnr.concat(fznr), "month of registration", month);
+			vehiclesAttributes.putAttribute(hhnr.concat(fznr), MZConstants.MONTH_REGISTRATION, month);
 			
 						
 			// creating matsim vehicle

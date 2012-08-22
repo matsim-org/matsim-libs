@@ -49,7 +49,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 /**
 * 
-* Helper class to filter the population
+* Helper class with methods to filter/handle the population
 * 
 *
 * @author acmarmol
@@ -61,9 +61,6 @@ public class MZPopulationUtils {
 //////////////////////////////////////////////////////////////////////
 //member variables
 //////////////////////////////////////////////////////////////////////
-
-private static final String HOME = "home";	
-private static final String WORK = "work";	
 	
 
 //////////////////////////////////////////////////////////////////////
@@ -98,7 +95,21 @@ private static final String WORK = "work";
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
-			if (!last.getType().equals(HOME)) { ids.add(p.getId()); }
+			ActivityImpl first = (ActivityImpl)plan.getPlanElements().get(0);
+			if (!last.getType().equals(MZConstants.HOME) | !first.getType().equals(MZConstants.HOME) ) { ids.add(p.getId()); }
+		}
+		return ids;
+	}
+	
+//////////////////////////////////////////////////////////////////////
+	
+	public static Set<Id> identifyNonRoundPlans(final Population population) {
+		Set<Id> ids = new HashSet<Id>();
+		for (Person p : population.getPersons().values()) {
+			Plan plan = p.getSelectedPlan();
+			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+			ActivityImpl first = (ActivityImpl)plan.getPlanElements().get(0);
+			if (!last.getType().equals(first.getType())) { ids.add(p.getId()); }
 		}
 		return ids;
 	}
@@ -131,7 +142,7 @@ private static final String WORK = "work";
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					if ((leg.getMode().equals(TransportMode.walk))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(person.getId()); }
+					if ((leg.getMode().equals(MZConstants.WALK))&&(leg.getRoute().getDistance()>10000.0)) {ids.add(person.getId()); }
 				}
 			}
 		}
@@ -152,12 +163,14 @@ private static final String WORK = "work";
 				for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 					Activity act = (ActivityImpl)plan.getPlanElements().get(i);
 					if ((act.getCoord().getX() == homeCoord.getX()) && (act.getCoord().getY() == homeCoord.getY())) {
-						if (!act.getType().equals(HOME)) {
-							act.setType(HOME);
+						if (!act.getType().equals(MZConstants.HOME)) {
+							act.setType(MZConstants.HOME);
 							counter++;
 	//						System.out.println("        pid=" + p.getId() + "; act_nr=" + (i/2) + ": set type to '"+HOME+"'");
 						}
-					}
+					}else if(act.getType().equals(MZConstants.HOME) & !((act.getCoord().getX() == homeCoord.getX()) && (act.getCoord().getY() == homeCoord.getY()))){
+						act.getCoord().setXY(homeCoord.getX(), homeCoord.getY());
+					} 
 				}
 			}
 		}
@@ -179,8 +192,8 @@ private static final String WORK = "work";
 					for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 						Activity act = (ActivityImpl)plan.getPlanElements().get(i);
 						if ((act.getCoord().getX() == workCoord.getX()) && (act.getCoord().getY() == workCoord.getY())) {
-							if (!act.getType().equals(WORK)) {
-							act.setType(WORK);
+							if (!act.getType().equals(MZConstants.WORK)) {
+							act.setType(MZConstants.WORK);
 							counter++;
 							//						System.out.println("        pid=" + p.getId() + "; act_nr=" + (i/2) + ": set type to '"+HOME+"'");
 							}
@@ -234,7 +247,16 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	
 	
 //////////////////////////////////////////////////////////////////////
-
+	/**
+	*  
+	* This method handles legs that cross the border.
+	* 
+	* @see  #handleTripGoingOutOfCountry
+	* @see  #handleTripEnteringCountry
+	*  
+	*/	
+	
+	
 	public static void HandleBorderCrossingTrips(final Population population, final ObjectAttributes wegeAttributes, Set<Id> border_crossing_wids, String countryCode) {	
 		
 	final String COUNTRY = countryCode;
@@ -244,8 +266,8 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 	for(Id wid: border_crossing_wids){
 		
-	String sland = (String) wegeAttributes.getAttribute(wid.toString(), "start land");
-	String zland = (String) wegeAttributes.getAttribute(wid.toString(), "end land");
+	String sland = (String) wegeAttributes.getAttribute(wid.toString(), MZConstants.START_COUNTRY);
+	String zland = (String) wegeAttributes.getAttribute(wid.toString(), MZConstants.END_COUNTRY);
 
 		if(sland.equals(COUNTRY) &&  !zland.equals(COUNTRY)){
 			handleTripGoingOutOfCountry(population, wid, COUNTRY, wegeAttributes);
@@ -301,13 +323,13 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 		String type = previousActivity.getType();
 		//if goes in via plane, specify previous activity as airport, otherwise as border
-		if(leg.getMode().equals("plane")){
-			if(!previousActivity.getType().contains("airport") && !previousActivity.getType().contains("border")){
-				previousActivity.setType("airport: ".concat(type));
+		if(leg.getMode().equals(MZConstants.PLANE)){
+			if(!previousActivity.getType().contains(MZConstants.AIRPORT) && !previousActivity.getType().contains(MZConstants.BORDER)){
+				previousActivity.setType(MZConstants.AIRPORT.concat(": ").concat(type));
 			}else immediate_return = true;
 		}else{
-			if(!previousActivity.getType().contains("airport") && !previousActivity.getType().contains("border")){
-				previousActivity.setType("border: ".concat(type));
+			if(!previousActivity.getType().contains(MZConstants.AIRPORT) && !previousActivity.getType().contains(MZConstants.BORDER)){
+				previousActivity.setType(MZConstants.BORDER.concat(": ").concat(type));
 			}else immediate_return = true;
 		}
 		
@@ -316,9 +338,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		Coord curr_start_coord = null;
 		boolean start = false;
 		
-		for(int i=1; i<= (Integer) wegeAttributes.getAttribute(wid.toString(), "number of etappen"); i++){
+		for(int i=1; i<= (Integer) wegeAttributes.getAttribute(wid.toString(), MZConstants.NUMBER_STAGES); i++){
 						
-			Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), "etappe".concat(String.valueOf(i)));
+			Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), MZConstants.STAGE.concat(String.valueOf(i)));
 			
 			if(!etappe.getStartCountry().equals(country) && etappe.getEndCountry().equals(country)){
 				leg.setDepartureTime(etappe.getDepartureTime());
@@ -348,6 +370,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		}
 		
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------
 		
 			int index = planElements.indexOf(previousActivity);
 			String crossing_type = previousActivity.getType().substring(0, previousActivity.getType().indexOf(':')).trim();
@@ -370,7 +393,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						teleportLeg.setDepartureTime(previousActivity.getEndTime());
 						teleportLeg.setArrivalTime(previousActivity.getEndTime());
 						teleportLeg.setTravelTime(0);
-						teleportLeg.setMode("abroad: teleport");
+						teleportLeg.setMode(MZConstants.ABROAD_TELEPORT);
 						
 						if(toAdd.get(pid) == null){ toAdd.put(pid, new ArrayList<Tuple<Integer,PlanElement>>());}	
 						toAdd.get(pid).add(new Tuple<Integer, PlanElement>(index+1, teleportLeg));
@@ -398,7 +421,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 							PlanElement pe = planElements.get(j);
 							if(pe instanceof Activity){
 								Activity activity = (Activity) pe;
-								if(activity.getType().contains("airport") || activity.getType().contains("border")){
+								if(activity.getType().contains(MZConstants.AIRPORT) || activity.getType().contains(MZConstants.BORDER)){
 									
 									//going in to switzerland via the same path that went out -> merge activites  (2.1)
 									if(activity.getType().contains(crossing_type) && activity.getCoord().equals(previousActivity.getCoord())){ 
@@ -410,7 +433,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 									LegImpl teleportLeg = new LegImpl(leg);
 									teleportLeg.setDepartureTime(activity.getEndTime());
 									teleportLeg.setArrivalTime(previousActivity.getStartTime());
-									teleportLeg.setMode("abroad: teleport");
+									teleportLeg.setMode(MZConstants.ABROAD_TELEPORT);
 									if(toAdd.get(pid) == null){ toAdd.put(pid, new ArrayList<Tuple<Integer,PlanElement>>());}	
 									toAdd.get(pid).add(new Tuple<Integer, PlanElement>(index, teleportLeg));
 									delete = false; 
@@ -464,20 +487,20 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 			String type = nextActivity.getType();
 			
 			//if goes out via plane, specify next activity as airport, otherwise as border
-			if(leg.getMode().equals("plane")){
-				nextActivity.setType("airport: ".concat(type));
+			if(leg.getMode().equals(MZConstants.PLANE)){
+				nextActivity.setType(MZConstants.AIRPORT.concat(": ").concat(type));
 			}else {
-				nextActivity.setType("border: ".concat(type));
+				nextActivity.setType(MZConstants.BORDER.concat(": ").concat(type));
 			}
 									
 			//modify leg and replace with information from before the border crossing (in MZ2010, a new etappe always start at border crossing!)
 						
 			while(cont){
-				if(etappen > (Integer) wegeAttributes.getAttribute(wid.toString(), "number of etappen")){
+				if(etappen > (Integer) wegeAttributes.getAttribute(wid.toString(), MZConstants.NUMBER_STAGES)){
 					Gbl.errorMsg("This should never happen!  Wege id ("+wid+") doesn't cross border!");
 					}
 			
-				Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), "etappe".concat(String.valueOf(etappen)));
+				Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), MZConstants.STAGE.concat(String.valueOf(etappen)));
 				
 				if(etappe.getStartCountry().equals(country) && etappe.getEndCountry().equals(country)){
 					if(etappe.getModeInteger()<curr_mode){// && (leg.getMode().equals("plane")? !etappe.getMode().equals("plane"):true)){
@@ -516,7 +539,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 				
 				if(planElements.get(i) instanceof Activity){
 					Activity activity = (Activity) pe;
-					if(activity.getType().contains("border") || activity.getType().contains("airport")){
+					if(activity.getType().contains(MZConstants.BORDER) || activity.getType().contains(MZConstants.AIRPORT)){
 						cont = false;
 					}else{planElements.remove(i);}
 					
@@ -572,9 +595,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Leg) {
 						legCounter++;
-						String sland = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),"start land");
-						String zland = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),"end land");
-						if(sland.equals("8100") || zland.equals("8100")){
+						String sland = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),MZConstants.START_COUNTRY);
+						String zland = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),MZConstants.END_COUNTRY);
+						if(sland.equals(MZConstants.SWISS_CODE) || zland.equals(MZConstants.SWISS_CODE)){
 							out = false;
 							break;
 						}
@@ -604,9 +627,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						Leg leg = (Leg) pe;
 						legCounter++;
 						String wid = person.getId().toString().concat("-").concat(String.valueOf(legCounter));
-						String sland = (String) wegeAttributes.getAttribute(wid,"start land");
-						String zland = (String) wegeAttributes.getAttribute(wid,"end land");
-						if((!sland.equals("8100") ^ !zland.equals("8100"))){
+						String sland = (String) wegeAttributes.getAttribute(wid,MZConstants.START_COUNTRY);
+						String zland = (String) wegeAttributes.getAttribute(wid,MZConstants.END_COUNTRY);
+						if((!sland.equals(MZConstants.SWISS_CODE) ^ !zland.equals(MZConstants.SWISS_CODE))){
 						 wids.add(new IdImpl(wid));
 						 pids.add(person.getId());
 							
@@ -643,16 +666,16 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						Leg leg = (Leg) pe;
 						Activity act = (Activity) plan.getPlanElements().get(i+1);
 						
-						String sland = (String) wegeAttributes.getAttribute(wid,"start land");
-						String zland = (String) wegeAttributes.getAttribute(wid,"end land");
-						if((!sland.equals("8100") && !zland.equals("8100"))){
+						String sland = (String) wegeAttributes.getAttribute(wid,MZConstants.START_COUNTRY);
+						String zland = (String) wegeAttributes.getAttribute(wid,MZConstants.END_COUNTRY);
+						if((!sland.equals(MZConstants.SWISS_CODE) && !zland.equals(MZConstants.SWISS_CODE))){
 						elements.add((PlanElement) leg);
-						if(act.getType().contains("airport")){
+						if(act.getType().contains(MZConstants.AIRPORT)){
 							for(int j=i-1;j==0;j-=2){
 								PlanElement pel = plan.getPlanElements().get(j);
 							if(pel instanceof Activity){
 								Activity activity = (Activity) pel;
-								if(activity.getType().contains("aiport")){activity.setEndTime(act.getEndTime());}
+								if(activity.getType().contains(MZConstants.AIRPORT)){activity.setEndTime(act.getEndTime());}
 							}
 							}
 						}
@@ -667,6 +690,86 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		return ids;
 	}	
 	
+//////////////////////////////////////////////////////////////////////
+
+	public static final Set<Id> identifyPlansWithRoundTrips(final Population plans) {
+		Set<Id> ids = new HashSet<Id>();
+		for (Person p : plans.getPersons().values()) {
+			Plan plan = p.getSelectedPlan();
+			Activity prevAct = null;
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if (prevAct != null) {
+						Coord prevc = prevAct.getCoord();
+						Coord currc = act.getCoord();
+						if ((currc.getX()==prevc.getX())&& (currc.getY()==currc.getY())) { ids.add(p.getId()); }
+					}
+					prevAct = act;
+				}
+			}
+		}
+		return ids;
+	}	
+	
+	
+//////////////////////////////////////////////////////////////////////
+
+	public static void classifyActivtyChains(Population population){
+		
+		Set<String> actChains = new HashSet<String>();
+			
+		for(Person person: population.getPersons().values()){
+		
+			StringBuilder actChain = new StringBuilder();
+			Plan plan = person.getSelectedPlan();
+			
+			if(plan!=null){
+				for(PlanElement pe: plan.getPlanElements()){
+					
+					if(pe instanceof Activity){
+						
+						ActivityImpl act = (ActivityImpl) pe;
+						String type = act.getType();
+						
+						if(type.contains(MZConstants.WORK)
+						|| type.contains(MZConstants.BUSINESS)
+						||type.contains(MZConstants.DIENSTFAHRT)){actChain.append("W");}
+						
+						else if(type.contains(MZConstants.LEISURE)
+						||type.contains(MZConstants.ACCOMPANYING_CHILDREN)
+						|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+						|| type.contains(MZConstants.ERRANDS)
+						|| type.contains(MZConstants.OTHER)
+						|| type.contains(MZConstants.FOREING_PROPERTY)
+						|| type.contains(MZConstants.OVERNIGHT)
+						|| type.contains(MZConstants.PSEUDOETAPPE)) {actChain.append("L");}
+						
+						
+						else if(type.contains(MZConstants.SHOPPING)) {actChain.append("S");}
+						
+						else if(type.contains(MZConstants.EDUCATION)) {actChain.append("E");}
+						
+						else if(type.contains(MZConstants.HOME)) {actChain.append("H");}
+						
+						else{Gbl.errorMsg("This should never happen! Type: " + type + " doesn't exist " + person.getId());}
+					}
+					
+					
+				}
+				actChains.add(actChain.toString());	
+			}		
+		
+		}
+		
+		System.out.println("Total of different activity chains: " + actChains.size());
+		
+		
+	}
+	
+//////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////
+
 	
 	
 }

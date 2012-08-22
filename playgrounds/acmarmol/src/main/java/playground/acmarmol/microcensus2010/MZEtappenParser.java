@@ -32,10 +32,6 @@ public class MZEtappenParser {
 	//////////////////////////////////////////////////////////////////////
 		
 		private ObjectAttributes wegeAttributes;
-		
-		private static final String UNSPECIFIED = "unspecified";
-		private static final String NOT_KNOWN = "not known";
-
 
 	//////////////////////////////////////////////////////////////////////
 	//constructors
@@ -106,8 +102,8 @@ public class MZEtappenParser {
 				else if(carType.equals("4")){carType = "car sharing";}
 				else if(carType.equals("5")){carType = "other";}
 				else if(carType.equals("-97")){carType = "not car mode!";}
-				else if(carType.equals("-98")){carType = UNSPECIFIED;}
-				else if(carType.equals("-99")){carType = NOT_KNOWN;}
+				else if(carType.equals("-98")){carType = MZConstants.UNSPECIFIED;}
+				else if(carType.equals("-99")){carType = MZConstants.NOT_KNOWN;}
 				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 				//start coordinate - WGS84 (29,30) & CH1903 (31,32)
@@ -129,9 +125,9 @@ public class MZEtappenParser {
 				String zland = entries[63].trim();
 				
 				
-				int nr_etappen = (Integer) wegeAttributes.getAttribute(wid.toString(),"number of etappen")+1;
-				this.wegeAttributes.putAttribute(wid.toString(), "etappe".concat( String.valueOf(nr_etappen)) , new Etappe(departure, arrival, start_coord, end_coord, modeInt, sland,zland));
-				this.wegeAttributes.putAttribute(wid.toString(), "number of etappen", nr_etappen);
+				int nr_etappen = (Integer) wegeAttributes.getAttribute(wid.toString(),MZConstants.NUMBER_STAGES)+1;
+				this.wegeAttributes.putAttribute(wid.toString(), MZConstants.STAGE.concat( String.valueOf(nr_etappen)) , new Etappe(departure, arrival, start_coord, end_coord, modeInt, sland,zland, carType));
+				this.wegeAttributes.putAttribute(wid.toString(), MZConstants.NUMBER_STAGES, nr_etappen);
 				
 				
 				

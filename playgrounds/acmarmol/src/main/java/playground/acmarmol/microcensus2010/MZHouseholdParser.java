@@ -51,9 +51,7 @@ public class MZHouseholdParser {
 	private Households households;
 	private ObjectAttributes householdAttributes;
 	
-	private static final String NO_ANSWER = "no answer";
-	private static final String NOT_KNOWN = "not known";
-	private static final String UNSPECIFIED = "unspecified";
+
 
 //////////////////////////////////////////////////////////////////////
 //constructors
@@ -119,7 +117,7 @@ public class MZHouseholdParser {
 		else if(kanton.equals("21")){kanton = "ticino";}				else if(kanton.equals("22")){kanton = "vaud";}
 		else if(kanton.equals("23")){kanton = "valais";}				else if(kanton.equals("24")){kanton = "neuchâtel";}
 		else if(kanton.equals("25")){kanton = "genève";}				else if(kanton.equals("26")){kanton = "jura";}
-		else if(kanton.equals("-97")){kanton = UNSPECIFIED;}		
+		else if(kanton.equals("-97")){kanton = MZConstants.UNSPECIFIED;}		
 		householdAttributes.putAttribute(hhnr, "kanton", kanton);
 		
 		//municipality BFS number
@@ -128,32 +126,32 @@ public class MZHouseholdParser {
 		
 		//number of cars
 		String nr_cars = entries[77];
-		if(nr_cars.equals("-98")){nr_cars = NO_ANSWER;}
-		else if(nr_cars.equals("-97")){nr_cars = NOT_KNOWN;}
+		if(nr_cars.equals("-98")){nr_cars = MZConstants.NO_ANSWER;}
+		else if(nr_cars.equals("-97")){nr_cars = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total cars ", nr_cars);
 		
 		//number of motorcycles
 		String nr_mcycles = entries[79];
-		if(nr_mcycles.equals("-98")){nr_mcycles = NO_ANSWER;}
-		else if(nr_mcycles.equals("-97")){nr_mcycles = NOT_KNOWN;}
+		if(nr_mcycles.equals("-98")){nr_mcycles = MZConstants.NO_ANSWER;}
+		else if(nr_mcycles.equals("-97")){nr_mcycles = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total motorcycles ", nr_mcycles);
 		
 		//number of small motorcycles
 		String nr_smcycles = entries[79];
-		if(nr_smcycles.equals("-98")){nr_smcycles = NO_ANSWER;}
-		else if(nr_smcycles.equals("-97")){nr_smcycles = NOT_KNOWN;}
+		if(nr_smcycles.equals("-98")){nr_smcycles = MZConstants.NO_ANSWER;}
+		else if(nr_smcycles.equals("-97")){nr_smcycles = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total small motorcycles ", nr_smcycles);
 		
 		//number of mofa
 		String nr_mofas = entries[79];
-		if(nr_mofas.equals("-98")){nr_mofas = NO_ANSWER;}
-		else if(nr_mofas.equals("-97")){nr_mofas = NOT_KNOWN;}
+		if(nr_mofas.equals("-98")){nr_mofas = MZConstants.NO_ANSWER;}
+		else if(nr_mofas.equals("-97")){nr_mofas = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total mofas ", nr_mofas);
 		
 		//number of bicycles
 		String nr_bikes = entries[79];
-		if(nr_bikes.equals("-98")){nr_bikes = NO_ANSWER;}
-		else if(nr_bikes.equals("-97")){nr_bikes = NOT_KNOWN;}
+		if(nr_bikes.equals("-98")){nr_bikes = MZConstants.NO_ANSWER;}
+		else if(nr_bikes.equals("-97")){nr_bikes = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total bicycles", nr_bikes);
 		
 		// creating matsim household
