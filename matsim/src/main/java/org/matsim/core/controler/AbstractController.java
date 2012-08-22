@@ -11,32 +11,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class AbstractController {
 	
 	private static Logger log = Logger.getLogger(AbstractController.class);
-
-//	private Config config;
-	
-	/**Helper class to wrap a standard plan algo into a multithreaded plan algo.
-	 * 
-	 * @param planAlgo
-	 * @param numberOfThreads
-	 * @return
-	 */
-	protected static final AbstractMultithreadedModule wrapPlanAlgo(final PlanAlgorithm planAlgo, int numberOfThreads) {
-		// wrap it into the AbstractMultithreadedModule:
-		final AbstractMultithreadedModule router = new AbstractMultithreadedModule(numberOfThreads) {
-			@Override
-			public PlanAlgorithm getPlanAlgoInstance() {
-				return planAlgo ;
-			}
-		};
-		return router;
-	}
-
 
 	protected OutputDirectoryHierarchy controlerIO;
 
