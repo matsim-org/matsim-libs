@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
@@ -94,8 +94,9 @@ public class PtSubModeControler extends Controler {
 	}
 	
 	private boolean thrown =  false;
+	
 	@Override
-	public PlansCalcSubModeDependendTransitRoute createRoutingAlgorithm(final TravelDisutility travelCosts, final PersonalizableTravelTime travelTimes) {
+	public PlansCalcSubModeDependendTransitRoute createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 		
 		// use own PlansCalcRoute

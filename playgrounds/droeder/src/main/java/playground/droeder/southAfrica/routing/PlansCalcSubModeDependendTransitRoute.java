@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
@@ -58,7 +58,7 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 	 * @param config
 	 * @param network
 	 * @param costCalculator
-	 * @param timeCalculator
+	 * @param travelTimes
 	 * @param factory
 	 * @param routeFactory
 	 * @param transitConfig
@@ -68,11 +68,11 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 	public PlansCalcSubModeDependendTransitRoute(
 			PlansCalcRouteConfigGroup config, Network network,
 			TravelDisutility costCalculator,
-			PersonalizableTravelTime timeCalculator,
+			TravelTime travelTimes,
 			LeastCostPathCalculatorFactory factory,
 			ModeRouteFactory routeFactory, TransitConfigGroup transitConfig,
 			TransitRouter transitRouter, TransitSchedule transitSchedule) {
-		super(config, network, costCalculator, timeCalculator, factory, routeFactory,
+		super(config, network, costCalculator, travelTimes, factory, routeFactory,
 				transitConfig, transitRouter, transitSchedule);
 		if(!(transitRouter instanceof PtSubModeDependendRouter)){
 			throw new IllegalArgumentException("the transitRouter needs to be an instance of 'PtSubModeDependendRouter'. ABORT!");
