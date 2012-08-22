@@ -20,9 +20,11 @@
 package playground.thibautd.hitchiking.routing;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingSpots;
+import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.RoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
@@ -33,20 +35,26 @@ import playground.thibautd.router.TripRouterFactory;
 public class HitchHikingDriverRoutingModuleFactory implements RoutingModuleFactory {
 	private final HitchHikingSpots spots;
 	private final HitchHikingConfigGroup configGroup;
+	private final SpotWeighter spotsWeighter;
 
 	public HitchHikingDriverRoutingModuleFactory(
 			final HitchHikingSpots spots,
+			final SpotWeighter spotsWeighter,
 			final HitchHikingConfigGroup configGroup) {
 		this.spots = spots;
 		this.configGroup = configGroup;
+		this.spotsWeighter = spotsWeighter;
 	}
 
 	@Override
 	public RoutingModule createModule(final String mainMode, final TripRouterFactory factory) {
 		return new HitchHikingDriverRoutingModule(
+				spotsWeighter,
 				factory.getRoutingModuleFactories().get( TransportMode.car ).createModule( TransportMode.car , factory ),
 				spots,
-				configGroup);
+				configGroup,
+				// XXX here or even at a higher level?
+				MatsimRandom.getLocalInstance());
 	}
 }
 

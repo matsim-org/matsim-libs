@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Run.java
+ * SpotWeighter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.hitchiking.herbie;
+package playground.thibautd.hitchiking.spotweights;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-
-import herbie.running.config.HerbieConfigGroup;
-
-import playground.thibautd.analysis.listeners.ModeAnalysis;
-import playground.thibautd.hitchiking.HitchHikingUtils;
-import playground.thibautd.hitchiking.spotweights.FrequentationSpotWeighter;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
+import org.matsim.api.core.v01.Id;
 
 /**
+ * Gives weights to spots to guide search.
+ * The weights only depend on origin, destination and
+ * time of day, and not on the characteristics of the trip.
  * @author thibautd
  */
-public class Run {
-	public static void main(final String[] args) {
-		String configFile = args[ 0 ];
+public interface SpotWeighter {
+	/**
+	 * @param departureTime
+	 * @param originLink
+	 * @param destinationLink the destination of the trip (not the drop of point)
+	 * @return
+	 */
+	public double weightDriverOrigin(
+			double departureTime,
+			Id originLink,
+			Id destinationLink);
 
-		Config config = ConfigUtils.createConfig();
-		config.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
-		HitchHikingUtils.loadConfig( config , configFile );
-		Scenario sc = HitchHikingUtils.loadScenario( config );
-
-		// TODO: tune parameters
-		FrequentationSpotWeighter weighter = new FrequentationSpotWeighter();
-		MultiLegRoutingControler controler = new HHHerbieControler( sc , weighter );
-		controler.getEvents().addHandler( weighter );
-		controler.addControlerListener(new ModeAnalysis( true ));
-		controler.run();
-	}
+	/**
+	 * @param departureTime
+	 * @param originLink
+	 * @param dropOffLink the exact drop off link
+	 * @return
+	 */
+	public double weightPassengerOrigin(
+			double departureTime,
+			Id originLink,
+			Id dropOffLink);
 }
 

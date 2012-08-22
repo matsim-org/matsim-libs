@@ -20,8 +20,11 @@
 package playground.thibautd.hitchiking.routing;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,8 +39,10 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.HitchHikingSpots;
+import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.StageActivityTypes;
 
@@ -49,14 +54,23 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 	private final RoutingModule ptRoutingModule;
 	private final ModeRouteFactory routeFactory;
 	private final HitchHikingSpots spots;
+	private final SpotWeighter spotWeighter;
+	private final HitchHikingConfigGroup config;
+	private final Random random;
 
 	public HitchHikingPassengerRoutingModule(
 			final RoutingModule ptRoutingModule,
 			final HitchHikingSpots spots,
-			final ModeRouteFactory factory) {
+			final ModeRouteFactory factory,
+			final SpotWeighter spotWeighter,
+			final HitchHikingConfigGroup config,
+			final Random random) {
 		this.ptRoutingModule = ptRoutingModule;
 		this.routeFactory = factory;
 		this.spots = spots;
+		this.spotWeighter = spotWeighter;
+		this.config = config;
+		this.random = random;
 	}
 
 	@Override
@@ -65,8 +79,12 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		Link puSpot = spots.getNearestSpot( fromFacility.getCoord() );
 		Link doSpot = spots.getNearestSpot( toFacility.getCoord() );
+		Link puSpot = getPickUpSpot(
+				departureTime,
+				fromFacility,
+				toFacility,
+				doSpot);
 		double distance = CoordUtils.calcDistance( puSpot.getCoord() , doSpot.getCoord() );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
@@ -101,6 +119,71 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 					person ) );
 
 		return trip;
+	}
+
+	private List<Link> getPossiblePickUps(
+			final Facility fromFacility,
+			final Facility toFacility,
+			final Coord doPoint) {
+		Coord o = fromFacility.getCoord();
+		Coord d = toFacility.getCoord();
+
+		double centerX = (o.getX() + d.getX()) / 2d;
+		double centerY = (o.getY() + d.getY()) / 2d;
+		double maxBeeFlyDist = CoordUtils.calcDistance( o , d ) * (1 + config.getMaximumDetourFraction());
+
+		List<Link> disk = new ArrayList<Link>( spots.getSpots( centerX , centerY , maxBeeFlyDist / 2d ) );
+
+		Iterator<Link> it = disk.iterator();
+		while (it.hasNext()) {
+			Link l = it.next();
+			double dist = CoordUtils.calcDistance( o, l.getCoord() )
+				+ CoordUtils.calcDistance( l.getCoord() , doPoint )
+				+ CoordUtils.calcDistance( doPoint , d );
+			if (dist > maxBeeFlyDist) it.remove();
+		}
+
+		return disk;
+	}
+
+	private Link getPickUpSpot(
+			final double departureTime,
+			final Facility fromFacility,
+			final Facility toFacility,
+			final Link dropOffLink) {
+		List<Link> possiblePus = getPossiblePickUps(
+				fromFacility,
+				toFacility,
+				dropOffLink.getCoord());
+
+		if (possiblePus.isEmpty()) {
+			return spots.getNearestSpot( fromFacility.getCoord() );
+		}
+
+		// choose according to weight
+		double sum = 0;
+		List<Double> weights = new ArrayList<Double>();
+
+		for (Link l : possiblePus) {
+			double w = spotWeighter.weightPassengerOrigin(
+					departureTime,
+					l.getId(),
+					dropOffLink.getId());
+			sum += w;
+			weights.add( w );
+		}
+
+		double choice = random.nextDouble() * sum;
+
+		sum = 0;
+		int choiceIndex = 0;
+		for (double level : weights) {
+			sum += level;
+			if (choice <= level) break;
+			choiceIndex++;
+		}
+
+		return possiblePus.get( choiceIndex );
 	}
 
 	@Override

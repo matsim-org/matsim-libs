@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,13 +35,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.HitchHikingSpots;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
+import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 import playground.thibautd.router.EmptyStageActivityTypes;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.StageActivityTypes;
@@ -49,17 +50,23 @@ import playground.thibautd.router.StageActivityTypes;
  * @author thibautd
  */
 public class HitchHikingDriverRoutingModule implements RoutingModule {
+	private final SpotWeighter spotWeighter;
 	private final HitchHikingSpots spots;
 	private final HitchHikingConfigGroup config;
 	private final RoutingModule carRoutingModule;
+	private final Random random;
 
 	public HitchHikingDriverRoutingModule(
+			final SpotWeighter spotWeighter,
 			final RoutingModule carRoutingModule,
 			final HitchHikingSpots spots,
-			final HitchHikingConfigGroup config) {
+			final HitchHikingConfigGroup config,
+			final Random random) {
+		this.spotWeighter = spotWeighter;
 		this.spots = spots;
 		this.config = config;
 		this.carRoutingModule = carRoutingModule;
+		this.random = random;
 	}
 
 	@Override
@@ -77,11 +84,12 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 
 		Collection<Link> closeSpots = spots.getSpots( centerX , centerY , maxBeeFlyDist / 2d );
 
-		if (closeSpots.size() < 2) {
+		Link puSpot = getPuSpot( departureTime , o, d , toFacility.getLinkId() , closeSpots );
+
+		if ( puSpot == null ) {
 			return carRoutingModule.calcRoute( fromFacility , toFacility , departureTime , person );
 		}
 
-		Link puSpot = getPuSpot( o, d , closeSpots );
 		List<Id> doSpots = getDoSpots(
 				puSpot,
 				d,
@@ -144,23 +152,52 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 		return ids;
 	}
 
-	private static Link getPuSpot(
+	private Link getPuSpot(
+			final double departureTime,
 			final Coord origin,
 			final Coord destination,
+			final Id destinationId,
 			final Collection<Link> spots) {
+		double maxDetour = CoordUtils.calcDistance( origin , destination ) * ( 1  + config.getMaximumDetourFraction());
 		double currentDetour = Double.POSITIVE_INFINITY;
-		Link pu = null;
+		List<Link> possibleSpots = new ArrayList<Link>();
 
 		for (Link l : spots) {
 			double detour = CoordUtils.calcDistance( origin, l.getCoord() )
 				+ CoordUtils.calcDistance( l.getCoord() , destination );
-			if (detour < currentDetour) {
-				pu = l;
-				currentDetour = detour;
+			if (detour <= maxDetour) {
+				possibleSpots.add( l );
 			}
 		}
 
-		return pu;
+		if (possibleSpots.isEmpty()) {
+			return null;
+		}
+
+		// choose according to weight
+		double sum = 0;
+		List<Double> weights = new ArrayList<Double>();
+
+		for (Link l : possibleSpots) {
+			double w = spotWeighter.weightDriverOrigin(
+					departureTime,
+					l.getId(),
+					destinationId);
+			sum += w;
+			weights.add( w );
+		}
+
+		double choice = random.nextDouble() * sum;
+
+		sum = 0;
+		int choiceIndex = 0;
+		for (double level : weights) {
+			sum += level;
+			if (choice <= level) break;
+			choiceIndex++;
+		}
+
+		return possibleSpots.get( choiceIndex );
 	}
 
 	@Override

@@ -37,6 +37,7 @@ import playground.thibautd.hitchiking.HitchHikingUtils;
 import playground.thibautd.hitchiking.qsim.HitchHikingQsimFactory;
 import playground.thibautd.hitchiking.routing.HitchHikingDriverRoutingModuleFactory;
 import playground.thibautd.hitchiking.routing.HitchHikingPassengerRoutingModuleFactory;
+import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.DefaultRoutingModuleFactory;
 import playground.thibautd.router.RoutingModuleFactory;
@@ -49,10 +50,14 @@ import playground.thibautd.router.TripRouterFactory;
 public class HitchHikingControler extends MultiLegRoutingControler {
 	private static final Logger log =
 		Logger.getLogger(HitchHikingControler.class);
+	private final SpotWeighter spotWeighter;
 
 
-	public HitchHikingControler(final Scenario scenario) {
+	public HitchHikingControler(
+			final Scenario scenario,
+			final SpotWeighter spotWeighter) {
 		super(scenario);
+		this.spotWeighter = spotWeighter;
 	}
 
 	@Override
@@ -106,11 +111,14 @@ public class HitchHikingControler extends MultiLegRoutingControler {
 				HitchHikingConstants.DRIVER_MODE,
 				new HitchHikingDriverRoutingModuleFactory(
 					spots,
+					spotWeighter,
 					hhConfigGroup));
 		factory.setRoutingModuleFactory(
 				HitchHikingConstants.PASSENGER_MODE,
 				new HitchHikingPassengerRoutingModuleFactory(
-					spots) );
+					spots,
+					spotWeighter,
+					hhConfigGroup) );
 
 		// if the user defined something, erase defaults
 		for (Map.Entry<String, RoutingModuleFactory> entry : userDefinedRoutingModuleFactories.entrySet()) {

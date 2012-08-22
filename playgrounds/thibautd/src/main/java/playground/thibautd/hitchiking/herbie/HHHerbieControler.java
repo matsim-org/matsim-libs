@@ -40,6 +40,7 @@ import herbie.running.scoring.TravelScoringFunction;
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.hitchiking.run.HitchHikingControler;
+import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
 
 /**
@@ -56,8 +57,10 @@ public class HHHerbieControler extends HitchHikingControler {
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 	
-	public HHHerbieControler( final Scenario scenario ) {
-		super( scenario );
+	public HHHerbieControler(
+			final Scenario scenario,
+			final SpotWeighter weighter) {
+		super( scenario , weighter );
 		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
 	}
 

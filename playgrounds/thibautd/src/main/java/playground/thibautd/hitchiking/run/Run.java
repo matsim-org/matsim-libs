@@ -25,6 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.hitchiking.HitchHikingUtils;
+import playground.thibautd.hitchiking.spotweights.FrequentationSpotWeighter;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
@@ -38,7 +39,10 @@ public class Run {
 		HitchHikingUtils.loadConfig( config , configFile );
 		Scenario sc = HitchHikingUtils.loadScenario( config );
 
-		MultiLegRoutingControler controler = new HitchHikingControler( sc );
+		// TODO: tune parameters
+		FrequentationSpotWeighter weighter = new FrequentationSpotWeighter();
+		MultiLegRoutingControler controler = new HitchHikingControler( sc , weighter );
+		controler.getEvents().addHandler( weighter );
 		controler.addControlerListener(new ModeAnalysis( true ));
 		controler.run();
 	}
