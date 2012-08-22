@@ -57,7 +57,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.PlansCalcRouteData;
+import org.matsim.core.router.ModularPlanRouter;
 import org.matsim.core.router.PseudoTransitLegRouter;
 import org.matsim.core.router.TeleportationLegRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -181,7 +181,7 @@ public class KnSimplifiedController extends AbstractController {
 	}
 
 
-	private PlansCalcRouteData createRoutingAlgorithm() {
+	private ModularPlanRouter createRoutingAlgorithm() {
 		// factory to generate routes:
 		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
@@ -198,7 +198,7 @@ public class KnSimplifiedController extends AbstractController {
 		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
 
 		// plug it together
-		final PlansCalcRouteData plansCalcRoute = new PlansCalcRouteData();
+		final ModularPlanRouter plansCalcRoute = new ModularPlanRouter();
 		
 		Collection<String> networkModes = this.config.plansCalcRoute().getNetworkModes();
 		for (String mode : networkModes) {
