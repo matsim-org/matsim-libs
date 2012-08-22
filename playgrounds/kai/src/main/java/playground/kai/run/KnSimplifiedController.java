@@ -122,6 +122,7 @@ public class KnSimplifiedController extends AbstractController {
 	public void run() {
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
+		this.setupOutputDirectory(config.controler().getOutputDirectory(), config.controler().getRunId(), true);
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 		this.eventsManager = EventsUtils.createEventsManager(config); 
@@ -130,8 +131,7 @@ public class KnSimplifiedController extends AbstractController {
 		this.legTimes = new CalcLegTimes();
 		this.eventsManager.addHandler(legTimes);
 		this.travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.eventsManager.addHandler(travelTime);
-		this.setupOutputDirectory("out", "1", true);
+		this.eventsManager.addHandler(travelTime);	
 		super.run(config);
 	}
 
