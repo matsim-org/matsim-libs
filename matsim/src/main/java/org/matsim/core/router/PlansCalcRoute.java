@@ -93,7 +93,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private final TravelTime timeCalculator;
 
-	private PlansCalcRouteData data = new PlansCalcRouteData();
+	private ModularPlanRouter data = new ModularPlanRouter();
 
 	/**Does the following (as far as I can see):<ul>
 	 * <li> sets routeAlgo to the path calculator defined by <tt>factory</tt>, using <tt>costCalculator</tt> and <tt>timeCalculator</tt> as arguments </li>
