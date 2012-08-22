@@ -39,6 +39,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -66,6 +67,15 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author mrieser
  */
 public class PlansCalcTransitRoute extends PlansCalcRoute {
+
+	private class PtLegHandler implements LegRouter {
+
+		@Override
+		public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+			return handlePtPlan(leg, fromAct, toAct, depTime, person);
+		}
+
+	}
 
 	private final TransitActsRemover transitLegsRemover = new TransitActsRemover();
 	private final TransitRouter transitRouter;
@@ -102,6 +112,11 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 		if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
 			((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(Collections.singleton(TransportMode.car));
 		}
+		
+		for (String transitMode : this.transitConfig.getTransitModes()) {
+			this.addLegHandler(transitMode, new PtLegHandler());
+		}
+		
 	}
 
 	@Override
@@ -113,14 +128,6 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 		this.replaceLegs();
 		this.currentPlan = null;
 
-	}
-
-	@Override
-	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		if (this.transitConfig.getTransitModes().contains(leg.getMode())) {
-			return this.handlePtPlan(leg, fromAct, toAct, depTime, person);
-		}
-		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 
 	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime, final Person person) {

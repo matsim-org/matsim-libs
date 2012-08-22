@@ -21,7 +21,6 @@
 package org.matsim.core.router;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -31,9 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -41,7 +38,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -66,7 +62,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * */
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	
-	private static final Logger log = Logger.getLogger(PlansCalcRoute.class);
+	static final Logger log = Logger.getLogger(PlansCalcRoute.class);
 
 	private static final String NO_CONFIGGROUP_SET_WARNING = "No PlansCalcRouteConfigGroup"
 		+ " is set in PlansCalcRoute, using the default values. Make sure that those values" +
@@ -94,15 +90,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	protected final Network network;
 
-	private final TravelDisutility costCalculator;
-
 	private final PersonalizableTravelTime timeCalculator;
 
-	private Map<String, LegRouter> legHandlers;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+	private PlansCalcRouteData data = new PlansCalcRouteData();
 
 	/**Does the following (as far as I can see):<ul>
 	 * <li> sets routeAlgo to the path calculator defined by <tt>factory</tt>, using <tt>costCalculator</tt> and <tt>timeCalculator</tt> as arguments </li>
@@ -118,7 +108,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 		this.network = network;
-		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 		this.routeFactory = routeFactory;
 		if (group != null) {
@@ -128,7 +117,18 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			log.warn(NO_CONFIGGROUP_SET_WARNING);
 		}
 
-		initDefaultLegHandlers();
+		Collection<String> networkModes = this.configGroup.getNetworkModes();
+		for (String mode : networkModes) {
+			this.addLegHandler(mode, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
+		}
+		Map<String, Double> teleportedModeSpeeds = this.configGroup.getTeleportedModeSpeeds();
+		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
+			this.addLegHandler(entry.getKey(), new TeleportationLegRouter(this.routeFactory, entry.getValue(), this.configGroup.getBeelineDistanceFactor()));
+		}
+		Map<String, Double> teleportedModeFreespeedFactors = this.configGroup.getTeleportedModeFreespeedFactors();
+		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
+			this.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, entry.getValue(), this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
+		}
 	}
 
 	/**
@@ -150,31 +150,9 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		return this.routeAlgoPtFreeflow;
 	}
 
-	private void initDefaultLegHandlers() {
-		legHandlers = new HashMap<String, LegRouter>();
-		Collection<String> networkModes = this.configGroup.getNetworkModes();
-		for (String mode : networkModes) {
-			this.addLegHandler(mode, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
-		}
-		Map<String, Double> teleportedModeSpeeds = this.configGroup.getTeleportedModeSpeeds();
-		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
-			this.addLegHandler(entry.getKey(), new TeleportationLegRouter(this.routeFactory, entry.getValue(), this.configGroup.getBeelineDistanceFactor()));
-		}
-		Map<String, Double> teleportedModeFreespeedFactors = this.configGroup.getTeleportedModeFreespeedFactors();
-		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
-			this.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, entry.getValue(), this.configGroup.getBeelineDistanceFactor(), this.routeFactory));
-		}
-	}
-
 	public final void addLegHandler(String transportMode, LegRouter legHandler) {
-		if (legHandlers.get(transportMode) != null) {
-			log.warn("A LegHandler for " + transportMode + " legs is already registered - it is replaced!");
-		}
-		legHandlers.put(transportMode, legHandler);
+		data.addLegHandler(transportMode, legHandler);
 	}
-	//////////////////////////////////////////////////////////////////////
-	// run methods
-	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public void run(final Person person) {
@@ -188,51 +166,11 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		handlePlan(plan.getPerson(), plan);
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// helper methods
-	//////////////////////////////////////////////////////////////////////
-
 	protected void handlePlan(Person person, final Plan plan) {
-		double now = 0;
 		if (timeCalculator != null) {
 			timeCalculator.setPerson(person);
 		}
-
-		// loop over all <act>s
-		Activity fromAct = null;
-		Activity toAct = null;
-		Leg leg = null;
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				leg = (Leg) pe;
-			} else if (pe instanceof Activity) {
-				if (fromAct == null) {
-					fromAct = (Activity) pe;
-				} else {
-					toAct = (Activity) pe;
-
-					double endTime = fromAct.getEndTime();
-					double startTime = fromAct.getStartTime();
-					double dur = (fromAct instanceof ActivityImpl ? ((ActivityImpl) fromAct).getMaximumDuration() : Time.UNDEFINED_TIME);
-					if (endTime != Time.UNDEFINED_TIME) {
-						// use fromAct.endTime as time for routing
-						now = endTime;
-					} else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-						// use fromAct.startTime + fromAct.duration as time for routing
-						now = startTime + dur;
-					} else if (dur != Time.UNDEFINED_TIME) {
-						// use last used time + fromAct.duration as time for routing
-						now += dur;
-					} else {
-						throw new RuntimeException("activity of plan of person " + plan.getPerson().getId().toString() + " has neither end-time nor duration." + fromAct.toString());
-					}
-
-					now += handleLeg(person, leg, fromAct, toAct, now);
-
-					fromAct = toAct;
-				}
-			}
-		}
+		data.routePlan(person, plan);
 	}
 
 	/**
@@ -244,13 +182,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * @return the estimated travel time for this leg
 	 */
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		String legmode = leg.getMode();
-		LegRouter legHandler = legHandlers.get(legmode);
-		if (legHandler != null) {
-			return legHandler.routeLeg(person, leg, fromAct, toAct, depTime);
-		} else {
-			throw new RuntimeException("cannot handle legmode '" + legmode + "'.");
-		}
+		return data.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 
 	public ModeRouteFactory getRouteFactory() {
