@@ -43,7 +43,7 @@ import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
  * @author thomas
  *
  */
-public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerTemplate implements ShutdownListener{
+public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
 	

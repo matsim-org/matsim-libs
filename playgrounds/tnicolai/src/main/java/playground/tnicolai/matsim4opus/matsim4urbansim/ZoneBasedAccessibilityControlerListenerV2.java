@@ -46,7 +46,7 @@ import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
  * @author thomas
  *
  */
-public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityControlerListenerTemplate implements ShutdownListener{
+public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityControlerListenerImpl implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV2.class);
 	

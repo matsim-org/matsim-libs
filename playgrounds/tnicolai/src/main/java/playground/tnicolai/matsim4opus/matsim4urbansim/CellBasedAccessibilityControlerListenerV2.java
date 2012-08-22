@@ -106,7 +106,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author thomas
  * 
  */
-public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityControlerListenerTemplate implements ShutdownListener{ // implements ShutdownListener
+public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
 	
 	private static final Logger log = Logger.getLogger(CellBasedAccessibilityControlerListenerV2.class);
 	

@@ -27,9 +27,17 @@ import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 import com.vividsolutions.jts.geom.Point;
 
-public class AccessibilityControlerListenerTemplate{
+/**
+ * improvements aug'12
+ * - accessibility calculation of unified for cell- and zone-base approach
+ * 
+ * 
+ * @author thomas
+ *
+ */
+public class AccessibilityControlerListenerImpl{
 	
-	protected static final Logger log = Logger.getLogger(AccessibilityControlerListenerTemplate.class);
+	protected static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 	public static final String SHAPE_FILE = "SF";
 	public static final String NETWORK = "NW";
 	protected static String fileExtension;
@@ -508,7 +516,7 @@ public class AccessibilityControlerListenerTemplate{
 		private double sumBIKE = 0.;
 		private double sumWALK = 0.;
 		
-		/*package*/ void reset() {
+		public void reset() {
 			this.sumFREESPEED = 0.;
 			this.sumCAR		  = 0.;
 			this.sumBIKE	  = 0.;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.tnicolai.matsim4opus.LeastCostPathTree;
+package playground.tnicolai.matsim4opus.matsim4urbansim.LeastCostPathTree;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -32,6 +32,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
+import org.omg.CORBA.TCKind;
+
+import com.vividsolutions.jts.geom.Point;
+
+import playground.tnicolai.matsim4opus.utils.helperObjects.Distances;
+import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
  * Calculates a least-cost-path tree using Dijkstra's algorithm for calculating a shortest-path
@@ -51,6 +57,7 @@ public class LeastCostPathTree {
 	private final TravelTime ttFunction;
 	private final TravelDisutility tcFunction;
 	private HashMap<Id, NodeData> nodeData = null;
+	private GeneralizedCostSumV2 gcs;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -59,11 +66,13 @@ public class LeastCostPathTree {
 	public LeastCostPathTree(TravelTime tt, TravelDisutility tc) {
 		this.ttFunction = tt;
 		this.tcFunction = tc;
+		this.gcs 		= new GeneralizedCostSumV2();
 	}
 
 	public void calculate(final Network network, final Node origin, final double time) {
 		this.origin = origin;
 		this.dTime = time;
+		this.gcs.reset();
 		
 		this.nodeData = new HashMap<Id, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
 		NodeData d = new NodeData();
@@ -80,6 +89,51 @@ public class LeastCostPathTree {
 		}
 	}
 
+	// ////////////////////////////////////////////////////////////////////
+	// get methods
+	// ////////////////////////////////////////////////////////////////////
+
+	public final Map<Id, NodeData> getTree() {
+		return this.nodeData;
+	}
+
+	/**
+	 * @return Returns the root of the calculated tree, or <code>null</code> if no tree was calculated yet.
+	 */
+	public final Node getOrigin() {
+		return this.origin;
+	}
+
+	public final double getDepartureTime() {
+		return this.dTime;
+	}
+
+	// ////////////////////////////////////////////////////////////////////
+	// private methods
+	// ////////////////////////////////////////////////////////////////////
+
+	private void relaxNode(final Node n, PriorityQueue<Node> pendingNodes) {
+		NodeData nData = nodeData.get(n.getId());
+		double currTime = nData.getTime();
+		double currCost = nData.getCost();
+		for (Link l : n.getOutLinks().values()) {
+			Node nn = l.getToNode();
+			NodeData nnData = nodeData.get(nn.getId());
+			if (nnData == null) {
+				nnData = new NodeData();
+				this.nodeData.put(nn.getId(), nnData);
+			}
+			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, null, null);
+			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime);
+			double visitGeneralizedCost = 0.; // tnicolai todo
+			if (visitCost < nnData.getCost()) {
+				pendingNodes.remove(nn);
+				nnData.visit(n.getId(), visitCost, visitTime, visitGeneralizedCost);
+				pendingNodes.add(nn);
+			}
+		}
+	}
+	
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes
 	// ////////////////////////////////////////////////////////////////////
@@ -146,74 +200,70 @@ public class LeastCostPathTree {
 		}
 	}
 
-	// ////////////////////////////////////////////////////////////////////
-	// get methods
-	// ////////////////////////////////////////////////////////////////////
 
-	public final Map<Id, NodeData> getTree() {
-		return this.nodeData;
-	}
-
-	/**
-	 * @return Returns the root of the calculated tree, or <code>null</code> if no tree was calculated yet.
-	 */
-	public final Node getOrigin() {
-		return this.origin;
-	}
-
-	public final double getDepartureTime() {
-		return this.dTime;
-	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// private methods
-	// ////////////////////////////////////////////////////////////////////
-
-	private void relaxNode(final Node n, PriorityQueue<Node> pendingNodes) {
-		NodeData nData = nodeData.get(n.getId());
-		double currTime = nData.getTime();
-		double currCost = nData.getCost();
-		for (Link l : n.getOutLinks().values()) {
-			Node nn = l.getToNode();
-			NodeData nnData = nodeData.get(nn.getId());
-			if (nnData == null) {
-				nnData = new NodeData();
-				this.nodeData.put(nn.getId(), nnData);
-			}
-			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, null, null);
-			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime);
-			double visitGeneralizedCost = 0.; // tnicolai todo
-			if (visitCost < nnData.getCost()) {
-				pendingNodes.remove(nn);
-				nnData.visit(n.getId(), visitCost, visitTime, visitGeneralizedCost);
-				pendingNodes.add(nn);
-			}
+	
+	
+	public static class GeneralizedCostSumV2 {
+		
+		private double sumFREESPEED;
+		private double sumCAR;
+		private double sumBIKE;
+		private double sumWALK;
+		
+		public GeneralizedCostSumV2(){
+			
+//			Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
+//			
+//			double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
+//			double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
+//			
+//			double offsetWalkTime2Node_h 				= distanceMeasuringPoint2Road_meter / walkSpeedMeterPerHour;
+//			double carTravelTime_meterpersec			= nearestLink.getLength() / tt.getLinkTravelTime(nearestLink, depatureTime);
+//			
+//			double freeSpeedTravelTime_meterpersec 		= nearestLink.getFreespeed();
+//			
+//			double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
+//			double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
+//			double offsetBikeTime_h						= distanceRoad2Node_meter / bikeSpeedMeterPerHour;
+		}
+		
+		public void reset() {
+			this.sumFREESPEED = 0.;
+			this.sumCAR		  = 0.;
+			this.sumBIKE	  = 0.;
+			this.sumWALK	  = 0.;
+		}
+		
+		public void addFreeSpeedCost(double cost){
+			this.sumFREESPEED += cost;
+		}
+		
+		public void addCongestedCarCost(double cost){
+			this.sumCAR += cost;
+		}
+		
+		public void addBikeCost(double cost){
+			this.sumBIKE += cost;
+		}
+		
+		public void addWalkCost(double cost){
+			this.sumWALK += cost;
+		}
+		
+		public double getFreeSpeedSum(){
+			return this.sumFREESPEED;
+		}
+		
+		public double getCarSum(){
+			return this.sumCAR;
+		}
+		
+		public double getBikeSum(){
+			return this.sumBIKE;
+		}
+		
+		public double getWalkSum(){
+			return this.sumWALK;
 		}
 	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// main method
-	// ////////////////////////////////////////////////////////////////////
-
-//	public static void main(String[] args) {
-//		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		Network network = scenario.getNetwork();
-//		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
-//
-//		TravelTime ttc = new TravelTimeCalculator(network, 60, 30 * 3600, scenario.getConfig().travelTimeCalculator());
-//		LeastCostPathTree st = new LeastCostPathTree(ttc, new TravelTimeAndDistanceBasedTravelDisutility(ttc, scenario.getConfig()
-//				.planCalcScore()));
-//		Node origin = network.getNodes().get(new IdImpl(1));
-//		st.calculate(network, origin, 8*3600);
-//		Map<Id, NodeData> tree = st.getTree();
-//		for (Map.Entry<Id, NodeData> e : tree.entrySet()) {
-//			Id id = e.getKey();
-//			NodeData d = e.getValue();
-//			if (d.getPrevNodeId() != null) {
-//				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + d.getPrevNodeId());
-//			} else {
-//				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + "0");
-//			}
-//		}
-//	}
 }

@@ -101,7 +101,7 @@ import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
  * @author thomas
  * 
  */
-public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerTemplate implements ShutdownListener{ // implements ShutdownListener
+public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
 	
 	private static final Logger log = Logger.getLogger(CellBasedAccessibilityControlerListenerV3.class);
 	
