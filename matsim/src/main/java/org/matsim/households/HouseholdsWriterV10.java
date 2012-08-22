@@ -44,28 +44,42 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 	}
 
 	public void writeFile(String filename) throws UncheckedIOException {
+		this.openFileAndWritePreamble(filename);
+		this.writeHouseholds(this.households);
+		this.writeEndAndCloseFile();
+	}
+	
+	/*package*/ void openFileAndWritePreamble(String filename){
 		this.openFile(filename);
 		this.writeXmlHead();
-		this.writeHouseholds(this.households);
+		this.writeHeader();
+	}
+	
+	/*package*/ void writeEndAndCloseFile(){
+		
+		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLDS);
 		this.close();
 	}
-
-	private void writeHouseholds(Households basicHouseholds) throws UncheckedIOException {
+	
+	
+	private void writeHeader(){
 		atts.clear();
 		atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		atts.add(this.createTuple(XMLNS + ":xsi", DEFAULTSCHEMANAMESPACELOCATION));
 		atts.add(this.createTuple("xsi:schemaLocation", MATSIM_NAMESPACE + " " + DEFAULT_DTD_LOCATION + "households_v1.0.xsd"));
 		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLDS, atts);
+	}
+	
+	private void writeHouseholds(Households basicHouseholds) throws UncheckedIOException {
 		Counter counter = new Counter("[HouseholdsWriter] dumped household # ");
 		for (Household h : basicHouseholds.getHouseholds().values()) {
 			this.writeHousehold(h);
 			counter.incCounter();
 		}
 		counter.printCounter();
-		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLDS);
 	}
 
-	private void writeHousehold(Household h) throws UncheckedIOException {
+	/*package*/ void writeHousehold(Household h) throws UncheckedIOException {
 		this.atts.clear();
 		atts.add(this.createTuple(HouseholdsSchemaV10Names.ID, h.getId().toString()));
 		this.writeStartTag(HouseholdsSchemaV10Names.HOUSEHOLD, atts);

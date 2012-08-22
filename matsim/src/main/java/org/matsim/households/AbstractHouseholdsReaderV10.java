@@ -1,0 +1,147 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AbstractHouseholdsReaderV10
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package org.matsim.households;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.households.Income.IncomePeriod;
+import org.xml.sax.Attributes;
+
+
+/**
+ * @author dgrether
+ *
+ */
+abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
+	
+	private List<Id> currentmembers = null;
+
+	private Income currentincome = null;
+
+	private HouseholdsFactory builder = null;
+
+	private Id currentHhId = null;
+
+	private List<Id> currentVehicleIds = null;
+
+	private IncomePeriod currentIncomePeriod;
+
+	private String currentincomeCurrency;
+
+	private final Households households;
+
+	public AbstractHouseholdsReaderV10(Households households) {
+		if (households == null) {
+			throw new IllegalArgumentException("Container for households must not be null!");
+		}
+		this.households = households;
+		this.builder = households.getFactory();
+	}
+	
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
+		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
+			Household currentHousehold = createHousehold();
+			((HouseholdsImpl)this.households).addHousehold(currentHousehold);
+		}
+		else if (HouseholdsSchemaV10Names.INCOME.equalsIgnoreCase(name)) {
+			this.currentincome = this.builder.createIncome(Double.parseDouble(content.trim()), this.currentIncomePeriod);
+			this.currentincome.setCurrency(this.currentincomeCurrency);
+		}
+	}
+
+	/*package*/ Household createHousehold() {
+		Household hh = this.builder.createHousehold(this.currentHhId);
+		((HouseholdImpl) hh).setMemberIds(this.currentmembers);
+		((HouseholdImpl) hh).setVehicleIds(this.currentVehicleIds);		
+		hh.setIncome(this.currentincome);
+		this.currentHhId = null;
+		this.currentVehicleIds = null;
+		this.currentincome = null;
+		this.currentmembers = null;
+		this.currentIncomePeriod = null;
+		this.currentincomeCurrency = null;
+		return hh;
+	}
+
+	/**
+	 * @see org.matsim.core.utils.io.MatsimXmlParser#startTag(java.lang.String, org.xml.sax.Attributes, java.util.Stack)
+	 */
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
+			this.currentHhId = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.ID));
+			this.currentmembers = new ArrayList<Id>();
+			this.currentVehicleIds = new ArrayList<Id>();
+		}
+		else if (HouseholdsSchemaV10Names.MEMBERS.equalsIgnoreCase(name)) {
+//			this.currentmembers = new ArrayList<Id>();
+		}
+		else if (HouseholdsSchemaV10Names.PERSONID.equalsIgnoreCase(name)) {
+			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.REFID));
+			this.currentmembers.add(id);
+		}
+		else if (HouseholdsSchemaV10Names.INCOME.equalsIgnoreCase(name)) {
+			this.currentIncomePeriod = getIncomePeriod(atts.getValue(HouseholdsSchemaV10Names.PERIOD));
+			this.currentincomeCurrency = atts.getValue(HouseholdsSchemaV10Names.CURRENCY);
+		}
+		else if (HouseholdsSchemaV10Names.VEHICLES.equalsIgnoreCase(name)){
+//			this.currentVehicleIds = new ArrayList<Id>();
+		}
+		else if (HouseholdsSchemaV10Names.VEHICLEDEFINITIONID.equalsIgnoreCase(name)) {
+			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.REFID));
+			this.currentVehicleIds.add(id);
+		}
+	}
+
+
+	private IncomePeriod getIncomePeriod(String s) {
+		if (IncomePeriod.day.toString().equalsIgnoreCase(s)) {
+			return IncomePeriod.day;
+		}
+		else if (IncomePeriod.month.toString().equalsIgnoreCase(s)) {
+			return IncomePeriod.month;
+		}
+		else if (IncomePeriod.week.toString().equalsIgnoreCase(s)) {
+			return IncomePeriod.week;
+		}
+		else if (IncomePeriod.hour.toString().equalsIgnoreCase(s)) {
+			return IncomePeriod.hour;
+		}
+		else if (IncomePeriod.second.toString().equalsIgnoreCase(s)) {
+			return IncomePeriod.second;
+		}
+		else if (IncomePeriod.year.toString().equalsIgnoreCase(s)) {
+			return IncomePeriod.year;
+		}
+		throw new IllegalArgumentException("Not known income period!");
+	}
+	
+	/*package*/ Households getHouseholds(){
+		return this.households;
+	}
+	
+	
+}

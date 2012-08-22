@@ -31,13 +31,20 @@ import org.matsim.households.algorithms.HouseholdAlgorithm;
 
 
 /**
- * Basic implementation of the Households container
+ * Basic implementation of the Households container, a pure data class
+ * 
+ * @author dgrether
  */
 public class HouseholdsImpl implements Households{
-	private final static Logger LOG = Logger.getLogger(HouseholdImpl.class);
-	private boolean isStreaming = false;
-	private Counter counter = new Counter (" household # ");
 	
+	private final static Logger LOG = Logger.getLogger(HouseholdImpl.class);
+
+	@Deprecated 
+	private boolean isStreaming = false;
+	
+	@Deprecated 
+	private Counter counter = new Counter (" household # ");
+	@Deprecated 
 	private final List<HouseholdAlgorithm> householdAlgorithms = new ArrayList<HouseholdAlgorithm>();
 
 	private HouseholdsFactory factory;
@@ -90,7 +97,9 @@ public class HouseholdsImpl implements Households{
 	
 	/**
 	 * Run all the algorithms added to the container. 
+	 * @deprecated use HouseholdsAlgorithmRunner instead
 	 */
+	@Deprecated
 	public final void runAlgorithms(){
 		if(!this.isStreaming){
 			for(int i = 0; i < this.householdAlgorithms.size(); i++){
@@ -112,7 +121,9 @@ public class HouseholdsImpl implements Households{
 	
 	/**
 	 * Removes all the algorithms from the Households container.
+	 * @deprecated use HouseholdsAlgorithmRunner instead
 	 */
+	@Deprecated
 	public final void clearAlgorithms(){
 		this.householdAlgorithms.clear();
 	}
@@ -123,7 +134,9 @@ public class HouseholdsImpl implements Households{
 	 * possible that the same algorithm can appear multiple times in the list.
 	 * @param algorithm
 	 * @return
+	 * 	@deprecated use HouseholdsAlgorithmRunner instead
 	 */
+	@Deprecated
 	public boolean removeAlgorithm(final HouseholdAlgorithm algorithm){
 		return this.householdAlgorithms.remove(algorithm);
 	}
@@ -133,7 +146,9 @@ public class HouseholdsImpl implements Households{
 	 * Add the algorithm to the container. Algorithms will be executed in the
 	 * same sequence in which they are added.
 	 * @param algorithm
+	 * @deprecated use HouseholdsAlgorithmRunner instead
 	 */
+	@Deprecated
 	public final void addAlgorithm(final HouseholdAlgorithm algorithm){
 		this.householdAlgorithms.add(algorithm);
 	}
@@ -149,6 +164,10 @@ public class HouseholdsImpl implements Households{
 		return this.households;
 	}
 	
+	/**
+	 * @deprecated use HouseholdsStreamingReaderV10 instead
+	 */
+	@Deprecated
 	public final boolean isStreaming(){
 		return this.isStreaming;
 	}
@@ -159,7 +178,9 @@ public class HouseholdsImpl implements Households{
 	 * want to accumulate the {@link Household}s, but rather execute
 	 * a set of {@link HouseholdAlgorithm}s while reading the a households file.  
 	 * @param isStreaming
+	 * @deprecated use HouseholdsStreamingReaderV10 instead
 	 */
+	@Deprecated
 	public final void setStreaming(final boolean isStreaming){
 		this.isStreaming = isStreaming;
 	}
@@ -167,8 +188,10 @@ public class HouseholdsImpl implements Households{
 	/**
 	 * Prints the current value of the households counter. This should be the
 	 * same as the number of households in the container.
+	 * @deprecated could be invoked directly on this.counter
 	 */
-	public void printCounter(){
+	@Deprecated
+	/*package*/ void printCounter(){
 		this.counter.printCounter();
 	}
 
