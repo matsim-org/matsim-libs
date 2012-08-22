@@ -41,6 +41,8 @@ import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
 import playground.thibautd.router.TripRouter;
 
 /**
+ * Handler for the driver mode.
+ * This is where the magic happens.
  * @author thibautd
  */
 public class DriverRouteHandler implements HitchHikingHandler {

@@ -26,6 +26,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
 /**
+ * The handler for the passenger mode.
+ * Actually does not do anything special.
  * @author thibautd
  */
 public class PassengerRouteHandler implements HitchHikingHandler {

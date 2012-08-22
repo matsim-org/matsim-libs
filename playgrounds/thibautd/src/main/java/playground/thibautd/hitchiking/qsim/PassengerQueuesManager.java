@@ -38,6 +38,8 @@ import playground.thibautd.hitchiking.qsim.events.PassengerStartsWaitingEvent;
 import playground.thibautd.hitchiking.qsim.PassengerQueuesPerLink.Queue;
 
 /**
+ * A departure handler for the "hitch hiking passenger" mode.
+ *
  * @author thibautd
  */
 public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
@@ -52,6 +54,13 @@ public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
 		this.events = events;
 	}
 
+	/**
+	 * If the agent getMode method returns the hitch hiking passenger mode,
+	 * the agent is added to the wait line for its destination at its origin,
+	 * and an event of type {@link PassengerStartsWaitingEvent} is fired.
+	 *
+	 * @return true iff the agent has been identified as a passenger and added to a line
+	 */
 	@Override
 	public boolean handleDeparture(
 			final double now,
@@ -78,6 +87,16 @@ public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
 					link ) );
 	}
 
+	/**
+	 * Gets the maximum number of passengers from the first non-empty queue encountered
+	 * when parsing the possible destinations in the order they are provided.
+	 * Throws a {@link PassengerEndsWaitingEvent} for each returned passenger.
+	 * @param now  the time
+	 * @param pickUpLink the link
+	 * @param possibleDestinations the possible destination links, to search for queues
+	 * @param nPassengers the maximum number of passengers to pick up
+	 * @return a tuple destination link id -- passengers.
+	 */
 	public Tuple<Id, Collection<MobsimAgent>> getPassengersFromFirstNonEmptyQueue(
 			final double now,
 			final Id pickUpLink,

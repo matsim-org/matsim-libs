@@ -23,9 +23,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 
 /**
+ * Interface for a class meant at generating fake plan elements
+ * on the fly during the simulation of a hitch hiking trip
  * @author thibautd
  */
 public interface HitchHikingHandler {
+	/**
+	 * The stage of the trip
+	 */
 	public enum Stage {
 			EGRESS( null ),
 			DROP_OFF( EGRESS ),
@@ -38,6 +43,9 @@ public interface HitchHikingHandler {
 				this.next = next;
 			}
 
+			/**
+			 * @return  The stage following the current one,  or null if it is the last one
+			 */
 			public Stage next() {
 				return next;
 			}

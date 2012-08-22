@@ -43,14 +43,23 @@ import playground.thibautd.router.TripRouter;
  * Agent for simulating casual car-pooling.
  * Rather than using an engine, the agent exposes on-the-fly
  * created activities and legs, derived from the route and the events.
+ *
  * @author thibautd
  */
 public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
+	/**
+	 * the "basic" delegate, used outside of hitch-hiking trips
+	 */
 	private final MobsimDriverPassengerAgent delegate;
 	private final TripRouter router;
 	private final PassengerQueuesManager manager;
 	private final EventsManager events;
 
+	/**
+	 * hitch-hiking-specific delegate.
+	 * One new instance is created for each trip, and is responsible for
+	 * exposing "fake" activities and legs.
+	 */ 
 	private HitchHikingHandler hitchHiker = null;
 
 	// /////////////////////////////////////////////////////////////////////////
