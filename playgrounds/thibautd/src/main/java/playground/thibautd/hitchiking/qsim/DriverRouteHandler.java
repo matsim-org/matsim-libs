@@ -38,6 +38,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
+import playground.thibautd.hitchiking.qsim.events.PassengerDepartsWithDriverEvent;
 import playground.thibautd.router.TripRouter;
 
 /**
@@ -46,6 +47,9 @@ import playground.thibautd.router.TripRouter;
  * @author thibautd
  */
 public class DriverRouteHandler implements HitchHikingHandler {
+	/**
+	 * Maximum number of passengers per driver. 
+	 */
 	public static final int N_PASSENGERS = 3;
 	private final HitchHikingDriverRoute route;
 	private final PassengerQueuesManager queuesManager;
@@ -181,9 +185,10 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	}
 
 	private boolean performPickUp() {
+		final Id pickUpLink =  route.getPickUpLinkId();
 		events.processEvent(
 				events.getFactory().createAgentArrivalEvent(
-						now, agent.getId(), route.getPickUpLinkId(), TransportMode.car));
+						now, agent.getId(), pickUpLink, TransportMode.car));
 
 		Tuple<Id, Collection<MobsimAgent>> destAndPassengers =
 			queuesManager.getPassengersFromFirstNonEmptyQueue(
@@ -199,6 +204,16 @@ public class DriverRouteHandler implements HitchHikingHandler {
 				route(
 					route.getPickUpLinkId(),
 					currentDestination);
+
+			for (MobsimAgent p : passengers) {
+				// fire event for each passenger
+				events.processEvent(
+						new PassengerDepartsWithDriverEvent(
+							now,
+							p.getId(),
+							agent.getId(),
+							pickUpLink));
+			}
 		}
 		else {
 			passengers = null;
