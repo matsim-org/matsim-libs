@@ -85,7 +85,7 @@ public class SfCottbusPtSchedule {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 		
-		this.LINES = ptdir+"lines\\lines.csv";
+		this.LINES = ptdir+"lines\\lines_congregated.csv";
 		this.NETWORK = ptdir+"network_pt.xml";
 		this.config.network().setInputFile(this.NETWORK);
 		ScenarioUtils.loadScenario(this.scenario);
@@ -116,7 +116,7 @@ public class SfCottbusPtSchedule {
 		
 		String[] lines = cottbus.getLineNumbers(cottbus.LINES);
 		
-		for(int nLines = 0; nLines<24; nLines++) {
+		for(int nLines = 0; nLines<16; nLines++) {
 			List<String> transitStopIdStrings = new ArrayList<String>();
 			List<String> stopLinkString = new ArrayList<String>();
 			List<Integer> offset = new ArrayList<Integer>();		
@@ -125,12 +125,12 @@ public class SfCottbusPtSchedule {
 			double firstDep = 0.;
 			double freq = 0.;
 			int counter = 0;
-			String linesfile = cottbus.ptdir+"lines\\all\\"+lineName+".csv";
+			String linesfile = cottbus.ptdir+"lines\\all_congregated\\"+lineName+".csv";
 			BufferedReader br = new BufferedReader(new FileReader(linesfile));
-			if (nLines <=7) cottbus.pt_mode="tram";
-			else if (nLines>7 && nLines<=20) cottbus.pt_mode="pt";
+			if (nLines <=3) cottbus.pt_mode="tram";
+			else if (nLines>3 && nLines<=12) cottbus.pt_mode="pt";
 			else cottbus.pt_mode="train";
-			System.out.println("parsing line" + lineName);
+			System.out.println("parsing line" + lineName + " as "+cottbus.pt_mode);
 				
 				while(br.ready()) {
 					String[] lineEntries = br.readLine().split(";");
@@ -156,7 +156,7 @@ public class SfCottbusPtSchedule {
 			List<TransitRouteStop> stopList = cottbus.createTransitStopFacilities(transitStopIdStrings, stopLinkString, offset,stoptime);
 
 			
-			String lineroutes = cottbus.ptdir+"lines\\all\\"+lineName+"_links.csv";
+			String lineroutes = cottbus.ptdir+"lines\\all_congregated\\"+lineName+"_links.csv";
 			List<String> routeLinks = cottbus.createRouteLinks(lineroutes);
 			//todo
 			

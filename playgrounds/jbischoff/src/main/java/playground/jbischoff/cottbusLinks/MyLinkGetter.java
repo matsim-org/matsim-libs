@@ -63,7 +63,7 @@ public class MyLinkGetter {
 	DijkstraFactory df = new DijkstraFactory();
 	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	String netfile = "E:\\Cottbus\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\network_pt.xml";
+	String netfile = "Z:\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\network_pt.xml";
 	log.info("loading network from " + netfile);
 	network = scenario.getNetwork();
 	new MatsimNetworkReader(scenario).readFile(netfile);
@@ -77,13 +77,16 @@ public class MyLinkGetter {
 	
 	public static void main(String[] args) {
 		MyLinkGetter mgl = new MyLinkGetter();
-		String line = "1417";
-		String dir = "ow";
-		String in = "E:\\Cottbus\\Cottbus_pt\\Linien\\"+line+"\\"+line+dir+".csv";
-		String out = "E:\\Cottbus\\Cottbus_pt\\Linien\\"+line+"\\"+line+dir+"_links.csv";
-		
-		mgl.run(in,out);
-
+//		String line = "1417";
+//		String dir = "ow";
+//		String in = "E:\\Cottbus\\Cottbus_pt\\Linien\\"+line+"\\"+line+dir+".csv";
+//		String out = "E:\\Cottbus\\Cottbus_pt\\Linien\\"+line+"\\"+line+dir+"_links.csv";
+//		
+//		mgl.run(in,out);
+		List<Link> ll = mgl.getLinks(new IdImpl(6546), new IdImpl(6549));
+		for (Link l : ll){
+			System.out.println(l.getId());
+		}
 	}
 
 	public void run(String infile, String outfile) {
