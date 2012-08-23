@@ -66,6 +66,9 @@ public class CountTripsPerMode extends AbstractPAnalyisModule implements Transit
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+			if (ptMode == null) {
+				ptMode = "nonPtMode";
+			}
 			if (ptMode2CountMap.get(ptMode) == null) {
 				ptMode2CountMap.put(ptMode, new Integer(0));
 			}

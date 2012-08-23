@@ -76,13 +76,6 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 			ptMode = "no valid pt mode found";
 		}
 		
-		if (ptMode2SecondsTravelledMap.get(ptMode) == null) {
-			ptMode2SecondsTravelledMap.put(ptMode, new Double(0.0));
-		}
-		if (ptMode2TripCountMap.get(ptMode) == null) {
-			ptMode2TripCountMap.put(ptMode, new Integer(0));
-		}
-		
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
 	}
 
@@ -97,6 +90,17 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+			if (ptMode == null) {
+				ptMode = "nonPtMode";
+			}
+			
+			if (ptMode2SecondsTravelledMap.get(ptMode) == null) {
+				ptMode2SecondsTravelledMap.put(ptMode, new Double(0.0));
+			}
+			if (ptMode2TripCountMap.get(ptMode) == null) {
+				ptMode2TripCountMap.put(ptMode, new Integer(0));
+			}
+			
 			this.ptMode2SecondsTravelledMap.put(ptMode, new Double(this.ptMode2SecondsTravelledMap.get(ptMode) + (event.getTime() - this.agentId2PersonEntersVehicleEventTime.get(event.getPersonId()).doubleValue())));
 			this.ptMode2TripCountMap.put(ptMode, new Integer(this.ptMode2TripCountMap.get(ptMode) + 1));
 		}

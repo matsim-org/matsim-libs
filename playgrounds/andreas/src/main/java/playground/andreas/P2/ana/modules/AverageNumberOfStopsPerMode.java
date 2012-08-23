@@ -83,14 +83,6 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
-		if (ptMode2NumberOfStopsTravelledMap.get(ptMode) == null) {
-			ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(0));
-		}
-		if (ptMode2TripCountMap.get(ptMode) == null) {
-			ptMode2TripCountMap.put(ptMode, new Integer(0));
-		}
-		
 		if (this.vehId2AgentId2StopCountMap.get(event.getVehicleId()) == null) {
 			this.vehId2AgentId2StopCountMap.put(event.getVehicleId(), new HashMap<Id, Integer>());
 		}
@@ -104,6 +96,17 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+			if (ptMode == null) {
+				ptMode = "nonPtMode";
+			}
+			
+			if (ptMode2NumberOfStopsTravelledMap.get(ptMode) == null) {
+				ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(0));
+			}
+			if (ptMode2TripCountMap.get(ptMode) == null) {
+				ptMode2TripCountMap.put(ptMode, new Integer(0));
+			}
+			
 			this.ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(this.ptMode2NumberOfStopsTravelledMap.get(ptMode) + this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).get(event.getPersonId()).intValue()));
 			this.ptMode2TripCountMap.put(ptMode, new Integer(this.ptMode2TripCountMap.get(ptMode) + 1));
 		}

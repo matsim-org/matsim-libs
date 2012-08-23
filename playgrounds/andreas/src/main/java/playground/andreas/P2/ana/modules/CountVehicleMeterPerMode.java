@@ -79,6 +79,9 @@ public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+		if (ptMode == null) {
+			ptMode = "nonPtMode";
+		}
 		if (ptMode2CountMap.get(ptMode) == null) {
 			ptMode2CountMap.put(ptMode, new Double(0.0));
 		}

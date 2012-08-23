@@ -101,11 +101,6 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 			log.warn("Should not happen");
 			ptMode = "no valid pt mode found";
 		}
-		
-		if (ptModeCombination2TripCountMap.get(ptMode) == null) {
-			ptModeCombination2TripCountMap.put(ptMode, new Integer(0));
-		}
-		
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
 	}
 
@@ -113,6 +108,13 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+			if (ptMode == null) {
+				ptMode = "nonPtMode";
+			}
+			if (ptModeCombination2TripCountMap.get(ptMode) == null) {
+				ptModeCombination2TripCountMap.put(ptMode, new Integer(0));
+			}
+			
 			if (this.agentId2LastPtModeUsed.get(event.getPersonId()) != null) {
 				// it's a transfer
 				String tripCombination = this.agentId2LastPtModeUsed.get(event.getPersonId()) + "-" + ptMode;

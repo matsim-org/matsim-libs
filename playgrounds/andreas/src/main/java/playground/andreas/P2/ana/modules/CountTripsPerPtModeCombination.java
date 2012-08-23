@@ -20,7 +20,6 @@
 package playground.andreas.P2.ana.modules;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -89,6 +88,9 @@ public class CountTripsPerPtModeCombination extends AbstractPAnalyisModule imple
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+			if (ptMode == null) {
+				ptMode = "nonPtMode";
+			}
 			if (this.agentId2TripCombination.get(event.getPersonId()) == null) {
 				this.agentId2TripCombination.put(event.getPersonId(), ptMode);
 			} else {
