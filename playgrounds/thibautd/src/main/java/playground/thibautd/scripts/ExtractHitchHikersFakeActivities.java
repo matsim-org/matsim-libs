@@ -36,6 +36,12 @@ import org.matsim.core.events.PersonEventImpl;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
 /**
+ * Parses an event file and creates fake activity starts and ends for the
+ * following events:
+ * <ul>
+ * <li> "waitingTime" activity for the duration for which an agent waits for a driver
+ * <li> departure and arrival activities ant pu and do
+ * </ul>
  * @author thibautd
  */
 public class ExtractHitchHikersFakeActivities {
