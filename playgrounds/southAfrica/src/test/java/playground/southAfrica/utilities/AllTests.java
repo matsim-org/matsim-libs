@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for playground.southAfrica.utilities");
 		
 		suite.addTest(playground.southAfrica.utilities.openstreetmap.AllTests.suite());
+		suite.addTestSuite(playground.southAfrica.utilities.SouthAfricaInflationCorrectorTest.class);
 
 		return suite;
 	}
