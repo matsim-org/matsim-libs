@@ -65,6 +65,18 @@ import herbie.running.scoring.TravelScoringFunction;
  */
 public class HerbieTransitRouter implements TransitRouter {
 
+	/**
+	 * It seems that in the dirty herbie fork, the access and egress
+	 * walk cost were not modified consistently with the custom
+	 * utility, whereas the routing costs were.
+	 * This flags are here to easily include or remove this bug,
+	 * to obtain results consistent with the herbie project.
+	 * Being able to toggle this bug does not make this state more consistent,
+	 * or the results obtained this way more truthworthy...
+	 */
+	private static final boolean MAKE_ACCESS_COST_BUGGED = true;
+	private static final boolean MAKE_EGRESS_COST_BUGGED = true;
+	private static final boolean MAKE_DIRECT_COST_BUGGED = false;
 	private final TransitRouterNetwork transitNetwork;
 
 	private final MultiNodeDijkstra dijkstra;
@@ -120,7 +132,8 @@ public class HerbieTransitRouter implements TransitRouter {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost =
-				//- (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+				MAKE_ACCESS_COST_BUGGED ?
+				- initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s() :
 				- distanceScoring.getWalkScore( distance , initialTime );
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
@@ -138,7 +151,8 @@ public class HerbieTransitRouter implements TransitRouter {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost =
-				// - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+				MAKE_EGRESS_COST_BUGGED ?
+				- initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s() :
 				- distanceScoring.getWalkScore( distance , initialTime );
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
@@ -153,8 +167,9 @@ public class HerbieTransitRouter implements TransitRouter {
 		double directDist = CoordUtils.calcDistance(fromCoord, toCoord);
 		double directWalkTime = directDist / this.config.getBeelineWalkSpeed();
 		double directWalkCost =
-			// CoordUtils.calcDistance(fromCoord, toCoord) /
-			// this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+			MAKE_DIRECT_COST_BUGGED ?
+			CoordUtils.calcDistance(fromCoord, toCoord) /
+				this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()) :
 			- distanceScoring.getWalkScore( 
 					directDist,
 					directWalkTime);
