@@ -213,7 +213,7 @@ public class Controler extends AbstractController {
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final List<MobsimListener> simulationListener = new ArrayList<MobsimListener>();
 
-	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+	private TravelTimeCalculatorFactory travelTimeCalculatorFactory;
 	private MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
 
 	private TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
@@ -307,10 +307,6 @@ public class Controler extends AbstractController {
 	private final void setupMultiModalSimulation() {
 		log.info("setting up multi modal simulation");
 
-		// Use a TravelTimeCalculator that buffers TravelTimes from the previous Iteration.
-		TravelTimeCalculatorWithBufferFactory timeFactory = new TravelTimeCalculatorWithBufferFactory();
-		setTravelTimeCalculatorFactory(timeFactory);
-
 		// set Route Factories
 		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
@@ -367,11 +363,49 @@ public class Controler extends AbstractController {
 	 * scenario data (network, population) is read.
 	 */
 	protected void setUp() {
-		if (this.config.multiModal().isMultiModalSimulationEnabled()) multiModalSetUp();
 
-		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		if (this.travelTimeCalculatorFactory != null) {
+			log.info("travelTimeCalculatorFactory already set, ignoring default");
+		} else {
+			if (this.config.multiModal().isMultiModalSimulationEnabled()) {
+				this.travelTimeCalculatorFactory = new TravelTimeCalculatorWithBufferFactory();
+			} else {
+				this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+			}	 
 		}
+		
+		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		
+		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
+			if (this.config.multiModal().isCreateMultiModalNetwork()) {
+				log.info("Creating multi modal network.");
+				new MultiModalNetworkCreator(this.config.multiModal()).run(this.scenarioData.getNetwork());
+			}
+			
+			if (this.config.multiModal().isEnsureActivityReachability()) {
+				log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
+				new EnsureActivityReachability(this.scenarioData).run(this.scenarioData.getPopulation());
+			}
+			
+			if (this.config.multiModal().isDropNonCarRoutes()) {
+				log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
+				new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
+			}
+			
+			// Wraps the (thread-safe) TravelTime 
+			TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.getTravelTimeCalculator());
+			
+			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, wrapper);
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
+					new WalkTravelTimeFactory(configGroup)));
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(wrapper, 
+					new WalkTravelTimeFactory(configGroup)));
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
+					wrapper, new WalkTravelTimeFactory(configGroup)));
+		}
+
 		if (this.travelCostCalculator == null) {
 			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelDisutility(this.travelTimeCalculator, this.config.planCalcScore());
 		}
@@ -414,36 +448,7 @@ public class Controler extends AbstractController {
 		this.strategyManager = loadStrategyManager();
 	}
 
-	private void multiModalSetUp() {
-		if (this.config.multiModal().isCreateMultiModalNetwork()) {
-			log.info("Creating multi modal network.");
-			new MultiModalNetworkCreator(this.config.multiModal()).run(this.scenarioData.getNetwork());
-		}
-
-		if (this.config.multiModal().isEnsureActivityReachability()) {
-			log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
-			new EnsureActivityReachability(this.scenarioData).run(this.scenarioData.getPopulation());
-		}
-
-		if (this.config.multiModal().isDropNonCarRoutes()) {
-			log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
-			new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
-		}
-
-		// pre-initialize the travel time calculator to be able to use it in the wrapper
-		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.getTravelTimeCalculator());
-
-		PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, wrapper);
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
-				new WalkTravelTimeFactory(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(wrapper, 
-				new WalkTravelTimeFactory(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
-				wrapper, new WalkTravelTimeFactory(configGroup)));
-	}
+	
 
 	/*
 	 * ===================================================================
