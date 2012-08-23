@@ -19,13 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.spotweights;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
@@ -34,11 +36,18 @@ import playground.thibautd.hitchiking.HitchHikingConstants;
  * having interacted with this spot (ie it is destination or success blind).
  *
  * It uses learning with linear forgetting to avoid to much fluctuation.
- *
+ * </b>
  * CAUTION: the weights are NOT valid during the mobsim step.
+ * </b>
+ * To work properly, the instance has to be registered as a StartupListener before
+ * starting the run. It will than insert itself as an AgentDepartureEventHandler
+ * once the EventsManager is initialized. 
  * @author thibautd
  */
-public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEventHandler {
+public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEventHandler, StartupListener {
+	public static final String CONFIG_GROUP_NAME = "frequentationSpotWeighter";
+	public static final String CONFIG_PARAM_RATE = "learningRate";
+	public static final String CONFIG_PARAM_BASE_WEIGHT = "baseWeight";
 	private final double learningRate;
 	private final double baseWeight;
 
@@ -47,13 +56,32 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 
 	private int currentIter = -1;
 
+	public FrequentationSpotWeighter(final Config config) {
+		this( getLearningRate( config ) , getBaseWeight( config ) );
+	}
+
+	private static double getBaseWeight(final Config config) {
+		String v = config == null ? null :
+			config.findParam( CONFIG_GROUP_NAME , CONFIG_PARAM_BASE_WEIGHT );
+		return v == null ? 50 : Double.parseDouble( v );
+	}
+
+	private static double getLearningRate(Config config) {
+		String v = config == null ? null :
+			config.findParam( CONFIG_GROUP_NAME , CONFIG_PARAM_RATE );
+		return v == null ? 0.5 : Double.parseDouble( v );
+	}
+
 	public FrequentationSpotWeighter() {
-		this( 0.5 , 50 );
+		this( null );
 	}
 
 	public FrequentationSpotWeighter(
 			final double learningRate,
 			final double baseWeight) {
+		if (learningRate < 0 || learningRate > 1) {
+			throw new IllegalArgumentException( "invalid learning rate "+learningRate );
+		}
 		this.learningRate = learningRate;
 		this.baseWeight = baseWeight;
 	}
@@ -105,6 +133,11 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 		}
 	}
 
+
+	@Override
+	public void notifyStartup(final StartupEvent event) {
+		event.getControler().getEvents().addHandler( this );
+	}
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////

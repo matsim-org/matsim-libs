@@ -39,10 +39,9 @@ public class Run {
 		HitchHikingUtils.loadConfig( config , configFile );
 		Scenario sc = HitchHikingUtils.loadScenario( config );
 
-		// TODO: tune parameters
-		FrequentationSpotWeighter weighter = new FrequentationSpotWeighter();
+		FrequentationSpotWeighter weighter = new FrequentationSpotWeighter( config );
 		MultiLegRoutingControler controler = new HitchHikingControler( sc , weighter );
-		controler.getEvents().addHandler( weighter );
+		controler.addControlerListener( weighter );
 		controler.addControlerListener(new ModeAnalysis( true ));
 		controler.run();
 	}

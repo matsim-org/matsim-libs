@@ -190,11 +190,11 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 		double choice = random.nextDouble() * sum;
 
 		sum = 0;
-		int choiceIndex = 0;
+		int choiceIndex = -1;
 		for (double level : weights) {
 			sum += level;
-			if (choice <= level) break;
 			choiceIndex++;
+			if (choice <= level) break;
 		}
 
 		return possibleSpots.get( choiceIndex );
