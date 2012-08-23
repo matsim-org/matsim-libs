@@ -46,6 +46,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
+import playground.andreas.P2.ana.PAnalysisManager;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
@@ -92,6 +93,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 //		controler.addControlerListener(new GexfPStat(pConfig, true));
 		controler.addControlerListener(new GexfPStatLight(pConfig));
 		controler.addControlerListener(new Line2GexfPStat(pConfig));
+		controler.addControlerListener(new PAnalysisManager(pConfig, "pt_"));
 	}
 
 	@Override
