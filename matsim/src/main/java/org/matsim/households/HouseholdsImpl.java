@@ -153,12 +153,15 @@ public class HouseholdsImpl implements Households{
 		this.householdAlgorithms.add(algorithm);
 	}
 	
-	
 	@Override
 	public HouseholdsFactory getFactory() {
 		return this.factory;
 	}
 
+	public void setFactory(HouseholdsFactory factory) {
+		this.factory = factory;
+	}
+	
 	@Override
 	public Map<Id, Household> getHouseholds() {
 		return this.households;
