@@ -22,8 +22,13 @@ package playground.toronto.mapping;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,21 +37,28 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.QuadTree;
 
-public class NetworkCreateL2ZMapping {
+public class Link2ZoneMap {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private static final Logger log = Logger.getLogger(NetworkCreateL2ZMapping.class);
-	private final String outfile;
+	private static final Logger log = Logger.getLogger(Link2ZoneMap.class);
+	
+	//////////////////////////////////////////////////////////////////////
+	// member variables
+	//////////////////////////////////////////////////////////////////////
+	
+
+	private HashMap<Id, Integer> linkZoneMap; //LinkId, ZoneId
+	private HashSet<Id> setOfZone;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public NetworkCreateL2ZMapping(final String outfile) {
-		this.outfile = outfile;
+	public Link2ZoneMap(){
+		this.linkZoneMap = new HashMap<Id, Integer>();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -94,21 +106,61 @@ public class NetworkCreateL2ZMapping {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(Network network) {
-		QuadTree<Node> qt = buildCentroidNodeQuadTree(network.getNodes());
-		log.info("# centroid nodes: "+qt.size());
-		try {
-			FileWriter fw = new FileWriter(outfile);
-			BufferedWriter out = new BufferedWriter(fw);
-			for (Link l : network.getLinks().values()) {
-				Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
-				out.write(l.getId().toString()+"\t"+n.getId().toString()+"\n");
-			}
-			out.close();
-			fw.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
+	//TODO build QuadTree w/o zones as part of the network
+	//TODO add functionality to ensure that network WITH nodes as zones is OK.
+	
+	public void run(Network network){
+		log.info("Mapping links to zones...");
+		log.warn("Zones not explicitly defined! Assuming that all nodes with Ids < 10,000 are zones!");
+		
+		HashMap<Id, Node> zones = new HashMap<Id, Node>();
+		
+		
+	}
+	
+	public void run(final Network network, final Map<Id,? extends Node> zones){
+		log.info("Mapping links to zones...");
+		
+		Network tempNetwork = network;
+		for (Node z : zones.values()){
+			tempNetwork.addNode(z);
+			this.setOfZone.add(z.getId());
 		}
+		
+		QuadTree<Node> qt = buildCentroidNodeQuadTree(tempNetwork.getNodes());
+		
+		for (Link l : network.getLinks().values()) {
+			Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
+			this.linkZoneMap.put(l.getId(), Integer.parseInt(n.getId().toString()));
+		}
+		
+		log.info("..done.");
+	}
+	
+	//////////////////////////////////////////////////////////////////////
+	// public methods
+	//////////////////////////////////////////////////////////////////////
+	
+	public void write(String outfile) throws IOException{
+		BufferedWriter bw = new BufferedWriter(new FileWriter(outfile));
+		bw.write("link,zone");
+		for (Entry<Id, Integer> e : this.linkZoneMap.entrySet()){
+			bw.newLine();
+			bw.write(e.getKey() + "," + e.getValue());
+		}
+		bw.close();
+		log.info("Link to zone mapping written to " + outfile);
+	}
+	
+	public int getNumberOfZones(){
+		return this.setOfZone.size();
+	}
+	
+	public Integer getZoneOfLink(Id linkId){
+		return this.linkZoneMap.get(linkId);
+	}
+
+	public Set<Id> getSetOfZone() {
+		return this.setOfZone;
 	}
 }

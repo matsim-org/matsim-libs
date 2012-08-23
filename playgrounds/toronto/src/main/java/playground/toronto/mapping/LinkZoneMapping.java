@@ -52,7 +52,7 @@ public class LinkZoneMapping {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
-		new NetworkCreateL2ZMapping(outputMappingFile).run(network);
+		new Link2ZoneMap().run(network);
 	}
 	
 	public void run(final String[] args) {

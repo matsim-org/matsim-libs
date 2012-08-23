@@ -601,7 +601,7 @@ public class Emme2MatsimConverter {
 		HashSet<Id> hovs = new HashSet<Id>(); 
 		for (Link i : network.getLinks().values()) {
 			LinkImpl L = (LinkImpl) i;
-			if(L.getType().equals("HOV")) hovs.add(L.getId());
+			if(L.getType().equals(TorontoLinkTypes.hov)) hovs.add(L.getId());
 		}
 		
 		log.info("Re-drawing HOV lanes. " + hovs.size() + " links are flagged as HOV");
@@ -623,7 +623,7 @@ public class Emme2MatsimConverter {
 			Link incomingTransfer = null;
 			for (Link L : hovLane.getFromNode().getInLinks().values()) {
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals("HOV transfer")) {
+				if (l.getType().equals(TorontoLinkTypes.hovTransfer)) {
 					if (incomingTransfer != null) 
 						System.out.println("Check here.");
 					incomingTransfer = L; 
@@ -635,7 +635,7 @@ public class Emme2MatsimConverter {
 			Link outgoingTransfer = null;
 			for (Link L : hovLane.getToNode().getOutLinks().values()){
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals("HOV transfer")) {
+				if (l.getType().equals(TorontoLinkTypes.hovTransfer)) {
 					if (outgoingTransfer != null) 
 						System.out.println("Check here.");
 					outgoingTransfer = L; 
@@ -668,7 +668,7 @@ public class Emme2MatsimConverter {
 		ArrayList<Id> rows = new ArrayList<Id>();
 		for (Link i : network.getLinks().values()) {
 			LinkImpl L = (LinkImpl) i;
-			if(L.getType().equals("Streetcar ROW")) rows.add(L.getId());
+			if(L.getType().equals(TorontoLinkTypes.streetcarROW)) rows.add(L.getId());
 		}
 		
 		for (Id i : rows){
@@ -691,8 +691,8 @@ public class Emme2MatsimConverter {
 			ArrayList<Link> incomingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getFromNode().getInLinks().values()) {
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals("Transfer")) incomingTransfers.add(L);
-				if (l.getType().equals("Streetcar ROW")) hasIncomingTransitLink = true;
+				if (l.getType().equals(TorontoLinkTypes.transfer)) incomingTransfers.add(L);
+				if (l.getType().equals(TorontoLinkTypes.streetcarROW)) hasIncomingTransitLink = true;
 			}
 			for (Link l : incomingTransfers) linksToRemove.add(l.getId());
 			
@@ -700,8 +700,8 @@ public class Emme2MatsimConverter {
 			ArrayList<Link> outgoingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getToNode().getOutLinks().values()){
 				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals("Transfer")) outgoingTransfers.add(L);
-				if (l.getType().equals("Streetcar ROW")) hasOutgoingTransitLink = true;
+				if (l.getType().equals(TorontoLinkTypes.transfer)) outgoingTransfers.add(L);
+				if (l.getType().equals(TorontoLinkTypes.streetcarROW)) hasOutgoingTransitLink = true;
 			}
 			for (Link l : outgoingTransfers) linksToRemove.add(l.getId());
 	
@@ -869,29 +869,30 @@ public class Emme2MatsimConverter {
 		
 		//HOV links
 		if (hovVDFs.contains(cells[7])) {
-			if (cells[7].equals("17") || (Double.parseDouble(cells[3]) == 0.0 )) return "HOV transfer";
-			else return "HOV";
+			if (cells[7].equals("17") || (Double.parseDouble(cells[3]) == 0.0 )) return TorontoLinkTypes.hovTransfer;
+			else return TorontoLinkTypes.hov;
 		}
 		
 		//Centroid Connectors
-		if ((Integer.parseInt(cells[1]) < 10000) || (Integer.parseInt(cells[2]) < 10000)) return "CC";
+		if ((Integer.parseInt(cells[1]) < 10000) || (Integer.parseInt(cells[2]) < 10000)) 
+			return TorontoLinkTypes.centroidConnector;
 		
 		//Highway 407 toll road
-		if (cells[7].equals("14")) return "Toll Highway";
+		if (cells[7].equals("14")) return TorontoLinkTypes.ETR407;
 		
-		if (cells[7].equals("11")) return "Highway";
+		if (cells[7].equals("11")) return TorontoLinkTypes.highway;
 		
-		if(cells[7].equals("13") || cells[7].equals("15")) return "On/Off Ramp";
+		if(cells[7].equals("13") || cells[7].equals("15")) return TorontoLinkTypes.ramp;
 		
 		//Exclusive streetcar ROW
-		if (cells[4].equals("sl") || cells[4].equals("s" )| cells[4].equals("l")) return "Streetcar ROW";
+		if (cells[4].equals("sl") || cells[4].equals("s" )| cells[4].equals("l")) return TorontoLinkTypes.streetcarROW;
 		
 		//Transfer to transit (only contains walk/transfer modes)
 		if ((cells[4].contains("t") || cells[4].contains("u") || cells[4].contains("v") || cells[4].contains("w") || cells[4].contains("a") || cells[4].contains("y")) 
 				&& ( !cells[4].contains("c") && !cells[4].contains("h")  && !cells[4].contains("b") && !cells[4].contains("m") && !cells[4].contains("r") 
 						&& !cells[4].contains("g") && !cells[4].contains("s") && !cells[4].contains("l") && !cells[4].contains("i") && !cells[4].contains("f")  
 						&& !cells[4].contains("e") && !cells[4].contains("d") && !cells[4].contains("j")  && !cells[4].contains("p")  && !cells[4].contains("q"))) 
-			return "Transfer";
+			return TorontoLinkTypes.transfer;
 		
 		return "";
 	}

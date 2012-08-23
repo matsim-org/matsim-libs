@@ -5,25 +5,47 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * A class for reconstructing trips from TripComponents.
+ * 
+ * 
+ * @author pkucirek
+ *
+ */
 public class Trip {
 	private List<TripComponent> components;
 	public Integer zone_o;
 	public Integer zone_d;
 	private List<String> routeSet;
 	private Id pid;
+	private double startTime;
+	private double endTime;
 	
 	public Trip(Id personId){
 		this.components = new ArrayList<TripComponent>();
 		this.routeSet = new ArrayList<String>();
 		this.pid = personId;
+		this.startTime = Double.MAX_VALUE;
+		this.endTime = Double.MIN_VALUE;
 	}
 	
 	public void addComponent(TripComponent tc){
 		this.components.add(tc);
+		if (tc.getStartTime() < this.startTime) this.startTime = tc.getStartTime();
+		if (tc.getEndtime() > this.endTime) this.endTime = tc.getEndtime();
+		
 		if (tc instanceof InTransitVehicleComponent){
 			this.routeSet.add(((InTransitVehicleComponent) tc).getFullRouteName());
 		}
 	}
+
+	public double getStartTime(){
+		return this.startTime;
+	}
+	public double getEndTime(){
+		return this.endTime;
+	}
+	
 	
 	public List<String> getTransitRoute(){
 		return this.routeSet;
@@ -31,6 +53,15 @@ public class Trip {
 	
 	public Id getPersonId(){
 		return this.pid;
+	}
+	
+	public double getComponentTime(Class c){
+		double time = 0;
+		for (TripComponent tc : this.components){
+			if (tc.getClass().equals(c))
+				time += (tc.getEndtime() - tc.getStartTime());
+		}
+		return time;
 	}
 	
 	public double getWalkTime(){

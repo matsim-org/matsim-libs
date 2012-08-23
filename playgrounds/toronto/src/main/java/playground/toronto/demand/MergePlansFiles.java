@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class MergePlansFiles {
@@ -74,9 +74,9 @@ public class MergePlansFiles {
 	}
 	
 	private static Population openPlansFile(String filename){
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
-		reader.readFile(filename);
+		Config config = ConfigUtils.createConfig();
+		config.plans().setInputFile(filename);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		return scenario.getPopulation();
 	}
