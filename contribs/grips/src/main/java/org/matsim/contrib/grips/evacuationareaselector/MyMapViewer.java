@@ -38,6 +38,7 @@ import java.awt.geom.Point2D;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
+import org.matsim.contrib.grips.config.ToolConfig;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
@@ -254,14 +255,15 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						g.drawLine(x[i-1], y[i-1], x[i], y[i]);
 					}
 				}
-				g.setColor(new Color(255,0,0,128));
+				g.setColor(ToolConfig.COLOR_EVAC_AREA);
 				g.fillPolygon(x, y, p.getExteriorRing().getNumPoints());
 				
 				
 			} else {
 				int r = (int) (Math.sqrt(Math.pow(sc0.x-sc1.x, 2)+Math.pow(sc0.y-sc1.y, 2))+0.5);
+				g.setColor(ToolConfig.COLOR_EVAC_AREA_BORDER);
 				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
-				g.setColor(new Color(255,0,0,128));
+				g.setColor(ToolConfig.COLOR_EVAC_AREA);
 				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
 			}
 		}

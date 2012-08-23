@@ -46,12 +46,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.grips.config.ToolConfig;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWheelListener, KeyListener, MouseMotionListener {
 
@@ -83,6 +86,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 
 	private final RoadClosuresEditor evacSel;
+
+	private Polygon areaPolygon;
 
 
 	public MyMapViewer(RoadClosuresEditor evacSel) {
@@ -321,17 +326,38 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		//paint map and links
 		super.paint(g);
 		{
-			//get viewport offset
-			Rectangle b = this.getViewportBounds();
-
-			g.setColor(Color.black);
 			Graphics2D g2D = (Graphics2D) g;     
 			g2D.setStroke(new BasicStroke(5F));
-
+			
+			//get viewport offset
+			Rectangle b = this.getViewportBounds();
+			
+			//draw area polygon
+			if (areaPolygon == null)
+				areaPolygon = this.evacSel.getAreaPolygon();
+			
+			if (areaPolygon != null)
+			{
+				g.setColor(ToolConfig.COLOR_EVAC_AREA_BORDER);
+				int [] x = new int[areaPolygon.getExteriorRing().getNumPoints()];
+				int [] y = new int[areaPolygon.getExteriorRing().getNumPoints()];
+				for (int i = 0; i < areaPolygon.getExteriorRing().getNumPoints(); i++) {
+					Coordinate c = areaPolygon.getExteriorRing().getCoordinateN(i);
+					Point2D wldPoint = this.getTileFactory().geoToPixel(new GeoPosition(c.y,c.x), this.getZoom());
+					x[i] = (int) (wldPoint.getX()-b.x);
+					y[i] = (int) (wldPoint.getY()-b.y);
+					if (i > 0) {
+						g.drawLine(x[i-1], y[i-1], x[i], y[i]);
+					}
+				}
+				g.setColor(ToolConfig.COLOR_EVAC_AREA);
+				g.fillPolygon(x, y, areaPolygon.getExteriorRing().getNumPoints());
+			}
+			
 			
 			if (!evacSel.getRoadClosures().isEmpty())
 			{
-				g.setColor(Color.RED);
+				g.setColor(ToolConfig.COLOR_ROAD_CLOSED);
 				
 				Iterator<Entry<Id, String>> it = evacSel.getRoadClosures().entrySet().iterator();
 				
@@ -358,7 +384,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			    }
 				
 			}			
-
 
 			if ((!this.freezeMode)&&(this.currentHoverLinks.size()>0))
 				this.currentHoverLinks.clear();
@@ -390,17 +415,15 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				int x2 = (int) (to2D.getX()-b.x);
 				int y2 = (int) (to2D.getY()-b.y);
 
-				g2D.setStroke(new BasicStroke(5F));
+				g2D.setStroke(new BasicStroke(3F));
 
 				//				//if there is already data available for the current link (road)
 				//				if (this.evacSel.hasLink(fromToIds[2]))
 				//					g.setColor(Color.blue);
 				//				else
-				
-
 
 				
-				g.setColor(new Color(255,255,0,100));
+				g.setColor(ToolConfig.COLOR_ROAD_HOVER);
 
 				int x = (x2-x1);
 				int y = (y2-y1);
@@ -436,7 +459,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 							}
 							g2D.setStroke(new BasicStroke(8F));
-							g.setColor(Color.blue);
+							g.setColor(ToolConfig.COLOR_ROAD_HOVER);
 						}
 
 					}
@@ -447,7 +470,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				if ((!this.freezeMode)||(!this.currentHoverLinks.contains(l))) {
 					g.drawLine(x1,y1,x2,y2);
 				}
-				g.setColor(Color.CYAN);
 			}
 
 			//display selected roads (with arrows)
@@ -518,14 +540,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					int ary = (int) (arrowRightPeakEnd.getY()-b.y);
 
 
-					g.setColor(Color.blue);
+					g.setColor(ToolConfig.COLOR_ROAD_SELECTED);
 					g.drawLine(x1,y1,x2,y2);
 
 					//give each arrow a different color
 					if (i ==0 ) {
-						g.setColor(new Color(255,0,0));
+						g.setColor(ToolConfig.COLOR_ROAD_1);
 					} else {
-						g.setColor(new Color(0,255,0));
+						g.setColor(ToolConfig.COLOR_ROAD_2);
 					}
 					g.drawLine(ax1, ay1, ax2, ay2);
 					g.drawLine(ax2,ay2,alx,aly);

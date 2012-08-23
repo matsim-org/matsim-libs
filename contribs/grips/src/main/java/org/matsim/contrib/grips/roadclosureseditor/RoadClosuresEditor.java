@@ -36,6 +36,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.geotools.feature.Feature;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
@@ -75,9 +77,15 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 
@@ -130,6 +138,8 @@ public class RoadClosuresEditor implements ActionListener{
 	private final String wms;
 
 	private final String layer;
+
+	private Polygon areaPolygon;
 
 	/**
 	 * Launch the application.
@@ -220,7 +230,7 @@ public class RoadClosuresEditor implements ActionListener{
 	private void initialize()
 	{
 		this.frame = new JFrame();
-		this.frame.setBounds(100, 100, 1000, 800);
+		this.frame.setSize(960, 768);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.frame.setResizable(true);
@@ -387,6 +397,8 @@ public class RoadClosuresEditor implements ActionListener{
 			@Override
 			public void componentHidden(ComponentEvent e) {}
 		});
+		
+		this.frame.setLocationRelativeTo(null);
 
 	}
 
@@ -451,6 +463,8 @@ public class RoadClosuresEditor implements ActionListener{
 				this.scPath = file.getParent();
 				Config c = ConfigUtils.loadConfig(this.configFile);
 				this.sc = ScenarioUtils.loadScenario(c);
+				String shp = this.sc.getConfig().getModule("grips").getValue("evacuationAreaFile");			
+				readShapeFile(shp);
 				loadMapView();
 			} else {
 				log.info("Open command cancelled by user.");
@@ -801,4 +815,33 @@ public class RoadClosuresEditor implements ActionListener{
 	public Scenario getScenario() {
 		return this.sc;
 	}
+
+	public Polygon getAreaPolygon()
+	{
+		return areaPolygon;
+	}
+	
+	public void readShapeFile(String shapeFileString)
+	{
+			ShapeFileReader shapeFileReader = new ShapeFileReader();
+			shapeFileReader.readFileAndInitialize(shapeFileString);
+	
+			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
+			for (Feature ft : shapeFileReader.getFeatureSet())
+			{
+				Geometry geo = ft.getDefaultGeometry();
+				//System.out.println(ft.getFeatureType());
+				geometries.add(geo);
+			}
+			
+			int j = 0;			
+			Coordinate [] coords = geometries.get(0).getCoordinates();
+			coords[coords.length-1] = coords[0];
+			
+			GeometryFactory geofac = new GeometryFactory();
+			
+			LinearRing shell = geofac.createLinearRing(coords);
+			areaPolygon = geofac.createPolygon(shell, null);		
+			
+	}	
 }

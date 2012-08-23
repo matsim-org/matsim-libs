@@ -36,6 +36,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.geotools.feature.Feature;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
@@ -74,11 +76,17 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleWriterV1;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class EvacuationPTLinesEditor implements ActionListener{
 
@@ -138,6 +146,8 @@ public class EvacuationPTLinesEditor implements ActionListener{
 	private final String wms;
 
 	private final String layer;
+
+	private Polygon areaPolygon;
 
 	private void setBusStopEditorPanelEnabled(boolean toggle) {
 		if (!toggle) {
@@ -292,10 +302,7 @@ public class EvacuationPTLinesEditor implements ActionListener{
 		});
 
 
-
 		JPanel panelLink1 = new JPanel(new GridLayout(1, 3));
-
-
 
 
 		this.redLinkSelct = new JRadioButton();
@@ -527,6 +534,10 @@ public class EvacuationPTLinesEditor implements ActionListener{
 				this.sc = ScenarioUtils.loadScenario(c);
 				c.scenario().setUseTransit(true);
 				c.scenario().setUseVehicles(true);
+				
+				String shp = this.sc.getConfig().getModule("grips").getValue("evacuationAreaFile");			
+				readShapeFile(shp);
+
 				
 				loadMapView();
 			} else {
@@ -807,5 +818,36 @@ public class EvacuationPTLinesEditor implements ActionListener{
 	public Scenario getScenario() {
 		return this.sc;
 	}
+
+
+
+	public Polygon getAreaPolygon()
+	{
+		return areaPolygon;
+	}
+	
+	public void readShapeFile(String shapeFileString)
+	{
+			ShapeFileReader shapeFileReader = new ShapeFileReader();
+			shapeFileReader.readFileAndInitialize(shapeFileString);
+	
+			ArrayList<Geometry> geometries = new ArrayList<Geometry>();
+			for (Feature ft : shapeFileReader.getFeatureSet())
+			{
+				Geometry geo = ft.getDefaultGeometry();
+				//System.out.println(ft.getFeatureType());
+				geometries.add(geo);
+			}
+			
+			int j = 0;			
+			Coordinate [] coords = geometries.get(0).getCoordinates();
+			coords[coords.length-1] = coords[0];
+			
+			GeometryFactory geofac = new GeometryFactory();
+			
+			LinearRing shell = geofac.createLinearRing(coords);
+			areaPolygon = geofac.createPolygon(shell, null);		
+			
+	}	
 
 }
