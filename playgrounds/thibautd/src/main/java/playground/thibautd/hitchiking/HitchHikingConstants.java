@@ -27,6 +27,5 @@ public class HitchHikingConstants {
 
 	public static final String DRIVER_MODE = "casualCarDriver";
 	public static final String PASSENGER_MODE = "casualPassenger";
-	public static final String SIMULATED_DRIVER_MODE = "simulatedCasualDriver";
 }
 

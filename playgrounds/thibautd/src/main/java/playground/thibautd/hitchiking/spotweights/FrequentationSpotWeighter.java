@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.spotweights;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,8 +29,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
@@ -48,8 +55,12 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	public static final String CONFIG_GROUP_NAME = "frequentationSpotWeighter";
 	public static final String CONFIG_PARAM_RATE = "learningRate";
 	public static final String CONFIG_PARAM_BASE_WEIGHT = "baseWeight";
+	public static final String CONFIG_PARAM_WRITE_INTERVAL = "writeInterval";
 	private final double learningRate;
 	private final double baseWeight;
+	private final int writeInterval;
+
+	private StatsWriter statsWriter = null;
 
 	private final Map<Id, MyDouble> weightsForDrivers = new TreeMap<Id, MyDouble>();
 	private final Map<Id, MyDouble> weightsForPassengers = new TreeMap<Id, MyDouble>();
@@ -57,7 +68,15 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	private int currentIter = -1;
 
 	public FrequentationSpotWeighter(final Config config) {
-		this( getLearningRate( config ) , getBaseWeight( config ) );
+		this( getLearningRate( config ),
+				getBaseWeight( config ),
+				getWriteInterval( config ));
+	}
+
+	private static int getWriteInterval(final Config config) {
+		String v = config == null ? null :
+			config.findParam( CONFIG_GROUP_NAME , CONFIG_PARAM_WRITE_INTERVAL );
+		return v == null ? 10 : Integer.parseInt( v );
 	}
 
 	private static double getBaseWeight(final Config config) {
@@ -78,12 +97,14 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 
 	public FrequentationSpotWeighter(
 			final double learningRate,
-			final double baseWeight) {
+			final double baseWeight,
+			final int writeInterval) {
 		if (learningRate < 0 || learningRate > 1) {
 			throw new IllegalArgumentException( "invalid learning rate "+learningRate );
 		}
 		this.learningRate = learningRate;
 		this.baseWeight = baseWeight;
+		this.writeInterval = writeInterval;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////
@@ -113,6 +134,10 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 		if (iteration > currentIter) {
 			currentIter = iteration;
 
+			if (writeInterval > 0 && iteration % writeInterval == 0) {
+				statsWriter.writeStats( iteration );
+			}
+
 			for (MyDouble v : weightsForDrivers.values()) {
 				v.value *= learningRate;
 			}
@@ -125,11 +150,11 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		final String mode = event.getLegMode();
-		if (mode.equals( HitchHikingConstants.SIMULATED_DRIVER_MODE )) {
-			getValue( event.getLinkId() , weightsForDrivers ).value++;
+		if (mode.equals( HitchHikingConstants.DRIVER_MODE )) {
+			getValue( event.getLinkId() , weightsForPassengers ).value++;
 		}
 		else if (mode.equals( HitchHikingConstants.PASSENGER_MODE )) {
-			getValue( event.getLinkId() , weightsForPassengers ).value++;
+			getValue( event.getLinkId() , weightsForDrivers ).value++;
 		}
 	}
 
@@ -137,12 +162,13 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		event.getControler().getEvents().addHandler( this );
+		statsWriter = new StatsWriter( event.getControler() );
 	}
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
 	private static class MyDouble {
-		public double value = Double.NaN;
+		public double value = 0;
 	}
 
 	private static MyDouble getValue(
@@ -156,6 +182,37 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 		}
 
 		return val;
+	}
+
+	private class StatsWriter {
+		private final OutputDirectoryHierarchy io;
+
+		public StatsWriter(final Controler c)  {
+			io = c.getControlerIO();
+		}
+
+		public void writeStats(final int iter) {
+			try {
+				write( io.getIterationFilename( iter , "weightsForDrivers.dat.gz" ) , weightsForDrivers);
+				write( io.getIterationFilename( iter , "weightsForPassengers.dat.gz" ) , weightsForPassengers);
+			}
+			catch (IOException e) {
+				throw new UncheckedIOException( e );
+			}
+		}
+
+		private void write(
+				final String fileName,
+				final Map<Id, MyDouble> weights) throws IOException {
+			BufferedWriter writer = IOUtils.getBufferedWriter( fileName ); 
+
+			writer.write( "linkId\tweight" );
+			for (Map.Entry<Id, MyDouble> entry : weights.entrySet()) {
+				writer.newLine();
+				writer.write( entry.getKey() +"\t" +(entry.getValue().value + baseWeight) );
+			}
+			writer.close();
+		}
 	}
 }
 
