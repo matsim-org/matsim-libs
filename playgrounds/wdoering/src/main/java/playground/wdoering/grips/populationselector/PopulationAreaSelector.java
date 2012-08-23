@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -34,7 +33,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,27 +67,23 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
+import playground.wdoering.grips.populationselector.MyMapViewer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -390,7 +384,8 @@ public class PopulationAreaSelector implements ActionListener{
 		
 		frame.addComponentListener(new ComponentListener() 
 		{  
-		        public void componentResized(ComponentEvent evt)
+		        @Override
+				public void componentResized(ComponentEvent evt)
 		        {
 		            Component src = (Component)evt.getSource();
 		            Dimension newSize = src.getSize();
@@ -433,13 +428,13 @@ public class PopulationAreaSelector implements ActionListener{
 		if (e.getActionCommand() == "Open") {
 			final JFileChooser fc = new JFileChooser();
 			
-//			fc.setCurrentDirectory(new File("C:/temp/!matsimfiles/hh/demo/output/"));
+			fc.setCurrentDirectory(new File("C:/temp/!matsimfiles/hh/demo/"));
 			
 			fc.setFileFilter(new FileFilter() {
 
 				@Override
 				public String getDescription() {
-					return "MATSim config file";
+					return "GRIPS config file";
 				}
 
 				@Override
@@ -453,6 +448,7 @@ public class PopulationAreaSelector implements ActionListener{
 					return false;
 				}
 			});
+			
 			int returnVal = fc.showOpenDialog(this.frame);
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION)
@@ -486,7 +482,6 @@ public class PopulationAreaSelector implements ActionListener{
 				
 				if (gcm!=null)
 				{
-				
 					this.sc = ScenarioUtils.loadScenario(c);				
 					String osm = this.sc.getConfig().getModule("grips").getValue("networkFile");
 					String shp = gcm.getEvacuationAreaFileName();
@@ -495,8 +490,6 @@ public class PopulationAreaSelector implements ActionListener{
 					this.targetSystem = c.global().getCoordinateSystem();
 					
 					readShapeFile(shp);
-					
-
 					
 	//				this.snapper = new ShapeToStreetSnapperThreadWrapper(osm, this, shp);
 					loadMapView();
@@ -601,7 +594,7 @@ public class PopulationAreaSelector implements ActionListener{
 	public void addNewArea(int index)
 	{
 		editing = true;
-		((DefaultTableModel)areaTable.getModel()).addRow(new Object[]{index, 100});
+		((DefaultTableModel)areaTable.getModel()).addRow(new Object[]{index, "100"});
 		if (!popInput.isEnabled())
 		{
 			popInput.setEnabled(true);
@@ -654,7 +647,7 @@ public class PopulationAreaSelector implements ActionListener{
 			return;
 			
 		CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:4326");
-		AttributeType p = DefaultAttributeTypeFactory.newAttributeType(
+		AttributeType p = AttributeTypeFactory.newAttributeType(
 				"MultiPolygon", MultiPolygon.class, true, null, null, targetCRS);
 		AttributeType t = AttributeTypeFactory.newAttributeType(
 				"persons", Long.class);
@@ -671,10 +664,11 @@ public class PopulationAreaSelector implements ActionListener{
 				DefaultTableModel defModel = (DefaultTableModel)areaTable.getModel();
 				
 				int pop = 23;
-				for (int j = 0; j < defModel.getRowCount(); j++)
-				{
-					if ((Integer) areaTable.getModel().getValueAt(j, 0) == id)
-						pop = Integer.valueOf((String)areaTable.getModel().getValueAt(j, 1));
+				for (int j = 0; j < defModel.getRowCount(); j++){
+					if ((Integer) areaTable.getModel().getValueAt(j, 0) == id){
+						pop = Integer.parseInt(""+areaTable.getModel().getValueAt(j, 1));
+						break;
+					}
 				}
 				
 				FeatureType ft = FeatureTypeFactory.newFeatureType(new AttributeType[] { p, t }, "EvacuationArea");

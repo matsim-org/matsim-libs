@@ -22,7 +22,6 @@ package playground.wdoering.grips.populationselector;
 
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -35,8 +34,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,11 +42,14 @@ import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.contrib.grips.algorithms.PolygonalCircleApproximation;
+import org.matsim.contrib.grips.config.ToolConfig;
+import playground.wdoering.grips.populationselector.PopulationAreaSelector;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
+
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
@@ -124,9 +124,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println("klick!" + " e.getButton():" + e.getButton());
-		
-		
 	}
 
 	@Override
@@ -155,7 +152,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			this.editMode = true;
 			if (this.thread != null) {
-//				System.out.println("interrupt");
 				this.thread.stop();
 			}
 			Rectangle b = this.getViewportBounds();
@@ -315,6 +311,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		
 		super.paint(g);
 		
+		Graphics2D g2D = (Graphics2D) g;     
+		g2D.setStroke(new BasicStroke(2F));
+		
 		//set drawing boolean (to avoid race conditions (polygon hashmap))
 		drawing = true;
 		
@@ -326,6 +325,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		
 		if (areaPolygon != null)
 		{
+			g.setColor(ToolConfig.COLOR_EVAC_AREA_BORDER);
 			
 			int [] x = new int[areaPolygon.getExteriorRing().getNumPoints()];
 			int [] y = new int[areaPolygon.getExteriorRing().getNumPoints()];
@@ -338,17 +338,15 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					g.drawLine(x[i-1], y[i-1], x[i], y[i]);
 				}
 			}
-			g.setColor(new Color(0,0,255,128));
+			
+			g.setColor(ToolConfig.COLOR_EVAC_AREA);
 			g.fillPolygon(x, y, areaPolygon.getExteriorRing().getNumPoints());
 		}
 		
 		//draw population polygon(s)
 		if (this.c0 != null && this.c1 != null)
 		{
-			g.setColor(Color.red);
-			Graphics2D g2D = (Graphics2D) g;     
-			g2D.setStroke(new BasicStroke(2F));
-			
+//			g.setColor(Color.red);
 
 //			//get already selected areas
 //			HashMap<Integer, Polygon> polys = null;
@@ -362,9 +360,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			if (polygons != null)
 			{
 				
+				
 				Iterator it = polygons.entrySet().iterator();
 				while (it.hasNext())
 				{
+					g.setColor(ToolConfig.COLOR_POP_AREA_BORDER);
+					
 					Map.Entry<Integer,Polygon> pairs = (Map.Entry)it.next();
 					int id = pairs.getKey();
 					Polygon p = pairs.getValue();
@@ -380,13 +381,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							g.drawLine(x[i-1], y[i-1], x[i], y[i]);
 						}
 					}
+					
 					if (selectedAreaId==id)
-						g.setColor(new Color(255,0,0,128));
+						g.setColor(ToolConfig.COLOR_AREA_SELECTED);
 					else
-						g.setColor(new Color(180,127,0,128));
+						g.setColor(ToolConfig.COLOR_POP_AREA);
 					
 					g.fillPolygon(x, y, p.getExteriorRing().getNumPoints());
-					
 					
 //					com.vividsolutions.jts.geom.Point c = p.getCentroid();
 //					Point2D centerPoint = this.getTileFactory().geoToPixel(new GeoPosition(c.getY(),c.getX()), this.getZoom());
@@ -407,10 +408,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				Point sc1 = new Point((int)(wldPoint1.getX() - b.x), (int)(wldPoint1.getY() - b.y));
 
 				int r = (int) (Math.sqrt(Math.pow(sc0.x-sc1.x, 2)+Math.pow(sc0.y-sc1.y, 2))+0.5);
-				g.setColor(new Color(255,127,0,255));
-				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
-				g.setColor(new Color(255,127,0,128));
+				
+//				g.setColor(new Color(255,127,0,255));
+//				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
+				g.setColor(ToolConfig.COLOR_AREA_HOVER);
 				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
+				
 			}
 
 		}
