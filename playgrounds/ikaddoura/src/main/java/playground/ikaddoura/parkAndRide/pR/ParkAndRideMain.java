@@ -88,10 +88,7 @@ public class ParkAndRideMain {
 					
 					int probIndex = arg+1;
 					int disableIndex = arg+2;
-					
-					System.out.println(probIndex);
-					System.out.println(args.length);
-					
+				
 					if (probIndex >= args.length - 1){
 						throw new RuntimeException("Missing strategy specifications. Aborting...");
 					}

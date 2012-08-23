@@ -75,7 +75,7 @@ public class TextFileWriter {
 	    } catch (IOException e) {}
 	}
 
-	public void writeFile1(int equalPlanPersonIDs, int improvedPlanPersonIDs, int worsePlanPersonIDs, int improvedPRPlanPersonIDs, String outputFile) {
+	public void writeFile1(int equalPlanPersonIDs, int improvedPlanPersonIDs, int worsePlanPersonIDs, int improvedPRPlanPersonIDs, int worsePRPlanPersonIDs, int equalPRPlanPersonIDs, String outputFile) {
 		
 		File file = new File(outputFile);
 		   
@@ -94,6 +94,12 @@ public class TextFileWriter {
 	        bw.newLine();
 	        String zeile3 = "number of selected plans with Park'n'Ride and a higher score: " + String.valueOf(improvedPRPlanPersonIDs);
 	    	bw.write(zeile3);
+	        bw.newLine();
+	        String zeile4 = "number of selected plans with Park'n'Ride and a lower score: " + String.valueOf(worsePRPlanPersonIDs);
+	    	bw.write(zeile4);
+	        bw.newLine();
+	        String zeile5 = "number of selected plans with Park'n'Ride and an equal score: " + String.valueOf(equalPRPlanPersonIDs);
+	    	bw.write(zeile5);
 	        bw.newLine();
 		
 		    bw.flush();

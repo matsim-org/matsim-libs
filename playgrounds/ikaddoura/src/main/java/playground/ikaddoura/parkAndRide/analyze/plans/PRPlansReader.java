@@ -40,9 +40,13 @@ public class PRPlansReader {
 	private Scenario scenario1;
 	private Scenario scenario2;
 	
-	private List<Person> personsHomeWork = new ArrayList<Person>();
-	private List<Person> allPersonsPR = new ArrayList<Person>();
+	private List<Person> personsHomeWork = new ArrayList<Person>(); // persons who have a home and work activity
+	
+	private List<Person> allPersonsPR = new ArrayList<Person>(); // all persons who have a park-and-ride activity in the selected plan
 	private List<Person> improvedPersonsPR = new ArrayList<Person>();
+	private List<Person> worsePersonsPR = new ArrayList<Person>();
+	private List<Person> equalPersonsPR = new ArrayList<Person>();
+	
 	private Map<Id, ParkAndRideFacility> id2PRFacilities;
 	private List <Person> improvedPlanPersons = new ArrayList<Person>();
 	private List <Person> worsePlanPersons = new ArrayList<Person>();
@@ -87,17 +91,31 @@ public class PRPlansReader {
 		analyzeSelectedPlans_scores();
 		analyzeSelectedPlans_activities();
 		setImprovedPRPersons();
-		
+		setWorsePRPersons();
+		setEqualPRPersons();
+
 		File directory = new File(outputPath);
 		directory.mkdirs();
 		
-		writer.writeFile1(this.equalPlanPersons.size(), this.improvedPlanPersons.size(), this.worsePlanPersons.size(), this.improvedPersonsPR.size(), outputPath + "scoreComparison.txt");		
+		writer.writeFile1(this.equalPlanPersons.size(), this.improvedPlanPersons.size(), this.worsePlanPersons.size(), this.improvedPersonsPR.size(), this.worsePersonsPR.size(), this.equalPersonsPR.size(), outputPath + "scoreComparison.txt");		
 		writer.writeFile2(this.allPersonsPR.size(), this.personsHomeWork.size(), outputPath+"parkAndRideShare.txt");
 		
-		shapeFileWriter.writeShapeFileLines(scenario2, outputPath + "network.shp");			
-		writeShapeFiles(allPersonsPR, "prUsage_allPersons", "prUsage_all.txt");
-		writeShapeFiles(improvedPersonsPR, "prUsage_improvedPersons", "prUsage_improvedPersons.txt");
+		shapeFileWriter.writeShapeFileLines(this.scenario2, outputPath + "network.shp");
 		
+		this.writeShapeFiles_homeWorkCoord(this.allPersonsPR, "allPRUsers");
+		this.writeShapeFiles_PRUsage(this.allPersonsPR, "allPRUsers", "allPRUsers.txt");
+		
+		this.writeShapeFiles_homeWorkCoord(this.improvedPersonsPR, "pRUsers_higherScore");
+		this.writeShapeFiles_PRUsage(this.improvedPersonsPR, "pRUsers_higherScore", "pRUsers_higherScore.txt");
+
+		this.writeShapeFiles_homeWorkCoord(this.worsePersonsPR, "prUsers_lowerScore");
+		this.writeShapeFiles_PRUsage(this.worsePersonsPR, "prUsers_lowerScore", "pRUsers_lowerScore.txt");
+
+		this.writeShapeFiles_homeWorkCoord(this.equalPersonsPR, "prUsers_equalScore");
+		this.writeShapeFiles_PRUsage(this.equalPersonsPR, "prUsers_equalScore", "pRUsers_equalScore.txt");
+
+		writeShapeFiles_homeWorkCoord(this.personsHomeWork, "allHomeWorkPersons");
+
 		System.out.println("Done.");
 	}
 
@@ -106,6 +124,24 @@ public class PRPlansReader {
 		for (Person person : this.allPersonsPR){
 			if (this.improvedPlanPersons.contains(person)){
 				this.improvedPersonsPR.add(person);
+			}
+		}
+	}
+	
+	private void setEqualPRPersons() {
+		
+		for (Person person : this.allPersonsPR){
+			if (this.equalPlanPersons.contains(person)){
+				this.equalPersonsPR.add(person);
+			}
+		}
+	}
+	
+	private void setWorsePRPersons() {
+		
+		for (Person person : this.allPersonsPR){
+			if (this.worsePlanPersons.contains(person)){
+				this.worsePersonsPR.add(person);
 			}
 		}
 	}
@@ -132,6 +168,7 @@ public class PRPlansReader {
 						} else if ( score1 > score2 + tolerance){
 							worsePlanPersons.add(person2);
 						} else {
+							// approx. the same score (within tolerance)
 							equalPlanPersons.add(person2);
 						}
 
@@ -141,15 +178,28 @@ public class PRPlansReader {
 		}		
 	}
 
-	private void writeShapeFiles(List<Person> persons, String outputDir, String outputFile) {
+	private void writeShapeFiles_homeWorkCoord(List<Person> persons, String outputDir) {
 
-		Map<Id, Integer> prLinkId2prActs = new HashMap<Id, Integer>();
 		SortedMap<Id,Coord> homeCoordinates = new TreeMap<Id,Coord>();
 		SortedMap<Id,Coord> workCoordinates = new TreeMap<Id,Coord>();
-		SortedMap<Id,Coord> prCoordinates = new TreeMap<Id,Coord>();
 		
 		homeCoordinates = getCoordinates(persons, "home");
 		workCoordinates = getCoordinates(persons, "work");
+		
+		File directory = new File(outputPath + outputDir);
+		directory.mkdirs();
+		
+		if (persons.isEmpty()){
+			// do nothing
+		} else {
+			shapeFileWriter.writeShapeFilePoints(scenario2, homeCoordinates, outputPath + outputDir + "/homeCoordinates.shp");
+			shapeFileWriter.writeShapeFilePoints(scenario2, workCoordinates, outputPath + outputDir + "/workCoordinates.shp");	
+		}
+	}
+	
+	private void writeShapeFiles_PRUsage(List<Person> persons, String outputDir, String outputFile) {
+		Map<Id, Integer> prLinkId2prActs = new HashMap<Id, Integer>();
+		SortedMap<Id,Coord> prCoordinates = new TreeMap<Id,Coord>();
 		prCoordinates = getCoordinates(persons, ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE);
 		
 		File directory = new File(outputPath + outputDir);
@@ -175,10 +225,7 @@ public class PRPlansReader {
 				}
 			}
 		
-			writer.writeFile3(prLinkId2prActs, this.id2PRFacilities, outputPath + outputFile);
-
-			shapeFileWriter.writeShapeFilePoints(scenario2, homeCoordinates, outputPath + outputDir + "/homeCoordinates.shp");
-			shapeFileWriter.writeShapeFilePoints(scenario2, workCoordinates, outputPath + outputDir + "/workCoordinates.shp");
+			writer.writeFile3(prLinkId2prActs, this.id2PRFacilities, outputPath + "prUsage_" + outputFile);
 			shapeFileWriter.writeShapeFilePoints(scenario2, prCoordinates, outputPath + outputDir + "/prCoordinates.shp");
 			shapeFileWriter.writeShapeFilePRUsage(scenario2, this.id2PRFacilities, prLinkId2prActs, outputPath + outputDir + "/prUsage.shp");
 	
