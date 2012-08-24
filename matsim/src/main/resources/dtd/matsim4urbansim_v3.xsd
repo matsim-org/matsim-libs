@@ -136,7 +136,7 @@
 	<!-- accessibilityParameter element definition -->
 	<xs:complexType name="accessibilityParameterType">
 		<xs:sequence>
-			<xs:element name="accessibilityOpportunitiySamplingRate" type="xs:double"/>
+			<xs:element name="opportunitiySamplingRate" type="xs:double"/>
 			<xs:element name="useLogitScaleParameterFromMATSim" type="xs:boolean"/>
 			<xs:element name="useCarParameterFromMATSim" type="xs:boolean"/>
 			<xs:element name="useBikeParameterFromMATSim" type="xs:boolean"/>
