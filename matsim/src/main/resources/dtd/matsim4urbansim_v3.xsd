@@ -95,6 +95,7 @@
 	<!-- urbansimParameter element definition -->
 	<xs:complexType name="urbansimParameterType">
 		<xs:sequence>
+			<xs:element name="projectName" type="xs:token"/>
 			<xs:element name="populationSamplingRate" type="xs:double"/>
 			<xs:element name="year" type="xs:nonNegativeInteger"/>
 			<xs:element name="opusHome" type="xs:token"/>
@@ -103,8 +104,11 @@
 			<xs:element name="matsim4opusConfig" type="xs:token"/>
 			<xs:element name="matsim4opusOutput" type="xs:token"/>
 			<xs:element name="matsim4opusTemp" type="xs:token"/>
-			<xs:element name="isTestRun" type="xs:boolean"/>
+			<xs:element name="useLocationDistributionShapefileForUrbanSimZone" type="xs:boolean"/>
 			<xs:element name="randomLocationDistributionRadiusForUrbanSimZone" type="xs:double"/>
+			<xs:element name="shapeFileLocationDistributionRadiusForUrbanSimZone" type="fileType" minOccurs="1" 
+				maxOccurs="1"/>
+			<xs:element name="isTestRun" type="xs:boolean"/>
 			<xs:element name="testParameter" type="xs:token"/>
 			<xs:element name="backupRunData" type="xs:boolean"/>
 		</xs:sequence>
@@ -125,15 +129,17 @@
 			<xs:element name="boundingBoxLeft" type="xs:double"/>
 			<xs:element name="boundingBoxRight" type="xs:double"/>
 			<xs:element name="boundingBoxBottom" type="xs:double"/>
+			<xs:element name="timeOfADay" type="xs:double"/>
 		</xs:sequence>
 	</xs:complexType>
 	
 	<!-- accessibilityParameter element definition -->
 	<xs:complexType name="accessibilityParameterType">
 		<xs:sequence>
-			<xs:element name="accessibilityDestinationSamplingRate" type="xs:double"/>
+			<xs:element name="accessibilityOpportunitiySamplingRate" type="xs:double"/>
 			<xs:element name="useLogitScaleParameterFromMATSim" type="xs:boolean"/>
 			<xs:element name="useCarParameterFromMATSim" type="xs:boolean"/>
+			<xs:element name="useBikeParameterFromMATSim" type="xs:boolean"/>
 			<xs:element name="useWalkParameterFromMATSim" type="xs:boolean"/>
 			<xs:element name="useRawSumsWithoutLn" type="xs:boolean"/>
 			<xs:element name="logitScaleParameter" type="xs:double"/>
@@ -146,6 +152,15 @@
 			<xs:element name="betaCarTravelCost" type="xs:double"/>
 			<xs:element name="betaCarTravelCostPower2" type="xs:double"/>
 			<xs:element name="betaCarLnTravelCost" type="xs:double"/>
+			<xs:element name="betaBikeTravelTime" type="xs:double"/>
+			<xs:element name="betaBikeTravelTimePower2" type="xs:double"/>
+			<xs:element name="betaBikeLnTravelTime" type="xs:double"/>
+			<xs:element name="betaBikeTravelDistance" type="xs:double"/>
+			<xs:element name="betaBikeTravelDistancePower2" type="xs:double"/>
+			<xs:element name="betaBikeLnTravelDistance" type="xs:double"/>
+			<xs:element name="betaBikeTravelCost" type="xs:double"/>
+			<xs:element name="betaBikeTravelCostPower2" type="xs:double"/>
+			<xs:element name="betaBikeLnTravelCost" type="xs:double"/>
 			<xs:element name="betaWalkTravelTime" type="xs:double"/>
 			<xs:element name="betaWalkTravelTimePower2" type="xs:double"/>
 			<xs:element name="betaWalkLnTravelTime" type="xs:double"/>
