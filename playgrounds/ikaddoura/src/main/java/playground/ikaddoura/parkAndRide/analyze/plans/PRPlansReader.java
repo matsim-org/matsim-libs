@@ -69,7 +69,7 @@ public class PRPlansReader {
 //		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
 //		netFile = "/Users/Ihab/Desktop/test/network.xml";
 //		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
-//		zoneInputFile = "/Users/Ihab/Desktop/test/dlm_gemeinden.shp";
+//		zoneInputFile = "/Users/Ihab/Desktop/test/rasterBB.shp";
 //		outputPath = "/Users/Ihab/Desktop/analyseOutput/";
 //		tolerance = 1.0;
 
@@ -82,7 +82,7 @@ public class PRPlansReader {
 		zoneInputFile = args[4];
 		outputPath = args[5];
 		tolerance = Double.parseDouble(args[6]);
-//		
+		
 		PRPlansReader analysis = new PRPlansReader();
 		analysis.run();
 	}
