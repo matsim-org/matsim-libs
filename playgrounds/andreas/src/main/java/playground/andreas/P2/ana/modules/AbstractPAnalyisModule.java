@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * 
@@ -95,5 +96,14 @@ public abstract class AbstractPAnalyisModule {
 	 * @return The results collected by the module. Must be in the same order as the header.
 	 */
 	public abstract String getResult();
+	
+	/**
+	 * This is called before a new iteration starts. Update everything needed.
+	 * 
+	 * @param vehicles The vehicles used in the current iteration.
+	 */
+	public void updateVehicles(Vehicles vehicles) {
+				
+	}
 
 }
