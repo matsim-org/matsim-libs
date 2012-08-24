@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -20,7 +22,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.config.ConfigUtils;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 import playground.ikaddoura.parkAndRide.pR.PRFileReader;
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideConstants;
@@ -34,6 +41,7 @@ public class PRPlansReader {
 	static String plansFile2; // output Plans
 	static String netFile;
 	static String prFacilitiesFile;
+	static String zoneFile;
 	static String outputPath;
 	static double tolerance;
 	
@@ -57,22 +65,23 @@ public class PRPlansReader {
 			
 	public static void main(String[] args) throws IOException {
 		
-//		plansFile1 = "/Users/Ihab/Desktop/test/population1.xml";
-//		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
-//		netFile = "/Users/Ihab/Desktop/test/network.xml";
-//		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
-//		outputPath = "/Users/Ihab/Desktop/analyseOutput/";
-//		tolerance = 1.0;
+		plansFile1 = "/Users/Ihab/Desktop/test/population1.xml";
+		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
+		netFile = "/Users/Ihab/Desktop/test/network.xml";
+		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
+		zoneFile = "/Users/Ihab/Desktop/test/dlm_gemeinden.shp";
+		outputPath = "/Users/Ihab/Desktop/analyseOutput/";
+		tolerance = 1.0;
 
 		// ****************************
 		
-		plansFile1 = args[0];
-		plansFile2 = args[1];
-		netFile = args[2];
-		prFacilitiesFile = args[3];
-		outputPath = args[4];
-		tolerance = Double.parseDouble(args[5]);
-		
+//		plansFile1 = args[0];
+//		plansFile2 = args[1];
+//		netFile = args[2];
+//		prFacilitiesFile = args[3];
+//		outputPath = args[4];
+//		tolerance = Double.parseDouble(args[5]);
+//		
 		PRPlansReader analysis = new PRPlansReader();
 		analysis.run();
 	}
@@ -93,6 +102,12 @@ public class PRPlansReader {
 		setImprovedPRPersons();
 		setWorsePRPersons();
 		setEqualPRPersons();
+		
+		try {
+			analyzeZones(zoneFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		File directory = new File(outputPath);
 		directory.mkdirs();
@@ -117,6 +132,64 @@ public class PRPlansReader {
 		writeShapeFiles_homeWorkCoord(this.personsHomeWork, "allHomeWorkPersons");
 
 		System.out.println("Done.");
+	}
+
+	private void analyzeZones(String zoneFile) throws IOException {
+		
+		Map<Integer, Geometry> nr2zoneGeometry = new HashMap<Integer, Geometry>();
+		Map<Integer, Integer> nr2homeAll = new HashMap<Integer, Integer>();	
+		Map<Integer, Integer> nr2homePR = new HashMap<Integer, Integer>();
+		Map<Integer, Double> nr2PRUsersHomeShare = new HashMap<Integer, Double>();	
+
+		ShapeFileReader reader = new ShapeFileReader();
+		Set<Feature> features;
+		features = reader.readFileAndInitialize(zoneFile);
+		for (Feature feature : features) {
+			nr2zoneGeometry.put(Integer.parseInt((String)feature.getAttribute("NR")), feature.getDefaultGeometry());
+		}
+				
+		SortedMap<Id,Coord> id2homeCoordAll = getCoordinates(this.personsHomeWork, "home");
+		
+		for (Coord coord : id2homeCoordAll.values()) {
+			for (Integer nr : nr2zoneGeometry.keySet()) {
+				Geometry geometry = nr2zoneGeometry.get(nr);
+				Point p = MGC.coord2Point(coord); 
+				
+				if (p.within(geometry)){
+					if (nr2homeAll.get(nr) == null){
+						nr2homeAll.put(nr, 1);
+					} else {
+						int homes = nr2homeAll.get(nr);
+						nr2homeAll.put(nr, homes + 1);
+					}
+				}
+			}
+		}
+		
+		SortedMap<Id,Coord> id2homeCoordPRUsers = getCoordinates(this.allPersonsPR, "home");
+		
+		for (Coord coord : id2homeCoordPRUsers.values()) {
+			for (Integer nr : nr2zoneGeometry.keySet()) {
+				Geometry geometry = nr2zoneGeometry.get(nr);
+				if (geometry.getEnvelopeInternal().contains(MGC.coord2Coordinate(coord))){
+					if (nr2homePR.get(nr) == null){
+						nr2homePR.put(nr, 1);
+					} else {
+						int homes = nr2homePR.get(nr);
+						nr2homePR.put(nr, homes + 1);
+					}
+				}
+			}
+		}
+		
+		for (Integer nr : nr2homeAll.keySet()){
+			double share = (double) nr2homePR.get(nr) / (double) nr2homeAll.get(nr);
+			nr2PRUsersHomeShare.put(nr, share);
+			System.out.println("Zonen-Nr: " + nr + " PR home share: " + share);
+		}
+		
+		shapeFileWriter.writeShapeFileGeometry(nr2zoneGeometry, nr2PRUsersHomeShare, outputPath + "/prUsersHomeShare.shp");
+		
 	}
 
 	private void setImprovedPRPersons() {

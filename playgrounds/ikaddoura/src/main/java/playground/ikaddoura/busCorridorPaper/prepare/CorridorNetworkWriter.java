@@ -48,7 +48,7 @@ public class CorridorNetworkWriter {
 	private Scenario scenario;
 	private Network network;
 	private final int linkNr = 40; // each direction
-	private final double capacityCarLinks = 50;
+	private final double capacityCarLinks = 200;
 	private final double capacityBusLinks = 4000;
 	private final double freeSpeedCarLinks = 13.8888888889;
 	private final double freeSpeedBusLinks = 8.3333333333;
@@ -72,7 +72,7 @@ public class CorridorNetworkWriter {
 		setLinks();
 		
 		NetworkWriter networkWriter = new NetworkWriter(network);
-		networkWriter.write("../../shared-svn/studies/ihab/busCorridor/input_Latsis/network_welfareBusCorridor_bus4000_car50.xml");
+		networkWriter.write("../../shared-svn/studies/ihab/busCorridor/input_Latsis/network_welfareBusCorridor_bus4000_car200.xml");
 	}
 	
 	private void createBusLinks(int linkNr) {
