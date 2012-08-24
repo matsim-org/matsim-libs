@@ -263,11 +263,11 @@ public class CreateTestScenario {
 		
 		@SuppressWarnings("serial")
 		List<Id> linkIds = new ArrayList<Id>(){{
-			add(new IdImpl("A-B3"));
-			add(new IdImpl("B3-C"));
+			add(new IdImpl("A-B1"));
+			add(new IdImpl("B1-C"));
 			add(new IdImpl("C-C"));
-			add(new IdImpl("C-B3"));
-			add(new IdImpl("B3-A"));
+			add(new IdImpl("C-B1"));
+			add(new IdImpl("B1-A"));
 		}};
 		route.setLinkIds(route.getStartLinkId(), linkIds, route.getEndLinkId());
 		

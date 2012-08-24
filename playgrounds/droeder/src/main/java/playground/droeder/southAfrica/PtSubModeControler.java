@@ -31,6 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
+import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
 import playground.droeder.southAfrica.routing.PlansCalcSubModeDependendTransitRoute;
 import playground.droeder.southAfrica.routing.PtSubModeDependRouterFactory;
 
@@ -49,6 +50,8 @@ public class PtSubModeControler extends Controler {
 	 */
 	public PtSubModeControler(String configFile, boolean routeOnSameMode) {
 		super(configFile);
+		//necessary for departure-handling
+		super.setMobsimFactory(new TransitSubModeQSimFactory());
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
 		super.setTransitRouterFactory(new PtSubModeDependRouterFactory(this, routeOnSameMode));
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-transitWalk"-legs

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -45,6 +46,16 @@ import playground.droeder.southAfrica.replanning.PtSubModePtInteractionRemover;
  *
  */
 public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute{
+	
+	
+	private class PtSubModeLegHandler implements LegRouter {
+
+		@Override
+		public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+			return handlePtPlan(person, leg, fromAct, toAct, depTime);
+		}
+
+	}
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -79,6 +90,9 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 		}
 		this.router = (PtSubModeDependendRouter) transitRouter;
 		this.config = transitConfig;
+		for (String transitMode : transitConfig.getTransitModes()) {
+			this.addLegHandler(transitMode, new PtSubModeLegHandler());
+		}
 	}
 	
 	@Override
@@ -87,10 +101,9 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 		super.handlePlan(person, plan);
 	}
 
-	@Override
-	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		//use own method if leg is a transit-leg (not only pt!)
-		if (this.config.getTransitModes().contains(leg.getMode())) {
+	protected double handlePtPlan(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+//		//use own method if leg is a transit-leg (not only pt!)
+//		if (this.config.getTransitModes().contains(leg.getMode())) {
 			List<Leg> legs= this.router.calcRoute(person, leg, fromAct, toAct, depTime);
 			for(int i = 0; i < legs.size(); i++) {
 				//not very nice, but legMode needs to be replaced here, because TransportMode.pt is 'hardcoded' in TransitRouterImpl... 
@@ -106,8 +119,8 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 				}
 			}
 			return travelTime;
-		}
-		//otherwise use original
-		return super.handleLeg(person, leg, fromAct, toAct, depTime);
+//		}
+//		//otherwise use original
+//		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 }
