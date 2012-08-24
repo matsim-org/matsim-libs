@@ -98,7 +98,13 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 			ptMode2CountMap.put(ptMode, new Double(0.0));
 		}
 		
-		double capacity = this.vehId2VehicleCapacity.get(event.getVehicleId()).doubleValue();
+		double capacity;
+		if(event.getPersonId().toString().startsWith(super.ptDriverPrefix)){
+			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId()).doubleValue();
+		}else{
+			// it's a car, which will not appear in the vehicles-list, called in updateVehicles \dr
+			capacity = 1;
+		}
 		double capacityMeterForThatLink = capacity * this.network.getLinks().get(event.getLinkId()).getLength();
 
 		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + capacityMeterForThatLink));
