@@ -105,8 +105,8 @@
 			<xs:element name="matsim4opusOutput" type="xs:token"/>
 			<xs:element name="matsim4opusTemp" type="xs:token"/>
 			<xs:element name="useShapefileLocationDistribution" type="xs:boolean"/>
-			<xs:element name="UrbanSimZoneRadiusLocationDistribution" type="xs:double"/>
-			<xs:element name="UrbanSimZoneShapefileLocationDistribution" type="fileType" minOccurs="1" 
+			<xs:element name="urbanSimZoneRadiusLocationDistribution" type="xs:double"/>
+			<xs:element name="urbanSimZoneShapefileLocationDistribution" type="fileType" minOccurs="1" 
 				maxOccurs="1"/>
 			<xs:element name="isTestRun" type="xs:boolean"/>
 			<xs:element name="testParameter" type="xs:token"/>
