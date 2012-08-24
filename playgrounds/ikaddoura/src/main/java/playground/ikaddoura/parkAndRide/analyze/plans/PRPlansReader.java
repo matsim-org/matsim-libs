@@ -65,22 +65,23 @@ public class PRPlansReader {
 			
 	public static void main(String[] args) throws IOException {
 		
-		plansFile1 = "/Users/Ihab/Desktop/test/population1.xml";
-		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
-		netFile = "/Users/Ihab/Desktop/test/network.xml";
-		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
-		zoneInputFile = "/Users/Ihab/Desktop/test/dlm_gemeinden.shp";
-		outputPath = "/Users/Ihab/Desktop/analyseOutput/";
-		tolerance = 1.0;
+//		plansFile1 = "/Users/Ihab/Desktop/test/population1.xml";
+//		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
+//		netFile = "/Users/Ihab/Desktop/test/network.xml";
+//		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
+//		zoneInputFile = "/Users/Ihab/Desktop/test/dlm_gemeinden.shp";
+//		outputPath = "/Users/Ihab/Desktop/analyseOutput/";
+//		tolerance = 1.0;
 
 		// ****************************
 		
-//		plansFile1 = args[0];
-//		plansFile2 = args[1];
-//		netFile = args[2];
-//		prFacilitiesFile = args[3];
-//		outputPath = args[4];
-//		tolerance = Double.parseDouble(args[5]);
+		plansFile1 = args[0];
+		plansFile2 = args[1];
+		netFile = args[2];
+		prFacilitiesFile = args[3];
+		zoneInputFile = args[4];
+		outputPath = args[5];
+		tolerance = Double.parseDouble(args[6]);
 //		
 		PRPlansReader analysis = new PRPlansReader();
 		analysis.run();
