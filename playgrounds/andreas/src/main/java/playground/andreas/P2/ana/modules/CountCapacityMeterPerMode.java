@@ -103,6 +103,7 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId()).doubleValue();
 		}else{
 			// it's a car, which will not appear in the vehicles-list, called in updateVehicles \dr
+			// TODO [AN] nonPtMode is not fully implemented - check that again
 			capacity = 1;
 		}
 		double capacityMeterForThatLink = capacity * this.network.getLinks().get(event.getLinkId()).getLength();

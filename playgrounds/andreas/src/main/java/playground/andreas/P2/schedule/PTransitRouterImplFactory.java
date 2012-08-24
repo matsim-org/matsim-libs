@@ -46,6 +46,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
+import playground.andreas.P2.ana.ActivityLocationsParatransitUser;
 import playground.andreas.P2.ana.PAnalysisManager;
 import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
@@ -103,6 +104,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		}else{
 			controler.addControlerListener(new PAnalysisManager(pConfig, "pt_", lineSetter));
 		}
+		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig));
 	}
 
 	@Override
