@@ -39,7 +39,6 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
@@ -47,8 +46,10 @@ import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
-import playground.tnicolai.matsim4opus.gis.ZoneMapper;
-import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
+import playground.tnicolai.matsim4opus.gis.ZoneUtil;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeBasedTravelDisutility;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
@@ -56,7 +57,11 @@ import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 /**
  * This controller version is designed for the sustaincity mile stone (Month 18).
  * 
- * This works for UrbanSim Zone and Parcel Applications !!! (march'12)
+ * improvements / changes march'12
+ * - This controler works for UrbanSim Zone and Parcel Applications
+ * 
+ * improvements / changes aug'12
+ * - added calculation of free speed car and bike travel times
  * 
  * @author nagel
  * @author thomas
@@ -99,12 +104,20 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
+		
+		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		double bikeSpeedMeterPerMinute = 250.; // corresponds to 15 km/h 
 
 		// init least cost path tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
+		// get the free-speed car travel times (in seconds)
+		LeastCostPathTree lcptFreeSpeedCarTravelTime = new LeastCostPathTree( ttc, new FreeSpeedTravelTimeCostCalculator() );
+		// get the congested car travel time (in seconds)
+		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree(ttc,new TravelTimeBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
+		// get travel distance (in meter)
+		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
 		// tnicolai: calculate "distance" as walk time -> add "am_walk_time_in_minutes:f4" to header
-		LeastCostPathTree lcptWalkTime = new LeastCostPathTree(ttc, new TravelWalkTimeCostCalculator( sc.getConfig().plansCalcRoute().getWalkSpeed() ));
+		
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
@@ -120,7 +133,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			log.info("Computing and writing zone2zone impedance matrix ..." );
 
 			// init array with zone informations
-			ZoneObject[] zones = ZoneMapper.mapZoneCentroid2NearestNode(this.zones, network);
+			ZoneObject[] zones = ZoneUtil.mapZoneCentroid2NearestNode(this.zones, network);
 			// init progress bar
 			ProgressBar bar = new ProgressBar( zones.length );
 			log.info("Processing " + zones.length + " UrbanSim zones ...");
@@ -137,7 +150,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 				
 				// run dijksrtra for current node as origin
 				lcptCongestedTravelTime.calculate(network, fromNode, depatureTime);
-				lcptWalkTime.calculate(network, fromNode, depatureTime);
+				lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
+				lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				for(int toZoneIndex = 0; toZoneIndex < zones.length; toZoneIndex++){
 					
@@ -145,20 +159,31 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					Node toNode = zones[toZoneIndex].getNearestNode();
 					Id destinationZoneID = zones[toZoneIndex].getZoneID();
 					
-					// get arrival time
-					double arrivalTime = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getTime();
-					// congested car travel times in minutes
-					double travelTime_min = (arrivalTime - depatureTime) / 60.;
-					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
-					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
-					if(travelTime_min < 1.2)
-						travelTime_min = 1.2;
+					// free speed car travel times in minutes
+					double freeSpeedTravelTime_min = (lcptFreeSpeedCarTravelTime.getTree().get( toNode.getId() ).getCost() / 60.);
+					if(freeSpeedTravelTime_min < 1.)
+						freeSpeedTravelTime_min = 1.;
+					
 					// get travel cost (marginal cost of time * travel time)
 					double travelCost_util = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getCost();
 					if(travelCost_util < 1.2)
 						travelCost_util = 1.2;
-					// get walk travel time (link lengths in meter)
-					double walkTravelTime_min = lcptWalkTime.getTree().get( toNode.getId() ).getCost() / 60.;
+					
+					// get congested arrival time
+					double arrivalTime = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getTime();
+					// congested car travel times in minutes
+					double congestedTravelTime_min = (arrivalTime - depatureTime) / 60.;
+					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
+					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
+					if(congestedTravelTime_min < 1.2)
+						congestedTravelTime_min = 1.2;
+
+					// travel distance in meter
+					double travelDistance_meter = lcptTravelDistance.getTree().get( toNode.getId() ).getCost();
+					double bikeTravelTime_min = travelDistance_meter / bikeSpeedMeterPerMinute;
+					if(bikeTravelTime_min < 4.)
+						bikeTravelTime_min = 4.;
+					double walkTravelTime_min = travelDistance_meter / walkSpeedMeterPerMinute;
 					if(walkTravelTime_min < 12.)
 						walkTravelTime_min = 12.;
 					
@@ -172,9 +197,11 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					// 			  when changing anything at this call.
 					travelDataWriter.write ( originZoneID.toString()			//origin zone id
 										+ "," + destinationZoneID.toString()	//destination zone id
-										+ "," + travelCost_util 				//congested tcost
-										+ "," + travelTime_min 					//congested ttimes
-										+ "," + walkTravelTime_min				//walk ttimes
+										+ "," + freeSpeedTravelTime_min			//free speed travel times
+										+ "," + travelCost_util 				//congested generalized cost
+										+ "," + congestedTravelTime_min 		//congested travel times
+										+ "," + bikeTravelTime_min				//bike travel times
+										+ "," + walkTravelTime_min				//walk travel times
 										+ "," + trips);							//vehicle trips
 					travelDataWriter.newLine();
 				}
@@ -217,7 +244,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 		
 		// Travel Data Header
-		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,vehicle_free_speed_travel_time:f4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,bike_time_in_minutes:f4,walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
 		
 		Logger.getLogger(this.getClass()).error( "add new fields (this message is shown until all travel data attributes are updated)" );
 		travelDataWriter.newLine();
@@ -293,7 +320,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 //				System.out.println("From Zone: " + e.getFromLocation() + " value = " + e.getValue());
 //			}
 //		}
-		
 		log.info("DONE with computing zone2zone trip numbers ...") ;
 	}
 }

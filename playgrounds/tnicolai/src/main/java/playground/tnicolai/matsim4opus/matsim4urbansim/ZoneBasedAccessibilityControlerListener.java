@@ -15,7 +15,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
-import playground.tnicolai.matsim4opus.gis.ZoneMapper;
+import playground.tnicolai.matsim4opus.gis.ZoneUtil;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
@@ -132,7 +132,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Walk speed (meter/min): " + this.walkSpeedMeterPerMin);
 			
 			// gather zone information like zone id, nearest node and coordinate (zone centroid)
-			ZoneObject[] zones = ZoneMapper.mapZoneCentroid2NearestNode(this.zones, network);
+			ZoneObject[] zones = ZoneUtil.mapZoneCentroid2NearestNode(this.zones, network);
 			assert( zones != null );
 			log.info("Calculating " + zones.length + " zones ...");
 			

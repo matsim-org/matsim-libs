@@ -38,11 +38,12 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
  * @author thomas
  *
  */
-public class ZoneMapper {
+public class ZoneUtil {
 
 	/**
-	 * Initializing an array with zone information like:
-	 * zone id, zone coordinate (centroid) and its nearest node 
+	 * Mapping zone centroids to their nearest network node and
+	 * creating an array containing the follwoing information:
+	 * zone id, zone coordinate (centroid) and nearest node 
 	 * 
 	 * @param network
 	 */

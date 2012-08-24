@@ -32,12 +32,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
-import org.omg.CORBA.TCKind;
-
-import com.vividsolutions.jts.geom.Point;
-
-import playground.tnicolai.matsim4opus.utils.helperObjects.Distances;
-import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
  * Calculates a least-cost-path tree using Dijkstra's algorithm for calculating a shortest-path

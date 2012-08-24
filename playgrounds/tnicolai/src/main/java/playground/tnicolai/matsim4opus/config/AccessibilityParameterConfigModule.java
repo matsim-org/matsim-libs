@@ -14,6 +14,8 @@ public class AccessibilityParameterConfigModule extends Module{
 	
 	private boolean useCarParameterFromMATSim;
 	
+	private boolean useBikeParameterFromMATSim;
+	
 	private boolean useWalkParameterFromMATSim;
     
 	private boolean useRawSumsWithoutLn;
@@ -37,7 +39,25 @@ public class AccessibilityParameterConfigModule extends Module{
 	private double betaCarTravelCostPower2;
     
 	private double betaCarLnTravelCost;
+	
+	private double betaBikeTravelTime;
     
+	private double betaBikeTravelTimePower2;
+    
+	private double betaBikeLnTravelTime;
+    
+	private double betaBikeTravelDistance;
+    
+	private double betaBikeTravelDistancePower2;
+    
+	private double betaBikeLnTravelDistance;
+    
+	private double betaBikeTravelCost;
+    
+	private double betaBikeTravelCostPower2;
+    
+	private double betaBikeLnTravelCost;
+	
 	private double betaWalkTravelTime;
     
 	private double betaWalkTravelTimePower2;
@@ -83,7 +103,15 @@ public class AccessibilityParameterConfigModule extends Module{
     public void setUseCarParameterFromMATSim(boolean value) {
         this.useCarParameterFromMATSim = value;
     }
+    
+    public boolean isUseBikeParameterFromMATSim() {
+        return useBikeParameterFromMATSim;
+    }
 
+    public void setUseBikeParameterFromMATSim(boolean value) {
+        this.useBikeParameterFromMATSim = value;
+    }
+    
     public boolean isUseWalkParameterFromMATSim() {
         return useWalkParameterFromMATSim;
     }
@@ -178,6 +206,78 @@ public class AccessibilityParameterConfigModule extends Module{
 
     public void setBetaCarLnTravelCost(double value) {
         this.betaCarLnTravelCost = value;
+    }
+    
+    public double getBetaBikeTravelTime() {
+        return betaBikeTravelTime;
+    }
+
+    public void setBetaBikeTravelTime(double value) {
+        this.betaBikeTravelTime = value;
+    }
+
+    public double getBetaBikeTravelTimePower2() {
+        return betaBikeTravelTimePower2;
+    }
+
+    public void setBetaBikeTravelTimePower2(double value) {
+        this.betaBikeTravelTimePower2 = value;
+    }
+
+    public double getBetaBikeLnTravelTime() {
+        return betaBikeLnTravelTime;
+    }
+
+    public void setBetaBikeLnTravelTime(double value) {
+        this.betaBikeLnTravelTime = value;
+    }
+
+    public double getBetaBikeTravelDistance() {
+        return betaBikeTravelDistance;
+    }
+
+    public void setBetaBikeTravelDistance(double value) {
+        this.betaBikeTravelDistance = value;
+    }
+
+    public double getBetaBikeTravelDistancePower2() {
+        return betaBikeTravelDistancePower2;
+    }
+
+    public void setBetaBikeTravelDistancePower2(double value) {
+        this.betaBikeTravelDistancePower2 = value;
+    }
+
+    public double getBetaBikeLnTravelDistance() {
+        return betaBikeLnTravelDistance;
+    }
+
+    public void setBetaBikeLnTravelDistance(double value) {
+        this.betaBikeLnTravelDistance = value;
+    }
+
+    public double getBetaBikeTravelCost() {
+        return betaBikeTravelCost;
+    }
+
+    public void setBetaBikeTravelCost(double value) {
+        this.betaBikeTravelCost = value;
+    }
+
+    public double getBetaBikeTravelCostPower2() {
+        return betaBikeTravelCostPower2;
+    }
+
+    public void setBetaBikeTravelCostPower2(double value) {
+        this.betaBikeTravelCostPower2 = value;
+    }
+
+    public double getBetaBikeLnTravelCost() {
+        return betaBikeLnTravelCost;
+    }
+
+    public void setBetaBikeLnTravelCost(double value) {
+        this.betaBikeLnTravelCost = value;
     }
 
     public double getBetaWalkTravelTime() {

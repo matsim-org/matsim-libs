@@ -325,10 +325,13 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		
 		// these are all parameter for the accessibility computation
 		double logitScaleParameter,
-		betaCarTT, betaCarTTPower, betaCarLnTT,
+		betaCarTT, betaCarTTPower, betaCarLnTT,		// car
 		betaCarTD, betaCarTDPower, betaCarLnTD,
 		betaCarTC, betaCarTCPower, betaCarLnTC,
-		betaWalkTT, betaWalkTTPower, betaWalkLnTT,
+		betaBikeTT, betaBikeTTPower, betaBikeLnTT,	// bike
+		betaBikeTD, betaBikeTDPower, betaBikeLnTD,
+		betaBikeTC, betaBikeTCPower, betaBikeLnTC,
+		betaWalkTT, betaWalkTTPower, betaWalkLnTT,	// walk
 		betaWalkTD, betaWalkTDPower, betaWalkLnTD,
 		betaWalkTC, betaWalkTCPower, betaWalkLnTC;
 		
@@ -371,6 +374,31 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 			betaCarLnTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaCarLnTravelCost();
 		}
 		
+		// tnicolai: TODO extend urbansim gui with bike beta vlaues!
+		if(useMATSimWalkParameter){// if(useMATSimBikeParameter){
+			// usually travelling_utils are negative
+			betaBikeTT		= planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
+			betaBikeTTPower	= 0.;
+			betaBikeLnTT	= 0.;
+			betaBikeTD		= 0.;//mixing parameter makes no sense, thus disabled: planCalcScoreConfigGroup.getMarginalUtlOfDistanceBike(); // [utils/meter]
+			betaBikeTDPower	= 0.;												
+			betaBikeLnTD	= 0.;
+			betaBikeTC		= 0.;// [utils/money], not available in MATSim
+			betaBikeTCPower	= 0.;
+			betaBikeLnTC	= 0.;
+		}
+		else{
+			betaBikeTT		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTime(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeTravelTime();
+			betaBikeTTPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelTimePower2(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeTravelTimePower2();
+			betaBikeLnTT	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelTime(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeLnTravelTime();
+			betaBikeTD		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistance();// matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeTravelDistance();
+			betaBikeTDPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelDistancePower2(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeTravelDistancePower2();
+			betaBikeLnTD	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelDistance(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeLnTravelDistance();
+			betaBikeTC		= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelCost(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeTravelCost();
+			betaBikeTCPower	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkTravelCostPower2(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeTravelCostPower2();
+			betaBikeLnTC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelCost(); // matsim4UrbanSimParameter.getAccessibilityParameter().getBetaBikeLnTravelCost();
+		}
+		
 		if(useMATSimWalkParameter){
 			// usually travelling_utils are negative
 			betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
@@ -400,6 +428,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		module.setUseLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
 		module.setUseRawSumsWithoutLn(useRawSum);
 		module.setUseCarParameterFromMATSim(useMATSimCarParameter);
+		module.setUseBikeParameterFromMATSim(useMATSimWalkParameter); // tnicolai: todo use "Bike parameter"!!!
 		module.setUseWalkParameterFromMATSim(useMATSimWalkParameter);
 		module.setLogitScaleParameter(logitScaleParameter);
 		module.setBetaCarTravelTime(betaCarTT);
@@ -411,6 +440,15 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		module.setBetaCarTravelCost(betaCarTC);
 		module.setBetaCarTravelCostPower2(betaCarTCPower);
 		module.setBetaCarLnTravelCost(betaCarLnTC);
+		module.setBetaBikeTravelTime(betaBikeTT);
+		module.setBetaBikeTravelTimePower2(betaBikeTTPower);
+		module.setBetaBikeLnTravelTime(betaBikeLnTT);
+		module.setBetaBikeTravelDistance(betaBikeTD);
+		module.setBetaBikeTravelDistancePower2(betaBikeTDPower);
+		module.setBetaBikeLnTravelDistance(betaBikeLnTD);
+		module.setBetaBikeTravelCost(betaBikeTC);
+		module.setBetaBikeTravelCostPower2(betaBikeTCPower);
+		module.setBetaBikeLnTravelCost(betaBikeLnTC);
 		module.setBetaWalkTravelTime(betaWalkTT);
 		module.setBetaWalkTravelTimePower2(betaWalkTTPower);
 		module.setBetaWalkLnTravelTime(betaWalkLnTT);
@@ -422,7 +460,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		module.setBetaWalkLnTravelCost(betaWalkLnTC);
 		
 		
-		// view results
+		// display results
 		log.info("AccessibilityParameter settings:");
 		
 		log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
@@ -439,6 +477,16 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		log.info("BETA_CAR_TRAVEL_COSTS_POWER: " + module.getBetaCarTravelCostPower2() );
 		log.info("BETA_CAR_LN_TRAVEL_COSTS: " + module.getBetaCarLnTravelCost());
 		
+		log.info("BETA_BIKE_TRAVEL_TIMES: " + module.getBetaBikeTravelTime()  );
+		log.info("BETA_BIKE_TRAVEL_TIMES_POWER: " + module.getBetaBikeTravelTimePower2() );
+		log.info("BETA_BIKE_LN_TRAVEL_TIMES: " + module.getBetaBikeLnTravelTime() );
+		log.info("BETA_BIKE_TRAVEL_DISTANCE: " + module.getBetaBikeTravelDistance() );
+		log.info("BETA_BIKE_TRAVEL_DISTANCE_POWER: " + module.getBetaBikeTravelDistancePower2() );
+		log.info("BETA_BIKE_LN_TRAVEL_DISTANCE: " + module.getBetaBikeLnTravelDistance() );
+		log.info("BETA_BIKE_TRAVEL_COSTS: " + module.getBetaBikeTravelCost() );
+		log.info("BETA_BIKE_TRAVEL_COSTS_POWER: " + module.getBetaBikeTravelCostPower2() );
+		log.info("BETA_BIKE_LN_TRAVEL_COSTS: " + module.getBetaBikeLnTravelCost() );
+		
 		log.info("BETA_WALK_TRAVEL_TIMES: " + module.getBetaWalkTravelTime()  );
 		log.info("BETA_WALK_TRAVEL_TIMES_POWER: " + module.getBetaWalkTravelTimePower2() );
 		log.info("BETA_WALK_LN_TRAVEL_TIMES: " + module.getBetaWalkLnTravelTime() );
@@ -449,6 +497,7 @@ public class MATSim4UrbanSimConfigurationConverterV2 {
 		log.info("BETA_WALK_TRAVEL_COSTS_POWER: " + module.getBetaWalkTravelCostPower2() );
 		log.info("BETA_WALK_LN_TRAVEL_COSTS: " + module.getBetaWalkLnTravelCost() );
 	}
+	
 	/**
 	 * setting MATSim network
 	 * 

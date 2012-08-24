@@ -25,7 +25,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
-import playground.tnicolai.matsim4opus.matsim4urbansim.archive.SpatialGridOld;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;

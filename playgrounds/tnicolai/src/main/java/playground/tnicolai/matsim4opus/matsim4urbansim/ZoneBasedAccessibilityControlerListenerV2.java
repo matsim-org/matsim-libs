@@ -14,7 +14,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.LeastCostPathTree;
 
-import playground.tnicolai.matsim4opus.gis.ZoneMapper;
+import playground.tnicolai.matsim4opus.gis.ZoneUtil;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
@@ -107,7 +107,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 			printParameterSettings();
 			
 			// gather zone information like zone id, nearest node and coordinate (zone centroid)
-			ZoneObject[] zones = ZoneMapper.mapZoneCentroid2NearestNode(this.zones, network);
+			ZoneObject[] zones = ZoneUtil.mapZoneCentroid2NearestNode(this.zones, network);
 			log.info(zones.length + "  measurement points are now processing ...");
 			
 			ProgressBar bar = new ProgressBar( zones.length );

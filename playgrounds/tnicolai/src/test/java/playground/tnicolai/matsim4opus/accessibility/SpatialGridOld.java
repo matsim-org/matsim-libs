@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
+package playground.tnicolai.matsim4opus.accessibility;
 
 import java.io.IOException;
 import java.util.Stack;

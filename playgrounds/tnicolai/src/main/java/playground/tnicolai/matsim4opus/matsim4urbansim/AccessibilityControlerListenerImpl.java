@@ -75,6 +75,15 @@ public class AccessibilityControlerListenerImpl{
 	protected double betaCarTC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 	protected double betaCarTCPower;
 	protected double betaCarLnTC;
+	protected double betaBikeTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+	protected double betaBikeTTPower;
+	protected double betaBikeLnTT;
+	protected double betaBikeTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist: 
+	protected double betaBikeTDPower;
+	protected double betaBikeLnTD;
+	protected double betaBikeTC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	protected double betaBikeTCPower;
+	protected double betaBikeLnTC;
 	protected double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	protected double betaWalkTTPower;
 	protected double betaWalkLnTT;
@@ -119,6 +128,16 @@ public class AccessibilityControlerListenerImpl{
 		betaCarTCPower	= module.getBetaCarTravelCostPower2();
 		betaCarLnTC		= module.getBetaCarLnTravelCost();
 		
+		betaBikeTT		= module.getBetaBikeTravelTime();
+		betaBikeTTPower	= module.getBetaBikeTravelTimePower2();
+		betaBikeLnTT	= module.getBetaBikeLnTravelTime();
+		betaBikeTD		= module.getBetaBikeTravelDistance();
+		betaBikeTDPower	= module.getBetaBikeTravelDistancePower2();
+		betaBikeLnTD	= module.getBetaBikeLnTravelDistance();
+		betaBikeTC		= module.getBetaBikeTravelCost();
+		betaBikeTCPower	= module.getBetaBikeTravelCostPower2();
+		betaBikeLnTC	= module.getBetaBikeLnTravelCost();
+		
 		betaWalkTT		= module.getBetaWalkTravelTime();
 		betaWalkTTPower	= module.getBetaWalkTravelTimePower2();
 		betaWalkLnTT	= module.getBetaWalkLnTravelTime();
@@ -153,6 +172,15 @@ public class AccessibilityControlerListenerImpl{
 		log.info("Beta Car Travel Cost: " + betaCarTC );
 		log.info("Beta Car Travel Cost Power2: " + betaCarTCPower );
 		log.info("Beta Car Ln Travel Cost: " + betaCarLnTC );
+		log.info("Beta Bike Travel Time: " + betaBikeTT );
+		log.info("Beta Bike Travel Time Power2: " + betaBikeTTPower );
+		log.info("Beta Bike Ln Travel Time: " + betaBikeLnTT );
+		log.info("Beta Bike Travel Distance: " + betaBikeTD );
+		log.info("Beta Bike Travel Distance Power2: " + betaBikeTDPower );
+		log.info("Beta Bike Ln Travel Distance: " + betaBikeLnTD );
+		log.info("Beta Bike Travel Cost: " + betaBikeTC );
+		log.info("Beta Bike Travel Cost Power2: " + betaBikeTCPower );
+		log.info("Beta Bike Ln Travel Cost: " + betaBikeLnTC );
 		log.info("Beta Walk Travel Time: " + betaWalkTT );
 		log.info("Beta Walk Travel Time Power2: " + betaWalkTTPower );
 		log.info("Beta Walk Ln Travel Time: " + betaWalkLnTT );
@@ -256,7 +284,7 @@ public class AccessibilityControlerListenerImpl{
 				int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
 
 				// free speed car travel times in hours
-				double freeSpeedTravelTime_h = (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
+				double freeSpeedTravelTime_h= (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
 				// travel distance in meter
 				double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
 				// bike travel times in hours
@@ -365,13 +393,13 @@ public class AccessibilityControlerListenerImpl{
 						+ carTC + carTCPower + carLnTC)));
 		
 		// for debugging bike accessibility
-		bikeTT 		= getAsUtilCar(betaWalkTT, bikeTravelTime_h, betaWalkTT, offsetWalkTime2Node2Opportunity_h);
-		bikeTTPower = getAsUtilCar(betaWalkTTPower, bikeTravelTime_h * bikeTravelTime_h, betaWalkTTPower, offsetWalkTime2Node2Opportunity_h * offsetWalkTime2Node2Opportunity_h);
-		bikeLnTT	= getAsUtilCar(betaWalkLnTT, Math.log(bikeTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node2Opportunity_h));
+		bikeTT 		= getAsUtilCar(betaBikeTT, bikeTravelTime_h, betaWalkTT, offsetWalkTime2Node2Opportunity_h);
+		bikeTTPower = getAsUtilCar(betaBikeTTPower, bikeTravelTime_h * bikeTravelTime_h, betaWalkTTPower, offsetWalkTime2Node2Opportunity_h * offsetWalkTime2Node2Opportunity_h);
+		bikeLnTT	= getAsUtilCar(betaBikeLnTT, Math.log(bikeTravelTime_h), betaWalkLnTT, Math.log(offsetWalkTime2Node2Opportunity_h));
 		
-		bikeTD = getAsUtilCar(betaWalkTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road2Opportunity_meter); 
-		bikeTDPower = getAsUtilCar(betaWalkTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road2Opportunity_meter * distanceMeasuringPoint2Road2Opportunity_meter);
-		bikeLnTD = getAsUtilCar(betaWalkLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road2Opportunity_meter));
+		bikeTD = getAsUtilCar(betaBikeTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road2Opportunity_meter); 
+		bikeTDPower = getAsUtilCar(betaBikeTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road2Opportunity_meter * distanceMeasuringPoint2Road2Opportunity_meter);
+		bikeLnTD = getAsUtilCar(betaBikeLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road2Opportunity_meter));
 		
 		bikeTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
 		bikeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
