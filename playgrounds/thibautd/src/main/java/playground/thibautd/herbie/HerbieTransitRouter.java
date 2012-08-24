@@ -74,9 +74,9 @@ public class HerbieTransitRouter implements TransitRouter {
 	 * Being able to toggle this bug does not make this state more consistent,
 	 * or the results obtained this way more truthworthy...
 	 */
-	private static final boolean MAKE_ACCESS_COST_BUGGED = true;
-	private static final boolean MAKE_EGRESS_COST_BUGGED = true;
-	private static final boolean MAKE_DIRECT_COST_BUGGED = true;
+	private static final boolean MAKE_ACCESS_COST_BUGGED = false;
+	private static final boolean MAKE_EGRESS_COST_BUGGED = false;
+	private static final boolean MAKE_DIRECT_COST_BUGGED = false;
 	private final TransitRouterNetwork transitNetwork;
 
 	private final MultiNodeDijkstra dijkstra;
