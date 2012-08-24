@@ -76,7 +76,7 @@ public class HerbieTransitRouter implements TransitRouter {
 	 */
 	private static final boolean MAKE_ACCESS_COST_BUGGED = true;
 	private static final boolean MAKE_EGRESS_COST_BUGGED = true;
-	private static final boolean MAKE_DIRECT_COST_BUGGED = false;
+	private static final boolean MAKE_DIRECT_COST_BUGGED = true;
 	private final TransitRouterNetwork transitNetwork;
 
 	private final MultiNodeDijkstra dijkstra;
