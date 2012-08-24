@@ -23,6 +23,7 @@
  */
 package playground.ikaddoura.parkAndRide.analyze.plans;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -64,11 +65,16 @@ public class MyShapeFileWriter {
 	ArrayList<Feature> FeatureList = new ArrayList<Feature>();
 	private FeatureType featureType;
 	
-	public void writeShapeFileLines(Scenario scenario, String outputFile) {
+	public void writeShapeFileLines(Scenario scenario, String path, String outputFile) {
+		File directory = new File(path);
+		directory.mkdirs();
+		
+		String file = path + outputFile;
+		
 		initFeatureType1();
 		Collection<Feature> features = createFeatures1(scenario);
-		ShapeFileWriter.writeGeometries(features, outputFile);
-		System.out.println("ShapeFile " + outputFile + " written.");	
+		ShapeFileWriter.writeGeometries(features, file);
+		System.out.println("ShapeFile " + file + " written.");	
 	}
 	
 	public void writeShapeFilePoints(Scenario scenario, SortedMap<Id,Coord> koordinaten, String outputFile) {
@@ -83,9 +89,9 @@ public class MyShapeFileWriter {
 		}
 	}
 	
-	public void writeShapeFileGeometry(Map<Integer, Geometry> nr2geometry, Map<Integer, Double> nr2PRUsersHomeShare, String outputFile) {
+	public void writeShapeFileGeometry(Map<Integer, Geometry> nr2geometry, Map<Integer, Double> nr2PRUsersHomeShare, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all, String outputFile) {
 		initFeatureType4();
-		Collection<Feature> features = createFeatures4(nr2geometry, nr2PRUsersHomeShare);
+		Collection<Feature> features = createFeatures4(nr2geometry, nr2PRUsersHomeShare, zoneNr2activityShare_work, zoneNr2home_prUsers, zoneNr2work_prUsers, zoneNr2home_all, zoneNr2work_all);
 		ShapeFileWriter.writeGeometries(features, outputFile);
 		System.out.println("ShapeFile " + outputFile + " written.");	
 	}
@@ -147,11 +153,16 @@ public class MyShapeFileWriter {
 	}
 	
 	private void initFeatureType4() {
-		AttributeType [] attribs = new AttributeType[3];
+		AttributeType [] attribs = new AttributeType[8];
 		
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Geometry", Geometry.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
 		attribs[1] = AttributeTypeFactory.newAttributeType("NR", String.class);
-		attribs[2] = AttributeTypeFactory.newAttributeType("PRUsersHomeShare", Double.class);
+		attribs[2] = AttributeTypeFactory.newAttributeType("HomeAll", Integer.class);
+		attribs[3] = AttributeTypeFactory.newAttributeType("WorkAll", Integer.class);
+		attribs[4] = AttributeTypeFactory.newAttributeType("HomePRUsers", Integer.class);
+		attribs[5] = AttributeTypeFactory.newAttributeType("WorkPRUsers", Integer.class);
+		attribs[6] = AttributeTypeFactory.newAttributeType("HomePRshare", Double.class);
+		attribs[7] = AttributeTypeFactory.newAttributeType("WorkPRshare", Double.class);
 
 		try {
 		this.featureType = FeatureTypeBuilder.newFeatureType(attribs, "geometry");
@@ -194,10 +205,10 @@ public class MyShapeFileWriter {
 		return liste;
 	}
 	
-	private Collection<Feature> createFeatures4(Map<Integer, Geometry> nr2geometry, Map<Integer, Double> nr2PRUsersHomeShare) {
+	private Collection<Feature> createFeatures4(Map<Integer, Geometry> nr2geometry, Map<Integer, Double> nr2PRUsersHomeShare, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all) {
 		ArrayList<Feature> liste = new ArrayList<Feature>();
 		for (Integer nr : nr2geometry.keySet()){
-			liste.add(getFeature4(nr, nr2geometry.get(nr), nr2PRUsersHomeShare));
+			liste.add(getFeature4(nr, nr2geometry.get(nr), nr2PRUsersHomeShare, zoneNr2activityShare_work, zoneNr2home_prUsers, zoneNr2work_prUsers, zoneNr2home_all, zoneNr2work_all));
 		}
 		return liste;
 	}
@@ -215,15 +226,40 @@ public class MyShapeFileWriter {
 		}
 	}
 	
-	private Feature getFeature4(Integer nr, Geometry geometry, Map<Integer, Double> nr2PRUsersHomeShare) {
+	private Feature getFeature4(Integer nr, Geometry geometry, Map<Integer, Double> zoneNr2activityShare_home, Map<Integer, Double> zoneNr2activityShare_work, Map<Integer, Integer> zoneNr2home_prUsers, Map<Integer, Integer> zoneNr2work_prUsers, Map<Integer, Integer> zoneNr2home_all, Map<Integer, Integer> zoneNr2work_all) {
 		Geometry g = this.geometryFactory.createGeometry(geometry);
-		Object [] attribs = new Object[3];
+		Object [] attribs = new Object[8];
 		attribs[0] = g;
 		attribs[1] = String.valueOf(nr);
-		if (nr2PRUsersHomeShare.containsKey(nr)){
-			attribs[2] = nr2PRUsersHomeShare.get(nr).toString();
+		if (zoneNr2home_all.containsKey(nr)){
+			attribs[2] = zoneNr2home_all.get(nr);
 		} else {
-			
+			attribs[2] = 0;
+		}
+		if (zoneNr2work_all.containsKey(nr)){
+			attribs[3] = zoneNr2work_all.get(nr);
+		} else {
+			attribs[3] = 0;
+		}
+		if (zoneNr2home_prUsers.containsKey(nr)){
+			attribs[4] = zoneNr2home_prUsers.get(nr);
+		} else {
+			attribs[4] = 0;
+		}
+		if (zoneNr2work_prUsers.containsKey(nr)){
+			attribs[5] = zoneNr2work_prUsers.get(nr);
+		} else {
+			attribs[5] = 0;
+		}
+		if (zoneNr2activityShare_home.containsKey(nr)){
+			attribs[6] = zoneNr2activityShare_home.get(nr);
+		} else {
+			attribs[6] = 0;
+		}
+		if (zoneNr2activityShare_work.containsKey(nr)){
+			attribs[7] = zoneNr2activityShare_work.get(nr);
+		} else {
+			attribs[7] = 0;
 		}
 
 		try {

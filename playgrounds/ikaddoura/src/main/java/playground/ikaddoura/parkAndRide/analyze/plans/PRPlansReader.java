@@ -41,7 +41,7 @@ public class PRPlansReader {
 	static String plansFile2; // output Plans
 	static String netFile;
 	static String prFacilitiesFile;
-	static String zoneFile;
+	static String zoneInputFile;
 	static String outputPath;
 	static double tolerance;
 	
@@ -50,10 +50,10 @@ public class PRPlansReader {
 	
 	private List<Person> personsHomeWork = new ArrayList<Person>(); // persons who have a home and work activity
 	
-	private List<Person> allPersonsPR = new ArrayList<Person>(); // all persons who have a park-and-ride activity in the selected plan
-	private List<Person> improvedPersonsPR = new ArrayList<Person>();
-	private List<Person> worsePersonsPR = new ArrayList<Person>();
-	private List<Person> equalPersonsPR = new ArrayList<Person>();
+	private List<Person> prUsers_all = new ArrayList<Person>(); // all persons who have a park-and-ride activity in the selected plan
+	private List<Person> prUsers_higherScore = new ArrayList<Person>();
+	private List<Person> prUsers_lowerScore = new ArrayList<Person>();
+	private List<Person> prUsers_equalScore = new ArrayList<Person>();
 	
 	private Map<Id, ParkAndRideFacility> id2PRFacilities;
 	private List <Person> improvedPlanPersons = new ArrayList<Person>();
@@ -69,7 +69,7 @@ public class PRPlansReader {
 		plansFile2 = "/Users/Ihab/Desktop/test/population2.xml";
 		netFile = "/Users/Ihab/Desktop/test/network.xml";
 		prFacilitiesFile = "/Users/Ihab/Desktop/test/prFacilities.txt";
-		zoneFile = "/Users/Ihab/Desktop/test/dlm_gemeinden.shp";
+		zoneInputFile = "/Users/Ihab/Desktop/test/dlm_gemeinden.shp";
 		outputPath = "/Users/Ihab/Desktop/analyseOutput/";
 		tolerance = 1.0;
 
@@ -86,7 +86,7 @@ public class PRPlansReader {
 		analysis.run();
 	}
 	
-	public void run() {
+	public void run() throws IOException {
 		
 		this.scenario1 = getScenario(netFile, plansFile1);
 		this.scenario2 = getScenario(netFile, plansFile2);
@@ -97,124 +97,134 @@ public class PRPlansReader {
 		System.out.println();
 		System.out.println("Starting Analyzing the plan files...");
 		
+		// level 1
+		
 		analyzeSelectedPlans_scores();
 		analyzeSelectedPlans_activities();
 		setImprovedPRPersons();
 		setWorsePRPersons();
 		setEqualPRPersons();
 		
-		try {
-			analyzeZones(zoneFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// level 2
 
 		File directory = new File(outputPath);
 		directory.mkdirs();
 		
-		writer.writeFile1(this.equalPlanPersons.size(), this.improvedPlanPersons.size(), this.worsePlanPersons.size(), this.improvedPersonsPR.size(), this.worsePersonsPR.size(), this.equalPersonsPR.size(), outputPath + "scoreComparison.txt");		
-		writer.writeFile2(this.allPersonsPR.size(), this.personsHomeWork.size(), outputPath+"parkAndRideShare.txt");
+		writer.writeFile1(this.equalPlanPersons.size(), this.improvedPlanPersons.size(), this.worsePlanPersons.size(), this.prUsers_higherScore.size(), this.prUsers_lowerScore.size(), this.prUsers_equalScore.size(), outputPath + "scoreComparison.txt");		
+		writer.writeFile2(this.prUsers_all.size(), this.personsHomeWork.size(), outputPath+"parkAndRideShare.txt");
 		
-		shapeFileWriter.writeShapeFileLines(this.scenario2, outputPath + "network.shp");
+		shapeFileWriter.writeShapeFileLines(this.scenario2, outputPath + "network/", "network.shp");
 		
-		this.writeShapeFiles_homeWorkCoord(this.allPersonsPR, "allPRUsers");
-		this.writeShapeFiles_PRUsage(this.allPersonsPR, "allPRUsers", "allPRUsers.txt");
+		this.writeShapeFiles_homeWorkCoord(this.prUsers_all, "prUsers_all");
+		this.writeShapeFiles_PRUsage(this.prUsers_all, "pRUsers_all", "prUsers_all.txt");
 		
-		this.writeShapeFiles_homeWorkCoord(this.improvedPersonsPR, "pRUsers_higherScore");
-		this.writeShapeFiles_PRUsage(this.improvedPersonsPR, "pRUsers_higherScore", "pRUsers_higherScore.txt");
+		this.writeShapeFiles_homeWorkCoord(this.prUsers_higherScore, "pRUsers_higherScore");
+		this.writeShapeFiles_PRUsage(this.prUsers_higherScore, "pRUsers_higherScore", "pRUsers_higherScore.txt");
 
-		this.writeShapeFiles_homeWorkCoord(this.worsePersonsPR, "prUsers_lowerScore");
-		this.writeShapeFiles_PRUsage(this.worsePersonsPR, "prUsers_lowerScore", "pRUsers_lowerScore.txt");
+		this.writeShapeFiles_homeWorkCoord(this.prUsers_lowerScore, "prUsers_lowerScore");
+		this.writeShapeFiles_PRUsage(this.prUsers_lowerScore, "prUsers_lowerScore", "pRUsers_lowerScore.txt");
 
-		this.writeShapeFiles_homeWorkCoord(this.equalPersonsPR, "prUsers_equalScore");
-		this.writeShapeFiles_PRUsage(this.equalPersonsPR, "prUsers_equalScore", "pRUsers_equalScore.txt");
+		this.writeShapeFiles_homeWorkCoord(this.prUsers_equalScore, "prUsers_equalScore");
+		this.writeShapeFiles_PRUsage(this.prUsers_equalScore, "prUsers_equalScore", "pRUsers_equalScore.txt");
 
-		writeShapeFiles_homeWorkCoord(this.personsHomeWork, "allHomeWorkPersons");
+		this.writeShapeFiles_homeWorkCoord(this.personsHomeWork, "allHomeWorkPersons");
+		
+		this.writeShapeFiles_zones(zoneInputFile, this.prUsers_all, this.personsHomeWork, outputPath + "prUsers_all/", "zones_prUsers_all.shp");
+		this.writeShapeFiles_zones(zoneInputFile, this.prUsers_higherScore, this.personsHomeWork, outputPath + "prUsers_higherScore/", "zones_prUsers_higherScore.shp");
+		this.writeShapeFiles_zones(zoneInputFile, this.prUsers_equalScore, this.personsHomeWork, outputPath + "prUsers_equalScore/", "zones_prUsers_equalScore.shp");
+		this.writeShapeFiles_zones(zoneInputFile, this.prUsers_lowerScore, this.personsHomeWork, outputPath + "prUsers_lowerScore/", "zones_prUsers_lowerScore.shp");
 
+		System.out.println();
 		System.out.println("Done.");
 	}
 
-	private void analyzeZones(String zoneFile) throws IOException {
+	private void writeShapeFiles_zones(String zoneInputFile, List<Person> personsPR, List<Person> personsAll, String outputPath, String outputFile) throws IOException {
 		
-		Map<Integer, Geometry> nr2zoneGeometry = new HashMap<Integer, Geometry>();
-		Map<Integer, Integer> nr2homeAll = new HashMap<Integer, Integer>();	
-		Map<Integer, Integer> nr2homePR = new HashMap<Integer, Integer>();
-		Map<Integer, Double> nr2PRUsersHomeShare = new HashMap<Integer, Double>();	
-
-		ShapeFileReader reader = new ShapeFileReader();
-		Set<Feature> features;
-		features = reader.readFileAndInitialize(zoneFile);
-		for (Feature feature : features) {
-			nr2zoneGeometry.put(Integer.parseInt((String)feature.getAttribute("NR")), feature.getDefaultGeometry());
+		if (personsPR.isEmpty()){
+			// do nothing!
+		} else {
+			
+			// read zone Data
+			Map<Integer, Geometry> zoneNr2zoneGeometry = new HashMap<Integer, Geometry>();
+			ShapeFileReader reader = new ShapeFileReader();
+			Set<Feature> features;
+			features = reader.readFileAndInitialize(zoneInputFile);
+			for (Feature feature : features) {
+				zoneNr2zoneGeometry.put(Integer.parseInt((String)feature.getAttribute("NR")), feature.getDefaultGeometry());
+			}
+						
+			Map<Integer, Integer> zoneNr2home_all = getZoneNr2activityLocations("home", personsAll, zoneNr2zoneGeometry);	
+			Map<Integer, Integer> zoneNr2home_prUsers = getZoneNr2activityLocations("home", personsPR, zoneNr2zoneGeometry);
+			Map<Integer, Integer> zoneNr2work_all = getZoneNr2activityLocations("work", personsAll, zoneNr2zoneGeometry);	
+			Map<Integer, Integer> zoneNr2work_prUsers = getZoneNr2activityLocations("work", personsPR, zoneNr2zoneGeometry);
+								
+			Map<Integer, Double> zoneNr2activityShare_home = getZoneNr2activityShare(zoneNr2home_prUsers, zoneNr2home_all);
+			Map<Integer, Double> zoneNr2activityShare_work = getZoneNr2activityShare(zoneNr2work_prUsers, zoneNr2work_all);
+			
+			String path = outputPath + "shapeFiles/";
+			File directory = new File(path);
+			directory.mkdirs();
+			shapeFileWriter.writeShapeFileGeometry(zoneNr2zoneGeometry, zoneNr2activityShare_home, zoneNr2activityShare_work, zoneNr2home_prUsers, zoneNr2work_prUsers, zoneNr2home_all, zoneNr2work_all, path + outputFile);
 		}
-				
-		SortedMap<Id,Coord> id2homeCoordAll = getCoordinates(this.personsHomeWork, "home");
+	}
+	
+	private Map<Integer, Double> getZoneNr2activityShare(Map<Integer, Integer> zoneNr2activity_prUsers, Map<Integer, Integer> zoneNr2activity_all) {
+		Map<Integer, Double> zoneNr2activityShare = new HashMap<Integer, Double>();
+
+		for (Integer nr : zoneNr2activity_all.keySet()){
+			double share = (double) zoneNr2activity_prUsers.get(nr) / (double) zoneNr2activity_all.get(nr);
+			zoneNr2activityShare.put(nr, share);
+		}
 		
-		for (Coord coord : id2homeCoordAll.values()) {
-			for (Integer nr : nr2zoneGeometry.keySet()) {
-				Geometry geometry = nr2zoneGeometry.get(nr);
+		return zoneNr2activityShare;
+	}
+
+	private Map<Integer, Integer> getZoneNr2activityLocations(String activity, List<Person> persons, Map<Integer, Geometry> zoneNr2zoneGeometry) {
+		Map<Integer, Integer> zoneNr2activity = new HashMap<Integer, Integer>();	
+
+		SortedMap<Id,Coord> id2activityCoord = getCoordinates(persons, activity);
+		
+		for (Coord coord : id2activityCoord.values()) {
+			for (Integer nr : zoneNr2zoneGeometry.keySet()) {
+				Geometry geometry = zoneNr2zoneGeometry.get(nr);
 				Point p = MGC.coord2Point(coord); 
 				
 				if (p.within(geometry)){
-					if (nr2homeAll.get(nr) == null){
-						nr2homeAll.put(nr, 1);
+					if (zoneNr2activity.get(nr) == null){
+						zoneNr2activity.put(nr, 1);
 					} else {
-						int homes = nr2homeAll.get(nr);
-						nr2homeAll.put(nr, homes + 1);
+						int activityCounter = zoneNr2activity.get(nr);
+						zoneNr2activity.put(nr, activityCounter + 1);
 					}
 				}
 			}
 		}
-		
-		SortedMap<Id,Coord> id2homeCoordPRUsers = getCoordinates(this.allPersonsPR, "home");
-		
-		for (Coord coord : id2homeCoordPRUsers.values()) {
-			for (Integer nr : nr2zoneGeometry.keySet()) {
-				Geometry geometry = nr2zoneGeometry.get(nr);
-				if (geometry.getEnvelopeInternal().contains(MGC.coord2Coordinate(coord))){
-					if (nr2homePR.get(nr) == null){
-						nr2homePR.put(nr, 1);
-					} else {
-						int homes = nr2homePR.get(nr);
-						nr2homePR.put(nr, homes + 1);
-					}
-				}
-			}
-		}
-		
-		for (Integer nr : nr2homeAll.keySet()){
-			double share = (double) nr2homePR.get(nr) / (double) nr2homeAll.get(nr);
-			nr2PRUsersHomeShare.put(nr, share);
-			System.out.println("Zonen-Nr: " + nr + " PR home share: " + share);
-		}
-		
-		shapeFileWriter.writeShapeFileGeometry(nr2zoneGeometry, nr2PRUsersHomeShare, outputPath + "/prUsersHomeShare.shp");
-		
+		return zoneNr2activity;
 	}
 
 	private void setImprovedPRPersons() {
 		
-		for (Person person : this.allPersonsPR){
+		for (Person person : this.prUsers_all){
 			if (this.improvedPlanPersons.contains(person)){
-				this.improvedPersonsPR.add(person);
+				this.prUsers_higherScore.add(person);
 			}
 		}
 	}
 	
 	private void setEqualPRPersons() {
 		
-		for (Person person : this.allPersonsPR){
+		for (Person person : this.prUsers_all){
 			if (this.equalPlanPersons.contains(person)){
-				this.equalPersonsPR.add(person);
+				this.prUsers_equalScore.add(person);
 			}
 		}
 	}
 	
 	private void setWorsePRPersons() {
 		
-		for (Person person : this.allPersonsPR){
+		for (Person person : this.prUsers_all){
 			if (this.worsePlanPersons.contains(person)){
-				this.worsePersonsPR.add(person);
+				this.prUsers_lowerScore.add(person);
 			}
 		}
 	}
@@ -259,14 +269,15 @@ public class PRPlansReader {
 		homeCoordinates = getCoordinates(persons, "home");
 		workCoordinates = getCoordinates(persons, "work");
 		
-		File directory = new File(outputPath + outputDir);
+		String path = outputPath + outputDir + "/shapeFiles";
+		File directory = new File(path);
 		directory.mkdirs();
 		
 		if (persons.isEmpty()){
 			// do nothing
 		} else {
-			shapeFileWriter.writeShapeFilePoints(scenario2, homeCoordinates, outputPath + outputDir + "/homeCoordinates.shp");
-			shapeFileWriter.writeShapeFilePoints(scenario2, workCoordinates, outputPath + outputDir + "/workCoordinates.shp");	
+			shapeFileWriter.writeShapeFilePoints(scenario2, homeCoordinates, path + "/homeCoordinates.shp");
+			shapeFileWriter.writeShapeFilePoints(scenario2, workCoordinates, path + "/workCoordinates.shp");	
 		}
 	}
 	
@@ -275,7 +286,8 @@ public class PRPlansReader {
 		SortedMap<Id,Coord> prCoordinates = new TreeMap<Id,Coord>();
 		prCoordinates = getCoordinates(persons, ParkAndRideConstants.PARKANDRIDE_ACTIVITY_TYPE);
 		
-		File directory = new File(outputPath + outputDir);
+		String path = outputPath + outputDir + "/shapeFiles";
+		File directory = new File(path);
 		directory.mkdirs();
 		
 		if (persons.isEmpty()){
@@ -298,9 +310,9 @@ public class PRPlansReader {
 				}
 			}
 		
-			writer.writeFile3(prLinkId2prActs, this.id2PRFacilities, outputPath + "prUsage_" + outputFile);
-			shapeFileWriter.writeShapeFilePoints(scenario2, prCoordinates, outputPath + outputDir + "/prCoordinates.shp");
-			shapeFileWriter.writeShapeFilePRUsage(scenario2, this.id2PRFacilities, prLinkId2prActs, outputPath + outputDir + "/prUsage.shp");
+			writer.writeFile3(prLinkId2prActs, this.id2PRFacilities, outputPath + outputDir + "/prUsage_" + outputFile);
+			shapeFileWriter.writeShapeFilePoints(scenario2, prCoordinates, path + "/prCoordinates.shp");
+			shapeFileWriter.writeShapeFilePRUsage(scenario2, this.id2PRFacilities, prLinkId2prActs, path + "/prUsage.shp");
 	
 		}
 	}
@@ -330,7 +342,7 @@ public class PRPlansReader {
 			}
 			
 			if (hasPR) {
-				allPersonsPR.add(person);
+				prUsers_all.add(person);
 			}
 			
 			if (hasHome && hasWork){
