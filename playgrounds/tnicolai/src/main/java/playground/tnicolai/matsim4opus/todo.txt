@@ -7,11 +7,11 @@ Todos:
 - MATSim4UrbanSim Config V3: 
 	- DONE! make "opportunity" sampling rate configurable
 	- DONE! add "Radius" to spread Home/Worklocations for UrbanSim-Zone
-	- Add Switch for Radius or Shapefile
-	- Add Interpolation switch
-	- Add "project_name" as id to determine srid and feet2meter conversion in MATSim
-	- Add time-of-a-day switch
-	- Add beta parameter for Bike
+	- DONE! Switch for Radius or Shapefile
+	- Add Interpolation switch???
+	- DONE! "project_name" as id to determine srid and feet2meter conversion in MATSim
+	- DONE! time-of-a-day 
+	- DONE! beta parameter for Bike
 	- implement a "Switch" on the UrbanSim side to choose between Radius or Shape-file distribution of locations
 - Pt and road pricing: are available via standard MATSim config, this just needs to be explicitly documented in the User Guide !!! (nothing else todo)
 - add a "Travel model visualization" section: "There are at least two options to visualize matsim: 1. OTFVis or 2. senozon via" -> to be done by senozone ???

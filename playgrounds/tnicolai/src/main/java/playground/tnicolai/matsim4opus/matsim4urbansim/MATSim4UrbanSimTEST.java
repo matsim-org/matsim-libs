@@ -34,12 +34,10 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule;
-import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV2;
-import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModule;
-import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModule;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV3;
+import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
@@ -51,6 +49,8 @@ import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author thomas
@@ -64,7 +64,7 @@ public class MATSim4UrbanSimTEST {
 	// MATSim scenario
 	ScenarioImpl scenario = null;
 	// MATSim4UrbanSim configuration converter
-	MATSim4UrbanSimConfigurationConverterV2 connector = null;
+	MATSim4UrbanSimConfigurationConverterV3 connector = null;
 	// Reads UrbanSim Parcel output files
 	ReadFromUrbanSimModel readFromUrbansim = null;
 	// Benchmarking computation times and hard disc space ... 
@@ -74,7 +74,9 @@ public class MATSim4UrbanSimTEST {
 	// needed for controler listeners
 	AggregateObject2NearestNode[] aggregatedOpportunities = null;
 	
-	boolean isParcel = true;
+	boolean isParcel = false;
+	
+	double timeOfADay;
 	
 	// run selected controler
 	boolean computeCellBasedAccessibility			 = false;
@@ -105,18 +107,11 @@ public class MATSim4UrbanSimTEST {
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
 		
-		if( !(connector = new MATSim4UrbanSimConfigurationConverterV2( matsimConfiFile )).init() ){
+		if( !(connector = new MATSim4UrbanSimConfigurationConverterV3( matsimConfiFile )).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}
-		
-		// TODO check connector to determie if parcel or zone
-		this.isParcel = false;
-		if(isParcel)
-			this.srid = InternalConstants.SRID_SWITZERLAND;
-		else
-			this.srid = InternalConstants.SRID_BELGIUM;
-		
+
 		scenario = connector.getScenario();
 		ScenarioUtils.loadScenario(scenario);
 		setControlerSettings(scenario, args);
@@ -141,10 +136,7 @@ public class MATSim4UrbanSimTEST {
 		modifyNetwork(network);
 		cleanNetwork(network);
 		
-		// get the data from UrbanSim (parcels and persons)
-		readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-				  null, // tnicolai april'12: location distribution via shapefile is disabled until a "switch" between Radius and shape-file is implemented getMATSim4UrbaSimControlerConfig().getShapeFileCellBasedAccessibility(),
-				  getUrbanSimParameterConfig().getRandomLocationDistributionRadiusForUrbanSimZone());
+		readFromUrbanSim();
 		
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = null;
@@ -174,6 +166,22 @@ public class MATSim4UrbanSimTEST {
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels);
 	}
+
+	/**
+	 * 
+	 */
+	protected void readFromUrbanSim() {
+		// get the data from UrbanSim (parcels and persons)
+		if(getUrbanSimParameterConfig().isUseShapefileLocationDistribution()){
+			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
+					  getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
+					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
+		}
+		else
+			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
+					  null,
+					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
+	}
 	
 	/**
 	 * read person table from urbansim and build MATSim population
@@ -187,8 +195,8 @@ public class MATSim4UrbanSimTEST {
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		
-		MATSim4UrbanSimControlerConfigModule m4uModule= getMATSim4UrbaSimControlerConfig();
-		UrbanSimParameterConfigModule uspModule		  = getUrbanSimParameterConfig();
+		MATSim4UrbanSimControlerConfigModuleV3 m4uModule= getMATSim4UrbaSimControlerConfig();
+		UrbanSimParameterConfigModuleV3 uspModule		  = getUrbanSimParameterConfig();
 		
 		
 		// check for existing plans file
@@ -255,8 +263,8 @@ public class MATSim4UrbanSimTEST {
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
 		
-//		// set spatial reference id (not necessary but needed to match the outcomes with google maps)
-//		int srid = InternalConstants.SRID_SWITZERLAND; // Constants.SRID_WASHINGTON_NORTH
+		// tnicolai TODO Time-of-a-day
+//		this.timeOfADay = XXX;
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
@@ -375,7 +383,8 @@ public class MATSim4UrbanSimTEST {
 	void setControlerSettings(ScenarioImpl scenario, String[] args) {
 
 		AccessibilityParameterConfigModule moduleAccessibility = getAccessibilityParameterConfig();
-		MATSim4UrbanSimControlerConfigModule moduleMATSim4UrbanSim = getMATSim4UrbaSimControlerConfig();
+		MATSim4UrbanSimControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbaSimControlerConfig();
+		UrbanSimParameterConfigModuleV3 moduleUrbanSimParameter = getUrbanSimParameterConfig();
 		
 		this.destinationSampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
 
@@ -402,6 +411,24 @@ public class MATSim4UrbanSimTEST {
 		else{
 			log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
+		}
+		
+		this.timeOfADay					= moduleMATSim4UrbanSim.getTimeOfADay();
+		
+		
+		// check which setting to use
+		if(moduleUrbanSimParameter.getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_BRUSSELS_ZONE)){
+			this.isParcel = false;
+			this.srid = InternalConstants.SRID_BELGIUM;
+		}
+		else if(moduleUrbanSimParameter.getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_ZURICH_PARCEL)){
+			this.isParcel = true;
+			this.srid = InternalConstants.SRID_SWITZERLAND;
+		}
+		else if(moduleUrbanSimParameter.getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_SEATTLE_PARCEL) ||
+				connector.getUrbanSimParameterConfig().getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_PSRC_PARCEL)){
+			this.isParcel = true;
+			this.srid = InternalConstants.SRID_WASHINGTON_NORTH;
 		}
 	}
 
@@ -468,23 +495,23 @@ public class MATSim4UrbanSimTEST {
 		return apcm;
 	}
 	
-	MATSim4UrbanSimControlerConfigModule getMATSim4UrbaSimControlerConfig() {
-		Module m = this.scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
-		if (m instanceof MATSim4UrbanSimControlerConfigModule) {
-			return (MATSim4UrbanSimControlerConfigModule) m;
+	MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig() {
+		Module m = this.scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
+		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
+			return (MATSim4UrbanSimControlerConfigModuleV3) m;
 		}
-		MATSim4UrbanSimControlerConfigModule mccm = new MATSim4UrbanSimControlerConfigModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
-		this.scenario.getConfig().getModules().put(MATSim4UrbanSimControlerConfigModule.GROUP_NAME, mccm);
+		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}
 	
-	UrbanSimParameterConfigModule getUrbanSimParameterConfig() {
-		Module m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModule.GROUP_NAME);
-		if (m instanceof UrbanSimParameterConfigModule) {
-			return (UrbanSimParameterConfigModule) m;
+	UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig() {
+		Module m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		if (m instanceof UrbanSimParameterConfigModuleV3) {
+			return (UrbanSimParameterConfigModuleV3) m;
 		}
-		UrbanSimParameterConfigModule upcm = new UrbanSimParameterConfigModule(UrbanSimParameterConfigModule.GROUP_NAME);
-		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModule.GROUP_NAME, upcm);
+		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		return upcm;
 	}
 	

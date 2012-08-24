@@ -164,6 +164,10 @@ public class InternalConstants {
 	public static final String V2_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v2.xsd";
 	public static final String V2_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v2.xsd";
 	public static final String V2_XSD_FILE_NAME = "matsim4urbansim_v2.xsd";
+	public static final String V3_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v3.xsd";
+	public static final String V3_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v3.xsd";
+	public static final String V3_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v3.xsd";
+	public static final String V3_XSD_FILE_NAME = "matsim4urbansim_v3.xsd";
 	public static final String JAXB_PARSER_PACKAGE_NAME = "matsim4urbansim.jaxbconfig";
 	
 	/** MATSim properties */
@@ -225,6 +229,11 @@ public class InternalConstants {
 	public static final String BETA_WALK_TRAVEL_COSTS_POWER = "betaWalkLnTravelCost";
 	
 	/** Spatial IDs and spatial conversion factors */
+	
+	public static final String PROJECT_NAME_BRUSSELS_ZONE	= "brussels_zone";
+	public static final String PROJECT_NAME_ZURICH_PARCEL 	= "zurich_parcel";
+	public static final String PROJECT_NAME_SEATTLE_PARCEL	= "seattle_parcel";
+	public static final String PROJECT_NAME_PSRC_PARCEL		= "psrc_parcel";	
 	public static final int SRID_WASHINGTON_NORTH = 2926;	// srid 2285 also worked, but was last updated in 2001 instead of 2007
 	public static final int SRID_SWITZERLAND = 21781;		// 
 	public static final int SRID_BELGIUM = 31300;			// this is the EPSG id of Belgium (old id 31300, new id 3447)
