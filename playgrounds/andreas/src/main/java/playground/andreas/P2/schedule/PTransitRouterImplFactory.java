@@ -47,6 +47,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
 import playground.andreas.P2.ana.PAnalysisManager;
+import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
@@ -81,6 +82,10 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	private PBox pBox;
 
 	public PTransitRouterImplFactory(Controler controler) {
+		this(controler, null);
+	}
+	
+	public PTransitRouterImplFactory(Controler controler, PtMode2LineSetter lineSetter){
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
 		this.ptEnabler = pConfig.getPtEnabler();
@@ -93,7 +98,11 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 //		controler.addControlerListener(new GexfPStat(pConfig, true));
 		controler.addControlerListener(new GexfPStatLight(pConfig));
 		controler.addControlerListener(new Line2GexfPStat(pConfig));
-		controler.addControlerListener(new PAnalysisManager(pConfig, "pt_"));
+		if(lineSetter == null){
+			controler.addControlerListener(new PAnalysisManager(pConfig, "pt_"));
+		}else{
+			controler.addControlerListener(new PAnalysisManager(pConfig, "pt_", lineSetter));
+		}
 	}
 
 	@Override

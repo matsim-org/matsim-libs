@@ -71,13 +71,19 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 	private List<AbstractPAnalyisModule> pAnalyzesList = new LinkedList<AbstractPAnalyisModule>();
 	private HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<String, BufferedWriter>();
 	private boolean firstIteration = true;
+	private PtMode2LineSetter lineSetter;
 
 	public PAnalysisManager(PConfigGroup pConfig, String ptDriverPrefix) {
+		this(pConfig, ptDriverPrefix, new BVGLines2PtModes());
+		log.info("using default PtMode2LineSetter " +  this.lineSetter.getClass().getSimpleName());
+	}
+
+	public PAnalysisManager(PConfigGroup pConfig, String ptDriverPrefix, PtMode2LineSetter lineSetter){
 		log.info("enabled");
 		this.pIdentifier = pConfig.getPIdentifier();
 		this.ptDriverPrefix = ptDriverPrefix;
+		this.lineSetter = lineSetter;
 	}
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// create all analyzes
@@ -141,10 +147,10 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 
 	private void updateLineId2ptModeMap(TransitSchedule transitSchedule) {
 		// TODO [AN] This is currently hardcoded and should be configurable
-		PtMode2LineSetter lineSetter = new BVGLines2PtModes();
+//		PtMode2LineSetter lineSetter = new BVGLines2PtModes();
 		
-		lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
-		HashMap<Id, String> lineIds2ptModeMap = lineSetter.getLineId2ptModeMap();
+		this.lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
+		HashMap<Id, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
 		
 		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
 			ana.setLineId2ptModeMap(lineIds2ptModeMap);
