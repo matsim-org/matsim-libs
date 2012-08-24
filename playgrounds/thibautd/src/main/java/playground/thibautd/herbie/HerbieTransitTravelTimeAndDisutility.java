@@ -40,6 +40,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTravelTime, TravelDisutility {
 	private final boolean CONSIDER_NEGATIVE_WALK_TIMES = true;
+	private final boolean USE_CUSTOM_IV_COSTS = false;
 	private final TransitRouterNetworkTravelTimeAndDisutility timeCost;
 	private final TravelScoringFunction distanceScoring;
 	private final HerbieConfigGroup herbieConfig;
@@ -98,10 +99,14 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 		}
 
 		// this is fine as long as the scores are additives
-		double cost = -distanceScoring.getInVehiclePtScore(
+		double cost =
+			USE_CUSTOM_IV_COSTS ?
+			-distanceScoring.getInVehiclePtScore(
 				link.getLength(),
 				getLinkTravelTime( link , time ),
-				distanceCost);
+				distanceCost) :
+			-getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s()
+			- link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 
 		if (cost < 0) {
 			throw new RuntimeException( "negative cost! "+cost );
