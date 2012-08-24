@@ -88,25 +88,15 @@ public class FreeSpeedTravelTimeAndDistanceBasedTravelDisutility implements Trav
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
-		
-//		if (this.marginalCostOfDistance == 0.0) {
-//			return travelTime * this.marginalCostOfTime;
-//		}
-		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
-		
-		return this.marginalCostOfTime * travelTime + this.marginalCostOfDistance * link.getLength();
+//		return this.marginalCostOfTime * travelTime + this.marginalCostOfDistance * link.getLength();
+		return 0.;
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
-
-//		if (this.marginalCostOfDistance == 0.0) {
-//			return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;
-//		}
-		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
-
-		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime
-		+ this.marginalCostOfDistance * link.getLength();
+//		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime
+//		+ this.marginalCostOfDistance * link.getLength();
+		return 0.;
 	}
 
 }
