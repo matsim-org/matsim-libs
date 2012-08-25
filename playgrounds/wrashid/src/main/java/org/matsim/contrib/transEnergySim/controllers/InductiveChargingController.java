@@ -30,6 +30,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyCo
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumptionModelGalus;
 import org.matsim.contrib.transEnergySim.vehicles.impl.IC_BEV;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -39,6 +40,10 @@ import playground.wrashid.lib.obj.DoubleValueHashMap;
 
 public class InductiveChargingController extends Controler {
 
+	public InductiveChargingController(Config config) {
+		super(config);
+	}
+	
 	public InductiveChargingController(String[] args) {
 		super(args);
 	}
