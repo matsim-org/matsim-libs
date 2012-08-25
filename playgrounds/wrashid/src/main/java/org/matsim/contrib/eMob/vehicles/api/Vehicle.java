@@ -20,7 +20,7 @@
 package org.matsim.contrib.eMob.vehicles.api;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.eMob.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.matsim.contrib.eMob.vehicles.energyConsumption.api.EnergyConsumptionModel;
 
 public interface Vehicle {
 

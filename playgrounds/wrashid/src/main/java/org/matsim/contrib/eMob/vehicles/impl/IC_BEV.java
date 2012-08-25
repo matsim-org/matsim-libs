@@ -21,7 +21,7 @@ package org.matsim.contrib.eMob.vehicles.impl;
 
 import org.matsim.contrib.eMob.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.eMob.vehicles.api.InductivlyChargable;
-import org.matsim.contrib.eMob.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.matsim.contrib.eMob.vehicles.energyConsumption.api.EnergyConsumptionModel;
 
 /**
  * Inductively chargeable, battery electric vehicle

@@ -1,4 +1,4 @@
-package playground.wrashid.PHEV.Utility;
+package org.matsim.contrib.eMob.vehicles.energyConsumption.galus;
 
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -8,7 +8,7 @@ import org.matsim.contrib.eMob.vehicles.energyConsumption.galus.EnergyConsumptio
 
 
 
-public class EnergyConsumptionSamples{
+public class EnergyConsumptionInterpolated{
 	
 	private PriorityQueue<EnergyConsumption> queue=new PriorityQueue<EnergyConsumption>();
 	private EnergyConsumption zeroSpeedConsumption=new EnergyConsumption(0,0);
