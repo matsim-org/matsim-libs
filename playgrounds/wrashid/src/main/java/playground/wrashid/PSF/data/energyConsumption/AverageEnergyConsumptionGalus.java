@@ -1,6 +1,6 @@
 package playground.wrashid.PSF.data.energyConsumption;
 
-import org.matsim.contrib.eMob.vehicles.energyConsumption.galus.EnergyConsumption;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumption;
 
 import playground.wrashid.PHEV.Utility.EnergyConsumptionSamples;
 

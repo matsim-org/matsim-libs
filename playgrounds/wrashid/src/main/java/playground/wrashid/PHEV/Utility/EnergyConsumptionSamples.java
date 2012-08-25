@@ -3,7 +3,7 @@ package playground.wrashid.PHEV.Utility;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import org.matsim.contrib.eMob.vehicles.energyConsumption.galus.EnergyConsumption;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumption;
 
 
 
