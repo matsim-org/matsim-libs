@@ -19,13 +19,14 @@
 
 package org.matsim.contrib.transEnergySim.controllers;
 
+import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestInductiveChargingController extends MatsimTestCase {
 
 	public void testBasic(){
-		String[] args={getClassInputDirectory()+"config.xml"};
-		InductiveChargingController icc=new InductiveChargingController(args);
+		Config config= loadConfig(getClassInputDirectory()+"config.xml");
+		InductiveChargingController icc=new InductiveChargingController(config);
 		icc.run();
 		
 		
