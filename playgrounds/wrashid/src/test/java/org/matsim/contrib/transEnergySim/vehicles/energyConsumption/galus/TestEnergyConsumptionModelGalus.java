@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.eMob.vehicles.energyConsumption.galus;
+package org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumptionModelGalus;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.LinkImplTest;
 

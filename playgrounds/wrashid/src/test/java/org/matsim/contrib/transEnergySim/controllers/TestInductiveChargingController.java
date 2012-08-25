@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.eMob.controllers;
+package org.matsim.contrib.transEnergySim.controllers;
 
 import org.matsim.testcases.MatsimTestCase;
 
