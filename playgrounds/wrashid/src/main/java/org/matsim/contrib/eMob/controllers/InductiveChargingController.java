@@ -20,26 +20,28 @@
 package org.matsim.contrib.eMob.controllers;
 
 import org.matsim.contrib.eMob.chargingInfrastructure.road.InductiveStreetCharger;
+import org.matsim.contrib.eMob.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
 
-public class EMobInductiveChargingController extends Controler {
+public class InductiveChargingController extends Controler {
 
-	public EMobInductiveChargingController(String[] args) {
+	public InductiveChargingController(String[] args) {
 		super(args);
 	}
 
 	public static void main(String[] args) {
-		EMobInductiveChargingController eMobInductiveChargingController = new EMobInductiveChargingController(args);
+		InductiveChargingController eMobInductiveChargingController = new InductiveChargingController(args);
 		
 		eMobInductiveChargingController.addControlerListener(new StartupListener() {
 			
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				event.getControler().getEvents().addHandler(new InductiveStreetCharger());
+				//event.getControler().getEvents().addHandler(new EnergyConsumptionTracker());
 			}
 		});
 		
