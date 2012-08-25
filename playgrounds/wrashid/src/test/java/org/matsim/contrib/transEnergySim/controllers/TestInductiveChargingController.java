@@ -23,4 +23,8 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class TestInductiveChargingController extends MatsimTestCase {
 
+	public void testBasic(){
+		
+	}
+	
 }
