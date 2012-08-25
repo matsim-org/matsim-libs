@@ -24,6 +24,10 @@ import org.matsim.testcases.MatsimTestCase;
 public class TestInductiveChargingController extends MatsimTestCase {
 
 	public void testBasic(){
+		String[] args={getClassInputDirectory()+"config.xml"};
+		InductiveChargingController icc=new InductiveChargingController(args);
+		icc.run();
+		
 		
 	}
 	
