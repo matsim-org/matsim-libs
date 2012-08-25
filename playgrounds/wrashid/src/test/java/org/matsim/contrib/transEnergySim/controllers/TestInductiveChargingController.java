@@ -29,6 +29,7 @@ public class TestInductiveChargingController extends MatsimTestCase {
 		InductiveChargingController icc=new InductiveChargingController(config);
 		icc.run();
 		
+		//TODO: add assertions here
 		
 	}
 	
