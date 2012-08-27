@@ -114,7 +114,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		}
 
 		double chargableEnergyInJoules = availablePowerInWatt * parkingDuration;
-		
+
 		VehicleWithBattery vehicleWithBattery = chargableVehicles.get(personId);
 		double energyToChargeInJoules = 0;
 		if (vehicleWithBattery.getRequiredEnergyInJoules() <= chargableEnergyInJoules) {
@@ -123,8 +123,11 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 			energyToChargeInJoules = chargableEnergyInJoules;
 		}
 		vehicleWithBattery.chargeBattery(energyToChargeInJoules);
-		// TODO: log this properly! (who charged, where, how much
-		// energy, start time of charging.)
+
+		// TODO: log: agentId, startChargingTime, endChargingTime,
+		// energyCharged, facilityId (which can be a normal facility or
+		// a parking facility - just based on, if parking module used or not)
+		//
 	}
 
 	private boolean isFirstCarDepartureOfDay(Id personId) {

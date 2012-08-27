@@ -132,7 +132,8 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 		}
 		vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 
-		// TODO: also log this... (per vehicle energy consumption)
+		// TODO: log: agentId, startChargingTime, endChargingTime, energyCharged, linkId
+		
 	}
 
 	private boolean shouldLinkBeIgnored(double linkLeaveTime, double timeSpendOnLink, Link link,
