@@ -13,7 +13,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
@@ -28,7 +28,7 @@ class LocalMCCalculator extends LeastCostInsertionCalculator {
 	}
 
 	@Override
-	double calculateLeastCost(Tour tour, TourActivity prevAct, TourActivity nextAct, TourActivity newAct, Driver driver, Vehicle vehicle) {
+	double calculateLeastCost(TourImpl tour, TourActivity prevAct, TourActivity nextAct, TourActivity newAct, Driver driver, Vehicle vehicle) {
 		double earliestDepTimeFromPrevAct = prevAct.getEarliestOperationStartTime() + prevAct.getOperationTime();
 		
 		double tt_prevAct2newAct = costs.getTransportTime(prevAct.getLocationId(), newAct.getLocationId(), earliestDepTimeFromPrevAct, driver, vehicle);

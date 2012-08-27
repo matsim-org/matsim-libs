@@ -2,7 +2,7 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 
@@ -19,7 +19,7 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
  */
 abstract class TourActivityRecorder {
 
-	abstract void initialiseRecorder(Vehicle v, Tour t, Pickup pickup2insert, Delivery delivery2insert);
+	abstract void initialiseRecorder(Vehicle v, TourImpl t, Pickup pickup2insert, Delivery delivery2insert);
 
 	abstract void reset();
 

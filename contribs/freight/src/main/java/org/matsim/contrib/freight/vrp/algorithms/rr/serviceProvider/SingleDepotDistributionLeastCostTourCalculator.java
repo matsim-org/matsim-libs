@@ -21,7 +21,7 @@ import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Start;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
@@ -46,7 +46,7 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 	}
 
 	@Override
-	TourData calculateLeastCostTour(Job job, Vehicle vehicle, Tour tour, Driver driver, double bestKnownCosts) {
+	TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownCosts) {
 		Double bestPenalty = bestKnownCosts;
 		Shipment shipment = (Shipment)job;
 		if(!checkCapacity(tour,shipment,vehicle)){
@@ -54,7 +54,7 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 		}
 		
 		Pickup pickup = new Pickup(shipment);
-		Tour tourCopy = tour;
+		TourImpl tourCopy = tour;
 		int startListIterator = tour.getActivities().size()/2-1;
 		boolean pickupInserted = false;
 		
@@ -64,7 +64,7 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 				warned = true;
 			}
 			startListIterator++;
-			tourCopy = new Tour(tour);
+			tourCopy = new TourImpl(tour);
 			tourCopy.getActivities().add(1, pickup);
 			pickupInserted = true;
 			boolean isFeasible = updateTour(tourCopy, vehicle, driver);
@@ -107,7 +107,7 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 		return new TourData(bestPenalty, 1, finalInsertionIndex);
 	}
 
-	private boolean updateTour(Tour tourCopy, Vehicle vehicle, Driver driver) {
+	private boolean updateTour(TourImpl tourCopy, Vehicle vehicle, Driver driver) {
 		boolean isFeasible = new TourCostAndTWProcessor(costs).process(tourCopy, vehicle, driver);
 		return isFeasible;
 	}
@@ -120,7 +120,7 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 		
 	}
 
-	private boolean checkCapacity(Tour tour, Shipment shipment, Vehicle vehicle) {
+	private boolean checkCapacity(TourImpl tour, Shipment shipment, Vehicle vehicle) {
 		if(tour.tourData.totalLoad + shipment.getSize() > vehicle.getCapacity()){
 			return false;
 		}

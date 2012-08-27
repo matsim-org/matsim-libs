@@ -18,6 +18,18 @@ public enum VehicleRoutingProblemType {
 	 * Single depot distribution problem with time-dependent transport costs,
 	 * capacity constraints and time windows
 	 */
-	TDCVRPTW
+	TDCVRPTW,
+	
+	/**
+	 * Single depot distribution problem with
+	 * capacity constraints, time windows and heterogeneous fleet
+	 */
+	CVRPTWHF,
+	
+	/**
+	 * Single depot distribution problem with time-dependent costs and
+	 * capacity constraints, time windows and heterogeneous fleet
+	 */
+	TDCVRPTWHF
 	
 }

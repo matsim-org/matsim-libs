@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
@@ -133,7 +133,7 @@ public class TransportCostCalculator implements VehicleRoutingCosts, TourCost{
 	}
 	
 	@Override
-	public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+	public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
 		return vehicle.getType().vehicleCostParams.fix + tour.tourData.transportCosts;
 	}
 

@@ -23,7 +23,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
@@ -36,14 +36,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class RRVRPSolverTest extends TestCase{
 	
-	class MyVRPSolverFactory implements VRPSolverFactory{
+	class MyVRPSolverFactory implements MatsimVrpSolverFactory{
 
 		@Override
-		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
+		public MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
 			ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemType.CVRPTW);
-			MatsimVrpSolver solver = new MatsimVrpSolver(shipments, carrierVehicles,costs);
+			MatsimVrpSolverImpl solver = new MatsimVrpSolverImpl(shipments, carrierVehicles,costs);
 			RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
-			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
+			solver.setVrpSolverFactory(ruinAndRecreateFactory);
 			return solver;
 		}
 	}
@@ -84,7 +84,7 @@ public class RRVRPSolverTest extends TestCase{
 		tourCost = new TourCost(){
 
 			@Override
-			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
 				return 100 + tour.tourData.transportCosts;
 			}
 			

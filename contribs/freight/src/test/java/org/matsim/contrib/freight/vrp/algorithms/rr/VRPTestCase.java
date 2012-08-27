@@ -32,7 +32,7 @@ import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -58,7 +58,7 @@ public class VRPTestCase extends TestCase{
 		
 	}
 	
-	public Tour tour;
+	public TourImpl tour;
 	
 	public VehicleRoutingCosts costs;
 	
@@ -129,7 +129,7 @@ public class VRPTestCase extends TestCase{
 		TourCost tourCost = new TourCost(){
 
 			@Override
-			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
 				return tour.tourData.transportCosts;
 			}
 			
@@ -137,11 +137,11 @@ public class VRPTestCase extends TestCase{
 		return new InitialSolutionBestInsertion(new ServiceProviderAgentFactoryFinder(tourCost,vrp.getCosts()).getFactory(VehicleRoutingProblemType.CVRPTW)).createInitialSolution(vrp);
 	}
 	
-	protected ServiceProviderAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
+	protected ServiceProviderAgent getTourAgent(VehicleRoutingProblem vrp, TourImpl tour1, Vehicle vehicle) {
 		TourCost tourCost = new TourCost(){
 
 			@Override
-			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
 				return tour.tourData.transportCosts;
 			}
 			

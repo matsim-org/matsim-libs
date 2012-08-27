@@ -21,11 +21,11 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingSolution;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
 public class CVRPTWSolver implements VehicleRoutingProblemSolver{
@@ -47,7 +47,7 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver{
 	}
 
 	@Override
-	public VehicleRoutingSolution solve() {
+	public VehicleRoutingProblemSolution solve() {
 		checkWhetherProblemIsOfCorrectType();
 		
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp);
@@ -86,7 +86,7 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver{
 		TourCost tourCost = new TourCost() {
 			
 			@Override
-			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
 				return vehicle.getType().vehicleCostParams.fix + tour.tourData.transportCosts;
 			}
 		};	

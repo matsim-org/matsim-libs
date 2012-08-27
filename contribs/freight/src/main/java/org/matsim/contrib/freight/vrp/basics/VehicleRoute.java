@@ -14,17 +14,17 @@ package org.matsim.contrib.freight.vrp.basics;
 
 public class VehicleRoute {
 	
-	private Tour tour;
+	private TourImpl tour;
 	
 	private Vehicle vehicle;
 
-	public VehicleRoute(Tour tour, Vehicle vehicle) {
+	public VehicleRoute(TourImpl tour, Vehicle vehicle) {
 		super();
 		this.tour = tour;
 		this.vehicle = vehicle;
 	}
 
-	public Tour getTour() {
+	public TourImpl getTour() {
 		return tour;
 	}
 

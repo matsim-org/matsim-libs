@@ -15,7 +15,7 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
@@ -24,7 +24,7 @@ class ConstraintManager extends TourActivityRecorder {
 	
 	private Vehicle vehicle;
 	
-	private Tour tour;
+	private TourImpl tour;
 	
 	private Pickup pickup;
 	
@@ -42,7 +42,7 @@ class ConstraintManager extends TourActivityRecorder {
 	
 	private int currentPickupIndex = 0;
 	
-	ConstraintManager(Vehicle vehicle, Tour tour, Pickup pickup, Delivery delivery) {
+	ConstraintManager(Vehicle vehicle, TourImpl tour, Pickup pickup, Delivery delivery) {
 		this.vehicle = vehicle;
 		this.tour = tour;
 		this.pickup = pickup;
@@ -53,7 +53,7 @@ class ConstraintManager extends TourActivityRecorder {
 	 * @see org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourActivityRecorder#initialiseRecorder(org.matsim.contrib.freight.vrp.basics.Vehicle, org.matsim.contrib.freight.vrp.basics.Tour, org.matsim.contrib.freight.vrp.basics.Pickup, org.matsim.contrib.freight.vrp.basics.Delivery)
 	 */
 	@Override
-	void initialiseRecorder(Vehicle v, Tour t, Pickup pickup2insert, Delivery delivery2insert){
+	void initialiseRecorder(Vehicle v, TourImpl t, Pickup pickup2insert, Delivery delivery2insert){
 		reset();
 		this.vehicle = v;
 		this.tour = t;

@@ -19,7 +19,7 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 import org.matsim.core.gbl.MatsimRandom;
 
-public class DTWSolverFactory implements VRPSolverFactory{
+public class DTWSolverFactory implements MatsimVrpSolverFactory{
 
 	private Random random = MatsimRandom.getRandom();
 
@@ -28,12 +28,12 @@ public class DTWSolverFactory implements VRPSolverFactory{
 	}
 
 	@Override
-	public VRPSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
+	public MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
 		verifyDistributionProblem(shipments,carrierVehicles);
 		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemType.CVRPTW);
-		MatsimVrpSolver rrSolver = new MatsimVrpSolver(shipments, carrierVehicles, costs);
+		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(shipments, carrierVehicles, costs);
 		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
-		rrSolver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
+		rrSolver.setVrpSolverFactory(ruinAndRecreateFactory);
 		return rrSolver;
 	}
 

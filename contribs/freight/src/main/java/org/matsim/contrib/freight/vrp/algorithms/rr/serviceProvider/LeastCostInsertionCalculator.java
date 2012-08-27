@@ -13,12 +13,12 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 abstract class LeastCostInsertionCalculator {
 	
-	abstract double calculateLeastCost(Tour tour, TourActivity prevAct, TourActivity nextAct, TourActivity activity2insert, Driver driver, Vehicle vehicle);
+	abstract double calculateLeastCost(TourImpl tour, TourActivity prevAct, TourActivity nextAct, TourActivity activity2insert, Driver driver, Vehicle vehicle);
 
 }

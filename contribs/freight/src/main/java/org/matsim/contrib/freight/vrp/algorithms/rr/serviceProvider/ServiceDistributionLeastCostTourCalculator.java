@@ -19,7 +19,7 @@ import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Service;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
@@ -34,16 +34,15 @@ class ServiceDistributionLeastCostTourCalculator extends LeastCostTourCalculator
 	}
 
 	@Override
-	TourData calculateLeastCostTour(Job job, Vehicle vehicle, Tour tour, Driver driver, double bestKnownCosts) {
-		Double bestPenalty = bestKnownCosts;
+	TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownCosts) {
+		Double bestCost = bestKnownCosts;
 		Service service = (Service)job;
 		if(!checkCapacity(tour,service.getDemand(),vehicle)){
 			return new TourData(Double.MAX_VALUE, null, null);
 		}
-		Tour tourCopy = tour;
 		Delivery deliveryAct = new Delivery(service);
 		Integer insertionIndex = null;
-		Iterator<TourActivity> actIter = tourCopy.getActivities().iterator();
+		Iterator<TourActivity> actIter = tour.getActivities().iterator();
 		TourActivity prevAct = actIter.next();
 		while(actIter.hasNext()){
 			TourActivity currAct = actIter.next();
@@ -51,22 +50,20 @@ class ServiceDistributionLeastCostTourCalculator extends LeastCostTourCalculator
 				prevAct = currAct;
 				continue;
 			}
-			double mc = marginalInsertionCostCalculator.calculateLeastCost(tourCopy, prevAct, currAct, deliveryAct, driver, vehicle);			
-			double penalty = mc;
-			if(penalty < bestPenalty){
-				bestPenalty = penalty;
-				insertionIndex = tourCopy.getActivities().indexOf(currAct);
+			double mc = marginalInsertionCostCalculator.calculateLeastCost(tour, prevAct, currAct, deliveryAct, driver, vehicle);			
+			if(mc < bestCost){
+				bestCost = mc;
+				insertionIndex = tour.getActivities().indexOf(currAct);
 			}
 			prevAct = currAct;
 		}
 		if(insertionIndex == null){
 			return new TourData(Double.MAX_VALUE, null, null);
 		}
-		int finalInsertionIndex = insertionIndex;
-		return new TourData(bestPenalty, 1, finalInsertionIndex);
+		return new TourData(bestCost, 1, insertionIndex);
 	}
 
-	private boolean checkCapacity(Tour tour, int demand, Vehicle vehicle) {
+	private boolean checkCapacity(TourImpl tour, int demand, Vehicle vehicle) {
 		if(tour.tourData.totalLoad + demand > vehicle.getCapacity()){
 			return false;
 		}

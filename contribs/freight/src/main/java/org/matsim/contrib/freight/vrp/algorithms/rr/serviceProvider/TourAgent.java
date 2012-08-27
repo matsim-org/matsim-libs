@@ -1,14 +1,14 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 public interface TourAgent {
 	
 	public String getId();
 	
-	public Tour getTour();
+	public TourImpl getTour();
 	
 	public Vehicle getVehicle();
 	

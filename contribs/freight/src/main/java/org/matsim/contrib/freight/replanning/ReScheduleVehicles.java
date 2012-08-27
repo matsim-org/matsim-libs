@@ -7,8 +7,8 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.vrp.VRPSolver;
-import org.matsim.contrib.freight.vrp.VRPSolverFactoryImpl;
+import org.matsim.contrib.freight.vrp.MatsimVrpSolver;
+import org.matsim.contrib.freight.vrp.MatsimVrpSolverFactoryImpl;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
@@ -34,7 +34,7 @@ public class ReScheduleVehicles implements CarrierPlanStrategyModule{
 	@Override
 	public void handleActor(Carrier carrier) {	
 		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemType.CVRPTW);
-		VRPSolver vrpSolver = new VRPSolverFactoryImpl(new RuinAndRecreateStandardAlgorithmFactory(spFactory), VehicleRoutingProblemType.CVRPTW).createSolver(new CarrierFactory().getShipments(carrier.getContracts()), 
+		MatsimVrpSolver vrpSolver = new MatsimVrpSolverFactoryImpl(new RuinAndRecreateStandardAlgorithmFactory(spFactory), VehicleRoutingProblemType.CVRPTW).createSolver(new CarrierFactory().getShipments(carrier.getContracts()), 
 				new CarrierFactory().getVehicles(carrier.getCarrierCapabilities()), network, tourCost, costs);
 		Collection<ScheduledTour> scheduledTours = vrpSolver.solve();
 		carrier.setSelectedPlan(new CarrierPlan(scheduledTours));

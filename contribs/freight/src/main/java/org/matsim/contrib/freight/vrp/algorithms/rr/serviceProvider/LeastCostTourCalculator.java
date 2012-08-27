@@ -14,11 +14,11 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
  abstract class LeastCostTourCalculator {
 	
-	abstract TourData calculateLeastCostTour(Job job, Vehicle vehicle, Tour tour, Driver driver, double bestKnownScore);
+	abstract TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownScore);
 
 }

@@ -1,7 +1,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
@@ -19,7 +19,7 @@ public class ServiceDistribTWSPFactory implements ServiceProviderAgentFactory{
 	}
 	
 	@Override
-	public ServiceProviderAgent createAgent(Vehicle vehicle, Driver driver, Tour tour) {
+	public ServiceProviderAgent createAgent(Vehicle vehicle, Driver driver, TourImpl tour) {
 		RRDriverAgent a = new RRDriverAgent(vehicle, driver, tour);
 		a.setTourTimeWindowsAndCostUpdater(new TourCostAndTWProcessor(vehicleRoutingCost));
 		a.setTourCost(tourCost);
@@ -34,13 +34,13 @@ public class ServiceDistribTWSPFactory implements ServiceProviderAgentFactory{
 		VrpTourBuilder vrpTourBuilder = new VrpTourBuilder();
 		vrpTourBuilder.scheduleStart(vehicle.getLocationId(), vehicle.getEarliestDeparture(), Double.MAX_VALUE);
 		vrpTourBuilder.scheduleEnd(vehicle.getLocationId(), 0.0, vehicle.getLatestArrival());
-		Tour tour = vrpTourBuilder.build();
+		TourImpl tour = vrpTourBuilder.build();
 		return createAgent(vehicle,driver,tour);
 	}
 
 	@Override
 	public ServiceProviderAgent createAgent(ServiceProviderAgent agent) {
-		Tour tourCopy = new Tour(agent.getTour());
+		TourImpl tourCopy = new TourImpl(agent.getTour());
 		return createAgent(agent.getVehicle(),agent.getDriver(),tourCopy);
 	}
 

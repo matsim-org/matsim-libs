@@ -32,7 +32,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProvi
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -132,7 +132,7 @@ public class RuinAndRecreateTest extends TestCase{
 		TourCost tourCost = new TourCost(){
 
 			@Override
-			public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
 				return tour.tourData.transportCosts;
 			}
 			
@@ -160,8 +160,8 @@ public class RuinAndRecreateTest extends TestCase{
 		return new IdImpl(string);
 	}
 
-	private Collection<Tour> getTours(RuinAndRecreateSolution solution) {
-		List<Tour> tours = new ArrayList<Tour>();
+	private Collection<TourImpl> getTours(RuinAndRecreateSolution solution) {
+		List<TourImpl> tours = new ArrayList<TourImpl>();
 		for(ServiceProviderAgent a : solution.getTourAgents()){
 			tours.add(a.getTour());
 		}
@@ -176,9 +176,9 @@ public class RuinAndRecreateTest extends TestCase{
 		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory).createAlgorithm(vrp);
 		algo.run();
 		
-		Collection<Tour> solution = getTours(algo.getSolution());
+		Collection<TourImpl> solution = getTours(algo.getSolution());
 		int solVal = 0;
-		for(Tour t : solution){
+		for(TourImpl t : solution){
 			solVal += t.tourData.transportCosts;
 		}
 		assertEquals(397,solVal);
@@ -207,17 +207,17 @@ public class RuinAndRecreateTest extends TestCase{
 		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory).createAlgorithm(vrp);
 		algo.run();
 		
-		Collection<Tour> solution = getTours(algo.getSolution());
+		Collection<TourImpl> solution = getTours(algo.getSolution());
 		int solVal = 0;
-		for(Tour t : solution){
+		for(TourImpl t : solution){
 			solVal += t.tourData.transportCosts;
 		}
 		assertEquals(solVal,445);
 	}
 
-	private int getActiveVehicles(Collection<Tour> solution) {
+	private int getActiveVehicles(Collection<TourImpl> solution) {
 		int active = 0;
-		for(Tour t : solution){
+		for(TourImpl t : solution){
 			if(t.getActivities().size()>2){
 				active++;
 			}

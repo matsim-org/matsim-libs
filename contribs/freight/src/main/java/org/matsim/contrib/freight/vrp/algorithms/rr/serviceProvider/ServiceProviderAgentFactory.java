@@ -1,7 +1,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 public interface ServiceProviderAgentFactory {
@@ -13,7 +13,7 @@ public interface ServiceProviderAgentFactory {
 	 * @param tour
 	 * @return
 	 */
-	public ServiceProviderAgent createAgent(Vehicle vehicle, Driver driver, Tour tour);
+	public ServiceProviderAgent createAgent(Vehicle vehicle, Driver driver, TourImpl tour);
 
 	/**
 	 * creates an initial agent with an empty tour

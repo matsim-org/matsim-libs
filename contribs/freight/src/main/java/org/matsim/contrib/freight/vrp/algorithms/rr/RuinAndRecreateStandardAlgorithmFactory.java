@@ -31,7 +31,7 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
-public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateFactory, VehicleRoutingProblemSolverFactory {
+public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateFactory {
 
 	private static Logger logger = Logger.getLogger(RuinAndRecreateStandardAlgorithmFactory.class);
 

@@ -21,20 +21,20 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl;
 import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
 
 public class TourCostProcessorTest extends VRPTestCase{
 	
-	Tour tour;
+	TourImpl tour;
 	
 	Driver driver;
 	
 	Vehicle vehicle;
 	
-	Tour anotherTour;
+	TourImpl anotherTour;
 	
 	TourCostProcessor statusUpdater;
 	

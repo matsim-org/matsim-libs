@@ -2,7 +2,7 @@ package org.matsim.contrib.freight.vrp.basics;
 
 import java.util.Collection;
 
-public interface VehicleRoutingSolution {
+public interface VehicleRoutingProblemSolution {
 	
 	public Collection<VehicleRoute> getRoutes();
 	

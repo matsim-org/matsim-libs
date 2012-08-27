@@ -17,7 +17,7 @@ import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
@@ -27,11 +27,11 @@ class PickupAndDeliveryJIF extends LeastCostTourCalculator {
 	private VehicleRoutingCosts costs;
 	private Vehicle vehicle;
 	private Driver driver;
-	private Tour tour;
+	private TourImpl tour;
 	
 	private TourActivityRecorder activityRecorder;
 
-	PickupAndDeliveryJIF(VehicleRoutingCosts costs, Vehicle vehicle, Tour tour) {
+	PickupAndDeliveryJIF(VehicleRoutingCosts costs, Vehicle vehicle, TourImpl tour) {
 		this.costs = costs;
 		this.vehicle = vehicle;
 		this.tour = tour;
@@ -43,7 +43,7 @@ class PickupAndDeliveryJIF extends LeastCostTourCalculator {
 	}
 
 	@Override
-	TourData calculateLeastCostTour(Job job, Vehicle vehicle, Tour tour, Driver driver, double bestKnownPrice) {
+	TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownPrice) {
 		Shipment shipment = (Shipment)job;
 		Pickup pickup = createPickup(shipment);
 		Delivery delivery = createDelivery(shipment);
@@ -98,7 +98,7 @@ class PickupAndDeliveryJIF extends LeastCostTourCalculator {
 		return new LocalMCCalculator(costs).calculateLeastCost(tour, prevAct, nextAct, newAct, driver, vehicle);
 	}
 
-	private TourActivity getActivity(Tour tour, int i) {
+	private TourActivity getActivity(TourImpl tour, int i) {
 		return tour.getActivities().get(i);
 	}
 

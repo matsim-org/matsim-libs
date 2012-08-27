@@ -12,6 +12,11 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.utils.VrpUtils;
 import org.matsim.contrib.freight.vrp.utils.matsim2vrp.VRPVehicleAdapter;
 
+/**
+ * Translates matsim-carrier data to what the vehicle router needs, and memorizes translation that it can be translated back.
+ * @author schroeder
+ *
+ */
 class Matsim2VrpMap {
 	
 	private static class MatSimVrpVehicleMap {

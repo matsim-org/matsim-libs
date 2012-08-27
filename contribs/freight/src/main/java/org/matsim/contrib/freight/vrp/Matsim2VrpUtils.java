@@ -6,28 +6,25 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.TourBuilder;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
+import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.End;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Start;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.core.basic.v01.IdImpl;
 
 class Matsim2VrpUtils {
 	
-	static Collection<ScheduledTour> createTours(RuinAndRecreateSolution vrpSolution, Matsim2VrpMap matsim2vrpMap){
+	static Collection<ScheduledTour> createTours(VehicleRoutingProblemSolution vrpSolution, Matsim2VrpMap matsim2vrpMap){
 		Collection<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
-		for(ServiceProviderAgent a : vrpSolution.getTourAgents()){
-			if(!a.isActive()){
-				continue;
-			}
-			Tour tour = a.getTour();
+		for(VehicleRoute route : vrpSolution.getRoutes()){
+			TourImpl tour = route.getTour();
 			TourBuilder tourBuilder = new TourBuilder();
 			for(TourActivity act : tour.getActivities()){
 				if(act instanceof Pickup){
@@ -54,7 +51,7 @@ class Matsim2VrpUtils {
 				}
 			}
 			org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
-			ScheduledTour scheduledTour = new ScheduledTour(vehicleTour, matsim2vrpMap.getCarrierVehicle(a.getVehicle()), vehicleTour.getEarliestDeparture());
+			ScheduledTour scheduledTour = new ScheduledTour(vehicleTour, matsim2vrpMap.getCarrierVehicle(route.getVehicle()), vehicleTour.getEarliestDeparture());
 			scheduledTours.add(scheduledTour);
 		}
 		return scheduledTours;

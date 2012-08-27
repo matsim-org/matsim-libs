@@ -31,8 +31,6 @@ public class RuinAndRecreateAlgorithmBuilder {
 	
 	private Collection<RuinAndRecreateListener> contolerListeners = new ArrayList<RuinAndRecreateListener>();
 	
-	private VehicleRoutingProblemType vrpType;
-
 	public void setThresholdFunction(ThresholdFunction thresholdFunction) {
 		this.thresholdFunction = thresholdFunction;
 	}
@@ -52,11 +50,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 	public void addControlerListener(RuinAndRecreateListener l){
 		this.contolerListeners.add(l);
 	}
-	
-	public void setProblemType(VehicleRoutingProblemType vrpType){
-		this.vrpType = vrpType;
-	}
-	
+		
 	public void setServiceProviderAgentFactory(ServiceProviderAgentFactory serviceProviderAgentFactory){
 		this.serviceProviderAgentFactory = serviceProviderAgentFactory;
 	}

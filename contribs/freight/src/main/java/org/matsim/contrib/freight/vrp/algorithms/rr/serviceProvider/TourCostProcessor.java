@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
@@ -48,7 +48,7 @@ class TourCostProcessor extends TourStatusProcessor{
 	}
 	
 	@Override
-	boolean process(Tour tour, Vehicle vehicle, Driver driver){
+	boolean process(TourImpl tour, Vehicle vehicle, Driver driver){
 		tour.tourData.reset();
 		if(tour.isEmpty()){
 			return true;
@@ -71,7 +71,7 @@ class TourCostProcessor extends TourStatusProcessor{
 		return true;
 	}
 
-	private void updateLoad(Tour tour, TourActivity prevAct, TourActivity currAct) {
+	private void updateLoad(TourImpl tour, TourActivity prevAct, TourActivity currAct) {
 		if(currAct instanceof JobActivity){
 			currAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currAct).getCapacityDemand());
 			if(currAct instanceof Pickup){

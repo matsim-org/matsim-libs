@@ -35,7 +35,7 @@ import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingSolution;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -117,18 +117,18 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	@Override
-	public VehicleRoutingSolution solve() {
+	public VehicleRoutingProblemSolution solve() {
 		run();
 		return createSolution();
 	}
 
-	private VehicleRoutingSolution createSolution() {
+	private VehicleRoutingProblemSolution createSolution() {
 		final Collection<VehicleRoute> routes = new ArrayList<VehicleRoute>();
 		for(ServiceProviderAgent spa : currentSolution.getTourAgents()){
 			if(spa.isActive()) routes.add(new VehicleRoute(spa.getTour(),spa.getVehicle()));
 		}
 		
-		return new VehicleRoutingSolution() {
+		return new VehicleRoutingProblemSolution() {
 			
 			@Override
 			public Collection<VehicleRoute> getRoutes() {

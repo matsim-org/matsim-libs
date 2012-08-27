@@ -6,28 +6,28 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 
-public class VRPSolverFactoryImpl implements VRPSolverFactory{
+public class MatsimVrpSolverFactoryImpl implements MatsimVrpSolverFactory{
 	
-	private RuinAndRecreateFactory rrFactory;
+	private VehicleRoutingProblemSolverFactory vrpSolverFactory;
 	
 	private VehicleRoutingProblemType vrpType;
 
-	public VRPSolverFactoryImpl(RuinAndRecreateFactory rrFactory, VehicleRoutingProblemType vrpType) {
+	public MatsimVrpSolverFactoryImpl(VehicleRoutingProblemSolverFactory solverFactory, VehicleRoutingProblemType vrpType) {
 		super();
-		this.rrFactory = rrFactory;
+		this.vrpSolverFactory = solverFactory;
 		this.vrpType = vrpType;
 	}
 
 	@Override
-	public VRPSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
+	public MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
 		verifyVehicleRouteProblem(shipments,carrierVehicles);
-		MatsimVrpSolver rrSolver = new MatsimVrpSolver(shipments, carrierVehicles, costs);
-		rrSolver.setRuinAndRecreateFactory(rrFactory);
+		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(shipments, carrierVehicles, costs);
+		rrSolver.setVrpSolverFactory(vrpSolverFactory);
 		return rrSolver;
 	}
 

@@ -13,7 +13,7 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 /**
@@ -24,6 +24,6 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 abstract class TourStatusProcessor {
 	
-	abstract boolean process(Tour tour, Vehicle vehicle, Driver driver);
+	abstract boolean process(TourImpl tour, Vehicle vehicle, Driver driver);
 	
 }

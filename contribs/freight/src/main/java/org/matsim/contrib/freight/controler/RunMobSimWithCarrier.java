@@ -48,7 +48,7 @@ import org.matsim.contrib.freight.vrp.TransportCostCalculator;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateChartListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -162,7 +162,7 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 		TourCost tourCost = new TourCost(){
 
 			@Override
-			public double getTourCost(Tour tour, Driver driver, org.matsim.contrib.freight.vrp.basics.Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver, org.matsim.contrib.freight.vrp.basics.Vehicle vehicle) {
 				return vehicle.getType().vehicleCostParams.fix + tour.tourData.transportCosts;
 			}
 			

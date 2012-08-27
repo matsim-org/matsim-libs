@@ -25,7 +25,7 @@ import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Service;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
@@ -39,7 +39,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	
 	private static Logger logger = Logger.getLogger(RRDriverAgent.class);
 	
-	private Tour tour;
+	private TourImpl tour;
 	
 	private String id;
 	
@@ -60,7 +60,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	private TourCost tourCost = new TourCost() {
 		
 		@Override
-		public double getTourCost(Tour tour, Driver driver, Vehicle vehicle) {
+		public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
 			double cost = 0.0;
 			cost+=vehicle.getType().vehicleCostParams.fix;
 			cost+=tour.tourData.transportCosts;
@@ -68,7 +68,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 		}
 	};
 	
-	RRDriverAgent(final Vehicle vehicle, Driver driver, Tour tour) {
+	RRDriverAgent(final Vehicle vehicle, Driver driver, TourImpl tour) {
 		super();
 		this.tour = tour;
 		this.vehicle = vehicle;
@@ -111,7 +111,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 		return cost(tour);
 	}
 	
-	private double cost(Tour tour){
+	private double cost(TourImpl tour){
 		if(isActive(tour)){
 			return tourCost.getTourCost(tour,driver,vehicle);
 		}
@@ -120,7 +120,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 		}
 	}
 
-	public Tour getTour() {
+	public TourImpl getTour() {
 		syncTour();
 		return tour;
 	}
@@ -219,7 +219,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 		return vehicle;
 	}
 	
-	private boolean isActive(Tour tour){
+	private boolean isActive(TourImpl tour){
 		return !tour.isEmpty();
 	}
 	

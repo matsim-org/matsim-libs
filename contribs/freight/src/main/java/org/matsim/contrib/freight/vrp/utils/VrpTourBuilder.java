@@ -21,12 +21,12 @@ import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Service;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Start;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 
 public class VrpTourBuilder {
 	
-	private Tour tour;
+	private TourImpl tour;
 	
 	private boolean tourStarted = false;
 	
@@ -37,7 +37,7 @@ public class VrpTourBuilder {
 	private boolean checkConsistency = true;
 	
 	public VrpTourBuilder() {
-		tour = new Tour();
+		tour = new TourImpl();
 	}
 	
 	public VrpTourBuilder(boolean checkConsistency){
@@ -105,7 +105,7 @@ public class VrpTourBuilder {
 		return delivery;
 	}
 	
-	public Tour build(){
+	public TourImpl build(){
 		if(!tourEnded){
 			throw new IllegalStateException("a tour must have an end");
 		}

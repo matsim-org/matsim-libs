@@ -14,10 +14,12 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
 import java.util.Iterator;
 
+import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
-import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.Service;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
@@ -51,7 +53,7 @@ class TourCostAndTWProcessor extends TourStatusProcessor{
 	}
 
 	@Override
-	boolean process(Tour tour, Vehicle vehicle, Driver driver) {
+	boolean process(TourImpl tour, Vehicle vehicle, Driver driver) {
 //		counter.incCounter();
 //		counter.printCounter();
 		reset(tour);
@@ -63,13 +65,13 @@ class TourCostAndTWProcessor extends TourStatusProcessor{
 	}
 
 
-	private boolean updateTimeWindowsAndLoadsAtTourActivities(Tour tour, Vehicle vehicle, Driver driver) {
+	private boolean updateTimeWindowsAndLoadsAtTourActivities(TourImpl tour, Vehicle vehicle, Driver driver) {
 		updateEarliestArrivalTimes(tour,vehicle,driver);
 		boolean tourIsFeasible = updateLatestArrivalTimes(tour,vehicle,driver);
 		return tourIsFeasible;
 	}
 	
-	private void updateEarliestArrivalTimes(Tour tour, Vehicle vehicle, Driver driver) {
+	private void updateEarliestArrivalTimes(TourImpl tour, Vehicle vehicle, Driver driver) {
 		TourActivity prevAct = null;
 		for(TourActivity currentAct : tour.getActivities()){
 			if(prevAct == null){
@@ -91,7 +93,7 @@ class TourCostAndTWProcessor extends TourStatusProcessor{
 		}
 	}
 
-	private boolean updateLatestArrivalTimes(Tour tour, Vehicle vehicle, Driver driver) {
+	private boolean updateLatestArrivalTimes(TourImpl tour, Vehicle vehicle, Driver driver) {
 		TourActivity prevAct = null;
 		Iterator<TourActivity> actIterator = tour.getActivities().descendingIterator(); 
 		while(actIterator.hasNext()){
@@ -116,10 +118,13 @@ class TourCostAndTWProcessor extends TourStatusProcessor{
 		
 	}
 
-	private void updateLoad(Tour tour, TourActivity prevAct, TourActivity currentAct) {
+	private void updateLoad(TourImpl tour, TourActivity prevAct, TourActivity currentAct) {
 		if(currentAct instanceof JobActivity){
 			currentAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currentAct).getCapacityDemand());
-			if(currentAct instanceof Pickup){
+			if(((JobActivity) currentAct).getJob() instanceof Service){
+				tour.tourData.totalLoad += ((Service)((JobActivity) currentAct).getJob()).getDemand(); 
+			}
+			else if(currentAct instanceof Pickup){
 				tour.tourData.totalLoad += ((Pickup) currentAct).getCapacityDemand();
 			}
 		}
@@ -128,7 +133,7 @@ class TourCostAndTWProcessor extends TourStatusProcessor{
 		}
 	}
 
-	private void reset(Tour tour) {
+	private void reset(TourImpl tour) {
 		tour.tourData.reset();
 	}
 
