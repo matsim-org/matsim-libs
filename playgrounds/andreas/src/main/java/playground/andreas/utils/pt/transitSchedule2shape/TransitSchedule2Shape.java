@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.utils.pt;
+package playground.andreas.utils.pt.transitSchedule2shape;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -51,8 +52,10 @@ public class TransitSchedule2Shape {
 	 */
 	public static void main(String[] args) {
 
-		final String SCHEDULEFILE = "f:/p_runs/txl/run75/it.2740/run75.2740.transitSchedule.xml.gz";
-		final String SHAPEOUTFILE = "f:/p_runs/txl/run75/it.2740/run75.2740.transitSchedule.shp";
+		final String SCHEDULEFILE = "f:/p_runs/txl/run71/it.120/run71.120.transitSchedule.xml.gz";
+		final String COOPLOGGERFILE = "f:/p_runs/txl/run71/run71.pCoopLogger.txt";
+		final String ALLLINESSHAPEOUTFILE = "f:/p_runs/txl/run71/it.120/run71.120.transitSchedule.shp";
+		final String PARAINBUSINESSSHAPEOUTFILE = "f:/p_runs/txl/run71/it.120/run71.120.transitSchedule_para_in_business.shp";
 		final int removeAllParatransitLinesYoungerThanIteration = 2729;
 		final String pIdentifier = "para_";
 		
@@ -86,8 +89,10 @@ public class TransitSchedule2Shape {
 	
 		Map<Id, SortedMap<String, Object>> lineAttributesMap = TransitSchedule2Shape.getAttributesForLines(transitSchedule, pIdentifier);
 		Collection<Id> linesToConvert = TransitSchedule2Shape.getIdsFromAllLinesButParatransitYoungerThanIterationGiven(transitSchedule, pIdentifier, removeAllParatransitLinesYoungerThanIteration);
-
-		DaShapeWriter.writeTransitLines2Shape(SHAPEOUTFILE, transitSchedule, linesToConvert, lineAttributesMap);
+		DaShapeWriter.writeTransitLines2Shape(ALLLINESSHAPEOUTFILE, transitSchedule, linesToConvert, lineAttributesMap);
+		
+		linesToConvert = TransitSchedule2Shape.getIdsFromCoopLoggerInBusinessOnly(transitSchedule, COOPLOGGERFILE);
+		DaShapeWriter.writeTransitLines2Shape(PARAINBUSINESSSHAPEOUTFILE, transitSchedule, linesToConvert, lineAttributesMap);
 	}
 	
 	public static Map<Id, SortedMap<String, Object>> getAttributesForLines(TransitSchedule transitSchedule, String pIdentifier){
@@ -138,6 +143,18 @@ public class TransitSchedule2Shape {
 			}
 		}
 		
+		return linesToConvert;
+	}
+	
+	private static Collection<Id> getIdsFromCoopLoggerInBusinessOnly(TransitSchedule transitSchedule, String coopLoggerFile) {
+		Set<String> coopsToKeep = ReadCoopLoggerFileAndReturnCoopsInBusiness.readCoopLoggerFileAndReturnCoopsInBusiness(coopLoggerFile);
+		Collection<Id> linesToConvert = new TreeSet<Id>();
+		
+		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
+			if (coopsToKeep.contains(transitLine.getId().toString())) {
+				linesToConvert.add(transitLine.getId());
+			}
+		}
 		return linesToConvert;
 	}
 }

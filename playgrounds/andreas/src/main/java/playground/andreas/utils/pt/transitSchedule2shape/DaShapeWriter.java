@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.utils.pt;
+package playground.andreas.utils.pt.transitSchedule2shape;
 
 import java.util.ArrayList;
 import java.util.Collection;
