@@ -104,7 +104,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		}else{
 			controler.addControlerListener(new PAnalysisManager(pConfig, "pt_", lineSetter));
 		}
-		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig));
+		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig, 100.0));
 	}
 
 	@Override

@@ -23,113 +23,148 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.utils.ana.plans2gexf.GridNode;
 
 /**
- * Writes all the coordinates of all activities right before and after a paratransit trip to file.
+ * Accumulates the number of activities right before and after a paratransit trip. Ignores pt interactions.
+ * Accumulation is done with respect to given grid size. Grid nodes' coordinates are the weighted average 
+ * of all activities relevant for that grid node.
  * 
  * @author aneumann
  *
  */
 public class ActivityLocationsParatransitUser implements IterationEndsListener {
 	private final static Logger log = Logger.getLogger(ActivityLocationsParatransitUser.class);
+	private final String outNameIdentifier = "actsFromParatransitUsers.txt";
 	
 	private final String pIdentifier;
+	private final double gridSize;
 	private boolean firstIteration = true;
 	
-	private List<Coord> activitiesOfParatransitUsers;
+	private Set<String> actTypes = new TreeSet<String>();
+	private HashMap<String, GridNode> gridNodeId2GridNode = new HashMap<String, GridNode>();
 
-	public ActivityLocationsParatransitUser(PConfigGroup pConfig) {
+	public ActivityLocationsParatransitUser(PConfigGroup pConfig, double gridSize) {
+		this(pConfig.getPIdentifier(), gridSize);
+	}
+	
+	public ActivityLocationsParatransitUser(String pIdentifier, double gridSize) {
 		log.info("enabled");
-		this.pIdentifier = pConfig.getPIdentifier();
+		this.pIdentifier = pIdentifier;
+		this.gridSize = gridSize;
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		this.activitiesOfParatransitUsers = parsePopulation(event.getControler().getPopulation().getPersons().values());
+		parsePopulation(event.getControler().getPopulation());
 		
 		if (this.firstIteration) {
 			// write it to main output
-			writeResults(event.getControler().getControlerIO().getOutputFilename("actsFromParatransitUsers.txt"), this.activitiesOfParatransitUsers);
+			writeResults(event.getControler().getControlerIO().getOutputFilename(this.outNameIdentifier));
 			this.firstIteration = false;
 		} else {
 			// write it somewhere
-			writeResults(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "actsFromParatransitUsers.txt"), this.activitiesOfParatransitUsers);
+			writeResults(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), this.outNameIdentifier));
 		}
-		
-		this.activitiesOfParatransitUsers = null;
 	}
 
-	private List<Coord> parsePopulation(Collection<? extends Person> persons) {
+	private void parsePopulation(Population population) {
+
+		this.gridNodeId2GridNode = new HashMap<String, GridNode>();
+		this.actTypes = new TreeSet<String>();
 		
-		List<Coord> activitiesOfParatransitUsers = new LinkedList<Coord>();
-		
-		for (Person person : persons) {
-			Coord lastCoord = null;
+		for (Person person : population.getPersons().values()) {
+			Activity lastAct = null;
 			boolean lastLegUsesParatransit = false;
+			Activity lastActAdded = null;
 			
 			
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()) {
 				if (pE instanceof Activity) {
+					Activity act = ((Activity) pE);
 					
-					if (!((Activity) pE).getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+					if (!act.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+						this.actTypes.add(act.getType());
 						if (lastLegUsesParatransit) {
-							activitiesOfParatransitUsers.add(lastCoord);
+							if (lastActAdded == null || !lastActAdded.equals(lastAct)) {
+								getNodeFromAct(lastAct).addActivity(lastAct);
+								lastActAdded = lastAct;
+							}
+							if (!lastActAdded.equals(act)) {
+								getNodeFromAct(act).addActivity(act);
+								lastActAdded = act;
+							}
 						}
-						lastCoord = ((Activity) pE).getCoord();
+						lastAct = act;
 						lastLegUsesParatransit = false;
 					}
-					
 				}
 
 				if (pE instanceof Leg) {
 					// check, if it is a paratransit user
 					Leg leg = (Leg) pE;
 					
-					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+					if (leg.getRoute() instanceof GenericRouteImpl) {
+						GenericRouteImpl route = (GenericRouteImpl) leg.getRoute();
 						
-						if (route.getRouteId().toString().contains(this.pIdentifier)) {
-							// it's a paratransit user
-							lastLegUsesParatransit = true;
+						if (route.getRouteDescription() != null) {
+							if (route.getRouteDescription().contains(this.pIdentifier)) {
+								// it's a paratransit user
+								lastLegUsesParatransit = true;
+							}
 						}
 					}
 				}
 			}
-			
-			// add very last act as well
-			if (lastLegUsesParatransit) {
-				activitiesOfParatransitUsers.add(lastCoord);
-			}
 		}
-		
-		return activitiesOfParatransitUsers;
 	}
 	
-	private void writeResults(String filename, List<Coord> activitiesOfParatransitUsers) {
+	private void writeResults(String filename) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename)));
-			writer.write("x\ty");
+			writer.write("x\ty\ttotal");
+			for (String actType : this.actTypes) {
+				writer.write("\t" + actType);
+			}
 			writer.newLine();
 			
-			for (Coord coord : activitiesOfParatransitUsers) {
-				writer.write(coord.getX() + "\t" + coord.getY());
+			for (GridNode gridNode : this.gridNodeId2GridNode.values()) {
+				int totalNActs = 0;
+				for (String actType : this.actTypes) {
+					totalNActs += gridNode.getCountForAct(actType);
+				}
+				
+				writer.write(gridNode.getX() + "\t" + gridNode.getY() + "\t" + totalNActs);
+				
+				for (String actType : this.actTypes) {
+					writer.write("\t" + gridNode.getCountForAct(actType));
+				}
+				
 				writer.newLine();
 			}
 			
@@ -139,5 +174,45 @@ public class ActivityLocationsParatransitUser implements IterationEndsListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private GridNode getNodeFromAct(Activity act) {
+		int xSlot = getSpaceSlotForCoord(act.getCoord().getX());
+		int ySlot = getSpaceSlotForCoord(act.getCoord().getY());
+		
+		Id gridNodeId = GridNode.createGridNodeId(xSlot, ySlot);
+		
+		if (this.gridNodeId2GridNode.get(gridNodeId.toString()) == null) {
+			this.gridNodeId2GridNode.put(gridNodeId.toString(), new GridNode(gridNodeId));
+		}
+		
+		return this.gridNodeId2GridNode.get(gridNodeId.toString());
+	}
+
+	private int getSpaceSlotForCoord(double coord){
+		return (int) (coord / this.gridSize);
+	}
+	
+	public static void main(String[] args) {
+		
+		Gbl.startMeasurement();
+		
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		String networkFile = "f:/p_runs/txl/network.final.xml.gz";
+		String inPlansFile = "f:/p_runs/txl/run71/it.380/run71.380.plans.xml.gz";
+		String outFilename = "f:/p_runs/txl/run71/it.380/actsFromParatransitUsers.txt";
+		
+		new MatsimNetworkReader(sc).readFile(networkFile);
+		
+		Population inPop = sc.getPopulation();
+		PopulationReader popReader = new MatsimPopulationReader(sc);
+		popReader.readFile(inPlansFile);
+		
+		ActivityLocationsParatransitUser ana = new ActivityLocationsParatransitUser("para_", 100.0);
+		ana.parsePopulation(inPop);
+		ana.writeResults(outFilename);
+		
+		Gbl.printElapsedTime();
 	}
 }
