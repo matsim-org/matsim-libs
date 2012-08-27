@@ -46,7 +46,7 @@ public class TestGridInterpolation {
 						+ resolution + "travel_time_accessibility.txt");		
 		
 		log.info("interpolating...");
-		Interpolation interpolation = new Interpolation(sg, interpolationMethod, expForIDW);
+		Interpolation interpolation = new Interpolation(sg, interpolationMethod, true, expForIDW);
 		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
 		GeometryFactory factory = new GeometryFactory();
 		// calculate new values for higher resolution
