@@ -30,7 +30,16 @@ public class MiniTest {
 	private SpatialGrid interpolatedSG= null;
 	private Interpolation interpolation= null;
 	private boolean interpolationUseful= true;
-	private long interpolationTime= Long.MAX_VALUE;
+	private double interpolationTime= Double.MAX_VALUE;
+	
+	private static double interpTime_bilinear1x2= Double.MAX_VALUE;
+	private static double interpTime_bilinear3x3= Double.MAX_VALUE;
+	private static double interpTime_bilinear10x10= Double.MAX_VALUE;
+	private static double interpTime_bicubic3x3= Double.MAX_VALUE;
+	private static double interpTime_bicubic10x10= Double.MAX_VALUE;
+	private static double interpTime_idw1x2= Double.MAX_VALUE;
+	private static double interpTime_idw3x3= Double.MAX_VALUE;
+	private static double interpTime_idw10x10= Double.MAX_VALUE;
 	
 	/**
 	 * Creates a SpatialGrid with the given size for testing.
@@ -101,7 +110,7 @@ public class MiniTest {
 	 * 
 	 * @return the interpolation time
 	 */
-	public long getInterpolationTime(){
+	public double getInterpolationTime(){
 		return this.interpolationTime;
 	}
 	
@@ -215,7 +224,8 @@ public class MiniTest {
 	
 	
 	/**
-	 * Tests the three implemented interpolation methods bilinear interpolation, bicubic spline interpolation and inverse distance weighting at different test scenarios.
+	 * Tests the three implemented interpolation methods bilinear interpolation, bicubic spline interpolation and inverse distance weighting
+	 * at different test scenarios and compares the needed calculation times.
 	 * 
 	 * @param args, not used
 	 */
@@ -223,6 +233,14 @@ public class MiniTest {
 		testBiLinear();
 		testBiCubic();
 		testIDW();
+		
+		logger.info("Comparison of the interpolation times of the different methods:");
+		System.out.println("interpolation method \t\t" + "1*2 grid \t" + "3*3 grid \t" + "10*10 grid");
+		System.out.println("-----------------------------------------------------------------------------------------------------");
+		System.out.println("bilinear interpolation \t\t" + interpTime_bilinear1x2 + " ms \t\t" + interpTime_bilinear3x3 + " ms \t\t" + interpTime_bilinear10x10 + " ms \t\t\t");
+		System.out.println("bicubic interpolation \t\t" + "  - \t\t" + interpTime_bicubic3x3 + " ms \t" + interpTime_bicubic10x10 + " ms \t\t");
+		System.out.println("inverse distance weighting \t" + interpTime_idw1x2 + " ms \t\t" + interpTime_idw3x3 + " ms \t\t" +  interpTime_idw10x10 + " ms \t\t\t");
+	
 	}
 	
 	/**
@@ -234,7 +252,6 @@ public class MiniTest {
 		
 		interpolationTest(Interpolation.BILINEAR,1,2);
 		interpolationTest(Interpolation.BILINEAR,3,3);
-		interpolationTest(Interpolation.BILINEAR,4,4); 
 		interpolationTest(Interpolation.BILINEAR,10,10);
 	}
 	
@@ -245,7 +262,7 @@ public class MiniTest {
 		System.out.println("");
 		logger.info("-----Test of bicubic spline interpolation-----");
 		
-		interpolationTest(Interpolation.BICUBIC,5,5);
+		interpolationTest(Interpolation.BICUBIC,3,3);
 		interpolationTest(Interpolation.BICUBIC,10,10);
 	}
 	
@@ -256,6 +273,7 @@ public class MiniTest {
 		System.out.println("");
 		logger.info("-----Test of the inverse distance weighting method for interpolation-----");
 		
+		interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,1,2);
 		interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,3,3);
 		interpolationTest(Interpolation.INVERSE_DISTANCE_WEIGHTING,10,10);
 		
@@ -298,9 +316,23 @@ public class MiniTest {
 			}
 		}else
 		switch (interpolationMethod){
-		case 0: logger.info("The bilinear interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!"); break;
-		case 1: logger.info("The bicubic spline interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!"); break;
+		case 0: logger.info("The bilinear interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!");
+				switch (numberOfRows){
+				case 1: interpTime_bilinear1x2= testScenario.getInterpolationTime(); break;
+				case 3: interpTime_bilinear3x3= testScenario.getInterpolationTime(); break;
+				case 10: interpTime_bilinear10x10= testScenario.getInterpolationTime();
+				} break;
+		case 1: logger.info("The bicubic spline interpolation test on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!");
+				switch (numberOfRows){
+				case 3: interpTime_bicubic3x3= testScenario.getInterpolationTime(); break;
+				case 10: interpTime_bicubic10x10= testScenario.getInterpolationTime();
+				} break;
 		case 2: logger.info("The interpolation test for the inverse distance weighting method on a "+ numberOfRows +"*"+ numberOfColumns +" grid was successful!");
+				switch (numberOfRows){
+				case 1: interpTime_idw1x2= testScenario.getInterpolationTime(); break;
+				case 3: interpTime_idw3x3= testScenario.getInterpolationTime(); break;
+				case 10: interpTime_idw10x10= testScenario.getInterpolationTime();
+		} 
 		}
 	}
 	

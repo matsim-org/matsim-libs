@@ -39,21 +39,22 @@ public class Interpolation {
 	private BiLinearInterpolator biLinearInterpolator = null;
 	private InverseDistanceWeighting inverseDistanceWeighting = null;
 	
-	/** exponent only necessary for the inverse distance weighting method **/
+	/** exponent and boolean only necessary for the inverse distance weighting method **/
 	private double exp = 1.;
+	private boolean allNeighbors = true;
 	private int interpolationMethod = -1;
 	
 	/**
 	 * Prepares interpolation with the selected interpolation method.
 	 * 
-	 * If inverse distance weighting is chosen, the exponent for weights will be the default value 1.
+	 * If inverse distance weighting is chosen, the exponent for weights will be the default value 1. TODO
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @param method the interpolation method
 	 */
 	public Interpolation(SpatialGrid sg, final int method ){
 		
-		this(sg, method, 1);
+		this(sg, method, true, 1.);
 	}
 	
 	/**
@@ -61,13 +62,16 @@ public class Interpolation {
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @param method the interpolation method
-	 * @param exp the exponent for weights. only considered if interpolation method is inverse distance weighting. standard values are one or two.
+	 * @param exp the exponent for weights. only necessary if interpolation method is inverse distance weighting. standard values are one or two.
+	 * @param allNeighbors sets, whether the inverse distance weighting with all or four neighbors should be used. only necessary if interpolation method is inverse distance weighting.
 	 */
-	public Interpolation(SpatialGrid sg, final int method, final double exp ){
+	public Interpolation(SpatialGrid sg, final int method, final boolean allNeighbors , final double exp ){
 		
 		this.sg = sg;
 		this.interpolationMethod = method;
 		this.exp = exp;
+		this.allNeighbors = allNeighbors;
+		
 		if(this.interpolationMethod == BILINEAR){
 			log.info("Preparing bilinear interpolation ...");
 			this.biLinearInterpolator = new BiLinearInterpolator(this.sg);
@@ -107,7 +111,7 @@ public class Interpolation {
 		switch(this.interpolationMethod){
 		case 0: return this.biLinearInterpolator.biLinearInterpolation(x, y);
 		case 1: return this.biCubicInterpolator.biCubicInterpolation(x, y);
-		case 2: return this.inverseDistanceWeighting.inverseDistanceWeighting(x, y, this.exp);		
+		case 2: return this.inverseDistanceWeighting.inverseDistanceWeighting(x, y, this.allNeighbors, this.exp);		
 		}
 		return Double.NaN;
 	}

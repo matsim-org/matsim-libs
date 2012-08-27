@@ -37,14 +37,20 @@ class BiCubicInterpolator {
 		this.sg= sg;
 		sgNaNcheck();
 		
-		//create default coordinates for interpolation and compatible array of values
-		double[] x_default= coord(0, sg.getNumCols(0)-1, 1);
-		double[] y_default= coord(0, sg.getNumRows()-1, 1);
+//		//create default coordinates for interpolation and compatible array of values
+//		double[] x_default= coord(0, sg.getNumCols(0)-1, 1);
+//		double[] y_default= coord(0, sg.getNumRows()-1, 1);
+//		double[][] mirroredValues= sg.getMatrix();
+		
+		//create coordinate vectors and compatible array of values
+		double[] x_coord= coord(this.sg.getXmin(), this.sg.getXmax(), this.sg.getResolution());
+		double[] y_coord= coord(this.sg.getYmin(), this.sg.getYmax(), this.sg.getResolution());
 		double[][] mirroredValues= sg.getMatrix();
 		
 		BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
 		try {
-			interpolatingFunction = interpolator.interpolate(y_default, x_default, mirroredValues); //needs default coordinates (0,1,2,...)
+//			interpolatingFunction = interpolator.interpolate(y_default, x_default, mirroredValues); //needs default coordinates (0,1,2,...)
+			interpolatingFunction = interpolator.interpolate(y_coord, x_coord, mirroredValues);
 		} catch (MathException e) {
 			e.printStackTrace();
 		} 
@@ -70,7 +76,8 @@ class BiCubicInterpolator {
 	 */
 	double biCubicInterpolation(double xCoord, double yCoord){
 		try {
-			return interpolatingFunction.value(transform(yCoord, this.sg.getYmin(), this.sg.getResolution()), transform(xCoord, this.sg.getXmin(), this.sg.getResolution()));
+//			return interpolatingFunction.value(transform(yCoord, this.sg.getYmin(), this.sg.getResolution()), transform(xCoord, this.sg.getXmin(), this.sg.getResolution()));
+			return interpolatingFunction.value(yCoord, xCoord);
 		} catch (FunctionEvaluationException e) {
 			e.printStackTrace();
 		}
