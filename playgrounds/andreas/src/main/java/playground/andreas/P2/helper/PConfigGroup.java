@@ -22,6 +22,7 @@ package playground.andreas.P2.helper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -88,6 +89,7 @@ public class PConfigGroup extends Module{
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
 	private static final String PT_ENABLER = "ptEnabler";
 	private static final String OPERATIONMODE = "OperationMode";
+	private static final String TOPOTYPESFORSTOPS = "TopoTypesForStops";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -129,6 +131,7 @@ public class PConfigGroup extends Module{
 	private String transitScheduleToStartWith = null;
 	private String ptEnabler = null;
 	private String operationMode = TransportMode.pt;
+	private String topoTypesForStops = null;
 
 	// Strategies
 	private final LinkedHashMap<Id, PStrategySettings> strategies = new LinkedHashMap<Id, PStrategySettings>();
@@ -214,7 +217,9 @@ public class PConfigGroup extends Module{
 			this.ptEnabler = value;
 		} else if(OPERATIONMODE.equals(key)){
 			this.operationMode = value;
-		} else if (key != null && key.startsWith(PMODULE)) {
+		} else if(TOPOTYPESFORSTOPS.equals(key)){
+			this.topoTypesForStops = value;
+		}else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE.length())), true);
 			settings.setModuleName(value);
 		} else if (key != null && key.startsWith(PMODULE_PROBABILITY)) {
@@ -268,6 +273,7 @@ public class PConfigGroup extends Module{
 		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
 		map.put(OPERATIONMODE, this.operationMode);
+		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
@@ -316,6 +322,7 @@ public class PConfigGroup extends Module{
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one cooperative for each transit line with the given time of operation and number of vehicles");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
+		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
@@ -466,6 +473,17 @@ public class PConfigGroup extends Module{
 		return this.operationMode;
 	}
 
+	public List<Integer> getTopoTypesForStops() {
+		if(this.topoTypesForStops == null){
+			return null;
+		}
+		List<Integer> list = new ArrayList<Integer>();
+		for(String s: this.topoTypesForStops.split(",")){
+			list.add(Integer.parseInt(s.trim()));
+		}
+		return list;
+	}
+
 	public Collection<PStrategySettings> getStrategySettings() {
 		return this.strategies.values();
 	}
@@ -545,4 +563,6 @@ public class PConfigGroup extends Module{
 		}
 
 	}
+
+
 }

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -72,6 +73,10 @@ public class CreatePStops{
 	private GeometryFactory factory;
 
 	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+
+	private List<Integer> topoTypesForStops = null;
+
+	private NetworkCalcTopoType networkCalcTopoType;
 	
 	public static TransitSchedule createPStops(Network network, PConfigGroup pConfigGroup){
 		return createPStops(network, pConfigGroup, null);
@@ -132,7 +137,12 @@ public class CreatePStops{
 		
 		if (stopsWithoutLinkIds.size() > 0) {
 			log.warn("There are " + stopsWithoutLinkIds.size() + " stop facilities without link id, namely: " + stopsWithoutLinkIds.toString());
-		}			
+		}
+		this.topoTypesForStops = this.pConfigGroup.getTopoTypesForStops();
+		if(!(this.topoTypesForStops == null)){
+			this.networkCalcTopoType = new NetworkCalcTopoType();
+			this.networkCalcTopoType.run(net);
+		}
 	}
 
 	/**
@@ -271,6 +281,10 @@ public class CreatePStops{
 			return 0;
 		}
 		
+		if(!topoTypeAllowed(link)){
+			return 0;
+		}
+		
 		if (link.getFreespeed() >= this.pConfigGroup.getSpeedLimitForStops()) {
 			return 0;
 		}
@@ -285,6 +299,15 @@ public class CreatePStops{
 		this.transitSchedule.addStopFacility(stop);
 		return 1;		
 	}
+
+	private boolean topoTypeAllowed(Link link) {
+		if(this.topoTypesForStops == null){
+			// flag not set or null in config
+			return true;
+		}
+		Integer topoType = this.networkCalcTopoType.getTopoType(link.getToNode());
+		return this.topoTypesForStops.contains(topoType);
+	}	
 
 	private boolean linkToNodeInServiceArea(Link link) {
 		Point p = factory.createPoint(MGC.coord2Coordinate(link.getToNode().getCoord()));
