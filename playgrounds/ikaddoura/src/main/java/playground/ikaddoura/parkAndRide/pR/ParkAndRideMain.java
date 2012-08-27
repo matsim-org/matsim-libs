@@ -138,8 +138,8 @@ public class ParkAndRideMain {
 			}
 		} else {
 			
-			configFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/berlinConfigTEST.xml";
-			prFacilityFile = "../../shared-svn/studies/ihab/parkAndRide/inputBerlinTest/PRfacilities_berlin.txt";
+			configFile = "/Users/Ihab/Desktop/PR_test/config.xml";
+			prFacilityFile = "/Users/Ihab/Desktop/test/prFacilities.xml";
 			prCapacity = 100;
 			gravity = 2;
 			
@@ -152,11 +152,11 @@ public class ParkAndRideMain {
 			timeAllocationProb = 0.;
 			timeAllocationDisable = 0;
 			
-			addPRtimeAllocationProb = 100.;
-			addPRtimeAllocationDisable = 500;
+			addPRtimeAllocationProb = 0.;
+			addPRtimeAllocationDisable = 0;
 			
-			reRouteProb = 100.;
-			reRouteDisable = 500;
+			reRouteProb = 0.;
+			reRouteDisable = 0;
 		}
 		
 		ParkAndRideMain main = new ParkAndRideMain();

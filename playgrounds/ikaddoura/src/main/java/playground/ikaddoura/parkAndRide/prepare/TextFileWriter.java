@@ -79,8 +79,13 @@ public class TextFileWriter {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 	
 	    for (TransitStopFacility stop : stops){
-	    	
-	    	String zeile = stop.getId().toString() + " / " + stop.getName().toString();
+	    	String stopName = "";
+	    	if (stop.getName() == null) {
+	    		stopName = stop.getId().toString();
+	    	} else {
+	    		stopName = stop.getName().toString();
+	    	}
+	    	String zeile = stop.getId().toString() + " / " + stopName;
 	
 	    	bw.write(zeile);
 	        bw.newLine();
