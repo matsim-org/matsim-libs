@@ -23,6 +23,8 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPowerAtActivity;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPowerAtLink;
 import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
@@ -32,7 +34,11 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 
@@ -51,6 +57,11 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	// programmatically
 	// TODO: one should be able to turn this mode on.
 
+	// TODO: also provide option (e.g. in separate class), which restricts this
+	// to facilities, as this is especially interesting
+	// for parking facilities. in this case, we could also limit the number of parking, which are available with
+	// such a parking option.
+
 	// TODO: perhaps also allow to specify, what kind of charging is available
 	// where: e.g. plug or contactless or genral.
 	// TODO: these things are more relevant, with parking choice and search.
@@ -62,20 +73,26 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 	// TODO: energy consumption per link auch genau fuehren (in separate file).
 
+	// TODO: perhaps provide an adapted version of this with parking also
+
+	private ChargingOutputLog log;
+
+	private DoubleValueHashMap<String> chargablePowerAtActivityTypes;
+
 	HashMap<Id, VehicleWithBattery> chargableVehicles;
 
 	DoubleValueHashMap<Id> firstDepartureTimeOfDay;
 	DoubleValueHashMap<Id> previousCarArrivalTime;
 
 	HashMap<Id, String> firstActivityTypeAfterCarArrival;
+	HashMap<Id, Id> firstFacilityIdAfterCarArrival;
 
 	HashMap<Id, Id> previousCarArrivalLinkId;
 
-	Object chargingPower;
-
-	public ChargingUponArrival(HashMap<Id, VehicleWithBattery> chargableVehicles, Object chargingPower) {
+	public ChargingUponArrival(HashMap<Id, VehicleWithBattery> chargableVehicles,
+			DoubleValueHashMap<String> chargablePowerAtActivityTypes) {
 		this.chargableVehicles = chargableVehicles;
-		this.chargingPower = chargingPower;
+		this.chargablePowerAtActivityTypes = chargablePowerAtActivityTypes;
 	}
 
 	@Override
@@ -83,6 +100,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		firstDepartureTimeOfDay = new DoubleValueHashMap<Id>();
 		previousCarArrivalTime = new DoubleValueHashMap<Id>();
 		firstActivityTypeAfterCarArrival = new HashMap<Id, String>();
+		firstFacilityIdAfterCarArrival = new HashMap<Id, Id>();
 	}
 
 	@Override
@@ -104,13 +122,14 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	private void chargeVehicle(Id personId, double carArrivalTime, double carDepartureTime) {
 
 		double parkingDuration = GeneralLib.getIntervalDuration(carArrivalTime, carDepartureTime);
-		double availablePowerInWatt = 0;
+		Double availablePowerInWatt = null;
 		String activityType = firstActivityTypeAfterCarArrival.get(personId);
-		if (chargingPower instanceof ChargingPowerAtActivity) {
-			availablePowerInWatt = ((ChargingPowerAtActivity) chargingPower).getAvailableChargingPower(activityType);
-		} else if (chargingPower instanceof ChargingPowerAtLink) {
-			availablePowerInWatt = ((ChargingPowerAtLink) chargingPower).getAvailableChargingPowerInWatt(previousCarArrivalLinkId
-					.get(personId));
+
+		availablePowerInWatt = chargablePowerAtActivityTypes.get(activityType);
+
+		if (availablePowerInWatt == null) {
+			DebugLib.stopSystemAndReportInconsistency("power at all activity types needs to be specified, missing:"
+					+ activityType);
 		}
 
 		double chargableEnergyInJoules = availablePowerInWatt * parkingDuration;
@@ -124,10 +143,11 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		}
 		vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 
-		// TODO: log: agentId, startChargingTime, endChargingTime,
-		// energyCharged, facilityId (which can be a normal facility or
-		// a parking facility - just based on, if parking module used or not)
-		//
+		if (log != null) {
+			ChargingLogRow chargingLogRow = new ChargingLogRow(personId, firstFacilityIdAfterCarArrival.get(personId),
+					carArrivalTime, energyToChargeInJoules / availablePowerInWatt, energyToChargeInJoules);
+			log.add(chargingLogRow);
+		}
 	}
 
 	private boolean isFirstCarDepartureOfDay(Id personId) {
@@ -137,7 +157,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
-			initFirstActivityTypeAfterCarArrival(event);
+			initFirstActivityAfterCarArrival(event);
 			updateCarArrivalTime(event);
 			updatePreviousCarArrivalLinkId(event);
 		}
@@ -151,8 +171,9 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		previousCarArrivalTime.put(event.getPersonId(), event.getTime());
 	}
 
-	private void initFirstActivityTypeAfterCarArrival(AgentArrivalEvent event) {
+	private void initFirstActivityAfterCarArrival(AgentArrivalEvent event) {
 		firstActivityTypeAfterCarArrival.remove(event.getPersonId());
+		firstFacilityIdAfterCarArrival.remove(event.getPersonId());
 	}
 
 	@Override
@@ -165,6 +186,10 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		if (!firstActivityTypeAfterCarArrival.containsKey(personId)) {
 			firstActivityTypeAfterCarArrival.put(personId, event.getActType());
 		}
+
+		if (!firstFacilityIdAfterCarArrival.containsKey(personId)) {
+			firstFacilityIdAfterCarArrival.put(event.getPersonId(), event.getFacilityId());
+		}
 	}
 
 	public void handleLastParkingOfDay() {
@@ -173,6 +198,18 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 			double carDepartureTime = firstDepartureTimeOfDay.get(personId);
 
 			chargeVehicle(personId, carArrivalTime, carDepartureTime);
+		}
+	}
+
+	public void setPowerAvailableAtAllActivityTypesTo(ActivityFacilities facilities, double powerInWatt) {
+		this.chargablePowerAtActivityTypes = new DoubleValueHashMap<String>();
+		for (ActivityFacility facility : facilities.getFacilities().values()) {
+			for (ActivityOption actOption : facility.getActivityOptions().values()) {
+				String actType = actOption.getType();
+				if (!chargablePowerAtActivityTypes.containsKey(actType)) {
+					chargablePowerAtActivityTypes.put(actType, powerInWatt);
+				}
+			}
 		}
 	}
 

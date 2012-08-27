@@ -49,6 +49,13 @@ public abstract class ChargingOutputLog {
 	
 	public abstract String getTitleRowFileOutput();
 	
+	public void printToConsole(){
+		//TODO:implement this.
+	}
+	
+	public void writeToFile(String outputFile){
+		//TODO:implement this.
+	}
 	
 	
 }

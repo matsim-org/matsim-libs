@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
@@ -50,6 +52,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 		AgentArrivalEventHandler {
 
 	private DoubleValueHashMap<Id> chargableStreets;
+	private ChargingOutputLog log;
 
 	HashMap<Id, Vehicle> vehicles;
 
@@ -119,7 +122,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 			return;
 		}
 
-		double availablePowerInWatt = 0;
+		double availablePowerInWatt = chargableStreets.get(linkId);
 
 		double chargableEnergyInJoules = availablePowerInWatt * timeSpendOnLink;
 
@@ -132,7 +135,10 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 		}
 		vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 
-		// TODO: log: agentId, startChargingTime, endChargingTime, energyCharged, linkId
+		if (log!=null){
+			ChargingLogRow chargingLogRow = new ChargingLogRow(personId,linkId,linkEnterTime,energyToChargeInJoules/availablePowerInWatt,energyToChargeInJoules);
+			log.add(chargingLogRow);
+		}
 		
 	}
 
