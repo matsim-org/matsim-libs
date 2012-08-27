@@ -41,7 +41,7 @@ public abstract class HybridElectricVehicle extends VehicleWithBattery {
 	
 	EnergyConsumptionModel combustionEngineECM;
 	
-	public void updateEnergyUse(Link link, double averageSpeedDriven){
+	public double updateEnergyUse(Link link, double averageSpeedDriven){
 		double energyConsumptionForLinkInJoule;
 		if (socInJoules>0){
 			energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
@@ -59,6 +59,8 @@ public abstract class HybridElectricVehicle extends VehicleWithBattery {
 			energyConsumptionForLinkInJoule=combustionEngineECM.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
 			useCombustionEngine(energyConsumptionForLinkInJoule);
 		}
+		
+		return energyConsumptionForLinkInJoule;
 	}
 	
 	private void useCombustionEngine(double energyConsumptionInJoule){

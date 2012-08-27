@@ -27,9 +27,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
+import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutput;
+import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
+import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -54,41 +57,48 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	private DoubleValueHashMap<Id> chargableStreets;
 	private ChargingOutputLog log;
 
-	HashMap<Id, Vehicle> vehicles;
+	private HashMap<Id, Vehicle> vehicles;
 
 	DoubleValueHashMap<Id> linkEnterTime;
 	HashMap<Id, Id> previousLinkEntered;
 
 	private final Network network;
 
-	public InductiveStreetCharger(DoubleValueHashMap<Id> powerAtInductiveStreets, HashMap<Id, Vehicle> vehicles, Network network) {
-		this.chargableStreets = powerAtInductiveStreets;
-		this.vehicles = vehicles;
+	public InductiveStreetCharger(DoubleValueHashMap<Id> powerAtInductiveStreets, HashMap<Id, Vehicle> vehicles, Network network,
+			AddHandlerAtStartupControler controller) {
+		this.setChargableStreets(powerAtInductiveStreets);
+		this.setVehicles(vehicles);
 		this.network = network;
+		controller.addHandler(this);
+	}
+
+	private void setVehicles(HashMap<Id, Vehicle> vehicles) {
+		this.vehicles = vehicles;
 	}
 
 	@Override
 	public void reset(int iteration) {
 		linkEnterTime = new DoubleValueHashMap<Id>();
 		previousLinkEntered = new HashMap<Id, Id>();
+		setLog(new InductiveChargingAtRoadOutput());
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if (notChargableRoad(event.getLinkId())) {
+		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
 		handleCharging(event.getPersonId(), event.getLinkId(), event.getTime());
 	}
 
-	private boolean notChargableRoad(Id id) {
-		return !chargableStreets.containsKey(id);
+	private boolean isAgentAndLinkRelevantForProcessing(Id agentId, Id linkId) {
+		return !getChargableStreets().containsKey(linkId) && (getVehicles().get(agentId) instanceof VehicleWithBattery);
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (notChargableRoad(event.getLinkId())) {
+		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
@@ -100,7 +110,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (notChargableRoad(event.getLinkId())) {
+		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
@@ -108,7 +118,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	}
 
 	private void handleCharging(Id personId, Id linkId, double linkLeaveTime) {
-		if (!(vehicles.get(personId) instanceof InductivlyChargable)) {
+		if (!(getVehicles().get(personId) instanceof InductivlyChargable)) {
 			return;
 		}
 
@@ -122,24 +132,26 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 			return;
 		}
 
-		double availablePowerInWatt = chargableStreets.get(linkId);
+		double availablePowerInWatt = getChargableStreets().get(linkId);
 
 		double chargableEnergyInJoules = availablePowerInWatt * timeSpendOnLink;
 
-		BatteryElectricVehicle vehicleWithBattery = (BatteryElectricVehicle) vehicles.get(personId);
+		VehicleWithBattery vehicleWithBattery = (VehicleWithBattery) getVehicles().get(personId);
 		double energyToChargeInJoules = 0;
 		if (vehicleWithBattery.getRequiredEnergyInJoules() <= chargableEnergyInJoules) {
 			energyToChargeInJoules = vehicleWithBattery.getRequiredEnergyInJoules();
 		} else {
 			energyToChargeInJoules = chargableEnergyInJoules;
 		}
-		vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 
-		if (log!=null){
-			ChargingLogRow chargingLogRow = new ChargingLogRow(personId,linkId,linkEnterTime,energyToChargeInJoules/availablePowerInWatt,energyToChargeInJoules);
-			log.add(chargingLogRow);
+		if (energyToChargeInJoules > 0) {
+			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
+
+			ChargingLogRow chargingLogRow = new ChargingLogRow(personId, linkId, linkEnterTime, energyToChargeInJoules
+					/ availablePowerInWatt, energyToChargeInJoules);
+			getLog().add(chargingLogRow);
 		}
-		
+
 	}
 
 	private boolean shouldLinkBeIgnored(double linkLeaveTime, double timeSpendOnLink, Link link,
@@ -149,7 +161,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (notChargableRoad(event.getLinkId())) {
+		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
@@ -158,10 +170,29 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	}
 
 	public void allStreetsCanChargeWithPower(double powerInWatt) {
-		chargableStreets=new DoubleValueHashMap<Id>();
-		for (Id linkId:network.getLinks().keySet()){
-			chargableStreets.put(linkId, powerInWatt);
+		setChargableStreets(new DoubleValueHashMap<Id>());
+		for (Id linkId : network.getLinks().keySet()) {
+			getChargableStreets().put(linkId, powerInWatt);
 		}
 	}
 
+	public ChargingOutputLog getLog() {
+		return log;
+	}
+
+	private void setLog(ChargingOutputLog log) {
+		this.log = log;
+	}
+
+	public HashMap<Id, Vehicle> getVehicles() {
+		return vehicles;
+	}
+
+	public DoubleValueHashMap<Id> getChargableStreets() {
+		return chargableStreets;
+	}
+
+	public void setChargableStreets(DoubleValueHashMap<Id> chargableStreets) {
+		this.chargableStreets = chargableStreets;
+	}
 }

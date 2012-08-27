@@ -147,7 +147,7 @@ public class EnergyConsumptionModelGalus implements EnergyConsumptionModel {
 
 	@Override
 	public double getEnergyConsumptionForLinkInJoule(Link link, double averageSpeedDriven) {
-		return getEnergyConsumptionForLinkInJoule(averageSpeedDriven,-1, link.getLength());
+		return getEnergyConsumptionForLinkInJoule(link.getLength(),-1, averageSpeedDriven);
 	}
 
 	@Override

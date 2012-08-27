@@ -22,55 +22,53 @@ package org.matsim.contrib.transEnergySim.controllers;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumptionModelGalus;
-import org.matsim.contrib.transEnergySim.vehicles.impl.IC_BEV;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 
-import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
+/**
+ * @author wrashid
+ *
+ */
+public class InductiveChargingController extends AddHandlerAtStartupControler {
 
-public class InductiveChargingController extends Controler {
+	private InductiveStreetCharger inductiveCharger;
+	private ChargingUponArrival chargingUponArrival;
+	private EnergyConsumptionTracker energyConsumptionTracker;
 
-	public InductiveChargingController(Config config) {
+	public InductiveChargingController(Config config, HashMap<Id, Vehicle> vehicles) {
 		super(config);
+		setInductiveCharger(new InductiveStreetCharger(null,vehicles,network,this));
+		setChargingUponArrival(new ChargingUponArrival(vehicles, null, this));
+		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network,this));
 	}
 	
-	public InductiveChargingController(String[] args) {
-		super(args);
+	
+
+	public InductiveStreetCharger getInductiveCharger() {
+		return inductiveCharger;
 	}
 
-	public static void main(String[] args) {
-		InductiveChargingController eMobInductiveChargingController = new InductiveChargingController(args);
-		
-		eMobInductiveChargingController.addControlerListener(new StartupListener() {
-			
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				//TODO: set this properly for the scenario
-				
-				EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
-				Network network = event.getControler().getNetwork();
-				HashMap<Id, Vehicle> vehicles=new HashMap<Id, Vehicle>();
-				vehicles.put(new IdImpl("1"), new IC_BEV(ecm));
-				
-				InductiveStreetCharger inductiveCharger = new InductiveStreetCharger(null,vehicles,network);
-				inductiveCharger.allStreetsCanChargeWithPower(3000);
-				event.getControler().getEvents().addHandler(inductiveCharger);
-				
-				event.getControler().getEvents().addHandler(new EnergyConsumptionTracker(vehicles, network));
-			}
-		});
-		
-		eMobInductiveChargingController.run();
+	private void setInductiveCharger(InductiveStreetCharger inductiveCharger) {
+		this.inductiveCharger = inductiveCharger;
 	}
-	
+
+	public ChargingUponArrival getChargingUponArrival() {
+		return chargingUponArrival;
+	}
+
+	private void setChargingUponArrival(ChargingUponArrival chargingUponArrival) {
+		this.chargingUponArrival = chargingUponArrival;
+	}
+
+	public EnergyConsumptionTracker getEnergyConsumptionTracker() {
+		return energyConsumptionTracker;
+	}
+
+	private void setEnergyConsumptionTracker(EnergyConsumptionTracker energyConsumptionTracker) {
+		this.energyConsumptionTracker = energyConsumptionTracker;
+	}
+
 }

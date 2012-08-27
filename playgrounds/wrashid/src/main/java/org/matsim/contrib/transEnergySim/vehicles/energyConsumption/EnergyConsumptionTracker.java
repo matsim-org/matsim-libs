@@ -25,6 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionLogRow;
+import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionOutputLog;
+import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -35,6 +38,8 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
@@ -42,39 +47,48 @@ import playground.wrashid.lib.obj.DoubleValueHashMap;
 
 /**
  * This module can handle both the energy consumption of jdeqsim and qsim.
+ * 
+ * TODO: add tests for this also
+ * 
  * @author wrashid
- *
+ * 
  */
 
 public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler,
-AgentArrivalEventHandler {
+		AgentArrivalEventHandler {
+
+	private EnergyConsumptionOutputLog log;
 
 	HashMap<Id, Vehicle> vehicles;
-	
+
 	DoubleValueHashMap<Id> linkEnterTime;
 	HashMap<Id, Id> previousLinkEntered;
 
 	private final Network network;
-	
-	public EnergyConsumptionTracker(HashMap<Id, Vehicle> vehicles, Network network){
-		this.vehicles=vehicles;
+
+	public EnergyConsumptionTracker(HashMap<Id, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
+		this.vehicles = vehicles;
 		this.network = network;
+		controller.addHandler(this);
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
-		linkEnterTime=new DoubleValueHashMap<Id>();
-		previousLinkEntered=new HashMap<Id, Id>();
+		linkEnterTime = new DoubleValueHashMap<Id>();
+		previousLinkEntered = new HashMap<Id, Id>();
+		setLog(new EnergyConsumptionOutputLog());
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		handleEnergyConsumption(event.getPersonId(),event.getLinkId(),event.getTime());
+		if (event.getLegMode().equals(TransportMode.car)) {
+			handleEnergyConsumption(event.getPersonId(), event.getLinkId(), event.getTime());
+		}
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)){
+		if (event.getLegMode().equals(TransportMode.car)) {
 			Id personId = event.getPersonId();
 			linkEnterTime.put(personId, event.getTime());
 		}
@@ -82,35 +96,43 @@ AgentArrivalEventHandler {
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		handleEnergyConsumption(event.getPersonId(),event.getLinkId(),event.getTime());
-	}
-	
-	private void handleEnergyConsumption(Id personId,Id linkId,double linkLeaveTime){
-		double linkEnterTime=this.linkEnterTime.get(personId);
-		double timeSpendOnLink = GeneralLib.getIntervalDuration(linkEnterTime, linkLeaveTime);
-		
-		Link link = network.getLinks().get(linkId);
-		double averageSpeedDrivenInMetersPerSecond = link.getLength() / timeSpendOnLink;
-		
-		if (shouldLinkBeIgnored(linkLeaveTime, timeSpendOnLink, link, averageSpeedDrivenInMetersPerSecond)) {
-			return;
-		}
-		
-		Vehicle vehicle = vehicles.get(personId);
-		vehicle.updateEnergyUse(link, averageSpeedDrivenInMetersPerSecond);
-		
-		//TODO: also log this... (per vehicle energy consumption)
+		handleEnergyConsumption(event.getPersonId(), event.getLinkId(), event.getTime());
 	}
 
-	private boolean shouldLinkBeIgnored(double linkLeaveTime, double timeSpendOnLink, Link link,
+	private void handleEnergyConsumption(Id personId, Id linkId, double linkLeaveTime) {
+		double linkEnterTime = this.linkEnterTime.get(personId);
+		double timeSpendOnLink = GeneralLib.getIntervalDuration(linkEnterTime, linkLeaveTime);
+
+		Link link = network.getLinks().get(linkId);
+		double averageSpeedDrivenInMetersPerSecond = link.getLength() / timeSpendOnLink;
+
+		if (shouldLinkBeIgnored(linkEnterTime, linkLeaveTime, link, averageSpeedDrivenInMetersPerSecond)) {
+			return;
+		}
+
+		Vehicle vehicle = vehicles.get(personId);
+		double energyConsumptionInJoule = vehicle.updateEnergyUse(link, averageSpeedDrivenInMetersPerSecond);
+
+		getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
+	}
+
+	private boolean shouldLinkBeIgnored(double linkEnterTime, double linkLeaveTime, Link link,
 			double averageSpeedDrivenInMetersPerSecond) {
-		return timeSpendOnLink == linkLeaveTime || averageSpeedDrivenInMetersPerSecond > link.getFreespeed();
+		return linkEnterTime == linkLeaveTime || averageSpeedDrivenInMetersPerSecond > link.getFreespeed();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id personId = event.getPersonId();
 		linkEnterTime.put(personId, event.getTime());
+	}
+
+	public EnergyConsumptionOutputLog getLog() {
+		return log;
+	}
+
+	public void setLog(EnergyConsumptionOutputLog log) {
+		this.log = log;
 	}
 
 }

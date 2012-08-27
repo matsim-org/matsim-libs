@@ -26,6 +26,8 @@ import playground.wrashid.lib.DebugLib;
 /**
  * vehicle has only battery (no combustion engine)
  * 
+ * TODO: think, if BatteryElectricVehicle and VehicleWithBattery can be just merged to VehicleWithBattery 
+ * 
  * @author wrashid
  * 
  */
@@ -34,6 +36,9 @@ public abstract class BatteryElectricVehicle extends VehicleWithBattery {
 	/**
 	 * as electric vehicles can run out of battery during the simulation, this
 	 * has also to be taken into account
+	 * 
+
+	 * 
 	 */
 	private boolean didRunOutOfBattery=false;
 	
@@ -48,10 +53,11 @@ public abstract class BatteryElectricVehicle extends VehicleWithBattery {
 	
 	
 	
-	public void updateEnergyUse(Link link, double averageSpeedDriven){
+	public double updateEnergyUse(Link link, double averageSpeedDriven){
 		double energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
 		
 		useBattery(energyConsumptionForLinkInJoule);
+		return energyConsumptionForLinkInJoule;
 	}
 			
 	

@@ -17,23 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.vehicles.impl;
+package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
 
-import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
-import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
+import java.util.LinkedList;
 
-/**
- * Inductively chargeable, battery electric vehicle
- * @author wrashid
- *
- */
-public class IC_BEV extends BatteryElectricVehicle implements InductivlyChargable {
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
 
-	public IC_BEV(EnergyConsumptionModel ecm, double batteryCapacityInJoules){
-		this.electricDriveEnergyConsumptionModel=ecm;
-		this.usableBatteryCapacityInJoules=batteryCapacityInJoules;
-		this.socInJoules=batteryCapacityInJoules;
+public class EnergyConsumptionOutputLog {
+
+	private LinkedList<EnergyConsumptionLogRow> log;
+
+	public EnergyConsumptionOutputLog() {
+		reset();
 	}
-	 
+
+	public void reset() {
+		log = new LinkedList<EnergyConsumptionLogRow>();
+	}
+
+	public void add(EnergyConsumptionLogRow row) {
+		log.add(row);
+	}
+
+	public EnergyConsumptionLogRow get(int i) {
+		return log.get(i);
+	}
+
+	public int getNumberOfEntries() {
+		return log.size();
+	}
+
+	public String getTitleRowFileOutput() {
+		return "";
+	}
+
+	public void printToConsole() {
+		// TODO:implement this.
+	}
+
+	public void writeToFile(String outputFile) {
+		// TODO:implement this.
+	}
+
 }

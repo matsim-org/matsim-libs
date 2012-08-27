@@ -39,7 +39,7 @@ public abstract class VehicleWithBattery implements Vehicle {
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
 
 	public double getRequiredEnergyInJoules(){
-		double requiredEnergyInJoules = usableBatteryCapacityInJoules-socInJoules;
+		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules()-socInJoules;
 		
 		if (requiredEnergyInJoules<0){
 			DebugLib.stopSystemAndReportInconsistency("soc bigger than battery size");
@@ -63,9 +63,13 @@ public abstract class VehicleWithBattery implements Vehicle {
 	public void chargeBattery(double energyChargeInJoule){
 		socInJoules+=energyChargeInJoule;
 
-		if (socInJoules>usableBatteryCapacityInJoules){
+		if (socInJoules>getUsableBatteryCapacityInJoules()){
 			DebugLib.stopSystemAndReportInconsistency("the car has been overcharged");
 		}
+	}
+
+	public double getUsableBatteryCapacityInJoules() {
+		return usableBatteryCapacityInJoules;
 	}
 
 }

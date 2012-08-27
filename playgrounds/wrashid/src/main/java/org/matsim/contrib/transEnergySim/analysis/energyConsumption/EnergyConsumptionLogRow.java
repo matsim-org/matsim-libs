@@ -17,23 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.vehicles.impl;
+package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
 
-import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
-import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
+import org.matsim.api.core.v01.Id;
 
-/**
- * Inductively chargeable, battery electric vehicle
- * @author wrashid
- *
- */
-public class IC_BEV extends BatteryElectricVehicle implements InductivlyChargable {
+public class EnergyConsumptionLogRow {
+	Id agentId;
+	Id linkId;
+	double energyConsumedInJoules;
 
-	public IC_BEV(EnergyConsumptionModel ecm, double batteryCapacityInJoules){
-		this.electricDriveEnergyConsumptionModel=ecm;
-		this.usableBatteryCapacityInJoules=batteryCapacityInJoules;
-		this.socInJoules=batteryCapacityInJoules;
+	public EnergyConsumptionLogRow(Id agentId, Id linkId, double energyConsumedInJoules) {
+		this.agentId = agentId;
+		this.linkId = linkId;
+		this.energyConsumedInJoules = energyConsumedInJoules;
 	}
-	 
+
+	public Id getAgentId() {
+		return agentId;
+	}
+
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	public double getEnergyConsumedInJoules() {
+		return energyConsumedInJoules;
+	}
+
 }

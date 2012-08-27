@@ -24,6 +24,6 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyCo
 
 public interface Vehicle {
 
-	public void updateEnergyUse(Link link, double averageSpeedDrivenInMetersPerSecond);
+	public double updateEnergyUse(Link link, double averageSpeedDrivenInMetersPerSecond);
 	
 }

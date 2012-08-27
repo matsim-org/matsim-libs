@@ -20,10 +20,10 @@
 package org.matsim.contrib.transEnergySim.controllers;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
@@ -35,41 +35,43 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.events.handler.EventHandler;
+
+import com.sun.tools.xjc.reader.internalizer.DOMForest.Handler;
+
+import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
+import playground.wrashid.lib.obj.DoubleValueHashMap;
 /**
  * @author wrashid
  *
  */
-public class TestInductiveChargingController extends MatsimTestCase {
+public class AddHandlerAtStartupControler extends Controler {
 
-	public void testBasic2(){
-		Config config= loadConfig(getClassInputDirectory()+"config.xml");
-		
-		EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
-		HashMap<Id, Vehicle> vehicles=new HashMap<Id, Vehicle>();
-		vehicles.put(new IdImpl("1"), new IC_BEV(ecm,10*1000*3600));
-		
-		InductiveChargingController controller = new InductiveChargingController(config,vehicles);
+	protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
 
-		InductiveStreetCharger inductiveCharger = controller.getInductiveCharger();
-		inductiveCharger.allStreetsCanChargeWithPower(3000);
-		
-		ChargingUponArrival chargingUponArrival= controller.getChargingUponArrival();
-		chargingUponArrival.setPowerAvailableAtAllActivityTypesTo(controller.getFacilities(), 0);
-		chargingUponArrival.getChargablePowerAtActivityTypes().put("home", 3500.0);
-		chargingUponArrival.getChargablePowerAtActivityTypes().put("work", 3500.0);
-		
-		
-		EnergyConsumptionTracker energyConsumptionTracker = controller.getEnergyConsumptionTracker();
-		
-		controller.setOverwriteFiles(true);
-		
-		controller.run();
-
-		//assertEquals(1.0, inductiveCharger.getLog().get(0).getEnergyChargedInJoule());
-		//assertEquals(1.0, chargingUponArrival.getLog().get(0).getEnergyChargedInJoule());
-		assertEquals(1.0, energyConsumptionTracker.getLog().get(0).getEnergyConsumedInJoules());
-		//TODO: check also, if the energy consumption functions correctly
-		
+	public AddHandlerAtStartupControler(Config config) {
+		super(config);
+		addControlerListener(new EventHandlerAdder());
 	}
+
+	public AddHandlerAtStartupControler(String[] args) {
+		super(args);
+		addControlerListener(new EventHandlerAdder());
+	}
+
+	public void addHandler(EventHandler handler) {
+		this.handler.add(handler);
+	}
+
+	private class EventHandlerAdder implements StartupListener {
+
+		@Override
+		public void notifyStartup(StartupEvent event) {
+			for (EventHandler h : handler) {
+				getEvents().addHandler(h);
+			}
+		}
+
+	}
+
 }
