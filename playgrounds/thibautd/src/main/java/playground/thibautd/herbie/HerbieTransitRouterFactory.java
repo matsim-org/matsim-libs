@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.TravelScoringFunction;
 

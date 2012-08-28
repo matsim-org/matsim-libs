@@ -87,18 +87,18 @@ public class HerbieTransitRouter implements TransitRouter {
 	
 	private final DepartureTimeCache data = new DepartureTimeCache();
 
-	public HerbieTransitRouter(
-			final TransitRouterConfig config,
-			final TransitSchedule schedule,
-			final TravelScoringFunction distanceScoring) {
-		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
-		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
-		this.config = config;
-		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
-		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
-		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
-		this.distanceScoring = distanceScoring;
-	}
+	//public HerbieTransitRouter(
+	//		final TransitRouterConfig config,
+	//		final TransitSchedule schedule,
+	//		final TravelScoringFunction distanceScoring) {
+	//	TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
+	//	this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
+	//	this.config = config;
+	//	this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
+	//	this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
+	//	this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
+	//	this.distanceScoring = distanceScoring;
+	//}
 
 	public HerbieTransitRouter(
 			final TransitRouterConfig config,

@@ -142,11 +142,4 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.scenarioData.getNetwork()));
 //		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
-
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		PlanAlgorithm router = null;
-		router = super.createRoutingAlgorithm(travelCosts, travelTimes);
-		return router;
-	}
 }
