@@ -43,5 +43,5 @@ public class EnergyConsumptionLogRow {
 	public double getEnergyConsumedInJoules() {
 		return energyConsumedInJoules;
 	}
-
+ 
 }
