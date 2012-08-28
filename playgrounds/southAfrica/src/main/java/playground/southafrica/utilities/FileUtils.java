@@ -40,7 +40,7 @@ public class FileUtils {
 	
 	/**
 	 * Cleans a given file. If the file is a directory, it first cleans all
-	 * its contained file (or folders).
+	 * its contained files (or folders).
 	 * @param folder
 	 */
 	public static void delete(File folder){
