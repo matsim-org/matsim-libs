@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -39,13 +40,14 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
  *
  */
 public class TextFileWriter {
+	private static final Logger log = Logger.getLogger(TextFileWriter.class);
 
 	public void write(List<ParkAndRideFacility> parkAndRideFacilities, String prFacilitiesFile) {
 		File file = new File(prFacilitiesFile);
 		
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "Id ; Link1in ; Link1out ; Link2in ; Link2out ; Link3in ; Link3out ; TransitStopFacilityName";
+	    String zeile1 = "Id ; Link1in ; Link1out ; Link2in ; Link2out ; Link3in ; Link3out ; TransitStopFacilityName ; Capacity";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -58,8 +60,9 @@ public class TextFileWriter {
 	    	Id link3in = pr.getPrLink3in();
 	    	Id link3out = pr.getPrLink3out();
 	    	String name = pr.getStopFacilityName();
+	    	int capacity = pr.getCapacity();
 	    	
-	    	String zeile = id + " ; " + link1in + " ; " + link1out + " ; " + link2in + " ; " + link2out + " ; " + link3in + " ; " + link3out + " ; " + name;
+	    	String zeile = id + " ; " + link1in + " ; " + link1out + " ; " + link2in + " ; " + link2out + " ; " + link3in + " ; " + link3out + " ; " + name + " ; " + String.valueOf(capacity);
 	
 	    	bw.write(zeile);
 	        bw.newLine();
@@ -69,7 +72,7 @@ public class TextFileWriter {
 	    bw.close();
     
 	    } catch (IOException e) {}
-	    System.out.println("ParkAndRideFacilites written to "+file.toString());		
+	    log.info("ParkAndRideFacilites written to "+file.toString());		
 	}
 	
 	public void writeInfo (List<TransitStopFacility> stops, String name) {
@@ -95,7 +98,28 @@ public class TextFileWriter {
 	    bw.close();
     
 	    } catch (IOException e) {}
-	    System.out.println("Info written to "+file.toString());		
+	    log.info("Info written to "+file.toString());		
+	}
+	
+	public void writeInfoIDs(List<Id> idsNoNodeFound, String name) {
+		File file = new File(name);
+		
+	    try {
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+	
+	    for (Id id : idsNoNodeFound){
+	    	
+	    	String zeile = id.toString();
+	
+	    	bw.write(zeile);
+	        bw.newLine();
+	    }
+	
+	    bw.flush();
+	    bw.close();
+    
+	    } catch (IOException e) {}
+	    log.info("Info written to "+file.toString());	
 	}
 
 }

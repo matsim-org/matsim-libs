@@ -39,6 +39,7 @@ public class ParkAndRideFacility {
 	private Id prLink2out;
 	private Id prLink3in; // parkAndRideActivity
 	private Id prLink3out;
+	private int capacity;
 
 	public Id getId() {
 		return id;
@@ -102,6 +103,14 @@ public class ParkAndRideFacility {
 
 	public String getStopFacilityName() {
 		return stopFacilityName;
+	}
+
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+
+	public int getCapacity() {
+		return capacity;
 	}
 	
 }

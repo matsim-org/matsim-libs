@@ -24,13 +24,8 @@
 package playground.ikaddoura.parkAndRide.prepare;
 
 import java.io.IOException;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,29 +37,30 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class ParkAndRideGeneratorMain {
 	
-	// input
-	static String networkFile = "/Users/Ihab/Desktop/PR_test/network.xml";
-	static String scheduleFile = "/Users/Ihab/Desktop/PR_test/schedule.xml";
-	static String vehiclesFile = "/Users/Ihab/Desktop/PR_test/vehicles.xml";
+	static String networkFile = "/Users/Ihab/Desktop/Berlin/berlinNetwork.xml";
+	static String scheduleFile = "/Users/Ihab/Desktop/Berlin/berlinTransitSchedule.xml";
+	static String vehiclesFile = "/Users/Ihab/Desktop/Berlin/berlinTransitVehicles.xml";
 	
-	static boolean usePrInputFile = false;
-	static String prInputFile = "/Users/Ihab/Desktop/PR_test/prInputData.txt";
+	static boolean usePrInputFile = false; // uses a file to insert park-and-ride facilities
+	static String prInputFile = "/Users/Ihab/Desktop/Berlin/prInputData.txt";
 
-	static String filterType = "berlin"; // possible: allTransitStops, berlin
-	
-	// outputFiles
-	static String outputPath = "/Users/Ihab/Desktop/PR_test/";
-	static String prFacilitiesFile = "prFacilities.txt";
-	static String prNetworkFile = "network_PR.xml";
+	static boolean useScheduleFile = true; // uses the schedule to insert park-and-ride facilities
+	static String filterType = "allTransitStops"; // defines at which stops park-and-ride is inserted (possible: allTransitStops, berlin)
+	static int constantCapacity = 100000;
 	
 	static double extensionRadius = 10;
-	static int maxSearchSteps = 100;
-		     
-	// parkAndRide Link:
-	private double capacity = 2000;
+	static int maxSearchSteps = 1000;
+	
+	// parkAndRide Link Attributes:
+	private double linkCapacity = 2000;
 	private double freeSpeed = 2.77778;
 	private double length = 20;
 	private double nrOfLanes = 40;
+	
+	// outputFiles
+	static String outputPath = "/Users/Ihab/Desktop/PR_test/";
+	static String prFacilitiesFile = "prFacilities_allTransitStops.txt";
+	static String prNetworkFile = "berlinNetwork_PR.xml";
 	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -80,30 +76,24 @@ public class ParkAndRideGeneratorMain {
 		
 		ParkAndRideFactory prFactory = new ParkAndRideFactory(this.scenario, extensionRadius, maxSearchSteps, outputPath);
 		
-		prFactory.setUseInputFile(usePrInputFile, prInputFile);
-		prFactory.setFilterType(filterType);
-		prFactory.setId2prCarLinkToNode();
+		if (usePrInputFile && useScheduleFile){
+			throw new RuntimeException("usePRInputFile and useScheduleFile set true. Aborting...");
+		}
 		
-		Map<Id, PRCarLinkToNode> id2prCarLinkToNode = prFactory.getId2prCarLinkToNode();
-			
-		PRFacilityCreator prFacilityCreator = new PRFacilityCreator();
-		prFacilityCreator.setCapacity(this.capacity);
+		prFactory.setUseInputFile(usePrInputFile, prInputFile);
+		prFactory.setUseScheduleFile(useScheduleFile, filterType, constantCapacity);
+		
+		prFactory.setId2prCarLinkToNode();		
+		
+		PRFacilityCreator prFacilityCreator = new PRFacilityCreator(this.scenario);
+		prFacilityCreator.setLinkCapacity(this.linkCapacity);
 		prFacilityCreator.setFreeSpeed(this.freeSpeed);
 		prFacilityCreator.setLength(this.length);
 		prFacilityCreator.setNrOfLanes(this.nrOfLanes);
 		
-		int i = 0;
-		for (Id nodeId : id2prCarLinkToNode.keySet()){
-			Id id = new IdImpl(i);
-			prFacilityCreator.createPRFacility(id, id2prCarLinkToNode.get(nodeId).getNode(), this.scenario, id2prCarLinkToNode.get(nodeId).getStopName());
-			i++;
-		}
-				
-		NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork());
-		networkWriter.write(outputPath + prNetworkFile);
-		
-		TextFileWriter writer = new TextFileWriter();	
-		writer.write(prFacilityCreator.getParkAndRideFacilities(), outputPath + prFacilitiesFile);
+		prFactory.createPRLinks(prFacilityCreator);
+		prFactory.writeNetwork(outputPath + prNetworkFile);
+		prFactory.writePrFacilities(prFacilityCreator, outputPath + prFacilitiesFile);
 		
 	}
 

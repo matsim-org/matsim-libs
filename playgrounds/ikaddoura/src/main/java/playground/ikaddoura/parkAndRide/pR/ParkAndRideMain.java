@@ -52,7 +52,6 @@ public class ParkAndRideMain {
 	
 	static String configFile;
 	static String prFacilityFile;
-	static int prCapacity;
 	static int gravity;
 	
 	static double addPRProb = 0.;
@@ -73,18 +72,16 @@ public class ParkAndRideMain {
 		if (args.length > 0) {
 			configFile = args[0];
 			prFacilityFile = args[1];
-			prCapacity = Integer.parseInt(args[2]);
-			gravity = Integer.parseInt(args[3]);
+			gravity = Integer.parseInt(args[2]);
 			
 			log.info("configFile: "+ configFile);
 			log.info("prFacilityFile: "+ prFacilityFile);
-			log.info("prCapacity: "+ prCapacity);
 			log.info("gravity: "+ gravity);
 			
-			if (args.length <= 4) {
+			if (args.length <= 3) {
 				log.warn("No strategies defined.");
 			} else {
-				for (int arg = 4; arg < args.length ; arg = arg + 3) {
+				for (int arg = 3; arg < args.length ; arg = arg + 3) {
 					
 					int probIndex = arg+1;
 					int disableIndex = arg+2;
@@ -139,12 +136,11 @@ public class ParkAndRideMain {
 		} else {
 			
 			configFile = "/Users/Ihab/Desktop/PR_test/config.xml";
-			prFacilityFile = "/Users/Ihab/Desktop/test/prFacilities.xml";
-			prCapacity = 100;
+			prFacilityFile = "/Users/Ihab/Desktop/PR_test/prFacilities.txt";
 			gravity = 2;
 			
-			addPRProb = 0.;
-			addPRDisable = 0;
+			addPRProb = 0.5;
+			addPRDisable = 10;
 			
 			changeLocationProb = 0.;
 			changeLocationDisable = 0;
@@ -172,7 +168,7 @@ public class ParkAndRideMain {
 		PRFileReader prReader = new PRFileReader(prFacilityFile);
 		Map<Id, ParkAndRideFacility> id2prFacility = prReader.getId2prFacility();
 
-		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(id2prFacility, prCapacity);
+		final AdaptiveCapacityControl adaptiveControl = new AdaptiveCapacityControl(id2prFacility);
 				
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);

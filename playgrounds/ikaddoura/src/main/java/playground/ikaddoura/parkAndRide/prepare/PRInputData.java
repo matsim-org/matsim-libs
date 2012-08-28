@@ -23,36 +23,43 @@
  */
 package playground.ikaddoura.parkAndRide.prepare;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author Ihab
  *
  */
-public class PRCarLinkToNode {
+public class PRInputData {
 	
-	private Id nodeId;
-	private Node node;
+	private Id id;
 	private String stopName;
+	private int capacity;
+	private Coord coord;
 	
-	public Id getNodeId() {
-		return nodeId;
+	public Id getId() {
+		return id;
 	}
-	public void setNodeId(Id nodeId) {
-		this.nodeId = nodeId;
-	}
-	public Node getNode() {
-		return node;
-	}
-	public void setNode(Node node) {
-		this.node = node;
+	public void setId(Id id) {
+		this.id = id;
 	}
 	public String getStopName() {
 		return stopName;
 	}
 	public void setStopName(String stopName) {
 		this.stopName = stopName;
+	}
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+	public int getCapacity() {
+		return capacity;
+	}
+	public void setCoord(Coord coord) {
+		this.coord = coord;
+	}
+	public Coord getCoord() {
+		return coord;
 	}
 
 }

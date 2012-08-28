@@ -22,6 +22,7 @@ package playground.ikaddoura.parkAndRide.pR;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -40,25 +41,23 @@ import org.matsim.signalsystems.model.SignalGroupState;
  *
  */
 public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHandler, LinkLeaveEventHandler {
-
+	
+	private static final Logger log = Logger.getLogger(AdaptiveCapacityControl.class);
 	private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
 	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
 	private Map<Id, ParkAndRideFacility> id2prFacility = new HashMap<Id, ParkAndRideFacility>();
-
-	private Integer maxCapacity;
 	
 	private InternalInterface internalInterface;
 	
-	public AdaptiveCapacityControl(Map<Id, ParkAndRideFacility> id2prFacility, int prCapacity) {
+	public AdaptiveCapacityControl(Map<Id, ParkAndRideFacility> id2prFacility) {
 		this.id2prFacility = id2prFacility;
-		this.maxCapacity = prCapacity;
 	}
 
 	@Override
 	public void doSimStep(double time) {
 		
 		for (Id prId : this.prId2ampel.keySet()){
-			if (this.prId2vehicles.get(prId) >= this.maxCapacity){
+			if (this.prId2vehicles.get(prId) >= this.id2prFacility.get(prId).getCapacity()){
 				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.RED);
 			} else {
 				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.GREEN);
@@ -103,7 +102,7 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 		for (ParkAndRideFacility pr : this.id2prFacility.values()){
 			Id id = pr.getPrLink3in();
 			if (id.toString().equals(event.getLinkId().toString())){
-				System.out.println("Car entered ParkAndRideFacilty: " + id.toString());
+				log.info("Car entered ParkAndRideFacilty: " + id.toString());
 				int vehNr = this.prId2vehicles.get(pr.getId()) + 1;
 				System.out.println("Auslastung: "+vehNr);
 				this.prId2vehicles.put(pr.getId(), vehNr);
@@ -117,7 +116,7 @@ public class AdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHand
 			Id id = pr.getPrLink3out();
 
 			if (id.toString().equals(event.getLinkId().toString())){
-				System.out.println("Car left ParkAndRideFacilty: " + id.toString());
+				log.info("Car left ParkAndRideFacilty: " + id.toString());
 				int vehNr = this.prId2vehicles.get(pr.getId()) - 1;
 				System.out.println("Auslastung: "+vehNr);
 				this.prId2vehicles.put(pr.getId(), vehNr);

@@ -30,10 +30,10 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
@@ -44,18 +44,24 @@ import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 public class PRFacilityCreator {
 	
-	private double capacity;
+	private ScenarioImpl scenario;
+	
+	private double linkCapacity;
 	private double freeSpeed;
 	private double length;
 	private double nrOfLanes;
 	
 	private List<ParkAndRideFacility> parkAndRideFacilities = new ArrayList<ParkAndRideFacility>();
 	
-	public double getCapacity() {
-		return capacity;
+	public PRFacilityCreator(ScenarioImpl scenario) {
+		this.scenario = scenario;
 	}
-	public void setCapacity(double capacity) {
-		this.capacity = capacity;
+	
+	public double getLinkCapacity() {
+		return linkCapacity;
+	}
+	public void setLinkCapacity(double linkCapacity) {
+		this.linkCapacity = linkCapacity;
 	}
 	public double getFreeSpeed() {
 		return freeSpeed;
@@ -80,11 +86,12 @@ public class PRFacilityCreator {
 		return parkAndRideFacilities;
 	}
 	
-	public void createPRFacility(Id id, Node node, Scenario scenario, String stopName) {
+	public void createPRFacility(Id id, Node node, String stopName, int capacity) {
 		
 		ParkAndRideFacility prFacility = new ParkAndRideFacility();
 		prFacility.setId(id);
 		prFacility.setStopFacilityName(stopName);
+		prFacility.setCapacity(capacity);
 		
 		Id pRnodeId1 = new IdImpl("PR1_"+id);
 		Id pRnodeId2 = new IdImpl("PR2_"+id);
@@ -131,7 +138,7 @@ public class PRFacilityCreator {
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");		
 		link.setAllowedModes((Set<String>) modes);
-		link.setCapacity(capacity);
+		link.setCapacity(linkCapacity);
 		link.setFreespeed(freeSpeed);
 		link.setLength(length);
 		link.setNumberOfLanes(nrOfLanes);
@@ -142,7 +149,7 @@ public class PRFacilityCreator {
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");		
 		link.setAllowedModes((Set<String>) modes);
-		link.setCapacity(capacity);
+		link.setCapacity(linkCapacity);
 		link.setFreespeed(100.0);
 		link.setLength(1.0);
 		link.setNumberOfLanes(40.0);
