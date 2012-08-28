@@ -77,7 +77,7 @@ public class CreateTestScenario {
 		new CreateTestScenario().run();
 	}
 
-	private int numAgents = 1000;
+	private int numAgents = 2000;
 	
 	public CreateTestScenario(){
 		
@@ -256,6 +256,7 @@ public class CreateTestScenario {
 		vType.setLength(15);
 		VehicleCapacity cap = new VehicleCapacityImpl();
 		cap.setSeats(51);
+		cap.setStandingRoom(0);
 		vType.setCapacity(cap);
 		//create Line and Route
 		TransitLine l = f.createTransitLine(sc.createId(mode));
@@ -343,6 +344,7 @@ public class CreateTestScenario {
 		vType.setLength(45);
 		VehicleCapacity cap = new VehicleCapacityImpl();
 		cap.setSeats(150);
+		cap.setStandingRoom(0);
 		vType.setCapacity(cap);
 		//create Line and Route
 		TransitLine l = f.createTransitLine(sc.createId(mode));
@@ -437,10 +439,12 @@ public class CreateTestScenario {
 			if(rnd < 0.2){
 				mode = "bus";
 			}
-			else if(rnd < 0.5){
+			else if(rnd < 0.4){
 				mode = "taxi";
 			}
-			else{
+			else if(rnd < 0.6){
+				mode = "car";
+			} else{
 				mode = "train";
 			}
 			l = pFac.createLeg(mode);

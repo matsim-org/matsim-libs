@@ -76,18 +76,22 @@ public class RunRsaMultiModalTest {
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
-		// TODO[dr] this is very confusing, but the PTransitRouterFactory needs to be registered as controlerListener, because it provides
-		//some essential functionality to the P-module
+		
+		/*
+		 *  TODO[dr] this is very confusing, but the PTransitRouterFactory needs to be registered as 
+		 *  controlerListener (even if it is not set as ROuterFactory), because it provides
+		 *	some essential functionality to the P-module
+		 */
 		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(controler, new Mode2LineSetterRSA());
 //		PtSubModeDependRouterFactory pFact = new PtSubModeDependRouterFactory(controler, true);
 		controler.addControlerListener(pFact);		
 //		controler.setTransitRouterFactory(pFact);
 		//set mobsimFactory
 		controler.setMobsimFactory(new TransitSubModeQSimFactory());
-		controler.addControlerListener(new WriteSelectedPlansAfterIteration());
+//		controler.addControlerListener(new WriteSelectedPlansAfterIteration());
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 
 		controler.run();
-		OTFVis.playMVI(controler.getControlerIO().getIterationFilename(controler.getLastIteration(), "otfvis.mvi"));
+//		OTFVis.playMVI(controler.getControlerIO().getIterationFilename(controler.getLastIteration(), "otfvis.mvi"));
 	}
 }

@@ -63,7 +63,6 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 	
 	private PtSubModePtInteractionRemover remover = new PtSubModePtInteractionRemover();
 	private PtSubModeDependendRouter router;
-	private TransitConfigGroup config;
 
 	/**
 	 * @param config
@@ -89,7 +88,9 @@ public class PlansCalcSubModeDependendTransitRoute extends PlansCalcTransitRoute
 			throw new IllegalArgumentException("the transitRouter needs to be an instance of 'PtSubModeDependendRouter'. ABORT!");
 		}
 		this.router = (PtSubModeDependendRouter) transitRouter;
-		this.config = transitConfig;
+		// add the default
+		this.addLegHandler(TransportMode.pt, new PtSubModeLegHandler());
+		// add all other modes (maybe pt again)
 		for (String transitMode : transitConfig.getTransitModes()) {
 			this.addLegHandler(transitMode, new PtSubModeLegHandler());
 		}
