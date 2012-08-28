@@ -39,14 +39,14 @@ import playground.thibautd.router.StageActivityTypes;
  * @author thibautd
  */
 public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
-	private final int mutationRange;
+	private final double mutationRange;
 	private final StageActivityTypes blackList;
 	private final Random random;
 	private boolean useActivityDurations = true;
 
 	public BlackListedTimeAllocationMutator(
 			final StageActivityTypes blackList,
-			final int mutationRange,
+			final double mutationRange,
 			final Random random) {
 		this.blackList = blackList;
 		this.mutationRange = mutationRange;

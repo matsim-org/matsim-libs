@@ -39,12 +39,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 	private final MultiLegRoutingControler controler;
 	private final StageActivityTypes blackList;
 
-	public final static String CONFIG_GROUP = "TimeAllocationMutator";
-	public final static String CONFIG_MUTATION_RANGE = "mutationRange";
-
-	private final static Logger log = Logger.getLogger(TimeAllocationMutatorModule.class);
-
-	private int mutationRange = 1800;
+	private final double mutationRange;
 	private boolean useActivityDurations = true;
 
 	/**
@@ -70,14 +65,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 		this.blackList = blackList;
 
 		Config config = controler.getConfig();
-		String range = config.findParam(CONFIG_GROUP, CONFIG_MUTATION_RANGE);
-		if (range == null) {
-			log.info("No mutation range defined in the config file. Using default of " + this.mutationRange + " sec.");
-		}
-		else {
-			this.mutationRange = Integer.parseInt(range);
-			log.info("mutation range = " + this.mutationRange);
-		}
+		this.mutationRange = config.timeAllocationMutator().getMutationRange();
 
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime ) ) {
 			useActivityDurations = true ;

@@ -27,33 +27,18 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.controler.MultiLegRoutingControler;
-import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
 
 /**
  * @author thibautd
  */
 public class JointTimeAllocationMutatorModule extends AbstractMultithreadedModule {
-	private static final Logger log =
-		Logger.getLogger(JointTimeAllocationMutatorModule.class);
-
 	private final MultiLegRoutingControler controler;
-	private final int mutationRange;
+	private final double mutationRange;
 
 	public JointTimeAllocationMutatorModule(final Controler controler) {
 		super( controler.getConfig().global() );
 		this.controler = (MultiLegRoutingControler) controler;
-
-		String range = controler.getConfig().findParam(
-				TimeAllocationMutatorModule.CONFIG_GROUP,
-				TimeAllocationMutatorModule.CONFIG_MUTATION_RANGE);
-		if (range == null) {
-			mutationRange = 1800;
-			log.info("No mutation range defined in the config file. Using default of " + mutationRange + " sec.");
-		}
-		else {
-			mutationRange = Integer.parseInt(range);
-			log.info("mutation range = " + mutationRange);
-		}
+		this.mutationRange = controler.getConfig().timeAllocationMutator().getMutationRange();
 	}
 
 	@Override

@@ -45,7 +45,7 @@ public class JointTimeAllocationMutatorAlgorithm implements PlanAlgorithm {
 	public JointTimeAllocationMutatorAlgorithm(
 			final Random random,
 			final StageActivityTypes routerStageTypes,
-			final int mutationRange) {
+			final double mutationRange) {
 		this.random = random;
 		CompositeStageActivityTypes blackList = new CompositeStageActivityTypes();
 		blackList.addActivityTypes( routerStageTypes );
