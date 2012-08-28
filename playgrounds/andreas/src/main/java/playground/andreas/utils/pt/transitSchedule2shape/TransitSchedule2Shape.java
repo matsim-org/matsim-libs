@@ -51,11 +51,14 @@ public class TransitSchedule2Shape {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		final String iteration = "380";
+		final String runId = "run71";
 
-		final String SCHEDULEFILE = "f:/p_runs/txl/run71/it.120/run71.120.transitSchedule.xml.gz";
-		final String COOPLOGGERFILE = "f:/p_runs/txl/run71/run71.pCoopLogger.txt";
-		final String ALLLINESSHAPEOUTFILE = "f:/p_runs/txl/run71/it.120/run71.120.transitSchedule.shp";
-		final String PARAINBUSINESSSHAPEOUTFILE = "f:/p_runs/txl/run71/it.120/run71.120.transitSchedule_para_in_business.shp";
+		final String SCHEDULEFILE = "f:/p_runs/txl/" + runId + "/it." + iteration + "/" + runId + "." + iteration + ".transitSchedule.xml.gz";
+		final String COOPLOGGERFILE = "f:/p_runs/txl/" + runId + "/" + runId + ".pCoopLogger.txt";
+		final String ALLLINESSHAPEOUTFILE = "f:/p_runs/txl/" + runId + "/it." + iteration + "/" + runId + "." + iteration + ".transitSchedule.shp";
+		final String PARAINBUSINESSSHAPEOUTFILE = "f:/p_runs/txl/" + runId + "/it." + iteration + "/" + runId + "." + iteration + ".transitSchedule_para_in_business.shp";
 		final int removeAllParatransitLinesYoungerThanIteration = 2729;
 		final String pIdentifier = "para_";
 		
