@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
@@ -32,7 +33,6 @@ import org.matsim.core.events.EventsUtils;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.artemis.hubs.LinkHubMapping;
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
 public class PeakParkingDemandPerHub {

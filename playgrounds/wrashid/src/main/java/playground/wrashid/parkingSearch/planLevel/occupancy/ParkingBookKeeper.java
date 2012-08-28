@@ -3,13 +3,13 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.lib.DebugLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEndEventHandler {

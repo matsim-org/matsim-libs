@@ -3,11 +3,11 @@ package playground.wrashid.lib.tools.facility;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class PrintStatisticsAboutFacilities {

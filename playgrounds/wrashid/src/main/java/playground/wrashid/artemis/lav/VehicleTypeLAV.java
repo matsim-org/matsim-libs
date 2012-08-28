@@ -1,6 +1,6 @@
 package playground.wrashid.artemis.lav;
 
-import playground.wrashid.lib.DebugLib;
+import org.matsim.contrib.parking.lib.DebugLib;
 
 public class VehicleTypeLAV {
 

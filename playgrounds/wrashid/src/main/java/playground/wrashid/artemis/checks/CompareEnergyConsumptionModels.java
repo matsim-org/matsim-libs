@@ -5,11 +5,11 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import org.geotools.math.Statistics;
+import org.matsim.contrib.parking.lib.DebugLib;
 
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel;
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
 import playground.wrashid.artemis.lav.VehicleTypeLAV;
-import playground.wrashid.lib.DebugLib;
 
 public class CompareEnergyConsumptionModels {
 

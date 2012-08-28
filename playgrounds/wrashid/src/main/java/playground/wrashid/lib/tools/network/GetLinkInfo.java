@@ -21,9 +21,9 @@
 package playground.wrashid.lib.tools.network;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.wrashid.lib.GeneralLib;
 
 public class GetLinkInfo {
 

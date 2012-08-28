@@ -1,10 +1,10 @@
 package playground.wrashid.PSF.converter.scenario;
 
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.PSF.converter.addingParkings.AddParkingsToPlans;
 import playground.wrashid.PSF.converter.addingParkings.GenerateParkingFacilities;
-import playground.wrashid.lib.GeneralLib;
 
 public class Zurich {
 	public static void main(String[] args) {

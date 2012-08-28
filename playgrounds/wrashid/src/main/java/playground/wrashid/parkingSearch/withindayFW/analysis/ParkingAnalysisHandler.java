@@ -20,10 +20,10 @@
 package playground.wrashid.parkingSearch.withindayFW.analysis;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.lib.obj.Pair;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 

@@ -22,6 +22,8 @@ package playground.wrashid.PSF2.chargingSchemes;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -31,8 +33,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
 /**

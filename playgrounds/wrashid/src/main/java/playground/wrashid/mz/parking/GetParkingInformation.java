@@ -1,9 +1,9 @@
 package playground.wrashid.mz.parking;
 
 import org.apache.log4j.chainsaw.Main;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.StringMatrix;
 
-import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.StringMatrix;
 
 public class GetParkingInformation {
 

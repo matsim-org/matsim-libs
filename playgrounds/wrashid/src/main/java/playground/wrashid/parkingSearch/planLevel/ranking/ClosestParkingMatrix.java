@@ -7,11 +7,11 @@ import java.util.PriorityQueue;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
 import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;

@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 

@@ -5,9 +5,9 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.xml.sax.SAXException;
 
-import playground.wrashid.lib.GeneralLib;
 
 public class ConvertOsmNetworkToMATSimNetwork {
 

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -38,7 +39,6 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
 
 public class PlanGeneratorWithParkingActivities {

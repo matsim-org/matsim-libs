@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -12,8 +14,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
 
 public class EnergyConsumptionMain {

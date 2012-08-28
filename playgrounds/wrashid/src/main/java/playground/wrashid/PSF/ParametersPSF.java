@@ -1,6 +1,7 @@
 package playground.wrashid.PSF;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 
@@ -10,7 +11,6 @@ import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionBin
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGalus;
 import playground.wrashid.PSF.data.powerCharging.DefaultChargingPower;
 import playground.wrashid.PSF.data.powerCharging.FacilityChargingPowerMapper;
-import playground.wrashid.lib.GeneralLib;
 
 public class ParametersPSF {
 

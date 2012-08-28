@@ -3,8 +3,8 @@ package playground.wrashid.parkingSearch.planLevel.analysis;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingWalkingDistanceAnalysis {

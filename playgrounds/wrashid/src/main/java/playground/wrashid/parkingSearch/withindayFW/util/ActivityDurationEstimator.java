@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
 
 public class ActivityDurationEstimator {
 

@@ -22,6 +22,7 @@ package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
@@ -30,7 +31,6 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.ConventionalVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.ElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.GeneralLib;
 
 public class ARTEMISEnergyStateMaintainer_StartChargingUponArrival extends EnergyStateMaintainer {
 

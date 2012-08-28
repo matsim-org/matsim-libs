@@ -22,12 +22,12 @@ package playground.wrashid.artemis.checks;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.StringMatrix;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
-import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 

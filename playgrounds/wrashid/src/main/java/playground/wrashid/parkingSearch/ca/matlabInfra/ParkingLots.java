@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.StringMatrix;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
-import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.StringMatrix;
 
 public class ParkingLots {
 

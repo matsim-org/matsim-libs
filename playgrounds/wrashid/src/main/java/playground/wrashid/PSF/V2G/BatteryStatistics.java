@@ -3,12 +3,12 @@ package playground.wrashid.PSF.V2G;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF.parking.ParkingTimes;
-import playground.wrashid.lib.GeneralLib;
 
 public class BatteryStatistics {
 	

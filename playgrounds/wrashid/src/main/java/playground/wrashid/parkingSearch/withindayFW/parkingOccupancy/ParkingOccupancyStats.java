@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;

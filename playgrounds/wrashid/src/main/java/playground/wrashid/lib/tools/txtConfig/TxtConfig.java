@@ -3,9 +3,10 @@ package playground.wrashid.lib.tools.txtConfig;
 import java.io.File;
 import java.util.HashMap;
 
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.StringMatrix;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.StringMatrix;
+
 
 /**
  * usage: put tab separated key, value pairs into a file and read them

@@ -2,7 +2,8 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 
 import java.util.ArrayList;
 
-import playground.wrashid.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
+
 
 /**
  * Knowing, when a parking gets full, lets car drivers estimate if they could

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -29,7 +30,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.objenesis.instantiator.basic.NewInstanceInstantiator;
 
-import playground.wrashid.lib.GeneralLib;
 
 /**
  * prints out coordinates of all parked vehicles at 'timeOfSnapShotInSeconds'

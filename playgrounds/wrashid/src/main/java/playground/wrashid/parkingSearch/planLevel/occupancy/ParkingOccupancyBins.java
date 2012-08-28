@@ -1,7 +1,8 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
+
 
 /**
  * 15 minute bins for the whole day (96 bins) for one single parking.

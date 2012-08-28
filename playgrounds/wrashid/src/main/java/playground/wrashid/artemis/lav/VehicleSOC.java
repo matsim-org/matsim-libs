@@ -1,7 +1,8 @@
 package playground.wrashid.artemis.lav;
 
+import org.matsim.contrib.parking.lib.DebugLib;
+
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
-import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.MathLib;
 
 public class VehicleSOC {

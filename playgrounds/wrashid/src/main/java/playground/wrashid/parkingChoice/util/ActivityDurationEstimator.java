@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
@@ -15,8 +17,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
 
 public class ActivityDurationEstimator implements ActivityStartEventHandler, AgentDepartureEventHandler {
 

@@ -21,7 +21,8 @@ package playground.wrashid.parkingSearch.withindayFW.analysis;
 
 import java.util.LinkedList;
 
-import playground.wrashid.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
+
 
 public class ConsoleOutputAnalysis {
 

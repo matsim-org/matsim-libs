@@ -23,8 +23,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
 
-import playground.wrashid.lib.GeneralLib;
 
 public class PrintFreeSpeeds {
 

@@ -3,8 +3,9 @@ package playground.wrashid.artemis.smartCharging;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
+
 import playground.wrashid.lib.obj.SortableMapObject;
 
 public class ChargingTime {

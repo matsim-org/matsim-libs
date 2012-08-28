@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -13,7 +14,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.wrashid.lib.GeneralLib;
 
 public class StreetParkingsWriter extends MatsimXmlWriter {
 

@@ -1,6 +1,6 @@
 package playground.wrashid.parkingChoice.counts;
 
-import playground.wrashid.lib.obj.StringMatrixFilter;
+import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
 
 public class RemoveNonRelevantGarageInformation implements StringMatrixFilter{
 

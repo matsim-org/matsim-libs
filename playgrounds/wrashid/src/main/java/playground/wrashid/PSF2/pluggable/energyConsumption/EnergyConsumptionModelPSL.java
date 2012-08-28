@@ -23,13 +23,13 @@ package playground.wrashid.PSF2.pluggable.energyConsumption;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGalus;
 import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.obj.GeneralLogObject;
 
 public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {

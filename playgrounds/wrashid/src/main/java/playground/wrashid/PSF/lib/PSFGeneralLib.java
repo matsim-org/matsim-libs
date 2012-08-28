@@ -1,6 +1,6 @@
 package playground.wrashid.PSF.lib;
 
-import playground.wrashid.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 
 public class PSFGeneralLib {
 

@@ -5,10 +5,10 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.ParkingConfigModule;
 import playground.wrashid.parkingChoice.ParkingManager;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
