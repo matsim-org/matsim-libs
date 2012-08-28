@@ -10,7 +10,7 @@ emissions<-c("CO2_TOTAL","NMHC","NOX","PM","SO2")
 emissioncolors<- c("black","mediumblue","limegreen","yellow","red")
 
 directory <- commandArgs()[3]
-baseFile <- file.path(directory, "emissionInformation_baseCase_ctd_newCode.txt")
+baseFile <- file.path(directory, "emissionInformation_1.txt")
 outFile <- file.path(commandArgs()[4], "PlotA.pdf")
 basecase <- read.table(file=baseFile, header = T, sep = "\t", comment.char="")
 

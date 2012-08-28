@@ -46,6 +46,7 @@ public class EmissionCostModule {
 	
 	public EmissionCostModule(double emissionCostFactor, boolean considerCO2Costs) {
 		this.emissionCostFactor = emissionCostFactor;
+		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		
 		if(considerCO2Costs){
 			this.considerCO2Costs = true;
@@ -57,6 +58,7 @@ public class EmissionCostModule {
 	
 	public EmissionCostModule(double emissionCostFactor) {
 		this.emissionCostFactor = emissionCostFactor;
+		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		logger.info("CO2 emission costs will NOT be calculated... ");
 	}
 

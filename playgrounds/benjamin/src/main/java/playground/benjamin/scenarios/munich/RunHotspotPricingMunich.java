@@ -63,7 +63,7 @@ public class RunHotspotPricingMunich {
 		configFile = "../../runs-svn/detEval/test/input/config_munich_1pct_policyCase_hotspotPricing.xml";
 		emissionCostFactor = "1.0";
 		considerCO2Costs = "false";
-		hotspotFile = "../../detailedEval/papers/mobilTUM2011/Hotspots/Hotspots_No2_annualmean1%.txt";
+		hotspotFile = "../../detailedEval/papers/mobilTUM2011/Hotspots/Hotspots_No2_annualmean1pct.txt";
 		
 //		configFile = args[0];
 //		emissionCostFactor = args[1];

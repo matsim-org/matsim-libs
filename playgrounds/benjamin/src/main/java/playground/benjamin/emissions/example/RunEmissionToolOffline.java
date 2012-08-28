@@ -43,29 +43,30 @@ import playground.benjamin.emissions.EmissionModule;
 public class RunEmissionToolOffline {
 	private static final Logger logger = Logger.getLogger(RunEmissionToolOffline.class);
 
-//	final static String runNumber = "981";
-//	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
-//	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
-//	final static Integer lastIteration = getLastIteration(configFile);
-//	
-//	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration;
-//	static String eventsFile = eventsPath + ".events.xml.gz";
-////	static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
-//	static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
-//	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
-//	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
+	final static String runNumber = "1";
+	final static String paperName = "mobilTUMPaper/1pct/";
+	final static String runDirectory = "../../runs-svn/detEval/" + paperName + "run" + runNumber + "/";
+	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+	final static Integer lastIteration = getLastIteration(configFile);
 	
-	private static String runDirectory = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-	static String configFile = runDirectory + "output_config.xml.gz";
-	static String netFile =  runDirectory + "output_network.xml.gz";
-	final static  Integer lastIteration = getLastIteration(configFile);
-//	final static  Integer lastIteration = 500;
-	
-	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + lastIteration;
+	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration;
 	static String eventsFile = eventsPath + ".events.xml.gz";
-	
+//	static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+	static String netFile = "../../detailedEval/Net/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_1pct.xml.gz";
 	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
+	
+//	private static String runDirectory = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+//	static String configFile = runDirectory + "output_config.xml.gz";
+//	static String netFile =  runDirectory + "output_network.xml.gz";
+//	final static  Integer lastIteration = getLastIteration(configFile);
+////	final static  Integer lastIteration = 500;
+//	
+//	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + lastIteration;
+//	static String eventsFile = eventsPath + ".events.xml.gz";
+//	
+//	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_1pct.xml.gz";
+//	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
 
 	// ===
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";

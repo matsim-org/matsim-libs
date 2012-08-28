@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SetLinkAttributesControlerListener.java
+ * RunMunich.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich;
+package playground.benjamin.scenarios.munich.controller;
 
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,50 +41,66 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author benjamin
  *
  */
-public class SetLinkAttributesControlerListener implements StartupListener {
-
-	private final Set<Feature> featuresInZone30;
-
-	public SetLinkAttributesControlerListener(Set<Feature> featuresInZone30) {
-		this.featuresInZone30 = featuresInZone30;
+public class RunMunichZone30 {
+	public static Logger logger = Logger.getLogger(RunMunichZone30.class);
+	
+	static String configFile = "../../runs-svn/detEval/test/input/config_munich_1pct_baseCase_newController.xml";
+	static String zone30Shape = "../../runs-svn/detEval/test/input/zone30.shp";
+	
+	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		
+		Set<Feature> featuresInZone30 = readShape(zone30Shape);
+		setZone30(scenario.getNetwork(), featuresInZone30);
+		
+		RunMunichZone30Controller controler = new RunMunichZone30Controller(scenario);
+		
+		Scenario ptRoutingScenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		controler.setPtRoutingNetwork(ptRoutingScenario.getNetwork());
+		
+		controler.run();
 	}
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		Network network = event.getControler().getNetwork();		
-		for(Link link : network.getLinks().values()){
+	private static void setZone30(Network net, Set<Feature> zone30) {
+		for(Link link : net.getLinks().values()){
 			Id linkId = link.getId();
-			LinkImpl ll = (LinkImpl) network.getLinks().get(linkId);
-			if(isLinkInShape(ll)){
-				System.out.println("Changing freespeed of link " + ll.getId() + " from " + ll.getFreespeed() + " to 8.3333333334.");
+			LinkImpl ll = (LinkImpl) net.getLinks().get(linkId);
+			if(isLinkInShape(ll, zone30)){
+				logger.info("Changing freespeed of link " + ll.getId() + " from " + ll.getFreespeed() + " to 8.3333333334.");
 				ll.setFreespeed(30 / 3.6);
 				if(ll.getNumberOfLanes() == 1){
-					System.out.println("Changing type of link " + ll.getId() + " from " + ll.getType() + " to 75.");
+					logger.info("Changing type of link " + ll.getId() + " from " + ll.getType() + " to 75.");
 					ll.setType("75");
-					System.out.println("Changing capacity of link " + ll.getId() + " from " + ll.getCapacity() + " to 11200.");
+					logger.info("Changing capacity of link " + ll.getId() + " from " + ll.getCapacity() + " to 11200.");
 					ll.setCapacity(11200);
 				}
 				else{
-					System.out.println("Changing type of link " + ll.getId() + " from " + ll.getType() + " to 83.");
+					logger.info("Changing type of link " + ll.getId() + " from " + ll.getType() + " to 83.");
 					ll.setType("83");
-					System.out.println("Changing capacity of link " + ll.getId() + " from " + ll.getCapacity() + " to 20000.");
+					logger.info("Changing capacity of link " + ll.getId() + " from " + ll.getCapacity() + " to 20000.");
 					ll.setCapacity(20000);
 				}
 			}
 		}
 	}
 
-	private boolean isLinkInShape(Link link) {
+	private static boolean isLinkInShape(Link link, Set<Feature> zone30) {
 		boolean isInShape = false;
 		Coord coord = link.getCoord();
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-		for(Feature feature : this.featuresInZone30){
+		for(Feature feature : zone30){
 			if(feature.getDefaultGeometry().contains(geo)){
 				isInShape = true;
 				break;
 			}
 		}
 		return isInShape;
+	}
+
+	private static Set<Feature> readShape(String shapeFile) {
+		final Set<Feature> featuresInZone30;
+		featuresInZone30 = new ShapeFileReader().readFileAndInitialize(shapeFile);
+		return featuresInZone30;
 	}
 }

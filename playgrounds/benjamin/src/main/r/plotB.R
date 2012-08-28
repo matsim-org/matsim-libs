@@ -7,9 +7,9 @@ emissioncolors<- c("black", "mediumblue", "limegreen", "yellow", "red")
 
 #relative paths
 directory <- commandArgs()[3]
-baseFile <- file.path(directory,"emissionInformation_baseCase_ctd_newCode.txt")
-z30File <- file.path(directory, "emissionInformation_policyCase_zone30.txt")
-priFile <- file.path(directory, "emissionInformation_policyCase_pricing_newCode.txt")
+baseFile <- file.path(directory,"emissionInformation_1.txt")
+z30File <- file.path(directory, "emissionInformation_16.txt")
+priFile <- file.path(directory, "emissionInformation_20.txt")
 outFile <- file.path(commandArgs()[4], "PlotB.pdf")
 
 #read files
@@ -68,9 +68,9 @@ ymaximum<-ceiling(max(relPri, relZ30)) #rounded up maximum
 ylimits<-c(yminimum,ymaximum)
 
 #plots
-barplot(t(relZ30), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="zone 30",beside=T, cex.names=1.2)
+barplot(t(relZ30), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="Factor 20",beside=T, cex.names=1.2)
 axis(2, at=c(-3,-2.5,-2,-1.5,-1,-0.5,0,0.5), labels=c("-3.00%", "-2.50%", "-2.00%", "-1.50%","-1.00%", "-0.50%","0.00%", "0.50%"), tick=TRUE)
-barplot(t(relPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="internalization", beside=T, cex.names=1.2) #use main="title" to add a title here 
+barplot(t(relPri), legend=F, col=emissioncolors, ylim=ylimits, axes=F, main="Factor 40", beside=T, cex.names=1.2) #use main="title" to add a title here 
 plot.new()
 emissions<-sub("_TOTAL","", emissions, fixed=T)
 legend(-0.1,0.8, emissions, fill = emissioncolors, cex=1, bty="n", y.intersp=2)
