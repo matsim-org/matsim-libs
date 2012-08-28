@@ -100,9 +100,6 @@ public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		TravelTime timeCalculator = super.getTravelTimeCalculator();
-		PlanCalcScoreConfigGroup cnScoringGroup = null;
-		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 		
 		this.setTravelDisutilityFactory(costCalculatorFactory);
 		
