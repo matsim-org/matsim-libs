@@ -66,10 +66,9 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	private final Network network;
 
-	public EnergyConsumptionTracker(HashMap<Id, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
+	public EnergyConsumptionTracker(HashMap<Id, Vehicle> vehicles, Network network) {
 		this.vehicles = vehicles;
 		this.network = network;
-		controller.addHandler(this);
 	}
 
 	@Override
@@ -106,7 +105,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		Link link = network.getLinks().get(linkId);
 		double averageSpeedDrivenInMetersPerSecond = link.getLength() / timeSpendOnLink;
 
-		if (shouldLinkBeIgnored(linkEnterTime, linkLeaveTime, link, averageSpeedDrivenInMetersPerSecond)) {
+		if (zeroTravelTime(linkEnterTime, linkLeaveTime)) {
 			return;
 		}
 
@@ -116,9 +115,8 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
 	}
 
-	private boolean shouldLinkBeIgnored(double linkEnterTime, double linkLeaveTime, Link link,
-			double averageSpeedDrivenInMetersPerSecond) {
-		return linkEnterTime == linkLeaveTime || averageSpeedDrivenInMetersPerSecond > link.getFreespeed();
+	private boolean zeroTravelTime(double linkEnterTime, double linkLeaveTime) {
+		return linkEnterTime == linkLeaveTime;
 	}
 
 	@Override

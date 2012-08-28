@@ -25,16 +25,16 @@ public class ChargingLogRow {
 	Id agentId;
 	Id linkIdOrFacilityId;
 	double startChargingTime;
-	double endChargingTime;
+	double chargingDuration;
 	double energyChargedInJoule;
 
-	public ChargingLogRow(Id agentId, Id linkIdOrFacilityId, double startChargingTime, double endChargingTime,
+	public ChargingLogRow(Id agentId, Id linkIdOrFacilityId, double startChargingTime, double chargingDuration,
 			double energyChargedInJoule) {
 		super();
 		this.agentId = agentId;
 		this.linkIdOrFacilityId = linkIdOrFacilityId;
 		this.startChargingTime = startChargingTime;
-		this.endChargingTime = endChargingTime;
+		this.chargingDuration = chargingDuration;
 		this.energyChargedInJoule = energyChargedInJoule;
 	}
 
@@ -50,8 +50,8 @@ public class ChargingLogRow {
 		return startChargingTime;
 	}
 
-	public double getEndChargingTime() {
-		return endChargingTime;
+	public double getChargingDuration() {
+		return chargingDuration;
 	}
 
 	public double getEnergyChargedInJoule() {

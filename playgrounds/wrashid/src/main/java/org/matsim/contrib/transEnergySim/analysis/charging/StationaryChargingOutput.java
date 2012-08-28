@@ -29,7 +29,7 @@ public class StationaryChargingOutput extends ChargingOutputLog {
 	
 	@Override
 	public String getTitleRowFileOutput() {
-		return "agentId\tfacilityId\tstartChargingTime\tendChargingTime\tenergyChargedInJoule";
+		return "agentId\tfacilityId\tstartChargingTime\tchargingDuration\tenergyChargedInJoule";
 	}
 	
 	

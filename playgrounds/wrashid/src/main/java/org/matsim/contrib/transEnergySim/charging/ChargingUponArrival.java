@@ -100,18 +100,12 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 	private PowerAvalabilityParameters powerAvalabilityParameters;
 
-	public ChargingUponArrival(HashMap<Id, Vehicle> vehicles, DoubleValueHashMap<String> chargablePowerAtActivityTypes,
+	public ChargingUponArrival(HashMap<Id, Vehicle> vehicles, 
 			AddHandlerAtStartupControler controller) {
 		this.vehicles = vehicles;
 		this.setDefaultValues(chargablePowerAtActivityTypes);
-		controller.addHandler(this);
 		controller.addControlerListener(this);
-		
-		if (chargablePowerAtActivityTypes!=null){
-			this.chargablePowerAtActivityTypes=chargablePowerAtActivityTypes;
-		} else {
-			this.chargablePowerAtActivityTypes=new DoubleValueHashMap<String>();
-		}
+		chargablePowerAtActivityTypes=new DoubleValueHashMap<String>();
 	}
 
 	@Override
@@ -152,6 +146,10 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 		availablePowerInWatt = getChargablePowerAtActivityTypes().get(activityType);
 
+		if (availablePowerInWatt==0){
+			return;
+		}
+		
 		if (availablePowerInWatt == null) {
 			DebugLib.stopSystemAndReportInconsistency("power at all activity types needs to be specified, missing:"
 					+ activityType);
@@ -253,10 +251,14 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		handleLastParkingOfDay();
 	}
 
-	public void setPowerAvailableAtAllActivityTypesTo(ActivityFacilities facilities, double powerInWatt) {
+	public void setPowerForNonInitializedActivityTypes(ActivityFacilities facilities, double powerInWatt) {
 		this.powerAvalabilityParameters = new PowerAvalabilityParameters(facilities, powerInWatt);
 	}
 
+	public void setChargablePowerAtActivityTypes(DoubleValueHashMap<String> chargablePowerAtActivityTypes) {
+		this.chargablePowerAtActivityTypes = chargablePowerAtActivityTypes;
+	}
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		initPowerAvailableAtStartup();
@@ -280,8 +282,10 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	}
 
 	public void setDefaultValues(DoubleValueHashMap<String> chargablePowerAtActivityTypes) {
-		this.chargablePowerAtActivityTypes = chargablePowerAtActivityTypes;
+		this.setChargablePowerAtActivityTypes(chargablePowerAtActivityTypes);
 	}
+
+	
 
 	private class PowerAvalabilityParameters {
 

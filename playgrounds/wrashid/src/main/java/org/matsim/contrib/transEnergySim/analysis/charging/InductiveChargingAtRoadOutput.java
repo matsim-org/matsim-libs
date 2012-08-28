@@ -32,6 +32,6 @@ public class InductiveChargingAtRoadOutput extends ChargingOutputLog {
 
 	@Override
 	public String getTitleRowFileOutput() {
-		return "agentId\tlinkId\tstartChargingTime\tendChargingTime\tenergyChargedInJoule";
+		return "agentId\tlinkId\tstartChargingTime\tchargingDuration\tenergyChargedInJoule";
 	}
 }

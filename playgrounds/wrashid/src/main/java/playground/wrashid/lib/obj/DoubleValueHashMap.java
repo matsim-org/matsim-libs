@@ -106,4 +106,8 @@ public class DoubleValueHashMap<KeyClass> {
 		return sum / hm.size();
 	}
 	
+	public int size(){
+		return hm.size();
+	}
+	
 }

@@ -41,7 +41,11 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 
@@ -52,7 +56,7 @@ import playground.wrashid.lib.obj.DoubleValueHashMap;
  * 
  */
 public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
-		AgentArrivalEventHandler {
+		AgentArrivalEventHandler, StartupListener {
 
 	private DoubleValueHashMap<Id> chargableStreets;
 	private ChargingOutputLog log;
@@ -63,13 +67,13 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	HashMap<Id, Id> previousLinkEntered;
 
 	private final Network network;
+	private Double samePowerAtAllLinks;
 
-	public InductiveStreetCharger(DoubleValueHashMap<Id> powerAtInductiveStreets, HashMap<Id, Vehicle> vehicles, Network network,
+	public InductiveStreetCharger(HashMap<Id, Vehicle> vehicles, Network network,
 			AddHandlerAtStartupControler controller) {
-		this.setChargableStreets(powerAtInductiveStreets);
 		this.setVehicles(vehicles);
 		this.network = network;
-		controller.addHandler(this);
+		controller.addControlerListener(this);
 	}
 
 	private void setVehicles(HashMap<Id, Vehicle> vehicles) {
@@ -85,20 +89,20 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
+		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
 		handleCharging(event.getPersonId(), event.getLinkId(), event.getTime());
 	}
 
-	private boolean isAgentAndLinkRelevantForProcessing(Id agentId, Id linkId) {
-		return !getChargableStreets().containsKey(linkId) && (getVehicles().get(agentId) instanceof VehicleWithBattery);
+	private boolean ignoreAgent(Id agentId, Id linkId) {
+		return (samePowerAtAllLinks==null && !getChargableStreets().containsKey(linkId)) && !(getVehicles().get(agentId) instanceof VehicleWithBattery);
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
+		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
@@ -110,7 +114,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
+		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
@@ -128,11 +132,16 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 		Link link = network.getLinks().get(linkId);
 		double averageSpeedDrivenInMetersPerSecond = link.getLength() / timeSpendOnLink;
 
-		if (shouldLinkBeIgnored(linkLeaveTime, timeSpendOnLink, link, averageSpeedDrivenInMetersPerSecond)) {
+		if (shouldLinkBeIgnored(linkEnterTime, linkLeaveTime)) {
 			return;
 		}
 
-		double availablePowerInWatt = getChargableStreets().get(linkId);
+		double availablePowerInWatt;
+		if (samePowerAtAllLinks!=null){
+			availablePowerInWatt=samePowerAtAllLinks;
+		} else {
+			availablePowerInWatt = getChargableStreets().get(linkId);
+		}
 
 		double chargableEnergyInJoules = availablePowerInWatt * timeSpendOnLink;
 
@@ -154,26 +163,18 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 
 	}
 
-	private boolean shouldLinkBeIgnored(double linkLeaveTime, double timeSpendOnLink, Link link,
-			double averageSpeedDrivenInMetersPerSecond) {
-		return timeSpendOnLink == linkLeaveTime || averageSpeedDrivenInMetersPerSecond > link.getFreespeed();
+	private boolean shouldLinkBeIgnored(double linkEnterTime, double linkLeaveTime) {
+		return linkEnterTime == linkLeaveTime;
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (isAgentAndLinkRelevantForProcessing(event.getPersonId(), event.getLinkId())) {
+		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
 
 		Id personId = event.getPersonId();
 		linkEnterTime.put(personId, event.getTime());
-	}
-
-	public void allStreetsCanChargeWithPower(double powerInWatt) {
-		setChargableStreets(new DoubleValueHashMap<Id>());
-		for (Id linkId : network.getLinks().keySet()) {
-			getChargableStreets().put(linkId, powerInWatt);
-		}
 	}
 
 	public ChargingOutputLog getLog() {
@@ -195,4 +196,20 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	public void setChargableStreets(DoubleValueHashMap<Id> chargableStreets) {
 		this.chargableStreets = chargableStreets;
 	}
+
+	public void setSamePowerAtAllStreets(double powerInWatt) {
+		samePowerAtAllLinks = powerInWatt;
+	}
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		if (samePowerAtAllLinks == null) {
+			return;
+		}
+
+		if (getChargableStreets() != null && getChargableStreets().size() > 0) {
+			DebugLib.stopSystemAndReportInconsistency("when using method 'setSamePowerAtAllStreets', manipulation of individual roads not allowed ");
+		}
+	}
+
 }

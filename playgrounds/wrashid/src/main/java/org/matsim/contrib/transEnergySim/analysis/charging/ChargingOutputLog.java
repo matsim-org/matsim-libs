@@ -21,6 +21,8 @@ package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import java.util.LinkedList;
 
+import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionLogRow;
+
 public abstract class ChargingOutputLog {
 	
 	
@@ -50,11 +52,19 @@ public abstract class ChargingOutputLog {
 	public abstract String getTitleRowFileOutput();
 	
 	public void printToConsole(){
-		//TODO:implement this.
+		System.out.println(getTitleRowFileOutput());
+		
+		for (ChargingLogRow row:log){
+			System.out.println(row.getAgentId() + "\t" + row.getLinkIdOrFacilityId() + "\t" + row.getStartChargingTime() + "\t" + row.getChargingDuration() + "\t" + row.getEnergyChargedInJoule() );
+		}
 	}
 	
 	public void writeToFile(String outputFile){
 		//TODO:implement this.
+	}
+	
+	public int size(){
+		return log.size();
 	}
 	
 	
