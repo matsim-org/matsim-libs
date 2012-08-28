@@ -6,14 +6,14 @@ graphics.off()
 colors<-c(1:6) #colors for modes - will be repeated if necessary - use colours for a bigger variety
 modeOrder<- c("ride", "car", "bike", "undefined", "pt", "walk")
 groupOrder<- c("URBAN", "COMMUTER", "REV_COMMUTER", "FREIGHT")
-caseOrder<- c("BaseCase", "Factor 1", "Factor 20")
+caseOrder<- c("BaseCase", "Internalization", "Zone30")
 
 #read files and set directories
 directory <- commandArgs()[3]
 
-BaCFile <- file.path(directory,"avgTTInformation_1.txt")
-Z30File <- file.path(directory,"avgTTInformation_16.txt")
-PriFile <- file.path(directory,"avgTTInformation_20.txt")
+BaCFile <- file.path(directory,"avgTTInformation_baseCase_ctd_newCode.txt")
+PriFile <- file.path(directory,"avgTTInformation_policyCase_pricing_newCode.txt")
+Z30File <- file.path(directory,"avgTTInformation_policyCase_zone30.txt")
 
 BaC <- read.table(file = BaCFile, header=T, sep = "\t", comment.char="")
 Z30 <- read.table(file = Z30File, header=T, sep = "\t", comment.char="")
@@ -21,8 +21,8 @@ Pri <- read.table(file = PriFile, header=T, sep = "\t", comment.char="")
 
 outputFile <- file.path(commandArgs()[4], "ModalSplitByGroups.pdf")
 rownames(BaC)<-paste(BaC[,"mode"], BaC[,"user.group"])
-rownames(Z30)<-paste(Z30[,"mode"], Z30[,"user.group"])
 rownames(Pri)<-paste(Pri[,"mode"], Pri[,"user.group"])
+rownames(Z30)<-paste(Z30[,"mode"], Z30[,"user.group"])
 
 #organise needed data as array
 data<- array(dim=c(length(modeOrder), length(caseOrder), length(groupOrder)), dimnames=list(modeOrder, caseOrder, groupOrder)) 
@@ -36,13 +36,13 @@ for (case in caseOrder){
 				summe<- sum(subset(BaC[,"departures"], BaC$user.group==group))
 				data[mode, case, group]<- BaC[paste(mode, group), "departures"]/summe*100
 			}
-			if(case == "Factor 20"){
-				summe<- sum(subset(Z30[,"departures"], Z30$user.group==group))
-				data[mode, case, group]<- Z30[paste(mode, group), "departures"]/summe*100			
-			}
-			if(case == "Factor 40"){
+			if(case == "Internalization"){
 				summe<- sum(subset(Pri[,"departures"], Pri$user.group==group))
 				data[mode, case, group]<- Pri[paste(mode, group), "departures"]/summe*100
+			}
+			if(case == "Zone30"){
+				summe<- sum(subset(Z30[,"departures"], Z30$user.group==group))
+				data[mode, case, group]<- Z30[paste(mode, group), "departures"]/summe*100			
 			}
 			#set NA to 0 
 			if(is.na(data[mode,case,group])){
