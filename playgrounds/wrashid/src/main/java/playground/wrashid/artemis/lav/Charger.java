@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -19,7 +20,6 @@ import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyCon
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.MathLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.artemis.output.*;
 import playground.wrashid.artemis.smartCharging.ChargingTime;
 import playground.wrashid.artemis.smartCharging.SmartCharger;

@@ -17,46 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
+package org.matsim.contrib.parking.lib.obj;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
+public class CollectionLib {
 
-public class EnergyConsumptionOutputLog {
-
-	private LinkedList<EnergyConsumptionLogRow> log;
-
-	public EnergyConsumptionOutputLog() {
-		reset();
+	/**
+	 * TODO: move method to approporaite place where the data structures are
+	 * located.
+	 * 
+	 * @param hm
+	 */
+	public static void printHashmapToConsole(HashMap hm) {
+		for (Object key : hm.keySet()) {
+			if (key == null) {
+				System.out.println("null" + "\t" + hm.get(key));
+			} else {
+				System.out.println(key.toString() + "\t" + hm.get(key));
+			}
+		}
 	}
-
-	public void reset() {
-		log = new LinkedList<EnergyConsumptionLogRow>();
-	}
-
-	public void add(EnergyConsumptionLogRow row) {
-		log.add(row);
-	}
-
-	public EnergyConsumptionLogRow get(int i) {
-		return log.get(i);
-	}
-
-	public int getNumberOfEntries() {
-		return log.size();
-	}
-
-	public String getTitleRowFileOutput() {
-		return "";
-	}
-
-	public void printToConsole() {
-		// TODO:implement this.
-	}
-
-	public void writeToFile(String outputFile) {
-		// TODO:implement this.
-	}
-
+	
 }

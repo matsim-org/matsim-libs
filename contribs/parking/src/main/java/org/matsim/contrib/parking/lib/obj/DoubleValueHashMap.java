@@ -1,11 +1,9 @@
-package playground.wrashid.lib.obj;
+package org.matsim.contrib.parking.lib.obj;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
-
-import playground.wrashid.lib.GeneralLib;
 
 /**
  * Often one needs a HashMap, where the value can be incremented and
@@ -69,7 +67,7 @@ public class DoubleValueHashMap<KeyClass> {
 	}
 	
 	public void printToConsole(){
-		GeneralLib.printHashmapToConsole(hm);
+		CollectionLib.printHashmapToConsole(hm);
 	}
 	
 	public KeyClass getKeyForMaxValue(){

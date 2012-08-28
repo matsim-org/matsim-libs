@@ -26,6 +26,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -37,7 +38,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**

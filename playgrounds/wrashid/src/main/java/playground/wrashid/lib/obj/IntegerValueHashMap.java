@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.matsim.contrib.parking.lib.obj.CollectionLib;
+
 import playground.wrashid.lib.GeneralLib;
 
 /**
@@ -72,7 +74,7 @@ public class IntegerValueHashMap<KeyClass> {
 	}
 
 	public void printToConsole() {
-		GeneralLib.printHashmapToConsole(hm);
+		CollectionLib.printHashmapToConsole(hm);
 	}
 
 	

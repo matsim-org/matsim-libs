@@ -5,11 +5,11 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.list.Lists;
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutput;
@@ -47,7 +48,6 @@ import org.matsim.core.controler.listener.StartupListener;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 
 /**
  * This class should work both with jdeqsim and mobsim.

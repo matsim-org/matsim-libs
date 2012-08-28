@@ -23,6 +23,8 @@ package playground.wrashid.lib.obj;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+
 public class TwoKeyHashMapsWithDouble<ClassKey1,ClassKey2> {
 
 	// TODO: write test

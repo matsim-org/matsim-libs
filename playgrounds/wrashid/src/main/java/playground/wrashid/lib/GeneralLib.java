@@ -767,21 +767,7 @@ public class GeneralLib {
 		return readStringMatrix(fileName, delim, null);
 	}
 
-	/**
-	 * TODO: move method to approporaite place where the data structures are
-	 * located.
-	 * 
-	 * @param hm
-	 */
-	public static void printHashmapToConsole(HashMap hm) {
-		for (Object key : hm.keySet()) {
-			if (key == null) {
-				System.out.println("null" + "\t" + hm.get(key));
-			} else {
-				System.out.println(key.toString() + "\t" + hm.get(key));
-			}
-		}
-	}
+	
 
 	public static void printLinkedListToConsole(LinkedList list) {
 		for (Object value : list) {

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
@@ -15,7 +16,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import playground.wrashid.lib.DebugLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 import playground.wrashid.lib.tools.facility.FacilityLib;

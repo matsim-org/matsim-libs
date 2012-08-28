@@ -40,7 +40,6 @@ import org.matsim.core.events.handler.EventHandler;
 import com.sun.tools.xjc.reader.internalizer.DOMForest.Handler;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 /**
  * @author wrashid
  *

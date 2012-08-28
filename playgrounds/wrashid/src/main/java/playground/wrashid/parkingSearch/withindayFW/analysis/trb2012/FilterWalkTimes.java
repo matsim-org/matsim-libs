@@ -20,10 +20,10 @@
 package playground.wrashid.parkingSearch.withindayFW.analysis.trb2012;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 

@@ -7,6 +7,7 @@ import java.util.PriorityQueue;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
@@ -16,7 +17,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.SortableMapObject;
 import playground.wrashid.lib.obj.list.Lists;
 

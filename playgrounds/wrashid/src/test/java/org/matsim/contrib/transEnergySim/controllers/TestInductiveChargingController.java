@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
@@ -38,7 +39,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 /**
  * @author wrashid
  *

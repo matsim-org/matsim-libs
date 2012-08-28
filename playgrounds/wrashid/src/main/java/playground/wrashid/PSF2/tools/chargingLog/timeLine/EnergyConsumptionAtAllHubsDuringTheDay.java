@@ -3,10 +3,10 @@ package playground.wrashid.PSF2.tools.chargingLog.timeLine;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 
 import playground.wrashid.artemis.hubs.LinkHubMapping;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 
 public class EnergyConsumptionAtAllHubsDuringTheDay {

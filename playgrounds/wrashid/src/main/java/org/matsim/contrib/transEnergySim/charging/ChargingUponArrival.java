@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.analysis.charging.StationaryChargingOutput;
@@ -47,7 +48,6 @@ import org.matsim.core.facilities.ActivityOption;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 
 /**
  * This module is not compatible with parking search, but should be with parking

@@ -27,6 +27,7 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -35,7 +36,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.Collections;
-import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
