@@ -2,6 +2,8 @@ package playground.wrashid.lib.obj.list;
 
 import java.util.ArrayList;
 
+import org.matsim.contrib.parking.lib.obj.list.Lists;
+
 import junit.framework.TestCase;
 
 public class ListsTest extends TestCase {

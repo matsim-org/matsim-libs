@@ -3,6 +3,8 @@ package playground.wrashid.lib.obj;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.matsim.contrib.parking.lib.obj.StringMatrix;
+
 import junit.framework.TestCase;
 
 public class StringMatrixTest extends TestCase{

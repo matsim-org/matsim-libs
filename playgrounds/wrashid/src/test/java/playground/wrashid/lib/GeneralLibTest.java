@@ -21,10 +21,11 @@ package playground.wrashid.lib;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.StringMatrix;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.lib.obj.StringMatrix;
 
 public class GeneralLibTest extends MatsimTestCase {
 
