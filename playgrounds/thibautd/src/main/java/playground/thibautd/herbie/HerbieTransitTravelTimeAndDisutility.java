@@ -85,7 +85,8 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 			// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
 			// be the same as the marginal opprotunity cost of time).  kai, nov'11
 			double cost = 
-				-distanceScoring.getWalkScore(
+				HerbieRoutingWalkCostEstimator.getWalkCost(
+						config,
 						link.getLength(),
 						CONSIDER_NEGATIVE_WALK_TIMES || (walktime > 0) ? walktime : 0 )
 			    -waittime * config.getMarginalUtiltityOfWaiting_utl_s()
