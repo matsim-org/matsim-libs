@@ -1,4 +1,4 @@
-package playground.wrashid.lib.obj;
+package org.matsim.contrib.parking.lib.obj;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
