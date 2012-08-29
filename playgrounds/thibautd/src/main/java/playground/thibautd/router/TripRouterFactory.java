@@ -24,72 +24,107 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 
 /**
  * Allows to create {@link TripRouter} instances, and gives access to factories
  * for the basic elements used for routing.
  * <br>
  * The actual result of the {@link #createTripRouter()} method can be customized
- * by providing a {@link TripRouterBuilder} to the constructor.
+ * by changing the registered factories (see the <tt>setSomething<tt> methods below).
+ * <br>
+ * Moreover, this class provides access to its member fields, in case they
+ * would be needed to initialise a routing module.
  *
  * @author thibautd
  */
 public class TripRouterFactory implements MatsimFactory {
 	private final Network network;
 	private final TravelDisutilityFactory travelCostCalculatorFactory;
-	private final PersonalizableTravelTimeFactory travelTimeFactory;
+	private final TravelTimeFactory travelTimeFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
 	private final ModeRouteFactory modeRouteFactory;
+	private final PopulationFactory populationFactory;
 
 	private final Map<String, RoutingModuleFactory> routingModulesFactories =
 		new HashMap<String, RoutingModuleFactory>();
 
 	/**
+	 * Initialises an instance, with an empty list of routing modules.
 	 *
-	 * @param network
-	 * @param travelCostCalculatorFactory
-	 * @param travelTimeFactory
-	 * @param leastCostPathAlgoFactory
-	 * @param modeRouteFactory
-	 * @param builder
+	 * @param network the network to route on.
+	 * @param travelCostCalculatorFactory the factory for the travel disutility
+	 * calculator used in netwrok-based routing.
+	 * @param travelTimeFactory the factory for the travel time estimator used in
+	 * network-based routing. Typically, it will return always the same instance
+	 * of a {@link TravelTimeCalculator}.
+	 * @param leastCostPathAlgoFactory the factory to use to get least-cost path
+	 * algorithms
+	 * @param modeRouteFactory the {@link ModeRouteFactory} to use to create routes.
+	 * Note that it is not guaranteed that all routing modules will use it...
 	 */
 	public TripRouterFactory(
 			final Network network,
 			final TravelDisutilityFactory travelCostCalculatorFactory,
-			final PersonalizableTravelTimeFactory travelTimeFactory,
+			final TravelTimeFactory travelTimeFactory,
 			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
+			final PopulationFactory populationFactory,
 			final ModeRouteFactory modeRouteFactory) {
 		this.network = network;
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 		this.travelTimeFactory = travelTimeFactory;
 		this.leastCostPathAlgorithmFactory = leastCostPathAlgoFactory;
 		this.modeRouteFactory = modeRouteFactory;
+		this.populationFactory = populationFactory;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// getters
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * @return the registered network
+	 */
 	public Network getNetwork() {
 		return network;
 	}
 
-	public TravelDisutilityFactory getTravelCostCalculatorFactory() {
+	/**
+	 * @return the registered travel disutility calculator
+	 */
+	public TravelDisutilityFactory getTravelDisutilityFactory() {
 		return travelCostCalculatorFactory;
 	}
 
-	public PersonalizableTravelTimeFactory getTravelTimeCalculatorFactory() {
+	/**
+	 * @return the registered travel time estimator factory
+	 */
+	public TravelTimeFactory getTravelTimeFactory() {
 		return travelTimeFactory;
 	}
 
+	/**
+	 * @return the registered mode route factory
+	 */
 	public ModeRouteFactory getModeRouteFactory() {
 		return modeRouteFactory;
 	}
 
+	/**
+	 * @return the registered {@link PopulationFactory} instance.
+	 */
+	public PopulationFactory getPopulationFactory() {
+		return populationFactory;
+	}
+
+	/**
+	 * @return the registered least cost path factory
+	 */
 	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		return leastCostPathAlgorithmFactory;
 	}
@@ -108,7 +143,7 @@ public class TripRouterFactory implements MatsimFactory {
 	/**
 	 * Sets a factory for creating {@link RoutingModule}s for a given mode.
 	 * @param mainMode the main mode
-	 * @param moduleFactory the factory
+	 * @param moduleFactory the factory to associate to this mode
 	 * @return the previously registered factory, if any
 	 */
 	public RoutingModuleFactory setRoutingModuleFactory(
@@ -118,7 +153,8 @@ public class TripRouterFactory implements MatsimFactory {
 	}
 
 	/**
-	 * Creates a new {@link TripRouter} instance.
+	 * Creates a new {@link TripRouter} instance, using the registered
+	 * {@link RoutingModuleFactory}es.
 	 * @return a fully initialised {@link TripRouter}.
 	 */
 	public TripRouter createTripRouter() {
@@ -140,6 +176,12 @@ public class TripRouterFactory implements MatsimFactory {
 	 * implementations can be used.
 	 * This should only be used to change the way the "main mode"
 	 * is detected.
+	 * <br>
+	 * This method is called from {@link #createTripRouter()}, to
+	 * obtain the instance to configure and than return.
+	 *
+	 * @return a new {@link TripRouter} instance, with no routing modules
+	 * set.
 	 */
 	protected TripRouter initRouter() {
 		return new TripRouter();

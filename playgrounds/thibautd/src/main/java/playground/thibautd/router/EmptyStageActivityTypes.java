@@ -20,9 +20,14 @@
 package playground.thibautd.router;
 
 /**
+ * A {@link StageActivityTypes} that identifies no activity as a "stage activity".
+ * To use for modes for which no activities are generated.
  * @author thibautd
  */
 public final class EmptyStageActivityTypes implements StageActivityTypes {
+	/**
+	 * The only instance.
+	 */
 	public static final EmptyStageActivityTypes INSTANCE = new EmptyStageActivityTypes();
 
 	private EmptyStageActivityTypes() {}

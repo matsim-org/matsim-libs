@@ -40,8 +40,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * Subclass of {@link PlansCalcRoute}, actually relying on a {@link PlanRouter}
  * to do all operations.
- * This is just meant to ensure backward compatibility, and new could should by
- * no mean use it!
+ * This is just meant to ensure backward compatibility, and should not be used if
+ * possible.
  * <br>
  * The functionality of {@link PlansCalcRoute} has been split over the following classes:
  *

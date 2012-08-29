@@ -57,7 +57,7 @@ public class TripRouter {
 	// setters / getters
 	// /////////////////////////////////////////////////////////////////////////
 	/**
-	 * Sets the {@link RoutingModule} to use for the given (main) mode
+	 * Sets the {@link RoutingModule} to use for the given (main) mode.
 	 * @param mainMode the mode
 	 * @param module the module to use with this mode
 	 * @return the previously registered {@link RoutingModule} for this mode if any, null otherwise.
@@ -76,7 +76,7 @@ public class TripRouter {
 	}
 
 	/**
-	 * Gives access to the stage activity types, for all modes
+	 * Gives access to the stage activity types, for all modes.
 	 * @return a {@link StageActivityTypes} considering all registered modules
 	 */
 	public StageActivityTypes getStageActivityTypes() {
@@ -111,10 +111,24 @@ public class TripRouter {
 		return tripsToLegs( plan , checker );
 	}
 
+	/**
+	 * The same as {@link #tripsToLeg(Plan)}, but allowing to use
+	 * a specific {@link StageActivityTypes} instance.
+	 * @param plan the plan to analyse
+	 * @param checker the checker to use
+	 * @return the plan structure. See {@link #tripsToLeg(Plan)} for details.
+	 */
 	public List<PlanElement> tripsToLegs(final Plan plan, final StageActivityTypes checker) {
 		return tripsToLegs( plan.getPlanElements() , checker );
 	}
 
+	/**
+	 * The same as {@link #tripsToLeg(List)}, but allowing to use
+	 * a specific {@link StageActivityTypes} instance.
+	 * @param plan the plan to analyse
+	 * @param checker the checker to use
+	 * @return the plan structure. See {@link #tripsToLeg(Plan)} for details.
+	 */
 	public List<PlanElement> tripsToLegs(final List<PlanElement> plan, final StageActivityTypes checker) {
 		List<PlanElement> simplifiedPlan = new ArrayList<PlanElement>();
 		List<PlanElement> currentTrip = new ArrayList<PlanElement>();
@@ -195,8 +209,10 @@ public class TripRouter {
 	/**
 	 * This is the method responsible for identifying the "main mode"
 	 * of the trip, that is, the mode to which is attached the routing module to use.
-	 *
-	 * Override to add new modes.
+	 * This default implementation considers a trip always starts by a leg, and
+	 * the main mode is the mode of the first leg.
+	 * <br>
+	 * Override to change that.
 	 */
 	protected String identifyMainMode(final List<PlanElement> trip) {
 		String mode = ((Leg) trip.get( 0 )).getMode();

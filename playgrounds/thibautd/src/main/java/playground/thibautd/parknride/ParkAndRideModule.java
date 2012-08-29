@@ -36,6 +36,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -118,9 +119,9 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					transitConfig,
 					controler.getConfig().planCalcScore());
 
-		PersonalizableTravelTime carTime = tripRouterFactory.getTravelTimeCalculatorFactory().createTravelTime();
+		TravelTime carTime = tripRouterFactory.getTravelTimeFactory().createTravelTime();
 		TravelDisutility carCost =
-			tripRouterFactory.getTravelCostCalculatorFactory().createTravelDisutility(
+			tripRouterFactory.getTravelDisutilityFactory().createTravelDisutility(
 					carTime, controler.getConfig().planCalcScore() );
 		TransitRouterNetworkTravelTimeAndDisutility ptTimeCost =
 					new TransitRouterNetworkTravelTimeAndDisutility( transitConfig );

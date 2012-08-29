@@ -32,6 +32,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -80,6 +81,26 @@ public class MultiLegRoutingControler extends Controler {
 	}
 
 	/**
+	 * creates an uninitialized trip router factory.
+	 * Allows to change easily the implementation of the trip router factory,
+	 * whithout having to reimplement the initialization routine.
+	 */
+	protected TripRouterFactory createUninitializedTripRouterFactory() {
+		 return new TripRouterFactory(
+				getNetwork(),
+				getTravelDisutilityFactory(),
+				new TravelTimeFactory() {
+					@Override
+					public TravelTime createTravelTime() {
+						return getTravelTimeCalculator();
+					}
+				},
+				getLeastCostPathCalculatorFactory(),
+				getPopulation().getFactory(),
+				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory());
+	}
+
+	/**
 	 * <b>Creates</b> a new router factory. Thus, modifying the returned instance
 	 * will not modify the next returned instances.
 	 * To customize the routing behaviour, the default {@link RoutingModule}s can be erased
@@ -88,28 +109,11 @@ public class MultiLegRoutingControler extends Controler {
 	 * @return a new {@link TripRouterFactory}
 	 */
 	public TripRouterFactory getTripRouterFactory() {
-		// initialise each time, as components may vary accross iterations
-		TravelTimeCalculatorFactory travelTimeFactory = getTravelTimeCalculatorFactory();
-		PersonalizableTravelTimeFactory persFactory;
-
-		if ( travelTimeFactory instanceof PersonalizableTravelTimeFactory ) {
-			persFactory = (PersonalizableTravelTimeFactory) travelTimeFactory;
-		}
-		else {
-			persFactory = new TravelTimeFactoryWrapper( getTravelTimeCalculator() );
-		}
-
-		TripRouterFactory factory =  new TripRouterFactory(
-				getNetwork(),
-				getTravelDisutilityFactory(),
-				persFactory,
-				getLeastCostPathCalculatorFactory(),
-				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory());
-
+		TripRouterFactory factory = createUninitializedTripRouterFactory();
+		
 		// Base modules
 		RoutingModuleFactory defaultFactory =
 			new DefaultRoutingModuleFactory(
-					getPopulation().getFactory(),
 					getConfig().plansCalcRoute(),
 					getConfig().planCalcScore());
 

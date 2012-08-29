@@ -113,9 +113,7 @@ public class RoutesTest {
 						new TeleportationLegRouter(
 							routeFactory,
 							config.plansCalcRoute().getWalkSpeed(),
-							config.plansCalcRoute().getBeelineDistanceFactor()),
-						null,
-						null));
+							config.plansCalcRoute().getBeelineDistanceFactor())));
 
 		FreespeedTravelTimeAndDisutility timeCost = new FreespeedTravelTimeAndDisutility( -1 , 1 , -1 );
 		ParkAndRideTravelTimeCost pnrTimeCost = new ParkAndRideTravelTimeCost( transitConfig , config.planCalcScore() );

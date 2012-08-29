@@ -29,6 +29,10 @@ import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.TripRouter;
 
 /**
+ * Removes trips and replaces them by legs.
+ * The aim is to simplify the plan before passing it to plan algorithms
+ * unable to handle multi-planElement trips.
+ * The plan must be re-routed before execution!
  * @author thibautd
  */
 public class TripsToLegModule extends AbstractMultithreadedModule {

@@ -30,6 +30,8 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
+ * Uses a TripsToLegModule to simplify trips before running subtour
+ * mode choice and re-routing
  * @author thibautd
  */
 public class SubtourModeChoiceStrategy implements PlanStrategy {

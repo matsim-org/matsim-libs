@@ -24,10 +24,11 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTimeFactory;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.router.TripRouter;
@@ -41,11 +42,12 @@ public class HitchHikingTripRouterFactory extends TripRouterFactory {
 	public HitchHikingTripRouterFactory(
 			final Network network,
 			final TravelDisutilityFactory travelCostCalculatorFactory,
-			final PersonalizableTravelTimeFactory travelTimeFactory,
+			final TravelTimeFactory travelTimeFactory,
 			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
+			final PopulationFactory populationFactory,
 			final ModeRouteFactory modeRouteFactory) {
 		super(network, travelCostCalculatorFactory, travelTimeFactory,
-				leastCostPathAlgoFactory, modeRouteFactory);
+				leastCostPathAlgoFactory, populationFactory, modeRouteFactory);
 	}
 
 	@Override

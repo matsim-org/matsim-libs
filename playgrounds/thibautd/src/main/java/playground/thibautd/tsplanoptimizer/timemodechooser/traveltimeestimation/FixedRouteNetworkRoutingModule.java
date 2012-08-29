@@ -46,6 +46,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -81,7 +82,7 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	private final boolean isLastLinkSimulated;
 	private final PopulationFactory populationFactory;
 	private final NetworkLegRouter routingModule;
-	private final PersonalizableTravelTime travelTime;
+	private final TravelTime travelTime;
 	private final TravelDisutility travelCost;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
 
@@ -101,8 +102,8 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 		this.isLastLinkSimulated = isLastLinkSimulated;
 
 		this.network = routerFactory.getNetwork();
-		this.travelTime = routerFactory.getTravelTimeCalculatorFactory().createTravelTime();
-		this.travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelDisutility( travelTime , scoreConfigGroup );
+		this.travelTime = routerFactory.getTravelTimeFactory().createTravelTime();
+		this.travelCost = routerFactory.getTravelDisutilityFactory().createTravelDisutility( travelTime , scoreConfigGroup );
 
 		routes = extractRoutes( plan , mainMode );
 
@@ -194,7 +195,9 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 			final NetworkRoute route,
 			final double departureTime,
 			final Person person) {
-		travelTime.setPerson( person );
+		if (travelTime instanceof PersonalizableTravelTime) {
+			((PersonalizableTravelTime) travelTime).setPerson( person );
+		}
 
 		double now = processDeparture( route.getStartLinkId() , departureTime );
 
@@ -244,7 +247,9 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		travelTime.setPerson( person );
+		if (travelTime instanceof PersonalizableTravelTime) {
+			((PersonalizableTravelTime) travelTime).setPerson( person );
+		}
 
 		Leg leg = populationFactory.createLeg( mode );
 		double tt = routingModule.routeLeg(

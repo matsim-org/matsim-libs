@@ -20,11 +20,16 @@
 package playground.thibautd.router;
 
 /**
- * Represent a list of activity types corresponding to stages in a trip.
+ * Represents a list of activity types corresponding to stages in a trip.
  * A trip is defined as the longest sequence of PlanElements containing only
  * legs and stage-type activities.
+ * <br>
+ * It is used by the {@link TripRouter} to detect trips, and can be used by
+ * replanning modules as a "black list" of activities not to touch.
+ * <br>
  * Equals and hashCode methods should be implemented so that two instances
  * of the same implementation returning the same results are considered equal.
+ * If it is not the case, replacement of a routing module may not work as expected.
  *
  * @author thibautd
  */

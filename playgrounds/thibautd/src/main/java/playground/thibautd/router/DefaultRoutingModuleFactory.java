@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -36,26 +35,25 @@ import org.matsim.core.router.TeleportationLegRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
- * Initialises default handlers for all modes except pt.
- * Used together with {@link TeleportationPtTripRouterBuilder}, it provides
- * MATSim defaults (the old PlansCalcRoute class).
- * It is compatible with transit (if it obtains an {@link IntermodalLeastCostPathCalculator},
- * it restrains the usable part to car).
+ * A {@link RoutingModuleFactory} able to generate default routing
+ * modules for the default set of modes.
  *
  * @author thibautd
  */
 public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 	private static final String UNDEFINED_MODE = "undefined";
+	/**
+	 * The list of modes for which this class is able to create routing modules.
+	 */
 	public static final List<String> HANDLED_MODES = Arrays.asList( new String[]
 			{TransportMode.car, TransportMode.pt, TransportMode.ride,
 				TransportMode.walk, TransportMode.transit_walk, TransportMode.bike, UNDEFINED_MODE});
 	private final PlansCalcRouteConfigGroup routeConfigGroup;
 	private final PlanCalcScoreConfigGroup scoreConfigGroup;
-	private final PopulationFactory populationFactory;
 
 	/**
 	 * Initialises an instance.
@@ -64,10 +62,8 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 	 * @param scoreConfigGroup the config group with score-related parameters
 	 */
 	public DefaultRoutingModuleFactory(
-			final PopulationFactory populationFactory,
 			final PlansCalcRouteConfigGroup routeConfigGroup,
 			final PlanCalcScoreConfigGroup scoreConfigGroup) {
-		this.populationFactory = populationFactory;
 		this.routeConfigGroup = routeConfigGroup;
 		this.scoreConfigGroup = scoreConfigGroup;
 	}
@@ -77,8 +73,8 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 			final String mainMode,
 			final TripRouterFactory routerFactory) {
 		Network network = routerFactory.getNetwork();
-		PersonalizableTravelTime travelTime = routerFactory.getTravelTimeCalculatorFactory().createTravelTime();
-		TravelDisutility travelCost = routerFactory.getTravelCostCalculatorFactory().createTravelDisutility( travelTime , scoreConfigGroup );
+		TravelTime travelTime = routerFactory.getTravelTimeFactory().createTravelTime();
+		TravelDisutility travelCost = routerFactory.getTravelDisutilityFactory().createTravelDisutility( travelTime , scoreConfigGroup );
 
 		LeastCostPathCalculatorFactory leastCostPathAlgoFactory = routerFactory.getLeastCostPathCalculatorFactory();
 		LeastCostPathCalculator routeAlgo = leastCostPathAlgoFactory.createPathCalculator(network, travelCost, travelTime);
@@ -97,88 +93,74 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 		if (routeConfigGroup.getTeleportedModeFreespeedFactors().containsKey( mainMode )) {
 			return new LegRouterWrapper(
 					mainMode,
-					populationFactory,
+					routerFactory.getPopulationFactory(),
 					new PseudoTransitLegRouter(
 						network,
 						routeAlgoPtFreeFlow,
 						routeConfigGroup.getTeleportedModeFreespeedFactors().get( mainMode ),
 						routeConfigGroup.getBeelineDistanceFactor(),
-						routeFactory),
-					travelCost,
-					travelTime);
+						routeFactory));
 		}
 
 		if (routeConfigGroup.getTeleportedModeSpeeds().containsKey( mainMode )) {
 			return new LegRouterWrapper(
 					mainMode,
-					populationFactory,
+					routerFactory.getPopulationFactory(),
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-						routeConfigGroup.getBeelineDistanceFactor()),
-					travelCost,
-					travelTime);
+						routeConfigGroup.getBeelineDistanceFactor()));
 		}
 
 		// mode was not a teleported one: set the default routing module
 		if ( mainMode.equals( TransportMode.car ) ) {
 			return new LegRouterWrapper(
 					TransportMode.car,
-					populationFactory,
+					routerFactory.getPopulationFactory(),
 					new NetworkLegRouter(
 						network,
 						routeAlgo,
-						routeFactory),
-					travelCost,
-					travelTime);
+						routeFactory));
 		}
 
 		if ( mainMode.equals( TransportMode.ride ) ) {
 			return new LegRouterWrapper(
 					TransportMode.ride,
-					populationFactory,
+					routerFactory.getPopulationFactory(),
 					new NetworkLegRouter(
 						network,
 						routeAlgo,
-						routeFactory),
-					travelCost,
-					travelTime);
+						routeFactory));
 		}
 
 		if ( mainMode.equals( TransportMode.bike ) ) {
 			return new LegRouterWrapper(
 					TransportMode.bike,
-					populationFactory,
+					routerFactory.getPopulationFactory(),
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getBikeSpeed(),
-						routeConfigGroup.getBeelineDistanceFactor()),
-					travelCost,
-					travelTime);
+						routeConfigGroup.getBeelineDistanceFactor()));
 		}
 
 		if ( mainMode.equals( TransportMode.walk ) || mainMode.equals( TransportMode.transit_walk ) ) {
 			return new LegRouterWrapper(
 					mainMode,
-					populationFactory,
+					routerFactory.getPopulationFactory(),
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getWalkSpeed(),
-						routeConfigGroup.getBeelineDistanceFactor()),
-					travelCost,
-					travelTime);
+						routeConfigGroup.getBeelineDistanceFactor()));
 		}
 
 		if ( mainMode.equals( UNDEFINED_MODE ) ) {
 			return new LegRouterWrapper(
 					UNDEFINED_MODE,
-					populationFactory,
+					routerFactory.getPopulationFactory(),
 					new TeleportationLegRouter(
 						routeFactory,
 						routeConfigGroup.getUndefinedModeSpeed(),
-						routeConfigGroup.getBeelineDistanceFactor()),
-					travelCost,
-					travelTime);
+						routeConfigGroup.getBeelineDistanceFactor()));
 		}
 
 		throw new IllegalArgumentException( "unhandled mode "+mainMode );

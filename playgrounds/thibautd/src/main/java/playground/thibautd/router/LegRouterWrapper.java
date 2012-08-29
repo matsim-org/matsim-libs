@@ -31,58 +31,43 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.router.LegRouter;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelDisutility;
 
 /**
  * Class wrapping a {@link LegRouter} in a {@link RoutingModule}.
+ * <br>
+ * It is meant only at using legacy code without adaptation.
+ * If you want to implement a new routing module, implement
+ * a {@link RoutingModule} directly!
  *
  * @author thibautd
  */
 public class LegRouterWrapper implements RoutingModule {
-	private static final StageActivityTypes EMPTY_CHECKER = new StageActivityTypesImpl( null );
-
 	private final String mode;
 	private final PopulationFactory populationFactory;
 	private final LegRouter wrapped;
-	private final TravelDisutility travelCost;
-	private final PersonalizableTravelTime travelTime;
 
 	/**
 	 * Initialises a wrapper.
 	 *
 	 * @param mode the mode to route
+	 * @param populationFactory the factory to use to create the return leg instance
 	 * @param toWrap the {@link LegRouter} to wrap
-	 * @param travelCost if the {@link LegRouter} uses (probably indirectly) a
-	 * {@link PersonalizableTravelDisutility}, it should be provided here. Otherwise,
-	 * it can be null. The person will be set at each travel time estimation.
-	 * @param travelTime  if the {@link LegRouter} uses (probably indirectly) a
-	 * {@link PersonalizableTravelTime}, it should be provided here. Otherwise,
-	 * it can be null. The person will be set at each travel time estimation.
 	 */
 	public LegRouterWrapper(
 			final String mode,
 			final PopulationFactory populationFactory,
-			final LegRouter toWrap,
-			final TravelDisutility travelCost,
-			final PersonalizableTravelTime travelTime) {
+			final LegRouter toWrap) {
 		this.mode = mode;
 		this.populationFactory = populationFactory;
 		this.wrapped = toWrap;
-		this.travelCost = travelCost;
-		this.travelTime = travelTime;
 	}
 
 	@Override
-	public List<PlanElement> calcRoute(
+	public List<? extends PlanElement> calcRoute(
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		if (travelTime != null) {
-			travelTime.setPerson( person );
-		}
-
 		Leg newLeg = populationFactory.createLeg( mode );
 		newLeg.setDepartureTime( departureTime );
 
@@ -96,12 +81,12 @@ public class LegRouterWrapper implements RoutingModule {
 		// otherwise, information may be lost
 		newLeg.setTravelTime( travTime );
 
-		return Arrays.asList( new PlanElement[]{ newLeg } );
+		return Arrays.asList( newLeg );
 	}
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return EMPTY_CHECKER;
+		return EmptyStageActivityTypes.INSTANCE;
 	}
 
 	private static class FacilityWrapper implements Activity {

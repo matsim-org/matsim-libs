@@ -24,7 +24,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * {@link StageActivityTypes} based on a list of types.
+ * Default implementation of a {@link StageActivityTypes}, based on a list of types.
  *
  * @author thibautd
  */

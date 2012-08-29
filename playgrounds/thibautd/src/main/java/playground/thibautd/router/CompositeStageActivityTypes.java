@@ -32,10 +32,28 @@ public class CompositeStageActivityTypes implements StageActivityTypes {
 	// set or list?
 	private final Collection<StageActivityTypes> checkers = new ArrayList<StageActivityTypes>();
 
+	/**
+	 * Adds a {@link StageActivityTypes} to the delegates
+	 * @param checker an instance which will be used to check whether an activity
+	 * type corresponds to a stage activity
+	 */
 	public void addActivityTypes(final StageActivityTypes checker) {
+		if (checker instanceof EmptyStageActivityTypes) {
+			// avoid having to loop through lots of those,
+			// which would be useless.
+			return;
+		}
 		checkers.add( checker );
 	}
 
+	/**
+	 * Removes the first registered {@link StageActivityTypes} instance
+	 * considered equal to the parameter instance
+	 * @param checker the instance to use to identify the instance to remove
+	 * @return true if an instance was actually removed, false otherwise.
+	 * Note that this will always return false for {@link EmptyStageActivityTypes}
+	 * instances.
+	 */
 	public boolean removeActivityTypes(final StageActivityTypes checker) {
 		return checkers.remove( checker );
 	}
