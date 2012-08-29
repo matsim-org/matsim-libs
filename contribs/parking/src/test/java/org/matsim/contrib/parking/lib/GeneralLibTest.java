@@ -57,7 +57,7 @@ public class GeneralLibTest extends MatsimTestCase {
 	}
 
 	public void testReadWriteMatrix(){
-		double[][] hubPriceInfoOriginal=GeneralLib.readMatrix(96, 4, false, "test/input/playground/wrashid/PSF/data/hubPriceInfo.txt");
+		double[][] hubPriceInfoOriginal=GeneralLib.readMatrix(96, 4, false, getClassInputDirectory() +  "tabTable.txt");
 
 		GeneralLib.writeMatrix(hubPriceInfoOriginal, getOutputDirectory() + "hubPriceInfo.txt", null);
 
@@ -112,7 +112,8 @@ public class GeneralLibTest extends MatsimTestCase {
 	}
 	
 	public void testReadStringMatrix(){
-		StringMatrix matrix=GeneralLib.readStringMatrix("test/input/playground/wrashid/PSF/data/hubPriceInfo.txt");
+		System.out.println();
+		StringMatrix matrix=GeneralLib.readStringMatrix(getClassInputDirectory() +  "tabTable.txt");
 		
 		assertEquals(96, matrix.getNumberOfRows());
 		assertEquals(4, matrix.getNumberOfColumnsInRow(0));
