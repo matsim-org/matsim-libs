@@ -4,11 +4,12 @@
 
 <!-- Author: Christoph Dobler -->
 
-<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes, informAgents, roadConditions)>
+<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes, informAgents, roadConditions, evacuationDecision)>
 
 <!ELEMENT evacuationTime	EMPTY>
 <!ATTLIST evacuationTime
-			time		CDATA				#REQUIRED>
+			time		CDATA				#REQUIRED
+			delay		CDATA				#REQUIRED>
 
 
 <!ELEMENT centerCoord		EMPTY>
@@ -79,3 +80,7 @@
 <!ATTLIST roadConditions
 			capacityFactor		CDATA	#REQUIRED
 			speedFactor			CDATA	#REQUIRED>
+
+<!ELEMENT evacuationDecision	EMPTY>
+<!ATTLIST evacuationDecision
+			behaviour			CDATA	#REQUIRED>
