@@ -72,8 +72,11 @@ import playground.southafrica.utilities.SouthAfricaInflationCorrector;
 import playground.southafrica.utilities.containers.MyZone;
 import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class NmbmQTBuilder {
 	private final static Logger LOG = Logger.getLogger(NmbmQTBuilder.class);
@@ -319,6 +322,7 @@ public class NmbmQTBuilder {
 					
 					/* Get the home location of the household. */
 					Point homePoint = this.zones.get(new IdImpl(sa[12])).getInteriorPoint();
+					Point altHomePoint = getRandomInteriorPoint(this.zones.get(new IdImpl(sa[12])));
 					homeCoord = new CoordImpl(homePoint.getX(), homePoint.getY());
 					
 					firstMember = false;
@@ -357,7 +361,6 @@ public class NmbmQTBuilder {
 				} else{
 					qtId = tryNewId;
 				}
-				
 				
 				/* Get the closest 20 people to the person's home location. */				
 				if(qtMap.containsKey(qtId)){
@@ -806,6 +809,40 @@ public class NmbmQTBuilder {
 			LOG.error("Couldn't find the index for the value " + value + " in the array " + classes);
 		}
 		return index;
+	}
+	
+	
+	private Point getRandomInteriorPoint(Geometry geometry){
+		Point p = null;
+		GeometryFactory gf = geometry.getFactory();
+		
+		/* First get the radius as the distance from the centroid to the
+		 * farthest from the four envelope corners. */
+		Coordinate c = geometry.getCentroid().getCoordinate(); 
+		double radius = Double.NEGATIVE_INFINITY;
+		Polygon envelope = (Polygon) geometry.getEnvelope();
+		Coordinate c1 = envelope.getCoordinates()[0];
+		Coordinate c2 = envelope.getCoordinates()[1];
+		Coordinate c3 = envelope.getCoordinates()[2];
+		Coordinate c4 = envelope.getCoordinates()[3];
+		radius = Math.max(radius, c.distance(c1));
+		radius = Math.max(radius, c.distance(c2));
+		radius = Math.max(radius, c.distance(c3));
+		radius = Math.max(radius, c.distance(c4));
+		
+		boolean found = false;
+		while(!found){
+			double randomAngle = MatsimRandom.getRandom().nextDouble()*2*Math.PI;
+			double randomRadius = MatsimRandom.getRandom().nextDouble()*radius;
+			double x = c.x + randomRadius*Math.cos(randomAngle);
+			double y = c.y + randomRadius*Math.sin(randomAngle);
+			p = geometry.getFactory().createPoint(new Coordinate(x, y));
+			if(geometry.contains(p)){
+				found = true;
+			}
+		}
+		
+		return p;
 	}
 
 }
