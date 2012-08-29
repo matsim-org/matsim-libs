@@ -39,12 +39,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 /**
  * @author Ihab
  *
+ * input File format: id;name;xCoord;yCoord;capacity
+ *
  */
 public class PRInputDataReader {
 	private static final Logger log = Logger.getLogger(PRInputDataReader.class);
 	
 	private Map<Id, PRInputData> id2PRInputData = new HashMap<Id, PRInputData>();
-
+	
 	public Map<Id, PRInputData> getId2prInputData(String prInputDataFile) {
 		BufferedReader br = null;
 	    try {
@@ -53,14 +55,28 @@ public class PRInputDataReader {
 	        int lineCounter = 0;
 	        while((line = br.readLine()) != null) {
 	            if (lineCounter > 0) {	            	
-	            	String[] parts = line.split(" ; ");
+	            	String[] parts = line.split(";");
+	            	
+	            	for (int i = 0 ; i <= parts.length; i++){
+	            		if (parts[i].isEmpty()){
+	        				throw new RuntimeException("The prInputFile " + prInputDataFile + " is not complete. Aborting...");
+	            		}
+	            	}
+	            	
 	            	PRInputData prInputData = new PRInputData();
-	            	prInputData.setId(new IdImpl(parts[0]));
-	            	prInputData.setStopName(parts[1]);
-	            	prInputData.setCoord(new CoordImpl(parts[2], parts[3]));
-	            	prInputData.setCapacity(Integer.parseInt(parts[4]));
+	            	
+	            	Id id = new IdImpl(parts[0]);
+	            	String name = parts[1];
+	            	double xCoord = Double.valueOf(parts[2]);
+	            	double yCoord = Double.valueOf(parts[3]);
+	            	int capacity = Integer.parseInt(parts[4]);
+	            	
+	            	prInputData.setId(id);
+		            prInputData.setStopName(name);
+	            	prInputData.setCoord(new CoordImpl(xCoord, yCoord));
+	            	prInputData.setCapacity(capacity);
 	            	this.id2PRInputData.put(prInputData.getId(), prInputData);
-	            }
+	            	}  	
 	            lineCounter++;
 	        }
 	    } catch(FileNotFoundException e) {

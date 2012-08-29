@@ -41,15 +41,15 @@ public class ParkAndRideGeneratorMain {
 	static String scheduleFile = "/Users/Ihab/Desktop/Berlin/berlinTransitSchedule.xml";
 	static String vehiclesFile = "/Users/Ihab/Desktop/Berlin/berlinTransitVehicles.xml";
 	
-	static boolean usePrInputFile = false; // uses a file to insert park-and-ride facilities
-	static String prInputFile = "/Users/Ihab/Desktop/Berlin/prInputData.txt";
+	static boolean usePrInputFile = true; // uses a file to insert park-and-ride facilities
+	static String prInputFile = "/Users/Ihab/Desktop/Berlin/prInputData_Berlin.csv";
 
-	static boolean useScheduleFile = true; // uses the schedule to insert park-and-ride facilities
-	static String filterType = "allTransitStops"; // defines at which stops park-and-ride is inserted (possible: allTransitStops, berlin)
+	static boolean useScheduleFile = false; // uses the schedule to insert park-and-ride facilities
+	static String filterType = "berlin"; // defines at which stops park-and-ride is inserted (possible: allTransitStops, berlin)
 	static int constantCapacity = 100000;
 	
 	static double extensionRadius = 10;
-	static int maxSearchSteps = 1000;
+	static int maxSearchSteps = 100;
 	
 	// parkAndRide Link Attributes:
 	private double linkCapacity = 2000;
@@ -58,9 +58,9 @@ public class ParkAndRideGeneratorMain {
 	private double nrOfLanes = 40;
 	
 	// outputFiles
-	static String outputPath = "/Users/Ihab/Desktop/PR_test/";
-	static String prFacilitiesFile = "prFacilities_allTransitStops.txt";
-	static String prNetworkFile = "berlinNetwork_PR.xml";
+	static String outputPath = "/Users/Ihab/Desktop/Berlin/";
+	static String prFacilitiesFile = "prFacilities_Berlin.txt";
+	static String prNetworkFile = "berlinNetwork_PR_Berlin.xml";
 	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
