@@ -34,6 +34,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
+import playground.andreas.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 import playground.andreas.aas.modules.ptTripAnalysis.BvgTripAnalysisRunnerV4;
 
 /**
@@ -77,8 +78,12 @@ public class AasRunner {
 		
 		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
 		ptAna.init(this.config, this.scenario, this.shapeFile);
-		anaModules.add(ptAna);
+		this.anaModules.add(ptAna);
 		this.eventsManager.addHandler(ptAna);
+		
+		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
+		distAna.init(this.scenario, 15);
+		this.anaModules.add(distAna);
 	}
 
 	public void preProcess(){
