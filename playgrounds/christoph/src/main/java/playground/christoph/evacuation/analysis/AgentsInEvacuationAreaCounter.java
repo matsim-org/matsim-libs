@@ -66,7 +66,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 
 /**
  * Counts the number of agents within an evacuated area.
@@ -91,7 +92,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected final Scenario scenario;
 	protected final Set<String> transportModes;
 	protected final CoordAnalyzer coordAnalyzer;
-	protected final PopulationAdministration popAdmin;
+	protected final DecisionDataProvider decisionDataProvider;
 	protected final double scaleFactor;
 	
 	protected Set<Id> activityAgentsInEvacuationArea;
@@ -110,13 +111,16 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected Map<String, int[]> legBinsNotParticipating;
 	protected Map<Id, Tuple<String, Double>> leftByMode;
 	
+	protected Map<Integer, Set<Id>> undefinedActivityAgentBins;
+	protected Map<Integer, Map<String, Set<Id>>> undefinedLegAgentBins;
+	
 	public AgentsInEvacuationAreaCounter(Scenario scenario, Set<String> transportModes, CoordAnalyzer coordAnalyzer,
-			PopulationAdministration popAdmin, double scaleFactor) {
+			DecisionDataProvider decisionDataProvider, double scaleFactor) {
 		this.scenario = scenario;
 		this.transportModes = transportModes;
 		this.coordAnalyzer = coordAnalyzer;
 		this.scaleFactor = scaleFactor;
-		this.popAdmin = popAdmin;
+		this.decisionDataProvider = decisionDataProvider;
 		
 		init();
 	}
@@ -135,6 +139,8 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		legBins = new TreeMap<String, int[]>();
 		legBinsParticipating = new TreeMap<String, int[]>();
 		legBinsNotParticipating = new TreeMap<String, int[]>();
+		undefinedActivityAgentBins = new HashMap<Integer, Set<Id>>();
+		undefinedLegAgentBins = new HashMap<Integer, Map<String, Set<Id>>>();
 		
 		for (String string : transportModes) {
 			legAgentsInEvacuationArea.put(string, new HashSet<Id>());
@@ -350,6 +356,8 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		driverVehicleMap.clear();
 		vehiclePassengersMap.clear();
 		activityBins = new int[nofBins];
+		undefinedActivityAgentBins.clear();
+		undefinedLegAgentBins.clear();
 		
 		for (String string : transportModes) {
 			legAgentsInEvacuationArea.put(string, new HashSet<Id>());
@@ -366,7 +374,8 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 		// debug
 		for (Id id : activityAgentsInEvacuationArea) {
-			if (this.popAdmin.isAgentParticipating(id)) {
+			Participating participating = this.decisionDataProvider.getPersonDecisionData(id).getParticipating();
+			if (participating == Participating.TRUE) {
 				log.warn("Person " + id.toString() + " is still inside the evacuation area but should have left.");				
 			}
 		}
@@ -374,6 +383,9 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		// ensure, that the last bin is written
 		updateBinData(currentBin + 1);
 
+		// now process data that has been collected before agents have decided whether to evacuate or not
+		postProcessUndefinedAgents();
+		
 		String fileName = null;
 
 		AgentsInEvacuationAreaWriter writer = new AgentsInEvacuationAreaWriter(this.binSize, event.getIteration());
@@ -509,24 +521,25 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			notParticipatingLeftByModeBins.put(transportMode, new int[nofBins]);
 		}
 		for (Entry<Id, Tuple<String, Double>> entry : this.leftByMode.entrySet()) {
-			boolean isParticipating = this.popAdmin.isAgentParticipating(entry.getKey());
+			Participating participating = this.decisionDataProvider.getPersonDecisionData(entry.getKey()).getParticipating();
 			Tuple<String, Double> tuple = entry.getValue();
 			String transportMode = tuple.getFirst();
 			double time = tuple.getSecond();
 			
-			if (isParticipating) {
+			if (participating == Participating.TRUE) {
 				int count = participatingEvacueesPerMode.get(transportMode);
 				participatingEvacueesPerMode.put(transportMode, count + 1);
 				
 				int binIndex = getBinIndex(time);
 				participatingLeftByModeBins.get(transportMode)[binIndex] = participatingLeftByModeBins.get(transportMode)[binIndex] + 1;
-			} else {
+			} else if (participating == Participating.FALSE) {
 				int count = notParticipatingEvacueesPerMode.get(transportMode);
 				notParticipatingEvacueesPerMode.put(transportMode, count + 1);
 				
 				int binIndex = getBinIndex(time);
 				notParticipatingLeftByModeBins.get(transportMode)[binIndex] = notParticipatingLeftByModeBins.get(transportMode)[binIndex] + 1;
-			}
+			} 
+			else throw new RuntimeException("Cannot handle agent since its participation state is undefined.");
 		}
 		
 		/*
@@ -629,35 +642,96 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		if (binIndex > currentBin) {
 
 			int participatingActivityAgents = 0;
-			Map<String, Integer> participatingLegAgents = new HashMap<String, Integer>();
+			int notParticipatingActivityAgents = 0;
+			Set<Id> undefinedActivityAgents = new HashSet<Id>();
 			for (Id activityAgentId : activityAgentsInEvacuationArea) {
-				if (this.popAdmin.isAgentParticipating(activityAgentId)) participatingActivityAgents++;
+				Participating participating = this.decisionDataProvider.getPersonDecisionData(activityAgentId).getParticipating();
+				if (participating == Participating.TRUE) participatingActivityAgents++;
+				else if (participating == Participating.FALSE) notParticipatingActivityAgents++;
+				else if (participating == Participating.UNDEFINED) undefinedActivityAgents.add(activityAgentId);
+				else throw new RuntimeException("Undefined participation state found: " + participating.toString());
 			}
-			for (String string : transportModes) {
+			
+			Map<String, Integer> participatingLegAgents = new HashMap<String, Integer>();
+			Map<String, Integer> notParticipatingLegAgents = new HashMap<String, Integer>();
+			Map<String, Set<Id>> undefinedLegAgents = new HashMap<String, Set<Id>>();
+			for (String transportMode : transportModes) {
 				int participatingAgents = 0;
-				for (Id legAgentId : legAgentsInEvacuationArea.get(string)) {
-					if (this.popAdmin.isAgentParticipating(legAgentId)) participatingAgents++;
+				int notParticipatingAgents = 0;
+				Set<Id> undefinedAgents = new HashSet<Id>();
+				for (Id legAgentId : legAgentsInEvacuationArea.get(transportMode)) {
+					Participating participating = this.decisionDataProvider.getPersonDecisionData(legAgentId).getParticipating();
+					if (participating == Participating.TRUE) participatingAgents++;
+					else if (participating == Participating.FALSE) notParticipatingAgents++;
+					else if (participating == Participating.UNDEFINED) undefinedAgents.add(legAgentId);
+					else throw new RuntimeException("Undefined participation state found: " + participating.toString());
 				}
-				participatingLegAgents.put(string, participatingAgents);
+				participatingLegAgents.put(transportMode, participatingAgents);
+				notParticipatingLegAgents.put(transportMode, notParticipatingAgents);
+				undefinedLegAgents.put(transportMode, undefinedAgents);
 			}
 			
 			// for all not processed past bins
 			for (int index = currentBin; index < binIndex; index++) {
 				activityBins[index] = (int) Math.round(activityAgentsInEvacuationArea.size() * scaleFactor);
 				activityBinsParticipating[index] = (int) Math.round(participatingActivityAgents * scaleFactor);
-				activityBinsNotParticipating[index] = 
-					(int) Math.round((activityAgentsInEvacuationArea.size() - participatingActivityAgents) * scaleFactor);
+				activityBinsNotParticipating[index] = (int) Math.round(notParticipatingActivityAgents * scaleFactor);
+				undefinedActivityAgentBins.put(index, undefinedActivityAgents);
 				
-				for (String string : transportModes) {
-					legBins.get(string)[index] = (int) Math.round(legAgentsInEvacuationArea.get(string).size() * scaleFactor);
-					legBinsParticipating.get(string)[index] = (int) Math.round(participatingLegAgents.get(string) * scaleFactor);
-					legBinsNotParticipating.get(string)[index] =  
-						(int) Math.round((legAgentsInEvacuationArea.get(string).size() - participatingLegAgents.get(string)) * scaleFactor);
+				for (String transportMode : transportModes) {
+					legBins.get(transportMode)[index] = (int) Math.round(legAgentsInEvacuationArea.get(transportMode).size() * scaleFactor);
+					legBinsParticipating.get(transportMode)[index] = (int) Math.round(participatingLegAgents.get(transportMode) * scaleFactor);
+					legBinsNotParticipating.get(transportMode)[index] = (int) Math.round(notParticipatingLegAgents.get(transportMode) * scaleFactor);
 				}
+				undefinedLegAgentBins.put(index, undefinedLegAgents);
 			}
 
 		}
 
 		currentBin = binIndex;
+	}
+	
+	private void postProcessUndefinedAgents() {
+		
+		Set<Integer> bins = undefinedActivityAgentBins.keySet();
+		for (int index : bins) {
+			
+			int participatingActivityAgents = 0;
+			int notParticipatingActivityAgents = 0;
+			for (Id activityAgentId : undefinedActivityAgentBins.get(index)) {
+				Participating participating = this.decisionDataProvider.getPersonDecisionData(activityAgentId).getParticipating();
+				if (participating == Participating.TRUE) participatingActivityAgents++;
+				else if (participating == Participating.FALSE) notParticipatingActivityAgents++;
+				else if (participating == Participating.UNDEFINED) {
+					throw new RuntimeException("Participation state still UNDEFINED: " + activityAgentId.toString());
+				}
+				else throw new RuntimeException("Unexpected participation state found: " + participating.toString());
+			}
+
+			// update activity bin arrays
+			activityBinsParticipating[index] = activityBinsParticipating[index] + (int) Math.round(participatingActivityAgents * scaleFactor);
+			activityBinsNotParticipating[index] = activityBinsNotParticipating[index] + (int) Math.round(notParticipatingActivityAgents * scaleFactor);
+			
+			for (String transportMode : transportModes) {
+				
+				int participatingLegAgents = 0;
+				int notParticipatingLegAgents = 0;
+				for (Id legAgentId : undefinedLegAgentBins.get(index).get(transportMode)) {
+					Participating participating = this.decisionDataProvider.getPersonDecisionData(legAgentId).getParticipating();
+					if (participating == Participating.TRUE) participatingLegAgents++;
+					else if (participating == Participating.FALSE) notParticipatingLegAgents++;
+					else if (participating == Participating.UNDEFINED) {
+						throw new RuntimeException("Participation state still UNDEFINED: " + legAgentId.toString());
+					}
+					else throw new RuntimeException("Unexpected participation state found: " + participating.toString());
+				}
+				
+				// update leg bin arrays
+				legBinsParticipating.get(transportMode)[index] = legBinsParticipating.get(transportMode)[index] +
+						(int) Math.round(participatingLegAgents * scaleFactor);
+				legBinsNotParticipating.get(transportMode)[index] = legBinsNotParticipating.get(transportMode)[index] + 
+						(int) Math.round(notParticipatingLegAgents * scaleFactor);
+			}			
+		}
 	}
 }

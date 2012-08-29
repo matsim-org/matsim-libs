@@ -26,24 +26,24 @@ import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 
 public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
-	private final HouseholdsTracker householdsTracker;
+	private final DecisionDataProvider decisionDataProvider;
 	private final JoinedHouseholdsIdentifier identifier;
 	private final PTTravelTimeKTIFactory ptTravelTimeFactory;
 	
 	public JoinedHouseholdsReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
-			HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier,
+			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
 			PTTravelTimeKTIFactory ptTravelTimeFactory) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
-		this.householdsTracker = householdsTracker;
+		this.decisionDataProvider = decisionDataProvider;
 		this.identifier = identifier;
 		this.ptTravelTimeFactory = ptTravelTimeFactory;
 	}
@@ -51,7 +51,7 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new JoinedHouseholdsReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), householdsTracker, identifier,
+				this.getReplanningManager().getInternalInterface(), decisionDataProvider, identifier,
 				ptTravelTimeFactory.createTravelTime());
 		super.initNewInstance(replanner);
 		return replanner;

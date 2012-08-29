@@ -45,7 +45,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
@@ -58,14 +57,11 @@ public class HouseholdsTracker extends AgentsTracker implements
 	private int infoTime = 0;
 	private static final int INFO_PERIOD = 3600;
 	
-	private final ObjectAttributes householdObjectAttributes;
 	private final Set<Id> householdsToUpdate;
 	private final Map<Id, Id> personHouseholdMap;
 	private final Map<Id, HouseholdPosition> householdPositions;
 	
-	public HouseholdsTracker(ObjectAttributes householdObjectAttributes) {
-		this.householdObjectAttributes = householdObjectAttributes;
-		
+	public HouseholdsTracker() {		
 		this.householdsToUpdate = new HashSet<Id>();
 		this.personHouseholdMap = new HashMap<Id, Id>();
 		this.householdPositions = new HashMap<Id, HouseholdPosition>();
@@ -75,18 +71,10 @@ public class HouseholdsTracker extends AgentsTracker implements
 		return this.personHouseholdMap.get(personId);
 	}
 	
-	public HouseholdPosition getPersonsHouseholdPosition(Id personId) {
-		return householdPositions.get(personHouseholdMap.get(personId));
-	}
-	
 	public HouseholdPosition getHouseholdPosition(Id householdId) {
 		return householdPositions.get(householdId);
 	}
-	
-	public Map<Id, HouseholdPosition> getHouseholdPositions() {
-		return this.householdPositions;
-	}
-	
+
 	public Set<Id> getHouseholdsToUpdate() {
 		return this.householdsToUpdate;
 	}
@@ -154,11 +142,7 @@ public class HouseholdsTracker extends AgentsTracker implements
 		Households households = ((ScenarioImpl) sim.getScenario()).getHouseholds();
 		for (Household household : households.getHouseholds().values()) {
 			
-			Id homeFacilityId = sim.getScenario().createId(this.householdObjectAttributes.getAttribute(household.getId().toString(), "homeFacilityId").toString());
-			
 			HouseholdPosition householdPosition = new HouseholdPosition();			
-			householdPosition.setHomeFacilityId(homeFacilityId);
-			householdPosition.setMeetingPointFacilityId(homeFacilityId);
 			for (Id personId : household.getMemberIds()) {
 				personHouseholdMap.put(personId, household.getId());
 				

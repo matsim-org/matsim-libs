@@ -40,8 +40,9 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 
@@ -58,15 +59,15 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	
 	public static final String activityType = "rescue";
 	
-	private final HouseholdsTracker householdsTracker;
+	private final DecisionDataProvider decisionDataProvider;
 	private final JoinedHouseholdsIdentifier identifier;
 	private final PTTravelTimeKTI ptTravelTime;
 	
 	public JoinedHouseholdsReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
-			HouseholdsTracker householdsTracker, JoinedHouseholdsIdentifier identifier,
+			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
 			PTTravelTimeKTI ptTravelTime) {
 		super(id, scenario, internalInterface);
-		this.householdsTracker = householdsTracker;
+		this.decisionDataProvider = decisionDataProvider;
 		this.identifier = identifier;
 		this.ptTravelTime = ptTravelTime;
 	}
@@ -98,11 +99,12 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 * Otherwise create a new activity at the meeting point, add it to the plan
 		 * and remove all other remaining activities.
 		 */
-		Id householdId = householdsTracker.getPersonsHouseholdId(withinDayAgent.getId());
+		PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(withinDayAgent.getId());
+		Id householdId = pdd.getHouseholdId();
 		Id meetingPointId = identifier.getHouseholdMeetingPointMapping().get(householdId);
 		
 		// set new meeting point
-		this.householdsTracker.getHouseholdPosition(householdId).setMeetingPointFacilityId(meetingPointId);
+		this.decisionDataProvider.getHouseholdDecisionData(householdId).setMeetingPointFacilityId(meetingPointId);
 		
 		/*
 		 * The agent is currently not at the Meeting Point. Therefore, we create a new Activity

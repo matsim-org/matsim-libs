@@ -59,16 +59,17 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.mobsim.HouseholdPosition;
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Decides where a household will meet after the evacuation order has been given.
@@ -87,14 +88,14 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	
 	private final Scenario scenario;
 	private final MultiModalTravelTimeFactory timeFactory;
-	private final HouseholdsTracker householdsTracker;
 	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
 	private final Geometry affectedArea;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
-	private final PopulationAdministration popAdmin;
 	private final int numOfThreads;
+	private final EvacuationDecisionModel evacuationDecisionModel;
+	private final DecisionDataProvider decisionDataProvider;
 
 	private ReplanningModule toHomeFacilityRouter;
 	private ReplanningModule fromHomeFacilityRouter;
@@ -115,21 +116,21 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private int meetInsecure = 0;
 	
 	public SelectHouseholdMeetingPoint(Scenario scenario, MultiModalTravelTimeFactory timeFactory,
-			HouseholdsTracker householdsTracker, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer,
-			Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker,
-			PopulationAdministration popAdmin) {
+			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, Geometry affectedArea, 
+			ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker,
+			DecisionDataProvider decisionDataProvider, EvacuationDecisionModel evacuationDecisionModel) {
 		this.scenario = scenario;
 		this.timeFactory = timeFactory;
-		this.householdsTracker = householdsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.affectedArea = affectedArea;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
-		this.popAdmin = popAdmin;
+		this.decisionDataProvider = decisionDataProvider;
 		
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
+		this.evacuationDecisionModel = evacuationDecisionModel;
 		
 		init();
 	}
@@ -326,33 +327,37 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	}
 	
 	/*
-	 * So far, households will directly meet at a rescue facility or
-	 * at their home facility. For the later case, they have to select
-	 * a next meeting point, when all household members have arrived
-	 * at their current meeting point. At the moment, this next meeting 
+	 * So far, households will directly meet at a rescue facility or at their home facility. 
+	 * For the later case, they have to select a next meeting point, when all household 
+	 * members have arrived at their current meeting point. At the moment, this next meeting 
 	 * point is hard coded as a rescue facility.
 	 * 
-	 * So far, there is only a single rescue facility.
-	 * Instead, multiple *real* rescue facilities could be defined. 
+	 * So far, there is only a single rescue facility. Instead, multiple *real* rescue 
+	 * facilities could be defined. 
 	 */
 	public Id selectNextMeetingPoint(Id householdId) {
-//		Id rescueMeetingPointId = scenario.createId("rescueFacility");
-//		this.householdsTracker.getHouseholdPosition(householdId).setMeetingPointFacilityId(rescueMeetingPointId);
-//		return rescueMeetingPointId;
 		
-		// if the household evacuates, select rescue facilty as meeting point
-		if (popAdmin.isHouseholdParticipating(householdId)) {
+		// if the household evacuates, select rescue facility as meeting point
+		HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(householdId);
+		
+		boolean householdParticipates;
+		Participating participating = this.decisionDataProvider.getHouseholdDecisionData(householdId).getParticipating();
+		if (participating == Participating.TRUE) householdParticipates = true;
+		else if (participating == Participating.FALSE) householdParticipates = false;
+		else throw new RuntimeException("Households participation state is undefined: " + householdId.toString());
+		
+		if (householdParticipates) {
 			Id rescueMeetingPointId = scenario.createId("rescueFacility");
-			this.householdsTracker.getHouseholdPosition(householdId).setMeetingPointFacilityId(rescueMeetingPointId);
+			hdd.setMeetingPointFacilityId(rescueMeetingPointId);
 			return rescueMeetingPointId;
 		}
 		// otherwise meet and stay at home
-		else return this.householdsTracker.getHouseholdPosition(householdId).getHomeFacilityId();
+		else return this.decisionDataProvider.getHouseholdDecisionData(householdId).getHomeFacilityId();
 	}
 
-	public Id getMeetingPoint(Id householdId) {
-		return this.householdsTracker.getHouseholdPosition(householdId).getMeetingPointFacilityId();
-	}
+//	public Id getMeetingPoint(Id householdId) {
+//		return this.householdsTracker.getHouseholdPosition(householdId).getMeetingPointFacilityId();
+//	}
 	
 	/*
 	 * If the evacuation starts in the current time step, define the
@@ -388,6 +393,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					log.info("Households meet at secure place:   " + meetSecure);
 					log.info("Households meet at insecure place: " + meetInsecure);
 					
+					evacuationDecisionModel.printStatistics();
 				} else {
 					// set current Time
 					for (Runnable runnable : this.runnables) {
@@ -413,6 +419,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 						// ignore empty households
 						if (household.getMemberIds().size() == 0) continue;
 						
+						this.evacuationDecisionModel.runModel(household);
+												
 						((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
 						roundRobin++;
 					}
@@ -438,11 +446,15 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 						// ignore empty households
 						if (household.getMemberIds().size() == 0) continue;
 						
-						HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(household.getId());
-						if (householdPosition.getHomeFacilityId().equals(householdPosition.getMeetingPointFacilityId())) meetAtHome++;
+						HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
+
+						Id homeFacilityId = hdd.getHomeFacilityId();
+						Id meetingPointFacilityId = hdd.getMeetingPointFacilityId();
+						
+						if (homeFacilityId.equals(meetingPointFacilityId)) meetAtHome++;
 						else meetAtRescue++;
 						
-						ActivityFacility meetingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(householdPosition.getMeetingPointFacilityId());
+						ActivityFacility meetingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(meetingPointFacilityId);
 						if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
 						else meetSecure++;
 					}
@@ -465,8 +477,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		for (int i = 0; i < this.numOfThreads; i++) {
 			
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, toHomeFacilityRouter, 
-					fromHomeFacilityRouter, householdsTracker, vehiclesTracker, coordAnalyzer.createInstance(), 
-					modeAvailabilityChecker.createInstance(), this.popAdmin, startBarrier, endBarrier, allMeetingsPointsSelected);
+					fromHomeFacilityRouter, vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance(), 
+					decisionDataProvider, startBarrier, endBarrier, allMeetingsPointsSelected);
 			runner.setTime(time);
 			runnables[i] = runner; 
 					

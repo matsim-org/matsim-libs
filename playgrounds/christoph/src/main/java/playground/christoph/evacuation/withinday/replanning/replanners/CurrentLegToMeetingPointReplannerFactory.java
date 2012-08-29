@@ -26,24 +26,24 @@ import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 
 public class CurrentLegToMeetingPointReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
-	private final HouseholdsTracker householdsTracker;
+	private final DecisionDataProvider decisionDataProvider;
 	
 	public CurrentLegToMeetingPointReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, HouseholdsTracker householdsTracker) {
+			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, DecisionDataProvider decisionDataProvider) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
-		this.householdsTracker = householdsTracker;
+		this.decisionDataProvider = decisionDataProvider;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegToMeetingPointReplanner(super.getId(), 
-				scenario, this.getReplanningManager().getInternalInterface(), householdsTracker);
+				scenario, this.getReplanningManager().getInternalInterface(), decisionDataProvider);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

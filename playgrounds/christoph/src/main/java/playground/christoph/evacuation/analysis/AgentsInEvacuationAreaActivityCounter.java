@@ -44,7 +44,8 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 
 /**
  * Counts the number of agents (not) at home within an evacuated area.
@@ -63,13 +64,15 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 
 	protected final Scenario scenario;
 	protected final CoordAnalyzer coordAnalyzer;
-	protected final PopulationAdministration popAdmin;
+	protected final DecisionDataProvider decisionDataProvider;
 	protected final double scaleFactor;
 		
 	protected Set<Id> activityAgentsInEvacuationAreaAtHome;
 	protected Set<Id> activityAgentsInEvacuationAreaNotAtHome;
 	protected Map<Id, Id> homeFacilities;
-		
+	protected Map<Integer, Set<Id>> activityBinsUndefinedAtHome;
+	protected Map<Integer, Set<Id>> activityBinsUndefinedNotAtHome;
+	
 	protected int[] activityBins;
 	protected int[] activityBinsParticipatingAtHome;
 	protected int[] activityBinsParticipatingNotAtHome;
@@ -77,11 +80,11 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 	protected int[] activityBinsNotParticipatingNotAtHome;
 
 	public AgentsInEvacuationAreaActivityCounter(Scenario scenario, CoordAnalyzer coordAnalyzer,
-			PopulationAdministration popAdmin, double scaleFactor) {
+			DecisionDataProvider decisionDataProvider, double scaleFactor) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.scaleFactor = scaleFactor;
-		this.popAdmin = popAdmin;
+		this.decisionDataProvider = decisionDataProvider;
 		
 		init();
 	}
@@ -90,6 +93,8 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 		homeFacilities = new HashMap<Id, Id>();
 		activityAgentsInEvacuationAreaAtHome = new HashSet<Id>();
 		activityAgentsInEvacuationAreaNotAtHome = new HashSet<Id>();
+		activityBinsUndefinedAtHome = new HashMap<Integer, Set<Id>>();
+		activityBinsUndefinedNotAtHome = new HashMap<Integer, Set<Id>>();
 		activityBins = new int[nofBins];
 		activityBinsParticipatingAtHome = new int[nofBins];
 		activityBinsParticipatingNotAtHome = new int[nofBins];
@@ -163,6 +168,8 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 		currentBin = 0;
 		activityAgentsInEvacuationAreaAtHome.clear();
 		activityAgentsInEvacuationAreaNotAtHome.clear();
+		activityBinsUndefinedAtHome.clear();
+		activityBinsUndefinedNotAtHome.clear();
 
 		activityBins = new int[nofBins];
 		activityBinsParticipatingAtHome = new int[nofBins];
@@ -173,19 +180,25 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-
-		// debug
-		for (Id id : activityAgentsInEvacuationAreaNotAtHome) {
-			if (this.popAdmin.isAgentParticipating(id)) {
-				log.warn("Person " + id.toString() + " is still inside the evacuation area but should have left.");
-			} else {
-				log.warn("Person " + id.toString() + " is still inside the evacuation area but has not returned home yet.");
-			}
-		}
-
+		
 		// ensure, that the last bin is written
 		updateBinData(currentBin + 1);
-
+		
+		// now process data that has been collected before agents have decided whether to evacuate or not
+		postProcessUndefinedAgents();
+		
+		// debug
+		for (Id id : activityAgentsInEvacuationAreaNotAtHome) {
+			Participating participating = this.decisionDataProvider.getPersonDecisionData(id).getParticipating();
+			if (participating == Participating.TRUE) {
+				log.warn("Person " + id.toString() + " is still inside the evacuation area but should have left.");
+			} else if (participating == Participating.FALSE) {
+				log.warn("Person " + id.toString() + " is still inside the evacuation area but has not returned home yet.");
+			} else {
+				log.warn("Person " + id.toString() + " is still inside the evacuation area and has an undefined evacuation participation state.");
+			}
+		}
+		
 		String fileName = null;
 
 		AgentsInEvacuationAreaActivityWriter writer = new AgentsInEvacuationAreaActivityWriter(this.binSize, event.getIteration());
@@ -222,16 +235,25 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 		if (binIndex > currentBin) {
 
 			int participatingActivityAgentsAtHome = 0;
-			int notParticipatingAgentsAtHome = 0;
+			int notParticipatingActivityAgentsAtHome = 0;
+			Set<Id> undefinedActivityAgentsInEvacuationAreaAtHome = new HashSet<Id>();
 			for (Id activityAgentId : activityAgentsInEvacuationAreaAtHome) {
-				if (this.popAdmin.isAgentParticipating(activityAgentId)) participatingActivityAgentsAtHome++;
-				else notParticipatingAgentsAtHome++;
+				Participating participating = this.decisionDataProvider.getPersonDecisionData(activityAgentId).getParticipating();
+				if (participating == Participating.TRUE) participatingActivityAgentsAtHome++;
+				else if (participating == Participating.FALSE) notParticipatingActivityAgentsAtHome++;
+				else if (participating == Participating.UNDEFINED) undefinedActivityAgentsInEvacuationAreaAtHome.add(activityAgentId);
+				else throw new RuntimeException("Unexpected participation state found: " + participating.toString());
 			}
+			
 			int participatingActivityAgentsNotAtHome = 0;
 			int notParticipatingActivityAgentsNotAtHome = 0;
+			Set<Id> undefinedActivityAgentsInEvacuationAreaNotAtHome = new HashSet<Id>();
 			for (Id activityAgentId : activityAgentsInEvacuationAreaNotAtHome) {
-				if (this.popAdmin.isAgentParticipating(activityAgentId)) participatingActivityAgentsNotAtHome++;
-				else notParticipatingActivityAgentsNotAtHome++;
+				Participating participating = this.decisionDataProvider.getPersonDecisionData(activityAgentId).getParticipating();
+				if (participating == Participating.TRUE) participatingActivityAgentsNotAtHome++;
+				else if (participating == Participating.FALSE) notParticipatingActivityAgentsNotAtHome++;
+				else if (participating == Participating.UNDEFINED) undefinedActivityAgentsInEvacuationAreaNotAtHome.add(activityAgentId);
+				else throw new RuntimeException("Unexpected participation state found: " + participating.toString());
 			}
 			
 			// for all not processed past bins
@@ -241,11 +263,51 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 				activityBins[index] = (int) Math.round(activityAgentsInEvacuationArea * scaleFactor);
 				activityBinsParticipatingAtHome[index] = (int) Math.round(participatingActivityAgentsAtHome * scaleFactor);
 				activityBinsParticipatingNotAtHome[index] = (int) Math.round(participatingActivityAgentsNotAtHome * scaleFactor);
-				activityBinsNotParticipatingAtHome[index] = (int) Math.round(notParticipatingAgentsAtHome * scaleFactor);
-				activityBinsNotParticipatingNotAtHome[index] = (int) Math.round(notParticipatingActivityAgentsNotAtHome * scaleFactor);				
+				activityBinsNotParticipatingAtHome[index] = (int) Math.round(notParticipatingActivityAgentsAtHome * scaleFactor);
+				activityBinsNotParticipatingNotAtHome[index] = (int) Math.round(notParticipatingActivityAgentsNotAtHome * scaleFactor);
+				
+				activityBinsUndefinedAtHome.put(index, undefinedActivityAgentsInEvacuationAreaAtHome);
+				activityBinsUndefinedNotAtHome.put(index, undefinedActivityAgentsInEvacuationAreaNotAtHome);
 			}
 		}
 
 		currentBin = binIndex;
+	}
+	
+	private void postProcessUndefinedAgents() {
+		
+		Set<Integer> bins = activityBinsUndefinedAtHome.keySet();
+		for (int index : bins) {
+			
+			int participatingActivityAgentsAtHome = 0;
+			int notParticipatingActivityAgentsAtHome = 0;
+			for (Id activityAgentId : activityBinsUndefinedAtHome.get(index)) {			
+				Participating participating = this.decisionDataProvider.getPersonDecisionData(activityAgentId).getParticipating();
+				if (participating == Participating.TRUE) participatingActivityAgentsAtHome++;
+				else if (participating == Participating.FALSE) notParticipatingActivityAgentsAtHome++;
+				else if (participating == Participating.UNDEFINED) {
+					throw new RuntimeException("Participation state still UNDEFINED: " + activityAgentId.toString());
+				}
+				else throw new RuntimeException("Unexpected participation state found: " + participating.toString());
+			}
+			
+			int participatingActivityAgentsNotAtHome = 0;
+			int notParticipatingActivityAgentsNotAtHome = 0;
+			for (Id activityAgentId : activityBinsUndefinedNotAtHome.get(index)) {			
+				Participating participating = this.decisionDataProvider.getPersonDecisionData(activityAgentId).getParticipating();
+				if (participating == Participating.TRUE) participatingActivityAgentsNotAtHome++;
+				else if (participating == Participating.FALSE) notParticipatingActivityAgentsNotAtHome++;
+				else if (participating == Participating.UNDEFINED) {
+					throw new RuntimeException("Participation state still UNDEFINED: " + activityAgentId.toString());
+				}
+				else throw new RuntimeException("Unexpected participation state found: " + participating.toString());
+			}
+			
+			// update activity bin arrays
+			activityBinsParticipatingAtHome[index] = activityBinsParticipatingAtHome[index] + (int) Math.round(participatingActivityAgentsAtHome * scaleFactor);
+			activityBinsParticipatingNotAtHome[index] = activityBinsParticipatingNotAtHome[index] + (int) Math.round(participatingActivityAgentsNotAtHome * scaleFactor);
+			activityBinsNotParticipatingAtHome[index] = activityBinsNotParticipatingAtHome[index] + (int) Math.round(notParticipatingActivityAgentsAtHome * scaleFactor);
+			activityBinsNotParticipatingNotAtHome[index] = activityBinsNotParticipatingNotAtHome[index] +(int) Math.round(notParticipatingActivityAgentsNotAtHome * scaleFactor);			
+		}
 	}
 }

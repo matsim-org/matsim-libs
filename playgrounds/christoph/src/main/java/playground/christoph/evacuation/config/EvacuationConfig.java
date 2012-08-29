@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * EvacuationConfig.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.evacuation.config;
 
 import java.util.ArrayList;
@@ -13,7 +33,16 @@ public class EvacuationConfig {
 	
 	private static final Logger log = Logger.getLogger(EvacuationConfig.class);
 	
-	public static double evacuationTime = 3600 * 8.0;
+	public static double evacuationTime = 3600 * 8.0;	// time when the incident takes place
+	public static double evacuationDelayTime = 3600 * 8.0;	// time until the area should be cleared
+		
+	/*
+	 * Even if meet at home and evacuate afterwards might be more time consuming than
+	 * evacuating directly (but not joined), a household might still prefer the first option.
+	 * We assume that a certain time overhead compared to the second option is accepted.
+	 * E.g. accept 25% time overhead: if t1 < t2  * (1 + 0.25) -> meet at home first.
+	 */
+	public static double acceptedMeetAtHomeTimeOverhead = 0.25;
 	
 	public static double innerRadius = 30000.0;
 	public static double outerRadius = 30500.0;
@@ -39,12 +68,18 @@ public class EvacuationConfig {
 	public static double compassProbability = 0.667;
 	public static boolean tabuSearch = true;
 
-	public static double householdParticipationShare = 1.00;
-	
 	public static double duringLegReroutingShare = 1.00;
 	
-	public static enum PickupAgentBehaviour {ALWAYS, NEVER, MODEL}; 
-	public static PickupAgentBehaviour pickupAgents = PickupAgentBehaviour.NEVER;
+	/*
+	 * This parameter is ignored if EvacuationDecisionBehaviour is not set to SHARE!
+	 */
+	public static double householdParticipationShare = 1.00;	
+	
+	public static enum EvacuationDecisionBehaviour {SHARE, MODEL};
+	public static EvacuationDecisionBehaviour evacuationDecisionBehaviour = EvacuationDecisionBehaviour.MODEL;
+	
+	public static enum PickupAgentBehaviour {ALWAYS, NEVER, MODEL};
+	public static PickupAgentBehaviour pickupAgents = PickupAgentBehaviour.MODEL;
 	
 	public static boolean useFuzzyTravelTimes = true;
 	
@@ -81,8 +116,8 @@ public class EvacuationConfig {
 	/*
 	 * These two values are fixed so far. They might be changed in another study.
 	 */
-	public enum PreEvacuationTime {TIME0, TIME8, TIME16};
-	public enum EvacuationReason {WATER, FIRE, CHEMICAL, ATOMIC};
+	public static enum PreEvacuationTime {TIME0, TIME8, TIME16};
+	public static enum EvacuationReason {WATER, FIRE, CHEMICAL, ATOMIC};
 	public static PreEvacuationTime leaveModelPreEvacuationTime = PreEvacuationTime.TIME0;
 	public static EvacuationReason leaveModelEvacuationReason = EvacuationReason.ATOMIC;
 	
@@ -118,6 +153,7 @@ public class EvacuationConfig {
 	
 	public static void printConfig() {
 		log.info("evacuation start time:\t" + evacuationTime);
+		log.info("delay to latest leave time:\t" + evacuationDelayTime);
 		log.info("inner radius:\t" + innerRadius);
 		log.info("outer radius:\t" + outerRadius);
 		log.info("center coordinate:\t" + centerCoord.toString());
@@ -149,5 +185,6 @@ public class EvacuationConfig {
 		log.info("sigma for inform-agents Rayleigh function:\t" + informAgentsRayleighSigma);
 		log.info("Network capacity factor:\t" + capacityFactor);
 		log.info("Network speed factor:\t" + speedFactor);
+		log.info("Evacuation decision:\t" + evacuationDecisionBehaviour.toString());
 	}
 }

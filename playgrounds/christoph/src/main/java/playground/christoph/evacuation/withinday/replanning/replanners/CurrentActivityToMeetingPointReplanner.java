@@ -43,7 +43,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
@@ -53,15 +54,15 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	
 	private static final String activityType = "meetHousehold";
 	
-	protected final HouseholdsTracker householdsTracker;
+	protected final DecisionDataProvider decisionDataProvider;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	protected final PTTravelTimeKTI ptTravelTime;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
-			InternalInterface internalInterface, HouseholdsTracker householdsTracker,
+			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
 			ModeAvailabilityChecker modeAvailabilityChecker, PTTravelTimeKTI ptTravelTime) {
 		super(id, scenario, internalInterface);
-		this.householdsTracker = householdsTracker;
+		this.decisionDataProvider = decisionDataProvider;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.ptTravelTime = ptTravelTime;
 	}
@@ -97,7 +98,10 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		 * Otherwise create a new activity at the meeting point, add it to the plan
 		 * and remove all other remaining activities.
 		 */
-		Id meetingPointId = householdsTracker.getPersonsHouseholdPosition(withinDayAgent.getId()).getMeetingPointFacilityId();
+		PersonDecisionData pdd = decisionDataProvider.getPersonDecisionData(withinDayAgent.getId());
+		Id householdId = pdd.getHouseholdId();
+		Id meetingPointId = decisionDataProvider.getHouseholdDecisionData(householdId).getMeetingPointFacilityId(); 
+		
 		if (currentActivity.getFacilityId().equals(meetingPointId)) {
 			currentActivity.setType(activityType);
 			currentActivity.setMaximumDuration(Time.UNDEFINED_TIME);

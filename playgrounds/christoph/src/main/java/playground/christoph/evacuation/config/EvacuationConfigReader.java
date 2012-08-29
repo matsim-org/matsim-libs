@@ -51,8 +51,10 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String FUZZYTRAVELTIMES = "fuzzytraveltimes";
 	public static String INFORMAGENTS = "informagents";
 	public static String ROADCONDITIONS = "roadconditions";
+	public static String EVACUATIONDECISION = "evacuationdecision";
 	
 	public static String TIME = "time";
+	public static String DELAY = "delay";
 	public static String X = "x";
 	public static String Y = "y";
 	public static String INNERRADIUS = "innerRadius";
@@ -89,6 +91,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		if (EVACUATIONCONFIG.equalsIgnoreCase(name)) {
 		} else if (EVACUATIONTIME.equalsIgnoreCase(name)) {
 			EvacuationConfig.evacuationTime = Double.parseDouble(atts.getValue(TIME));
+			EvacuationConfig.evacuationDelayTime = Double.parseDouble(atts.getValue(DELAY));
 		} else if (CENTERCOORD.equalsIgnoreCase(name)) {
 			double x = Double.parseDouble(atts.getValue(X));
 			double y = Double.parseDouble(atts.getValue(Y));
@@ -181,6 +184,15 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			if (value < 0.0) value = 1.0;
 			else if (value > 1.0) log.warn("Network speed factor > 1.0 was found: " + value);
 			EvacuationConfig.speedFactor = value;			
+		} else if (EVACUATIONDECISION.equalsIgnoreCase(name)) {
+			String behaviour = atts.getValue(BEHAVIOUR);
+			if (EvacuationConfig.EvacuationDecisionBehaviour.SHARE.toString().equalsIgnoreCase(behaviour)) {
+				EvacuationConfig.evacuationDecisionBehaviour = EvacuationConfig.EvacuationDecisionBehaviour.SHARE;
+			} else if (EvacuationConfig.EvacuationDecisionBehaviour.MODEL.toString().equalsIgnoreCase(behaviour)) {
+				EvacuationConfig.evacuationDecisionBehaviour = EvacuationConfig.EvacuationDecisionBehaviour.MODEL;
+			} else {
+				throw new RuntimeException("Unknown value for evacuation decision behaviour found: " + behaviour);
+			}
 		} else {
 			log.warn("Ignoring startTag: " + name);
 		}
@@ -209,6 +221,8 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if(PICKUPAGENTS.equalsIgnoreCase(name)) {
 		} else if(FUZZYTRAVELTIMES.equalsIgnoreCase(name)) {
 		} else if(INFORMAGENTS.equalsIgnoreCase(name)) {
+		} else if(ROADCONDITIONS.equalsIgnoreCase(name)) {
+		} else if(EVACUATIONDECISION.equalsIgnoreCase(name)) {
 		} else log.warn("Ignoring endTag: " + name);
 	}
 	

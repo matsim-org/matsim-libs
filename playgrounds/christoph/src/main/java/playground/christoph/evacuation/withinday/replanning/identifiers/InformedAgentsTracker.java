@@ -36,9 +36,12 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 
-/*
+/**
  * To simplify the decision making process, we assume that all members of a household
- * are informed at the same time.
+ * are informed at the same time, i.e. the first household member that gets informed
+ * immediately informs all other members.
+ * 
+ * @author cdobler
  */
 public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 	

@@ -55,14 +55,14 @@ public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEv
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, 
 		LinkEnterEventHandler, LinkLeaveEventHandler, MobsimInitializedListener {
 
-	private final Map<Id, AgentPosition> agentPositions;
+	/*package*/ final Map<Id, AgentPosition> agentPositions;
 	
 	public AgentsTracker() {
 		this.agentPositions = new HashMap<Id, AgentPosition>();
 	}
 	
 	public AgentPosition getAgentPosition(Id agentId) {
-		return agentPositions.get(agentId);
+		return this.agentPositions.get(agentId);
 	}
 	
 	@Override
@@ -125,6 +125,7 @@ public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEv
 		
 		QSim sim = (QSim) e.getQueueSimulation();
 		for (MobsimAgent agent : sim.getAgents()) {
+						
 			PlanElement planElement = ((PlanAgent) agent).getCurrentPlanElement();
 			Id facilityId = ((Activity) planElement).getFacilityId();
 			AgentPosition agentPosition = new AgentPosition(agent, facilityId, Position.FACILITY);

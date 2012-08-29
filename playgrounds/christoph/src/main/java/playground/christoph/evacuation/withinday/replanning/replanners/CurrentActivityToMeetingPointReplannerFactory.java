@@ -26,24 +26,24 @@ import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
 public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
-	private final HouseholdsTracker householdsTracker; 
+	private final DecisionDataProvider decisionDataProvider; 
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final PTTravelTimeKTIFactory ptTravelTimeFactory;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
 			ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
-			double replanningProbability, HouseholdsTracker householdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
+			double replanningProbability, DecisionDataProvider decisionDataProvider, ModeAvailabilityChecker modeAvailabilityChecker,
 			PTTravelTimeKTIFactory ptTravelTimeFactory) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
-		this.householdsTracker = householdsTracker;
+		this.decisionDataProvider = decisionDataProvider;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.ptTravelTimeFactory = ptTravelTimeFactory;
 	}
@@ -51,7 +51,7 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario,
-				this.getReplanningManager().getInternalInterface(), householdsTracker, 
+				this.getReplanningManager().getInternalInterface(), decisionDataProvider, 
 				modeAvailabilityChecker.createInstance(), ptTravelTimeFactory.createTravelTime());
 		super.initNewInstance(replanner);
 		return replanner;

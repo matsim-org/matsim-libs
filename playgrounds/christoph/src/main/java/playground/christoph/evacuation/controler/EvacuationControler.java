@@ -93,8 +93,10 @@ import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.router.LeastCostPathCalculatorSelectorFactory;
 import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
@@ -172,11 +174,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
 	
-	protected PopulationAdministration popAdmin;
 	protected InformedHouseholdsTracker informedHouseholdsTracker;
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	protected PassengerDepartureHandler passengerDepartureHandler;
+	protected DecisionDataProvider decisionDataProvider;
+	protected DecisionDataGrabber decisionDataGrabber;
+	protected DecisionModelRunner decisionModelRunner;
 	protected AffectedAreaPenaltyCalculator penaltyCalculator;
 	protected HouseholdsTracker householdsTracker;
 	protected VehiclesTracker vehiclesTracker;
@@ -220,6 +224,8 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 
 	@Override
 	protected void loadData() {
+		
+		// load data in super class
 		super.loadData();
 	
 		/*
@@ -325,18 +331,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.penaltyCalculator = new AffectedAreaPenaltyCalculator(this.getNetwork(), affectedArea, 
 				EvacuationConfig.affectedAreaDistanceBuffer, EvacuationConfig.affectedAreaTimePenaltyFactor);
 		
-		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
-		
-		this.popAdmin = new PopulationAdministration(this.scenarioData);
-		this.popAdmin.selectPanicPeople(EvacuationConfig.panicShare);
-		this.popAdmin.selectParticipatingHouseholds(EvacuationConfig.householdParticipationShare);
-		this.addControlerListener(this.popAdmin);
+		this.coordAnalyzer = new CoordAnalyzer(affectedArea);	
 		
 		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), 
 				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents(), EvacuationConfig.informAgentsRayleighSigma);
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
-		this.householdsTracker = new HouseholdsTracker(this.householdObjectAttributes);
+		this.householdsTracker = new HouseholdsTracker();
 		this.getEvents().addHandler(householdsTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
@@ -344,7 +345,16 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
+		this.decisionDataProvider = new DecisionDataProvider();
+		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.decisionDataProvider, this.coordAnalyzer.createInstance(), 
+				this.householdsTracker, this.householdObjectAttributes);
+		this.getFixedOrderSimulationListener().addSimulationListener(this.decisionDataGrabber);
+		
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
+		
+		this.decisionModelRunner = new DecisionModelRunner(this.scenarioData, this.decisionDataProvider);
+		this.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
+		this.addControlerListener(this.decisionModelRunner);
 		
 		/*
 		 * Update PT Travel time Matrices for evacuation routes (requires CoordAnalyzer)
@@ -430,13 +440,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
 			double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
 			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer.createInstance(), 
-					this.popAdmin, scaleFactor);
+					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
 			this.events.addHandler(agentsInEvacuationAreaCounter);
 			
 			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(this.scenarioData, coordAnalyzer.createInstance(), 
-					this.popAdmin, scaleFactor);
+					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaActivityCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaActivityCounter);
 			this.events.addHandler(agentsInEvacuationAreaActivityCounter);
@@ -480,8 +490,9 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.travelTimeCollectorWrapperFactory);
 		
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, timeFactory, 
-				this.householdsTracker, this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.affectedArea, 
-				this.modeAvailabilityChecker.createInstance(), this.informedHouseholdsTracker, this.popAdmin);
+				this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.affectedArea, 
+				this.modeAvailabilityChecker.createInstance(), this.informedHouseholdsTracker, this.decisionDataProvider,
+				this.decisionModelRunner.getEvacuationDecisionModel());
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	
@@ -577,7 +588,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
 				this.coordAnalyzer.createInstance(), this.vehiclesTracker, this.householdsTracker, this.informedHouseholdsTracker,
-				this.modeAvailabilityChecker.createInstance(), this.popAdmin);
+				this.modeAvailabilityChecker.createInstance(), this.decisionDataProvider);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
@@ -590,7 +601,8 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 		
-		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, walkTravelTimeFactory); 
+		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, 
+				walkTravelTimeFactory, this.decisionDataProvider); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.agentsToPickupIdentifier = duringLegFactory.createIdentifier();
 		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
@@ -641,18 +653,18 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		LeastCostPathCalculatorFactory panicFactory = new RandomCompassRouterFactory(EvacuationConfig.tabuSearch, EvacuationConfig.compassProbability);
 		
-		LeastCostPathCalculatorFactory factory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, this.popAdmin);
+		LeastCostPathCalculatorFactory factory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, this.decisionDataProvider);
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, timeFactory, factory, routeFactory);
 		
 		/*
 		 * During Activity Replanners
 		 */
-		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.householdsTracker, 
+		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.decisionDataProvider, 
 				this.modeAvailabilityChecker, (PTTravelTimeKTIFactory) this.ptTravelTimeFactory);
 		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, householdsTracker,
+		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, decisionDataProvider,
 				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (PTTravelTimeKTIFactory) this.ptTravelTimeFactory);
 		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
@@ -660,7 +672,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		/*
 		 * During Leg Replanners
 		 */
-		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, householdsTracker);
+		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, decisionDataProvider);
 		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 				

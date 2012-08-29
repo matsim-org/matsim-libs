@@ -27,6 +27,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 
 public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory {
 
@@ -34,19 +35,21 @@ public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory 
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final PersonalizableTravelTimeFactory travelTimeFactory;
+	private final DecisionDataProvider decisionDataProvider;
 	
-	public AgentsToPickupIdentifierFactory(Scenario scenario,  CoordAnalyzer coordAnalyzer,
-			VehiclesTracker vehiclesTracker, PersonalizableTravelTimeFactory travelTimeFactory) {
+	public AgentsToPickupIdentifierFactory(Scenario scenario,  CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, 
+			PersonalizableTravelTimeFactory travelTimeFactory, DecisionDataProvider decisionDataProvider) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.travelTimeFactory = travelTimeFactory;
+		this.decisionDataProvider = decisionDataProvider;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, coordAnalyzer.createInstance(), 
-				vehiclesTracker, travelTimeFactory.createTravelTime());
+				vehiclesTracker, travelTimeFactory.createTravelTime(), decisionDataProvider);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

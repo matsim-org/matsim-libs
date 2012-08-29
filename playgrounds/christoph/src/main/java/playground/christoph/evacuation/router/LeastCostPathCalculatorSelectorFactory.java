@@ -26,19 +26,19 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 
 public class LeastCostPathCalculatorSelectorFactory implements LeastCostPathCalculatorFactory {
 	
-	private final PopulationAdministration popAdmin;
+	private final DecisionDataProvider decisionDataProvider;
 	private final LeastCostPathCalculatorFactory panicRouterFactory;
 	private final LeastCostPathCalculatorFactory nonPanicRouterFactory;
 	
 	public LeastCostPathCalculatorSelectorFactory(LeastCostPathCalculatorFactory nonPanicRouterFactory,
-			 LeastCostPathCalculatorFactory panicRouterFactory, PopulationAdministration popAdmin) {
+			 LeastCostPathCalculatorFactory panicRouterFactory, DecisionDataProvider decisionDataProvider) {
 		this.nonPanicRouterFactory = nonPanicRouterFactory;
 		this.panicRouterFactory = panicRouterFactory;
-		this.popAdmin = popAdmin;
+		this.decisionDataProvider = decisionDataProvider;
 	}
 	
 	@Override
@@ -48,6 +48,6 @@ public class LeastCostPathCalculatorSelectorFactory implements LeastCostPathCalc
 				panicRouterFactory.createPathCalculator(network, travelCosts, travelTimes);
 		IntermodalLeastCostPathCalculator nonPanicRouter = (IntermodalLeastCostPathCalculator) 
 				nonPanicRouterFactory.createPathCalculator(network, travelCosts, travelTimes);
-		return new LeastCostPathCalculatorSelector(nonPanicRouter, panicRouter, popAdmin);
+		return new LeastCostPathCalculatorSelector(nonPanicRouter, panicRouter, decisionDataProvider);
 	}
 }

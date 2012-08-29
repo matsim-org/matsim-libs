@@ -20,7 +20,6 @@
 
 package playground.christoph.evacuation.analysis;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,6 +41,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEventImpl;
@@ -50,17 +50,25 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-
-import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.controler.PrepareEvacuationScenario;
+import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
+import playground.christoph.evacuation.mobsim.decisionmodel.PanicModel;
+import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Class to produce AgentInEvacuationArea data using output data from a 
@@ -71,6 +79,8 @@ import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
  * 	<li>evacuation config file</li>
  * 	<li>events file</li>
  * </ul>
+ * 
+ * Note: due to changes in PersonDriverAgentImpl this code does not run at the moment!
  * 
  * @author cdobler
  */
@@ -84,12 +94,16 @@ public class AgentsInEvacuationAreaPostProcessing {
 	
 	public AgentsInEvacuationAreaPostProcessing(String configFile, String evacuationConfigFile, String eventsFile) throws IOException {
 		
-		Config config = ConfigUtils.loadConfig(configFile);		
+		Config config = ConfigUtils.loadConfig(configFile);	
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager(); 
 		
 		new EvacuationConfigReader().readFile(evacuationConfigFile);
 		EvacuationConfig.printConfig();
+		
+		// load household object attributes
+		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
+		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
 		
 		/*
 		 * Prepare the scenario:
@@ -114,22 +128,47 @@ public class AgentsInEvacuationAreaPostProcessing {
 		
 		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
 		
-		PopulationAdministration popAdmin = new PopulationAdministration(scenario);
-		controlerListeners.add(popAdmin);
+//		PostProcessingHouseholdsTracker householdsTracker = new PostProcessingHouseholdsTracker(householdObjectAttributes);
+//		householdsTracker.createAgents(scenario, eventsManager);
+//		eventsManager.addHandler(householdsTracker);
+//		mobsimListeners.add(householdsTracker);
+
+		HouseholdsTracker householdsTracker = new HouseholdsTracker();
+		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
 		
-		// read people in panic and participating households from file
-		String panicFile = dummyController.getControlerIO().getIterationFilename(0, PopulationAdministration.panicFileName);
-		String participatingHouseholdsFile = dummyController.getControlerIO().getIterationFilename(0, PopulationAdministration.participatingHouseholdsFileName);
-		String line = null;
+		/*
+		 * Create a DecisionDataGrabber and run notifyMobsimInitialized(...)
+		 * which inserts decision data into the DecisionDataProvider.
+		 */
+		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
+				householdsTracker, householdObjectAttributes);	
 		
-		BufferedReader panicFileReader = IOUtils.getBufferedReader(panicFile);
-		panicFileReader.readLine();	// skip header
-		while ((line = panicFileReader.readLine()) != null) popAdmin.addPersonInPanic(scenario.createId(line));
+		// create mobsim and run it for 1 second - doing so is required to create the mobsim agents
+		config.getQSimConfigGroup().setEndTime(1.0);
+		Mobsim mobsim = new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
+		// SimulationListeners are fired in reverse order! Therefore add householdsTracker after decisionDataGrabber.
+		((QSim) mobsim).addQueueSimulationListeners(decisionDataGrabber);
+		((QSim) mobsim).addQueueSimulationListeners(householdsTracker);		
+		mobsim.run();
 		
-		BufferedReader participatingHouseholdsFileReader = IOUtils.getBufferedReader(participatingHouseholdsFile);
-		participatingHouseholdsFileReader.readLine();	// skip header
-		while ((line = participatingHouseholdsFileReader.readLine()) != null) popAdmin.addHouseholdParticipating(scenario.createId(line));
+		// read people in panic from file
+		String panicFile = dummyController.getControlerIO().getIterationFilename(0, PanicModel.panicModelFile);
+		PanicModel panicModel = new PanicModel(decisionDataProvider, EvacuationConfig.panicShare);
+		panicModel.readDecisionsFromFile(panicFile);
+		panicModel.printStatistics();
 		
+		// read pickup behavior from file
+		String pickupFile = dummyController.getControlerIO().getIterationFilename(0, PickupModel.pickupModelFile);
+		PickupModel pickupModel = new PickupModel(decisionDataProvider);
+		pickupModel.readDecisionsFromFile(pickupFile);
+		pickupModel.printStatistics();
+		
+		// read evacuation decisions from file
+		String evacuationDecisionFile = dummyController.getControlerIO().getIterationFilename(0, EvacuationDecisionModel.evacuationDecisionModelFile);
+		EvacuationDecisionModel evacuationDecisionModel = new EvacuationDecisionModel(scenario, MatsimRandom.getLocalInstance(), decisionDataProvider);
+		evacuationDecisionModel.readDecisionsFromFile(evacuationDecisionFile);
+		evacuationDecisionModel.printStatistics();
+				
 		// Create the set of analyzed modes.
 		Set<String> transportModes = new HashSet<String>();
 		transportModes.add(TransportMode.bike);
@@ -149,14 +188,14 @@ public class AgentsInEvacuationAreaPostProcessing {
 		// Initialize AgentsInEvacuationAreaCounter
 		double scaleFactor = 1 / config.getQSimConfigGroup().getFlowCapFactor();
 		AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(scenario, transportModes, 
-				coordAnalyzer.createInstance(), popAdmin, scaleFactor);
+				coordAnalyzer.createInstance(), decisionDataProvider, scaleFactor);
 		controlerListeners.add(agentsInEvacuationAreaCounter);
 		mobsimListeners.add(agentsInEvacuationAreaCounter);
 		eventsManager.addHandler(agentsInEvacuationAreaCounter);
 		
 		// Initialize AgentsInEvacuationAreaActivityCounter
-		AgentsInEvacuationAreaActivityCounter agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(scenario,
-				coordAnalyzer.createInstance(), popAdmin, scaleFactor);
+		AgentsInEvacuationAreaActivityCounter agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(scenario, 
+				coordAnalyzer.createInstance(), decisionDataProvider, scaleFactor);
 		controlerListeners.add(agentsInEvacuationAreaActivityCounter);
 		mobsimListeners.add(agentsInEvacuationAreaActivityCounter);
 		eventsManager.addHandler(agentsInEvacuationAreaActivityCounter);
@@ -229,9 +268,9 @@ public class AgentsInEvacuationAreaPostProcessing {
 				outputPath = outputPath.substring(0, outputPath.length() - 1);
 			}
 			if (this.scenarioData.getConfig().controler().getRunId() != null) {
-				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), false);
+				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
 			} else {
-				this.controlerIO = new OutputDirectoryHierarchy(outputPath, false);
+				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
 			}
 		}
 		

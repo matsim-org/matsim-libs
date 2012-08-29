@@ -109,8 +109,8 @@ import playground.christoph.evacuation.api.core.v01.Coord3d;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIEvacuationFactory;
@@ -165,7 +165,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	private AgentsTracker agentsTracker;
 	private InformedHouseholdsTracker informedHouseholdsTracker;
 	private VehiclesTracker vehiclesTracker;
-	private PopulationAdministration popAdmin;
+	private DecisionDataProvider decisionDataProvider;
 	private KtiConfigGroup ktiConfigGroup;
 	
 	/*
@@ -382,10 +382,14 @@ public class MarathonController extends WithinDayController implements StartupLi
 //		this.getEvents().addHandler(vehiclesTracker);
 //		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
-		this.popAdmin = new PopulationAdministration(this.scenarioData);
-		this.popAdmin.selectPanicPeople(EvacuationConfig.panicShare);
-		this.popAdmin.selectParticipatingHouseholds(EvacuationConfig.householdParticipationShare);
-		this.addControlerListener(this.popAdmin);
+//		this.popAdmin = new PopulationAdministration(this.scenarioData);
+//		this.popAdmin.selectPanicPeople(EvacuationConfig.panicShare);
+//		this.popAdmin.selectParticipatingHouseholds(EvacuationConfig.householdParticipationShare);
+//		this.addControlerListener(this.popAdmin);
+		
+		this.decisionDataProvider = new DecisionDataProvider();	
+//		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
+//				householdsTracker, householdObjectAttributes);	
 
 		// Create the set of analyzed modes.
 		Set<String> transportModes = new HashSet<String>();
@@ -399,7 +403,8 @@ public class MarathonController extends WithinDayController implements StartupLi
 		// Create and add an AgentsInEvacuationAreaCounter
 		double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
 		agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer.createInstance(), 
-				this.popAdmin, scaleFactor);
+				decisionDataProvider, scaleFactor);
+
 		this.addControlerListener(agentsInEvacuationAreaCounter);
 		this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
 		this.events.addHandler(agentsInEvacuationAreaCounter);	

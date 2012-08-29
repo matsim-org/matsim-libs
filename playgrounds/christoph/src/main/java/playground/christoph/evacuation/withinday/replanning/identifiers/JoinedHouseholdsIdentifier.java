@@ -52,9 +52,11 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.PopulationAdministration;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 import playground.christoph.evacuation.utils.DeterministicRNG;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdModeAssignment;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
@@ -82,7 +84,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
-	private final PopulationAdministration popAdmin;
+	private final DecisionDataProvider decisionDataProvider;
 	
 	private final DeterministicRNG rng;
 	private final Map<Id, HouseholdDeparture> householdDepartures;
@@ -100,7 +102,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	public JoinedHouseholdsIdentifier(Scenario scenario, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
 			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
 			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
-			PopulationAdministration popAdmin) {
+			DecisionDataProvider decisionDataProvider) {
 		this.households = ((ScenarioImpl) scenario).getHouseholds();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
@@ -109,7 +111,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.householdsTracker = householdsTracker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
-		this.popAdmin = popAdmin;
+		this.decisionDataProvider = decisionDataProvider;
 		
 		this.rng = new DeterministicRNG();
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
@@ -255,16 +257,17 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		 */	
 		Queue<Id> informedHouseholds = this.informedHouseholdsTracker.getInformedHouseholdsInCurrentTimeStep();
 		for (Id householdId : informedHouseholds) {
-			HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(householdId);
+			HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
+			HouseholdPosition householdPosition = hdd.getHouseholdPosition();
 			
 			// if the household is joined
-			if (householdPosition.isHouseholdJoined()) {
+			if (hdd.isJoined()) {
 				
 				// if the household is at a facility
 				if (householdPosition.getPositionType() == Position.FACILITY) {
 					
 					//if the household is at its meeting point facility
-					if (householdPosition.getPositionId().equals(householdPosition.getMeetingPointFacilityId())) {
+					if (householdPosition.getPositionId().equals(hdd.getMeetingPointFacilityId())) {
 						
 						/*
 						 * If the meeting point is not secure and the household is willing 
@@ -273,15 +276,21 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 						Id facilityId = householdPosition.getPositionId();
 						ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 						boolean facilityIsSecure = !this.coordAnalyzer.isFacilityAffected(facility);
-						boolean householdParticipates = this.popAdmin.isHouseholdParticipating(householdId);
+						
+						boolean householdParticipates;
+						Participating participating = this.decisionDataProvider.getHouseholdDecisionData(householdId).getParticipating();
+						if (participating == Participating.TRUE) householdParticipates = true;
+						else if (participating == Participating.FALSE) householdParticipates = false;
+						else throw new RuntimeException("Households participation state is undefined: " + householdId.toString());
+						
 						if (!facilityIsSecure && householdParticipates) {
 							HouseholdDeparture householdDeparture = createHouseholdDeparture(time, householdId, householdPosition.getPositionId());
 							this.householdDepartures.put(householdId, householdDeparture);
 							
-							/*
-							 * The initial meeting points have been selected by the SelectHouseholdMeetingPoint class.
-							 */
-							this.selectHouseholdMeetingPoint.getMeetingPoint(householdId);
+//							/*
+//							 * The initial meeting points have been selected by the SelectHouseholdMeetingPoint class.
+//							 */
+//							this.decisionDataProvider.getHouseholdDecisionData(householdId).getMeetingPointFacilityId();
 						}
 					}
 				}
@@ -297,13 +306,14 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			 */
 			if (!informedHouseholdsTracker.isHouseholdInformed(householdId)) continue;
 			
-			HouseholdPosition householdPosition = householdsTracker.getHouseholdPosition(householdId);
+			HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
+			HouseholdPosition householdPosition = hdd.getHouseholdPosition();
 			HouseholdDeparture householdDeparture = this.householdDepartures.get(householdId);
 			
 			/*
 			 * Check whether the household is joined.
 			 */
-			boolean isJoined = householdPosition.isHouseholdJoined();
+			boolean isJoined = this.decisionDataProvider.getHouseholdDecisionData(householdId).isJoined();
 			boolean wasJoined = (householdDeparture != null);
 			if (isJoined) {
 				/*
@@ -312,7 +322,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				Position positionType = householdPosition.getPositionType();
 				if (positionType == Position.FACILITY) {
 					Id facilityId = householdPosition.getPositionId();
-					Id meetingPointId = householdPosition.getMeetingPointFacilityId();
+					Id meetingPointId = this.decisionDataProvider.getHouseholdDecisionData(householdId).getMeetingPointFacilityId();
 					
 					/*
 					 * Check whether the household is at its meeting facility.
@@ -328,7 +338,13 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 							
 							ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 							boolean facilityIsSecure = !this.coordAnalyzer.isFacilityAffected(facility);
-							boolean householdParticipates = this.popAdmin.isHouseholdParticipating(householdId);
+							
+							boolean householdParticipates;
+							Participating participating = this.decisionDataProvider.getHouseholdDecisionData(householdId).getParticipating();
+							if (participating == Participating.TRUE) householdParticipates = true;
+							else if (participating == Participating.FALSE) householdParticipates = false;
+							else throw new RuntimeException("Households participation state is undefined: " + householdId.toString());
+							
 							if (!facilityIsSecure && householdParticipates) {
 								// ... and schedule the household's departure.
 								householdDeparture = createHouseholdDeparture(time, householdId, meetingPointId);
@@ -447,5 +463,4 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		}
 	}
 	
-
 }

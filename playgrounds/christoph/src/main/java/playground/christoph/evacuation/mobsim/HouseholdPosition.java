@@ -35,14 +35,12 @@ public class HouseholdPosition {
 	private boolean joined;
 	private Position position;
 	private Id id;
-	private Id homeFacilityId;
-	private Id meetingFacilityId;
 	
 	public HouseholdPosition() {
 		this.agentPositions = new ArrayList<AgentPosition>();
 		this.joined = true;
 		this.id = null;
-		this.meetingFacilityId = null;
+	
 		this.position = Position.UNDEFINED;
 	}
 	
@@ -50,6 +48,8 @@ public class HouseholdPosition {
 		this.agentPositions.add(position);
 	}
 	
+	// use HouseholdDecisionData.isJoined() instead
+	@Deprecated
 	public boolean isHouseholdJoined() {
 		return this.joined;
 	}
@@ -60,22 +60,6 @@ public class HouseholdPosition {
 	
 	public Id getPositionId() {
 		return this.id;
-	}
-	
-	public Id getHomeFacilityId() {
-		return this.homeFacilityId;
-	}
-	
-	public void setHomeFacilityId(Id homeFacilityId) {
-		this.homeFacilityId = homeFacilityId;
-	}
-	
-	public Id getMeetingPointFacilityId() {
-		return this.meetingFacilityId;
-	}
-	
-	public void setMeetingPointFacilityId(Id meetingFacilityId) {
-		this.meetingFacilityId = meetingFacilityId;
 	}
 	
 	public void update() {

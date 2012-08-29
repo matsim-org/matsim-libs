@@ -33,7 +33,8 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
 
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 
 /**
  * Move the destination of the next activity to the agent's household,
@@ -46,12 +47,12 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 
 	private static final String activityType = "meetHousehold";
 	
-	protected final HouseholdsTracker householdsTracker;
+	protected final DecisionDataProvider decisionDataProvider;
 	
 	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario,
-			InternalInterface internalInterface, HouseholdsTracker householdsTracker) {
+			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider) {
 		super(id, scenario, internalInterface);
-		this.householdsTracker = householdsTracker;
+		this.decisionDataProvider = decisionDataProvider;
 	}
 
 	@Override
@@ -75,7 +76,9 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		/*
 		 * Create new Activity at the meeting point.
 		 */
-		Id meetingPointId = householdsTracker.getPersonsHouseholdPosition(withinDayAgent.getId()).getMeetingPointFacilityId();
+		PersonDecisionData pdd = decisionDataProvider.getPersonDecisionData(withinDayAgent.getId());
+		Id householdId = pdd.getHouseholdId();
+		Id meetingPointId = decisionDataProvider.getHouseholdDecisionData(householdId).getMeetingPointFacilityId(); 		
 		ActivityFacility meetingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(meetingPointId);
 		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
 		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);

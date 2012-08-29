@@ -81,19 +81,23 @@ public class EvacuationQSimFactory implements MobsimFactory {
         } else {
             netsimEngFactory = new DefaultQSimEngineFactory();
         }
-		QSim qSim1 = new QSim(sc, eventsManager);
+		QSim qSim = new QSim(sc, eventsManager);
+		
 		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1, MatsimRandom.getRandom());
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-        QSim qSim = qSim1;
+		qSim.addMobsimEngine(teleportationEngine);
+		
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim);
         qSim.addAgentSource(agentSource);
+        
         if (this.passengerDepartureHandler != null) qSim.addDepartureHandler(passengerDepartureHandler);
         
         /*

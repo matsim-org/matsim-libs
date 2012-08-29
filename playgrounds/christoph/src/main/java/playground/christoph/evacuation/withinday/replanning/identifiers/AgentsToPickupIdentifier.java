@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,7 +50,6 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -70,6 +68,8 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel.PickupDecision;
 import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplanner;
 
 /**
@@ -89,13 +89,13 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final PersonalizableTravelTime walkTravelTime;
-
-	private final Random random;
+	
 	private final Map<Id, MobsimAgent> agents;
 	private final Map<Id, Double> earliestLinkLeaveTime;
 	private final Set<Id> carLegPerformingAgents;
 	private final Set<Id> walkLegPerformingAgents;
 	private final Set<Id> insecureWalkLegPerformingAgents;
+	private final DecisionDataProvider decisionDataProvider;
 	
 	/*
 	 * Queue that contains information on when agents are going to leave one
@@ -103,18 +103,19 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	 */
 	private final Queue<Tuple<Double, MobsimAgent>> agentsLeaveLinkQueue = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
 
-	/* package */AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, PersonalizableTravelTime walkTravelTime) {
+	/* package */AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, PersonalizableTravelTime walkTravelTime,
+			DecisionDataProvider decisionDataProvider) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.walkTravelTime = walkTravelTime;
 
-		this.random = MatsimRandom.getLocalInstance();
 		this.agents = new HashMap<Id, MobsimAgent>();
 		this.earliestLinkLeaveTime = new HashMap<Id, Double>();
 		this.carLegPerformingAgents= new HashSet<Id>();
 		this.walkLegPerformingAgents = new HashSet<Id>();
 		this.insecureWalkLegPerformingAgents = new HashSet<Id>();
+		this.decisionDataProvider = decisionDataProvider;
 	}
 
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
@@ -189,8 +190,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 					
 					/*
 					 * Check whether the available capacity equals the total
-					 * capacity. If true, the vehicle is parked and therefore not
-					 * available.
+					 * capacity. If true, the vehicle has no free seats left.
 					 */
 					int seats = vehicles.getVehicles().get(vehicleId).getType().getCapacity().getSeats();
 					if (seats == capacity) continue;
@@ -207,7 +207,21 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 					 * Check whether the driver would pick up the person.
 					 */
 					Person driver = this.scenario.getPopulation().getPersons().get(driverId);
-					boolean pickup = checkPickup(((HasPerson) personAgent).getPerson(), driver);
+					PickupDecision decision = checkPickup(((HasPerson) personAgent).getPerson(), driver);
+					
+					boolean pickup;
+					if (decision == PickupDecision.ALWAYS) pickup = true;
+					else if (decision == PickupDecision.NEVER) pickup = false;
+					else if (decision == PickupDecision.IFSPACE) {
+						/*
+						 * Return true if after picking up the person at least one seat remains free,
+						 * otherwise return false.
+						 */
+						if (seats + 1 < capacity) pickup = true;
+						else pickup = false;
+					} else {
+						throw new RuntimeException("Undefined pickup agents behavior found: " + decision);
+					}
 					
 					/*
 					 * If the driver will not pick up the possible passenger, go on an try the next vehicle.
@@ -230,13 +244,14 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		return agentsToReplan;
 	}
 
-	private boolean checkPickup(Person passenger, Person driver) {
+	private PickupDecision checkPickup(Person passenger, Person driver) {
 		
-		if (EvacuationConfig.pickupAgents == EvacuationConfig.PickupAgentBehaviour.NEVER) return false;
-		else if (EvacuationConfig.pickupAgents == EvacuationConfig.PickupAgentBehaviour.ALWAYS) return true;
+		if (EvacuationConfig.pickupAgents == EvacuationConfig.PickupAgentBehaviour.NEVER) return PickupDecision.NEVER;
+		else if (EvacuationConfig.pickupAgents == EvacuationConfig.PickupAgentBehaviour.ALWAYS) return PickupDecision.ALWAYS;
 		else if (EvacuationConfig.pickupAgents == EvacuationConfig.PickupAgentBehaviour.MODEL) {
-			throw new RuntimeException("Model based pickup agents decisions are not supported so far.");
-		} else {
+			return this.decisionDataProvider.getPersonDecisionData(driver.getId()).getPickupDecision();
+		}
+		else {
 			throw new RuntimeException("Unknown pickup agents behavior found: " + EvacuationConfig.pickupAgents);
 		}
 	}
