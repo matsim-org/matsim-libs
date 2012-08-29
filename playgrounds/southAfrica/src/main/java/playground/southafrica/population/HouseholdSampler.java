@@ -73,7 +73,7 @@ public class HouseholdSampler {
 	}
 	
 	
-	public HouseholdSampler() {
+	public HouseholdSampler() {	
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 	

@@ -21,6 +21,7 @@
 package playground.southafrica.population.utilities;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,12 +43,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -78,10 +81,11 @@ public class NmbmQTBuilder {
 	private Map<Id, QuadTree<Plan>> qtMap; 
 	private ComprehensivePopulationReader cr;
 	
-	private final String[] genderClasses = {"m","f"};
+	private final String[] employmentClasses = {"1", "0"};
 	private final String[] ageClasses = {"5", "12", "23", "45", "68","120"};
 	private final String[] incomeClasses = {"800", "3200", "12800", "51200", "500000"};
 	private final String[] householdSizeClasses = {"2", "10", "30"};//{"1","2","5","15","50"};
+	private List<String[]> qtSpace;
 	private final int ipfYear = 2001;
 	private final int travelActivityYear = 2004;
 	private final int populationYear = 2011; 
@@ -94,15 +98,8 @@ public class NmbmQTBuilder {
 	
 	/*TODO Remove the dummy check variables. */
 	int nullQtCount = 0;
-	private int fixedByReducingIncome = 0;
-	private int fixedByReducingHouseholdSize = 0;
-	private int fixedByReducingBoth = 0;
-	private int fixedByIncreasingAge = 0;
-	private int fixedByIncreasingAgeReducingBoth = 0;
-	private int fixedByIncreasingIncome = 0;
-	private int fixedByIncreasingIncomeReducingSize = 0;
-	private int fixedByPuttingKidsOutOfWork = 0;
-	private Map<Integer, Integer> distanceMap = new TreeMap<Integer, Integer>();
+	private List<Integer> hammingDistanceChanges;
+	private List<Double> distanceList = new ArrayList<Double>();
 
 
 	/**
@@ -110,6 +107,7 @@ public class NmbmQTBuilder {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(NmbmQTBuilder.class.toString(), args);
+		MatsimRandom.reset();
 		
 		String inputFolder = args[0];
 		String populationFile = args[1];
@@ -156,6 +154,24 @@ public class NmbmQTBuilder {
 		for(MyZone zone : mfr.getAllZones()){
 			this.zones.put(zone.getId(), zone);
 		}
+		
+		// ---------------------------------------------------------//
+		// The following is hard-coded and implementation-specific. //
+		// The remainder of the method should be generic and not    //
+		// require any changes to work. 							//
+		// ---------------------------------------------------------//
+		qtSpace = new ArrayList<String[]>();						//
+		qtSpace.add(employmentClasses);								//
+		qtSpace.add(ageClasses);									//
+		qtSpace.add(incomeClasses);									//
+		qtSpace.add(householdSizeClasses);							//
+		/*__________________________________________________________*/
+		
+		hammingDistanceChanges = new ArrayList<Integer>();
+		for(int i = 0; i <= qtSpace.size(); i++){
+			hammingDistanceChanges.add(new Integer(0));
+		}
+
 	}
 	
 	
@@ -187,7 +203,6 @@ public class NmbmQTBuilder {
 			for(Id personId : inputHouseholds.getHouseholds().get(householdId).getMemberIds()){
 				PersonImpl person = (PersonImpl) inputPopulation.getPersons().get(personId);
 				if(person != null){
-					String gender = person.getSex();
 					int householdSize = household.getMemberIds().size();
 					int age = person.getAge();
 					Income surveyIncome = household.getIncome();
@@ -331,42 +346,36 @@ public class NmbmQTBuilder {
 				/*===== Now pick a plan for the person =====*/
 				/* Get the QT id */
 				Id qtId = getQtId(p.isEmployed(), Integer.parseInt(sa[2]), p.getAge(), hh.getIncome());
-
-				if(!qtMap.containsKey(qtId)){
-					Id tryNewId = nmbmRulesToChangeQtId(qtId);
-					if(tryNewId == null){
-						if(!noQtMap.containsKey(qtId)){
-							noQtMap.put(qtId, 1);
-						} else{
-							noQtMap.put(qtId, noQtMap.get(qtId)+1);
-						}
-						/* FIXME Must still decide what to do. Not necessary for NMBM */						
+				Id tryNewId = searchForQtId(qtId);
+				if(tryNewId == null){
+					if(!noQtMap.containsKey(qtId)){
+						noQtMap.put(qtId, 1);
 					} else{
-						qtId = tryNewId;
+						noQtMap.put(qtId, noQtMap.get(qtId)+1);
 					}
-				} 
+					/* FIXME Must still decide what to do. Not necessary for NMBM */						
+				} else{
+					qtId = tryNewId;
+				}
 				
-				/* Starting with 500m, search and sample from the associated 
-				 * QuadTree. If not found, double the distance. */
+				
+				/* Get the closest 20 people to the person's home location. */				
 				if(qtMap.containsKey(qtId)){
-					int distance = 250;
+					List<Tuple<Plan,Double>> closestPlans = getClosestPlans(homeCoord, qtMap.get(qtId), 20);
+					/* Randomly pick any of the closest plans */
+					Tuple<Plan, Double> randomTuple = closestPlans.get(getRandomPermutation(closestPlans.size())[0]);
+					Plan plan = randomTuple.getFirst();
+					distanceList.add(randomTuple.getSecond());
 					
-					Plan plan = null;
-					do {
-						Collection<Plan> plans = qtMap.get(qtId).get(homeCoord.getX(), homeCoord.getY(), distance);
-						if(plans.size() == 0){
-							distance *= 2;
-						} else{
-							plan = ((List<Plan>) plans).get((int) Math.rint(Math.random() * (plans.size()-1)));
-							/* Keep track of the distance for which plans were selected */
-							if(distanceMap.containsKey(distance)){
-								int oldValue = distanceMap.get(distance);
-								distanceMap.put(distance, oldValue+1);
-							} else{
-								distanceMap.put(distance, 1);
-							}
-						}
-					} while (plan == null);
+					/* For each person you have a different sample size - choice set.
+					 * If you have 200 observations, and you pick one randomly.
+					 * 1. Get all persons in QT;
+					 * 2. Pick the twenty nearest (choice);
+					 *    - randomly choose one of them.
+					 * (The distance distribution is (typically) consistent with the
+					 * distribution of the observations.)
+					 * ...  
+					 */
 
 					/* Should have a plan now. Change its activity locations. */
 					for(PlanElement pe : plan.getPlanElements()){
@@ -396,21 +405,67 @@ public class NmbmQTBuilder {
 			LOG.info("   " + counter++ + ". " +  id.toString() + " (" + noQtMap.get(id) + ")");
 		}
 		/*=====================================================================*/
-		LOG.info("Fixes applied:");
-		LOG.info("   Number of income-reducing-fixes: " + fixedByReducingIncome);
-		LOG.info("   Number of household size-reducing-fixes: " + fixedByReducingHouseholdSize);
-		LOG.info("   Number of combination-fixes: " + fixedByReducingBoth);
-		LOG.info("   Number of age-increase-fixes: " + fixedByIncreasingAge);
-		LOG.info("   Number of age-increase-combination-reduction-fixes: " + fixedByIncreasingAgeReducingBoth);
-		LOG.info("   Number of income-increasing-fixes: " + fixedByIncreasingIncome);
-		LOG.info("   Number of income-increasing-size-reduction-fixes: " + fixedByIncreasingIncomeReducingSize);
-		LOG.info("   Number of child-liberating-fixes: " + fixedByPuttingKidsOutOfWork);
-		/*=====================================================================*/
-		LOG.info("Distances within which a plan was found in the QuadTree:");
-		for(int i : distanceMap.keySet()){
-			LOG.info("   " + i + "m: " + distanceMap.get(i));
+		LOG.info("Hamming distance fixes applied:");
+		for(int i = 0; i < hammingDistanceChanges.size(); i++){
+			LOG.info("   " + i + ": " + hammingDistanceChanges.get(i));
 		}
 		/*=====================================================================*/
+	}
+	
+	
+	private List<Tuple<Plan, Double>> getClosestPlans(Coord c, QuadTree<Plan> qt, int number){
+		List<Tuple<Plan, Double>> list = new ArrayList<Tuple<Plan,Double>>();
+		List<Tuple<Plan, Double>> tuples = new ArrayList<Tuple<Plan,Double>>();
+		
+		/* Quickly scan distance in QuadTree to limit the ranking later-on. */ 
+		Collection<Plan> plansToRank = null;
+		if(qt.values().size() > number){
+		 /* Start the search radius with the distance to the closest person. */
+			Plan closestPlan = qt.get(c.getX(), c.getY());
+			double radius = ((CoordImpl)c).calcDistance( ((ActivityImpl)closestPlan.getPlanElements().get(0)).getCoord());
+			Collection<Plan> plans = qt.get(c.getX(), c.getY(), radius);
+			while(plans.size() < number){
+				/* Double the radius. If the radius happens to be zero (0), 
+				 * then you stand the chase of running into an infinite loop.
+				 * Hence, add a minimum of 1m to move on. */
+				radius += Math.max(radius, 1.0);
+				plans = qt.get(c.getX(), c.getY(), radius);
+			}
+			plansToRank = plans;
+		} else{
+			plansToRank = qt.values();
+		}
+		
+		/* Rank the plans based on distance. */
+		for(Plan plan : plansToRank){
+			double d = ((CoordImpl)c).calcDistance( ((ActivityImpl)plan.getPlanElements().get(0)).getCoord() );
+			Tuple<Plan, Double> thisTuple = new Tuple<Plan, Double>(plan, d);
+			if(tuples.size() == 0){
+				tuples.add(thisTuple);
+			} else{
+				int index = 0;
+				boolean found = false;
+				while(!found && index < tuples.size()){
+					if(d <= tuples.get(index).getSecond()){
+						found = true;
+					} else{
+						index++;
+					}
+				}
+				if(found){
+					tuples.add(index, thisTuple);
+				} else{
+					tuples.add(thisTuple);
+				}
+			}
+		}
+		
+		/* Add the number of plans requested, or the  number of the plans in 
+		 * the QuadTree, whichever is less, to the results, and return. */
+		for(int i = 0; i < Math.min(number, tuples.size()); i++){
+			list.add(tuples.get(i));
+		}
+		return list;
 	}
 	
 
@@ -445,6 +500,26 @@ public class NmbmQTBuilder {
 		/* Write the households.*/
 		HouseholdsWriterV10 hw = new HouseholdsWriterV10(outputHouseholds);
 		hw.writeFile(outputFolder + "households.xml.gz");
+		
+		/* Write the distances of the selected plans. This is purely for 
+		 * statistical purposes and will only be relevant if the population
+		 * and the survey data are for the same area, e.g. Nelson Mandela Bay.
+		 */
+		String bufferedWriterName = outputFolder + "distances.txt";
+		BufferedWriter bw = IOUtils.getBufferedWriter(bufferedWriterName);
+		try{
+			for(double d : distanceList){
+				bw.write(String.format("%.0f\n", d));
+			}
+		} catch (IOException e) {
+			Gbl.errorMsg("Could not write to " + bufferedWriterName);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				Gbl.errorMsg("Could not close BufferedWriter for " + bufferedWriterName);
+			}
+		}
 	}
 	
 		
@@ -556,7 +631,7 @@ public class NmbmQTBuilder {
 //		genderCode = "u"; // Override
 		
 		/* Employment */
-		String employment = isEmployed ? "y" : "n";
+		String employment = isEmployed ? "1" : "0";
 		
 		/* Household size */
 		boolean foundHouseholdSizeClass = false;
@@ -571,7 +646,7 @@ public class NmbmQTBuilder {
 		if(!foundHouseholdSizeClass){
 			LOG.error("Could not find a household size class for the value " + householdSize);
 		}
-		String householdSizeCode = String.format("%02d", Integer.parseInt(householdSizeClasses[i]));
+		String householdSizeCode = String.format("%d", Integer.parseInt(householdSizeClasses[i]));
 		
 		/* Age */
 		boolean foundAgeClass = false;
@@ -586,7 +661,7 @@ public class NmbmQTBuilder {
 		if(!foundAgeClass){
 			LOG.error("Could not find an age class for the value " + age);
 		}
-		String ageCode = String.format("%03d", Integer.parseInt(ageClasses[i]));
+		String ageCode = String.format("%d", Integer.parseInt(ageClasses[i]));
 		
 		/* Income, assuming the income is already in the population year, and expressed as monthly. */
 		if(income != null){
@@ -611,187 +686,126 @@ public class NmbmQTBuilder {
 	}
 	
 	
-	public Id nmbmRulesToChangeQtId(Id id){
+	/**
+	 * The {@link Id} used in the {@link QuadTree} is made up of the following
+	 * elements:
+	 * <ol>
+	 * 		<li> employment status;
+	 * 		<li> age class;
+	 * 		<li> household income class; and
+	 * 		<li> household size class.
+	 * </ol>
+	 * @param id
+	 * @return
+	 */
+	public Id searchForQtId(Id id){
+		/* TODO Remove after debugging. */
+//		if(id.toString().equalsIgnoreCase("0_12_800_30")){
+//			String s = "";
+//		}
+		
+		
+		/* If the Id is already associated with a QuadTree, no change is 
+		 * required. Return the current Id as is. */
+		if(qtMap.containsKey(id)){
+			hammingDistanceChanges.set(0, hammingDistanceChanges.get(0)+1);
+			return id;
+		}
+		
+		/* Otherwise, attempt perturbations to the Id. */
 		Id newId = null;
+		int maximumTriesAtCurrentHammingDistance = 500;
+		int hammingDistance = 1;
+
+		/* Get the index for each of the QuadTree dimensions of the given Id. */
 		String[] sa = id.toString().split("_");
-		
-		getGenderIndex(sa[0]); // Currently we don't do anything with it.
-		
-		/* Get one level lower income class. */
-		if(newId == null){ // this may seem silly, but eases up the moving around of rules. 
-			int incomeIndex = getHouseholdIncomeIndex(sa[2]);
-			if(incomeIndex > 0){
-				Id tempId = new IdImpl(sa[0] + "_" + sa[1] + "_" + incomeClasses[incomeIndex-1] + "_" + sa[3]);
-				if(qtMap.containsKey(tempId)){
-					newId = tempId;
-					fixedByReducingIncome++;
-				}
-			}
+		int[] indices = new int[qtSpace.size()];
+		for(int i = 0; i < qtSpace.size(); i++){
+			indices[i] = getIndex(sa[i], qtSpace.get(i));
 		}
 		
-		/* Reduce household size class by one level. */
-		if(newId == null){
-			int hhsIndex = getHouseholdSizeIndex(sa[3]);
-			if(hhsIndex > 0){
-				Id tempId = new IdImpl(sa[0] + "_" + sa[1] + "_" + sa[2] + "_" + String.format("%02d", Integer.parseInt(householdSizeClasses[hhsIndex-1])) );
-				if(qtMap.containsKey(tempId)){
-					newId = tempId;
-					fixedByReducingHouseholdSize++;
-				}
-			}
-		}
+		do {
+			int triesAtCurrentHammingDistance = 0;
+			do{
+				int[] tmpIndices = indices.clone();
 
-		/* Next, try moving both income and household size down (but only by ONE class). */
-		if(newId == null){
-			int incomeIndex = getHouseholdIncomeIndex(sa[2]);
-			int hhsIndex = getHouseholdSizeIndex(sa[3]);
-			if(incomeIndex > 0 && hhsIndex > 0){
-				Id tempId = new IdImpl(sa[0] + "_" + sa[1] + "_" + incomeClasses[incomeIndex-1] + "_" + String.format("%02d", Integer.parseInt(householdSizeClasses[hhsIndex-1])) );
-				if(qtMap.containsKey(tempId)){
-					newId = tempId;
-					fixedByReducingBoth++;
+				/* Get a random permutation of the QuadTree dimensions. */
+				int[] permutation = getRandomPermutation(qtSpace.size());
+				
+				/* Make random changes. The number of changes should be the
+				 * same as the current Hamming distance. */
+				for(int stepChange = 0; stepChange < hammingDistance; stepChange++){
+					int classToChange = permutation[stepChange];
+					/* Randomly change the class. */
+					int change = 0;
+					if(indices[classToChange] == 0){
+						/* It is the lowest class, so can only increase. */
+						change = +1;
+					} else if(indices[classToChange] == qtSpace.get(classToChange).length-1){
+						/* It is the highest class, so can only decrease. */
+						change = -1;
+					} else{
+						double d = MatsimRandom.getRandom().nextDouble();
+						change =  d < 0.5 ? -1 : +1;
+					}
+					tmpIndices[classToChange] = indices[classToChange] + change;
 				}
-			}
-		}	
+				
+				/* Check if the perturbation has resulted in a known QuadTree. */
+				String tmpIdString = "";
+				for(int i = 0; i < tmpIndices.length-1; i++){
+					tmpIdString += qtSpace.get(i)[tmpIndices[i]] + "_";
+				}
+				tmpIdString += qtSpace.get(tmpIndices.length-1)[tmpIndices[tmpIndices.length-1]];
+				Id tmpId = new IdImpl(tmpIdString);
+				
+				newId = qtMap.containsKey(tmpId) ? tmpId : null; 
+				
+			} while (newId == null &&
+					triesAtCurrentHammingDistance++ < maximumTriesAtCurrentHammingDistance);
+			
+		} while (newId == null && ++hammingDistance <= qtSpace.size());
 
-		/* Next increase age category by one class. This is the result of seeing the only remaining 
-		 * unidentified groups being up-to-six-year olds. */
-		if(newId == null){
-			int ageIndex = getAgeIndex(sa[1]);
-			if(ageIndex < (ageClasses.length-1) ){
-				Id tempId = new IdImpl(sa[0] + "_" + String.format("%03d", Integer.parseInt(ageClasses[ageIndex+1])) + "_" + sa[2] + "_" + sa[3]);
-				if(qtMap.containsKey(tempId)){
-					newId = tempId;
-					fixedByIncreasingAge++;
-				}
-			}			
-		}
-		
-		/* Move all to the average: increase age by one class, reduce income 
-		 * and household size by one. */
- 		if(newId == null){
-			int ageIndex = getAgeIndex(sa[1]);
-			int incomeIndex = getHouseholdIncomeIndex(sa[2]);
-			int hhsIndex = getHouseholdSizeIndex(sa[3]);
-			if(ageIndex < (ageClasses.length-1) && incomeIndex > 0 && hhsIndex > 0){
-				Id tempId = new IdImpl(sa[0] + "_" + String.format("%03d", Integer.parseInt(ageClasses[ageIndex+1])) + "_" + incomeClasses[incomeIndex-1] + "_" + String.format("%02d", Integer.parseInt(householdSizeClasses[hhsIndex-1])) );
-				if(qtMap.containsKey(tempId)){
-					newId = tempId;
-					fixedByIncreasingAgeReducingBoth++;
-				}
-			}
-		}
- 		
- 		/* Increase low-income by one class. */
- 		if(newId == null){
- 			int incomeIndex = getHouseholdIncomeIndex(sa[2]);
- 			if(incomeIndex < (incomeClasses.length-2) ){
- 				Id tempId = new IdImpl(sa[0] + "_" + sa[1] + "_" + incomeClasses[incomeIndex+1] + "_" + sa[3] );
- 				if(qtMap.containsKey(tempId)){
- 					newId = tempId;
- 					fixedByIncreasingIncome++;
- 				}
- 			}
- 		}
- 		
- 		/* If it happens to be a low-income, large(est) family size, and we've 
- 		 * STILL not been able to get a QT, increase the income by one class, 
- 		 * and decrease the family size by one. */
- 		if(newId == null){
-			int incomeIndex = getHouseholdIncomeIndex(sa[2]);
-			int hhsIndex = getHouseholdSizeIndex(sa[3]);
-			if(incomeIndex < (incomeClasses.length-2) && hhsIndex == (householdSizeClasses.length-1) ){
-				Id tempId = new IdImpl(sa[0] + "_" + sa[1] + "_" + incomeClasses[incomeIndex+1] + "_" + String.format("%02d", Integer.parseInt(householdSizeClasses[hhsIndex-1])) );
-				if(qtMap.containsKey(tempId)){
-					newId = tempId;
-					fixedByIncreasingIncomeReducingSize++;
-				}
-			}
- 		}
- 		
- 		/* Employed children, up to and including 16 years, have their
- 		 * employment status changed. Household size reduced one class; 
- 		 */
- 		if(newId == null){
- 			int ageIndex = getAgeIndex(sa[1]);
-			int hhsIndex = getHouseholdSizeIndex(sa[3]);
- 			if(ageIndex < 3 && sa[0].equalsIgnoreCase("y")){
- 				Id tempId = new IdImpl("n" + "_" + sa[1] + "_" + sa[2] + "_" + String.format("%02d", Integer.parseInt(householdSizeClasses[hhsIndex-1])) );
-				if(qtMap.containsKey(tempId)){
-					newId = tempId;
-					fixedByPuttingKidsOutOfWork++;
-				}
- 			}
- 		}
-		
 		if(newId == null){
 			nullQtCount++;
+		} else{
+			hammingDistanceChanges.set(hammingDistance, hammingDistanceChanges.get(hammingDistance)+1);
 		}
 		
 		return newId;
 	}
 	
-	
-	private int getHouseholdIncomeIndex(String income){
-		int index = -1;
-		for(int i = incomeClasses.length-1; i >= 0; i--){
-			if(Double.parseDouble(incomeClasses[i]) == Double.parseDouble(income)){
-				index = i;
-				break;
-			}
+	private int[] getRandomPermutation(int number){
+		/* Add the sequential integers to an array. */
+		int[] a = new int[number];
+		for(int i = 0; i < number; i++){
+			a[i] = i;
 		}
-		if(index == -1){
-			LOG.error("Couldn't find the income index for the value " + income);
+
+		/* Shuffle each position in the array with a random other position. */
+		int[] b = (int[])a.clone();
+		for(int c = b.length-1; c >= 0; c--){
+			int d = (int)Math.floor(MatsimRandom.getRandom().nextDouble() * (c+1));
+			int tmp = b[d];
+			b[d] = b[c];
+			b[c] = tmp;
 		}
-		return index;
+		return b;
 	}
 	
 	
-	private int getHouseholdSizeIndex(String size){
+	private int getIndex(String value, String[] classes){
 		int index = -1;
-		for(int i = householdSizeClasses.length-1; i >= 0; i--){
-			if(Double.parseDouble(householdSizeClasses[i]) == Double.parseDouble(size)){
+		for(int i = 0; i < classes.length; i++){
+			if(Double.parseDouble(classes[i]) == Double.parseDouble(value)){
 				index = i;
 				break;
 			}
 		}
 		if(index == -1){
-			LOG.error("Couldn't find the household size index for the value " + size);
+			LOG.error("Couldn't find the index for the value " + value + " in the array " + classes);
 		}
 		return index;
-
-	}
-
-	
-	private int getAgeIndex(String age){
-		int index = -1;
-		for(int i = ageClasses.length-1; i >= 0; i--){
-			if(Double.parseDouble(ageClasses[i]) == Double.parseDouble(age)){
-				index = i;
-				break;
-			}
-		}
-		if(index == -1){
-			LOG.error("Couldn't find the age index for the value " + age);
-		}
-		return index;
-
-	}
-
-	
-	private int getGenderIndex(String gender){
-		int index = -1;
-		for(int i = genderClasses.length-1; i >= 0; i--){
-			if(genderClasses[i].equalsIgnoreCase(gender)){
-				index = i;
-				break;
-			}
-		}
-		if(index == -1){
-//			LOG.error("Couldn't find the age index for the value " + gender);
-		}
-		return index;
-
 	}
 
 }
