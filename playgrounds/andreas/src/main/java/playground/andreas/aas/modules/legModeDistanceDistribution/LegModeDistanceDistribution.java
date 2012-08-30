@@ -71,7 +71,7 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 	private SortedMap<String, Double> mode2Share;
 
 	public LegModeDistanceDistribution(String ptDriverPrefix){
-		super("LegModeDistanceDistribution", ptDriverPrefix);
+		super(LegModeDistanceDistribution.class.getSimpleName(), ptDriverPrefix);
 		log.info("enabled");
 
 		this.distanceClasses = new ArrayList<Integer>();

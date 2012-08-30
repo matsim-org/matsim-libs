@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
 import playground.andreas.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
+import playground.andreas.aas.modules.multiAnalyzer.MultiAnalyzer;
 import playground.andreas.aas.modules.ptTripAnalysis.BvgTripAnalysisRunnerV4;
 
 /**
@@ -49,7 +50,6 @@ public class AasRunner {
 	private final String baseFolder;
 	private final String iterationOutputDir;
 	private final String eventsFile;
-	private final EventsManager eventsManager;
 	private ScenarioImpl scenario;
 	private Set<Feature> shapeFile;
 	
@@ -61,7 +61,6 @@ public class AasRunner {
 		this.baseFolder = baseFolder;
 		this.iterationOutputDir = iterationOutputDir;
 		this.eventsFile = eventsFile;
-		this.eventsManager = EventsUtils.createEventsManager();
 		this.scenario = scenario;
 		this.shapeFile = shapeFile;
 	}
@@ -75,21 +74,19 @@ public class AasRunner {
 		
 		
 		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
-		ptAna.init(this.scenario.getConfig(), this.scenario, this.shapeFile);
+		ptAna.init(this.scenario, this.shapeFile);
 		this.anaModules.add(ptAna);
 		
 		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
 		distAna.init(this.scenario, 15);
 		this.anaModules.add(distAna);
 		
+		MultiAnalyzer mA = new MultiAnalyzer(ptDriverPrefix);
+		mA.init(this.scenario);
+		this.anaModules.add(mA);
 		
-		// END ugly code
 		
-		for (AbstractAnalyisModule module : this.anaModules) {
-			for (EventHandler handler : module.getEventHandler()) {
-				this.eventsManager.addHandler(handler);
-			}
-		}
+		// END ugly code - Initialization needs to be configurable
 	}
 
 	public void preProcess(){
@@ -99,7 +96,14 @@ public class AasRunner {
 	}
 	
 	public void run(){
-		EventsReaderXMLv1 reader = new EventsReaderXMLv1(this.eventsManager);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		for (AbstractAnalyisModule module : this.anaModules) {
+			for (EventHandler handler : module.getEventHandler()) {
+				eventsManager.addHandler(handler);
+			}
+		}
+		
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 		reader.parse(this.eventsFile);
 	}
 	

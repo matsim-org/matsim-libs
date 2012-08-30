@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -48,11 +47,11 @@ public class BvgTripAnalysisRunnerV4 extends AbstractAnalyisModule{
 	private TTtripAnalysisV4 ana;
 	
 	public BvgTripAnalysisRunnerV4(String ptDriverPrefix){
-		super("BvgTripAnalysisRunnerV4", ptDriverPrefix);
+		super(BvgTripAnalysisRunnerV4.class.getSimpleName(), ptDriverPrefix);
 		log.info("enabled");
 	}
 	
-	public void init(Config config, ScenarioImpl scenario, Set<Feature> shapeFile) {
+	public void init(ScenarioImpl scenario, Set<Feature> shapeFile) {
 		this.scenario = scenario;
 		this.ana = new TTtripAnalysisV4();
 
