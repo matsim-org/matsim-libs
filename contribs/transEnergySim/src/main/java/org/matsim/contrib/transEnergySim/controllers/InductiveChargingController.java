@@ -38,6 +38,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -50,9 +51,17 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 	private ChargingUponArrival chargingUponArrival;
 	private EnergyConsumptionTracker energyConsumptionTracker;
 
+	public InductiveChargingController(String[] args, HashMap<Id, Vehicle> vehicles) {
+		super(args);
+		init(vehicles);
+	}
+	
 	public InductiveChargingController(Config config, HashMap<Id, Vehicle> vehicles) {
 		super(config);
-		
+		init(vehicles);
+	}
+
+	private void init(HashMap<Id, Vehicle> vehicles) {
 		EventHandlerGroupForRaceConditionAvoidance handlerGroup=new EventHandlerGroupForRaceConditionAvoidance();
 		
 		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network));
