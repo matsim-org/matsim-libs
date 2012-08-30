@@ -54,7 +54,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
@@ -179,14 +178,14 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 					 * evacuate united which is preferred by them. Households might be even willing to accept
 					 * longer evacuation times if this allows them to meet at home.
 					 */
-					calculateHouseholdTimes(household, time);
-					calculateLatestAcceptedLeaveTime(household, time);
+					calculateHouseholdMemberTimes(household, time);
+//					calculateLatestAcceptedLeaveTime(household);
 					
-					calculateHouseholdReturnHomeTime(household, time);
+					calculateHouseholdReturnHomeTime(household);
 					calculateEvacuationTimeFromHome(household, hdd.getHouseholdReturnHomeTime());
-					calculateHouseholdDirectEvacuationTime(household, time);
+					calculateHouseholdDirectEvacuationTime(household);
 					
-					selectHouseholdMeetingPoint(household, time);
+					selectHouseholdMeetingPoint(household);
 				}
 				
 				// clear list for next time step
@@ -213,10 +212,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		this.householdsToCheck.add(household);
 	}
 	
-	/*
-	 * TODO implement a decision model based on the survey data...
-	 */
-	private void selectHouseholdMeetingPoint(Household household, double time) {
+	private void selectHouseholdMeetingPoint(Household household) {
 		
 		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
 		EvacuationDecision evacuationDecision = hdd.getEvacuationDecision();
@@ -232,29 +228,11 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		}
 		
 		/*
-		 * Count number of agents affected and not affected.
-		 */
-		int affected = 0;
-		int notAffected = 0;
-		for (Id personId : household.getMemberIds()) {
-			PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(personId);
-			if (pdd.isAffected()) affected++;
-			else notAffected++;
-		}
-		
-		Id newMeetingPointId = scenario.createId("rescueFacility");
-		
-		/*
-		 * If all agents of the household are outside the affected area, they decide to stay outside.
-		 * TODO: if there is enough time available, they might decide to still meet at home.
-		 */
-		if (affected == 0) {
-			hdd.setMeetingPointFacilityId(newMeetingPointId);
-		}
-		
-		/*
-		 * The household compare its evacuation options: meet at home and leave together or leave
-		 * immediately - and probably split - and meet outside.
+		 * Else: the household compares its evacuation options - meet at home and leave together 
+		 * or leave immediately - and probably split - and meet outside.
+		 * 
+		 * Also households where all members are located outside the affected area might decide
+		 * to meet at home if they assume that there is enough time to meet and evacuate jointly.
 		 */
 		else {
 			double fromHome = hdd.getHouseholdEvacuateFromHomeTime();
@@ -269,8 +247,15 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			if (hdd.getHouseholdEvacuateFromHomeTime() < hdd.getLatestAcceptedLeaveTime()) {
 				hdd.setMeetingPointFacilityId(hdd.getHomeFacilityId());
 			} else {
+				
+				/*
+				 * TODO: the household might be willing to meet at home even if that takes longer.
+				 * How to define "longer"? E.g. 30 Minutes are always accepted, more than 60 Minutes
+				 * never, in between a random value based on the household id is used. Take
+				 * travel time into account? Take ratio difference/travel time into account?
+				 */
 				if (direct < fromHome) {
-					hdd.setMeetingPointFacilityId(newMeetingPointId);
+					hdd.setMeetingPointFacilityId(scenario.createId("rescueFacility"));
 				} else {
 					hdd.setMeetingPointFacilityId(hdd.getHomeFacilityId());
 				}				
@@ -278,41 +263,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		}
 	}
 	
-	/*
-	 * The time until a household wants to have left the affected area. 
-	 * Note: this is NOT the time when the household wants to start its evacuation trip!
-	 */
-	private void calculateLatestAcceptedLeaveTime(Household household, double time) {
-		
-		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
-		EvacuationDecision evacuationDecision = hdd.getEvacuationDecision();
-
-		if (evacuationDecision == EvacuationDecision.IMMEDIATELY) {
-			hdd.setLatestAcceptedLeaveTime(EvacuationConfig.evacuationTime);
-		} 
-		/*
-		 * The household defines its latest accepted evacuation time as:
-		 * (latest time given by the government (e.g. 8 hours time) - current time) * 0.75..1.00
-		 * As a result households 
-		 */
-		else if (evacuationDecision == EvacuationDecision.LATER) {
-			
-			// calculate random double value between 0.75 and 1.0
-			double rand = 0.75 + (this.random.nextDouble() / 4);
-			
-			double dt = EvacuationConfig.evacuationDelayTime * rand;
-			hdd.setLatestAcceptedLeaveTime(EvacuationConfig.evacuationTime + dt);			
-		} else if (evacuationDecision == EvacuationDecision.NEVER) {
-			hdd.setLatestAcceptedLeaveTime(EvacuationConfig.evacuationTime);
-		} else {
-			throw new RuntimeException("Household's EvacuationDecision is undefined " + evacuationDecision);
-		}
-		
-		// old behavioral model
-//		hdd.setLatestAcceptedLeaveTime(EvacuationConfig.evacuationTime + 2*3600);
-	}
-	
-	private void calculateHouseholdReturnHomeTime(Household household, double time) {
+	private void calculateHouseholdReturnHomeTime(Household household) {
 		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
 		
 		double returnHomeTime = Double.MIN_VALUE;
@@ -325,7 +276,11 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		hdd.setHouseholdReturnHomeTime(returnHomeTime);
 	}
 	
-	private void calculateHouseholdDirectEvacuationTime(Household household, double time) {
+	/*
+	 * TODO: a household might be joined but not at home. Still its members would evacuate jointly.
+	 * However, this option is not taken into account so far (neither here nor in the replanning code).
+	 */
+	private void calculateHouseholdDirectEvacuationTime(Household household) {
 		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
 		
 		double agentDirectEvacuationTime = Double.MIN_VALUE;
@@ -341,7 +296,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	/*
 	 * Calculates (estimates) the time until all members of a household have returned home.
 	 */
-	private void calculateHouseholdTimes(Household household, double time) {
+	private void calculateHouseholdMemberTimes(Household household, double time) {
 		
 		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
 		for (Id personId : household.getMemberIds()) {
@@ -430,26 +385,29 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		 * Calculate the travel time from the agents current position to its home facility.
 		 */
 		if (needsHomeRouting) {
-			double t = calculateTravelTime(toHomeFacilityPlanAlgo, personId, fromLinkId, homeLinkId, mode, time);
-			pdd.setAgentReturnHomeTime(t);
+			double travelTime = calculateTravelTime(toHomeFacilityPlanAlgo, personId, fromLinkId, homeLinkId, mode, time);
+			pdd.setAgentReturnHomeTime(time + travelTime);
 		} else pdd.setAgentReturnHomeTime(time);
 		pdd.setAgentTransportMode(mode);
 		
 		/*
 		 * Calculate the travel time from the agents current position to a secure place.
+		 * If the agent is not inside the affected area, its evacuation travel time is 0, therefore
+		 * its direct evacuation time is the actual time.
+		 * Otherwise its the actual time + the travel time to leave the affected area.
 		 */
-		if (!pdd.isAffected()) pdd.setAgentDirectEvacuationTime(0.0);
+		if (!pdd.isAffected()) pdd.setAgentDirectEvacuationTime(time);
 		else {
 			Id toLinkId = this.scenario.createId("exitLink");
-			double t = calculateTravelTime(evacuationPlanAlgo, personId, fromLinkId, toLinkId, mode, time);
-			pdd.setAgentDirectEvacuationTime(t);
+			double travelTime = calculateTravelTime(evacuationPlanAlgo, personId, fromLinkId, toLinkId, mode, time);
+			pdd.setAgentDirectEvacuationTime(time + travelTime);
 		}
 	}
 	
 	/*
 	 * Calculates (estimates) a households evacuation time from home to a rescue facility.
 	 */
-	private void calculateEvacuationTimeFromHome(Household household, double time) {
+	private void calculateEvacuationTimeFromHome(Household household, double departureTime) {
 		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
 		
 		/*
@@ -482,24 +440,24 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			if (mode.equals(TransportMode.car)) {
 				// Calculate a car travel time only once since it should not be person dependent.
 				if (vehicularTravelTime == Double.MIN_VALUE) {
-					vehicularTravelTime = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, time);
+					vehicularTravelTime = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
 				} else continue;
 			}
 			else if (mode.equals(TransportMode.ride)) continue;
 			else if (mode.equals(PassengerDepartureHandler.passengerTransportMode)) continue;
 			else {
-				double tt = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, time);
+				double tt = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
 				if (tt > nonVehicularTravelTime) nonVehicularTravelTime = tt;
 			}
 		}
 		
-		hdd.setHouseholdEvacuateFromHomeTime(Math.max(vehicularTravelTime, nonVehicularTravelTime));
+		hdd.setHouseholdEvacuateFromHomeTime(departureTime + Math.max(vehicularTravelTime, nonVehicularTravelTime));
 	}
 	
 	/*
 	 * Calculates (estimates) the travel time from a fromLink to a toLink using a given mode.
 	 */
-	private double calculateTravelTime(PlanAlgorithm planAlgo, Id personId, Id fromLinkId, Id toLinkId, String mode, double time) {
+	private double calculateTravelTime(PlanAlgorithm planAlgo, Id personId, Id fromLinkId, Id toLinkId, String mode, double departureTime) {
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		
@@ -509,8 +467,8 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		Activity toActivity = factory.createActivityFromLinkId("home", toLinkId);
 		Leg leg = factory.createLeg(mode);
 		
-		fromActivity.setEndTime(time);
-		leg.setDepartureTime(time);
+		fromActivity.setEndTime(departureTime);
+		leg.setDepartureTime(departureTime);
 		
 		plan.addActivity(fromActivity);
 		plan.addLeg(leg);
@@ -518,7 +476,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		
 		planAlgo.run(plan);
 		
-		return time + leg.getTravelTime();
+		return Math.round(leg.getTravelTime());
 	}
 	
 	/*

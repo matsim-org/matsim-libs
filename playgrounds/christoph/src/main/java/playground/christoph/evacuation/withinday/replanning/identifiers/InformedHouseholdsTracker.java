@@ -64,7 +64,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 		this.sigma = sigma;
 		this.informedHouseholdsInCurrentTimeStep = new ConcurrentLinkedQueue<Id>();
 
-		this.rng = new DeterministicRNG();
+		this.rng = new DeterministicRNG(132456);
 		this.informedHouseholds = new HashSet<Id>();
 		this.informationTime = new PriorityBlockingQueue<Tuple<Id, Double>>(500, new InformationTimeComparator());
 
@@ -123,7 +123,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 
 	private double calculateInformationDelay(Id householdId) {
 
-		double rand = this.rng.hashCodeToRandomDouble(householdId);
+		double rand = this.rng.idToRandomDouble(householdId);
 
 		if (rand == 0.0) return 0.0;
 		else if (rand > upperLimit) rand = upperLimit;

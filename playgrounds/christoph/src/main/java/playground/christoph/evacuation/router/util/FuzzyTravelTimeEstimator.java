@@ -69,7 +69,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 		this.agentsTracker = agentsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 		this.distanceFuzzyFactorProvider = distanceFuzzyFactorProvider;
-		this.rng = new DeterministicRNG();
+		this.rng = new DeterministicRNG(213456);
 	}
 	
 	@Override

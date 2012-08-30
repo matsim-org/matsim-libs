@@ -492,7 +492,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, timeFactory, 
 				this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.affectedArea, 
 				this.modeAvailabilityChecker.createInstance(), this.informedHouseholdsTracker, this.decisionDataProvider,
-				this.decisionModelRunner.getEvacuationDecisionModel());
+				this.decisionModelRunner);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	

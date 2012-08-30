@@ -62,7 +62,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
  */
 public class PickupModel implements PersonDecisionModel {
 	
-	static final Logger log = Logger.getLogger(PickupModel.class);
+	private static final Logger log = Logger.getLogger(PickupModel.class);
 	
 	public static final String pickupModelFile = "pickupModel.txt.gz";
 	

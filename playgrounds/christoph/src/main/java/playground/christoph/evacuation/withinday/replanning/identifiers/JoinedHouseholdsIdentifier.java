@@ -56,6 +56,7 @@ import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
+import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 import playground.christoph.evacuation.utils.DeterministicRNG;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdModeAssignment;
@@ -113,7 +114,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.decisionDataProvider = decisionDataProvider;
 		
-		this.rng = new DeterministicRNG();
+		this.rng = new DeterministicRNG(123654);
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.householdMeetingPointMapping = new ConcurrentHashMap<Id, Id>();
 		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
@@ -283,8 +284,8 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 						else if (participating == Participating.FALSE) householdParticipates = false;
 						else throw new RuntimeException("Households participation state is undefined: " + householdId.toString());
 						
-						if (!facilityIsSecure && householdParticipates) {
-							HouseholdDeparture householdDeparture = createHouseholdDeparture(time, householdId, householdPosition.getPositionId());
+						if (!facilityIsSecure && householdParticipates) {																											
+							HouseholdDeparture householdDeparture = createHouseholdDeparture(time, hdd, householdPosition.getPositionId());
 							this.householdDepartures.put(householdId, householdDeparture);
 							
 //							/*
@@ -347,7 +348,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 							
 							if (!facilityIsSecure && householdParticipates) {
 								// ... and schedule the household's departure.
-								householdDeparture = createHouseholdDeparture(time, householdId, meetingPointId);
+								householdDeparture = createHouseholdDeparture(time, hdd, meetingPointId);
 								this.householdDepartures.put(householdId, householdDeparture);
 							}
 						}
@@ -395,15 +396,47 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		}
 	}
 	
-	private HouseholdDeparture createHouseholdDeparture(double time, Id householdId, Id facilityId) {
+	/*
+	 * Create a HouseholdDeparture object. The household's departure time depends on its
+	 * evacuation decision (immediately vs. later).
+	 * We further assume that the household requires at least a certain time to grab some
+	 * basic stuff. Therefore, we add an offset to the current time based on a Rayleigh
+	 * distribution.
+	 */
+	private HouseholdDeparture createHouseholdDeparture(double currentTime, HouseholdDecisionData hdd, Id facilityId) {
 		
-		double departureDelay = calculateDepartureDelay(time, householdId);
+		Id householdId = hdd.getHouseholdId();
+		EvacuationDecision evacuationDecision = hdd.getEvacuationDecision();
+		double departureDelay = calculateDepartureDelay(householdId);
+		double earliestDepartureTime = currentTime + departureDelay;
 		
+		double departureTime;
+		if (evacuationDecision == EvacuationDecision.IMMEDIATELY) {
+			departureTime = earliestDepartureTime;
+		} else if (evacuationDecision == EvacuationDecision.LATER) {
+			// TODO: re-estimate evacuate from home time?
+			double evacuateFromHomeTime = hdd.getHouseholdEvacuateFromHomeTime();	// arrive at rescue facility
+			double householdReturnHomeTime = hdd.getHouseholdReturnHomeTime();	// all household members meet at home
+			double evacuateFromHomeTravelTime = evacuateFromHomeTime - householdReturnHomeTime;
+			
+			double latestLeaveTime = hdd.getLatestAcceptedLeaveTime();	// leave affected area
+			double latestDepartureTime = latestLeaveTime - evacuateFromHomeTravelTime;
+			
+			/*
+			 * The household stays as long as possible at home.
+			 */
+			if (latestDepartureTime > earliestDepartureTime) {
+				departureTime = latestDepartureTime;
+			} else 
+				departureTime = earliestDepartureTime;
+			
+		} else throw new RuntimeException("Unexpected evacuation decision found: " + evacuationDecision.toString());
+						
 		/*
 		 * We have to add one second here. This ensure that some code which is executed
 		 * at the end of a time step is executed when the simulation has started.
 		 */
-		HouseholdDeparture householdDeparture = new HouseholdDeparture(householdId, facilityId, time + departureDelay + 1);
+		HouseholdDeparture householdDeparture = new HouseholdDeparture(householdId, facilityId, departureTime + 1);
 		
 		return householdDeparture;
 	}
@@ -417,9 +450,9 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final double sigma = 600;
 	private final double upperLimit = 0.999999;
 	
-	private double calculateDepartureDelay(double time, Id householdId) {
+	private double calculateDepartureDelay(Id householdId) {
 		
-		double rand = this.rng.hashCodeToRandomDouble(householdId);
+		double rand = this.rng.idToRandomDouble(householdId);
 		
 		if (rand == 0.0) return 0.0;
 		else if (rand > upperLimit) rand = upperLimit;

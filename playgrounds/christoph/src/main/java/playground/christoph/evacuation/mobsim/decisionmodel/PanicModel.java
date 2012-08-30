@@ -44,7 +44,7 @@ import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
  */
 public class PanicModel implements PersonDecisionModel {
 	
-	static final Logger log = Logger.getLogger(PanicModel.class);
+	private static final Logger log = Logger.getLogger(PanicModel.class);
 	
 	public static final String panicModelFile = "panicModel.txt.gz";
 	

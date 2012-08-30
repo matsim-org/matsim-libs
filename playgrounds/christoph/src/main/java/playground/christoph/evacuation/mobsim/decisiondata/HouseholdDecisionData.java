@@ -50,9 +50,28 @@ public class HouseholdDecisionData {
 	private boolean hasChildren = false;
 	private Participating participating = Participating.UNDEFINED;
 	private boolean homeFacilityIsAffected = false;
+	
+	/*
+	 * Time when the household wants to have left the evacuation area.
+	 */
 	private double latestAcceptedLeaveTime = Double.MAX_VALUE;
+	
+	/*
+	 * Time when all household members would arrive at home when traveling 
+	 * there to evacuate jointly.
+	 */
 	private double householdReturnHomeTime = Double.MAX_VALUE;
+	
+	/*
+	 * Time when all members of a household which evacuates from home have
+	 * arrived at a secure facility.
+	 */
 	private double householdEvacuateFromHomeTime = Double.MAX_VALUE;
+	
+	/*
+	 * Time when the last household member would arrive at a secure facility 
+	 * when evacuating directly = max(mebers.directEvacuationTime).
+	 */	
 	private double householdDirectEvacuationTime = Double.MAX_VALUE;
 	
 	public HouseholdDecisionData(Id householdId) {
@@ -156,8 +175,7 @@ public class HouseholdDecisionData {
 		return householdEvacuateFromHomeTime;
 	}
 
-	public void setHouseholdEvacuateFromHomeTime(
-			double householdEvacuateFromHomeTime) {
+	public void setHouseholdEvacuateFromHomeTime(double householdEvacuateFromHomeTime) {
 		this.householdEvacuateFromHomeTime = householdEvacuateFromHomeTime;
 	}
 

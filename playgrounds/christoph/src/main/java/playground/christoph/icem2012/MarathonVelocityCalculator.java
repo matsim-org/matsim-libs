@@ -58,7 +58,7 @@ public class MarathonVelocityCalculator implements VelocityCalculator {
 	
 	public MarathonVelocityCalculator(VelocityCalculator delegate) {
 		this.delegate = delegate;
-		this.rng = new DeterministicRNG();
+		this.rng = new DeterministicRNG(1234590);
 	}
 	
 	@Override

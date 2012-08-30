@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class EvacuationDecisionModel implements HouseholdDecisionModel {
 	
-	static final Logger log = Logger.getLogger(EvacuationDecisionModel.class);
+	private static final Logger log = Logger.getLogger(EvacuationDecisionModel.class);
 	
 	public static final String evacuationDecisionModelFile = "evacuationDecisionModel.txt.gz";
 	

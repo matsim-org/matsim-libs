@@ -49,9 +49,20 @@ public class PersonDecisionData {
 	private final Id personId;
 	private Id householdId = null;
 	private boolean isAffected = false;
-	private boolean hasChildren = false; 
+	private boolean hasChildren = false;
+	
+	/*
+	 * Time when the agent would arrive at home when traveling there to
+	 * evacuate jointly with its other household members.
+	 */
 	private double agentReturnHomeTime = Double.MAX_VALUE;
+	
+	/*
+	 * Time when the agent would arrive at a secure facility when evacuating
+	 * directly.
+	 */	
 	private double agentDirectEvacuationTime = Double.MAX_VALUE;
+	
 	private String agentTransportMode = null;
 	private Id agentReturnHomeVehicleId = null;
 	

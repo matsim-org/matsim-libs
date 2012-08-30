@@ -64,8 +64,10 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
+import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
+import playground.christoph.evacuation.mobsim.decisionmodel.LatestAcceptedLeaveTimeModel;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
 
@@ -95,6 +97,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final int numOfThreads;
 	private final EvacuationDecisionModel evacuationDecisionModel;
+	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	private final DecisionDataProvider decisionDataProvider;
 
 	private ReplanningModule toHomeFacilityRouter;
@@ -118,7 +121,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	public SelectHouseholdMeetingPoint(Scenario scenario, MultiModalTravelTimeFactory timeFactory,
 			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, Geometry affectedArea, 
 			ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker,
-			DecisionDataProvider decisionDataProvider, EvacuationDecisionModel evacuationDecisionModel) {
+			DecisionDataProvider decisionDataProvider, DecisionModelRunner decisionModelRunner) {
 		this.scenario = scenario;
 		this.timeFactory = timeFactory;
 		this.vehiclesTracker = vehiclesTracker;
@@ -130,7 +133,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
-		this.evacuationDecisionModel = evacuationDecisionModel;
+		this.evacuationDecisionModel = decisionModelRunner.getEvacuationDecisionModel();
+		this.latestAcceptedLeaveTimeModel = decisionModelRunner.getLatestAcceptedLeaveTimeModel();
 		
 		init();
 	}
@@ -393,7 +397,8 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					log.info("Households meet at secure place:   " + meetSecure);
 					log.info("Households meet at insecure place: " + meetInsecure);
 					
-					evacuationDecisionModel.printStatistics();
+					this.evacuationDecisionModel.printStatistics();
+					this.latestAcceptedLeaveTimeModel.printStatistics();
 				} else {
 					// set current Time
 					for (Runnable runnable : this.runnables) {
@@ -420,6 +425,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 						if (household.getMemberIds().size() == 0) continue;
 						
 						this.evacuationDecisionModel.runModel(household);
+						this.latestAcceptedLeaveTimeModel.runModel(household);
 												
 						((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
 						roundRobin++;

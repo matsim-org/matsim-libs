@@ -20,18 +20,39 @@
 
 package playground.christoph.evacuation.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 public class DeterministicRNG {
 
-	private static final long hashCodeModFactor = 123456;
-
+	private static final Logger log = Logger.getLogger(DeterministicRNG.class);
+	private static List<Long> usedModFactors = new ArrayList<Long>();
+	
+	private final long hashCodeModFactor;
+	
+	/**
+	 * Use values > 10^6. The value is used to calculate a modulo
+	 */
+	public DeterministicRNG(long hashCodeModFactor) {
+		this.hashCodeModFactor = hashCodeModFactor;
+		
+		synchronized(usedModFactors) {
+			if (usedModFactors.contains(hashCodeModFactor)) {
+				log.warn("hashCodeModFactor is re-used: " + hashCodeModFactor + ". Ensure that this behavior is desired.");
+			}
+			usedModFactors.add(hashCodeModFactor);
+		}
+	}
+	
 	/**
 	 * Creates a random double value between 0.0 and 1.0 based
 	 * on an Id.
 	 */
-	public double hashCodeToRandomDouble(Id id) {
+	public double idToRandomDouble(Id id) {
 		return this.hashCodeToRandomDouble(id.hashCode());
 	}
 	
@@ -57,14 +78,15 @@ public class DeterministicRNG {
 	
 	
 	public static void main(String[] args) {
-		DeterministicRNG rng = new DeterministicRNG();
-		
+		DeterministicRNG rng = new DeterministicRNG(122456);
+				
 		Gbl.startMeasurement();
 		double sum = 0.0;
 		int iters = 10000000;
 		for (int i = 0; i < iters; i++) {
 			sum += rng.hashCodeToRandomDouble(i);
 		}
+		System.out.println(sum/iters);
 		Gbl.printElapsedTime();
 	}
 }

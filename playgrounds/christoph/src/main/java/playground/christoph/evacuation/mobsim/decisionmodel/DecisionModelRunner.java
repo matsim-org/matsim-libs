@@ -38,6 +38,7 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 	private PanicModel panicModel;
 	private PickupModel pickupModel;
 	private EvacuationDecisionModel evacuationDecisionModel;
+	private LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	
 	public DecisionModelRunner(Scenario scenario, DecisionDataProvider decisionDataProvider) {
 		this.scenario = scenario;
@@ -46,10 +47,15 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 		panicModel = new PanicModel(this.decisionDataProvider, EvacuationConfig.panicShare);
 		pickupModel = new PickupModel(this.decisionDataProvider);
 		evacuationDecisionModel = new EvacuationDecisionModel(this.scenario, MatsimRandom.getLocalInstance(), this.decisionDataProvider);
+		latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider);
 	}
 	
 	public EvacuationDecisionModel getEvacuationDecisionModel() {
 		return this.evacuationDecisionModel;
+	}
+	
+	public LatestAcceptedLeaveTimeModel getLatestAcceptedLeaveTimeModel() {
+		return this.latestAcceptedLeaveTimeModel;
 	}
 	
 	@Override
@@ -66,8 +72,8 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 		pickupModel.runModel(this.scenario.getPopulation());
 		
 		/*
-		 * EvacuationDecisionModel has to be run during the simulation when a household
-		 * is informed.
+		 * EvacuationDecisionModel and LatestAcceptedLeaveTimeModel have to be run during the 
+		 * simulation when a household is informed.
 		 */
 	}
 
@@ -77,6 +83,7 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 		panicModel.printStatistics();
 		pickupModel.printStatistics();
 		evacuationDecisionModel.printStatistics();
+		latestAcceptedLeaveTimeModel.printStatistics();
 		
 		String panicModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), PanicModel.panicModelFile);
 		panicModel.writeDecisionsToFile(panicModelFile);
@@ -87,6 +94,10 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 		String evacuationDecisionModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
 				EvacuationDecisionModel.evacuationDecisionModelFile);
 		evacuationDecisionModel.writeDecisionsToFile(evacuationDecisionModelFile);
+		
+		String latestAcceptedLeaveTimeModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
+				LatestAcceptedLeaveTimeModel.latestAcceptedLeaveTimeFile);
+		latestAcceptedLeaveTimeModel.writeDecisionsToFile(latestAcceptedLeaveTimeModelFile);
 	}
 	
 }
