@@ -1,5 +1,8 @@
 Todos:
 
+- TODO: Identifiziere für jeden Messpunkt den Startknoten. Messpunkte mit dem gleichen Startknoten haben, haben auf dem Netzwerk die gleichen Kosten zu allen Knoten, d.h. den Baum für die weiteren Messpunkte weiterverwerten!
+	   - Damit steigt die Komplexität der Accessibility-Berechnung bei beliebig hohen Auflösungen kaum noch an (was jetzt noch der Fall ist)
+	   Alternativ (aber weniger gut), ermittle alle Netzwerkknoten im Untersuchungsgebeit (z.B. Shapefile/Boundingbox) nur für diese Knoten wird der LCPT ausgeführt. Nachteil, Komplexität skaliert bei geringen Auflösungen nicht nach unten. 
 - Compute difference in Accessibility plots... 
 - UrbanSim Runs:
 	- Ohne Developer model (da gute Accessibility durch hohe Preise kompensiert)
