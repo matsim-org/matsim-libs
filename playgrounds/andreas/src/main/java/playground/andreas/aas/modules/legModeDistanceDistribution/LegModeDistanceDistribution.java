@@ -92,7 +92,7 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 
 	@Override
 	public EventHandler getEventHandler() {
-		return this;
+		return null;
 	}
 
 	@Override
@@ -246,10 +246,5 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 				}
 			}
 		}
-	}
-
-	@Override
-	public void reset(int iteration) {
-		// nothing to do here
 	}
 }

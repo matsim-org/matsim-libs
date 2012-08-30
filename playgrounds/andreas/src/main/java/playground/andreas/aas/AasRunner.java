@@ -79,11 +79,19 @@ public class AasRunner {
 		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
 		ptAna.init(this.config, this.scenario, this.shapeFile);
 		this.anaModules.add(ptAna);
-		this.eventsManager.addHandler(ptAna);
 		
 		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
 		distAna.init(this.scenario, 15);
 		this.anaModules.add(distAna);
+		
+		
+		// END ugly code
+		
+		for (AbstractAnalyisModule module : this.anaModules) {
+			if (module.getEventHandler() != null) {
+				this.eventsManager.addHandler(module.getEventHandler());
+			}
+		}
 	}
 
 	public void preProcess(){

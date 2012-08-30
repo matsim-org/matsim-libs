@@ -34,7 +34,7 @@ import org.matsim.core.events.handler.EventHandler;
  * @author aneumann
  *
  */
-public abstract class AbstractAnalyisModule implements EventHandler{
+public abstract class AbstractAnalyisModule {
 	
 	private final String name;
 	protected final String ptDriverPrefix;

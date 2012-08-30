@@ -80,8 +80,4 @@ public class BvgTripAnalysisRunnerV4 extends AbstractAnalyisModule{
 		this.ana.writeResults(outputFolder);
 	}
 
-	@Override
-	public void reset(int iteration) {
-		// nothing to do here		
-	}
 }
