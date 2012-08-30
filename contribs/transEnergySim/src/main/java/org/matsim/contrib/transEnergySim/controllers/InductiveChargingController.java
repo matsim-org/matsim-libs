@@ -76,11 +76,13 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 	}
 	
 	public void printToConsole(){
-		System.out.println("energyConsumptionTracker");
+		System.out.println("energyConsumption");
 		energyConsumptionTracker.getLog().printToConsole();
 		System.out.println("===");
+		System.out.println("inductiveCharger");
 		inductiveCharger.getLog().printToConsole();
 		System.out.println("===");
+		System.out.println("chargingUponArrival");
 		chargingUponArrival.getLog().printToConsole();
 		System.out.println("===");
 	}
