@@ -263,8 +263,7 @@ public class MATSim4UrbanSimTEST {
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
 		
-		// tnicolai TODO Time-of-a-day
-//		this.timeOfADay = XXX;
+		// tnicolai TODO provide Time-of-a-day as a parameter for contoler listeners ...
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)

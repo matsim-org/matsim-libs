@@ -1,6 +1,6 @@
 Todos:
 
-
+- Compute difference in Accessibility plots... 
 - UrbanSim Runs:
 	- Ohne Developer model (da gute Accessibility durch hohe Preise kompensiert)
 	- HLCM + HRM (später mit Relocation und LocationChoice für Firmen) -> Was passiert wenn eine Frma umzieht, besteht dann noch die Verlinkung mit den Personen???
@@ -25,6 +25,8 @@ Todos:
 
 Tasks Done:
 
+- Compute Logsum over agent/Matsim scores -> see CalculateMATSimScores or UserWelfareCalculator
+- Get Difference between logsum of Basecase and Tunnel Scenario by computing: Scenario - Basecase
 - LATSIS Paper: Bild-Artefakte diskutieren
 - Paper for D7.2. (tech report):
 	- Reference to Software issues Paper (we solved the coupling as follows ... see Paper ...)
