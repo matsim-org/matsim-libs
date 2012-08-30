@@ -27,9 +27,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -46,7 +46,6 @@ public class AasRunner {
 	
 	private final static Logger log = Logger.getLogger(AasRunner.class);
 	
-	private final Config config;
 	private final String baseFolder;
 	private final String iterationOutputDir;
 	private final String eventsFile;
@@ -58,8 +57,7 @@ public class AasRunner {
 
 	
 
-	public AasRunner(Config config, String baseFolder, String iterationOutputDir, String eventsFile, ScenarioImpl scenario, Set<Feature> shapeFile) {
-		this.config = config;
+	public AasRunner(ScenarioImpl scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<Feature> shapeFile) {
 		this.baseFolder = baseFolder;
 		this.iterationOutputDir = iterationOutputDir;
 		this.eventsFile = eventsFile;
@@ -77,7 +75,7 @@ public class AasRunner {
 		
 		
 		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
-		ptAna.init(this.config, this.scenario, this.shapeFile);
+		ptAna.init(this.scenario.getConfig(), this.scenario, this.shapeFile);
 		this.anaModules.add(ptAna);
 		
 		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
@@ -88,8 +86,8 @@ public class AasRunner {
 		// END ugly code
 		
 		for (AbstractAnalyisModule module : this.anaModules) {
-			if (module.getEventHandler() != null) {
-				this.eventsManager.addHandler(module.getEventHandler());
+			for (EventHandler handler : module.getEventHandler()) {
+				this.eventsManager.addHandler(handler);
 			}
 		}
 	}

@@ -20,6 +20,8 @@
 package playground.andreas.aas.modules.ptTripAnalysis;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,8 +63,10 @@ public class BvgTripAnalysisRunnerV4 extends AbstractAnalyisModule{
 	}
 
 	@Override
-	public EventHandler getEventHandler() {
-		return this.ana.getEventHandler();
+	public List<EventHandler> getEventHandler() {
+		List<EventHandler> handler = new LinkedList<EventHandler>();
+		handler.add(this.ana.getEventHandler());
+		return handler;
 	}
 
 	@Override

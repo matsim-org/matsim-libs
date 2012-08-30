@@ -69,7 +69,7 @@ public class AasMain {
 		String shapeFile = aM.getConfig().findParam(PConfigGroup.GROUP_NAME, "serviceAreaFile");
 		aM.readFiles(aM.getBaseFolder() + shapeFile.substring(2));
 		
-		AasRunner aR = new AasRunner(aM.getConfig(), aM.getBaseFolder(), aM.getIterationOutputDir(), aM.getEventsFile(), aM.getScenario(), aM.getShapeFile());
+		AasRunner aR = new AasRunner(aM.getScenario(), aM.getBaseFolder(), aM.getIterationOutputDir(), aM.getEventsFile(), aM.getShapeFile());
 		aR.init(AASRUNNERCONFIGFILE);
 		aR.preProcess();
 		aR.run();

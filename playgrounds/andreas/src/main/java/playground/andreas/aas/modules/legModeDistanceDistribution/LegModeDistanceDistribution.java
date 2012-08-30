@@ -22,6 +22,7 @@ package playground.andreas.aas.modules.legModeDistanceDistribution;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -91,8 +92,9 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 	}
 
 	@Override
-	public EventHandler getEventHandler() {
-		return null;
+	public List<EventHandler> getEventHandler() {
+		// nothing to return
+		return new LinkedList<EventHandler>();
 	}
 
 	@Override

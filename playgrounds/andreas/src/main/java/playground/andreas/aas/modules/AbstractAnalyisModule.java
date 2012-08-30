@@ -21,6 +21,7 @@ package playground.andreas.aas.modules;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -81,9 +82,9 @@ public abstract class AbstractAnalyisModule {
 	
 	/**
 	 * 
-	 * @return An event handler of the module, if necessary, otherwise null.
+	 * @return A list of all the event handler of the module, if necessary, otherwise an empty List.
 	 */
-	public abstract EventHandler getEventHandler();
+	public abstract List<EventHandler> getEventHandler();
 	
 	/**
 	 * Hook called before the events stream is processed.
