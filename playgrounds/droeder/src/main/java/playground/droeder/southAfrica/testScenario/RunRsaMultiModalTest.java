@@ -19,8 +19,9 @@
 
 package playground.droeder.southAfrica.testScenario;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -44,14 +45,28 @@ public class RunRsaMultiModalTest {
 	
 	
 	private final static Logger log = Logger.getLogger(RunRsaMultiModalTest.class);
+	private static String CONFIGFILE = 
+//			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
+			"E:/rsa/server/configDebug0.01.xml";
+	
 
 	public static void main(final String[] args) {
+		String configFile = null;
 		
 		if(args.length == 0){
-			log.info("Arg 1: config.xml");
+			if(new File(CONFIGFILE).exists()){
+				configFile = CONFIGFILE;
+			}else{
+				log.error("no config Found...");
+				System.exit(1);
+			}
+		}else if(args.length == 1){
+			configFile = args[0];
+		}else{
+			log.error("no config Found...");
 			System.exit(1);
 		}
-		sim(args[0]);
+		sim(configFile);
 		
 	}
 

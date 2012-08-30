@@ -42,7 +42,7 @@ public class PtSubModeDependRouterFactory implements TransitRouterFactory{
 		this.sc = c.getScenario();
 		this.routeOnSameMode = routeOnSameMode;
 	}
-
+	// TODO[dr] create RouterNetworks only once per iteration and add them here to the router!
 	public TransitRouter createTransitRouter() {
 		return new PtSubModeDependendRouter(this.sc, this.routeOnSameMode);
 	}
