@@ -1,6 +1,9 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -30,8 +33,11 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * improvements aug'12
  * - accessibility calculation of unified for cell- and zone-base approach
- * 
- * 
+ * - Big computing savings due reduction of "least cost path tree" execution:
+ *   In a pre-processing step all nearest nodes of measuring points (origins) are determined. 
+ *   The "least cost path tree" for measuring points with the same nearest node are now only executed once. 
+ *   Only the cost calculations from the measuring point to the network is done individually.
+ *   
  * @author thomas
  *
  */
@@ -207,130 +213,285 @@ public class AccessibilityControlerListenerImpl{
 			LeastCostPathTree lcptCongestedCarTravelTime,
 			LeastCostPathTree lcptTravelDistance, NetworkImpl network,
 			Iterator<Zone<Id>> measuringPointIterator,
-			int size, int mode) {
+			int numberOfMeasuringPoints, int mode) {
 
-		ProgressBar bar = new ProgressBar( size );
-		
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
 		
 //			// tnicolai: only for testing, disable afterwards
 //			ZoneLayer<Id> testSet = createTestPoints();
 //			measuringPointIterator = testSet.getZones().iterator();
 
-		// iterates through all starting points (fromZone) and calculates their accessibility, e.g. to jobs
+		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
+		Map<Id,ArrayList<Zone<Id>>> aggregatedMeasurePoints = new HashMap<Id, ArrayList<Zone<Id>>>();
+
+		// go through all measuring points ...
 		while( measuringPointIterator.hasNext() ){
-			
-			bar.update();
-			
+
 			Zone<Id> measurePoint = measuringPointIterator.next();
-			
 			Point point = measurePoint.getGeometry().getCentroid();
 			// get coordinate from origin (start point)
 			Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
-			assert( coordFromZone!=null );
-			
-			// from here: accessibility computation for current starting point ("fromNode")
-			
 			// captures the distance (as walk time) between a cell centroid and the road network
 			Link nearestLink = network.getNearestLinkExactly(coordFromZone);
-
 			// determine nearest network node (from- or toNode) based on the link 
 			Node fromNode = NetworkUtil.getNearestNode(coordFromZone, nearestLink);
-			assert( fromNode != null );
+			
+			// this is used as a key for hash map lookups
+			Id id = fromNode.getId();
+			
+			// create new entry if key does not exist!
+			if(!aggregatedMeasurePoints.containsKey(id))
+				aggregatedMeasurePoints.put(id, new ArrayList<Zone<Id>>());
+			// assign measure point (origin) to it's nearest node
+			aggregatedMeasurePoints.get(id).add(measurePoint);
+		}
+		
+		log.info("");
+		log.info("Number of measure points: " + numberOfMeasuringPoints);
+		log.info("Number of aggregated measure points: " + aggregatedMeasurePoints.size());
+		log.info("");
+		
+
+		ProgressBar bar = new ProgressBar( aggregatedMeasurePoints.size() );
+		
+		// contains all nodes that have a measuring point (origin) assigned
+		Iterator<Id> keyIterator = aggregatedMeasurePoints.keySet().iterator();
+		// contains all network nodes
+		Map<Id, Node> networkNodesMap = network.getNodes();
+		
+		// go through all nodes (key's) that have a measuring point (origin) assigned
+		while( keyIterator.hasNext() ){
+			
+			bar.update();
+			
+			Id nodeId = keyIterator.next();
+			Node fromNode = networkNodesMap.get( nodeId );
 			
 			// run dijkstra on network
+			// this is done once for all origins in the "origins" list, see below
 			lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
 			lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
 			lcptTravelDistance.calculate(network, fromNode, depatureTime);
 			
-			// captures the distance (as walk time) between a zone centroid and its nearest node
+			// get list with origins that are assigned to "fromNode"
+			ArrayList<Zone<Id>> origins = aggregatedMeasurePoints.get( nodeId );
+			Iterator<Zone<Id>> originsIterator = origins.iterator();
 			
-			Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
-			
-			double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
-			double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
-			
-			double offsetWalkTime2Node_h 				= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
-			double carTravelTime_meterpersec			= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime);
-			double freeSpeedTravelTime_meterpersec 		= nearestLink.getFreespeed();
-			
-			double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
-			double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
-			double offsetBikeTime_h						= distanceRoad2Node_meter / this.bikeSpeedMeterPerHour;
-			
+			while( originsIterator.hasNext() ){
+				
+				Zone<Id> measurePoint = originsIterator.next();
+				Point point = measurePoint.getGeometry().getCentroid();
+				// get coordinate from origin (start point)
+				Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
+				assert( coordFromZone!=null );
+				// captures the distance (as walk time) between a cell centroid and the road network
+				Link nearestLink = network.getNearestLinkExactly(coordFromZone);
+				
+				// captures the distance (as walk time) between a zone centroid and its nearest node
+				
+				Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
+				
+				double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
+				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
+				
+				double offsetWalkTime2Node_h 				= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
+				double carTravelTime_meterpersec			= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime);
+				double freeSpeedTravelTime_meterpersec 		= nearestLink.getFreespeed();
+				
+				double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
+				double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
+				double offsetBikeTime_h						= distanceRoad2Node_meter / this.bikeSpeedMeterPerHour;
+				
 
-			// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
-			// Euclidean Distance (measuring point 2 nearest node):
-			// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
-			// Orthogonal Distance (measuring point 2 nearest link, does not include remaining distance between link intersection and nearest node)
-			// LinkImpl nearestLink = network.getNearestLink( coordFromZone );
-			// double walkTimeOffset_min = (nearestLink.calcDistance( coordFromZone ) / this.walkSpeedMeterPerMin); 
-			// or use NetworkUtil.getOrthogonalDistance(link, point) instead!
-			
-			gcs.reset();
+				// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
+				// Euclidean Distance (measuring point 2 nearest node):
+				// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
+				// Orthogonal Distance (measuring point 2 nearest link, does not include remaining distance between link intersection and nearest node)
+				// LinkImpl nearestLink = network.getNearestLink( coordFromZone );
+				// double walkTimeOffset_min = (nearestLink.calcDistance( coordFromZone ) / this.walkSpeedMeterPerMin); 
+				// or use NetworkUtil.getOrthogonalDistance(link, point) instead!
+				
+				gcs.reset();
 
-			// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
-			for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
-				
-				// add the avg. distance of all aggregated opportunities (euclidiean distance from nearest node to opportunity)
-				double averageDistanceRoad2Opportunitiy_meter = this.aggregatedOpportunities[i].getAverageDistance();
-				double offsetWalkTime2Opportunity_h = averageDistanceRoad2Opportunitiy_meter / this.walkSpeedMeterPerHour;
-				
-				// get stored network node (this is the nearest node next to an aggregated work place)
-				Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
-				Id nodeID = destinationNode.getId();
-				
-				// using number of aggregated opportunities as weight for log sum measure
-				int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
+				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
+				for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
+					
+					// add the avg. distance of all aggregated opportunities (euclidiean distance from nearest node to opportunity)
+					double averageDistanceRoad2Opportunitiy_meter = this.aggregatedOpportunities[i].getAverageDistance();
+					double offsetWalkTime2Opportunity_h = averageDistanceRoad2Opportunitiy_meter / this.walkSpeedMeterPerHour;
+					
+					// get stored network node (this is the nearest node next to an aggregated work place)
+					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
+					Id nodeID = destinationNode.getId();
+					
+					// using number of aggregated opportunities as weight for log sum measure
+					int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
 
-				// free speed car travel times in hours
-				double freeSpeedTravelTime_h= (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
-				// travel distance in meter
-				double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
-				// bike travel times in hours
-				double bikeTravelTime_h 	= (travelDistance_meter / this.bikeSpeedMeterPerHour) + offsetBikeTime_h; // using a constant speed of 15km/h
-				// walk travel times in hours
-				double walkTravelTime_h		= travelDistance_meter / this.walkSpeedMeterPerHour;
-				// congested car travel times in hours
-				double arrivalTime = lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime(); // may also use .getCost() !!!
-				double congestedCarTravelTime_h = ((arrivalTime - depatureTime) / 3600.) + offsetCongestedCarTime_h;
+					// free speed car travel times in hours
+					double freeSpeedTravelTime_h= (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
+					// travel distance in meter
+					double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
+					// bike travel times in hours
+					double bikeTravelTime_h 	= (travelDistance_meter / this.bikeSpeedMeterPerHour) + offsetBikeTime_h; // using a constant speed of 15km/h
+					// walk travel times in hours
+					double walkTravelTime_h		= travelDistance_meter / this.walkSpeedMeterPerHour;
+					// congested car travel times in hours
+					double arrivalTime = lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime(); // may also use .getCost() !!!
+					double congestedCarTravelTime_h = ((arrivalTime - depatureTime) / 3600.) + offsetCongestedCarTime_h;
+					
+					sumGeneralizedCosts(gcs, 
+							distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
+							distanceRoad2Node_meter, 
+							offsetWalkTime2Node_h + offsetWalkTime2Opportunity_h,
+							opportunityWeight, freeSpeedTravelTime_h,
+							travelDistance_meter, bikeTravelTime_h,
+							walkTravelTime_h, congestedCarTravelTime_h);
+				}
 				
-				sumGeneralizedCosts(gcs, 
-						distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
-						distanceRoad2Node_meter, 
-						offsetWalkTime2Node_h + offsetWalkTime2Opportunity_h,
-						opportunityWeight, freeSpeedTravelTime_h,
-						travelDistance_meter, bikeTravelTime_h,
-						walkTravelTime_h, congestedCarTravelTime_h);
+				// aggregated value
+				double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility;
+				if(!useRawSum){ 	// get log sum
+					freeSpeedAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() );
+					carAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() );
+					bikeAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() );
+					walkAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() );
+				}
+				else{ 				// get raw sum
+					freeSpeedAccessibility = inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();
+					carAccessibility = inverseOfLogitScaleParameter * gcs.getCarSum();
+					bikeAccessibility= inverseOfLogitScaleParameter * gcs.getBikeSum();
+					walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
+				}
+				
+				if(mode == CELL_BASED){ // only for cell-based accessibility computation
+					// assign log sums to current starZone object and spatial grid
+					freeSpeedGrid.setValue(freeSpeedAccessibility, measurePoint.getGeometry().getCentroid());
+					carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());
+					bikeGrid.setValue(bikeAccessibility , measurePoint.getGeometry().getCentroid());
+					walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
+				}
+				
+				writeCSVData(measurePoint, coordFromZone,
+						fromNode, freeSpeedAccessibility, carAccessibility,
+						bikeAccessibility, walkAccessibility);
 			}
-			
-			// aggregated value
-			double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility;
-			if(!useRawSum){ 	// get log sum
-				freeSpeedAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() );
-				carAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() );
-				bikeAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() );
-				walkAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() );
-			}
-			else{ 				// get raw sum
-				freeSpeedAccessibility = inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();
-				carAccessibility = inverseOfLogitScaleParameter * gcs.getCarSum();
-				bikeAccessibility= inverseOfLogitScaleParameter * gcs.getBikeSum();
-				walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
-			}
-			
-			if(mode == CELL_BASED){ // only for cell-based accessibility computation
-				// assign log sums to current starZone object and spatial grid
-				freeSpeedGrid.setValue(freeSpeedAccessibility, measurePoint.getGeometry().getCentroid());
-				carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());
-				bikeGrid.setValue(bikeAccessibility , measurePoint.getGeometry().getCentroid());
-				walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
-			}
-			
-			writeCSVData(measurePoint, coordFromZone,
-					fromNode, freeSpeedAccessibility, carAccessibility,
-					bikeAccessibility, walkAccessibility);
 		}
+		
+		// tnicolai: this is the previous version, below (deleted !!!)
+//		// iterates through all starting points (fromZone) and calculates their accessibility, e.g. to jobs
+//		while( measuringPointIterator.hasNext() ){
+//			
+//			bar.update();
+//			
+//			Zone<Id> measurePoint = measuringPointIterator.next();
+//			
+//			Point point = measurePoint.getGeometry().getCentroid();
+//			// get coordinate from origin (start point)
+//			Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
+//			assert( coordFromZone!=null );
+//			
+//			// from here: accessibility computation for current starting point ("fromNode")
+//			
+//			// captures the distance (as walk time) between a cell centroid and the road network
+//			Link nearestLink = network.getNearestLinkExactly(coordFromZone);
+//
+//			// determine nearest network node (from- or toNode) based on the link 
+//			Node fromNode = NetworkUtil.getNearestNode(coordFromZone, nearestLink);
+//			assert( fromNode != null );
+//			
+//			// run dijkstra on network
+//			lcptFreeSpeedCarTravelTime.calculate(network, fromNode, depatureTime);
+//			lcptCongestedCarTravelTime.calculate(network, fromNode, depatureTime);		
+//			lcptTravelDistance.calculate(network, fromNode, depatureTime);
+//			
+//			// captures the distance (as walk time) between a zone centroid and its nearest node
+//			
+//			Distances distance = NetworkUtil.getDistance2NodeV2(nearestLink, point, fromNode);
+//			
+//			double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
+//			double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
+//			
+//			double offsetWalkTime2Node_h 				= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
+//			double carTravelTime_meterpersec			= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime);
+//			double freeSpeedTravelTime_meterpersec 		= nearestLink.getFreespeed();
+//			
+//			double offsetFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTime_meterpersec * 3600);
+//			double offsetCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTime_meterpersec * 3600.);
+//			double offsetBikeTime_h						= distanceRoad2Node_meter / this.bikeSpeedMeterPerHour;
+//			
+//
+//			// Possible offsets to calculate the gap between measuring (start) point and start node (fromNode)
+//			// Euclidean Distance (measuring point 2 nearest node):
+//			// double walkTimeOffset_min = NetworkUtil.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
+//			// Orthogonal Distance (measuring point 2 nearest link, does not include remaining distance between link intersection and nearest node)
+//			// LinkImpl nearestLink = network.getNearestLink( coordFromZone );
+//			// double walkTimeOffset_min = (nearestLink.calcDistance( coordFromZone ) / this.walkSpeedMeterPerMin); 
+//			// or use NetworkUtil.getOrthogonalDistance(link, point) instead!
+//			
+//			gcs.reset();
+//
+//			// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
+//			for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
+//				
+//				// add the avg. distance of all aggregated opportunities (euclidiean distance from nearest node to opportunity)
+//				double averageDistanceRoad2Opportunitiy_meter = this.aggregatedOpportunities[i].getAverageDistance();
+//				double offsetWalkTime2Opportunity_h = averageDistanceRoad2Opportunitiy_meter / this.walkSpeedMeterPerHour;
+//				
+//				// get stored network node (this is the nearest node next to an aggregated work place)
+//				Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
+//				Id nodeID = destinationNode.getId();
+//				
+//				// using number of aggregated opportunities as weight for log sum measure
+//				int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
+//
+//				// free speed car travel times in hours
+//				double freeSpeedTravelTime_h= (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
+//				// travel distance in meter
+//				double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
+//				// bike travel times in hours
+//				double bikeTravelTime_h 	= (travelDistance_meter / this.bikeSpeedMeterPerHour) + offsetBikeTime_h; // using a constant speed of 15km/h
+//				// walk travel times in hours
+//				double walkTravelTime_h		= travelDistance_meter / this.walkSpeedMeterPerHour;
+//				// congested car travel times in hours
+//				double arrivalTime = lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime(); // may also use .getCost() !!!
+//				double congestedCarTravelTime_h = ((arrivalTime - depatureTime) / 3600.) + offsetCongestedCarTime_h;
+//				
+//				sumGeneralizedCosts(gcs, 
+//						distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
+//						distanceRoad2Node_meter, 
+//						offsetWalkTime2Node_h + offsetWalkTime2Opportunity_h,
+//						opportunityWeight, freeSpeedTravelTime_h,
+//						travelDistance_meter, bikeTravelTime_h,
+//						walkTravelTime_h, congestedCarTravelTime_h);
+//			}
+//			
+//			// aggregated value
+//			double freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility;
+//			if(!useRawSum){ 	// get log sum
+//				freeSpeedAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() );
+//				carAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() );
+//				bikeAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() );
+//				walkAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() );
+//			}
+//			else{ 				// get raw sum
+//				freeSpeedAccessibility = inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();
+//				carAccessibility = inverseOfLogitScaleParameter * gcs.getCarSum();
+//				bikeAccessibility= inverseOfLogitScaleParameter * gcs.getBikeSum();
+//				walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
+//			}
+//			
+//			if(mode == CELL_BASED){ // only for cell-based accessibility computation
+//				// assign log sums to current starZone object and spatial grid
+//				freeSpeedGrid.setValue(freeSpeedAccessibility, measurePoint.getGeometry().getCentroid());
+//				carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());
+//				bikeGrid.setValue(bikeAccessibility , measurePoint.getGeometry().getCentroid());
+//				walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
+//			}
+//			
+//			writeCSVData(measurePoint, coordFromZone,
+//					fromNode, freeSpeedAccessibility, carAccessibility,
+//					bikeAccessibility, walkAccessibility);
+//		}
 	}
 	
 	/**

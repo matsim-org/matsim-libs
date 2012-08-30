@@ -40,7 +40,7 @@ public class FreeSpeedTravelTimeCostCalculator implements TravelDisutility {
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		if(link!=null)
 			return link.getLength() / link.getFreespeed();
-		log.warn("Link is null. Returned 0 as walk time.");
+		log.warn("Link is null. Returned 0 as free speed time.");
 		return 0.;
 	}
 
@@ -48,7 +48,7 @@ public class FreeSpeedTravelTimeCostCalculator implements TravelDisutility {
 	public double getLinkMinimumTravelDisutility(Link link) {
 		if(link!=null)
 			return link.getLength() / link.getFreespeed();
-		log.warn("Link is null. Returned 0 as walk time.");
+		log.warn("Link is null. Returned 0 as free speed time.");
 		return 0.;
 	}
 
