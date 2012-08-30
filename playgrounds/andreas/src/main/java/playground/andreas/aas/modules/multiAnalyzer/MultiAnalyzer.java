@@ -65,6 +65,7 @@ public class MultiAnalyzer extends AbstractAnalyisModule{
 
 	public MultiAnalyzer(String ptDriverPrefix){
 		super(MultiAnalyzer.class.getSimpleName(), ptDriverPrefix);
+		log.info("enabled");
 	}
 	
 	public void init(ScenarioImpl scenario){

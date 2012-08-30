@@ -37,6 +37,7 @@ import playground.andreas.aas.modules.AbstractAnalyisModule;
 import playground.andreas.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 import playground.andreas.aas.modules.multiAnalyzer.MultiAnalyzer;
 import playground.andreas.aas.modules.ptTripAnalysis.BvgTripAnalysisRunnerV4;
+import playground.andreas.aas.modules.spatialAveragingLinkDemand.SpatialAveragingForLinkDemand;
 
 /**
  * 
@@ -84,6 +85,10 @@ public class AasRunner {
 		MultiAnalyzer mA = new MultiAnalyzer(ptDriverPrefix);
 		mA.init(this.scenario);
 		this.anaModules.add(mA);
+		
+		SpatialAveragingForLinkDemand sAD = new SpatialAveragingForLinkDemand(ptDriverPrefix);
+		sAD.init(this.scenario, this.shapeFile, 1);
+		this.anaModules.add(sAD);
 		
 		
 		// END ugly code - Initialization needs to be configurable
