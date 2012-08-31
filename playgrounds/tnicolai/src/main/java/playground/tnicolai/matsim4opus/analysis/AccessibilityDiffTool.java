@@ -38,7 +38,7 @@ public class AccessibilityDiffTool {
 		
 		String policyAccessibilityGridFile = args[0];
 		String baseCaseAccessibilityGridFile = args[1];
-		String outputFilename = args[2];
+		String outputDir = args[2];
 		
 		SpatialGrid policy = SpatialGrid.readFromFile(policyAccessibilityGridFile);
 		SpatialGrid basecase = SpatialGrid.readFromFile(baseCaseAccessibilityGridFile);
@@ -59,6 +59,8 @@ public class AccessibilityDiffTool {
 		double ymax = basecase.getYmax();
 		double resolution = basecase.getResolution();
 		
+		double minDiffValue = Double.MAX_VALUE;
+		double maxDiffValue = Double.MIN_VALUE;
 		
 		for (double y = ymin; y <= ymax; y += resolution){
 			for (double x = xmin; x <= xmax; x += resolution){
@@ -67,8 +69,11 @@ public class AccessibilityDiffTool {
 				double bValue= basecase.getValue(x, y);
 				double diffValue;
 				//calculate difference only in the zurich area
-				if(!Double.isNaN(pValue) && !Double.isNaN(bValue))
+				if(!Double.isNaN(pValue) && !Double.isNaN(bValue)){
 					diffValue = pValue - bValue;
+					minDiffValue = Math.min(minDiffValue, diffValue);
+					maxDiffValue = Math.max(maxDiffValue, diffValue);
+				}
 				else
 					diffValue = Double.NaN;
 				
@@ -77,8 +82,9 @@ public class AccessibilityDiffTool {
 			}
 		}
 		
-		diff.writeToFile(outputFilename);
+		diff.writeToFile(outputDir + "/diff.txt");
 		
+		log.info("Max value= " + maxDiffValue + " Min value= " + minDiffValue + " in diff grid-layer");
 		log.info("Done!");
 	}
 
