@@ -43,6 +43,7 @@ public class AccessibilityDiffTool {
 		SpatialGrid policy = SpatialGrid.readFromFile(policyAccessibilityGridFile);
 		SpatialGrid basecase = SpatialGrid.readFromFile(baseCaseAccessibilityGridFile);
 		SpatialGrid diff;
+		SpatialGrid percentage;
 		
 		// check if grid files have equal size
 		if(! isSameSize(policy, basecase) ){
@@ -52,6 +53,7 @@ public class AccessibilityDiffTool {
 		
 		// init diff
 		diff = new SpatialGrid(basecase);
+		percentage = new SpatialGrid(basecase);
 		
 		double xmin = basecase.getXmin();
 		double xmax = basecase.getXmax();
@@ -61,6 +63,8 @@ public class AccessibilityDiffTool {
 		
 		double minDiffValue = Double.MAX_VALUE;
 		double maxDiffValue = Double.MIN_VALUE;
+		double minPercentangeValue = Double.MAX_VALUE;
+		double maxPercentangeValue = Double.MIN_VALUE;
 		
 		for (double y = ymin; y <= ymax; y += resolution){
 			for (double x = xmin; x <= xmax; x += resolution){
@@ -68,23 +72,41 @@ public class AccessibilityDiffTool {
 				double pValue = policy.getValue(x, y);
 				double bValue= basecase.getValue(x, y);
 				double diffValue;
+				double percentageValue;
 				//calculate difference only in the zurich area
 				if(!Double.isNaN(pValue) && !Double.isNaN(bValue)){
+					// compute difference on values
 					diffValue = pValue - bValue;
 					minDiffValue = Math.min(minDiffValue, diffValue);
 					maxDiffValue = Math.max(maxDiffValue, diffValue);
+					
+					// compute derivation in per cent
+					percentageValue = ((pValue * 100.) / bValue) - 100.;
+
+					minPercentangeValue = Math.min(minPercentangeValue, percentageValue);
+					maxPercentangeValue = Math.max(maxPercentangeValue, percentageValue);
+					// limit values at +/- 20% for visualization reasons
+					if(percentageValue > 20)
+						percentageValue = 20.;
+					if(percentageValue < -20)
+						percentageValue = -20.;
 				}
-				else
+				else{
 					diffValue = Double.NaN;
+					percentageValue = Double.NaN;
+				}
 				
-				// set diff value
+				// set diff and percentage value
 				diff.setValue(diffValue, x, y);
+				percentage.setValue(percentageValue, x, y);
 			}
 		}
 		
 		diff.writeToFile(outputDir + "/diff.txt");
+		percentage.writeToFile(outputDir + "/percentage.txt");
 		
-		log.info("Max value= " + maxDiffValue + " Min value= " + minDiffValue + " in diff grid-layer");
+		log.info("Diff: Max value= " + maxDiffValue + " Min value= " + minDiffValue + " in diff grid-layer");
+		log.info("Percentage: Max value= " + maxPercentangeValue + " Min value= " + minPercentangeValue + " in percentage grid-layer");
 		log.info("Done!");
 	}
 
