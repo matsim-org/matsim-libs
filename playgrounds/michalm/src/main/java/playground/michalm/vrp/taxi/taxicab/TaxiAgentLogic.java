@@ -150,7 +150,7 @@ public class TaxiAgentLogic
     }
 
 
-    private final int printVehId = 13;
+    private final int printVehId = -13;
 
 
     // ========================================================================================

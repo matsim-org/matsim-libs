@@ -108,7 +108,7 @@ public class MatsimVertexImpl
     private static class MatsimVertexFromLinkIdBuilder
         implements MatsimVertexBuilder
     {
-        private static int ID = -1;
+        private int id = -1;
 
         private Network network;
 
@@ -132,10 +132,10 @@ public class MatsimVertexImpl
         @Override
         public MatsimVertex build()
         {
-            ID++;
+            id++;
             Link link = network.getLinks().get(linkId);
 
-            return new MatsimVertexImpl(ID, linkId.toString(), link.getCoord(), link);
+            return new MatsimVertexImpl(id, linkId.toString(), link.getCoord(), link);
         }
     }
 
@@ -143,7 +143,7 @@ public class MatsimVertexImpl
     private static class MatsimVertexFromXYBuilder
         implements VertexBuilder
     {
-        private static int ID = -1;
+        private int id = -1;
 
         private Scenario scenario;
         private NetworkImpl network;
@@ -187,16 +187,16 @@ public class MatsimVertexImpl
         @Override
         public MatsimVertex build()
         {
-            ID++;
+            id++;
 
             Coord coord = scenario.createCoord(x, y);
             Link link = network.getNearestLink(coord);
 
             if (name == null) {
-                return new MatsimVertexImpl(ID++, Integer.toString(ID), coord, link);
+                return new MatsimVertexImpl(id++, Integer.toString(id), coord, link);
             }
 
-            return new MatsimVertexImpl(ID, name, coord, link);
+            return new MatsimVertexImpl(id, name, coord, link);
         }
     }
 }

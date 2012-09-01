@@ -76,8 +76,19 @@ public class AbstractDemandGenerator
 
     Activity createActivity(Plan plan, String actType, Coord coord)
     {
+        return createActivity(plan, actType, coord, null);
+    }
+
+
+    Activity createActivity(Plan plan, String actType, Coord coord, Id bannedLinkId)
+    {
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
         Link link = network.getNearestLink(coord);
+
+        if (link.getId().equals(bannedLinkId)) {
+            return null;
+        }
+
         Activity act = pf.createActivityFromLinkId(actType, link.getId());
         plan.addActivity(act);
         return act;
@@ -110,7 +121,7 @@ public class AbstractDemandGenerator
     private int id = 0;
 
 
-    // private static int ID_LENGTH = 6;
+    // private static final int ID_LENGTH = 6;
     //
     //
     // private String createId(String strId)

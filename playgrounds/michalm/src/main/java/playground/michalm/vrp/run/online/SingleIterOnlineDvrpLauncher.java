@@ -66,132 +66,110 @@ import playground.michalm.vrp.taxi.wal.WalTaxiSimEngine;
 
 public class SingleIterOnlineDvrpLauncher
 {
-    private String dirName;
-    private String netFileName;
-    private String plansFileName;
-    private String taxiCustomersFileName;
-    private String depotsFileName;
-    private String reqIdToVehIdFileName;
-    private String dbFileName;
-    private boolean vrpOutFiles;
-    private String vrpOutDirName;
+    String dirName;
+    String netFileName;
+    String plansFileName;
+    String taxiCustomersFileName;
+    String depotsFileName;
+    String reqIdToVehIdFileName;
+    String dbFileName;
+    boolean vrpOutFiles;
+    String vrpOutDirName;
 
-    private AlgorithmConfig algorithmConfig;
-    private String eventsFileName;
+    AlgorithmConfig algorithmConfig;
+    String eventsFileName;
 
-    private Scenario scenario;
-    private MatsimVrpData data;
+    Scenario scenario;
+    MatsimVrpData data;
 
-    private TaxiOptimizerFactory optimizerFactory;
+    TaxiOptimizerFactory optimizerFactory;
 
-    private boolean otfVis;
+    boolean otfVis;
     public static OTFQueryControl queryControl;
 
-    private boolean wal;
+    boolean wal;
 
 
-    private void processArgs(String... args)
+    void defaultArgs()
     {
-        if (args.length == 1) {// Wal - do not change the following block
-            dirName = args[0] + "\\";
-            netFileName = dirName + "network.xml";
-            plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
+        dirName = "D:\\PP-rad\\taxi\\mielec-morning-variable\\";
+        netFileName = dirName + "network.xml";
 
-            depotsFileName = dirName + "depots.xml";
-            reqIdToVehIdFileName = dirName + "reqIdToVehId";
+        plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
 
-            taxiCustomersFileName = dirName + "taxiCustomers_5_pc.txt";
+        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
+        // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
-            dbFileName = dirName + "system_state.mdb";
+        depotsFileName = dirName + "depots-5_taxis-50.xml";
+        // depotsFileName = dirName + "depots-5_taxis-150.xml";
 
-            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
+        // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
-            algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
+        eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
 
-            otfVis = !true;
+        // algorithmConfig = AlgorithmConfig.NOS_STRAIGHT_LINE;
+        // algorithmConfig = AlgorithmConfig.NOS_TRAVEL_DISTANCE;
+        algorithmConfig = AlgorithmConfig.NOS_FREE_FLOW;
+        // algorithmConfig = AlgorithmConfig.NOS_24_H;
+        // algorithmConfig = AlgorithmConfig.NOS_15_MIN;
+        // algorithmConfig = AlgorithmConfig.OTS_REQ_FREE_FLOW;
+        // algorithmConfig = AlgorithmConfig.OTS_REQ_24_H;
+        // algorithmConfig = AlgorithmConfig.OTS_REQ_15_MIN;
+        // algorithmConfig = AlgorithmConfig.OTS_DRV_FREE_FLOW;
+        // algorithmConfig = AlgorithmConfig.OTS_DRV_24_H;
+        // algorithmConfig = AlgorithmConfig.OTS_DRV_15_MIN;
+        // algorithmConfig = AlgorithmConfig.RES_REQ_FREE_FLOW;
+        // algorithmConfig = AlgorithmConfig.RES_REQ_24_H;
+        // algorithmConfig = AlgorithmConfig.RES_REQ_15_MIN;
+        // algorithmConfig = AlgorithmConfig.RES_DRV_FREE_FLOW;
+        // algorithmConfig = AlgorithmConfig.RES_DRV_24_H;
+        // algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
 
-            vrpOutFiles = !true;
-            vrpOutDirName = dirName + "vrp_output";
+        otfVis = !true;
 
-            wal = true;
-        }
-        else if (args.length == 2 && args[1] == "KAI") { // demo version for Kai
-            dirName = args[0] + "\\";
-            netFileName = dirName + "network.xml";
-            plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
+        vrpOutFiles = !true;
+        vrpOutDirName = dirName + "vrp_output";
 
-            reqIdToVehIdFileName = dirName + "reqIdToVehId";
-
-            depotsFileName = dirName + "depots-5_taxis-15.xml";
-            taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
-
-            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
-
-            algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
-
-            otfVis = true;
-
-            vrpOutFiles = !true;
-            vrpOutDirName = dirName + "vrp_output";
-
-            wal = false;
-        }
-        else {
-            dirName = "D:\\PP-rad\\taxi\\mielec\\";
-            netFileName = dirName + "network.xml";
-
-            // plansFileName = dirName + "plans.xml";
-            plansFileName = dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
-
-            depotsFileName = dirName + "depots.xml";
-
-            // depotsFileName = dirName + "depots-5_taxis-10.xml";
-            // depotsFileName = dirName + "depots-5_taxis-15.xml";
-            // taxiCustomersFileName = dirName + "taxiCustomers_1_pc.txt";
-
-            // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
-            // depotsFileName = dirName + "depots-5_taxis-150.xml";
-
-            // taxiCustomersFileName = dirName + "taxiCustomers_20_pc.txt";
-            // depotsFileName = dirName + "depots-5_taxis-500.xml";
-
-            // reqIdToVehIdFileName = dirName + "reqIdToVehId";
-
-            eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
-
-            // algorithmConfig = AlgorithmConfig.NOS_STRAIGHT_LINE;
-            // algorithmConfig = AlgorithmConfig.NOS_TRAVEL_DISTANCE;
-            // algorithmConfig = AlgorithmConfig.NOS_FREE_FLOW;
-            // algorithmConfig = AlgorithmConfig.NOS_24_H;
-            // algorithmConfig = AlgorithmConfig.NOS_15_MIN;
-            // algorithmConfig = AlgorithmConfig.OTS_REQ_FREE_FLOW;
-            // algorithmConfig = AlgorithmConfig.OTS_REQ_24_H;
-            // algorithmConfig = AlgorithmConfig.OTS_REQ_15_MIN;
-            // algorithmConfig = AlgorithmConfig.OTS_DRV_FREE_FLOW;
-            // algorithmConfig = AlgorithmConfig.OTS_DRV_24_H;
-            // algorithmConfig = AlgorithmConfig.OTS_DRV_15_MIN;
-            // algorithmConfig = AlgorithmConfig.RES_REQ_FREE_FLOW;
-            // algorithmConfig = AlgorithmConfig.RES_REQ_24_H;
-            // algorithmConfig = AlgorithmConfig.RES_REQ_15_MIN;
-            // algorithmConfig = AlgorithmConfig.RES_DRV_FREE_FLOW;
-            // algorithmConfig = AlgorithmConfig.RES_DRV_24_H;
-            algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
-
-            otfVis = !true;
-
-            vrpOutFiles = !true;
-            vrpOutDirName = dirName + "vrp_output";
-
-            wal = false;
-        }
-
-        if (vrpOutFiles) {
-            new File(vrpOutDirName).mkdir();
-        }
+        wal = false;
     }
 
 
-    private void prepareMatsimData()
+    void readArgs(String paramFile)
+        throws FileNotFoundException
+    {
+        Scanner scanner = new Scanner(new BufferedReader(new FileReader(paramFile)));
+        Map<String, String> params = new HashMap<String, String>();
+
+        while (scanner.hasNext()) {
+            String key = scanner.next();
+            String value = scanner.next();
+            params.put(key, value);
+        }
+
+        dirName = params.get("dirName") + '\\';
+        netFileName = dirName + params.get("netFileName");
+
+        plansFileName = dirName + params.get("plansFileName");
+
+        taxiCustomersFileName = dirName + params.get("taxiCustomersFileName");
+
+        depotsFileName = dirName + params.get("depotsFileName");
+
+        eventsFileName = dirName + params.get("eventsFileName");
+
+        algorithmConfig = AlgorithmConfig.ALL[Integer.valueOf(params.get("algorithmConfig"))];
+
+        otfVis = Boolean.valueOf(params.get("otfVis"));
+
+        vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
+
+        vrpOutDirName = dirName + params.get("vrpOutDirName");
+
+        wal = false;
+    }
+
+
+    void prepareMatsimData()
         throws IOException
     {
         Config config = ConfigUtils.createConfig();
@@ -210,7 +188,7 @@ public class SingleIterOnlineDvrpLauncher
     }
 
 
-    private void initMatsimVrpData()
+    void initMatsimVrpData()
         throws IOException
     {
         int travelTimeBinSize = algorithmConfig.ttimeSource.travelTimeBinSize;
@@ -261,7 +239,7 @@ public class SingleIterOnlineDvrpLauncher
     }
 
 
-    private void initOptimizerFactory()
+    void initOptimizerFactory()
         throws IOException
     {
         switch (algorithmConfig.algorithmType) {
@@ -302,11 +280,14 @@ public class SingleIterOnlineDvrpLauncher
     }
 
 
-    private void runSim()
+    void runSim()
     {
-        QSimConfigGroup qSimConfig = new QSimConfigGroup();
-        qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-        scenario.getConfig().addQSimConfigGroup(qSimConfig);
+        if (scenario.getConfig().getQSimConfigGroup() == null) {
+            QSimConfigGroup qSimConfig = new QSimConfigGroup();
+            qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+            qSimConfig.setRemoveStuckVehicles(false);
+            scenario.getConfig().addQSimConfigGroup(qSimConfig);
+        }
 
         EventsManager events = EventsUtils.createEventsManager();
         QSim qSim = new QSim(scenario, events);
@@ -352,15 +333,25 @@ public class SingleIterOnlineDvrpLauncher
             VrpOTFClientLive.run(scenario.getConfig(), server);
         }
 
+        // events.addHandler(runningVehicleRegister = new RunningVehicleRegister());
+
         qSim.run();
     }
 
+    // RunningVehicleRegister runningVehicleRegister;
 
-    private void generateVrpOutput()
+    void generateVrpOutput()
     {
-        System.out.println(new TaxiEvaluator().evaluateVrp(data.getVrpData()).toString());
+        // DVRP-based evaluation (using schedules)
+        TaxiEvaluation taxiEval = (TaxiEvaluation)new TaxiEvaluator()
+                .evaluateVrp(data.getVrpData());
+        System.out.println(TaxiEvaluation.HEADER);
+        System.out.println(taxiEval.toString());
+
+        // MATSim-based evaluation (using events)
 
         if (vrpOutFiles) {
+            new File(vrpOutDirName).mkdir();
             new Schedules2GIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
                     .write();
         }
@@ -370,15 +361,12 @@ public class SingleIterOnlineDvrpLauncher
     }
 
 
-    private void go(String... args)
+    void go()
         throws IOException
     {
-        processArgs(args);
-        prepareMatsimData();
         initMatsimVrpData();
         initOptimizerFactory();
         runSim();
-        generateVrpOutput();
 
         // check
         for (Request r : data.getVrpData().getRequests()) {
@@ -392,6 +380,28 @@ public class SingleIterOnlineDvrpLauncher
     public static void main(String... args)
         throws IOException
     {
-        new SingleIterOnlineDvrpLauncher().go(args);
+        String paramFile;
+        if (args.length == 0) {
+            paramFile = null;
+        }
+        else if (args.length == 1) {
+            paramFile = args[0];
+        }
+        else {
+            throw new RuntimeException();
+        }
+
+        SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher();
+
+        if (paramFile == null) {
+            launcher.defaultArgs();
+        }
+        else {
+            launcher.readArgs(paramFile);
+        }
+
+        launcher.prepareMatsimData();
+        launcher.go();
+        launcher.generateVrpOutput();
     }
 }

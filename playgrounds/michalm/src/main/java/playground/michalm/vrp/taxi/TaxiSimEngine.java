@@ -129,7 +129,7 @@ public class TaxiSimEngine
     protected void optimize(double now)
     {
         optimizer.optimize();
-        System.err.println("Optimization @simTime=" + vrpData.getTime());
+        //System.err.println("Optimization @simTime=" + vrpData.getTime());
 
         notifyAgents();
         notifyOptimizerListeners(new OptimizerEvent((int)now, vrpData,
@@ -160,7 +160,7 @@ public class TaxiSimEngine
     public void doSimStep(double time)
     {
         // this happens at the end of QSim.doSimStep() therefore "time+1"
-        // this value will be used throughout the next QSim.doSimStep()
+        // this value will be used throughout the next QSim.doSimStep() call
         vrpData.setTime((int)time + 1); // this can be moved to Before/AfterSimStepListener
     }
 

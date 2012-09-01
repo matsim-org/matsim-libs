@@ -41,9 +41,9 @@ public class ODDemandGenerator
     private final int zoneCount;
     private final double[][] odMatrix;
 
-    private final double hours; // time of simulation (i.e. 1.5 hours)
-    private final double flowCoeff; // artificial increase/decrease of the flow
-    private final double taxiProbability; // for internal flow (i.e. between internal zones: 0-8)
+    private final double[] hours; // time of simulation (i.e. 1.5 hours)
+    private final double[] flowCoeff; // artificial increase/decrease of the flow
+    private final double[] taxiProbability; // for internal flow (i.e. between internal zones: 0-8)
 
     private final List<Person> taxiCustomers = new ArrayList<Person>();
 
@@ -51,6 +51,17 @@ public class ODDemandGenerator
     public ODDemandGenerator(String networkFileName, String zonesXMLFileName,
             String zonesShpFileName, String odMatrixFileName, String idField, double hours,
             double flowCoeff, double taxiProbability)
+        throws IOException, SAXException, ParserConfigurationException
+    {
+        this(networkFileName, zonesXMLFileName, zonesShpFileName, odMatrixFileName, idField,
+                new double[] { hours }, new double[] { flowCoeff },
+                new double[] { taxiProbability });
+    }
+
+
+    public ODDemandGenerator(String networkFileName, String zonesXMLFileName,
+            String zonesShpFileName, String odMatrixFileName, String idField, double[] hours,
+            double[] flowCoeff, double[] taxiProbability)
         throws IOException, SAXException, ParserConfigurationException
     {
         super(networkFileName, zonesXMLFileName, zonesShpFileName, idField);
@@ -67,6 +78,17 @@ public class ODDemandGenerator
 
     @Override
     public void generate()
+    {
+        double startTime = 0;
+        for (int i = 0; i < hours.length; i++) {
+            generateImpl(startTime, hours[i], flowCoeff[i], taxiProbability[i]);
+            startTime += 3600 * hours[i];
+        }
+    }
+
+
+    private void generateImpl(double startTime, double hours, double flowCoeff,
+            double taxiProbability)
     {
         PopulationFactory pf = getPopulationFactory();
 
@@ -86,15 +108,16 @@ public class ODDemandGenerator
                         && dZone.getType() == Type.INTERNAL;
 
                 int count = (int)Math.round(hours * odFlow);
+                double timeStep = 3600. / odFlow;
 
                 for (int k = 0; k < count; k++) {
                     Plan plan = createPlan();
 
                     Coord oCoord = getRandomCoordInZone(oZone);
-                    Activity act = createActivity(plan, "dummy", oCoord);
+                    Activity startAct = createActivity(plan, "dummy", oCoord);
 
-                    double timeStep = 3600. / odFlow;
-                    act.setEndTime((int)uniform.nextDoubleFromTo(k * timeStep, (k + 1) * timeStep));
+                    startAct.setEndTime((int) (startTime + k * timeStep + uniform.nextDoubleFromTo(
+                            0, timeStep)));
 
                     if (isInternalFlow && taxiProbability > 0
                             && uniform.nextDoubleFromTo(0, 1) < taxiProbability) {
@@ -107,15 +130,20 @@ public class ODDemandGenerator
                         plan.addLeg(pf.createLeg(TransportMode.car));
                     }
 
-                    Coord dCoord = getRandomCoordInZone(dZone);
-                    act = createActivity(plan, "dummy", dCoord);
+                    // searches for the destinationLink until it is different from the startLink
+                    Activity endActivity = null;
+                    do {
+                        Coord dCoord = getRandomCoordInZone(dZone);
+                        endActivity = createActivity(plan, "dummy", dCoord, startAct.getLinkId());
+                    }
+                    while (endActivity == null);
                 }
             }
         }
     }
 
 
-    private void writeTaxiCustomers(String taxiCustomersFileName)
+    public void writeTaxiCustomers(String taxiCustomersFileName)
         throws IOException
     {
         BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFileName)));

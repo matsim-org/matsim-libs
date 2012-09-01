@@ -81,7 +81,7 @@ public class TaxiModeDepartureHandler
 
             customers.add(customer);
             requests.add(request);
-
+            
             // taxiSimEngine.getMobsim().registerAdditionalAgentOnLink(agent);
             taxiSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
 

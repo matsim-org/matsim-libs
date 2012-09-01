@@ -17,37 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.util.sim;
+package playground.michalm.vrp.run.online;
 
-import java.util.Arrays;
-
-import org.matsim.core.controler.Controler;
+import java.io.IOException;
 
 
-public class SimLauncher
+public class WalSingleIterOnlineDvrpLauncher
 {
-    public static void main(String[] args)
+    private static void processArgs(SingleIterOnlineDvrpLauncher launcher, String dir)
     {
-        String dirName;
-        String cfgFileName;
+        launcher.dirName = dir + "\\";
+        launcher.netFileName = launcher.dirName + "network.xml";
+        launcher.plansFileName = launcher.dirName + "output\\ITERS\\it.20\\20.plans.xml.gz";
 
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "d:\\PP-rad\\taxi\\mielec-morning-variable\\";
-            cfgFileName = "siec-config.xml";
-            // dirName = "d:\\PP-rad\\taxi\\poznan\\";
-            // cfgFileName = "poznan-config.xml";
-        }
-        else if (args.length == 2) {
-            dirName = args[0];
-            cfgFileName = args[1];
-        }
-        else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
-        }
+        launcher.reqIdToVehIdFileName = launcher.dirName + "reqIdToVehId";
 
-        Controler controler = new Controler(new String[] { dirName + cfgFileName });
-        controler.setOverwriteFiles(true);
-        controler.run();
+        launcher.depotsFileName = launcher.dirName + "depots.xml";
+        launcher.taxiCustomersFileName = launcher.dirName + "taxiCustomers_5_pc.txt";
+
+        launcher.dbFileName = launcher.dirName + "system_state.mdb";
+
+        launcher.eventsFileName = launcher.dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
+
+        launcher.algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
+
+        launcher.otfVis = !true;
+
+        launcher.vrpOutFiles = !true;
+        launcher.vrpOutDirName = launcher.dirName + "vrp_output";
+
+        launcher.wal = true;
+    }
+    
+    
+    public static void main(String... args)
+        throws IOException
+    {
+        String dir = args[0] + "\\";
+        SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher();
+        processArgs(launcher, dir);
+        
+        launcher.prepareMatsimData();
+        launcher.go();
     }
 }
