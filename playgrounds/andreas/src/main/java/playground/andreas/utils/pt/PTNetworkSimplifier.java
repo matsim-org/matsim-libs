@@ -237,7 +237,7 @@ public class PTNetworkSimplifier {
 		log.info("  resulting network contains " + this.network.getNodes().size() + " nodes and " +
 				this.network.getLinks().size() + " links.");
 		log.info("done.");
-
+		// no functionality, because TransitScheduleCleaner creates a deep copy /dr
 		TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(this.transitSchedule, this.network);
 		TransitScheduleCleaner.removeEmptyLines(this.transitSchedule);
 		TransitScheduleCleaner.removeStopsNotUsed(this.transitSchedule);

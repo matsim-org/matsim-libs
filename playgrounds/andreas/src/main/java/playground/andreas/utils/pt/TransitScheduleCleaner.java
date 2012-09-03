@@ -1,5 +1,6 @@
 package playground.andreas.utils.pt;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -206,7 +207,7 @@ public class TransitScheduleCleaner {
 		// Remove routes with missing links
 		for (TransitLine transitLine : tS.getTransitLines().values()) {
 			
-			TreeSet<TransitRoute> transitRouteToBeRemoved = new TreeSet<TransitRoute>();
+			Set<TransitRoute> transitRouteToBeRemoved = new HashSet<TransitRoute>();
 			
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				
