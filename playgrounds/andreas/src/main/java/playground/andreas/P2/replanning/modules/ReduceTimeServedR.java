@@ -39,7 +39,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategy;
 
 /**
@@ -51,7 +50,7 @@ import playground.andreas.P2.replanning.PStrategy;
  * @author aneumann
  *
  */
-public class ReduceTimeServedR extends PStrategy implements PPlanStrategy, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class ReduceTimeServedR extends PStrategy implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(ReduceTimeServedR.class);
 	

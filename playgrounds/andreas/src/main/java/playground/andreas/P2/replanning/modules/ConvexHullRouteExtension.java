@@ -33,7 +33,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategy;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,7 +44,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author droeder
  *
  */
-public class ConvexHullRouteExtension extends PStrategy implements PPlanStrategy{
+public class ConvexHullRouteExtension extends PStrategy {
 	
 	private static final Logger log = Logger
 			.getLogger(ConvexHullRouteExtension.class);

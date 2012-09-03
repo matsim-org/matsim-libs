@@ -39,7 +39,7 @@ import playground.andreas.P2.operator.Cooperative;
  * @author aneumann
  *
  */
-public class AddRandomStop extends PStrategy implements PPlanStrategy{
+public class AddRandomStop extends PStrategy {
 	
 	private final static Logger log = Logger.getLogger(AddRandomStop.class);
 	

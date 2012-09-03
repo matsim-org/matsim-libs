@@ -43,7 +43,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategy;
 
 /**
@@ -54,7 +53,7 @@ import playground.andreas.P2.replanning.PStrategy;
  * @author aneumann
  *
  */
-public class ReduceStopsToBeServed extends PStrategy implements PPlanStrategy, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class ReduceStopsToBeServed extends PStrategy implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(ReduceStopsToBeServed.class);
 	

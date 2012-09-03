@@ -35,7 +35,7 @@ import playground.andreas.P2.operator.Cooperative;
  * @author aneumann
  *
  */
-public class CreateNewPlan extends PStrategy implements PPlanStrategy{
+public class CreateNewPlan extends PStrategy {
 	
 	private final static Logger log = Logger.getLogger(CreateNewPlan.class);
 	public static final String STRATEGY_NAME = "CreateNewPlan";

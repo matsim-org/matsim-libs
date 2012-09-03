@@ -26,7 +26,7 @@ import java.util.ArrayList;
  * 
  * @author aneumann
  */
-public abstract class PStrategy {
+public abstract class PStrategy implements PPlanStrategy{
 	
 	public PStrategy(ArrayList<String> parameter){
 
