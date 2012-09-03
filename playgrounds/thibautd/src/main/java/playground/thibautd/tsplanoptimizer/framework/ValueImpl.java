@@ -21,6 +21,8 @@ package playground.thibautd.tsplanoptimizer.framework;
 
 /**
  * Default generic implementation of a {@link Value}. 
+ * It is actually not that nice: it is better to use
+ * non-generic implementations.
  * @author thibautd
  */
 public class ValueImpl<T> implements Value<T> {

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * A {@link MoveGenerator} wich generates moves using several sub-routines.
  * @author thibautd
  */
 public class CompositeMoveGenerator implements MoveGenerator {

@@ -20,9 +20,13 @@
 package playground.thibautd.tsplanoptimizer.framework;
 
 /**
+ * Interface to implement to tune the configuration before running the search process
  * @author thibautd
  */
 public interface ConfigurationBuilder {
+	/**
+	 * @param configuration the configuration to tune
+	 */
 	public void buildConfiguration( TabuSearchConfiguration configuration );
 }
 

@@ -20,10 +20,15 @@
 package playground.thibautd.tsplanoptimizer.framework;
 
 /**
- * Scores a solutions
+ * Scores a solution
  * @author thibautd
  */
 public interface FitnessFunction {
+	/**
+	 * Computes the score
+	 * @param solution the solution to score
+	 * @return the score
+	 */
 	public double computeFitnessValue( Solution solution );
 }
 

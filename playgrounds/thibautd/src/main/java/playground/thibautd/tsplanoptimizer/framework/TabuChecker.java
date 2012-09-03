@@ -20,6 +20,8 @@
 package playground.thibautd.tsplanoptimizer.framework;
 
 /**
+ * Interface for a "tabu list", which may actually use
+ * any criterion to mark a move as tabu.
  * @author thibautd
  */
 public interface TabuChecker extends AppliedMoveListener {

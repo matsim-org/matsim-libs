@@ -22,7 +22,7 @@ package playground.thibautd.tsplanoptimizer.framework;
 import java.util.Iterator;
 
 /**
- * forbids the moves which do not change the solution.
+ * Forbids the moves which do not change the solution.
  *
  * @author thibautd
  */

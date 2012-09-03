@@ -20,12 +20,21 @@
 package playground.thibautd.tsplanoptimizer.framework;
 
 /**
+ * Interface for objects responsible of deciding whether to continue the search
+ * or not.
  * @author thibautd
  */
 public interface EvolutionMonitor {
+	/**
+	 * Method called after each iteration
+	 * @param iteration the number of the iteration which just finishes (starts at 0)
+	 * @param currentBest the current best solution
+	 * @param currentBestScore the score of the best solution
+	 * @return true to continue to next iteration, false to stop the search
+	 */
 	public boolean continueIterations(
 			final int iteration,
-			final Solution newBest,
-			final double newBestScore);
+			final Solution currentBest,
+			final double currentBestScore);
 }
 

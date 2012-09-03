@@ -35,8 +35,8 @@ public interface Solution {
 	/**
 	 * Gives access to the representation, under the form of an ordered
 	 * list of values. The values must be internal references (modifying
-	 * them modifies the represented plan), the list may not (it should not be
-	 * modified).
+	 * them modifies the represented plan), the list may not (elements
+	 * should not be added or removed).
 	 *
 	 * @return the internal representation.
 	 */
@@ -44,8 +44,13 @@ public interface Solution {
 
 	/**
 	 * Returns the plan represented by this solution.
-	 * It must not be modified by the moves. Moves acting directly on the plan
+	 * It must <b>not</b> be modified by the moves. Moves acting directly on the plan
 	 * should use representations with Value\<Plan\> values.
+	 * <br>
+	 * However, to avoid both side effects and high computational cost,
+	 * it is recomended to just copy the reference to the plan to optimize,
+	 * and to modify its properties according to the representation in this
+	 * method.
 	 *
 	 * @return the plan, which may be a newly created plan or a modification
 	 * of a plan used at initialisation (in both case, it should be indicated in
@@ -53,6 +58,11 @@ public interface Solution {
 	 */
 	public Plan getRepresentedPlan();
 
+	/**
+	 * Clones the solution.
+	 * @return a deep copy (i.e. modifying the copy should not affect the copied
+	 * in any sense)
+	 */
 	public Solution createClone();
 }
 

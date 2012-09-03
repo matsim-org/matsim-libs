@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * best-response module based on Matthias Feil "TimeModeChooser" algorithm.
+ * best-response module based on Matthias Feil "TimeModeChoicer" algorithm.
  * @author thibautd
  */
 package playground.thibautd.tsplanoptimizer.timemodechooser;

@@ -23,6 +23,8 @@ import java.util.LinkedList;
 
 /**
  * A tabu list which forbids reverse moves of the previouly applied moves.
+ * Note that it works only for moves for which the {@link Move#getReverseMove()}
+ * method is implemented.
  *
  * @author thibautd
  */

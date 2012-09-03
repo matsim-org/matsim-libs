@@ -39,7 +39,6 @@ public class TabuSearchRunner {
 	private static final Logger log =
 		Logger.getLogger(TabuSearchRunner.class);
 
-
 	/**
 	 * Runs the process.
 	 * @param configurationBuilder the builder to use to create the configuration

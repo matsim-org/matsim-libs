@@ -30,7 +30,7 @@ public interface Move {
 	/**
 	 * Creates a new Solution, corresponding to a start position to which the move is applied.
 	 * @param solution the solution to start from. The instance must not be modified!
-	 * @return the modified solution.
+	 * @return a <b>new</b> instance representing the modified solution.
 	 */
 	public Solution apply( Solution solution );
 
@@ -38,6 +38,8 @@ public interface Move {
 	 * Gives access to the reverse move. The reverse move <tt>-m</tt> for a given move
 	 * <tt>m</tt>  is the move such that, applying <tt>m</tt> and than <tt>-m</tt>
 	 * lets the solution unchanged.
+	 * 
+	 * If it is not applicable, the method should throw an {@link UnsupportedOperationException}.
 	 *
 	 * @return the reverse move
 	 */

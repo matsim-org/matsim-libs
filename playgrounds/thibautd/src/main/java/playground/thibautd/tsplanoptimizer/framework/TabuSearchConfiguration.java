@@ -25,6 +25,8 @@ import java.util.Random;
 
 /**
  * Defines various settings for the Tabu Search process.
+ * See documentation of the interfaces of the components for details:
+ * this class is just a container.
  * @author thibautd
  */
 public class TabuSearchConfiguration {
