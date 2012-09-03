@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,14 +36,19 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.replanning.modules.ReduceStopsToBeServed;
+import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedR;
 
 /**
  * 
- * Limits demand to stops with demand.
+ * Limits demand to stops with demand. Use {@link ReduceStopsToBeServed} or {@link ReduceStopsToBeServedR}. No Tests for this one.
  * 
  * @author aneumann
  *
  */
+@Deprecated
 public class StopReduceDemand extends AbstractPStrategyModule implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(StopReduceDemand.class);

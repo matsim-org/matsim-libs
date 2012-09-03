@@ -42,8 +42,10 @@ import playground.andreas.P2.replanning.modules.ReduceTimeServed;
 import playground.andreas.P2.replanning.modules.ReduceTimeServedR;
 import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
 import playground.andreas.P2.replanning.modules.TimeReduceDemand;
+import playground.andreas.P2.replanning.modules.deprecated.AddRandomStop;
 import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;
+import playground.andreas.P2.replanning.modules.deprecated.StopReduceDemand;
 
 /**
  * Loads strategies from config and chooses strategies according to their weights.

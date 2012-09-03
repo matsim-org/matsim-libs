@@ -35,6 +35,7 @@ import playground.andreas.P2.replanning.AbstractPStrategyModule;
  * @author aneumann
  *
  */
+@Deprecated
 public class RemoveAllVehiclesButOne extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(RemoveAllVehiclesButOne.class);

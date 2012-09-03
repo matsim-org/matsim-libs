@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -31,14 +31,17 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
 
 /**
  * 
- * Limits demand to stops with demand.
+ * Adds a random stop to the route. There is no test for this one.
  * 
  * @author aneumann
  *
  */
+@Deprecated
 public class AddRandomStop extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(AddRandomStop.class);
