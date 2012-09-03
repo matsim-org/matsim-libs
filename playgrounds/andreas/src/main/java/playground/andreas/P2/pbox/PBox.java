@@ -26,9 +26,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -52,12 +49,8 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
-import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
 import playground.andreas.P2.plan.PRouteProvider;
-import playground.andreas.P2.plan.RandomStopProvider;
-import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
-import playground.andreas.P2.plan.TimeAwareComplexCircleScheduleProvider;
-import playground.andreas.P2.plan.deprecated.SimpleBackAndForthScheduleProvider;
+import playground.andreas.P2.plan.PRouteProviderFactory;
 import playground.andreas.P2.replanning.CreateCooperativeFromSchedule;
 import playground.andreas.P2.replanning.CreateNew24hPlan;
 import playground.andreas.P2.replanning.CreateNewPlan;
@@ -126,7 +119,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.pStopsOnly = CreatePStops.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
 		// init route provider
-		this.routeProvider = this.initRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath(), event.getControler().getEvents());
+		this.routeProvider = PRouteProviderFactory.createRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath(), event.getControler().getEvents());
 
 		// init additional cooperatives from a given transit schedule file
 		this.cooperatives = new LinkedList<Cooperative>();
@@ -192,24 +185,6 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 		
 		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
-	}
-
-	private PRouteProvider initRouteProvider(Network network, Population population, PConfigGroup pConfig, TransitSchedule pStopsOnly, String outputDir, EventsManager eventsManager) {
-		
-		RandomStopProvider randomStopProvider = new RandomStopProvider(pConfig, population, pStopsOnly, outputDir);
-		
-		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
-			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0, pConfig.getMode());
-		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
-			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0, pConfig.getMode());
-		} else if(pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)){
-			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getPlanningSpeedFactor(), pConfig.getMode());
-		} else if(pConfig.getRouteProvider().equalsIgnoreCase(TimeAwareComplexCircleScheduleProvider.NAME)){
-			return new TimeAwareComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getPlanningSpeedFactor(), pConfig.getPIdentifier(), eventsManager, pConfig.getMode());
-		} else {
-			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
-			return null;
-		}
 	}
 
 	private LinkedList<Cooperative> initInitialCooperatives(int firstIteration, int numberOfCooperatives) {
