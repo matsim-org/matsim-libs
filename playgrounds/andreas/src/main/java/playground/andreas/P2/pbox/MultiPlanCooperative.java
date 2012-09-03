@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.plan;
+package playground.andreas.P2.replanning;
 
 import java.util.ArrayList;
 import java.util.Set;

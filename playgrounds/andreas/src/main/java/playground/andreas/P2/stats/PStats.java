@@ -39,7 +39,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.pbox.PBox;
-import playground.andreas.P2.plan.PPlan;
+import playground.andreas.P2.replanning.PPlan;
 
 /**
  * Calculates at the end of each iteration the following statistics:

@@ -27,7 +27,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.pbox.Cooperative;
-import playground.andreas.P2.plan.PPlan;
 
 /**
  * 

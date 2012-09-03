@@ -26,7 +26,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.pbox.Cooperative;
-import playground.andreas.P2.plan.PPlan;
 
 /**
  * 

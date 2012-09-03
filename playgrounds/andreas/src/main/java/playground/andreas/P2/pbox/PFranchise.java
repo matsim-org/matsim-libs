@@ -27,7 +27,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.plan.PPlan;
+import playground.andreas.P2.replanning.PPlan;
 
 /**
  * Simple Franchise system rejecting all routes already operated

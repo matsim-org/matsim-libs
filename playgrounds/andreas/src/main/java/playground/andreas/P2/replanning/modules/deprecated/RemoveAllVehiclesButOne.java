@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.andreas.P2.pbox.Cooperative;
-import playground.andreas.P2.plan.PPlan;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategy;
 
