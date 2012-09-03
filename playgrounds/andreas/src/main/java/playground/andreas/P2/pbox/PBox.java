@@ -41,8 +41,7 @@ import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.PRouteProviderFactory;
-import playground.andreas.P2.schedule.CreatePStops;
-import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
+import playground.andreas.P2.schedule.PStopsFactory;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
@@ -92,8 +91,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		event.getControler().getEvents().addHandler(this.scorePlansHandler);
 		
 		// init possible paratransit stops
-//		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
-		this.pStopsOnly = CreatePStops.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
+		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
 		// init route provider
 		this.routeProvider = PRouteProviderFactory.createRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath(), event.getControler().getEvents());
