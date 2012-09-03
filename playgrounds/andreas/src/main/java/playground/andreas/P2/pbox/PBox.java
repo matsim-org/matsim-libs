@@ -75,11 +75,10 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
 	private LinkedList<Cooperative> cooperatives;
-	private int counter = 0;
 	
 	private final PConfigGroup pConfig;
 	private PFranchise franchise;
-	private CooperativeFactory cooperativeFactory;
+	private OperatorInitializer operatorInitializer;
 
 	TransitSchedule pStopsOnly;
 	TransitSchedule pTransitSchedule;
@@ -89,7 +88,6 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private final ScorePlansHandler scorePlansHandler;
 	private PStrategyManager strategyManager;
 	private PRouteProvider routeProvider;
-	private PStrategy initialStrategy;
 
 	
 	public PBox(PConfigGroup pConfig) {
@@ -97,12 +95,6 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.scorePlansHandler = new ScorePlansHandler(this.pConfig);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager(this.pConfig);
-		this.cooperativeFactory = new CooperativeFactory(this.pConfig, this.franchise);
-		if (this.pConfig.getStartWith24Hours()) {
-			this.initialStrategy = new CreateNew24hPlan(new ArrayList<String>());
-		} else {
-			this.initialStrategy = new CreateNewPlan(new ArrayList<String>());
-		}
 	}
 
 	@Override
@@ -123,13 +115,15 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// init route provider
 		this.routeProvider = PRouteProviderFactory.createRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath(), event.getControler().getEvents());
 
-		// init additional cooperatives from a given transit schedule file
 		this.cooperatives = new LinkedList<Cooperative>();
-		LinkedList<Cooperative> coopsFromSchedule = new CreateCooperativeFromSchedule(this.cooperativeFactory, this.routeProvider, this.pConfig, event.getControler().getScenario().getTransitSchedule()).run();
-		this.cooperatives.addAll(coopsFromSchedule);	
-
+		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.routeProvider);
+		
+		// init additional cooperatives from a given transit schedule file
+		LinkedList<Cooperative> coopsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
+		this.cooperatives.addAll(coopsFromSchedule);
+		
 		// init initial set of cooperatives - reduced by the number of preset coops
-		LinkedList<Cooperative> initialCoops = this.initInitialCooperatives(event.getControler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
+		LinkedList<Cooperative> initialCoops = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, event.getControler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
 		this.cooperatives.addAll(initialCoops);
 		
 		// collect the transit schedules from all cooperatives
@@ -189,21 +183,6 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
 	}
 
-	private LinkedList<Cooperative> initInitialCooperatives(int firstIteration, int numberOfCooperatives) {
-		LinkedList<Cooperative> initialCoops = new LinkedList<Cooperative>();
-		for (int i = 0; i < numberOfCooperatives; i++) {
-			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(firstIteration));
-			initialCoops.add(cooperative);
-		}
-		
-		for (Cooperative cooperative : initialCoops) {
-			cooperative.init(this.routeProvider, this.initialStrategy, firstIteration, this.pConfig.getInitialBudget());
-			cooperative.replan(this.strategyManager, firstIteration);
-		}
-		
-		return initialCoops;
-	}
-
 	private void handleBankruptCopperatives(int iteration) {
 		
 		LinkedList<Cooperative> cooperativesToKeep = new LinkedList<Cooperative>();
@@ -249,18 +228,12 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.cooperatives = cooperativesToKeep;
 			
 		// recreate all other
-		for (int i = 0; i < numberOfNewCoopertives; i++) {
-			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
-			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
-			this.cooperatives.add(cooperative);
-		}
+		LinkedList<Cooperative> newCoops1 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, numberOfNewCoopertives);
+		this.cooperatives.addAll(newCoops1);
 			
 		// too few cooperatives in play, increase to the minimum specified in the config
-		for (int i = this.cooperatives.size(); i < this.pConfig.getNumberOfCooperatives(); i++) {
-			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
-			cooperative.init(this.routeProvider, this.initialStrategy, iteration - 1, pConfig.getInitialBudget());
-			this.cooperatives.add(cooperative);
-		}
+		LinkedList<Cooperative> newCoops2 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
+		this.cooperatives.addAll(newCoops2);
 	}
 
 	public TransitSchedule getpTransitSchedule() {
@@ -309,37 +282,4 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
 		writer.write(iterationFilename);		
 	}
-
-	private void addTransitRoutesToArchiv(int iteration) {
-		
-		if(pTransitScheduleArchiv == null){
-			pTransitScheduleArchiv = this.pTransitSchedule;
-		}
-		
-		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {
-			if(!this.pTransitScheduleArchiv.getTransitLines().containsKey(line.getId())){
-				this.pTransitScheduleArchiv.addTransitLine(line);
-			} else {
-				for (TransitRoute route : line.getRoutes().values()) {
-					pTransitScheduleArchiv.getTransitLines().get(line.getId()).addRoute(route);
-				}
-			}
-		}		
-	}
-
-	private Id createNewIdForCooperative(int iteration){
-		this.counter++;
-		return new IdImpl(this.pConfig.getPIdentifier() + iteration + "_" + this.counter);
-	}
-	
-//	private Cooperative createNewCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
-//		if(pConfig.getCoopType().equalsIgnoreCase(BasicCooperative.COOP_NAME)){
-//			return new BasicCooperative(id, pConfig, franchise);
-//		} else if(pConfig.getCoopType().equalsIgnoreCase(InitCooperative.COOP_NAME)){
-//			return new InitCooperative(id, pConfig, franchise);
-//		} else {
-//			log.error("There is no coop type specified. " + pConfig.getCoopType() + " unknown");
-//			return null;
-//		}
-//	}
 }
