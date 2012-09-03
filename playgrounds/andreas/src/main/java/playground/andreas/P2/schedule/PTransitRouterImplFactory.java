@@ -79,6 +79,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	private TransitRouterFactory routerFactory = null;
 	private String ptEnabler = null;
 	
+	private PVehiclesFactory pVehiclesFactory = null;
+	
 	private AgentsStuckHandlerImpl agentsStuckHandler;
 	private PBox pBox;
 
@@ -90,6 +92,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
 		this.ptEnabler = pConfig.getPtEnabler();
+		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
 		if(pConfig.getReRouteAgentsStuck()){
 			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
 		}
@@ -160,7 +163,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		this.baseVehicles = event.getControler().getScenario().getVehicles();
 		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
 		((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
-		this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pBox.getVehicles());
+		this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pVehiclesFactory.getVehicles(this.pBox.getpTransitSchedule()));
 		((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
 		this.config = new TransitRouterConfig(event.getControler().getScenario().getConfig().planCalcScore()
 				, event.getControler().getScenario().getConfig().plansCalcRoute(), event.getControler().getScenario().getConfig().transitRouter(),
@@ -181,7 +184,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 			this.needToUpdateRouter = true;
 			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
 			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
-			this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pBox.getVehicles());
+			this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pVehiclesFactory.getVehicles(this.pBox.getpTransitSchedule()));
 			((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
 			
 			if(this.agentsStuckHandler != null){

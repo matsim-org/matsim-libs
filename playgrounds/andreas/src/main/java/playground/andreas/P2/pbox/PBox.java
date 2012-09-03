@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -33,18 +32,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
@@ -232,36 +221,6 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 
 	public TransitSchedule getpTransitSchedule() {
 		return this.pTransitSchedule;
-	}
-
-	/**
-	 * Create vehicles for each departure.
-	 * 
-	 * @return Vehicles of paratranit
-	 */
-	public Vehicles getVehicles(){		
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
-		VehiclesFactory vehFactory = vehicles.getFactory();
-		VehicleType vehType = vehFactory.createVehicleType(new IdImpl(this.pConfig.getPIdentifier()));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(this.pConfig.getPaxPerVehicle() + 1)); // july 2011 the driver takes one seat
-		capacity.setStandingRoom(Integer.valueOf(0));
-		vehType.setCapacity(capacity);
-		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
-		vehType.setAccessTime(2.0);
-		vehType.setEgressTime(1.0);
-		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
-	
-		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
-					vehicles.getVehicles().put(vehicle.getId(), vehicle);
-				}
-			}
-		}
-		
-		return vehicles;
 	}
 
 	public ScorePlansHandler getScorePlansHandler() {
