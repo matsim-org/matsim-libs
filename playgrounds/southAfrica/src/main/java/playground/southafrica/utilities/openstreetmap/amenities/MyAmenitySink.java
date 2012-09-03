@@ -333,7 +333,7 @@ public class MyAmenitySink implements Sink {
 	
 	
 	/**
-	 * Return the education facilities parsed.
+	 * Return the facilities parsed.
 	 * @return
 	 */
 	public ActivityFacilitiesImpl getFacilities(){

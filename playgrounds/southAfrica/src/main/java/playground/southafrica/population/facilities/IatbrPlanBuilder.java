@@ -43,6 +43,7 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.population.PopulationWriter;
@@ -84,7 +85,7 @@ public class IatbrPlanBuilder {
 		ConfigUtils.loadConfig(config, configFile);		
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		activityFacilities = new ActivityFacilitiesImpl();
-		activityFacilities.setName("IATBR facilities for Nelson Mandela Bay Metropolitan");
+		activityFacilities.setName("Facilities for Nelson Mandela Bay Metropolitan");
 		
 		/* Build QuadTree from Spot 5 facilities. */
 		spot5QT = buildSpot5QuadTree(spot5File);
@@ -113,7 +114,7 @@ public class IatbrPlanBuilder {
 		LOG.info("Number of nodes: " + sc.getNetwork().getNodes().size());
 
 		/* Read plans */
-		PopulationReaderMatsimV5 pr = new PopulationReaderMatsimV5(sc);
+		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
 		pr.parse(plansFile);
 		createPrimaryActivityFacilities(sc.getPopulation());
 		
@@ -128,13 +129,14 @@ public class IatbrPlanBuilder {
 		
 		/* Write the population to the same file as what the config specifies. 
 		 * This is necessary since the controller will later read in this file 
-		 * when executing. */		PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
+		 * when executing. */		
+		PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());
 		pw.writeFileV5(sc.getConfig().plans().getInputFile());
 		
 		
 		/* Try location choice */
-		ConfigUtils.loadConfig(sc.getConfig(), configFile);
-		Controler controler = new Controler(sc);
+//		ConfigUtils.loadConfig(sc.getConfig(), configFile);
+//		Controler controler = new Controler(sc);
 //		controler.getConfig().locationchoice().setAlgorithm("bestResponse");
 //		CharyparNagelScoringFunctionFactory cn = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), sc.getNetwork());
 //		controler.setScoringFunctionFactory(cn);
@@ -155,11 +157,11 @@ public class IatbrPlanBuilder {
 //		lc.finishReplanning();
 		
 		/* Run the simulation for one run. */
-		Config configRun = ConfigUtils.createConfig();
-		configRun.addCoreModules();
-		ConfigUtils.loadConfig(configRun, configFile);		
-		controler = new Controler(configRun);
-		controler.setOverwriteFiles(true);
+//		Config configRun = ConfigUtils.createConfig();
+//		configRun.addCoreModules();
+//		ConfigUtils.loadConfig(configRun, configFile);		
+//		controler = new Controler(configRun);
+//		controler.setOverwriteFiles(true);
 //		controler.run();
 		
 		Header.printFooter();
@@ -204,7 +206,6 @@ public class IatbrPlanBuilder {
 		/* READ THE SPOT Facilities */
 		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
 		List<Coord> spot5Coords = mfr.readCoords(filename);
-		LOG.info("Number of Spot 5 facilities: " + spot5Coords.size());
 		
 		double xMin = Double.POSITIVE_INFINITY;
 		double xMax = Double.NEGATIVE_INFINITY;
@@ -220,12 +221,13 @@ public class IatbrPlanBuilder {
 		for(Coord c : spot5Coords){
 			qt.put(c.getX(), c.getY(), c);
 		}		
+		LOG.info("Number of Spot 5 facilities: " + qt.size());
 		return qt;
 	}
 	
 	private static void createPrimaryActivityFacilities(Population population){
-		LOG.info("Assigning Spot 5 facilities to activities...");
-		LOG.info("Number of people (unaltered):     " + population.getPersons().size());
+		LOG.info("Assigning Spot 5 facilities to activities with unknown facilities...");
+		LOG.info("Number of people (before):     " + population.getPersons().size());
 		double workAtAmenityThreshold = 20;
 		double workAtShoppingThreshold = 500;
 		
@@ -240,26 +242,32 @@ public class IatbrPlanBuilder {
 
 				/* Check for home activity */
 				ActivityFacilityImpl home = null;
+				Coord closestBuilding = spot5QT.get(firstActivity.getCoord().getX(), firstActivity.getCoord().getY());
+				if(!facilityIdMap.containsKey(closestBuilding)){
+					Id newFacility = new IdImpl("spot_" + spotId++);
+					home = activityFacilities.createFacility(newFacility, closestBuilding);
+					home.createActivityOption("h");
+					/* This should not be necessary, but is inconsistent with other containers. */
+					/* TODO Follow up with MATSim developers. */
+					if(!activityFacilities.getFacilities().containsKey(home.getId())){
+						activityFacilities.getFacilities().put(home.getId(), home);
+					}
+					facilityIdMap.put(closestBuilding, home.getId());
+				} else{
+					home = (ActivityFacilityImpl) activityFacilities.getFacilities().get(facilityIdMap.get(closestBuilding));
+				}
+				firstActivity.setFacilityId(home.getId());
+				firstActivity.setCoord(home.getCoord());
+				lastActivity.setFacilityId(home.getId());
+				lastActivity.setCoord(home.getCoord());
+				
+				
 
 				for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
 					if(pe instanceof Activity){
 						ActivityImpl act = (ActivityImpl) pe;
-
 						if(act.getType().equalsIgnoreCase("h")){
-							if(home == null){
-								Coord closestBuilding = spot5QT.get(act.getCoord().getX(), act.getCoord().getY());
-								if(!facilityIdMap.containsKey(closestBuilding)){
-									Id newFacility = new IdImpl("spot_" + spotId++);
-									ActivityFacilityImpl afi = activityFacilities.createFacility(newFacility, closestBuilding);
-									afi.createActivityOption("h");
-									home = afi;
-									facilityIdMap.put(closestBuilding, newFacility);
-								} else{
-									home = (ActivityFacilityImpl) activityFacilities.getFacilities().get(facilityIdMap.get(closestBuilding));
-								}
-							}
-							act.setFacilityId(home.getId());
-							act.setCoord(home.getCoord());
+							/* Do nothing, it is already assigned a home facility. */
 						} else if(act.getType().equalsIgnoreCase("w")){
 							/* Check for work activity */
 							ActivityFacilityImpl closestMall = sacscQT.get(act.getCoord().getX(), act.getCoord().getY());
@@ -320,12 +328,12 @@ public class IatbrPlanBuilder {
 				agentsToRemove.add(person.getId());
 			} 
 		}
-		LOG.info("Removing " + agentsToRemove.size() + " agents whose plans do not start with `h'");
+		LOG.info("   Removing " + agentsToRemove.size() + " agents whose plans do not start with `h'");
 		for(Id id : agentsToRemove){
 			population.getPersons().remove(id);
 		}
-		LOG.info("Number of facilities      : " + facilityIdMap.size());
- 		LOG.info("Number of people (altered):     " + population.getPersons().size());
+		LOG.info("Number of facilities    : " + activityFacilities.getFacilities().size());
+ 		LOG.info("Number of people (after): " + population.getPersons().size());
 	}
 	
 	
@@ -341,7 +349,11 @@ public class IatbrPlanBuilder {
 			sacscQT.put(afNew.getCoord().getX(), afNew.getCoord().getY(), afNew);
 			shoppingQT.put(afNew.getCoord().getX(), afNew.getCoord().getY(), afNew);
 			leisureQT.put(afNew.getCoord().getX(), afNew.getCoord().getY(), afNew);
+			if(!facilityIdMap.containsKey(afNew.getCoord())){
+				facilityIdMap.put(afNew.getCoord(), afNew.getId());
+			}
 		}
+		LOG.info("Activity facilities (after SACSC data): " + activityFacilities.getFacilities().size());
 	}
 
 
@@ -380,6 +392,7 @@ public class IatbrPlanBuilder {
 			}
 		}
 		LOG.info("Number of OSM amenities dropped in favour of SACSC malls: " + droppedCounter);
+		LOG.info("Activity facilities (after OSM amenities): " + activityFacilities.getFacilities().size());
 	}
 
 }
