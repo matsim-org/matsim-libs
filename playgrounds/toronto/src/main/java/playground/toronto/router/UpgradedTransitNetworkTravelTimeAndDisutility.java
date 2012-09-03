@@ -14,7 +14,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * A significantly upgraded version of the base {@link TransitNetworkTravelTimeAndDisutility} calculator for transit, with several differences:
  *  <ul>
- *  	<li>Uses a {@link TransitDataCache} to remember as-simulated transit arrivals/departures, for use in congested transit simulation</li>
+ *  	<li>Uses a {@link TransitDataCache} to remember as-simulated transit arrivals/departures, for use in congested transit simulation.</li>
  *  	<li>Changes the disutility calculation to explicitly use agent waiting time to boarding transit. </li>
  *  </ul>
  *  
@@ -66,11 +66,7 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 			cost = - getInVehicleTravelTime((TransitRouterNetworkLink) link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 				       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
-		
-		if (cost < 0){
-			System.err.println("Check here!");
-		}
-		
+				
 		this.previousLink = link;
 		this.previousTime = time;
 		
@@ -156,7 +152,7 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 		}
 		
 		if (ttime < 0){
-			System.err.println("Check here!");
+			log.error("Travel time was calculated as negative at time " + Time.writeTime(time) + "!");
 		}
 		
 		this.previousLink = link;
