@@ -50,12 +50,12 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.pbox.BasicCooperative;
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.pbox.PFranchise;
-import playground.andreas.P2.plan.ComplexCircleScheduleProvider;
-import playground.andreas.P2.plan.PRouteProvider;
-import playground.andreas.P2.plan.RandomStopProvider;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.routeProvider.ComplexCircleScheduleProvider;
+import playground.andreas.P2.routeProvider.PRouteProvider;
+import playground.andreas.P2.routeProvider.RandomStopProvider;
 import playground.andreas.P2.schedule.CreatePStops;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 

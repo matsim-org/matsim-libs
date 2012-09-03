@@ -49,13 +49,13 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
-import playground.andreas.P2.plan.PRouteProvider;
-import playground.andreas.P2.plan.PRouteProviderFactory;
 import playground.andreas.P2.replanning.CreateCooperativeFromSchedule;
 import playground.andreas.P2.replanning.CreateNew24hPlan;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
+import playground.andreas.P2.routeProvider.PRouteProvider;
+import playground.andreas.P2.routeProvider.PRouteProviderFactory;
 import playground.andreas.P2.schedule.CreatePStops;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;

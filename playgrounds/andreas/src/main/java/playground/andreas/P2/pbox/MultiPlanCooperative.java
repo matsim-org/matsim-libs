@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
+import playground.andreas.P2.routeProvider.PRouteProvider;
 
 /**
  * This cooperative has multiple plans. Each is weighted by the number of vehicles associated with.

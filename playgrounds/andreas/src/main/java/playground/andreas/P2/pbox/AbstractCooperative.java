@@ -30,10 +30,10 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
-import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
+import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.scoring.ScoreContainer;
 
 /**
