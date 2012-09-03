@@ -31,25 +31,22 @@ package playground.thibautd.tsplanoptimizer.framework;
  * It must implement equals and hashCode
  *
  * @author thibautd
- * @param <T> the type of object this object represents. For safety reasons,
- * is should be immutable.
  */
-public interface Value<T> {
+public interface Value {
 	/**
 	 * returns the value.
 	 * @return the value.
 	 */
-	public T getValue();
+	public Object getValue();
 
 	/**
 	 * Sets the value.
 	 * @param newValue the new value
 	 * @return the old value.
 	 * @throws IllegalArgumentException if the value is not allowed (for example,
-	 * a double value may be bounded)
+	 * a double value may be bounded, or the new value may be checked for its type)
 	 */
-	public T setValue(T newValue);
+	public Object setValue(Object newValue);
 
-	public Value<T> createClone();
+	public Value createClone();
 }
-

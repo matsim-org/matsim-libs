@@ -59,14 +59,14 @@ public class IntegerValueChanger implements Move {
 	public Solution apply(final Solution solution) {
 		Solution newSolution = solution.createClone();
 
-		Value<Integer> val = (Value<Integer>) newSolution.getRepresentation().get( index );
-		val.setValue( val.getValue().intValue() + amount );
+		Value val = newSolution.getRepresentation().get( index );
+		val.setValue( ((Integer) val.getValue()).intValue() + amount );
 
 		if (durationEncoding) {
 			// emulate a duration-based encoding by modifying all subsequent end times.
 			for (int i=index+1; i < newSolution.getRepresentation().size(); i++) {
-				val = (Value<Integer>) newSolution.getRepresentation().get( index );
-				val.setValue( val.getValue().intValue() + amount );
+				val = newSolution.getRepresentation().get( index );
+				val.setValue( ((Integer) val.getValue()).intValue() + amount );
 			}
 		}
 

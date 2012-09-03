@@ -275,7 +275,7 @@ public class JointTimeModeChooserSolution implements Solution {
 								act.getType().equals( JointActingTypes.DROP_OFF )) ) {
 						// enforce the values to be consistent (ie end time do not produce negative durations)
 						int value = (int) (now - lastNow);
-						values.add( new ValueImpl<Integer>( value ) );
+						values.add( new ValueImpl( value ) );
 						currentValueIndex++;
 						codedPlanElements.add( pe );
 						lastNow = now;
@@ -629,7 +629,7 @@ public class JointTimeModeChooserSolution implements Solution {
 		}
 	}
 
-	public static class SubtourValue implements Value<String> {
+	public static class SubtourValue implements Value {
 		private final int parentSubtourValueIndex;
 		private String value;
 
@@ -650,14 +650,17 @@ public class JointTimeModeChooserSolution implements Solution {
 		}
 
 		@Override
-		public String setValue(final String newValue) {
+		public String setValue(final Object newValue) {
+			if ( !(newValue instanceof String) ) {
+				throw new IllegalArgumentException( "argument must be a String, got a "+newValue.getClass()+": "+newValue );
+			}
 			String old = value;
-			value = newValue;
+			value = (String) newValue;
 			return old;
 		}
 
 		@Override
-		public Value<String> createClone() {
+		public Value createClone() {
 			return new SubtourValue( parentSubtourValueIndex , value );
 		}
 	}

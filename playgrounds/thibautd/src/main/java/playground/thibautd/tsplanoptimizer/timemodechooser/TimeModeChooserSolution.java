@@ -158,7 +158,7 @@ public class TimeModeChooserSolution implements Solution {
 				// enforce the values to be consistent (ie end time do not produce negative durations)
 				int value = Math.max( (int) now , lastValue );
 				lastValue = value;
-				values.add( new ValueImpl<Integer>( value ) );
+				values.add( new ValueImpl( value ) );
 				codedPlanElements.add( pe );
 			}
 		}
@@ -166,7 +166,7 @@ public class TimeModeChooserSolution implements Solution {
 		for (List<PlanElement> subtour : analyseSubtours( planStructure )) {
 			Subtour subtourElement = new Subtour( subtour );
 			codedPlanElements.add( subtourElement );
-			values.add( new ValueImpl<String>( subtourElement.getMode() ) );
+			values.add( new ValueImpl( subtourElement.getMode() ) );
 		}
 
 		return new Values(

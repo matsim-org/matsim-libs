@@ -20,26 +20,25 @@
 package playground.thibautd.tsplanoptimizer.framework;
 
 /**
- * Default generic implementation of a {@link Value}. 
- * It is actually not that nice: it is better to use
- * non-generic implementations.
+ * Default implementation of a {@link Value}. 
+ *
  * @author thibautd
  */
-public class ValueImpl<T> implements Value<T> {
-	private T value;
+public class ValueImpl implements Value {
+	private Object value;
 
-	public ValueImpl(final T value) {
+	public ValueImpl(final Object value) {
 		this.value = value;
 	}
 
 	@Override
-	public T getValue() {
+	public Object getValue() {
 		return value;
 	}
 
 	@Override
-	public T setValue(final T newValue) {
-		T old = value;
+	public Object setValue(final Object newValue) {
+		Object old = value;
 		this.value = newValue;
 		return old;
 	}
@@ -60,8 +59,8 @@ public class ValueImpl<T> implements Value<T> {
 	}
 
 	@Override
-	public Value<T> createClone() {
-		return new ValueImpl<T>( value );
+	public Value createClone() {
+		return new ValueImpl( value );
 	}
 
 	@Override
