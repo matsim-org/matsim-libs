@@ -34,6 +34,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants;
 
 /**
  * Generates vehicles for a whole transit schedule
@@ -55,7 +56,7 @@ public class PVehiclesFactory {
 	 * 
 	 * @return Vehicles used by paratranit lines
 	 */
-	public Vehicles getVehicles(TransitSchedule pTransitSchedule){		
+	public Vehicles createVehicles(TransitSchedule pTransitSchedule){		
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(new IdImpl(this.pConfig.getPIdentifier()));
@@ -64,8 +65,8 @@ public class PVehiclesFactory {
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
-		vehType.setAccessTime(2.0);
-		vehType.setEgressTime(1.0);
+		vehType.setAccessTime(PConstants.pVehAccessTime);
+		vehType.setEgressTime(PConstants.pVehEgressTime);
 		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
 	
 		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {

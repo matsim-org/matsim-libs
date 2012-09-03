@@ -23,6 +23,9 @@ package playground.andreas.P2.helper;
  * @author aneumann
  */
 public class PConstants {
+
+	public static final double pVehAccessTime = 2.0;
+	public static final double pVehEgressTime = 1.0;
 	
 	public enum CoopState {
 	    PROSPECTING, INBUSINESS, BANKRUPT
