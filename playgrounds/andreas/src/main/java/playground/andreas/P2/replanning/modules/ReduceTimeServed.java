@@ -37,7 +37,7 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 
-import playground.andreas.P2.pbox.Cooperative;
+import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategy;

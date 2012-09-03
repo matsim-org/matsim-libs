@@ -41,8 +41,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.pbox.Cooperative;
-import playground.andreas.P2.pbox.CooperativeFactory;
+import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.CooperativeFactory;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
 /**

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.pbox;
+package playground.andreas.P2.operator;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;

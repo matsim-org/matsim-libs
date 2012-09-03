@@ -49,6 +49,8 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.CooperativeFactory;
 import playground.andreas.P2.replanning.CreateCooperativeFromSchedule;
 import playground.andreas.P2.replanning.CreateNew24hPlan;
 import playground.andreas.P2.replanning.CreateNewPlan;

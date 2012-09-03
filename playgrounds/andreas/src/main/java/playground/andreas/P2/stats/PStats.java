@@ -37,7 +37,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
-import playground.andreas.P2.pbox.Cooperative;
+import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.replanning.PPlan;
 

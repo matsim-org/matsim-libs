@@ -34,7 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.andreas.P2.pbox.BasicCooperative;
+import playground.andreas.P2.operator.BasicCooperative;
 
 /**
  * Config group to configure p

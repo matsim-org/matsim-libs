@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.pbox;
+package playground.andreas.P2.operator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.pbox.PFranchise;
 
 /**
  * 

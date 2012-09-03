@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
-import playground.andreas.P2.pbox.Cooperative;
+import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 
 

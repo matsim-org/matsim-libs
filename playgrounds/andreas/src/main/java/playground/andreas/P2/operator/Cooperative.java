@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.pbox;
+package playground.andreas.P2.operator;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 
 import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PPlanStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
