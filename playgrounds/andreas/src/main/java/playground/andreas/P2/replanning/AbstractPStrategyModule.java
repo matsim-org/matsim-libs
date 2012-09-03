@@ -19,16 +19,17 @@
 
 package playground.andreas.P2.replanning;
 
-import playground.andreas.P2.operator.Cooperative;
+import java.util.ArrayList;
 
-public interface PPlanStrategy {
-
-	/**
-	 * 
-	 * @param cooperative
-	 * @return the plan found or null if there is no better plan 
-	 */
-	public PPlan run(Cooperative cooperative);
+/**
+ * Provide a common constructor
+ * 
+ * @author aneumann
+ */
+public abstract class AbstractPStrategyModule implements PStrategy{
 	
-	public String getName();
+	public AbstractPStrategyModule(ArrayList<String> parameter){
+
+	}
+
 }

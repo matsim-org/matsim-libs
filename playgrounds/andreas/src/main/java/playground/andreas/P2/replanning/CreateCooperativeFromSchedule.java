@@ -52,7 +52,7 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
  * @author aneumann
  *
  */
-public class CreateCooperativeFromSchedule implements PPlanStrategy{
+public class CreateCooperativeFromSchedule implements PStrategy{
 	
 	private final static Logger log = Logger.getLogger(CreateCooperativeFromSchedule.class);
 	public static final String STRATEGY_NAME = "CreateCooperativeFromSchedule";

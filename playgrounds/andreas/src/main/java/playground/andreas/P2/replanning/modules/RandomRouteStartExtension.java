@@ -36,7 +36,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PStrategy;
+import playground.andreas.P2.replanning.AbstractPStrategyModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author droeder
  *
  */
-public class RandomRouteStartExtension extends PStrategy {
+public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	
 	private static final Logger log = Logger
 	.getLogger(RandomRouteStartExtension.class);
@@ -77,7 +77,7 @@ public class RandomRouteStartExtension extends PStrategy {
 	}
 	
 	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PPlanStrategy#run(playground.andreas.P2.pbox.Cooperative)
+	 * @see playground.andreas.P2.replanning.PStrategy#run(playground.andreas.P2.pbox.Cooperative)
 	 */
 	@Override
 	public PPlan run(Cooperative cooperative) {
@@ -332,7 +332,7 @@ public class RandomRouteStartExtension extends PStrategy {
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
 	public String getName() {

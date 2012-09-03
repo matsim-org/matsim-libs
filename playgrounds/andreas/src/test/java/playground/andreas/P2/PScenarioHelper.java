@@ -52,7 +52,7 @@ import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.routeProvider.ComplexCircleScheduleProvider;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.RandomStopProvider;
@@ -390,7 +390,7 @@ public class PScenarioHelper {
 
 }
 
-class Route2111to2333 implements PPlanStrategy{
+class Route2111to2333 implements PStrategy{
 	
 	private String pId;
 	private TransitSchedule sched;
@@ -416,7 +416,7 @@ class Route2111to2333 implements PPlanStrategy{
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
 	public String getName() {
@@ -424,7 +424,7 @@ class Route2111to2333 implements PPlanStrategy{
 	}
 }
 
-class Route2333to2111 implements PPlanStrategy{
+class Route2333to2111 implements PStrategy{
 	
 	private String pId;
 	private TransitSchedule sched;
@@ -450,7 +450,7 @@ class Route2333to2111 implements PPlanStrategy{
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
 	public String getName() {
@@ -458,7 +458,7 @@ class Route2333to2111 implements PPlanStrategy{
 	}
 }
 
-class Route2414to3444 implements PPlanStrategy{
+class Route2414to3444 implements PStrategy{
 	
 	private String pId;
 	private TransitSchedule sched;
@@ -484,7 +484,7 @@ class Route2414to3444 implements PPlanStrategy{
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
 	public String getName() {
@@ -493,7 +493,7 @@ class Route2414to3444 implements PPlanStrategy{
 }
 
 
-class Route2111to1314to4443 implements PPlanStrategy{
+class Route2111to1314to4443 implements PStrategy{
 	
 	private String pId;
 	private TransitSchedule sched;
@@ -521,7 +521,7 @@ class Route2111to1314to4443 implements PPlanStrategy{
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PPlanStrategy#getName()
+	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
 	public String getName() {

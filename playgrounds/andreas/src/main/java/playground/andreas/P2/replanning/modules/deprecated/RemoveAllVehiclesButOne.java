@@ -26,7 +26,7 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PStrategy;
+import playground.andreas.P2.replanning.AbstractPStrategyModule;
 
 /**
  * 
@@ -35,7 +35,7 @@ import playground.andreas.P2.replanning.PStrategy;
  * @author aneumann
  *
  */
-public class RemoveAllVehiclesButOne extends PStrategy {
+public class RemoveAllVehiclesButOne extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(RemoveAllVehiclesButOne.class);
 	public static final String STRATEGY_NAME = "RemoveAllVehiclesButOne";

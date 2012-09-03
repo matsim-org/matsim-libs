@@ -32,7 +32,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.scoring.ScoreContainer;
@@ -78,7 +78,7 @@ public abstract class AbstractCooperative implements Cooperative{
 		this.franchise = franchise;
 	}
 
-	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration, double initialBudget) {
+	public void init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
 		this.coopState = CoopState.PROSPECTING;
 		this.budget = initialBudget;
 		this.currentIteration = iteration;

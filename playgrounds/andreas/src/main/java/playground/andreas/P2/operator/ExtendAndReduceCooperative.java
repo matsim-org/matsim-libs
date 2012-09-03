@@ -28,7 +28,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.ConvexHullRouteExtension;
@@ -101,7 +101,7 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 		}
 		
 		// always buy vehicles without test
-		PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
+		PStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
 		PPlan buy = strategy.run(this);
 		if(!(buy == null)){
 			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + buy.getNVehicles());
@@ -121,7 +121,7 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 	 * @param iteration
 	 */
 	private void randomReplan(PStrategyManager pStrategyManager, int iteration) {
-		PPlanStrategy s = pStrategyManager.chooseStrategy();
+		PStrategy s = pStrategyManager.chooseStrategy();
 		PPlan p = s.run(this);
 		
 		if(!(p == null)){
@@ -142,7 +142,7 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 	 * @param iteration
 	 */
 	private void replanInProgress(PStrategyManager pStrategyManager, int iteration) {
-		PPlanStrategy s;
+		PStrategy s;
 		if(this.reduceStopsAfter.contains(this.lastStrategy)){
 			this.lastScore = this.bestPlan.getScorePerVehicle();
 			s = pStrategyManager.getReduceStopsToBeServed();

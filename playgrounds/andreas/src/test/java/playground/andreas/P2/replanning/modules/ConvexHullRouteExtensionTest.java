@@ -30,7 +30,7 @@ import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 
 /**
  * @author droeder
@@ -51,7 +51,7 @@ public class ConvexHullRouteExtensionTest {
 		Assert.assertEquals(c.getPIdentifier() + "4443", plan.getStopsToBeServed().get(2).getId().toString());
 		//set up strategy
 		ArrayList<String> parameters = new ArrayList<String>();
-		PPlanStrategy strategy = new ConvexHullRouteExtension(parameters);
+		PStrategy strategy = new ConvexHullRouteExtension(parameters);
 		// run strategy with initial cooperative
 		Assert.assertNull("new plan should be null", strategy.run(coop));
 		// create new Plan

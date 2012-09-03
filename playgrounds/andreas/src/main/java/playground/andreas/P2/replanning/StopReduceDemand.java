@@ -44,7 +44,7 @@ import playground.andreas.P2.operator.Cooperative;
  * @author aneumann
  *
  */
-public class StopReduceDemand extends PStrategy implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class StopReduceDemand extends AbstractPStrategyModule implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(StopReduceDemand.class);
 	

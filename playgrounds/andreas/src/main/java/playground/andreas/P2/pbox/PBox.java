@@ -54,7 +54,7 @@ import playground.andreas.P2.operator.CooperativeFactory;
 import playground.andreas.P2.replanning.CreateCooperativeFromSchedule;
 import playground.andreas.P2.replanning.CreateNew24hPlan;
 import playground.andreas.P2.replanning.CreateNewPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.PRouteProviderFactory;
@@ -89,7 +89,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private final ScorePlansHandler scorePlansHandler;
 	private PStrategyManager strategyManager;
 	private PRouteProvider routeProvider;
-	private PPlanStrategy initialStrategy;
+	private PStrategy initialStrategy;
 
 	
 	public PBox(PConfigGroup pConfig) {

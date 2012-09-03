@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.PFranchise;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
 
@@ -84,18 +84,18 @@ public class InitCooperative extends AbstractCooperative{
 		}
 		
 		if (firstIteration) {
-			PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
+			PStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
 			this.testPlan = strategy.run(this);
 			this.firstIteration = false;
 		} else if (this.needToReduceRoute) {
-			PPlanStrategy strategy = pStrategyManager.getReduceStopsToBeServed();
+			PStrategy strategy = pStrategyManager.getReduceStopsToBeServed();
 			this.testPlan = strategy.run(this);
 			if (this.testPlan != null) {
 				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 			}
 			this.needToReduceRoute = false;
 		} else if (this.needToReduceTime) {
-			PPlanStrategy strategy = pStrategyManager.getReduceTimeServed();
+			PStrategy strategy = pStrategyManager.getReduceTimeServed();
 			this.testPlan = strategy.run(this);
 			if (this.testPlan != null) {
 				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
@@ -104,7 +104,7 @@ public class InitCooperative extends AbstractCooperative{
 		} else {
 		
 			// First buy vehicles
-			PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
+			PStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
 			this.testPlan = strategy.run(this);
 
 			// Second replan, if testplan null

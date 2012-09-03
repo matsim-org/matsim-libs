@@ -28,7 +28,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
@@ -50,7 +50,7 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		this.plans = new LinkedList<PPlan>();
 	}
 	
-	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration, double initialBudget) {
+	public void init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
 		super.init(pRouteProvider, initialStrategy, iteration, initialBudget);
 		this.plans.add(this.bestPlan);
 		this.bestPlan = null;
@@ -124,7 +124,7 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		
 		// Third, replan
 		if (this.bestPlan != null) {
-			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
+			PStrategy strategy = pStrategyManager.chooseStrategy();
 			PPlan newPlan = strategy.run(this);
 			if (newPlan != null) {
 				// check, if it is a duplicate of an existing plan

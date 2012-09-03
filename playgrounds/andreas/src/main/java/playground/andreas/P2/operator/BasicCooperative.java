@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.PFranchise;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.modules.AggressiveIncreaseNumberOfVehicles;
 
@@ -79,7 +79,7 @@ public class BasicCooperative extends AbstractCooperative{
 		}
 
 		// First buy vehicles
-		PPlanStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
+		PStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
 		this.testPlan = strategy.run(this);
 		
 		// Second replan, if testplan null

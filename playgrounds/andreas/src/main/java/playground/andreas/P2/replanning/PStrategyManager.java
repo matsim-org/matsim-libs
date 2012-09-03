@@ -57,7 +57,7 @@ public class PStrategyManager {
 	
 	private EventsManager eventsManager;
 	
-	private final ArrayList<PPlanStrategy> strategies = new ArrayList<PPlanStrategy>();
+	private final ArrayList<PStrategy> strategies = new ArrayList<PStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private double totalWeights = 0.0;
 	
@@ -77,16 +77,16 @@ public class PStrategyManager {
 				continue;
 			}
 			String classname = settings.getModuleName();
-			PPlanStrategy strategy = loadStrategy(classname, settings, eventsManager);
+			PStrategy strategy = loadStrategy(classname, settings, eventsManager);
 			this.addStrategy(strategy, rate);
 		}
 		
 		log.info("enabled with " + this.strategies.size()  + " strategies");
 	}
 
-	private PPlanStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager) {
+	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
-		PPlanStrategy strategy = null;
+		PStrategy strategy = null;
 		
 		if (name.equals(RemoveAllVehiclesButOne.STRATEGY_NAME)) {
 			strategy = new RemoveAllVehiclesButOne(settings.getParametersAsArrayList());
@@ -157,13 +157,13 @@ public class PStrategyManager {
 		return strategy;
 	}
 
-	private void addStrategy(final PPlanStrategy strategy, final double weight) {
+	private void addStrategy(final PStrategy strategy, final double weight) {
 		this.strategies.add(strategy);
 		this.weights.add(Double.valueOf(weight));
 		this.totalWeights += weight;
 	}
 
-	public PPlanStrategy chooseStrategy() {
+	public PStrategy chooseStrategy() {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
 
 		double sum = 0.0;

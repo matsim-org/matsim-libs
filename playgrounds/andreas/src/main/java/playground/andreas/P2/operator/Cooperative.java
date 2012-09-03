@@ -28,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.scoring.ScoreContainer;
@@ -40,7 +40,7 @@ import playground.andreas.P2.scoring.ScoreContainer;
  */
 public interface Cooperative {
 	
-	public void init(PRouteProvider pRouteProvider, PPlanStrategy initialStrategy, int iteration, double initialBudget);
+	public void init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget);
 	
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap);
 	

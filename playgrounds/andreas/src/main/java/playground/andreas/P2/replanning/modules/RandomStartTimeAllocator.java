@@ -27,7 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PStrategy;
+import playground.andreas.P2.replanning.AbstractPStrategyModule;
 
 /**
  * 
@@ -36,7 +36,7 @@ import playground.andreas.P2.replanning.PStrategy;
  * @author aneumann
  *
  */
-public class RandomStartTimeAllocator extends PStrategy {
+public class RandomStartTimeAllocator extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(RandomStartTimeAllocator.class);
 	public static final String STRATEGY_NAME = "RandomStartTimeAllocator";

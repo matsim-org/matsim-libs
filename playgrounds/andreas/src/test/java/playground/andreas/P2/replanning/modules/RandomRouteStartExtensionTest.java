@@ -30,7 +30,7 @@ import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.replanning.PPlanStrategy;
+import playground.andreas.P2.replanning.PStrategy;
 
 
 
@@ -53,7 +53,7 @@ public class RandomRouteStartExtensionTest {
 		// set up strategy
 		ArrayList<String> parameters = new ArrayList<String>();
 		parameters.add("0.7");
-		PPlanStrategy strategy = new RandomRouteStartExtension(parameters);
+		PStrategy strategy = new RandomRouteStartExtension(parameters);
 		// run strategy with initial cooperative
 		Assert.assertNull("new plan should be null", strategy.run(coop));
 		// create new Plan
