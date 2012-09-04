@@ -47,7 +47,7 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 	private HashMap<Id, Double> agentId2PersonEntersVehicleEventTime = new HashMap<Id, Double>();
 	
 	public AverageInVehicleTripTravelTimeSecondsPerMode(String ptDriverPrefix){
-		super("AverageInVehicleTripTravelTimeSecondsPerMode",ptDriverPrefix);
+		super(AverageInVehicleTripTravelTimeSecondsPerMode.class.getSimpleName(),ptDriverPrefix);
 		log.info("enabled");
 	}
 

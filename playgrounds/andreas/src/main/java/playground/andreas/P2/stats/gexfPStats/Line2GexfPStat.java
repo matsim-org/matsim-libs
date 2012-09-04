@@ -33,6 +33,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants;
 
 /**
  * GexfPStat stats for all lines. Each line is written separately to file
@@ -43,7 +44,6 @@ import playground.andreas.P2.helper.PConfigGroup;
 public class Line2GexfPStat implements StartupListener, IterationEndsListener, ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(Line2GexfPStat.class);
-	private final static String GEXFDIR = "gexf";
 
 	private String gexfOutputDir;
 	
@@ -77,19 +77,18 @@ public class Line2GexfPStat implements StartupListener, IterationEndsListener, S
 			
 			this.vehHandler = new CountPVehHandler(this.pConfig.getPIdentifier());
 			event.getControler().getEvents().addHandler(this.vehHandler);
-			
-			this.gexfOutputDir = event.getControler().getControlerIO().getOutputPath() + "/" + Line2GexfPStat.GEXFDIR + "/";
-			try {
-				new File(this.gexfOutputDir).mkdir();
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.pConfig.getGexfInterval() > 0) {
+			this.gexfOutputDir = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + Line2GexfPStat.class.getSimpleName() + "/";
+			try {
+				new File(this.gexfOutputDir).mkdir();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 
 			Set<String> currentLineIds = this.globalPaxHandler.getLineIds();
 

@@ -85,7 +85,7 @@ public class ActivityLocationsParatransitUser implements IterationEndsListener {
 		
 		if (this.firstIteration) {
 			// write it to main output
-			writeResults(event.getControler().getControlerIO().getOutputFilename(this.outNameIdentifier));
+			writeResults(event.getControler().getControlerIO().getOutputFilename("0." + this.outNameIdentifier));
 			this.firstIteration = false;
 		} else {
 			// write it somewhere

@@ -21,7 +21,6 @@ package playground.andreas.P2.stats;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,10 +35,12 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AbstractPAnalyisModule;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageInVehicleTripTravelTimeSecondsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDeparturePerMode;
@@ -116,10 +117,15 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.firstIteration) {
+			// create the output folder for this module
+			String outFilename = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + PAnalysisManager.class.getSimpleName() + "/";
+			new File(outFilename).mkdir();
+			
 			// create one output stream for each analysis
 			for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
 				try {
-					BufferedWriter writer = new BufferedWriter(new FileWriter(new File(event.getControler().getControlerIO().getOutputFilename("pAna_" + ana.getName() + ".txt"))));
+					String moduleOutFilename = outFilename + ana.getName() + ".txt";
+					BufferedWriter writer = IOUtils.getBufferedWriter(moduleOutFilename);
 					writer.write("# iteration" + ana.getHeader());
 					writer.newLine();
 					this.pAnalyis2Writer.put(ana.getName(), writer);

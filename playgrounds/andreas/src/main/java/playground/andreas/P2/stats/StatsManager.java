@@ -19,7 +19,11 @@
 
 package playground.andreas.P2.stats;
 
+import java.io.File;
+
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;
@@ -37,9 +41,10 @@ import playground.andreas.P2.stats.pStatsOverview.PStatsOverview;
  * @author aneumann
  *
  */
-public class StatsManager {
+public class StatsManager implements StartupListener{
 	
 	public StatsManager(Controler controler, PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter){
+		// register all modules
 		controler.addControlerListener(new PStatsOverview(pBox, pConfig));
 		controler.addControlerListener(new PCoopLogger(pBox, pConfig));
 		controler.addControlerListener(new GexfPStat(pConfig, false));
@@ -50,5 +55,11 @@ public class StatsManager {
 		controler.addControlerListener(new PAnalysisManager(pConfig, PConstants.ptDriverPrefix, lineSetter));
 		
 		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig, 100.0));
+	}
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		String outFilename = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
+		new File(outFilename).mkdir();
 	}
 }

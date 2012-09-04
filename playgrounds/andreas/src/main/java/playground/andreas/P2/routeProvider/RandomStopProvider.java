@@ -39,6 +39,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants;
 
 /**
  * 
@@ -167,7 +168,7 @@ public class RandomStopProvider {
 		try {
 			if (this.lastIteration == -1) {
 				// init output dir
-				this.outputDir = this.outputDir + "/" + "stopId2stopWeight" + "/";
+				this.outputDir = this.outputDir + PConstants.statsOutputFolder + RandomStopProvider.class.getSimpleName() + "/";
 				new File(this.outputDir).mkdir();
 			}
 			

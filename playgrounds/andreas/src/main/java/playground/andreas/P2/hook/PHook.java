@@ -65,6 +65,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	private AgentsStuckHandlerImpl agentsStuckHandler;
 	private PBox pBox;
 
+	private StatsManager statsManager;
 
 	public PHook(Controler controler) {
 		this(controler, null);
@@ -82,11 +83,12 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
 		}
 		
-		new StatsManager(controler, pConfig, this.pBox, lineSetter); 
+		this.statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter); 
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		this.statsManager.notifyStartup(event);
 		this.pBox.notifyStartup(event);
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
 		this.baseVehicles = event.getControler().getScenario().getVehicles();
