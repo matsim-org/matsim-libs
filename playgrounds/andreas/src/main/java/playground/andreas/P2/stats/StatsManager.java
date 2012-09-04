@@ -17,23 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.helper;
+package playground.andreas.P2.stats;
+
+import org.matsim.core.controler.Controler;
+
+import playground.andreas.P2.ana.ActivityLocationsParatransitUser;
+import playground.andreas.P2.ana.PAnalysisManager;
+import playground.andreas.P2.ana.helper.PtMode2LineSetter;
+import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.helper.PConstants;
+import playground.andreas.P2.pbox.PBox;
 
 /**
+ * 
+ * Registers all stats modules with MATSim
+ * 
  * @author aneumann
+ *
  */
-public class PConstants {
-
-	public static final String ptDriverPrefix = "pt_"; // TODO[AN] This really needs to be changed.
+public class StatsManager {
 	
-	public static final double pVehAccessTime = 2.0;
-	public static final double pVehEgressTime = 1.0;
-	
-	public enum CoopState {
-	    PROSPECTING, INBUSINESS, BANKRUPT
-	}
-	
-	private PConstants() {
+	public StatsManager(Controler controler, PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter){
+		controler.addControlerListener(new PStats(pBox, pConfig));
+		controler.addControlerListener(new PCoopLogger(pBox, pConfig));
+		controler.addControlerListener(new GexfPStat(pConfig, false));
+//		controler.addControlerListener(new GexfPStat(pConfig, true));
+		controler.addControlerListener(new GexfPStatLight(pConfig));
+		controler.addControlerListener(new Line2GexfPStat(pConfig));
 		
+		controler.addControlerListener(new PAnalysisManager(pConfig, PConstants.ptDriverPrefix, lineSetter));
+		
+		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig, 100.0));
 	}
 }

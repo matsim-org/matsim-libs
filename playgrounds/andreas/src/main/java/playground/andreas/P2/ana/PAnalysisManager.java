@@ -73,16 +73,16 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 	private boolean firstIteration = true;
 	private PtMode2LineSetter lineSetter;
 
-	public PAnalysisManager(PConfigGroup pConfig, String ptDriverPrefix) {
-		this(pConfig, ptDriverPrefix, new BVGLines2PtModes());
-		log.info("using default PtMode2LineSetter " +  this.lineSetter.getClass().getSimpleName());
-	}
-
 	public PAnalysisManager(PConfigGroup pConfig, String ptDriverPrefix, PtMode2LineSetter lineSetter){
 		log.info("enabled");
 		this.pIdentifier = pConfig.getPIdentifier();
 		this.ptDriverPrefix = ptDriverPrefix;
-		this.lineSetter = lineSetter;
+		if (lineSetter == null) {
+			this.lineSetter = new BVGLines2PtModes();
+			log.info("using default PtMode2LineSetter " +  this.lineSetter.getClass().getSimpleName());
+		} else {
+			this.lineSetter = lineSetter;
+		}
 	}
 	@Override
 	public void notifyStartup(StartupEvent event) {

@@ -37,18 +37,12 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-import playground.andreas.P2.ana.ActivityLocationsParatransitUser;
-import playground.andreas.P2.ana.PAnalysisManager;
 import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
-import playground.andreas.P2.stats.GexfPStat;
-import playground.andreas.P2.stats.GexfPStatLight;
-import playground.andreas.P2.stats.Line2GexfPStat;
-import playground.andreas.P2.stats.PCoopLogger;
-import playground.andreas.P2.stats.PStats;
+import playground.andreas.P2.stats.StatsManager;
 
 /**
  * Hook to register paratransit black box with MATSim
@@ -82,23 +76,13 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
 		controler.setTransitRouterFactory(this.pTransitRouterFactory);
 		controler.setMobsimFactory(new PQSimFactory());
-		
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
+
 		if(pConfig.getReRouteAgentsStuck()){
 			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
 		}
-		controler.addControlerListener(new PStats(this.pBox, pConfig));
-		controler.addControlerListener(new PCoopLogger(this.pBox, pConfig));
-		controler.addControlerListener(new GexfPStat(pConfig, false));
-//		controler.addControlerListener(new GexfPStat(pConfig, true));
-		controler.addControlerListener(new GexfPStatLight(pConfig));
-		controler.addControlerListener(new Line2GexfPStat(pConfig));
-		if(lineSetter == null){
-			controler.addControlerListener(new PAnalysisManager(pConfig, "pt_"));
-		}else{
-			controler.addControlerListener(new PAnalysisManager(pConfig, "pt_", lineSetter));
-		}
-		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig, 100.0));
+		
+		new StatsManager(controler, pConfig, this.pBox, lineSetter); 
 	}
 
 	@Override
@@ -152,7 +136,6 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	}
 
 	private TransitSchedule addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
-		
 		TransitSchedule schedule = new PTransitScheduleImpl(baseSchedule.getFactory());
 		
 		if(pSchedule == null){
@@ -163,7 +146,6 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		for (TransitStopFacility pStop : baseSchedule.getFacilities().values()) {
 			schedule.addStopFacility(pStop);
 		}
-		
 		for (TransitStopFacility pStop : pSchedule.getFacilities().values()) {
 			schedule.addStopFacility(pStop);
 		}
@@ -179,7 +161,6 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	}
 	
 	private Vehicles addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
-		
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		
 		vehicles.getVehicleTypes().putAll(baseVehicles.getVehicleTypes());
@@ -203,5 +184,4 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			writer2.writeFile(controler.getControlerIO().getIterationFilename(controler.getIterationNumber().intValue(), "vehicles.xml.gz"));
 		}
 	}
-
 }
