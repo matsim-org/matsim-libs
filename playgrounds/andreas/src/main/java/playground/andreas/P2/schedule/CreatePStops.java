@@ -256,7 +256,7 @@ public class CreatePStops{
 	}
 
 	private void run(){
-		this.transitSchedule = new PTransitSchedule(new PTransitScheduleImpl(new TransitScheduleFactoryImpl()));
+		this.transitSchedule = new PTransitScheduleImpl(new TransitScheduleFactoryImpl());
 		int stopsAdded = 0;
 		
 		for (Link link : this.net.getLinks().values()) {

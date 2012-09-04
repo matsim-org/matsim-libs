@@ -161,7 +161,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		this.needToUpdateRouter = true;
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
 		this.baseVehicles = event.getControler().getScenario().getVehicles();
-		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
+		this.schedule = addPTransitScheduleToOriginalOne(this.baseSchedule, this.pBox.getpTransitSchedule());
 		((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 		this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
 		((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
@@ -182,7 +182,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		} else {
 			this.pBox.notifyIterationStarts(event);
 			this.needToUpdateRouter = true;
-			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
+			this.schedule = addPTransitScheduleToOriginalOne(this.baseSchedule, this.pBox.getpTransitSchedule());
 			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 			this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
 			((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
@@ -204,7 +204,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		this.pBox.notifyScoring(event);	
 	}
 
-	private TransitSchedule addPTransitScheduleToOriginalOne(PTransitSchedule baseSchedule, TransitSchedule pSchedule) {
+	private TransitSchedule addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
 		
 		TransitSchedule schedule = new PTransitScheduleImpl(baseSchedule.getFactory());
 		
