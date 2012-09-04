@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.overview;
+package playground.andreas.P2.stats.pStatsOverview;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

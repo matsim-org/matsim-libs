@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.overview;
+package playground.andreas.P2.stats.pStatsOverview;
 
 import org.apache.log4j.Logger;
 
