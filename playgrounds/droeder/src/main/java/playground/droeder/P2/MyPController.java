@@ -27,11 +27,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
-import playground.andreas.P2.PControler;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
-import playground.andreas.P2.hook.PQSimFactory;
-import playground.andreas.P2.hook.PTransitRouterImplFactory;
+import playground.andreas.P2.hook.PHook;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 
@@ -65,10 +63,9 @@ public class MyPController {
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
-		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(controler);
+		PHook pFact = new PHook(controler);
 		controler.addControlerListener(pFact);		
 		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
-		controler.setMobsimFactory(new PQSimFactory());
 
 		controler.run();
 	}

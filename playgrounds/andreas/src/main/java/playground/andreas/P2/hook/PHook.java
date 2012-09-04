@@ -55,9 +55,9 @@ import playground.andreas.P2.stats.PStats;
  * 
  * @author aneumann
  */
-public class PTransitRouterImplFactory implements IterationStartsListener, StartupListener, ScoringListener{
+public class PHook implements IterationStartsListener, StartupListener, ScoringListener{
 	
-	private final static Logger log = Logger.getLogger(PTransitRouterImplFactory.class);
+	private final static Logger log = Logger.getLogger(PHook.class);
 
 	private TransitSchedule baseSchedule;
 	private Vehicles baseVehicles;
@@ -65,22 +65,23 @@ public class PTransitRouterImplFactory implements IterationStartsListener, Start
 	private TransitSchedule schedule;
 	private Vehicles vehicles;
 	
-	private PTransitRouterFactory pTransitRouterFactory;
+	private PTransitRouterFactory pTransitRouterFactory = null;
 	private PVehiclesFactory pVehiclesFactory = null;
 	
 	private AgentsStuckHandlerImpl agentsStuckHandler;
 	private PBox pBox;
 
 
-	public PTransitRouterImplFactory(Controler controler) {
+	public PHook(Controler controler) {
 		this(controler, null);
 	}
 	
-	public PTransitRouterImplFactory(Controler controler, PtMode2LineSetter lineSetter){
+	public PHook(Controler controler, PtMode2LineSetter lineSetter){
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
 		this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
 		controler.setTransitRouterFactory(this.pTransitRouterFactory);
+		controler.setMobsimFactory(new PQSimFactory());
 		
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
 		if(pConfig.getReRouteAgentsStuck()){

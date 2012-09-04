@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
-import playground.andreas.P2.hook.PTransitRouterImplFactory;
+import playground.andreas.P2.hook.PHook;
 import playground.droeder.southAfrica.PtSubModeControler;
 import playground.droeder.southAfrica.helper.Mode2LineSetterRSA;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
@@ -97,7 +97,7 @@ public class RunRsaMultiModalTest {
 		 *  controlerListener (even if it is not set as ROuterFactory), because it provides
 		 *	some essential functionality to the P-module
 		 */
-		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(controler, new Mode2LineSetterRSA());
+		PHook pFact = new PHook(controler, new Mode2LineSetterRSA());
 //		PtSubModeDependRouterFactory pFact = new PtSubModeDependRouterFactory(controler, true);
 		controler.addControlerListener(pFact);		
 //		controler.setTransitRouterFactory(pFact);
