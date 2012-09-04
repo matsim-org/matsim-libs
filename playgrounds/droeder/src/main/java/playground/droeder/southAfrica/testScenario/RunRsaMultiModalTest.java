@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
-import playground.andreas.P2.schedule.PTransitRouterImplFactory;
+import playground.andreas.P2.hook.PTransitRouterImplFactory;
 import playground.droeder.southAfrica.PtSubModeControler;
 import playground.droeder.southAfrica.helper.Mode2LineSetterRSA;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
