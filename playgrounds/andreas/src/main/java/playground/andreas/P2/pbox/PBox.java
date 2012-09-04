@@ -38,6 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.replanning.OperatorInitializer;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.PStopsFactory;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
@@ -63,11 +64,8 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private TransitSchedule pStopsOnly;
 	private TransitSchedule pTransitSchedule;
 	
-	
 	private final ScorePlansHandler scorePlansHandler;
 	private PStrategyManager strategyManager;
-//	private PRouteProvider routeProvider;
-
 	
 	public PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;		
