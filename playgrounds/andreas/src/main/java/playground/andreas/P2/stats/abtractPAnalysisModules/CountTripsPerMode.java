@@ -43,7 +43,7 @@ public class CountTripsPerMode extends AbstractPAnalyisModule implements Transit
 	private HashMap<String, Integer> ptMode2CountMap;
 	
 	public CountTripsPerMode(String ptDriverPrefix){
-		super("CountTripsPerMode",ptDriverPrefix);
+		super(CountTripsPerMode.class.getSimpleName(),ptDriverPrefix);
 		log.info("enabled");
 	}
 

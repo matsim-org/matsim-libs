@@ -55,7 +55,7 @@ public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule imple
 
 	
 	public AverageLoadPerDeparturePerMode(String ptDriverPrefix){
-		super("AverageLoadPerDeparturePerMode",ptDriverPrefix);
+		super(AverageLoadPerDeparturePerMode.class.getSimpleName(), ptDriverPrefix);
 		log.info("enabled");
 	}
 

@@ -42,7 +42,7 @@ public class CountVehPerMode extends AbstractPAnalyisModule implements TransitDr
 	private HashMap<String, Set<Id>> ptMode2VehIdsMap;
 	
 	public CountVehPerMode(String ptDriverPrefix){
-		super("CountVehPerMode",ptDriverPrefix);
+		super(CountVehPerMode.class.getSimpleName(),ptDriverPrefix);
 		log.info("enabled");
 	}
 

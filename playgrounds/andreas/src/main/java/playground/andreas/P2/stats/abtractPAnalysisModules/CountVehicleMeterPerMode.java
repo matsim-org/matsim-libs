@@ -46,7 +46,7 @@ public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements 
 
 	
 	public CountVehicleMeterPerMode(String ptDriverPrefix, Network network){
-		super("CountVehicleMeterPerMode",ptDriverPrefix);
+		super(CountVehicleMeterPerMode.class.getSimpleName(),ptDriverPrefix);
 		this.network = network;
 		log.info("enabled");
 	}

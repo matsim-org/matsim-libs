@@ -49,7 +49,7 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 	private HashMap<Id, String> agentId2LastPtModeUsed = new HashMap<Id, String>();
 	
 	public CountTransfersPerModeModeCombination(String ptDriverPrefix){
-		super("CountTransfersPerModeModeCombination",ptDriverPrefix);
+		super(CountTransfersPerModeModeCombination.class.getSimpleName(),ptDriverPrefix);
 		log.info("enabled");
 	}
 	

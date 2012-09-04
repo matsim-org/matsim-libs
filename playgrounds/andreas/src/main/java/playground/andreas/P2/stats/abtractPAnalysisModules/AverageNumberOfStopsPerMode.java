@@ -50,7 +50,7 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 
 	
 	public AverageNumberOfStopsPerMode(String ptDriverPrefix){
-		super("AverageNumberOfStopsPerMode",ptDriverPrefix);
+		super(AverageNumberOfStopsPerMode.class.getSimpleName(),ptDriverPrefix);
 		log.info("enabled");
 	}
 

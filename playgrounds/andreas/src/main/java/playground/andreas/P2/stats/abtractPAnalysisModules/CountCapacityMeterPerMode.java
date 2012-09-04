@@ -50,7 +50,7 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 
 	
 	public CountCapacityMeterPerMode(String ptDriverPrefix, Network network){
-		super("CountCapacityMeterPerMode",ptDriverPrefix);
+		super(CountCapacityMeterPerMode.class.getSimpleName(),ptDriverPrefix);
 		this.network = network;
 		log.info("enabled");
 	}

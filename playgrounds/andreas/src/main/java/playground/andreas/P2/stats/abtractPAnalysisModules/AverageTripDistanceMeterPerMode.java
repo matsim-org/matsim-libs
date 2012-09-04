@@ -52,7 +52,7 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 
 	
 	public AverageTripDistanceMeterPerMode(String ptDriverPrefix, Network network){
-		super("AverageTripDistanceMeterPerMode",ptDriverPrefix);
+		super(AverageTripDistanceMeterPerMode.class.getSimpleName(),ptDriverPrefix);
 		this.network = network;
 		log.info("enabled");
 	}

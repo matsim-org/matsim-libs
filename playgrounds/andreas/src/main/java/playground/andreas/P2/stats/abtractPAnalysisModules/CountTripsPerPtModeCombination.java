@@ -47,7 +47,7 @@ public class CountTripsPerPtModeCombination extends AbstractPAnalyisModule imple
 	private HashMap<Id, String> agentId2TripCombination = new HashMap<Id, String>();
 	
 	public CountTripsPerPtModeCombination(String ptDriverPrefix){
-		super("CountTripsPerPtModeCombination",ptDriverPrefix);
+		super(CountTripsPerPtModeCombination.class.getSimpleName(),ptDriverPrefix);
 		log.info("enabled");
 	}
 	

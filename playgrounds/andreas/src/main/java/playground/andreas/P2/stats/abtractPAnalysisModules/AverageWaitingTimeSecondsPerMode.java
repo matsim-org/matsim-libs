@@ -47,7 +47,7 @@ public class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule imp
 	private HashMap<Id, Double> agentId2AgentDepartureEventTime = new HashMap<Id, Double>();
 	
 	public AverageWaitingTimeSecondsPerMode(String ptDriverPrefix){
-		super("AverageWaitingTimeSecondsPerMode",ptDriverPrefix);
+		super(AverageWaitingTimeSecondsPerMode.class.getSimpleName(),ptDriverPrefix);
 		log.info("enabled");
 	}
 

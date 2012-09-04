@@ -51,7 +51,7 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 
 	
 	public CountPassengerMeterPerMode(String ptDriverPrefix, Network network){
-		super("CountPassengerMeterPerMode",ptDriverPrefix);
+		super(CountPassengerMeterPerMode.class.getSimpleName(),ptDriverPrefix);
 		this.network = network;
 		log.info("enabled");
 	}
