@@ -91,6 +91,9 @@ public class NmbmSurveyParser {
 		nsp.writeHouseholds(args[3]);
 		nsp.writePopulation(args[3]);
 		
+		/*TODO update JavaDoc */
+		String sacscFile = args[4];
+		
 		Header.printFooter();
 	}
 
@@ -216,7 +219,9 @@ public class NmbmSurveyParser {
 				int endTime = Integer.parseInt(sa[11].substring(11, 13))*3600 + Integer.parseInt(sa[11].substring(14, 16))*60;
 				
 				String zoneFrom = sa[12];
+				Coord coordFrom = getLocalScrambledCoord(getCoord(zoneFrom));
 				String zoneTo = sa[13];
+				Coord coordTo = getLocalScrambledCoord(getCoord(zoneTo));
 				
 				String mode = getMode(Integer.parseInt(sa[14]));
 
@@ -235,6 +240,13 @@ public class NmbmSurveyParser {
 				if(activityTypeDestination.equalsIgnoreCase("e1") && age >= 23 && isEmployed){
 					activityTypeDestination = "w";
 				}
+				
+				/* Identify type of centre. */
+				if(activityTypeOrigin.equalsIgnoreCase("s")){
+					String shopClass = getShopClass(coordFrom);					
+				}
+				
+
 				
 
 				/* Process person if it doesn't yet exist TODO This must be fixed - should not occur. */
@@ -263,8 +275,7 @@ public class NmbmSurveyParser {
 						plan = (PlanImpl) population.getFactory().createPlan();
 						
 						/* Add the first activity. */
-						Coord coord = getCoord(zoneFrom);
-						if(coord == null){
+						if(coordFrom == null){
 							if(locationlessPersons.containsKey(personId)){
 								Integer oldValue = locationlessPersons.get(personId);
 								locationlessPersons.put(personId, oldValue + 1);
@@ -278,7 +289,7 @@ public class NmbmSurveyParser {
 								locationlessType.put(activityTypeOrigin, new Integer(1));
 							}
 						}
-						Activity act = population.getFactory().createActivityFromCoord(activityTypeOrigin, getLocalScrambledCoord(coord));
+						Activity act = population.getFactory().createActivityFromCoord(activityTypeOrigin, coordFrom);
 						act.setEndTime(startTime);
 						plan.addActivity(act);
 						person.addPlan(plan);
@@ -296,11 +307,10 @@ public class NmbmSurveyParser {
 					leg.setDepartureTime(startTime);
 					leg.setTravelTime(endTime - startTime);
 					plan.addLeg(leg);
-					Coord coord = getCoord(zoneTo);
-					if(coord == null){
+					if(coordTo == null){
 						Coord formerCoord = ( (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-2) ).getCoord();
 						if(formerCoord != null){
-							coord = getScrambledCoord(formerCoord);
+							coordTo = getScrambledCoord(formerCoord);
 						} else{
 							if(locationlessPersons.containsKey(personId)){
 								Integer oldValue = locationlessPersons.get(personId);
@@ -316,7 +326,7 @@ public class NmbmSurveyParser {
 							}							
 						}
 					}
-					Activity act = population.getFactory().createActivityFromCoord(activityTypeDestination, getLocalScrambledCoord(coord));
+					Activity act = population.getFactory().createActivityFromCoord(activityTypeDestination, coordTo);
 					act.setStartTime(endTime);
 					plan.addActivity(act);
 				}
@@ -359,6 +369,14 @@ public class NmbmSurveyParser {
 			}
 		}
 		LOG.info("  new population size: " + population.getPersons().size() + " (" + cleaned + " removed)");
+	}
+	
+	
+	private String getShopClass(Coord coord){
+		String type = "";
+		
+		
+		return type;
 	}
 	
 	
