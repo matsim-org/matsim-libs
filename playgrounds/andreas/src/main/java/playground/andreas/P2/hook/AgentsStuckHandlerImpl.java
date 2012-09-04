@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.schedule;
+package playground.andreas.P2.hook;
 
 import java.util.Set;
 import java.util.TreeSet;

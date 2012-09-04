@@ -30,7 +30,7 @@ import org.matsim.pt.PtConstants;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PQSimFactory;
-import playground.andreas.P2.schedule.PTransitRouterImplFactory;
+import playground.andreas.P2.hook.PTransitRouterImplFactory;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 

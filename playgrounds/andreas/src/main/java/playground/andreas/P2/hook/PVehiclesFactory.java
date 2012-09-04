@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.schedule;
+package playground.andreas.P2.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;

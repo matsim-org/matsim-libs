@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.schedule;
+package playground.andreas.P2.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
@@ -43,6 +43,7 @@ import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
+import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.stats.GexfPStat;
 import playground.andreas.P2.stats.GexfPStatLight;
 import playground.andreas.P2.stats.Line2GexfPStat;
