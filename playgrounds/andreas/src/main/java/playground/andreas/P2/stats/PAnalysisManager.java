@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana;
+package playground.andreas.P2.stats;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,20 +41,20 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.andreas.P2.ana.helper.BVGLines2PtModes;
 import playground.andreas.P2.ana.helper.PtMode2LineSetter;
-import playground.andreas.P2.ana.modules.AbstractPAnalyisModule;
-import playground.andreas.P2.ana.modules.AverageLoadPerDeparturePerMode;
-import playground.andreas.P2.ana.modules.AverageNumberOfStopsPerMode;
-import playground.andreas.P2.ana.modules.AverageTripDistanceMeterPerMode;
-import playground.andreas.P2.ana.modules.AverageInVehicleTripTravelTimeSecondsPerMode;
-import playground.andreas.P2.ana.modules.AverageWaitingTimeSecondsPerMode;
-import playground.andreas.P2.ana.modules.CountCapacityMeterPerMode;
-import playground.andreas.P2.ana.modules.CountPassengerMeterPerMode;
-import playground.andreas.P2.ana.modules.CountTransfersPerModeModeCombination;
-import playground.andreas.P2.ana.modules.CountTripsPerMode;
-import playground.andreas.P2.ana.modules.CountTripsPerPtModeCombination;
-import playground.andreas.P2.ana.modules.CountVehPerMode;
-import playground.andreas.P2.ana.modules.CountVehicleMeterPerMode;
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.stats.abtractPAnalysisModules.AbstractPAnalyisModule;
+import playground.andreas.P2.stats.abtractPAnalysisModules.AverageInVehicleTripTravelTimeSecondsPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDeparturePerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.AverageNumberOfStopsPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.AverageTripDistanceMeterPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.AverageWaitingTimeSecondsPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountCapacityMeterPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountPassengerMeterPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountTransfersPerModeModeCombination;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerPtModeCombination;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehicleMeterPerMode;
 
 /**
  * Plugs in all analysis.

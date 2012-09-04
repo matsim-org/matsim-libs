@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana.modules;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import java.util.HashMap;
 
@@ -35,23 +35,24 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 
 /**
- * Count the number of passenger-meter per ptModes specified.
+ * Calculates the average trip distance per ptModes specified. A trip starts by entering a vehicle and end by leaving one.
  * 
  * @author aneumann
  *
  */
-public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
+public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 	
-	private final static Logger log = Logger.getLogger(CountPassengerMeterPerMode.class);
+	private final static Logger log = Logger.getLogger(AverageTripDistanceMeterPerMode.class);
 	
 	private Network network;
 	private HashMap<Id, String> vehId2ptModeMap;
-	private HashMap<String, Double> ptMode2CountMap;
-	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<Id, Integer>();
+	private HashMap<String, Double> ptMode2MeterTravelledMap;
+	private HashMap<String, Integer> ptMode2TripCountMap;
+	private HashMap<Id,HashMap<Id,Double>> vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<Id, HashMap<Id, Double>>();
 
 	
-	public CountPassengerMeterPerMode(String ptDriverPrefix, Network network){
-		super("CountPassengerMeterPerMode",ptDriverPrefix);
+	public AverageTripDistanceMeterPerMode(String ptDriverPrefix, Network network){
+		super("AverageTripDistanceMeterPerMode",ptDriverPrefix);
 		this.network = network;
 		log.info("enabled");
 	}
@@ -60,7 +61,7 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 	public String getResult() {
 		StringBuffer strB = new StringBuffer();
 		for (String ptMode : this.ptModes) {
-			strB.append(", " + this.ptMode2CountMap.get(ptMode));
+			strB.append(", " + (this.ptMode2MeterTravelledMap.get(ptMode) / this.ptMode2TripCountMap.get(ptMode)));
 		}
 		return strB.toString();
 	}
@@ -68,8 +69,9 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 	@Override
 	public void reset(int iteration) {
 		this.vehId2ptModeMap = new HashMap<Id, String>();
-		this.ptMode2CountMap = new HashMap<String, Double>();
-		this.vehId2NumberOfPassengers = new HashMap<Id, Integer>();
+		this.ptMode2MeterTravelledMap = new HashMap<String, Double>();
+		this.ptMode2TripCountMap = new HashMap<String, Integer>();
+		this.vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<Id, HashMap<Id,Double>>();
 	}
 
 	@Override
@@ -84,33 +86,43 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (this.vehId2NumberOfPassengers.get(event.getVehicleId()) == null) {
-			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(0));
+		if (this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()) == null) {
+			this.vehId2AgentId2DistanceTravelledInMeterMap.put(event.getVehicleId(), new HashMap<Id, Double>());
 		}
 		
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
-			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() + 1));
+			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(event.getPersonId(), new Double(0.0));
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
-			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() - 1));
+			
+			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+			if (ptMode == null) {
+				ptMode = "nonPtMode";
+			}
+			if (ptMode2MeterTravelledMap.get(ptMode) == null) {
+				ptMode2MeterTravelledMap.put(ptMode, new Double(0.0));
+			}
+			if (ptMode2TripCountMap.get(ptMode) == null) {
+				ptMode2TripCountMap.put(ptMode, new Integer(0));
+			}
+			
+			this.ptMode2MeterTravelledMap.put(ptMode, new Double(this.ptMode2MeterTravelledMap.get(ptMode) + this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).get(event.getPersonId()).doubleValue()));
+			this.ptMode2TripCountMap.put(ptMode, new Integer(this.ptMode2TripCountMap.get(ptMode) + 1));
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
-		if (ptMode == null) {
-			ptMode = "nonPtMode";
+		double newValue = this.network.getLinks().get(event.getLinkId()).getLength();
+		
+		for (Id agentId : this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).keySet()) {
+			double oldValue = this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).get(agentId).doubleValue();
+			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(agentId, new Double(oldValue + newValue));
 		}
-		if (ptMode2CountMap.get(ptMode) == null) {
-			ptMode2CountMap.put(ptMode, new Double(0.0));
-		}
-
-		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + this.network.getLinks().get(event.getLinkId()).getLength() * this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue()));
 	}
 
 }

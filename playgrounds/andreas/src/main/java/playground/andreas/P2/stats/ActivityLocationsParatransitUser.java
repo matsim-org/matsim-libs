@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana;
+package playground.andreas.P2.stats;
 
 import java.io.BufferedWriter;
 import java.io.File;

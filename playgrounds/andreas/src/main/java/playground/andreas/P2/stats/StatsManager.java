@@ -21,8 +21,6 @@ package playground.andreas.P2.stats;
 
 import org.matsim.core.controler.Controler;
 
-import playground.andreas.P2.ana.ActivityLocationsParatransitUser;
-import playground.andreas.P2.ana.PAnalysisManager;
 import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;

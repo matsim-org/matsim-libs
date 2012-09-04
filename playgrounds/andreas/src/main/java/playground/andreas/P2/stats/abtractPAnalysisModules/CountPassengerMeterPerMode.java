@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana.modules;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import java.util.HashMap;
 
@@ -26,31 +26,32 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.Vehicles;
 
 
 /**
- * Count the number of offered capacity-meters per ptModes specified.
+ * Count the number of passenger-meter per ptModes specified.
  * 
  * @author aneumann
  *
  */
-public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler{
+public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 	
-	private final static Logger log = Logger.getLogger(CountCapacityMeterPerMode.class);
+	private final static Logger log = Logger.getLogger(CountPassengerMeterPerMode.class);
 	
 	private Network network;
-	private HashMap<Id, Double> vehId2VehicleCapacity = new HashMap<Id, Double>();
-	
 	private HashMap<Id, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2CountMap;
+	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<Id, Integer>();
 
 	
-	public CountCapacityMeterPerMode(String ptDriverPrefix, Network network){
-		super("CountCapacityMeterPerMode",ptDriverPrefix);
+	public CountPassengerMeterPerMode(String ptDriverPrefix, Network network){
+		super("CountPassengerMeterPerMode",ptDriverPrefix);
 		this.network = network;
 		log.info("enabled");
 	}
@@ -65,17 +66,10 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 	}
 	
 	@Override
-	public void updateVehicles(Vehicles vehicles) {
-		this.vehId2VehicleCapacity = new HashMap<Id, Double>();
-		for (Vehicle veh : vehicles.getVehicles().values()) {
-			this.vehId2VehicleCapacity.put(veh.getId(), new Double(veh.getType().getCapacity().getSeats() + veh.getType().getCapacity().getStandingRoom() - 1.0));
-		}
-	}
-	
-	@Override
 	public void reset(int iteration) {
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2CountMap = new HashMap<String, Double>();
+		this.vehId2NumberOfPassengers = new HashMap<Id, Integer>();
 	}
 
 	@Override
@@ -89,6 +83,24 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 	}
 
 	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (this.vehId2NumberOfPassengers.get(event.getVehicleId()) == null) {
+			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(0));
+		}
+		
+		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() + 1));
+		}
+	}
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() - 1));
+		}
+	}
+
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
 		if (ptMode == null) {
@@ -97,17 +109,8 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 		if (ptMode2CountMap.get(ptMode) == null) {
 			ptMode2CountMap.put(ptMode, new Double(0.0));
 		}
-		
-		double capacity;
-		if(event.getPersonId().toString().startsWith(super.ptDriverPrefix)){
-			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId()).doubleValue();
-		}else{
-			// it's a car, which will not appear in the vehicles-list, called in updateVehicles \dr
-			// TODO [AN] nonPtMode is not fully implemented - check that again
-			capacity = 1;
-		}
-		double capacityMeterForThatLink = capacity * this.network.getLinks().get(event.getLinkId()).getLength();
 
-		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + capacityMeterForThatLink));
+		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + this.network.getLinks().get(event.getLinkId()).getLength() * this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue()));
 	}
+
 }

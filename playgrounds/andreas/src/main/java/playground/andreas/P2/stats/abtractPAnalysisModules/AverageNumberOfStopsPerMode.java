@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana.modules;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import java.util.HashMap;
 

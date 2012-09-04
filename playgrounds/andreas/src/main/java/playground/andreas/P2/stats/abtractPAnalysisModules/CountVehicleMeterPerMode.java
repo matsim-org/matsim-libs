@@ -17,33 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana.modules;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 
 /**
- * Count the number of trips per ptModes specified.
+ * Count the number of vehicle-meter per ptModes specified.
  * 
  * @author aneumann
  *
  */
-public class CountTripsPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
+public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler{
 	
-	private final static Logger log = Logger.getLogger(CountTripsPerMode.class);
+	private final static Logger log = Logger.getLogger(CountVehicleMeterPerMode.class);
 	
+	private Network network;
 	private HashMap<Id, String> vehId2ptModeMap;
-	private HashMap<String, Integer> ptMode2CountMap;
+	private HashMap<String, Double> ptMode2CountMap;
+
 	
-	public CountTripsPerMode(String ptDriverPrefix){
-		super("CountTripsPerMode",ptDriverPrefix);
+	public CountVehicleMeterPerMode(String ptDriverPrefix, Network network){
+		super("CountVehicleMeterPerMode",ptDriverPrefix);
+		this.network = network;
 		log.info("enabled");
 	}
 
@@ -59,22 +63,7 @@ public class CountTripsPerMode extends AbstractPAnalyisModule implements Transit
 	@Override
 	public void reset(int iteration) {
 		this.vehId2ptModeMap = new HashMap<Id, String>();
-		this.ptMode2CountMap = new HashMap<String, Integer>();
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
-			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
-			if (ptMode == null) {
-				ptMode = "nonPtMode";
-			}
-			if (ptMode2CountMap.get(ptMode) == null) {
-				ptMode2CountMap.put(ptMode, new Integer(0));
-			}
-
-			ptMode2CountMap.put(ptMode, new Integer(ptMode2CountMap.get(ptMode) + 1));
-		}
+		this.ptMode2CountMap = new HashMap<String, Double>();
 	}
 
 	@Override
@@ -85,5 +74,18 @@ public class CountTripsPerMode extends AbstractPAnalyisModule implements Transit
 			ptMode = "no valid pt mode found";
 		}
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
+		if (ptMode == null) {
+			ptMode = "nonPtMode";
+		}
+		if (ptMode2CountMap.get(ptMode) == null) {
+			ptMode2CountMap.put(ptMode, new Double(0.0));
+		}
+
+		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + this.network.getLinks().get(event.getLinkId()).getLength()));
 	}
 }

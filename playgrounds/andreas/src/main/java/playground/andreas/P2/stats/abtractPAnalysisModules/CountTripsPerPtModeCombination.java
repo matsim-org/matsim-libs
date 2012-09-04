@@ -17,45 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana.modules;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.pt.PtConstants;
 
 
 /**
- * Calculates the average waiting time per trip and per ptModes specified. This is from departure event to PersonEntersVehicleEvent.
+ * Counts the number of trips per ptMode-chains.
  * 
  * @author aneumann
  *
  */
-public class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule implements AgentDepartureEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
+public class CountTripsPerPtModeCombination extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler{
 	
-	private final static Logger log = Logger.getLogger(AverageWaitingTimeSecondsPerMode.class);
+	private final static Logger log = Logger.getLogger(CountTripsPerPtModeCombination.class);
 	
 	private HashMap<Id, String> vehId2ptModeMap;
-	private HashMap<String, Double> ptMode2SecondsTravelledMap;
-	private HashMap<String, Integer> ptMode2TripCountMap;
-	private HashMap<Id, Double> agentId2AgentDepartureEventTime = new HashMap<Id, Double>();
+	private HashMap<String, Integer> ptModeCombination2TripCountMap;
+	private HashMap<Id, String> agentId2TripCombination = new HashMap<Id, String>();
 	
-	public AverageWaitingTimeSecondsPerMode(String ptDriverPrefix){
-		super("AverageWaitingTimeSecondsPerMode",ptDriverPrefix);
+	public CountTripsPerPtModeCombination(String ptDriverPrefix){
+		super("CountTripsPerPtModeCombination",ptDriverPrefix);
 		log.info("enabled");
+	}
+	
+	@Override
+	public String getHeader() {
+		// need to write an own header
+		return ", There is no header. Please refer to each iterations results separately.";
 	}
 
 	@Override
 	public String getResult() {
 		StringBuffer strB = new StringBuffer();
-		for (String ptMode : this.ptModes) {
-			strB.append(", " + (this.ptMode2SecondsTravelledMap.get(ptMode) / this.ptMode2TripCountMap.get(ptMode)));
+		for (String ptMode : this.ptModeCombination2TripCountMap.keySet()) {
+			strB.append(", " + ptMode + ": " + this.ptModeCombination2TripCountMap.get(ptMode));
 		}
 		return strB.toString();
 	}
@@ -63,9 +69,8 @@ public class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule imp
 	@Override
 	public void reset(int iteration) {
 		this.vehId2ptModeMap = new HashMap<Id, String>();
-		this.ptMode2SecondsTravelledMap = new HashMap<String, Double>();
-		this.ptMode2TripCountMap = new HashMap<String, Integer>();
-		this.agentId2AgentDepartureEventTime = new HashMap<Id, Double>();
+		this.ptModeCombination2TripCountMap = new HashMap<String, Integer>();
+		this.agentId2TripCombination = new HashMap<Id, String>();
 	}
 
 	@Override
@@ -80,30 +85,37 @@ public class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule imp
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
-			this.agentId2AgentDepartureEventTime.put(event.getPersonId(), event.getTime());
-		}
-		
-	}
-
-	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
 			if (ptMode == null) {
 				ptMode = "nonPtMode";
 			}
-			
-			if (ptMode2SecondsTravelledMap.get(ptMode) == null) {
-				ptMode2SecondsTravelledMap.put(ptMode, new Double(0.0));
+			if (this.agentId2TripCombination.get(event.getPersonId()) == null) {
+				this.agentId2TripCombination.put(event.getPersonId(), ptMode);
+			} else {
+				// it's a transfer - extend the agent's trip combination
+				String tripCombination = this.agentId2TripCombination.get(event.getPersonId()) + "-" + ptMode;
+				this.agentId2TripCombination.put(event.getPersonId(), tripCombination);
 			}
-			if (ptMode2TripCountMap.get(ptMode) == null) {
-				ptMode2TripCountMap.put(ptMode, new Integer(0));
+		}
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+			if (!event.getActType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				// trip finished
+				String tripCombination = this.agentId2TripCombination.get(event.getPersonId());
+				if (tripCombination != null) {
+					if (this.ptModeCombination2TripCountMap.get(tripCombination) == null) {
+						this.ptModeCombination2TripCountMap.put(tripCombination, new Integer(0));
+					}
+					this.ptModeCombination2TripCountMap.put(tripCombination, new Integer(this.ptModeCombination2TripCountMap.get(tripCombination) + 1));
+				} 
+				// reset the last used pt mode
+				this.agentId2TripCombination.remove(event.getPersonId());
 			}
-			
-			this.ptMode2SecondsTravelledMap.put(ptMode, new Double(this.ptMode2SecondsTravelledMap.get(ptMode) + (event.getTime() - this.agentId2AgentDepartureEventTime.get(event.getPersonId()).doubleValue())));
-			this.ptMode2TripCountMap.put(ptMode, new Integer(this.ptMode2TripCountMap.get(ptMode) + 1));
 		}
 	}
 }
