@@ -69,7 +69,6 @@ public class PControler{
 		
 		PTransitRouterImplFactory pFact = new PTransitRouterImplFactory(controler);
 		controler.addControlerListener(pFact);		
-		controler.setTransitRouterFactory(pFact);
 		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
 		controler.setMobsimFactory(new PQSimFactory());
 
