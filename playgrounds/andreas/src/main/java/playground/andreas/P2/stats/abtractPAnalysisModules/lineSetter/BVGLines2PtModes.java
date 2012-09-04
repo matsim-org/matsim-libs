@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana.helper;
+package playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter;
 
 import java.util.HashMap;
 import java.util.Map.Entry;

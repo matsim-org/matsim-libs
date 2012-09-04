@@ -39,8 +39,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
-import playground.andreas.P2.ana.helper.BVGLines2PtModes;
-import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AbstractPAnalyisModule;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageInVehicleTripTravelTimeSecondsPerMode;
@@ -55,6 +53,8 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerPtModeCombination;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehicleMeterPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
+import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
 /**
  * Plugs in all analysis.

@@ -27,7 +27,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.andreas.P2.ana.helper.PtMode2LineSetter;
+import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
 /**
  * @author droeder

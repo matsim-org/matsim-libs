@@ -21,10 +21,10 @@ package playground.andreas.P2.stats;
 
 import org.matsim.core.controler.Controler;
 
-import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;
 import playground.andreas.P2.pbox.PBox;
+import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 import playground.andreas.P2.stats.gexfPStats.GexfPStat;
 import playground.andreas.P2.stats.gexfPStats.GexfPStatLight;
 import playground.andreas.P2.stats.gexfPStats.Line2GexfPStat;

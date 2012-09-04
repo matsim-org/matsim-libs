@@ -37,12 +37,12 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-import playground.andreas.P2.ana.helper.PtMode2LineSetter;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.stats.StatsManager;
+import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
 /**
  * Hook to register paratransit black box with MATSim
