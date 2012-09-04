@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats;
+package playground.andreas.P2.stats.gexfPStats;
 
 import java.io.File;
 import java.util.HashMap;

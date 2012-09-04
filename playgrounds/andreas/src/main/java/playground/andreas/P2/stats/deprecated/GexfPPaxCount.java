@@ -45,7 +45,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.stats.CountPPaxHandler;
+import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
 import playground.andreas.gexf.ObjectFactory;
 import playground.andreas.gexf.XMLAttributeContent;
 import playground.andreas.gexf.XMLAttributesContent;
