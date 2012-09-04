@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.controler.Controler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.andreas.P2.helper.PConfigGroup;
@@ -36,6 +37,7 @@ import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
+import playground.andreas.P2.routeProvider.PRouteProviderFactory;
 
 /**
  * 
@@ -52,10 +54,10 @@ public class OperatorInitializer {
 	private int counter;
 	
 	
-	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, PRouteProvider routeProvider) {
+	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, Controler controler) {
 		this.pConfig = pConfig;
 		this.cooperativeFactory = new CooperativeFactory(this.pConfig, franchise);
-		this.routeProvider = routeProvider;
+		this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getNetwork(), controler.getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());
 		
 		if (this.pConfig.getStartWith24Hours()) {
 			this.initialStrategy = new CreateNew24hPlan(new ArrayList<String>());

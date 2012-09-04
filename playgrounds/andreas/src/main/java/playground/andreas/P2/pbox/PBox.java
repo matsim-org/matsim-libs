@@ -39,8 +39,6 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PStrategyManager;
-import playground.andreas.P2.routeProvider.PRouteProvider;
-import playground.andreas.P2.routeProvider.PRouteProviderFactory;
 import playground.andreas.P2.schedule.PStopsFactory;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.scoring.ScoreContainer;
@@ -62,14 +60,13 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private PFranchise franchise;
 	private OperatorInitializer operatorInitializer;
 
-	TransitSchedule pStopsOnly;
-	TransitSchedule pTransitSchedule;
+	private TransitSchedule pStopsOnly;
+	private TransitSchedule pTransitSchedule;
 	
-	TransitSchedule pTransitScheduleArchiv;
 	
 	private final ScorePlansHandler scorePlansHandler;
 	private PStrategyManager strategyManager;
-	private PRouteProvider routeProvider;
+//	private PRouteProvider routeProvider;
 
 	
 	public PBox(PConfigGroup pConfig) {
@@ -93,11 +90,8 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// init possible paratransit stops
 		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
-		// init route provider
-		this.routeProvider = PRouteProviderFactory.createRouteProvider(event.getControler().getNetwork(), event.getControler().getPopulation(), this.pConfig, this.pStopsOnly, event.getControler().getControlerIO().getOutputPath(), event.getControler().getEvents());
-
 		this.cooperatives = new LinkedList<Cooperative>();
-		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.routeProvider);
+		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getControler());
 		
 		// init additional cooperatives from a given transit schedule file
 		LinkedList<Cooperative> coopsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
