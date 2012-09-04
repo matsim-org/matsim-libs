@@ -56,9 +56,9 @@ import playground.andreas.P2.replanning.PPlan;
  *
  * @author aneumann based on {@link org.matsim.analysis.ScoreStats} by mrieser
  */
-public class PStats implements StartupListener, IterationEndsListener, ShutdownListener {
+public class PStatsOverview implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	private final static Logger log = Logger.getLogger(PStats.class);
+	private final static Logger log = Logger.getLogger(PStatsOverview.class);
 	
 	final private static int INDEX_NCOOPS = 0;
 	final private static int INDEX_NCOOPSPOS = 1;
@@ -95,7 +95,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 	private RecursiveStatsContainer statsContainer;
 	private RecursiveStatsApproxContainer statsApproxContainer;
 
-	public PStats(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
+	public PStatsOverview(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
 		this.pBox = pBox;
 		this.pConfig = pConfig;
 	}

@@ -30,7 +30,7 @@ import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.stats.gexfPStats.GexfPStat;
 import playground.andreas.P2.stats.gexfPStats.GexfPStatLight;
 import playground.andreas.P2.stats.gexfPStats.Line2GexfPStat;
-import playground.andreas.P2.stats.overview.PStats;
+import playground.andreas.P2.stats.overview.PStatsOverview;
 
 /**
  * 
@@ -42,7 +42,7 @@ import playground.andreas.P2.stats.overview.PStats;
 public class StatsManager {
 	
 	public StatsManager(Controler controler, PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter){
-		controler.addControlerListener(new PStats(pBox, pConfig));
+		controler.addControlerListener(new PStatsOverview(pBox, pConfig));
 		controler.addControlerListener(new PCoopLogger(pBox, pConfig));
 		controler.addControlerListener(new GexfPStat(pConfig, false));
 //		controler.addControlerListener(new GexfPStat(pConfig, true));
