@@ -24,6 +24,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.andreas.P2.stats.overview.RecursiveStatsApproxContainer;
+
 
 public class RecursiveStatsApproxContainerTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
