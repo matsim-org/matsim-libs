@@ -17,49 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.vehicles.api;
+package org.matsim.contrib.transEnergySim.vehicles;
 
-import org.matsim.api.core.v01.network.Link;
+import java.util.HashMap;
 
-/**
- * vehicle has only battery (no combustion engine)
- * 
- * TODO: think, if BatteryElectricVehicle and VehicleWithBattery can be just
- * merged to VehicleWithBattery
- * 
- * @author wrashid
- * 
- */
-public abstract class BatteryElectricVehicle extends VehicleWithBattery {
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 
-	/**
-	 * as electric vehicles can run out of battery during the simulation, this
-	 * has also to be taken into account
-	 * 
-	 * 
-	 * 
-	 */
-	private boolean didRunOutOfBattery = false;
+public class VehicleUtils {
 
-	public boolean didVehicleRunOutOfBattery() {
-		return didRunOutOfBattery;
-	}
-
-	@Override
-	public void useBattery(double energyConsumptionInJoule) {
-		super.useBattery(energyConsumptionInJoule);
-
-		if (socInJoules < 0) {
-			didRunOutOfBattery = true;
+	public static void printToConsoleVehiclesWhichRanOutOfBattery(HashMap<Id, Vehicle> vehicles){
+		System.out.println("Vehicles, which ran out of battery");
+		
+		
+		for (Id personId:vehicles.keySet()){
+			Vehicle vehicle=vehicles.get(personId);
+			
+			if (vehicle instanceof BatteryElectricVehicle){
+				BatteryElectricVehicle bev=(BatteryElectricVehicle) vehicle;
+				
+				if (bev.didVehicleRunOutOfBattery()){
+					System.out.println(personId);
+				}
+			}
 		}
 	}
-
-	public double updateEnergyUse(Link link, double averageSpeedDriven) {
-		double energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link,
-				averageSpeedDriven);
-
-		useBattery(energyConsumptionForLinkInJoule);
-		return energyConsumptionForLinkInJoule;
-	}
-
+	
 }

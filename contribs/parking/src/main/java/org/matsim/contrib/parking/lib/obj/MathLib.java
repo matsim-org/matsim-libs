@@ -17,49 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.vehicles.api;
+package org.matsim.contrib.parking.lib.obj;
 
-import org.matsim.api.core.v01.network.Link;
+public class MathLib {
 
-/**
- * vehicle has only battery (no combustion engine)
- * 
- * TODO: think, if BatteryElectricVehicle and VehicleWithBattery can be just
- * merged to VehicleWithBattery
- * 
- * @author wrashid
- * 
- */
-public abstract class BatteryElectricVehicle extends VehicleWithBattery {
-
-	/**
-	 * as electric vehicles can run out of battery during the simulation, this
-	 * has also to be taken into account
-	 * 
-	 * 
-	 * 
-	 */
-	private boolean didRunOutOfBattery = false;
-
-	public boolean didVehicleRunOutOfBattery() {
-		return didRunOutOfBattery;
+	public static boolean equals(double numberA, double numberB, double epsilon){
+		return Math.abs(numberA-numberB)<Math.abs(epsilon);
 	}
-
-	@Override
-	public void useBattery(double energyConsumptionInJoule) {
-		super.useBattery(energyConsumptionInJoule);
-
-		if (socInJoules < 0) {
-			didRunOutOfBattery = true;
-		}
-	}
-
-	public double updateEnergyUse(Link link, double averageSpeedDriven) {
-		double energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link,
-				averageSpeedDriven);
-
-		useBattery(energyConsumptionForLinkInJoule);
-		return energyConsumptionForLinkInJoule;
-	}
-
+	
+	
 }

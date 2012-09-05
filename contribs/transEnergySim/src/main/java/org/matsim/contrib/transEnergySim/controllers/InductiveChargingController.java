@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
+import org.matsim.contrib.transEnergySim.vehicles.VehicleUtils;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -50,6 +51,7 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 	private InductiveStreetCharger inductiveCharger;
 	private ChargingUponArrival chargingUponArrival;
 	private EnergyConsumptionTracker energyConsumptionTracker;
+	private HashMap<Id, Vehicle> vehicles;
 
 	public InductiveChargingController(String[] args, HashMap<Id, Vehicle> vehicles) {
 		super(args);
@@ -62,6 +64,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 	}
 
 	private void init(HashMap<Id, Vehicle> vehicles) {
+		this.vehicles = vehicles;
+		
 		EventHandlerGroupForRaceConditionAvoidance handlerGroup=new EventHandlerGroupForRaceConditionAvoidance();
 		
 		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network));
@@ -84,6 +88,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 		System.out.println("===");
 		System.out.println("chargingUponArrival");
 		chargingUponArrival.getLog().printToConsole();
+		System.out.println("===");
+		VehicleUtils.printToConsoleVehiclesWhichRanOutOfBattery(vehicles);
 		System.out.println("===");
 	}
 

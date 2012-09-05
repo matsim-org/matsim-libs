@@ -20,7 +20,10 @@
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.MathLib;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
+import org.matsim.testcases.MatsimTestUtils;
 
 public abstract class VehicleWithBattery implements Vehicle {
 
@@ -40,7 +43,7 @@ public abstract class VehicleWithBattery implements Vehicle {
 	public double getRequiredEnergyInJoules(){
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules()-socInJoules;
 		
-		if (requiredEnergyInJoules<0){
+		if (!MathLib.equals(requiredEnergyInJoules, 0, MatsimTestUtils.EPSILON*100) && requiredEnergyInJoules<0){
 			DebugLib.stopSystemAndReportInconsistency("soc bigger than battery size");
 		}
 		
@@ -62,9 +65,10 @@ public abstract class VehicleWithBattery implements Vehicle {
 	public void chargeBattery(double energyChargeInJoule){
 		socInJoules+=energyChargeInJoule;
 
-		if (socInJoules>getUsableBatteryCapacityInJoules()){
+		
+		if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), MatsimTestUtils.EPSILON*100) && socInJoules>getUsableBatteryCapacityInJoules()){
 			DebugLib.stopSystemAndReportInconsistency("the car has been overcharged");
-		}
+		} 
 	}
 
 	public double getUsableBatteryCapacityInJoules() {
