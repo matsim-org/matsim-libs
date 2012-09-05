@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning.modules;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +43,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
 
 /**
+ * @deprecated Use {@link ReduceStopsToBeServedRFare} with parameter false.<br>
  * 
  * Removes all stops belonging to a demand relation with trips below a certain threshold.
  * Threshold is standard deviation of number of trips of all relations twice a scaling factor.
@@ -53,6 +55,7 @@ import playground.andreas.P2.replanning.AbstractPStrategyModule;
  * @author aneumann
  *
  */
+@Deprecated
 public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(ReduceStopsToBeServedR.class);

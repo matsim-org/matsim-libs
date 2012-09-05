@@ -72,6 +72,14 @@ public class FareContainer {
 		return this.vehArrivesAtFacilityELeft.getFacilityId();
 	}
 	
+	public double getTimeEntered(){
+		return this.personEnterVehE.getTime();
+	}
+	
+	public double getTimeLeft(){
+		return this.personLeavesVehE.getTime();
+	}
+	
 	public Id getRouteId() {
 		return this.transitDriverStartsE.getTransitRouteId();
 	}

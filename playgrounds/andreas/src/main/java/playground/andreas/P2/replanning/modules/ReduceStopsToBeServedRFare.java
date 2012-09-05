@@ -57,13 +57,14 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	private HashMap<Id,HashMap<Id,HashMap<Id,Double>>> route2StartStop2EndStop2WeightMap = new HashMap<Id, HashMap<Id,HashMap<Id,Double>>>();
 	
 	private final double sigmaScale;
-	private boolean useFareAsWeight;
+	private final boolean useFareAsWeight;
 	
 	public ReduceStopsToBeServedRFare(ArrayList<String> parameter) {
 		super(parameter);
 		if(parameter.size() != 2){
 			log.error("Too many parameter. Will ignore: " + parameter);
-			log.error("Expecting sigmaScale (double) and 'useFareAsWeight' (boolean) as parameters");
+			log.error("Parameter 1: Scaling factor for sigma");
+			log.error("Parameter 2: true=use the fare as weight, false=use number of trips as weight");
 		}
 		this.sigmaScale = Double.parseDouble(parameter.get(0));
 		this.useFareAsWeight = Boolean.parseBoolean(parameter.get(1));
@@ -186,7 +187,6 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 
 	@Override
 	public void handleFareContainer(FareContainer fareContainer) {
-		// basic version - only count number of trips
 		Id routeId = fareContainer.getRouteId();
 		Id startStopId = fareContainer.getStopEntered();
 		Id endStopId = fareContainer.getStopLeft();

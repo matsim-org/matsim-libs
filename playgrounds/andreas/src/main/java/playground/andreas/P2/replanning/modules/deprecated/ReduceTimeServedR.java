@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning.modules;
+package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +38,12 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
 
 /**
+ * @deprecated Use {@link ReduceTimeServedRFare} with parameter false.<br>
  * 
  * Restricts the time of operation to temporal relations higher than a certain threshold.
  * Threshold is standard deviation of number of trips of all relations twice a scaling factor.
@@ -50,6 +52,7 @@ import playground.andreas.P2.replanning.AbstractPStrategyModule;
  * @author aneumann
  *
  */
+@Deprecated
 public class ReduceTimeServedR extends AbstractPStrategyModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(ReduceTimeServedR.class);
