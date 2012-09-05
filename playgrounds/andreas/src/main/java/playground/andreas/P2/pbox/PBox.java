@@ -221,10 +221,6 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		return this.pTransitSchedule;
 	}
 
-	public ScorePlansHandler getScorePlansHandler() {
-		return scorePlansHandler;
-	}
-
 	public List<Cooperative> getCooperatives() {
 		return cooperatives;
 	}
