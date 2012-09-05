@@ -40,10 +40,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.router.controler.MultiLegRoutingControler;
@@ -112,7 +110,7 @@ public class BackwardCompatibilityTest {
 	// "handleLeg" methods check-
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testUnwrappedTravelTime() {
+	public void testTravelTime() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
@@ -155,102 +153,8 @@ public class BackwardCompatibilityTest {
 	}
 
 	@Test
-	@Ignore
-	public void testWrappedTravelTime() {
-		//for (Person person : controler.getPopulation().getPersons().values()) {
-		//	for (Plan plan : person.getPlans()) {
-		//		Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
-
-		//		Activity origin = (Activity) iterator.next();
-
-		//		double now = 0;
-		//		while (iterator.hasNext()) {
-		//			Leg leg = (Leg) iterator.next();
-		//			Activity destination = (Activity) iterator.next();
-
-		//			now = updateNow( now , origin );
-
-		//			double timePcr = plansCalcRoute.handleLeg(
-		//					person,
-		//					leg,
-		//					origin,
-		//					destination,
-		//					now);
-
-		//			double timeWrapper = wrapper.handleLeg(
-		//					person,
-		//					leg,
-		//					origin,
-		//					destination,
-		//					now);
-
-		//			Assert.assertEquals(
-		//					"trip durations do not match for mode "+leg.getMode(),
-		//					timePcr,
-		//					timeWrapper,
-		//					MatsimTestUtils.EPSILON);
-
-		//			origin = destination;
-		//		}
-		//	}
-		//}
-	}
-
-	@Test
-	@Ignore
-	public void testWrappedMode() {
-		//for (Person person : controler.getPopulation().getPersons().values()) {
-		//	for (Plan plan : person.getPlans()) {
-		//		Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
-
-		//		Activity origin = (Activity) iterator.next();
-
-		//		double now = 0;
-		//		while (iterator.hasNext()) {
-		//			Leg leg = (Leg) iterator.next();
-		//			Activity destination = (Activity) iterator.next();
-
-		//			double endTime = origin.getEndTime();
-		//			double startTime = origin.getStartTime();
-		//			double dur = (origin instanceof ActivityImpl ? ((ActivityImpl) origin).getMaximumDuration() : Time.UNDEFINED_TIME);
-		//			if (endTime != Time.UNDEFINED_TIME) {
-		//				// use fromAct.endTime as time for routing
-		//				now = endTime;
-		//			}
-		//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-		//				// use fromAct.startTime + fromAct.duration as time for routing
-		//				now = startTime + dur;
-		//			}
-		//			else if (dur != Time.UNDEFINED_TIME) {
-		//				// use last used time + fromAct.duration as time for routing
-		//				now += dur;
-		//			}
-		//			else {
-		//				throw new RuntimeException("activity of plan of person " + plan.getPerson().getId() + " has neither end-time nor duration." + origin);
-		//			}
-
-		//			String mode = leg.getMode();
-		//			double timePcr = wrapper.handleLeg(
-		//					person,
-		//					leg,
-		//					origin,
-		//					destination,
-		//					now);
-
-		//			Assert.assertEquals(
-		//					"unexpected mode after wrapped routing",
-		//					mode,
-		//					leg.getMode());
-
-		//			origin = destination;
-		//		}
-		//	}
-		//}
-	}
-
-	@Test
 	@Ignore // obviously fails with detailed pt: reinsert when the "main mode" is consistently handled
-	public void testUnwrappedMode() {
+	public void testMode() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				Iterator<PlanElement> iterator = tripRouter.tripsToLegs(plan).iterator();
@@ -287,7 +191,7 @@ public class BackwardCompatibilityTest {
 	// plan routing methods check-
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
-	public void testUnwrappedPlanRouting() {
+	public void testPlanRouting() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
 			for (Plan withNew : person.getPlans()) {
 				Plan withOld = new PlanImpl( person );

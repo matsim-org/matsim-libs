@@ -38,7 +38,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.DefaultRoutingModuleFactory;
 import playground.thibautd.router.PlanRouter;
-import playground.thibautd.router.PlanRouterWrapper;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.RoutingModuleFactory;
 import playground.thibautd.router.TransitRoutingModuleFactory;
