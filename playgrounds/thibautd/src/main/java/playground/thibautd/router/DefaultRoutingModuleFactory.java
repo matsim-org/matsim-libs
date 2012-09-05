@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -54,6 +55,15 @@ public class DefaultRoutingModuleFactory implements RoutingModuleFactory {
 				TransportMode.walk, TransportMode.transit_walk, TransportMode.bike, UNDEFINED_MODE});
 	private final PlansCalcRouteConfigGroup routeConfigGroup;
 	private final PlanCalcScoreConfigGroup scoreConfigGroup;
+
+
+	/**
+	 * Simple constructor
+	 * @param config the config to seach the config groups in
+	 */
+	public DefaultRoutingModuleFactory( final Config config ) {
+		this( config.plansCalcRoute() , config.planCalcScore() );
+	}
 
 	/**
 	 * Initialises an instance.
