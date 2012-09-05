@@ -45,6 +45,7 @@ import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
 import playground.andreas.P2.scoring.fare.FareCollectorHandler;
+import playground.andreas.P2.scoring.operator.OperatorCostCollectorHandler;
 
 /**
  * Black box for paratransit
@@ -67,13 +68,15 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	
 	private final ScorePlansHandler scorePlansHandler;
 	private FareCollectorHandler fareCollectorHandler;
+	private OperatorCostCollectorHandler operatorCostCollectorHandler;
 	private PStrategyManager strategyManager;
 
 	
 	public PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;		
-		this.scorePlansHandler = new ScorePlansHandler(this.pConfig);
+		this.scorePlansHandler = new ScorePlansHandler();
 		this.fareCollectorHandler = new FareCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
+		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager(this.pConfig);
 	}
@@ -85,13 +88,15 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// initialize strategy manager
 		this.strategyManager.init(this.pConfig, event.getControler().getEvents(), this.fareCollectorHandler);
 		
-		// init scorePlansHandler
-		this.scorePlansHandler.init(event.getControler().getNetwork());
-		event.getControler().getEvents().addHandler(this.scorePlansHandler);
-		
 		// init fare collector
 		this.fareCollectorHandler.init(event.getControler().getNetwork());
 		event.getControler().getEvents().addHandler(this.fareCollectorHandler);
+		this.fareCollectorHandler.addFareContainerHandler(this.scorePlansHandler);
+		
+		// init operator cost collector
+		this.operatorCostCollectorHandler.init(event.getControler().getNetwork());
+		event.getControler().getEvents().addHandler(this.operatorCostCollectorHandler);
+		this.operatorCostCollectorHandler.addOperatorCostContainerHandler(this.scorePlansHandler);
 		
 		// init possible paratransit stops
 		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());

@@ -23,6 +23,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+import playground.andreas.P2.scoring.fare.FareContainer;
+import playground.andreas.P2.scoring.operator.OperatorCostContainer;
+
 /**
  * Simple container class holding scoring information for one vehicle
  * 
@@ -35,40 +38,29 @@ public class ScoreContainer {
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);
 
 	private final Id vehicleId;
-	private double earningsPerBoardingPassenger;
-	private final double earningsPerMeterAndPassenger;
-	private final double expensesPerMeter;
+	private boolean isFirstTour = true;
 	
 	private int servedTrips = 0;
 	private double costs = 0;
 	private double earnings = 0;
-		
-	int passengersCurrentlyInVeh = 0;
-
 	
-	public ScoreContainer(Id vehicleId, double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger, double expensesPerMeter, double costPerVehicleAndDay){
+	public ScoreContainer(Id vehicleId) {
 		this.vehicleId = vehicleId;
-		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
-		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
-		this.expensesPerMeter = expensesPerMeter;
-		this.costs += costPerVehicleAndDay;
 	}
-	
-	public void addPassenger(){
-		this.passengersCurrentlyInVeh++;
-		this.earnings += this.earningsPerBoardingPassenger;
-	}
-	
-	public void removePassenger(){
-		this.passengersCurrentlyInVeh--;
+
+	public void handleFareContainer(FareContainer fareContainer) {
 		this.servedTrips++;
+		this.earnings += fareContainer.getFare();
 	}
-	
-	public void handleLinkTravelled(Link link){
-		this.costs += link.getLength() * this.expensesPerMeter;
-		this.earnings += link.getLength() * this.earningsPerMeterAndPassenger * this.passengersCurrentlyInVeh;
+
+	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
+		if (this.isFirstTour) {
+			this.costs += operatorCostContainer.getFixedCostPerDay();
+			this.isFirstTour = false;
+		}
+		this.costs += operatorCostContainer.getRunningCost();
 	}
-	
+
 	public double getTotalRevenue(){
 		return this.earnings - this.costs;
 	}

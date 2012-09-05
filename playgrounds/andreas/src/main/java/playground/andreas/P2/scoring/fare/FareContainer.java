@@ -87,5 +87,8 @@ public class FareContainer {
 	public double getFare(){
 		return this.earningsPerBoardingPassenger + this.earningsPerMeterAndPassenger * this.meterTravelled;
 	}
-
+	
+	public Id getVehicleId(){
+		return this.transitDriverStartsE.getVehicleId();
+	}
 }

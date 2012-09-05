@@ -56,7 +56,7 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 	private List<FareContainerHandler> fareContainerHandlerList = new LinkedList<FareContainerHandler>();
 	private HashMap<Id, TransitDriverStartsEvent> vehId2TransitDriverStartsE = new HashMap<Id, TransitDriverStartsEvent>();
 	private HashMap<Id, VehicleArrivesAtFacilityEvent> vehId2VehArrivesAtFacilityE = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
-	private HashMap<Id, LinkedList<FareContainer>> vehId2FareContainer = new HashMap<Id, LinkedList<FareContainer>>();
+	private HashMap<Id, LinkedList<FareContainer>> vehId2FareContainerList = new HashMap<Id, LinkedList<FareContainer>>();
 	private HashMap<Id, FareContainer> personId2FareContainer = new HashMap<Id, FareContainer>();
 
 	public FareCollectorHandler(String pIdentifier, double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
@@ -78,7 +78,7 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 	public void reset(int iteration) {
 		this.vehId2TransitDriverStartsE = new HashMap<Id, TransitDriverStartsEvent>();
 		this.vehId2VehArrivesAtFacilityE = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
-		this.vehId2FareContainer = new HashMap<Id, LinkedList<FareContainer>>();
+		this.vehId2FareContainerList = new HashMap<Id, LinkedList<FareContainer>>();
 		this.personId2FareContainer = new HashMap<Id, FareContainer>();
 		
 		for (FareContainerHandler fareContainerHandler : this.fareContainerHandlerList) {
@@ -89,8 +89,8 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		this.vehId2TransitDriverStartsE.put(event.getVehicleId(), event);
-		if (this.vehId2FareContainer.get(event.getVehicleId()) == null) {
-			this.vehId2FareContainer.put(event.getVehicleId(), new LinkedList<FareContainer>());
+		if (this.vehId2FareContainerList.get(event.getVehicleId()) == null) {
+			this.vehId2FareContainerList.put(event.getVehicleId(), new LinkedList<FareContainer>());
 		}
 	}
 
@@ -104,7 +104,7 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 		if (this.vehId2TransitDriverStartsE.containsKey(event.getVehicleId())) {
 			// It's a transit driver
 			double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
-			for (FareContainer fareContainer : this.vehId2FareContainer.get(event.getVehicleId())) {
+			for (FareContainer fareContainer : this.vehId2FareContainerList.get(event.getVehicleId())) {
 				fareContainer.addDistanceTravelled(linkLength);
 			}
 		}
@@ -118,7 +118,7 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 				// it's not the driver
 				FareContainer fareContainer = new FareContainer(this.earningsPerBoardingPassenger, this.earningsPerMeterAndPassenger);
 				fareContainer.handlePersonEnters(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()), this.vehId2TransitDriverStartsE.get(event.getVehicleId()));
-				this.vehId2FareContainer.get(event.getVehicleId()).add(fareContainer);
+				this.vehId2FareContainerList.get(event.getVehicleId()).add(fareContainer);
 				this.personId2FareContainer.put(event.getPersonId(), fareContainer);
 			}
 		}
@@ -131,7 +131,7 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				// it's not the driver
 				FareContainer fareContainer = this.personId2FareContainer.remove(event.getPersonId());
-				this.vehId2FareContainer.get(event.getVehicleId()).remove(fareContainer);
+				this.vehId2FareContainerList.get(event.getVehicleId()).remove(fareContainer);
 				fareContainer.handlePersonLeaves(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()));
 				
 				// call all FareContainerHandler

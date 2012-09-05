@@ -23,17 +23,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
-import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.scoring.fare.FareContainer;
+import playground.andreas.P2.scoring.fare.FareContainerHandler;
+import playground.andreas.P2.scoring.operator.OperatorCostContainer;
+import playground.andreas.P2.scoring.operator.OperatorCostContainerHandler;
 
 /**
  * Scores paratransit vehicles
@@ -41,77 +35,37 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class ScorePlansHandler implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
+public class ScorePlansHandler implements FareContainerHandler, OperatorCostContainerHandler{
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
-	private final String pIdentifier;
-	private double earningsPerBoardingPassenger;
-	private final double earningsPerMeterAndPassenger;
-	private final double expensesPerMeter;
-	private final double costPerVehicleAndDay;
-	
-	private Network net;
-	
-	TreeMap<Id, Id> driverId2VehIdMap = new TreeMap<Id, Id>();
 	TreeMap<Id, ScoreContainer> vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
-
-
-	public ScorePlansHandler(PConfigGroup pConfig){
-		this.pIdentifier = pConfig.getPIdentifier();
-		this.earningsPerBoardingPassenger = pConfig.getEarningsPerBoardingPassenger();
-		this.earningsPerMeterAndPassenger = pConfig.getEarningsPerKilometerAndPassenger() / 1000.0;
-		this.expensesPerMeter = pConfig.getCostPerKilometer() / 1000.0;
-		this.costPerVehicleAndDay = pConfig.getCostPerVehicleAndDay();
-	}
-
-	public void init(Network net) {
-		this.net = net;
-	}
 
 	public TreeMap<Id, ScoreContainer> getDriverId2ScoreMap() {
 		return this.vehicleId2ScoreMap;
 	}
 
 	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		if(this.driverId2VehIdMap.get(event.getDriverId()) == null){
-			this.driverId2VehIdMap.put(event.getDriverId(), event.getVehicleId());
+	public void handleFareContainer(FareContainer fareContainer) {
+		if (this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()) == null) {
+			this.vehicleId2ScoreMap.put(fareContainer.getVehicleId(), new ScoreContainer(fareContainer.getVehicleId()));
 		}
-		if(this.vehicleId2ScoreMap.get(event.getVehicleId()) == null){
-			this.vehicleId2ScoreMap.put(event.getVehicleId(), new ScoreContainer(event.getVehicleId(), this.earningsPerBoardingPassenger, this.earningsPerMeterAndPassenger, this.expensesPerMeter, this.costPerVehicleAndDay));
-		}		
+		
+		this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleFareContainer(fareContainer);
+	}
+
+	@Override
+	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
+		if (this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()) == null) {
+			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new ScoreContainer(operatorCostContainer.getVehicleId()));
+		}
+		
+		this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()).handleOperatorCostContainer(operatorCostContainer);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.driverId2VehIdMap = new TreeMap<Id, Id>();
 		this.vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				this.vehicleId2ScoreMap.get(event.getVehicleId()).addPassenger();
-			}
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				this.vehicleId2ScoreMap.get(event.getVehicleId()).removePassenger();
-			}
-		}
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if(this.driverId2VehIdMap.get(event.getPersonId()) != null){
-			this.vehicleId2ScoreMap.get(this.driverId2VehIdMap.get(event.getPersonId())).handleLinkTravelled(this.net.getLinks().get(event.getLinkId()));
-		}
 	}
 }
