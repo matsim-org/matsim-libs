@@ -144,10 +144,14 @@ public class TripRouter {
 					currentTrip.add( act );
 				}
 				else {
-					if (currentTrip.size() == 1) {
-						simplifiedPlan.addAll( currentTrip );
-					}
-					else if (currentTrip.size() > 1) {
+					// "transmitting" the instance for mono-legs trips
+					// sounds like a good idea, but it's not: it forces to skip
+					// main mode identification...
+					//if (currentTrip.size() == 1) {
+					//	simplifiedPlan.addAll( currentTrip );
+					//}
+					// else if (currentTrip.size() > 1) {
+					if (currentTrip.size() > 0) {
 						Leg newLeg = new LegImpl( identifyMainMode( currentTrip ) );
 
 						// set the time
