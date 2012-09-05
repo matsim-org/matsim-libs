@@ -97,7 +97,10 @@ public class RunRsaMultiModalTest {
 		 *  controlerListener (even if it is not set as ROuterFactory), because it provides
 		 *	some essential functionality to the P-module
 		 */
-		PHook pFact = new PHook(controler, new Mode2LineSetterRSA());
+		
+		// just committing to get rid of the compile error
+		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), null);
+		
 //		PtSubModeDependRouterFactory pFact = new PtSubModeDependRouterFactory(controler, true);
 		controler.addControlerListener(pFact);		
 //		controler.setTransitRouterFactory(pFact);
