@@ -51,7 +51,7 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 	private Network network;
 	private String pIdentifier;
 	private double earningsPerBoardingPassenger;
-	private double earningsPerKilometerAndPassenger;
+	private double earningsPerMeterAndPassenger;
 	
 	private List<FareContainerHandler> fareContainerHandlerList = new LinkedList<FareContainerHandler>();
 	private HashMap<Id, TransitDriverStartsEvent> vehId2TransitDriverStartsE = new HashMap<Id, TransitDriverStartsEvent>();
@@ -59,10 +59,10 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 	private HashMap<Id, LinkedList<FareContainer>> vehId2FareContainer = new HashMap<Id, LinkedList<FareContainer>>();
 	private HashMap<Id, FareContainer> personId2FareContainer = new HashMap<Id, FareContainer>();
 
-	public FareCollectorHandler(String pIdentifier, double earningsPerBoardingPassenger, double earningsPerKilometerAndPassenger){
+	public FareCollectorHandler(String pIdentifier, double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
 		this.pIdentifier = pIdentifier;
 		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
-		this.earningsPerKilometerAndPassenger = earningsPerKilometerAndPassenger;
+		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
 		log.info("enabled");
 	}
 	
@@ -116,7 +116,7 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 			// it's a paratransit vehicle
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				// it's not the driver
-				FareContainer fareContainer = new FareContainer(this.earningsPerBoardingPassenger, this.earningsPerKilometerAndPassenger);
+				FareContainer fareContainer = new FareContainer(this.earningsPerBoardingPassenger, this.earningsPerMeterAndPassenger);
 				fareContainer.handlePersonEnters(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()), this.vehId2TransitDriverStartsE.get(event.getVehicleId()));
 				this.vehId2FareContainer.get(event.getVehicleId()).add(fareContainer);
 				this.personId2FareContainer.put(event.getPersonId(), fareContainer);

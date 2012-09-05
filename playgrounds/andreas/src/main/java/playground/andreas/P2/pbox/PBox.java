@@ -73,7 +73,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	public PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;		
 		this.scorePlansHandler = new ScorePlansHandler(this.pConfig);
-		this.fareCollectorHandler = new FareCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger());
+		this.fareCollectorHandler = new FareCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager(this.pConfig);
 	}

@@ -35,18 +35,18 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 public class FareContainer {
 	
 	private final double earningsPerBoardingPassenger;
-	private final double earningsPerKilometerAndPassenger;
+	private final double earningsPerMeterAndPassenger;
 	
 	private PersonEntersVehicleEvent personEnterVehE;
 	private TransitDriverStartsEvent transitDriverStartsE;
 	private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityEEntered;
 	private PersonLeavesVehicleEvent personLeavesVehE;
 	private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityELeft;
-	private double kilometerTravelled = 0.0;
+	private double meterTravelled = 0.0;
 
-	public FareContainer(double earningsPerBoardingPassenger, double earningsPerKilometerAndPassenger){
+	public FareContainer(double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
 		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
-		this.earningsPerKilometerAndPassenger = earningsPerKilometerAndPassenger;
+		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
 	}
 	
 	public void handlePersonEnters(PersonEntersVehicleEvent personEnterVehE, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE, TransitDriverStartsEvent transitDriverStartsE){
@@ -60,8 +60,8 @@ public class FareContainer {
 		this.vehArrivesAtFacilityELeft = vehArrivesAtFacilityE;
 	}
 	
-	public void addDistanceTravelled(double kilometerTravelled){
-		this.kilometerTravelled  += kilometerTravelled;
+	public void addDistanceTravelled(double meterTravelled){
+		this.meterTravelled  += meterTravelled;
 	}
 
 	public Id getStopEntered() {
@@ -85,7 +85,7 @@ public class FareContainer {
 	}
 	
 	public double getFare(){
-		return this.earningsPerBoardingPassenger + this.earningsPerKilometerAndPassenger * this.kilometerTravelled;
+		return this.earningsPerBoardingPassenger + this.earningsPerMeterAndPassenger * this.meterTravelled;
 	}
 
 }
