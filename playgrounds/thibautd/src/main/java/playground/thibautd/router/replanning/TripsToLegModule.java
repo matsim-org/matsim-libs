@@ -39,10 +39,21 @@ public class TripsToLegModule extends AbstractMultithreadedModule {
 	private final MultiLegRoutingControler controler;
 	private final StageActivityTypes additionalBlackList;
 
+	/**
+	 * Initializes an instance using the stage activity types from the controler
+	 * @param controler
+	 */
 	public TripsToLegModule(final Controler controler) {
 		this( controler , null );
 	}
 
+	/**
+	 * Initializes an instance, allowing to specify additional activity types to
+	 * consider as stage activities.
+	 * @param controler
+	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
+	 * the additionnal types
+	 */
 	public TripsToLegModule(final Controler controler, final StageActivityTypes additionalBlackList) {
 		super( controler.getConfig().global() );
 		this.controler = (MultiLegRoutingControler) controler;
