@@ -51,7 +51,7 @@ public class Link2ZoneMap {
 	
 
 	private HashMap<Id, Integer> linkZoneMap; //LinkId, ZoneId
-	private HashSet<Id> setOfZone;
+	private HashSet<String> setOfZones; //Used to create OD matrices
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -65,7 +65,9 @@ public class Link2ZoneMap {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private QuadTree<Node> buildCentroidNodeQuadTree(final Map<Id,? extends Node> nodes) {
+	private QuadTree<Node> buildCentroidNodeQuadTree(final Map<Id,? extends Node> nodes, boolean guessZoneNumbers) {
+		this.setOfZones = new HashSet<String>();
+		
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -74,13 +76,24 @@ public class Link2ZoneMap {
 		for (Node n : nodes.values()) {
 			try {
 				int nid = Integer.parseInt(n.getId().toString());
-				if (nid < 10000) {
+				if (guessZoneNumbers){
+					if (nid < 10000) {
+						ns.add(n);
+						if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
+						if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
+						if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
+						if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+						this.setOfZones.add(n.getId().toString());
+					}
+				}else{
 					ns.add(n);
 					if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
 					if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
 					if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
 					if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+					this.setOfZones.add(n.getId().toString());
 				}
+
 			} catch (NumberFormatException e) {
 			}
 //			if (Integer.parseInt(n.getId().toString()) < 10000) {
@@ -106,8 +119,6 @@ public class Link2ZoneMap {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	//TODO build QuadTree w/o zones as part of the network
-	//TODO add functionality to ensure that network WITH nodes as zones is OK.
 	
 	public void run(Network network){
 		log.info("Mapping links to zones...");
@@ -115,6 +126,14 @@ public class Link2ZoneMap {
 		
 		HashMap<Id, Node> zones = new HashMap<Id, Node>();
 		
+		QuadTree<Node> qt = buildCentroidNodeQuadTree(network.getNodes(), true);
+		
+		for (Link l : network.getLinks().values()) {
+			Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
+			this.linkZoneMap.put(l.getId(), Integer.parseInt(n.getId().toString()));
+		}
+		
+		log.info("..done.");
 		
 	}
 	
@@ -124,10 +143,10 @@ public class Link2ZoneMap {
 		Network tempNetwork = network;
 		for (Node z : zones.values()){
 			tempNetwork.addNode(z);
-			this.setOfZone.add(z.getId());
+			this.setOfZones.add(z.getId().toString());
 		}
 		
-		QuadTree<Node> qt = buildCentroidNodeQuadTree(tempNetwork.getNodes());
+		QuadTree<Node> qt = buildCentroidNodeQuadTree(tempNetwork.getNodes(), false);
 		
 		for (Link l : network.getLinks().values()) {
 			Node n = qt.get(l.getCoord().getX(),l.getCoord().getY());
@@ -153,14 +172,14 @@ public class Link2ZoneMap {
 	}
 	
 	public int getNumberOfZones(){
-		return this.setOfZone.size();
+		return this.setOfZones.size();
 	}
 	
 	public Integer getZoneOfLink(Id linkId){
 		return this.linkZoneMap.get(linkId);
 	}
 
-	public Set<Id> getSetOfZone() {
-		return this.setOfZone;
+	public Set<String> getSetOfZone() {
+		return this.setOfZones;
 	}
 }
