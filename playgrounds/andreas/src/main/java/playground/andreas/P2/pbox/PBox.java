@@ -44,6 +44,7 @@ import playground.andreas.P2.schedule.PStopsFactory;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
+import playground.andreas.P2.scoring.fare.FareCollectorHandler;
 
 /**
  * Black box for paratransit
@@ -65,11 +66,14 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private TransitSchedule pTransitSchedule;
 	
 	private final ScorePlansHandler scorePlansHandler;
+	private FareCollectorHandler fareCollectorHandler;
 	private PStrategyManager strategyManager;
+
 	
 	public PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;		
 		this.scorePlansHandler = new ScorePlansHandler(this.pConfig);
+		this.fareCollectorHandler = new FareCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger());
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager(this.pConfig);
 	}
@@ -79,11 +83,15 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// This is the first iteration
 		
 		// initialize strategy manager
-		this.strategyManager.init(this.pConfig, event.getControler().getEvents());
+		this.strategyManager.init(this.pConfig, event.getControler().getEvents(), this.fareCollectorHandler);
 		
 		// init scorePlansHandler
 		this.scorePlansHandler.init(event.getControler().getNetwork());
 		event.getControler().getEvents().addHandler(this.scorePlansHandler);
+		
+		// init fare collector
+		this.fareCollectorHandler.init(event.getControler().getNetwork());
+		event.getControler().getEvents().addHandler(this.fareCollectorHandler);
 		
 		// init possible paratransit stops
 		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());

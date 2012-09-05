@@ -38,6 +38,7 @@ import playground.andreas.P2.replanning.modules.RandomStartTimeAllocator;
 import playground.andreas.P2.replanning.modules.RectangleHullRouteExtension;
 import playground.andreas.P2.replanning.modules.ReduceStopsToBeServed;
 import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedR;
+import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
 import playground.andreas.P2.replanning.modules.ReduceTimeServed;
 import playground.andreas.P2.replanning.modules.ReduceTimeServedR;
 import playground.andreas.P2.replanning.modules.RouteEnvelopeExtension;
@@ -46,6 +47,7 @@ import playground.andreas.P2.replanning.modules.deprecated.AddRandomStop;
 import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
 import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;
 import playground.andreas.P2.replanning.modules.deprecated.StopReduceDemand;
+import playground.andreas.P2.scoring.fare.FareCollectorHandler;
 
 /**
  * Loads strategies from config and chooses strategies according to their weights.
@@ -72,21 +74,21 @@ public class PStrategyManager {
 		this.pIdentifier = pConfig.getPIdentifier();
 	}
 	// TODO[an] always initialize TimeReduceDemand
-	public void init(PConfigGroup pConfig, EventsManager eventsManager) {
+	public void init(PConfigGroup pConfig, EventsManager eventsManager, FareCollectorHandler fareCollectorHandler) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
 				continue;
 			}
 			String classname = settings.getModuleName();
-			PStrategy strategy = loadStrategy(classname, settings, eventsManager);
+			PStrategy strategy = loadStrategy(classname, settings, eventsManager, fareCollectorHandler);
 			this.addStrategy(strategy, rate);
 		}
 		
 		log.info("enabled with " + this.strategies.size()  + " strategies");
 	}
 
-	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager) {
+	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager, FareCollectorHandler fareCollectorHandler) {
 		this.eventsManager = eventsManager;
 		PStrategy strategy = null;
 		
@@ -150,6 +152,10 @@ public class PStrategyManager {
 			eventsManager.addHandler(strat);
 			strategy = strat;
 //			this.reduceStopsToBeServed = strat;
+		} else if (name.equals(ReduceStopsToBeServedRFare.STRATEGY_NAME)) {
+			ReduceStopsToBeServedRFare strat = new ReduceStopsToBeServedRFare(settings.getParametersAsArrayList());
+			fareCollectorHandler.addFareContainerHandler(strat);
+			strategy = strat;
 		}
 		
 		if (strategy == null) {
