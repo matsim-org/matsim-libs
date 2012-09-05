@@ -45,9 +45,9 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 	private Map<TransitRoute, Map<Id, TransitRouteStop>> routeStops; //Maps stopFacilityId to TransitRouteStop
 		
 	//Stores all the departures from a given TransitRouteStop
-	private Map<TransitRouteStop, SortedSet<Double>> departures = null;
-	private Map<TransitRouteStop, SortedSet<Double>> updatedDepartures = null;
-	private Map<TransitRouteStop, SortedSet<Double>> defaultDepartures = null;
+	private Map<TransitRouteStop, TreeSet<Double>> departures = null;
+	private Map<TransitRouteStop, TreeSet<Double>> updatedDepartures = null;
+	private Map<TransitRouteStop, TreeSet<Double>> defaultDepartures = null;
 	
 	//Stores the travel times from one stop to the next for use in routing
 	private Map<TransitRouteStop, TreeMap<Double, Double>> travelTimes = null; 
@@ -74,9 +74,9 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		//loads the initial schedule data into the maps
 		//also creates the initial mapping to go from stopFacilityId to TransitRouteStop
 		this.routeStops = new HashMap<TransitRoute, Map<Id,TransitRouteStop>>();
-		this.defaultDepartures = new HashMap<TransitRouteStop, SortedSet<Double>>();
+		this.defaultDepartures = new HashMap<TransitRouteStop, TreeSet<Double>>();
 		this.defaultTravelTimes = new HashMap<TransitRouteStop, TreeMap<Double,Double>>();
-		this.updatedDepartures = new HashMap<TransitRouteStop, SortedSet<Double>>();
+		this.updatedDepartures = new HashMap<TransitRouteStop, TreeSet<Double>>();
 		this.updatedTravelTimes = new HashMap<TransitRouteStop, TreeMap<Double,Double>>();
 		
 		for (TransitLine line: this.schedule.getTransitLines().values()){
@@ -106,12 +106,11 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 					}
 					
 					//Build the map of departures from the stop
-					SortedSet<Double> stopDepartures = new TreeSet<Double>();
+					TreeSet<Double> stopDepartures = new TreeSet<Double>();
 					for (Departure d : route.getDepartures().values()){						
 						stopDepartures.add(d.getDepartureTime() + stop.getDepartureOffset());
 					}				
 					this.defaultDepartures.put(stop, stopDepartures);
-					this.updatedDepartures.put(stop, stopDepartures);
 					
 					prevStop = stop;
 				}
@@ -121,7 +120,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		
 		this.travelTimes = new HashMap<TransitRouteStop, TreeMap<Double,Double>>();
 		this.travelTimes.putAll(defaultTravelTimes);
-		this.departures = new HashMap<TransitRouteStop, SortedSet<Double>>();
+		this.departures = new HashMap<TransitRouteStop, TreeSet<Double>>();
 		this.departures.putAll(defaultDepartures);
 		
 		log.info("Transit data cache built.");
@@ -140,25 +139,22 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 	 * 
 	 * @param stop The {@link TransitRouteStop} of interest.
 	 * @param now The current time (eg, 9:00AM)
-	 * @return The next available departure time for the {@link TransitRoute} of interest (eg, 9:03AM), or
-	 * the first departure the next day if none are found.
+	 * @return The next available departure time for the {@link TransitRoute} of interest (eg, 9:03AM), 2*MIDNIGHT if no such dpearture is found.
 	 */
 	public double getNextDepartureTime(final TransitRouteStop stop,final double now){
 		
-		
-		SortedSet<Double> subSet = this.departures.get(stop).tailSet(now);
-		
-		if (subSet.size() == 0){ //no departures were found after this time.
-			return 2 * Time.MIDNIGHT; //Get the earliest departure time the next day. 
+		Double e = this.departures.get(stop).ceiling(now);
+		if (e == null){ //no departures were found after this time.
+			return 2 * Time.MIDNIGHT;
 		}
-		return subSet.first();
+		return e;
 	}
 		
 	/**
 	 * Gets the dynamic time from one transit stop to the next. Travel times are stored in a ordered map; the as-simulated travel time at any 
 	 * given point in time is returned as the next-lowest observed time. For example, if at 6:00 it took 10 minutes to travel to the next stop,
 	 * and you are looking for travel time at 6:10, then this method would return 10 minutes. If no lower estimate is found, this method will
-	 * return the first value (usually the as-scheduled travel time).
+	 * return the the as-scheduled travel time.
 	 * 
 	 * @param stop The {@link TransitRouteStop} of interest.
 	 * @param now The current time.
@@ -168,7 +164,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		
 		Entry<Double, Double> t = this.travelTimes.get(stop).floorEntry(now);
 		if (t == null){ //current time is lower than lowest key, therefore get the lowest entry. Wait times are not handled here.
-			t = this.travelTimes.get(stop).firstEntry();
+			t = this.defaultTravelTimes.get(stop).firstEntry();
 		}
 		
 		if (t.getValue() < 0){
@@ -214,7 +210,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		this.updatedTravelTimes.clear();
 		
 		//Check and correct to make sure that all transit stops have mapped travel times and departures
-		this.travelTimes.putAll(updatedTravelTimes); // Default times = 0.0->[defaultStaticTravelTime]
+		//this.travelTimes.putAll(updatedTravelTimes); // Default times = 0.0->[defaultStaticTravelTime]
 		for (TransitRouteStop key : this.defaultDepartures.keySet()){
 			if (this.departures.get(key) == null){
 				//For some reason no actual departures were recorded
@@ -247,7 +243,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 			}
 			
 			if (!this.updatedDepartures.containsKey(trStop)){
-				SortedSet<Double> set = new TreeSet<Double>();
+				TreeSet<Double> set = new TreeSet<Double>();
 				set.add(event.getTime());
 				this.updatedDepartures.put(trStop, set);
 			}else{
