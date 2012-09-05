@@ -42,6 +42,7 @@ import playground.andreas.P2.replanning.OperatorInitializer;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.PStopsFactory;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
+import playground.andreas.P2.scoring.FareContainer2AgentMoneyEvent;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
 import playground.andreas.P2.scoring.fare.FareCollectorHandler;
@@ -92,12 +93,18 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// init fare collector
 		this.fareCollectorHandler.init(event.getControler().getNetwork());
 		event.getControler().getEvents().addHandler(this.fareCollectorHandler);
+		event.getControler().addControlerListener(this.fareCollectorHandler);
 		this.fareCollectorHandler.addFareContainerHandler(this.scorePlansHandler);
 		
 		// init operator cost collector
 		this.operatorCostCollectorHandler.init(event.getControler().getNetwork());
 		event.getControler().getEvents().addHandler(this.operatorCostCollectorHandler);
+		event.getControler().addControlerListener(this.operatorCostCollectorHandler);
 		this.operatorCostCollectorHandler.addOperatorCostContainerHandler(this.scorePlansHandler);
+		
+		// init fare2moneyEvent
+		FareContainer2AgentMoneyEvent fare2AgentMoney = new FareContainer2AgentMoneyEvent(event.getControler());
+		this.fareCollectorHandler.addFareContainerHandler(fare2AgentMoney);
 		
 		// init possible paratransit stops
 		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());

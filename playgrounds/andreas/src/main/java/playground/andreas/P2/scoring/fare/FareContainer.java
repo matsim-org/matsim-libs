@@ -91,4 +91,8 @@ public class FareContainer {
 	public Id getVehicleId(){
 		return this.transitDriverStartsE.getVehicleId();
 	}
+	
+	public Id getAgentId(){
+		return this.personLeavesVehE.getPersonId();
+	}
 }

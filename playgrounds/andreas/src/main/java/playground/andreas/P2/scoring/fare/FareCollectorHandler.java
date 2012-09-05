@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
@@ -44,7 +46,7 @@ import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
  * @author aneumann
  *
  */
-public class FareCollectorHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public class FareCollectorHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener{
 	
 	private final static Logger log = Logger.getLogger(FareCollectorHandler.class);
 	
@@ -141,6 +143,14 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 				
 				// Note the fareContainer is dropped at this point.
 			}
+		}
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		// ok, mobsim is done - finish incomplete entries
+		if (this.personId2FareContainer.size() > 0) {
+			log.warn("There are " + this.personId2FareContainer.size() + " passengers with incomplete trips. Cannot finish them. Will not forward those entries");
 		}
 	}
 }

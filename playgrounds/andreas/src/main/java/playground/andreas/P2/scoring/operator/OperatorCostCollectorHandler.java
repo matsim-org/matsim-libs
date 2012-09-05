@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
@@ -40,7 +42,7 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
  * @author aneumann
  *
  */
-public class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler{
+public class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener {
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	
@@ -105,6 +107,30 @@ public class OperatorCostCollectorHandler implements TransitDriverStartsEventHan
 				}
 				
 				// Note the operatorCostContainer is dropped at this point.
+			}
+		}
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		// ok, mobsim is done - finish incomplete entries
+		
+		// remove non paratransit entries
+		List<OperatorCostContainer> entriesToProcess = new LinkedList<OperatorCostContainer>();
+		for (OperatorCostContainer operatorCostContainer : this.vehId2OperatorCostContainer.values()) {
+			if(operatorCostContainer.getVehicleId().toString().startsWith(this.pIdentifier)){
+				// it's a paratransit vehicle
+				entriesToProcess.add(operatorCostContainer);
+			}
+		}
+		
+		if (entriesToProcess.size() > 0) {
+			log.warn("There are " + entriesToProcess.size() + " incomplete entries. Will forward them anyway...");
+			for (OperatorCostContainer operatorCostContainer : entriesToProcess) {
+				// call all OperatorCostContainerHandler
+				for (OperatorCostContainerHandler operatorCostContainerHandler : this.operatorCostContainerHandlerList) {
+					operatorCostContainerHandler.handleOperatorCostContainer(operatorCostContainer);
+				}
 			}
 		}
 	}
