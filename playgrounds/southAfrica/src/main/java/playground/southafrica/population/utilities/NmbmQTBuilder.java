@@ -47,6 +47,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -74,7 +75,6 @@ import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -103,6 +103,11 @@ public class NmbmQTBuilder {
 	int nullQtCount = 0;
 	private List<Integer> hammingDistanceChanges;
 	private List<Double> distanceList = new ArrayList<Double>();
+	private Map<Id, Tuple<Integer, Integer>> zoneCounts = new HashMap<Id, Tuple<Integer,Integer>>();
+	private List<Coord> homeCoords2 = new ArrayList<Coord>();
+	private List<Coord> homeCoords = new ArrayList<Coord>();
+	private Coord checkCoord = null;
+	private boolean created = false;
 
 
 	/**
@@ -157,6 +162,7 @@ public class NmbmQTBuilder {
 		for(MyZone zone : mfr.getAllZones()){
 			this.zones.put(zone.getId(), zone);
 		}
+		LOG.info("Total number of subplaces: " + this.zones.size());
 		
 		// ---------------------------------------------------------//
 		// The following is hard-coded and implementation-specific. //
@@ -282,6 +288,7 @@ public class NmbmQTBuilder {
 	public void buildPopulation(String populationFile) throws FileNotFoundException{
 		/*TODO Remove these dummy variables and counters */
 		Map<Id, Integer> noQtMap = new HashMap<Id, Integer>();
+		int dummy = 0;
 		
 		
 		/* Ensure that the population file exist. */
@@ -303,13 +310,28 @@ public class NmbmQTBuilder {
 			Household hh = outputHouseholds.getFactory().createHousehold(hhId);
 			boolean firstMember = true;
 			
-			Coord homeCoord = null;
 
 			List<String> persons = personMap.get(hhId);
 			/* Create each individual */
 			for(String s : persons){
 				String[] sa = s.split(",");
+
+				/* Check household counts, and add first if not. */
+				Id homeZone = new IdImpl(sa[12]);
+				if (!zoneCounts.containsKey(homeZone)){
+					zoneCounts.put(homeZone, new Tuple<Integer, Integer>(0, 0));
+				}
+				
+				
+				/* Get the home location of the household. */
+				Point homePoint = this.zones.get(new IdImpl(sa[12])).getInteriorPoint();
+				Point altHomePoint = getRandomInteriorPoint(this.zones.get(new IdImpl(sa[12])));
+				Coord homeCoord = new CoordImpl(altHomePoint.getX(), altHomePoint.getY());
+				
 				PersonImpl p = (PersonImpl) sc.getPopulation().getFactory().createPerson(new IdImpl(personCounter++));
+				
+				
+				
 				if(firstMember){
 					/* Income */
 					double censusIncome = getRandomCensusIncomeMonthly(Integer.parseInt(sa[5]));
@@ -320,12 +342,19 @@ public class NmbmQTBuilder {
 					
 					/*TODO Living quarter type */
 					
-					/* Get the home location of the household. */
-					Point homePoint = this.zones.get(new IdImpl(sa[12])).getInteriorPoint();
-					Point altHomePoint = getRandomInteriorPoint(this.zones.get(new IdImpl(sa[12])));
-					homeCoord = new CoordImpl(homePoint.getX(), homePoint.getY());
-					
 					firstMember = false;
+					
+					/* Add to person and household counts. */
+					zoneCounts.put(homeZone, new Tuple<Integer, Integer>(
+							zoneCounts.get(homeZone).getFirst()+1, 
+							zoneCounts.get(homeZone).getSecond()) );
+					homeCoords.add(homeCoord);
+					/* TODO Remove after debugging. */
+					String checkZone = "27508018";
+					if(homeZone.toString().equalsIgnoreCase(checkZone) && dummy < 10){
+						LOG.warn(checkZone + ": " + p.getId().toString());
+						dummy++;
+					}
 				}
 				/* Add the person's Id to the household. */
 				hh.getMemberIds().add(p.getId());
@@ -364,12 +393,6 @@ public class NmbmQTBuilder {
 				
 				/* Get the closest 20 people to the person's home location. */				
 				if(qtMap.containsKey(qtId)){
-					List<Tuple<Plan,Double>> closestPlans = getClosestPlans(homeCoord, qtMap.get(qtId), 20);
-					/* Randomly pick any of the closest plans */
-					Tuple<Plan, Double> randomTuple = closestPlans.get(getRandomPermutation(closestPlans.size())[0]);
-					Plan plan = randomTuple.getFirst();
-					distanceList.add(randomTuple.getSecond());
-					
 					/* For each person you have a different sample size - choice set.
 					 * If you have 200 observations, and you pick one randomly.
 					 * 1. Get all persons in QT;
@@ -379,8 +402,15 @@ public class NmbmQTBuilder {
 					 * distribution of the observations.)
 					 * ...  
 					 */
+					List<Tuple<Plan,Double>> closestPlans = getClosestPlans(homeCoord, qtMap.get(qtId), 20);
+					/* Randomly pick any of the closest plans. and make a COPY of it. */
+					Tuple<Plan, Double> randomTuple = closestPlans.get(getRandomPermutation(closestPlans.size())[0]);
+					PlanImpl plan = new PlanImpl();
+					plan.copyPlan(randomTuple.getFirst());
+				
+					distanceList.add(randomTuple.getSecond());
 
-					/* Should have a plan now. Change its activity locations. */
+					/* Should have a plan now. Change its home locations. */
 					for(PlanElement pe : plan.getPlanElements()){
 						if(pe instanceof ActivityImpl){
 							ActivityImpl activity = (ActivityImpl) pe;
@@ -393,10 +423,38 @@ public class NmbmQTBuilder {
 						}
 					}
 					p.addPlan(plan);
+					
+					/*TODO Remove after debugging */
+					if(p.getId().equals(new IdImpl("48548"))){
+						checkCoord = ((ActivityImpl)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
+						created = true;
+					}
+					
+					/* TODO Remove after debugging. Add to person and household counts. */
+					zoneCounts.put(homeZone, new Tuple<Integer, Integer>(
+							zoneCounts.get(homeZone).getFirst(), 
+							zoneCounts.get(homeZone).getSecond()+1) );
+					
 				}
 				outputPopulation.addPerson(p);
 			}
 			outputHouseholds.getHouseholds().put(hhId, hh);
+			
+			/* TODO Remove after debugging. Add to person and household counts. */
+			Person oneMember = outputPopulation.getPersons().get(hh.getMemberIds().get(0));
+			PlanElement firstActivity = oneMember.getSelectedPlan().getPlanElements().get(0);
+			if(firstActivity instanceof ActivityImpl){
+				ActivityImpl ai = (ActivityImpl)firstActivity;
+				if(ai.getType().equalsIgnoreCase("h")){
+					homeCoords2.add(ai.getCoord());
+				}
+			}
+			
+			if(created){
+				if(!((ActivityImpl) sc.getPopulation().getPersons().get(new IdImpl(48548)).getSelectedPlan().getPlanElements().get(0)).getCoord().equals(checkCoord)){
+					LOG.error("GOTCHA!!");
+				}
+			}
 		}
 		
 		/*=====================================================================*/
@@ -480,6 +538,64 @@ public class NmbmQTBuilder {
 	public void writePopulation(String outputFolder, String networkFile){
 		LOG.info("Writing output...");
 		
+		/*TODO Remove after debugging. */
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "check2.csv");
+		try {
+			bw.write("SPCode,Hhs2,Persons2");
+			bw.newLine();
+			for(Id id : zoneCounts.keySet()){
+				bw.write(id.toString());
+				bw.write(",");
+				bw.write(String.valueOf(zoneCounts.get(id).getFirst()));
+				bw.write(",");
+				bw.write(String.valueOf(zoneCounts.get(id).getSecond()));
+				bw.newLine();				
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Could not write to BufferedWriter " + outputFolder + "check2.csv");
+		} finally {
+			try {
+				bw.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedWriter " + outputFolder + "check2.csv");
+			}
+		}
+		
+		BufferedWriter bw2 = IOUtils.getBufferedWriter(outputFolder + "check3.csv");
+		try {
+			bw2.write("Long,Lat");
+			bw2.newLine();
+			for(Coord c : homeCoords){
+				bw2.write(String.format("%.0f,%.0f\n", c.getX(), c.getY()));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Could not write to BufferedWriter " + outputFolder + "check3.csv");
+		} finally {
+			try {
+				bw2.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedWriter " + outputFolder + "check3.csv");
+			}
+		}
+		
+		BufferedWriter bw3 = IOUtils.getBufferedWriter(outputFolder + "check4.csv");
+		try {
+			bw3.write("Long,Lat");
+			bw3.newLine();
+			for(Coord c : homeCoords2){
+				bw3.write(String.format("%.0f,%.0f\n", c.getX(), c.getY()));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Could not write to BufferedWriter " + outputFolder + "check4.csv");
+		} finally {
+			try {
+				bw3.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedWriter " + outputFolder + "check4.csv");
+			}
+		}
+
+		
 		/* Parse the network */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
@@ -509,7 +625,7 @@ public class NmbmQTBuilder {
 		 * and the survey data are for the same area, e.g. Nelson Mandela Bay.
 		 */
 		String bufferedWriterName = outputFolder + "distances.txt";
-		BufferedWriter bw = IOUtils.getBufferedWriter(bufferedWriterName);
+		bw = IOUtils.getBufferedWriter(bufferedWriterName);
 		try{
 			for(double d : distanceList){
 				bw.write(String.format("%.0f\n", d));
@@ -813,9 +929,6 @@ public class NmbmQTBuilder {
 	
 	
 	private Point getRandomInteriorPoint(Geometry geometry){
-		Point p = null;
-		GeometryFactory gf = geometry.getFactory();
-		
 		/* First get the radius as the distance from the centroid to the
 		 * farthest from the four envelope corners. */
 		Coordinate c = geometry.getCentroid().getCoordinate(); 
@@ -830,12 +943,19 @@ public class NmbmQTBuilder {
 		radius = Math.max(radius, c.distance(c3));
 		radius = Math.max(radius, c.distance(c4));
 		
+		Point p = null;
 		boolean found = false;
 		while(!found){
-			double randomAngle = MatsimRandom.getRandom().nextDouble()*2*Math.PI;
-			double randomRadius = MatsimRandom.getRandom().nextDouble()*radius;
-			double x = c.x + randomRadius*Math.cos(randomAngle);
-			double y = c.y + randomRadius*Math.sin(randomAngle);
+			/* Radius and angle. */
+//			double randomAngle = MatsimRandom.getRandom().nextDouble()*2*Math.PI;
+//			double randomRadius = MatsimRandom.getRandom().nextDouble()*radius;
+//			double x = c.x + randomRadius*Math.cos(randomAngle);
+//			double y = c.y + randomRadius*Math.sin(randomAngle);
+
+			/* Just delta x and y. */
+			double x = c1.x + MatsimRandom.getRandom().nextDouble()*(c3.x - c1.x);
+			double y = c1.y + MatsimRandom.getRandom().nextDouble()*(c3.y - c1.y);
+
 			p = geometry.getFactory().createPoint(new Coordinate(x, y));
 			if(geometry.contains(p)){
 				found = true;
