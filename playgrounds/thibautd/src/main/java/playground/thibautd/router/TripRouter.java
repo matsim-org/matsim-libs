@@ -133,14 +133,11 @@ public class TripRouter {
 		List<PlanElement> simplifiedPlan = new ArrayList<PlanElement>();
 		List<PlanElement> currentTrip = new ArrayList<PlanElement>();
 
-		double now = 0;
-		double startOfTrip = Time.UNDEFINED_TIME;
 		for (PlanElement currentElement : plan) {
 			if (currentElement instanceof Activity) {
 				Activity act = (Activity) currentElement;
 
 				if (checker.isStageActivity( act.getType() )) {
-					now = calcEndOfPlanElement( now , currentElement );
 					currentTrip.add( act );
 				}
 				else {
@@ -154,20 +151,13 @@ public class TripRouter {
 					if (currentTrip.size() > 0) {
 						Leg newLeg = new LegImpl( identifyMainMode( currentTrip ) );
 
-						// set the time
-						newLeg.setDepartureTime( startOfTrip);
-						newLeg.setTravelTime( now - startOfTrip );
-
 						simplifiedPlan.add( newLeg );
 					}
 					currentTrip.clear();
-					now = calcEndOfPlanElement( now , currentElement );
-					startOfTrip = now;
 					simplifiedPlan.add( act );
 				}
 			}
 			else if (currentElement instanceof Leg) {
-				now = calcEndOfPlanElement( now , currentElement );
 				currentTrip.add( currentElement );
 			}
 			else {
