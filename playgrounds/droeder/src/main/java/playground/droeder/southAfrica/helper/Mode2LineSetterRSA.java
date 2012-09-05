@@ -24,10 +24,10 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
+
 
 /**
  * @author droeder
@@ -50,11 +50,12 @@ public class Mode2LineSetterRSA implements PtMode2LineSetter {
 		for (TransitLine line : transitSchedule.getTransitLines().values()) {
 			if(line.getRoutes().size() < 1){
 				log.error("no routes for line " + line.getId());
-			}else{
-				for(TransitRoute route: line.getRoutes().values()){
-					log.info(route.getTransportMode());
-				}
 			}
+//			else{
+//				for(TransitRoute route: line.getRoutes().values()){
+//					log.info(route.getTransportMode());
+//				}
+//			}
 			// there should beat least one transitRoute and all routes should have the same mode (forced by router used for RSA-scenarios)
 			String mode =line.getRoutes().values().iterator().next().getTransportMode();
 			this.lineId2ptMode.put(line.getId(), mode);

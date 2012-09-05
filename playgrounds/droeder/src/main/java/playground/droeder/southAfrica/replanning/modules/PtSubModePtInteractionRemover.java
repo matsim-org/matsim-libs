@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning;
+package playground.droeder.southAfrica.replanning.modules;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +42,8 @@ public class PtSubModePtInteractionRemover implements PlanAlgorithm {
 	public PtSubModePtInteractionRemover(){
 		//do nothing
 	}
+	
+	private boolean thrown = false;
 
 	@Override
 	public void run(Plan plan) {
@@ -61,13 +63,17 @@ public class PtSubModePtInteractionRemover implements PlanAlgorithm {
 						// this might be a non-pt-chain or it is a single-transit_walk
 						if(temp.size() == 2){
 							if(((Leg) temp.get(0)).getMode().equals(TransportMode.transit_walk)){
-								log.warn("found act-transitWalk-act without any real pt-leg. LegMode set to pt." +
-										" Can not guarantee that PtSubMode is still fixed!");
+								if(!thrown){
+									log.warn("found act-transitWalk-act without any 'real' pt-leg. LegMode set to 'pt'." +
+											" Thrown only once (per Thread).");
+									thrown = true;
+								}
 								((Leg) temp.get(0)).setMode(TransportMode.pt);
+								((Leg) temp.get(0)).setRoute(null);
 							}
 							newPlanElements.addAll(temp);
 						}
-						// this is "pt-chain". Throw away all unnecessary pt legs and activities...
+						// this is a "pt-chain". Throw away all unnecessary pt legs and activities...
 						else{
 							PlanElement delegate = null;
 							// find (at least) the one leg which is not a transitWalk. ignore the activities
@@ -84,6 +90,7 @@ public class PtSubModePtInteractionRemover implements PlanAlgorithm {
 								}
 							}
 							//add the non-transit_walk-leg and the last activity - which must not be an "pt interaction"
+							((Leg) delegate).setRoute(null);
 							newPlanElements.add(delegate);
 							newPlanElements.add(temp.get(temp.size() - 1));
 						}

@@ -16,35 +16,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.routing;
+package playground.droeder.southAfrica.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.droeder.southAfrica.PtSubModeControler;
 
 /**
  * @author droeder
  *
  */
-public class PtSubModeDependRouterFactory implements TransitRouterFactory{
+public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
+	private Controler c;
 	
-	private boolean routeOnSameMode;
-	private Scenario sc;
-
 	/**
-	 * Factory to create the <code>PtSubModeDependendRouter</code>
-	 * @param sc
-	 * @param routeOnSameMode
+	 * <code>PlanStrategyModule</code> which reroutes pt-legs and stores pt-submodes.
+	 * Aborts if the controler is not an instance of instance of <code>PtSubModeControler</code>
+	 * @param c
 	 */
-	public PtSubModeDependRouterFactory(Controler c, boolean routeOnSameMode) {
-//		super(c);
-		this.sc = c.getScenario();
-		this.routeOnSameMode = routeOnSameMode;
+	public ReRoutePtSubModeStrategy(Controler c) {
+		super(c.getConfig().global());
+		if(!(c instanceof PtSubModeControler)){
+			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler...");
+		}
+		this.c = c;
 	}
-	// TODO[dr] create RouterNetworks only once per iteration and add them here to the router!
-	public TransitRouter createTransitRouter() {
-		return new PtSubModeDependendRouter(this.sc, this.routeOnSameMode);
+
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return this.c.createRoutingAlgorithm();
 	}
+
+//	@Override
+//	public void prepareReplanning() {
+//		
+//	}
+//
+//	@Override
+//	public void handlePlan(Plan plan) {
+//		this.c.createRoutingAlgorithm().run(plan);
+//	}
+//
+//	@Override
+//	public void finishReplanning() {
+//		
+//	}
 
 }

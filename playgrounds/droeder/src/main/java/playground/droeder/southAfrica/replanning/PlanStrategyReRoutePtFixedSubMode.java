@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+q * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -35,6 +35,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
+import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemoverStrategy;
+import playground.droeder.southAfrica.replanning.modules.ReRoutePtSubModeStrategy;
+import playground.droeder.southAfrica.replanning.modules.ReturnToOldModesStrategy;
 
 /**
  * @author droeder

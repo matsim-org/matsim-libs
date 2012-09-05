@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning;
+package playground.droeder.southAfrica.replanning.modules;
 
 import java.util.List;
 import java.util.Map;
@@ -58,6 +58,7 @@ public class ReturnToOldModesStrategy extends AbstractMultithreadedModule {
 			this.originalModes = originalModes;
 		}
 
+		private boolean thrown = false;
 		@Override
 		public void run(Plan plan) {
 			if(this.originalModes.containsKey(plan.getPerson().getId())){
@@ -73,8 +74,11 @@ public class ReturnToOldModesStrategy extends AbstractMultithreadedModule {
 						Leg l = (Leg) plan.getPlanElements().get(i);
 						String mode = legModes.get(i/2);
 						if(!l.getMode().equals(mode)){
-							log.warn("Changing Legmode for person " + plan.getPerson().getId() + " from " + l.getMode() 
-									+ " to " + mode + ".");
+							if(!this.thrown){
+								log.warn("Changing Legmode for person " + plan.getPerson().getId() + " from " + l.getMode() 
+										+ " to " + mode + ". Thrown only once (per thread)...");
+								this.thrown = true;
+							}
 							l.setMode(mode);
 						}
 					}
