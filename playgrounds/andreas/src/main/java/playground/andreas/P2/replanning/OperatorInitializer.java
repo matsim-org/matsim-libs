@@ -42,6 +42,7 @@ import playground.andreas.P2.routeProvider.PRouteProviderFactory;
  */
 public class OperatorInitializer {
 	
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(OperatorInitializer.class);
 	private PConfigGroup pConfig;
 	private CooperativeFactory cooperativeFactory;

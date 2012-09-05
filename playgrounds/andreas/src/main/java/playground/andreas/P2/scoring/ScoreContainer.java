@@ -21,7 +21,6 @@ package playground.andreas.P2.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 import playground.andreas.P2.scoring.fare.FareContainer;
 import playground.andreas.P2.scoring.operator.OperatorCostContainer;

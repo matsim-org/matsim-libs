@@ -55,6 +55,7 @@ import playground.andreas.P2.scoring.operator.OperatorCostCollectorHandler;
  */
 public class PBox implements StartupListener, IterationStartsListener, ScoringListener{
 	
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
 	private LinkedList<Cooperative> cooperatives;
