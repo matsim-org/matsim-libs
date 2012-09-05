@@ -76,7 +76,7 @@ public class HitchHikingControler extends MultiLegRoutingControler {
 	}
 
 	@Override
-	public TripRouterFactory getTripRouterFactory() {
+	protected void setUpTripRouterFactory( final TripRouterFactory tripRouterFactory ) {
 		TripRouterFactory factory = super.getTripRouterFactory();
 
 		// hitch hiking specific
@@ -94,8 +94,6 @@ public class HitchHikingControler extends MultiLegRoutingControler {
 					spots,
 					spotWeighter,
 					hhConfigGroup) );
-
-		return factory;
 	}
 }
 
