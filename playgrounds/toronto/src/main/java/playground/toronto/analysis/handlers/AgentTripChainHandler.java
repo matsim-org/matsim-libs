@@ -2,6 +2,7 @@ package playground.toronto.analysis.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,12 +16,10 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.toronto.analysis.ODMatrix;
 import playground.toronto.analysis.tripchains.AutoDriveComponent;
@@ -44,53 +43,35 @@ import playground.toronto.mapping.Link2ZoneMap;
  * @author pkucirek
  *
  */
-public class AgentTripChainHandler implements ActivityStartEventHandler, ActivityEndEventHandler,
+public class AgentTripChainHandler implements TransitDriverStartsEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
 	AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentArrivalEventHandler{
 
 	private static final Logger log = Logger.getLogger(AgentTripChainHandler.class);
 	
 	//Main components
 	private HashMap<Id, List<Trip>> personTripChainMap;
-	private TransitSchedule schedule;
 	private Link2ZoneMap linkToZoneMap;
-	
-	//OD Matrices of travel time components
-	private ODMatrix autoTravelTimes;
-	private ODMatrix transitWaitTimes;
-	private ODMatrix transitInVehicleTimes;
+	private HashSet<Id> driverIds;
 	
 	//Internal sets for assembling trip chains
-	private HashMap<Id, Trip> currentTrip;
+	private HashMap<Id, Trip> currentTrips;
 	private HashMap<Id, TripComponent> currentComponents;
 	private HashMap<Id, Tuple<Id,Id>> vehicleIdLineIdMap;
 	
 	////////////////////////////////////////////////////////////////////////////////
-	public AgentTripChainHandler(TransitSchedule tSchedule){
-		this.schedule = tSchedule;
-		//this.vehicles = vehList;
+	public AgentTripChainHandler(){
 		this.personTripChainMap = new HashMap<Id, List<Trip>>();
 		this.currentComponents = new HashMap<Id, TripComponent>();
-		this.currentTrip = new HashMap<Id, Trip>();
-		this.linkToZoneMap = null;
-		
-		this.mapVehicleIds();
+		this.currentTrips = new HashMap<Id, Trip>();
+		this.linkToZoneMap = null;	
+		this.driverIds = new HashSet<Id>();
+		this.vehicleIdLineIdMap = new HashMap<Id, Tuple<Id,Id>>();
 	}
 	
 	public void setLinkZoneMap(Link2ZoneMap map){
 		this.linkToZoneMap = map;
 	}
 	
-	private void mapVehicleIds(){
-		this.vehicleIdLineIdMap = new HashMap<Id, Tuple<Id,Id>>();
-		
-		for (TransitLine line : this.schedule.getTransitLines().values()){
-			for (TransitRoute route : line.getRoutes().values()){
-				for (Departure dep : route.getDepartures().values()){
-					vehicleIdLineIdMap.put(dep.getVehicleId(), new Tuple<Id, Id>(line.getId(), route.getId()));
-				}
-			}
-		}
-	}
 	
 	////////////////////////////////////////////////////////////////////////////////
 	private void addTrip(Id pid, Trip trip){
@@ -100,7 +81,12 @@ public class AgentTripChainHandler implements ActivityStartEventHandler, Activit
 	}
 	
 	private void addTripComponent(Id pid, TripComponent tcc){
-		Trip trip = this.currentTrip.get(pid);
+		if (this.driverIds.contains(pid)) return;
+		Trip trip = this.currentTrips.get(pid);
+		if (trip == null){
+			log.error("Could not find valid trip for agent " + pid + "!");
+			return;
+		}
 		trip.addComponent(tcc);
 	}
 
@@ -111,7 +97,9 @@ public class AgentTripChainHandler implements ActivityStartEventHandler, Activit
 	}
 	
 	public int getTripSize(Id pid){
-		return this.personTripChainMap.get(pid).size();
+		List<Trip> q = this.personTripChainMap.get(pid);
+		if (q == null) return 0;
+		return q.size();
 	}
 	
 	public ODMatrix getAvgTransitWalkTimeODM(){
@@ -146,7 +134,7 @@ public class AgentTripChainHandler implements ActivityStartEventHandler, Activit
 	@Override
 	public void reset(int iteration) {
 		this.currentComponents = new HashMap<Id, TripComponent>();
-		this.currentTrip = new HashMap<Id, Trip>();
+		this.currentTrips = new HashMap<Id, Trip>();
 		this.currentComponents = new HashMap<Id, TripComponent>();
 	}
 
@@ -165,6 +153,11 @@ public class AgentTripChainHandler implements ActivityStartEventHandler, Activit
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!this.vehicleIdLineIdMap.containsKey(event.getVehicleId()))
+			return; //Skips vehicles which are not transit vehicles
+		if (this.driverIds.contains(event.getPersonId()))
+			return; //skips transit drivers entering vehicles
+
 		Id pid = event.getPersonId();
 		TripComponent tcc = this.currentComponents.get(pid);
 		if (tcc == null){
@@ -211,11 +204,11 @@ public class AgentTripChainHandler implements ActivityStartEventHandler, Activit
 
 			Id pid = event.getPersonId();
 			Trip trip = new Trip(pid);
-
+			
 			if (this.linkToZoneMap != null){
 				trip.zone_o = this.linkToZoneMap.getZoneOfLink(event.getLinkId());
 			}
-			this.currentTrip.put(pid, trip);
+			this.currentTrips.put(pid, trip);
 		}
 		
 	}
@@ -224,12 +217,12 @@ public class AgentTripChainHandler implements ActivityStartEventHandler, Activit
 	public void handleEvent(ActivityStartEvent event) {
 		if (!event.getActType().equals(LegModes.interactionAct)){
 			Id pid = event.getPersonId();
-			Trip trip = this.currentTrip.get(pid);
+			Trip trip = this.currentTrips.get(pid);
 			if (this.linkToZoneMap != null){
 				trip.zone_d = this.linkToZoneMap.getZoneOfLink(event.getLinkId());
 			}
 			this.addTrip(pid, trip);
-			this.currentTrip.remove(pid);
+			this.currentTrips.remove(pid);
 		}
 	}
 	///////////////////////////////////////////////////////////////////////////////
@@ -267,6 +260,14 @@ public class AgentTripChainHandler implements ActivityStartEventHandler, Activit
 		public static final String inVehicleMode = "pt";
 		public static final String carMode = "car";
 		public static final String interactionAct = "pt interaction";
+	}
+
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.driverIds.add(event.getDriverId());
+		this.vehicleIdLineIdMap.put(event.getVehicleId(), new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId()));
+		
 	}
 	
 }

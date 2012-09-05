@@ -3,6 +3,7 @@ package playground.toronto.analysis.tripchains;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -20,6 +21,8 @@ public class Trip {
 	private Id pid;
 	private double startTime;
 	private double endTime;
+	private Coord fromCood;
+	private Coord toCoord;
 	
 	public Trip(Id personId){
 		this.components = new ArrayList<TripComponent>();

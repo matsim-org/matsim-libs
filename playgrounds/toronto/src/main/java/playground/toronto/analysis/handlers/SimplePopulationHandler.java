@@ -8,10 +8,13 @@ import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.TransitDriverStartsEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
-public class SimplePopulationHandler implements PersonEventHandler {
+public class SimplePopulationHandler implements PersonEventHandler, TransitDriverStartsEventHandler {
 
 	private HashSet<Id> pop;
+	private HashSet<Id> transitDrivers;
 	
 	public static void main(String[] args){
 		
@@ -31,6 +34,7 @@ public class SimplePopulationHandler implements PersonEventHandler {
 	
 	public SimplePopulationHandler(){
 		this.pop = new HashSet<Id>();
+		this.transitDrivers = new HashSet<Id>();
 	}
 
 	public HashSet<Id> getPop(){
@@ -40,10 +44,17 @@ public class SimplePopulationHandler implements PersonEventHandler {
 	@Override
 	public void reset(int iteration) {
 		this.pop = new HashSet<Id>();
+		this.transitDrivers = new HashSet<Id>();
 	}
 
 	@Override
 	public void handleEvent(PersonEvent event) {
+		if (this.transitDrivers.contains(event.getPersonId())) return;
 		this.pop.add(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.transitDrivers.add(event.getDriverId());
 	}
 }

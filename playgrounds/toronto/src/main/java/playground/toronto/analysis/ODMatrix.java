@@ -1,9 +1,14 @@
 package playground.toronto.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
 
 
 /**
@@ -23,15 +28,15 @@ import org.matsim.api.core.v01.Id;
 public class ODMatrix {
 
 	private HashMap<String, Double> mappedValues;
-	private final Set<Id> allZones;
+	private final Set<String> allZones;
 	private final double defaultValue;
 	
-	public ODMatrix(Set<Id> set){
+	public ODMatrix(Set<String> set){
 		this.allZones = set;
 		this.mappedValues = new HashMap<String, Double>();
 		this.defaultValue = 0.0;
 	}
-	public ODMatrix(Set<Id> set, double defaultValue){
+	public ODMatrix(Set<String> set, double defaultValue){
 		this.allZones = set;
 		this.mappedValues = new HashMap<String, Double>();
 		this.defaultValue = defaultValue;
@@ -127,8 +132,25 @@ public class ODMatrix {
 		return result;
 	}
 	
-	public void exportAs311File(String filename){
-		//TODO write code to export to .311 EMME matrix files
+	public void exportAs311File(String filename, int i, String name6char) throws IOException{
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+		writer.write("c Matrix exported from MATSim");
+		writer.newLine(); writer.write("c Exported at " + dateFormat.format(new Date()));
+		writer.newLine(); writer.write("t matrices");
+		writer.newLine(); writer.write("a mf" + i + " " + name6char + " default=" + this.defaultValue);
+		
+		for(Entry<String, Double> e : this.mappedValues.entrySet()){
+			int origin = Integer.parseInt(e.getKey().split(",")[0]);
+			int destination = Integer.parseInt(e.getKey().split(",")[1]);
+			double val = Math.round(e.getValue() * 100.0) / 100.0;
+			
+			writer.newLine();
+			writer.write(" " + origin + " " + destination + ":" + val);
+		}
+		
+		
 	}
 	
 }
