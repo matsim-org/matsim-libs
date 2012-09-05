@@ -68,13 +68,16 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	private StatsManager statsManager;
 
 	public PHook(Controler controler) {
-		this(controler, null);
+		this(controler, null, null);
 	}
 	
-	public PHook(Controler controler, PtMode2LineSetter lineSetter){
+	public PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory){
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
-		this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
+		this.pTransitRouterFactory = pTransitRouterFactory;
+		if (this.pTransitRouterFactory == null) {
+			this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
+		}
 		controler.setTransitRouterFactory(this.pTransitRouterFactory);
 		controler.setMobsimFactory(new PQSimFactory());
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
