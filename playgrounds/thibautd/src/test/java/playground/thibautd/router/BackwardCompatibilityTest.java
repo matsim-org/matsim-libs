@@ -288,16 +288,15 @@ public class BackwardCompatibilityTest {
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
 	public void testUnwrappedPlanRouting() {
-		PlanRouter planRouter = new PlanRouter( tripRouter );
 		for (Person person : controler.getPopulation().getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				Plan newPlan = new PlanImpl( person );
-				((PlanImpl) newPlan).copyPlan( plan );
+			for (Plan withNew : person.getPlans()) {
+				Plan withOld = new PlanImpl( person );
+				((PlanImpl) withOld).copyPlan( withNew );
 				
-				plansCalcRoute.run( newPlan );
-				planRouter.run( plan );
+				plansCalcRoute.run( withOld );
+				planRouter.run( withNew );
 
-				comparePlans( newPlan , plan );
+				comparePlans( withOld , withNew );
 			}
 		}
 	}
