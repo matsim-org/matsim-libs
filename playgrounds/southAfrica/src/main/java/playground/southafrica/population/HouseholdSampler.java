@@ -34,6 +34,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Households;
+import org.matsim.households.HouseholdsAlgorithmRunner;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.HouseholdsWriterV10;
@@ -101,13 +102,14 @@ public class HouseholdSampler {
 		/* Sets up the sampling algorithm. */
 		this.algorithm = new HouseholdSamplerAlgorithm(fraction);
 		HouseholdsImpl hhs = new HouseholdsImpl();
-		hhs.addAlgorithm(algorithm);
 
 		/* Run the household algorithm. */
 		HouseholdsReaderV10 hr = new HouseholdsReaderV10(hhs);
 		hr.readFile(hhf.getAbsolutePath());		
 		LOG.info("  original number of households: " + hhs.getHouseholds().size());
-		hhs.runAlgorithms();
+		HouseholdsAlgorithmRunner algos = new HouseholdsAlgorithmRunner();
+		algos.addAlgorithm(algorithm);
+		algos.runAlgorithms(hhs);
 		
 		/* Check if there are custom attributes with the households */
 		ObjectAttributes hha = null;
