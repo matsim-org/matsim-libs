@@ -69,7 +69,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String CONSTANT_OTHER = "constantOther" ;
 	private static final String CONSTANT_PT = "constantPt" ;
 	
-
+	private static final String WRITE_EXPERIENCED_PLANS = "writeExperiencedPlans";
+	
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
 
@@ -114,10 +115,6 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double constantPt   = 0. ;
 	private double constantBike = 0. ;
 	
-//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-//	private double marginalUtlOfDistanceCar = 0.0;
-//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-//	private double marginalUtlOfDistancePt = 0.0;
 	private double marginalUtlOfDistanceWalk = 0.0;
 
 	private double waiting = -0.0;
@@ -136,6 +133,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double constantOther = constantCar ;
 
 	private double travelingOther_utils_hr = traveling ;
+	
+	private boolean writeExperiencedPlans = false;
 
 	@Override
 	public String getValue(final String key) {
@@ -220,6 +219,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 			this.setConstantPt(Double.parseDouble(value)) ;
 		} else if ( CONSTANT_BIKE.equals(key)) {
 			this.setConstantBike(Double.parseDouble(value)) ;
+		} else if ( WRITE_EXPERIENCED_PLANS.equals(key)) {
+			this.setWriteExperiencedPlans(Boolean.parseBoolean(value));
 		} else if ((key != null) && key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			this.activityTypes.remove(actParams.getType());
@@ -267,8 +268,6 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(TRAVELING_OTHER, Double.toString(this.getTravelingOther_utils_hr()));
 		map.put(TRAVELING_BIKE, Double.toString(this.getTravelingBike_utils_hr()));
 		map.put(WAITING, Double.toString(this.getWaiting_utils_hr()));
-//		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, Double.toString(this.getMarginalUtlOfDistanceCar()));
-//		map.put(MARGINAL_UTL_OF_DISTANCE_PT, Double.toString(this.getMarginalUtlOfDistancePt()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_OTHER, Double.toString(this.getMarginalUtlOfDistanceOther()));
 		map.put(MARGINAL_UTL_OF_MONEY, Double.toString( this.getMarginalUtilityOfMoney() ) ) ;
@@ -280,6 +279,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(CONSTANT_OTHER, Double.toString( this.getConstantOther() )) ;
 		map.put(CONSTANT_BIKE, Double.toString( this.getConstantBike() )) ;
 		map.put(CONSTANT_PT, Double.toString( this.getConstantPt() )) ;
+		map.put(WRITE_EXPERIENCED_PLANS, Boolean.toString(this.writeExperiencedPlans));
 		int index = 0;
 		for(ActivityParams params : this.activityTypes.values()) {
 			String key = Integer.toString(index);
@@ -336,7 +336,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 		"default=0 to be backwards compatible for the time being" ) ;
 		map.put(CONSTANT_BIKE, "[utils] alternative-specific constant for bike.  no guarantee that this is used anywhere. " +
 		"default=0 to be backwards compatible for the time being" ) ;
-
+		map.put(WRITE_EXPERIENCED_PLANS, "write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
+		
 		return map ;
 	}
 
@@ -474,39 +475,22 @@ public class PlanCalcScoreConfigGroup extends Module {
 		this.marginalUtlOfDistanceWalk = marginalUtlOfDistanceWalk;
 	}
 
-//	/**
-//	 * @return the marginal utility of distance for mode pt per meter
-//	 */
-//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-//	private double getMarginalUtlOfDistancePt() {
-////		return this.marginalUtlOfDistancePt;
-//		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRatePt() ;
-//	}
 	/**
 	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
-//		this.marginalUtlOfDistancePt = marginalUtlOfDistancePt;
 		if ( marginalUtlOfDistancePt != 0. ) {
 			log.warn( "marginalUtlOfDistancePt is deprecated; setting monetaryDistanceCostRatePt instead.") ;
 			this.setMonetaryDistanceCostRatePt( marginalUtlOfDistancePt/this.getMarginalUtilityOfMoney() ) ;
 		}
 	}
-//	/**
-//	 * @return the marginal utility of distance for mode car per meter
-//	 */
-//	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-//	private double getMarginalUtlOfDistanceCar() {
-////		return this.marginalUtlOfDistanceCar;
-//		return this.getMarginalUtilityOfMoney() * this.getMonetaryDistanceCostRateCar() ;
-//	}
+
 	/**
 	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
-//		this.marginalUtlOfDistanceCar = marginalUtlOfDistanceCar;
 		if ( marginalUtlOfDistanceCar != 0. ) {
 			log.warn( "marginalUtlOfDistanceCar is deprecated; setting monetaryDistanceCostRateCar instead") ;
 			this.setMonetaryDistanceCostRateCar( marginalUtlOfDistanceCar/this.getMarginalUtilityOfMoney() ) ;
@@ -516,7 +500,9 @@ public class PlanCalcScoreConfigGroup extends Module {
 	public double getWaiting_utils_hr() {
 		return this.waiting;
 	}
+	
 	private static int setWaitingCnt=0 ;
+	
 	public void setWaiting_utils_hr(final double waiting) {
 		if ( (this.earlyDeparture != 0.) && (setWaitingCnt<1) ) {
 			setWaitingCnt++ ;
@@ -700,6 +686,14 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	public void setTravelingOther_utils_hr(double travelingOtherUtilsHr) {
 		travelingOther_utils_hr = travelingOtherUtilsHr;
+	}
+
+	public boolean isWriteExperiencedPlans() {
+		return writeExperiencedPlans;
+	}
+
+	public void setWriteExperiencedPlans(boolean outputExperience) {
+		this.writeExperiencedPlans = outputExperience;
 	}
 
 }

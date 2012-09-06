@@ -26,8 +26,6 @@ import org.matsim.core.scoring.EventsToLegs.LegHandler;
  */
 class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	
-	private boolean debug = true;
-	
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
 	private final TreeMap<Id,  ScoringFunction> agentScorers = new TreeMap<Id,ScoringFunction>();
@@ -35,7 +33,6 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	private final TreeMap<Id,  PlanImpl> agentRecords = new TreeMap<Id,PlanImpl>();
 
 	private Scenario scenario;
-	
 
 	public ScoringFunctionsForPopulation(Scenario scenario, ScoringFunctionFactory scoringFunctionFactory) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
@@ -45,7 +42,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			this.agentScorers.put(person.getId(), data);
 			
 		}
-		if (debug) {
+		if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				this.agentRecords.put(person.getId(), new PlanImpl());
 			}
@@ -71,7 +68,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
         ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
         if (scoringFunctionForAgent != null) {
             scoringFunctionForAgent.handleActivity(activity);
-            if (debug) {
+            if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
                 agentRecords.get(agentId).addActivity(activity);
             }
         }
@@ -82,7 +79,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
         ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
         if (scoringFunctionForAgent != null) {
             scoringFunctionForAgent.handleLeg(leg);
-            if (debug) {
+            if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
             	agentRecords.get(agentId).addLeg(leg);
             }
         }
@@ -92,15 +89,18 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		for (ScoringFunction sf : agentScorers.values()) {
 			sf.finish();
 		}
-		if (debug) {
-			PopulationImpl population = new PopulationImpl((ScenarioImpl) scenario);
-			for (Entry<Id, PlanImpl> entry : agentRecords.entrySet()) {
-				PersonImpl person = new PersonImpl(entry.getKey());
-				person.addPlan(entry.getValue());
-				population.addPerson(person);
-			}
-			new PopulationWriter(population, scenario.getNetwork()).writeV4(scenario.getConfig().controler().getOutputDirectory() + "/scored_plans.xml");
+	}
+
+	public void writeExperiencedPlans(String iterationFilename) {
+		PopulationImpl population = new PopulationImpl((ScenarioImpl) scenario);
+		for (Entry<Id, PlanImpl> entry : agentRecords.entrySet()) {
+			PersonImpl person = new PersonImpl(entry.getKey());
+			PlanImpl plan = entry.getValue();
+			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
+			person.addPlan(plan);
+			population.addPerson(person);
 		}
+		new PopulationWriter(population, scenario.getNetwork()).writeV5(iterationFilename);	
 	}
 
 }

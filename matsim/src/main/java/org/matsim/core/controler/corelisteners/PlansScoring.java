@@ -23,6 +23,8 @@ package org.matsim.core.controler.corelisteners;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -50,11 +52,14 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	private EventsManager events;
 
 	private ScoringFunctionFactory scoringFunctionFactory;
+
+	private OutputDirectoryHierarchy controlerIO;
 	
-	public PlansScoring( Scenario sc, EventsManager events, ScoringFunctionFactory scoringFunctionFactory ) {
+	public PlansScoring( Scenario sc, EventsManager events, OutputDirectoryHierarchy controlerIO, ScoringFunctionFactory scoringFunctionFactory ) {
 		this.sc = sc ;
 		this.events = events ;
 		this.scoringFunctionFactory = scoringFunctionFactory ;
+		this.controlerIO = controlerIO;
 	}
 
 	@Override
@@ -71,6 +76,9 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.events.removeHandler(this.eventsToScore);
+		if(sc.getConfig().planCalcScore().isWriteExperiencedPlans()) {
+			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
+		}
 	}
 
 	/** 
