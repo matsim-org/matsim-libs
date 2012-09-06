@@ -26,13 +26,6 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class HouseholdImplTest extends MatsimTestCase {
 	
-	public void testSetStreaming(){
-		HouseholdsImpl hhs = new HouseholdsImpl();
-		assertFalse("Streaming should be off.", hhs.isStreaming());
-		hhs.setStreaming(true);
-		assertTrue("Streaming should be on.", hhs.isStreaming());
-	}
-	
 	/**
 	 * Test that households with the same {@link Id} are not accepted.
 	 */
@@ -70,22 +63,5 @@ public class HouseholdImplTest extends MatsimTestCase {
 		assertTrue("Second household not present.", hhs.getHouseholds().containsValue(hh2));
 	}
 
-	
-	/**
-	 * Test that households are not accumulated if streaming is on.
-	 */
-	public void testAddHousehold_Streaming(){
-		HouseholdsImpl hhs = new HouseholdsImpl();
-		hhs.setStreaming(true);
-		Household hh1 = new HouseholdImpl(new IdImpl("1"));
-		Household hh2 = new HouseholdImpl(new IdImpl("2"));
-		
-		hhs.addHousehold(hh1);
-		assertEquals("Should not keep any household household added.", 0, hhs.getHouseholds().size());
-		hhs.addHousehold(hh2);
-		assertEquals("Should not keep any household household added.", 0, hhs.getHouseholds().size());
-	}
-	
-	
 }
 

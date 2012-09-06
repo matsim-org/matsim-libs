@@ -57,7 +57,7 @@ public class HouseholdsAlgorithmRunner {
 
 	public void runAlgorithms(Household h){
 		for(HouseholdAlgorithm algorithm : this.householdAlgorithms){
-			log.info("Running algorithm " + algorithm.getClass().getName());
+			log.info("Running algorithm " + algorithm.getClass().getName() + " on household " + h.getId());
 			algorithm.run(h);
 		}		
 	}

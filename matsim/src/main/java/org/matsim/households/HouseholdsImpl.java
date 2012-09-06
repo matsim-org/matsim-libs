@@ -19,15 +19,10 @@
  * *********************************************************************** */
 package org.matsim.households;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.households.algorithms.HouseholdAlgorithm;
 
 
 /**
@@ -37,15 +32,7 @@ import org.matsim.households.algorithms.HouseholdAlgorithm;
  */
 public class HouseholdsImpl implements Households{
 	
-	private final static Logger LOG = Logger.getLogger(HouseholdImpl.class);
-
-	@Deprecated 
-	private boolean isStreaming = false;
-	
-	@Deprecated 
-	private Counter counter = new Counter (" household # ");
-	@Deprecated 
-	private final List<HouseholdAlgorithm> householdAlgorithms = new ArrayList<HouseholdAlgorithm>();
+//	private final static Logger log = Logger.getLogger(HouseholdImpl.class);
 
 	private HouseholdsFactory factory;
 
@@ -72,85 +59,7 @@ public class HouseholdsImpl implements Households{
 			throw new IllegalArgumentException("Household with Id " + household.getId() + 
 					" already exisits.");
 		}
-		counter.incCounter();
-		
-		if(!isStreaming){
-			/* Streaming is off: just add the household to the container. */
-			this.households.put(household.getId(), household);
-		} else{
-			/* Streaming is in: run algorithm(s) on household and remove it */
-			
-			/* Add the household, for algorithms might reference the household
-			 * through `household = Households.getHouseholds.get(hhId);' */
-			this.households.put(household.getId(), household);
-			
-			/* Run each of the algorithms */
-			for(HouseholdAlgorithm algorithm : this.householdAlgorithms){
-				algorithm.run(household);
-			}
-			
-			/* Remove the household again as we are streaming. */
-			this.getHouseholds().remove(household.getId());
-		}
-	}
-	
-	
-	/**
-	 * Run all the algorithms added to the container. 
-	 * @deprecated use HouseholdsAlgorithmRunner instead
-	 */
-	@Deprecated
-	public final void runAlgorithms(){
-		if(!this.isStreaming){
-			for(int i = 0; i < this.householdAlgorithms.size(); i++){
-				HouseholdAlgorithm algorithm = this.householdAlgorithms.get(i);
-				LOG.info("Running algorithm " + algorithm.getClass().getName());
-				Counter c = new Counter ("  household # ");
-				for(Household household : this.getHouseholds().values()){
-					algorithm.run(household);
-					c.incCounter();
-				}
-				c.printCounter();
-				LOG.info("Done running algorithm.");
-			}
-		} else{
-			LOG.info("Household streaming is on. Algorithms were run during parsing.");
-		}
-	}
-	
-	
-	/**
-	 * Removes all the algorithms from the Households container.
-	 * @deprecated use HouseholdsAlgorithmRunner instead
-	 */
-	@Deprecated
-	public final void clearAlgorithms(){
-		this.householdAlgorithms.clear();
-	}
-	
-	
-	/**
-	 * Removes the first instance found of the algorithm from the list. It is 
-	 * possible that the same algorithm can appear multiple times in the list.
-	 * @param algorithm
-	 * @return
-	 * 	@deprecated use HouseholdsAlgorithmRunner instead
-	 */
-	@Deprecated
-	public boolean removeAlgorithm(final HouseholdAlgorithm algorithm){
-		return this.householdAlgorithms.remove(algorithm);
-	}
-	
-	
-	/**
-	 * Add the algorithm to the container. Algorithms will be executed in the
-	 * same sequence in which they are added.
-	 * @param algorithm
-	 * @deprecated use HouseholdsAlgorithmRunner instead
-	 */
-	@Deprecated
-	public final void addAlgorithm(final HouseholdAlgorithm algorithm){
-		this.householdAlgorithms.add(algorithm);
+		this.households.put(household.getId(), household);
 	}
 	
 	@Override
@@ -165,37 +74,6 @@ public class HouseholdsImpl implements Households{
 	@Override
 	public Map<Id, Household> getHouseholds() {
 		return this.households;
-	}
-	
-	/**
-	 * @deprecated use HouseholdsStreamingReaderV10 instead
-	 */
-	@Deprecated
-	public final boolean isStreaming(){
-		return this.isStreaming;
-	}
-	
-	
-	/**
-	 * Default is <code>false</code>. Set to <code>true</code> if you do not 
-	 * want to accumulate the {@link Household}s, but rather execute
-	 * a set of {@link HouseholdAlgorithm}s while reading the a households file.  
-	 * @param isStreaming
-	 * @deprecated use HouseholdsStreamingReaderV10 instead
-	 */
-	@Deprecated
-	public final void setStreaming(final boolean isStreaming){
-		this.isStreaming = isStreaming;
-	}
-	
-	/**
-	 * Prints the current value of the households counter. This should be the
-	 * same as the number of households in the container.
-	 * @deprecated could be invoked directly on this.counter
-	 */
-	@Deprecated
-	/*package*/ void printCounter(){
-		this.counter.printCounter();
 	}
 
 }
