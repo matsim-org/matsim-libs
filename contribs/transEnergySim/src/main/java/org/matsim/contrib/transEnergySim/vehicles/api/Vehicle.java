@@ -26,4 +26,5 @@ public interface Vehicle {
 
 	public double updateEnergyUse(Link link, double averageSpeedDrivenInMetersPerSecond);
 	
+	public void reset();
 }

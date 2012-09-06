@@ -27,7 +27,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyCo
  * @author wrashid
  *
  */
-public abstract class HybridElectricVehicle extends VehicleWithBattery {
+public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithBattery {
 
 	// TODO: both depletion mode and sustaining mode and other modes of use
 	// e.g. one mode which just switches to hybrid mode (soc not changing), when battery empty

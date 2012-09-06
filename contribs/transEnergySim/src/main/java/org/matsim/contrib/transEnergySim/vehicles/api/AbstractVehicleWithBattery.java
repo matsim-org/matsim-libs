@@ -24,54 +24,66 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.MathLib;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
 
-public abstract class VehicleWithBattery implements Vehicle {
+/**
+ * Provides the basic structure for a vehicle running on battery.
+ * 
+ * @author User
+ * 
+ */
+public abstract class AbstractVehicleWithBattery implements Vehicle {
 
 	/**
 	 * often not the full capacity of a battery can be used or is recommended to
 	 * be used, as this might reduce the life time of the battery.
 	 */
 	protected double usableBatteryCapacityInJoules;
-	
+
 	/**
 	 * state of charge
 	 */
 	protected double socInJoules;
-	
+
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
 
-	public double getRequiredEnergyInJoules(){
-		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules()-socInJoules;
-		
-		if (!MathLib.equals(requiredEnergyInJoules, 0, GeneralLib.EPSILON*100) && requiredEnergyInJoules<0){
+	public double getRequiredEnergyInJoules() {
+		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
+
+		if (!MathLib.equals(requiredEnergyInJoules, 0, GeneralLib.EPSILON * 100) && requiredEnergyInJoules < 0) {
 			DebugLib.stopSystemAndReportInconsistency("soc bigger than battery size");
 		}
-		
+
 		return requiredEnergyInJoules;
 	}
-	
-	public double getSocInJoules(){
+
+	public double getSocInJoules() {
 		return socInJoules;
 	}
-	
-	public void useBattery(double energyConsumptionInJoule){
-		socInJoules-=energyConsumptionInJoule;
+
+	public void useBattery(double energyConsumptionInJoule) {
+		socInJoules -= energyConsumptionInJoule;
 	}
-	
+
 	/**
 	 * This method is operated by the charging scheme
+	 * 
 	 * @param energyChargeInJoule
 	 */
-	public void chargeBattery(double energyChargeInJoule){
-		socInJoules+=energyChargeInJoule;
+	public void chargeBattery(double energyChargeInJoule) {
+		socInJoules += energyChargeInJoule;
 
-		
-		if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON*100) && socInJoules>getUsableBatteryCapacityInJoules()){
+		if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100)
+				&& socInJoules > getUsableBatteryCapacityInJoules()) {
 			DebugLib.stopSystemAndReportInconsistency("the car has been overcharged");
-		} 
+		}
 	}
 
 	public double getUsableBatteryCapacityInJoules() {
 		return usableBatteryCapacityInJoules;
+	}
+
+	@Override
+	public void reset() {
+		socInJoules = usableBatteryCapacityInJoules;
 	}
 
 }

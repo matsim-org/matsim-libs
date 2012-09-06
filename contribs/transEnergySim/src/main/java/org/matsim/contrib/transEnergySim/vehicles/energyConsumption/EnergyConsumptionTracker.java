@@ -75,6 +75,10 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		linkEnterTime = new DoubleValueHashMap<Id>();
 		previousLinkEntered = new HashMap<Id, Id>();
 		setLog(new EnergyConsumptionOutputLog());
+		
+		for (Vehicle vehicle:vehicles.values()){
+			vehicle.reset();
+		}
 	}
 
 	@Override

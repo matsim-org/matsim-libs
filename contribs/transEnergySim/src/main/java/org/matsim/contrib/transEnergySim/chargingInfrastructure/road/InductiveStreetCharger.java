@@ -35,7 +35,7 @@ import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControle
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
-import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -97,7 +97,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	}
 
 	private boolean ignoreAgent(Id agentId, Id linkId) {
-		return (samePowerAtAllLinks==null && !getChargableStreets().containsKey(linkId)) && !(getVehicles().get(agentId) instanceof VehicleWithBattery);
+		return (samePowerAtAllLinks==null && !getChargableStreets().containsKey(linkId)) && !(getVehicles().get(agentId) instanceof AbstractVehicleWithBattery);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 
 		double chargableEnergyInJoules = availablePowerInWatt * timeSpendOnLink;
 
-		VehicleWithBattery vehicleWithBattery = (VehicleWithBattery) getVehicles().get(personId);
+		AbstractVehicleWithBattery vehicleWithBattery = (AbstractVehicleWithBattery) getVehicles().get(personId);
 		double energyToChargeInJoules = 0;
 		if (vehicleWithBattery.getRequiredEnergyInJoules() <= chargableEnergyInJoules) {
 			energyToChargeInJoules = vehicleWithBattery.getRequiredEnergyInJoules();

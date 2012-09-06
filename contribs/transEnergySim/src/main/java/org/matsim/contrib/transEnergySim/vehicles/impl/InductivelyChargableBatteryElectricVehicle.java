@@ -28,12 +28,13 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyCo
  * @author wrashid
  *
  */
-public class IC_BEV extends BatteryElectricVehicle implements InductivlyChargable {
+public class InductivelyChargableBatteryElectricVehicle extends BatteryElectricVehicle implements InductivlyChargable {
 
-	public IC_BEV(EnergyConsumptionModel ecm, double batteryCapacityInJoules){
+	public InductivelyChargableBatteryElectricVehicle(EnergyConsumptionModel ecm, double batteryCapacityInJoules){
 		this.electricDriveEnergyConsumptionModel=ecm;
 		this.usableBatteryCapacityInJoules=batteryCapacityInJoules;
 		this.socInJoules=batteryCapacityInJoules;
 	}
+
 	 
 }

@@ -43,8 +43,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author wrashid
+ * Controller for starting a scenario, which includes the options for stationary
+ * charging at activity locations and inductive charging along the roads.
  * 
+ * @author rashid_waraich
  */
 public class InductiveChargingController extends AddHandlerAtStartupControler {
 
@@ -57,7 +59,7 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 		super(args);
 		init(vehicles);
 	}
-	
+
 	public InductiveChargingController(Config config, HashMap<Id, Vehicle> vehicles) {
 		super(config);
 		init(vehicles);
@@ -65,30 +67,36 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 	private void init(HashMap<Id, Vehicle> vehicles) {
 		this.vehicles = vehicles;
-		
-		EventHandlerGroupForRaceConditionAvoidance handlerGroup=new EventHandlerGroupForRaceConditionAvoidance();
-		
+
+		EventHandlerGroupForRaceConditionAvoidance handlerGroup = new EventHandlerGroupForRaceConditionAvoidance();
+
 		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network));
 		setInductiveCharger(new InductiveStreetCharger(vehicles, network, this));
 		setChargingUponArrival(new ChargingUponArrival(vehicles, this));
-		
+
 		handlerGroup.addHandler(getEnergyConsumptionTracker());
 		handlerGroup.addHandler(getInductiveCharger());
 		handlerGroup.addHandler(getChargingUponArrival());
-		
+
 		addHandler(handlerGroup);
 	}
-	
-	public void printToConsole(){
-		System.out.println("energyConsumption");
+
+	/**
+	 * Prints information to console regarding energy consumption, charging (stationary +
+	 * inductive along the roads) and EV drivers, who's vehicle ran out of
+	 * battery in the last iteration.
+	 */
+	public void printStatisticsToConsole() {
+		System.out.println("energy consumption stats");
 		energyConsumptionTracker.getLog().printToConsole();
 		System.out.println("===");
-		System.out.println("inductiveCharger");
-		inductiveCharger.getLog().printToConsole();
-		System.out.println("===");
-		System.out.println("chargingUponArrival");
+		System.out.println("stationary charging at activity locations (charging scheme: charging upon arrival)");
 		chargingUponArrival.getLog().printToConsole();
 		System.out.println("===");
+		System.out.println("inductive charging along roads");
+		inductiveCharger.getLog().printToConsole();
+		System.out.println("===");
+		System.out.println("electric vehicles drivers, who's vehicle ran out of battery");
 		VehicleUtils.printToConsoleVehiclesWhichRanOutOfBattery(vehicles);
 		System.out.println("===");
 	}
@@ -119,24 +127,24 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 	private class EventHandlerGroupForRaceConditionAvoidance implements ActivityStartEventHandler, AgentArrivalEventHandler,
 			AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
-		
+
 		protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
 
-		public void addHandler(EventHandler handler){
+		public void addHandler(EventHandler handler) {
 			this.handler.add(handler);
 		}
-		
+
 		@Override
 		public void reset(int iteration) {
-			for (EventHandler h:handler){
+			for (EventHandler h : handler) {
 				h.reset(iteration);
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			for (EventHandler h:handler){
-				if (h instanceof LinkLeaveEventHandler){
+			for (EventHandler h : handler) {
+				if (h instanceof LinkLeaveEventHandler) {
 					((LinkLeaveEventHandler) h).handleEvent(event);
 				}
 			}
@@ -144,8 +152,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			for (EventHandler h:handler){
-				if (h instanceof LinkEnterEventHandler){
+			for (EventHandler h : handler) {
+				if (h instanceof LinkEnterEventHandler) {
 					((LinkEnterEventHandler) h).handleEvent(event);
 				}
 			}
@@ -153,8 +161,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 		@Override
 		public void handleEvent(AgentDepartureEvent event) {
-			for (EventHandler h:handler){
-				if (h instanceof AgentDepartureEventHandler){
+			for (EventHandler h : handler) {
+				if (h instanceof AgentDepartureEventHandler) {
 					((AgentDepartureEventHandler) h).handleEvent(event);
 				}
 			}
@@ -162,8 +170,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 		@Override
 		public void handleEvent(AgentArrivalEvent event) {
-			for (EventHandler h:handler){
-				if (h instanceof AgentArrivalEventHandler){
+			for (EventHandler h : handler) {
+				if (h instanceof AgentArrivalEventHandler) {
 					((AgentArrivalEventHandler) h).handleEvent(event);
 				}
 			}
@@ -171,8 +179,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 		@Override
 		public void handleEvent(ActivityStartEvent event) {
-			for (EventHandler h:handler){
-				if (h instanceof ActivityStartEventHandler){
+			for (EventHandler h : handler) {
+				if (h instanceof ActivityStartEventHandler) {
 					((ActivityStartEventHandler) h).handleEvent(event);
 				}
 			}

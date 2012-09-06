@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author wrashid
  * 
  */
-public abstract class BatteryElectricVehicle extends VehicleWithBattery {
+public abstract class BatteryElectricVehicle extends AbstractVehicleWithBattery {
 
 	/**
 	 * as electric vehicles can run out of battery during the simulation, this
@@ -60,6 +60,12 @@ public abstract class BatteryElectricVehicle extends VehicleWithBattery {
 
 		useBattery(energyConsumptionForLinkInJoule);
 		return energyConsumptionForLinkInJoule;
+	}
+	
+	@Override
+	public void reset(){
+		super.reset();
+		didRunOutOfBattery=false;
 	}
 
 }

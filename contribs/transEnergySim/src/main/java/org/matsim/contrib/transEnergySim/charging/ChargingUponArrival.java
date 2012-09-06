@@ -33,7 +33,7 @@ import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.Charg
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPowerAtLink;
 import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
-import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -157,7 +157,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 		double chargableEnergyInJoules = availablePowerInWatt * parkingDuration;
 
-		VehicleWithBattery vehicleWithBattery = (VehicleWithBattery) vehicles.get(personId);
+		AbstractVehicleWithBattery vehicleWithBattery = (AbstractVehicleWithBattery) vehicles.get(personId);
 		double energyToChargeInJoules = 0;
 		if (vehicleWithBattery.getRequiredEnergyInJoules() <= chargableEnergyInJoules) {
 			energyToChargeInJoules = vehicleWithBattery.getRequiredEnergyInJoules();
@@ -193,7 +193,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	}
 
 	private boolean isVehicleWithBattery(Id personId) {
-		return vehicles.get(personId) instanceof VehicleWithBattery;
+		return vehicles.get(personId) instanceof AbstractVehicleWithBattery;
 	}
 
 	private void updatePreviousCarArrivalLinkId(AgentArrivalEvent event) {

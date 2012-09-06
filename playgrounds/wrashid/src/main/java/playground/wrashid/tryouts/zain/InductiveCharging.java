@@ -13,7 +13,7 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumptionModelGalus;
-import org.matsim.contrib.transEnergySim.vehicles.impl.IC_BEV;
+import org.matsim.contrib.transEnergySim.vehicles.impl.InductivelyChargableBatteryElectricVehicle;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,7 +44,7 @@ public class InductiveCharging {
 		}
 		*/
 		IdImpl agentId = new IdImpl("pid" + 0);
-		vehicles.put(agentId, new IC_BEV(ecm,batteryCapacityInJoules));
+		vehicles.put(agentId, new InductivelyChargableBatteryElectricVehicle(ecm,batteryCapacityInJoules));
 		
 		InductiveChargingController controller = new InductiveChargingController(config,vehicles);
 
@@ -70,7 +70,7 @@ public class InductiveCharging {
 		
 		controller.setOverwriteFiles(true);
 		controller.run();
-		controller.printToConsole();
+		controller.printStatisticsToConsole();
 		
 	}
 

@@ -27,8 +27,12 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 
 public class VehicleUtils {
 
+	/**
+	 * Prints all electric vehicles (the drivers agentId), which ran out of battery.
+	 * @param vehicles
+	 */
 	public static void printToConsoleVehiclesWhichRanOutOfBattery(HashMap<Id, Vehicle> vehicles){
-		System.out.println("Vehicles, which ran out of battery");
+		System.out.println("agentId");
 		
 		
 		for (Id personId:vehicles.keySet()){
