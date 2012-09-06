@@ -40,12 +40,12 @@ public class Net2GIS
         String outFileNameP;
         String outFileNameN;
 
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "D:\\PP-rad\\taxi\\poznan\\";
+        if (args.length == 0) {// for testing
+            dirName = "D:\\PP-rad\\matsim-poznan\\";
             netFileName = dirName + "network.xml";
-            outFileNameLs = dirName + "linksLs.shp";
-            outFileNameP = dirName + "linksP.shp";
-            outFileNameN = dirName + "nodes.shp";
+            outFileNameLs = dirName + "GIS\\linksLs.shp";
+            outFileNameP = dirName + "GIS\\linksP.shp";
+            outFileNameN = dirName + "GIS\\nodes.shp";
         }
         else if (args.length == 5) {
             dirName = args[0];
