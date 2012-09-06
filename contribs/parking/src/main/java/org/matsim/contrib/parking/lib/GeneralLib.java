@@ -90,6 +90,7 @@ public class GeneralLib {
 	public static final double numberOfSecondsInDay = 86400;
 	public static String eclipseLocalTempPath = "C:/eTmp";
 	public static Controler controler;
+	public static final double EPSILON = 1e-10;
 
 	/*
 	 * Reads the population from the plans file.
