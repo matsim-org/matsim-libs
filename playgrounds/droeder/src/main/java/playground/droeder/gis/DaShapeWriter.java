@@ -185,7 +185,7 @@ public class DaShapeWriter {
 		AttributeType[] attribs;
 		if(attributes == null){
 			if(links){
-				attribs = new AttributeType[4];
+				attribs = new AttributeType[5];
 			}else{
 				attribs = new AttributeType[2];
 			}
@@ -206,6 +206,7 @@ public class DaShapeWriter {
 			if(links){
 				attribs[2] = AttributeTypeFactory.newAttributeType("capacity",Double.class);
 				attribs[3] = AttributeTypeFactory.newAttributeType("length",Double.class);
+				attribs[4] = AttributeTypeFactory.newAttributeType("modes", String.class);
 			}
 		}
 		
@@ -284,6 +285,7 @@ public class DaShapeWriter {
 				attr = new TreeMap<String, Object>();
 				attr.put("capacity", l.getCapacity());
 				attr.put("length", l.getLength());
+				attr.put("modes", l.getAllowedModes().toString());
 				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attr);
 			}else{
 				feature = getLineStringFeature(new CoordinateArraySequence(coord), l.getId().toString(), attributes.get(l.getId()));
@@ -382,6 +384,9 @@ public class DaShapeWriter {
 	}
 	
 	private static Feature getLineStringFeature(CoordinateArraySequence c, String name, SortedMap<String, Object> attributes) {
+		if(c.toCoordinateArray().length < 2){
+			log.error("should never happen");
+		}
 		LineString s = geometryFactory.createLineString(c);
 		Object[] attribs ;
 		if(attributes == null){

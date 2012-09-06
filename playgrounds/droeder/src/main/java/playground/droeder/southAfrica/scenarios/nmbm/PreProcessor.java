@@ -70,10 +70,10 @@ public class PreProcessor {
 	
 	private final static String INPUTDIR = "E:/rsa/Data-nmbm/";
 		private final static String POPULATIONINPUTDIR = INPUTDIR + "population/20120831_100pct/"; 
-		private final static String INPUTNETWORK =  INPUTDIR + "transit/bus/NMBM_Bus_V1.xml.gz";
-		private final static String INPUTSCHEDULE = INPUTDIR + "transit/bus/Transitschedule_Bus_V1_WithVehicles.xml.gz";
-		private final static String INPUTVEHICLES = INPUTDIR + "transit/bus/transitVehicles_Bus_V1.xml.gz";
-	private final static String OUTDIR = "E:/rsa/server/sample_" + String.valueOf(SAMPLESIZE) + "/";
+		private final static String INPUTNETWORK =  INPUTDIR + "transit/bus&train/NMBM_PT_V1.xml.gz";
+		private final static String INPUTSCHEDULE = INPUTDIR + "transit/bus&train/Transitschedule_PT_V1_WithVehicles.xml.gz";
+		private final static String INPUTVEHICLES = INPUTDIR + "transit/bus&train/transitVehicles_PT_V1.xml.gz";
+	private final static String OUTDIR = "E:/rsa/server/sample_rail_" + String.valueOf(SAMPLESIZE) + "/";
 
 	
 	public static void main(String[] args) {

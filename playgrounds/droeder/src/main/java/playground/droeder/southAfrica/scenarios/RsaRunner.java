@@ -83,20 +83,8 @@ public class RsaRunner {
 			System.exit(1);
 		}
 		
-		
-		Config conf = ConfigUtils.loadConfig(configFile);
-		
-		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(conf.controler().getOutputDirectory(), conf.controler().getRunId(), true);
-		
-		TTtripAnalysisV4 ana =new TTtripAnalysisV4();
-		ana.run(
-				conf.plans().getInputFile(), 
-				conf.network().getInputFile(), 
-				dir.getIterationFilename(1, Controler.FILENAME_EVENTS_XML),
-				dir.getIterationPath(1));
-		
 				
-//		sim(configFile);
+		sim(configFile);
 		
 	}
 
@@ -134,46 +122,46 @@ public class RsaRunner {
 	}
 	
 }
-class ReRouteStuckHandler implements AgentStuckEventHandler, IterationStartsListener, StartupListener{
-	
-	
-	private List<Id> agentToReRoute;
-
-	public ReRouteStuckHandler(){
-		this.agentToReRoute = new ArrayList<Id>();
-	}
-
-	@Override
-	public void reset(int iteration) {
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		PlanStrategy strategy = null;
-		for(PlanStrategy ps: event.getControler().getStrategyManager().getStrategies()){
-			if(ps instanceof PlanStrategyReRoutePtFixedSubMode){
-				strategy = ps;
-				break;
-			}
-		}
-		if(!(strategy == null)){
-			Person p;
-			for(Id id: this.agentToReRoute){
-				p = event.getControler().getPopulation().getPersons().get(id);
-				strategy.run(p);
-			}
-		}
-		this.agentToReRoute.clear();
-	}
-
-	@Override
-	public void handleEvent(AgentStuckEvent event) {
-		this.agentToReRoute.add(event.getPersonId());
-	}
-
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		event.getControler().getEvents().addHandler(this);
-	}
-	
-}
+//class ReRouteStuckHandler implements AgentStuckEventHandler, IterationStartsListener, StartupListener{
+//	
+//	
+//	private List<Id> agentToReRoute;
+//
+//	public ReRouteStuckHandler(){
+//		this.agentToReRoute = new ArrayList<Id>();
+//	}
+//
+//	@Override
+//	public void reset(int iteration) {
+//	}
+//
+//	@Override
+//	public void notifyIterationStarts(IterationStartsEvent event) {
+//		PlanStrategy strategy = null;
+//		for(PlanStrategy ps: event.getControler().getStrategyManager().getStrategies()){
+//			if(ps instanceof PlanStrategyReRoutePtFixedSubMode){
+//				strategy = ps;
+//				break;
+//			}
+//		}
+//		if(!(strategy == null)){
+//			Person p;
+//			for(Id id: this.agentToReRoute){
+//				p = event.getControler().getPopulation().getPersons().get(id);
+//				strategy.run(p);
+//			}
+//		}
+//		this.agentToReRoute.clear();
+//	}
+//
+//	@Override
+//	public void handleEvent(AgentStuckEvent event) {
+//		this.agentToReRoute.add(event.getPersonId());
+//	}
+//
+//	@Override
+//	public void notifyStartup(StartupEvent event) {
+//		event.getControler().getEvents().addHandler(this);
+//	}
+//	
+//}
