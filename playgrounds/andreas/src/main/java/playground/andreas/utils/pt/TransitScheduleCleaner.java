@@ -282,4 +282,33 @@ public class TransitScheduleCleaner {
 		
 		return tS;
 	}
+
+	/**
+	 * @param schedule
+	 * @return
+	 */
+	public static TransitSchedule removeRoutesWithOnlyOneRouteStop(TransitSchedule schedule) {
+		log.info("Removing transitRoutes with only one stop...");
+		TransitSchedule tS = TransitScheduleCleaner.makeTransitScheduleModifiable(schedule);
+		Set<Id> routeIds;
+		for(TransitLine line: tS.getTransitLines().values()){
+			routeIds = new HashSet<Id>();
+			for(TransitRoute route: line.getRoutes().values()){
+				// a transitRoute with only one stop makes no sense
+				if(route.getStops().size() < 2){
+					routeIds.add(route.getId());
+				}
+			}
+			//remove identified routes
+			for(Id id: routeIds){
+				line.removeRoute(line.getRoutes().get(id));
+			}
+			// log only if something has been done
+			if(routeIds.size() > 0){
+				log.info("Following TransitRoutes are removed from TransitLine: " + line.getId() + ". " + routeIds.toString());
+			}
+			
+		}
+		return tS;
+	}
 }
