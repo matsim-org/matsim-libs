@@ -24,6 +24,13 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
 
+/**
+ * 
+ * 
+ * 
+ * @author User
+ *
+ */
 public class EnergyConsumptionOutputLog {
 
 	private LinkedList<EnergyConsumptionLogRow> log;

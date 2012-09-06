@@ -27,10 +27,16 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
 
 /**
- * TODO: make tests for this!!!
+ * This module provides the energy consumption by an PHEV/EV(?? TODO: check) based on
+ * different speeds. This work is based on the following paper (TODO: double check with Galus again)
  * 
+ * Galus, M. D. and G. Andersson (2009b) Power system considerations of plug-in
+ * hybrid electric vehicles based on a multi energy carrier model, paper
+ * presented at Power and Energy Society (PES) General Meeting, Calgary, Canada.
  * 
- * @author User
+ * TODO: also need to explain the discontinuation at speed 50.
+ * 
+ * @author rashid_waraich
  * 
  */
 public class EnergyConsumptionModelGalus implements EnergyConsumptionModel {
@@ -66,27 +72,25 @@ public class EnergyConsumptionModelGalus implements EnergyConsumptionModel {
 	 */
 	private double getInterpolatedEnergyConsumption(double speedInMetersPerSecond, double distanceInMeters) {
 		Iterator<EnergyConsumption> iter = queue.iterator();
-		
+
 		EnergyConsumption currentAverageConsumption = iter.next();
-			
-			if (ifSmallerThanMimimumSpeed(speedInMetersPerSecond, currentAverageConsumption)) {
-				return currentAverageConsumption.getEnergyConsumption() * distanceInMeters;
-			}
-			EnergyConsumption previousConsumption = null;
 
-			while (currentAverageConsumption.getSpeed() < speedInMetersPerSecond && iter.hasNext()) {
-				previousConsumption = currentAverageConsumption;
-				currentAverageConsumption = iter.next();
-			}
+		if (ifSmallerThanMimimumSpeed(speedInMetersPerSecond, currentAverageConsumption)) {
+			return currentAverageConsumption.getEnergyConsumption() * distanceInMeters;
+		}
+		EnergyConsumption previousConsumption = null;
 
-			
-			
-			if (ifHigherThanMaxSpeed(speedInMetersPerSecond, currentAverageConsumption)) {
-				return currentAverageConsumption.getEnergyConsumption() * distanceInMeters;
-			} else {
-				return getInterpolatedEnergyConsumption(previousConsumption, currentAverageConsumption, speedInMetersPerSecond)
-						* distanceInMeters;
-			}
+		while (currentAverageConsumption.getSpeed() < speedInMetersPerSecond && iter.hasNext()) {
+			previousConsumption = currentAverageConsumption;
+			currentAverageConsumption = iter.next();
+		}
+
+		if (ifHigherThanMaxSpeed(speedInMetersPerSecond, currentAverageConsumption)) {
+			return currentAverageConsumption.getEnergyConsumption() * distanceInMeters;
+		} else {
+			return getInterpolatedEnergyConsumption(previousConsumption, currentAverageConsumption, speedInMetersPerSecond)
+					* distanceInMeters;
+		}
 	}
 
 	private boolean ifHigherThanMaxSpeed(double speedInMetersPerSecond, EnergyConsumption currentAverageConsumption) {
@@ -125,11 +129,11 @@ public class EnergyConsumptionModelGalus implements EnergyConsumptionModel {
 		if (speed < smallerSpeedEC.getSpeed() || speed > biggerSpeedEC.getSpeed()) {
 			DebugLib.stopSystemAndReportInconsistency("input speed is not inside given interval");
 		}
-		
+
 		if (speed == smallerSpeedEC.getSpeed()) {
 			return smallerSpeedEC.getEnergyConsumption();
 		}
-		
+
 		if (speed == biggerSpeedEC.getSpeed()) {
 			return biggerSpeedEC.getEnergyConsumption();
 		}
@@ -139,20 +143,18 @@ public class EnergyConsumptionModelGalus implements EnergyConsumptionModel {
 
 		double interpolationFactor = differenceEnergyConsumption / differenceSpeed;
 
-		double result = smallerSpeedEC.getEnergyConsumption() + interpolationFactor
-				* (speed - smallerSpeedEC.getSpeed());
+		double result = smallerSpeedEC.getEnergyConsumption() + interpolationFactor * (speed - smallerSpeedEC.getSpeed());
 		return result;
 	}
 
 	@Override
 	public double getEnergyConsumptionForLinkInJoule(Link link, double averageSpeedDriven) {
-		return getEnergyConsumptionForLinkInJoule(link.getLength(),-1, averageSpeedDriven);
+		return getEnergyConsumptionForLinkInJoule(link.getLength(), -1, averageSpeedDriven);
 	}
 
 	@Override
-	public double getEnergyConsumptionForLinkInJoule(double drivenDistanceInMeters, double maxSpeedOnLink,
-			double averageSpeedDriven) {
-		return getInterpolatedEnergyConsumption(averageSpeedDriven,drivenDistanceInMeters);
+	public double getEnergyConsumptionForLinkInJoule(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven) {
+		return getInterpolatedEnergyConsumption(averageSpeedDriven, drivenDistanceInMeters);
 	}
 
 }

@@ -29,7 +29,6 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionLogRow;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionOutputLog;
-import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -37,19 +36,24 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-
 
 /**
- * This module can handle both the energy consumption of jdeqsim and qsim.
+ * This module tracks the energy consumption of vehicles based on event
+ * handling.
+ * 
+ * Special attention should be paid, when using this module in connection with
+ * parallelEventHandling, see comments regarding this on the matsim.org website. 
+ * 
+ * 
+ * 
+ * This module can handle both the energy consumption of
+ * jdeqsim and qsim.
  * 
  * TODO: add tests for this also
  * 
- * @author wrashid
+ * @author rashid_waraich
  * 
  */
 
@@ -65,9 +69,12 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	private final Network network;
 
+	private boolean loggingEnabled;
+
 	public EnergyConsumptionTracker(HashMap<Id, Vehicle> vehicles, Network network) {
 		this.vehicles = vehicles;
 		this.network = network;
+		enableLogging();
 	}
 
 	@Override
@@ -75,8 +82,8 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		linkEnterTime = new DoubleValueHashMap<Id>();
 		previousLinkEntered = new HashMap<Id, Id>();
 		setLog(new EnergyConsumptionOutputLog());
-		
-		for (Vehicle vehicle:vehicles.values()){
+
+		for (Vehicle vehicle : vehicles.values()) {
 			vehicle.reset();
 		}
 	}
@@ -115,7 +122,9 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		Vehicle vehicle = vehicles.get(personId);
 		double energyConsumptionInJoule = vehicle.updateEnergyUse(link, averageSpeedDrivenInMetersPerSecond);
 
-		getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
+		if (loggingEnabled) {
+			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
+		}
 	}
 
 	private boolean zeroTravelTime(double linkEnterTime, double linkLeaveTime) {
@@ -134,6 +143,14 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	public void setLog(EnergyConsumptionOutputLog log) {
 		this.log = log;
+	}
+
+	public void enableLogging() {
+		loggingEnabled = true;
+	}
+
+	public void disableLogging() {
+		loggingEnabled = false;
 	}
 
 }

@@ -48,7 +48,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
-
 /**
  * This class should work both with jdeqsim and mobsim.
  * 
@@ -68,12 +67,13 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 
 	private final Network network;
 	private Double samePowerAtAllLinks;
+	private boolean loggingEnabled;
 
-	public InductiveStreetCharger(HashMap<Id, Vehicle> vehicles, Network network,
-			AddHandlerAtStartupControler controller) {
+	public InductiveStreetCharger(HashMap<Id, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
 		this.setVehicles(vehicles);
 		this.network = network;
 		controller.addControlerListener(this);
+		enableLogging();
 	}
 
 	private void setVehicles(HashMap<Id, Vehicle> vehicles) {
@@ -97,7 +97,8 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	}
 
 	private boolean ignoreAgent(Id agentId, Id linkId) {
-		return (samePowerAtAllLinks==null && !getChargableStreets().containsKey(linkId)) && !(getVehicles().get(agentId) instanceof AbstractVehicleWithBattery);
+		return (samePowerAtAllLinks == null && !getChargableStreets().containsKey(linkId))
+				&& !(getVehicles().get(agentId) instanceof AbstractVehicleWithBattery);
 	}
 
 	@Override
@@ -137,8 +138,8 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 		}
 
 		double availablePowerInWatt;
-		if (samePowerAtAllLinks!=null){
-			availablePowerInWatt=samePowerAtAllLinks;
+		if (samePowerAtAllLinks != null) {
+			availablePowerInWatt = samePowerAtAllLinks;
 		} else {
 			availablePowerInWatt = getChargableStreets().get(linkId);
 		}
@@ -156,9 +157,11 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 		if (energyToChargeInJoules > 0) {
 			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 
-			ChargingLogRow chargingLogRow = new ChargingLogRow(personId, linkId, linkEnterTime, energyToChargeInJoules
-					/ availablePowerInWatt, energyToChargeInJoules);
-			getLog().add(chargingLogRow);
+			if (loggingEnabled) {
+				ChargingLogRow chargingLogRow = new ChargingLogRow(personId, linkId, linkEnterTime, energyToChargeInJoules
+						/ availablePowerInWatt, energyToChargeInJoules);
+				getLog().add(chargingLogRow);
+			}
 		}
 
 	}
@@ -210,6 +213,14 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 		if (getChargableStreets() != null && getChargableStreets().size() > 0) {
 			DebugLib.stopSystemAndReportInconsistency("when using method 'setSamePowerAtAllStreets', manipulation of individual roads not allowed ");
 		}
+	}
+
+	public void enableLogging() {
+		loggingEnabled = true;
+	}
+
+	public void disableLogging() {
+		loggingEnabled = false;
 	}
 
 }

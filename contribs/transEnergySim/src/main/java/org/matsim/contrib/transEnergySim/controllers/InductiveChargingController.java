@@ -68,7 +68,7 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 	private void init(HashMap<Id, Vehicle> vehicles) {
 		this.vehicles = vehicles;
 
-		EventHandlerGroupForRaceConditionAvoidance handlerGroup = new EventHandlerGroupForRaceConditionAvoidance();
+		EventHandlerGroup handlerGroup = new EventHandlerGroup();
 
 		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network));
 		setInductiveCharger(new InductiveStreetCharger(vehicles, network, this));
@@ -125,67 +125,6 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 		this.energyConsumptionTracker = energyConsumptionTracker;
 	}
 
-	private class EventHandlerGroupForRaceConditionAvoidance implements ActivityStartEventHandler, AgentArrivalEventHandler,
-			AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
-
-		public void addHandler(EventHandler handler) {
-			this.handler.add(handler);
-		}
-
-		@Override
-		public void reset(int iteration) {
-			for (EventHandler h : handler) {
-				h.reset(iteration);
-			}
-		}
-
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			for (EventHandler h : handler) {
-				if (h instanceof LinkLeaveEventHandler) {
-					((LinkLeaveEventHandler) h).handleEvent(event);
-				}
-			}
-		}
-
-		@Override
-		public void handleEvent(LinkEnterEvent event) {
-			for (EventHandler h : handler) {
-				if (h instanceof LinkEnterEventHandler) {
-					((LinkEnterEventHandler) h).handleEvent(event);
-				}
-			}
-		}
-
-		@Override
-		public void handleEvent(AgentDepartureEvent event) {
-			for (EventHandler h : handler) {
-				if (h instanceof AgentDepartureEventHandler) {
-					((AgentDepartureEventHandler) h).handleEvent(event);
-				}
-			}
-		}
-
-		@Override
-		public void handleEvent(AgentArrivalEvent event) {
-			for (EventHandler h : handler) {
-				if (h instanceof AgentArrivalEventHandler) {
-					((AgentArrivalEventHandler) h).handleEvent(event);
-				}
-			}
-		}
-
-		@Override
-		public void handleEvent(ActivityStartEvent event) {
-			for (EventHandler h : handler) {
-				if (h instanceof ActivityStartEventHandler) {
-					((ActivityStartEventHandler) h).handleEvent(event);
-				}
-			}
-		}
-
-	}
 
 }

@@ -48,7 +48,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityOption;
 
-
 /**
  * This module is not compatible with parking search, but should be with parking
  * choice. TODO: when those modules are finished, check if this is really a
@@ -100,12 +99,14 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 	private PowerAvalabilityParameters powerAvalabilityParameters;
 
-	public ChargingUponArrival(HashMap<Id, Vehicle> vehicles, 
-			AddHandlerAtStartupControler controller) {
+	private boolean loggingEnabled;
+
+	public ChargingUponArrival(HashMap<Id, Vehicle> vehicles, AddHandlerAtStartupControler controller) {
 		this.vehicles = vehicles;
 		this.setDefaultValues(chargablePowerAtActivityTypes);
 		controller.addControlerListener(this);
-		chargablePowerAtActivityTypes=new DoubleValueHashMap<String>();
+		chargablePowerAtActivityTypes = new DoubleValueHashMap<String>();
+		enableLogging();
 	}
 
 	@Override
@@ -146,13 +147,12 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 		availablePowerInWatt = getChargablePowerAtActivityTypes().get(activityType);
 
-		if (availablePowerInWatt==0){
+		if (availablePowerInWatt == 0) {
 			return;
 		}
-		
+
 		if (availablePowerInWatt == null) {
-			DebugLib.stopSystemAndReportInconsistency("power at all activity types needs to be specified, missing:"
-					+ activityType);
+			DebugLib.stopSystemAndReportInconsistency("power at all activity types needs to be specified, missing:" + activityType);
 		}
 
 		double chargableEnergyInJoules = availablePowerInWatt * parkingDuration;
@@ -167,10 +167,11 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 		if (energyToChargeInJoules > 0) {
 			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
-
-			ChargingLogRow chargingLogRow = new ChargingLogRow(personId, firstFacilityIdAfterCarArrival.get(personId),
-					carArrivalTime, energyToChargeInJoules / availablePowerInWatt, energyToChargeInJoules);
-			getLog().add(chargingLogRow);
+			if (loggingEnabled) {
+				ChargingLogRow chargingLogRow = new ChargingLogRow(personId, firstFacilityIdAfterCarArrival.get(personId),
+						carArrivalTime, energyToChargeInJoules / availablePowerInWatt, energyToChargeInJoules);
+				getLog().add(chargingLogRow);
+			}
 		}
 
 	}
@@ -258,7 +259,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	public void setChargablePowerAtActivityTypes(DoubleValueHashMap<String> chargablePowerAtActivityTypes) {
 		this.chargablePowerAtActivityTypes = chargablePowerAtActivityTypes;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		initPowerAvailableAtStartup();
@@ -285,8 +286,6 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		this.setChargablePowerAtActivityTypes(chargablePowerAtActivityTypes);
 	}
 
-	
-
 	private class PowerAvalabilityParameters {
 
 		private ActivityFacilities facilities;
@@ -305,6 +304,14 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 			this.powerInWatt = powerInWatt;
 		}
 
+	}
+
+	public void enableLogging() {
+		loggingEnabled = true;
+	}
+
+	public void disableLogging() {
+		loggingEnabled = false;
 	}
 
 }
