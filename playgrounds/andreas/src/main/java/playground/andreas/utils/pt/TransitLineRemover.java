@@ -54,13 +54,13 @@ public class TransitLineRemover {
 		new TransitScheduleReaderV1(baseCaseTransitSchedule, network, scenario).readFile(SCHEDULEFILE);
 		
 		// Move one stop to a new link (wrong matching in original model)
-		for (TransitStopFacility stop : baseCaseTransitSchedule.getFacilities().values()) {
-			if (stop.getId().toString().equalsIgnoreCase("202070.1")) {
-				log.info("Moving stop facility " + stop.getId() + " " + stop.getName() + " from link " + stop.getLinkId() + "...");
-				stop.setLinkId(new IdImpl("108036"));
-				log.info("... to link " + stop.getLinkId());
-			}
-		}
+//		for (TransitStopFacility stop : baseCaseTransitSchedule.getFacilities().values()) {
+//			if (stop.getId().toString().equalsIgnoreCase("202070.1")) {
+//				log.info("Moving stop facility " + stop.getId() + " " + stop.getName() + " from link " + stop.getLinkId() + "...");
+//				stop.setLinkId(new IdImpl("108036"));
+//				log.info("... to link " + stop.getLinkId());
+//			}
+//		}
 		
 		
 		Set<Id> stopsInArea = TransitLineRemover.getStopIdsWithinArea(baseCaseTransitSchedule, minCoord, maxCoord);
