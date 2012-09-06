@@ -160,7 +160,7 @@ public class RunMunichZone30Controller extends AbstractController {
 	}
 	private PlansScoring buildPlansScoring() {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
-		final PlansScoring plansScoring = new PlansScoring( this.scenario, this.eventsManager, scoringFunctionFactory );
+		final PlansScoring plansScoring = new PlansScoring( this.scenario, this.eventsManager, controlerIO, scoringFunctionFactory );
 		return plansScoring;
 	}
 

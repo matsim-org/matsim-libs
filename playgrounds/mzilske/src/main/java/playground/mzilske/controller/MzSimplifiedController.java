@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.run;
+package playground.mzilske.controller;
 
 
 import java.util.Collection;
@@ -43,19 +43,8 @@ import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
@@ -91,9 +80,9 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
  * @author nagel
  *
  */
-public class KnSimplifiedController extends AbstractController {
+public class MzSimplifiedController extends AbstractController {
 
-	public static Logger log = Logger.getLogger(KnSimplifiedController.class);
+	public static Logger log = Logger.getLogger(MzSimplifiedController.class);
 
 	private Config config;
 
@@ -114,15 +103,13 @@ public class KnSimplifiedController extends AbstractController {
 
 
 	
-	public KnSimplifiedController(Scenario sc) {
+	public MzSimplifiedController(Scenario sc) {
 		this.scenarioData = sc;
-		this.config = sc.getConfig();
 	}
 
 	public void run() {
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
-		this.setupOutputDirectory(config.controler().getOutputDirectory(), config.controler().getRunId(), true);
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
 		this.eventsManager = EventsUtils.createEventsManager(config); 
@@ -131,7 +118,7 @@ public class KnSimplifiedController extends AbstractController {
 		this.legTimes = new CalcLegTimes();
 		this.eventsManager.addHandler(legTimes);
 		this.travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.eventsManager.addHandler(travelTime);	
+		this.eventsManager.addHandler(travelTime);
 		super.run(config);
 	}
 
@@ -243,25 +230,14 @@ public class KnSimplifiedController extends AbstractController {
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenarioData);
+				return new PersonPrepareForSim(createRoutingAlgorithm(), MzSimplifiedController.this.scenarioData);
 			}
 		});
 	}
 	
 	@Override
 	protected void runMobSim(int iteration) {
-		QSim qSim = new QSim( this.scenarioData, this.eventsManager ) ;
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, MatsimRandom.getRandom());
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim.addMobsimEngine(teleportationEngine);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenarioData.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
+		QSim simulation = new QSim( this.scenarioData, this.eventsManager ) ;
 		if (config.controler().getWriteSnapshotsInterval() != 0 && iteration % config.controler().getWriteSnapshotsInterval() == 0) {
 			// yyyy would be nice to have the following encapsulated in some way:
 			// === begin ===
@@ -272,9 +248,10 @@ public class KnSimplifiedController extends AbstractController {
 			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
 			manager.addSnapshotWriter(snapshotWriter);
 			// === end ===
-			qSim.addQueueSimulationListeners(manager);
+			simulation.addQueueSimulationListeners(manager);
 		}
-		qSim.run();
+		Mobsim sim = simulation;
+		sim.run();
 	}
 
 }
