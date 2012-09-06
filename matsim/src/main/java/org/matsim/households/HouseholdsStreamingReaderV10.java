@@ -56,6 +56,9 @@ public class HouseholdsStreamingReaderV10 extends AbstractHouseholdsReaderV10 {
 	}
 	
 	public void readFileRunAlgorithmsAndWriteFile(String inputFile, String outputFile){
+		if (inputFile.equalsIgnoreCase(outputFile)){
+			throw new IllegalArgumentException("Inputfile and outputfile must not refer to the same filename!");
+		}
 		hhWriter = new HouseholdsWriterV10(super.getHouseholds());
 		hhWriter.openFileAndWritePreamble(outputFile);
 		super.parse(inputFile);
