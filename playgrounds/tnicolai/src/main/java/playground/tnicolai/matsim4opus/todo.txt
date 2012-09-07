@@ -1,5 +1,10 @@
 Todos:
 
+- Sensitivity Test (Schöneichtunnel): investigate if the travel demand is shifted in time (opening hour between 7 - 9 am)
+- GUI: 
+     - input_plans_file rename in warmstart_plans_file
+     - hotstart_plans_file ersetzen such Flag "disable_hotstart" (debugging), d.h. by default mimer aktiv
+- MAUT: Generalized Cost zurückgeben (separat oder in Persons table …)
 - TODO: Identifiziere für jeden Messpunkt den Startknoten. Messpunkte mit dem gleichen Startknoten haben, haben auf dem Netzwerk die gleichen Kosten zu allen Knoten, d.h. den Baum für die weiteren Messpunkte weiterverwerten!
 	   - Damit steigt die Komplexität der Accessibility-Berechnung bei beliebig hohen Auflösungen kaum noch an (was jetzt noch der Fall ist)
 	   Alternativ (aber weniger gut), ermittle alle Netzwerkknoten im Untersuchungsgebeit (z.B. Shapefile/Boundingbox) nur für diese Knoten wird der LCPT ausgeführt. Nachteil, Komplexität skaliert bei geringen Auflösungen nicht nach unten. 

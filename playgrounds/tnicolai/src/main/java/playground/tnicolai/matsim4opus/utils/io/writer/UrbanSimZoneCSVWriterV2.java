@@ -77,6 +77,36 @@ public class UrbanSimZoneCSVWriterV2 {
 	}
 	
 	/**
+	 * writing the accessibility measures into csv file
+	 * 
+	 * @param startZone
+	 * @param freeSpeedAccessibility
+	 * @param carAccessibility
+	 * @param bikeAccessibility
+	 * @param walkAccessibility
+	 */
+	@Deprecated
+	public static synchronized void write(Id startZone,
+							 double freeSpeedAccessibility,
+							 double carAccessibility, 
+							 double bikeAccessibility,
+							 double walkAccessibility){
+		
+		try{
+			assert(UrbanSimZoneCSVWriterV2.zoneWriter != null);
+			zoneWriter.write( ((Id)startZone).toString() + "," + 
+							  freeSpeedAccessibility + "," + 
+							  carAccessibility + "," + 
+							  bikeAccessibility + "," +
+							  walkAccessibility );
+			zoneWriter.newLine();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * finalize and close csv file
 	 */
 	public static void close(){

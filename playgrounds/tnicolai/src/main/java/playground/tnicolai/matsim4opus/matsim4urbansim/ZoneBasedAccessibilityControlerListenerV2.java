@@ -213,20 +213,20 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
 				}
 
-//				// writing accessibility measures of current node in csv format (UrbanSim input)
-//				UrbanSimZoneCSVWriterV2.write(originZoneID,
-//												freeSpeedAccessibility,
-//												carAccessibility,
-//												bikeAccessibility,
-//												walkAccessibility);
-//				// writing complete zones information for further analysis
-//				AnalysisZoneCSVWriterV2.write(originZoneID, 
-//											zones[fromIndex].getZoneCoordinate(), 
-//											fromNode.getCoord(), 
-//											freeSpeedAccessibility,
-//											carAccessibility,
-//											bikeAccessibility,
-//											walkAccessibility);
+				// writing accessibility measures of current node in csv format (UrbanSim input)
+				UrbanSimZoneCSVWriterV2.write(originZoneID,
+												freeSpeedAccessibility,
+												carAccessibility,
+												bikeAccessibility,
+												walkAccessibility);
+				// writing complete zones information for further analysis
+				AnalysisZoneCSVWriterV2.write(originZoneID, 
+											zones[fromIndex].getZoneCoordinate(), 
+											fromNode.getCoord(), 
+											freeSpeedAccessibility,
+											carAccessibility,
+											bikeAccessibility,
+											walkAccessibility);
 			}
 			System.out.println("");
 			// finalizing/closing csv file containing accessibility measures

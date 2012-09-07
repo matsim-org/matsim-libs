@@ -82,6 +82,43 @@ public class AnalysisZoneCSVWriterV2 {
 	}
 	
 	/**
+	 * writing the accessibility measures into csv file
+	 * 
+	 * @param startZone
+	 * @param zoneCentroid
+	 * @param nearestNode
+	 * @param carAccessibility
+	 * @param bikeAccessibility
+	 * @param walkAccessibility
+	 */
+	@Deprecated
+	public static void write(Id startZone,
+							 Coord zoneCentroid,
+							 Coord nearestNode,
+							 double freeSpeedAccessibility,
+							 double carAccessibility, 
+							 double bikeAccessibility,
+							 double walkAccessibility){
+		
+		try{
+			assert(AnalysisZoneCSVWriterV2.zoneCSVWriter != null);
+			zoneCSVWriter.write( ((Id)startZone).toString() + "," + 
+								 zoneCentroid.getX() + "," + 
+								 zoneCentroid.getY() + "," + 
+								 nearestNode.getX() + "," + 
+								 nearestNode.getY() + "," + 
+								 freeSpeedAccessibility + "," +
+								 carAccessibility + "," + 
+								 bikeAccessibility + "," +
+								 walkAccessibility );
+			zoneCSVWriter.newLine();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * finalize and close csv file
 	 */
 	public static void close(){
