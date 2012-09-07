@@ -118,7 +118,7 @@ public class EvacuationConfig {
 	 */
 	public static enum PreEvacuationTime {TIME0, TIME8, TIME16};
 	public static enum EvacuationReason {WATER, FIRE, CHEMICAL, ATOMIC};
-	public static PreEvacuationTime leaveModelPreEvacuationTime = PreEvacuationTime.TIME0;
+	public static PreEvacuationTime leaveModelPreEvacuationTime = PreEvacuationTime.TIME8;
 	public static EvacuationReason leaveModelEvacuationReason = EvacuationReason.ATOMIC;
 	
 	public static double leaveModelHasChildren = 0.60;

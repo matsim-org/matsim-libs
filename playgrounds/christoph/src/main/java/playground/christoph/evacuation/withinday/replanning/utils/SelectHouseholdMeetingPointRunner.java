@@ -247,18 +247,42 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			if (hdd.getHouseholdEvacuateFromHomeTime() < hdd.getLatestAcceptedLeaveTime()) {
 				hdd.setMeetingPointFacilityId(hdd.getHomeFacilityId());
 			} else {
+							
+				// if evacuating from home is faster than directly, meet at home
+				if (fromHome <= direct) {
+					hdd.setMeetingPointFacilityId(hdd.getHomeFacilityId());
+				}
 				
 				/*
-				 * TODO: the household might be willing to meet at home even if that takes longer.
-				 * How to define "longer"? E.g. 30 Minutes are always accepted, more than 60 Minutes
-				 * never, in between a random value based on the household id is used. Take
-				 * travel time into account? Take ratio difference/travel time into account?
+				 * Check how much longer evacuation from home takes. If the time difference is
+				 * not to large, it still might be an option.
 				 */
-				if (direct < fromHome) {
-					hdd.setMeetingPointFacilityId(scenario.createId("rescueFacility"));
-				} else {
-					hdd.setMeetingPointFacilityId(hdd.getHomeFacilityId());
-				}				
+				else {
+					/*
+					 * TODO: the household might be willing to meet at home even if that takes longer.
+					 * How to define "longer"? E.g. 30 Minutes are always accepted, more than 60 Minutes
+					 * never, in between a random value based on the household id is used. Take
+					 * travel time into account? Take ratio difference/travel time into account?
+					 * 
+					 * So far:
+					 * - 0..60 minutes in total
+					 * - 0..30 minutes randomly based on households Id
+					 * - 0..30 minutes based on ratio tDirect / tFromHome (for tDirect << tFromHome -> ~ 0 min) 
+					 */
+					double tDirect = direct - time;
+					double tFromHome = fromHome - time;
+					double ratio = tDirect / tFromHome;	// should be 0.0 .. 1.0
+					if (ratio < 0.0 || ratio > 1.0) throw new RuntimeException("Unexpected ratio tDirect/tFromHome was found: " + ratio);
+					
+					double rand = this.random.nextDouble();
+					double delta = rand * 1800.0 + ratio * 1800.0;
+					
+					if (direct < fromHome - delta) {
+						hdd.setMeetingPointFacilityId(scenario.createId("rescueFacility"));
+					} else {
+						hdd.setMeetingPointFacilityId(hdd.getHomeFacilityId());
+					}
+				}			
 			}
 		}
 	}
