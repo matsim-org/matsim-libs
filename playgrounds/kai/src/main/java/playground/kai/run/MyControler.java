@@ -53,14 +53,14 @@ class MyControler {
 		controler.setOverwriteFiles(true) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.setMobsimFactory(new MyMobsimFactory()) ;
+//		controler.setMobsimFactory(new PatnaMobsimFactory()) ;
 
 		// run everything:
 		controler.run();
 	
 	}
 	
-	static class MyMobsimFactory implements MobsimFactory {
+	static class PatnaMobsimFactory implements MobsimFactory {
 		private boolean useOTFVis = false ;
 
 		@Override
