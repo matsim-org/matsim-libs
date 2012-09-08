@@ -83,6 +83,9 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @return the weight of the plan
 	 */
 	protected double calcPlanWeight(final Plan plan, final double maxScore) {
+		// NOTE: The deduction of "maxScore" from all scores is a numerical trick.  It ensures that the values of exp(...)
+		// are in some normal range, instead of close to numerical infinity.  The latter leads to numerically instable
+		// results (this is not fiction; we had that some time ago). kai, aug'12
 
 		if (plan.getScore() == null) {
 			return Double.NaN;
@@ -112,6 +115,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 
 		for (Plan plan : person.getPlans()) {
 			weights.put(plan, this.calcPlanWeight(plan, maxScore));
+			// see note in calcPlanWeight!
 		}
 
 		return weights;
