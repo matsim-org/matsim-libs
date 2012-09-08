@@ -118,14 +118,20 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 			log.warn(NO_CONFIGGROUP_SET_WARNING);
 		}
 
+		// for all network modes, a network router is added:
 		Collection<String> networkModes = this.configGroup.getNetworkModes();
 		for (String mode : networkModes) {
 			this.addLegHandler(mode, new NetworkLegRouter(this.network, this.routeAlgo, this.routeFactory));
 		}
+		
+		// for all modes that have teleported mode speeds, a router is added based on teleported mode speed:
 		Map<String, Double> teleportedModeSpeeds = this.configGroup.getTeleportedModeSpeeds();
 		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
 			this.addLegHandler(entry.getKey(), new TeleportationLegRouter(this.routeFactory, entry.getValue(), this.configGroup.getBeelineDistanceFactor()));
 		}
+		
+		// for all modes that have freespeed factors, a router is added based on freespeed factors. Presumably overwrites
+		// routers based on teleported mode speeds.
 		Map<String, Double> teleportedModeFreespeedFactors = this.configGroup.getTeleportedModeFreespeedFactors();
 		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
 			this.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.network, this.routeAlgoPtFreeflow, entry.getValue(), this.configGroup.getBeelineDistanceFactor(), this.routeFactory));

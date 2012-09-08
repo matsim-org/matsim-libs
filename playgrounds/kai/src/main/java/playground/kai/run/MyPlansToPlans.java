@@ -64,7 +64,8 @@ public class MyPlansToPlans {
 //		plans.printPlansCount();
 //		plansWriter.closeStreaming();
 
-		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
+//		String configFileName = "/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/config/kaiconfig.xml" ;
+		String configFileName = args[0] ;
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFileName) ;
 		Scenario sc = sl.loadScenario() ;
 		Population pop = sc.getPopulation();
