@@ -227,7 +227,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			return new InputSource(is);
 		} catch (IOException e) {
 			// There was a problem getting the (remote) file, just show the error as information for the user
-			log.error(e.toString() + ". May not be fatal." ) ;
+			log.warn(e.toString() + ". May not be fatal." ) ;
 		}
 		// systemId could not be resolved, try it locally
 		if (this.localDtdBase != null) {
