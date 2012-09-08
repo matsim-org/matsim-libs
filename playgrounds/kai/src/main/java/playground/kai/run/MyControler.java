@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -53,12 +54,19 @@ class MyControler {
 		controler.setOverwriteFiles(true) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-//		controler.setMobsimFactory(new PatnaMobsimFactory()) ;
+//		controler.setMobsimFactory(new OldMobsimFactory()) ;
 
 		// run everything:
 		controler.run();
 	
 	}
+	
+//	static class OldMobsimFactory implements MobsimFactory {
+//		@Override
+//		public Mobsim createMobsim( Scenario sc, EventsManager eventsManager ) {
+//			return new QueueSimulation(sc, eventsManager);
+//		}
+//	}
 	
 	static class PatnaMobsimFactory implements MobsimFactory {
 		private boolean useOTFVis = false ;

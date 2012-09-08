@@ -48,7 +48,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(OnePercentBerlin10sTest.class);
 
-	public void estOnePercent10s() {
+	public void testOnePercent10s() {
 		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
@@ -86,7 +86,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		
 	}
 
-	public void testOnePercent10sQSim() {
+	public void estOnePercent10sQSim() {
 		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
