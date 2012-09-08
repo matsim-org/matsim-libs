@@ -321,8 +321,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 		map.put(MARGINAL_UTL_OF_DISTANCE_CAR, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
 		map.put(MARGINAL_UTL_OF_DISTANCE_PT, "DON'T USE THIS!  It is not clear if this is in [utils/m] or in [Eu/m]!") ;
-		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "DISCOURAGED! [utils/m] utility of walking per m, normally negative.  this is " +
-				"on top of the time (dis)utility.  It is discouraged to use this but in some cases it may make sense.") ;
+		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, "[utils/m] utility of walking per m, normally negative.  this is " +
+				"on top of the time (dis)utility.") ;
 
 		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils" ) ;
 		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money. Probably needs to be negative to work." ) ;
