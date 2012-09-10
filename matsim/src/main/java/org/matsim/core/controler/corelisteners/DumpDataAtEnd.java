@@ -22,6 +22,7 @@ package org.matsim.core.controler.corelisteners;
 import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -34,7 +35,6 @@ import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.HouseholdsWriterV10;
@@ -45,9 +45,9 @@ import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 public class DumpDataAtEnd implements ShutdownListener {
 
 	Scenario scenarioData;
-	
+
 	OutputDirectoryHierarchy controlerIO;
-	
+
 	public DumpDataAtEnd(Scenario scenarioData, OutputDirectoryHierarchy controlerIO) {
 		this.scenarioData = scenarioData;
 		this.controlerIO = controlerIO;
@@ -62,7 +62,7 @@ public class DumpDataAtEnd implements ShutdownListener {
 		} else {
 			kk = ((ScenarioImpl) scenarioData).retrieveNotEnabledKnowledges() ;
 		}
-		new PopulationWriter(scenarioData.getPopulation(), scenarioData.getNetwork(), kk).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+		new PopulationWriter(scenarioData.getPopulation(), scenarioData.getNetwork()).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		// dump network
 		new NetworkWriter(scenarioData.getNetwork()).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		// dump config

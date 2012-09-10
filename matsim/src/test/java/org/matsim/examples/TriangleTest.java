@@ -100,7 +100,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("running testInitDemand()...");
 
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
+
 		log.info("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
@@ -139,7 +139,7 @@ public class TriangleTest extends MatsimTestCase {
 		/*
 		 * After switching from TreeMap to LinkedHashMap it is necessary to sort a
 		 * population manually, of the persons are not added according to their
-		 * natural order.  
+		 * natural order.
 		 * cdobler, oct'11
 		 */
 		PopulationUtils.sortPersons(plans);

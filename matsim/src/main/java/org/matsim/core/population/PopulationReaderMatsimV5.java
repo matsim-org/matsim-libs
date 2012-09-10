@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansReaderMatsimV4.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -270,7 +269,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void startRoute(final Attributes atts) {
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(this.currleg.getMode(), null, null);
 		this.currleg.setRoute(this.currRoute);
-		
+
 		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
 			((NetworkRoute)this.currRoute).setVehicleId(new IdImpl(atts.getValue("vehicleRefId"))) ;
 		}

@@ -23,11 +23,11 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -98,7 +98,7 @@ public class RoutingTest extends MatsimTestCase {
 			}
 		});
 	}
-	
+
 	public void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
 			@Override
@@ -152,7 +152,7 @@ public class RoutingTest extends MatsimTestCase {
 			}
 		});
 	}
-	
+
 	public void testAStarEuclidean() {
 		doTest(new RouterProvider() {
 			@Override

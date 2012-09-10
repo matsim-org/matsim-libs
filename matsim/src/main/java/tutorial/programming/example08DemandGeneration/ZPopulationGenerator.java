@@ -14,8 +14,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class ZPopulationGenerator {
@@ -23,7 +23,7 @@ public class ZPopulationGenerator {
 	public static void main(String args[]) {
 
 		/*
-		 * Create population from sample input data.  
+		 * Create population from sample input data.
 		 */
 		Scenario scenario = createPopulationFromCensusFile("./input/input_sample_zurich.txt");
 
@@ -118,7 +118,7 @@ public class ZPopulationGenerator {
 			 * - set the activity type to "home"
 			 * - set the start time to 0.0
 			 * - add the Activity to the plan.
-			 */	
+			 */
 			Coord homeCoord =  scenario.createCoord(entry.h_x, entry.h_y);
 			Activity homeActivity = populationFactory.createActivityFromCoord("home", homeCoord);
 			homeActivity.setStartTime(0.0);
@@ -127,13 +127,13 @@ public class ZPopulationGenerator {
 			/*
 			 * Create objects that are needed when creating the other
 			 * Activities and Legs of the Plan.
-			 * 
+			 *
 			 * Mind that we have to set a start and end time for each Activity
 			 * (except the last one - it will last until the end of the simulated
 			 * period). The end time of an Activity equals the departure time of
 			 * the next Trip. We set the end time of an Activity when we process
 			 * the next Trip by using a point to the last previously created
-			 * Activity (initially this is the Home Activity). 
+			 * Activity (initially this is the Home Activity).
 			 */
 
 			Coord endCoord = null;

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2011 by the members listed in the COPYING,  *
+ * copyright       : (C) 2007, 2012 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -46,7 +46,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	private Knowledges knowledges = null;
 	private final Network network;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
-	
+
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
 
 	/**
@@ -75,13 +75,13 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 		this.population = population;
 		this.network = network;
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV4(this.network);
+		this.handler = new PopulationWriterHandlerImplV5();
 	}
 
 	public PopulationWriter(final Population pop, final Network network, final Knowledges knowledges) {
 		this(pop, network);
 		this.knowledges = knowledges;
-		this.handler = new PopulationWriterHandlerImplV4(this.network, this.knowledges);
+		this.handler = new PopulationWriterHandlerImplV5();
 	}
 
 	public void startStreaming(final String filename) {
@@ -179,7 +179,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	}
 
 	public void writeFileV4(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV4(this.network);
+		this.handler = new PopulationWriterHandlerImplV4(this.network, this.knowledges);
 		write(filename);
 	}
 

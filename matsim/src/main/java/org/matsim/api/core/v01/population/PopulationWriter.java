@@ -37,11 +37,11 @@ public class PopulationWriter implements MatsimWriter {
 	}
 
 	/**
-	 * Writes the population in the most current format (currently plans_v4.dtd).
+	 * Writes the population in the most current format (currently population_v5.dtd).
 	 */
 	@Override
 	public void write(final String filename) {
-		writeV4(filename);
+		writeV5(filename);
 	}
 
 	/**

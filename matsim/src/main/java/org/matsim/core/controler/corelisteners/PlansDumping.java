@@ -23,11 +23,11 @@ package org.matsim.core.controler.corelisteners;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.knowledges.Knowledges;
 
@@ -44,13 +44,13 @@ public class PlansDumping implements BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumping.class);
 	private Scenario sc ;
-	private int writePlansInterval, firstIteration ; 
+	private int writePlansInterval, firstIteration ;
 	private IterationStopWatch stopwatch ;
 	private OutputDirectoryHierarchy controlerIO;
-	
+
 	boolean calledViaOldConstructor = false ;
-	
-	public PlansDumping(Scenario sc, int firstIteration, int writePlansInterval, IterationStopWatch stopwatch, 
+
+	public PlansDumping(Scenario sc, int firstIteration, int writePlansInterval, IterationStopWatch stopwatch,
 			OutputDirectoryHierarchy controlerIO ) {
 		this.sc = sc ;
 		this.firstIteration = firstIteration ;
@@ -58,7 +58,7 @@ public class PlansDumping implements BeforeMobsimListener {
 		this.stopwatch = stopwatch ;
 		this.controlerIO = controlerIO ;
 	}
-	
+
 	@Deprecated // use other contructor; do not assume that Controler object is accessible from here.  kai, jun'12
 	public PlansDumping() {
 		calledViaOldConstructor = true ;
@@ -83,11 +83,10 @@ public class PlansDumping implements BeforeMobsimListener {
 				k = ((ScenarioImpl) sc).getKnowledges();
 			} else {
 				k = ((ScenarioImpl) sc).retrieveNotEnabledKnowledges();
-				// seems that this call is there for some backwards compatibility ... reading knowledges into the 
+				// seems that this call is there for some backwards compatibility ... reading knowledges into the
 				// population even when knowledges is not enabled.  kai, mar'12
 			}
-			new PopulationWriter(sc.getPopulation(), sc.getNetwork(), k)
-				.write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
+			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");
 		}
