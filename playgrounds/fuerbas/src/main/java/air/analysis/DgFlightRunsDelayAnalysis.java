@@ -31,7 +31,7 @@ public class DgFlightRunsDelayAnalysis {
 		String[] runs = {
 //				 "1804", 
 //				"1805",
-				 "1807"
+				 "1809"
 				};
 		String euTimesBase = baseDirectory + "shared-svn/studies/countries/eu/flight/";
 		String[] scheduledTimes = {
@@ -52,14 +52,19 @@ public class DgFlightRunsDelayAnalysis {
 	public static void main(String[] args) throws Exception {
 		String baseDirectory = "/media/data/work/repos/";
 		String[] runs = {
-				 "1804", 
+//				 "1804", 
 //				"1805",
-				 "1807"
+				 "1809",
+				 "1810",
+				 "1811"
 				};
 		String euTimesBase = baseDirectory + "shared-svn/studies/countries/eu/flight/";
 		String[] scheduledTimes = {
-				euTimesBase + "dg_oag_flight_model_2_runways_3600vph/oag_flights.txt",
-				euTimesBase + "dg_oag_flight_model_2_runways_60vph/oag_flights.txt",
+//				euTimesBase + "dg_oag_flight_model_2_runways_3600vph/oag_flights.txt",
+//				euTimesBase + "dg_oag_flight_model_2_runways_60vph/oag_flights.txt",
+				euTimesBase + "dg_oag_tuesday_flight_model_2_runways_airport_capacities_www/oag_flights.txt",
+				euTimesBase + "dg_oag_tuesday_flight_model_2_runways_60vph/oag_flights.txt",
+				euTimesBase + "dg_oag_tuesday_flight_model_2_runways_3600vph/oag_flights.txt"
 		};
 		
 		for (int i = 0; i < runs.length; i++){
