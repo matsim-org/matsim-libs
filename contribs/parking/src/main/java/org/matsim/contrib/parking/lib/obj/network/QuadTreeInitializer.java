@@ -1,4 +1,4 @@
-package playground.wrashid.lib.obj.geoGrid;
+package org.matsim.contrib.parking.lib.obj.network;
 
 import java.util.Collection;
 
@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.wrashid.lib.tools.network.obj.EnclosingRectangle;
 
 public class QuadTreeInitializer<T> {
 

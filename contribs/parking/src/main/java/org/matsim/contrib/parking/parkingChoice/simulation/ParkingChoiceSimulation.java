@@ -17,58 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.parking.parkingChoice.infrastructure;
+package org.matsim.contrib.parking.parkingChoice.simulation;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
-/**
- * 
- * 
- * 
- * 
- * @author rashid_waraich
- *
- */
-public abstract class AbstractParking implements Parking{
-	private Id id = null;
-	private int capacity =0;
-	private int availableParking=0;
-	private Coord coord=null;
+public class ParkingChoiceSimulation implements AgentDepartureEventHandler, ActivityStartEventHandler{
+
 	
-	public abstract boolean isAllowedToUseParking(Id agentId, Id actFacilityId, String actType);
 	
-	public Coord getCoordinate(){
-		return coord;
+	
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
 	}
-	
-	public boolean isParkingAvailable(){
-		return availableParking>0;
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		
 	}
-	
-	public int getMaximumParkingCapacity(){
-		return capacity;
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
-	
-	public int getAvailableParkingCapacity(){
-		return availableParking;
-	}
-	
-	public void parkVehicle(Id agentId){
-		if (availableParking>0){
-			availableParking--;
-		} else {
-			DebugLib.stopSystemAndReportInconsistency("trying to park vehicle on full parking - parkingId:" + id + ";agentId:" + agentId);
-		}
-	}
-	
-	public void unparkVehicle(Id agentId){
-		if (availableParking<capacity){
-			availableParking++;
-		} else {
-			DebugLib.stopSystemAndReportInconsistency("trying to unpark vehicle from empty parking - parkingId:" + id + ";agentId:" + agentId);
-		}
-	}
-	
+
 }

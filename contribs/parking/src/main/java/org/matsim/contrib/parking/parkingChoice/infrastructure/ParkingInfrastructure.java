@@ -19,56 +19,13 @@
 
 package org.matsim.contrib.parking.parkingChoice.infrastructure;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
+import java.util.Collection;
+import java.util.LinkedList;
 
-/**
- * 
- * 
- * 
- * 
- * @author rashid_waraich
- *
- */
-public abstract class AbstractParking implements Parking{
-	private Id id = null;
-	private int capacity =0;
-	private int availableParking=0;
-	private Coord coord=null;
-	
-	public abstract boolean isAllowedToUseParking(Id agentId, Id actFacilityId, String actType);
-	
-	public Coord getCoordinate(){
-		return coord;
+public class ParkingInfrastructure {
+
+	public ParkingInfrastructure(Collection<Parking> parking) {
+		
 	}
-	
-	public boolean isParkingAvailable(){
-		return availableParking>0;
-	}
-	
-	public int getMaximumParkingCapacity(){
-		return capacity;
-	}
-	
-	public int getAvailableParkingCapacity(){
-		return availableParking;
-	}
-	
-	public void parkVehicle(Id agentId){
-		if (availableParking>0){
-			availableParking--;
-		} else {
-			DebugLib.stopSystemAndReportInconsistency("trying to park vehicle on full parking - parkingId:" + id + ";agentId:" + agentId);
-		}
-	}
-	
-	public void unparkVehicle(Id agentId){
-		if (availableParking<capacity){
-			availableParking++;
-		} else {
-			DebugLib.stopSystemAndReportInconsistency("trying to unpark vehicle from empty parking - parkingId:" + id + ";agentId:" + agentId);
-		}
-	}
-	
+
 }

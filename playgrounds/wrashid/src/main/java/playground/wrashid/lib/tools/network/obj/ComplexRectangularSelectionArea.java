@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 
+
 public class ComplexRectangularSelectionArea {
 
 	private final LinkedList<RectangularArea> includeInSection;
