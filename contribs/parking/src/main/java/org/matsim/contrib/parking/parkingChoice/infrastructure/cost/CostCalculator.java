@@ -19,12 +19,11 @@
 
 package org.matsim.contrib.parking.parkingChoice.infrastructure.cost;
 
+import org.matsim.api.core.v01.Id;
 
-// attach to parking
+
 public interface CostCalculator {
 	
-	 // getcost duration 
-	
-	// make null cost parking and add that to some.
+	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond);
 	
 }

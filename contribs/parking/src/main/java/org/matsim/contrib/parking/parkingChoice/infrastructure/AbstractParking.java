@@ -22,6 +22,7 @@ package org.matsim.contrib.parking.parkingChoice.infrastructure;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingChoice.infrastructure.cost.CostCalculator;
 
 /**
  * 
@@ -36,8 +37,13 @@ public abstract class AbstractParking implements Parking{
 	private int capacity =0;
 	private int availableParking=0;
 	private Coord coord=null;
+	private CostCalculator costCalculator=null;
 	
 	public abstract boolean isAllowedToUseParking(Id agentId, Id actFacilityId, String actType);
+	
+	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond){
+		return costCalculator.getCost(agentId, arrivalTime, parkingDurationInSecond);
+	}
 	
 	public Coord getCoordinate(){
 		return coord;

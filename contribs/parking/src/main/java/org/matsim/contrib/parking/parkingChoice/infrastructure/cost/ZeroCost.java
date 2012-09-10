@@ -17,41 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.parking.parkingChoice.manager;
-
-import java.util.Collection;
+package org.matsim.contrib.parking.parkingChoice.infrastructure.cost;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
-import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
-import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
-import org.matsim.core.utils.collections.QuadTree;
 
-//TODO:
-// get parking for agent
-// utility function vom agent beruecksichtigen
-// preference hinzufuegen (allow user to programm code to overwride pure utility based appraoch, but also allow some other appraoch,
-//e.g. filtering available parking)
-// there should be a function, which can be overwritten by subclasses, to do that.
+public class ZeroCost implements CostCalculator{
 
-
-public class ParkingManager {
-
-	private QuadTree<Parking> parkings;
-	private double initialParkingSearchRadiusInMeter;
-	
-	public ParkingManager(Collection<Parking> parkingCollection) {
-		EnclosingRectangle rect=new EnclosingRectangle();
-		
-		for (Parking parking:parkingCollection){
-			rect.registerCoord(parking.getCoordinate());
-		}
-		parkings=(new QuadTreeInitializer<Parking>()).getQuadTree(rect);
+	@Override
+	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond) {
+		return 0;
 	}
 	
-	public Parking parkVehicle(Id agentId, Id actFacilityId, String actType){
-		
-		return null;
-	}
-
 }

@@ -22,7 +22,6 @@ package org.matsim.contrib.parking.parkingChoice.infrastructure;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
-// TODO: prices!!!!!
 public interface Parking {
 
 	public boolean isAllowedToUseParking(Id agentId, Id actFacilityId, String actType);
@@ -36,6 +35,8 @@ public interface Parking {
 	public void parkVehicle(Id agentId);
 
 	public void unparkVehicle(Id agentId);
+	
+	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond);
 	
 	public Coord getCoordinate();
 
