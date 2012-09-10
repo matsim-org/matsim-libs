@@ -93,9 +93,9 @@ public class KnSimplifiedController extends AbstractController {
 
 	private Config config;
 
-	private final Scenario scenarioData;	
+	private final Scenario scenario;	
 
-	private EventsManager eventsManager;
+	private EventsManager events;
 
 	private Network network  ;
 	private Population population  ;
@@ -111,23 +111,26 @@ public class KnSimplifiedController extends AbstractController {
 
 	
 	public KnSimplifiedController(Scenario sc) {
-		this.scenarioData = sc;
+		this.scenario = sc;
 		this.config = sc.getConfig();
 	}
 
 	public void run() {
+		// yyyyyy move config reading into the c'tor.  Lock config there.  Force everybody who wants to modify the config to
+		// do this by loading it before the controler.
+		// yyyyyy move events into the c'tor.  ... Similarly.
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
 		this.setupOutputDirectory(config.controler().getOutputDirectory(), config.controler().getRunId(), true);
-		this.network = this.scenarioData.getNetwork();
-		this.population = this.scenarioData.getPopulation();
-		this.eventsManager = EventsUtils.createEventsManager(config); 
+		this.network = this.scenario.getNetwork();
+		this.population = this.scenario.getPopulation();
+		this.events = EventsUtils.createEventsManager(config); 
 		// add a couple of useful event handlers:
-		this.eventsManager.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
+		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.legTimes = new CalcLegTimes();
-		this.eventsManager.addHandler(legTimes);
+		this.events.addHandler(legTimes);
 		this.travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.eventsManager.addHandler(travelTime);	
+		this.events.addHandler(travelTime);	
 		super.run(config);
 	}
 
@@ -147,7 +150,7 @@ public class KnSimplifiedController extends AbstractController {
 	@Override
 	protected void loadCoreListeners() {
 
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenarioData, controlerIO);
+		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, controlerIO);
 		this.addControlerListener(dumpDataAtEnd);
 		
 		final PlansScoring plansScoring = buildPlansScoring();
@@ -156,23 +159,25 @@ public class KnSimplifiedController extends AbstractController {
 		final StrategyManager strategyManager = buildStrategyManager() ;
 		this.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
-		final PlansDumping plansDumping = new PlansDumping( this.scenarioData, this.config.controler().getFirstIteration(), 
+		final PlansDumping plansDumping = new PlansDumping( this.scenario, this.config.controler().getFirstIteration(), 
 				this.config.controler().getWritePlansInterval(), stopwatch, controlerIO );
 		this.addCoreControlerListener(plansDumping);
 
 		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
-		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) eventsManager,
+		
+		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) events,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
 				controlerIO );
 		this.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
 	}
-	private PlansScoring buildPlansScoring() {
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
-		final PlansScoring plansScoring = new PlansScoring( this.scenarioData, this.eventsManager, controlerIO, scoringFunctionFactory );
-		return plansScoring;
-	}
 
+	/**
+	 * Design thoughts:<ul>
+	 * <li> At this point, my tendency is to not provide a default version here.  Reason is that this would need to be based
+	 * on the config to be consistent with what is done in the mobsim, router, and scoring builders.  This, however, would
+	 * obfuscale the strategy more than it would help.  kai, sep'12
+	 */
 	private StrategyManager buildStrategyManager() {
 		StrategyManager strategyManager = new StrategyManager() ;
 		{
@@ -184,7 +189,7 @@ public class KnSimplifiedController extends AbstractController {
 		}
 		{
 			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-			strategy.addStrategyModule( new AbstractMultithreadedModule(this.scenarioData.getConfig().global().getNumberOfThreads()) {
+			strategy.addStrategyModule( new AbstractMultithreadedModule(this.scenario.getConfig().global().getNumberOfThreads()) {
 
 				@Override
 				public PlanAlgorithm getPlanAlgoInstance() {
@@ -197,11 +202,65 @@ public class KnSimplifiedController extends AbstractController {
 		return strategyManager ;
 	}
 
-
-	private ModularPlanRouter createRoutingAlgorithm() {
-		return createRoutingAlgorithmDefault( this.scenarioData, this.travelTime );
+	@Override
+	protected void prepareForSim() {
+		checkConfigConsistencyAndWriteToLog(this.config, "Config dump before doIterations:");
+		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenario);
+			}
+		});
+	}
+	
+	private PlansScoring buildPlansScoring() {
+		return buildPlansScoringDefault( this.scenario, this.events, this.controlerIO );
 	}
 
+	private ModularPlanRouter createRoutingAlgorithm() {
+		return createRoutingAlgorithmDefault( this.scenario, this.travelTime );
+	}
+
+	@Override
+	protected void runMobSim(int iteration) {
+		runMobsimDefault(scenario, events, iteration, controlerIO );
+	}
+	
+	// static convenience methods below
+
+	/**
+	 * Convenience method to have a default implementation of the mobsim.  It is deliberately non-configurable.  It makes
+	 * no promises about what it does, nor about stability over time.  May be used as a starting point for own variants.
+	 */
+	private static void runMobsimDefault(Scenario sc, EventsManager ev, int iteration, OutputDirectoryHierarchy controlerIO ) {
+		QSim qSim = new QSim( sc, ev ) ;
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, MatsimRandom.getRandom());
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
+		if (sc.getConfig().controler().getWriteSnapshotsInterval() != 0 && iteration % sc.getConfig().controler().getWriteSnapshotsInterval() == 0) {
+			// yyyy would be nice to have the following encapsulated in some way:
+			// === begin ===
+			SnapshotWriterManager manager = new SnapshotWriterManager(sc.getConfig());
+			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
+			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
+			String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
+			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, sc);
+			manager.addSnapshotWriter(snapshotWriter);
+			// === end ===
+			qSim.addQueueSimulationListeners(manager);
+		}
+		qSim.run();
+	}
+	
 	/**
 	 * Convenience method to provide a default routing algorithm.  Design thoughts:<ul>
 	 * <li> This is deliberately not configurable.  If you need configuration, copy this method and re-write.
@@ -210,6 +269,7 @@ public class KnSimplifiedController extends AbstractController {
 	 * <li> A TravelTimeCalculator argument is included, since it needs to be added as an events handler, and we do not want
 	 * to do this as a side effect.
 	 * </ul>
+	 * May be used as starting point for own variants.
 	 */
 	private static ModularPlanRouter createRoutingAlgorithmDefault( Scenario sc, TravelTimeCalculator travelTime ) {
 		Population population = sc.getPopulation() ;
@@ -252,53 +312,20 @@ public class KnSimplifiedController extends AbstractController {
 		return plansCalcRoute;
 	}
 	
-	@Override
-	protected void prepareForSim() {
-		checkConfigConsistencyAndWriteToLog(this.config, "Config dump before doIterations:");
-		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenarioData);
-			}
-		});
-	}
-	
-	@Override
-	protected void runMobSim(int iteration) {
-		runMobsimDefault(scenarioData, eventsManager, iteration, controlerIO );
-	}
-
 	/**
-	 * Convenience method to have a default implementation of the mobsim.  It is deliberately non-configurable.  It makes
+	 * Convenience method to have a default implementation of the scoring.  It is deliberately non-configurable.  It makes
 	 * no promises about what it does, nor about stability over time.  May be used as a starting point for own variants.
 	 */
-	private static void runMobsimDefault(Scenario sc, EventsManager ev, int iteration, OutputDirectoryHierarchy controlerIO ) {
-		QSim qSim = new QSim( sc, ev ) ;
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, MatsimRandom.getRandom());
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim.addMobsimEngine(teleportationEngine);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-		if (sc.getConfig().controler().getWriteSnapshotsInterval() != 0 && iteration % sc.getConfig().controler().getWriteSnapshotsInterval() == 0) {
-			// yyyy would be nice to have the following encapsulated in some way:
-			// === begin ===
-			SnapshotWriterManager manager = new SnapshotWriterManager(sc.getConfig());
-			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
-			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-			String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
-			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, sc);
-			manager.addSnapshotWriter(snapshotWriter);
-			// === end ===
-			qSim.addQueueSimulationListeners(manager);
-		}
-		qSim.run();
+	private static PlansScoring buildPlansScoringDefault( Scenario sc, EventsManager ev, OutputDirectoryHierarchy controlerIO ) {
+		Config config = sc.getConfig();
+		Network network = sc.getNetwork() ;
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( config.planCalcScore(), network );
+		final PlansScoring plansScoring = new PlansScoring( sc, ev, controlerIO, scoringFunctionFactory );
+		return plansScoring;
 	}
+
+
+	
+
 
 }

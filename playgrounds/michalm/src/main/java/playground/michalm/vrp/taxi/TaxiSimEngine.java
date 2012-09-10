@@ -69,6 +69,9 @@ public class TaxiSimEngine
     // TODO should not be PUBLIC!!!
     // probably all actions on InternalInterface should be carried out via TaxiSimEngine...
     // but for now, let it be public...
+    // 
+    // yyyy yes, definitely should not be public.  One compromise is to make it "default", and have everything that
+    // needs access inside the same package.  kai, sep'12
     public InternalInterface getInternalInterface()
     {
         return internalInterface;
