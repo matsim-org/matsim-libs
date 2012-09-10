@@ -37,7 +37,7 @@ public class QuadTreeInitializer<T> {
 	}
 	
 	public QuadTree<T> getQuadTree(EnclosingRectangle rectagle){
-		return new QuadTree<T>(rectagle.getMinX(), rectagle.getMinY(), rectagle.getMaxX() + 1.0, rectagle.getMaxY() + 1.0);
+		return new QuadTree<T>(rectagle.getMinX() -1.0, rectagle.getMinY() -1.0, rectagle.getMaxX() + 1.0, rectagle.getMaxY() + 1.0);
 	}
 
 }
