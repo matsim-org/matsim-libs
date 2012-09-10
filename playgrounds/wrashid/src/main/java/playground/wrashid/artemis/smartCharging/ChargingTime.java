@@ -5,8 +5,8 @@ import java.util.PriorityQueue;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 
-import playground.wrashid.lib.obj.SortableMapObject;
 
 public class ChargingTime {
 

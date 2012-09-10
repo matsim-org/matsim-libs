@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.Id;
 
 public interface Parking {
 
+	public Id getId();
+	
 	public boolean isAllowedToUseParking(Id agentId, Id actFacilityId, String actType);
 
 	public boolean isParkingAvailable();

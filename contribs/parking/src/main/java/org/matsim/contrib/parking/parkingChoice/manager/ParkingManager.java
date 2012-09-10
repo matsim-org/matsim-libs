@@ -20,11 +20,15 @@
 package org.matsim.contrib.parking.parkingChoice.manager;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.QuadTree;
 
 //TODO:
@@ -38,7 +42,9 @@ import org.matsim.core.utils.collections.QuadTree;
 public class ParkingManager {
 
 	private QuadTree<Parking> parkings;
+	private HashSet<Parking> fullParking;
 	private double initialParkingSearchRadiusInMeter;
+	private Controler controller;
 	
 	public ParkingManager(Collection<Parking> parkingCollection) {
 		EnclosingRectangle rect=new EnclosingRectangle();
@@ -49,9 +55,43 @@ public class ParkingManager {
 		parkings=(new QuadTreeInitializer<Parking>()).getQuadTree(rect);
 	}
 	
-	public Parking parkVehicle(Id agentId, Id actFacilityId, String actType){
+	/**
+	 * 
+	 * returns the parkingId
+	 * 
+	 */
+	public Id parkVehicle(Id agentId, Id actFacilityId, String actType){
+		Coord actCoordinate = controller.getFacilities().getFacilities().get(actFacilityId).getCoord();
 		
+		double radius=initialParkingSearchRadiusInMeter;
+		Collection<Parking> collection = parkings.get(actCoordinate.getX(), actCoordinate.getY(), radius);
+		removeAllUnusableParking(collection,agentId, actFacilityId, actType);
+		
+		while (collection.size()==0){
+			radius*=2;
+			collection = parkings.get(actCoordinate.getX(), actCoordinate.getY(), radius);
+			removeAllUnusableParking(collection,agentId, actFacilityId, actType);
+		}
+		
+		
+		
+		return selectParking(collection, actFacilityId, actFacilityId, actType).getId();
+	}
+
+	//TODO: document, that this method can be overwritten, to make new logic or model the perference of the agent
+	// can already make default impl. for some ev related preference.
+	protected Parking selectParking(Collection<Parking> collection,Id agentId, Id actFacilityId, String actType) {
+		// score parking in collection
 		return null;
+		
+	}
+
+	private void removeAllUnusableParking(Collection<Parking> collection,Id agentId, Id actFacilityId, String actType) {
+		for (Parking parking:collection){
+			if (!parking.isAllowedToUseParking(agentId, actFacilityId, actType)){
+				collection.remove(parking);
+			}
+		}
 	}
 
 }

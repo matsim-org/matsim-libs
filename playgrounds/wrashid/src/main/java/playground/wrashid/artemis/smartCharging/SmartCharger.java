@@ -8,10 +8,10 @@ import java.util.Random;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
 
 import playground.wrashid.lib.MathLib;
-import playground.wrashid.lib.obj.SortableMapObject;
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
 
 // example config: H:\data\experiments\ARTEMIS\nov2011\SR-szenario11\run1\config.txt

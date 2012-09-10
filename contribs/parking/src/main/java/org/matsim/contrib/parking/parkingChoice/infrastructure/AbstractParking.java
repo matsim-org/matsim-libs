@@ -41,6 +41,10 @@ public abstract class AbstractParking implements Parking{
 	
 	public abstract boolean isAllowedToUseParking(Id agentId, Id actFacilityId, String actType);
 	
+	public Id getId(){
+		return id;
+	}
+	
 	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond){
 		return costCalculator.getCost(agentId, arrivalTime, parkingDurationInSecond);
 	}
