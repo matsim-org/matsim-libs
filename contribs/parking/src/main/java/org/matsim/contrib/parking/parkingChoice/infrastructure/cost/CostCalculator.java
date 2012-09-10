@@ -17,15 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.parking.parkingChoice.infrastructure;
+package org.matsim.contrib.parking.parkingChoice.infrastructure.cost;
 
-import java.util.Collection;
-import java.util.LinkedList;
 
-public class ParkingInfrastructure {
-
-	public ParkingInfrastructure(Collection<Parking> parking) {
-		
-	}
-
+// attach to parking
+public interface CostCalculator {
+	
+	 // getcost duration 
+	
+	// make null cost parking and add that to some.
+	
 }
