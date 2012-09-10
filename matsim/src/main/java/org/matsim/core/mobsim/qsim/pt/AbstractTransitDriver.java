@@ -275,9 +275,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public boolean handlePassengerLeaving(final PassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.removePassenger(passenger);
 		if(handled){
-			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
+//			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId()));
+			events.processEvent(new PersonLeavesVehicleEventImpl(time, passenger.getId(), this.vehicle.getVehicle().getId()));
+			
+			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.
+			// kai, sep'12
+			
+			MobsimAgent agent = (MobsimAgent) passenger ;
 			agent.notifyArrivalOnLinkByNonNetworkMode(this.currentStop.getStopFacility().getLinkId());
 			agent.endLegAndComputeNextState(time);
 			this.internalInterface.arrangeNextAgentState(agent) ;

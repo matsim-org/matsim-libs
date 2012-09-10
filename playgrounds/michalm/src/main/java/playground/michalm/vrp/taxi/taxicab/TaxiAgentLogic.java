@@ -233,6 +233,8 @@ public class TaxiAgentLogic
             @Override
             public void endLeg(double now)
             {
+            	// following line only works if PassengerAgent can indeed be cast into MobsimAgent ...
+            	// ... but that makes sense for what the current system is constructed.  kai, sep'12
                 MobsimAgent passenger = ((TaxiCustomer)request.getCustomer()).getPassenger();
 
                 // deliver the passenger
