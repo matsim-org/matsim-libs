@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.controler.AbstractController;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
@@ -44,7 +45,6 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -52,7 +52,6 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
@@ -200,9 +199,25 @@ public class KnSimplifiedController extends AbstractController {
 
 
 	private ModularPlanRouter createRoutingAlgorithm() {
-		// factory to generate routes:
-		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
+		return createRoutingAlgorithmDefault( this.scenarioData, this.travelTime );
+	}
 
+	/**
+	 * Convenience method to provide a default routing algorithm.  Design thoughts:<ul>
+	 * <li> This is deliberately not configurable.  If you need configuration, copy this method and re-write.
+	 * <li> This takes deliberately the Scenario as input.  It will do something with it, but there are no promises what 
+	 * it does.  Including no promise that results will remain stable over time.
+	 * <li> A TravelTimeCalculator argument is included, since it needs to be added as an events handler, and we do not want
+	 * to do this as a side effect.
+	 * </ul>
+	 */
+	private static ModularPlanRouter createRoutingAlgorithmDefault( Scenario sc, TravelTimeCalculator travelTime ) {
+		Population population = sc.getPopulation() ;
+		Network network = sc.getNetwork() ;
+		Config config = sc.getConfig() ;
+		
+		// factory to generate routes:
+		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (population.getFactory())).getModeRouteFactory();
 
 		// travel disutility (generalized cost)
 		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
@@ -216,17 +231,21 @@ public class KnSimplifiedController extends AbstractController {
 		// plug it together
 		final ModularPlanRouter plansCalcRoute = new ModularPlanRouter();
 		
-		Collection<String> networkModes = this.config.plansCalcRoute().getNetworkModes();
+		Collection<String> networkModes = config.plansCalcRoute().getNetworkModes();
 		for (String mode : networkModes) {
-			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime), routeFactory));
+			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(network, 
+					leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime), routeFactory));
 		}
-		Map<String, Double> teleportedModeSpeeds = this.config.plansCalcRoute().getTeleportedModeSpeeds();
+		Map<String, Double> teleportedModeSpeeds = config.plansCalcRoute().getTeleportedModeSpeeds();
 		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor()));
+			plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), 
+					config.plansCalcRoute().getBeelineDistanceFactor()));
 		}
-		Map<String, Double> teleportedModeFreespeedFactors = this.config.plansCalcRoute().getTeleportedModeFreespeedFactors();
+		Map<String, Double> teleportedModeFreespeedFactors = config.plansCalcRoute().getTeleportedModeFreespeedFactors();
 		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.network, leastCostPathFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc), entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
+			plansCalcRoute.addLegHandler(entry.getKey(), 
+					new PseudoTransitLegRouter(network, leastCostPathFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc), 
+							entry.getValue(), config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
 		}
 		
 		// return it:
@@ -247,7 +266,15 @@ public class KnSimplifiedController extends AbstractController {
 	
 	@Override
 	protected void runMobSim(int iteration) {
-		QSim qSim = new QSim( this.scenarioData, this.eventsManager ) ;
+		runMobsimDefault(scenarioData, eventsManager, iteration, controlerIO );
+	}
+
+	/**
+	 * Convenience method to have a default implementation of the mobsim.  It is deliberately non-configurable.  It makes
+	 * no promises about what it does, nor about stability over time.  May be used as a starting point for own variants.
+	 */
+	private static void runMobsimDefault(Scenario sc, EventsManager ev, int iteration, OutputDirectoryHierarchy controlerIO ) {
+		QSim qSim = new QSim( sc, ev ) ;
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
@@ -257,16 +284,16 @@ public class KnSimplifiedController extends AbstractController {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenarioData.getPopulation(), agentFactory, qSim);
+        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);
-		if (config.controler().getWriteSnapshotsInterval() != 0 && iteration % config.controler().getWriteSnapshotsInterval() == 0) {
+		if (sc.getConfig().controler().getWriteSnapshotsInterval() != 0 && iteration % sc.getConfig().controler().getWriteSnapshotsInterval() == 0) {
 			// yyyy would be nice to have the following encapsulated in some way:
 			// === begin ===
-			SnapshotWriterManager manager = new SnapshotWriterManager(config);
+			SnapshotWriterManager manager = new SnapshotWriterManager(sc.getConfig());
 			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
 			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
 			String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
-			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
+			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, sc);
 			manager.addSnapshotWriter(snapshotWriter);
 			// === end ===
 			qSim.addQueueSimulationListeners(manager);
