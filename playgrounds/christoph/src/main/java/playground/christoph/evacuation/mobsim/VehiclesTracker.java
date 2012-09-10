@@ -366,7 +366,7 @@ public class VehiclesTracker implements MobsimInitializedListener, MobsimEngine,
 					 * the currently performed leg of the agent is ended.
 					 */
 					MobsimAgent passenger = this.agents.get(passengerId);
-					passenger.notifyTeleportToLink(event.getLinkId());	// use drivers position
+					passenger.notifyArrivalOnLinkByNonNetworkMode(event.getLinkId());	// use drivers position
 					passenger.endLegAndComputeNextState(event.getTime());	
 					this.internalInterface.arrangeNextAgentState(passenger);
 

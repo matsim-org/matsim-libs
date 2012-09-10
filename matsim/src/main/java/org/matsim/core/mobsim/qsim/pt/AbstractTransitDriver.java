@@ -171,7 +171,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public void notifyTeleportToLink(final Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
 	}
 
 	Netsim getSimulation(){
@@ -278,7 +278,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId()));
-			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
+			agent.notifyArrivalOnLinkByNonNetworkMode(this.currentStop.getStopFacility().getLinkId());
 			agent.endLegAndComputeNextState(time);
 			this.internalInterface.arrangeNextAgentState(agent) ;
 			// (cannot set trEngine to TransitQSimEngine because there are tests where this will not work. kai, dec'11)

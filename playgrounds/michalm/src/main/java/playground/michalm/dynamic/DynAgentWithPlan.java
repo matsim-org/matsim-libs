@@ -94,9 +94,9 @@ public class DynAgentWithPlan
 
 
     @Override
-    public void notifyTeleportToLink(Id linkId)
+    public void notifyArrivalOnLinkByNonNetworkMode(Id linkId)
     {
-        dynAgent.notifyTeleportToLink(linkId);
+        dynAgent.notifyArrivalOnLinkByNonNetworkMode(linkId);
     }
 
 

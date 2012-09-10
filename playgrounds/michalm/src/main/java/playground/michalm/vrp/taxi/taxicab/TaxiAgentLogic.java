@@ -118,7 +118,7 @@ public class TaxiAgentLogic
         }
 
         switch (task.getType()) {
-            case DRIVE:
+            case DRIVE: // driving both with and without passengers
                 // ======DEBUG PRINTOUTS======
                 // DriveTask dt = (DriveTask)task;
                 // Id fromLinkId = ((MATSimVertex)dt.getFromVertex()).getLink().getId();
@@ -138,7 +138,7 @@ public class TaxiAgentLogic
                     return createLeg((DriveTask)task, time);
                 }
 
-            case SERVE:
+            case SERVE: // pick up passenger
                 return createServeActivity((ServeTask)task, now);
 
             case WAIT:
@@ -241,7 +241,7 @@ public class TaxiAgentLogic
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
                         agent.getId()));
 
-                passenger.notifyTeleportToLink(passenger.getDestinationLinkId());
+                passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
                 passenger.endLegAndComputeNextState(now);
                 TaxiAgentLogic.this.taxiSimEngine.getInternalInterface().arrangeNextAgentState(
                         passenger);

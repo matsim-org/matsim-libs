@@ -186,7 +186,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 			
 			events.processEvent( evFac.createPersonLeavesVehicleEvent(now, this.currentPassenger.getId(), this.vehicle.getId()));
 			
-			this.currentPassenger.notifyTeleportToLink(this.currentLinkId) ;
+			this.currentPassenger.notifyArrivalOnLinkByNonNetworkMode(this.currentLinkId) ;
 //			this.currentPassenger.endLegAndAssumeControl(now) ;
 			
 			throw new RuntimeException("I don't think this is used anywhere.  Pls complain if this is wrong. kai, dec'11");
@@ -235,7 +235,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	// things that should never happen with the random taxicab agent:
 	
 	@Override
-	public void notifyTeleportToLink(Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}

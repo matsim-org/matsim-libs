@@ -68,7 +68,7 @@ public class MyAgent implements MobsimDriverAgent {
 		PlanElement pe = delegate.getCurrentPlanElement();
 		
 		if (pe instanceof Leg) { // when a leg ended 
-			delegate.notifyTeleportToLink(this.currentLinkId); // just a try
+			delegate.notifyArrivalOnLinkByNonNetworkMode(this.currentLinkId); // just a try
 		}
 		
 		delegate.endActivityAndComputeNextState(now);
@@ -103,8 +103,8 @@ public class MyAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void notifyTeleportToLink(Id linkId) {
-		delegate.notifyTeleportToLink(linkId);
+	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+		delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 		// but teleportation will not be used for the reactive agent anyway
 	}
 

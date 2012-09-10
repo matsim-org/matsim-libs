@@ -175,7 +175,7 @@ public class JointTripsEngine implements DepartureHandler, MobsimEngine {
 						// remove it from the passengers.
 						it.remove();
 
-						p.notifyTeleportToLink( link );
+						p.notifyArrivalOnLinkByNonNetworkMode( link );
 						p.endLegAndComputeNextState( now );
 						internalInterface.arrangeNextAgentState( p );
 					}

@@ -249,7 +249,7 @@ public class DynAgent
 
 
     @Override
-    public void notifyTeleportToLink(Id linkId)
+    public void notifyArrivalOnLinkByNonNetworkMode(Id linkId)
     {
         throw new UnsupportedOperationException(
                 "This is used only for teleportation and this agent does not teleport");

@@ -170,9 +170,11 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	* <li>There needs to be some method that tells the agent that a teleportation has happened, similar to "moveOverNode".
 	* Could be separated out to a "teleportation" agent, but can as well leave it here.
 	* The name may still be improved.  kai, nov'10
+	* <li> changed the name from notifyTeleportToLink to notifyArrivalOnLinkByNonNetworkMode since it was also used by Transit
+	* and by TaxiCabs.  kai, sep'12
 	* </ul>
 	*/
-	public void notifyTeleportToLink(final Id linkId);
+	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId);
 
 	/**
 	 * Design thoughts:<ul>

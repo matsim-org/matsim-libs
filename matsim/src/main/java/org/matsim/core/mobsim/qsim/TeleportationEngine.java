@@ -42,7 +42,7 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine {
 			if (entry.getFirst().doubleValue() <= now) {
 				teleportationList.poll();
 				MobsimAgent personAgent = entry.getSecond();
-				personAgent.notifyTeleportToLink(personAgent.getDestinationLinkId());
+				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
 				personAgent.endLegAndComputeNextState(now);
 				internalInterface.arrangeNextAgentState(personAgent) ;
 			} else {

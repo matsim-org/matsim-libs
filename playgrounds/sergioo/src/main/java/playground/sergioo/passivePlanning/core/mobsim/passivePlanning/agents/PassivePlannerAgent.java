@@ -130,7 +130,7 @@ public class PassivePlannerAgent implements MobsimDriverAgent, HasBasePerson  {
 		return null;
 	}
 	@Override
-	public void notifyTeleportToLink(Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
 		if(state == State.LEG)
 			simulation.getEventsManager().processEvent(new TravelledEventImpl(simulation.getSimTimer().getTimeOfDay(), getId(), ((Leg)getCurrentPlanElement()).getRoute().getDistance()));
 	}

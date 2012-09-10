@@ -273,8 +273,8 @@ public class JointTravelerAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void notifyTeleportToLink(final Id linkId) {
-		delegate.notifyTeleportToLink(linkId);
+	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
+		delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 	}
 }
 

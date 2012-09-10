@@ -128,7 +128,7 @@ public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
 			final Id link,
 			final double time) {
 		for (MobsimAgent p : passengers) {
-			p.notifyTeleportToLink( link );
+			p.notifyArrivalOnLinkByNonNetworkMode( link );
 			p.endLegAndComputeNextState( time );
 			internalInterface.arrangeNextAgentState( p );
 		}

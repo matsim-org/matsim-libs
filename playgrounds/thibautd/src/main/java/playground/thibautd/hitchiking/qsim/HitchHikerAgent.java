@@ -131,7 +131,7 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	public void endLegAndComputeNextState(double now) {
 		if ( hitchHiker != null && !hitchHiker.endLegAndComputeNextState( now ) ) {
 			// FIXME: this generates a "traveled" event!
-			delegate.notifyTeleportToLink( hitchHiker.getCurrentLinkId() );
+			delegate.notifyArrivalOnLinkByNonNetworkMode( hitchHiker.getCurrentLinkId() );
 			hitchHiker = null;
 		}
 
@@ -216,8 +216,8 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	}
 
 	@Override
-	public void notifyTeleportToLink(Id linkId) {
-		delegate.notifyTeleportToLink(linkId);
+	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+		delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 	}
 
 	@Override

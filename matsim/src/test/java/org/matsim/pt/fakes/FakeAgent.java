@@ -145,7 +145,7 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void notifyTeleportToLink(final Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
 	}
 
 	@Override

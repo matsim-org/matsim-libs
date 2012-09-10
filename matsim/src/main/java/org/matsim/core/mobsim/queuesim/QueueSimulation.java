@@ -315,7 +315,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			if (entry.getFirst().doubleValue() <= now) {
 				this.teleportationList.poll();
 				MobsimAgent person = entry.getSecond();
-				person.notifyTeleportToLink(person.getDestinationLinkId());
+				person.notifyArrivalOnLinkByNonNetworkMode(person.getDestinationLinkId());
 				person.endLegAndComputeNextState(now) ;
 				this.arrangeNextAgentAction(person) ;
 			} else break;

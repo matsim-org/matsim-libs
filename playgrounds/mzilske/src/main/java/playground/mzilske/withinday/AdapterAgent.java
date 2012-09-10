@@ -319,7 +319,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 	}
 
 	@Override
-	public void notifyTeleportToLink(Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
 		// I am told this when the Simulation decides to not move me to my destination over the network, but to teleport me there.
 		// This is a little silly - apparently the Simulation thinks that when I'm moved over the network, I can keep track of
 		// my current link myself, but when I'm "teleported", I can't do that. But I can! After all, the Simulation just asked me where I 
