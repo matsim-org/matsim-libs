@@ -243,7 +243,7 @@
 		<param name="marginalUtilityOfMoney" value="1.0" />
 		<param name="marginalUtlOfDistanceOther" value="0.0" />
 
-		<!-- DISCOURAGED! [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility.  It is discouraged to use this but in some cases it may make sense. -->
+		<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
 		<param name="marginalUtlOfDistanceWalk" value="0.0" />
 
 		<!-- [unit_of_money/m] conversion of car distance into money. Probably needs to be negative to work. -->
@@ -271,6 +271,9 @@
 
 		<!-- [utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested. -->
 		<param name="waiting" value="-0.0" />
+
+		<!-- write a plans file in each iteration directory which contains what each agent actually did, and the score it received. -->
+		<param name="writeExperiencedPlans" value="false" />
 	</module>
 
 <!-- ====================================================================== -->
