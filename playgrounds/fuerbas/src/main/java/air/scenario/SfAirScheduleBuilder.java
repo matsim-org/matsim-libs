@@ -172,7 +172,7 @@ public class SfAirScheduleBuilder {
 						
 						// some error correction code
 						if (
-						// lineEntries[14].contains("2") && //filter for Tuesday flights only
+						 lineEntries[14].contains("2") && //filter for Tuesday flights only
 						!flights.containsKey(flightDesignator)
 								&& seatsAvail > 0 // filter for flights with 1 PAX or more only
 								&& !originAirport.equalsIgnoreCase(destinationAirport)

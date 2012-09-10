@@ -58,11 +58,11 @@ public class DgCreateDgFlightScenario {
 	private static String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 	public static String inputAirportsCoordinatesFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
 	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
-	private String flightScenarioDirectoryName = "dg_oag_flight_model_2_runways_airport_capacities_www/";
+	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_3600vph/";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
-	private DgFlightScenarioData scenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
-	private boolean useAirportCapacities = true;
+	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
+	private boolean useAirportCapacities = false;
 	private String airportCapacityFile = dataBaseDirectory + "shared-svn/projects/throughFlightData/airportCapacityData/2012-08-14_airport_capacity_from_www.csv";
 	
 	private ScenarioImpl initScenario(){
@@ -85,10 +85,10 @@ public class DgCreateDgFlightScenario {
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
 		ScenarioImpl scenario = initScenario();
 		if (this.useAirportCapacities){
-			this.readAirportCapacities(scenarioData);
+			this.readAirportCapacities(flightScenarioData);
 		}
 		
-		DgAirNetworkBuilder networkBuilder = new DgAirNetworkBuilder(scenario, transform, scenarioData);
+		DgAirNetworkBuilder networkBuilder = new DgAirNetworkBuilder(scenario, transform, flightScenarioData);
 		networkBuilder.createNetwork(flightsData, airports, outputNetworkFilename);
 		Map<Id, SfMatsimAirport> airportMap = networkBuilder.getAirportMap();
 		//
