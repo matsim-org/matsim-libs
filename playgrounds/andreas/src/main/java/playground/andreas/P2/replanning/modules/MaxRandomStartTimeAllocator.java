@@ -42,13 +42,16 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	public static final String STRATEGY_NAME = "MaxRandomStartTimeAllocator";
 	
 	private final int mutationRange;
+	private final int timeBinSize;
 	
 	public MaxRandomStartTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 1){
-			log.error("Missing parameter: 1 - Mutation range in seconds");
+		if(parameter.size() != 2){
+			log.error("Parameter 1: Mutation range in seconds");
+			log.error("Parameter 2: Time bin size in seconds");
 		}
 		this.mutationRange = Integer.parseInt(parameter.get(0));
+		this.timeBinSize = Integer.parseInt(parameter.get(1));
 	}
 
 	@Override
@@ -64,6 +67,9 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 		// get a valid new start time
 		double newStartTime = Math.max(0.0, cooperative.getBestPlan().getStartTime() - MatsimRandom.getRandom().nextDouble() * this.mutationRange);
 		newStartTime = Math.min(newStartTime, cooperative.getBestPlan().getEndTime() - cooperative.getMinOperationTime());
+		
+		// cast time to time bin size
+		newStartTime = this.getTimeSlotForTime(newStartTime) * this.timeBinSize;
 		newPlan.setStartTime(newStartTime);
 		
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
@@ -76,5 +82,8 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	public String getName() {
 		return MaxRandomStartTimeAllocator.STRATEGY_NAME;
 	}
-
+	
+	private int getTimeSlotForTime(double time){
+		return ((int) time / this.timeBinSize);
+	}
 }

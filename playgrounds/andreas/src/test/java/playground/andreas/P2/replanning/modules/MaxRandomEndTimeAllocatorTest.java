@@ -41,6 +41,7 @@ public class MaxRandomEndTimeAllocatorTest {
 		Cooperative coop = PScenarioHelper.createTestCooperative();
 		ArrayList<String> param = new ArrayList<String>();
 		param.add("0");
+		param.add("1");
 		MaxRandomEndTimeAllocator strat = new MaxRandomEndTimeAllocator(param);
 		PPlan testPlan = null;
 		
@@ -70,6 +71,7 @@ public class MaxRandomEndTimeAllocatorTest {
 		
 		param = new ArrayList<String>();
 		param.add("900");
+		param.add("10");
 		strat = new MaxRandomEndTimeAllocator(param);
 		
 		// enough vehicles for testing
@@ -79,6 +81,6 @@ public class MaxRandomEndTimeAllocatorTest {
 		Assert.assertEquals("Compare start time", 40000.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare end time", 40074.474191341884, testPlan.getEndTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare end time", 40070.0, testPlan.getEndTime(), MatsimTestUtils.EPSILON);
 	}
 }

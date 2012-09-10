@@ -42,13 +42,16 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 	public static final String STRATEGY_NAME = "MaxRandomEndTimeAllocator";
 	
 	private final int mutationRange;
+	private final int timeBinSize;
 	
 	public MaxRandomEndTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
 		if(parameter.size() != 1){
-			log.error("Missing parameter: 1 - Mutation range in seconds");
+			log.error("Parameter 1: Mutation range in seconds");
+			log.error("Parameter 2: Time bin size in seconds");
 		}
 		this.mutationRange = Integer.parseInt(parameter.get(0));
+		this.timeBinSize = Integer.parseInt(parameter.get(1));
 	}
 	
 	@Override
@@ -65,6 +68,9 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 		// get a valid new end time
 		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + MatsimRandom.getRandom().nextDouble() * this.mutationRange);
 		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime());
+		
+		// cast time to time bin size
+		newEndTime = this.getTimeSlotForTime(newEndTime) * this.timeBinSize;
 		newPlan.setEndTime(newEndTime);
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
@@ -76,5 +82,8 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 	public String getName() {
 		return MaxRandomEndTimeAllocator.STRATEGY_NAME;
 	}
-
+	
+	private int getTimeSlotForTime(double time){
+		return ((int) time / this.timeBinSize);
+	}
 }
