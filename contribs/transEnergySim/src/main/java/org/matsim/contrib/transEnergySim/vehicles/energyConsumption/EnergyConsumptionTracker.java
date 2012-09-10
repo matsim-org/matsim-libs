@@ -115,7 +115,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		Link link = network.getLinks().get(linkId);
 		double averageSpeedDrivenInMetersPerSecond = link.getLength() / timeSpendOnLink;
 
-		if (zeroTravelTime(linkEnterTime, linkLeaveTime)) {
+		if (zeroTravelTime(linkEnterTime, linkLeaveTime) || averageSpeedDrivenInMetersPerSecond>link.getFreespeed()) {
 			return;
 		}
 
