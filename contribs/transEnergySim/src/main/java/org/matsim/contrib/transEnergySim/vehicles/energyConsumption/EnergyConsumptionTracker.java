@@ -115,12 +115,19 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		Link link = network.getLinks().get(linkId);
 		double averageSpeedDrivenInMetersPerSecond = link.getLength() / timeSpendOnLink;
 
-		if (zeroTravelTime(linkEnterTime, linkLeaveTime) || averageSpeedDrivenInMetersPerSecond>link.getFreespeed()) {
+		if (zeroTravelTime(linkEnterTime, linkLeaveTime)) {
 			return;
 		}
 
 		Vehicle vehicle = vehicles.get(personId);
-		double energyConsumptionInJoule = vehicle.updateEnergyUse(link, averageSpeedDrivenInMetersPerSecond);
+		
+		double energyConsumptionInJoule=0;
+		if (averageSpeedDrivenInMetersPerSecond<=link.getFreespeed()){
+			energyConsumptionInJoule= vehicle.updateEnergyUse(link, averageSpeedDrivenInMetersPerSecond);
+		} else {
+			energyConsumptionInJoule= vehicle.updateEnergyUse(link.getFreespeed()*timeSpendOnLink, link.getFreespeed(), link.getFreespeed());
+		}
+		 
 
 		if (loggingEnabled) {
 			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));

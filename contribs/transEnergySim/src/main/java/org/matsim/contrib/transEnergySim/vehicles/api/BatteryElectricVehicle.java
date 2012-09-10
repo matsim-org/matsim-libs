@@ -54,18 +54,18 @@ public abstract class BatteryElectricVehicle extends AbstractVehicleWithBattery 
 		}
 	}
 
-	public double updateEnergyUse(Link link, double averageSpeedDriven) {
-		double energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link,
-				averageSpeedDriven);
+	public double updateEnergyUse(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven) {
+		double energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(
+				drivenDistanceInMeters, maxSpeedOnLink, averageSpeedDriven);
 
 		useBattery(energyConsumptionForLinkInJoule);
 		return energyConsumptionForLinkInJoule;
 	}
-	
+
 	@Override
-	public void reset(){
+	public void reset() {
 		super.reset();
-		didRunOutOfBattery=false;
+		didRunOutOfBattery = false;
 	}
 
 }

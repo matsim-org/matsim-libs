@@ -30,7 +30,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyCo
  * @author User
  * 
  */
-public abstract class AbstractVehicleWithBattery implements Vehicle {
+public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 
 	/**
 	 * often not the full capacity of a battery can be used or is recommended to

@@ -20,13 +20,12 @@
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
 
-public interface Vehicle {
+public abstract class AbstractVehicle implements Vehicle{
 
-	public double updateEnergyUse(Link link, double averageSpeedDrivenInMetersPerSecond);
+	public double updateEnergyUse(Link link, double averageSpeedDrivenInMetersPerSecond){
+		return updateEnergyUse(link.getLength(), link.getFreespeed(), averageSpeedDrivenInMetersPerSecond);
+	}
 	
-	public double updateEnergyUse(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven);
 	
-	public void reset();
 }
