@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.studies.snowball;
+package playground.johannes.studies.smallworld;
 
 import java.util.ArrayList;
 import java.util.HashMap;

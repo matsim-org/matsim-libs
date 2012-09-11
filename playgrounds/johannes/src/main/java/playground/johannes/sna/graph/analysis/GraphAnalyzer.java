@@ -122,8 +122,8 @@ public class GraphAnalyzer {
 			writer.write(String.valueOf(entry.getValue().getMin()));
 			writer.write("\t");
 			writer.write(String.valueOf(entry.getValue().getMax()));
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
 			writer.write("\t");
 			writer.write(String.valueOf(entry.getValue().getN()));
 			writer.write("\t");

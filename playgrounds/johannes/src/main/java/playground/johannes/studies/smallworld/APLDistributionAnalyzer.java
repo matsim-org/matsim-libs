@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExtendedTopologyAnalyzerTask.java
+ * APLDistributionAnalyzer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.studies.smallworld;
 
-import playground.johannes.sna.graph.analysis.ComponentsTask;
+import java.io.IOException;
+
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.GraphAnalyzer;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
+import playground.johannes.socialnetworks.graph.analysis.ExtendedTopologyAnalyzerTask;
+import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 
 /**
  * @author illenberger
  *
  */
-public class ExtendedTopologyAnalyzerTask extends AnalyzerTaskComposite {
+public class APLDistributionAnalyzer {
 
-	public ExtendedTopologyAnalyzerTask() {
-		addTask(new ComponentsTask());
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
+		composite.addTask(new TopologyAnalyzerTask());
+		composite.addTask(new ExtendedTopologyAnalyzerTask());
 		
-//		CentralityTask task = new CentralityTask();
-//		task.setCalcAPLDistribution(false);
-//		task.setCalcBetweenness(false);
-//		addTask(task);
+		SparseGraphMLReader reader = new SparseGraphMLReader();
+		Graph graph = reader.readGraph("/Users/jillenberger/vsp/work/data/graphs/hep-th/hep-th.graphml");
 		
-		addTask(new APLTask(true));
+		GraphAnalyzer.analyze(graph, composite, "/Users/jillenberger/vsp/work/data/graphs/hep-th/analysis/");
+
 	}
+
 }

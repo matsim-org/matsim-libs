@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
+import playground.johannes.coopsim.Profiler;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
@@ -34,6 +35,7 @@ import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.analysis.DegreeTask;
 import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
 import playground.johannes.sna.graph.analysis.GraphSizeTask;
+import playground.johannes.sna.graph.analysis.PropDegreeFixedSizePartition;
 import playground.johannes.sna.graph.analysis.RandomPartition;
 import playground.johannes.sna.graph.analysis.TransitivityTask;
 import playground.johannes.sna.graph.analysis.VertexFilter;
@@ -41,17 +43,24 @@ import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
 import playground.johannes.sna.snowball.analysis.EstimatedDegree;
 import playground.johannes.sna.snowball.analysis.EstimatedTransitivity;
+import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.sna.snowball.analysis.ObservedTransitivity;
 import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.FinalSampleAnalyzer;
+import playground.johannes.sna.snowball.sim.IntervalSampleAnalyzer;
 import playground.johannes.sna.snowball.sim.IterationSampleAnalyzer;
+import playground.johannes.sna.snowball.sim.LogIntervalSampleAnalyzer;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
+import playground.johannes.socialnetworks.snowball2.analysis.ResponseRateTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.sim.EstimatorTask;
 import playground.johannes.socialnetworks.snowball2.sim.RDSEstimator;
+import playground.johannes.studies.coopsim.TimeSampler;
 
 /**
  * @author illenberger
@@ -80,7 +89,11 @@ public class SnowballSim {
 		 * Init random seed generator.
 		 */
 		int numSeeds = Integer.parseInt(config.getParam(MODULENAME, "seeds"));
-		VertexFilter<Vertex> seedGenerator = new FixedSizeRandomPartition<Vertex>(numSeeds, randomSeed);
+//		VertexFilter<Vertex> seedGenerator = new FixedSizeRandomPartition<Vertex>(numSeeds, randomSeed);
+//		Object dummy = new Object();
+//		Profiler.start(dummy);
+		VertexFilter<Vertex> seedGenerator = new PropDegreeFixedSizePartition<Vertex>(numSeeds, randomSeed);
+//		Profiler.stopAll();
 		/*
 		 * Init response rate generator.
 		 */
@@ -111,9 +124,9 @@ public class SnowballSim {
 		 */
 //		final int interval = Integer.parseInt(config.getParam(MODULENAME, "interval"));
 //		IntervalSampleAnalyzer intervalAnalyzer = new IntervalSampleAnalyzer(analyzers, estimators, output);
-//		IntervalSampleAnalyzer intervalAnalyzer = new LogIntervalSampleAnalyzer(analyzers, estimators, output, 1.5, 100, numSeeds);
+		IntervalSampleAnalyzer intervalAnalyzer = new LogIntervalSampleAnalyzer(analyzers, estimators, output, 1.5, 100, numSeeds);
 		IterationSampleAnalyzer iterationAnalyzer = new IterationSampleAnalyzer(analyzers, estimators, output);
-//		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimators, output);
+		FinalSampleAnalyzer completeAnalyzer = new FinalSampleAnalyzer(analyzers, estimators, output);
 //		ConnectionSampleAnalyzer connectionAnalyzer = new ConnectionSampleAnalyzer(numSeeds, analyzers, output);
 		/*
 		 * Init sampler listener.
@@ -130,9 +143,9 @@ public class SnowballSim {
 		/*
 		 * Add analyzers to listener.
 		 */
-//		listeners.addComponent(intervalAnalyzer);
+		listeners.addComponent(intervalAnalyzer);
 		listeners.addComponent(iterationAnalyzer);
-//		listeners.addComponent(completeAnalyzer);
+		listeners.addComponent(completeAnalyzer);
 //		listeners.addComponent(connectionAnalyzer);
 //		listeners.addComponent(new DegreeGrowth(output));
 //		listeners.addComponent(new DegreeShare(output));
@@ -170,15 +183,15 @@ public class SnowballSim {
 		tasks.addTask(new WaveSizeTask());
 		tasks.addTask(new IterationTask());
 		
-//		DegreeTask obsDegree = new DegreeTask();
-//		obsDegree.setModule(ObservedDegree.getInstance());
-//		tasks.addTask(obsDegree);
-//		
-//		TransitivityTask obsTransitivity = new TransitivityTask();
-//		obsTransitivity.setModule(ObservedTransitivity.getInstance());
-//		tasks.addTask(obsTransitivity);
-//		
-//		tasks.addTask(new ResponseRateTask());
+		DegreeTask obsDegree = new DegreeTask();
+		obsDegree.setModule(ObservedDegree.getInstance());
+		tasks.addTask(obsDegree);
+		
+		TransitivityTask obsTransitivity = new TransitivityTask();
+		obsTransitivity.setModule(ObservedTransitivity.getInstance());
+		tasks.addTask(obsTransitivity);
+		
+		tasks.addTask(new ResponseRateTask());
 		
 		analyzers.put("obs", tasks);
 		/*
@@ -193,7 +206,7 @@ public class SnowballSim {
 		DescriptivePiStatisticsFactory wsmFactory = new WSMStatsFactory();
 		analyzers.put("wsm", createDefaultEstimAnalyzer(estimator, wsmFactory));
 		
-//		analyzers.put("rds", createDefaultEstimAnalyzer(rdsEstimator, wsmFactory));
+		analyzers.put("rds", createDefaultEstimAnalyzer(rdsEstimator, wsmFactory));
 		
 //		DescriptivePiStatisticsFactory htFactory = new HTStatsFactory(graph.getVertices().size());
 //		analyzers.put("ht", createDefaultEstimAnalyzer(estimator, htFactory));

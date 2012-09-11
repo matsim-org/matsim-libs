@@ -27,17 +27,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.geotools.feature.Feature;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.GraphBuilder;
 import playground.johannes.sna.graph.GraphUtils;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.sna.graph.matrix.Dijkstra;
+import playground.johannes.sna.graph.spatial.SpatialEdge;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.sna.snowball.SampledEdge;
 import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.sna.snowball.analysis.SnowballPartitions;
+import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.io.PajekAttributes;
+import playground.johannes.socialnetworks.graph.spatial.analysis.SpatialFilter;
+import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.AlterGraphFilter;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.ApplySeedsFilter;
@@ -55,21 +66,30 @@ public class NetworkRPlotExport {
 	 * @param args
 	 */
 	public static void main(String args[]) throws IOException {
-		Graph g = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/graph.graphml");
+		SpatialGraph g = GraphReaderFacade.read("/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/graph/graph.graphml");
+		
+		Set<Feature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
+		Geometry geometry = features.iterator().next().getDefaultGeometry();
+		geometry.setSRID(21781);
+		
+		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
+		
+		SpatialFilter filter2 = new SpatialFilter((GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge>) builder, geometry);
+		g = (SpatialGraph) filter2.apply(g);
 		
 		ApplySeedsFilter seedFiler = new ApplySeedsFilter();
-		g = seedFiler.apply((SampledGraph) g);
+		g = (SpatialGraph) seedFiler.apply((SampledGraph) g);
 		
-		AlterGraphFilter filter = new AlterGraphFilter(new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>());
-		g = (SampledGraph) filter.apply((SampledGraph) g);
+		AlterGraphFilter filter = new AlterGraphFilter(builder);
+		g = (SpatialGraph) filter.apply((SampledGraph) g);
 
 		
-		PajekWriter writer = new PajekWriter();
+		SpatialPajekWriter writer = new SpatialPajekWriter();
 		
 		final SeedComponentColorizer colorizer = new SeedComponentColorizer((SampledGraph) g);
 		final Set<SampledEdge> pathEdges = getPathEdges((SampledGraph) g);
 		
-		PajekAttributes<Vertex, Edge> attrs = new PajekAttributes<Vertex, Edge>() {
+		PajekAttributes<SpatialVertex, SpatialEdge> attrs = new PajekAttributes<SpatialVertex, SpatialEdge>() {
 
 			@Override
 			public List<String> getVertexAttributes() {
@@ -86,7 +106,7 @@ public class NetworkRPlotExport {
 			}
 
 			@Override
-			public String getVertexValue(Vertex v, String attribute) {
+			public String getVertexValue(SpatialVertex v, String attribute) {
 				if (PajekAttributes.VERTEX_FILL_COLOR.equals(attribute))
 					return colorizer.getVertexFillColor((SampledVertex) v);
 				else
@@ -94,7 +114,7 @@ public class NetworkRPlotExport {
 			}
 
 			@Override
-			public String getEdgeValue(Edge e, String attribute) {
+			public String getEdgeValue(SpatialEdge e, String attribute) {
 				if(PajekAttributes.EDGE_WIDTH.equals(attribute)) {
 					if(pathEdges.contains(e))
 						return "1";

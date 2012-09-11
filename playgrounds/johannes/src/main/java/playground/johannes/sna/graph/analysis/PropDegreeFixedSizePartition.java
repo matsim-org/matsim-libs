@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExtendedTopologyAnalyzerTask.java
+ * PropDegreeFixedSizePartition.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,57 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.sna.graph.analysis;
 
-import playground.johannes.sna.graph.analysis.ComponentsTask;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import playground.johannes.sna.graph.Vertex;
 
 /**
  * @author illenberger
  *
  */
-public class ExtendedTopologyAnalyzerTask extends AnalyzerTaskComposite {
+public class PropDegreeFixedSizePartition<V extends Vertex> implements VertexFilter<V> {
 
-	public ExtendedTopologyAnalyzerTask() {
-		addTask(new ComponentsTask());
-		
-//		CentralityTask task = new CentralityTask();
-//		task.setCalcAPLDistribution(false);
-//		task.setCalcBetweenness(false);
-//		addTask(task);
-		
-		addTask(new APLTask(true));
+	private final int n;
+	
+	private final Random random;
+	
+	public PropDegreeFixedSizePartition(int n, long randomSeed) {
+		this.n = n;
+		this.random = new Random(randomSeed);
 	}
+	
+	@Override
+	public Set<V> apply(Set<V> vertices) {
+		double ksum = 0;
+		for(V v : vertices) {
+			ksum += v.getNeighbours().size();
+		}
+		
+		double psum = 0;
+		for(V v : vertices) {
+			psum += v.getNeighbours().size()/ksum;
+		}
+		
+		double c = n/psum;
+		
+		List<V> vertexList = new ArrayList<V>(vertices);
+		Set<V> partition = new HashSet<V>();
+		
+		while(partition.size() < n) {
+			V v = vertexList.get(random.nextInt(vertices.size()));
+			double p = v.getNeighbours().size()/ksum * c;
+			if(p > random.nextDouble()) {
+				partition.add(v);
+			}
+		}
+		
+		return partition;
+	}
+
 }
