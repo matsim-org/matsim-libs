@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -46,6 +47,7 @@ import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates actual travel times on link from events and optionally also the link-to-link 
@@ -235,8 +237,9 @@ public class TravelTimeCalculator
         "if calculation is switched off by config option!");
 	}
 	
+
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 	  return this.getLinkTravelTime(link.getId(), time);
 	}
 	

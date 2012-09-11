@@ -26,8 +26,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * This class can bundle several MultiModalTravelTime calculators.
@@ -54,32 +54,23 @@ public class MultiModalTravelTimeWrapper implements MultiModalTravelTime {
 		}
 		this.travelTimes.put(transportMode, travelTime);
 	}
-	
-	@Override
-	public void setPerson(Person person) {
-		for (TravelTime travelTime : travelTimes.values()) {
-			if (travelTime instanceof PersonalizableTravelTime) {
-				((PersonalizableTravelTime) travelTime).setPerson(person);
-			}
-		}
-	}
 
 	@Override
 	public void setTransportMode(String transportMode) {
 		modeTravelTime = travelTimes.get(transportMode);
 		if (modeTravelTime == null) throw new RuntimeException("No PersonalizableTravelTime calculator set for transport mode " + transportMode);
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		return modeTravelTime.getLinkTravelTime(link, time);
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		return modeTravelTime.getLinkTravelTime(link, time, person, vehicle);
 	}
 
 	@Override
-	public double getModalLinkTravelTime(Link link, double time, String transportMode) {
+	public double getModalLinkTravelTime(Link link, double time, String transportMode, Person person, Vehicle vehicle) {
 		TravelTime travelTime = travelTimes.get(transportMode);
 		if (travelTime == null) throw new RuntimeException("No PersonalizableTravelTime calculator set for transport mode " + transportMode);
-		return travelTime.getLinkTravelTime(link, time);
+		return travelTime.getLinkTravelTime(link, time, null, null);
 	}
 
 }

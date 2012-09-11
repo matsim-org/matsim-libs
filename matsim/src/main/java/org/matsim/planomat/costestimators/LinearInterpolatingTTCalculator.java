@@ -25,6 +25,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -33,6 +34,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * A link travel time calculator which returns a travel time that comes
@@ -241,9 +243,8 @@ implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandle
 		this.enterEvents.remove(e);
 	}
 
-
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		return getTravelTimeRole(link.getId()).getTravelTime(time);
 	}
 

@@ -149,7 +149,7 @@ public class ControlerTest {
 		// test if we got the right result
 		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
 		assertEquals("TravelTimeCalculator has wrong result",
-				151.0, controler.getTravelTimeCalculator().getLinkTravelTime(f.link2, 7*3600), 0.0);
+				151.0, controler.getTravelTimeCalculator().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controler().setLastIteration(1);

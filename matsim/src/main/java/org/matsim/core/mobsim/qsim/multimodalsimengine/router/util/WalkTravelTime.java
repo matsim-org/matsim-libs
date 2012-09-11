@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * This is just a first implementation. It will be replaced with a 
@@ -42,16 +43,13 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	/*package*/ WalkTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
 		this.walkSpeed = plansCalcRouteConfigGroup.getWalkSpeed();
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		this.ageScaleFactor = calculateAgeScaleFactor(person);
 		return link.getLength() / (walkSpeed * ageScaleFactor);
 	}
 
-	@Override
-	public void setPerson(Person person) {
-		this.ageScaleFactor = calculateAgeScaleFactor(person);
-	}
 	
 	/*
 	 * Scale the speed of walk/bike legs depending on the age

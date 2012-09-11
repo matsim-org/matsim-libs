@@ -21,7 +21,9 @@
 package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates and returns the FreeSpeedTravelTime on a link at the given time.
@@ -30,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 public class FreeSpeedTravelTimeCalculator implements TravelTime {
 
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		return link.getLength() / link.getFreespeed(time);
 	}
 

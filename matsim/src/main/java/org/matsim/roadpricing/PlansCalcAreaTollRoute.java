@@ -121,7 +121,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					if (path == null) {
 						throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 					}
-					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex]);
+					tollRouteInsideTollArea = routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex], person);
 					tollRoute.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 					tollRoute.setTravelTime((int) path.travelTime);
 					tollRoute.setTravelCost(path.travelCost);
@@ -148,7 +148,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);
 
-					if (routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex])) {
+					if (routeOverlapsTollLinks(fromLink, path, toLink, depTimes[TOLL_INDEX][routeIndex], person)) {
 						/* the no-toll route leads also through the tolling area, so it seems the agent
 						 * can not avoid paying the toll. */
 						agentPaysToll = true;
@@ -251,10 +251,11 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param route The route to test.
 	 * @param endLink The link on which the agent arrives.
 	 * @param depTime The time at which the agent departs.
+	 * @param person TODO
 	 * @return true if the route leads into an active tolling area and an agent
 	 * taking this route will likely have to pay the toll, false otherwise.
 	 */
-	private boolean routeOverlapsTollLinks(final Link startLink, final Path route, final Link endLink, final double depTime) {
+	private boolean routeOverlapsTollLinks(final Link startLink, final Path route, final Link endLink, final double depTime, Person person) {
 		double time = depTime;
 
 		// handle first link
@@ -271,7 +272,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 			if (isLinkTolled(link, time)) {
 				return true;
 			}
-			time += this.timeCalculator.getLinkTravelTime(link, time);
+			time += this.timeCalculator.getLinkTravelTime(link, time, person, null /*vehicle*/);
 		}
 
 		// handle last link

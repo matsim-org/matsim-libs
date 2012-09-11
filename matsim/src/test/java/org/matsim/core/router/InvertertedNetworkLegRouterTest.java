@@ -44,6 +44,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 
@@ -122,10 +123,10 @@ public class InvertertedNetworkLegRouterTest {
 		private double turningMoveCosts34;
 		private double turningMoveCosts35;
 		private double turningMoveCosts36;
+
 		@Override
-		public double getLinkTravelTime(Link link, double time) {
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 			throw new RuntimeException();
-//			return link.getLength() / link.getFreespeed(time);
 		}
 
 		public void setTurningMoveCosts(double link34, double link35, double link36) {

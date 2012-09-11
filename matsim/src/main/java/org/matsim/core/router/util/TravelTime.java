@@ -21,6 +21,8 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 
 
@@ -38,8 +40,10 @@ public interface TravelTime {
 	 * @param link The link for which the travel time is calculated.
 	 * @param time The departure time (in seconds since 00:00) at the beginning
 	 * 		of the link for which the travel time is calculated.
+	 * @param person TODO
+	 * @param vehicle TODO
 	 * @return The time (in seconds) needed to travel over the link
 	 * 		<code>link</code>, departing at time <code>time</code>.
 	 */
-	public double getLinkTravelTime(Link link, double time);
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle);
 }

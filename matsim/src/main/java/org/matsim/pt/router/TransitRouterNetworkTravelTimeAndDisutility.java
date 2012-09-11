@@ -61,7 +61,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			//			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
 			// (old specification)
 			
-			double transfertime = getLinkTravelTime(link, time);
+			double transfertime = getLinkTravelTime(link, time, person, vehicle);
 			double waittime = this.config.additionalTransferTime;
 			
 			// say that the effective walk time is the transfer time minus some "buffer"
@@ -76,7 +76,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			       - this.config.getUtilityOfLineSwitch_utl();
 			
 		} else {
-			cost = - getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 			       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
 		return cost;
@@ -88,7 +88,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	}
 
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		if ((link == this.previousLink) && (time == this.previousTime)) {
 			return this.cachedTravelTime;
 		}

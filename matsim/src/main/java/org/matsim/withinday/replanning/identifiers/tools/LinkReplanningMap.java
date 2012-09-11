@@ -153,8 +153,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 		double departureTime;
 		if (this.multiModalTravelTime != null) {
 			Person person = this.personAgentMapping.get(event.getPersonId()).getSelectedPlan().getPerson();
-			multiModalTravelTime.setPerson(person);
-			double travelTime = multiModalTravelTime.getModalLinkTravelTime(link, now, mode);
+			double travelTime = multiModalTravelTime.getModalLinkTravelTime(link, now, mode, person, null);
 			departureTime = Math.floor(now + travelTime);				
 		} else {
 			departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));

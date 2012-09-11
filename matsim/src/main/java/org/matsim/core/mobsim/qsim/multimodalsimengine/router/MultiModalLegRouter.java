@@ -89,9 +89,6 @@ public class MultiModalLegRouter implements LegRouter {
 			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
 		}
 		
-		// set Person in TravelTime and TravelCost
-		travelTime.setPerson(person);
-		
 		// set transport mode in TravelTime
 		travelTime.setTransportMode(legMode);
 		

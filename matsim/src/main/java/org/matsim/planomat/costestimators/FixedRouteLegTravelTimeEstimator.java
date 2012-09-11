@@ -229,7 +229,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 	protected double processLink(final Link link, final double start) {
 
-		double linkEnd = start + this.linkTravelTimeEstimator.getLinkTravelTime(link, start);
+		double linkEnd = start + this.linkTravelTimeEstimator.getLinkTravelTime(link, start, null, null);
 		return linkEnd;
 
 	}

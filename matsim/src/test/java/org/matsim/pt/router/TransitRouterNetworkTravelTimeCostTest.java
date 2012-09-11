@@ -48,7 +48,7 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 				testLink = link;
 			}
 		}
-		assertEquals(9.0*60, tc.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
+		assertEquals(9.0*60, tc.getLinkTravelTime(testLink, 6.0*3600, null, null), MatsimTestCase.EPSILON);
 	}
 
 	public void testWaitingTime() {
@@ -69,10 +69,10 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 				testLink = link;
 			}
 		}
-		assertEquals(2.0*60 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
-		assertEquals(1.0*60 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600 + 60), MatsimTestCase.EPSILON);
-		assertEquals(0.0*60 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600 + 120), MatsimTestCase.EPSILON);
-		assertEquals(20.0*60 -1 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600 + 121), MatsimTestCase.EPSILON);
+		assertEquals(2.0*60 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600, null, null), MatsimTestCase.EPSILON);
+		assertEquals(1.0*60 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600 + 60, null, null), MatsimTestCase.EPSILON);
+		assertEquals(0.0*60 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600 + 120, null, null), MatsimTestCase.EPSILON);
+		assertEquals(20.0*60 -1 + 7.0*60, tc.getLinkTravelTime(testLink, 6.0*3600 + 121, null, null), MatsimTestCase.EPSILON);
 	}
 
 	public void testTravelTimeAfterMidnight() {
@@ -94,11 +94,11 @@ public class TransitRouterNetworkTravelTimeCostTest extends TestCase {
 			}
 		}
 		// planned departure at 25:00, has to wait until 05:22 = 29:22
-		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 25.0*3600), MatsimTestCase.EPSILON);
+		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 25.0*3600, null, null), MatsimTestCase.EPSILON);
 		// planned departure at 47:00, has to wait until 05:22 = 53:22
-		assertEquals(22.0*60 + 6.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 47.0*3600), MatsimTestCase.EPSILON);
+		assertEquals(22.0*60 + 6.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 47.0*3600, null, null), MatsimTestCase.EPSILON);
 		// planned departure at 49:00, has to wait until 05:22 = 53:22, tests explicitly > 2*MIDNIGHT
-		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 49.0*3600), MatsimTestCase.EPSILON);
+		assertEquals(22.0*60 + 4.0*3600 + 7.0*60, tc.getLinkTravelTime(testLink, 49.0*3600, null, null), MatsimTestCase.EPSILON);
 	}
 
 	public void testTravelCostLineSwitch() {

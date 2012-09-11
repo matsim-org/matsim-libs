@@ -376,7 +376,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
 
-		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
+		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, person, vehicle);
 		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();

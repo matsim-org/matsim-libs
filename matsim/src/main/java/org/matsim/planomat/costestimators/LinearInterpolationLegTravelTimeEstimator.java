@@ -220,11 +220,11 @@ LegTravelTimeEstimator {
 		if (MODES_WITH_VARIABLE_TRAVEL_TIME.contains(legIntermediate.getMode())) {
 
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actOrigin.getLinkId()), departureTime);
+				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actOrigin.getLinkId()), departureTime, person, null);
 			}
 			legTravelTimeEstimation += this.plansCalcRoute.handleLeg(person, legIntermediate, actOrigin, actDestination, departureTime + legTravelTimeEstimation);
 			if (this.simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actDestination.getLinkId()), departureTime + legTravelTimeEstimation);
+				legTravelTimeEstimation += this.linkTravelTimeEstimator.getLinkTravelTime(this.network.getLinks().get(actDestination.getLinkId()), departureTime + legTravelTimeEstimation, person, null);
 			}
 
 		} else {

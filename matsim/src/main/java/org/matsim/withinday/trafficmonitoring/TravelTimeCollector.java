@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -61,6 +62,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
@@ -163,7 +165,7 @@ public class TravelTimeCollector implements TravelTime,
 	}
 
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		return travelTimeInfos.get(link.getId()).travelTime;
 	}
 

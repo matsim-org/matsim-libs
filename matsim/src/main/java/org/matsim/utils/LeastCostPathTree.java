@@ -189,7 +189,7 @@ public class LeastCostPathTree {
 				this.nodeData.put(nn.getId(), nnData);
 			}
 			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, null, null);
-			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime);
+			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime, null, null);
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
 				nnData.visit(n.getId(), visitCost, visitTime);

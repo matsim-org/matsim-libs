@@ -23,7 +23,6 @@ package org.matsim.core.router.costcalculators;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -49,17 +48,13 @@ public class OnlyTimeDependentTravelDisutilityCalculator implements TravelDisuti
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		if (this.travelTime instanceof PersonalizableTravelTime) {
-			((PersonalizableTravelTime) this.travelTime).setPerson(person);
-		}
-		
-		return this.travelTime.getLinkTravelTime(link, time);
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {		
+		return this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
-		return this.travelTime.getLinkTravelTime(link, Time.UNDEFINED_TIME);
+		return this.travelTime.getLinkTravelTime(link, Time.UNDEFINED_TIME, null, null);
 	}
 	
 }

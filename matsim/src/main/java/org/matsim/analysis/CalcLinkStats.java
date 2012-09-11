@@ -93,7 +93,7 @@ public class CalcLinkStats {
 			LinkData data = this.linkData.get(linkId);
 			int sum = 0; // daily (0-24) sum
 			for (int i = 0; i < this.nofHours; i++) {
-				double ttime = ttimes.getLinkTravelTime(link, i*3600);
+				double ttime = ttimes.getLinkTravelTime(link, i*3600, null, null);
 				sum += volumes[i];
 				if (this.count == 1) {
 					data.volumes[MIN][i] = volumes[i];

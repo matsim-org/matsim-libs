@@ -90,9 +90,9 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 			link.setCapacity(500.0);	// reduce capacity
 			
 			// check free speed travel times - they should not be initialized yet
-			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1));
-			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2));
-			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3));
+			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1, null, null));
+			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2, null, null));
+			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3, null, null));
 		}
 	}
 	
@@ -125,64 +125,64 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		@Override
 		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			// check free speed travel times - they should be initialized now
-			assertEquals(link.getLength()/link.getFreespeed(t1), travelTime.getLinkTravelTime(link, t1));
-			assertEquals(link.getLength()/link.getFreespeed(t2), travelTime.getLinkTravelTime(link, t2));
-			assertEquals(link.getLength()/link.getFreespeed(t3), travelTime.getLinkTravelTime(link, t3));
-			assertEquals(link.getLength()/link.getFreespeed(t4), travelTime.getLinkTravelTime(link, t4));
-			assertEquals(link.getLength()/link.getFreespeed(t5), travelTime.getLinkTravelTime(link, t5));
-			assertEquals(link.getLength()/link.getFreespeed(t6), travelTime.getLinkTravelTime(link, t6));
-			assertEquals(link.getLength()/link.getFreespeed(t7), travelTime.getLinkTravelTime(link, t7));
-			assertEquals(link.getLength()/link.getFreespeed(t8), travelTime.getLinkTravelTime(link, t8));
+			assertEquals(link.getLength()/link.getFreespeed(t1), travelTime.getLinkTravelTime(link, t1, null, null));
+			assertEquals(link.getLength()/link.getFreespeed(t2), travelTime.getLinkTravelTime(link, t2, null, null));
+			assertEquals(link.getLength()/link.getFreespeed(t3), travelTime.getLinkTravelTime(link, t3, null, null));
+			assertEquals(link.getLength()/link.getFreespeed(t4), travelTime.getLinkTravelTime(link, t4, null, null));
+			assertEquals(link.getLength()/link.getFreespeed(t5), travelTime.getLinkTravelTime(link, t5, null, null));
+			assertEquals(link.getLength()/link.getFreespeed(t6), travelTime.getLinkTravelTime(link, t6, null, null));
+			assertEquals(link.getLength()/link.getFreespeed(t7), travelTime.getLinkTravelTime(link, t7, null, null));
+			assertEquals(link.getLength()/link.getFreespeed(t8), travelTime.getLinkTravelTime(link, t8, null, null));
 		}
 
 		@Override
 		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 //			System.out.println(travelTime.getLinkTravelTime(link, e.getSimulationTime()));
 			if (e.getSimulationTime() == t1) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1));
+				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1, null, null));
 			} else if (e.getSimulationTime() == t2) {
-				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2));
+				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null));
 			} else if (e.getSimulationTime() == t3) {
-				assertEquals(468.2162162162162, travelTime.getLinkTravelTime(link, t3));
+				assertEquals(468.2162162162162, travelTime.getLinkTravelTime(link, t3, null, null));
 			} else if (e.getSimulationTime() == t4) {
 //				assertEquals(616.4935064935065, travelTime.getLinkTravelTime(link, t4));
-				assertEquals(613.2051282051282, travelTime.getLinkTravelTime(link, t4));
+				assertEquals(613.2051282051282, travelTime.getLinkTravelTime(link, t4, null, null));
 			} else if (e.getSimulationTime() == t5) {
 //				assertEquals(822.1428571428571, travelTime.getLinkTravelTime(link, t5));
-				assertEquals(691.19, travelTime.getLinkTravelTime(link, t5));
+				assertEquals(691.19, travelTime.getLinkTravelTime(link, t5, null, null));
 			} else if (e.getSimulationTime() == t6) {
 //				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t6));
-				assertEquals(691.19, travelTime.getLinkTravelTime(link, t6));
+				assertEquals(691.19, travelTime.getLinkTravelTime(link, t6, null, null));
 			} else if (e.getSimulationTime() == t7) {
 //				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t7));
-				assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7));
+				assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7, null, null));
 			} else if (e.getSimulationTime() == t8) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8));
+				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null));
 			}
 		}
 
 		@Override
 		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 			if (e.getSimulationTime() == t1) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1));
+				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1, null, null));
 			} else if (e.getSimulationTime() == t2) {
-				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2));
+				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null));
 			} else if (e.getSimulationTime() == t3) {
-				assertEquals(468.2162162162162, travelTime.getLinkTravelTime(link, t3));
+				assertEquals(468.2162162162162, travelTime.getLinkTravelTime(link, t3, null, null));
 			} else if (e.getSimulationTime() == t4) {
 //				assertEquals(616.4935064935065, travelTime.getLinkTravelTime(link, t4));
-				assertEquals(613.2051282051282, travelTime.getLinkTravelTime(link, t4));
+				assertEquals(613.2051282051282, travelTime.getLinkTravelTime(link, t4, null, null));
 			} else if (e.getSimulationTime() == t5) {
 //				assertEquals(822.1428571428571, travelTime.getLinkTravelTime(link, t5));
-				assertEquals(691.19, travelTime.getLinkTravelTime(link, t5));
+				assertEquals(691.19, travelTime.getLinkTravelTime(link, t5, null, null));
 			} else if (e.getSimulationTime() == t6) {
 //				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t6));
-				assertEquals(691.19, travelTime.getLinkTravelTime(link, t6));
+				assertEquals(691.19, travelTime.getLinkTravelTime(link, t6, null, null));
 			} else if (e.getSimulationTime() == t7) {
 //				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t7));
-				assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7));
+				assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7, null, null));
 			} else if (e.getSimulationTime() == t8) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8));
+				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null));
 			}
 		}
 	}

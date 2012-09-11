@@ -20,7 +20,6 @@
 
 package org.matsim.core.router.util;
 
-import org.matsim.api.core.v01.population.Person;
 
 @Deprecated
 /**
@@ -44,6 +43,5 @@ import org.matsim.api.core.v01.population.Person;
  */
 public interface PersonalizableTravelTime extends TravelTime {
 	
-	void setPerson(Person person);
-	
+
 }

@@ -160,7 +160,7 @@ public class AStarEuclidean extends Dijkstra {
 	boolean addToPendingNodes(final Link l, final Node n, final PseudoRemovePriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode) {
 
-		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime);
+		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, getPerson(), getVehicle());
 		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.getPerson(), this.getVehicle());
 		AStarNodeData data = getData(n);
 		double nCost = data.getCost();

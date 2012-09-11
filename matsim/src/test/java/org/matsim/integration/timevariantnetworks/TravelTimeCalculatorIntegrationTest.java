@@ -68,10 +68,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		TravelTime ttcalc = new TravelTimeCalculator(network,config.travelTimeCalculator());
 
 		// do the tests
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link2, 7*3600.0), EPSILON);
-		assertEquals(5.0, ttcalc.getLinkTravelTime(link2, 8*3600.0), EPSILON);
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 7*3600.0), EPSILON);
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 8*3600.0), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTime(link2, 7*3600.0, null, null), EPSILON);
+		assertEquals(5.0, ttcalc.getLinkTravelTime(link2, 8*3600.0, null, null), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 7*3600.0, null, null), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 8*3600.0, null, null), EPSILON);
 	}
 
 	public void testTravelTimeCalculatorHashMap() {
@@ -104,10 +104,10 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		ttcalc.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
 
 		// do the tests
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link2, 7*3600.0), EPSILON);
-		assertEquals(5.0, ttcalc.getLinkTravelTime(link2, 8*3600.0), EPSILON);
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 7*3600.0), EPSILON);
-		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 8*3600.0), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTime(link2, 7*3600.0, null, null), EPSILON);
+		assertEquals(5.0, ttcalc.getLinkTravelTime(link2, 8*3600.0, null, null), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 7*3600.0, null, null), EPSILON);
+		assertEquals(10.0, ttcalc.getLinkTravelTime(link1, 8*3600.0, null, null), EPSILON);
 	}
 
 }

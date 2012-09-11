@@ -453,7 +453,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 
 		@Override
-		public double getLinkTravelTime(final Link link, final double time) {
+		public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 			return this.travelTimes.get(link.getId()).doubleValue();
 		}
 

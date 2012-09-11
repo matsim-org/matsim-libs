@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Wraps a PersonalizableTravelTime around a TravelTime object.
@@ -49,15 +50,10 @@ public class TravelTimeFactoryWrapper implements PersonalizableTravelTimeFactory
 		public Wrapper(TravelTime travelTime) {
 			this.travelTime = travelTime;
 		}
-		
-		@Override
-		public double getLinkTravelTime(Link link, double time) {
-			return this.travelTime.getLinkTravelTime(link, time);
-		}
 
 		@Override
-		public void setPerson(Person person) {
-			// nothing to do here
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			return this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 		}
 		
 	}

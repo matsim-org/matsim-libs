@@ -102,7 +102,7 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 	}
 
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		return link.getLength() / link.getFreespeed(time);
 	}
 
@@ -111,7 +111,7 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 	 */
 	@Override
 	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
-		return this.getLinkTravelTime(fromLink, time);
+		return this.getLinkTravelTime(fromLink, time, null, null);
 	}
 	
 }

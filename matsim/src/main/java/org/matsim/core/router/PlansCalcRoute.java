@@ -36,7 +36,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -91,8 +90,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 
 	protected final Network network;
 
-	private final TravelTime timeCalculator;
-
 	private ModularPlanRouter data = new ModularPlanRouter();
 
 	/**Does the following (as far as I can see):<ul>
@@ -109,7 +106,6 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 		this.network = network;
-		this.timeCalculator = timeCalculator;
 		this.routeFactory = routeFactory;
 		if (group != null) {
 			this.configGroup = group;
@@ -174,9 +170,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	protected void handlePlan(Person person, final Plan plan) {
-		if (timeCalculator instanceof PersonalizableTravelTime) {
-			((PersonalizableTravelTime) timeCalculator).setPerson(person);
-		}
+
 		data.routePlan(person, plan);
 	}
 

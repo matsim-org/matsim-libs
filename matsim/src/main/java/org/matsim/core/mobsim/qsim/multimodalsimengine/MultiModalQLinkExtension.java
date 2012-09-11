@@ -30,7 +30,6 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
@@ -86,10 +85,7 @@ public class MultiModalQLinkExtension {
 	private void addAgent(MobsimAgent personAgent, double now) {
 
 		MultiModalTravelTime multiModalTravelTime = simEngine.getMultiModalTravelTime();
-		if (personAgent instanceof HasPerson) {
-			multiModalTravelTime.setPerson(((HasPerson) personAgent).getPerson());			
-		}
-		double travelTime = multiModalTravelTime.getModalLinkTravelTime(qLink.getLink(), now, personAgent.getMode());
+		double travelTime = multiModalTravelTime.getModalLinkTravelTime(qLink.getLink(), now, personAgent.getMode(), null, null);
 		double departureTime = now + travelTime;
 
 		departureTime = Math.round(departureTime);

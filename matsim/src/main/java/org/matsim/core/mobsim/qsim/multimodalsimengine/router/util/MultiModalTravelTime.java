@@ -21,11 +21,13 @@
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.vehicles.Vehicle;
 
 public interface MultiModalTravelTime extends PersonalizableTravelTime {
 
-	public double getModalLinkTravelTime(Link link, double time, String transportMode);
+	public double getModalLinkTravelTime(Link link, double time, String transportMode, Person person, Vehicle vehicle);
 	
 	/**
 	 * Define the transport mode that should be used if getLinkTravelTime(...) is called.

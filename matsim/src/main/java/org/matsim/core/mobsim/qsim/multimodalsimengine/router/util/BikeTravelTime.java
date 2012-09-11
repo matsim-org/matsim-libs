@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * This is just a first implementation. It will be replaced with a 
@@ -45,10 +46,10 @@ public class BikeTravelTime implements PersonalizableTravelTime {
 		this.bikeSpeed = plansCalcRouteConfigGroup.getBikeSpeed();
 		this.walkTravelTime = walkTravelTime;
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		this.ageScaleFactor = calculateAgeScaleFactor(person);
 		/*
 		 * If the link allows bike trips, we use bike speed.
 		 * Otherwise we check whether walk trips are allowed and return walk speed.
@@ -56,15 +57,10 @@ public class BikeTravelTime implements PersonalizableTravelTime {
 		 * is used.
 		 */
 		if (link.getAllowedModes().contains(TransportMode.bike)) return link.getLength() / (bikeSpeed * ageScaleFactor);
-		else if (link.getAllowedModes().contains(TransportMode.walk)) return walkTravelTime.getLinkTravelTime(link, time);
+		else if (link.getAllowedModes().contains(TransportMode.walk)) return walkTravelTime.getLinkTravelTime(link, time, person, vehicle);
 		else return link.getLength() / 1.0;
 	}
 
-	@Override
-	public void setPerson(Person person) {
-		this.ageScaleFactor = calculateAgeScaleFactor(person);
-		this.walkTravelTime.setPerson(person);
-	}
 	
 	/*
 	 * Scale the speed of walk/bike legs depending on the age
