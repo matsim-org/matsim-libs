@@ -46,7 +46,6 @@ import playground.thibautd.jointtrips.router.DriverRoutingModule;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
 import playground.thibautd.jointtrips.router.JointTripRouterFactory;
 import playground.thibautd.jointtrips.router.PassengerRoutingModule;
-import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
@@ -107,7 +106,7 @@ public class JointControler extends MultiLegRoutingControler {
 		addControlerListener( new StartupListener() {
 			@Override
 			public void notifyStartup(final StartupEvent event) {
-				setTripRouterFactory( new JointTripRouterFactory( new RoutingElements( event.getControler() ) ) );
+				setTripRouterFactory( new JointTripRouterFactory( event.getControler() ) );
 			}
 		});
 
@@ -208,6 +207,6 @@ public class JointControler extends MultiLegRoutingControler {
 
 	@Override
 	public TripRouterFactory getTripRouterFactory() {
-		return new JointTripRouterFactory( new RoutingElements( this ) );
+		return new JointTripRouterFactory( this );
 	}
 }

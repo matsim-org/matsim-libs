@@ -30,7 +30,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.PlanRouter;
-import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.TripRouterFactoryImpl;
 
@@ -53,7 +52,7 @@ public class MultiLegRoutingControler extends Controler {
 		addControlerListener( new StartupListener() {
 			@Override
 			public void notifyStartup(final StartupEvent event) {
-				setTripRouterFactory( new TripRouterFactoryImpl( new RoutingElements( event.getControler() ) ) );
+				setTripRouterFactory( new TripRouterFactoryImpl( event.getControler() ) );
 			}
 		});
 

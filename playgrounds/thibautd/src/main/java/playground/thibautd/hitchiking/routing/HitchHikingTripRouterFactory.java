@@ -24,13 +24,14 @@ import java.util.List;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationFactoryImpl;
 
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.HitchHikingSpots;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
-import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.TripRouter;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.TripRouterFactoryImpl;
@@ -40,17 +41,17 @@ import playground.thibautd.router.TripRouterFactoryImpl;
  */
 public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 	private final HitchHikingSpots spots;
-	private final RoutingElements data;
+	private final Controler controler;
 	private final SpotWeighter spotWeighter;
 	private final HitchHikingConfigGroup config;
 
 	public HitchHikingTripRouterFactory(
-			final RoutingElements data,
+			final Controler controler,
 			final HitchHikingSpots spots,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config) {
-		super( data );
-		this.data = data;
+		super( controler );
+		this.controler = controler;
 		this.spotWeighter = spotWeighter;
 		this.spots = spots;
 		this.config = config;
@@ -70,7 +71,7 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 				new HitchHikingPassengerRoutingModule(
 					instance.getRoutingModule( TransportMode.pt ),
 					spots,
-					data.getModeRouteFactory(),
+					((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
 					spotWeighter,
 					config,
 					// XXX here or higher level?

@@ -30,7 +30,6 @@ import playground.thibautd.hitchiking.qsim.HitchHikingQsimFactory;
 import playground.thibautd.hitchiking.routing.HitchHikingTripRouterFactory;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
-import playground.thibautd.router.RoutingElements;
 
 /**
  * @author thibautd
@@ -45,7 +44,7 @@ public class HitchHikingControler extends MultiLegRoutingControler {
 			public void notifyStartup(final StartupEvent event) {
 				setTripRouterFactory(
 					new HitchHikingTripRouterFactory(
-						new RoutingElements( event.getControler() ),
+						event.getControler(),
 						HitchHikingUtils.getSpots( getScenario() ),
 						spotWeighter,
 						HitchHikingUtils.getConfigGroup( getConfig() )));

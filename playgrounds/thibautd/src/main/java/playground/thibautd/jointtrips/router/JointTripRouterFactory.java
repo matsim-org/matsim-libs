@@ -19,10 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.router;
 
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationImpl;
 
 import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.TripRouter;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.TripRouterFactoryImpl;
@@ -32,11 +35,11 @@ import playground.thibautd.router.TripRouterFactoryImpl;
  */
 public class JointTripRouterFactory implements TripRouterFactory {
 	private final TripRouterFactory defaultFactory;
-	private final RoutingElements data;
+	private final PopulationFactory populationFactory;
 
-	public JointTripRouterFactory(final RoutingElements data) {
-		this.data = data;
-		defaultFactory = new TripRouterFactoryImpl( data );
+	public JointTripRouterFactory(final Controler controler) {
+		defaultFactory = new TripRouterFactoryImpl( controler );
+		populationFactory = ((PopulationImpl) controler.getPopulation()).getFactory();
 	}
 
 	@Override
@@ -47,15 +50,15 @@ public class JointTripRouterFactory implements TripRouterFactory {
 				JointActingTypes.DRIVER,
 				new DriverRoutingModule(
 					JointActingTypes.DRIVER,
-					data.getPopulationFactory(),
+					populationFactory,
 					instance.getRoutingModule( TransportMode.car )));
 
 		instance.setRoutingModule(
 				JointActingTypes.PASSENGER,
 				new PassengerRoutingModule(
 					JointActingTypes.PASSENGER,
-					data.getPopulationFactory(),
-					data.getModeRouteFactory()));
+					populationFactory,
+					((PopulationFactoryImpl) populationFactory).getModeRouteFactory()));
 
 		return instance;
 	}

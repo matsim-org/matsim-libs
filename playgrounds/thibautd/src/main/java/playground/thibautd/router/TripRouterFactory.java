@@ -23,7 +23,7 @@ import org.matsim.core.api.internal.MatsimFactory;
 
 /**
  * Creates configured {@link TripRouter} instances.
- * This class must be extended to implement a custom routing behaviour.
+ * This interface must be implemented to implement a custom routing behaviour.
  * @author thibautd
  */
 public interface TripRouterFactory extends MatsimFactory {

@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -50,7 +51,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
-import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.StageActivityTypesImpl;
@@ -88,28 +88,32 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	public FixedRouteNetworkRoutingModule(
 			final String mainMode,
 			final Plan plan,
-			final RoutingElements routingElements,
+			final PopulationFactory populationFactory,
+			final Network network,
+			final TravelTime travelTime,
+			final TravelDisutilityFactory travelDisutilityFactory,
+			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
+			final ModeRouteFactory modeRouteFactory,
 			final PlanCalcScoreConfigGroup scoreConfigGroup,
 			final DepartureDelayAverageCalculator tDepDelayCalc,
 			final boolean isFirstLinkSimulated,
 			final boolean isLastLinkSimulated) {
 		this.mode = mainMode;
-		this.populationFactory = routingElements.getPopulationFactory();
+		this.populationFactory = populationFactory;
 		this.tDepDelayCalc = tDepDelayCalc;
 		this.isFirstLinkSimulated = isFirstLinkSimulated;
 		this.isLastLinkSimulated = isLastLinkSimulated;
 
-		this.network = routingElements.getNetwork();
-		this.travelTime = routingElements.getTravelTimeFactory().createTravelTime();
-		this.travelCost = routingElements.getTravelDisutilityFactory().createTravelDisutility( travelTime , scoreConfigGroup );
+		this.network = network;
+		this.travelTime = travelTime;
+		this.travelCost = travelDisutilityFactory.createTravelDisutility( travelTime , scoreConfigGroup );
 
 		routes = extractRoutes( plan , mainMode );
 
 		// if no route is found, the shortest path without congestion will be used
 		FreespeedTravelTimeAndDisutility freeFlowTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-		LeastCostPathCalculatorFactory leastCostPathAlgoFactory = routingElements.getLeastCostPathCalculatorFactory();
 		LeastCostPathCalculator routeAlgo = leastCostPathAlgoFactory.createPathCalculator(network, freeFlowTimeCostCalc, freeFlowTimeCostCalc);
-		ModeRouteFactory routeFactory = routingElements.getModeRouteFactory();
+		ModeRouteFactory routeFactory = modeRouteFactory;
 
 		this.routingModule =
 			new NetworkLegRouter(

@@ -24,13 +24,14 @@ import java.util.Random;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
@@ -111,9 +112,16 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 			final MultiLegRoutingControler controler ) {
 		return new EstimatorTripRouterFactory(
 				plan,
-				new RoutingElements( controler ),
+				((PopulationImpl) controler.getPopulation()).getFactory(),
+				controler.getNetwork(),
+				controler.getTravelTimeCalculator(),
+				controler.getTravelDisutilityFactory(),
+				controler.getLeastCostPathCalculatorFactory(),
+				((PopulationFactoryImpl) ((PopulationImpl) controler.getPopulation()).getFactory()).getModeRouteFactory(),
+				controler.getScenario().getTransitSchedule(),
 				controler.getConfig().plansCalcRoute(),
 				controler.getConfig().planCalcScore(),
 				delay,
-				controler.getTripRouterFactory());	}
+				controler.getTripRouterFactory());
+	}
 }

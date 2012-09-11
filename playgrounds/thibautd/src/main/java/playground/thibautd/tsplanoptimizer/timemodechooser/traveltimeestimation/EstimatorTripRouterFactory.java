@@ -19,13 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.RoutingModule;
 import playground.thibautd.router.TransitRouterWrapper;
 import playground.thibautd.router.TripRouter;
@@ -39,22 +45,40 @@ public class EstimatorTripRouterFactory implements TripRouterFactory {
 	private final PlansCalcRouteConfigGroup config;
 	private final PlanCalcScoreConfigGroup configScore;
 	private final Plan plan;
-	private final RoutingElements data;
+	private final PopulationFactory populationFactory;
+	private final Network network;
+	private final TravelTime travelTime;
+	private final TravelDisutilityFactory travelDisutilityFactory;
+	private final LeastCostPathCalculatorFactory leastCostPathAlgoFactory;
+	private final ModeRouteFactory modeRouteFactory;
 	private final DepartureDelayAverageCalculator delay;
+	private final TransitSchedule transitSchedule;
 
 	public EstimatorTripRouterFactory(
 			final Plan plan,
-			final RoutingElements data,
+			final PopulationFactory populationFactory,
+			final Network network,
+			final TravelTime travelTime,
+			final TravelDisutilityFactory travelDisutilityFactory,
+			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
+			final ModeRouteFactory modeRouteFactory,
+			final TransitSchedule transitSchedule,
 			final PlansCalcRouteConfigGroup config,
 			final PlanCalcScoreConfigGroup configScore,
 			final DepartureDelayAverageCalculator delay,
 			final TripRouterFactory delegate) {
-		this.data = data;
 		this.plan = plan;
 		this.config = config;
 		this.configScore = configScore;
 		this.delay = delay;
 		this.delegate = delegate;
+		this.populationFactory = populationFactory;
+		this.network = network;
+		this.travelTime = travelTime;
+		this.travelDisutilityFactory = travelDisutilityFactory;
+		this.leastCostPathAlgoFactory = leastCostPathAlgoFactory;
+		this.modeRouteFactory = modeRouteFactory;
+		this.transitSchedule = transitSchedule;
 	}
 
 	@Override
@@ -67,7 +91,12 @@ public class EstimatorTripRouterFactory implements TripRouterFactory {
 					new FixedRouteNetworkRoutingModule(
 						mode,
 						plan,
-						data,
+						populationFactory,
+						network,
+						travelTime,
+						travelDisutilityFactory,
+						leastCostPathAlgoFactory,
+						modeRouteFactory,
 						configScore,
 						delay,
 						// TODO: import from somewhere, or detect from the mobsim
@@ -81,7 +110,7 @@ public class EstimatorTripRouterFactory implements TripRouterFactory {
 					TransportMode.pt,
 					new FixedTransitRouteRoutingModule(
 						plan,
-						data.getTransitSchedule(),
+						transitSchedule,
 						(TransitRouterWrapper) pt ));
 		}
 
