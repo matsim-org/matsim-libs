@@ -41,7 +41,7 @@
  * route all trips in a plan.
  * </ul>
  *
- * The behaviour can be modified by implementing custom {@link playground.thibautd.router.TripRouterBuilder}s.
+ * The behaviour can be modified by implementing custom {@link playground.thibautd.router.TripRouterFactory}s.
  *
  *
  * @author thibautd
