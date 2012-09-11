@@ -78,7 +78,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 		}
 
 		// add the events handler to calculate the tolls paid by agents
-		this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme, controler.getPopulation());
+		this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.tollCalc);
 
 		// replace the travelCostCalculator with a toll-dependent one if required

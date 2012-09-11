@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -58,7 +56,6 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	final RoadPricingScheme scheme;
 	final TreeMap<Id, AgentTollInfo> agents = new TreeMap<Id, AgentTollInfo>();
 	private final Network network;
-	private final Population population ;
 
 	private final TollBehaviourI handler;
 
@@ -68,10 +65,9 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * <li> yyyy However, would need EventsManager if toll is sent to agent at arrival. kai, mar'12
 	 * </ul>
 	 */
-	public CalcPaidToll(final Network network, final RoadPricingScheme scheme, Population population) {
+	public CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
 		super();
 		this.network = network;
-		this.population = population ;
 		this.scheme = scheme;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.handler = new DistanceTollBehaviour();
@@ -93,15 +89,13 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
-		Person person = this.population.getPersons().get(event.getPersonId()) ;
-		this.handler.handleEvent(event, link, person);
+		this.handler.handleEvent(event, link);
 	}
 
 	@Override
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
-		Person person = this.population.getPersons().get(event.getPersonId()) ;
-		this.handler.handleEvent(event, link, person);
+		this.handler.handleEvent(event, link);
 	}
 
 	/**
@@ -171,7 +165,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 * A simple interface to implement different toll schemes.
 	 */
 	private interface TollBehaviourI {
-		public void handleEvent(PersonEvent event, Link link, Person person );
+		public void handleEvent(PersonEvent event, Link link );
 	}
 
 	/**
@@ -182,7 +176,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link, Person person) {
+		public void handleEvent(final PersonEvent event, final Link link) {
 			if (event instanceof AgentWait2LinkEventImpl) {
 				/* we do not handle wait2link-events for distance toll, because the agent
 				 * must not pay twice for this link, and he (likely) paid already when
@@ -190,7 +184,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 				return;
 			}
 			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
-					event.getTime(), person.getId());
+					event.getTime(), event.getPersonId());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
@@ -205,14 +199,14 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 
 	class LinkTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link, Person person) {
+		public void handleEvent(final PersonEvent event, final Link link) {
 			if (event instanceof AgentWait2LinkEventImpl) {
 				/* we do not handle wait2link-events for link toll, because the agent
 				 * should not pay twice for this link, and he (likely) paid already when
 				 * arriving at this link.  */
 				return;
 			}
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), person.getId());
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getPersonId());
 			if (cost != null) {
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
@@ -234,8 +228,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 */
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link, Person person) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), person.getId());
+		public void handleEvent(final PersonEvent event, final Link link) {
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getPersonId());
 			if (cost != null) {
 				AgentTollInfo info = CalcPaidToll.this.agents.get(event.getPersonId());
 				if (info == null) {
@@ -253,8 +247,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventH
 	 */
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link, Person person) {
-			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), person.getId());
+		public void handleEvent(final PersonEvent event, final Link link) {
+			Cost cost = CalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getPersonId());
 			if (cost != null) {
 				// this is a link inside the toll area.
 				// [[I guess this assumes that all links inside the cordon are listed in the toll scheme, similar to an area

@@ -31,7 +31,7 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 	final GautengTollStatistics gautengTollStatistics ;
 	
 	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingScheme vehDepScheme ) {
-		calcPaidToll = new CalcPaidToll(network, vehDepScheme, population ) ;
+		calcPaidToll = new CalcPaidToll(network, vehDepScheme) ;
 		cattl = new CalcAverageTolledTripLength(network, vehDepScheme );
 		gautengTollStatistics = new GautengTollStatistics() ;
 	}
