@@ -282,7 +282,7 @@ public class PTActWriter {
 
 		for(Link link2: routeLinks){
 			LinkImpl link = (LinkImpl) link2;
-			linkTravelTime=this.ptRouter.ptTravelTime.getLinkTravelTime(link,accumulatedTime);
+			linkTravelTime=this.ptRouter.ptTravelTime.getLinkTravelTime(link,accumulatedTime, null, null);
 			linkDistance = link.getLength();
 
 			if (link.getType().equals(PTValues.STANDARD_STR)){

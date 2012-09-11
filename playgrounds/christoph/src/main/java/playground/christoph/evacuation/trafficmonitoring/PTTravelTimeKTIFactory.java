@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
@@ -33,13 +34,13 @@ import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 public class PTTravelTimeKTIFactory implements PersonalizableTravelTimeFactory {
 	
 	/*package*/ final Scenario scenario;
-	private final PersonalizableTravelTimeFactory ptTravelTimeFactory;
+	private final TravelTime ptTravelTimeFactory;
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private final Map<Id, Double> agentSpeedMap;
 	
-	public PTTravelTimeKTIFactory(Scenario scenario, PersonalizableTravelTimeFactory ptTravelTimeFactory) {
+	public PTTravelTimeKTIFactory(Scenario scenario, TravelTime travelTime) {
 		this.scenario = scenario;
-		this.ptTravelTimeFactory = ptTravelTimeFactory;
+		this.ptTravelTimeFactory = travelTime;
 		this.agentSpeedMap = new ConcurrentHashMap<Id, Double>();
 		
 		KtiConfigGroup ktiConfigGroup = (KtiConfigGroup) scenario.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
@@ -50,7 +51,7 @@ public class PTTravelTimeKTIFactory implements PersonalizableTravelTimeFactory {
 	@Override
 	public PTTravelTimeKTI createTravelTime() {
 		return new PTTravelTimeKTI(plansCalcRouteKtiInfo, scenario.getConfig().plansCalcRoute(), agentSpeedMap,
-				ptTravelTimeFactory.createTravelTime());
+				ptTravelTimeFactory);
 	}
 	
 	public PlansCalcRouteKtiInfo getPlansCalcRouteKtiInfo() {

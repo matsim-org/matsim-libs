@@ -303,12 +303,12 @@ public class CalculateTravelTimes {
 		
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-			return travelTime.getLinkTravelTime(link, time);
+			return travelTime.getLinkTravelTime(link, time, person, vehicle);
 		}
 
 		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
-			return travelTime.getLinkTravelTime(link, 0.0);
+			return travelTime.getLinkTravelTime(link, 0.0, null, null);
 		}
 	}
 }

@@ -47,9 +47,9 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 	}
 
 	@Override
-	public double getLinkTravelTime(final Link link, final double time)
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle)
 	{
-		double time2 = calc.getLinkTravelTime(link, time);
+		double time2 = calc.getLinkTravelTime(link, time, person, vehicle);
 		
 		// Do some stuff
 		

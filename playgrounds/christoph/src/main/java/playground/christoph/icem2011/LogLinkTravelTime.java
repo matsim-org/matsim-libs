@@ -107,7 +107,7 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 //				double ett = expectedTravelTime.getLinkTravelTime(link, time);
 //				double mtt = measuredTravelTime.getLinkTravelTime(link, time);
 //				data.get(link.getId()).append(time + delimiter + ett + delimiter + mtt + "\n");
-				double ett = expectedTravelTime.getLinkTravelTime(link, time);
+				double ett = expectedTravelTime.getLinkTravelTime(link, time, null, null);
 				data.get(link.getId()).add(ett);
 			}
 		}
@@ -131,7 +131,7 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 				for (int i = 0; i < times.size(); i++) {
 					double time = times.get(i);
 					double ett = etts.get(i);
-					double mtt = measuredTravelTime.getLinkTravelTime(link, time);
+					double mtt = measuredTravelTime.getLinkTravelTime(link, time, null, null);
 					String string = time + delimiter + ett + delimiter + mtt + "\n";
 					bw.write(string);
 				}
@@ -165,7 +165,7 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 			if (time > graphCutOffTime) break;	// do not display values > 30h in the graph
 			double hour = Double.valueOf(time) / 3600.0;
 			expectedTravelTimes.add(hour, Double.valueOf(etts.get(i)));
-			measuredTravelTimes.add(hour, Double.valueOf(measuredTravelTime.getLinkTravelTime(link, time)));
+			measuredTravelTimes.add(hour, Double.valueOf(measuredTravelTime.getLinkTravelTime(link, time, null, null)));
 		}
 
 		xyData.addSeries(expectedTravelTimes);

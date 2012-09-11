@@ -67,14 +67,14 @@ public class FareBasedTravelTimeCost implements TravelDisutility, TravelTime {
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// it's a transfer link (walk)
 			//cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
-			double transfertime = getLinkTravelTime(link, time);
+			double transfertime = getLinkTravelTime(link, time, null, null);
 			double waittime = this.config.additionalTransferTime;
 			double walktime = transfertime - waittime;
 			cost = -walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
 			       -waittime * this.config.getMarginalUtiltityOfWaiting_utl_s()
 			       - this.config.getUtilityOfLineSwitch_utl();
 		} else {
-			cost = -getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+			cost = -getLinkTravelTime(link, time, null, null) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
 		
 		/* Looks up the 'zone' (or type) of the start-node/-stop and the end-node/-stop in the
@@ -104,9 +104,10 @@ public class FareBasedTravelTimeCost implements TravelDisutility, TravelTime {
 		
 		return cost;
 	}
-	
+
+
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		if ((link == this.previousLink) && (time == this.previousTime)) {
 			return this.cachedTravelTime;
 		}

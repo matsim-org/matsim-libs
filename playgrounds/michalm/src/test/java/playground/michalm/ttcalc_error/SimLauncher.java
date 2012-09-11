@@ -48,7 +48,7 @@ public class SimLauncher
 
         for (int i = 0; i < 2 * 60 * 60; i += 5 * 60) {// each 5 minutes during the first 2 hours
             int m = i / 60;
-            System.out.println(m + " : " + travelTime.getLinkTravelTime(linkB, i));
+            System.out.println(m + " : " + travelTime.getLinkTravelTime(linkB, i, null, null));
         }
     }
 }

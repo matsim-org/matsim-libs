@@ -37,7 +37,7 @@ public class PTTravelCost implements TravelDisutility{
 	
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double cost = ptTravelTime.getLinkTravelTime(link, time) ;  
+		double cost = ptTravelTime.getLinkTravelTime(link, time, person, vehicle) ;  
 
 		String type = ((LinkImpl)link).getType();
 		if (type.equals( PTValues.DETTRANSFER_STR ) || type.equals( PTValues.TRANSFER_STR )){

@@ -39,7 +39,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		final String msg = "different result of cost calculation:";
 		for (Link link : adaptedTransitRouter.getTransitRouterNetwork().getLinks().values()){
 			double travelCost = adaptedTravelTimeCost.getLinkTravelDisutility(link, accumTime, null, null);
-			double travelTime = adaptedTravelTimeCost.getLinkTravelTime(link, accumTime);
+			double travelTime = adaptedTravelTimeCost.getLinkTravelTime(link, accumTime, null, null);
 			Assert.assertEquals(msg , travelCost, -travelTime * myConfig.getMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * myConfig.getMarginalUtilityOfTravelDistancePt_utl_m() , MatsimTestUtils.EPSILON);
 			accumTime += travelTime;
 		}

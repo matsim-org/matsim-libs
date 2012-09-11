@@ -44,7 +44,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.vehicles.Vehicle;
 
-import playground.johannes.coopsim.pysical.TravelTimeDecorator;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
@@ -80,7 +79,7 @@ public class TimeOverDist {
 		TravelDisutility travelCost = new TravelDisutility() {
 			@Override
 			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-				return travelTime.getLinkTravelTime(link, time);
+				return travelTime.getLinkTravelTime(link, time, person, vehicle);
 			}
 			@Override
 			public double getLinkMinimumTravelDisutility(Link link) {
@@ -93,12 +92,12 @@ public class TimeOverDist {
 
 			@Override
 			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-				return travelTime.getLinkTravelTime(link, time);
+				return travelTime.getLinkTravelTime(link, time, person, vehicle);
 			}
 
 			@Override
 			public double getLinkMinimumTravelDisutility(Link link) {
-				return travelTime.getLinkTravelTime(link, 0);
+				return travelTime.getLinkTravelTime(link, 0, null, null);
 			}
 		};
 
@@ -124,7 +123,7 @@ public class TimeOverDist {
 					double tt = 0;
 					double dist = calc.distance(p1, p2);
 					for (Link link : path.links) {
-						tt += travelTime.getLinkTravelTime(link, 0);
+						tt += travelTime.getLinkTravelTime(link, 0, null, null);
 						tt+=10;
 					}
 

@@ -43,7 +43,7 @@ public class TravelTimeCostCalculatorTest implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		
 		return this.marginalCostOfTime * travelTime;
 	}

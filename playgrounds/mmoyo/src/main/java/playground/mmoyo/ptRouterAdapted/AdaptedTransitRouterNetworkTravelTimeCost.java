@@ -52,7 +52,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// "route" here means "pt route".  If no pt route is attached, it means that it is a transfer link.
 
-			double transfertime = getLinkTravelTime(link, time);
+			double transfertime = getLinkTravelTime(link, time, person, vehicle);
 			
 			// one can configure an "additionalTransferTime" which leaves a bit more time between transfers.  That time
 			// is probably spent waiting, so we will weigh it with the waiting disutility.
@@ -76,7 +76,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 				offVehWaitTime = nextVehArrivalTime-time;
 			}
 			
-			double inVehTime = getLinkTravelTime(link,time) - offVehWaitTime ;
+			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;
 			
 			cost = - inVehTime                   * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
 					-offVehWaitTime				 * this.myConfig.getMarginalUtiltityOfWaiting_utl_s()

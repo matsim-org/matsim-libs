@@ -64,7 +64,7 @@ public class BKickIncomeTravelTimeDistanceCostCalculator implements TravelDisuti
 	 */
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;
 		}

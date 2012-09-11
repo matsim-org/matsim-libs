@@ -37,7 +37,6 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTra
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -155,19 +154,16 @@ public class PreparePopulation {
 	}
 	
 	private LegRouter createLegRouter() {
-				
-		// pre-initialize the travel time calculator to be able to use it in the wrapper
-		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.travelTime);
 			
 		PlansCalcRouteConfigGroup configGroup = this.scenario.getConfig().plansCalcRoute();
 		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, wrapper);
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(wrapper, 
-				new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.travelTime);
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup).createTravelTime());
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(this.travelTime,
+				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
 		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
-				wrapper, new WalkTravelTimeFactory(configGroup)));
+				this.travelTime, new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
 		
 		// create multi-modal travel time calculator
 		MultiModalTravelTime multiModalTravelTime = multiModalTravelTimeFactory.createTravelTime(); 

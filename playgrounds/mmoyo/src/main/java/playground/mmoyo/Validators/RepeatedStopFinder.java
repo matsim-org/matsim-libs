@@ -82,9 +82,9 @@ public class RepeatedStopFinder {
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			return 1.0;
 		}
-		
+
 		@Override
-		public double getLinkTravelTime(final Link link, final double time) {
+		public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 			return 1.0;
 		}
 		

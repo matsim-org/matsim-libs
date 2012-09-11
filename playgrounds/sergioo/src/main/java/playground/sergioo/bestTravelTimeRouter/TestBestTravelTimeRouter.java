@@ -4,14 +4,13 @@ package playground.sergioo.bestTravelTimeRouter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-/*import org.matsim.core.router.BestTravelTimePathCalculatorImpl;
-import org.matsim.core.router.util.BestTravelTimePathCalculator;
-import org.matsim.core.router.util.BestTravelTimePathCalculator.Path;*/
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 
 public class TestBestTravelTimeRouter {
 
@@ -22,8 +21,9 @@ public class TestBestTravelTimeRouter {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/networks/singapart.xml");
 		TravelTime tt = new TravelTime() {
+
 			@Override
-			public double getLinkTravelTime(Link link, double time) {
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength();
 			}
 		};

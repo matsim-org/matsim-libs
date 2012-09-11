@@ -61,8 +61,8 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 	@Override
 	public double getLinkTravelTime(
 			final Link link,
-			final double time) {
-		return timeCost.getLinkTravelTime( link , time );
+			final double time, Person person, Vehicle vehicle) {
+		return timeCost.getLinkTravelTime( link , time, person, vehicle );
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 			//			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
 			// (old specification)
 			
-			double transfertime = getLinkTravelTime(link, time);
+			double transfertime = getLinkTravelTime(link, time, person, vehicle);
 			double waittime = config.additionalTransferTime;
 			
 			// say that the effective walk time is the transfer time minus some "buffer"
@@ -104,9 +104,9 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 			USE_CUSTOM_IV_COSTS ?
 			-distanceScoring.getInVehiclePtScore(
 				link.getLength(),
-				getLinkTravelTime( link , time ),
+				getLinkTravelTime( link , time, person, vehicle ),
 				distanceCost) :
-			-getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s()
+			-getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimePt_utl_s()
 			- link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 
 		if (cost < 0) {
@@ -121,9 +121,7 @@ public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTrave
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public void setPerson(
-			final Person person) {
+	public void setPerson(final Person person) {
 		TreeSet<String> travelCards = ((PersonImpl) person).getTravelcards();
 		if (travelCards == null) {
 			distanceCost = herbieConfig.getDistanceCostPtNoTravelCard();

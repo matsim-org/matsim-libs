@@ -53,7 +53,11 @@ public class EmissionTravelDisutilityCalculator implements TravelDisutility {
 	private final Set<Id> hotspotLinks;
 
 
-	public EmissionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id> hotspotLinks) {
+<<<<<<< HEAD
+	public EmissionTravelDisutilityCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id> hotspotLinks) {
+=======
+	public EmissionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
+>>>>>>> Removed PersonalizableTravelTime from where it is not necessary
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
@@ -67,7 +71,7 @@ public class EmissionTravelDisutilityCalculator implements TravelDisutility {
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle v) {
 		double linkTravelDisutility;
 
-		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, v);
+		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time);
 		double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime ;
 
 		double distance = link.getLength();

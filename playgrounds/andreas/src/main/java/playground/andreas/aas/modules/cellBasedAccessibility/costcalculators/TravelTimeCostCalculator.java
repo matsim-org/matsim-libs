@@ -45,7 +45,7 @@ public class TravelTimeCostCalculator implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		if(link != null){
-			double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+			double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 			return travelTime; 	// travel time in seconds
 		}
 		log.warn("Link is null. Returned 0 as car time.");

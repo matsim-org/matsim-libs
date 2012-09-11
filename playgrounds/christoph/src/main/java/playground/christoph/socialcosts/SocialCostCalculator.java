@@ -142,7 +142,7 @@ public class SocialCostCalculator implements TravelDisutility,
 			SocialCostsData scd = new SocialCostsData();
 			scd.link = link;
 			scd.socialCosts = new double[this.numSlots];
-			scd.freeSpeedTravelTime = travelTime.getLinkTravelTime(link, 0.0);
+			scd.freeSpeedTravelTime = travelTime.getLinkTravelTime(link, 0.0, null, null);
 
 			/*
 			 * We have to do some blurring here: Imagine an Agent travels over a
@@ -499,7 +499,7 @@ public class SocialCostCalculator implements TravelDisutility,
 				 * if ta(k) = tfree then ke = k We have to use "<=" because we
 				 * use a PseudoFreeSpeedTravelTime!
 				 */
-				if (travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize) <= data.pseudoFreeSpeedTravelTime) ke = k;
+				if (travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null) <= data.pseudoFreeSpeedTravelTime) ke = k;
 
 				// Ca(k) = max(0, (ke - k)*T - tfree)
 				double socialCost = (ke - k) * travelTimeBinSize - data.freeSpeedTravelTime;

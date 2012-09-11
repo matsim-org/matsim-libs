@@ -87,13 +87,13 @@ public class SparseShortestPath
             int idxShift;
 
             if (ShortestPath.INCLUDE_TO_LINK) {
-                time += sspFinder.travelTime.getLinkTravelTime(toLink, departTime);
+                time += sspFinder.travelTime.getLinkTravelTime(toLink, departTime, null, null);
                 cost += sspFinder.travelCost.getLinkTravelDisutility(toLink, time, null, null);
                 ids[idCount - 1] = toLink.getId();
                 idxShift = 0;
             }
             else {
-                time += sspFinder.travelTime.getLinkTravelTime(fromLink, departTime);
+                time += sspFinder.travelTime.getLinkTravelTime(fromLink, departTime, null, null);
                 cost += sspFinder.travelCost.getLinkTravelDisutility(fromLink, time, null, null);
                 ids[0] = fromLink.getId();
                 idxShift = 1;

@@ -34,7 +34,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
@@ -238,9 +237,9 @@ public class AccessibilityCalculator {
 	 */
 	private void setupRouterForWalking(PreProcessLandmarks pp) {
 		TravelTime travelTimeWalk = new TravelTime() {
-			
+
 			@Override
-			public double getLinkTravelTime(Link link, double time) {
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength() / (3 / (60 * 60));
 			}
 		};
@@ -255,9 +254,9 @@ public class AccessibilityCalculator {
 	 */
 	private void setupRouterForDriving(PreProcessLandmarks pp) {
 		TravelTime travelTimeDrive = new TravelTime() {
-			
+
 			@Override
-			public double getLinkTravelTime(Link link, double time) {
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return (link.getLength() / link.getFreespeed()) * 1.2;
 			}
 		};

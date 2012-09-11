@@ -120,7 +120,7 @@ public class PTRouter{
 						legList.add(createLeg(TransportMode.transit_walk, linkList, depTime, time));
 					}
 				}
-				time += ptTravelTime.getLinkTravelTime(link, time);
+				time += ptTravelTime.getLinkTravelTime(link, time, null, null);
 				linkList.add(ptLink);
 				lastLinkType = ptLink.getAliasType();
 				i++;

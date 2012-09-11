@@ -83,7 +83,7 @@ public class PlanToPlanStep {
 			for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 				Link link = net.getLinks().get(linkId);
 				planStepFactory.addTurn(link, (int) time);
-				time += ttime.getLinkTravelTime(link, time);
+				time += ttime.getLinkTravelTime(link, time, null, null);
 				if (time > maxTime) {
 					planStepFactory.addExit(maxTime);
 					return;
@@ -93,7 +93,7 @@ public class PlanToPlanStep {
 			planStepFactory.addTurn(net.getLinks().get(toAct.getLinkId()),
 					(int) time);
 			time += ttime.getLinkTravelTime(net.getLinks().get(
-					toAct.getLinkId()), time);
+					toAct.getLinkId()), time, null, null);
 			if (time > maxTime) {
 				planStepFactory.addExit(maxTime);
 				return;

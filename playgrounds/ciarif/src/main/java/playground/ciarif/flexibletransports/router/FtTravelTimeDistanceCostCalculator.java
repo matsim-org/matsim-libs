@@ -54,7 +54,7 @@ public class FtTravelTimeDistanceCostCalculator implements TravelDisutility {
 
   @Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-    double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+    double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
     return (travelTime * this.travelCostFactor - (this.marginalUtlOfDistance * link.getLength()));
   }
 

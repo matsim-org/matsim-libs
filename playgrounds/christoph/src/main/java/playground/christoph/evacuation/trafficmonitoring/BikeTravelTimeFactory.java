@@ -21,8 +21,8 @@
 package playground.christoph.evacuation.trafficmonitoring;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 
 public class BikeTravelTimeFactory implements PersonalizableTravelTimeFactory {
 
@@ -33,7 +33,7 @@ public class BikeTravelTimeFactory implements PersonalizableTravelTimeFactory {
 	}
 	
 	@Override
-	public PersonalizableTravelTime createTravelTime() {
+	public TravelTime createTravelTime() {
 		return new BikeTravelTime(plansCalcRouteConfigGroup);
 	}
 	

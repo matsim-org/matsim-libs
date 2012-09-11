@@ -73,14 +73,14 @@ public class TravelTimeEstimator {
 
 		if (departureIsOnStartOfLink) {
 			dist += o.getLength();
-			tt += travelTime.getLinkTravelTime( o , departureTime );
+			tt += travelTime.getLinkTravelTime( o , departureTime, null, null);
 		}
 
 		tt += estimate.getTravelTime( departureTime + tt , travelTime );
 
 		if (!arrivalIsOnStartOfLink) {
 			dist += d.getLength();
-			tt += travelTime.getLinkTravelTime( d , departureTime + tt );
+			tt += travelTime.getLinkTravelTime( d , departureTime + tt, null, null);
 		}
 
 		return new DistanceAndDuration( dist , tt );
@@ -130,7 +130,7 @@ public class TravelTimeEstimator {
 			double now = departureTime;
 
 			for (Link l : links) {
-				now += estimator.getLinkTravelTime( l , now );
+				now += estimator.getLinkTravelTime( l , now, null, null);
 			}
 
 			return now - departureTime;

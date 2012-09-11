@@ -70,7 +70,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		bikeTravelTime.setPerson(person);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		
@@ -80,7 +80,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		bikeTravelTime.setPerson(person);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		
@@ -90,7 +90,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		bikeTravelTime.setPerson(person);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		
@@ -100,7 +100,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		double slopeShift = bikeTravelTime.getSlopeShift(slope);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor + slopeShift;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		
@@ -110,7 +110,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		slopeShift = bikeTravelTime.getSlopeShift(slope);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactor + slopeShift;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		
@@ -118,8 +118,8 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		((Coord3d) node2.getCoord()).setZ(0.25);
 		WalkTravelTime walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute());
 		walkTravelTime.setPerson(person);
-		expectedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0);
-		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0);	
+		expectedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
+		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);	
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 	}

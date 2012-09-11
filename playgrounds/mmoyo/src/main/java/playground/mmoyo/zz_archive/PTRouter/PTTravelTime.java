@@ -3,7 +3,9 @@ package playground.mmoyo.zz_archive.PTRouter;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /** Calculates the travel time of each link depending on its type */
 public class PTTravelTime implements TravelTime {
@@ -16,9 +18,9 @@ public class PTTravelTime implements TravelTime {
 	public PTTravelTime() {
 	
 	}
-	
+
 	/**Calculation of travel time for each link type:*/
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		if (lastLink==link && lastTime==time) return lastTravelTime;
 		PTLink ptLink = (PTLink)link;
 		

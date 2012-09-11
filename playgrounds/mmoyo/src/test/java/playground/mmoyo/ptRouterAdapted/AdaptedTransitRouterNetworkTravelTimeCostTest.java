@@ -58,7 +58,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 			}
 		}
 		//at 6:00 the link travel time = 540
-		assertEquals(9.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600), MatsimTestCase.EPSILON);
+		assertEquals(9.0*60, timecost.getLinkTravelTime(testLink, 6.0*3600, null, null), MatsimTestCase.EPSILON);
 	}
 
 	public void testVehArrivalTime() {
@@ -81,8 +81,8 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		}
 		
 		//original MATSim. same as before
-		assertEquals(9.0*60 , timecost.getLinkTravelTime(testLink, 6.0*3600) , MatsimTestCase.EPSILON);
-		assertEquals(9.0*60+1 , timecost.getLinkTravelTime(testLink, 6.0*3600-1) , MatsimTestCase.EPSILON);
+		assertEquals(9.0*60 , timecost.getLinkTravelTime(testLink, 6.0*3600, null, null) , MatsimTestCase.EPSILON);
+		assertEquals(9.0*60+1 , timecost.getLinkTravelTime(testLink, 6.0*3600-1, null, null) , MatsimTestCase.EPSILON);
 		
 		/*
 		//if the agents arrives to stop (in or outside the veh) before  06:02, his/her "arrrival veh time" is 05:58

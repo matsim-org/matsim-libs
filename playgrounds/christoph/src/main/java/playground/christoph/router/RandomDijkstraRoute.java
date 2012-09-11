@@ -31,8 +31,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
@@ -50,12 +50,12 @@ public class RandomDijkstraRoute extends SimpleRouter {
 	protected LeastCostPathCalculator leastCostPathCalculator;
 	protected TravelDisutilityFactory travelCostFactory;
 	protected TravelDisutility travelCost;
-	protected PersonalizableTravelTime travelTime;
+	protected TravelTime travelTime;
 	protected int maxLinks = 50000; // maximum number of links in a created plan
 	
 	private final static Logger log = Logger.getLogger(RandomDijkstraRoute.class);
 	
-	public RandomDijkstraRoute(Network network, TravelDisutilityFactory travelCostFactory, PersonalizableTravelTime travelTime) {
+	public RandomDijkstraRoute(Network network, TravelDisutilityFactory travelCostFactory, TravelTime travelTime) {
 		super(network);
 		this.travelCostFactory = travelCostFactory;
 		this.travelTime = travelTime;

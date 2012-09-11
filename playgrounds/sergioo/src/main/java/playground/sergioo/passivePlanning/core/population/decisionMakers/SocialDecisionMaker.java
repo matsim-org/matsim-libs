@@ -101,8 +101,9 @@ public class SocialDecisionMaker implements TypeOfActivityDecisionMaker, StartTi
 		public void setMode(String mode) {
 			this.mode = mode;
 		}
+
 		@Override
-		public double getLinkTravelTime(Link link, double time) {
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 			time = time%periodsTime;
 			double sum = 0, tSum = 0;
 			for(int i=0; i<periods.length; i++) {

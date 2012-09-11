@@ -185,7 +185,7 @@ public class RouteChoiceCostcalculatorTest {
 		
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-			return this.timeCalculator.getLinkTravelTime(link, time);
+			return this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		}
 		
 		@Override

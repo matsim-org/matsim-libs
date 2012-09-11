@@ -164,7 +164,6 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
 		super.createAndInitTravelTimeCollector(analyzedModes);
-		TravelTimeFactoryWrapper travelTimeCollectorWrapperFactory = new TravelTimeFactoryWrapper(this.getTravelTimeCollector());
 
 //		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
 //		// TravelTimeCollector for car mode
@@ -181,7 +180,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 //		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory,
 //				routeFactory);
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimeCollectorWrapperFactory, factory,
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getTravelTimeCollector(), factory,
 				routeFactory);
 		
 		// adding hight utility parking choice algo

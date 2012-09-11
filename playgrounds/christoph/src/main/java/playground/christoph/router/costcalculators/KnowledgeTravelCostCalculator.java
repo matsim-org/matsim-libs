@@ -65,7 +65,7 @@ public class KnowledgeTravelCostCalculator implements TravelDisutility {
 		}
 
 		// Person knows the link, so calculate it's costs
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
 		if (this.marginalUtlOfDistance == 0.0) {
 			return travelTime * this.travelCostFactor;

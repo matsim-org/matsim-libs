@@ -79,7 +79,7 @@ public class HerbieTravelTimeDistanceCostCalculator implements TravelDisutility 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		double distance = link.getLength();
 		return Math.abs(travelScoring.getCarScore(distance, travelTime));
 		

@@ -610,13 +610,13 @@ public class CreateMarathonPopulation {
 		
 		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
 		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
 		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
-				new WalkTravelTimeFactory(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory(), 
-				new WalkTravelTimeFactory(configGroup)));
+				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory().createTravelTime(), 
+				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
 		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
-				new FreeSpeedTravelTimeCalculatorFactory(), new WalkTravelTimeFactory(configGroup)));
+				new FreeSpeedTravelTimeCalculatorFactory().createTravelTime(), new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
 
 		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());

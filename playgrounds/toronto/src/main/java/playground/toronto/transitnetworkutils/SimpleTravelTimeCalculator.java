@@ -32,7 +32,7 @@ public class SimpleTravelTimeCalculator implements TravelDisutility, TravelTime 
 	}
 
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		// TODO Auto-generated method stub
 		return link.getLength() / link.getFreespeed();
 	}

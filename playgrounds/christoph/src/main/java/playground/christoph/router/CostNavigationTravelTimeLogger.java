@@ -111,7 +111,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		double time = event.getTime();
 
 		enterTimes.put(personId, time);
-		expectedTravelTimes.put(personId, travelTime.getLinkTravelTime(this.network.getLinks().get(linkId), time));
+		expectedTravelTimes.put(personId, travelTime.getLinkTravelTime(this.network.getLinks().get(linkId), time, null, null));
 	}
 
 	@Override

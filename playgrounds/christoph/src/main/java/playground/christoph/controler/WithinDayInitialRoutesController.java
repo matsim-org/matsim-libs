@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -44,7 +45,11 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -217,21 +222,23 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
 								
 		// create a copy of the MultiModalTravelTimeWrapperFactory...
-		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-		for (Entry<String, TravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getTravelTimeFactories().entrySet()) {
-			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());			
-		}
-		// ... and set the TravelTimeCollector for car mode
-		TravelTimeCollectorFactory carTravelTimeFactory = this.getTravelTimeCollectorFactory();
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, carTravelTimeFactory);
-
-//		PersonalizableTravelTimeFactory timeFactory = this.getTravelTimeCollectorFactory();
+		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
+		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCalculator());
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(configGroup));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(configGroup,
+				new WalkTravelTime(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+				new WalkTravelTime(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(configGroup, 
+				this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
+		
 		
 		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
 
 		LeastCostPathCalculatorFactory factory = this.getLeastCostPathCalculatorFactory();
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, timeFactory, factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, multiModalTravelTimeFactory.createTravelTime(), factory, routeFactory);
 		
 		/*
 		 * During Activity Replanner

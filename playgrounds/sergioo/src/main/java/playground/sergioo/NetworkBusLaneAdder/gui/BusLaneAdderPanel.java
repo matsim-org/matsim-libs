@@ -112,7 +112,7 @@ public class BusLaneAdderPanel extends LayersPanel implements MouseListener, Mou
 		};
 		TravelTime timeFunction = new TravelTime() {	
 			@Override
-			public double getLinkTravelTime(Link link, double time) {
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				if(link.getAllowedModes().contains("bus"))
 					return link.getLength()/BUS_SPEED;
 				else

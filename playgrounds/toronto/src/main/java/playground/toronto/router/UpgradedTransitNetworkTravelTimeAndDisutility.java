@@ -132,7 +132,7 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 	}
 
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		
 		double ttime = 0;
 		

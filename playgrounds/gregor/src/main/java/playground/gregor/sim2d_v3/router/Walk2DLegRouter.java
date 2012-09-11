@@ -33,7 +33,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.NetworkLegRouter;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 
 public class Walk2DLegRouter implements LegRouter {
 
@@ -43,11 +43,11 @@ public class Walk2DLegRouter implements LegRouter {
 	private final ModeRouteFactory modeRouteFactory;
 	private final RouteFactory routeFactory;
 	
-	private final PersonalizableTravelTime travelTime;
+	private final TravelTime travelTime;
 
 	private final LegRouter legRouter;
 	
-	public Walk2DLegRouter(final Network network, final PersonalizableTravelTime travelTime, 
+	public Walk2DLegRouter(final Network network, final TravelTime travelTime, 
 			final IntermodalLeastCostPathCalculator routeAlgo) {
 		
 		this.travelTime = travelTime;
@@ -71,9 +71,6 @@ public class Walk2DLegRouter implements LegRouter {
 		} else {
 			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
 		}
-		
-		// set Person in TravelTime
-		travelTime.setPerson(person);
 		
 		return legRouter.routeLeg(person, leg, fromAct, toAct, depTime);
 	}

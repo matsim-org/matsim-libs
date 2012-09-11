@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.knowledge.container.NodeKnowledge;
 import playground.christoph.router.util.KnowledgeTools;
@@ -51,15 +52,12 @@ public class KnowledgeTravelTimeWrapper implements PersonalizableTravelTime {
 		this.checkNodeKnowledge = value;
 	}
 	
-	@Override
 	public void setPerson(Person person) {
 		this.person = person;
-		if (travelTimeCalculator instanceof PersonalizableTravelTime) {
-			((PersonalizableTravelTime)travelTimeCalculator).setPerson(person);
-		}
+
 	}
-	
-	public double getLinkTravelTime(final Link link, final double time) 
+
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) 
 	{	
 		NodeKnowledge nodeKnowledge = null;
 		
@@ -72,7 +70,7 @@ public class KnowledgeTravelTimeWrapper implements PersonalizableTravelTime {
 		if (nodeKnowledge != null && !nodeKnowledge.knowsLink(link)) {
 			return Double.MAX_VALUE;
 		} else {
-			return travelTimeCalculator.getLinkTravelTime(link, time);
+			return travelTimeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		}
 	}
 }

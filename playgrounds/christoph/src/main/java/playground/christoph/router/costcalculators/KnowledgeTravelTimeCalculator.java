@@ -22,8 +22,10 @@ package playground.christoph.router.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.network.MyLinkImpl;
 import playground.christoph.network.SubLink;
@@ -44,7 +46,7 @@ public class KnowledgeTravelTimeCalculator implements TravelTime {
 	}
 	
 	// return travel time without account for the actual traffic load
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		if(qNetwork == null) {
 			log.warn("No QueueNetwork found - FreeSpeedTravelTime is calculated and returned!");
 			return link.getLength()/link.getFreespeed(time);

@@ -2,37 +2,22 @@ package playground.pieter.router;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
 
 public class StochasticRouter implements LeastCostPathCalculator {
@@ -160,7 +145,7 @@ public class StochasticRouter implements LeastCostPathCalculator {
 						travelCost += travelCosts.getLinkTravelDisutility(
 								selection, travelTime, person, vehicle);
 						travelTime += travelTimes.getLinkTravelTime(selection,
-								travelTime);
+								travelTime, person, vehicle);
 						break;
 
 						// ((Link)network.getLinks().get(selection.getId())).setCapacity(1000000000);
@@ -199,7 +184,7 @@ public class StochasticRouter implements LeastCostPathCalculator {
 				}, new TravelTime() {
 
 					@Override
-					public double getLinkTravelTime(Link link, double time) {
+					public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 						// TODO Auto-generated method stub
 						return link.getLength() / link.getFreespeed();
 					}

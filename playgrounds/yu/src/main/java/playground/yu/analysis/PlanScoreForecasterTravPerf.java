@@ -148,10 +148,10 @@ public class PlanScoreForecasterTravPerf {
 			Map<Id, Link> links = this.net.getLinks();
 			for (Id linkId : netRoute.getLinkIds()) {
 				travelTime_s += ttc.getLinkTravelTime(links.get(linkId),
-						departTime + travelTime_s);
+						departTime + travelTime_s, null, null);
 			}
 			travelTime_s += this.ttc.getLinkTravelTime(links.get(netRoute
-					.getEndLinkId()), departTime + travelTime_s);
+					.getEndLinkId()), departTime + travelTime_s, null, null);
 		} else if (route instanceof GenericRoute)
 			travelTime_s += route.getTravelTime();
 

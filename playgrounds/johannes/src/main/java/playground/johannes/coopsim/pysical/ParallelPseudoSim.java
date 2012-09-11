@@ -195,10 +195,10 @@ public class ParallelPseudoSim {
 
 				List<Id> ids = route.getLinkIds();
 				for (int i = 0; i < ids.size(); i++) {
-					tt += travelTime.getLinkTravelTime(network.getLinks().get(ids.get(i)), startTime);
+					tt += travelTime.getLinkTravelTime(network.getLinks().get(ids.get(i)), startTime, null, null);
 					tt++;// 1 sec for each node
 				}
-				tt += travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), startTime);
+				tt += travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), startTime, null, null);
 			}
 
 			return tt;

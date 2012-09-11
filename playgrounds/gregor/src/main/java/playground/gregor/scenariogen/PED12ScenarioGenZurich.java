@@ -52,12 +52,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -69,12 +69,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -313,13 +312,13 @@ public class PED12ScenarioGenZurich {
 		Network network = scenario.getNetwork();
 		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
 		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
-				new WalkTravelTimeFactory(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory(), 
-				new WalkTravelTimeFactory(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
-				new FreeSpeedTravelTimeCalculatorFactory(), new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(configGroup));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(configGroup,
+				new WalkTravelTime(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTimeCalculator(), 
+				new WalkTravelTime(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(configGroup, 
+				new FreeSpeedTravelTimeCalculator(), new WalkTravelTime(configGroup)));
 
 		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
 		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());

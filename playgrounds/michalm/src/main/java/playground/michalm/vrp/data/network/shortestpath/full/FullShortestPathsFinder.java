@@ -134,13 +134,13 @@ public class FullShortestPathsFinder
                         int idxShift;
 
                         if (ShortestPath.INCLUDE_TO_LINK) {
-                            time += travelTime.getLinkTravelTime(toLink, departTime);
+                            time += travelTime.getLinkTravelTime(toLink, departTime, null, null);
                             cost += travelCost.getLinkTravelDisutility(toLink, time, null, null);
                             ids[idCount - 1] = toLink.getId();
                             idxShift = 0;
                         }
                         else {
-                            time += travelTime.getLinkTravelTime(fromLink, departTime);
+                            time += travelTime.getLinkTravelTime(fromLink, departTime, null, null);
                             cost += travelCost.getLinkTravelDisutility(fromLink, time, null, null);
                             ids[0] = fromLink.getId();
                             idxShift = 1;

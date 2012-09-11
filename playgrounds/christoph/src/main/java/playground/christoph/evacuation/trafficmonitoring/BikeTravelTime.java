@@ -23,6 +23,7 @@ package playground.christoph.evacuation.trafficmonitoring;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Data to calculate a person's travel time on a link is taken from:
@@ -58,11 +59,12 @@ public class BikeTravelTime extends WalkTravelTime {
 		super(plansCalcGroup);
 		this.referenceBikeSpeed = plansCalcGroup.getBikeSpeed();
 	}
-	
+
+
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		
-		double walkTravelTime = super.getLinkTravelTime(link, time);
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		setPerson(person);
+		double walkTravelTime = super.getLinkTravelTime(link, time, person, vehicle);
 		
 		double slope = super.calcSlope(link);
 		double slopeShift = getSlopeShift(slope);
@@ -87,15 +89,13 @@ public class BikeTravelTime extends WalkTravelTime {
 		else return personDownhillFactor * slope;
 	}
 	
-	@Override
-	public void setPerson(Person person) {
+	protected void setPerson(Person person) {
 		/* 
 		 * Only recalculate the person's walk speed factor if the person has 
 		 * changed. This check has to be performed before super.setPerson(...)
 		 * is called because there the personId is already updated!
 		 */
 		if (person.getId().equals(personId)) return;
-
 		super.setPerson(person);
 		
 		this.personBikeSpeed = this.referenceBikeSpeed * this.personFactor;

@@ -66,7 +66,7 @@ public class SpeedRatioWeightedTimeListener implements IterationStartsListener {
 
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-			double travelTime = timeCalculator.getLinkTravelTime(link, time);
+			double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
 			return travelTime
 					/ (link.getLength() / travelTime / link.getFreespeed(time));

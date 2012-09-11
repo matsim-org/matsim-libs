@@ -36,7 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
@@ -48,7 +48,7 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 
 	private static final long serialVersionUID = 1L;
 	
-	private final PersonalizableTravelTime travelTime;
+	private final TravelTime travelTime;
 	private final Link link; 
 	private final Map<Id, Double> travelTimesMap;
 	
@@ -68,8 +68,7 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 		travelTimesMap.clear();
 		
 		for (Person person : population.getPersons().values()) {
-			travelTime.setPerson(person);
-			double tt = travelTime.getLinkTravelTime(link, 0.0);
+			double tt = travelTime.getLinkTravelTime(link, 0.0, person, null);
 			travelTimesMap.put(person.getId(), tt);
 		}
 	}

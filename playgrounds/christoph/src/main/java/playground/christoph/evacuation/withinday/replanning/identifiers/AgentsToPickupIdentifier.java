@@ -59,7 +59,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicles;
@@ -88,7 +88,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
-	private final PersonalizableTravelTime walkTravelTime;
+	private final TravelTime walkTravelTime;
 	
 	private final Map<Id, MobsimAgent> agents;
 	private final Map<Id, Double> earliestLinkLeaveTime;
@@ -103,7 +103,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	 */
 	private final Queue<Tuple<Double, MobsimAgent>> agentsLeaveLinkQueue = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
 
-	/* package */AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, PersonalizableTravelTime walkTravelTime,
+	/* package */AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, TravelTime walkTravelTime,
 			DecisionDataProvider decisionDataProvider) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
@@ -285,8 +285,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				 * Otherwise add the agent to the agentsLeaveLinkQueue.
 				 */
 				Person person = ((PersonDriverAgentImpl) agent).getPerson();
-				this.walkTravelTime.setPerson(person);
-				double travelTime = walkTravelTime.getLinkTravelTime(link, event.getTime());
+				double travelTime = walkTravelTime.getLinkTravelTime(link, event.getTime(), person, null);
 				double departureTime = event.getTime() + travelTime;
 				departureTime = Math.floor(departureTime);
 				this.agentsLeaveLinkQueue.add(new Tuple<Double, MobsimAgent>(departureTime, agent));

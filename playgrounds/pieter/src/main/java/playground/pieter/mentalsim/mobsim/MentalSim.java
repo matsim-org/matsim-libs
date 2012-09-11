@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -25,7 +24,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.ActivityEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -43,7 +41,6 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -306,7 +303,7 @@ public class MentalSim implements Mobsim {
 					eventQueue.add(linkEnterEvent);
 
 					double linkTime = travelTime.getLinkTravelTime(network
-							.getLinks().get(link), startTime);
+							.getLinks().get(link), startTime, null, null);
 					tt += Math.max(linkTime, 1.0);
 
 					linkLeaveTime = Math.max(linkEnterTime + 1, linkEnterTime
@@ -316,13 +313,13 @@ public class MentalSim implements Mobsim {
 					eventQueue.add(linkLeaveEvent);
 
 					tt += travelTime.getLinkTravelTime(
-							network.getLinks().get(ids.get(i)), startTime);
+							network.getLinks().get(ids.get(i)), startTime, null, null);
 					// tt++;// 1 sec for each node
 				}
 				tt += travelTime
 						.getLinkTravelTime(
 								network.getLinks().get(route.getEndLinkId()),
-								startTime);
+								startTime, null, null);
 			}
 			LinkEnterEventImpl linkEnterEvent = new LinkEnterEventImpl(tt,
 					agentId, route.getEndLinkId(), agentId);
@@ -338,13 +335,13 @@ public class MentalSim implements Mobsim {
 				List<Id> ids = route.getLinkIds();
 				for (int i = 0; i < ids.size(); i++) {
 					tt += travelTime.getLinkTravelTime(
-							network.getLinks().get(ids.get(i)), startTime);
+							network.getLinks().get(ids.get(i)), startTime, null, null);
 					tt++;// 1 sec for each node
 				}
 				tt += travelTime
 						.getLinkTravelTime(
 								network.getLinks().get(route.getEndLinkId()),
-								startTime);
+								startTime, null, null);
 			}
 
 			return tt;

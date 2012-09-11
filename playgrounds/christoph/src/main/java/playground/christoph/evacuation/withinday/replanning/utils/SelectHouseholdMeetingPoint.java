@@ -57,6 +57,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -149,7 +150,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		
 		LeastCostPathCalculatorFactory toHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, timeFactory, toHomeFactory, routeFactory);
+		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, timeFactory.createTravelTime(), toHomeFactory, routeFactory);
 
 		/*
 		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
@@ -266,7 +267,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		 */
 		TravelTimeWrapperFactory wrapperTimeFactory = new TravelTimeWrapperFactory(timeFactory);
 		LeastCostPathCalculatorFactory fromHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapperTimeFactory, fromHomeFactory, routeFactory);
+		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapperTimeFactory.createTravelTime(), fromHomeFactory, routeFactory);
 	}
 	
 	/*
@@ -521,20 +522,15 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		}
 		
 		@Override
-		public void setPerson(Person person) {
-			travelTime.setPerson(person);
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			if (link.getId().toString().contains("exit")) return 1.0;
+			else return travelTime.getLinkTravelTime(link, time, person, vehicle);
 		}
 
 		@Override
-		public double getLinkTravelTime(Link link, double time) {
+		public double getModalLinkTravelTime(Link link, double time, String transportMode, Person person, Vehicle vehicle) {
 			if (link.getId().toString().contains("exit")) return 1.0;
-			else return travelTime.getLinkTravelTime(link, time);
-		}
-
-		@Override
-		public double getModalLinkTravelTime(Link link, double time, String transportMode) {
-			if (link.getId().toString().contains("exit")) return 1.0;
-			else return travelTime.getModalLinkTravelTime(link, time, transportMode);
+			else return travelTime.getModalLinkTravelTime(link, time, transportMode, person, vehicle);
 		}
 
 		@Override

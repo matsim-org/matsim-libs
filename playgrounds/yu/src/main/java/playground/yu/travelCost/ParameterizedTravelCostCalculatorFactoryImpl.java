@@ -66,7 +66,7 @@ public class ParameterizedTravelCostCalculatorFactoryImpl implements TravelDisut
 
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-			double travelTime = timeCalculator.getLinkTravelTime(link, time);
+			double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 			if (marginalUtlOfDistance == 0.0) {
 				return travelTime * travelCostFactor;
 			}

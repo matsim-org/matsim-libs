@@ -30,6 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 public class CostNavigationTravelTimeLoggerTest extends MatsimTestCase {
 
@@ -94,7 +95,7 @@ public class CostNavigationTravelTimeLoggerTest extends MatsimTestCase {
 	private class DummyTravelTime implements TravelTime {
 
 		@Override
-		public double getLinkTravelTime(Link link, double time) {
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 			return 100.0;
 		}
 		

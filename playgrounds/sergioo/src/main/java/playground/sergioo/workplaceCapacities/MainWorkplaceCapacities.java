@@ -586,8 +586,9 @@ public class MainWorkplaceCapacities {
 			}
 		};
 		TravelTime timeFunction = new TravelTime() {	
+
 			@Override
-			public double getLinkTravelTime(Link link, double time) {
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength()/WALKING_SPEED;
 			}
 		};

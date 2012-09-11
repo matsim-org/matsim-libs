@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -65,8 +66,8 @@ public class PTTravelTimeKTIEvacuationFactory extends PTTravelTimeKTIFactory {
 
 	static final Logger log = Logger.getLogger(PTTravelTimeKTIEvacuationFactory.class);
 	
-	public PTTravelTimeKTIEvacuationFactory(Scenario scenario, PersonalizableTravelTimeFactory ptTravelTimeFactory) {
-		super(scenario, ptTravelTimeFactory);
+	public PTTravelTimeKTIEvacuationFactory(Scenario scenario, TravelTime travelTime) {
+		super(scenario, travelTime);
 	}
 
 	public void prepareMatrixForEvacuation(CoordAnalyzer coordAnalyzer) {

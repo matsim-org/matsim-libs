@@ -248,7 +248,7 @@ public class EvacuationTimeClusterer {
 	private static class TravelTimeCost implements TravelTime, TravelDisutility {
 
 		@Override
-		public double getLinkTravelTime(Link link, double time) {
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 			return link.getLength()/link.getFreespeed();
 		}
 

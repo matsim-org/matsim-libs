@@ -114,7 +114,7 @@ public class HITSAnalyser {
 		preProcessData.run(network);
 		TravelTime timeFunction = new TravelTime() {
 
-			public double getLinkTravelTime(Link link, double time) {
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength() / link.getFreespeed();
 			}
 		};

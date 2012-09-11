@@ -70,7 +70,9 @@ public class ComposedLinkFactory implements LinkFactory {
 		PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 		preProcessData.run(baseNetwork);
 		TravelTime timeFunction = new TravelTime() {	
-			public double getLinkTravelTime(Link link, double time) {
+
+
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength()/link.getFreespeed();
 			}
 		};

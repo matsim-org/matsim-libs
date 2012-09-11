@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
@@ -47,7 +49,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	private static final Logger log = Logger.getLogger(FuzzyTravelTimeEstimator.class);
 	
 	private final Scenario scenario;
-	private final PersonalizableTravelTime travelTime;
+	private final TravelTime travelTime;
 	private final AgentsTracker agentsTracker;
 	private final VehiclesTracker vehiclesTracker;
 	private final DistanceFuzzyFactorProvider distanceFuzzyFactorProvider;
@@ -62,7 +64,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 	private Link fromLink;
 	private boolean fromLinkIsObserved;
 	
-	/*package*/ FuzzyTravelTimeEstimator(Scenario scenario, PersonalizableTravelTime travelTime, AgentsTracker agentsTracker,
+	/*package*/ FuzzyTravelTimeEstimator(Scenario scenario, TravelTime travelTime, AgentsTracker agentsTracker,
 			VehiclesTracker vehiclesTracker, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider) {
 		this.scenario = scenario;
 		this.travelTime = travelTime;
@@ -71,11 +73,11 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 		this.distanceFuzzyFactorProvider = distanceFuzzyFactorProvider;
 		this.rng = new DeterministicRNG(213456);
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
-			
-		double tt = this.travelTime.getLinkTravelTime(link, time);
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		setPerson(person);	
+		double tt = this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 				
 		double distanceFuzzyFactor = calcDistanceFuzzyFactor(link);
 		double linkFuzzyFactor = calcLinkFuzzyFactor(link);
@@ -99,9 +101,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
 		return tt + ttError;
 	}
 
-	@Override
-	public void setPerson(Person person) {
-		this.travelTime.setPerson(person);
+	private void setPerson(Person person) {
 
 		/* 
 		 * Only recalculate the person's HashCode and FuzzyFactor

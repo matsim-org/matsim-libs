@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 
@@ -104,10 +105,10 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		this.referenceWalkSpeed = plansCalcGroup.getWalkSpeed();
 		this.random = MatsimRandom.getLocalInstance();
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time) {		
-		
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {		
+		setPerson(person);
 		double slope = calcSlope(link);
 		double slopeFactor = getSlopeFactor(slope);
 				
@@ -194,8 +195,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		else log.warn(text);
 	}
 	
-	@Override
-	public void setPerson(Person person) {
+	protected void setPerson(Person person) {
 		/* 
 		 * Only recalculate the person's walk speed factor if
 		 * the person has changed.

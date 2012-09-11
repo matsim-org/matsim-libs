@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;

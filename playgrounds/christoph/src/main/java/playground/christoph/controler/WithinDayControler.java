@@ -130,7 +130,7 @@ public class WithinDayControler extends WithinDayController {
 		
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, super.getTravelTimeCollectorFactory(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, getTravelTimeCollector(), factory, routeFactory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);

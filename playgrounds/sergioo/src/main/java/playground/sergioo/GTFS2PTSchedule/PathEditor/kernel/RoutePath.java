@@ -636,8 +636,9 @@ public class RoutePath {
 		preProcessData = new PreProcessEuclidean(travelMinCost);
 		preProcessData.run(network);
 		TravelTime timeFunction = new TravelTime() {	
+
 			@Override
-			public double getLinkTravelTime(Link link, double time) {
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength()/link.getFreespeed();
 			}
 		};

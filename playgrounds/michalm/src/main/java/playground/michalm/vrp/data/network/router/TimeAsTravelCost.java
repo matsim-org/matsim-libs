@@ -41,7 +41,7 @@ public class TimeAsTravelCost
     public double getLinkTravelDisutility(final Link link, final double time, final Person person,
             final Vehicle vehicle)
     {
-        return travelTime.getLinkTravelTime(link, time);
+        return travelTime.getLinkTravelTime(link, time, person, vehicle);
     }
 
 

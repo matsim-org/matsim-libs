@@ -163,11 +163,8 @@ public class SocialCostsController {
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double disutility = 0.0;
-			if (this.travelTime instanceof PersonalizableTravelTime) {
-				((PersonalizableTravelTime) this.travelTime).setPerson(person);
-			}
-			
-			disutility += this.travelTime.getLinkTravelTime(link, time);
+	
+			disutility += this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 			disutility += this.scc.getLinkTravelDisutility(link, time, person, vehicle); 
 			return disutility;
 		}

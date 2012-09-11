@@ -43,7 +43,7 @@ public class ParkAndRideTravelTimeCost implements TravelDisutility, TravelTime {
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double transfertime = getLinkTravelTime(link, time);
+		double transfertime = getLinkTravelTime(link, time, person, vehicle);
 		double waittime = this.config.additionalTransferTime;
 		
 		// say that the effective walk time is the transfer time minus some "buffer"
@@ -63,9 +63,9 @@ public class ParkAndRideTravelTimeCost implements TravelDisutility, TravelTime {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		double distance = link.getLength();
 		return distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
 	}

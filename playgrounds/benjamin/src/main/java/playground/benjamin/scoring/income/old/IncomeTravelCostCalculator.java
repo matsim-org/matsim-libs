@@ -87,7 +87,7 @@ public class IncomeTravelCostCalculator implements TravelDisutility {
 		double distance   = link.getLength();
 		double distanceCost = this.distanceCostFactor * distance;
 		
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		
 		double generalizedDistanceCost   = betaCost * distanceCost;
 		double generalizedTravelTimeCost = this.betaTravelTime * travelTime;

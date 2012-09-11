@@ -17,7 +17,7 @@ public class CapacityFavoringStochasticCostCalculator extends
 		// TODO Auto-generated constructor stub
 	}
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time);
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		double disutil = super.getLinkTravelDisutility(link, travelTime, person, vehicle);
 		double uniform = MatsimRandom.getRandom().nextDouble();
 		double error = disutil*( - 1.0 * Math.log(-Math.log(1.0 * uniform)));

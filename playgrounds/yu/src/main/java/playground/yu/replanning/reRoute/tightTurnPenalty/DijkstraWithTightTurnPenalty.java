@@ -383,7 +383,7 @@ public class DijkstraWithTightTurnPenalty implements
 			final PseudoRemovePriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode) {
 
-		double travelTime = timeFunction.getLinkTravelTime(l, currTime);
+		double travelTime = timeFunction.getLinkTravelTime(l, currTime, null, null);
 		double travelCost = costFunction.getLinkTravelDisutility(l, currTime, null, null);
 		DijkstraNodeData data = getData(n);
 		double nCost = data.getCost();

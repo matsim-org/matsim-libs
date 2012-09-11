@@ -28,11 +28,13 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 public class LookupTravelTime implements TravelTime, MobsimBeforeSimStepListener {
 	
@@ -60,9 +62,9 @@ public class LookupTravelTime implements TravelTime, MobsimBeforeSimStepListener
 	public void setUpdateInterval(int interval) {
 		this.updateInterval = interval;
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(final Link link, double time) {
+	public double getLinkTravelTime(final Link link, double time, Person person, Vehicle vehicle) {
 		if (link instanceof RoutingNetworkLink) return ((LookupNetworkLink)((RoutingNetworkLink) link).getLink()).getLinkTravelTime();
 		else if (link instanceof LookupNetworkLink) return ((LookupNetworkLink) link).getLinkTravelTime();
 		else throw new RuntimeException("Unexpected link type found: " + link.getClass().toString());
@@ -201,7 +203,7 @@ public class LookupTravelTime implements TravelTime, MobsimBeforeSimStepListener
 					startBarrier.await();
 
 					for (LookupNetworkLink link : links) {
-						link.setLinkTravelTime(travelTime.getLinkTravelTime(link, time));
+						link.setLinkTravelTime(travelTime.getLinkTravelTime(link, time, null, null));
 					}
 				} catch (InterruptedException e) {
 					Gbl.errorMsg(e);

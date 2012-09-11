@@ -62,12 +62,12 @@ public class TransitRouteFinder {
 						linkList = new ArrayList<Link>();
 					}
 					if (i == path.links.size()){
-						travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
+						travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime, person, null);
 						LegImpl newLeg = createLeg(selectMode(linkType), linkList, depTime, travTime);
 						legList.add(newLeg);
 					}
 				}
-				travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime);
+				travTime = travTime + ptRouter.ptTravelTime.getLinkTravelTime(link, travTime, person, null);
 				linkList.add(link);
 				lastLinkType = linkType;
 				i++;

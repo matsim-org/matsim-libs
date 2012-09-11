@@ -107,7 +107,7 @@ public class DemoController extends WithinDayController implements MobsimInitial
 		
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getTravelTimeCollectorFactory(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getTravelTimeCollector(), factory, routeFactory);
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);

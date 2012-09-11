@@ -68,7 +68,7 @@ public class MinimizeLinkAmountListener implements IterationStartsListener {
 
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-			double cost = timeCalculator.getLinkTravelTime(link, time);
+			double cost = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 			Node from = link.getFromNode();
 			if (!NotAnIntersection.notAnIntersection(from)) {
 				// recognize a real intersection

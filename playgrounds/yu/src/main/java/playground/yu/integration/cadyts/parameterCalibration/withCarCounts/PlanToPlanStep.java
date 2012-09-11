@@ -111,7 +111,7 @@ public class PlanToPlanStep {
 					}
 					// ////////////////////////////////
 
-					time += ttime.getLinkTravelTime(link, time);
+					time += ttime.getLinkTravelTime(link, time, null, null);
 					if (time > maxTime) {
 						planStepFactory.addExit(maxTime);
 						return;
@@ -128,7 +128,7 @@ public class PlanToPlanStep {
 				// ////////////////////////////////
 
 				time += ttime.getLinkTravelTime(net.getLinks().get(
-						toAct.getLinkId()), time);
+						toAct.getLinkId()), time, null, null);
 				if (time > maxTime) {
 					planStepFactory.addExit(maxTime);
 					return;

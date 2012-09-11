@@ -107,7 +107,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			int[] vols = volumes.getVolumesForLink(link.getId());
 			double vol = vols != null ? vols[(int) time / 3600] : 0d;
-			return timeCalculator.getLinkTravelTime(link, time)
+			return timeCalculator.getLinkTravelTime(link, time, person, vehicle)
 					* (1 + vol / flowCapFactor
 							/ (link.getCapacity(time) / (capPeriod / 3600d)));
 			// double travelTime = timeCalculator.getLinkTravelTime(link, time);

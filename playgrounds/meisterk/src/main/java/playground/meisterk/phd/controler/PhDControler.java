@@ -124,7 +124,7 @@ public class PhDControler extends Controler {
 			for (Link link : network.getLinks().values()) {
 				out.print(link.getId());
 				for (double time=Time.parseTime("00:00:00"); time<Time.parseTime("24:00:00"); time+=binSize) {
-					out.print("\t" + timeFormat.format(travelTime.getLinkTravelTime(link, time)));
+					out.print("\t" + timeFormat.format(travelTime.getLinkTravelTime(link, time, null, null)));
 				}
 				out.println();
 			}

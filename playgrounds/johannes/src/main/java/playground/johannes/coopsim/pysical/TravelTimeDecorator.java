@@ -20,7 +20,9 @@
 package playground.johannes.coopsim.pysical;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author illenberger
@@ -36,10 +38,10 @@ public class TravelTimeDecorator implements TravelTime {
 		this.delegate = delegate;
 		this.ttFactor = ttFactor;
 	}
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		return delegate.getLinkTravelTime(link, time) * ttFactor;
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		return delegate.getLinkTravelTime(link, time, person, vehicle) * ttFactor;
 	}
 
 }

@@ -27,7 +27,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -72,16 +76,19 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
 		// TravelTimeCollector for car mode
-		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-		for (Entry<String, TravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory()
-				.getTravelTimeFactories().entrySet()) {
-			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
-		}
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, super.getTravelTimeCollectorFactory());
+		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute(),
+				new WalkTravelTime(this.config.plansCalcRoute())));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+				new WalkTravelTime(this.config.plansCalcRoute())));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
+				this.getTravelTimeCalculator(), new WalkTravelTime(this.config.plansCalcRoute())));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, super.getTravelTimeCollector());
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory,
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, multiModalTravelTimeFactory.createTravelTime(), factory,
 				routeFactory);
 
 		// adding hight utility parking choice algo

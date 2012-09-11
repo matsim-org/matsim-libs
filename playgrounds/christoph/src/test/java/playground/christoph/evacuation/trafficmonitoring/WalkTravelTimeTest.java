@@ -65,7 +65,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		// reference speed * person factor * slope factor		
 		speed = defaultWalkSpeed * walkTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person,null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 
@@ -75,7 +75,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		walkTravelTime.setPerson(person);
 		speed = defaultWalkSpeed * walkTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 				
@@ -85,7 +85,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		walkTravelTime.setPerson(person);
 		speed = defaultWalkSpeed * walkTravelTime.personFactor * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 
@@ -95,7 +95,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		double slopeFactor = walkTravelTime.getSlopeFactor(slope);
 		speed = defaultWalkSpeed * walkTravelTime.personFactor * slopeFactor;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		
@@ -105,7 +105,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		slopeFactor = walkTravelTime.getSlopeFactor(slope);
 		speed = defaultWalkSpeed * walkTravelTime.personFactor * slopeFactor;
 		expectedTravelTime = link.getLength() / speed;
-		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0);
+		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		printInfo(person, link, expectedTravelTime, calculatedTravelTime);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 	}

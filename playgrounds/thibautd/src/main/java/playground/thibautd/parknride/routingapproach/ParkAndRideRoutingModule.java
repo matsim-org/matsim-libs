@@ -145,7 +145,6 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 			final double departureTime,
 			final Person person) {
 		try {
-			timeCost.setPerson( person );
 
 			// start is unique: it is a car linkstart is unique: it is a car link
 			Node fromNode = this.routingNetwork.getLinks().get( fromFacility.getLinkId() ).getToNode();
@@ -681,7 +680,7 @@ public class ParkAndRideRoutingModule implements RoutingModule {
 
 		public Link next() {
 			currentElement = iterator.next();
-			currentTravelTime = timeCost.getLinkTravelTime( currentElement , now );
+			currentTravelTime = timeCost.getLinkTravelTime( currentElement , now, null, null );
 			currentTravelCost = timeCost.getLinkTravelDisutility( currentElement , now, null, null );
 
 			now += currentTravelTime;

@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 import playground.balmermi.world.Layer;
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -42,13 +44,13 @@ public class PTTravelTimeKTI implements PersonalizableTravelTime {
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private final PlansCalcRouteConfigGroup configGroup;
 	private final Map<Id, Double> agentSpeedMap;
-	private final PersonalizableTravelTime ptTravelTime;
+	private final TravelTime ptTravelTime;
 
 	private Double personSpeed;
 	
 	public PTTravelTimeKTI(PlansCalcRouteKtiInfo plansCalcRouteKtiInfo, 
 			PlansCalcRouteConfigGroup configGroup, Map<Id, Double> agentSpeedMap,
-			PersonalizableTravelTime ptTravelTime) {
+			TravelTime ptTravelTime) {
 		this.plansCalcRouteKtiInfo = plansCalcRouteKtiInfo;
 		this.configGroup = configGroup;
 		this.agentSpeedMap = agentSpeedMap;
@@ -56,14 +58,14 @@ public class PTTravelTimeKTI implements PersonalizableTravelTime {
 	}
 	
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		setPerson(person);
 		if (this.personSpeed != null) {
 			return link.getLength() / this.personSpeed;			
-		} else return ptTravelTime.getLinkTravelTime(link, time);
+		} else return ptTravelTime.getLinkTravelTime(link, time, person, vehicle);
 	}
 
-	@Override
-	public void setPerson(Person person) {
+	private void setPerson(Person person) {
 		this.personSpeed = agentSpeedMap.get(person.getId());
 		
 		/*
@@ -71,9 +73,9 @@ public class PTTravelTimeKTI implements PersonalizableTravelTime {
 		 * the PT trip before the evacuation starts. Therefore use
 		 * the simple PT travel time calculator.
 		 */
-		if (this.personSpeed == null) {
-			this.ptTravelTime.setPerson(person);			
-		}
+//		if (this.personSpeed == null) {
+//			this.ptTravelTime.setPerson(person);			
+//		}
 	}
 
 	public void setPersonSpeed(Id personId, double speed) {

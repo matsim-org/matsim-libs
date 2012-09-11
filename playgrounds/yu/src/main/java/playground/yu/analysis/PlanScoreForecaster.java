@@ -147,10 +147,10 @@ public class PlanScoreForecaster {
 		Map<Id, Link> links = this.net.getLinks();
 		for (Id linkId : route.getLinkIds()) {
 			travelTime_s += ttc.getLinkTravelTime(links.get(linkId), departTime
-					+ travelTime_s);
+					+ travelTime_s, null, null);
 		}
 		travelTime_s += this.ttc.getLinkTravelTime(links.get(route
-				.getEndLinkId()), departTime + travelTime_s);
+				.getEndLinkId()), departTime + travelTime_s, null, null);
 		double attrTravelTime = travelTime_s / 3600.0;
 		this.attrTraveling += attrTravelTime;
 

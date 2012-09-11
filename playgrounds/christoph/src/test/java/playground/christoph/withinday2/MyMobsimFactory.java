@@ -23,12 +23,11 @@ package playground.christoph.withinday2;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -90,9 +89,8 @@ public class MyMobsimFactory implements MobsimFactory {
 	private void initReplanningRouter(Scenario sc, Netsim mobsim ) {
 
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) mobsim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.travTimeCalc);
 		AbstractMultithreadedModule routerModule =
-			new ReplanningModule(sc.getConfig(), sc.getNetwork(), this.travCostCalc, wrapper, new DijkstraFactory(), routeFactory);
+			new ReplanningModule(sc.getConfig(), sc.getNetwork(), this.travCostCalc, this.travTimeCalc, new DijkstraFactory(), routeFactory);
 		// (ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute)
 		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 

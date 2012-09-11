@@ -136,8 +136,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		
-		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCollectorFactory());	
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory, this.getMultiModalTravelTimeWrapperFactory(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory, this.getMultiModalTravelTime(), factory, routeFactory);
 		
 		if (agentsLearn) {
 			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime,

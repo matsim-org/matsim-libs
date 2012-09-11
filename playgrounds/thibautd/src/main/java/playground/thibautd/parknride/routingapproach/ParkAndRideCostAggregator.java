@@ -59,14 +59,14 @@ public class ParkAndRideCostAggregator implements PersonalizableTravelTime, Trav
 	@Override
 	public double getLinkTravelTime(
 			final Link link,
-			final double time) {
+			final double time, Person person, Vehicle vehicle) {
 		if (link instanceof TransitRouterNetworkLink) {
-			return transitTravelTimeCost.getLinkTravelTime( link , time );
+			return transitTravelTimeCost.getLinkTravelTime( link , time, person, vehicle );
 		}
 		if (link instanceof ParkAndRideLink) {
-			return pnrTravelTime.getLinkTravelTime( link , time );
+			return pnrTravelTime.getLinkTravelTime( link , time, person, vehicle );
 		}
-		return carTravelTime.getLinkTravelTime( link , time );
+		return carTravelTime.getLinkTravelTime( link , time, person, vehicle );
 	}
 
 	@Override
@@ -85,14 +85,4 @@ public class ParkAndRideCostAggregator implements PersonalizableTravelTime, Trav
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public void setPerson(final Person person) {
-		if (carTravelTime instanceof PersonalizableTravelTime) {
-			((PersonalizableTravelTime) carTravelTime).setPerson( person );
-		}
-		if (pnrTravelTime instanceof PersonalizableTravelTime) {
-			((PersonalizableTravelTime) pnrTravelTime).setPerson( person );
-		}
-		
-	}
 }

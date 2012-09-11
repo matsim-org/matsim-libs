@@ -113,7 +113,7 @@ public class LinkFlowAndTravelTimeExtractor implements AfterMobsimListener,
 			for (int i = 0; i < 24; i++) {
 				SimpleWriter.appendIntermission(line);
 				line.append(travelTimeCalculator.getLinkTravelTime(link,
-						i * 3600d));
+						i * 3600d, null, null));
 			}
 
 			writer.writeln(line);
