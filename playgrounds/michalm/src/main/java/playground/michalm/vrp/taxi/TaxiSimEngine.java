@@ -69,9 +69,14 @@ public class TaxiSimEngine
     // TODO should not be PUBLIC!!!
     // probably all actions on InternalInterface should be carried out via TaxiSimEngine...
     // but for now, let it be public...
+    //
+    // yyyy yes, definitely should not be public. One compromise is to make it "default", and have
+    // everything that
+    // needs access inside the same package. kai, sep'12
     // 
-    // yyyy yes, definitely should not be public.  One compromise is to make it "default", and have everything that
-    // needs access inside the same package.  kai, sep'12
+    // Currently, all objects that need access to InternalInterface and only these objects
+    // have access to TaxiSimEngine, therefore I will keep TaxiSimEngine.getInternalInterface()
+    // public to avoid passing too many arguments through the code. michalm, sep'12
     public InternalInterface getInternalInterface()
     {
         return internalInterface;
@@ -132,7 +137,7 @@ public class TaxiSimEngine
     protected void optimize(double now)
     {
         optimizer.optimize();
-        //System.err.println("Optimization @simTime=" + vrpData.getTime());
+        // System.err.println("Optimization @simTime=" + vrpData.getTime());
 
         notifyAgents();
         notifyOptimizerListeners(new OptimizerEvent((int)now, vrpData,
