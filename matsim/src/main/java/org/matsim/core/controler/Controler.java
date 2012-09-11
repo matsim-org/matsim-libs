@@ -279,6 +279,7 @@ public class Controler extends AbstractController {
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
 		this.events = (EventsManagerImpl) createEventsManager(this.config);
+		this.config.parallelEventHandling().makeLocked();
 	}
 
 	protected EventsManager createEventsManager(final Config config) {

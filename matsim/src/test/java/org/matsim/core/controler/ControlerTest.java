@@ -54,8 +54,8 @@ import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -80,6 +80,24 @@ public class ControlerTest {
 		assertEquals(0, controler.getNetwork().getLinks().size());
 		assertEquals(0, controler.getNetwork().getNodes().size());
 		assertEquals(0, controler.getPopulation().getPersons().size());
+		assertNotNull(controler.getEvents());
+	}
+
+	@Test
+	public void testConstructor_EventsManagerTypeImmutable() {
+		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		try {
+			controler.getConfig().setParam("parallelEventHandling", "numberOfThreads", "2");
+			Assert.fail("Expected exception");
+		} catch (Exception e) {
+			log.info("catched expected exception", e);
+		}
+		try {
+			controler.getConfig().setParam("parallelEventHandling", "estimatedNumberOfEvents", "200000");
+			Assert.fail("Expected exception");
+		} catch (Exception e) {
+			log.info("catched expected exception", e);
+		}
 	}
 
 	/**
@@ -683,7 +701,7 @@ public class ControlerTest {
 			log.info("catched expected exception.", e);
 		}
 	}
-	
+
 	@Test
 	public void testKMLSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -693,7 +711,7 @@ public class ControlerTest {
 		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
 		config.simulation().setSnapshotPeriod(600);
 		config.simulation().setSnapshotStyle("equiDist");
-		
+
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
@@ -703,7 +721,7 @@ public class ControlerTest {
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "googleearth.kmz")).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "googleearth.kmz")).exists());
 	}
-	
+
 	@Test
 	public void testKMLSnapshotWriterOnQSim() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -716,7 +734,7 @@ public class ControlerTest {
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle("equiDist");
 		config.addQSimConfigGroup(qSimConfigGroup);
-		
+
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
@@ -726,7 +744,7 @@ public class ControlerTest {
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "googleearth.kmz")).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "googleearth.kmz")).exists());
 	}
-	
+
 	@Test
 	public void testTransimsSnapshotWriterOnQueueSimulation() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -736,7 +754,7 @@ public class ControlerTest {
 		config.controler().setSnapshotFormat(Arrays.asList("transims"));
 		config.simulation().setSnapshotPeriod(10);
 		config.simulation().setSnapshotStyle("equiDist");
-		
+
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
@@ -746,7 +764,7 @@ public class ControlerTest {
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "T.veh.gz")).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "T.veh.gz")).exists());
 	}
-	
+
 	@Test
 	public void testOneSnapshotWriterInConfig() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -755,7 +773,7 @@ public class ControlerTest {
 		config.controler().setWritePlansInterval(0);
 		config.simulation().setSnapshotPeriod(10);
 		config.simulation().setSnapshotStyle("equiDist");
-		
+
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
@@ -763,7 +781,7 @@ public class ControlerTest {
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
 	}
-	
+
 	@Test
 	public void testTransimsSnapshotWriterOnQSim() {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
@@ -776,7 +794,7 @@ public class ControlerTest {
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle("equiDist");
 		config.addQSimConfigGroup(qSimConfigGroup);
-		
+
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
