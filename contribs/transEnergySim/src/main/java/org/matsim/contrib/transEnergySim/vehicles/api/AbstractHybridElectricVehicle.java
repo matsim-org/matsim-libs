@@ -20,7 +20,7 @@
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 /**
  * vehicle has both combustion engine and battery on board

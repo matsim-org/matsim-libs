@@ -17,13 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api;
+package org.matsim.contrib.transEnergySim.vehicles.energyConsumption;
+
+import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.parking.lib.DebugLib;
 
 public interface EnergyConsumptionModel {
 
-	public double getEnergyConsumptionForLinkInJoule(Link link, double averageSpeedDriven);
+	public abstract double getEnergyConsumptionForLinkInJoule(Link link, double averageSpeedDriven);
 	
-	public double getEnergyConsumptionForLinkInJoule(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven);
+	public abstract double getEnergyConsumptionForLinkInJoule(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven);
+
+	
 }

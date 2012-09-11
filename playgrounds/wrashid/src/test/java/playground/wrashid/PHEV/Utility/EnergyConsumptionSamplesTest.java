@@ -1,6 +1,6 @@
 package playground.wrashid.PHEV.Utility;
 
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumption;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 
 import junit.framework.TestCase;
 

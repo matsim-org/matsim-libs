@@ -3,7 +3,7 @@ package org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumption;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 
 
 

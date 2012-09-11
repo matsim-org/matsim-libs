@@ -1,6 +1,6 @@
 package playground.wrashid.PHEV.Utility;
 
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumption;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;

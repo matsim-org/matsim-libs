@@ -10,8 +10,8 @@ import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveSt
 import org.matsim.contrib.transEnergySim.controllers.InductiveChargingController;
 import org.matsim.contrib.transEnergySim.vehicles.VehicleUtils;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumptionModelGalus;
 import org.matsim.contrib.transEnergySim.vehicles.impl.InductivelyChargableBatteryElectricVehicle;
 import org.matsim.core.basic.v01.IdImpl;

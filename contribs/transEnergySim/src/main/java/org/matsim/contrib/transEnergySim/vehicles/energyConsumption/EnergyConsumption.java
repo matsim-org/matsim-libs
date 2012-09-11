@@ -1,4 +1,4 @@
-package org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus;
+package org.matsim.contrib.transEnergySim.vehicles.energyConsumption;
 
 /**
  * container for energy consumption for driving at given given speed.

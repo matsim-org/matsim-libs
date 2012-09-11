@@ -22,7 +22,7 @@ package org.matsim.contrib.transEnergySim.vehicles.api;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.MathLib;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.api.EnergyConsumptionModel;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 /**
  * Provides the basic structure for a vehicle running on battery.
