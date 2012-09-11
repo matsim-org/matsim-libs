@@ -92,7 +92,7 @@ public class TransitRouteImpl implements TransitRoute {
 	public void addDeparture(final Departure departure) {
 		final Id id = departure.getId();
 		if (this.departures.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a departure with id " + id.toString());
+			throw new IllegalArgumentException("There is already a departure with id " + id.toString() + " in transit route " + this.routeId);
 		}
 		this.departures.put(id, departure);
 	}

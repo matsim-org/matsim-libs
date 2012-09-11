@@ -31,7 +31,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
- * 
+ *
  * @author mrieser
  */
 public class TransitLineImpl implements TransitLine {
@@ -52,7 +52,7 @@ public class TransitLineImpl implements TransitLine {
 	public void addRoute(final TransitRoute transitRoute) {
 		final Id id = transitRoute.getId();
 		if (this.transitRoutes.containsKey(id)) {
-			throw new IllegalArgumentException("There is already a transit route with id " + id.toString());
+			throw new IllegalArgumentException("There is already a transit route with id " + id.toString() + " with line " + this.lineId);
 		}
 		this.transitRoutes.put(id, transitRoute);
 	}
