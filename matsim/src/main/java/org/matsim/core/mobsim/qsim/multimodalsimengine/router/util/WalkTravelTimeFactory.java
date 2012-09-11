@@ -21,8 +21,8 @@
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 
 public class WalkTravelTimeFactory implements PersonalizableTravelTimeFactory {
 
@@ -33,7 +33,7 @@ public class WalkTravelTimeFactory implements PersonalizableTravelTimeFactory {
 	}
 	
 	@Override
-	public PersonalizableTravelTime createTravelTime() {
+	public TravelTime createTravelTime() {
 		return new WalkTravelTime(plansCalcRouteConfigGroup);
 	}
 	

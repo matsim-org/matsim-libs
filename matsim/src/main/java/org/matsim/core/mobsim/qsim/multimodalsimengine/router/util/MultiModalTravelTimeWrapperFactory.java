@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * Factory for a MultiModalTravelTimeWrapper. Uses PersonalizableTravelTimeFactory
@@ -38,31 +38,31 @@ public class MultiModalTravelTimeWrapperFactory implements MultiModalTravelTimeF
 
 	private static final Logger log = Logger.getLogger(MultiModalTravelTimeWrapperFactory.class);
 	
-	private final Map<String, TravelTimeFactory> travelTimeFactories;
+	private final Map<String, TravelTime> travelTimeFactories;
 	
 	public MultiModalTravelTimeWrapperFactory() {
-		this.travelTimeFactories = new HashMap<String, TravelTimeFactory>();
+		this.travelTimeFactories = new HashMap<String, TravelTime>();
 	}
 	
 	@Override
 	public MultiModalTravelTimeWrapper createTravelTime() {
 		MultiModalTravelTimeWrapper wrapper = new MultiModalTravelTimeWrapper();
 		
-		for (Entry<String, TravelTimeFactory> entry : travelTimeFactories.entrySet()) {
-			wrapper.setTravelTime(entry.getKey(), entry.getValue().createTravelTime());
+		for (Entry<String, TravelTime> entry : travelTimeFactories.entrySet()) {
+			wrapper.setTravelTime(entry.getKey(), entry.getValue());
 		}
 		
 		return wrapper;
 	}
 	
-	public void setPersonalizableTravelTimeFactory(String transportMode, TravelTimeFactory factory) {
+	public void setPersonalizableTravelTimeFactory(String transportMode, TravelTime travelTime) {
 		if (this.travelTimeFactories.containsKey(transportMode)) {
 			log.warn("A PersonalizableTravelTimeFactory for transport mode " + transportMode + " already exists. Replacing it!");
 		}
-		this.travelTimeFactories.put(transportMode, factory);
+		this.travelTimeFactories.put(transportMode, travelTime);
 	}
 
-	public Map<String, TravelTimeFactory> getTravelTimeFactories() {
+	public Map<String, TravelTime> getTravelTimeFactories() {
 		return Collections.unmodifiableMap(travelTimeFactories);
 	}
 

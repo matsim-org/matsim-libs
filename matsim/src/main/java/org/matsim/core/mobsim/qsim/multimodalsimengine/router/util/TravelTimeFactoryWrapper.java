@@ -32,14 +32,14 @@ import org.matsim.vehicles.Vehicle;
  */
 public class TravelTimeFactoryWrapper implements PersonalizableTravelTimeFactory {
 
-	private final PersonalizableTravelTime travelTime;
+	private final TravelTime travelTime;
 	
 	public TravelTimeFactoryWrapper(TravelTime travelTime) {
 		this.travelTime = new Wrapper(travelTime);
 	}
 	
 	@Override
-	public PersonalizableTravelTime createTravelTime() {
+	public TravelTime createTravelTime() {
 		return travelTime;
 	}
 

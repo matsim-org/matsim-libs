@@ -34,10 +34,9 @@ import org.matsim.vehicles.Vehicle;
 public class RideTravelTime implements PersonalizableTravelTime {
 
 	private final TravelTime carTravelTime;	// ride speed does not depend on a passenger, therefore not personalizable
-	private final PersonalizableTravelTime walkTravelTime;
+	private final TravelTime walkTravelTime;
 	
-	// use the factory
-	/*package*/ RideTravelTime(TravelTime carTravelTime, PersonalizableTravelTime walkTravelTime) {
+	public RideTravelTime(TravelTime carTravelTime, TravelTime walkTravelTime) {
 		this.carTravelTime = carTravelTime;
 		this.walkTravelTime = walkTravelTime;
 	}

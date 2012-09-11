@@ -22,5 +22,5 @@ package org.matsim.core.router.util;
 
 public interface PersonalizableTravelTimeFactory extends TravelTimeFactory {
 
-	public PersonalizableTravelTime createTravelTime();
+	public TravelTime createTravelTime();
 }

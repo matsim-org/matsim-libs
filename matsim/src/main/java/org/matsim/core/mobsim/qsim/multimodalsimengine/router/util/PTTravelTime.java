@@ -37,12 +37,11 @@ import org.matsim.vehicles.Vehicle;
 public class PTTravelTime implements PersonalizableTravelTime {
 
 	private final TravelTime carTravelTime;	// PT speed does not depend on a passenger, therefore not personalizable
-	private final PersonalizableTravelTime walkTravelTime;
+	private final TravelTime walkTravelTime;
 	private final double ptScaleFactor;
 	
-	// use the factory
-	/*package*/ PTTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, 
-			TravelTime carTravelTime, PersonalizableTravelTime walkTravelTime) {
+	public PTTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, 
+			TravelTime carTravelTime, TravelTime walkTravelTime) {
 		this.ptScaleFactor = plansCalcRouteConfigGroup.getPtSpeedFactor();
 		this.carTravelTime = carTravelTime;
 		this.walkTravelTime = walkTravelTime;

@@ -21,26 +21,25 @@
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
-import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 
 public class PTTravelTimeFactory implements PersonalizableTravelTimeFactory {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	private final TravelTimeFactory carTravelTimeFactory;	// PT speed does not depend on a passenger, therefore not personalizable
-	private final PersonalizableTravelTimeFactory walkTravelTimeFactory;
+	private final TravelTime travelTime;	// PT speed does not depend on a passenger, therefore not personalizable
+	private final TravelTime walkTravelTimeFactory;
 	
 	public PTTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
-			TravelTimeFactory carTravelTimeFactory, PersonalizableTravelTimeFactory walkTravelTimeFactory) {
+			TravelTime travelTime, TravelTime walkTravelTimeFactory2) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
-		this.carTravelTimeFactory = carTravelTimeFactory;
-		this.walkTravelTimeFactory = walkTravelTimeFactory;
+		this.travelTime = travelTime;
+		this.walkTravelTimeFactory = walkTravelTimeFactory2;
 	}
 	
 	@Override
-	public PersonalizableTravelTime createTravelTime() {
-		return new PTTravelTime(plansCalcRouteConfigGroup, carTravelTimeFactory.createTravelTime(), walkTravelTimeFactory.createTravelTime());
+	public TravelTime createTravelTime() {
+		return new PTTravelTime(plansCalcRouteConfigGroup, travelTime, walkTravelTimeFactory);
 	}
 	
 }

@@ -36,13 +36,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
@@ -73,15 +72,14 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		// pre-initialize the travel time calculator to be able to use it in the wrapper
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(travelTimeCalculator);
-
+	
 		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
 		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, wrapper);
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup, new WalkTravelTimeFactory(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(wrapper, new WalkTravelTimeFactory(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, wrapper, new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, travelTimeCalculator);
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(configGroup));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(configGroup, new WalkTravelTime(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(travelTimeCalculator, new WalkTravelTime(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(configGroup, travelTimeCalculator, new WalkTravelTime(configGroup)));
 		MultiModalTravelTime travelTime = multiModalTravelTimeFactory.createTravelTime();	
 		
 		/*

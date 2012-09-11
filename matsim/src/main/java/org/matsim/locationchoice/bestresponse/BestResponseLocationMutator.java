@@ -39,7 +39,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -134,7 +133,7 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 					// maybe repeat this a couple of times
 					TravelTime travelTime = super.getControler().getTravelTimeCalculator();
 					TravelDisutility travelCost = super.getControler().getTravelDisutilityFactory().
-							createTravelDisutility((PersonalizableTravelTime)travelTime, (PlanCalcScoreConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
+							createTravelDisutility((TravelTime)travelTime, (PlanCalcScoreConfigGroup)super.getControler().getConfig().getModule("planCalcScore"));
 						
 					this.setLocation((ActivityImpl)actToMove, 
 							cs.getWeightedRandomChoice(actlegIndex, plan.getPerson(),

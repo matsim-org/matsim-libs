@@ -28,13 +28,12 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
 
 class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	
-	private final MultiModalTravelTimeFactory timeFactory;
 	private final int numOfThreads;
 	
 	private Thread[] threads;
@@ -51,12 +50,11 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	 * those instances.
 	 * 
 	 * @param sim
-	 * @param multiModalTravelTimeFactory
+	 * @param multiModalTravelTimeCalculator
 	 */
 	// use the factory
-	/*package*/ ParallelMultiModalSimEngine(Netsim sim, MultiModalTravelTimeFactory multiModalTravelTimeFactory) {
-		super(sim, multiModalTravelTimeFactory.createTravelTime());
-		this.timeFactory = multiModalTravelTimeFactory;
+	/*package*/ ParallelMultiModalSimEngine(Netsim sim, MultiModalTravelTimeWrapper multiModalTravelTimeCalculator) {
+		super(sim, multiModalTravelTimeCalculator);
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 	
@@ -204,7 +202,6 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
-			multiModalTravelTime = timeFactory.createTravelTime();
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
 					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTime);
 

@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
@@ -33,17 +34,17 @@ public class MultiModalSimEngineFactory implements MatsimFactory {
 
 	final private static Logger log = Logger.getLogger(MultiModalSimEngineFactory.class);
 	
-	public MultiModalSimEngine createMultiModalSimEngine(Netsim sim, MultiModalTravelTimeFactory multiModalTravelTimeFactory) {
+	public MultiModalSimEngine createMultiModalSimEngine(Netsim sim, MultiModalTravelTimeWrapper multiModalTravelTimeCalculator) {
 		
 		MultiModalSimEngine simEngine;
 		
 		int numOfThreads = sim.getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads(); 
 		if (numOfThreads > 1) {
-			simEngine = new ParallelMultiModalSimEngine(sim, multiModalTravelTimeFactory);
+			simEngine = new ParallelMultiModalSimEngine(sim, multiModalTravelTimeCalculator);
 			log.info("Using ParallelMultiModalSimEngine with " + numOfThreads + " threads.");
 		}
 		else {
-			simEngine = new MultiModalSimEngine(sim, multiModalTravelTimeFactory.createTravelTime());
+			simEngine = new MultiModalSimEngine(sim, multiModalTravelTimeCalculator);
 		}
 		
 		addMultiModalToQNetwork(sim.getNetsimNetwork(), simEngine);

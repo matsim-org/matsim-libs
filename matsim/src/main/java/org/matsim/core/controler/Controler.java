@@ -80,14 +80,13 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandle
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.EnsureActivityReachability;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.NonCarRouteDropper;
@@ -214,7 +213,6 @@ public class Controler extends AbstractController {
 	private final List<MobsimListener> simulationListener = new ArrayList<MobsimListener>();
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory;
-	private MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
 
 	private TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private MobsimFactory mobsimFactory = null;
@@ -227,6 +225,7 @@ public class Controler extends AbstractController {
 
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
+	private MultiModalTravelTimeWrapper multiModalTravelTimeCalculator;
 
 
 	/**
@@ -392,18 +391,20 @@ public class Controler extends AbstractController {
 				new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
 			}
 			
-			// Wraps the (thread-safe) TravelTime 
-			TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.getTravelTimeCalculator());
 			
 			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, wrapper);
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
-					new WalkTravelTimeFactory(configGroup)));
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(wrapper, 
-					new WalkTravelTimeFactory(configGroup)));
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
-					wrapper, new WalkTravelTimeFactory(configGroup)));
+			MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCalculator());
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(configGroup));
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(configGroup,
+					new WalkTravelTime(configGroup)));
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+					new WalkTravelTime(configGroup)));
+			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(configGroup, 
+					this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
+			
+			multiModalTravelTimeCalculator = multiModalTravelTimeFactory.createTravelTime();
+			
 		}
 
 		if (this.travelCostCalculator == null) {
@@ -709,7 +710,7 @@ public class Controler extends AbstractController {
 			if (config.multiModal().isMultiModalSimulationEnabled()) {
 				log.info("Using MultiModalMobsim...");
 				QSim qSim = (QSim) simulation;
-				MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimeFactory);
+				MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimeCalculator);
 				qSim.addMobsimEngine(multiModalEngine);
 				qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, config.multiModal()));
 			}
@@ -917,14 +918,13 @@ public class Controler extends AbstractController {
 			log.warn("As simulation of public transit is enabled a leg router for transit is used. Other features, " +
 					"e.g. multimodal simulation, may not work as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			// Note: we don't use the given TravelTime object! Instead we use a MultiModalTravelTime object!
-			MultiModalTravelTime travelTime = multiModalTravelTimeFactory.createTravelTime();
-			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTime,
+
+			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, multiModalTravelTimeCalculator,
 					this.getLeastCostPathCalculatorFactory(), routeFactory);
 
 			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) 
-					this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, travelTime);
-			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, travelTime, routeAlgo);
+					this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, multiModalTravelTimeCalculator);
+			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, multiModalTravelTimeCalculator, routeAlgo);
 
 			/*
 			 * A MultiModalTravelTime calculator is used. Before creating a route for a given
@@ -1101,10 +1101,6 @@ public class Controler extends AbstractController {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 
-	public MultiModalTravelTimeWrapperFactory getMultiModalTravelTimeWrapperFactory() {
-		return this.multiModalTravelTimeFactory;
-	}
-
 	public OutputDirectoryHierarchy getControlerIO() {
 		return this.controlerIO;
 	}
@@ -1162,6 +1158,10 @@ public class Controler extends AbstractController {
 
 	public int getWritePlansInterval() {
 		return this.writePlansInterval;
+	}
+
+	public TravelTime getMultiModalTravelTime() {
+		return multiModalTravelTimeCalculator;
 	}
 
 }

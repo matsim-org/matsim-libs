@@ -39,8 +39,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	
 	private double ageScaleFactor;
 	
-	// use the factory
-	/*package*/ WalkTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
 		this.walkSpeed = plansCalcRouteConfigGroup.getWalkSpeed();
 	}
 

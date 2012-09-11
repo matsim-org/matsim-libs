@@ -43,26 +43,25 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 	protected Config config;
 	protected Network network;
 	protected TravelDisutilityFactory travelCostFactory;
-	protected TravelTimeFactory travelTimeFactory;
+	private TravelTime travelTime;
 	protected LeastCostPathCalculatorFactory pathFactory;
 	private final ModeRouteFactory routeFactory;
 	
 	public ReplanningModule(Config config, Network network,
-			TravelDisutilityFactory costFactory, TravelTimeFactory timeFactory,
+			TravelDisutilityFactory costFactory, TravelTime travelTime,
 			LeastCostPathCalculatorFactory pathFactory, ModeRouteFactory routeFactory) {
 		super(config.global());
 
 		this.config = config;
 		this.network = network;
 		this.travelCostFactory = costFactory;
-		this.travelTimeFactory = timeFactory;
+		this.travelTime = travelTime;
 		this.pathFactory = pathFactory;
 		this.routeFactory = routeFactory;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TravelTime travelTime = travelTimeFactory.createTravelTime();
 		TravelDisutility travelCost = travelCostFactory.createTravelDisutility(travelTime, config.planCalcScore());
 		
 		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, pathFactory, this.routeFactory);

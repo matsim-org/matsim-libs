@@ -21,22 +21,22 @@
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 
 public class BikeTravelTimeFactory implements PersonalizableTravelTimeFactory {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	private final PersonalizableTravelTimeFactory walkTravelTimeFactory;
+	private final TravelTime walkTravelTimeFactory;
 	
-	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, PersonalizableTravelTimeFactory walkTravelTimeFactory) {
+	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime travelTime) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
-		this.walkTravelTimeFactory = walkTravelTimeFactory;
+		this.walkTravelTimeFactory = travelTime;
 	}
 	
 	@Override
-	public PersonalizableTravelTime createTravelTime() {
-		return new BikeTravelTime(plansCalcRouteConfigGroup, walkTravelTimeFactory.createTravelTime());
+	public TravelTime createTravelTime() {
+		return new BikeTravelTime(plansCalcRouteConfigGroup, walkTravelTimeFactory);
 	}
 	
 }

@@ -53,7 +53,7 @@ public class WithinDayController extends Controler {
 	private static final Logger log = Logger.getLogger(WithinDayController.class);
 	
 	private TravelTimeCollectorFactory travelTimeCollectorFactory = new TravelTimeCollectorFactory();
-	private TravelTimeCollector travelTime;
+	private TravelTimeCollector travelTimeCollector;
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
 	
@@ -95,21 +95,17 @@ public class WithinDayController extends Controler {
 			log.warn("Cannot create and init the TravelTimeCollector. EventsManager has not be initialized yet!");
 			return;
 		}
-		if (travelTime == null) {
-			travelTime = travelTimeCollectorFactory.createTravelTimeCollector(this.scenarioData, analyzedModes);
-			fosl.addSimulationInitializedListener((TravelTimeCollector)travelTime);
-			fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);
-			fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);
-			this.events.addHandler((TravelTimeCollector)travelTime);
+		if (travelTimeCollector == null) {
+			travelTimeCollector = travelTimeCollectorFactory.createTravelTimeCollector(this.scenarioData, analyzedModes);
+			fosl.addSimulationInitializedListener(travelTimeCollector);
+			fosl.addSimulationBeforeSimStepListener(travelTimeCollector);
+			fosl.addSimulationAfterSimStepListener(travelTimeCollector);
+			this.events.addHandler(travelTimeCollector);
 		}
 	}
 	
 	public TravelTimeCollector getTravelTimeCollector() {
-		return this.travelTime;
-	}
-	
-	public TravelTimeCollectorFactory getTravelTimeCollectorFactory() {
-		return this.travelTimeCollectorFactory;
+		return this.travelTimeCollector;
 	}
 	
 	public void createAndInitActivityReplanningMap() {

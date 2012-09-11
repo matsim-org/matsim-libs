@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.controller;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -119,8 +118,7 @@ public class ExampleWithinDayController extends WithinDayController implements M
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 
-		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCollectorFactory());	
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getMultiModalTravelTimeWrapperFactory(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getMultiModalTravelTime(), factory, routeFactory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
@@ -142,6 +140,7 @@ public class ExampleWithinDayController extends WithinDayController implements M
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
+
 
 	/*
 	 * When the Controller Startup Event is created, the EventsManager

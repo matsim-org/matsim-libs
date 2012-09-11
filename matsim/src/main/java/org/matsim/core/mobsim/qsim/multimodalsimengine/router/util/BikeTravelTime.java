@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -36,13 +37,12 @@ import org.matsim.vehicles.Vehicle;
  */
 public class BikeTravelTime implements PersonalizableTravelTime {
 
-	private final PersonalizableTravelTime walkTravelTime;
+	private final TravelTime walkTravelTime;
 	private final double bikeSpeed;
 	
 	private double ageScaleFactor;
 	
-	// use the factory
-	/*package*/ BikeTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, PersonalizableTravelTime walkTravelTime) {
+	public BikeTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime walkTravelTime) {
 		this.bikeSpeed = plansCalcRouteConfigGroup.getBikeSpeed();
 		this.walkTravelTime = walkTravelTime;
 	}
