@@ -29,7 +29,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 /**
- * TODO: exploain, that the model is based on the following paper:
+ * TODO: explain, that the model is based on the following paper:
  * http://www2.isr.uc.pt/~carlospatrao/VE/A_sustainability_assessment_of_EVs.pdf
  * 
  * A sustainability assessment of electric vehicles as a personal mobility
