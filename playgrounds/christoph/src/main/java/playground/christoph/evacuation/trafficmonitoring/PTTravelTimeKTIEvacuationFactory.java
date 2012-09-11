@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -47,16 +46,16 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.matrices.Matrix;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
 import playground.balmermi.world.Layer;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
 import playground.meisterk.kti.router.SwissHaltestellen;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 /*
  * Extended PTTravelTimeKTIFactory that adapted the travel time matrix
@@ -66,8 +65,8 @@ public class PTTravelTimeKTIEvacuationFactory extends PTTravelTimeKTIFactory {
 
 	static final Logger log = Logger.getLogger(PTTravelTimeKTIEvacuationFactory.class);
 	
-	public PTTravelTimeKTIEvacuationFactory(Scenario scenario, TravelTime travelTime) {
-		super(scenario, travelTime);
+	public PTTravelTimeKTIEvacuationFactory(Scenario scenario, TravelTime ptTravelTime) {
+		super(scenario, ptTravelTime);
 	}
 
 	public void prepareMatrixForEvacuation(CoordAnalyzer coordAnalyzer) {

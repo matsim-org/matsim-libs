@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
@@ -39,14 +38,14 @@ import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
 
-public class PTTravelTimeKTI implements PersonalizableTravelTime {
+public class PTTravelTimeKTI implements TravelTime {
 
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private final PlansCalcRouteConfigGroup configGroup;
 	private final Map<Id, Double> agentSpeedMap;
 	private final TravelTime ptTravelTime;
 
-	private Double personSpeed;
+	private ThreadLocal<Double> personSpeed;
 	
 	public PTTravelTimeKTI(PlansCalcRouteKtiInfo plansCalcRouteKtiInfo, 
 			PlansCalcRouteConfigGroup configGroup, Map<Id, Double> agentSpeedMap,
@@ -60,22 +59,30 @@ public class PTTravelTimeKTI implements PersonalizableTravelTime {
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		setPerson(person);
-		if (this.personSpeed != null) {
-			return link.getLength() / this.personSpeed;			
+		if (this.personSpeed.get() != null) {
+			return link.getLength() / this.personSpeed.get();			
 		} else return ptTravelTime.getLinkTravelTime(link, time, person, vehicle);
 	}
 
 	private void setPerson(Person person) {
-		this.personSpeed = agentSpeedMap.get(person.getId());
+		Double personSpeed = agentSpeedMap.get(person.getId());
+		if (personSpeed != null) {
+			this.personSpeed.set(agentSpeedMap.get(person.getId()));			
+		} else {
+			/*
+			 * After removing PersonalizeTravelTime this should not be 
+			 * necessary anymore.
+			 */
+			/*
+			 * If no speed value for the person is set, the agent performs
+			 * the PT trip before the evacuation starts. Therefore use
+			 * the simple PT travel time calculator.
+			 */
+//			if (this.personSpeed == null) {
+//				this.ptTravelTime.setPerson(person);			
+//			}			
+		}
 		
-		/*
-		 * If no speed value for the person is set, the agent performs
-		 * the PT trip before the evacuation starts. Therefore use
-		 * the simple PT travel time calculator.
-		 */
-//		if (this.personSpeed == null) {
-//			this.ptTravelTime.setPerson(person);			
-//		}
 	}
 
 	public void setPersonSpeed(Id personId, double speed) {

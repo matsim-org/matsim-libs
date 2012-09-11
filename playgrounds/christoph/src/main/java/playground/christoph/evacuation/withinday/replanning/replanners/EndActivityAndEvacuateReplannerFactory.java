@@ -26,25 +26,25 @@ import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 
 public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private Scenario scenario;
-	private PTTravelTimeKTIFactory ptTravelTimeFactory;
+	private PTTravelTimeKTI ptTravelTime;
 	
 	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
-			PTTravelTimeKTIFactory ptTravelTimeFactory) {
+			PTTravelTimeKTI ptTravelTime) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
-		this.ptTravelTimeFactory = ptTravelTimeFactory;
+		this.ptTravelTime = ptTravelTime;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), 
-				scenario, this.getReplanningManager().getInternalInterface(), ptTravelTimeFactory.createTravelTime());
+				scenario, this.getReplanningManager().getInternalInterface(), ptTravelTime);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

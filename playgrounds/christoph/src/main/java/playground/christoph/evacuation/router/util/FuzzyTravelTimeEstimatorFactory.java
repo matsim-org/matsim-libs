@@ -21,23 +21,24 @@
 package playground.christoph.evacuation.router.util;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 
 import playground.christoph.evacuation.mobsim.AgentsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
-public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTimeFactory {
+public class FuzzyTravelTimeEstimatorFactory implements TravelTimeFactory {
 	
 	private final Scenario scenario;
-	private final PersonalizableTravelTimeFactory timeFactory;
+	private final TravelTime travelTime;
 	private final AgentsTracker agentsTracker;
 	private final VehiclesTracker vehiclesTracker;
 	private final DistanceFuzzyFactorProviderFactory distanceFuzzyFactorProviderFactory;
 	
-	public FuzzyTravelTimeEstimatorFactory(Scenario scenario, PersonalizableTravelTimeFactory timeFactory, AgentsTracker agentsTracker,
+	public FuzzyTravelTimeEstimatorFactory(Scenario scenario, TravelTime travelTime, AgentsTracker agentsTracker,
 			VehiclesTracker vehiclesTracker) {
 		this.scenario = scenario;
-		this.timeFactory = timeFactory;
+		this.travelTime = travelTime;
 		this.agentsTracker = agentsTracker;
 		this.vehiclesTracker = vehiclesTracker;
 
@@ -46,7 +47,7 @@ public class FuzzyTravelTimeEstimatorFactory implements PersonalizableTravelTime
 	
 	@Override
 	public FuzzyTravelTimeEstimator createTravelTime() {
-		return new FuzzyTravelTimeEstimator(scenario, timeFactory.createTravelTime(), agentsTracker, vehiclesTracker, 
+		return new FuzzyTravelTimeEstimator(scenario, travelTime, agentsTracker, vehiclesTracker, 
 				distanceFuzzyFactorProviderFactory.createInstance());
 	}
 }

@@ -27,7 +27,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
 public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuringActivityReplannerFactory {
@@ -35,24 +35,24 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	private final Scenario scenario;
 	private final DecisionDataProvider decisionDataProvider; 
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	private final PTTravelTimeKTIFactory ptTravelTimeFactory;
+	private final PTTravelTimeKTI ptTravelTime;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
 			ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
 			double replanningProbability, DecisionDataProvider decisionDataProvider, ModeAvailabilityChecker modeAvailabilityChecker,
-			PTTravelTimeKTIFactory ptTravelTimeFactory) {
+			PTTravelTimeKTI ptTravelTime) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.decisionDataProvider = decisionDataProvider;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
-		this.ptTravelTimeFactory = ptTravelTimeFactory;
+		this.ptTravelTime = ptTravelTime;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario,
 				this.getReplanningManager().getInternalInterface(), decisionDataProvider, 
-				modeAvailabilityChecker.createInstance(), ptTravelTimeFactory.createTravelTime());
+				modeAvailabilityChecker.createInstance(), ptTravelTime);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

@@ -27,7 +27,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIFactory;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 
 public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityReplannerFactory {
@@ -35,24 +35,23 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	private final Scenario scenario;
 	private final DecisionDataProvider decisionDataProvider;
 	private final JoinedHouseholdsIdentifier identifier;
-	private final PTTravelTimeKTIFactory ptTravelTimeFactory;
+	private final PTTravelTimeKTI ptTravelTime;
 	
 	public JoinedHouseholdsReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
-			PTTravelTimeKTIFactory ptTravelTimeFactory) {
+			PTTravelTimeKTI ptTravelTime) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.decisionDataProvider = decisionDataProvider;
 		this.identifier = identifier;
-		this.ptTravelTimeFactory = ptTravelTimeFactory;
+		this.ptTravelTime = ptTravelTime;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new JoinedHouseholdsReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), decisionDataProvider, identifier,
-				ptTravelTimeFactory.createTravelTime());
+				this.getReplanningManager().getInternalInterface(), decisionDataProvider, identifier, ptTravelTime);
 		super.initNewInstance(replanner);
 		return replanner;
 	}
