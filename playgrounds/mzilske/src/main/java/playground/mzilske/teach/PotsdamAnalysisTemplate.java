@@ -7,7 +7,6 @@ import java.util.List;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;

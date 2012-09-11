@@ -57,9 +57,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.visum.VisumNetwork;
+import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.LineRouteItem;
 import org.matsim.visum.VisumNetwork.TransitLineRoute;
-import org.matsim.visum.VisumNetworkReader;
 
 
 public class NullFallDataPrepare {

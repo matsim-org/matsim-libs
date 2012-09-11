@@ -36,13 +36,11 @@ import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightAgentSource;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 
 /**
  * Created by IntelliJ IDEA.

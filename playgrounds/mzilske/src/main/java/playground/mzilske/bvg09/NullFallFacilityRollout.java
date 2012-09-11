@@ -60,8 +60,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetwork.StopPoint;
 import org.matsim.visum.VisumNetworkReader;
+import org.matsim.visum.VisumNetwork.StopPoint;
 
 import playground.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
 

@@ -27,8 +27,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetwork.StopPoint;
 import org.matsim.visum.VisumNetworkReader;
+import org.matsim.visum.VisumNetwork.StopPoint;
 
 
 public class VisumHafasScheduleMerger {
