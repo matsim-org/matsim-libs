@@ -70,16 +70,16 @@ public class ParallelEventHandlingConfigGroup extends Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
-		comments.put(NUMBER_OF_THREADS, "number of threads for parallel events handler.  0 or null means parallel events handler is disabled") ;
-		comments.put(ESTIMATED_NUMBER_OF_EVENTS, "estimated number of events during mobsim run, useful for configuration") ;
+		comments.put(NUMBER_OF_THREADS, "number of threads for parallel events handler.  0 or null means parallel events handler is disabled");
+		comments.put(ESTIMATED_NUMBER_OF_EVENTS, "estimated number of events during mobsim run, useful for configuration");
 		return comments;
 	}
 
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(NUMBER_OF_THREADS, this.getNumberOfThreads().toString() ) ;
-		map.put(ESTIMATED_NUMBER_OF_EVENTS, this.getEstimatedNumberOfEvents().toString() ) ;
+		map.put(NUMBER_OF_THREADS, this.getNumberOfThreads() == null ? null : this.getNumberOfThreads().toString());
+		map.put(ESTIMATED_NUMBER_OF_EVENTS, this.getEstimatedNumberOfEvents() == null ? null : this.getEstimatedNumberOfEvents().toString());
 		return map;
 	}
 
@@ -92,7 +92,7 @@ public class ParallelEventHandlingConfigGroup extends Module {
 		if ( !this.locked ) {
 			this.numberOfThreads = numberOfThreads;
 		} else {
-			throw new RuntimeException("it is too late in the control flow to modify this parameter") ;
+			throw new RuntimeException("it is too late in the control flow to modify this parameter");
 		}
 	}
 
@@ -104,12 +104,12 @@ public class ParallelEventHandlingConfigGroup extends Module {
 		if ( !this.locked ) {
 			this.estimatedNumberOfEvents = estimatedNumberOfEvents;
 		} else {
-			throw new RuntimeException("it is too late in the control flow to modify this parameter") ;
+			throw new RuntimeException("it is too late in the control flow to modify this parameter");
 		}
 	}
 
 	public void makeLocked() {
-		this.locked = true ;
+		this.locked = true;
 	}
 
 }
