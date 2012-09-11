@@ -2,6 +2,7 @@ package org.matsim.core.events;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 
 public class EventsUtils {
@@ -16,24 +17,21 @@ public class EventsUtils {
 	 */
 	public static EventsManager createEventsManager(Config config) {
 		EventsManager events;
-		final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
-		final String NUMBER_OF_THREADS = "numberOfThreads";
-		final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
-		String numberOfThreads = config.findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
-		String estimatedNumberOfEvents = config.findParam(PARALLEL_EVENT_HANDLING, ESTIMATED_NUMBER_OF_EVENTS);
+
+		Integer numberOfThreads = config.parallelEventHandling().getNumberOfThreads() ;
+
+		Long estimatedNumberOfEvents = config.parallelEventHandling().getEstimatedNumberOfEvents() ;
 
 		if (numberOfThreads != null) {
-			int numOfThreads = Integer.parseInt(numberOfThreads);
-			// the user wants to user parallel events handling
 			if (estimatedNumberOfEvents != null) {
-				int estNumberOfEvents = Integer.parseInt(estimatedNumberOfEvents);
-				events = new ParallelEventsManagerImpl(numOfThreads, estNumberOfEvents);
+				events = new ParallelEventsManagerImpl(numberOfThreads, estimatedNumberOfEvents);
 			} else {
-				events = new ParallelEventsManagerImpl(numOfThreads);
+				events = new ParallelEventsManagerImpl(numberOfThreads);
 			}
 		} else {
-			events = (EventsManagerImpl) EventsUtils.createEventsManager();
+			events = EventsUtils.createEventsManager();
 		}
+
 		return events;
 	}
 

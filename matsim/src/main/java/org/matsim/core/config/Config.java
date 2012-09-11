@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -85,6 +86,7 @@ public class Config {
 	private LocationChoiceConfigGroup locationchoice = null;
 	private MultiModalConfigGroup multiModal = null;
 	private NetworkConfigGroup network = null;
+	private ParallelEventHandlingConfigGroup parallelEventHandling = null ;
 	private PlanomatConfigGroup planomat = null;
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
 	private PlansConfigGroup plans = null;
@@ -148,6 +150,9 @@ public class Config {
 
 		this.households = new HouseholdsConfigGroup();
 		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, this.households);
+		
+		this.parallelEventHandling = new ParallelEventHandlingConfigGroup() ;
+		this.modules.put(ParallelEventHandlingConfigGroup.GROUP_NAME, this.parallelEventHandling ) ;
 
 		this.planomat = new PlanomatConfigGroup();
 		this.modules.put(PlanomatConfigGroup.GROUP_NAME, this.planomat);
@@ -498,6 +503,10 @@ public class Config {
 	
 	public TimeAllocationMutatorConfigGroup timeAllocationMutator(){
 		return this.timeAllocationMutator ;
+	}
+	
+	public ParallelEventHandlingConfigGroup parallelEventHandling() {
+		return this.parallelEventHandling ;
 	}
 
 	// typed adders:

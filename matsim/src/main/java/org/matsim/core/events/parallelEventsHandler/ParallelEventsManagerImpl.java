@@ -94,8 +94,8 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	 *            Only use this constructor for larger simulations (20M+
 	 *            events).
 	 */
-	public ParallelEventsManagerImpl(int numberOfThreads, int estimatedNumberOfEvents) {
-		preInputBufferMaxLength = estimatedNumberOfEvents / 10;
+	public ParallelEventsManagerImpl(int numberOfThreads, long estimatedNumberOfEvents) {
+		preInputBufferMaxLength = (int) (estimatedNumberOfEvents / 10 );
 		init(numberOfThreads);
 	}
 
