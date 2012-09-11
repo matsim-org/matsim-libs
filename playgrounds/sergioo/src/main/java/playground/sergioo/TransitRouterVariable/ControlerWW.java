@@ -23,7 +23,6 @@ package playground.sergioo.TransitRouterVariable;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesFaresScoringFunctionFactory;
 import org.matsim.pt.router.TransitRouterConfig;
 
 
@@ -44,7 +43,6 @@ public class ControlerWW implements StartupListener {
 
 	public static void main(String[] args) {
 		Controler controler = new Controler(args);
-		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesFaresScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.addControlerListener(new ControlerWW(controler));
 		controler.run();
 	}

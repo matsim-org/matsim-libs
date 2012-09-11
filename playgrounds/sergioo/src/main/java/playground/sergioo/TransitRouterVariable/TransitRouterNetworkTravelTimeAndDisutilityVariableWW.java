@@ -66,16 +66,16 @@ public class TransitRouterNetworkTravelTimeAndDisutilityVariableWW extends Trans
 		return waitTime;
 	}
 	@Override
-	public double getLinkTravelTime(final Link link, final double time) {
+	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null) {
 			//in line link
 			int slot = time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1);
 			double linksTime = linkTravelTimes.get(wrapped.getId())[slot];
 			if(linksTime==0) {
-				linksTime += travelTime.getLinkTravelTime(network.getLinks().get(wrapped.fromNode.stop.getStopFacility().getLinkId()), time);
+				linksTime += travelTime.getLinkTravelTime(network.getLinks().get(wrapped.fromNode.stop.getStopFacility().getLinkId()), time, person, vehicle);
 				for(Id linkId:wrapped.route.getRoute().getSubRoute(wrapped.fromNode.stop.getStopFacility().getLinkId(), wrapped.toNode.stop.getStopFacility().getLinkId()).getLinkIds())
-					linksTime += travelTime.getLinkTravelTime(network.getLinks().get(linkId), time);
+					linksTime += travelTime.getLinkTravelTime(network.getLinks().get(linkId), time, person, vehicle);
 				linkTravelTimes.get(wrapped.getId())[slot] = linksTime;
 			}
 			return linksTime;
@@ -94,14 +94,14 @@ public class TransitRouterNetworkTravelTimeAndDisutilityVariableWW extends Trans
 		double cost;
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
-			cost = - getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.fromNode.route==null)
 			// it's a wait link
-			cost = - getLinkTravelTime(link, time) * this.config.getMarginalUtiltityOfWaiting_utl_s();
+			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtiltityOfWaiting_utl_s();
 		else if(wrapped.toNode.route==null)
 			// it's a transfer link (walk)
-			cost = -getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
+			cost = -getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
 			       - this.config.getUtilityOfLineSwitch_utl();
 		else
 			throw new RuntimeException("Bad transit router link");
