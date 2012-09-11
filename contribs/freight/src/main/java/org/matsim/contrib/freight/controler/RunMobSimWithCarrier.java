@@ -93,7 +93,7 @@ public class RunMobSimWithCarrier implements StartupListener, ShutdownListener, 
 
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-			double genCosts = link.getLength()*cost_per_m + travelTime.getLinkTravelTime(link, time)*cost_per_s;
+			double genCosts = link.getLength()*cost_per_m + travelTime.getLinkTravelTime(link, time, person, vehicle)*cost_per_s;
 //			double genCosts = travelTime.getLinkTravelTime(link, time)*cost_per_s;
 			return genCosts;
 		}
