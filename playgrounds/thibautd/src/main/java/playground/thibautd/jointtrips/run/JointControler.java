@@ -26,6 +26,8 @@ import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.PlansCalcRoute;
@@ -41,12 +43,11 @@ import playground.thibautd.jointtrips.qsim.JointQSimFactory;
 import playground.thibautd.jointtrips.replanning.JointPlansReplanning;
 import playground.thibautd.jointtrips.replanning.JointStrategyManager;
 import playground.thibautd.jointtrips.router.DriverRoutingModule;
-import playground.thibautd.jointtrips.router.DriverRoutingModuleFactory;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
+import playground.thibautd.jointtrips.router.JointTripRouterFactory;
 import playground.thibautd.jointtrips.router.PassengerRoutingModule;
-import playground.thibautd.jointtrips.router.PassengerRoutingModuleFactory;
+import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.RoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
@@ -99,7 +100,18 @@ public class JointControler extends MultiLegRoutingControler {
 						return new ImportedJointRoutesChecker( getTripRouterFactory().createTripRouter() );
 					}
 		});
+	}
 
+	@Override
+	protected void loadControlerListeners() {
+		addControlerListener( new StartupListener() {
+			@Override
+			public void notifyStartup(final StartupEvent event) {
+				setTripRouterFactory( new JointTripRouterFactory( new RoutingElements( event.getControler() ) ) );
+			}
+		});
+
+		super.loadControlerListeners();
 	}
 
 	@Override
@@ -184,60 +196,18 @@ public class JointControler extends MultiLegRoutingControler {
 	}
 
 	@Override
-	public TripRouterFactory getTripRouterFactory() {
-		TripRouterFactory routerFactory = super.getTripRouterFactory();
-
-		routerFactory.setRoutingModuleFactory(
-				JointActingTypes.PASSENGER,
-				new PassengerRoutingModuleFactory( getPopulation().getFactory() ));
-		routerFactory.setRoutingModuleFactory(
-				JointActingTypes.DRIVER,
-				new DriverRoutingModuleFactory( getPopulation().getFactory() ));
-
-		return routerFactory;
-	}
-	
-	//@Override
-	//public PlanAlgorithm createRoutingAlgorithm() {
-	//	 return createRoutingAlgorithm(
-	//			 this.createTravelCostCalculator(),
-	//			 this.getTravelTimeCalculator());
-	//}
-
-	@Override
 	public PlanAlgorithm createRoutingAlgorithm(
 			final TravelDisutility travelCosts,
 			final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();
-		//plansCalcRoute = new PlanRouterWrapper(
-		//		getConfig().plansCalcRoute(),
-		//		getNetwork(),
-		//		travelCosts,
-		//		travelTimes,
-		//		getLeastCostPathCalculatorFactory(),
-		//		tripRouterFactory.getModeRouteFactory(),
-		//		tripRouterFactory,
-		//		new JointPlanRouter( tripRouterFactory.createTripRouter() ));
 
-		//return plansCalcRoute;
 		return new JointPlanRouter( tripRouterFactory.createTripRouter() );
 	}
 
-	///**
-	// * Exports plans in an importable format
-	// */
-	//@Override
-	//protected void shutdown(final boolean unexpected) {
-	//	super.shutdown(unexpected);
-
-	//	ControlerIO io = getControlerIO();
-	//	if (io != null) {
-	//		PopulationWriter popWriter = new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges());
-	//		popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(this.network,(this.getScenario()).getKnowledges()));
-
-	//		popWriter.write(io.getOutputFilename(FILENAME_POPULATION));
-	//	}
-	//}
+	@Override
+	public TripRouterFactory getTripRouterFactory() {
+		return new JointTripRouterFactory( new RoutingElements( this ) );
+	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HitchHikingPassengerRoutingModuleFactory.java
+ * HitchHikingTripRouterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,45 +19,94 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.routing;
 
+import java.util.List;
+
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
+import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.HitchHikingSpots;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.RoutingModuleFactory;
+import playground.thibautd.router.RoutingElements;
+import playground.thibautd.router.TripRouter;
 import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.router.TripRouterFactoryImpl;
 
 /**
  * @author thibautd
  */
-public class HitchHikingPassengerRoutingModuleFactory implements RoutingModuleFactory {
+public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 	private final HitchHikingSpots spots;
+	private final RoutingElements data;
 	private final SpotWeighter spotWeighter;
 	private final HitchHikingConfigGroup config;
 
-	public HitchHikingPassengerRoutingModuleFactory(
+	public HitchHikingTripRouterFactory(
+			final RoutingElements data,
 			final HitchHikingSpots spots,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config) {
-		this.spots = spots;
+		super( data );
+		this.data = data;
 		this.spotWeighter = spotWeighter;
+		this.spots = spots;
 		this.config = config;
 	}
 
 	@Override
-	public RoutingModule createModule(
-			final String mainMode,
-			final TripRouterFactory factory) {
-		return new HitchHikingPassengerRoutingModule(
-				factory.getRoutingModuleFactories().get( TransportMode.pt ).createModule( TransportMode.pt , factory ),
-				spots,
-				factory.getModeRouteFactory(),
-				spotWeighter,
-				config,
-				// XXX here or even higher level?
-				MatsimRandom.getLocalInstance());
+	protected TripRouter instanciateTripRouter() {
+		return new HhTripRouter();
+	};
+
+	@Override
+	public TripRouter createTripRouter() {
+		TripRouter instance = super.createTripRouter();
+
+		instance.setRoutingModule(
+				HitchHikingConstants.PASSENGER_MODE,
+				new HitchHikingPassengerRoutingModule(
+					instance.getRoutingModule( TransportMode.pt ),
+					spots,
+					data.getModeRouteFactory(),
+					spotWeighter,
+					config,
+					// XXX here or higher level?
+					MatsimRandom.getLocalInstance()));
+
+		instance.setRoutingModule(
+				HitchHikingConstants.DRIVER_MODE,
+				new HitchHikingDriverRoutingModule(
+					spotWeighter,
+					instance.getRoutingModule( TransportMode.car ),
+					spots,
+					config,
+					// XXX here or even at a higher level?
+					MatsimRandom.getLocalInstance()));
+
+		return instance;
+	}
+
+	private static class HhTripRouter extends TripRouter {
+		@Override
+		protected String identifyMainMode( final List<PlanElement> trip ) {
+			for (PlanElement pe : trip) {
+				if (pe instanceof Leg) {
+					String mode = ((Leg) pe).getMode();
+
+					if ( mode.equals( HitchHikingConstants.DRIVER_MODE ) ) {
+						return HitchHikingConstants.DRIVER_MODE;
+					}
+					else if ( mode.equals( HitchHikingConstants.PASSENGER_MODE ) ) {
+						return HitchHikingConstants.PASSENGER_MODE;
+					}
+				}
+			}
+
+			return super.identifyMainMode( trip );
+		}
 	}
 }
 

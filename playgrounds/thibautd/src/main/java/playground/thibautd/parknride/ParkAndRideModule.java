@@ -119,9 +119,9 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					transitConfig,
 					controler.getConfig().planCalcScore());
 
-		TravelTime carTime = tripRouterFactory.getTravelTimeFactory().createTravelTime();
+		TravelTime carTime = controler.getTravelTimeCalculator();
 		TravelDisutility carCost =
-			tripRouterFactory.getTravelDisutilityFactory().createTravelDisutility(
+			controler.getTravelDisutilityFactory().createTravelDisutility(
 					carTime, controler.getConfig().planCalcScore() );
 		TransitRouterNetworkTravelTimeAndDisutility ptTimeCost =
 					new TransitRouterNetworkTravelTimeAndDisutility( transitConfig );

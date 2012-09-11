@@ -19,22 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.RoutingModuleFactory;
-import playground.thibautd.router.TransitRoutingModuleFactory;
+import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
-import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedRouteNetworkRoutingModule;
-import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedTransitRouteRoutingModule;
+import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
 
 /**
  * @author thibautd
@@ -46,7 +43,6 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 	private static final boolean DEBUG = false;
 
 	private final MultiLegRoutingControler controler;
-	private final TabuSearchRunner runner = new TabuSearchRunner();
 	private final DepartureDelayAverageCalculator delay;
 
 	public TimeModeChooserAlgorithm(
@@ -72,7 +68,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 					tripRouterFactory,
 					DEBUG ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
-		Solution bestSolution = runner.runTabuSearch( builder );
+		Solution bestSolution = TabuSearchRunner.runTabuSearch( builder );
 
 		// two goals here:
 		// 1- the side effect: getRepresentedPlan sets the plan to the represented state
@@ -82,36 +78,17 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		}
 	}
 
-	// TODO: pass it to an helper class in the "estimation" package
 	private static TripRouterFactory getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
 			final MultiLegRoutingControler controler ) {
-		TripRouterFactory factory = controler.getTripRouterFactory();
-		
-		RoutingModuleFactory moduleFactory =
-			FixedRouteNetworkRoutingModule.getFactory(
-					plan,
-					controler.getConfig().planCalcScore(),
-					controler.getPopulation().getFactory(),
-					delay,
-					// TODO: import from somewhere, or detect from the mobsim
-					false,
-					true);
-
-		factory.setRoutingModuleFactory( TransportMode.car , moduleFactory );
-
-		RoutingModuleFactory ptFactory = factory.getRoutingModuleFactories().get( TransportMode.pt );
-		if (ptFactory instanceof TransitRoutingModuleFactory) {
-			factory.setRoutingModuleFactory(
-					TransportMode.pt,
-					FixedTransitRouteRoutingModule.createFactory(
-						plan,
-						controler.getScenario().getTransitSchedule(),
-						(TransitRoutingModuleFactory) ptFactory ));
-		}
-
-		return factory;
+		return new EstimatorTripRouterFactory(
+				plan,
+				new RoutingElements( controler ),
+				controler.getConfig().plansCalcRoute(),
+				controler.getConfig().planCalcScore(),
+				delay,
+				controler.getTripRouterFactory());
 	}
 }
 

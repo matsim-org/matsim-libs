@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.thibautd.router.RoutingModuleFactory;
+import playground.thibautd.router.TripRouter;
 import playground.thibautd.router.TripRouterFactory;
 
 /**
@@ -41,16 +41,14 @@ class StatisticsCollector {
 	private static final Logger log =
 		Logger.getLogger(StatisticsCollector.class);
 
-	private final Map<String, Set<String>> routingModuleFactoryClasses = new HashMap<String, Set<String>>();
+	private final Map<String, String> routingModuleClasses = new HashMap<String, String>();
 
 	public synchronized  void notifyTripRouterFactory(final TripRouterFactory factory) {
-		for (Map.Entry<String, RoutingModuleFactory> e : factory.getRoutingModuleFactories().entrySet()) {
-			Set<String> classes = routingModuleFactoryClasses.get( e.getKey() );
-			if (classes == null) {
-				classes = new TreeSet<String>();
-				routingModuleFactoryClasses.put( e.getKey() , classes );
-			}
-			classes.add( e.getValue().getClass().toString() );
+		TripRouter router = factory.createTripRouter();
+		for (String mode : router.getRegisteredModes()) {
+			routingModuleClasses.put(
+					mode,
+					""+router.getRoutingModule( mode ).getClass() );
 		}
 	}
 
@@ -70,13 +68,9 @@ class StatisticsCollector {
 			writer.newLine();
 
 			writer.write( "class of the routing modules used for travel time estimation:" );
-			for (Map.Entry<String, Set<String>> entry : routingModuleFactoryClasses.entrySet()) {
+			for (Map.Entry<String, String> entry : routingModuleClasses.entrySet()) {
 				writer.newLine();
-				writer.write( "\t->mode "+entry.getKey()+":" );
-				for (String c : entry.getValue()) {
-					writer.newLine();
-					writer.write( "\t\t->"+c );
-				}
+				writer.write( "\t->mode "+entry.getKey()+": "+entry.getValue() );
 			}
 			writer.newLine();
 

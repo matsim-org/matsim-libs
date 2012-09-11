@@ -20,9 +20,11 @@
 package playground.thibautd.router;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -73,6 +75,14 @@ public class TripRouter {
 		checker.addActivityTypes( module.getStageActivityTypes() );
 
 		return old;
+	}
+
+	public RoutingModule getRoutingModule(final String mainMode) {
+		return routingModules.get( mainMode );
+	}
+
+	public Set<String> getRegisteredModes() {
+		return Collections.unmodifiableSet( routingModules.keySet() );
 	}
 
 	/**

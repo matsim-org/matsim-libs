@@ -20,21 +20,19 @@
 package playground.thibautd.router.controler;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.DefaultRoutingModuleFactory;
 import playground.thibautd.router.PlanRouter;
-import playground.thibautd.router.RoutingModuleFactory;
-import playground.thibautd.router.TransitRoutingModuleFactory;
+import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.router.TripRouterFactoryImpl;
 
 /**
  * @author thibautd
@@ -50,65 +48,29 @@ public class MultiLegRoutingControler extends Controler {
 		super(scenario);
 	}
 
-	//TODO: check particular settings and handle them
 	@Override
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		PlansCalcRoute plansCalcRoute = null;
+	protected void loadControlerListeners() {
+		addControlerListener( new StartupListener() {
+			@Override
+			public void notifyStartup(final StartupEvent event) {
+				setTripRouterFactory( new TripRouterFactoryImpl( new RoutingElements( event.getControler() ) ) );
+			}
+		});
 
+		super.loadControlerListeners();
+	}
+
+	//TODO: pass arguments to factory
+	@Override
+	public PlanAlgorithm createRoutingAlgorithm(
+			final TravelDisutility travelCosts,
+			final TravelTime travelTimes) {
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();
-		//plansCalcRoute = new PlanRouterWrapper(
-		//		getConfig().plansCalcRoute(),
-		//		getNetwork(),
-		//		travelCosts,
-		//		travelTimes,
-		//		getLeastCostPathCalculatorFactory(),
-		//		tripRouterFactory.getModeRouteFactory(),
-		//		tripRouterFactory);
-
-		//return plansCalcRoute;
 		return new PlanRouter(
 				tripRouterFactory.createTripRouter(),
 				getScenario().getActivityFacilities());
 	}
 
-	/**
-	 * creates an uninitialized trip router factory.
-	 * Allows to change easily the implementation of the trip router factory,
-	 * whithout having to reimplement the initialization routine.
-	 */
-	protected TripRouterFactory createUninitializedTripRouterFactory() {
-		 return new TripRouterFactory(
-				getNetwork(),
-				getTravelDisutilityFactory(),
-				new TravelTimeFactory() {
-					@Override
-					public TravelTime createTravelTime() {
-						return getTravelTimeCalculator();
-					}
-				},
-				getLeastCostPathCalculatorFactory(),
-				getPopulation().getFactory(),
-				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory());
-	}
-
-	protected void setUpTripRouterFactory(final TripRouterFactory factory) {
-		// Base modules
-		RoutingModuleFactory defaultFactory =
-			new DefaultRoutingModuleFactory(
-					getConfig().plansCalcRoute(),
-					getConfig().planCalcScore());
-
-		for (String mode : DefaultRoutingModuleFactory.HANDLED_MODES) {
-			factory.setRoutingModuleFactory( mode , defaultFactory );
-		}
-
-		// PT module: if use transit, erase default
-		if (getConfig().scenario().isUseTransit()) {
-			factory.setRoutingModuleFactory(
-					TransportMode.pt,
-					new TransitRoutingModuleFactory(getTransitRouterFactory(), getScenario().getTransitSchedule()));
-		}
-	}
 
 	/**
 	 * Returns the (only) trip router factory instance for this controler.
@@ -122,11 +84,11 @@ public class MultiLegRoutingControler extends Controler {
 	 * @return the {@link TripRouterFactory} instance
 	 */
 	public TripRouterFactory getTripRouterFactory() {
-		if (tripRouterFactory == null) {
-			tripRouterFactory = createUninitializedTripRouterFactory();
-			setUpTripRouterFactory( tripRouterFactory );
-		}
 		return tripRouterFactory;
+	}
+
+	public void setTripRouterFactory(final TripRouterFactory tripRouterFactory) {
+		this.tripRouterFactory = tripRouterFactory;
 	}
 }
 

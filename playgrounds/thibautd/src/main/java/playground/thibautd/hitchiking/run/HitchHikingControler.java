@@ -22,28 +22,38 @@ package playground.thibautd.hitchiking.run;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 
-import playground.thibautd.hitchiking.HitchHikingConfigGroup;
-import playground.thibautd.hitchiking.HitchHikingConstants;
-import playground.thibautd.hitchiking.HitchHikingSpots;
 import playground.thibautd.hitchiking.HitchHikingUtils;
 import playground.thibautd.hitchiking.qsim.HitchHikingQsimFactory;
-import playground.thibautd.hitchiking.routing.HitchHikingDriverRoutingModuleFactory;
-import playground.thibautd.hitchiking.routing.HitchHikingPassengerRoutingModuleFactory;
+import playground.thibautd.hitchiking.routing.HitchHikingTripRouterFactory;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
-import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.router.RoutingElements;
 
 /**
  * @author thibautd
  */
 public class HitchHikingControler extends MultiLegRoutingControler {
-	private static final Logger log =
-		Logger.getLogger(HitchHikingControler.class);
 	private final SpotWeighter spotWeighter;
+
+	@Override
+	protected void loadControlerListeners() {
+		addControlerListener( new StartupListener() {
+			@Override
+			public void notifyStartup(final StartupEvent event) {
+				setTripRouterFactory(
+					new HitchHikingTripRouterFactory(
+						new RoutingElements( event.getControler() ),
+						HitchHikingUtils.getSpots( getScenario() ),
+						spotWeighter,
+						HitchHikingUtils.getConfigGroup( getConfig() )));
+			}
+		});
+
+		super.loadControlerListeners();
+	}
 
 
 	public HitchHikingControler(
@@ -59,41 +69,5 @@ public class HitchHikingControler extends MultiLegRoutingControler {
 		super.loadData();
 	}
 
-	@Override
-	protected TripRouterFactory createUninitializedTripRouterFactory() {
-		return new HitchHikingTripRouterFactory(
-				getNetwork(),
-				getTravelDisutilityFactory(),
-				new TravelTimeFactory() {
-					@Override
-					public TravelTime createTravelTime() {
-						return getTravelTimeCalculator();
-					}
-				},
-				getLeastCostPathCalculatorFactory(),
-				getPopulation().getFactory(),
-				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory());
-	}
-
-	@Override
-	protected void setUpTripRouterFactory( final TripRouterFactory tripRouterFactory ) {
-		TripRouterFactory factory = super.getTripRouterFactory();
-
-		// hitch hiking specific
-		HitchHikingSpots spots = HitchHikingUtils.getSpots( getScenario() );
-		HitchHikingConfigGroup hhConfigGroup = HitchHikingUtils.getConfigGroup( getConfig() );
-		factory.setRoutingModuleFactory(
-				HitchHikingConstants.DRIVER_MODE,
-				new HitchHikingDriverRoutingModuleFactory(
-					spots,
-					spotWeighter,
-					hhConfigGroup));
-		factory.setRoutingModuleFactory(
-				HitchHikingConstants.PASSENGER_MODE,
-				new HitchHikingPassengerRoutingModuleFactory(
-					spots,
-					spotWeighter,
-					hhConfigGroup) );
-	}
 }
 

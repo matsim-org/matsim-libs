@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EstimatorRouterBuilder.java
+ * JointTripRouterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,14 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation;
+package playground.thibautd.jointtrips.router;
+
+import org.matsim.api.core.v01.TransportMode;
+
+import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.router.RoutingElements;
+import playground.thibautd.router.TripRouter;
+import playground.thibautd.router.TripRouterFactory;
+import playground.thibautd.router.TripRouterFactoryImpl;
 
 /**
- * Builds a router with more efficient modules, which just update
- * travel times given the route rather than re-computing the route.
- *
  * @author thibautd
  */
-public class EstimatorRouterBuilder {
+public class JointTripRouterFactory implements TripRouterFactory {
+	private final TripRouterFactory defaultFactory;
+	private final RoutingElements data;
+
+	public JointTripRouterFactory(final RoutingElements data) {
+		this.data = data;
+		defaultFactory = new TripRouterFactoryImpl( data );
+	}
+
+	@Override
+	public TripRouter createTripRouter() {
+		TripRouter instance = defaultFactory.createTripRouter();
+
+		instance.setRoutingModule(
+				JointActingTypes.DRIVER,
+				new DriverRoutingModule(
+					JointActingTypes.DRIVER,
+					data.getPopulationFactory(),
+					instance.getRoutingModule( TransportMode.car )));
+
+		instance.setRoutingModule(
+				JointActingTypes.PASSENGER,
+				new PassengerRoutingModule(
+					JointActingTypes.PASSENGER,
+					data.getPopulationFactory(),
+					data.getModeRouteFactory()));
+
+		return instance;
+	}
 }
 

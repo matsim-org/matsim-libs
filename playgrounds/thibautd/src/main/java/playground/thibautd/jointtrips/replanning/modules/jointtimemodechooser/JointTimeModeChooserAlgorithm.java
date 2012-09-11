@@ -30,12 +30,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.router.RoutingModuleFactory;
-import playground.thibautd.router.TransitRoutingModuleFactory;
+import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
+import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedRouteNetworkRoutingModule;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedTransitRouteRoutingModule;
 
@@ -105,35 +105,15 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 		}
 	}
 
-	// TODO: pass it to an helper class in the "estimation" package
 	private static TripRouterFactory getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
 			final MultiLegRoutingControler controler ) {
-		TripRouterFactory factory = controler.getTripRouterFactory();
-		
-		RoutingModuleFactory moduleFactory =
-			FixedRouteNetworkRoutingModule.getFactory(
-					plan,
-					controler.getConfig().planCalcScore(),
-					controler.getPopulation().getFactory(),
-					delay,
-					// TODO: import from somewhere, or detect from the mobsim
-					true,
-					false);
-
-		factory.setRoutingModuleFactory( TransportMode.car , moduleFactory );
-
-		RoutingModuleFactory ptFactory = factory.getRoutingModuleFactories().get( TransportMode.pt );
-		if (ptFactory instanceof TransitRoutingModuleFactory) {
-			factory.setRoutingModuleFactory(
-					TransportMode.pt,
-					FixedTransitRouteRoutingModule.createFactory(
-						plan,
-						controler.getScenario().getTransitSchedule(),
-						(TransitRoutingModuleFactory) ptFactory ));
-		}
-
-		return factory;
-	}
+		return new EstimatorTripRouterFactory(
+				plan,
+				new RoutingElements( controler ),
+				controler.getConfig().plansCalcRoute(),
+				controler.getConfig().planCalcScore(),
+				delay,
+				controler.getTripRouterFactory());	}
 }

@@ -46,10 +46,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.RoutingModuleFactory;
 import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.TransitRouterWrapper;
-import playground.thibautd.router.TransitRoutingModuleFactory;
 import playground.thibautd.router.TripRouterFactory;
 
 /**
@@ -131,25 +129,6 @@ public class FixedTransitRouteRoutingModule implements RoutingModule {
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
 		return module.getStageActivityTypes();
-	}
-
-	public static RoutingModuleFactory createFactory(
-			final Plan plan,
-			final TransitSchedule schedule,
-			final TransitRoutingModuleFactory moduleFactory) {
-		return new RoutingModuleFactory(){
-			@Override
-			public RoutingModule createModule(
-					final String mainMode,
-					final TripRouterFactory factory) {
-				return new FixedTransitRouteRoutingModule(
-						plan,
-						schedule,
-						(TransitRouterWrapper) moduleFactory.createModule(
-							mainMode,
-							factory));
-			}
-		};
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

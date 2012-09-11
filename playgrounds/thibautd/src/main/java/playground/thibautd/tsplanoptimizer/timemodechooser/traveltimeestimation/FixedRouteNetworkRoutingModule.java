@@ -50,8 +50,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
+import playground.thibautd.router.RoutingElements;
 import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.RoutingModuleFactory;
 import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.StageActivityTypesImpl;
 import playground.thibautd.router.TripRouterFactory;
@@ -85,32 +85,31 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	private final TravelDisutility travelCost;
 	private final DepartureDelayAverageCalculator tDepDelayCalc;
 
-	private FixedRouteNetworkRoutingModule(
+	public FixedRouteNetworkRoutingModule(
 			final String mainMode,
 			final Plan plan,
-			final PopulationFactory populationFactory,
-			final TripRouterFactory routerFactory,
+			final RoutingElements routingElements,
 			final PlanCalcScoreConfigGroup scoreConfigGroup,
 			final DepartureDelayAverageCalculator tDepDelayCalc,
 			final boolean isFirstLinkSimulated,
 			final boolean isLastLinkSimulated) {
 		this.mode = mainMode;
-		this.populationFactory = populationFactory;
+		this.populationFactory = routingElements.getPopulationFactory();
 		this.tDepDelayCalc = tDepDelayCalc;
 		this.isFirstLinkSimulated = isFirstLinkSimulated;
 		this.isLastLinkSimulated = isLastLinkSimulated;
 
-		this.network = routerFactory.getNetwork();
-		this.travelTime = routerFactory.getTravelTimeFactory().createTravelTime();
-		this.travelCost = routerFactory.getTravelDisutilityFactory().createTravelDisutility( travelTime , scoreConfigGroup );
+		this.network = routingElements.getNetwork();
+		this.travelTime = routingElements.getTravelTimeFactory().createTravelTime();
+		this.travelCost = routingElements.getTravelDisutilityFactory().createTravelDisutility( travelTime , scoreConfigGroup );
 
 		routes = extractRoutes( plan , mainMode );
 
 		// if no route is found, the shortest path without congestion will be used
 		FreespeedTravelTimeAndDisutility freeFlowTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-		LeastCostPathCalculatorFactory leastCostPathAlgoFactory = routerFactory.getLeastCostPathCalculatorFactory();
+		LeastCostPathCalculatorFactory leastCostPathAlgoFactory = routingElements.getLeastCostPathCalculatorFactory();
 		LeastCostPathCalculator routeAlgo = leastCostPathAlgoFactory.createPathCalculator(network, freeFlowTimeCostCalc, freeFlowTimeCostCalc);
-		ModeRouteFactory routeFactory = routerFactory.getModeRouteFactory();
+		ModeRouteFactory routeFactory = routingElements.getModeRouteFactory();
 
 		this.routingModule =
 			new NetworkLegRouter(
@@ -260,59 +259,6 @@ public class FixedRouteNetworkRoutingModule implements RoutingModule {
 	// /////////////////////////////////////////////////////////////////////////
 	// classes
 	// /////////////////////////////////////////////////////////////////////////
-	public static RoutingModuleFactory getFactory(
-			final Plan plan,
-			final PlanCalcScoreConfigGroup configGroup,
-			final PopulationFactory populationFactory,
-			final DepartureDelayAverageCalculator tDepDelayCalc,
-			final boolean isFirstLinkSimulated,
-			final boolean isLastLinkSimulated) {
-		return new Factory(
-				plan, configGroup,
-				populationFactory,
-				tDepDelayCalc,
-				isFirstLinkSimulated,
-				isLastLinkSimulated );
-	}
-
-	private static class Factory implements RoutingModuleFactory {
-		private final  PlanCalcScoreConfigGroup conf;
-		private final Plan plan;
-		private final PopulationFactory popFact;
-		private final DepartureDelayAverageCalculator tDepDelayCalc;
-		private final boolean isFirstLinkSimulated;
-		private final boolean isLastLinkSimulated;
-
-		public Factory(
-				final Plan plan,
-				final PlanCalcScoreConfigGroup conf,
-				final PopulationFactory fact,
-				final DepartureDelayAverageCalculator tDepDelayCalc,
-				final boolean isFirstLinkSimulated,
-				final boolean isLastLinkSimulated) {
-			this.conf = conf;
-			this.plan = plan;
-			this.popFact = fact;
-			this.tDepDelayCalc = tDepDelayCalc;
-			this.isFirstLinkSimulated = isFirstLinkSimulated;
-			this.isLastLinkSimulated = isLastLinkSimulated;
-		}
-
-		@Override
-		public RoutingModule createModule(
-				final String mainMode,
-				final TripRouterFactory factory) {
-			return new FixedRouteNetworkRoutingModule(
-					mainMode,
-					plan,
-					popFact,
-					factory,
-					conf,
-					tDepDelayCalc,
-					isFirstLinkSimulated,
-					isLastLinkSimulated );
-		}
-	}
 
 	private static class FacilityWrapper implements Activity {
 		private final Facility wrapped;
