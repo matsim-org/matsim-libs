@@ -195,6 +195,17 @@
 
 <!-- ====================================================================== -->
 
+	<module name="parallelEventHandling" >
+
+		<!-- estimated number of events during mobsim run, useful for configuration -->
+		<param name="estimatedNumberOfEvents" value="null" />
+
+		<!-- number of threads for parallel events handler.  0 or null means parallel events handler is disabled -->
+		<param name="numberOfThreads" value="null" />
+	</module>
+
+<!-- ====================================================================== -->
+
 	<module name="planCalcScore" >
 
 		<!-- [1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated -->
