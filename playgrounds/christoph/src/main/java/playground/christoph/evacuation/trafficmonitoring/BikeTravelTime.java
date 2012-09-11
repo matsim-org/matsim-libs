@@ -39,6 +39,14 @@ import org.matsim.vehicles.Vehicle;
 public class BikeTravelTime extends WalkTravelTime {
 	
 	/*
+	 * Cache variables for each thread accessing the object separately.
+	 */
+	/*package*/ final ThreadLocal<Double> personBikeSpeedCache;
+	/*package*/ final ThreadLocal<Double> maxPersonBikeSpeedCache;
+	/*package*/ final ThreadLocal<Double> personUphillFactorCache;
+	/*package*/ final ThreadLocal<Double> personDownhillFactorCache;
+	
+	/*
 	 * If the set reference speed does not match the default reference speed,
 	 * the up- and downhill factors are scaled accordingly. 
 	 */
@@ -50,14 +58,19 @@ public class BikeTravelTime extends WalkTravelTime {
 	private final double downhillFactor = 0.2379;	// 0%..-15%
 	private final double uphillFactor = -0.4002;	// 0%..12%
 	
-	private double personBikeSpeed;
-	private double maxPersonBikeSpeed;
-	private double personDownhillFactor;
-	private double personUphillFactor;
+//	private double personBikeSpeed;
+//	private double maxPersonBikeSpeed;
+//	private double personDownhillFactor;
+//	private double personUphillFactor;
 	
 	public BikeTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
 		super(plansCalcGroup);
 		this.referenceBikeSpeed = plansCalcGroup.getBikeSpeed();
+		
+		this.personBikeSpeedCache = new ThreadLocal<Double>();
+		this.maxPersonBikeSpeedCache = new ThreadLocal<Double>();
+		this.personUphillFactorCache = new ThreadLocal<Double>();
+		this.personDownhillFactorCache = new ThreadLocal<Double>();
 	}
 
 
@@ -69,10 +82,12 @@ public class BikeTravelTime extends WalkTravelTime {
 		double slope = super.calcSlope(link);
 		double slopeShift = getSlopeShift(slope);
 		
-		double linkSpeed = this.personBikeSpeed + slopeShift;
+//		double linkSpeed = this.personBikeSpeed + slopeShift;
+		double linkSpeed = this.personBikeSpeedCache.get() + slopeShift;
 		
 		// limit min and max speed
-		if (linkSpeed > maxPersonBikeSpeed) linkSpeed = maxPersonBikeSpeed;
+//		if (linkSpeed > maxPersonBikeSpeed) linkSpeed = maxPersonBikeSpeed;
+		if (linkSpeed > this.maxPersonBikeSpeedCache.get()) linkSpeed = this.maxPersonBikeSpeedCache.get();
 		else if (linkSpeed < 0.0) linkSpeed = Double.MIN_VALUE;
 		
 		double bikeTravelTime = link.getLength() / linkSpeed;
@@ -85,23 +100,50 @@ public class BikeTravelTime extends WalkTravelTime {
 	 * E.g. speed(10%) = speed(0%) + slopeShift(10%)
 	 */
 	/*package*/ double getSlopeShift(double slope) {
-		if (slope > 0.0) return personUphillFactor * slope;
-		else return personDownhillFactor * slope;
+		if (slope > 0.0) return this.personUphillFactorCache.get() * slope;
+		else return this.personDownhillFactorCache.get() * slope;
 	}
 	
 	protected void setPerson(Person person) {
 		/* 
-		 * Only recalculate the person's walk speed factor if the person has 
+		 * Only recalculate the person's speed factor if the person has 
 		 * changed. This check has to be performed before super.setPerson(...)
 		 * is called because there the personId is already updated!
 		 */
-		if (person.getId().equals(personId)) return;
+		/* 
+		 * Only recalculate the person's walk speed factor if
+		 * the person has changed and is not in the map.
+		 */
+		if (this.personCache.get() != null && person.getId().equals(this.personCache.get().getId())) return;
+		
+		/*
+		 * If the person's walk speed is already in the map, use that value.
+		 * Otherwise calculate it and add it to the map.
+		 */
+		Double value = this.personFactors.get(person.getId());
+		if (value != null) {
+			double personFactor = value;
+//			this.personCache.set(person);	// set in the super-class
+//			this.personFactorCache.set(personFactor);	// set in the super-class
+			this.personBikeSpeedCache.set(this.referenceBikeSpeed * personFactor);
+			this.maxPersonBikeSpeedCache.set(maxBikeSpeed * personFactor);
+			this.personUphillFactorCache.set(uphillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed);
+			this.personDownhillFactorCache.set(downhillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed);
+			super.setPerson(person);
+			return;
+		}
+		
 		super.setPerson(person);
 		
-		this.personBikeSpeed = this.referenceBikeSpeed * this.personFactor;
-		
-		this.maxPersonBikeSpeed = maxBikeSpeed * personFactor;
-		this.personUphillFactor = uphillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed;
-		this.personDownhillFactor = downhillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed;
+//		this.personBikeSpeed = this.referenceBikeSpeed * this.personFactor;
+//		this.maxPersonBikeSpeed = maxBikeSpeed * personFactor;
+//		this.personUphillFactor = uphillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed;
+//		this.personDownhillFactor = downhillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed;
+
+		double personFactor = this.personFactorCache.get();
+		this.personBikeSpeedCache.set(this.referenceBikeSpeed * personFactor);
+		this.maxPersonBikeSpeedCache.set(maxBikeSpeed * personFactor);
+		this.personUphillFactorCache.set(uphillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed);
+		this.personDownhillFactorCache.set(downhillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed);
 	}
 }

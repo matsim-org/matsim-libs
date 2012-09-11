@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonalizableTravelTime.java
+ * WalkTravelTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,7 +20,11 @@
 
 package playground.christoph.evacuation.trafficmonitoring;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -28,9 +32,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.api.core.v01.Coord3d;
@@ -42,9 +45,19 @@ import playground.christoph.evacuation.api.core.v01.Coord3d;
  * 
  * Age data from 0..3 and from 80..100 is extrapolated.
  */
-public class WalkTravelTime implements PersonalizableTravelTime {
+public class WalkTravelTime implements TravelTime {
 
 	private static final Logger log = Logger.getLogger(WalkTravelTime.class);
+	
+	/*
+	 * Cache variables for each thread accessing the object separately.
+	 */
+	/*package*/ final ThreadLocal<Person> personCache;
+	/*package*/ final ThreadLocal<Double> personFactorCache;
+	private final ThreadLocal<Double> personWalkSpeedCache;
+	
+	// Map shared between all threads accessing this object.
+	/*package*/ final Map<Id, Double> personFactors;
 	
 	private final double referenceWalkSpeed; 				// 1.34 according to Weidmann, [m/s]
 	
@@ -83,27 +96,24 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 			1.0133, 1.0033, 0.9922, 0.9801, 0.9670, 0.9530, 0.9382, 0.9227, 0.9067, 0.8903,
 			0.8737, 0.8570, 0.8405, 0.8242, 0.8085, 0.7935, 0.7795, 0.7667, 0.7555, 0.7460,
 			0.7386};
-
-	private final Random random;
 	
-	/*package*/ Id personId;
-	/*package*/ double personFactor = 1.0;	// includes scatter, age and gender
-	private double personWalkSpeed;
+	private final AtomicBoolean warnLinkLength = new AtomicBoolean(true);
+	private final AtomicBoolean warnGender = new AtomicBoolean(true);
+	private final AtomicBoolean warnSlope = new AtomicBoolean(true);
+	private final AtomicBoolean warnAge = new AtomicBoolean(true);
 	
-	private boolean warnLinkLength;
-	private boolean warnGender;
-	private boolean warnSlope;
-	private boolean warnAge;
-	
-	private int linkLengthWarnCount = 0;
-	private int genderWarnCount = 0;
-	private int slopeWarnCount = 0;
-	private int ageWarnCount = 0;
-
+	private final AtomicInteger linkLengthWarnCount = new AtomicInteger(0);
+	private final AtomicInteger genderWarnCount = new AtomicInteger(0);
+	private final AtomicInteger slopeWarnCount = new AtomicInteger(0);
+	private final AtomicInteger ageWarnCount = new AtomicInteger(0);
 	
 	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
 		this.referenceWalkSpeed = plansCalcGroup.getWalkSpeed();
-		this.random = MatsimRandom.getLocalInstance();
+		this.personCache = new ThreadLocal<Person>();
+		this.personFactorCache = new ThreadLocal<Double>();
+		this.personWalkSpeedCache = new ThreadLocal<Double>();
+		
+		this.personFactors = new ConcurrentHashMap<Id, Double>();
 	}
 
 	@Override
@@ -111,7 +121,8 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		setPerson(person);
 		double slope = calcSlope(link);
 		double slopeFactor = getSlopeFactor(slope);
-				
+//		double personWalkSpeed = this.referenceWalkSpeed * this.personFactorCache.get();
+		double personWalkSpeed = this.personWalkSpeedCache.get();
 		return link.getLength() / (personWalkSpeed * slopeFactor);
 	}
 
@@ -119,12 +130,12 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		double slopeFactor = 1.0;
 		
 		if (slope > 80.0) {
-			if (slopeWarnCount < 10) {
+			if (slopeWarnCount.get() < 10) {
 				incSlopeWarnCount("Slope is out of expected range (-40% .. -80%). Found slope of " + slope + ". Use 80.0 instead.");
 			}
 			slope = 80.0;
 		} else if (slope < -40) {
-			if (slopeWarnCount < 10) {
+			if (slopeWarnCount.get() < 10) {
 				incSlopeWarnCount("Slope is out of expected range (-40% .. -80%). Found slope of " + slope + ". Use -40.0 instead.");
 			}
 			slope = -40.0;
@@ -159,34 +170,34 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	}
 	
 	private void incLinkLengthWarnCount(String text) {
-		linkLengthWarnCount++;
-		if (warnLinkLength) {
-			printWarning(text, linkLengthWarnCount);
-			if (linkLengthWarnCount >= 10) warnLinkLength = false;
+		linkLengthWarnCount.incrementAndGet();
+		if (warnLinkLength.get()) {
+			printWarning(text, linkLengthWarnCount.get());
+			if (linkLengthWarnCount.get() >= 10) warnLinkLength.set(false);
 		}
 	}
 
 	private void incGenderWarnCount(String text) {
-		genderWarnCount++;
-		if (warnGender) {
-			printWarning(text, genderWarnCount);
-			if (genderWarnCount >= 10) warnGender = false;
+		genderWarnCount.incrementAndGet();
+		if (warnGender.get()) {
+			printWarning(text, genderWarnCount.get());
+			if (genderWarnCount.get() >= 10) warnGender.set(false);
 		}
 	}
 	
 	private void incSlopeWarnCount(String text) {
-		slopeWarnCount++;
-		if (warnSlope) {
-			printWarning(text, slopeWarnCount);
-			if (slopeWarnCount >= 10) warnSlope = false;
+		slopeWarnCount.incrementAndGet();
+		if (warnSlope.get()) {
+			printWarning(text, slopeWarnCount.get());
+			if (slopeWarnCount.get() >= 10) warnSlope.set(false);
 		}
 	}
 	
 	private void incAgeWarnCount(String text) {
-		ageWarnCount++;
-		if (warnAge) {
-			printWarning(text, ageWarnCount);
-			if (ageWarnCount >= 10) warnAge = false;
+		ageWarnCount.incrementAndGet();
+		if (warnAge.get()) {
+			printWarning(text, ageWarnCount.get());
+			if (ageWarnCount.get() >= 10) warnAge.set(false);
 		}
 	}
 	
@@ -195,21 +206,34 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		else log.warn(text);
 	}
 	
-	protected void setPerson(Person person) {
+	/*package*/ void setPerson(Person person) {
 		/* 
 		 * Only recalculate the person's walk speed factor if
-		 * the person has changed.
+		 * the person has changed and is not in the map.
 		 */
-		if (person.getId().equals(personId)) return;
+		if (this.personCache.get() != null && person.getId().equals(this.personCache.get().getId())) return;
+		
+		/*
+		 * If the person's walk speed is already in the map, use that value.
+		 * Otherwise calculate it and add it to the map.
+		 */
+		Double value = this.personFactors.get(person.getId());
+		if (value != null) {
+			double personFactor = value;
+			this.personCache.set(person);
+			this.personFactorCache.set(personFactor);
+			this.personWalkSpeedCache.set(this.referenceWalkSpeed * personFactor);
+		}
 				
 		double scatterFactor = 1.0;
 		double ageFactor = 1.0;
 		double genderFactor = 1.0;
 
 		// calculate scatter factor
+		Random random = new Random();
 		random.setSeed(person.getId().toString().hashCode());
 		for (int i = 0; i < 5; i++) random.nextDouble();
-				
+		
 		/*
 		 * Limit scatter factor to +/- 4 times the standard deviation.
 		 * Therefore, the scatter factor is 0.224 ... 1.777
@@ -230,7 +254,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 			if (p.getSex().equals("m")) genderFactor = maleScaleFactor;
 			else if (p.getSex().equals("f")) genderFactor = femaleScaleFactor;
 			else {
-				if (genderWarnCount < 10) {
+				if (genderWarnCount.get() < 10) {
 					incGenderWarnCount("Person's gender is not defined. Ignoring gender dependent walk speed factor.");
 				}
 			}
@@ -239,17 +263,17 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 			
 			// by default, age is set to Integer.MIN_VALUE in PersonImpl  
 			if (age == Integer.MIN_VALUE) {
-				if (ageWarnCount < 10) {
+				if (ageWarnCount.get() < 10) {
 					incAgeWarnCount("Person's age is not defined. Ignoring age dependent walk speed factor.");
 				}
 			}
 			else if (age < 0) {
-				if (ageWarnCount < 10) {
+				if (ageWarnCount.get() < 10) {
 					incAgeWarnCount("Person's age is out of expected range (0 .. 100). Founde age of " + age + ". Use 0 instead.");
 				}
 				ageFactor = ageFactors[0];
 			} else if (age > 100) {
-				if (ageWarnCount < 10) {
+				if (ageWarnCount.get() < 10) {
 					incAgeWarnCount("Person's age is out of expected range (0 .. 100). Founde age of " + age + ". Use 100 instead.");
 				}
 				ageFactor = ageFactors[100];
@@ -258,9 +282,12 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 			}
 		}
 		
-		this.personFactor = scatterFactor * ageFactor * genderFactor;
-		this.personWalkSpeed = this.referenceWalkSpeed * this.personFactor;
-		this.personId = person.getId();
+		double personFactor = scatterFactor * ageFactor * genderFactor;
+		this.personCache.set(person);
+		this.personFactorCache.set(personFactor);
+		this.personWalkSpeedCache.set(this.referenceWalkSpeed * personFactor);
+		
+		this.personFactors.put(person.getId(), personFactor);
 	}
 
 }
