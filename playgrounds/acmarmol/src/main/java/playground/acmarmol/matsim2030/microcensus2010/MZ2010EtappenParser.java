@@ -1,4 +1,4 @@
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -24,7 +24,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 
 
-public class MZEtappenParser {
+public class MZ2010EtappenParser {
 
 
 	//////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ public class MZEtappenParser {
 	//constructors
 	//////////////////////////////////////////////////////////////////////
 
-		public MZEtappenParser(ObjectAttributes wegeAttributes) {
+		public MZ2010EtappenParser(ObjectAttributes wegeAttributes) {
 			super();
 			this.wegeAttributes = wegeAttributes;
 		}	

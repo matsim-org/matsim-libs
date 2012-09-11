@@ -1,4 +1,4 @@
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.Gbl;
 
@@ -79,24 +79,24 @@ public class Etappe {
 	public String getMode(){
 		
 		String mode = null;
-		if(modeInteger == 1){mode = "plane";}
-		else if(modeInteger == 2){mode = "train";}
-		else if(modeInteger == 3){mode = "postauto";}
-		else if(modeInteger == 4){mode = "ship";}
-		else if(modeInteger == 5){mode = "tram";}
-		else if(modeInteger == 6){mode = "bus";}
-		else if(modeInteger == 7){mode = "sonstigerOeV";}
-		else if(modeInteger == 8){mode = "reisecar";}
-		else if(modeInteger == 9){mode = "car";}
-		else if(modeInteger == 10){mode = "truck";}
-		else if(modeInteger == 11){mode = "taxi";}
-		else if(modeInteger == 12){mode = "motorcycle";}
-		else if(modeInteger == 13){mode = "mofa";}
-		else if(modeInteger == 14){mode = "bicycle";}
-		else if(modeInteger == 15){mode = "walk";}
-		else if(modeInteger == 16){mode = "skateboard/skates";}
-		else if(modeInteger == 17){mode = "other";}
-		else if(modeInteger == 99){mode = "Pseudoetappe";}
+		if(modeInteger == 1){mode = MZConstants.PLANE;}
+		else if(modeInteger == 2){mode = MZConstants.TRAIN;}
+		else if(modeInteger == 3){mode = MZConstants.POSTAUTO;}
+		else if(modeInteger == 4){mode = MZConstants.SHIP;}
+		else if(modeInteger == 5){mode = MZConstants.TRAM;}
+		else if(modeInteger == 6){mode = MZConstants.BUS;}
+		else if(modeInteger == 7){mode = MZConstants.SONSTINGER_OEV;}
+		else if(modeInteger == 8){mode = MZConstants.REISECAR;}
+		else if(modeInteger == 9){mode = MZConstants.CAR;}
+		else if(modeInteger == 10){mode =MZConstants.TRUCK ;}
+		else if(modeInteger == 11){mode = MZConstants.TAXI;}
+		else if(modeInteger == 12){mode = MZConstants.MOTORCYCLE;}
+		else if(modeInteger == 13){mode = MZConstants.MOFA;}
+		else if(modeInteger == 14){mode = MZConstants.BYCICLE;}
+		else if(modeInteger == 15){mode = MZConstants.WALK;}
+		else if(modeInteger == 16){mode = MZConstants.SKATEBOARD;}
+		else if(modeInteger == 17){mode = MZConstants.OTHER;}
+		else if(modeInteger == 99){mode = MZConstants.PSEUDOETAPPE;}
 		else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
 		
 		return mode;

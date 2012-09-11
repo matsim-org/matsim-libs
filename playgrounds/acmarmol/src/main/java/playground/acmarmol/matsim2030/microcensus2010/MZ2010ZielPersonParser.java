@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -47,7 +47,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 * 
 */
 	
-public class MZZielPersonParser {
+public class MZ2010ZielPersonParser {
 	
 //////////////////////////////////////////////////////////////////////
 //member variables
@@ -63,7 +63,7 @@ public class MZZielPersonParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZZielPersonParser(Population population, ObjectAttributes populationAttributes,  Households households, ObjectAttributes householdAttributes) {
+	public MZ2010ZielPersonParser(Population population, ObjectAttributes populationAttributes,  Households households, ObjectAttributes householdAttributes) {
 	super();
 	this.households = households;
 	this.householdAttributes = householdAttributes;
@@ -85,7 +85,7 @@ public class MZZielPersonParser {
 				
 		while ((curr_line = br.readLine()) != null) {
 			
-		String[] entries = curr_line.split("\t", -1);
+		String[] entries = curr_line.split("\t",-1);
 		
 		//household number & person number
 		String hhnr = entries[0].trim();
@@ -161,6 +161,32 @@ public class MZZielPersonParser {
 		//work_location.setY(Math.round(work_location.getY()/10.0)*10);
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), "work: location coord", work_location);
 		} //else?
+
+		
+		//total nr wege inland
+		String t_wege = entries[202];
+		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.TOTAL_TRIPS_INLAND, t_wege);
+		
+		//total wege time
+		String wege_time = entries[203];
+		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.TOTAL_TRIPS_DURATION, wege_time);
+		
+		//total wege distance
+		String wege_dist = entries[198];
+		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.TOTAL_TRIPS_DISTANCE, wege_dist);
+		
+		
+		
+		
+		//car driving license
+		String licence = entries[193];
+		if(licence.equals("1")){
+			licence = MZConstants.YES;
+		}else{
+			licence = MZConstants.NO;
+		}
+		populationAttributes.putAttribute(hhnr.concat(zielpnr), "driving licence", licence);
+		
 		
 		//car availability
 		String car_av = entries[63];
@@ -290,7 +316,7 @@ public class MZZielPersonParser {
 		PersonImpl person = new PersonImpl(new IdImpl(hhnr.concat(zielpnr)));
 		person.setAge(Integer.parseInt(age));
 		person.setEmployed(employed);
-		//person.setLicence(licence);
+		person.setLicence(licence);
 		person.setSex(gender);
 		population.addPerson(person);
 		}

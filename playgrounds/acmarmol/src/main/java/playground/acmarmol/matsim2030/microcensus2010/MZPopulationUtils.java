@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -266,6 +266,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 	for(Id wid: border_crossing_wids){
 		
+	
 	String sland = (String) wegeAttributes.getAttribute(wid.toString(), MZConstants.START_COUNTRY);
 	String zland = (String) wegeAttributes.getAttribute(wid.toString(), MZConstants.END_COUNTRY);
 
@@ -310,6 +311,12 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	private static void handleTripEnteringCountry(Population population, Id wid, String country, ObjectAttributes wegeAttributes, HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>> toAdd, HashMap<Id,ArrayList<PlanElement>> toRemove){
 	
 		Id pid = new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim());
+		
+		if(pid.toString().equals("87011")){
+			System.out.println(pid);
+		}
+		
+		
 		int legNumber = Integer.parseInt(wid.toString().substring(wid.toString().indexOf('-')+1));
 		//maybe legNumber is not the best way to index, because some planElements are deleted (the ones outside Switzerland)
 		// to overcome this issue, all plan elements are stored first in toRemove, and only in the end are deleted.
@@ -335,7 +342,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 		
 		int curr_mode = Integer.MAX_VALUE;
-		Coord curr_start_coord = null;
+		Coord curr_start_coord = previousActivity.getCoord();
 		boolean start = false;
 		
 		for(int i=1; i<= (Integer) wegeAttributes.getAttribute(wid.toString(), MZConstants.NUMBER_STAGES); i++){
@@ -359,7 +366,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 				curr_start_coord = (etappe.getStartCoord());
 			}
 		}	
-		
+				
 		
 		//identify if out and in - border crossings are the same, otherwise it necessary to create new virtual activity. 
 		boolean different_border_crossing = false;
@@ -585,7 +592,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	
 //////////////////////////////////////////////////////////////////////
 
-	public static Set<Id> identifyPlansOutOfSwizerland(final Population population, final ObjectAttributes wegeAttributes) {
+	public static Set<Id> identifyPlansOutOfSwizerland(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
 		Set<Id> ids = new HashSet<Id>();
 		for (Person person : population.getPersons().values()) {	
 			Plan plan = person.getSelectedPlan();
@@ -597,7 +604,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						legCounter++;
 						String sland = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),MZConstants.START_COUNTRY);
 						String zland = (String) wegeAttributes.getAttribute(person.getId().toString().concat("-").concat(String.valueOf(legCounter)),MZConstants.END_COUNTRY);
-						if(sland.equals(MZConstants.SWISS_CODE) || zland.equals(MZConstants.SWISS_CODE)){
+						if(sland.equals(countryCode) || zland.equals(countryCode)){
 							out = false;
 							break;
 						}
@@ -613,7 +620,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 
 //////////////////////////////////////////////////////////////////////
 
-	public static ArrayList<Set<Id>> identifyCrossBorderWeges(final Population population, final ObjectAttributes wegeAttributes) {
+	public static ArrayList<Set<Id>> identifyCrossBorderWeges(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
 		Set<Id> wids = new LinkedHashSet<Id>();
 		Set<Id> pids = new LinkedHashSet<Id>();
 		
@@ -629,7 +636,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						String wid = person.getId().toString().concat("-").concat(String.valueOf(legCounter));
 						String sland = (String) wegeAttributes.getAttribute(wid,MZConstants.START_COUNTRY);
 						String zland = (String) wegeAttributes.getAttribute(wid,MZConstants.END_COUNTRY);
-						if((!sland.equals(MZConstants.SWISS_CODE) ^ !zland.equals(MZConstants.SWISS_CODE))){
+						if((!sland.equals(countryCode) ^ !zland.equals(countryCode))){
 						 wids.add(new IdImpl(wid));
 						 pids.add(person.getId());
 							

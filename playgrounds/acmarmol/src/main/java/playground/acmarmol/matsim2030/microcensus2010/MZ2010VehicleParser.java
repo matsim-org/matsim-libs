@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -41,7 +41,7 @@ import org.matsim.vehicles.Vehicles;
 * 
 */
 
-public class MZVehicleParser {
+public class MZ2010VehicleParser {
 	
 
 //////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ public class MZVehicleParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZVehicleParser(Vehicles vehicles, ObjectAttributes vehiclesAttributes, Households households, ObjectAttributes householdAttributes) {
+	public MZ2010VehicleParser(Vehicles vehicles, ObjectAttributes vehiclesAttributes, Households households, ObjectAttributes householdAttributes) {
 	super();
 	this.households = households;
 	this.householdAttributes = householdAttributes;

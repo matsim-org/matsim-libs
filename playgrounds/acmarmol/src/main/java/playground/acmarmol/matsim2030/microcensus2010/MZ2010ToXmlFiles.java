@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -27,16 +27,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
+import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-import playground.acmarmol.microcensus2010.objectAttributesConverters.CoordConverter;
-import playground.acmarmol.microcensus2010.objectAttributesConverters.EtappeConverter;
+import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
+import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.EtappeConverter;
 
 
 
@@ -73,7 +76,7 @@ public class MZ2010ToXmlFiles {
 		//			"D:/balmermi/documents/eclipse/output/mz/"
 		//	};
 		
-		// from local directory
+		// from server directory
 		String inputBase = "P:/Daten/Mikrozensen Verkehr Schweiz/2010/3_DB_SPSS/dat files/";
 		args = new String[] {
 				inputBase+"haushalte.dat",
@@ -140,17 +143,17 @@ public class MZ2010ToXmlFiles {
 
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing haushalteFile...");
-		new MZHouseholdParser(households,householdAttributes).parse(haushalteFile);
+		new MZ2010HouseholdParser(households,householdAttributes).parse(haushalteFile);
 		log.info("done. (parsing haushalteFile)");
 				
 		Gbl.printElapsedTime();
 
 
 		log.info("writing intermediate files...");
-		//new HouseholdsWriterV10(households).writeFile(outputBase+"/households.00.xml.gz");
+		new HouseholdsWriterV10(households).writeFile(outputBase+"/households.00.xml.gz");
 		ObjectAttributesXmlWriter households_axmlw = new ObjectAttributesXmlWriter(householdAttributes);
 		households_axmlw.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		//households_axmlw.writeFile(outputBase+"/householdAttributes.00.xml.gz");
+		households_axmlw.writeFile(outputBase+"/householdAttributes.00.xml.gz");
 		log.info("done. (writing)");
 				
 		Gbl.printElapsedTime();
@@ -158,14 +161,14 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////	
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing haushaltspersonenFile...");
-		new MZHouseholdPersonParser(households,householdAttributes).parse(haushaltspersonenFile);
+		new MZ2010HouseholdPersonParser(households,householdAttributes).parse(haushaltspersonenFile);
 		log.info("done. (parsing haushaltspersonenFile)");
 				
 		Gbl.printElapsedTime();
 		
 		log.info("writing intermediate files...");
-		//new HouseholdsWriterV10(households).writeFile(outputBase+"/households.01.xml.gz");
-		//households_axmlw.writeFile(outputBase+"/householdAttributes.01.xml.gz");
+		new HouseholdsWriterV10(households).writeFile(outputBase+"/households.01.xml.gz");
+		households_axmlw.writeFile(outputBase+"/householdAttributes.01.xml.gz");
 		log.info("done. (writing)");
 		
 		Gbl.printElapsedTime();
@@ -175,7 +178,7 @@ public class MZ2010ToXmlFiles {
 		log.info("parsing fahrzeugeFile...");
 		// next fill up the vehicles. For that you need to doublecheck consistency with the households (as given in the MZ database structure)
 		// and probably add additional data to the households too
-		new MZVehicleParser(vehicles,vehiclesAttributes,households,householdAttributes).parse(fahrzeugeFile);
+		new MZ2010VehicleParser(vehicles,vehiclesAttributes,households,householdAttributes).parse(fahrzeugeFile);
 		log.info("done. (parsing fahrzeugeFile)");
 				
 		Gbl.printElapsedTime();
@@ -183,8 +186,8 @@ public class MZ2010ToXmlFiles {
 		log.info("writing intermediate files...");
 		//new HouseholdsWriterV10(households).writeFile(outputBase+"/households.02.xml.gz");
 		//households_axmlw.writeFile(outputBase+"/householdAttributes.02.xml.gz");
-		//new VehicleWriterV1(vehicles).writeFile(outputBase+"vehicles.02.xml.gz");
-		//new ObjectAttributesXmlWriter(vehiclesAttributes).writeFile(outputBase+"/vehiclesAttributes.02.xml.gz");
+		new VehicleWriterV1(vehicles).writeFile(outputBase+"vehicles.02.xml.gz");
+		new ObjectAttributesXmlWriter(vehiclesAttributes).writeFile(outputBase+"/vehiclesAttributes.02.xml.gz");
 		log.info("done. (writing)");
 		
 		Gbl.printElapsedTime();
@@ -192,7 +195,7 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////	
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing zielpersonenFile...");
-		new MZZielPersonParser(population,populationAttributes,households,householdAttributes).parse(zielpersonenFile);
+		new MZ2010ZielPersonParser(population,populationAttributes,households,householdAttributes).parse(zielpersonenFile);
 		log.info("done. (parsing zielpersonenFile)");
 				
 		Gbl.printElapsedTime();
@@ -200,10 +203,10 @@ public class MZ2010ToXmlFiles {
 		log.info("writing intermediate files...");
 		//new HouseholdsWriterV10(households).writeFile(outputBase+"/households.03.xml.gz");
 		//households_axmlw.writeFile(outputBase+"/householdAttributes.03.xml.gz");
-		//new PopulationWriter(population, null).write(outputBase+"population.03.xml.gz");
+		new PopulationWriter(population, null).write(outputBase+"population.03.xml.gz");
 		ObjectAttributesXmlWriter population_axmlw = new ObjectAttributesXmlWriter(populationAttributes);
 		population_axmlw.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		//population_axmlw.writeFile(outputBase+"/populationAttributes.03.xml.gz");
+		population_axmlw.writeFile(outputBase+"/populationAttributes.03.xml.gz");
 		log.info("done. (writing)");
 		
 		int original_pop_size = population.getPersons().size();
@@ -213,20 +216,20 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing wegeFile...");
-		ArrayList<Set<Id>> pids = new MZWegeParser(population, wegeAttributes).parse(wegeFile);
+		ArrayList<Set<Id>> pids = new MZ2010WegeParser(population, wegeAttributes).parse(wegeFile);
 		log.info("done. (parsing wegeFile)");
 		
 		Gbl.printElapsedTime();
 		
 		log.info("writing intermediate files...");
-		//new HouseholdsWriterV10(households).writeFile(outputBase+"/households.04.xml.gz");
-		//households_axmlw.writeFile(outputBase+"/householdAttributes.04.xml.gz");
-		//new PopulationWriter(population, null).write(outputBase+"population.04.xml.gz");
-		//population_axmlw.writeFile(outputBase+"/populationAttributes.04.xml.gz");
+		new HouseholdsWriterV10(households).writeFile(outputBase+"/households.04.xml.gz");
+		households_axmlw.writeFile(outputBase+"/householdAttributes.04.xml.gz");
+		new PopulationWriter(population, null).write(outputBase+"population.04.xml.gz");
+		population_axmlw.writeFile(outputBase+"/populationAttributes.04.xml");
 		ObjectAttributesXmlWriter wege_axmlw = new ObjectAttributesXmlWriter(wegeAttributes);
 		wege_axmlw.putAttributeConverter(CoordImpl.class, new CoordConverter());
 		wege_axmlw.putAttributeConverter(Etappe.class, new EtappeConverter());
-		//wege_axmlw.writeFile(outputBase+"/wegeAttributes.00.xml.gz");
+		wege_axmlw.writeFile(outputBase+"/wegeAttributes.00.xml.gz");
 
 		log.info("done. (writing)");
 		
@@ -234,8 +237,8 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing etappenFile...");
-		new MZEtappenParser(wegeAttributes).parse(etappenFile);
-		//wege_axmlw.writeFile(outputBase+"/wegeAttributes.01.xml.gz");
+		new MZ2010EtappenParser(wegeAttributes).parse(etappenFile);
+		wege_axmlw.writeFile(outputBase+"/wegeAttributes.01.xml.gz");
 		log.info("done. (parsing wegeFile)");
 		
 		Gbl.printElapsedTime();
@@ -246,7 +249,7 @@ public class MZ2010ToXmlFiles {
 		MZPopulationUtils.setWorkLocations(population, populationAttributes);
 		System.out.println("      done.");
 		System.out.println("      Writing population with work coords set xml file \n");	
-		//new PopulationWriter(population, null).write(outputBase+"population.05.xml.gz");
+		new PopulationWriter(population, null).write(outputBase+"population.05.xml.gz");
 		System.out.println("  done.");
 
 //////////////////////////////////////////////////////////////////////
@@ -271,7 +274,7 @@ public class MZ2010ToXmlFiles {
 			System.out.println("      Total persons removed: " +  coord_err_pids.size());
 			System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 			System.out.println("      Writing population without coord. inconsistencies xml file \n");	
-			//new PopulationWriter(population, null).write(outputBase+"population.07.xml.gz");
+			new PopulationWriter(population, null).write(outputBase+"population.07.xml.gz");
 			System.out.println("  done.");
 			
 			}else{System.out.println("      NO PEOPLE WITH COORD INCONSISTENCIES \n");} 
@@ -286,7 +289,7 @@ public class MZ2010ToXmlFiles {
 		System.out.println("      Total persons removed: " + time_err_pids.size());
 		System.out.println("      Remaining population size: " + population.getPersons().size()+" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 		System.out.println("      Writing population without time  inconsistencies xml file \n");	
-		//new PopulationWriter(population, null).write(outputBase+"population.08.xml.gz");
+		new PopulationWriter(population, null).write(outputBase+"population.08.xml.gz");
 		System.out.println("  done.");
 		
 		}else{System.out.println("      NO PEOPLE WITH TIME INCONSISTENCIES \n");}
@@ -295,14 +298,14 @@ public class MZ2010ToXmlFiles {
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with all plan outside switzerland...");
-		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwizerland(population, wegeAttributes);
+		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwizerland(population, wegeAttributes , MZConstants.SWISS_CODE);
 		if(out_pids.size()>0){
 		MZPopulationUtils.removePlans(population, out_pids);
 		System.out.println("      done.");
 		System.out.println("      Total persons removed: " + out_pids.size());
 		System.out.println("      Remaining population size: " + population.getPersons().size()+" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 		System.out.println("      Writing population without time  inconsistencies xml file \n");	
-		//new PopulationWriter(population, null).write(outputBase+"population.09.xml");
+		new PopulationWriter(population, null).write(outputBase+"population.09.xml");
 		System.out.println("  done.");
 		
 		}else{System.out.println("      NO PEOPLE WITH PLANS COMPLETELY OUT OF SWITZERLAND \n");}
@@ -316,7 +319,7 @@ public class MZ2010ToXmlFiles {
 		
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("handling border-crossing trips...");
-		ArrayList<Set<Id>> border_crossing_plane_ids = MZPopulationUtils.identifyCrossBorderWeges(population, wegeAttributes);
+		ArrayList<Set<Id>> border_crossing_plane_ids = MZPopulationUtils.identifyCrossBorderWeges(population, wegeAttributes, "8100");
 		Set<Id> border_crossing_wids = border_crossing_plane_ids.get(1);
 		if(border_crossing_wids.size()>0){
 		MZPopulationUtils.HandleBorderCrossingTrips(population, wegeAttributes, border_crossing_wids, "8100");
@@ -324,7 +327,7 @@ public class MZ2010ToXmlFiles {
 		System.out.println("      Total trips handled: " + border_crossing_wids.size());
 		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 		System.out.println("      Writing population without undefined coords xml file \n");	
-		//new PopulationWriter(population, null).write(outputBase+"population.10.xml");
+		new PopulationWriter(population, null).write(outputBase+"population.10.xml");
 		System.out.println("  done.");
 	
 		}else{System.out.println("      NO BORDER CROSSING TRIPS \n");}
@@ -340,7 +343,7 @@ public class MZ2010ToXmlFiles {
 		System.out.println("      Total persons removed: " + undef_neg_pids.size());
 		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 		System.out.println("      Writing population without undefined coords xml file \n");	
-		//new PopulationWriter(population, null).write(outputBase+"population.11.xml");
+		new PopulationWriter(population, null).write(outputBase+"population.11.xml");
 		System.out.println("NUMBER OF UNDEFINED  COORDS "+undef_neg_pids.size());
 		System.out.println("  done.");
 	
@@ -357,7 +360,7 @@ public class MZ2010ToXmlFiles {
 		System.out.println("      Total persons removed: " + neg_coord_pids.size());
 		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
 		System.out.println("      Writing population without negative coords xml file \n");	
-		//new PopulationWriter(population, null).write(outputBase+"population.12.xml");
+		new PopulationWriter(population, null).write(outputBase+"population.12.xml");
 		System.out.println("NUMBER OF PEOPLE WITH NEGATIVE COORDS "+neg_coord_pids.size());
 		System.out.println("  done.");
 		

@@ -1,4 +1,4 @@
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.util.ArrayList;
 import java.util.List;

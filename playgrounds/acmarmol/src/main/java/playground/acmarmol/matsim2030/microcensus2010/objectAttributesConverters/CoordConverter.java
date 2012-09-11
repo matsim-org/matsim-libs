@@ -1,4 +1,4 @@
-package playground.acmarmol.microcensus2010.objectAttributesConverters;
+package playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -11,8 +11,8 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 
 		@Override
 		public Coord convert(String value) {
-		Double x = Double.parseDouble(value.substring(value.indexOf('=')+1, value.indexOf(',')-1));	
-		Double y = Double.parseDouble(value.substring(value.indexOf(',')+1, value.indexOf(']')-1));	
+		Double x = Double.parseDouble(value.substring(value.indexOf('=')+1, value.indexOf(']')-1));	
+		Double y = Double.parseDouble(value.substring(value.lastIndexOf('=')+1, value.lastIndexOf(']')-1));	
 			return new CoordImpl(x,y);
 		}
 

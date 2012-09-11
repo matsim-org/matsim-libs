@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2005;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -43,15 +43,17 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
+
 /**
  * 
- * Parses the wege.dat file from MZ2010 and  fills matsim population with activities' and legs' information.
+ * Parses the wege.dat file from MZ2005 and  fills matsim population with activities' and legs' information.
  *
  * @author acmarmol
  * 
  */
 
-public class MZWegeParser {
+public class MZ2005WegeParser {
 
 //////////////////////////////////////////////////////////////////////
 //member variables
@@ -64,7 +66,7 @@ public class MZWegeParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZWegeParser(Population population, ObjectAttributes wegeAttributes) {
+	public MZ2005WegeParser(Population population, ObjectAttributes wegeAttributes) {
 		super();
 		this.wegeAttributes = wegeAttributes;
 		this.population = population;
@@ -109,7 +111,7 @@ public class MZWegeParser {
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.NUMBER_STAGES, 0); //initialize
 			
 			//mode
-			String mode = entries[80].trim();
+			String mode = entries[53].trim();
 			if(mode.equals("1")){mode =  MZConstants.PLANE;}
 			else if(mode.equals("2")){mode =  MZConstants.TRAIN;}
 			else if(mode.equals("3")){mode =  MZConstants.POSTAUTO;}
@@ -131,16 +133,16 @@ public class MZWegeParser {
 			else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.PRINCIPAL_MODE, mode);
 			
-			//start coordinate - WGS84 (22,23) & CH1903 (24,25)
-			Coord start_coord = new CoordImpl(entries[24].trim(),entries[25].trim());
+			//start coordinate - CH1903 (18,19)
+			Coord start_coord = new CoordImpl(entries[18].trim(),entries[19].trim());
 			
 							
-			//end coordinate (round to hectare) - WGS84 (42,43) & CH1903 (44,45)
-			Coord end_coord = new CoordImpl(entries[44].trim(),entries[45].trim());
+			//end coordinate - CH1903 (30,31)
+			Coord end_coord = new CoordImpl(entries[30].trim(),entries[31].trim());
 			
 			//starting and ending country ( == 8100 for switzerland)
-			String sland = entries[36].trim();
-			String zland = entries[56].trim();
+			String sland = entries[25].trim();
+			String zland = entries[37].trim();
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.START_COUNTRY, sland);
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.END_COUNTRY, zland);
 			
@@ -150,9 +152,13 @@ public class MZWegeParser {
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.DEPARTURE, departure);
 			
 			// arrival time (min => sec.)
-			int arrival = Integer.parseInt(entries[6].trim())*60;
+			int arrival;
+			if(entries[48].trim().equals("")){
+				arrival = departure;
+			} else{
+			   arrival = departure + Integer.parseInt(entries[48].trim())*60;
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.ARRIVAL, arrival);
-						
+			}			
 				// time consistency check N°1
 				if(arrival<departure){
 					if(!time_err_pids.contains(pid)){time_err_pids.add(pid);}
@@ -160,23 +166,24 @@ public class MZWegeParser {
 				}
 			
 			//bee-line distance (km => m)
-			double distance = Double.parseDouble(entries[85].trim())*1000.0;
+			double distance = Double.parseDouble(entries[52].trim())*1000.0;
 			entries[21] = Double.toString(distance);
 			
 			
 			
 			
 			
-			//ausgaenge number (=-98 if ausgaenge is imcomplete)
-			String ausnr = entries[86].trim();
+			
+			//ausgaenge number (=-97 if ausgaenge is imcomplete)
+			String ausnr = entries[58].trim();
 			
 			//activity type
-			String wzweck1 = entries[82].trim();
-			String wzweck2 = entries[83].trim();
+			String wzweck1 = entries[56].trim();
+			String wzweck2 = entries[55].trim();
 			String purpose ="";
 			
 					
-			if(wzweck2.equals("1") || ausnr.equals("-98")){
+			if(wzweck2.equals("1") || ausnr.equals("-97")){
 			//hinweg or last wege of incomplete ausgaenge: for some reason with incomplete ausgaenges,
 			// if wzweck = "2" doesnt necesarilly implies a Nachhauseweg  (maybe explained somewhere in documentation?)
 				
@@ -224,8 +231,15 @@ public class MZWegeParser {
 			
 				// coordinate consistency check
 				if ((from_act.getCoord().getX() != start_coord.getX()) || (from_act.getCoord().getY() != start_coord.getY())) {
-					 //Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + ((CoordImpl) from_act.getCoord()).calcDistance(start_coord) + ")");
+					if((from_act.getCoord().getX() != -97) &  (from_act.getCoord().getY() != -97) &
+					    (start_coord.getX() != -97) &  (start_coord.getY() != -97) 	){
+						
+						start_coord = from_act.getCoord();
+						
+					}else{
+					// Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": previous destination not equal to the current origin (from_act coord: " + from_act.getCoord() +", start coord: "+ start_coord +")");
 						coord_err_pids.add(pid);
+					}
 				}
 				
 				// time consistency check N°2
@@ -242,7 +256,7 @@ public class MZWegeParser {
 				  //finishes away. These cases are corrected lately by MZPopulationUtils.setHomeLocations
 				
 				ActivityImpl firstAct;
-				if(!ausnr.equals("-98")){ firstAct = ((PlanImpl) plan).createAndAddActivity(MZConstants.HOME,start_coord);
+				if(!ausnr.equals("-97")){ firstAct = ((PlanImpl) plan).createAndAddActivity(MZConstants.HOME,start_coord);
 				}else firstAct = ((PlanImpl) plan).createAndAddActivity(MZConstants.OVERNIGHT,start_coord);
 								
 				firstAct.setEndTime(departure);

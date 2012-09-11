@@ -1,4 +1,4 @@
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 
 /**
@@ -31,8 +31,8 @@ public class MZConstants{
 		public static final String AGE = "age";
 		//gender
 		public static final String GENDER = "gender";
-		public static final String FEMALE = "female";
-		public static final String MALE = "male";
+		public static final String FEMALE = "f";
+		public static final String MALE = "m";
 		//transport mode availability
 		public static final String ALWAYS = "always";
 		public static final String ARRANGEMENT = "by arrengement";
@@ -48,7 +48,10 @@ public class MZConstants{
 		public static final String DISABLED = "disabled";
 		public static final String HOUSEWIFE_HOUSEHUSBAND = "housewife/hosehusband";
 		public static final String OTHER_INACTIVE = "other inactive";
-
+		//wege information
+		public static final String TOTAL_TRIPS_INLAND = "total weges inland";
+		public static final String TOTAL_TRIPS_DISTANCE = "total trips distance";
+		public static final String TOTAL_TRIPS_DURATION = "total trips duration";
 		
 	//vehicles
 		public static final String YEAR_REGISTRATION = "year of registration";

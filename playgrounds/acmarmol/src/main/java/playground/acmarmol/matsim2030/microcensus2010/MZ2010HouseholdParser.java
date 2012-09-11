@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -42,7 +42,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 * 
 */
 
-public class MZHouseholdParser {
+public class MZ2010HouseholdParser {
 
 //////////////////////////////////////////////////////////////////////
 //member variables
@@ -57,7 +57,7 @@ public class MZHouseholdParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZHouseholdParser(Households households, ObjectAttributes householdAttributes) {
+	public MZ2010HouseholdParser(Households households, ObjectAttributes householdAttributes) {
 	super();
 	this.households = households;
 	this.householdAttributes = householdAttributes;
@@ -137,19 +137,19 @@ public class MZHouseholdParser {
 		householdAttributes.putAttribute(hhnr, "total motorcycles ", nr_mcycles);
 		
 		//number of small motorcycles
-		String nr_smcycles = entries[79];
+		String nr_smcycles = entries[80];
 		if(nr_smcycles.equals("-98")){nr_smcycles = MZConstants.NO_ANSWER;}
 		else if(nr_smcycles.equals("-97")){nr_smcycles = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total small motorcycles ", nr_smcycles);
 		
 		//number of mofa
-		String nr_mofas = entries[79];
+		String nr_mofas = entries[82];
 		if(nr_mofas.equals("-98")){nr_mofas = MZConstants.NO_ANSWER;}
 		else if(nr_mofas.equals("-97")){nr_mofas = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total mofas ", nr_mofas);
 		
 		//number of bicycles
-		String nr_bikes = entries[79];
+		String nr_bikes = entries[83];
 		if(nr_bikes.equals("-98")){nr_bikes = MZConstants.NO_ANSWER;}
 		else if(nr_bikes.equals("-97")){nr_bikes = MZConstants.NOT_KNOWN;}
 		householdAttributes.putAttribute(hhnr, "total bicycles", nr_bikes);
