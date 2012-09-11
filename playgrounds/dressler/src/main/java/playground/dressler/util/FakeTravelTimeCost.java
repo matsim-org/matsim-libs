@@ -41,14 +41,6 @@ public class FakeTravelTimeCost implements TravelTime, TravelDisutility {
 		return Math.round((link.getLength() / link.getFreespeed()));
 	}
 
-	/**
-	 * @deprecated Use {@link #getLinkTravelTime(Link,double,Person,Vehicle)} instead
-	 */
-	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		return getLinkTravelTime(link, time, person, vehicle);
-	}
-
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		return 0;

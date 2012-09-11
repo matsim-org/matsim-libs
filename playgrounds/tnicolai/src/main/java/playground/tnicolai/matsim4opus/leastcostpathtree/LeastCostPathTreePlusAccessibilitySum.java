@@ -189,9 +189,7 @@ public class LeastCostPathTreePlusAccessibilitySum {
 				this.nodeData.put(nn.getId(), nnData);
 			}
 			double visitCost = currCost + tcFunction.getLinkTravelDisutility(l, currTime, null, null);
-			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime);
-			
-//			accessibility += Math.exp( - beta * visitCost ) * numberOfOppAtNextNode ;
+			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime, null, null);
 			
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
