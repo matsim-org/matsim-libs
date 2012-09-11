@@ -38,7 +38,6 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  * 
  * 
  * @author Zain Ul Abedin
- * @author rashid_waraich
  * 
  */
 public class EnergyConsumptionModelRicardoFaria2012 extends AbstractInterpolatedEnergyConsumptionModel {
