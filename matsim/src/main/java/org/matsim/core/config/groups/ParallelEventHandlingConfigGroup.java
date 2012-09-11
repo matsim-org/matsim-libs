@@ -60,8 +60,10 @@ public class ParallelEventHandlingConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if ( NUMBER_OF_THREADS.equals(key) || ESTIMATED_NUMBER_OF_EVENTS.equals(key) ) {
-			throw new RuntimeException( "addParam access disabled; use direct setter ") ;
+		if ( NUMBER_OF_THREADS.equals(key) ) {
+			this.setNumberOfThreads(Integer.parseInt(value)) ; 
+		} else if ( ESTIMATED_NUMBER_OF_EVENTS.equals(key) ) {
+			this.setEstimatedNumberOfEvents( Long.parseLong(value) ) ; 
 		} else {
 			throw new IllegalArgumentException(key);
 		}
