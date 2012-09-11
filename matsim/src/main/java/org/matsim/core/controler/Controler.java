@@ -46,7 +46,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -143,7 +142,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
  * The Controler is responsible for complete simulation runs, including the
  * initialization of all required data, running the iterations and the
  * replanning, analyses, etc.
- * 
+ *
  * @author mrieser
  */
 public class Controler extends AbstractController {
@@ -168,9 +167,9 @@ public class Controler extends AbstractController {
 	Integer iteration = null;
 
 	protected final Config config;
-	protected ScenarioImpl scenarioData = null ;
+	protected ScenarioImpl scenarioData = null;
 
-	protected EventsManagerImpl events = null ;
+	protected final EventsManagerImpl events;
 
 	private final String configFileName;
 	private final String dtdFileName;
@@ -230,7 +229,7 @@ public class Controler extends AbstractController {
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
-	 * 
+	 *
 	 * @param args
 	 *            The arguments to initialize the controler with.
 	 *            <code>args[0]</code> is expected to contain the path to a
@@ -279,6 +278,11 @@ public class Controler extends AbstractController {
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
+		this.events = (EventsManagerImpl) createEventsManager(this.config);
+	}
+
+	protected EventsManager createEventsManager(final Config config) {
+		return EventsUtils.createEventsManager(this.config);
 	}
 
 	/**
@@ -298,7 +302,6 @@ public class Controler extends AbstractController {
 		if (this.config.scenario().isUseTransit()) {
 			setupTransitSimulation();
 		}
-		this.events = (EventsManagerImpl) EventsUtils.createEventsManager(config);
 		loadData();
 		setUp();
 	}
@@ -370,28 +373,28 @@ public class Controler extends AbstractController {
 				this.travelTimeCalculatorFactory = new TravelTimeCalculatorWithBufferFactory();
 			} else {
 				this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-			}	 
+			}
 		}
-		
+
 		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		
+
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			if (this.config.multiModal().isCreateMultiModalNetwork()) {
 				log.info("Creating multi modal network.");
 				new MultiModalNetworkCreator(this.config.multiModal()).run(this.scenarioData.getNetwork());
 			}
-			
+
 			if (this.config.multiModal().isEnsureActivityReachability()) {
 				log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
 				new EnsureActivityReachability(this.scenarioData).run(this.scenarioData.getPopulation());
 			}
-			
+
 			if (this.config.multiModal().isDropNonCarRoutes()) {
 				log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
 				new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
 			}
-			
-			
+
+
 			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
 			MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
 			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCalculator());
@@ -449,7 +452,7 @@ public class Controler extends AbstractController {
 		this.strategyManager = loadStrategyManager();
 	}
 
-	
+
 
 	/*
 	 * ===================================================================
@@ -458,16 +461,9 @@ public class Controler extends AbstractController {
 	 */
 
 	/**
-	 * Loads the configuration object with the correct settings.
+	 * Loads values from the configuration object to initialize the settings
 	 */
 	private void loadConfig() {
-		if (this.configFileName != null) {
-			new MatsimConfigReader(this.config).readFile(this.configFileName,
-					this.dtdFileName);
-			// yyyy I have to say that I do not understand this.  It seems to me that the
-			// config file was already read in the constructor.  Isn't this here overriding
-			// config settings that were entered between construction and run()?  kai, mar'12
-		}
 		checkConfigConsistencyAndWriteToLog("Complete config dump directly after reading the config file.  " +
 				"See later for config dump after setup.");
 
@@ -476,12 +472,10 @@ public class Controler extends AbstractController {
 		 * initialized programmatically
 		 */
 		if (this.writeEventsInterval == -1) {
-			this.writeEventsInterval = this.config.controler()
-					.getWriteEventsInterval();
+			this.writeEventsInterval = this.config.controler().getWriteEventsInterval();
 		}
 		if (this.writePlansInterval == -1) {
-			this.writePlansInterval = this.config.controler()
-					.getWritePlansInterval();
+			this.writePlansInterval = this.config.controler().getWritePlansInterval();
 		}
 	}
 
@@ -494,7 +488,7 @@ public class Controler extends AbstractController {
 	 * case the program fails before that config dump. Might be put into the
 	 * "unexpected shutdown hook" instead. kai, dec'10
 	 * </ul>
-	 * 
+	 *
 	 * @param message
 	 *            the message that is written just before the config dump
 	 */
@@ -538,7 +532,7 @@ public class Controler extends AbstractController {
 	 * This method will only be called if the user has not yet manually set a
 	 * custom scoring function with
 	 * {@link #setScoringFunctionFactory(ScoringFunctionFactory)}.
-	 * 
+	 *
 	 * @return The ScoringFunctionFactory to be used for plans-scoring.
 	 */
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
@@ -562,7 +556,7 @@ public class Controler extends AbstractController {
 		 * and write to common variables, the order is important. Example: The
 		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
 		 * turn is used by the PlansScoring-Listener.
-		 * 
+		 *
 		 * IMPORTANT: The execution order is reverse to the order the listeners
 		 * are added to the list.
 		 */
@@ -587,10 +581,10 @@ public class Controler extends AbstractController {
 
 
 		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
-		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(), 
-				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() )); 
+		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(),
+				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
 		// must be last being added (=first being executed)
-		
+
 
 		loadControlerListeners();
 	}
@@ -717,7 +711,7 @@ public class Controler extends AbstractController {
 		}
 	}
 
-	
+
 
 	/*
 	 * ===================================================================
@@ -727,7 +721,7 @@ public class Controler extends AbstractController {
 
 //	/**
 //	 * Add a core ControlerListener to the Controler instance
-//	 * 
+//	 *
 //	 * @param l
 //	 */
 //	protected final void addCoreControlerListener(final ControlerListener l) {
@@ -742,7 +736,7 @@ public class Controler extends AbstractController {
 
 //	/**
 //	 * Add a ControlerListener to the Controler instance
-//	 * 
+//	 *
 //	 * @param l
 //	 */
 //	public final void addControlerListener(final ControlerListener l) {
@@ -751,7 +745,7 @@ public class Controler extends AbstractController {
 
 	/**
 	 * Removes a ControlerListener from the Controler instance
-	 * 
+	 *
 	 * @param l
 	 */
 	public final void removeControlerListener(final ControlerListener l) {
@@ -773,7 +767,7 @@ public class Controler extends AbstractController {
 	 * interfering in test cases or while debugging. <br>
 	 * <strong>Use this setting with caution, as it can result in data
 	 * loss!</strong>
-	 * 
+	 *
 	 * @param overwrite
 	 *            whether files and directories should be overwritten (true) or
 	 *            not (false)
@@ -789,7 +783,7 @@ public class Controler extends AbstractController {
 	 * <tt>2</tt>, the events are written every second iteration. If set to
 	 * <tt>10</tt>, the events are written in every 10th iteration. To disable
 	 * writing of events completely, set the interval to <tt>0</tt> (zero).
-	 * 
+	 *
 	 * @param interval
 	 *            in which iterations events should be written
 	 */
@@ -807,7 +801,7 @@ public class Controler extends AbstractController {
 	 * small amount of time that does not have any weight in big simulations,
 	 * but add a significant overhead in smaller runs or in test cases where the
 	 * graphical output is not even requested.
-	 * 
+	 *
 	 * @param createGraphs
 	 *            true if graphs showing analyses' output should be generated.
 	 */
@@ -850,7 +844,7 @@ public class Controler extends AbstractController {
 	 * Sets a new {@link org.matsim.core.scoring.ScoringFunctionFactory} to use.
 	 * <strong>Note:</strong> This will reset all scores calculated so far! Only
 	 * call this before any events are generated in an iteration.
-	 * 
+	 *
 	 * @param factory
 	 *            The new ScoringFunctionFactory to be used.
 	 */
@@ -922,7 +916,7 @@ public class Controler extends AbstractController {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, multiModalTravelTimeCalculator,
 					this.getLeastCostPathCalculatorFactory(), routeFactory);
 
-			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) 
+			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator)
 					this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, multiModalTravelTimeCalculator);
 			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, multiModalTravelTimeCalculator, routeAlgo);
 
@@ -964,13 +958,13 @@ public class Controler extends AbstractController {
 	 * Factory methods
 	 * ===================================================================
 	 */
-	
+
 	/**Design comments:<ul>
 	 * <li> yyyy It seems to me that one would need a factory at <i>this</i> level. kai, may'12
 	 * <li> An issue is that the TravelTime(Calculator) object needs to be passed into the factory.  I don't think that
 	 * this is a large problem, but it needs to be dealt with. kai, may'12
 	 * </ul>
-	 * 
+	 *
 	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
 	 *         of plans with the default (= the current from the last or current
 	 *         iteration) travel costs and travel times. Only to be used by a
@@ -1124,10 +1118,10 @@ public class Controler extends AbstractController {
 
 	/**
 	 * Register a {@link MobsimFactory} with a given name.
-	 * 
+	 *
 	 * @param mobsimName
 	 * @param mobsimFactory
-	 * 
+	 *
 	 * @see ControlerConfigGroup#getMobsim()
 	 */
 	public void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {

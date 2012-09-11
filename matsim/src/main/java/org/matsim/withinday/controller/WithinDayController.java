@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
@@ -51,35 +52,35 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 public class WithinDayController extends Controler {
 
 	private static final Logger log = Logger.getLogger(WithinDayController.class);
-	
+
 	private TravelTimeCollectorFactory travelTimeCollectorFactory = new TravelTimeCollectorFactory();
 	private TravelTimeCollector travelTimeCollector;
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
-	
+
 	private boolean replanningManagerInitialized = false;
 	private ReplanningManager replanningManager;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-	
+
 	public WithinDayController(String[] args) {
 		super(args);
-		
+
 		init();
 	}
 
 	public WithinDayController(Config config) {
 		super(config);
-	
+
 		init();
 	}
 
 	public WithinDayController(Scenario scenario) {
 		super(scenario);
-		
+
 		init();
 	}
 
-	
+
 	/*
 	 * ===================================================================
 	 * Those methods initialize objects that might be typically be used
@@ -89,7 +90,7 @@ public class WithinDayController extends Controler {
 	public void createAndInitTravelTimeCollector() {
 		this.createAndInitTravelTimeCollector(null);
 	}
-	
+
 	public void createAndInitTravelTimeCollector(Set<String> analyzedModes) {
 		if (this.events == null) {
 			log.warn("Cannot create and init the TravelTimeCollector. EventsManager has not be initialized yet!");
@@ -103,11 +104,11 @@ public class WithinDayController extends Controler {
 			this.events.addHandler(travelTimeCollector);
 		}
 	}
-	
+
 	public TravelTimeCollector getTravelTimeCollector() {
 		return this.travelTimeCollector;
 	}
-	
+
 	public void createAndInitActivityReplanningMap() {
 		if (this.events == null) {
 			log.warn("Cannot create and init the ActivityReplanningMap. EventsManager has not be initialized yet!");
@@ -116,18 +117,18 @@ public class WithinDayController extends Controler {
 		if (activityReplanningMap == null) {
 			activityReplanningMap = new ActivityReplanningMap();
 			this.getEvents().addHandler(activityReplanningMap);
-			fosl.addSimulationListener(activityReplanningMap);			
+			fosl.addSimulationListener(activityReplanningMap);
 		}
 	}
-	
+
 	public ActivityReplanningMap getActivityReplanningMap() {
 		return this.activityReplanningMap;
 	}
-	
+
 	public void createAndInitLinkReplanningMap() {
 		this.createAndInitLinkReplanningMap(null);
 	}
-	
+
 	public void createAndInitLinkReplanningMap(MultiModalTravelTime travelTime) {
 		if (this.events == null) {
 			log.warn("Cannot create and init the LinkReplanningMap. EventsManager has not be initialized yet!");
@@ -139,12 +140,12 @@ public class WithinDayController extends Controler {
 			fosl.addSimulationListener(linkReplanningMap);
 		}
 	}
-	
-	
+
+
 	public LinkReplanningMap getLinkReplanningMap() {
 		return this.linkReplanningMap;
 	}
-	
+
 	/*
 	 * TODO: Add a Within-Day Group to the Config. Then this method
 	 * can be called on startup.
@@ -157,52 +158,59 @@ public class WithinDayController extends Controler {
 			replanningManagerInitialized = true;
 		}
 	}
-	
+
 	public ReplanningManager getReplanningManager() {
 		return this.replanningManager;
 	}
-	
+
 	public FixedOrderSimulationListener getFixedOrderSimulationListener() {
 		return this.fosl;
 	}
 	/*
 	 * ===================================================================
 	 */
-	
+
 	private void init() {
 		super.getQueueSimulationListener().add(fosl);
-		
+
 		this.replanningManager = new ReplanningManager();
 	}
-	
+
 	@Override
 	protected void setUp() {
-				
+
 		// set WithinDayQSimFactory
 		super.setMobsimFactory(new WithinDayQSimFactory(replanningManager));
+
+		super.setUp();
+	}
+
+	@Override
+	protected EventsManager createEventsManager(final Config config) {
+		EventsManager events = super.createEventsManager(config);
 		/*
 		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
 		 * Then this piece of code could be placed in the controller.
 		 */
-		if (this.events instanceof ParallelEventsManagerImpl) {
+		if (events instanceof ParallelEventsManagerImpl) {
 			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
-			
+
 			final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
 			final String NUMBER_OF_THREADS = "numberOfThreads";
 			String numberOfThreads = this.config.findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
-			
+
 			int numOfThreads = 1;
 			if (numberOfThreads != null) {
 				numOfThreads = Integer.parseInt(numberOfThreads);
 			}
-			
+
 			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl(numOfThreads);
 			this.fosl.addSimulationAfterSimStepListener(manager);
-			this.events = manager;
+			events = manager;
 		}
-
-		super.setUp();
+		return events;
 	}
+
 
 	@Override
 	protected void runMobSim() {
@@ -212,7 +220,7 @@ public class WithinDayController extends Controler {
 					"Please call createAndInitReplanningManager(int numOfThreads).");
 			initReplanningManager(1);
 		}
-		
+
 		super.runMobSim();
 	}
 

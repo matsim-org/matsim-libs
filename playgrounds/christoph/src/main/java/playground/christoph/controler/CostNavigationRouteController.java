@@ -29,12 +29,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -246,11 +242,12 @@ public class CostNavigationRouteController extends WithinDayController implement
 			 */
 			for (int i = 0; i < this.scenarioData.getNetwork().getNodes().size(); i++) MatsimRandom.getLocalInstance();
 			
-			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
-						
-			this.notifyMobsimInitialized(new MobsimInitializedEventImpl(qSim));
-			log.info("Agents to be handled: " + handledAgents);
-			new EventsReaderXMLv1(getEvents()).parse(eventsFile);
+				throw new RuntimeException("Events are no longer settable in this place after some refactoring. Sorry."); // mrieser, 11Sep2012
+//			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
+//						
+//			this.notifyMobsimInitialized(new MobsimInitializedEventImpl(qSim));
+//			log.info("Agents to be handled: " + handledAgents);
+//			new EventsReaderXMLv1(getEvents()).parse(eventsFile);
 		}		
 		
 		printStatistics();
