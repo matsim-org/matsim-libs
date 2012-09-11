@@ -31,6 +31,7 @@ public class WalVehicleLogic
     private Vehicle vrpVehicle;
 
 
+    @SuppressWarnings("unused")
     private void scheduleNextTask(double now)
     {
         Schedule schedule = vrpVehicle.getSchedule();

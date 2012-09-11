@@ -259,6 +259,7 @@ public class JdbcWriter
 
 
     // currently unused
+    @SuppressWarnings("unused")
     private void fillWithTaskForTesting()
     {
         try {
