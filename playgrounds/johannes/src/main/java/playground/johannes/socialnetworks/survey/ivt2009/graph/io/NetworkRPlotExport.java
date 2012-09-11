@@ -74,8 +74,8 @@ public class NetworkRPlotExport {
 		
 		SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> builder = new SocialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 		
-		SpatialFilter filter2 = new SpatialFilter((GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge>) builder, geometry);
-		g = (SpatialGraph) filter2.apply(g);
+//		SpatialFilter filter2 = new SpatialFilter((GraphBuilder<? extends SpatialGraph, ? extends SpatialVertex, ? extends SpatialEdge>) builder, geometry);
+//		g = (SpatialGraph) filter2.apply(g);
 		
 		ApplySeedsFilter seedFiler = new ApplySeedsFilter();
 		g = (SpatialGraph) seedFiler.apply((SampledGraph) g);
