@@ -284,7 +284,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				// Check if veh has reached destination:
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 					this.addParkedVehicle(veh);
-					network.simEngine.letAgentArrive(veh);
+					network.simEngine.letVehicleArrive(veh);
 					this.makeVehicleAvailableToNextDriver(veh, now);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
@@ -320,7 +320,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 						// zweiten Mal auf die Kante gesetzt wird (oder so ähnlich, aber wir brauchen "nextLink==currentLink").
 						// kai & marcel, mar'12
 						
-						network.simEngine.letAgentArrive(veh);
+						network.simEngine.letVehicleArrive(veh);
 						this.addParkedVehicle(veh);
 						makeVehicleAvailableToNextDriver(veh, now);
 						// remove _after_ processing the arrival to keep link active

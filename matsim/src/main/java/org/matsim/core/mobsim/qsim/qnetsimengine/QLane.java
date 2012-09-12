@@ -354,7 +354,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 				// Check if veh has reached destination:
 				if ((this.qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 					this.qLink.addParkedVehicle(veh);
-					this.qLink.network.simEngine.letAgentArrive(veh);
+					this.qLink.network.simEngine.letVehicleArrive(veh);
 					this.qLink.makeVehicleAvailableToNextDriver(veh, now);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();

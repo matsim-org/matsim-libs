@@ -381,7 +381,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 
-	void letAgentArrive(QVehicle veh) {
+	void letVehicleArrive(QVehicle veh) {
 		double now = qsim.getSimTimer().getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
 		qsim.getEventsManager().processEvent(qsim.getEventsManager().getFactory().createPersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));		
