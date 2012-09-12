@@ -23,7 +23,6 @@ package org.matsim.core.scoring.functions;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -51,8 +50,6 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 		this.plan = plan;
 		this.facilities = facilities;
 	}
-	
-	private static int wrnCnt = 0 ;
 
 	@Override
 	protected double[] getOpeningInterval(Activity act) {
@@ -72,14 +69,7 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 
 			facilityActType = facilityActTypeIterator.next();
-			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
-				if ( wrnCnt < 1 ) {
-					wrnCnt++ ;
-					Logger.getLogger(this.getClass()).warn("seems that only the first letters of activity types are checked at" +
-							"facilities.  Make sure this is what you want ... or please fix the code.  kai, jul'12, but" +
-							"detected by Pieter Fourie.") ;
-				}
-				
+			if (act.getType().equals(facilityActType)) {
 				foundAct = true;
 
 				// choose appropriate opentime:
