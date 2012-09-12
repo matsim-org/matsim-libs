@@ -48,12 +48,14 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.AverageNumberOfStopsP
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageTripDistanceMeterPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageWaitingTimeSecondsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountCapacityMeterPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountDeparturesPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountPassengerMeterPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTransfersPerModeModeCombination;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerPtModeCombination;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehicleMeterPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.CountDeparturesWithNoCapacityLeftPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
@@ -97,6 +99,8 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 		this.pAnalyzesList.add(new CountTripsPerPtModeCombination());
 		this.pAnalyzesList.add(new AverageLoadPerDeparturePerMode());
 		this.pAnalyzesList.add(new CountCapacityMeterPerMode(event.getControler().getNetwork()));
+		this.pAnalyzesList.add(new CountDeparturesWithNoCapacityLeftPerMode());
+		this.pAnalyzesList.add(new CountDeparturesPerMode());
 		
 		// register all analyzes
 		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
