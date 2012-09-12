@@ -90,6 +90,8 @@ public class RsaRunner {
 
 	
 	private static void sim(String conf) {
+		
+		boolean fixedSubMode = false;
 		Config config = new Config();
 		config.addModule(PConfigGroup.GROUP_NAME, new PConfigGroup());
 		ConfigUtils.loadConfig(config, conf);
@@ -99,7 +101,7 @@ public class RsaRunner {
 		
 //		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(conf));
 	
-		Controler controler = new PtSubModeControler(scenario, true);
+		Controler controler = new PtSubModeControler(scenario, fixedSubMode);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		
@@ -112,7 +114,8 @@ public class RsaRunner {
 		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory());
 		controler.addControlerListener(pFact);		
 		
-		controler.setMobsimFactory(new TransitSubModeQSimFactory());
+		//necessary because PHook overwrites setting, made in PtSubModeControler-c'tor
+		controler.setMobsimFactory(new TransitSubModeQSimFactory(fixedSubMode));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 

@@ -51,7 +51,7 @@ public class PtSubModeControler extends Controler {
 	public PtSubModeControler(String configFile, boolean routeOnSameMode) {
 		super(configFile);
 		//necessary for departure-handling
-		super.setMobsimFactory(new TransitSubModeQSimFactory());
+		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
 		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-transitWalk"-legs
@@ -71,6 +71,8 @@ public class PtSubModeControler extends Controler {
 	 */
 	public PtSubModeControler(Scenario sc, boolean routeOnSameMode) {
 		super(sc);
+		//necessary for departure-handling
+		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
 		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-tansitWalk"-legs

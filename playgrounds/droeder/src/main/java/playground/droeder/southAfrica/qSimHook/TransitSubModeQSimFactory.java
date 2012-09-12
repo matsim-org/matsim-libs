@@ -52,13 +52,13 @@ public class TransitSubModeQSimFactory implements MobsimFactory {
 	
 	private static final Logger log = Logger
 			.getLogger(TransitSubModeQSimFactory.class);
-	
-	
+	private boolean routeOnSameMode;
 	
 	/**
-	 * adding PTransitAgent and TransitSubModeQSimEngine
+	 * adding TransitSubModeAgent and TransitSubModeQSimEngine
 	 */
-	public TransitSubModeQSimFactory(){
+	public TransitSubModeQSimFactory(boolean routeOnSameMode){
+		this.routeOnSameMode = routeOnSameMode;
 	}
 	
 	
@@ -95,7 +95,7 @@ public class TransitSubModeQSimFactory implements MobsimFactory {
 		if (sc.getConfig().scenario().isUseTransit()) {
 			//##### changes here ############
 			// TODO[dr] replace with own Factory/Agent (agents board only when better time and when correct mode)
-			agentFactory = new PTransitAgentFactory(qSim, ((PConfigGroup) sc.getConfig().getModule(PConfigGroup.GROUP_NAME)).getPassengersBoardEveryLine());
+			agentFactory = new TransitSubModeAgentFactory(qSim, this.routeOnSameMode);
 			TransitQSimEngine transitEngine = new TransitSubModeQSimEngine(qSim);
 			//###############################
 			transitEngine.setUseUmlaeufe(true);

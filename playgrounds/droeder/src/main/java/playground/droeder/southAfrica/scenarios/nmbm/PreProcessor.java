@@ -28,12 +28,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -70,10 +72,10 @@ public class PreProcessor {
 	
 	private final static String INPUTDIR = "E:/rsa/Data-nmbm/";
 		private final static String POPULATIONINPUTDIR = INPUTDIR + "population/20120831_100pct/"; 
-		private final static String INPUTNETWORK =  INPUTDIR + "transit/bus&train/NMBM_PT_V1.xml.gz";
-		private final static String INPUTSCHEDULE = INPUTDIR + "transit/bus&train/Transitschedule_PT_V1_WithVehicles.xml.gz";
-		private final static String INPUTVEHICLES = INPUTDIR + "transit/bus&train/transitVehicles_PT_V1.xml.gz";
-	private final static String OUTDIR = "E:/rsa/server/sample_rail_" + String.valueOf(SAMPLESIZE) + "/";
+		private final static String INPUTNETWORK =  INPUTDIR + "transit/bus/NMBM_Bus_V1.xml.gz";
+		private final static String INPUTSCHEDULE = INPUTDIR + "transit/bus/Transitschedule_Bus_V1_WithVehicles.xml.gz";
+		private final static String INPUTVEHICLES = INPUTDIR + "transit/bus/transitVehicles_Bus_V1.xml.gz";
+	private final static String OUTDIR = "E:/rsa/server/sampleActivityTime_" + String.valueOf(SAMPLESIZE) + "/";
 
 	
 	public static void main(String[] args) {
@@ -220,6 +222,15 @@ public class PreProcessor {
 							}
 							if(((Leg) pe).getMode().equals("pt2")){
 								((Leg) pe).setMode("rail");
+							}
+						}
+						if(pe instanceof Activity){
+							Double blur = (5*60) * (2 * (0.5 - MatsimRandom.getRandom().nextDouble())); //+- 5 min
+							if(!(((Activity) pe).getEndTime() == Double.NaN)){
+								((Activity) pe).setEndTime(((Activity) pe).getEndTime() + blur);
+							}
+							if(!(((Activity) pe).getStartTime() == Double.NaN)){
+								((Activity) pe).setStartTime(((Activity) pe).getStartTime() + blur);
 							}
 						}
 					}
