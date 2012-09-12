@@ -20,12 +20,21 @@
 
 package org.matsim.core.utils.misc;
 
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
+
 
 public abstract class Time {
 
-	/* Never change this to NaN, as a compare of any valid time
+	/** 
+	 * Never change this to NaN, as a compare of any valid time
 	 * to this should result to "greater" for some algorithms to work
-	 * still we found the name "UNDEFINED" more suitable than TIME_MIN_VALUE */
+	 * still we found the name "UNDEFINED" more suitable than TIME_MIN_VALUE
+	 * <br><b><i>Note:</i></b> do not interpret the "UNDEFINED" as "time does 
+	 * not matter", as this has implications for, example, routing. If start 
+	 * time is given as {@link Time#UNDEFINED_TIME} then {@link Path#travelTime}
+	 * will return {@link Double#NaN}, even though the {@link TravelTime#getLinkTravelTime()}
+	 * is independent of the start time. */
 	public final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 	/**
 	 * The end of a day in MATSim in seconds

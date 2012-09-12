@@ -35,6 +35,7 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -198,7 +199,9 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * @param toNode
 	 *            The Node at which the route should end.
 	 * @param startTime
-	 *            The time at which the route should start.
+	 *            The time at which the route should start. <i>Note:</i> Using
+	 *            {@link Time#UNDEFINED_TIME} does not imply "time is not relevant",
+	 *            rather, {@link Path#travelTime} will return {@link Double#NaN}.
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
 	 */
