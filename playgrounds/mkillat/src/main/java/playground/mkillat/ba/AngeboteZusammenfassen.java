@@ -67,10 +67,17 @@ public class AngeboteZusammenfassen {
 		}
 		
 		for (int i = 0; i < datums.size(); i++) {
-			AuslesenGetTelNumber.auslesen(ids.get(i));
-			String number = GetTelNumber.read("C:\\Dokumente und Einstellungen\\Marie\\ba\\datei_temp.html");
-			Angebot temp = new Angebot(datums.get(i), zeiten.get(i), preise.get(i), plaetze.get(i), ids.get(i), number);
-			angebote.add(temp);
+			if(seite.equals("1") ||  seite.equals("2") ){
+				AuslesenGetTelNumber.auslesen(ids.get(i));
+				String number = GetTelNumber.read("C:\\Dokumente und Einstellungen\\Marie\\ba\\datei_temp.html");
+				Angebot temp = new Angebot(datums.get(i), zeiten.get(i), preise.get(i), plaetze.get(i), ids.get(i), number);
+				angebote.add(temp);
+			}else{
+				Angebot temp = new Angebot(datums.get(i), zeiten.get(i), preise.get(i), plaetze.get(i), ids.get(i), "000");
+				angebote.add(temp);
+			}
+		
+			
 		}
 		filename = filename.replace("_Seite" + seite + ".html", ".txt");
 		
@@ -79,6 +86,9 @@ public class AngeboteZusammenfassen {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filename),true));
 			writer.write("# datum; zeit; preis; plaetze; id; nummer"); 
 			writer.newLine();
+			
+
+			
 			for (int i = 0; i < angebote.size(); i++) {
 				writer.write(angebote.get(i).datum + ";" + angebote.get(i).zeit + ";" + angebote.get(i).preis + ";" + angebote.get(i).plaetze + ";" + angebote.get(i).id+  ";" + angebote.get(i).nummer);
 				writer.newLine();

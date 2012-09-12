@@ -99,12 +99,12 @@ public class Analyse implements Runnable {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				System.out.println("Sheduled @" + System.currentTimeMillis());
+				System.out.println("Start @" + System.currentTimeMillis());
 	            dateiEinlesen();
 			}
 			
 		};
-		timer.scheduleAtFixedRate(task, 0, 1000*60*60);
+		timer.scheduleAtFixedRate(task, 0, 1000*60*60*3);
 
 	}
 	

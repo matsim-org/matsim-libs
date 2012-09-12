@@ -24,17 +24,19 @@ public class GetTelNumber {
 		String line = null;
 		while ((line = br.readLine()) != null) {
 		if( line.startsWith("					<span>Name</span>")){
-			String[] result = line.split("<span>");
-			for (int i = 0; i < result.length; i++) {
-				bla.add(result[i]);
-			}
+			String[] result = line.split("<a href");
+//			for (int i = 0; i < result.length; i++) {
+//				bla.add(result[i]);
+//			}
 			
-			String temp1 = result[2];
-			String[] result2 = temp1.split("</span>");
-			String temp2 = result2[1];
-			nummer = result2[1];
-			nummer = nummer.replace("<br />", "");
-			nummer = nummer.substring(0, nummer.length()-2);
+			String temp1 = result[1];
+			String[] result2 = temp1.split(" ");
+			String temp2 = result2[0];
+			String[] result3 = temp2.split("view/");
+			nummer = result3[1];
+			nummer = nummer.substring(0, nummer.length()-1);
+//			nummer = nummer.replace("<br />", "");
+//			nummer = nummer.substring(0, nummer.length()-2);
 //			Datenschutz ist gesichert, letzten zwei Ziffern der Telefonnummer werden nicht übernommen jippy
 			
 			
