@@ -20,7 +20,8 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
-import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -30,7 +31,6 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
@@ -43,7 +43,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
@@ -90,20 +90,19 @@ public class WithinDayParkingController extends WithinDayController implements S
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
 
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
-		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute(),
+		Map<String, TravelTime> times = new HashMap<String, TravelTime>();
+		times.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
+		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute(),
 				new WalkTravelTime(this.config.plansCalcRoute())));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+		times.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
 				new WalkTravelTime(this.config.plansCalcRoute())));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
+		times.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
 				this.getTravelTimeCalculator(), new WalkTravelTime(this.config.plansCalcRoute())));
-		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, super.getTravelTimeCollector());
+		times.put(TransportMode.car, super.getTravelTimeCollector());
 		
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory.createTravelTime(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, times, factory, routeFactory);
 	
 		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(), router, 1.0, this.scenarioData, parkingAgentsTracker);
 		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		

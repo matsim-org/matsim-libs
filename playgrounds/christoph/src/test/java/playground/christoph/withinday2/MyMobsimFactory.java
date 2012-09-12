@@ -20,6 +20,8 @@
 
 package playground.christoph.withinday2;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -47,10 +49,10 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 public class MyMobsimFactory implements MobsimFactory {
 	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 	private TravelDisutilityFactory travCostCalc;
-	private TravelTime travTimeCalc;
+	private Map<String, TravelTime> travTimeCalc;
 	private ReplanningManager replanningManager;
 	
-	MyMobsimFactory( TravelDisutilityFactory travelCostCalculator, TravelTime travelTimeCalculator ) {
+	MyMobsimFactory( TravelDisutilityFactory travelCostCalculator, Map<String, TravelTime> travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}

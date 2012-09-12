@@ -20,7 +20,9 @@
 
 package playground.christoph.evacuation.population;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -33,8 +35,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
@@ -49,9 +49,11 @@ import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -156,20 +158,18 @@ public class PreparePopulation {
 	private LegRouter createLegRouter() {
 			
 		PlansCalcRouteConfigGroup configGroup = this.scenario.getConfig().plansCalcRoute();
-		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.travelTime);
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup).createTravelTime());
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(this.travelTime,
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		travelTimes.put(TransportMode.car, this.travelTime);
+		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
+		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(configGroup).createTravelTime());
+		travelTimes.put(TransportMode.ride, new RideTravelTimeFactory(this.travelTime,
 				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
+		travelTimes.put(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
 				this.travelTime, new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
 		
-		// create multi-modal travel time calculator
-		MultiModalTravelTime multiModalTravelTime = multiModalTravelTimeFactory.createTravelTime(); 
 		
 		// create travel costs object and use a multi-model travel time calculator
-		TravelDisutility travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(multiModalTravelTime, 
+		TravelDisutility travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime, 
 				this.scenario.getConfig().planCalcScore());
 
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getModeRouteFactory();
@@ -184,9 +184,8 @@ public class PreparePopulation {
 				this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore()));
 		
 		IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) 
-			leastCostPathCalculatorFactory.createPathCalculator(this.scenario.getNetwork(), travelCost, multiModalTravelTime);
-		MultiModalLegRouter multiModalLegRouter = new MultiModalLegRouter(this.scenario.getNetwork(), multiModalTravelTime, 
-				routeAlgo);
+			leastCostPathCalculatorFactory.createPathCalculator(this.scenario.getNetwork(), travelCost, travelTime);
+		MultiModalLegRouter multiModalLegRouter = new MultiModalLegRouter(this.scenario.getNetwork(), new DijkstraFactory(), travelTimes);
 
 		return multiModalLegRouter;
 	}

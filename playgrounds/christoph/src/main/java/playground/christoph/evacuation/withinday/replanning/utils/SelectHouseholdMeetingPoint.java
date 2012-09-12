@@ -21,6 +21,7 @@
 package playground.christoph.evacuation.withinday.replanning.utils;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
@@ -42,7 +43,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+<<<<<<< HEAD
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
+=======
+>>>>>>> simplifying multi-modal
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -52,6 +56,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
@@ -89,7 +94,11 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPoint.class);
 	
 	private final Scenario scenario;
+<<<<<<< HEAD
 	private final MultiModalTravelTime travelTime;
+=======
+	private final Map<String, TravelTime> travelTimes;
+>>>>>>> simplifying multi-modal
 	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
 	private final Geometry affectedArea;
@@ -118,12 +127,20 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private int meetSecure = 0;
 	private int meetInsecure = 0;
 	
+<<<<<<< HEAD
 	public SelectHouseholdMeetingPoint(Scenario scenario, MultiModalTravelTime travelTime,
+=======
+	public SelectHouseholdMeetingPoint(Scenario scenario, Map<String,TravelTime> travelTimes,
+>>>>>>> simplifying multi-modal
 			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, Geometry affectedArea, 
 			ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker,
 			DecisionDataProvider decisionDataProvider, DecisionModelRunner decisionModelRunner) {
 		this.scenario = scenario;
+<<<<<<< HEAD
 		this.travelTime = travelTime;
+=======
+		this.travelTimes = travelTimes;
+>>>>>>> simplifying multi-modal
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.affectedArea = affectedArea;
@@ -149,7 +166,11 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		
 		LeastCostPathCalculatorFactory toHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+<<<<<<< HEAD
 		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, travelTime, toHomeFactory, routeFactory);
+=======
+		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, travelTimes, toHomeFactory, routeFactory);
+>>>>>>> simplifying multi-modal
 
 		/*
 		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
@@ -260,11 +281,14 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			i++;
 		}
 		
+<<<<<<< HEAD
 		/*
 		 * Use a Wrapper that returns travel times for exit links because
 		 * the travel time collector does not know them. 
 		 */
 		TravelTimeWrapper wrapper = new TravelTimeWrapper(travelTime);
+=======
+>>>>>>> simplifying multi-modal
 		LeastCostPathCalculatorFactory fromHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
 		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapper, fromHomeFactory, routeFactory);
 	}
@@ -500,9 +524,9 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	
 	private static class TravelTimeWrapper implements MultiModalTravelTime {
 
-		private final MultiModalTravelTime travelTime;
+		private final TravelTime travelTime;
 		
-		public TravelTimeWrapper(MultiModalTravelTime travelTime) {
+		public TravelTimeWrapper(TravelTime travelTime) {
 			this.travelTime = travelTime;
 		}
 		
@@ -512,15 +536,5 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			else return travelTime.getLinkTravelTime(link, time, person, vehicle);
 		}
 
-		@Override
-		public double getModalLinkTravelTime(Link link, double time, String transportMode, Person person, Vehicle vehicle) {
-			if (link.getId().toString().contains("exit")) return 1.0;
-			else return travelTime.getModalLinkTravelTime(link, time, transportMode, person, vehicle);
-		}
-
-		@Override
-		public void setTransportMode(String transportMode) {
-			travelTime.setTransportMode(transportMode);
-		}	
 	}
 }

@@ -20,8 +20,10 @@
 package playground.wrashid.parkingSearch.withindayFW.controllers.kti;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -43,6 +45,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -115,7 +118,9 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 //		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory,
 //				routeFactory);
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getTravelTimeCollector(), factory,
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimes, factory,
 				routeFactory);
 		
 		// adding hight utility parking choice algo

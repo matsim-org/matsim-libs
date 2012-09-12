@@ -22,8 +22,10 @@ package playground.christoph.icem2012;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -55,8 +57,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
@@ -73,6 +73,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -609,20 +610,19 @@ public class CreateMarathonPopulation {
 		}
 		
 		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
-		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
+		
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+
+		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
+		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
 				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory().createTravelTime(), 
+		travelTimes.put(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory().createTravelTime(), 
 				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
+		travelTimes.put(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
 				new FreeSpeedTravelTimeCalculatorFactory().createTravelTime(), new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
 
-		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
-		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());
 		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
-		Dijkstra dijkstra = (Dijkstra) routerFactory.createPathCalculator(network, cost, wrapper);
-		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), wrapper, dijkstra);
+		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), routerFactory, travelTimes);
 		
 		Counter counterRemove = new Counter("persons to remove ");
 		Counter counterAdapt = new Counter("legs to adapt ");

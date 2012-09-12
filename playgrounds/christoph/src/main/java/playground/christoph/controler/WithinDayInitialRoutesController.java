@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -46,7 +45,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
@@ -56,7 +54,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayController;
@@ -73,7 +71,6 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
  * Creates initial routes using within-day replanning. Doing so should hopefully
@@ -221,16 +218,16 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
 								
-		// create a copy of the MultiModalTravelTimeWrapperFactory...
-		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		
 		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCalculator());
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(configGroup));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(configGroup,
+		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());
+		travelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
+		travelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
 				new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+		travelTimes.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
 				new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(configGroup, 
+		travelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
 				this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
 		
 		
@@ -238,7 +235,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
 
 		LeastCostPathCalculatorFactory factory = this.getLeastCostPathCalculatorFactory();
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, multiModalTravelTimeFactory.createTravelTime(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, travelTimes, factory, routeFactory);
 		
 		/*
 		 * During Activity Replanner

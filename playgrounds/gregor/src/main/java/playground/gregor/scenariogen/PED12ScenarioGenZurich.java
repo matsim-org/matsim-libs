@@ -22,9 +22,11 @@ package playground.gregor.scenariogen;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
@@ -53,8 +55,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
@@ -68,10 +68,12 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -311,20 +313,17 @@ public class PED12ScenarioGenZurich {
 
 		Network network = scenario.getNetwork();
 		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
-		MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(configGroup));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(configGroup,
+		Map<String, TravelTime> multiModalTravelTimeFactory = new HashMap<String, TravelTime>();
+		multiModalTravelTimeFactory.put(TransportMode.walk, new WalkTravelTime(configGroup));
+		multiModalTravelTimeFactory.put(TransportMode.bike, new BikeTravelTime(configGroup,
 				new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTimeCalculator(), 
+		multiModalTravelTimeFactory.put(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTimeCalculator(), 
 				new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(configGroup, 
+		multiModalTravelTimeFactory.put(TransportMode.pt, new PTTravelTime(configGroup, 
 				new FreeSpeedTravelTimeCalculator(), new WalkTravelTime(configGroup)));
 
-		MultiModalTravelTimeWrapper wrapper = multiModalTravelTimeFactory.createTravelTime();
-		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(wrapper, scenario.getConfig().planCalcScore());
 		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
-		Dijkstra dijkstra = (Dijkstra) routerFactory.createPathCalculator(network, cost, wrapper);
-		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), wrapper, dijkstra);
+		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), new DijkstraFactory(), multiModalTravelTimeFactory);
 		
 		Counter removedPersons = new Counter ("removed persons: ");
 		Iterator<? extends Person> iter = scenario.getPopulation().getPersons().values().iterator();

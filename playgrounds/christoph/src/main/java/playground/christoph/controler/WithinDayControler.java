@@ -20,7 +20,11 @@
 
 package playground.christoph.controler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -130,7 +134,9 @@ public class WithinDayControler extends WithinDayController {
 		
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, getTravelTimeCollector(), factory, routeFactory);
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		travelTimes.put(TransportMode.car, getTravelTimeCollector());
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimes, factory, routeFactory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);

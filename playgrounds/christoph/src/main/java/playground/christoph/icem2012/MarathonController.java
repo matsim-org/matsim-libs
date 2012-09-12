@@ -21,9 +21,11 @@
 package playground.christoph.icem2012;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -58,8 +60,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
 import org.matsim.core.network.NodeImpl;
@@ -417,11 +417,31 @@ public class MarathonController extends WithinDayController implements StartupLi
 		/*
 		 * Use advanced walk-, bike and pt travel time calculators
 		 */
+<<<<<<< HEAD
 		this.carTravelTime = this.getTravelTimeCollector();
 		this.walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 		this.bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 		this.ptTravelTime = new PTTravelTimeFactory(this.config.plansCalcRoute(), this.carTravelTime, this.walkTravelTime).createTravelTime();
 		this.rideTravelTime = new RideTravelTimeFactory(this.carTravelTime, this.walkTravelTime).createTravelTime();
+=======
+		Map<String, TravelTime> factory = new HashMap<String, TravelTime>();
+		this.walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
+		this.bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+		this.ptTravelTimeFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, 
+				new PTTravelTimeFactory(this.config.plansCalcRoute(), getTravelTimeCollector(), walkTravelTimeFactory.createTravelTime()).createTravelTime());
+		factory.put(TransportMode.walk, walkTravelTimeFactory.createTravelTime());
+		factory.put("walk2d", walkTravelTimeFactory.createTravelTime());
+		factory.put(TransportMode.bike, bikeTravelTimeFactory.createTravelTime());
+		factory.put(TransportMode.pt, ptTravelTimeFactory.createTravelTime());
+		
+		/*
+		 * Use the TravelTimeCollector as ride travel time estimator
+		 */
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.pt, 
+//				new PTTravelTimeFactory(this.config.plansCalcRoute(), travelTimeCollectorWrapperFactory, walkTravelTimeFactory));
+		factory.put(TransportMode.ride, 
+				new RideTravelTimeFactory(getTravelTimeCollector(), walkTravelTimeFactory.createTravelTime()).createTravelTime());
+>>>>>>> simplifying multi-modal
 		
 		MultiModalTravelTimeWrapperFactory factory = new MultiModalTravelTimeWrapperFactory();
 		factory.setPersonalizableTravelTimeFactory(TransportMode.car, this.carTravelTime);
@@ -437,7 +457,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		super.initReplanningManager(this.config.global().getNumberOfThreads());
 		super.getReplanningManager().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
-		MultiModalTravelTime linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
+		 Map<String, TravelTime> linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
 		
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
@@ -759,6 +779,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
+<<<<<<< HEAD
 		MultiModalTravelTimeWrapperFactory factory = new MultiModalTravelTimeWrapperFactory();
 		factory.setPersonalizableTravelTimeFactory(TransportMode.car, this.carTravelTime);
 		factory.setPersonalizableTravelTimeFactory(TransportMode.walk, this.walkTravelTime);
@@ -767,13 +788,30 @@ public class MarathonController extends WithinDayController implements StartupLi
 		factory.setPersonalizableTravelTimeFactory(TransportMode.ride, this.rideTravelTime);
 		factory.setPersonalizableTravelTimeFactory(TransportMode.pt, this.ptTravelTime);	
 		TravelTime travelTime = factory.createTravelTime();
+=======
+
+		Map<String, TravelTime> factory = new HashMap<String, TravelTime>();
+			this.walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
+			this.bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+			this.ptTravelTimeFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, 
+					new PTTravelTimeFactory(this.config.plansCalcRoute(), getTravelTimeCollector(), walkTravelTimeFactory.createTravelTime()).createTravelTime());
+			factory.put(TransportMode.walk, walkTravelTimeFactory.createTravelTime());
+			factory.put("walk2d", walkTravelTimeFactory.createTravelTime());
+			factory.put(TransportMode.bike, bikeTravelTimeFactory.createTravelTime());
+			factory.put(TransportMode.pt, ptTravelTimeFactory.createTravelTime());
+>>>>>>> simplifying multi-modal
 		
 //		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, coordAnalyzer);
 
+<<<<<<< HEAD
 		LeastCostPathCalculatorFactory pathFactory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, travelTime, pathFactory, routeFactory);
+=======
+		LeastCostPathCalculatorFactory lfactory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, factory, lfactory, routeFactory);
+>>>>>>> simplifying multi-modal
 		
 		/*
 		 * During Activity Replanners
@@ -827,6 +865,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 	 * and replace the car, ride and pt travel time calculators with free speed
 	 * travel time calculators.
 	 */
+<<<<<<< HEAD
 	private MultiModalTravelTime createLinkReplanningMapTravelTime() {
 
 		MultiModalTravelTimeWrapperFactory factory = new MultiModalTravelTimeWrapperFactory();
@@ -840,9 +879,26 @@ public class MarathonController extends WithinDayController implements StartupLi
 		factory.setPersonalizableTravelTimeFactory(TransportMode.car, new FreeSpeedTravelTimeCalculator());
 		factory.setPersonalizableTravelTimeFactory(TransportMode.ride, new FreeSpeedTravelTimeCalculator());
 		factory.setPersonalizableTravelTimeFactory(TransportMode.pt, new FreeSpeedTravelTimeCalculator());
+=======
+	private Map<String, TravelTime> createLinkReplanningMapTravelTime() {
+		
+		Map<String, TravelTime> factory = new HashMap<String, TravelTime>();
+		this.walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
+		this.bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+		this.ptTravelTimeFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, 
+				new PTTravelTimeFactory(this.config.plansCalcRoute(), getTravelTimeCollector(), walkTravelTimeFactory.createTravelTime()).createTravelTime());
+		factory.put(TransportMode.walk, walkTravelTimeFactory.createTravelTime());
+		factory.put("walk2d", walkTravelTimeFactory.createTravelTime());
+		factory.put(TransportMode.bike, bikeTravelTimeFactory.createTravelTime());
+	
+		// replace modes
+		factory.put(TransportMode.car, new FreeSpeedTravelTimeCalculator());
+		factory.put(TransportMode.ride, new FreeSpeedTravelTimeCalculator());
+		factory.put(TransportMode.pt, new FreeSpeedTravelTimeCalculator());
+>>>>>>> simplifying multi-modal
 
 		// return travel time object
-		return factory.createTravelTime();
+		return factory;
 	}
 
 }
