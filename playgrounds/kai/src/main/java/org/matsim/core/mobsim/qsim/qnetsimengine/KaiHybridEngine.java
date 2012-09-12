@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 public class KaiHybridEngine implements MobsimEngine {
 

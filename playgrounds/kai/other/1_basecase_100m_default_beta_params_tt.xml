@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<matsim_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/matsim4urbansim_v2.xsd">
-    <config>
+<matsim_config 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="/Users/nagel/git-svnroot-matsim-2/all/matsim/src/main/resources/dtd/matsim4urbansim_v2.xsd"
+>
+<!--xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/matsim4urbansim_v2.xsd" -->
+<config>
         <matsim_config>
             <inputFile>
 				
@@ -16,16 +20,12 @@
                 /Users/thomas/Development/opus_home/data/zurich_parcel/results/latsis/runs/basecase_ivt-osm/output/output_plans.xml.gz
 			</inputFile>
         </inputPlansFile>
-        <hotStartPlansFile>
-            <inputFile>
-				
-			</inputFile>
-        </hotStartPlansFile>
+        <hotStartPlansFile><inputFile></inputFile></hotStartPlansFile>
         <controler>
             <firstIteration>
 				0
 			</firstIteration>
-            <lastIteration>sldkfj</lastIteration>
+            <lastIteration>0</lastIteration>
         </controler>
         <planCalcScore>
             <activityType_0>
@@ -97,9 +97,7 @@
             <testParameter>
 				
 			</testParameter>
-            <backupRunData>
-				false
-			</backupRunData>
+            <backupRunData>true</backupRunData>
         </urbansimParameter>
         <matsim4urbansimContoler>
             <zone2zoneImpedance>
@@ -111,12 +109,8 @@
             <zoneBasedAccessibility>
 				true
 			</zoneBasedAccessibility>
-            <cellBasedAccessibility>
-				true
-			</cellBasedAccessibility>
-            <cellSizeCellBasedAccessibility>
-				100
-			</cellSizeCellBasedAccessibility>
+            <cellBasedAccessibility>true</cellBasedAccessibility>
+            <cellSizeCellBasedAccessibility>100</cellSizeCellBasedAccessibility>
             <shapeFileCellBasedAccessibility>
                 <inputFile>
 					/Users/thomas/Development/opus_home/data/zurich_parcel/shapefiles/zurich_mun.shp				
