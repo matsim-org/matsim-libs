@@ -27,10 +27,12 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
@@ -68,38 +70,42 @@ public class MultiModalQLinkExtension {
 	}
 
 	/**
-	 * Adds a personAgent to the link (i.e. the "queue"), called by
+	 * Adds a mobsimAgent to the link (i.e. the "queue"), called by
 	 * {@link MultiModalQNode#moveAgentOverNode(MobsimAgent, double)}.
 	 *
 	 * @param personAgent
 	 *          the personAgent
 	 */
-	public void addAgentFromIntersection(MobsimAgent personAgent, double now) {
+	public void addAgentFromIntersection(MobsimAgent mobsimAgent, double now) {
 		this.activateLink();
 
-		this.addAgent(personAgent, now);
+		this.addAgent(mobsimAgent, now);
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-			new LinkEnterEventImpl(now, personAgent.getId(), qLink.getLink().getId(), null));
+			new LinkEnterEventImpl(now, mobsimAgent.getId(), qLink.getLink().getId(), null));
 	}
 
-	private void addAgent(MobsimAgent personAgent, double now) {
+	private void addAgent(MobsimAgent mobsimAgent, double now) {
 
-		Map<String, TravelTime> multiModalTravelTime = simEngine.getMultiModalTravelTime();
-		double travelTime = multiModalTravelTime.get(personAgent.getMode()).getLinkTravelTime(qLink.getLink(), now, null, null);
+		Map<String, TravelTime> multiModalTravelTime = simEngine.getMultiModalTravelTimes();
+		Person person = null;
+		if (mobsimAgent instanceof HasPerson) {
+			person = ((HasPerson) mobsimAgent).getPerson(); 
+		}
+		double travelTime = multiModalTravelTime.get(mobsimAgent.getMode()).getLinkTravelTime(qLink.getLink(), now, person, null);
 		double departureTime = now + travelTime;
 
 		departureTime = Math.round(departureTime);
 
-		agents.add(new Tuple<Double, MobsimAgent>(departureTime, personAgent));
+		agents.add(new Tuple<Double, MobsimAgent>(departureTime, mobsimAgent));
 	}
 
-	public void addDepartingAgent(MobsimAgent personAgent, double now) {
-		this.waitingAfterActivityAgents.add(personAgent);
+	public void addDepartingAgent(MobsimAgent mobsimAgent, double now) {
+		this.waitingAfterActivityAgents.add(mobsimAgent);
 		this.activateLink();
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-				new AgentWait2LinkEventImpl(now, personAgent.getId(), qLink.getLink().getId(), null));
+				new AgentWait2LinkEventImpl(now, mobsimAgent.getId(), qLink.getLink().getId(), null));
 	}
 
 	protected boolean moveLink(double now) {
@@ -128,7 +134,7 @@ public class MultiModalQLinkExtension {
 
 		while ((tuple = agents.peek()) != null) {
 			/*
-			 * If the PersonAgent cannot depart now:
+			 * If the MobsimAgent cannot depart now:
 			 * At least still one Agent is still walking/cycling/... on the Link, therefore
 			 * it cannot be deactivated. We return true (Link has to be kept active).
 			 */
@@ -142,7 +148,7 @@ public class MultiModalQLinkExtension {
 			 */
 			agents.poll();
 
-			// Check if PersonAgent has reached destination:
+			// Check if MobsimAgent has reached destination:
 			MobsimDriverAgent driver = (MobsimDriverAgent) tuple.getSecond();
 			if ((qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 				driver.endLegAndComputeNextState(now);

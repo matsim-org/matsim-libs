@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -45,7 +46,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	private static final int INFO_PERIOD = 3600;
 	
 	/*package*/ Netsim qSim;
-	/*package*/ Map<String, TravelTime> multiModalTravelTime;
+	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
 	/*package*/ List<MultiModalQLinkExtension> allLinks = null;
 	/*package*/ List<MultiModalQLinkExtension> activeLinks;
 	/*package*/ List<MultiModalQNodeExtension> activeNodes;
@@ -67,7 +68,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		linksToActivate = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();	// thread-safe Queue!
 		nodesToActivate = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();	// thread-safe Queue!
 
-		this.multiModalTravelTime = map; 
+		this.multiModalTravelTimes = map; 
 	}
 
 	Netsim getMobsim() {
@@ -76,15 +77,22 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	@Override
 	public void onPrepareSim() {
+		
+		// debug message
+		log.info("TravelTime classes used for multi-modal simulation: ");
+		for (Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
+			log.info(entry.getKey() + "\t" + entry.getValue().getClass().toString());
+		}
+		
 		allLinks = new ArrayList<MultiModalQLinkExtension>();
 		for (NetsimLink qLink : this.qSim.getNetsimNetwork().getNetsimLinks().values()) {
 			allLinks.add(this.getMultiModalQLinkExtension(qLink));
 		}
-		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime()
-				/ INFO_PERIOD)
-				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
-		// to print out the info at the very first
-		// timestep already
+		/*
+		 * InfoTime may be < simStartTime, this ensures to print out the info 
+		 * at the very first timestep already
+		 */
+		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
 	}
 
 	@Override
@@ -182,8 +190,8 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		}
 	}
 
-	/*package*/ Map<String, TravelTime> getMultiModalTravelTime() {
-		return this.multiModalTravelTime;
+	/*package*/ Map<String, TravelTime> getMultiModalTravelTimes() {
+		return this.multiModalTravelTimes;
 	}
 
 	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(NetsimNode qNode) {

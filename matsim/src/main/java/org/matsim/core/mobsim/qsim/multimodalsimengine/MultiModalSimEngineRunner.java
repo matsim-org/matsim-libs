@@ -48,7 +48,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 		this.separationBarrier = separationBarrier;
 		this.reactivateLinksBarrier = reactivateLinksBarrier;
 		this.endBarrier = endBarrier;
-		this.multiModalTravelTime = multiModalTravelTime;
+		this.multiModalTravelTimes = multiModalTravelTime;
 	}
 
 	/*

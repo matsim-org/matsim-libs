@@ -42,10 +42,20 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.LegRouter;
+import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -73,16 +83,15 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 	
 		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
-		Map<String, TravelTime> multiModalTravelTimeFactory = new HashMap<String, TravelTime>();
-		multiModalTravelTimeFactory.put(TransportMode.car, travelTimeCalculator);
-		multiModalTravelTimeFactory.put(TransportMode.walk, new WalkTravelTime(configGroup));
-		multiModalTravelTimeFactory.put(TransportMode.bike, new BikeTravelTime(configGroup, new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.put(TransportMode.ride, new RideTravelTime(travelTimeCalculator, new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.put(TransportMode.pt, new PTTravelTime(configGroup, travelTimeCalculator, new WalkTravelTime(configGroup)));
+		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
+		multiModalTravelTimes.put(TransportMode.car, travelTimeCalculator);
+		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
+		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup, new WalkTravelTime(configGroup)));
+		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(travelTimeCalculator, new WalkTravelTime(configGroup)));
+		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, travelTimeCalculator, new WalkTravelTime(configGroup)));
 		
-		MultiModalLegRouter router = new MultiModalLegRouter(scenario.getNetwork(), new DijkstraFactory(), multiModalTravelTimeFactory);
-		
-	
+		Map<String, LegRouter> legRouters = createLegRouters(config, scenario.getNetwork(), multiModalTravelTimes);
+
 		Person person = scenario.getPopulation().getFactory().createPerson(scenario.createId("person"));
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		person.addPlan(plan);
@@ -96,7 +105,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		 */
 		transportMode = TransportMode.car;
 		leg.setMode(transportMode);
-		router.routeLeg(person, leg, startActivity, endActivity, 0.0);
+		legRouters.get(transportMode).routeLeg(person, leg, startActivity, endActivity, 0.0);
 		checkRoute(createSet(new String[]{TransportMode.car}), leg, scenario.getNetwork());
 		
 		/*
@@ -104,7 +113,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		 */
 		transportMode = TransportMode.pt;
 		leg.setMode(transportMode);
-		router.routeLeg(person, leg, startActivity, endActivity, 0.0);
+		legRouters.get(transportMode).routeLeg(person, leg, startActivity, endActivity, 0.0);
 		checkRoute(createSet(new String[]{TransportMode.car, TransportMode.pt}), leg, scenario.getNetwork());
 		
 		/*
@@ -112,7 +121,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		 */
 		transportMode = TransportMode.walk;
 		leg.setMode(transportMode);
-		router.routeLeg(person, leg, startActivity, endActivity, 0.0);
+		legRouters.get(transportMode).routeLeg(person, leg, startActivity, endActivity, 0.0);
 		checkRoute(createSet(new String[]{TransportMode.walk, TransportMode.bike}), leg, scenario.getNetwork());
 		
 		/*
@@ -120,7 +129,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		 */
 		transportMode = TransportMode.bike;
 		leg.setMode(transportMode);
-		router.routeLeg(person, leg, startActivity, endActivity, 0.0);
+		legRouters.get(transportMode).routeLeg(person, leg, startActivity, endActivity, 0.0);
 		checkRoute(createSet(new String[]{TransportMode.walk, TransportMode.bike}), leg, scenario.getNetwork());
 		
 		/*
@@ -128,7 +137,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		 */
 		transportMode = TransportMode.ride;
 		leg.setMode(transportMode);
-		router.routeLeg(person, leg, startActivity, endActivity, 0.0);
+		legRouters.get(transportMode).routeLeg(person, leg, startActivity, endActivity, 0.0);
 		checkRoute(createSet(new String[]{TransportMode.car, TransportMode.walk, TransportMode.bike}), leg, scenario.getNetwork());
 	}
 	
@@ -259,5 +268,106 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		Set<String> set = new HashSet<String>();
 		for (String entry : entries) set.add(entry);
 		return set;
+	}
+	
+	public static Map<String, LegRouter> createLegRouters(Config config, Network network, Map<String, TravelTime> travelTimes) {
+		
+		Set<String> modesToReroute = new HashSet<String>();
+		modesToReroute.add(TransportMode.car);
+		modesToReroute.add(TransportMode.ride);
+		modesToReroute.add(TransportMode.bike);
+		modesToReroute.add(TransportMode.walk);
+		modesToReroute.add(TransportMode.pt);
+
+		ModeRouteFactory modeRouteFactory = new ModeRouteFactory();
+		modeRouteFactory.setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
+				
+		// create Router Factory
+		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(network, new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+
+		Map<String, LegRouter> legRouters = new HashMap<String, LegRouter>();
+				
+		// Define restrictions for the different modes.
+		// Car
+		Set<String> carModeRestrictions = new HashSet<String>();
+		carModeRestrictions.add(TransportMode.car);
+		
+		// Walk
+		Set<String> walkModeRestrictions = new HashSet<String>();
+		walkModeRestrictions.add(TransportMode.bike);
+		walkModeRestrictions.add(TransportMode.walk);
+				
+		/*
+		 * Bike
+		 * Besides bike mode we also allow walk mode - but then the
+		 * agent only travels with walk speed (handled in MultiModalTravelTimeCost).
+		 */
+		Set<String> bikeModeRestrictions = new HashSet<String>();
+		bikeModeRestrictions.add(TransportMode.walk);
+		bikeModeRestrictions.add(TransportMode.bike);
+		
+		/*
+		 * PT
+		 * We assume PT trips are possible on every road that can be used by cars.
+		 * 
+		 * Additionally we also allow pt trips to use walk and / or bike only links.
+		 * On those links the traveltimes are quite high and we can assume that they
+		 * are only use e.g. to walk from the origin to the bus station or from the
+		 * bus station to the destination.
+		 */
+		Set<String> ptModeRestrictions = new HashSet<String>();
+		ptModeRestrictions.add(TransportMode.pt);
+		ptModeRestrictions.add(TransportMode.car);
+		ptModeRestrictions.add(TransportMode.bike);
+		ptModeRestrictions.add(TransportMode.walk);
+		
+		/*
+		 * Ride
+		 * We assume ride trips are possible on every road that can be used by cars.
+		 * Additionally we also allow ride trips to use walk and / or bike only links.
+		 * For those links walk travel times are used.
+		 */
+		Set<String> rideModeRestrictions = new HashSet<String>();
+		rideModeRestrictions.add(TransportMode.car);
+		rideModeRestrictions.add(TransportMode.bike);
+		rideModeRestrictions.add(TransportMode.walk);
+		
+		TravelTime travelTime;
+		TravelDisutility travelDisutility;
+		LeastCostPathCalculator routeAlgo;
+		TravelDisutilityFactory travlDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
+		for (String mode : modesToReroute) {
+			
+			Set<String> modeRestrictions;
+			if (mode.equals(TransportMode.car)) {
+				modeRestrictions = carModeRestrictions;
+			}
+			else if (mode.equals(TransportMode.walk)) {
+				modeRestrictions = walkModeRestrictions;
+			} else if (mode.equals(TransportMode.bike)) {
+				modeRestrictions = bikeModeRestrictions;
+			} else if (mode.equals(TransportMode.ride)) {
+				modeRestrictions = rideModeRestrictions;
+			} else if (mode.equals(TransportMode.pt)) {
+				modeRestrictions = ptModeRestrictions;
+			} else continue;
+			
+			Network subNetwork = NetworkImpl.createNetwork();
+			networkFilter.filter(subNetwork, modeRestrictions);
+			
+			travelTime = travelTimes.get(mode); 
+			
+			travelDisutility = travlDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore());
+			
+			routeAlgo = routerFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
+			legRouters.put(mode, new NetworkLegRouter(network, routeAlgo, modeRouteFactory));			
+		}
+		
+		return legRouters;
 	}
 }

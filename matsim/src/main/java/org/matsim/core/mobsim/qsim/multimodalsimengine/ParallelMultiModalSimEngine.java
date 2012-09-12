@@ -111,7 +111,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	}
 
 	@Override
-	Map<String, TravelTime> getMultiModalTravelTime() {
+	Map<String, TravelTime> getMultiModalTravelTimes() {
 		throw new RuntimeException("This method should never be called - calls should go to the MultiModalSimEngineRunner Threads.");
 	}
 	
@@ -203,7 +203,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
-					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTime);
+					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTimes);
 
 			engine.setInternalInterface(this.internalInterface);
 			
