@@ -20,8 +20,10 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
@@ -261,9 +263,13 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			i++;
 		}
 		
-		TravelTimeWrapper wrapper = new TravelTimeWrapper(travelTime);
+		Map<String, TravelTime> tts = new HashMap<String, TravelTime>();
+		for (Entry<String, TravelTime> entry : this.travelTimes.entrySet()) {
+			tts.put(entry.getKey(), new TravelTimeWrapper(entry.getValue()));
+		}
+		
 		LeastCostPathCalculatorFactory fromHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, wrapper, fromHomeFactory, routeFactory);
+		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, tts, fromHomeFactory, routeFactory);
 	}
 	
 	/*
@@ -495,6 +501,10 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		for (Thread thread : threads) thread.start();
 	}
 	
+	/*
+	 * Wrapper around a travel time object that returns 1.0 as travel time on
+	 * exit links.
+	 */
 	private static class TravelTimeWrapper implements TravelTime {
 
 		private final TravelTime travelTime;
