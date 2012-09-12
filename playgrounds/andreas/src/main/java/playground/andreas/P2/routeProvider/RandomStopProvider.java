@@ -82,7 +82,7 @@ public class RandomStopProvider {
 				if (pE instanceof Activity) {
 					Activity act = (Activity) pE;
 					numberOfActsInPlans++;
-					String gridNodeId = this.getGridNodeIdForAct(act.getCoord());
+					String gridNodeId = this.getGridNodeIdForCoord(act.getCoord());
 					if (gridNodeId2ActsCountMap.get(gridNodeId) == null) {
 						gridNodeId2ActsCountMap.put(gridNodeId, new Integer(0));
 					}
@@ -94,7 +94,7 @@ public class RandomStopProvider {
 		// sort facilities for all grid nodes
 		HashMap<String, List<TransitStopFacility>> gridNodeId2StopsMap = new HashMap<String, List<TransitStopFacility>>();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
-			String gridNodeId = this.getGridNodeIdForAct(stop.getCoord());
+			String gridNodeId = this.getGridNodeIdForCoord(stop.getCoord());
 			if (gridNodeId2StopsMap.get(gridNodeId) == null) {
 				gridNodeId2StopsMap.put(gridNodeId, new LinkedList<TransitStopFacility>());
 			}
@@ -185,7 +185,7 @@ public class RandomStopProvider {
 		}
 	}
 
-	private String getGridNodeIdForAct(Coord coord){
+	private String getGridNodeIdForCoord(Coord coord){
 		int xSlot = (int) (coord.getX() / this.gridSize);
 		int ySlot = (int) (coord.getY() / this.gridSize);
 		String gridNodeId = xSlot + "-" + ySlot;
