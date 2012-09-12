@@ -73,6 +73,11 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		
 		if(containsId(stopsToCome, route.getEgressStopId())){
+			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
+				// it's the route planned - just board
+				return true;
+			}
+			
 			if (this.transitSchedule.getTransitLines().get(route.getLineId()) == null) {
 				// agent is still on an old line, which probably went bankrupt - enter anyway
 				return true;
@@ -86,10 +91,11 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 			
 			TransitRoute transitRouteOffered = this.transitSchedule.getTransitLines().get(line.getId()).getRoutes().get(transitRoute.getId());
 
-			double offsetPlanned = getArrivalOffsetFromRoute(transitRoutePlanned, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRoutePlanned, route.getAccessStopId());
-			double offsetOffered = getArrivalOffsetFromRoute(transitRouteOffered, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRoutePlanned, route.getAccessStopId());
+			double travelTimePlanned = getArrivalOffsetFromRoute(transitRoutePlanned, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRoutePlanned, route.getAccessStopId());
+			double travelTimeOffered = getArrivalOffsetFromRoute(transitRouteOffered, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRouteOffered, route.getAccessStopId());
 			
-			if (offsetOffered <= offsetPlanned) {
+			if (travelTimeOffered <= travelTimePlanned) {
+				// transit route offered is faster the the one planned - enter
 				return true;
 			}
 		}
@@ -107,24 +113,26 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 //		}
 	}
 
-	private double getArrivalOffsetFromRoute(TransitRoute transitRoutePlanned, Id egressStopId) {
-		for (TransitRouteStop routeStop : transitRoutePlanned.getStops()) {
+	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id egressStopId) {
+		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
 				return routeStop.getArrivalOffset();
 			}
 		}
 
+		log.error("Stop " + egressStopId + " not found in route " + transitRoute.getId());
 		// returning what???
 		return -1.0;
 	}
 	
-	private double getDepartureOffsetFromRoute(TransitRoute transitRoutePlanned, Id accessStopId) {
-		for (TransitRouteStop routeStop : transitRoutePlanned.getStops()) {
+	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id accessStopId) {
+		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
 				return routeStop.getDepartureOffset();
 			}
 		}
 
+		log.error("Stop " + accessStopId + " not found in route " + transitRoute.getId());
 		// returning what???
 		return -1.0;
 	}
