@@ -67,6 +67,11 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 		this.ptMode2SecondsTravelledMap = new HashMap<String, Double>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
 		this.agentId2PersonEntersVehicleEventTime = new HashMap<Id, Double>();
+		// avoid null-pointer in getResult() /dr
+		for (String ptMode : this.ptModes) {
+			this.ptMode2SecondsTravelledMap.put(ptMode, new Double(0.));
+			this.ptMode2TripCountMap.put(ptMode, new Integer(0));
+		}
 	}
 
 	@Override

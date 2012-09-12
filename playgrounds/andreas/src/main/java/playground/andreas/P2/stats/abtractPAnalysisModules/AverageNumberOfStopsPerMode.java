@@ -70,6 +70,11 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 		this.ptMode2NumberOfStopsTravelledMap = new HashMap<String, Integer>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
 		this.vehId2AgentId2StopCountMap = new HashMap<Id, HashMap<Id, Integer>>();
+		// avoid null-pointer in getResult() /dr
+		for (String ptMode : this.ptModes) {
+			this.ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(0));
+			this.ptMode2TripCountMap.put(ptMode, new Integer(0));
+		}
 	}
 
 	@Override
