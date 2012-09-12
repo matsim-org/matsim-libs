@@ -53,7 +53,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
@@ -62,14 +61,22 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCr
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.LegRouter;
+import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -313,17 +320,19 @@ public class PED12ScenarioGenZurich {
 
 		Network network = scenario.getNetwork();
 		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
-		Map<String, TravelTime> multiModalTravelTimeFactory = new HashMap<String, TravelTime>();
-		multiModalTravelTimeFactory.put(TransportMode.walk, new WalkTravelTime(configGroup));
-		multiModalTravelTimeFactory.put(TransportMode.bike, new BikeTravelTime(configGroup,
+		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
+		multiModalTravelTimes.put(TransportMode.car, new FreeSpeedTravelTimeCalculator());
+		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
+		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
 				new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.put(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTimeCalculator(), 
+		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTimeCalculator(), 
 				new WalkTravelTime(configGroup)));
-		multiModalTravelTimeFactory.put(TransportMode.pt, new PTTravelTime(configGroup, 
+		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
 				new FreeSpeedTravelTimeCalculator(), new WalkTravelTime(configGroup)));
+	
+		Map<String, LegRouter> legRouters = createLegRouters(scenario.getConfig(), network, 
+				multiModalTravelTimes);
 
-		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
-		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), new DijkstraFactory(), multiModalTravelTimeFactory);
 		
 		Counter removedPersons = new Counter ("removed persons: ");
 		Iterator<? extends Person> iter = scenario.getPopulation().getPersons().values().iterator();
@@ -359,6 +368,7 @@ public class PED12ScenarioGenZurich {
 						Activity fromAct = (Activity) plan.getPlanElements().get(index-1);
 						Activity toAct = (Activity) plan.getPlanElements().get(index+1);
 						try {
+							LegRouter legRouter = legRouters.get(leg.getMode());
 							legRouter.routeLeg(person, leg, fromAct, toAct, leg.getDepartureTime());							
 						}
 						/*
@@ -723,6 +733,107 @@ public class PED12ScenarioGenZurich {
 				plan.getPlanElements().addAll(legIndex, replacement);
 			}
 		}
+	}
+	
+	public static Map<String, LegRouter> createLegRouters(Config config, Network network, Map<String, TravelTime> travelTimes) {
+		
+		Set<String> modesToReroute = new HashSet<String>();
+		modesToReroute.add(TransportMode.car);
+		modesToReroute.add(TransportMode.ride);
+		modesToReroute.add(TransportMode.bike);
+		modesToReroute.add(TransportMode.walk);
+		modesToReroute.add(TransportMode.pt);
+		
+		ModeRouteFactory modeRouteFactory = new ModeRouteFactory();
+		modeRouteFactory.setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
+		modeRouteFactory.setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
+				
+		// create Router Factory
+		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(network, new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+
+		Map<String, LegRouter> legRouters = new HashMap<String, LegRouter>();
+				
+		// Define restrictions for the different modes.
+		// Car
+		Set<String> carModeRestrictions = new HashSet<String>();
+		carModeRestrictions.add(TransportMode.car);
+		
+		// Walk
+		Set<String> walkModeRestrictions = new HashSet<String>();
+		walkModeRestrictions.add(TransportMode.bike);
+		walkModeRestrictions.add(TransportMode.walk);
+				
+		/*
+		 * Bike
+		 * Besides bike mode we also allow walk mode - but then the
+		 * agent only travels with walk speed (handled in MultiModalTravelTimeCost).
+		 */
+		Set<String> bikeModeRestrictions = new HashSet<String>();
+		bikeModeRestrictions.add(TransportMode.walk);
+		bikeModeRestrictions.add(TransportMode.bike);
+		
+		/*
+		 * PT
+		 * We assume PT trips are possible on every road that can be used by cars.
+		 * 
+		 * Additionally we also allow pt trips to use walk and / or bike only links.
+		 * On those links the traveltimes are quite high and we can assume that they
+		 * are only use e.g. to walk from the origin to the bus station or from the
+		 * bus station to the destination.
+		 */
+		Set<String> ptModeRestrictions = new HashSet<String>();
+		ptModeRestrictions.add(TransportMode.pt);
+		ptModeRestrictions.add(TransportMode.car);
+		ptModeRestrictions.add(TransportMode.bike);
+		ptModeRestrictions.add(TransportMode.walk);
+		
+		/*
+		 * Ride
+		 * We assume ride trips are possible on every road that can be used by cars.
+		 * Additionally we also allow ride trips to use walk and / or bike only links.
+		 * For those links walk travel times are used.
+		 */
+		Set<String> rideModeRestrictions = new HashSet<String>();
+		rideModeRestrictions.add(TransportMode.car);
+		rideModeRestrictions.add(TransportMode.bike);
+		rideModeRestrictions.add(TransportMode.walk);
+		
+		TravelTime travelTime;
+		TravelDisutility travelDisutility;
+		LeastCostPathCalculator routeAlgo;
+		TravelDisutilityFactory travlDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
+		for (String mode : modesToReroute) {
+			
+			Set<String> modeRestrictions;
+			if (mode.equals(TransportMode.car)) {
+				modeRestrictions = carModeRestrictions;
+			}
+			else if (mode.equals(TransportMode.walk)) {
+				modeRestrictions = walkModeRestrictions;
+			} else if (mode.equals(TransportMode.bike)) {
+				modeRestrictions = bikeModeRestrictions;
+			} else if (mode.equals(TransportMode.ride)) {
+				modeRestrictions = rideModeRestrictions;
+			} else if (mode.equals(TransportMode.pt)) {
+				modeRestrictions = ptModeRestrictions;
+			} else continue;
+			
+			Network subNetwork = NetworkImpl.createNetwork();
+			networkFilter.filter(subNetwork, modeRestrictions);
+			
+			travelTime = travelTimes.get(mode); 
+			
+			travelDisutility = travlDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore());
+			
+			routeAlgo = routerFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
+			legRouters.put(mode, new NetworkLegRouter(network, routeAlgo, modeRouteFactory));			
+		}
+		
+		return legRouters;
 	}
 
 }
