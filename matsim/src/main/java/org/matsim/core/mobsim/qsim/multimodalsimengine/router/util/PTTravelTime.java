@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
@@ -34,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author cdobler
  */
-public class PTTravelTime implements PersonalizableTravelTime {
+public class PTTravelTime implements TravelTime {
 
 	private final TravelTime carTravelTime;	// PT speed does not depend on a passenger, therefore not personalizable
 	private final TravelTime walkTravelTime;

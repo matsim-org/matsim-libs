@@ -20,10 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 
-public class RideTravelTimeFactory implements PersonalizableTravelTimeFactory {
+public class RideTravelTimeFactory implements TravelTimeFactory {
 
 	private final TravelTime carTravelTimeFactory;	// PT speed does not depend on a passenger, therefore not personalizable
 	private final TravelTime walkTravelTimeFactory;
