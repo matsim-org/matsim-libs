@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,48 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.andreas.P2.hook;
 
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.router.TransitActsRemover;
 
 /**
- * ReRoutes every person from a given set of person ids
+ * @author droeder
  *
- * @author aneumann
  */
-public class PersonReRouteStuck extends AbstractPersonReRouteStuck {
+public class PersonReRouteStuckFactoryImpl implements PersonReRouteStuckFactory {
 
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger.getLogger(PersonReRouteStuckFactoryImpl.class);
 
-	private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
-	
-	private TransitActsRemover transitActsRemover;
-
-	public PersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
-		super(router, scenario, agentsStuck);
-		this.transitActsRemover = new TransitActsRemover(); 
-	}
-	
-	@Override
-	public void run(final Person person) {
-		Plan selectedPlan = person.getSelectedPlan();
-		if (selectedPlan == null) {
-			// the only way no plan can be selected should be when the person has no plans at all
-			log.warn("Person " + person.getId() + " has no plans!");
-			return;
-		}
+	public PersonReRouteStuckFactoryImpl() {
 		
-		if(this.agentsStuck.contains(person.getId())){
-			this.transitActsRemover.run(selectedPlan);
-			this.router.run(selectedPlan);
-		}
+	}
+
+	@Override
+	public AbstractPersonReRouteStuck getReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
+		return new PersonReRouteStuck(router, scenario, agentsStuck);
 	}
 }
+

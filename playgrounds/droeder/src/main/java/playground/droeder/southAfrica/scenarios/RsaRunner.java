@@ -111,7 +111,7 @@ public class RsaRunner {
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
-		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory());
+		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory(), null);
 		controler.addControlerListener(pFact);		
 		
 		//necessary because PHook overwrites setting, made in PtSubModeControler-c'tor

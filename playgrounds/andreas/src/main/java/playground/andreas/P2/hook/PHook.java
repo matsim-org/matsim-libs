@@ -67,11 +67,13 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 
 	private StatsManager statsManager;
 
+	private PersonReRouteStuckFactory stuckFactory;
+
 	public PHook(Controler controler) {
-		this(controler, null, null);
+		this(controler, null, null, null);
 	}
 	
-	public PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory){
+	public PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory){
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
 		this.pTransitRouterFactory = pTransitRouterFactory;
@@ -84,6 +86,11 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 
 		if(pConfig.getReRouteAgentsStuck()){
 			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
+			if(stuckFactory == null){
+				this.stuckFactory = new PersonReRouteStuckFactoryImpl();
+			}else{
+				this.stuckFactory = stuckFactory;
+			}
 		}
 		
 		this.statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter); 
@@ -127,7 +134,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonReRouteStuck(controler.createRoutingAlgorithm(), controler.getScenario(), agentsStuckHandler.getAgentsStuck());
+						return stuckFactory.getReRouteStuck(controler.createRoutingAlgorithm(), controler.getScenario(), agentsStuckHandler.getAgentsStuck());
 					}
 				});
 			}
