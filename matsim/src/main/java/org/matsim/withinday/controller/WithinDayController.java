@@ -129,13 +129,8 @@ public class WithinDayController extends Controler {
 	public void createAndInitLinkReplanningMap() {
 		this.createAndInitLinkReplanningMap(null);
 	}
-<<<<<<< HEAD
-
-	public void createAndInitLinkReplanningMap(MultiModalTravelTime travelTime) {
-=======
 	
 	public void createAndInitLinkReplanningMap(Map<String, TravelTime> travelTime) {
->>>>>>> simplifying multi-modal
 		if (this.events == null) {
 			log.warn("Cannot create and init the LinkReplanningMap. EventsManager has not be initialized yet!");
 			return;

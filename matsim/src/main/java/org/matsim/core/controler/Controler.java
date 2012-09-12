@@ -914,21 +914,6 @@ public class Controler extends AbstractController {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, multiModalTravelTimes.get(TransportMode.car),
 					this.getLeastCostPathCalculatorFactory(), routeFactory);
 
-<<<<<<< HEAD
-			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator)
-					this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, multiModalTravelTimeCalculator);
-			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, multiModalTravelTimeCalculator, routeAlgo);
-
-			/*
-			 * A MultiModalTravelTime calculator is used. Before creating a route for a given
-			 * leg, the leg's mode has to be set in the travel time and travel cost objects.
-			 * This is not done by the LegHandler used by default in PlansCalcRoute. Therefore,
-			 * we have to use a multiModalLegHandler.
-			 */
-			plansCalcRoute.addLegHandler(TransportMode.car, multiModalLegHandler);
-
-=======
->>>>>>> simplifying multi-modal
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
 				LeastCostPathCalculator routeAlgo = this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, multiModalTravelTimes.get(mode));
 				plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(network, routeAlgo, routeFactory));
