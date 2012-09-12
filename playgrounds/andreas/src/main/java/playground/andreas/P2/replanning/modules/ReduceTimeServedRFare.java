@@ -34,8 +34,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.scoring.fare.FareContainer;
-import playground.andreas.P2.scoring.fare.FareContainerHandler;
+import playground.andreas.P2.scoring.fare.StageContainer;
+import playground.andreas.P2.scoring.fare.StageContainerHandler;
+import playground.andreas.P2.scoring.fare.TicketMachine;
 import playground.andreas.utils.stats.RecursiveStatsContainer;
 
 /**
@@ -47,17 +48,19 @@ import playground.andreas.utils.stats.RecursiveStatsContainer;
  * @author aneumann
  *
  */
-public class ReduceTimeServedRFare extends AbstractPStrategyModule implements FareContainerHandler{
+public class ReduceTimeServedRFare extends AbstractPStrategyModule implements StageContainerHandler{
 	
 	private final static Logger log = Logger.getLogger(ReduceTimeServedRFare.class);
 	
 	public static final String STRATEGY_NAME = "ReduceTimeServedRFare";
+
 	private final double sigmaScale;
 	private final int timeBinSize;
 	private final boolean useFareAsWeight;
 	
 	private HashMap<Id,HashMap<Integer,HashMap<Integer,Double>>> route2StartTimeSlot2EndTimeSlot2WeightMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Double>>>();
-	
+	private TicketMachine ticketMachine;
+
 	public ReduceTimeServedRFare(ArrayList<String> parameter) {
 		super(parameter);
 		if(parameter.size() != 3){
@@ -174,10 +177,10 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements Fa
 	}
 
 	@Override
-	public void handleFareContainer(FareContainer fareContainer) {
-		Id routeId = fareContainer.getRouteId();
-		Integer startTimeSlot = this.getTimeSlotForTime(fareContainer.getTimeEntered());
-		Integer endTimeSlot = this.getTimeSlotForTime(fareContainer.getTimeLeft());
+	public void handleFareContainer(StageContainer stageContainer) {
+		Id routeId = stageContainer.getRouteId();
+		Integer startTimeSlot = this.getTimeSlotForTime(stageContainer.getTimeEntered());
+		Integer endTimeSlot = this.getTimeSlotForTime(stageContainer.getTimeLeft());
 		
 		if (this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId) == null) {
 			this.route2StartTimeSlot2EndTimeSlot2WeightMap.put(routeId, new HashMap<Integer, HashMap<Integer,Double>>());
@@ -194,9 +197,13 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements Fa
 		double oldWeight = this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId).get(startTimeSlot).get(endTimeSlot);
 		double additionalWeight = 1.0;
 		if (this.useFareAsWeight) {
-			additionalWeight = fareContainer.getFare();
+			additionalWeight = this.ticketMachine.getFare(stageContainer);
 		}
 		this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId).get(startTimeSlot).put(endTimeSlot, new Double(oldWeight + additionalWeight));
+	}
+
+	public void setTicketMachine(TicketMachine ticketMachine) {
+		this.ticketMachine = ticketMachine;
 	}
 
 	private int getTimeSlotForTime(double time){

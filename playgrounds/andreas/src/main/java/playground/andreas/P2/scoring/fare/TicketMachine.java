@@ -20,21 +20,22 @@
 package playground.andreas.P2.scoring.fare;
 
 /**
- * 
- * Handles {@link FareContainer} and does something meaningful with them. 
+ * Calculates the fare for a given {@link StageContainer}.
  * 
  * @author aneumann
  *
  */
-public interface FareContainerHandler {
-
-	public void handleFareContainer(FareContainer fareContainer);
-
-	/**
-	 * Reset everything
-	 * 
-	 * @param iteration
-	 */
-	public void reset(int iteration);
+public class TicketMachine {
 	
+	private double earningsPerBoardingPassenger;
+	private double earningsPerMeterAndPassenger;
+
+	public TicketMachine(double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
+		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
+		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
+	}
+	
+	public double getFare(StageContainer stageContainer) {
+		return this.earningsPerBoardingPassenger + this.earningsPerMeterAndPassenger * stageContainer.getDistanceTravelledInMeter();
+	}
 }

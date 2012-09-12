@@ -22,11 +22,12 @@ package playground.andreas.P2.scoring;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import playground.andreas.P2.scoring.fare.FareContainer;
+import playground.andreas.P2.scoring.fare.StageContainer;
+import playground.andreas.P2.scoring.fare.TicketMachine;
 import playground.andreas.P2.scoring.operator.OperatorCostContainer;
 
 /**
- * Simple container class holding scoring information for one vehicle
+ * Simple container class collecting all incomes and expenses for one single vehicle.
  * 
  * @author aneumann
  *
@@ -37,19 +38,21 @@ public class ScoreContainer {
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);
 
 	private final Id vehicleId;
+	private final TicketMachine ticketMachine;
 	private boolean isFirstTour = true;
 	
 	private int servedTrips = 0;
 	private double costs = 0;
 	private double earnings = 0;
 	
-	public ScoreContainer(Id vehicleId) {
+	public ScoreContainer(Id vehicleId, TicketMachine ticketMachine) {
 		this.vehicleId = vehicleId;
+		this.ticketMachine = ticketMachine;
 	}
 
-	public void handleFareContainer(FareContainer fareContainer) {
+	public void handleStageContainer(StageContainer stageContainer) {
 		this.servedTrips++;
-		this.earnings += fareContainer.getFare();
+		this.earnings += this.ticketMachine.getFare(stageContainer);
 	}
 
 	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {

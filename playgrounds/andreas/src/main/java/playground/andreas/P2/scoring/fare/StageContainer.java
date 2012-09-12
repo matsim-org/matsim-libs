@@ -27,15 +27,12 @@ import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 
 /**
  * 
- * Holds all information needed to calculate the fare.
+ * Holds all information of one stage needed to calculate the fare.
  * 
  * @author aneumann
  *
  */
-public class FareContainer {
-	
-	private final double earningsPerBoardingPassenger;
-	private final double earningsPerMeterAndPassenger;
+public class StageContainer {
 	
 	private PersonEntersVehicleEvent personEnterVehE;
 	private TransitDriverStartsEvent transitDriverStartsE;
@@ -44,11 +41,6 @@ public class FareContainer {
 	private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityELeft;
 	private double meterTravelled = 0.0;
 
-	public FareContainer(double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
-		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
-		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
-	}
-	
 	public void handlePersonEnters(PersonEntersVehicleEvent personEnterVehE, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE, TransitDriverStartsEvent transitDriverStartsE){
 		this.personEnterVehE = personEnterVehE;
 		this.vehArrivesAtFacilityEEntered = vehArrivesAtFacilityE;
@@ -84,8 +76,8 @@ public class FareContainer {
 		return this.transitDriverStartsE.getTransitRouteId();
 	}
 	
-	public double getFare(){
-		return this.earningsPerBoardingPassenger + this.earningsPerMeterAndPassenger * this.meterTravelled;
+	public double getDistanceTravelledInMeter(){
+		return this.meterTravelled;
 	}
 	
 	public Id getVehicleId(){

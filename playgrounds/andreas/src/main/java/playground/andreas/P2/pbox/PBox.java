@@ -42,10 +42,11 @@ import playground.andreas.P2.replanning.OperatorInitializer;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.PStopsFactory;
 import playground.andreas.P2.schedule.PTransitScheduleImpl;
-import playground.andreas.P2.scoring.FareContainer2AgentMoneyEvent;
+import playground.andreas.P2.scoring.StageContainer2AgentMoneyEvent;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
-import playground.andreas.P2.scoring.fare.FareCollectorHandler;
+import playground.andreas.P2.scoring.fare.StageContainerCreator;
+import playground.andreas.P2.scoring.fare.TicketMachine;
 import playground.andreas.P2.scoring.operator.OperatorCostCollectorHandler;
 
 /**
@@ -69,15 +70,17 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	private TransitSchedule pTransitSchedule;
 	
 	private final ScorePlansHandler scorePlansHandler;
-	private FareCollectorHandler fareCollectorHandler;
+	private StageContainerCreator stageCollectorHandler;
 	private OperatorCostCollectorHandler operatorCostCollectorHandler;
 	private PStrategyManager strategyManager;
 
+	private final TicketMachine ticketMachine;
 	
 	public PBox(PConfigGroup pConfig) {
-		this.pConfig = pConfig;		
-		this.scorePlansHandler = new ScorePlansHandler();
-		this.fareCollectorHandler = new FareCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
+		this.pConfig = pConfig;
+		this.ticketMachine = new TicketMachine(this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
+		this.scorePlansHandler = new ScorePlansHandler(this.ticketMachine);
+		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager(this.pConfig);
@@ -88,13 +91,13 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// This is the first iteration
 		
 		// initialize strategy manager
-		this.strategyManager.init(this.pConfig, event.getControler().getEvents(), this.fareCollectorHandler);
+		this.strategyManager.init(this.pConfig, event.getControler().getEvents(), this.stageCollectorHandler, this.ticketMachine);
 		
 		// init fare collector
-		this.fareCollectorHandler.init(event.getControler().getNetwork());
-		event.getControler().getEvents().addHandler(this.fareCollectorHandler);
-		event.getControler().addControlerListener(this.fareCollectorHandler);
-		this.fareCollectorHandler.addFareContainerHandler(this.scorePlansHandler);
+		this.stageCollectorHandler.init(event.getControler().getNetwork());
+		event.getControler().getEvents().addHandler(this.stageCollectorHandler);
+		event.getControler().addControlerListener(this.stageCollectorHandler);
+		this.stageCollectorHandler.addStageContainerHandler(this.scorePlansHandler);
 		
 		// init operator cost collector
 		this.operatorCostCollectorHandler.init(event.getControler().getNetwork());
@@ -103,8 +106,8 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.operatorCostCollectorHandler.addOperatorCostContainerHandler(this.scorePlansHandler);
 		
 		// init fare2moneyEvent
-		FareContainer2AgentMoneyEvent fare2AgentMoney = new FareContainer2AgentMoneyEvent(event.getControler());
-		this.fareCollectorHandler.addFareContainerHandler(fare2AgentMoney);
+		StageContainer2AgentMoneyEvent fare2AgentMoney = new StageContainer2AgentMoneyEvent(event.getControler(), this.ticketMachine);
+		this.stageCollectorHandler.addStageContainerHandler(fare2AgentMoney);
 		
 		// init possible paratransit stops
 		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());

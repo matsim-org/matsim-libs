@@ -24,8 +24,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import playground.andreas.P2.scoring.fare.FareContainer;
-import playground.andreas.P2.scoring.fare.FareContainerHandler;
+import playground.andreas.P2.scoring.fare.StageContainer;
+import playground.andreas.P2.scoring.fare.StageContainerHandler;
+import playground.andreas.P2.scoring.fare.TicketMachine;
 import playground.andreas.P2.scoring.operator.OperatorCostContainer;
 import playground.andreas.P2.scoring.operator.OperatorCostContainerHandler;
 
@@ -35,30 +36,35 @@ import playground.andreas.P2.scoring.operator.OperatorCostContainerHandler;
  * @author aneumann
  *
  */
-public class ScorePlansHandler implements FareContainerHandler, OperatorCostContainerHandler{
+public class ScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
+	private final TicketMachine ticketMachine;
 	TreeMap<Id, ScoreContainer> vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
 
+	public ScorePlansHandler(TicketMachine ticketMachine){
+		this.ticketMachine = ticketMachine;
+	}
+	
 	public TreeMap<Id, ScoreContainer> getDriverId2ScoreMap() {
 		return this.vehicleId2ScoreMap;
 	}
 
 	@Override
-	public void handleFareContainer(FareContainer fareContainer) {
+	public void handleFareContainer(StageContainer fareContainer) {
 		if (this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()) == null) {
-			this.vehicleId2ScoreMap.put(fareContainer.getVehicleId(), new ScoreContainer(fareContainer.getVehicleId()));
+			this.vehicleId2ScoreMap.put(fareContainer.getVehicleId(), new ScoreContainer(fareContainer.getVehicleId(), this.ticketMachine));
 		}
 		
-		this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleFareContainer(fareContainer);
+		this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleStageContainer(fareContainer);
 	}
 
 	@Override
 	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
 		if (this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()) == null) {
-			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new ScoreContainer(operatorCostContainer.getVehicleId()));
+			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new ScoreContainer(operatorCostContainer.getVehicleId(), this.ticketMachine));
 		}
 		
 		this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()).handleOperatorCostContainer(operatorCostContainer);

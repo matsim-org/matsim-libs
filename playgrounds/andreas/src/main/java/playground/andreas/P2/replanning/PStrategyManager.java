@@ -48,7 +48,8 @@ import playground.andreas.P2.replanning.modules.deprecated.ReduceStopsToBeServed
 import playground.andreas.P2.replanning.modules.deprecated.ReduceTimeServedR;
 import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;
 import playground.andreas.P2.replanning.modules.deprecated.StopReduceDemand;
-import playground.andreas.P2.scoring.fare.FareCollectorHandler;
+import playground.andreas.P2.scoring.fare.StageContainerCreator;
+import playground.andreas.P2.scoring.fare.TicketMachine;
 
 /**
  * Loads strategies from config and chooses strategies according to their weights.
@@ -70,26 +71,26 @@ public class PStrategyManager {
 	private ReduceTimeServed reduceTimeServed = null;
 	private ReduceStopsToBeServed reduceStopsToBeServed = null;
 
-	
 	public PStrategyManager(PConfigGroup pConfig){
 		this.pIdentifier = pConfig.getPIdentifier();
 	}
+	
 	// TODO[an] always initialize TimeReduceDemand
-	public void init(PConfigGroup pConfig, EventsManager eventsManager, FareCollectorHandler fareCollectorHandler) {
+	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
 				continue;
 			}
 			String classname = settings.getModuleName();
-			PStrategy strategy = loadStrategy(classname, settings, eventsManager, fareCollectorHandler);
+			PStrategy strategy = loadStrategy(classname, settings, eventsManager, stageContainerCreator, ticketMachine);
 			this.addStrategy(strategy, rate);
 		}
 		
 		log.info("enabled with " + this.strategies.size()  + " strategies");
 	}
 
-	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager, FareCollectorHandler fareCollectorHandler) {
+	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine) {
 		this.eventsManager = eventsManager;
 		PStrategy strategy = null;
 		
@@ -137,7 +138,8 @@ public class PStrategyManager {
 			strategy = strat;
 		} else if (name.equals(ReduceTimeServedRFare.STRATEGY_NAME)) {
 			ReduceTimeServedRFare strat = new ReduceTimeServedRFare(settings.getParametersAsArrayList());
-			fareCollectorHandler.addFareContainerHandler(strat);
+			strat.setTicketMachine(ticketMachine);
+			stageContainerCreator.addStageContainerHandler(strat);
 			strategy = strat;
 		} else if (name.equals(StopReduceDemand.STRATEGY_NAME)) {
 			StopReduceDemand strat = new StopReduceDemand(settings.getParametersAsArrayList());
@@ -157,7 +159,8 @@ public class PStrategyManager {
 			strategy = strat;
 		} else if (name.equals(ReduceStopsToBeServedRFare.STRATEGY_NAME)) {
 			ReduceStopsToBeServedRFare strat = new ReduceStopsToBeServedRFare(settings.getParametersAsArrayList());
-			fareCollectorHandler.addFareContainerHandler(strat);
+			strat.setTicketMachine(ticketMachine);
+			stageContainerCreator.addStageContainerHandler(strat);
 			strategy = strat;
 		}
 		

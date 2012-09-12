@@ -32,50 +32,53 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.AgentMoneyEventImpl;
 
-import playground.andreas.P2.scoring.fare.FareContainer;
-import playground.andreas.P2.scoring.fare.FareContainerHandler;
+import playground.andreas.P2.scoring.fare.StageContainer;
+import playground.andreas.P2.scoring.fare.StageContainerHandler;
+import playground.andreas.P2.scoring.fare.TicketMachine;
 
 /**
- * Collects {@link FareContainer} and creates {@link AgentMoneyEvent}.
+ * Collects {@link StageContainer} and creates {@link AgentMoneyEvent}.
  * 
  * @author aneumann
  *
  */
-public class FareContainer2AgentMoneyEvent implements FareContainerHandler, AfterMobsimListener{
+public class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
 
 	private EventsManager eventsManager;
 	private double mobsimShutdownTime;
-	private HashMap<Id, List<FareContainer>> agentId2fareContainersMap = new HashMap<Id, List<FareContainer>>();
+	private HashMap<Id, List<StageContainer>> agentId2stageContainerListMap = new HashMap<Id, List<StageContainer>>();
+	private final TicketMachine ticketMachine;
 
-	public FareContainer2AgentMoneyEvent(Controler controler) {
+	public StageContainer2AgentMoneyEvent(Controler controler, TicketMachine ticketMachine) {
 		controler.addControlerListener(this);
 		this.eventsManager = controler.getEvents();
 		this.mobsimShutdownTime = controler.getConfig().getQSimConfigGroup().getEndTime();
+		this.ticketMachine = ticketMachine;
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// TODO[AN] This can be used to hook in a Farebox
-		for (Entry<Id, List<FareContainer>> agentId2fareContainersEntry : this.agentId2fareContainersMap.entrySet()) {
+		for (Entry<Id, List<StageContainer>> agentId2stageContainersEntry : this.agentId2stageContainerListMap.entrySet()) {
 			double totalFareOfAgent = 0.0;
-			for (FareContainer fareContainer : agentId2fareContainersEntry.getValue()) {
-				totalFareOfAgent += fareContainer.getFare();
+			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
+				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
 			}
-			this.eventsManager.processEvent(new AgentMoneyEventImpl(this.mobsimShutdownTime, agentId2fareContainersEntry.getKey(), totalFareOfAgent));
+			this.eventsManager.processEvent(new AgentMoneyEventImpl(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), totalFareOfAgent));
 		}
 	}
 
 	@Override
-	public void handleFareContainer(FareContainer fareContainer) {
-		if (this.agentId2fareContainersMap.get(fareContainer.getAgentId()) == null) {
-			this.agentId2fareContainersMap.put(fareContainer.getAgentId(), new LinkedList<FareContainer>());
+	public void handleFareContainer(StageContainer stageContainer) {
+		if (this.agentId2stageContainerListMap.get(stageContainer.getAgentId()) == null) {
+			this.agentId2stageContainerListMap.put(stageContainer.getAgentId(), new LinkedList<StageContainer>());
 		}
 		
-		this.agentId2fareContainersMap.get(fareContainer.getAgentId()).add(fareContainer);
+		this.agentId2stageContainerListMap.get(stageContainer.getAgentId()).add(stageContainer);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.agentId2fareContainersMap = new HashMap<Id, List<FareContainer>>();
+		this.agentId2stageContainerListMap = new HashMap<Id, List<StageContainer>>();
 	}
 }

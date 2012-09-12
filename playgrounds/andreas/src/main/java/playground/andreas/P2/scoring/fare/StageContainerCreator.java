@@ -41,30 +41,27 @@ import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 
 /**
  * 
- * Collects all information needed to calculate the fare.
+ * Collects all information needed to calculate create a {@link StageContainer}
+ * and pushes them to all registered {@link StageContainerHandler}.
  * 
  * @author aneumann
  *
  */
-public class FareCollectorHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener{
+public class StageContainerCreator implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener{
 	
-	private final static Logger log = Logger.getLogger(FareCollectorHandler.class);
+	private final static Logger log = Logger.getLogger(StageContainerCreator.class);
 	
 	private Network network;
 	private String pIdentifier;
-	private double earningsPerBoardingPassenger;
-	private double earningsPerMeterAndPassenger;
 	
-	private List<FareContainerHandler> fareContainerHandlerList = new LinkedList<FareContainerHandler>();
+	private List<StageContainerHandler> stageContainerHandlerList = new LinkedList<StageContainerHandler>();
 	private HashMap<Id, TransitDriverStartsEvent> vehId2TransitDriverStartsE = new HashMap<Id, TransitDriverStartsEvent>();
 	private HashMap<Id, VehicleArrivesAtFacilityEvent> vehId2VehArrivesAtFacilityE = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
-	private HashMap<Id, LinkedList<FareContainer>> vehId2FareContainerList = new HashMap<Id, LinkedList<FareContainer>>();
-	private HashMap<Id, FareContainer> personId2FareContainer = new HashMap<Id, FareContainer>();
+	private HashMap<Id, LinkedList<StageContainer>> vehId2StageContainerListMap = new HashMap<Id, LinkedList<StageContainer>>();
+	private HashMap<Id, StageContainer> personId2StageContainer = new HashMap<Id, StageContainer>();
 
-	public FareCollectorHandler(String pIdentifier, double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
+	public StageContainerCreator(String pIdentifier){
 		this.pIdentifier = pIdentifier;
-		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
-		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
 		log.info("enabled");
 	}
 	
@@ -72,27 +69,27 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 		this.network = network;
 	}
 	
-	public void addFareContainerHandler(FareContainerHandler fareContainerHandler){
-		this.fareContainerHandlerList.add(fareContainerHandler);
+	public void addStageContainerHandler(StageContainerHandler stageContainerHandler){
+		this.stageContainerHandlerList.add(stageContainerHandler);
 	}
 	
 	@Override
 	public void reset(int iteration) {
 		this.vehId2TransitDriverStartsE = new HashMap<Id, TransitDriverStartsEvent>();
 		this.vehId2VehArrivesAtFacilityE = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
-		this.vehId2FareContainerList = new HashMap<Id, LinkedList<FareContainer>>();
-		this.personId2FareContainer = new HashMap<Id, FareContainer>();
+		this.vehId2StageContainerListMap = new HashMap<Id, LinkedList<StageContainer>>();
+		this.personId2StageContainer = new HashMap<Id, StageContainer>();
 		
-		for (FareContainerHandler fareContainerHandler : this.fareContainerHandlerList) {
-			fareContainerHandler.reset(iteration);
+		for (StageContainerHandler stageContainerHandler : this.stageContainerHandlerList) {
+			stageContainerHandler.reset(iteration);
 		}
 	}
 	
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		this.vehId2TransitDriverStartsE.put(event.getVehicleId(), event);
-		if (this.vehId2FareContainerList.get(event.getVehicleId()) == null) {
-			this.vehId2FareContainerList.put(event.getVehicleId(), new LinkedList<FareContainer>());
+		if (this.vehId2StageContainerListMap.get(event.getVehicleId()) == null) {
+			this.vehId2StageContainerListMap.put(event.getVehicleId(), new LinkedList<StageContainer>());
 		}
 	}
 
@@ -106,8 +103,8 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 		if (this.vehId2TransitDriverStartsE.containsKey(event.getVehicleId())) {
 			// It's a transit driver
 			double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
-			for (FareContainer fareContainer : this.vehId2FareContainerList.get(event.getVehicleId())) {
-				fareContainer.addDistanceTravelled(linkLength);
+			for (StageContainer stageContainer : this.vehId2StageContainerListMap.get(event.getVehicleId())) {
+				stageContainer.addDistanceTravelled(linkLength);
 			}
 		}
 	}
@@ -118,10 +115,10 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 			// it's a paratransit vehicle
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				// it's not the driver
-				FareContainer fareContainer = new FareContainer(this.earningsPerBoardingPassenger, this.earningsPerMeterAndPassenger);
-				fareContainer.handlePersonEnters(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()), this.vehId2TransitDriverStartsE.get(event.getVehicleId()));
-				this.vehId2FareContainerList.get(event.getVehicleId()).add(fareContainer);
-				this.personId2FareContainer.put(event.getPersonId(), fareContainer);
+				StageContainer stageContainer = new StageContainer();
+				stageContainer.handlePersonEnters(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()), this.vehId2TransitDriverStartsE.get(event.getVehicleId()));
+				this.vehId2StageContainerListMap.get(event.getVehicleId()).add(stageContainer);
+				this.personId2StageContainer.put(event.getPersonId(), stageContainer);
 			}
 		}
 	}
@@ -132,16 +129,16 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 			// it's a paratransit vehicle
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				// it's not the driver
-				FareContainer fareContainer = this.personId2FareContainer.remove(event.getPersonId());
-				this.vehId2FareContainerList.get(event.getVehicleId()).remove(fareContainer);
-				fareContainer.handlePersonLeaves(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()));
+				StageContainer stageContainer = this.personId2StageContainer.remove(event.getPersonId());
+				this.vehId2StageContainerListMap.get(event.getVehicleId()).remove(stageContainer);
+				stageContainer.handlePersonLeaves(event, this.vehId2VehArrivesAtFacilityE.get(event.getVehicleId()));
 				
-				// call all FareContainerHandler
-				for (FareContainerHandler fareContainerHandler : this.fareContainerHandlerList) {
-					fareContainerHandler.handleFareContainer(fareContainer);
+				// call all StageContainerHandler
+				for (StageContainerHandler stageContainerHandler : this.stageContainerHandlerList) {
+					stageContainerHandler.handleFareContainer(stageContainer);
 				}
 				
-				// Note the fareContainer is dropped at this point.
+				// Note the stageContainer is dropped at this point.
 			}
 		}
 	}
@@ -149,8 +146,8 @@ public class FareCollectorHandler implements TransitDriverStartsEventHandler, Ve
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// ok, mobsim is done - finish incomplete entries
-		if (this.personId2FareContainer.size() > 0) {
-			log.warn("There are " + this.personId2FareContainer.size() + " passengers with incomplete trips. Cannot finish them. Will not forward those entries");
+		if (this.personId2StageContainer.size() > 0) {
+			log.warn("There are " + this.personId2StageContainer.size() + " passengers with incomplete trips. Cannot finish them. Will not forward those entries");
 		}
 	}
 }

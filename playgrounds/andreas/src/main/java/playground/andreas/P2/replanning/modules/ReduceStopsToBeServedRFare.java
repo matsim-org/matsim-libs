@@ -35,8 +35,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.operator.Cooperative;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
-import playground.andreas.P2.scoring.fare.FareContainer;
-import playground.andreas.P2.scoring.fare.FareContainerHandler;
+import playground.andreas.P2.scoring.fare.StageContainer;
+import playground.andreas.P2.scoring.fare.StageContainerHandler;
+import playground.andreas.P2.scoring.fare.TicketMachine;
 import playground.andreas.utils.stats.RecursiveStatsContainer;
 
 /**
@@ -48,16 +49,17 @@ import playground.andreas.utils.stats.RecursiveStatsContainer;
  * @author aneumann
  *
  */
-public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implements FareContainerHandler{
+public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implements StageContainerHandler{
 	
 	private final static Logger log = Logger.getLogger(ReduceStopsToBeServedRFare.class);
 	
 	public static final String STRATEGY_NAME = "ReduceStopsToBeServedRFare";
 	
-	private HashMap<Id,HashMap<Id,HashMap<Id,Double>>> route2StartStop2EndStop2WeightMap = new HashMap<Id, HashMap<Id,HashMap<Id,Double>>>();
-	
 	private final double sigmaScale;
 	private final boolean useFareAsWeight;
+
+	private TicketMachine ticketMachine;
+	private HashMap<Id,HashMap<Id,HashMap<Id,Double>>> route2StartStop2EndStop2WeightMap = new HashMap<Id, HashMap<Id,HashMap<Id,Double>>>();
 	
 	public ReduceStopsToBeServedRFare(ArrayList<String> parameter) {
 		super(parameter);
@@ -186,10 +188,10 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	}
 
 	@Override
-	public void handleFareContainer(FareContainer fareContainer) {
-		Id routeId = fareContainer.getRouteId();
-		Id startStopId = fareContainer.getStopEntered();
-		Id endStopId = fareContainer.getStopLeft();
+	public void handleFareContainer(StageContainer stageContainer) {
+		Id routeId = stageContainer.getRouteId();
+		Id startStopId = stageContainer.getStopEntered();
+		Id endStopId = stageContainer.getStopLeft();
 		
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId) == null) {
 			this.route2StartStop2EndStop2WeightMap.put(routeId, new HashMap<Id, HashMap<Id,Double>>());
@@ -206,8 +208,12 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		double oldWeight = this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId).get(endStopId).doubleValue();
 		double additionalWeight = 1.0;
 		if (this.useFareAsWeight) {
-			additionalWeight = fareContainer.getFare();
+			additionalWeight = this.ticketMachine.getFare(stageContainer);
 		}
 		this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId).put(endStopId, new Double(oldWeight + additionalWeight));
+	}
+
+	public void setTicketMachine(TicketMachine ticketMachine) {
+		this.ticketMachine = ticketMachine;
 	}
 }
