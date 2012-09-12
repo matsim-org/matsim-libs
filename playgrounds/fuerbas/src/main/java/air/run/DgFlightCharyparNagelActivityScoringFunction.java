@@ -63,12 +63,13 @@ public class DgFlightCharyparNagelActivityScoringFunction extends CharyparNagelA
 			this.noOfLineSwitch++;
 		}
 		else {
-			super.startActivity(time, activity);
+			super.endActivity(time, activity);
 		}
 	}
 
 	@Override
 	public void finish(){
+		super.finish();
 		if (this.noOfLineSwitch > 2){
 			this.score += (this.noOfLineSwitch - 2) * this.lineSwitch;
 		}
