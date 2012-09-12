@@ -40,6 +40,8 @@ import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
  * improvements / changes july'12 
  * - fixed error: used pre-factor (1/beta scale) in deterrence function instead of beta scale (fixed now!)
  * 
+ * todo (sep'12):
+ * - set external costs to opportunities within the same zone ...
  * @author thomas
  *
  */

@@ -21,10 +21,12 @@ public class BackupRun {
 	
 	public static void runBackup(ScenarioImpl scenario){
 		
-//		String value = scenario.getConfig().getParam(Constants.URBANSIM_PARAMETER, Constants.BACKUP_RUN_DATA_PARAM);
+		// tnicolai: TODO get UrbanSimParameterConfigModuleV3 !!!
 		UrbanSimParameterConfigModule module = ConfigurationModule.getUrbanSimParameterConfigModule(scenario);
 		
-		if( module.isBackup() ){
+		if(module == null)
+			log.error("UrbanSimParameterConfigModule module is null. Can't determine if backup option is activated. No backup will be performed.");
+		else if( module.isBackup() ){
 			// saving results from current run
 			saveRunOutputs(scenario);
 			prepareHotStart(scenario);

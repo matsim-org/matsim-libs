@@ -288,7 +288,7 @@ public class MATSim4UrbanSimTEST {
 		}
 		
 		// new method
-		if(computeCellBasedAccessibility && isParcel){
+		if(computeCellBasedAccessibility){
 			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size

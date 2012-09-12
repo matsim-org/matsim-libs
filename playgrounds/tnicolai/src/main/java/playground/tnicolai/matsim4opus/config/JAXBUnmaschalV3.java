@@ -23,33 +23,28 @@
  */
 package playground.tnicolai.matsim4opus.config;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.xml.sax.SAXException;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig3.MatsimConfigType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig3.ObjectFactory;
-import playground.tnicolai.matsim4opus.utils.io.LoadFile;
-import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 
 /**
  * @author thomas
  *
  */
-public class JAXBUnmaschalV3{
+public class JAXBUnmaschalV3 extends MatsimJaxbXmlParser{
 	
 	// logger
 	private static final Logger log = Logger.getLogger(JAXBUnmaschalV3.class);
@@ -61,6 +56,8 @@ public class JAXBUnmaschalV3{
 	 * @param configFile
 	 */
 	public JAXBUnmaschalV3(String configFile){
+		// schemaLocation
+		super(InternalConstants.V3_MATSIM_4_URBANSIM_XSD_MATSIMORG);
 		this.matsimConfigFile = configFile;
 	}
 	
@@ -81,30 +78,33 @@ public class JAXBUnmaschalV3{
 			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
 			// create an unmaschaller (write xml file)
 			Unmarshaller unmarschaller = jaxbContext.createUnmarshaller();
+			
+			// validate file
+			super.validateFile(this.matsimConfigFile, unmarschaller);
 
-			// crate a schema factory ...
-			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-			// ... and initialize it with an xsd
-
-			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
-			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
-			LoadFile loadFile = new LoadFile(InternalConstants.V3_MATSIM_4_URBANSIM_XSD_MATSIMORG , tempDir , InternalConstants.V3_XSD_FILE_NAME);
-			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
-			// tnicolai: debugging
-			//file2XSD = new File("/Users/thomas/Development/workspace/matsim/src/main/resources/dtd/matsim4urbansim_v2.xsd");
-			//log.warn("Running Jaxb in debugging mode. Change this!");
-			
-			if(file2XSD == null || !file2XSD.exists())
-				return null;
-			
-			printOutXSD(file2XSD);
-			
-			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
-			
-			// create a schema object via the given xsd to validate the MATSim xml config.
-			Schema schema = schemaFactory.newSchema(file2XSD);
-			// set the schema for validation while reading/importing the MATSim xml config.
-			unmarschaller.setSchema(schema);
+//			// crate a schema factory ...
+//			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+//			// ... and initialize it with an xsd
+//
+//			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
+//			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
+//			LoadFile loadFile = new LoadFile(InternalConstants.V3_MATSIM_4_URBANSIM_XSD_MATSIMORG , tempDir , InternalConstants.V3_XSD_FILE_NAME);
+//			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
+//			// tnicolai: debugging
+//			//file2XSD = new File("/Users/thomas/Development/workspace/matsim/src/main/resources/dtd/matsim4urbansim_v2.xsd");
+//			//log.warn("Running Jaxb in debugging mode. Change this!");
+//			
+//			if(file2XSD == null || !file2XSD.exists())
+//				return null;
+//			
+//			printOutXSD(file2XSD);
+//			
+//			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
+//			
+//			// create a schema object via the given xsd to validate the MATSim xml config.
+//			Schema schema = schemaFactory.newSchema(file2XSD);
+//			// set the schema for validation while reading/importing the MATSim xml config.
+//			unmarschaller.setSchema(schema);
 			
 			File inputFile = new File( matsimConfigFile );
 			isFileAvailable(inputFile);
@@ -126,41 +126,48 @@ public class JAXBUnmaschalV3{
 		} catch(Exception e){
 			e.printStackTrace();
 			return null;
-		} finally{
-			// clean up temp files
-			TempDirectoryUtil.cleaningUpCustomTempDirectories();
-		}
+		} 
+//		finally{
+//			// clean up temp files
+//			TempDirectoryUtil.cleaningUpCustomTempDirectories();
+//		}
 
 		log.info("... finished unmarschallig");
 		// return initialized object representation of matsim4urbansim config file
 		return matsimConfig;
 	}
 	
-	/**
-	 * prints out loaded xsd
-	 * @param file2XSD
-	 */
-	private void printOutXSD(File file2XSD){
-		
-		if(file2XSD != null && file2XSD.exists()){
-			try {
-				BufferedReader br = IOUtils.getBufferedReader(file2XSD.getCanonicalPath());
-				String line = null;
-				while( (line = br.readLine()) != null)
-					log.info( line );
-			} catch (UncheckedIOException e) {
-				// no warning needed here
-			} catch (IOException e) {
-				// no warning needed here
-			}
-		}
-	}
+//	/**
+//	 * prints out loaded xsd
+//	 * @param file2XSD
+//	 */
+//	private void printOutXSD(File file2XSD){
+//		
+//		if(file2XSD != null && file2XSD.exists()){
+//			try {
+//				BufferedReader br = IOUtils.getBufferedReader(file2XSD.getCanonicalPath());
+//				String line = null;
+//				while( (line = br.readLine()) != null)
+//					log.info( line );
+//			} catch (UncheckedIOException e) {
+//				// no warning needed here
+//			} catch (IOException e) {
+//				// no warning needed here
+//			}
+//		}
+//	}
 	
 	private void isFileAvailable(File file){
 		if(!file.exists()){
 			log.error(matsimConfigFile + " not found!!!");
 			System.exit(-1);
 		}
+	}
+	
+	@Override
+	public void readFile(String filename) throws JAXBException, SAXException,
+			ParserConfigurationException, IOException {
+		throw new UnsupportedOperationException("Use unmaschalMATSimConfig() method");
 	}
 
 }
