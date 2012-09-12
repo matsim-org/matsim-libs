@@ -20,12 +20,13 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine;
 
+import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
+import org.matsim.core.router.util.TravelTime;
 
 public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Runnable {
 
@@ -40,7 +41,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	
 	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier reactivateNodesBarrier,
 			CyclicBarrier separationBarrier, CyclicBarrier reactivateLinksBarrier, CyclicBarrier endBarrier,
-			Netsim sim, MultiModalTravelTime multiModalTravelTime) {
+			Netsim sim, Map<String, TravelTime> multiModalTravelTime) {
 		super(sim, multiModalTravelTime);
 		this.startBarrier = startBarrier;
 		this.reactivateNodesBarrier = reactivateNodesBarrier;

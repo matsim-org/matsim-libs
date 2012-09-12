@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine;
 
+import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -27,10 +28,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
+import org.matsim.core.router.util.TravelTime;
 
 class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	
@@ -50,11 +50,11 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	 * those instances.
 	 * 
 	 * @param sim
-	 * @param multiModalTravelTimeCalculator
+	 * @param map
 	 */
 	// use the factory
-	/*package*/ ParallelMultiModalSimEngine(Netsim sim, MultiModalTravelTimeWrapper multiModalTravelTimeCalculator) {
-		super(sim, multiModalTravelTimeCalculator);
+	/*package*/ ParallelMultiModalSimEngine(Netsim sim, Map<String, TravelTime> map) {
+		super(sim, map);
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 	
@@ -111,7 +111,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	}
 
 	@Override
-	/*package*/ MultiModalTravelTime getMultiModalTravelTime() {
+	Map<String, TravelTime> getMultiModalTravelTime() {
 		throw new RuntimeException("This method should never be called - calls should go to the MultiModalSimEngineRunner Threads.");
 	}
 	

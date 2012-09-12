@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.multimodalsimengine;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -32,9 +33,9 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
 public class MultiModalQLinkExtension {
@@ -84,8 +85,8 @@ public class MultiModalQLinkExtension {
 
 	private void addAgent(MobsimAgent personAgent, double now) {
 
-		MultiModalTravelTime multiModalTravelTime = simEngine.getMultiModalTravelTime();
-		double travelTime = multiModalTravelTime.getModalLinkTravelTime(qLink.getLink(), now, personAgent.getMode(), null, null);
+		Map<String, TravelTime> multiModalTravelTime = simEngine.getMultiModalTravelTime();
+		double travelTime = multiModalTravelTime.get(personAgent.getMode()).getLinkTravelTime(qLink.getLink(), now, null, null);
 		double departureTime = now + travelTime;
 
 		departureTime = Math.round(departureTime);

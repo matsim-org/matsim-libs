@@ -51,8 +51,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
@@ -82,7 +82,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
 
 	private final Network network;
-	private final MultiModalTravelTime multiModalTravelTime;
+	private final Map<String, TravelTime> multiModalTravelTime;
 
 	/*
 	 * EXACT... replanning is scheduled for the current time step (time == replanning time)
@@ -111,7 +111,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 				"minimal link travel time for all modes.");
 	}
 	
-	public LinkReplanningMap(Network network, MultiModalTravelTime multiModalTravelTime) {
+	public LinkReplanningMap(Network network, Map<String, TravelTime> multiModalTravelTime) {
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 
 		this.network = network;
@@ -153,7 +153,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 		double departureTime;
 		if (this.multiModalTravelTime != null) {
 			Person person = this.personAgentMapping.get(event.getPersonId()).getSelectedPlan().getPerson();
-			double travelTime = multiModalTravelTime.getModalLinkTravelTime(link, now, mode, person, null);
+			double travelTime = multiModalTravelTime.get(mode).getLinkTravelTime(link, now, person, null);
 			departureTime = Math.floor(now + travelTime);				
 		} else {
 			departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));

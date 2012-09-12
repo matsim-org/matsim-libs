@@ -24,7 +24,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -78,10 +80,7 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapper;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
@@ -95,8 +94,8 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.InvertedNetworkLegRouter;
+import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
@@ -105,6 +104,7 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -224,7 +224,7 @@ public class Controler extends AbstractController {
 
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
-	private MultiModalTravelTimeWrapper multiModalTravelTimeCalculator;
+	private Map<String, TravelTime> multiModalTravelTimes;
 
 
 	/**
@@ -397,17 +397,15 @@ public class Controler extends AbstractController {
 
 
 			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
-			MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCalculator());
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTime(configGroup));
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTime(configGroup,
+			multiModalTravelTimes = new HashMap<String, TravelTime>();
+			multiModalTravelTimes.put(TransportMode.car, this.getTravelTimeCalculator());
+			multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
+			multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
 					new WalkTravelTime(configGroup)));
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+			multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
 					new WalkTravelTime(configGroup)));
-			multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTime(configGroup, 
+			multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
 					this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
-			
-			multiModalTravelTimeCalculator = multiModalTravelTimeFactory.createTravelTime();
 			
 		}
 
@@ -705,7 +703,7 @@ public class Controler extends AbstractController {
 			if (config.multiModal().isMultiModalSimulationEnabled()) {
 				log.info("Using MultiModalMobsim...");
 				QSim qSim = (QSim) simulation;
-				MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimeCalculator);
+				MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
 				qSim.addMobsimEngine(multiModalEngine);
 				qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, config.multiModal()));
 			}
@@ -913,10 +911,10 @@ public class Controler extends AbstractController {
 			log.warn("As simulation of public transit is enabled a leg router for transit is used. Other features, " +
 					"e.g. multimodal simulation, may not work as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-
-			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, multiModalTravelTimeCalculator,
+			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, multiModalTravelTimes.get(TransportMode.car),
 					this.getLeastCostPathCalculatorFactory(), routeFactory);
 
+<<<<<<< HEAD
 			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator)
 					this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, multiModalTravelTimeCalculator);
 			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, multiModalTravelTimeCalculator, routeAlgo);
@@ -929,9 +927,13 @@ public class Controler extends AbstractController {
 			 */
 			plansCalcRoute.addLegHandler(TransportMode.car, multiModalLegHandler);
 
+=======
+>>>>>>> simplifying multi-modal
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
-				plansCalcRoute.addLegHandler(mode, multiModalLegHandler);
+				LeastCostPathCalculator routeAlgo = this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, multiModalTravelTimes.get(mode));
+				plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(network, routeAlgo, routeFactory));
 			}
+		
 		} else {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(),
 					this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory);
@@ -944,8 +946,8 @@ public class Controler extends AbstractController {
 			plansCalcRoute.addLegHandler(TransportMode.car,	invertedNetLegRouter);
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 		}
-
 		return plansCalcRoute;
+		
 	}
 
 	/*
@@ -1154,9 +1156,9 @@ public class Controler extends AbstractController {
 	public int getWritePlansInterval() {
 		return this.writePlansInterval;
 	}
-
-	public TravelTime getMultiModalTravelTime() {
-		return multiModalTravelTimeCalculator;
+	
+	public Map<String, TravelTime> getMultiModalTravelTimes() {
+		return this.multiModalTravelTimes;
 	}
 
 }

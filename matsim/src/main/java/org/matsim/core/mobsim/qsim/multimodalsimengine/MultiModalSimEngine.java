@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.multimodalsimengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -30,9 +31,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
 public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
@@ -44,7 +45,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	private static final int INFO_PERIOD = 3600;
 	
 	/*package*/ Netsim qSim;
-	/*package*/ MultiModalTravelTime multiModalTravelTime;
+	/*package*/ Map<String, TravelTime> multiModalTravelTime;
 	/*package*/ List<MultiModalQLinkExtension> allLinks = null;
 	/*package*/ List<MultiModalQLinkExtension> activeLinks;
 	/*package*/ List<MultiModalQNodeExtension> activeNodes;
@@ -58,7 +59,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		this.internalInterface = internalInterface ;
 	}
 
-	/*package*/ MultiModalSimEngine(Netsim qSim, MultiModalTravelTime multiModalTravelTime) {
+	/*package*/ MultiModalSimEngine(Netsim qSim, Map<String, TravelTime> map) {
 		this.qSim = qSim;
 
 		activeLinks = new ArrayList<MultiModalQLinkExtension>();
@@ -66,7 +67,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		linksToActivate = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();	// thread-safe Queue!
 		nodesToActivate = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();	// thread-safe Queue!
 
-		this.multiModalTravelTime = multiModalTravelTime; 
+		this.multiModalTravelTime = map; 
 	}
 
 	Netsim getMobsim() {
@@ -181,7 +182,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		}
 	}
 
-	/*package*/ MultiModalTravelTime getMultiModalTravelTime() {
+	/*package*/ Map<String, TravelTime> getMultiModalTravelTime() {
 		return this.multiModalTravelTime;
 	}
 

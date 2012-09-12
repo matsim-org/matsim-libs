@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.controller;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -30,7 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
@@ -128,8 +129,13 @@ public class WithinDayController extends Controler {
 	public void createAndInitLinkReplanningMap() {
 		this.createAndInitLinkReplanningMap(null);
 	}
+<<<<<<< HEAD
 
 	public void createAndInitLinkReplanningMap(MultiModalTravelTime travelTime) {
+=======
+	
+	public void createAndInitLinkReplanningMap(Map<String, TravelTime> travelTime) {
+>>>>>>> simplifying multi-modal
 		if (this.events == null) {
 			log.warn("Cannot create and init the LinkReplanningMap. EventsManager has not be initialized yet!");
 			return;

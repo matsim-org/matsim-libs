@@ -34,6 +34,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -118,7 +119,7 @@ public class ExampleWithinDayController extends WithinDayController implements M
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getMultiModalTravelTime(), factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, this.getMultiModalTravelTimes(), factory, routeFactory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
@@ -140,7 +141,6 @@ public class ExampleWithinDayController extends WithinDayController implements M
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
-
 
 	/*
 	 * When the Controller Startup Event is created, the EventsManager

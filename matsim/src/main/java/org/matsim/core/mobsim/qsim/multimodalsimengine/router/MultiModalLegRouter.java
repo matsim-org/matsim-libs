@@ -20,7 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -28,13 +31,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.LegRouter;
 import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 
 public class MultiModalLegRouter implements LegRouter {
 	
@@ -44,19 +51,14 @@ public class MultiModalLegRouter implements LegRouter {
 	private Set<String> rideModeRestrictions;
 	private Set<String> ptModeRestrictions;
 	
-	private final IntermodalLeastCostPathCalculator routeAlgo;
 	private final ModeRouteFactory modeRouteFactory;
 	private final RouteFactory routeFactory;
 	
-	private final MultiModalTravelTime travelTime;
+	private final Map<String, LegRouter> legRouters = new HashMap<String, LegRouter>();
 
-	private final LegRouter legRouter;
-	
-	public MultiModalLegRouter(final Network network, final MultiModalTravelTime travelTime, 
-			final IntermodalLeastCostPathCalculator routeAlgo) {
-		
-		this.travelTime = travelTime;
-		this.routeAlgo = routeAlgo;
+	public MultiModalLegRouter(Network network,
+			LeastCostPathCalculatorFactory routerFactory,
+			Map<String, TravelTime> travelTimes) {
 		
 		this.routeFactory = new LinkNetworkRouteFactory();
 		this.modeRouteFactory = new ModeRouteFactory();
@@ -66,33 +68,33 @@ public class MultiModalLegRouter implements LegRouter {
 		modeRouteFactory.setRouteFactory(TransportMode.pt, routeFactory);
 		modeRouteFactory.setRouteFactory(TransportMode.ride, routeFactory);
 		
-		this.legRouter = new NetworkLegRouter(network, this.routeAlgo, this.modeRouteFactory);
-		
 		initModeRestrictions();
+		for (Entry<String, TravelTime> entry : travelTimes.entrySet()) {
+			TravelTime travelTime = entry.getValue();
+			TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+			this.legRouters.put(entry.getKey(), new NetworkLegRouter(network, routerFactory.createPathCalculator(network, new OnlyTimeDependentTravelDisutilityCalculator(travelTime), travelTime), modeRouteFactory));
+		}
 	}
-	
+
 	@Override
 	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		String legMode = leg.getMode();
+		LegRouter routeAlgo = this.legRouters.get(legMode);
+//		if (TransportMode.car.equals(legMode)) {
+//			routeAlgo.setModeRestriction(carModeRestrictions);
+//		} else if (TransportMode.walk.equals(legMode)) {
+//			routeAlgo.setModeRestriction(walkModeRestrictions);
+//		} else if (TransportMode.bike.equals(legMode)) {
+//			routeAlgo.setModeRestriction(bikeModeRestrictions);
+//		} else if (TransportMode.pt.equals(legMode)) {
+//			routeAlgo.setModeRestriction(ptModeRestrictions);
+//		} else if (TransportMode.ride.equals(legMode)) {
+//			routeAlgo.setModeRestriction(rideModeRestrictions);
+//		} else {
+//			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
+//		}
 		
-		if (TransportMode.car.equals(legMode)) {
-			routeAlgo.setModeRestriction(carModeRestrictions);
-		} else if (TransportMode.walk.equals(legMode)) {
-			routeAlgo.setModeRestriction(walkModeRestrictions);
-		} else if (TransportMode.bike.equals(legMode)) {
-			routeAlgo.setModeRestriction(bikeModeRestrictions);
-		} else if (TransportMode.pt.equals(legMode)) {
-			routeAlgo.setModeRestriction(ptModeRestrictions);
-		} else if (TransportMode.ride.equals(legMode)) {
-			routeAlgo.setModeRestriction(rideModeRestrictions);
-		} else {
-			throw new RuntimeException("cannot handle legmode '" + legMode + "'.");
-		}
-		
-		// set transport mode in TravelTime
-		travelTime.setTransportMode(legMode);
-		
-		return legRouter.routeLeg(person, leg, fromAct, toAct, depTime);
+		return routeAlgo.routeLeg(person, leg, fromAct, toAct, depTime);
 	}
 
 
