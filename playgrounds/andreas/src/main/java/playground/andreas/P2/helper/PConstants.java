@@ -24,7 +24,6 @@ package playground.andreas.P2.helper;
  */
 public class PConstants {
 
-	public static final String ptDriverPrefix = "pt_"; // TODO[AN] This really needs to be changed.
 	public static final String statsOutputFolder = "/pStats/";
 	
 	public static final double pVehAccessTime = 2.0;

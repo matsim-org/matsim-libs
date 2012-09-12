@@ -49,8 +49,8 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 	private HashMap<Id,HashMap<Id,Integer>> vehId2AgentId2StopCountMap = new HashMap<Id, HashMap<Id, Integer>>();
 
 	
-	public AverageNumberOfStopsPerMode(String ptDriverPrefix){
-		super(AverageNumberOfStopsPerMode.class.getSimpleName(),ptDriverPrefix);
+	public AverageNumberOfStopsPerMode(){
+		super(AverageNumberOfStopsPerMode.class.getSimpleName());
 		log.info("enabled");
 	}
 
@@ -65,6 +65,7 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2NumberOfStopsTravelledMap = new HashMap<String, Integer>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
@@ -73,6 +74,7 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");
@@ -87,14 +89,14 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 			this.vehId2AgentId2StopCountMap.put(event.getVehicleId(), new HashMap<Id, Integer>());
 		}
 		
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).put(event.getPersonId(), new Integer(0));
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
 			if (ptMode == null) {
 				ptMode = "nonPtMode";

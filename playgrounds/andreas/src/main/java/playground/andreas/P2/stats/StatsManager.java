@@ -52,7 +52,7 @@ public class StatsManager implements StartupListener{
 		controler.addControlerListener(new GexfPStatLight(pConfig));
 		controler.addControlerListener(new Line2GexfPStat(pConfig));
 		
-		controler.addControlerListener(new PAnalysisManager(pConfig, PConstants.ptDriverPrefix, lineSetter));
+		controler.addControlerListener(new PAnalysisManager(pConfig, lineSetter));
 		
 		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig, 100.0));
 	}

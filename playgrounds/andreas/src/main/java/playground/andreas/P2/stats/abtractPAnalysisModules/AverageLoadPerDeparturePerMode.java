@@ -54,8 +54,8 @@ public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule imple
 	private HashMap<String, RecursiveStatsContainer> ptMode2Stats = new HashMap<String, RecursiveStatsContainer>();
 
 	
-	public AverageLoadPerDeparturePerMode(String ptDriverPrefix){
-		super(AverageLoadPerDeparturePerMode.class.getSimpleName(), ptDriverPrefix);
+	public AverageLoadPerDeparturePerMode(){
+		super(AverageLoadPerDeparturePerMode.class.getSimpleName());
 		log.info("enabled");
 	}
 
@@ -78,6 +78,7 @@ public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule imple
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.vehId2PaxMap = new HashMap<Id, Integer>();
 		this.ptMode2Stats = new HashMap<String, RecursiveStatsContainer>();
@@ -85,6 +86,7 @@ public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule imple
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");
@@ -101,7 +103,7 @@ public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule imple
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			if (this.vehId2PaxMap.get(event.getVehicleId()) == null) {
 				this.vehId2PaxMap.put(event.getVehicleId(), new Integer(0));
 			}
@@ -112,7 +114,7 @@ public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule imple
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			this.vehId2PaxMap.put(event.getVehicleId(), new Integer(this.vehId2PaxMap.get(event.getVehicleId()) - 1));
 		}
 	}

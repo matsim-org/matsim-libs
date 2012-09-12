@@ -46,8 +46,8 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 	private HashMap<String, Integer> ptMode2TripCountMap;
 	private HashMap<Id, Double> agentId2PersonEntersVehicleEventTime = new HashMap<Id, Double>();
 	
-	public AverageInVehicleTripTravelTimeSecondsPerMode(String ptDriverPrefix){
-		super(AverageInVehicleTripTravelTimeSecondsPerMode.class.getSimpleName(),ptDriverPrefix);
+	public AverageInVehicleTripTravelTimeSecondsPerMode(){
+		super(AverageInVehicleTripTravelTimeSecondsPerMode.class.getSimpleName());
 		log.info("enabled");
 	}
 
@@ -62,6 +62,7 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2SecondsTravelledMap = new HashMap<String, Double>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
@@ -70,6 +71,7 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");
@@ -81,14 +83,14 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			this.agentId2PersonEntersVehicleEventTime.put(event.getPersonId(), event.getTime());
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
 			if (ptMode == null) {
 				ptMode = "nonPtMode";

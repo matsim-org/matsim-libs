@@ -50,8 +50,8 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<Id, Integer>();
 
 	
-	public CountPassengerMeterPerMode(String ptDriverPrefix, Network network){
-		super(CountPassengerMeterPerMode.class.getSimpleName(),ptDriverPrefix);
+	public CountPassengerMeterPerMode(Network network){
+		super(CountPassengerMeterPerMode.class.getSimpleName());
 		this.network = network;
 		log.info("enabled");
 	}
@@ -67,6 +67,7 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2CountMap = new HashMap<String, Double>();
 		this.vehId2NumberOfPassengers = new HashMap<Id, Integer>();
@@ -74,6 +75,7 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");
@@ -88,14 +90,14 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(0));
 		}
 		
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() + 1));
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() - 1));
 		}
 	}

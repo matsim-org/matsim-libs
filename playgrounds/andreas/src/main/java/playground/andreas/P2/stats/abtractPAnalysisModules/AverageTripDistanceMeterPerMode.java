@@ -51,8 +51,8 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 	private HashMap<Id,HashMap<Id,Double>> vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<Id, HashMap<Id, Double>>();
 
 	
-	public AverageTripDistanceMeterPerMode(String ptDriverPrefix, Network network){
-		super(AverageTripDistanceMeterPerMode.class.getSimpleName(),ptDriverPrefix);
+	public AverageTripDistanceMeterPerMode(Network network){
+		super(AverageTripDistanceMeterPerMode.class.getSimpleName());
 		this.network = network;
 		log.info("enabled");
 	}
@@ -68,6 +68,7 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2MeterTravelledMap = new HashMap<String, Double>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
@@ -76,6 +77,7 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");
@@ -90,14 +92,14 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 			this.vehId2AgentId2DistanceTravelledInMeterMap.put(event.getVehicleId(), new HashMap<Id, Double>());
 		}
 		
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(event.getPersonId(), new Double(0.0));
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
 			if (ptMode == null) {

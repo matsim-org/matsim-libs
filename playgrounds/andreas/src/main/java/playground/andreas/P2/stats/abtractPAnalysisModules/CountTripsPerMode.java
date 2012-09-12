@@ -20,7 +20,6 @@
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.PersonEntersVehicleEvent;
@@ -42,8 +41,8 @@ public class CountTripsPerMode extends AbstractPAnalyisModule implements Transit
 	private HashMap<Id, String> vehId2ptModeMap;
 	private HashMap<String, Integer> ptMode2CountMap;
 	
-	public CountTripsPerMode(String ptDriverPrefix){
-		super(CountTripsPerMode.class.getSimpleName(),ptDriverPrefix);
+	public CountTripsPerMode(){
+		super(CountTripsPerMode.class.getSimpleName());
 		log.info("enabled");
 	}
 
@@ -58,13 +57,14 @@ public class CountTripsPerMode extends AbstractPAnalyisModule implements Transit
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2CountMap = new HashMap<String, Integer>();
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
 			if (ptMode == null) {
 				ptMode = "nonPtMode";
@@ -79,6 +79,7 @@ public class CountTripsPerMode extends AbstractPAnalyisModule implements Transit
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");

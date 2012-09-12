@@ -43,10 +43,9 @@ public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements 
 	private Network network;
 	private HashMap<Id, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2CountMap;
-
 	
-	public CountVehicleMeterPerMode(String ptDriverPrefix, Network network){
-		super(CountVehicleMeterPerMode.class.getSimpleName(),ptDriverPrefix);
+	public CountVehicleMeterPerMode(Network network){
+		super(CountVehicleMeterPerMode.class.getSimpleName());
 		this.network = network;
 		log.info("enabled");
 	}
@@ -62,12 +61,14 @@ public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements 
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2CountMap = new HashMap<String, Double>();
 	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");

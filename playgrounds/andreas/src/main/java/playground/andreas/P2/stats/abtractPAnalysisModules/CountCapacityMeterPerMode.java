@@ -49,8 +49,8 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 	private HashMap<String, Double> ptMode2CountMap;
 
 	
-	public CountCapacityMeterPerMode(String ptDriverPrefix, Network network){
-		super(CountCapacityMeterPerMode.class.getSimpleName(),ptDriverPrefix);
+	public CountCapacityMeterPerMode(Network network){
+		super(CountCapacityMeterPerMode.class.getSimpleName());
 		this.network = network;
 		log.info("enabled");
 	}
@@ -74,12 +74,14 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptMode2CountMap = new HashMap<String, Double>();
 	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");
@@ -99,7 +101,7 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 		}
 		
 		double capacity;
-		if(event.getPersonId().toString().startsWith(super.ptDriverPrefix)){
+		if(super.ptDriverIds.contains(event.getPersonId())){
 			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId()).doubleValue();
 		}else{
 			// it's a car, which will not appear in the vehicles-list, called in updateVehicles \dr

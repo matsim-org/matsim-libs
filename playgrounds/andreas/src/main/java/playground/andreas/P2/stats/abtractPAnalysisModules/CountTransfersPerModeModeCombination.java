@@ -48,8 +48,8 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 	private HashMap<String, Integer> ptModeCombination2TripCountMap;
 	private HashMap<Id, String> agentId2LastPtModeUsed = new HashMap<Id, String>();
 	
-	public CountTransfersPerModeModeCombination(String ptDriverPrefix){
-		super(CountTransfersPerModeModeCombination.class.getSimpleName(),ptDriverPrefix);
+	public CountTransfersPerModeModeCombination(){
+		super(CountTransfersPerModeModeCombination.class.getSimpleName());
 		log.info("enabled");
 	}
 	
@@ -89,6 +89,7 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 	
 	@Override
 	public void reset(int iteration) {
+		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<Id, String>();
 		this.ptModeCombination2TripCountMap = new HashMap<String, Integer>();
 		this.agentId2LastPtModeUsed = new HashMap<Id, String>();
@@ -96,6 +97,7 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
 			log.warn("Should not happen");
@@ -106,7 +108,7 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(!event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if(!super.ptDriverIds.contains(event.getPersonId())){
 			String ptMode = this.vehId2ptModeMap.get(event.getVehicleId());
 			if (ptMode == null) {
 				ptMode = "nonPtMode";

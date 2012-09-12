@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.events.TransitDriverStartsEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.vehicles.Vehicles;
 
 /**
@@ -34,21 +36,21 @@ import org.matsim.vehicles.Vehicles;
  * @author aneumann
  *
  */
-public abstract class AbstractPAnalyisModule {
+public abstract class AbstractPAnalyisModule implements TransitDriverStartsEventHandler{
 	
 	private final String name;
-	protected final String ptDriverPrefix;
 	protected LinkedList<String> ptModes = null;
 	protected HashMap<Id,String> lineIds2ptModeMap;
+	protected Set<Id> ptDriverIds;
 	
 	/**
 	 * 
 	 * @param name The name of the module.
 	 * @param ptDriverPrefix The prefix identifying a driver of driving a public transit vehicles.
 	 */
-	public AbstractPAnalyisModule(String name, String ptDriverPrefix){
+	public AbstractPAnalyisModule(String name){
 		this.name = name;
-		this.ptDriverPrefix = ptDriverPrefix;
+		this.ptDriverIds = new TreeSet<Id>();
 	}
 	
 	/**
@@ -105,5 +107,14 @@ public abstract class AbstractPAnalyisModule {
 	public void updateVehicles(Vehicles vehicles) {
 				
 	}
-
+	
+	@Override
+	public void reset(int iteration) {
+		this.ptDriverIds = new TreeSet<Id>();
+	}
+	
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.ptDriverIds.add(event.getDriverId());
+	}
 }

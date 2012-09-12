@@ -66,18 +66,15 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2Lin
 public class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
 	private final static Logger log = Logger.getLogger(PAnalysisManager.class);
 	
-	private final String ptDriverPrefix;
-	
 	private final String pIdentifier;
 	private List<AbstractPAnalyisModule> pAnalyzesList = new LinkedList<AbstractPAnalyisModule>();
 	private HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<String, BufferedWriter>();
 	private boolean firstIteration = true;
 	private PtMode2LineSetter lineSetter;
 
-	public PAnalysisManager(PConfigGroup pConfig, String ptDriverPrefix, PtMode2LineSetter lineSetter){
+	public PAnalysisManager(PConfigGroup pConfig, PtMode2LineSetter lineSetter){
 		log.info("enabled");
 		this.pIdentifier = pConfig.getPIdentifier();
-		this.ptDriverPrefix = ptDriverPrefix;
 		if (lineSetter == null) {
 			this.lineSetter = new BVGLines2PtModes();
 			log.info("using default PtMode2LineSetter " +  this.lineSetter.getClass().getSimpleName());
@@ -88,18 +85,18 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// create all analyzes
-		this.pAnalyzesList.add(new CountTripsPerMode(this.ptDriverPrefix));
-		this.pAnalyzesList.add(new CountVehPerMode(this.ptDriverPrefix));
-		this.pAnalyzesList.add(new CountVehicleMeterPerMode(ptDriverPrefix, event.getControler().getNetwork()));
-		this.pAnalyzesList.add(new CountPassengerMeterPerMode(ptDriverPrefix, event.getControler().getNetwork()));
-		this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(ptDriverPrefix, event.getControler().getNetwork()));
-		this.pAnalyzesList.add(new AverageInVehicleTripTravelTimeSecondsPerMode(ptDriverPrefix));
-		this.pAnalyzesList.add(new AverageWaitingTimeSecondsPerMode(ptDriverPrefix));
-		this.pAnalyzesList.add(new AverageNumberOfStopsPerMode(ptDriverPrefix));
-		this.pAnalyzesList.add(new CountTransfersPerModeModeCombination(ptDriverPrefix));
-		this.pAnalyzesList.add(new CountTripsPerPtModeCombination(ptDriverPrefix));
-		this.pAnalyzesList.add(new AverageLoadPerDeparturePerMode(ptDriverPrefix));
-		this.pAnalyzesList.add(new CountCapacityMeterPerMode(ptDriverPrefix, event.getControler().getNetwork()));
+		this.pAnalyzesList.add(new CountTripsPerMode());
+		this.pAnalyzesList.add(new CountVehPerMode());
+		this.pAnalyzesList.add(new CountVehicleMeterPerMode(event.getControler().getNetwork()));
+		this.pAnalyzesList.add(new CountPassengerMeterPerMode(event.getControler().getNetwork()));
+		this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(event.getControler().getNetwork()));
+		this.pAnalyzesList.add(new AverageInVehicleTripTravelTimeSecondsPerMode());
+		this.pAnalyzesList.add(new AverageWaitingTimeSecondsPerMode());
+		this.pAnalyzesList.add(new AverageNumberOfStopsPerMode());
+		this.pAnalyzesList.add(new CountTransfersPerModeModeCombination());
+		this.pAnalyzesList.add(new CountTripsPerPtModeCombination());
+		this.pAnalyzesList.add(new AverageLoadPerDeparturePerMode());
+		this.pAnalyzesList.add(new CountCapacityMeterPerMode(event.getControler().getNetwork()));
 		
 		// register all analyzes
 		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
@@ -152,9 +149,6 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 	}
 
 	private void updateLineId2ptModeMap(TransitSchedule transitSchedule) {
-		// TODO [AN] This is currently hardcoded and should be configurable
-//		PtMode2LineSetter lineSetter = new BVGLines2PtModes();
-		
 		this.lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
 		HashMap<Id, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
 		
