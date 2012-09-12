@@ -1,4 +1,4 @@
-package playground.sergioo.Singapore.TransitWithLocationChoice;
+package playground.sergioo.Singapore.TransitLocationChoice;
 
 import java.util.HashSet;
 
@@ -19,11 +19,11 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-public class TransitLocationChoice implements PlanStrategy {
+public class TransitLocationChoiceStrategy implements PlanStrategy {
 	
 	private PlanStrategyImpl delegate;
 	
-	public TransitLocationChoice(final Controler controler) {
+	public TransitLocationChoiceStrategy(final Controler controler) {
 		String planSelector = controler.getConfig().locationchoice().getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
@@ -44,6 +44,7 @@ public class TransitLocationChoice implements PlanStrategy {
 		addStrategyModule(new TimeAllocationMutator(controler.getConfig()));
 		addStrategyModule(new ReRoute(controler));
 	}
+	
 	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		delegate.addStrategyModule(module);

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.Singapore.TransitWithLocationChoice;
+package playground.sergioo.Singapore.TransitLocationChoice;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;

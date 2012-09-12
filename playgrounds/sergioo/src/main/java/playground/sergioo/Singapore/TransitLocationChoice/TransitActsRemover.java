@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.Singapore.TransitWithLocationChoice;
+package playground.sergioo.Singapore.TransitLocationChoice;
 
 import java.util.List;
 
