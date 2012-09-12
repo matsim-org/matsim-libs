@@ -291,6 +291,11 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return handled;
 	}
 
+	@Override
+	public int getNumberOfPassengers() {
+		return this.vehicle.getPassengers().size();
+	}
+
 	private List<PassengerAgent> findPassengersEntering(
 			final TransitStopFacility stop, int freeCapacity) {
 		ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();

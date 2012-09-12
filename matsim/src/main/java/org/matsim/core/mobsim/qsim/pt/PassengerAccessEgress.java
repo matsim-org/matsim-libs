@@ -39,4 +39,9 @@ public interface PassengerAccessEgress {
 	 */
 	public boolean handlePassengerLeaving(final PassengerAgent agent, final double time);
 
+	/**
+	 * @return the number of passengers currently still in the vehicle, including those about to leave the vehicle.
+	 */
+	public int getNumberOfPassengers();
+	
 }

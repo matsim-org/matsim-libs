@@ -263,4 +263,9 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		return handled;
 	}
 
+	@Override
+	public int getNumberOfPassengers() {
+		return this.vehicle.getPassengers().size();
+	}
+	
 }
