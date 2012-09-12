@@ -22,7 +22,6 @@ package playground.christoph.icem2012;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,14 +51,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.MultiModalLegRouter;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -68,12 +61,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.LegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -88,6 +76,8 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import playground.christoph.evacuation.population.CreateMultiModalLegRouters;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -609,20 +599,8 @@ public class CreateMarathonPopulation {
 			network.getLinks().get(linkId).setAllowedModes(modes);		
 		}
 		
-		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
-		
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-
-		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
-		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
-				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
-		travelTimes.put(TransportMode.ride, new RideTravelTimeFactory(new FreeSpeedTravelTimeCalculatorFactory().createTravelTime(), 
-				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
-		travelTimes.put(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
-				new FreeSpeedTravelTimeCalculatorFactory().createTravelTime(), new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());
-
-		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
-		MultiModalLegRouter legRouter = new MultiModalLegRouter(scenario.getNetwork(), routerFactory, travelTimes);
+		Map<String, LegRouter> legRouters = CreateMultiModalLegRouters.createLegRouters(scenario.getConfig(), network, 
+				new FreeSpeedTravelTimeCalculatorFactory().createTravelTime());
 		
 		Counter counterRemove = new Counter("persons to remove ");
 		Counter counterAdapt = new Counter("legs to adapt ");
@@ -698,6 +676,7 @@ public class CreateMarathonPopulation {
 							Activity fromAct = (Activity) plan.getPlanElements().get(index-1);
 							Activity toAct = (Activity) plan.getPlanElements().get(index+1);
 							try {
+								LegRouter legRouter = legRouters.get(leg.getRoute());
 								legRouter.routeLeg(person, leg, fromAct, toAct, leg.getDepartureTime());							
 							}
 							/*

@@ -21,6 +21,7 @@
 package playground.christoph.evacuation.population;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
@@ -34,14 +35,14 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class CreateMultiModalRoutes extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	private final LegRouter legRouter;
+	private final Map<String, LegRouter> legRouters;
 	private final Set<String> modesToReroute;
 	
-	public CreateMultiModalRoutes(LegRouter legRouter, Set<String> modesToReroute) {
-		this.legRouter = legRouter;
+	public CreateMultiModalRoutes(Map<String, LegRouter> legRouters, Set<String> modesToReroute) {
+		this.legRouters = legRouters;
 		this.modesToReroute = modesToReroute;
 	}
-	
+
 	@Override
 	public void run(Person person) {
 		for (Plan plan : person.getPlans()) this.run(plan);
@@ -55,6 +56,7 @@ public class CreateMultiModalRoutes extends AbstractPersonAlgorithm implements P
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
 				if (modesToReroute.contains(leg.getMode())) {
+					LegRouter legRouter = legRouters.get(leg.getMode());
 					legRouter.routeLeg(plan.getPerson(), leg, (Activity) planElements.get(i-1), (Activity) planElements.get(i+1), leg.getDepartureTime());					
 				}
 			}

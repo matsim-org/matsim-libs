@@ -54,6 +54,8 @@ public class PTTravelTimeKTI implements TravelTime {
 		this.configGroup = configGroup;
 		this.agentSpeedMap = agentSpeedMap;
 		this.ptTravelTime = ptTravelTime;
+		this.personSpeed = new ThreadLocal<Double>();
+		
 	}
 	
 	@Override
@@ -65,24 +67,30 @@ public class PTTravelTimeKTI implements TravelTime {
 	}
 
 	private void setPerson(Person person) {
+		/*
+		 * If no speed value for the person is set in the map, the 
+		 * agent performs the PT trip before the evacuation starts. 
+		 * Therefore use the simple PT travel time calculator, which
+		 * is done when personSpeed contains a null value.
+		 */
 		Double personSpeed = agentSpeedMap.get(person.getId());
-		if (personSpeed != null) {
-			this.personSpeed.set(agentSpeedMap.get(person.getId()));			
-		} else {
-			/*
-			 * After removing PersonalizeTravelTime this should not be 
-			 * necessary anymore.
-			 */
-			/*
-			 * If no speed value for the person is set, the agent performs
-			 * the PT trip before the evacuation starts. Therefore use
-			 * the simple PT travel time calculator.
-			 */
+		this.personSpeed.set(personSpeed);
+		/*
+		 * After removing PersonalizeTravelTime this should not be 
+		 * necessary anymore.
+		 */
+//		if (personSpeed != null) {
+//			this.personSpeed.set(agentSpeedMap.get(person.getId()));			
+//		} else {
+//			/*
+//			 * If no speed value for the person is set, the agent performs
+//			 * the PT trip before the evacuation starts. Therefore use
+//			 * the simple PT travel time calculator.
+//			 */
 //			if (this.personSpeed == null) {
 //				this.ptTravelTime.setPerson(person);			
 //			}			
-		}
-		
+//		}	
 	}
 
 	public void setPersonSpeed(Id personId, double speed) {

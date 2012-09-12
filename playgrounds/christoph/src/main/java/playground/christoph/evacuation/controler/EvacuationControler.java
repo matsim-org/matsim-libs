@@ -306,13 +306,12 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		// Use the TravelTimeCollector as ride travel time estimator. 
 		this.rideTravelTime = new RideTravelTimeFactory(this.getTravelTimeCollector(), walkTravelTime).createTravelTime(); 
 
-//		TODO: how to set them in the controler? This is needed for the multi-modal sim engine
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		Map<String, TravelTime> travelTimes = this.getMultiModalTravelTimes();
 		travelTimes.put(TransportMode.walk, walkTravelTime);
 		travelTimes.put(TransportMode.bike, bikeTravelTime);
 		travelTimes.put(TransportMode.ride, rideTravelTime);
 		travelTimes.put(TransportMode.pt, ptTravelTime);
-		
+				
 //		this.householdsUtils = new HouseholdsUtils(this.scenarioData, this.getEvents());
 //		this.getEvents().addHandler(householdsUtils);
 //		this.getFixedOrderSimulationListener().addSimulationListener(householdsUtils);
