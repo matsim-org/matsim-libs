@@ -16,7 +16,6 @@ import org.matsim.core.utils.misc.Time;
 import playground.andreas.bln.net.simplex.SimplexDelayHandler.DelayHandler;
 import playground.andreas.optimization.Objective;
 import playground.andreas.optimization.ParamPoint;
-import playground.mzilske.bvg09.TransitControler;
 
 public class PTNetFitObjectiveN implements Objective{
 	

@@ -1,29 +1,38 @@
-package playground.andreas.osmBB;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.andreas.mzilske.osm;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 
-import playground.andreas.mzilske.osm.JOSMTolerantFastXMLReader;
-import playground.andreas.mzilske.osm.NetworkSink;
-import playground.andreas.mzilske.osm.TransitNetworkSink;
-
-/**
- * 
- * @author aneumann, mzilske
- *
- */
 public class OsmTransitMain {
 	
 	private final static Logger log = Logger.getLogger(OsmTransitMain.class);
@@ -33,19 +42,17 @@ public class OsmTransitMain {
 	String toCoordSystem;
 	String networkOutFile;
 	String transitScheduleOutFile;
-	String vehiclesOutFile;
 	
-	public OsmTransitMain(String inFile, String fromCoordSystem, String toCoordSystem, String networkOutFile, String transitScheduleOutFile, String vehiclesOutFile){
+	public OsmTransitMain(String inFile, String fromCoordSystem, String toCoordSystem, String networkOutFile, String transitScheduleOutFile){
 		this.inFile = inFile;
 		this.fromCoordSystem = fromCoordSystem;
 		this.toCoordSystem = toCoordSystem;
 		this.networkOutFile = networkOutFile;
 		this.transitScheduleOutFile = transitScheduleOutFile;
-		this.vehiclesOutFile = vehiclesOutFile;
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new OsmTransitMain("/Users/michaelzilske/Desktop/wurst/neu.osm", TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, "/Users/michaelzilske/Desktop/wurst/net.osm", "/Users/michaelzilske/Desktop/wurst/transit.osm", "vehiclesOutFile").convertOsm2Matsim();
+		new OsmTransitMain("/Users/michaelzilske/Desktop/lv/potsdam.osm", TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, "/Users/michaelzilske/Desktop/lv/transit-network.xml", "/Users/michaelzilske/Desktop/lv/transitschedule.xml").convertOsm2Matsim();
 	}
 	
 	public void convertOsm2Matsim(){
@@ -57,7 +64,6 @@ public class OsmTransitMain {
 		log.info("Start...");		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
 		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(inFile), false, CompressionMethod.None);		
 
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(this.fromCoordSystem, this.toCoordSystem);
@@ -66,13 +72,13 @@ public class OsmTransitMain {
 		// Anmerkung trunk, primary und secondary sollten in Bln als ein Typ behandelt werden
 		
 		// Autobahn
-		networkGenerator.setHighwayDefaults(1, "motorway",      3,  100.0/3.6, 1.2, 2000, true); // 70
-		networkGenerator.setHighwayDefaults(1, "motorway_link", 2,  60.0/3.6, 1.2, 1500, true); // 60
+		networkGenerator.setHighwayDefaults(1, "motorway",      2,  100.0/3.6, 1.2, 2000, true); // 70
+		networkGenerator.setHighwayDefaults(1, "motorway_link", 1,  60.0/3.6, 1.2, 1500, true); // 60
 		// Pseudoautobahn
-		networkGenerator.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 0.75, 1000, false); // 45
+		networkGenerator.setHighwayDefaults(2, "trunk",         2,  50.0/3.6, 0.5, 1000, false); // 45
 		networkGenerator.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 0.5, 1000, false); // 40
 		// Durchgangsstrassen
-		networkGenerator.setHighwayDefaults(3, "primary",       2,  50.0/3.6, 0.75, 1000, false); // 35
+		networkGenerator.setHighwayDefaults(3, "primary",       1,  50.0/3.6, 0.5, 1000, false); // 35
 		networkGenerator.setHighwayDefaults(3, "primary_link",  1,  50.0/3.6, 0.5, 1000, false); // 30
 		
 		// Hauptstrassen
@@ -100,8 +106,6 @@ public class OsmTransitMain {
 		new NetworkWriter(scenario.getNetwork()).write(this.networkOutFile);
 		log.info("Writing transit schedule to " + this.transitScheduleOutFile);
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(this.transitScheduleOutFile);
-		log.info("Writing vehicles to " + this.vehiclesOutFile);
-		new VehicleWriterV1(scenario.getVehicles()).writeFile(this.vehiclesOutFile);
 		log.info("Done...");
 	}
 

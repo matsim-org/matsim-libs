@@ -28,8 +28,8 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 
 import playground.andreas.fcd.Fcd;
+import playground.andreas.mzilske.osm.OsmPrepare;
 import playground.andreas.osmBB.osm2counts.Osm2Counts;
-import playground.mzilske.osm.OsmPrepare;
 
 public class PTCountsOsm2Matsim {
 	

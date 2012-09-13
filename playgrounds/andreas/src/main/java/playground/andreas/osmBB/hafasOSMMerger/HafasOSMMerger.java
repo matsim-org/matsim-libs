@@ -17,7 +17,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.mzilske.bvg09.HafasReader;
+import playground.andreas.mzilske.bvg09.HafasReader;
 
 public class HafasOSMMerger {
 

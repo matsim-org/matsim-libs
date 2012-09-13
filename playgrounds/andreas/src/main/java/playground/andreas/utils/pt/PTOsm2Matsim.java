@@ -5,8 +5,8 @@ import java.util.TreeSet;
 
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import playground.andreas.mzilske.osm.OsmPrepare;
 import playground.andreas.osmBB.OsmTransitMain;
-import playground.mzilske.osm.OsmPrepare;
 
 public class PTOsm2Matsim {
 	

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bvgAna.level1;
+package playground.andreas.mzilske.osm;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.io.File;
 
-import playground.andreas.bvgAna.mrieser.analysis.TransitLoadByTime;
+import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
+import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
+import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
 
-/**
- * Wrapper class, should be replaced by original one or substituted by <code>TransitLoad</code>
- * 
- * @author aneumann
- *
- */
-public class VehId2OccupancyHandler extends TransitLoadByTime{
+public class ClipIncompleteEntitiesMain {
 	
-	private final Logger log = Logger.getLogger(VehId2OccupancyHandler.class);
-	private final Level logLevel = Level.DEBUG;	
-	
-	public VehId2OccupancyHandler(){
-		this.log.setLevel(this.logLevel);
+	public static void main(String[] args) {
+		FastXmlReader reader = new FastXmlReader(new File("/Users/michaelzilske/osm/motorway_germany.osm"), true, CompressionMethod.None);
+		ClipIncompleteEntities clipper = new ClipIncompleteEntities(IdTrackerType.BitSet, true, true, true);
+		XmlWriter writer = new XmlWriter(new File("/Users/michaelzilske/osm/clipped.osm"), CompressionMethod.None);
+		reader.setSink(clipper);
+		clipper.setSink(writer);
+		reader.run();
 	}
+
 }

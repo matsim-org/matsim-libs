@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bvgAna.level1;
+package playground.andreas.mzilske.osm;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.openstreetmap.osmosis.core.domain.v0_6.Node;
+import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
+import org.openstreetmap.osmosis.core.filter.v0_6.AreaFilter;
 
-import playground.andreas.bvgAna.mrieser.analysis.TransitLoadByTime;
+public class ClipIncompleteEntities extends AreaFilter {
 
-/**
- * Wrapper class, should be replaced by original one or substituted by <code>TransitLoad</code>
- * 
- * @author aneumann
- *
- */
-public class VehId2OccupancyHandler extends TransitLoadByTime{
-	
-	private final Logger log = Logger.getLogger(VehId2OccupancyHandler.class);
-	private final Level logLevel = Level.DEBUG;	
-	
-	public VehId2OccupancyHandler(){
-		this.log.setLevel(this.logLevel);
+	public ClipIncompleteEntities(IdTrackerType idTrackerType,
+			boolean clipIncompleteEntities, boolean completeWays,
+			boolean completeRelations) {
+		super(idTrackerType, true, completeWays, completeRelations);
 	}
+
+	@Override
+	protected boolean isNodeWithinArea(Node arg0) {
+		return true;
+	}
+
 }

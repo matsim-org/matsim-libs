@@ -18,7 +18,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.andreas.bln.pop.SharedNetScenario;
-import playground.mzilske.bvg09.DataPrepare;
+import playground.andreas.mzilske.bvg09.DataPrepare;
 
 public class DeriveSmallScenarioFromBigOne {
 	private static final Logger log = Logger.getLogger(DeriveSmallScenarioFromBigOne.class);

@@ -69,9 +69,9 @@ import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.mrieser.pt.analysis.RouteTimeDiagram;
-import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;
-import playground.mrieser.pt.analysis.VehicleTracker;
+import playground.andreas.bvgAna.mrieser.analysis.RouteTimeDiagram;
+import playground.andreas.bvgAna.mrieser.analysis.TransitRouteAccessEgressAnalysis;
+import playground.andreas.bvgAna.mrieser.analysis.VehicleTracker;
 
 public class AccessEgressDemoSimple {
 

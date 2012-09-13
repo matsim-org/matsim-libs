@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.bvgAna.level1;
+package playground.andreas.mzilske.osm;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import javax.swing.JPanel;
 
-import playground.andreas.bvgAna.mrieser.analysis.TransitLoadByTime;
+import org.openstreetmap.gui.jmapviewer.JMapViewer;
+import org.openstreetmap.gui.jmapviewer.Tile;
 
-/**
- * Wrapper class, should be replaced by original one or substituted by <code>TransitLoad</code>
- * 
- * @author aneumann
- *
- */
-public class VehId2OccupancyHandler extends TransitLoadByTime{
+public class MyJMapViewer extends JMapViewer {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
-	private final Logger log = Logger.getLogger(VehId2OccupancyHandler.class);
-	private final Level logLevel = Level.DEBUG;	
-	
-	public VehId2OccupancyHandler(){
-		this.log.setLevel(this.logLevel);
+	private JPanel panel;
+
+	public MyJMapViewer(JPanel compositePanel) {
+		this.panel = compositePanel;
 	}
+
+	@Override
+	public void tileLoadingFinished(Tile tile, boolean success) {
+		super.tileLoadingFinished(tile, success);
+		// We need to notify our parent component that we are finished drawing tiles, since
+		// our parent component is probably an overlay over this map, which needs to be redrawn now.
+		panel.repaint();
+	}
+	
+	
+
 }
