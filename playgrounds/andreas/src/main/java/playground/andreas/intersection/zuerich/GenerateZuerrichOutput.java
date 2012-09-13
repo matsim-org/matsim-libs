@@ -22,8 +22,7 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 
-import playground.dgrether.DgPaths;
-import playground.dgrether.lanes.LanesConsistencyChecker;
+import playground.andreas.intersection.zuerich.lanes.LanesConsistencyChecker;
 
 public class GenerateZuerrichOutput {
 

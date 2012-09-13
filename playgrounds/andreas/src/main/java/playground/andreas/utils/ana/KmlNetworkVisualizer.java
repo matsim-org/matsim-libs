@@ -21,8 +21,6 @@ import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
-import playground.dgrether.visualization.DgNetworkKmlStyleFactory;
-
 /**
  * Convert MATSim network to kml
  * 
