@@ -195,7 +195,8 @@ public abstract class TransitScheduleValidator {
 //		args = new String[] {"/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/transitSchedule.xml", "/Users/cello/Desktop/MATSim/pt-test/matsim-0.2.0-rc1-release/pt-rdam/rdamnetwork.xml"};
 //		args = new String[] {"/data/senozon/visumData/matsim/transitSchedule.xml", "/data/senozon/visumData/matsim/network.cleaned.xml"};
 //		args = new String[] {"/Users/cello/Desktop/bvgnet8/transitSchedule.xml", "/Users/cello/Desktop/bvgnet8/network.xml"};
-		args = new String[] {"/Users/cello/Downloads/0.transitSchedule.xml.gz", "/Users/cello/Downloads/network.final.xml.gz"};
+//		args = new String[] {"/Users/cello/Downloads/0.transitSchedule.xml.gz", "/Users/cello/Downloads/network.final.xml.gz"};
+		args = new String[] {"/Users/cello/Desktop/gaojian/pt-tutorial/TransitSchedule_Baoding.xml", "/Users/cello/Desktop/gaojian/pt-tutorial/multimodalnetwork_baoding.xml"};
 
 		if (args.length > 1) {
 			new MatsimNetworkReader(s).parse(args[1]);

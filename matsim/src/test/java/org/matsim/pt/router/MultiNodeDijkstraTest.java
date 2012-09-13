@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
@@ -442,7 +441,7 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 	}
 
-	/*package*/ static class TestTimeCost implements TravelTime, TravelDisutility {
+	/*package*/ static class TestTimeCost implements TravelTime, TransitTravelDisutility {
 
 		private final Map<Id, Double> travelTimes = new HashMap<Id, Double>();
 		private final Map<Id, Double> travelCosts = new HashMap<Id, Double>();
@@ -458,15 +457,10 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
 			return this.travelCosts.get(link.getId()).doubleValue();
 		}
 		
-		@Override
-		public double getLinkMinimumTravelDisutility(Link link) {
-			throw new UnsupportedOperationException();
-		}
-
 	}
 
 }

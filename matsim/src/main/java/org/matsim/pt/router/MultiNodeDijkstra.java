@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,16 +28,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.DijkstraNodeData;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -47,21 +49,76 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  *
  * @author mrieser
  */
-public class MultiNodeDijkstra extends Dijkstra {
+public class MultiNodeDijkstra /*extends Dijkstra*/ {
 
 	private static final Logger log = Logger.getLogger(MultiNodeDijkstra.class);
 
-	public MultiNodeDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
-		super(network, costFunction, timeFunction);
+	/**
+	 * Provides an unique id (loop number) for each routing request, so we don't
+	 * have to reset all nodes at the beginning of each re-routing but can use the
+	 * loop number instead.
+	 */
+	private int iterationID = Integer.MIN_VALUE + 1;
+	
+	/**
+	 * The network on which we find routes.
+	 */
+	protected Network network;
+	
+	/**
+	 * The cost calculator. Provides the cost for each link and time step.
+	 */
+	final TransitTravelDisutility costFunction;
+
+	/**
+	 * The travel time calculator. Provides the travel time for each link and time step.
+	 */
+	final TravelTime timeFunction;
+	
+	final HashMap<Id, DijkstraNodeData> nodeData;
+	private Person person = null;
+	private Vehicle vehicle = null;
+	private CustomDataManager customDataManager = new CustomDataManager();
+	
+	public MultiNodeDijkstra(final Network network, final TransitTravelDisutility costFunction, final TravelTime timeFunction) {
+		this.network = network;
+		this.costFunction = costFunction;
+		this.timeFunction = timeFunction;
+		
+		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 	}
 
-	public MultiNodeDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
-			final PreProcessDijkstra preProcessData) {
-		super(network, costFunction, timeFunction, preProcessData);
+	/**
+	 * Augments the iterationID and checks whether the visited information in
+	 * the nodes in the nodes have to be reset.
+	 */
+	private void augmentIterationId() {
+		if (getIterationId() == Integer.MAX_VALUE) {
+			this.iterationID = Integer.MIN_VALUE + 1;
+			resetNetworkVisited();
+		} else {
+			this.iterationID++;
+		}
+	}
+	
+	private int getIterationId() {
+		return this.iterationID;
+	}
+	
+	/**
+	 * Resets all nodes in the network as if they have not been visited yet.
+	 */
+	private void resetNetworkVisited() {
+		for (Node node : this.network.getNodes().values()) {
+			DijkstraNodeData data = getData(node);
+			data.resetVisited();
+		}
 	}
 
+	
 	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
-		setPerson( person );
+		this.person = person;
+		this.customDataManager.reset();
 
 		Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
 		Set<Node> foundNodes = new HashSet<Node>();
@@ -128,7 +185,140 @@ public class MultiNodeDijkstra extends Dijkstra {
 
 		return path;
 	}
+	
+	/**
+	 * Inserts the given Node n into the pendingNodes queue and updates its time
+	 * and cost information.
+	 *
+	 * @param n
+	 *            The Node that is revisited.
+	 * @param data
+	 *            The data for n.
+	 * @param pendingNodes
+	 *            The nodes visited and not processed yet.
+	 * @param time
+	 *            The time of the visit of n.
+	 * @param cost
+	 *            The accumulated cost at the time of the visit of n.
+	 * @param outLink
+	 *            The node from which we came visiting n.
+	 */
+	protected void visitNode(final Node n, final DijkstraNodeData data,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final Link outLink) {
+		data.visit(outLink, cost, time, getIterationId());
+		pendingNodes.add(n, getPriority(data));
+	}
 
+	/**
+	 * Expands the given Node in the routing algorithm; may be overridden in
+	 * sub-classes.
+	 *
+	 * @param outNode
+	 *            The Node to be expanded.
+	 * @param toNode
+	 *            The target Node of the route.
+	 * @param pendingNodes
+	 *            The set of pending nodes so far.
+	 */
+	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+
+		DijkstraNodeData outData = getData(outNode);
+		double currTime = outData.getTime();
+		double currCost = outData.getCost();
+		for (Link l : outNode.getOutLinks().values()) {
+			relaxNodeLogic(l, pendingNodes, currTime, currCost, toNode, null);
+		}				
+	}
+	
+	/**
+	 * Logic that was previously located in the relaxNode(...) method. 
+	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic. 
+	 */
+	/*package*/ void relaxNodeLogic(final Link l, final PseudoRemovePriorityQueue<Node> pendingNodes,
+			final double currTime, final double currCost, final Node toNode,
+			final PreProcessDijkstra.DeadEndData ddOutData) {
+				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
+	}
+	
+	/**
+	 * Adds some parameters to the given Node then adds it to the set of pending
+	 * nodes.
+	 *
+	 * @param l
+	 *            The link from which we came to this Node.
+	 * @param n
+	 *            The Node to add to the pending nodes.
+	 * @param pendingNodes
+	 *            The set of pending nodes.
+	 * @param currTime
+	 *            The time at which we started to traverse l.
+	 * @param currCost
+	 *            The cost at the time we started to traverse l.
+	 * @param toNode
+	 *            The target Node of the route.
+	 * @return true if the node was added to the pending nodes, false otherwise
+	 * 		(e.g. when the same node already has an earlier visiting time).
+	 */
+	protected boolean addToPendingNodes(final Link l, final Node n,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
+			final double currCost, final Node toNode) {
+
+		this.customDataManager.initForLink(l);
+		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
+		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle, this.customDataManager);
+		DijkstraNodeData data = getData(n);
+		double nCost = data.getCost();
+		if (!data.isVisited(getIterationId())) {
+			visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
+			this.customDataManager.storeTmpData();
+			return true;
+		}
+		double totalCost = currCost + travelCost;
+		if (totalCost < nCost) {
+			revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
+			this.customDataManager.storeTmpData();
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Changes the position of the given Node n in the pendingNodes queue and
+	 * updates its time and cost information.
+	 *
+	 * @param n
+	 *            The Node that is revisited.
+	 * @param data
+	 *            The data for n.
+	 * @param pendingNodes
+	 *            The nodes visited and not processed yet.
+	 * @param time
+	 *            The time of the visit of n.
+	 * @param cost
+	 *            The accumulated cost at the time of the visit of n.
+	 * @param outLink
+	 *            The link from which we came visiting n.
+	 */
+	void revisitNode(final Node n, final DijkstraNodeData data,
+			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final Link outLink) {
+		pendingNodes.remove(n);
+
+		data.visit(outLink, cost, time, getIterationId());
+		pendingNodes.add(n, getPriority(data));
+	}
+	
+	/**
+	 * The value used to sort the pending nodes during routing.
+	 * This implementation compares the total effective travel cost
+	 * to sort the nodes in the pending nodes queue during routing.
+	 */
+	private double getPriority(final DijkstraNodeData data) {
+		return data.getCost();
+	}
+	
 	public static class InitialNode {
 		public final double initialCost;
 		public final double initialTime;
@@ -137,4 +327,22 @@ public class MultiNodeDijkstra extends Dijkstra {
 			this.initialTime = initialTime;
 		}
 	}
+	
+	/**
+	 * Returns the data for the given node. Creates a new NodeData if none exists
+	 * yet.
+	 *
+	 * @param n
+	 *            The Node for which to return the data.
+	 * @return The data for the given Node
+	 */
+	protected DijkstraNodeData getData(final Node n) {
+		DijkstraNodeData r = this.nodeData.get(n.getId());
+		if (null == r) {
+			r = new DijkstraNodeData();
+			this.nodeData.put(n.getId(), r);
+		}
+		return r;
+	}
+
 }

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.toronto.transitfares;
 
 import java.util.Arrays;
@@ -5,20 +24,21 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
 
-public class FareBasedTravelTimeCost implements TravelDisutility, TravelTime {
+public class FareBasedTravelTimeCost implements TransitTravelDisutility, TravelTime {
 
 	private final static double MIDNIGHT = 24.0*3600;
 
@@ -174,14 +194,7 @@ public class FareBasedTravelTimeCost implements TravelDisutility, TravelTime {
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time,
-			Person person, Vehicle vehicle) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
+			Person person, Vehicle vehicle, final CustomDataManager dataManager) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

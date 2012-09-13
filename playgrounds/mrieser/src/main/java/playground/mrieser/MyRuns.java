@@ -20,11 +20,17 @@
 
 package playground.mrieser;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
 
 /**
  * @author mrieser
@@ -33,7 +39,7 @@ public class MyRuns {
 
 	private final static Logger log = Logger.getLogger(MyRuns.class);
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 
 		log.info("start");
 
@@ -62,10 +68,34 @@ public class MyRuns {
 //			}
 //		}
 
-		CoordinateTransformation t = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
-		Coord c = t.transform(new CoordImpl(679976, 248958));
-		System.out.println(c.getX());
-		System.out.println(c.getY());
+		CoordinateTransformation t = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+		
+		BufferedReader rdr = IOUtils.getBufferedReader("/Users/cello/Downloads/tracks.xy");
+		BufferedWriter wrtr = IOUtils.getBufferedWriter ("/Users/cello/Downloads/tracksCH1903.xy");
+		
+		String line = rdr.readLine();
+		wrtr.write(line.replace("lat", "x").replace("lon", "y"));
+		wrtr.write('\n');
+		
+		while ((line = rdr.readLine()) != null) {
+			String[] parts = StringUtils.explode(line, '\t');
+			Coord c = t.transform(new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[0])));
+			
+			wrtr.write(Double.toString(c.getX()));
+			wrtr.write('\t');
+			wrtr.write(Double.toString(c.getY()));
+			for (int i = 2, n = parts.length; i < n; i++) {
+				wrtr.write('\t');
+				wrtr.write(parts[i]);
+			}
+			wrtr.write('\n');
+		}
+		wrtr.close();
+		
+		
+//		Coord c = t.transform(new CoordImpl(679976, 248958));
+//		System.out.println(c.getX());
+//		System.out.println(c.getY());
 
 
 
@@ -125,6 +155,9 @@ public class MyRuns {
 //		new NetworkWriter(s.getNetwork()).write("/Users/cello/goteborg.xml.gz");
 
 //		log.info("done.");
+		
+		System.out.println(010);
+		System.out.println(020);
 
 	}
 

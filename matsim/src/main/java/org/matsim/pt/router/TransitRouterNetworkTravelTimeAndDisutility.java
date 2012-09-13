@@ -23,7 +23,6 @@ package org.matsim.pt.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -37,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, TravelDisutility {
+public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, TransitTravelDisutility {
 
 	final static double MIDNIGHT = 24.0*3600;
 
@@ -53,7 +52,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)
@@ -82,11 +81,6 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return cost;
 	}
 	
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		throw new UnsupportedOperationException();
-	}
-
 	@Override
 	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		if ((link == this.previousLink) && (time == this.previousTime)) {

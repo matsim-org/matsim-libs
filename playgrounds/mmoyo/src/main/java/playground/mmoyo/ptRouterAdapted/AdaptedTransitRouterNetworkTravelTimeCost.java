@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.DepartureTimeCache;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
@@ -47,7 +48,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	}
 
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
 		double cost;
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
 			// "route" here means "pt route".  If no pt route is attached, it means that it is a transfer link.

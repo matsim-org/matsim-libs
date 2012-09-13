@@ -164,12 +164,12 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		}
 
 		double oldCost = - myTRConfig.getUtilityOfLineSwitch_utl();
-		double cost1 = timecost.getLinkTravelDisutility(testLink, 7.0*3600, null, null);
+		double cost1 = timecost.getLinkTravelDisutility(testLink, 7.0*3600, null, null, null);
 		myTRConfig.setUtilityOfLineSwitch_utl(0.0);
-		double cost2 = timecost.getLinkTravelDisutility(testLink, 6.0*3600, null, null); // use different time because of internal caching effects
+		double cost2 = timecost.getLinkTravelDisutility(testLink, 6.0*3600, null, null, null); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
 		myTRConfig.setUtilityOfLineSwitch_utl(-40.125);
-		double cost3 = timecost.getLinkTravelDisutility(testLink, 5.0*3600, null, null);
+		double cost3 = timecost.getLinkTravelDisutility(testLink, 5.0*3600, null, null, null);
 		assertEquals(40.125, cost3 - cost2, MatsimTestCase.EPSILON);
 	}
 
@@ -195,16 +195,16 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		}
 
 		double oldCost = - myTRConfig.getUtilityOfLineSwitch_utl();
-		double cost1 = timecost.getLinkTravelDisutility(testLink, 7.0*3600, null, null);
+		double cost1 = timecost.getLinkTravelDisutility(testLink, 7.0*3600, null, null, null);
 		myTRConfig.setUtilityOfLineSwitch_utl(0.0);
-		double cost2 = timecost.getLinkTravelDisutility(testLink, 6.0*3600, null, null); // use different time because of internal caching effects
+		double cost2 = timecost.getLinkTravelDisutility(testLink, 6.0*3600, null, null, null); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
 		myTRConfig.additionalTransferTime = 120.0;
-		double cost3 = timecost.getLinkTravelDisutility(testLink, 5.0*3600, null, null);
+		double cost3 = timecost.getLinkTravelDisutility(testLink, 5.0*3600, null, null, null);
 		assertEquals(-120.0 * myTRConfig.getMarginalUtiltityOfWaiting_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
 		// test with custom value for utility of waiting, just in case too many of the default marginal utilities are 0.0
 		myTRConfig.setMarginalUtiltityOfWaiting_utl_s(-12.0 / 3600.0);
-		double cost4 = timecost.getLinkTravelDisutility(testLink, 7.0*3600, null, null);
+		double cost4 = timecost.getLinkTravelDisutility(testLink, 7.0*3600, null, null, null);
 		assertEquals(120.0 * 12.0 / 3600.0, cost4 - cost2, MatsimTestCase.EPSILON);
 	}
 

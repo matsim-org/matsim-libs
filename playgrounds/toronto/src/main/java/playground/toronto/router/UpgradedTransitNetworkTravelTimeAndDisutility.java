@@ -3,11 +3,12 @@ package playground.toronto.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 
@@ -24,7 +25,7 @@ import org.matsim.vehicles.Vehicle;
  * @author pkucirek
  *
  */
-public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime, TravelDisutility{
+public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime, TransitTravelDisutility{
 	
 	private static final Logger log = Logger.getLogger(UpgradedTransitNetworkTravelTimeAndDisutility.class);
 	
@@ -46,7 +47,7 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 	
 	@Override
 	public double getLinkTravelDisutility(Link link, double time,
-			Person person, Vehicle vehicle) {
+			Person person, Vehicle vehicle, final CustomDataManager dataManager) {
 		double cost;
 			
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
@@ -124,11 +125,6 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 		//TODO implement fares 
 		
 		return 0;
-	}
-	
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

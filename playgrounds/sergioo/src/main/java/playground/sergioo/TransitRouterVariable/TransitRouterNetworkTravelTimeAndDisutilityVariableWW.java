@@ -31,6 +31,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
@@ -90,7 +91,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityVariableWW extends Trans
 			throw new RuntimeException("Bad transit router link");
 	}
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
 		double cost;
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)

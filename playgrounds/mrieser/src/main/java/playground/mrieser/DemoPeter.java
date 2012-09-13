@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -77,11 +78,9 @@ public class DemoPeter {
 			super(config);
 		}
 
-
-
 		@Override
-		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-			return super.getLinkTravelDisutility(link, time, person, vehicle);
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
+			return super.getLinkTravelDisutility(link, time, person, vehicle, dataManager);
 		}
 
 	}

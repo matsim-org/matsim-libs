@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import herbie.running.scoring.TravelScoringFunction;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -26,17 +28,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -48,13 +48,12 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import herbie.running.scoring.TravelScoringFunction;
 
 /**
  * Dirty implementation of a transit router using the hebie assumptions
@@ -67,7 +66,7 @@ public class HerbieTransitRouter implements TransitRouter {
 
 	private final MultiNodeDijkstra dijkstra;
 	private final TransitRouterConfig config;
-	private final TravelDisutility travelDisutility;
+	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
 	private final TravelScoringFunction distanceScoring;
 	
@@ -90,7 +89,7 @@ public class HerbieTransitRouter implements TransitRouter {
 			final TransitRouterConfig config,
 			final TransitRouterNetwork routerNetwork,
 			final TravelTime travelTime,
-			final TravelDisutility travelDisutility,
+			final TransitTravelDisutility travelDisutility,
 			final TravelScoringFunction distanceScoring) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
