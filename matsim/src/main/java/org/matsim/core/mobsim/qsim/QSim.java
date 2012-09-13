@@ -188,6 +188,7 @@ public final class QSim implements VisMobsim, Netsim {
 		while (doContinue) {
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 			doContinue = doSimStep(time);
+			this.events.afterSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (doContinue) {
 				time = this.simTimer.incrementTime();

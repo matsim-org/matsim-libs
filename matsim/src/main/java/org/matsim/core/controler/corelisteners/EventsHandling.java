@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -46,7 +47,7 @@ public class EventsHandling implements BeforeMobsimListener,
 
 	final static private Logger log = Logger.getLogger(EventsHandling.class);
 	
-	private final EventsManagerImpl eventsManager;
+	private final EventsManager eventsManager;
 	private List<EventWriter> eventWriters = new LinkedList<EventWriter>();
 
 	private int writeEventsInterval;
@@ -63,7 +64,7 @@ public class EventsHandling implements BeforeMobsimListener,
 	 * @param eventsFileFormats
 	 * @param controlerIO
 	 */
-	public EventsHandling(EventsManagerImpl eventsManager, int writeEventsInterval, Set<EventsFileFormat> eventsFileFormats,
+	public EventsHandling(EventsManager eventsManager, int writeEventsInterval, Set<EventsFileFormat> eventsFileFormats,
 			OutputDirectoryHierarchy controlerIO ) {
 		this.eventsManager = eventsManager ;
 		this.writeEventsInterval = writeEventsInterval ;
@@ -73,7 +74,7 @@ public class EventsHandling implements BeforeMobsimListener,
 	
 	@Deprecated // use other constructor instead; do not assume that material can be retrieved from the Controler object.  
 	// kai, jun'12
-	public EventsHandling( EventsManagerImpl eventsManager ) {
+	public EventsHandling( EventsManager eventsManager ) {
 		this.eventsManager = eventsManager ;
 		this.calledViaOldConstructor = true ;
 	}

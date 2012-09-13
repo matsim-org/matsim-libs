@@ -26,12 +26,9 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEventImpl;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -58,7 +55,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 	 * Test, if adding and removing a handler works.
 	 */
 	public void testAddAndRemoveHandler() {
-		EventsManagerImpl events = new SimStepParallelEventsManagerImpl(2);
+		EventsManager events = new SimStepParallelEventsManagerImpl(2);
 
 		// start iteration
 		events.initProcessing();
@@ -78,7 +75,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		assertEquals(0, handler.getNumberOfProcessedMessages());
 	}
 
-	private void processEvents(final EventsManagerImpl events, final int eventCount,
+	private void processEvents(final EventsManager events, final int eventCount,
 			final int numberOfHandlers, final int numberOfIterations) {
 
 		Handler1[] handlers = new Handler1[numberOfHandlers];
@@ -124,11 +121,11 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		events.processEvent(linkLeaveEvent);
 		linkLeaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl(""), new IdImpl(""), null);
 		events.processEvent(linkLeaveEvent);
-		events.notifyMobsimAfterSimStep(new MobsimAfterSimStepEventImpl<Mobsim>(null, 1.0));
+		events.afterSimStep(1.0);
 		
 		linkLeaveEvent = new LinkLeaveEventImpl(2.0, new IdImpl(""), new IdImpl(""), null);
 		events.processEvent(linkLeaveEvent);
-		events.notifyMobsimAfterSimStep(new MobsimAfterSimStepEventImpl<Mobsim>(null, 2.0));
+		events.afterSimStep(2.0);
 		
 		events.finishProcessing();
 		
@@ -140,11 +137,11 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			
 			linkLeaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl(""), new IdImpl(""), null);
 			events.processEvent(linkLeaveEvent);
-			events.notifyMobsimAfterSimStep(new MobsimAfterSimStepEventImpl<Mobsim>(null, 1.0));
+			events.afterSimStep(1.0);
 			
 			linkLeaveEvent = new LinkLeaveEventImpl(2.0, new IdImpl(""), new IdImpl(""), null);
 			events.processEvent(linkLeaveEvent);
-			events.notifyMobsimAfterSimStep(new MobsimAfterSimStepEventImpl<Mobsim>(null, 2.0));
+			events.afterSimStep(2.0);
 			
 			linkLeaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl(""), new IdImpl(""), null);
 			events.processEvent(linkLeaveEvent);
@@ -220,7 +217,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			events.processEvent(linkLeaveEvent);
 			
 			// step ahead in time
-			events.notifyMobsimAfterSimStep(new MobsimAfterSimStepEventImpl<Mobsim>(null, time));
+			events.afterSimStep(time);
 			log.info("switched time step");
 		}
 		
@@ -286,7 +283,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testCrashingHandler() {
-		EventsManagerImpl events = new SimStepParallelEventsManagerImpl(2);
+		EventsManager events = new SimStepParallelEventsManagerImpl(2);
 
 		// start iteration
 		events.initProcessing();

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Events.java
+ * EventsManagerImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -143,6 +143,7 @@ public class EventsManagerImpl implements EventsManager {
 		}
 	}
 
+	@Override
 	public void printEventsCount() {
 		log.info(" event # " + this.counter);
 	}
@@ -175,6 +176,7 @@ public class EventsManagerImpl implements EventsManager {
 		this.cacheHandlers.clear();
 	}
 
+	@Override
 	public void clearHandlers() {
 		log.info("clearing Event-Handlers");
 		for (HandlerData handler : this.handlerData) {
@@ -183,6 +185,7 @@ public class EventsManagerImpl implements EventsManager {
 		this.cacheHandlers.clear();
 	}
 
+	@Override
 	public void resetHandlers(final int iteration) {
 		log.info("resetting Event-Handlers");
 		this.counter = 0;
@@ -202,25 +205,23 @@ public class EventsManagerImpl implements EventsManager {
 	/**
 	 * Resets the event counter to zero.
 	 */
+	@Override
 	public void resetCounter() {
 		this.counter = 0;
 		this.nextCounterMsg = 1;
 	}
 
-	/**
-	 * Called before the first event is sent for processing. Allows to initialize internal
-	 * data structures used to process events.
-	 */
+	@Override
 	public void initProcessing() {
 		// nothing to do in this implementation
 	}
 
-	/**
-	 * Called after the last event is sent for processing. The method must only return when all
-	 * events are completely processing (in case they are not directly processed in
-	 * {@link #processEvent(Event)}). Can be used to clean up internal data structures used
-	 * to process events.
-	 */
+	@Override
+	public void afterSimStep(double time) {
+		// nothing to do in this implementation
+	}
+	
+	@Override
 	public void finishProcessing() {
 		// nothing to do in this implementation
 	}
@@ -366,6 +367,7 @@ public class EventsManagerImpl implements EventsManager {
 		return false;
 	}
 
+	@Override
 	public void printEventHandlers() {
 		log.info("currently registered event-handlers:");
 		for (HandlerData handlerType : this.handlerData) {

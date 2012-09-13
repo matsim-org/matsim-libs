@@ -28,6 +28,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
@@ -37,18 +38,16 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 /**
  * An EventsHandler that handles all occurring Events in separate Threads.
  * When a Time Step of the QSim ends, all Events that have been created
  * in that Time Step are processed before the simulation can go on.
- * This is necessary e.g. when using Within Day Replanning.
+ * This is necessary e.g. when using Within-day Replanning.
  * 
  * @author cdobler
  */
-public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implements MobsimAfterSimStepListener {
+public class SimStepParallelEventsManagerImpl implements EventsManager {
 
 	private final static Logger log = Logger.getLogger(SimStepParallelEventsManagerImpl.class);
 	
@@ -59,11 +58,13 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 	private Thread[] threads;
 	private ProcessEventsRunnable[] runnables;
 	private EventsManager[] eventsManagers;
+	private EventsManager delegate;
 	private ProcessedEventsChecker processedEventsChecker;
 	
 	private boolean parallelMode = false;
 	private int handlerCount = 0;
 	
+	private AtomicLong counter;
 	private AtomicBoolean hadException;
 	private ExceptionHandler uncaughtExceptionHandler;
 	
@@ -77,23 +78,33 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 	}
 	
 	private void init() {
+		this.counter = new AtomicLong(0);
+		
 		this.simStepEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
 		this.iterationEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
 		
+		this.delegate = EventsUtils.createEventsManager();
+		if (!(delegate instanceof EventsManagerImpl)) {
+			throw new RuntimeException("Expected a EventsManagerImpl to be created but found a " +
+					delegate.getClass().toString());
+		}
+
 		this.eventsManagers = new EventsManager[this.numOfThreads];
 		for (int i = 0; i < numOfThreads; i++) this.eventsManagers[i] = EventsUtils.createEventsManager();
 	}
 
 	@Override
 	public void processEvent(final Event event) {
+		this.counter.incrementAndGet();
+		
 		if (parallelMode) {
 			runnables[0].processEvent(event);
-		} else super.processEvent(event);
+		} else delegate.processEvent(event);
 	}
 
 	@Override
 	public void addHandler(final EventHandler handler) {
-		super.addHandler(handler);
+		delegate.addHandler(handler);
 		
 		eventsManagers[handlerCount % numOfThreads].addHandler(handler);
 		handlerCount++;
@@ -101,28 +112,56 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 
 	@Override
 	public void removeHandler(final EventHandler handler) {
-		super.removeHandler(handler);
+		delegate.removeHandler(handler);
 		
 		for (EventsManager eventsManager : eventsManagers) eventsManager.removeHandler(handler);
 	}
 	
 	@Override
+	public EventsFactory getFactory() {
+		return delegate.getFactory();
+	}
+	
+	@Override
+	public void resetHandlers(int iteration) {
+		delegate.resetHandlers(iteration);
+		counter.set(0);
+	}
+	
+	@Override
 	public void resetCounter() {
-		super.resetCounter();
+		delegate.resetCounter();
+		counter.set(0);
 		
-		for (EventsManager eventsManager : eventsManagers) ((EventsManagerImpl) eventsManager).resetCounter();
+		for (EventsManager eventsManager : eventsManagers) eventsManager.resetCounter();
 	}
 
 	@Override
 	public void clearHandlers() {
-		super.clearHandlers();
+		delegate.clearHandlers();
 		
-		for (EventsManager eventsManager : eventsManagers) ((EventsManagerImpl) eventsManager).clearHandlers();
+		for (EventsManager eventsManager : eventsManagers) eventsManager.clearHandlers();
+	}
+	
+	@Override
+	public void printEventHandlers() {
+		log.info("all event handlers");
+		delegate.printEventHandlers();
+	}
+
+	@Override
+	public void printEventsCount() {
+		log.info(" overall event # " + this.counter.get());
+		log.info(" non parallel events:");
+		delegate.printEventsCount();
+		log.info(" parallel events:");
+		for (EventsManager eventsManager : this.eventsManagers) eventsManager.printEventsCount();
 	}
 
 	@Override
 	public void initProcessing() {
-		super.initProcessing();
+		delegate.initProcessing();
+		for (EventsManager eventsManager : this.eventsManagers) eventsManager.initProcessing();
 
 		Queue<Event>[] eventsQueuesArray = new Queue[this.numOfThreads];	
 		List<Queue<Event>> eventsQueues = new ArrayList<Queue<Event>>();
@@ -181,7 +220,6 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 	 */
 	@Override
 	public synchronized void finishProcessing() {
-		super.finishProcessing();
 		
 		/*
 		 * If an exception occurred, at least one of the events processing threads
@@ -200,6 +238,9 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 			}
 		}
 		
+		delegate.finishProcessing();
+		for (EventsManager eventsManager : this.eventsManagers) eventsManager.finishProcessing();
+		
 		/*
 		 * After the simulation Events are processed in
 		 * the Main Thread.
@@ -209,11 +250,10 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 		if (this.hadException.get()) {
 			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
 		}
-
 	}
 
 	@Override
-	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+	public void afterSimStep(double time) {
 		
 		/*
 		 * If an exception occurred, at least one of the events processing threads
@@ -225,13 +265,13 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 		}
 		
 		try {
-			this.processedEventsChecker.setTime(e.getSimulationTime());
-			this.processEvent(new LastEventOfSimStep(e.getSimulationTime()));
+			this.processedEventsChecker.setTime(time);
+			this.processEvent(new LastEventOfSimStep(time));
 			simStepEndBarrier.await();
-		} catch (InterruptedException e1) {
-			Gbl.errorMsg(e1);
-		} catch (BrokenBarrierException e1) {
-			Gbl.errorMsg(e1);
+		} catch (InterruptedException e) {
+			Gbl.errorMsg(e);
+		} catch (BrokenBarrierException e) {
+			Gbl.errorMsg(e);
 		}
 	}
 	
@@ -357,6 +397,49 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 		public void removeHandler(EventHandler handler) {
 			throw new RuntimeException("This method should never be called - calls should go to the EventHandlers directly.");
 		}
+
+		@Override
+		public void initProcessing() {
+			this.eventsManager.initProcessing();
+		}
+
+		@Override
+		public void afterSimStep(double time) {
+			this.eventsManager.afterSimStep(time);
+		}
+
+		@Override
+		public void finishProcessing() {
+			this.eventsManager.finishProcessing();
+		}
+
+		@Override
+		public void resetCounter() {
+			this.eventsManager.resetCounter();
+		}
+
+		@Override
+		public void clearHandlers() {
+			this.eventsManager.clearHandlers();			
+		}
+		
+		@Override
+		public void resetHandlers(int iteration) {
+			throw new RuntimeException("This method should never be called - calls should go to the EventHandlers directly.");
+		}
+
+		@Override
+		public void printEventsCount() {
+			log.info(Thread.currentThread().getName() + " events count:");
+			this.eventsManager.printEventHandlers();
+		}
+
+		@Override
+		public void printEventHandlers() {
+			log.info(Thread.currentThread().getName() + " registered EventHandlers:");
+			this.eventsManager.printEventHandlers();
+		}
+		
 	}	// ProcessEventsRunnable
 	
 	private static class ProcessedEventsChecker implements Runnable {
@@ -446,4 +529,5 @@ public class SimStepParallelEventsManagerImpl extends EventsManagerImpl implemen
 		}
 
 	}
+
 }

@@ -200,6 +200,46 @@ public class JointQSimFactory implements MobsimFactory {
 		public void removeHandler(final EventHandler handler) {
 			delegate.removeHandler(handler);
 		}
+
+		@Override
+		public void resetCounter() {
+			delegate.resetCounter();
+		}
+
+		@Override
+		public void resetHandlers(int iteration) {
+			delegate.resetHandlers(iteration);
+		}
+
+		@Override
+		public void clearHandlers() {
+			delegate.clearHandlers();
+		}
+
+		@Override
+		public void printEventsCount() {
+			delegate.printEventsCount();
+		}
+
+		@Override
+		public void printEventHandlers() {
+			delegate.printEventHandlers();
+		}
+
+		@Override
+		public void initProcessing() {
+			delegate.initProcessing();
+		}
+
+		@Override
+		public void afterSimStep(double time) {
+			delegate.afterSimStep(time);
+		}
+
+		@Override
+		public void finishProcessing() {
+			delegate.finishProcessing();
+		}
 	}
 }
 
