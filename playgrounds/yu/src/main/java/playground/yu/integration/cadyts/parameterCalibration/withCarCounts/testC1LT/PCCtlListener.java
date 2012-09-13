@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testC1LT;
 
@@ -79,9 +79,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	private int paramDim;
 
-	static String[] paramNames/* in configfile */;
+	static String[] paramNames in configfile ;
 
-	private double[][] paramArrays/* performing, traveling and so on */;
+	private double[][] paramArrays performing, traveling and so on ;
 
 	private double llhSum = 0d;
 	private boolean writeQGISFile = true;
@@ -306,10 +306,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			for (int i = 0; i < paramNames.length; i++) {
 				int paramNameIndex = Events2Score4AttrRecorder.attrNameList
-						.indexOf(paramNames[i]/*
+						.indexOf(paramNames[i]
 											 * pos. of param in Parameters in
 											 * Cadyts
-											 */);
+											 );
 
 				// double paramScaleFactor =
 				// Events2Score4PC_mnl_mnl.paramScaleFactorList
@@ -324,7 +324,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 							));
 					// ScoringConfigGetSetValues
 					// .setValue(paramNames[i], value);
-				} else/* bse */{
+				} else bse {
 					config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
 							Double.toString(value
 							// / paramScaleFactor
@@ -351,7 +351,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			writer.writeln(sb);
 			writer.flush();
 		}
-		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
+		-----------------initialStepSize==0, no parameters are changed----------------------
 
 		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setMultinomialLogit(mnl);
 
@@ -710,10 +710,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 		// SETTING msaExponent
 		{
-			/*
+			
 			 * initialStepSize * 1.0 /(iteration ^ msaExponent), if msaExponent
 			 * == 0.5, the step won't so quickly smaller, default value: 1.0
-			 */
+			 
 			String msaExponentStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 					"msaExponent");
 			if (msaExponentStr != null) {
@@ -745,7 +745,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				// * paramScaleFactor
 						);
 
-			} else/* bse */{
+			} else bse {
 				String paramStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 						paramNames[i]);
 				initialParams.set(i,
@@ -792,13 +792,14 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 		// set up volumes analyzer
 		volumes = ctl.getVolumes();
-		/*
+		
 		 * volumes = new VolumesAnalyzer(3600, 30 * 3600,
 		 * network);ctl.getEvents().addHandler(volumes);
-		 */
+		 
 	}
 
 	public void setWriteQGISFile(boolean writeQGISFile) {
 		this.writeQGISFile = writeQGISFile;
 	}
 }
+*/

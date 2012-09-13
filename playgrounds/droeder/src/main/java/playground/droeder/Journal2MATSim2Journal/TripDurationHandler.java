@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -42,45 +42,48 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 public class TripDurationHandler implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 											ActivityEndEventHandler, ActivityStartEventHandler{
 
-	Map<Id, Set<PersonEvent>> id2Event;
+	Map<Id, Set<Event>> id2Event;
 	public TripDurationHandler(){
-		this.id2Event = new HashMap<Id, Set<PersonEvent>>();
+		this.id2Event = new HashMap<Id, Set<Event>>();
 	}
 	
 	@Override
 	public void reset(int iteration) {
 	}
-	private void init(PersonEvent e){
-		if(!this.id2Event.containsKey(e.getPersonId())){
-			this.id2Event.put(e.getPersonId(), new LinkedHashSet<PersonEvent>());
-		}
-	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent e) {
-		this.init(e);
+		if(!this.id2Event.containsKey(e.getPersonId())){
+			this.id2Event.put(e.getPersonId(), new LinkedHashSet<Event>());
+		}
 		this.id2Event.get(e.getPersonId()).add(e);
 	}
 	
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
-		this.init(e);
+		if(!this.id2Event.containsKey(e.getPersonId())){
+			this.id2Event.put(e.getPersonId(), new LinkedHashSet<Event>());
+		}
 		this.id2Event.get(e.getPersonId()).add(e);
 	}
 	
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
-		this.init(e);
+		if(!this.id2Event.containsKey(e.getPersonId())){
+			this.id2Event.put(e.getPersonId(), new LinkedHashSet<Event>());
+		}
 		this.id2Event.get(e.getPersonId()).add(e);
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent e) {
-		this.init(e);
+		if(!this.id2Event.containsKey(e.getPersonId())){
+			this.id2Event.put(e.getPersonId(), new LinkedHashSet<Event>());
+		}
 		this.id2Event.get(e.getPersonId()).add(e);
 	}
 
-	public Map<Id, Set<PersonEvent>> getId2Event(){
+	public Map<Id, Set<Event>> getId2Event(){
 		return this.id2Event;
 	}
 

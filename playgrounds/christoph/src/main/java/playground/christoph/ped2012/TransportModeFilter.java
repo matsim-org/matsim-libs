@@ -29,7 +29,8 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -114,10 +115,14 @@ public class TransportModeFilter implements BasicEventHandler {
 		}
 		
 		// skip link events from not observed agents
-		else if (event instanceof LinkEvent) {
-			LinkEvent linkEvent = (LinkEvent) event;
-			if (!observedAgents.contains(linkEvent.getPersonId())) return;
-		}
+		else if (event instanceof LinkEnterEvent) {
+			Event linkEvent = (Event) event;
+			if (!observedAgents.contains(((LinkEnterEvent) linkEvent).getPersonId())) return;
+		} 
+		else if (event instanceof LinkLeaveEvent) {
+			Event linkEvent = (Event) event;
+			if (!observedAgents.contains(((LinkLeaveEvent) linkEvent).getPersonId())) return;
+		} 
 		
 		// skip agent wait 2 link events from not observed agents
 		else if (event instanceof AgentWait2LinkEvent) {

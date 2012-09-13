@@ -21,17 +21,17 @@ package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.PersonEventImpl;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -66,11 +66,11 @@ public class ExtractHitchHikersWaitingTimes {
 		public void handleEvent(final Event event) {
 			if (event.getAttributes().get( EventImpl.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
 				waitStarts.put(
-						event.getAttributes().get( PersonEventImpl.ATTRIBUTE_PERSON ),
+						event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ),
 						event.getTime());
 			}
 			else if (event.getAttributes().get( EventImpl.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
-				Double start = waitStarts.remove( event.getAttributes().get( PersonEventImpl.ATTRIBUTE_PERSON ) );
+				Double start = waitStarts.remove( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) );
 
 				try {
 					writer.write( ""+(event.getTime() - start) );

@@ -22,9 +22,9 @@ package playground.taxicab;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 
@@ -160,7 +160,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	public void endLegAndComputeNextState(double now) {
 		
 		EventsManager events = this.netsim.getEventsManager() ;
-		EventsFactoryImpl evFac = (EventsFactoryImpl) events.getFactory() ;
+		EventsFactory evFac = (EventsFactory) events.getFactory() ;
 
 		if ( this.expectedPassengerId!=null && this.currentPassenger==null ) {
 			// (= no passenger on board, but having a request)

@@ -21,8 +21,15 @@ package playground.dgrether.events.filters;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
 
 /**
@@ -40,8 +47,40 @@ public class PersonEventFilter implements EventFilter {
 	
 	@Override
 	public boolean doProcessEvent(Event event) {
-		if (event instanceof PersonEvent) {
-			return this.personIds.contains(((PersonEvent)event).getPersonId());
+		if (event instanceof LinkEnterEvent) {
+			LinkEnterEvent e = (LinkEnterEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else if (event instanceof LinkLeaveEvent) {
+			LinkLeaveEvent e = (LinkLeaveEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else if (event instanceof AgentWait2LinkEvent) {
+			AgentWait2LinkEvent e = (AgentWait2LinkEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else if (event instanceof AgentDepartureEvent) {
+			AgentDepartureEvent e = (AgentDepartureEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else if (event instanceof AgentArrivalEvent) {
+			AgentArrivalEvent e = (AgentArrivalEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else if (event instanceof ActivityStartEvent) {
+			ActivityStartEvent e = (ActivityStartEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else if (event instanceof ActivityEndEvent) {
+			ActivityEndEvent e = (ActivityEndEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else if (event instanceof AgentStuckEvent) {
+			AgentStuckEvent e = (AgentStuckEvent) event;
+			Id personId = e.getPersonId();
+			this.personIds.contains(personId);
+		} else {
+			return false;
 		}
 		return false;
 	}

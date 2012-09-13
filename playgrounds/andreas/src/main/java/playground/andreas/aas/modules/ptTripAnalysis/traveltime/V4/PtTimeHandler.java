@@ -22,7 +22,7 @@ package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.Event;
 
 
 /**
@@ -45,7 +45,7 @@ public class PtTimeHandler {
 		times.add(new SwitchWalk());
 	}
 	
-	public void handleEvent(PersonEvent e){
+	public void handleEvent(Event e){
 		if(first == null){
 			first = e.getTime();
 		}else{

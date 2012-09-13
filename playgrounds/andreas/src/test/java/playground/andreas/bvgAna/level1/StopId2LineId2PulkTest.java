@@ -10,8 +10,8 @@ import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 
@@ -43,7 +43,7 @@ public class StopId2LineId2PulkTest {
 
 //	    create events
 	    
-	    EventsFactoryImpl ef = new EventsFactoryImpl();
+	    EventsFactory ef = new EventsFactory();
 	    
 	    TransitDriverStartsEvent event1 = ef.createTransitDriverStartsEvent(1.0, driverId1, vehicleId1, transitLineId1, transitRouteId1, departureId1);
 	    VehicleDepartsAtFacilityEvent event2 = ef.createVehicleDepartsAtFacilityEvent(1.0, vehicleId1, facilityId1, 0.5);

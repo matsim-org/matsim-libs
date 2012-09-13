@@ -19,19 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.PersonEventImpl;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
@@ -63,7 +63,7 @@ public class ExtractHitchHikersFakeActivities {
 
 	private static class Handler implements BasicEventHandler, AgentArrivalEventHandler {
 		private final EventWriterXML writer;
-		private final EventsFactory factory = new EventsFactoryImpl();
+		private final EventsFactory factory = new EventsFactory();
 
 		public Handler(final String outFile) {
 			writer = new EventWriterXML( outFile );
@@ -100,7 +100,7 @@ public class ExtractHitchHikersFakeActivities {
 				writer.handleEvent(
 						factory.createActivityStartEvent(
 							event.getTime(),
-							new IdImpl( event.getAttributes().get( PersonEventImpl.ATTRIBUTE_PERSON ) ),
+							new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ),
 							new IdImpl( event.getAttributes().get( "link" ) ),
 							null,
 							WAIT_ACT_TYPE));
@@ -109,7 +109,7 @@ public class ExtractHitchHikersFakeActivities {
 				writer.handleEvent(
 						factory.createActivityEndEvent(
 							event.getTime(),
-							new IdImpl( event.getAttributes().get( PersonEventImpl.ATTRIBUTE_PERSON ) ),
+							new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ),
 							new IdImpl( event.getAttributes().get( "link" ) ),
 							null,
 							WAIT_ACT_TYPE));
@@ -117,14 +117,14 @@ public class ExtractHitchHikersFakeActivities {
 				writer.handleEvent(
 						factory.createActivityStartEvent(
 							event.getTime(),
-							new IdImpl( event.getAttributes().get( PersonEventImpl.ATTRIBUTE_PERSON ) ),
+							new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ),
 							new IdImpl( event.getAttributes().get( "link" ) ),
 							null,
 							DEP_ACT_TYPE));
 				writer.handleEvent(
 						factory.createActivityEndEvent(
 							event.getTime() + DUR,
-							new IdImpl( event.getAttributes().get( PersonEventImpl.ATTRIBUTE_PERSON ) ),
+							new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ),
 							new IdImpl( event.getAttributes().get( "link" ) ),
 							null,
 							DEP_ACT_TYPE));

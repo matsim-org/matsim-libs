@@ -1,7 +1,6 @@
 package playground.wrashid.PSF.DataForPSL;
 
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
@@ -34,20 +33,20 @@ public class FilterOutOnlyActStartAndActEndEvents implements ActivityStartEventH
 		
 	}
 
-	private boolean shouldEventBeWrittenOut(ActivityEvent event){
-		return !(event.getActType().equalsIgnoreCase("parkingDeparture") || event.getActType().equalsIgnoreCase("parkingArrival"));
+	private boolean shouldEventBeWrittenOut(String actType){
+		return !(actType.equalsIgnoreCase("parkingDeparture") || actType.equalsIgnoreCase("parkingArrival"));
 	}
 	
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (shouldEventBeWrittenOut(event)){
+		if (shouldEventBeWrittenOut(event.getActType())){
 			eventManagerForWritingOutEvents.processEvent(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (shouldEventBeWrittenOut(event)){
+		if (shouldEventBeWrittenOut(event.getActType())){
 			eventManagerForWritingOutEvents.processEvent(event);
 		}
 	}

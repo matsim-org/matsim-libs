@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v3.events.debug;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.PersonEventImpl;
+import org.matsim.core.events.EventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public class ArrowEvent extends PersonEventImpl {
+public class ArrowEvent extends EventImpl {
 	
 	public static final String ATTRIBUTE_FROM_X = "fromX";
 	public static final String ATTRIBUTE_FROM_Y = "fromY";
@@ -49,11 +49,11 @@ public class ArrowEvent extends PersonEventImpl {
 	private final float b;
 
 	public ArrowEvent(Id personId, Coordinate from, Coordinate to, float r, float g, float b, int type, double time) {
-		super(time,personId);
+		super(time);
+		this.persId = personId;
 		this.from = from;
 		this.to = to;
 		this.type = type;
-		this.persId = personId;
 		this.r = r;
 		this.g = g;
 		this.b = b;
@@ -77,7 +77,7 @@ public class ArrowEvent extends PersonEventImpl {
 		map.put(ATTRIBUTE_TO_X, ""+this.to.x);
 		map.put(ATTRIBUTE_TO_Y, ""+this.to.y);
 		map.put(ATTRIBUTE_LINE_SEG_TYPE, ""+this.type);
-		
+		map.put(ATTRIBUTE_PERSON, this.persId.toString());
 		return map;
 	}
 
@@ -144,5 +144,8 @@ public class ArrowEvent extends PersonEventImpl {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
+	
+	public static final String ATTRIBUTE_PERSON = "person";
 
 }
+

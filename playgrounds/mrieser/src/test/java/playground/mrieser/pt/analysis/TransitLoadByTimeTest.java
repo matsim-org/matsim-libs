@@ -22,8 +22,8 @@ package playground.mrieser.pt.analysis;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 
 public class TransitLoadByTimeTest {
 
@@ -34,7 +34,7 @@ public class TransitLoadByTimeTest {
 		Id vehicleIdDep1 = id[0];
 		Id vehicleIdDep2 = id[3];
 
-		EventsFactoryImpl ef = new EventsFactoryImpl();
+		EventsFactory ef = new EventsFactory();
 
 		TransitLoadByTime tl = new TransitLoadByTime();
 		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1));

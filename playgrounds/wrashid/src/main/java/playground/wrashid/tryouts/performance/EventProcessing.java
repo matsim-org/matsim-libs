@@ -3,10 +3,10 @@ package playground.wrashid.tryouts.performance;
 import java.util.LinkedList;
 
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 
 // this events processing relies on creating artifical events, intead of reading them
@@ -48,7 +48,7 @@ public class EventProcessing {
 			events.addHandler(ep.new Handler1());
 		}
 		
-		LinkLeaveEventImpl linkLeaveEvent=new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent=new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
 		
 		for (int i=0;i<1000000;i++){
 				events.processEvent(linkLeaveEvent);

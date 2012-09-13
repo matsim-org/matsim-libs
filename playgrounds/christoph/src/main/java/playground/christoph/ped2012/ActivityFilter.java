@@ -20,7 +20,8 @@
 
 package playground.christoph.ped2012;
 
-import org.matsim.core.api.experimental.events.ActivityEvent;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -62,7 +63,7 @@ public class ActivityFilter implements BasicEventHandler {
 	public void handleEvent(Event event) {
 
 		// If it is an activity event, write it to the output file, otherwise skip it.
-		if (event instanceof ActivityEvent) {
+		if (event instanceof ActivityStartEvent || event instanceof ActivityEndEvent) {
 			eventWriter.handleEvent(event);
 		} else return;
 	}

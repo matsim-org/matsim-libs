@@ -20,8 +20,8 @@
 package playground.michalm.vrp.taxi.taxicab;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
@@ -211,7 +211,7 @@ public class TaxiAgentLogic
 
         // event handling
         EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
-        EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
+        EventsFactory evFac = (EventsFactory)events.getFactory();
         events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
                 agent.getId()));
 
@@ -239,7 +239,7 @@ public class TaxiAgentLogic
 
                 // deliver the passenger
                 EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
-                EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
+                EventsFactory evFac = (EventsFactory)events.getFactory();
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
                         agent.getId()));
 

@@ -11,7 +11,6 @@ import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -22,7 +21,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
@@ -62,55 +60,68 @@ public class PrintEventsOfSingleAgent {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			printEvent(event);
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}
 		}
 
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			printEvent(event);
-		}
-
-		@Override
-		public void handleEvent(AgentWait2LinkEvent event) {
-			printEvent(event);
-		}
-
-		@Override
-		public void handleEvent(AgentMoneyEvent event) {
-			printEvent(event);			
-		}
-
-		@Override
-		public void handleEvent(AgentStuckEvent event) {
-			printEvent(event);			
-		}
-
-		@Override
-		public void handleEvent(AgentDepartureEvent event) {
-			printEvent(event);			
-		}
-
-		@Override
-		public void handleEvent(AgentArrivalEvent event) {
-			printEvent(event);			
-		}
-
-		@Override
-		public void handleEvent(ActivityStartEvent event) {
-			printEvent(event);			
-		}
-
-		@Override
-		public void handleEvent(ActivityEndEvent event) {
-			printEvent(event);			
-		}
-		
-		private void printEvent(PersonEvent event) {
 			if (event.getPersonId().equals(filterEventsForAgentId)){
 				System.out.println(event.toString());
 			}
 		}
+
+		@Override
+		public void handleEvent(AgentWait2LinkEvent event) {
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}
+		}
+
+		@Override
+		public void handleEvent(AgentMoneyEvent event) {
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}			
+		}
+
+		@Override
+		public void handleEvent(AgentStuckEvent event) {
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}			
+		}
+
+		@Override
+		public void handleEvent(AgentDepartureEvent event) {
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}			
+		}
+
+		@Override
+		public void handleEvent(AgentArrivalEvent event) {
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}			
+		}
+
+		@Override
+		public void handleEvent(ActivityStartEvent event) {
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}		
+		}
+
+		@Override
+		public void handleEvent(ActivityEndEvent event) {
+			if (event.getPersonId().equals(filterEventsForAgentId)){
+				System.out.println(event.toString());
+			}		
+		}
+		
 	}
 	
 }

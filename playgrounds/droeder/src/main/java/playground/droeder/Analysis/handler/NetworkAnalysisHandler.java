@@ -33,10 +33,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
@@ -201,13 +200,13 @@ class NetStats{
 		this.observer = new HashSet<Id>();
 	}
 	
-	public void processEvent(LinkEvent e){
-		if(e instanceof LinkEnterEvent){
-			this.observer.add(e.getPersonId());
-		}else if(e instanceof LinkLeaveEvent){
-			if(this.observer.contains(e.getPersonId())){
-				this.vhmt += this.net.getLinks().get(e.getLinkId()).getLength();
-				observer.remove(e.getPersonId());
+	public void processEvent(Event event){
+		if(event instanceof LinkEnterEvent){
+			this.observer.add(((LinkEnterEvent) event).getPersonId());
+		}else if(event instanceof LinkLeaveEvent){
+			if(this.observer.contains(((LinkLeaveEvent) event).getPersonId())){
+				this.vhmt += this.net.getLinks().get(((LinkLeaveEvent) event).getLinkId()).getLength();
+				observer.remove(((LinkLeaveEvent) event).getPersonId());
 			}
 		}
 	}
@@ -243,20 +242,20 @@ class LinkStats{
 		this.lastSlice = -1;
 	}
 	
-	public void processEvent(PersonEvent e){
+	public void processEvent(Event event){
 		this.absoluteFalse();
-		if(e instanceof LinkEnterEvent){
+		if(event instanceof LinkEnterEvent){
 			//observe if the agent passes the hole Link
-			this.observedAgents.put(e.getPersonId(), e.getTime());
-		}else if(e instanceof LinkLeaveEvent){
+			this.observedAgents.put(((LinkEnterEvent) event).getPersonId(), event.getTime());
+		}else if(event instanceof LinkLeaveEvent){
 			// register if the agent passes the hole link and remove from observer
-			if(this.observedAgents.containsKey(e.getPersonId())){
-				this.addTime((LinkEvent) e);
+			if(this.observedAgents.containsKey(((LinkLeaveEvent) event).getPersonId())){
+				this.addTime((LinkLeaveEvent) event);
 			}
-		}else if(e instanceof AgentArrivalEvent){
+		}else if(event instanceof AgentArrivalEvent){
 			//agent stays at this link for activity, so we can't use him for TTCalculation of the Link
-			if(this.observedAgents.containsKey(e.getPersonId())){
-				this.observedAgents.remove(e.getPersonId());
+			if(this.observedAgents.containsKey(((AgentArrivalEvent) event).getPersonId())){
+				this.observedAgents.remove(((AgentArrivalEvent) event).getPersonId());
 			}
 		}
 	}
@@ -267,7 +266,7 @@ class LinkStats{
 		this.absoluteAgentCnt = false;
 	}
 	
-	private void addTime(LinkEvent e){
+	private void addTime(LinkLeaveEvent e){
 		// calc the actual timeSlice
 		int timeSlice = (int)(e.getTime() / this.timeSliceSize);
 		// add timeSlice 2 all maps

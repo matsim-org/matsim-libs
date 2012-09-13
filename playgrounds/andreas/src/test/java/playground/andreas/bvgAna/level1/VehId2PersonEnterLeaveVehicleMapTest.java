@@ -9,8 +9,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 
@@ -40,7 +40,7 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 
 //	    create events
 	    
-	    EventsFactoryImpl ef = new EventsFactoryImpl();
+	    EventsFactory ef = new EventsFactory();
 	    
 	    PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2., persId1, vehId1);
 	    PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1, persId2, vehId1);  

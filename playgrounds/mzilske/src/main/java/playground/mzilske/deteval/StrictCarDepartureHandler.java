@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
@@ -70,7 +70,7 @@ public class StrictCarDepartureHandler implements DepartureHandler {
 			this.engine.handleAgent(agent);
 		} else {
 			EventsManager eventsManager = this.engine.getEventsManager();
-			eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonEntersVehicleEvent(engine.getCurrentTime(), person.getId(), simVehicle.getId()));
+			eventsManager.processEvent(((EventsFactory) eventsManager.getFactory()).createPersonEntersVehicleEvent(engine.getCurrentTime(), person.getId(), simVehicle.getId()));
 			link.continueVehicle(simVehicle);
 		}
 	}

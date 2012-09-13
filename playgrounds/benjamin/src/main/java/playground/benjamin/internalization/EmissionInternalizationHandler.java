@@ -23,10 +23,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.AgentMoneyEventImpl;
 
 import playground.benjamin.emissions.events.ColdEmissionEvent;
 import playground.benjamin.emissions.events.ColdEmissionEventHandler;
@@ -94,7 +94,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
 		double amount2Pay = - coldEmissionCosts;
 		
-		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);
+		Event moneyEvent = new AgentMoneyEvent(time, personId, amount2Pay);
 		
 		eventsManager.processEvent(moneyEvent);
 	}
@@ -105,7 +105,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
 		double amount2Pay = - warmEmissionCosts;
 		
-		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);
+		Event moneyEvent = new AgentMoneyEvent(time, personId, amount2Pay);
 		
 		eventsManager.processEvent(moneyEvent);
 	}

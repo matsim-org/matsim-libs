@@ -43,9 +43,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -441,7 +441,7 @@ public class PhysicalFloor implements Floor {
 		protected boolean checkForEndOfLinkReached(Agent2D agent2D, Coordinate oldPos, Coordinate newPos, double time) {
 			MobsimDriverAgent agent = agent2D.getDelegate();
 			if (this.finishLineCrossChecker.crossesFinishLine(agent.getCurrentLinkId(), agent.chooseNextLinkId(), oldPos, newPos)) {
-				LinkLeaveEventImpl e = new LinkLeaveEventImpl(time, agent.getId(), agent.getCurrentLinkId(), null);
+				LinkLeaveEvent e = new LinkLeaveEvent(time, agent.getId(), agent.getCurrentLinkId(), null);
 				this.em.processEvent(e);
 
 				Id id = agent.chooseNextLinkId();
@@ -455,7 +455,7 @@ public class PhysicalFloor implements Floor {
 					// the wrapped agent, not the wrapper)
 				} else {
 					agent2D.notifyMoveOverNode(id, time);
-					LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId(),null);
+					LinkEnterEvent e2 = new LinkEnterEvent(time, agent.getId(), agent.getCurrentLinkId(),null);
 					this.em.processEvent(e2);
 				}
 			}

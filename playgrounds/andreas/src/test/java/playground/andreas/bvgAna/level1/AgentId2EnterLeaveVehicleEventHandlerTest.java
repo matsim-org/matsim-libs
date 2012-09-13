@@ -6,8 +6,8 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 
@@ -36,7 +36,7 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
         Id persId2 = ida[5];
         Id persId3 = ida[8];
         
-        EventsFactoryImpl ef = new EventsFactoryImpl();
+        EventsFactory ef = new EventsFactory();
         AgentId2EnterLeaveVehicleEventHandler handler = new AgentId2EnterLeaveVehicleEventHandler(idSet);
         
 //        create Events

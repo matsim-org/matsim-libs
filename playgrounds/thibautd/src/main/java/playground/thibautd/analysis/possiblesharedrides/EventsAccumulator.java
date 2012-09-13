@@ -43,14 +43,11 @@ public class EventsAccumulator implements
 		AgentDepartureEventHandler,
 		AgentArrivalEventHandler {
 	
-	//private final List<AgentArrivalEvent> arrivals =
-	//	new ArrayList<AgentArrivalEvent>(1000);
-	//private final List<AgentDepartureEvent> departures =
-	//	new ArrayList<AgentDepartureEvent>(1000);
-	private final List<AgentEventWrapper> arrivals =
-		new ArrayList<AgentEventWrapper>(1000);
-	private final List<AgentEventWrapper> departures =
-		new ArrayList<AgentEventWrapper>(1000);
+	private final List<AgentArrivalEvent> arrivals =
+		new ArrayList<AgentArrivalEvent>(1000);
+	private final List<AgentDepartureEvent> departures =
+		new ArrayList<AgentDepartureEvent>(1000);
+
 	private final List<LinkEnterEvent> enterLinks =
 		new ArrayList<LinkEnterEvent>(1000);
 	private final List<LinkLeaveEvent> leaveLinks =
@@ -71,12 +68,12 @@ public class EventsAccumulator implements
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.arrivals.add(new AgentEventWrapper(event));
+		this.arrivals.add(event);
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		this.departures.add(new AgentEventWrapper(event));
+		this.departures.add(event);
 	}
 
 	@Override
@@ -95,11 +92,11 @@ public class EventsAccumulator implements
 	 * =========================================================================
 	 */
 
-	public List<AgentEventWrapper> getArrivalEvents() {
+	public List<AgentArrivalEvent> getArrivalEvents() {
 		return this.arrivals;
 	}
 
-	public List<AgentEventWrapper> getDepartureEvents()  {
+	public List<AgentDepartureEvent> getDepartureEvents()  {
 		return this.departures;
 	}
 

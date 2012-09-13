@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** 
 
 package playground.yu.analysis;
 
@@ -42,12 +42,12 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
-/**
+*//**
  * test of PtCheck and PtRate, outputs Public-Transit user fraction
  * 
  * @author ychen
  * 
- */
+ *//*
 public class PtcheckControler extends Controler {
 	private final String scenario;
 
@@ -62,9 +62,9 @@ public class PtcheckControler extends Controler {
 
 	public static class PtCheckListener implements StartupListener,
 			IterationEndsListener, ShutdownListener, IterationStartsListener {
-		/**
+		*//**
 		 * internal bufferedWriter
-		 */
+		 *//*
 		private BufferedWriter ptRateWriter = null;
 		private final String scenario;
 
@@ -211,10 +211,10 @@ public class PtcheckControler extends Controler {
 	}
 
 	// -------------------------MAIN FUNCTION--------------------
-	/**
+	*//**
 	 * @param args
 	 *            - the path of config-file
-	 */
+	 *//*
 	public static void main(final String[] args) {
 		final PtcheckControler controler;
 		controler = new PtcheckControler(args, "Zurich");
@@ -224,3 +224,4 @@ public class PtcheckControler extends Controler {
 		System.exit(0);
 	}
 }
+*/

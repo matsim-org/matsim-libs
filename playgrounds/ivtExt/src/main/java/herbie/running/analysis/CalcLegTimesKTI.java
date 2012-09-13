@@ -32,12 +32,14 @@ import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.ActivityEvent;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.ActivityEventHandler;
 
 /**
  * Calculates average trip durations by mode.
@@ -45,7 +47,7 @@ import org.matsim.core.events.handler.ActivityEventHandler;
  * @author meisterk
  *
  */
-public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityEventHandler {
+public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
@@ -146,46 +148,71 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 		// not used
 	}
 
+	// This used to listen to ActivityEvents, which were ActivityStartEvent and ActivityEndEvent.
+	// So I assume this sould be executed for ActivityStartEvents and ActivityEndEvents, although it seems
+	// strange. michaz 2012
+	
 	@Override
-	public void handleEvent(ActivityEvent event) {
+	public void handleEvent(ActivityStartEvent event) {
 		if (event.getActType().equals("pt interaction")) {
 			this.agentPerformsPtInteraction.put(event.getPersonId(), true);
 		}
 		else{
 			if(this.agentPerformsAnyPt.containsKey(event.getPersonId())){
-				
 				Id personId = event.getPersonId();
-				String mode;
-				if(this.agentPerformsPtInteraction.containsKey(personId)){
-					mode = standardPtMode;
-				}
-				else{
-					mode = onlyPtWalk;
-				}
-				
-				Frequency frequency = null;
-				ResizableDoubleArray rawData = null;
-				if (!this.frequencies.containsKey(mode)) {
-					frequency = new Frequency();
-					this.frequencies.put(mode, frequency);
-					rawData = new ResizableDoubleArray();
-					this.rawData.put(mode, rawData);
-				} else {
-					frequency = this.frequencies.get(mode);
-					rawData = this.rawData.get(mode);
-				}
-				
-				if(this.ptPerformingTime.get(personId) >= 0.0 && eventIsInTimeWindow(event.getTime())){
-					frequency.addValue(this.ptPerformingTime.get(personId));
-					rawData.addElement(this.ptPerformingTime.get(personId));
-				}
-				
-				this.agentPerformsAnyPt.remove(personId);
-				this.agentPerformsPtInteraction.remove(personId);
-				this.ptPerformingTime.remove(personId);
+				double time = event.getTime();
+				handleActivityStartOrEnd(personId, time);
 			}
 		}
 	}
+	
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (event.getActType().equals("pt interaction")) {
+			this.agentPerformsPtInteraction.put(event.getPersonId(), true);
+		}
+		else{
+			if(this.agentPerformsAnyPt.containsKey(event.getPersonId())){
+				Id personId = event.getPersonId();
+				double time = event.getTime();
+				handleActivityStartOrEnd(personId, time);
+			}
+		}
+	}
+
+	private void handleActivityStartOrEnd(Id personId, double time) {
+		String mode;
+		if(this.agentPerformsPtInteraction.containsKey(personId)){
+			mode = standardPtMode;
+		}
+		else{
+			mode = onlyPtWalk;
+		}
+		
+		Frequency frequency = null;
+		ResizableDoubleArray rawData = null;
+		if (!this.frequencies.containsKey(mode)) {
+			frequency = new Frequency();
+			this.frequencies.put(mode, frequency);
+			rawData = new ResizableDoubleArray();
+			this.rawData.put(mode, rawData);
+		} else {
+			frequency = this.frequencies.get(mode);
+			rawData = this.rawData.get(mode);
+		}
+		
+		if(this.ptPerformingTime.get(personId) >= 0.0 && eventIsInTimeWindow(time)){
+			frequency.addValue(this.ptPerformingTime.get(personId));
+			rawData.addElement(this.ptPerformingTime.get(personId));
+		}
+		
+		this.agentPerformsAnyPt.remove(personId);
+		this.agentPerformsPtInteraction.remove(personId);
+		this.ptPerformingTime.remove(personId);
+	}
+	
+
+	
 
 	private boolean eventIsInTimeWindow(double time) {
 		
@@ -202,4 +229,5 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 		this.endTime = endTime;
 		this.timeWindowIsSet = true;
 	}
+
 }

@@ -9,14 +9,14 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -144,7 +144,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 		if (!isPtVeh)return;
 		
 		//Departure
-		if(event.getClass() == AgentDepartureEventImpl.class){
+		if(event.getClass() == AgentDepartureEvent.class){
 			//printAttributes (event);
 			//initialize maps for personAtr 
 			if (!this.tempLinkMap.containsKey(personAtr)){
@@ -162,7 +162,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 			}
 
 		//Link Leave
-		}else if (event.getClass() == LinkLeaveEventImpl.class){
+		}else if (event.getClass() == LinkLeaveEvent.class){
 			if ( boolMap.get(personAtr)){
 				Id linkId = new IdImpl((event.getAttributes().get(LINK))); 
 				this.tempLinkMap.get(personAtr).getSecond().add(linkId);
@@ -170,7 +170,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 			}
 
 		//Arrival	
-		}else if (event.getClass() == AgentArrivalEventImpl.class){
+		}else if (event.getClass() == AgentArrivalEvent.class){
 			boolean accept = boolMap.get(personAtr); 
 			if (accept){
 				Id simPathId= new IdImpl(personAtr + LOWLINE + Double.toString(timeAtr));

@@ -22,7 +22,7 @@ package playground.andreas.aas.modules.ptTripAnalysis.distance;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.api.experimental.events.Event;
 
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
 
@@ -45,7 +45,7 @@ public class DistAnalysisAgent {
 	 * @param e
 	 * @return
 	 */
-	public boolean processAgentEvent(AgentEvent e) {
+	public boolean processAgentEvent(Event e) {
 		((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
 		return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();
 	}

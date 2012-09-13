@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.Event;
 
 import playground.andreas.aas.modules.ptTripAnalysis.traveltime.AbstractTTAnalysisTrip;
 
@@ -85,7 +85,7 @@ public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 	 * @param e
 	 * @return
 	 */
-	public boolean handleEvent(PersonEvent e){
+	public boolean handleEvent(Event e){
 		this.handledEvents++;
 		if(super.getMode().equals(TransportMode.pt)){
 			handler.handleEvent(e);

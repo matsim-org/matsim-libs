@@ -35,10 +35,9 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -155,26 +154,26 @@ public class TripReconstructor implements
 
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
-		if (isPtEvent(event)) return;
+		if (isPtEvent(event.getPersonId())) return;
 		this.agentsData.get( event.getPersonId() ).handleEvent( event );
 	}
 
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
-		if (isPtEvent(event)) return;
+		if (isPtEvent(event.getPersonId())) return;
 		this.agentsData.get( event.getPersonId() ).handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
-		if (isPtEvent(event)) return;
+		if (isPtEvent(event.getPersonId())) return;
 		//TODO: check if the entry exists
 		this.agentsData.get( event.getPersonId() ).handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (isPtEvent(event)) return;
+		if (isPtEvent(event.getPersonId())) return;
 		//TODO: check if the entry exists
 		this.agentsData.get( event.getPersonId() ).handleEvent(event);
 	}
@@ -205,8 +204,8 @@ public class TripReconstructor implements
 				new TripData(event) );
 	}
 
-	private boolean isPtEvent(final PersonEvent event) {
-		return event.getPersonId().toString().matches("pt_.*");
+	private boolean isPtEvent(final Id id) {
+		return id.toString().matches("pt_.*");
 	}
 }
 
@@ -222,7 +221,7 @@ class TripData {
 	private AgentDepartureEvent departure = null;
 	private AgentArrivalEvent arrival = null;
 	private ActivityStartEvent destination = null;
-	private final List<LinkEvent> routeEvents = new ArrayList<LinkEvent>();
+	private final List<Event> routeEvents = new ArrayList<Event>();
 
 	// //////////////////////////////////////////////////////////////////////
 	// constructor
@@ -248,10 +247,14 @@ class TripData {
 		this.departure = event;
 	}
 
-	public void handleEvent(final LinkEvent event) {
+	public void handleEvent(final LinkEnterEvent event) {
 		this.routeEvents.add(event);
 	}
 
+	public void handleEvent(final LinkLeaveEvent event) {
+		this.routeEvents.add(event);
+	}
+	
 	public void handleEvent(final AgentArrivalEvent event) {
 		this.arrival = event;
 	}

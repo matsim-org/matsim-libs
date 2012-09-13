@@ -22,8 +22,8 @@ package playground.mzilske.deteval;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.mrieser.core.mobsim.api.DriverAgent;
@@ -95,7 +95,7 @@ public class VehicleLeavingNetworkRouteDriver implements DriverAgent {
 	public void handleNextAction(final MobsimLink link, final double time) {
 		link.parkVehicle(this.vehicle);
 		EventsManager eventsManager = this.simEngine.getEventsManager();
-		eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonLeavesVehicleEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), vehicle.getId()));
+		eventsManager.processEvent(((EventsFactory) eventsManager.getFactory()).createPersonLeavesVehicleEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), vehicle.getId()));
 		this.simEngine.handleAgent(this.agent);
 	}
 

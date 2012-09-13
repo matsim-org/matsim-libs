@@ -27,9 +27,9 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.events.LaneEnterEvent;
 import org.matsim.core.events.LaneLeaveEvent;
@@ -67,7 +66,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	ActivityStartEventHandler, ActivityEndEventHandler, 
 	AgentDepartureEventHandler, AgentArrivalEventHandler, 
 	AgentMoneyEventHandler, AgentStuckEventHandler, 
-	PersonEventHandler, AgentWait2LinkEventHandler,
+	AgentWait2LinkEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
 	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, AdditionalTeleportationDepartureEventHandler {
@@ -108,7 +107,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 		log.info("AgentStuckEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId());
 	}
 
-	public void handleEvent(PersonEvent event) {
+	public void handleEvent(Event event) {
 //		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getPersonId());
 	}
 

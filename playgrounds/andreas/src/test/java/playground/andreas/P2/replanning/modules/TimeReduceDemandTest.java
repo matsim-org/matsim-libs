@@ -25,8 +25,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
@@ -42,7 +42,7 @@ public class TimeReduceDemandTest {
 	@Test
     public final void testRun() {
 	
-		EventsFactoryImpl eF = new EventsFactoryImpl();
+		EventsFactory eF = new EventsFactory();
 		PConfigGroup pC = new PConfigGroup();
 		
 		Cooperative coop = PScenarioHelper.createTestCooperative();

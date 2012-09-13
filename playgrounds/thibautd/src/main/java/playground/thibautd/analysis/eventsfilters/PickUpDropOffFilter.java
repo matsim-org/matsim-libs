@@ -25,13 +25,13 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -91,13 +91,13 @@ public class PickUpDropOffFilter {
 				Id fakeId = new IdImpl(departure.getPersonId()+"-"+(count++));
 
 				if ( departure.getLegMode().equals( JointActingTypes.PASSENGER ) ) {
-					events.add( new ActivityStartEventImpl(
+					events.add( new ActivityStartEvent(
 								useTimes ? departure.getTime() : 0,
 								fakeId,
 								departure.getLinkId(),
 								null , // facility
 								DEPARTURE) );
-					events.add( new ActivityEndEventImpl(
+					events.add( new ActivityEndEvent(
 								useTimes ? departure.getTime() + MINIMAL_DURATION : 1000,
 								fakeId,
 								departure.getLinkId(),
@@ -111,13 +111,13 @@ public class PickUpDropOffFilter {
 				Id fakeId = new IdImpl(arrival.getPersonId()+"-"+(count++));
 
 				if ( arrival.getLegMode().equals( JointActingTypes.PASSENGER ) ) {
-					events.add( new ActivityStartEventImpl(
+					events.add( new ActivityStartEvent(
 								useTimes ? arrival.getTime() : 500,
 								fakeId,
 								arrival.getLinkId(),
 								null , // facility
 								ARRIVAL) );
-					events.add( new ActivityEndEventImpl(
+					events.add( new ActivityEndEvent(
 								useTimes ? arrival.getTime() + MINIMAL_DURATION : 1500,
 								fakeId,
 								arrival.getLinkId(),

@@ -9,8 +9,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 
@@ -55,7 +55,7 @@ public class VehId2DelayAtStopMapTest {
 
 //        create events
         
-        EventsFactoryImpl ef = new EventsFactoryImpl();
+        EventsFactory ef = new EventsFactory();
         
         VehicleDepartsAtFacilityEvent event1 = ef.createVehicleDepartsAtFacilityEvent(2.3*3600, vehId1, facilId1, 2.3);
         TransitDriverStartsEvent event2 = ef.createTransitDriverStartsEvent(2.6*3600, driverId1, vehId1, transitLineId1, transitRouteId1, departureId1);

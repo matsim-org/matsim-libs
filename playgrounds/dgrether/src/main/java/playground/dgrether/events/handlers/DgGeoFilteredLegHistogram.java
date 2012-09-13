@@ -41,9 +41,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -93,23 +93,23 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (this.geospatialTools.doFeaturesContainEvent(event)){
+		if (this.geospatialTools.doFeaturesContainEvent(event.getLinkId())){
 			this.lastTimeSeenMap.put(event.getPersonId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.geospatialTools.doFeaturesContainEvent(event)){
+		if (this.geospatialTools.doFeaturesContainEvent(event.getLinkId())){
 			if (! this.firstTimeSeenMap.containsKey(event.getPersonId())) {
 				this.firstTimeSeenMap.put(event.getPersonId(), event);
 			} 
 		}
 	}
 	
-	private void handleArrivalOrStuck(PersonEvent event) {
-		LinkEnterEvent firstEvent = this.firstTimeSeenMap.remove(event.getPersonId());
-		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(event.getPersonId());
+	private void handleArrivalOrStuck(Event event, Id personId) {
+		LinkEnterEvent firstEvent = this.firstTimeSeenMap.remove(personId);
+		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(personId);
 		if (firstEvent != null && lastEvent != null){
 			int index = getBinIndex(firstEvent.getTime());
 			this.allModesData.countsDep[index]++;
@@ -120,12 +120,12 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.handleArrivalOrStuck(event);		
+		this.handleArrivalOrStuck(event, event.getPersonId());		
 	}
 	
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.handleArrivalOrStuck(event);
+		this.handleArrivalOrStuck(event, event.getPersonId());
 	}
 
 	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, Feature> cottbusFeatureTuple) {

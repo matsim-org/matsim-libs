@@ -54,8 +54,8 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -77,8 +77,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.run.Controler;
 
-import playground.droeder.DaFileReader;
 import playground.droeder.DRPaths;
+import playground.droeder.DaFileReader;
 
 
 /**
@@ -109,9 +109,9 @@ public class Journal2Matsim2Journal {
 	
 	private Map<String, List<JournalAnalysisTrip>> person2ways;
 	private Map<String, List<JournalAnalysisTrip>> person2waysUnrouted;
-	private Map<Id, Set<PersonEvent>> person2Event;
-	private Map<String, Set<List<PersonEvent>>> carId2TripEvents;
-	private Map<String, Set<List<PersonEvent>>> ptId2TripEvents;
+	private Map<Id, Set<Event>> person2Event;
+	private Map<String, Set<List<Event>>> carId2TripEvents;
+	private Map<String, Set<List<Event>>> ptId2TripEvents;
 	
 	private NetworkImpl net;
 	
@@ -426,27 +426,27 @@ public class Journal2Matsim2Journal {
 	
 	private void sortTripEventsByMode(){
 		log.info("sort events by trip and mode");
-		this.carId2TripEvents = new HashMap<String, Set<List<PersonEvent>>>();
-		this.ptId2TripEvents = new HashMap<String, Set<List<PersonEvent>>>();
+		this.carId2TripEvents = new HashMap<String, Set<List<Event>>>();
+		this.ptId2TripEvents = new HashMap<String, Set<List<Event>>>();
 		
-		for(Entry<Id, Set<PersonEvent>> entry : this.person2Event.entrySet()){
+		for(Entry<Id, Set<Event>> entry : this.person2Event.entrySet()){
 			
 			boolean start = true;
 			String[] id = entry.getKey().toString().split("_");
 			
 			
 			if(id[1].equals("pt")){
-				this.ptId2TripEvents.put(id[0], new LinkedHashSet<List<PersonEvent>>());
+				this.ptId2TripEvents.put(id[0], new LinkedHashSet<List<Event>>());
 			}else if(id[1].equals("car")){
-				this.carId2TripEvents.put(id[0], new LinkedHashSet<List<PersonEvent>>());
+				this.carId2TripEvents.put(id[0], new LinkedHashSet<List<Event>>());
 			}else{
 				continue;
 			}
 			
-			List<PersonEvent> temp = null;
-			for(PersonEvent e : entry.getValue()){
+			List<Event> temp = null;
+			for(Event e : entry.getValue()){
 				if(start){
-					temp = new LinkedList<PersonEvent>();
+					temp = new LinkedList<Event>();
 					start = false;
 				}
 				temp.add(e);
@@ -469,26 +469,26 @@ public class Journal2Matsim2Journal {
 		double travelTime, transitTime, waitingTime;
 		int i;
 		
-		for(Entry<String, Set<List<PersonEvent>>> e :this.carId2TripEvents.entrySet()){
+		for(Entry<String, Set<List<Event>>> e :this.carId2TripEvents.entrySet()){
 			
 			// get time for car
 			i = 0;
-			for(List<PersonEvent> list : e.getValue()){
+			for(List<Event> list : e.getValue()){
 				travelTime = 0;
-				travelTime = ((LinkedList<PersonEvent>) list).getLast().getTime() - ((LinkedList<PersonEvent>) list).getFirst().getTime();
+				travelTime = ((LinkedList<Event>) list).getLast().getTime() - ((LinkedList<Event>) list).getFirst().getTime();
 				this.person2ways.get(e.getKey()).get(i).setCarTime(travelTime);
 				i++;
 			}
 			
 			// get times for pt
 			i = 0;
-			for(List<PersonEvent> list : this.ptId2TripEvents.get(e.getKey())){
+			for(List<Event> list : this.ptId2TripEvents.get(e.getKey())){
 				travelTime = 0;
 				transitTime = 0;
 				waitingTime = 0;
 
-				travelTime = ((LinkedList<PersonEvent>) list).getLast().getTime() - ((LinkedList<PersonEvent>) list).getFirst().getTime();
-				for(PersonEvent pe : list){
+				travelTime = ((LinkedList<Event>) list).getLast().getTime() - ((LinkedList<Event>) list).getFirst().getTime();
+				for(Event pe : list){
 					if(pe instanceof ActivityStartEvent){
 						if(((ActivityStartEvent) pe).getActType().equals("pt interaction")){
 							waitingTime = waitingTime - pe.getTime();

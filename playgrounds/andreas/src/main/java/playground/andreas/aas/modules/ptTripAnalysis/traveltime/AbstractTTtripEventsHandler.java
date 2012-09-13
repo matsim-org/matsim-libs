@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -57,7 +57,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 			.getLogger(AbstractTTtripEventsHandler.class);
 	
 	protected Map<Id, LinkedList<AbstractAnalysisTrip>> id2Trips = null;
-	protected Map<Id, ArrayList<PersonEvent>> id2Events = null;
+	protected Map<Id, ArrayList<Event>> id2Events = null;
 	protected Map<String, AnalysisTripSetStorage> zone2tripSet;
 	private List<Id> stuckAgents;
 	
@@ -67,7 +67,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 	private boolean stuck = false;
 	
 	public AbstractTTtripEventsHandler(){
-		this.id2Events = new HashMap<Id, ArrayList<PersonEvent>>();
+		this.id2Events = new HashMap<Id, ArrayList<Event>>();
 		this.zone2tripSet = new HashMap<String, AnalysisTripSetStorage>();
 		this.zone2tripSet.put("noZone", new AnalysisTripSetStorage(false, null));
 		this.stuckAgents = new ArrayList<Id>();
@@ -107,7 +107,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 		this.processEvent(e);
 	}
 	
-	protected abstract void processEvent(PersonEvent e);
+	protected abstract void processEvent(Event e);
 	
 	/**
 	 * @param map
@@ -133,7 +133,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 			i = this.id2Trips.get(id).size();
 			this.possibleTrips += i;
 			this.nrOfTrips.get(id)[0] = i;
-			this.id2Events.put(id, new ArrayList<PersonEvent>());
+			this.id2Events.put(id, new ArrayList<Event>());
 		}
 	}
 	

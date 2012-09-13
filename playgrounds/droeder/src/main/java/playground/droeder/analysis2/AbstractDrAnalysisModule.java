@@ -20,28 +20,20 @@
 package playground.droeder.analysis2;
 
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
-import org.matsim.core.events.handler.LinkEventHandler;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
  * @author droeder
  *
  */
-public abstract class AbstractDrAnalysisModule implements LinkEventHandler, PersonEventHandler{
+public abstract class AbstractDrAnalysisModule implements BasicEventHandler {
 	
 	public abstract void processEvent(Event e);
 	
 	public abstract void dumpResults(String outDir);
 
 	@Override
-	public void handleEvent(PersonEvent event) {
-		this.processEvent(event);
-	}
-
-	@Override
-	public void handleEvent(LinkEvent event) {
+	public void handleEvent(Event event) {
 		this.processEvent(event);
 	}
 

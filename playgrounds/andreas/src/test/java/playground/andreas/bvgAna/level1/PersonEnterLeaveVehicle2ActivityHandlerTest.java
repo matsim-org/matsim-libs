@@ -8,8 +8,8 @@ import junit.framework.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 
@@ -38,7 +38,7 @@ public class PersonEnterLeaveVehicle2ActivityHandlerTest {
 		
 //		steht aus
 	    
-	    EventsFactoryImpl ef = new EventsFactoryImpl(); 
+	    EventsFactory ef = new EventsFactory(); 
 	    
 	    ActivityEndEvent event0 = ef.createActivityEndEvent(1.0, agentId1, linkId1, facilityId1, "w");
 	    PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(1.0, personId1, vehicleId1);

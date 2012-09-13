@@ -9,13 +9,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
@@ -231,7 +231,7 @@ public class FareHandler implements
 				factor = as.getSensitivity(p);
 			}
 			
-			AgentMoneyEvent ame =  new AgentMoneyEventImpl(24*3600, p, -(fare*factor));
+			AgentMoneyEvent ame =  new AgentMoneyEvent(24*3600, p, -(fare*factor));
 			rev += fare;
 			event.getControler().getEvents().processEvent(ame);
 		}

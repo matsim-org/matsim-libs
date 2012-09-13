@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -128,12 +128,12 @@ public class JoinableTrips {
 		for ( Trip trip : trips ) {
 			counter.logCount();
 			driverTripId = trip.getId();
-			for ( LinkEvent event : trip.getRouteEvents() ) {
+			for ( Event event : trip.getRouteEvents() ) {
 				if ( event instanceof LinkLeaveEvent ) {
 					// for departures
 					double eventTime = event.getTime();
 
-					currentCoord = links.get(event.getLinkId()).getCoord();
+					currentCoord = links.get(((LinkLeaveEvent) event).getLinkId()).getCoord();
 					neighbourInformations = linkInformation.get(
 							currentCoord.getX(), 
 							currentCoord.getY(),
@@ -163,7 +163,7 @@ public class JoinableTrips {
 					// for arrivals
 					double eventTime = event.getTime();
 
-					currentCoord = links.get(event.getLinkId()).getCoord();
+					currentCoord = links.get(((LinkEnterEvent) event).getLinkId()).getCoord();
 					neighbourInformations = linkInformation.get(
 							currentCoord.getX(), 
 							currentCoord.getY(),

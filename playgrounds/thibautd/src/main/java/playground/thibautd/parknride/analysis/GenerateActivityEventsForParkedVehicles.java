@@ -31,7 +31,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.MatsimEventsReader;
@@ -69,7 +68,7 @@ public class GenerateActivityEventsForParkedVehicles {
 	private static class EventsInterpreter implements ActivityStartEventHandler {
 		private final List<Id> parkedAgents = new ArrayList<Id>();
 		private final BasicEventHandler eventWriter;
-		private final EventsFactory factory = new EventsFactoryImpl();
+		private final EventsFactory factory = new EventsFactory();
 		private final boolean useTime;
 		// via does strange things if an agent is at several places at the same time.
 		// THis happend if time info is dropped to get daily parking occupation

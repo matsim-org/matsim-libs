@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -57,24 +57,22 @@ public class TTtripEventsHandlerV4 extends AbstractTTtripEventsHandler implement
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent e) {
-		this.processEvent(e);
-	}
-	
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent e) {
-		this.processEvent(e);
-	}
-	
-	@Override
-	protected void processEvent(PersonEvent e){
-		//process only if this agent has a plan in PlansFile
 		if(super.id2Trips.containsKey(e.getPersonId())){
 			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
 				this.addTrip2TripSet(e.getPersonId());
 			}
 		}
 	}
-
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent e) {
+		if(super.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
+	}
+	
 	private void addTrip2TripSet(Id id){
 		// store number of processed Trips
 		this.nrOfprocessedTrips++;
@@ -95,6 +93,12 @@ public class TTtripEventsHandlerV4 extends AbstractTTtripEventsHandler implement
 	public void addTrips(Map<Id, LinkedList<AbstractAnalysisTrip>> map) {
 		super.addTrips(map);
 		this.id2Events = null;
+	}
+
+	@Override
+	protected void processEvent(Event e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

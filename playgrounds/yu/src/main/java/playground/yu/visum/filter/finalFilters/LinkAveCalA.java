@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.utils.misc.Time;
 
 import playground.yu.visum.writer.UserDefAtt;
@@ -102,7 +102,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/**
 	 * String - AgentID LinkEnterEvent - an event of LinkEnterEvent
 	 */
-	private final Map<String, LinkEnterEventImpl> enters = new HashMap<String, LinkEnterEventImpl>();
+	private final Map<String, LinkEnterEvent> enters = new HashMap<String, LinkEnterEvent>();
 
 	protected long timeBinMinimum = -1;
 
@@ -128,20 +128,20 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	/*---------------------------OVERRIDE METHODS--------------------------*/
 	@Override
 	public void handleEvent(Event event) {
-		if (event instanceof LinkEnterEventImpl) { // event.getClass().equals(LinkEnterEvent.class))
+		if (event instanceof LinkEnterEvent) { // event.getClass().equals(LinkEnterEvent.class))
 													// {
-			enters.put(((LinkEnterEventImpl) event).getPersonId().toString(),
-					(LinkEnterEventImpl) event);
-		} else if (event instanceof LinkLeaveEventImpl) { // event.getClass().equals(LinkLeaveEvent.class))
+			enters.put(((LinkEnterEvent) event).getPersonId().toString(),
+					(LinkEnterEvent) event);
+		} else if (event instanceof LinkLeaveEvent) { // event.getClass().equals(LinkLeaveEvent.class))
 															// {
-			String agentId = ((LinkLeaveEventImpl) event).getPersonId()
+			String agentId = ((LinkLeaveEvent) event).getPersonId()
 					.toString();
 			if (enters.containsKey(agentId)) {
 				if (enters
 						.get(agentId)
 						.getLinkId()
 						.toString()
-						.equals(((LinkLeaveEventImpl) event).getLinkId()
+						.equals(((LinkLeaveEvent) event).getLinkId()
 								.toString())) {
 					count();
 					count();
@@ -286,7 +286,7 @@ public abstract class LinkAveCalA extends FinalEventFilterA {
 	 *            the point of time of the event called "leaving a link" with
 	 *            unit second
 	 */
-	public abstract void compute(LinkEnterEventImpl enter, double leaveTime_s);
+	public abstract void compute(LinkEnterEvent enter, double leaveTime_s);
 
 	/**
 	 * This function does nothing and must be overridden by subclasses and

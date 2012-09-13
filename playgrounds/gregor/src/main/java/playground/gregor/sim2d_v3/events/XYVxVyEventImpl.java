@@ -22,11 +22,11 @@ package playground.gregor.sim2d_v3.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.PersonEventImpl;
+import org.matsim.core.events.EventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class XYVxVyEventImpl extends PersonEventImpl implements XYVxVyEvent {
+public class XYVxVyEventImpl extends EventImpl implements XYVxVyEvent {
 
 	public static final String EVENT_TYPE = "XYVxVyEvent";
 	public static final String ATTRIBUTE_X = "x";
@@ -41,7 +41,8 @@ public class XYVxVyEventImpl extends PersonEventImpl implements XYVxVyEvent {
 	private final double vy;
 
 	public XYVxVyEventImpl(Id id, double x, double y, double vx, double vy, double time) {
-		super(time, id);
+		super(time);
+		this.personId = id;
 		this.c = new Coordinate(x, y);
 		this.x = x;
 		this.y = y;
@@ -50,7 +51,8 @@ public class XYVxVyEventImpl extends PersonEventImpl implements XYVxVyEvent {
 	}
 
 	public XYVxVyEventImpl(Id id, Coordinate c, double vx, double vy, double time) {
-		super(time, id);
+		super(time);
+		this.personId = id;
 		this.c = c;
 		this.x = c.x;
 		this.y = c.y;
@@ -74,6 +76,8 @@ public class XYVxVyEventImpl extends PersonEventImpl implements XYVxVyEvent {
 		attr.put(ATTRIBUTE_X, Double.toString(this.x));
 		attr.put(ATTRIBUTE_Y, Double.toString(this.y));
 		attr.put(ATTRIBUTE_VX, Double.toString(this.vx));
+
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		attr.put(ATTRIBUTE_VY, Double.toString(this.vy));
 		return attr;
 	}
@@ -125,6 +129,15 @@ public class XYVxVyEventImpl extends PersonEventImpl implements XYVxVyEvent {
 	@Override
 	public double getVY() {
 		return this.vy;
+	}
+	
+	public static final String ATTRIBUTE_PERSON = "person";
+
+	private final Id personId;
+
+
+	public Id getPersonId() {
+		return this.personId;
 	}
 
 }

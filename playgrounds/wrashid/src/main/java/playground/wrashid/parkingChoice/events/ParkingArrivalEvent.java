@@ -1,10 +1,7 @@
 package playground.wrashid.parkingChoice.events;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 
-import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class ParkingArrivalEvent {

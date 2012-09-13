@@ -26,14 +26,13 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
@@ -83,11 +82,19 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	@Override
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
-		this.handler.handleEvent(event, link);
+		if (handler instanceof DistanceTollBehaviour) {
+			/* we do not handle wait2link-events for these tolls, because the agent
+			 * should not pay twice for this link, and he (likely) paid already when
+			 * arriving at this link.  */
+			return;
+		} else {
+			// Just like a LinkEnterEvent
+			this.handler.handleEvent(new LinkEnterEvent(event.getTime(), event.getPersonId(), event.getLinkId(), event.getVehicleId()), link);
+		}
 	}
 
 	/**
-	 * Sends {@link AgentMoneyEventImpl}s for all agents that must pay a toll.
+	 * Sends {@link AgentMoneyEvent}s for all agents that must pay a toll.
 	 * This method should usually be called at the end before of an iteration.
 	 *
 	 * <strong>Important note: </strong>Do not call this method twice without
@@ -99,7 +106,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	 */
 	public void sendUtilityEvents(final double time, final EventsManager events) {
 		for (Map.Entry<Id, AgentInfo> entries : this.agents.entrySet()) {
-			events.processEvent(new AgentMoneyEventImpl(time, entries.getKey(), -entries.getValue().toll));
+			events.processEvent(new AgentMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
 		}
 	}
 
@@ -151,7 +158,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	 * A simple interface to implement different toll schemes.
 	 */
 	private interface TollBehaviourI {
-		public void handleEvent(PersonEvent event, Link link);
+		public void handleEvent(LinkEnterEvent event, Link link);
 	}
 
 	/**
@@ -162,13 +169,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	 */
 	class DistanceTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link) {
-			if (event instanceof AgentWait2LinkEventImpl) {
-				/* we do not handle wait2link-events for distance toll, because the agent
-				 * must not pay twice for this link, and he (likely) paid already when
-				 * arriving at this link.  */
-				return;
-			}
+		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
 					event.getTime(), null);
 			if (baseCost != null) {
@@ -187,7 +188,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	 * one of the tolled link, the constant toll amount has to be paid once. */
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link) {
+		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), null);
 			if (baseCost != null) {
 				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getPersonId());
@@ -206,7 +207,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	 */
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
-		public void handleEvent(final PersonEvent event, final Link link) {
+		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), null);
 			if (baseCost != null) {
 				// this is a link inside the toll area.

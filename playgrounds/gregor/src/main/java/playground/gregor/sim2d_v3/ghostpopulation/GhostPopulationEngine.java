@@ -6,13 +6,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 import playground.gregor.sim2d_v3.events.TickEvent;
 import playground.gregor.sim2d_v3.events.TickEventHandler;
@@ -59,9 +57,9 @@ public class GhostPopulationEngine implements TickEventHandler {
 		this.ghostPopulationEvents.parrotEvents(this.events, event.getTime());
 	}
 
-	private static final class GhostPopulationEvents implements PersonEventHandler{
+	private static final class GhostPopulationEvents implements BasicEventHandler{
 
-		List<PersonEvent> events = new ArrayList<PersonEvent>();
+		List<Event> events = new ArrayList<Event>();
 		private int pointer = 0;
 
 
@@ -83,19 +81,22 @@ public class GhostPopulationEngine implements TickEventHandler {
 
 		public void parrotEvents(EventsManager events, double time) {
 			while (this.events.size() > 0 && this.pointer  < this.events.size() && this.events.get(this.pointer).getTime() <= time) {
-				PersonEvent e = this.events.get(this.pointer++);
-				IdImpl id = new IdImpl("ghost_" + e.getPersonId().toString());
+				Event e = this.events.get(this.pointer++);
+				
 				if (e instanceof AgentDepartureEvent) {
+					IdImpl id = new IdImpl("ghost_" + ((AgentDepartureEvent) e).getPersonId().toString());
 					AgentDepartureEvent depart = (AgentDepartureEvent)e;
-					AgentDepartureEventImpl ghost = new AgentDepartureEventImpl(depart.getTime(), id, depart.getLinkId(), depart.getLegMode());
+					AgentDepartureEvent ghost = new AgentDepartureEvent(depart.getTime(), id, depart.getLinkId(), depart.getLegMode());
 					events.processEvent(ghost);
 				} else if (e instanceof XYVxVyEvent) {
+					IdImpl id = new IdImpl("ghost_" + ((XYVxVyEvent) e).getPersonId().toString());
 					XYVxVyEvent xyz = (XYVxVyEvent)e;
 					XYVxVyEventImpl ghost = new XYVxVyEventImpl(id, xyz.getCoordinate(), xyz.getVX(), xyz.getVY(), xyz.getTime());
 					events.processEvent(ghost);
 				} else if (e instanceof AgentArrivalEvent) {
+					IdImpl id = new IdImpl("ghost_" + ((AgentArrivalEvent) e).getPersonId().toString());
 					AgentArrivalEvent arr = (AgentArrivalEvent)e;
-					AgentArrivalEvent ghost = new AgentArrivalEventImpl(arr.getTime(), id, arr.getLinkId(), arr.getLegMode());
+					AgentArrivalEvent ghost = new AgentArrivalEvent(arr.getTime(), id, arr.getLinkId(), arr.getLegMode());
 					events.processEvent(ghost);
 				}
 			}
@@ -103,7 +104,7 @@ public class GhostPopulationEngine implements TickEventHandler {
 
 
 		@Override
-		public void handleEvent(PersonEvent event) {
+		public void handleEvent(Event event) {
 			this.events.add(event);
 		}
 

@@ -25,11 +25,9 @@ import java.util.List;
 import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
@@ -47,26 +45,26 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 public class GeospatialEventTools {
-	
+
 	private Network network;
 	private CoordinateReferenceSystem networkCrs;
 	private List<Geometry> transformedFeatureGeometries;
-	
+
 	public GeospatialEventTools(Network net, CoordinateReferenceSystem netCrs){
 		this.network = net;
 		this.networkCrs = netCrs;
 		this.transformedFeatureGeometries = new ArrayList<Geometry>();
 
 	}
-	
+
 	public boolean doFeaturesContainCoordinate(Coordinate coordinate) {
 		Geometry linkPoint = MGC.coordinate2Point(coordinate);
 		for (Geometry featureGeo : this.transformedFeatureGeometries){
-				return featureGeo.contains(linkPoint);
+			return featureGeo.contains(linkPoint);
 		}
 		return false;
 	}
-	
+
 	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, Feature> featureTuple) {
 		if ( !(this.networkCrs == null)){
 			MathTransform transformation;
@@ -87,20 +85,10 @@ public class GeospatialEventTools {
 		}
 	}
 
-	public boolean doFeaturesContainEvent(Event event) {
-		if (event instanceof AgentEvent) {
-			AgentEvent e = (AgentEvent) event;
-			Link link = this.network.getLinks().get(e.getLinkId());
-			Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
-			return this.doFeaturesContainCoordinate(coordinate);
-		}
-		else if (event instanceof LinkEvent){
-			LinkEvent e = (LinkEvent) event;
-			Link link = this.network.getLinks().get(e.getLinkId());
-			Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
-			return this.doFeaturesContainCoordinate(coordinate);
-		}
-		return false;
+	public boolean doFeaturesContainEvent(Id linkId) {
+		Link link = this.network.getLinks().get(linkId);
+		Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
+		return this.doFeaturesContainCoordinate(coordinate);
 	}
-	
+
 }

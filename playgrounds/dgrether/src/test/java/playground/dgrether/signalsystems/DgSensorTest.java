@@ -33,10 +33,6 @@ import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -80,7 +76,7 @@ public class DgSensorTest {
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		LinkEnterEvent enterEvent = new LinkEnterEventImpl(0.0, id1, id1, null);
+		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, id1, id1, null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
@@ -94,27 +90,27 @@ public class DgSensorTest {
 		}
 		Assert.assertNotNull(e);
 
-		LinkEnterEvent enterEvent2 = new LinkEnterEventImpl(10.0, id2, id1, null);
+		LinkEnterEvent enterEvent2 = new LinkEnterEvent(10.0, id2, id1, null);
 		sensor.handleEvent(enterEvent2);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(2, numberOfCars);
 		
-		LinkLeaveEvent leaveEvent = new LinkLeaveEventImpl(100.0, id1, id1, null);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, id1, id1, null);
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 		
-		AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(110.0, id2, id1, "car");
+		AgentArrivalEvent arrivalEvent = new AgentArrivalEvent(110.0, id2, id1, "car");
 		sensor.handleEvent(arrivalEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEventImpl(120.0, id2, id1, null);
+		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEvent(120.0, id2, id1, null);
 		sensor.handleEvent(wait2LinkEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 
-		leaveEvent = new LinkLeaveEventImpl(120.0, id2, id1, null);
+		leaveEvent = new LinkLeaveEvent(120.0, id2, id1, null);
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
@@ -131,12 +127,12 @@ public class DgSensorTest {
 		int numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 0.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		LinkEnterEvent enterEvent = new LinkEnterEventImpl(0.0, id1, id1, null);
+		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, id1, id1, null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 
-		enterEvent = new LinkEnterEventImpl(1.0, id2, id1, null);
+		enterEvent = new LinkEnterEvent(1.0, id2, id1, null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(2, numberOfCars);
@@ -163,25 +159,25 @@ public class DgSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 85.0);
 		Assert.assertEquals(2, numberOfCarsInDistance);
 		
-		LinkLeaveEvent leaveEvent = new LinkLeaveEventImpl(100.0, id1, id1, null);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, id1, id1, null);
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 100.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);
 		
-		AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(101.0, id2, id1, "car");
+		AgentArrivalEvent arrivalEvent = new AgentArrivalEvent(101.0, id2, id1, "car");
 		sensor.handleEvent(arrivalEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEventImpl(120.0, id2, id1, null);
+		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEvent(120.0, id2, id1, null);
 		sensor.handleEvent(wait2LinkEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);
 
-		leaveEvent = new LinkLeaveEventImpl(120.0, id2, id1, null);
+		leaveEvent = new LinkLeaveEvent(120.0, id2, id1, null);
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);

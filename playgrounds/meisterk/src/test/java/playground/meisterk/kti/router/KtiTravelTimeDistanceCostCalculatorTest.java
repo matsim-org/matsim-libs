@@ -28,8 +28,6 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
@@ -108,9 +106,9 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 
 	public void testGetLinkTravelCost() {
 
-		LinkEnterEvent enter = new LinkEnterEventImpl(Time.parseTime("06:01:00"), DUMMY_PERSON_ID, TEST_LINK_ID, null);
+		LinkEnterEvent enter = new LinkEnterEvent(Time.parseTime("06:01:00"), DUMMY_PERSON_ID, TEST_LINK_ID, null);
 		this.events.processEvent(enter);
-		LinkLeaveEvent leave = new LinkLeaveEventImpl(Time.parseTime("06:21:00"), DUMMY_PERSON_ID, TEST_LINK_ID, null);
+		LinkLeaveEvent leave = new LinkLeaveEvent(Time.parseTime("06:21:00"), DUMMY_PERSON_ID, TEST_LINK_ID, null);
 		this.events.processEvent(leave);
 
 		double expectedLinkTravelCost = 6.5;

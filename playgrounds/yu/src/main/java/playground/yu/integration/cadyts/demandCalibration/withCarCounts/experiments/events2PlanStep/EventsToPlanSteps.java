@@ -34,19 +34,15 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -105,12 +101,11 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 		return Math.min(MAX_TIME, time);
 	}
 
-	private PlanImpl getPlanFromEvent(PersonEvent event) {
-		Person person = pop.getPersons().get(event.getPersonId());
+	private PlanImpl getPlanFromEvent(Id personId) {
+		Person person = pop.getPersons().get(personId);
 		if (person == null) {
 			throw new RuntimeException(
-					"EventsToPlanSteps:\tPerson of an event [" + event
-							+ "] does NOT exist in Population!!!");
+					"EventsToPlanSteps:\tPerson of an event [] does NOT exist in Population!!!");
 		}
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		return plan;
@@ -156,7 +151,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		PlanImpl plan = getPlanFromEvent(event);
+		PlanImpl plan = getPlanFromEvent(event.getPersonId());
 		if (finishedPlans.contains(plan)) {
 			return;
 		}
@@ -178,7 +173,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		PlanImpl plan = getPlanFromEvent(event);
+		PlanImpl plan = getPlanFromEvent(event.getPersonId());
 		if (finishedPlans.contains(plan)) {
 			return;
 		}
@@ -197,7 +192,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 	public void handleEvent(AgentArrivalEvent event) {
 		// removePlanFactory, if the arrivalEvent ist the last one?? --> clearUp
 		// will be done afterMobsim
-		PlanImpl plan = getPlanFromEvent(event);
+		PlanImpl plan = getPlanFromEvent(event.getPersonId());
 		if (finishedPlans.contains(plan)) {
 			return;
 		}
@@ -214,7 +209,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		PlanImpl plan = getPlanFromEvent(event);
+		PlanImpl plan = getPlanFromEvent(event.getPersonId());
 		if (finishedPlans.contains(plan)) {
 			return;
 		}
@@ -294,7 +289,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 				System.out.println("Person:\t" + agentId);
 				// departure
 				{
-					PersonEvent event = new AgentDepartureEventImpl(time,
+					Event event = new AgentDepartureEvent(time,
 							agentId, actLinkId, "car");
 					System.out.println("Event\tDeparture\t" + event);
 					events.processEvent(event);
@@ -306,7 +301,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 					linkId = new IdImpl(r.nextInt(10));
 					LinkImpl link = (LinkImpl) net.getLinks().get(linkId);
 					{
-						PersonEvent event = new LinkEnterEventImpl(time,
+						Event event = new LinkEnterEvent(time,
 								agentId, linkId, null);
 						System.out.println("Event\tEntering\t" + event);
 						events.processEvent(event);
@@ -314,7 +309,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 					time += link.getFreespeedTravelTime()
 							* (r.nextDouble() * 3d + 1d);
 					if (r.nextDouble() < 0.05) {
-						PersonEvent event = new AgentStuckEventImpl(time,
+						Event event = new AgentStuckEvent(time,
 								agentId, linkId, "car");
 						System.out.println("Event\tStuck\t" + event);
 						events.processEvent(event);
@@ -324,7 +319,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 				// arrival
 				{
 					linkId = linkId != null ? linkId : actLinkId;
-					PersonEvent event = new AgentArrivalEventImpl(time,
+					Event event = new AgentArrivalEvent(time,
 							agentId, linkId, "car");
 					System.out.println("Event\tArrival\t" + event);
 					events.processEvent(event);

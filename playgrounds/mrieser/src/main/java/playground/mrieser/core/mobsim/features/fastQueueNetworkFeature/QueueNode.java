@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.network.api.MobsimNode;
@@ -161,7 +161,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimNode;
         if (this.network.isRemoveStuckVehicles()) {
         	buffer.link.removeVehicle(vehicle);
           this.network.simEngine.getEventsManager().processEvent(
-              new AgentStuckEventImpl(now, vehicle.getId(), buffer.link.getId(), TransportMode.car));
+              new AgentStuckEvent(now, vehicle.getId(), buffer.link.getId(), TransportMode.car));
         } else {
         	buffer.removeFirstVehicleInBuffer();
           vehicle.getDriver().notifyMoveToNextLink();

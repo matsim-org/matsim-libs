@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -99,7 +99,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.geospatialTools == null || this.geospatialTools.doFeaturesContainEvent(event)) {
+		if (this.geospatialTools == null || this.geospatialTools.doFeaturesContainEvent(event.getLinkId())) {
 			if (! this.firstTimeSeenMap.containsKey(event.getPersonId())) {
 				this.firstTimeSeenMap.put(event.getPersonId(), event);
 			} 
@@ -108,7 +108,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (this.geospatialTools == null || this.geospatialTools.doFeaturesContainEvent(event)) {
+		if (this.geospatialTools == null || this.geospatialTools.doFeaturesContainEvent(event.getLinkId())) {
 			this.lastTimeSeenMap.put(event.getPersonId(), event);
 		}
 
@@ -116,18 +116,18 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.handleArrivalOrStuck(event);		
+		this.handleArrivalOrStuck(event, event.getPersonId());		
 	}
 	
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.handleArrivalOrStuck(event);
+		this.handleArrivalOrStuck(event, event.getPersonId());
 	}
 
 	
-	private void handleArrivalOrStuck(PersonEvent event) {
-		LinkEnterEvent firstEvent = this.firstTimeSeenMap.remove(event.getPersonId());
-		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(event.getPersonId());
+	private void handleArrivalOrStuck(Event event, Id personId) {
+		LinkEnterEvent firstEvent = this.firstTimeSeenMap.remove(personId);
+		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(personId);
 		
 		if (firstEvent != null && lastEvent != null){
 			int index = getBinIndex(firstEvent.getTime());
@@ -136,7 +136,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			this.data.incrementArrivals(index);
 		}
 		else {
-			log.warn("No first or last event found for person id: " + event.getPersonId());
+			log.warn("No first or last event found for person id: " + personId);
 		}
 	}
 

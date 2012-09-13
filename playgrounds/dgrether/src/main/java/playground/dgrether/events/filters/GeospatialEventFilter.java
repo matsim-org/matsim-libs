@@ -25,11 +25,17 @@ import java.util.List;
 import org.geotools.feature.Feature;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
@@ -97,19 +103,43 @@ public class GeospatialEventFilter implements EventFilter {
 	
 	@Override
 	public boolean doProcessEvent(Event event) {
-		if (event instanceof AgentEvent) {
-			AgentEvent e = (AgentEvent) event;
-			Link link = this.network.getLinks().get(e.getLinkId());
-			Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
-			return this.doFeaturesContainCoordinate(coordinate);
+		if (event instanceof LinkEnterEvent) {
+			LinkEnterEvent e = (LinkEnterEvent) event;
+			Id linkId = e.getLinkId();
+			return containsLink(linkId);
+		} else if (event instanceof LinkLeaveEvent) {
+			LinkLeaveEvent e = (LinkLeaveEvent) event;
+			Id linkId = e.getLinkId();
+			return containsLink(linkId);
+		} else if (event instanceof AgentWait2LinkEvent) {
+			AgentWait2LinkEvent e = (AgentWait2LinkEvent) event;
+			Id linkId = e.getLinkId();
+			return containsLink(linkId);
+		} else if (event instanceof AgentDepartureEvent) {
+			AgentDepartureEvent e = (AgentDepartureEvent) event;
+			Id linkId = e.getLinkId();
+			return containsLink(linkId);
+		} else if (event instanceof AgentArrivalEvent) {
+			AgentArrivalEvent e = (AgentArrivalEvent) event;
+			Id linkId = e.getLinkId();
+			return containsLink(linkId);
+		} else if (event instanceof ActivityStartEvent) {
+			ActivityStartEvent e = (ActivityStartEvent) event;
+			Id linkId = e.getLinkId();
+			return containsLink(linkId);
+		} else if (event instanceof ActivityEndEvent) {
+			ActivityEndEvent e = (ActivityEndEvent) event;
+			Id linkId = e.getLinkId();
+			return containsLink(linkId);
+		} else {
+			return false;
 		}
-		else if (event instanceof LinkEvent){
-			LinkEvent e = (LinkEvent) event;
-			Link link = this.network.getLinks().get(e.getLinkId());
-			Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
-			return this.doFeaturesContainCoordinate(coordinate);
-		}
-		return false;
+	}
+
+	private boolean containsLink(Id linkId) {
+		Link link = this.network.getLinks().get(linkId);
+		Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
+		return this.doFeaturesContainCoordinate(coordinate);
 	}
 
 

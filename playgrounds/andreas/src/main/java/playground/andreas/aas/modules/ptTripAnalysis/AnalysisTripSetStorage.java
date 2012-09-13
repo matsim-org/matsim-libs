@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import playground.andreas.aas.modules.ptTripAnalysis.distance.DistAnalysisTripI;
 import playground.andreas.aas.modules.ptTripAnalysis.distance.DistanceAnalysisTripSet;
 import playground.andreas.aas.modules.ptTripAnalysis.traveltime.TTAnalysisTripI;
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.TTAnalysisTripSet;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -59,7 +58,8 @@ public class AnalysisTripSetStorage {
 			if(trip instanceof DistAnalysisTripI){
 				temp = new DistanceAnalysisTripSet(mode, this.zone);
 			}else if(trip instanceof TTAnalysisTripI){
-				temp = new TTAnalysisTripSet(mode, this.zone, this.storeTrips);
+			//	temp = new TTAnalysisTripSet(mode, this.zone, this.storeTrips);
+				temp=null;
 			}else{
 				log.error("could not define a tripSet");
 				temp = null;

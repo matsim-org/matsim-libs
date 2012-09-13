@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
@@ -73,16 +73,16 @@ public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, Agen
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		addElement(event);
+		addElement(event, event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		addElement(event);
+		addElement(event, event.getPersonId());
 	}
 
-	private void addElement(PersonEvent event) {
-		PersonData data = personData.get(event.getPersonId());
+	private void addElement(Event event, Id personId) {
+		PersonData data = personData.get(personId);
 		Trajectory t = data.trajectory;
 		int index = data.planIndex;
 		Person person = data.person;

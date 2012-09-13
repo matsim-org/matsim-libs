@@ -19,12 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.qsim.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.LinkEvent;
-import org.matsim.core.events.LinkEventImpl;
-import org.matsim.core.events.PersonEventImpl;
 
 /**
  * @author thibautd

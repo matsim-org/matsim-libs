@@ -33,11 +33,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -174,7 +174,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		EventsToScore eventsToScore = new EventsToScore(this.scenario, factory, this.scenario.getConfig().planCalcScore().getLearningRate());
 
 		double commonEndAndStartTime = Time.parseTime("23:40:00");
-		eventsToScore.handleEvent(new ActivityEndEventImpl(commonEndAndStartTime, TEST_PERSON_ID, link.getId(), facilityHome.getId(), ACTIVITY_TYPE_HOME));
+		eventsToScore.handleEvent(new ActivityEndEvent(commonEndAndStartTime, TEST_PERSON_ID, link.getId(), facilityHome.getId(), ACTIVITY_TYPE_HOME));
 //		eventsToScore.handleEvent(new ActivityStartEventImpl(commonEndAndStartTime, TEST_PERSON_ID, link.getId(), facilityHome.getId(), ACTIVITY_TYPE_HOME));
 		eventsToScore.finish();
 

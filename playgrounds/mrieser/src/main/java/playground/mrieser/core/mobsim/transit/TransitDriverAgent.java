@@ -24,9 +24,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsFactoryImpl;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
@@ -245,7 +245,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		if (handled) {
 			this.ptFeature.getAgentTracker().removeAgentFromStop(agent, this.currentStop.getStopFacility().getId());
 			EventsManager events = this.simEngine.getEventsManager();
-			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
+			events.processEvent(((EventsFactory) events.getFactory()).createPersonEntersVehicleEvent(time,
 					agent.getId(), this.vehicle.getId()));
 		}
 		return handled;
@@ -256,7 +256,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		boolean handled = this.vehicle.removePassenger(agent);
 		if (handled) {
 			EventsManager events = this.simEngine.getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getId()));
+			events.processEvent(new PersonLeavesVehicleEvent(time, agent.getId(), this.vehicle.getId()));
 //			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
 //			agent.endLegAndAssumeControl(time);
 		}

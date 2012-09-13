@@ -5,8 +5,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.lib.GlobalRegistry;
@@ -44,7 +44,7 @@ public class ParkingScoreExecutor {
 			event.getControler()
 					.getEvents()
 					.processEvent(
-							new AgentMoneyEventImpl(0.0, person.getId(), score));
+							new AgentMoneyEvent(0.0, person.getId(), score));
 
 			updateParkingScoreSumInPersonGroupsForPerson(person.getId(), score);
 		}

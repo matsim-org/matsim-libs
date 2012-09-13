@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.events.LinkEnterEventImpl;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -50,7 +49,7 @@ public class TraVolCal extends FinalEventFilterA {
 	// --------------------------OVERRIDE METHODS------------------------
 	@Override
 	public void handleEvent(final Event enter) {
-		if (enter instanceof LinkEnterEventImpl) {
+		if (enter instanceof LinkEnterEvent) {
 			count();
 			long hour = (long) (enter.getTime() / 3600);
 			if (hour > timeBinMax) {

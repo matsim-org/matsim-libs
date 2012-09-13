@@ -57,7 +57,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		mobsim.getEventsManager().addHandler(dispatcher ) ;
 		
 		// I add this to have some specific reporting on the console.
-		mobsim.getEventsManager().addHandler( new MyEventsReporter() ) ;
+		//mobsim.getEventsManager().addHandler( new MyEventsReporter() ) ;
 
 		return mobsim ;
 	}

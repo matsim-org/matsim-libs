@@ -24,7 +24,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.ActivityEvent;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
@@ -32,13 +33,6 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -239,11 +233,11 @@ public class MentalSim implements Mobsim {
 						/*
 						 * Send arrival and activity start events.
 						 */
-						AgentArrivalEvent arrivalEvent = new AgentArrivalEventImpl(
+						AgentArrivalEvent arrivalEvent = new AgentArrivalEvent(
 								arrivalTime, plan.getPerson().getId(),
 								act.getLinkId(), prevLeg.getMode());
 						eventQueue.add(arrivalEvent);
-						ActivityEvent startEvent = new ActivityStartEventImpl(
+						ActivityStartEvent startEvent = new ActivityStartEvent(
 								arrivalTime, plan.getPerson().getId(),
 								act.getLinkId(), act.getFacilityId(),
 								act.getType());
@@ -256,12 +250,12 @@ public class MentalSim implements Mobsim {
 						 * departure events.
 						 */
 						Leg nextLeg = (Leg) elements.get(idx + 1);
-						ActivityEvent endEvent = new ActivityEndEventImpl(
+						ActivityEndEvent endEvent = new ActivityEndEvent(
 								actEndTime, plan.getPerson().getId(),
 								act.getLinkId(), act.getFacilityId(),
 								act.getType());
 						eventQueue.add(endEvent);
-						AgentDepartureEvent departureEvent = new AgentDepartureEventImpl(
+						AgentDepartureEvent departureEvent = new AgentDepartureEvent(
 								actEndTime, plan.getPerson().getId(),
 								act.getLinkId(), nextLeg.getMode());
 
@@ -286,10 +280,10 @@ public class MentalSim implements Mobsim {
 			if (route.getStartLinkId() != route.getEndLinkId()) {
 				Id startLink = route.getStartLinkId();
 				double linkEnterTime = startTime;
-				AgentWait2LinkEvent wait2Link = new AgentWait2LinkEventImpl(
+				AgentWait2LinkEvent wait2Link = new AgentWait2LinkEvent(
 						linkEnterTime, agentId, startLink, agentId);
 				LinkEnterEvent linkEnterEvent = null;
-				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEventImpl(
+				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(
 						++linkEnterTime, agentId, startLink, agentId);
 				eventQueue.add(wait2Link);
 				eventQueue.add(linkLeaveEvent);
@@ -298,7 +292,7 @@ public class MentalSim implements Mobsim {
 				for (int i = 0; i < ids.size(); i++) {
 					Id link = ids.get(i);
 					linkEnterTime = linkLeaveTime;
-					linkEnterEvent = new LinkEnterEventImpl(linkEnterTime,
+					linkEnterEvent = new LinkEnterEvent(linkEnterTime,
 							agentId, link, agentId);
 					eventQueue.add(linkEnterEvent);
 
@@ -308,7 +302,7 @@ public class MentalSim implements Mobsim {
 
 					linkLeaveTime = Math.max(linkEnterTime + 1, linkEnterTime
 							+ linkTime);
-					linkLeaveEvent = new LinkLeaveEventImpl(linkLeaveTime,
+					linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime,
 							agentId, link, agentId);
 					eventQueue.add(linkLeaveEvent);
 
@@ -321,7 +315,7 @@ public class MentalSim implements Mobsim {
 								network.getLinks().get(route.getEndLinkId()),
 								startTime, null, null);
 			}
-			LinkEnterEventImpl linkEnterEvent = new LinkEnterEventImpl(tt,
+			LinkEnterEvent linkEnterEvent = new LinkEnterEvent(tt,
 					agentId, route.getEndLinkId(), agentId);
 			eventQueue.add(linkEnterEvent);
 			return tt;

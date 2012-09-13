@@ -13,9 +13,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -88,7 +88,7 @@ public class ChangeActivityTimesAdvancedTest {
 	@Test
 	public void testHandlePlanAndHandleEvent() {
 		
-		ActivityStartEvent ev = new ActivityStartEventImpl(8.5*3600, id1, new IdImpl("3"), new IdImpl("4"),"work");
+		ActivityStartEvent ev = new ActivityStartEvent(8.5*3600, id1, new IdImpl("3"), new IdImpl("4"),"work");
 		this.cata.handleEvent(ev);
 		Assert.assertEquals(8.5*3600, this.cata.getLastWorkActivityStartTime(new IdImpl("1")),0.0);
 		

@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
@@ -128,16 +128,16 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 	private int processedEvents = 0;
 	private ArrayList<Tuple<Coord, Coord>> legStartEnd = new ArrayList<Tuple<Coord,Coord>>();
 	private Coord start = null;
-	public void processAgentEvent(AgentEvent e) {
+	public void processAgentEvent(Event e) {
 		this.processedEvents++;
 		
 		if(e instanceof AgentDepartureEvent){
 			this.start = actLocations.removeFirst();
-			if(e.getLegMode().equals(TransportMode.pt)){
+			if(((AgentDepartureEvent) e).getLegMode().equals(TransportMode.pt)){
 				this.lineCnt++;
 			}
 		}else if(e instanceof AgentArrivalEvent){
-			if(!e.getLegMode().equals(TransportMode.pt) && !e.getLegMode().equals(TransportMode.car)){
+			if(!((AgentArrivalEvent) e).getLegMode().equals(TransportMode.pt) && !((AgentArrivalEvent) e).getLegMode().equals(TransportMode.car)){
 				this.legStartEnd.add(new Tuple<Coord, Coord>(start, actLocations.getFirst()));
 			}
 		}

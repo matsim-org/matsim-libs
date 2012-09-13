@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 
 public class AgentId2PtTripTravelTimeMapDataTest {
 
@@ -35,7 +35,7 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 	        Id agentId1 = ida[4];
 	        Id facilId1 = ida[5];
 
-		EventsFactoryImpl ef = new EventsFactoryImpl();
+		EventsFactory ef = new EventsFactory();
         ActivityEndEvent event = ef.createActivityEndEvent(1.2*3600, agentId1, linkId1, facilId1, "w");	
         AgentDepartureEvent event3 = ef.createAgentDepartureEvent(1.2*3600, agentId1, linkId2, "pt");        
         AgentArrivalEvent event4 = ef.createAgentArrivalEvent(1.9*3600, agentId1, linkId3, "pt");

@@ -24,8 +24,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.pt.PtConstants;
 
 public class TransitStopLoadByTimeTest {
@@ -39,7 +39,7 @@ public class TransitStopLoadByTimeTest {
 		Id agentId1 = id[0];
 		Id vehicleIdDep1 = id[0];
 
-		EventsFactoryImpl ef = new EventsFactoryImpl();
+		EventsFactory ef = new EventsFactory();
 
 		TransitStopLoadByTime tl = new TransitStopLoadByTime();
 		tl.handleEvent(ef.createActivityEndEvent(100, id[0], id[0], null, "home"));
@@ -108,7 +108,7 @@ public class TransitStopLoadByTimeTest {
 		Id vehicleIdDep1 = id[0];
 		Id vehicleIdDep2 = id[1];
 
-		EventsFactoryImpl ef = new EventsFactoryImpl();
+		EventsFactory ef = new EventsFactory();
 
 		TransitStopLoadByTime tl = new TransitStopLoadByTime();
 		tl.handleEvent(ef.createActivityEndEvent(110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
@@ -142,7 +142,7 @@ public class TransitStopLoadByTimeTest {
 		Id vehicleIdDep1 = id[0];
 		Id vehicleIdDep2 = id[1];
 
-		EventsFactoryImpl ef = new EventsFactoryImpl();
+		EventsFactory ef = new EventsFactory();
 
 		TransitStopLoadByTime tl = new TransitStopLoadByTime();
 		tl.handleEvent(ef.createActivityEndEvent(110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));

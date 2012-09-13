@@ -22,7 +22,7 @@ package playground.mrieser.core.mobsim.features.refQueueNetworkFeature;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
@@ -110,7 +110,7 @@ import playground.mrieser.core.mobsim.api.MobsimVehicle;
 		double now = this.link.network.simEngine.getCurrentTime();
 		MobsimVehicle veh = this.buffer.poll();
 		this.lastMovedTime = now;
-		this.link.network.simEngine.getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getId(), this.link.getId(), null));
+		this.link.network.simEngine.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), this.link.getId(), null));
 		return veh;
 	}
 

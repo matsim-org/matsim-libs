@@ -28,9 +28,9 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.framework.Steppable;
 import org.matsim.core.network.LinkImpl;
 
@@ -138,7 +138,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 			this.earliestLeaveTimes.put(vehicle, earliestLeaveTime);
 			this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 			this.network.simEngine.getEventsManager().processEvent(
-					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId(), null));
+					new LinkEnterEvent(now, vehicle.getId(), this.link.getId(), null));
 		} else {
 			if (priority == MobsimLink.PRIORITY_IMMEDIATELY) {
 				this.usedStorageCapacity += vehicle.getSizeInEquivalents();
@@ -230,7 +230,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 				if (this.buffer.hasSpace()) {
 					this.waitingList.poll();
 					this.network.simEngine.getEventsManager().processEvent(
-							new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId(), null));
+							new AgentWait2LinkEvent(time, vehicle.getId(), this.link.getId(), null));
 					this.buffer.addVehicle(vehicle, time);
 				} else {
 					return;
@@ -243,19 +243,19 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 		double now = this.network.simEngine.getCurrentTime();
 		for (MobsimVehicle v : this.buffer.buffer) {
 			this.network.simEngine.getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+					new AgentStuckEvent(now, v.getId(), this.link.getId(), null));
 		}
 		for (MobsimVehicle v : this.vehQueue) {
 			this.network.simEngine.getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+					new AgentStuckEvent(now, v.getId(), this.link.getId(), null));
 		}
 		for (MobsimVehicle v : this.parkedVehicles.values()) {
 			this.network.simEngine.getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+					new AgentStuckEvent(now, v.getId(), this.link.getId(), null));
 		}
 		for (MobsimVehicle v : this.waitingList) {
 			this.network.simEngine.getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, v.getId(), this.link.getId(), null));
+					new AgentStuckEvent(now, v.getId(), this.link.getId(), null));
 		}
 	}
 

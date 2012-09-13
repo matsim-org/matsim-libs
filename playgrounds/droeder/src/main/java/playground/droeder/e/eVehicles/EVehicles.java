@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.utils.io.IOUtils;
@@ -67,7 +67,7 @@ public class EVehicles {
 		this.vehicles.put(v.getId(), v);
 	}
 	
-	public void handleEvent(PersonEvent e){
+	public void handleEvent(Event e){
 		Link l;
 		EVehicle v;
 		double value;

@@ -16,9 +16,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -160,7 +160,7 @@ public class PrioQNetwork {
 		for (PrioQLink link : this.links.values()) {
 			PrioQAgent agent = link.tryPoll(sim2dTime);
 			while (agent != null) {
-				this.mgr.processEvent(new LinkLeaveEventImpl(sim2dTime,agent.getAgent().getId(), link.getId(), agent.getAgent().getId()));
+				this.mgr.processEvent(new LinkLeaveEvent(sim2dTime,agent.getAgent().getId(), link.getId(), agent.getAgent().getId()));
 
 				Id id = agent.getAgent().chooseNextLinkId();
 				if (id == null) {
@@ -174,7 +174,7 @@ public class PrioQNetwork {
 				this.links.get(id).push(agent);
 
 				agent.getAgent().notifyMoveOverNode(id);
-				this.mgr.processEvent(new LinkEnterEventImpl(sim2dTime,agent.getAgent().getId(), id, agent.getAgent().getId()));
+				this.mgr.processEvent(new LinkEnterEvent(sim2dTime,agent.getAgent().getId(), id, agent.getAgent().getId()));
 				agent = link.tryPoll(sim2dTime);
 			}
 		}

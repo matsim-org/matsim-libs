@@ -22,35 +22,43 @@ package playground.thibautd.hitchiking.qsim.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.LinkEvent;
+import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.LinkEventImpl;
-import org.matsim.core.events.PersonEventImpl;
 
 /**
  * @author thibautd
  */
-public abstract class WaitingEvent extends PersonEventImpl implements LinkEvent {
+public abstract class WaitingEvent extends EventImpl {
 	private final Id link;
 
+	public static final String ATTRIBUTE_PERSON = "person";
+
+	private final Id personId;
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attr.put( LinkEventImpl.ATTRIBUTE_LINK  , ""+link );
+		return attr;
+	}
+
+	public Id getPersonId() {
+		return this.personId;
+	}
+	
 	protected WaitingEvent(
 			final double time,
 			final Id agentId,
 			final Id linkId) {
-		super( time , agentId );
+		super(time);
+		this.personId = agentId;
 		link = linkId;
 	}
 
-	@Override
 	public Id getLinkId() {
 		return link;
 	}
 
-	public Map<String, String> getAttributes() {
-		Map<String, String> atts = super.getAttributes();
-
-		atts.put( LinkEventImpl.ATTRIBUTE_LINK  , ""+link );
-
-		return atts;
-	}
 }
 

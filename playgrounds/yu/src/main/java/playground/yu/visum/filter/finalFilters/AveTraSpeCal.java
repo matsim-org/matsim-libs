@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -73,7 +73,7 @@ public class AveTraSpeCal extends LinkAveCalA {
 	 * event)
 	 */
 	@Override
-	public void compute(final LinkEnterEventImpl event, final double leaveTime) {
+	public void compute(final LinkEnterEvent event, final double leaveTime) {
 		try {
 			computeInside(network.getLinks().get(event.getLinkId()).getLength()
 					/ (leaveTime - event.getTime()), event.getLinkId().toString(),
