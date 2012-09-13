@@ -70,6 +70,7 @@ import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -281,7 +282,17 @@ public class Controler extends AbstractController {
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
+		
 		this.events = (EventsManagerImpl) createEventsManager(this.config);
+		/*
+		 * The SimStepParallelEventsManagerImpl uses a MobsimAfterSimStepListener to ensure 
+		 * that all events created in the sim step are processed before the simulation goes on.
+		 * Therefore, we add it as very first listener.
+		 */
+		if (this.events instanceof SimStepParallelEventsManagerImpl) {
+			this.getQueueSimulationListener().add(0, (SimStepParallelEventsManagerImpl) this.events);
+		}
+		
 		this.config.parallelEventHandling().makeLocked();
 	}
 

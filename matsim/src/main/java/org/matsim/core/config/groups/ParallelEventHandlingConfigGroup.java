@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ParallelEventHandlingConfigGroup.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,9 +18,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.core.config.groups;
 
 import java.util.Map;
@@ -43,6 +41,9 @@ public class ParallelEventHandlingConfigGroup extends Module {
 	final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
 	private Long estimatedNumberOfEvents = null ;
 
+	final String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps"; 
+	Boolean synchronizeOnSimSteps = null;
+	
 	private boolean locked = false ;
 
 	public ParallelEventHandlingConfigGroup() {
@@ -64,7 +65,10 @@ public class ParallelEventHandlingConfigGroup extends Module {
 			this.setNumberOfThreads(Integer.parseInt(value)) ; 
 		} else if ( ESTIMATED_NUMBER_OF_EVENTS.equals(key) ) {
 			this.setEstimatedNumberOfEvents( Long.parseLong(value) ) ; 
-		} else {
+		} else if ( SYNCHRONIZE_ON_SIMSTEPS.equals(key)) {
+			this.setSynchronizeOnSimSteps(Boolean.parseBoolean(value));
+		}
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -105,6 +109,18 @@ public class ParallelEventHandlingConfigGroup extends Module {
 	public void setEstimatedNumberOfEvents(Long estimatedNumberOfEvents) {
 		if ( !this.locked ) {
 			this.estimatedNumberOfEvents = estimatedNumberOfEvents;
+		} else {
+			throw new RuntimeException("it is too late in the control flow to modify this parameter");
+		}
+	}
+	
+	public Boolean getSynchronizeOnSimSteps() {
+		return this.synchronizeOnSimSteps;
+	}
+
+	public void setSynchronizeOnSimSteps(Boolean synchronizeOnSimSteps) {
+		if ( !this.locked ) {
+			this.synchronizeOnSimSteps = synchronizeOnSimSteps;
 		} else {
 			throw new RuntimeException("it is too late in the control flow to modify this parameter");
 		}

@@ -3,6 +3,7 @@ package org.matsim.core.events;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
+import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 
 public class EventsUtils {
 
@@ -18,14 +19,23 @@ public class EventsUtils {
 		EventsManager events;
 
 		Integer numberOfThreads = config.parallelEventHandling().getNumberOfThreads() ;
-
 		Long estimatedNumberOfEvents = config.parallelEventHandling().getEstimatedNumberOfEvents() ;
-
+		Boolean synchronizeOnSimSteps = config.parallelEventHandling().getSynchronizeOnSimSteps();		
+		
 		if (numberOfThreads != null) {
-			if (estimatedNumberOfEvents != null) {
-				events = new ParallelEventsManagerImpl(numberOfThreads, estimatedNumberOfEvents);
+			/*
+			 * If events have to be fully processed at the end of a time step,
+			 * a SimStepParallelEventsManagerImpl is used. Note that this has to be
+			 * registered as a MobsimListener!
+			 */
+			if (synchronizeOnSimSteps != null && synchronizeOnSimSteps) {
+				events = new SimStepParallelEventsManagerImpl(numberOfThreads);
 			} else {
-				events = new ParallelEventsManagerImpl(numberOfThreads);
+				if (estimatedNumberOfEvents != null) {
+					events = new ParallelEventsManagerImpl(numberOfThreads, estimatedNumberOfEvents);
+				} else {
+					events = new ParallelEventsManagerImpl(numberOfThreads);
+				}				
 			}
 		} else {
 			events = EventsUtils.createEventsManager();
