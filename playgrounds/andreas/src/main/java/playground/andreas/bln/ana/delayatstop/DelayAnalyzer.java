@@ -1,15 +1,43 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.andreas.bln.ana.delayatstop;
 
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+
+import playground.andreas.utils.pt.DelayTracker;
 
 public class DelayAnalyzer {
 	
@@ -18,11 +46,15 @@ public class DelayAnalyzer {
 	private int hvzStartHour = 0;
 	private int hvzEndHour = 0;
 	private DelayHandler handler;
+	private final TransitSchedule schedule;
 
+	public DelayAnalyzer(final TransitSchedule schedule) {
+		this.schedule = schedule;
+	}
 	
 	public void readEvents(String filename){
 		EventsManager events = EventsUtils.createEventsManager();
-		this.handler = new DelayHandler(this.treshold);
+		this.handler = new DelayHandler(this.treshold, this.schedule);
 		events.addHandler(this.handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(filename);
@@ -31,11 +63,12 @@ public class DelayAnalyzer {
 	}
 	
 	public static void main(String[] args) {
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new TransitScheduleReader(s).readFile("TODO path missing");
 		
-		DelayAnalyzer delayEval = new DelayAnalyzer();
+		DelayAnalyzer delayEval = new DelayAnalyzer(s.getTransitSchedule());
 		delayEval.setTreshold_s(60);
 		delayEval.readEvents("E:/_out/nullfall_M44_344/out/ITERS/it.0/0.events.xml.gz");
-		
 	}
 	
 	public void setTreshold_s(int treshold) {
@@ -114,8 +147,9 @@ public class DelayAnalyzer {
 		return sum / entries;
 	}
 
-	static class DelayHandler implements VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler{
+	static class DelayHandler implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler{
 		
+		private final DelayTracker delayTracker;
 		private int positiveDepartureCounter = 0;
 		private int negativeArrivalCounter = 0;
 		
@@ -127,7 +161,8 @@ public class DelayAnalyzer {
 		private int treshold;		
 		private final static Logger dhLog = Logger.getLogger(DelayHandler.class);
 		
-		public DelayHandler(int treshold){
+		public DelayHandler(int treshold, final TransitSchedule schedule) {
+			this.delayTracker = new DelayTracker(schedule);
 			for (int i = 0; i < 30; i++) {
 				this.positiveDelayMap.put(new Integer(i), new DelayCountBox());
 			}
@@ -153,36 +188,42 @@ public class DelayAnalyzer {
 		}
 		
 		@Override
+		public void handleEvent(TransitDriverStartsEvent event) {
+			this.delayTracker.addVehicleAssignment(event.getVehicleId(), event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId());
+		}
+
+		@Override
 		public void handleEvent(VehicleArrivesAtFacilityEvent event) {			
-			
+			double delay = this.delayTracker.vehicleArrivesAtStop(event.getVehicleId(), event.getTime(), event.getFacilityId());
+
 			DelayCountBox delBox = this.negativeDelayMap.get(Integer.valueOf((int) event.getTime()/3600));
 			DelayCountBox delBoxTreshold = this.negativeDelayMapTreshold.get(Integer.valueOf((int) event.getTime()/3600));
-			if(event.getDelay() < -1 * this.treshold){
-				delBoxTreshold.addEntry(event.getDelay());
+			if(delay < -1 * this.treshold){
+				delBoxTreshold.addEntry(delay);
 			} else {
 				delBoxTreshold.addEntry(0.0);
 			}
 
-			delBox.addEntry(Math.min(0.0, event.getDelay()));
+			delBox.addEntry(Math.min(0.0, delay));
 
 			this.negativeDelayMap.put(Integer.valueOf((int) event.getTime()/3600), delBox);
 			this.negativeDelayMapTreshold.put(Integer.valueOf((int) event.getTime()/3600), delBoxTreshold); 
 			this.negativeArrivalCounter++;
-			
 		}
 
 		@Override
 		public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+			double delay = this.delayTracker.vehicleDepartsAtStop(event.getVehicleId(), event.getTime(), event.getFacilityId());
 		
 			DelayCountBox delBox = this.positiveDelayMap.get(Integer.valueOf((int) event.getTime()/3600));
 			DelayCountBox delBoxTreshold = this.positiveDelayMapTreshold.get(Integer.valueOf((int) event.getTime()/3600));
-			if(event.getDelay() > this.treshold){
-				delBoxTreshold.addEntry(event.getDelay());
+			if(delay > this.treshold){
+				delBoxTreshold.addEntry(delay);
 			} else {
 				delBoxTreshold.addEntry(0.0);
 			}
 			
-			delBox.addEntry(Math.max(0.0, event.getDelay()));
+			delBox.addEntry(Math.max(0.0, delay));
 			
 			this.positiveDelayMap.put(Integer.valueOf((int) event.getTime()/3600), delBox);
 			this.positiveDelayMapTreshold.put(Integer.valueOf((int) event.getTime()/3600), delBoxTreshold);

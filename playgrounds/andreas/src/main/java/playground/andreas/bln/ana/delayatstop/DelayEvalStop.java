@@ -1,27 +1,59 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.andreas.bln.ana.delayatstop;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+
+import playground.andreas.utils.pt.DelayTracker;
 
 public class DelayEvalStop {
 	
 	private final static Logger log = Logger.getLogger(DelayEvalStop.class);
 	private int treshold = 0;
+	private final TransitSchedule schedule;
 
-	
+	public DelayEvalStop(final TransitSchedule schedule) {
+		this.schedule = schedule;
+	}
+
 	public void readEvents(String filename){
 		EventsManager events = EventsUtils.createEventsManager();
-		DelayHandler handler = new DelayHandler(this.treshold);
+		DelayHandler handler = new DelayHandler(this.treshold, this.schedule);
 		handler.addTermStop("781015.1"); //344 nord
 		//handler.addTermStop("792200.2"); //344 sued aussetzer
 		handler.addTermStop("792200.3"); // m44 nord
@@ -39,8 +71,10 @@ public class DelayEvalStop {
 	}
 	
 	public static void main(String[] args) {
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new TransitScheduleReader(s).readFile("TODO path missing");
 		
-		DelayEvalStop delayEval = new DelayEvalStop();
+		DelayEvalStop delayEval = new DelayEvalStop(s.getTransitSchedule());
 		delayEval.setTreshold_s(60);
 		delayEval.readEvents("E:/_out/m3_traffic_jam/ITERS/it.0/0.events.xml.gz");
 
@@ -50,7 +84,7 @@ public class DelayEvalStop {
 		this.treshold = treshold;
 	}
 
-	static class DelayHandler implements VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler{
+	static class DelayHandler implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler{
 		
 		private int stopCounter = 0;
 		private int termCounter = 0;
@@ -62,12 +96,12 @@ public class DelayEvalStop {
 		LinkedList<IdImpl> termList = new LinkedList<IdImpl>();
 		
 		private int treshold;
-
-
+		private DelayTracker delayTracker;
 		
 		private final static Logger dhLog = Logger.getLogger(DelayHandler.class);
 		
-		public DelayHandler(int treshold){
+		public DelayHandler(int treshold, final TransitSchedule schedule){
+			this.delayTracker = new DelayTracker(schedule);
 			for (int i = 0; i < 30; i++) {
 				this.delayMap.put(new Integer(i), new DelayCountBox());
 			}
@@ -97,19 +131,25 @@ public class DelayEvalStop {
 		}
 		
 		@Override
+		public void handleEvent(TransitDriverStartsEvent event) {
+			this.delayTracker.addVehicleAssignment(event.getVehicleId(), event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId());
+		}
+		
+		@Override
 		public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+			double delay = this.delayTracker.vehicleArrivesAtStop(event.getVehicleId(), event.getTime(), event.getFacilityId());
 			
 			if(this.termList.contains(event.getFacilityId())){
 			
 				DelayCountBox delBox = this.delayMapTerm.get(Integer.valueOf((int) event.getTime()/3600));
 				DelayCountBox delBoxTreshold = this.delayMapTermTreshold.get(Integer.valueOf((int) event.getTime()/3600));
-				if(event.getDelay() < -1 * this.treshold){
-					delBoxTreshold.addEntry(event.getDelay());
+				if(delay < -1 * this.treshold){
+					delBoxTreshold.addEntry(delay);
 				} else {
 					delBoxTreshold.addEntry(0.0);
 				}
 				
-				delBox.addEntry(Math.min(0.0, event.getDelay()));
+				delBox.addEntry(Math.min(0.0, delay));
 			
 				this.delayMapTerm.put(Integer.valueOf((int) event.getTime()/3600), delBox);
 				this.delayMapTermTreshold.put(Integer.valueOf((int) event.getTime()/3600), delBoxTreshold); 
