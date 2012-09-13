@@ -63,15 +63,8 @@ public class MZ2010ToXmlFiles {
 	@SuppressWarnings("unused")
 	private static String[] getLocalFileArgs() {
 		// from local directory
-		String inputBase = "D:/balmermi/documents/data/mz/2010/3_DB_SPSS/dat files/";
 		return new String[] {
-				inputBase+"haushalte.dat",
-				inputBase+"haushaltspersonen.dat",
-				inputBase+"fahrzeuge.dat",
-				inputBase+"zielpersonen.dat",
-				inputBase+"wege.dat",
-				inputBase+"ausgaenge.dat",
-				inputBase+"etappen.dat",
+				"D:/balmermi/documents/data/mz/2010/3_DB_SPSS/dat files/",
 				"D:/balmermi/documents/eclipse/output/mz/"
 		};
 	}
@@ -79,15 +72,8 @@ public class MZ2010ToXmlFiles {
 	@SuppressWarnings("unused")
 	private static String[] getNetworkFileArgs() {
 		// from server directory
-		String inputBase = "P:/Daten/Mikrozensen Verkehr Schweiz/2010/3_DB_SPSS/dat files/";
 		return new String[] {
-				inputBase+"haushalte.dat",
-				inputBase+"haushaltspersonen.dat",
-				inputBase+"fahrzeuge.dat",
-				inputBase+"zielpersonen.dat",
-				inputBase+"wege.dat",
-				inputBase+"ausgaenge.dat",
-				inputBase+"etappen.dat",
+				"P:/Daten/Mikrozensen Verkehr Schweiz/2010/3_DB_SPSS/dat files/",
 				"C:/local/marmolea/output/MicroCensus2010/"
 		};
 	}
@@ -99,23 +85,25 @@ public class MZ2010ToXmlFiles {
 		//args = getLocalFileArgs();
 		//args = getNetworkFileArgs();
 		
-		if (args.length != 8) {
-			log.error("MZ2010ToXmlFiles haushalteFile haushaltspersonenFile fahrzeugeFile zielpersonenFile wegeFile ausgaengeFile etappenFile outputBase");
+		if (args.length != 2) {
+			log.error("MZ2010ToXmlFiles inputBase outputBase");
 			System.exit(-1);
 		}
 
 		Gbl.startMeasurement();
 		
 		// store input parameters
-		String haushalteFile = args[0];
-		String haushaltspersonenFile = args[1];
-		String fahrzeugeFile = args[2];
-		String zielpersonenFile = args[3];
-		String wegeFile = args[4];
-		String ausgaengeFile = args[5];
-		String etappenFile = args[6];
-		String outputBase = args[7];
+		String inputBase = args[0];
+		String outputBase = args[1];
 
+		String haushalteFile = inputBase+"haushalte.dat";
+		String haushaltspersonenFile = inputBase+"haushaltspersonen.dat";
+		String fahrzeugeFile = inputBase+"fahrzeuge.dat";
+		String zielpersonenFile = inputBase+"zielpersonen.dat";
+		String wegeFile = inputBase+"wege.dat";
+		String ausgaengeFile = inputBase+"ausgaenge.dat";
+		String etappenFile = inputBase+"etappen.dat";
+		
 		// print input parameters
 		log.info("haushalteFile: "+haushalteFile);
 		log.info("haushaltspersonenFile: "+haushaltspersonenFile);
