@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -43,8 +42,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -67,14 +64,12 @@ import org.matsim.population.algorithms.PersonAnalyseTimesByActivityType.Activit
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.run.XY2Links;
 
-import playground.meisterk.eaptus2010.MyControler;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
-import playground.meisterk.phd.controler.PhDControler;
 
 public class MyRuns {
 
@@ -114,38 +109,38 @@ public class MyRuns {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(final String[] args) throws Exception {
-
-		MyRuns myRuns = new MyRuns();
-
-		boolean validRun = false;
-
-		String desiredRunName = args[0];
-		for (Run run : Run.values()) {
-			if (desiredRunName.equals(run.getName())) {
-				validRun = true;
-			}
-		}
-		if (!validRun) {
-			logger.error("A run with the name \"" + desiredRunName + "\"is not available. Available runs are:");
-			for (Run run : Run.values()) {
-				System.out.println(run.getName());
-			}
-			System.exit(-1);
-		}
-
-		logger.info("Running " + desiredRunName + "...");
-		String[] methodArgs = Arrays.copyOfRange(args, 1, args.length);
-		if (desiredRunName.equals(Run.EAPTUS_2010.getName())) {
-			myRuns.eaptus2010ForPhDThesis(methodArgs);
-		} else if (desiredRunName.equals(Run.MOVE_DEMAND_TO_NETWORK.getName())) {
-			myRuns.moveInitDemandToDifferentNetwork(methodArgs);
-		} else if (desiredRunName.equals(Run.KTI_PT_ROUTES_PERFORMANCE_TEST.getName())) {
-			myRuns.ktiPtRoutesPerformanceTest(methodArgs);
-		}
-		logger.info("Running " + desiredRunName + "...done.");
-
-	}
+//	public static void main(final String[] args) throws Exception {
+//
+//		MyRuns myRuns = new MyRuns();
+//
+//		boolean validRun = false;
+//
+//		String desiredRunName = args[0];
+//		for (Run run : Run.values()) {
+//			if (desiredRunName.equals(run.getName())) {
+//				validRun = true;
+//			}
+//		}
+//		if (!validRun) {
+//			logger.error("A run with the name \"" + desiredRunName + "\"is not available. Available runs are:");
+//			for (Run run : Run.values()) {
+//				System.out.println(run.getName());
+//			}
+//			System.exit(-1);
+//		}
+//
+//		logger.info("Running " + desiredRunName + "...");
+//		String[] methodArgs = Arrays.copyOfRange(args, 1, args.length);
+//		if (desiredRunName.equals(Run.EAPTUS_2010.getName())) {
+//			myRuns.eaptus2010ForPhDThesis(methodArgs);
+//		} else if (desiredRunName.equals(Run.MOVE_DEMAND_TO_NETWORK.getName())) {
+//			myRuns.moveInitDemandToDifferentNetwork(methodArgs);
+//		} else if (desiredRunName.equals(Run.KTI_PT_ROUTES_PERFORMANCE_TEST.getName())) {
+//			myRuns.ktiPtRoutesPerformanceTest(methodArgs);
+//		}
+//		logger.info("Running " + desiredRunName + "...done.");
+//
+//	}
 
 	void ktiPtRoutesPerformanceTest(final String[] args) {
 
@@ -186,20 +181,20 @@ public class MyRuns {
 
 	}
 
-	void eaptus2010ForPhDThesis(final String[] args) {
-
-		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
-
-		for (double learningRate : VARY_LEARNING_RATE) {
-			MyControler myControler = new MyControler(args);
-			myControler.setCreateGraphs(false);
-
-			myControler.getConfig().planCalcScore().setLearningRate(learningRate);
-			myControler.getConfig().controler().setOutputDirectory("output/eaptus2010ForPhDThesis/equil/learningRate_" + Double.toString(learningRate));
-			myControler.run();
-		}
-
-	}
+//	void eaptus2010ForPhDThesis(final String[] args) {
+//
+//		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
+//
+//		for (double learningRate : VARY_LEARNING_RATE) {
+//			MyControler myControler = new MyControler(args);
+//			myControler.setCreateGraphs(false);
+//
+//			myControler.getConfig().planCalcScore().setLearningRate(learningRate);
+//			myControler.getConfig().controler().setOutputDirectory("output/eaptus2010ForPhDThesis/equil/learningRate_" + Double.toString(learningRate));
+//			myControler.run();
+//		}
+//
+//	}
 
 	void moveInitDemandToDifferentNetwork(final String[] args) {
 
@@ -237,45 +232,45 @@ public class MyRuns {
 	/**
 	 * Generates the results of the sensitivity analysis of the SUE study.
 	 */
-	void doSUEStudySensitivityAnalysis(final String[] args, String outputDirectory) {
-
-		final double[] VARY_BETA = new double[]{2.0, 0.1, 1.0, 4.0, 10.0, Double.MAX_VALUE};
-		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
-		final String[] VARY_TIME_MODULE = new String[]{"TimeAllocationMutator", "Planomat"};
-
-		for (double beta : VARY_BETA) {
-			for (double learningRate : VARY_LEARNING_RATE) {
-
-				for (String timingModule : VARY_TIME_MODULE) {
-					Controler testee = new PhDControler(args);
-
-					StrategySettings timingStrategy = new StrategySettings(new IdImpl(3));
-					timingStrategy.setModuleName(timingModule);
-					timingStrategy.setProbability(0.1);
-					testee.getConfig().strategy().addStrategySettings(timingStrategy);
-
-					if (timingModule.equals("Planomat")) {
-						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
-					} else if (timingModule.equals("TimeAllocationMutator")) {
-						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateAll6AM/expected_plans.xml.gz");
-					}
-
-					testee.getConfig().controler().setOutputDirectory(
-							outputDirectory
-							+ "/"
-							+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
-					testee.getConfig().planCalcScore().setBrainExpBeta(beta);
-					testee.getConfig().planCalcScore().setLearningRate(learningRate);
-
-					testee.setCreateGraphs(false);
-					testee.setWriteEventsInterval(10);
-					testee.run();
-				}
-
-			}
-		}
-
-	}
+//	void doSUEStudySensitivityAnalysis(final String[] args, String outputDirectory) {
+//
+//		final double[] VARY_BETA = new double[]{2.0, 0.1, 1.0, 4.0, 10.0, Double.MAX_VALUE};
+//		final double[] VARY_LEARNING_RATE = new double[]{1.0, 0.1};
+//		final String[] VARY_TIME_MODULE = new String[]{"TimeAllocationMutator", "Planomat"};
+//
+//		for (double beta : VARY_BETA) {
+//			for (double learningRate : VARY_LEARNING_RATE) {
+//
+//				for (String timingModule : VARY_TIME_MODULE) {
+//					Controler testee = new PhDControler(args);
+//
+//					StrategySettings timingStrategy = new StrategySettings(new IdImpl(3));
+//					timingStrategy.setModuleName(timingModule);
+//					timingStrategy.setProbability(0.1);
+//					testee.getConfig().strategy().addStrategySettings(timingStrategy);
+//
+//					if (timingModule.equals("Planomat")) {
+//						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateRandomCarOnly/expected_plans.xml.gz");
+//					} else if (timingModule.equals("TimeAllocationMutator")) {
+//						testee.getConfig().plans().setInputFile("test/input/playground/meisterk/phd/GenerateEquilPopulationsTest/testGenerateAll6AM/expected_plans.xml.gz");
+//					}
+//
+//					testee.getConfig().controler().setOutputDirectory(
+//							outputDirectory
+//							+ "/"
+//							+ this.getRunOutputDirectoryName(timingModule, beta, learningRate));
+//					testee.getConfig().planCalcScore().setBrainExpBeta(beta);
+//					testee.getConfig().planCalcScore().setLearningRate(learningRate);
+//
+//					testee.setCreateGraphs(false);
+//					testee.setWriteEventsInterval(10);
+//					testee.run();
+//				}
+//
+//			}
+//		}
+//
+//	}
 
 	String getRunOutputDirectoryName(final String timingModule, final double beta, final double learningRate) {
 		return

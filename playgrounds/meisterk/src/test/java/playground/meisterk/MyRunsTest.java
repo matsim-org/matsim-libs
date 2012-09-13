@@ -20,8 +20,6 @@
 
 package playground.meisterk;
 
-import java.io.File;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
@@ -33,18 +31,18 @@ public class MyRunsTest extends MatsimTestCase {
 	public void testMoveInitDemandToDifferentNetwork() {
 	}
 
-	@Test
-	public void testDoSUEStudySensitivityAnalysis() {
-
-		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
-
-		MyRuns myRuns = new MyRuns();
-		myRuns.doSUEStudySensitivityAnalysis(args, this.getOutputDirectory());
-
-		File aRandomResultsFile = new File(this.getOutputDirectory() + "timingModule_Planomat/brainExpBeta_1.0/learningRate_0.1/personTreatment.txt");
-		assertTrue(aRandomResultsFile.exists());
-		aRandomResultsFile = new File(this.getOutputDirectory() + "timingModule_Planomat/brainExpBeta_1.0/learningRate_0.1/ITERS/it.2");
-
-	}
+//	@Test
+//	public void testDoSUEStudySensitivityAnalysis() {
+//
+//		String[] args = new String[]{this.getInputDirectory() + "config.xml"};
+//
+//		MyRuns myRuns = new MyRuns();
+//		myRuns.doSUEStudySensitivityAnalysis(args, this.getOutputDirectory());
+//
+//		File aRandomResultsFile = new File(this.getOutputDirectory() + "timingModule_Planomat/brainExpBeta_1.0/learningRate_0.1/personTreatment.txt");
+//		assertTrue(aRandomResultsFile.exists());
+//		aRandomResultsFile = new File(this.getOutputDirectory() + "timingModule_Planomat/brainExpBeta_1.0/learningRate_0.1/ITERS/it.2");
+//
+//	}
 
 }
