@@ -60,25 +60,27 @@ public class MZ2010ToXmlFiles {
 	// main
 	//////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) throws Exception {
-		
-		System.out.println("MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 2010 database \n");
-		
+	@SuppressWarnings("unused")
+	private static String[] getLocalFileArgs() {
 		// from local directory
-		//	String inputBase = "D:/balmermi/documents/data/mz/2010/3_DB_SPSS/dat files/";
-		//	args = new String[] {
-		//			inputBase+"haushalte.dat",
-		//			inputBase+"haushaltspersonen.dat",
-		//			inputBase+"fahrzeuge.dat",
-		//			inputBase+"zielpersonen.dat",
-		//			inputBase+"wege.dat",
-		//			inputBase+"ausgaenge.dat",
-		//			"D:/balmermi/documents/eclipse/output/mz/"
-		//	};
-		
+		String inputBase = "D:/balmermi/documents/data/mz/2010/3_DB_SPSS/dat files/";
+		return new String[] {
+				inputBase+"haushalte.dat",
+				inputBase+"haushaltspersonen.dat",
+				inputBase+"fahrzeuge.dat",
+				inputBase+"zielpersonen.dat",
+				inputBase+"wege.dat",
+				inputBase+"ausgaenge.dat",
+				inputBase+"etappen.dat",
+				"D:/balmermi/documents/eclipse/output/mz/"
+		};
+	}
+
+	@SuppressWarnings("unused")
+	private static String[] getNetworkFileArgs() {
 		// from server directory
 		String inputBase = "P:/Daten/Mikrozensen Verkehr Schweiz/2010/3_DB_SPSS/dat files/";
-		args = new String[] {
+		return new String[] {
 				inputBase+"haushalte.dat",
 				inputBase+"haushaltspersonen.dat",
 				inputBase+"fahrzeuge.dat",
@@ -88,9 +90,17 @@ public class MZ2010ToXmlFiles {
 				inputBase+"etappen.dat",
 				"C:/local/marmolea/output/MicroCensus2010/"
 		};
+	}
+
+	public static void main(String[] args) throws Exception {
+		
+		System.out.println("MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 2010 database \n");
+		
+		//args = getLocalFileArgs();
+		//args = getNetworkFileArgs();
 		
 		if (args.length != 8) {
-			log.error("createMZ2Plans haushalteFile haushaltspersonenFile fahrzeugeFile zielpersonenFile wegeFile ausgaengeFile etappenFile outputBase");
+			log.error("MZ2010ToXmlFiles haushalteFile haushaltspersonenFile fahrzeugeFile zielpersonenFile wegeFile ausgaengeFile etappenFile outputBase");
 			System.exit(-1);
 		}
 
@@ -377,8 +387,6 @@ public class MZ2010ToXmlFiles {
 		
 
 	}//end main		
-
-
 }
 
 	
