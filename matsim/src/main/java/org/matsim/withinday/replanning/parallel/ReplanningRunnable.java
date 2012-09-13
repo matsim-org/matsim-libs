@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
-import org.matsim.withinday.events.ReplanningEventImpl;
+import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
@@ -180,7 +180,7 @@ public abstract class ReplanningRunnable implements Runnable {
 					 * If the EventsManager is not null, we create an entry for the events log file.
 					 */
 					if (eventsManager != null) {
-						ReplanningEvent replanningEvent = new ReplanningEventImpl(time, withinDayAgent.getId(), 
+						ReplanningEvent replanningEvent = new ReplanningEvent(time, withinDayAgent.getId(), 
 								withinDayReplanner.getClass().getSimpleName());
 						eventsManager.processEvent(replanningEvent);
 					}

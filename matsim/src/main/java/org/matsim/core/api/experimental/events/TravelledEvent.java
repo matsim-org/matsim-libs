@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +16,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.events;
+
+package org.matsim.core.api.experimental.events;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.LinkEvent;
+import org.matsim.core.events.EventImpl;
+
+public class TravelledEvent extends EventImpl {
 
 
-/**
- * Super interface for lane events
- * @author dgrether
- */
-public interface LaneEvent extends LinkEvent {
-	/**
-	 * @return the LaneId of the lane the event is thrown for.
-	 */
-	public Id getLaneId();
+	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUT_DISTANCE = "distance";
+
+	public static final String EVENT_TYPE = "travelled";
+
+    private Id agentId;
+    private double distance;
+
+    public TravelledEvent(double time, Id agentId, double distance) {
+        super(time);
+        this.agentId = agentId;
+        this.distance = distance;
+    }
+
+    @Override
+    public String getEventType() {
+        return EVENT_TYPE;
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        Map<String, String> attributes = super.getAttributes();
+        attributes.put(ATTRIBUTE_PERSON, agentId.toString());
+        attributes.put(ATTRIBUT_DISTANCE, Double.toString(distance));
+        return attributes;
+    }
+
+    public Id getPersonId() {
+        return agentId;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
 }

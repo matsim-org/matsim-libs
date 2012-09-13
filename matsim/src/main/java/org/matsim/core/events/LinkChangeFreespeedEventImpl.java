@@ -26,7 +26,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 public class LinkChangeFreespeedEventImpl extends LinkChangeEventImpl implements LinkChangeFreespeedEvent {
 
-	LinkChangeFreespeedEventImpl(double time, Id linkId, ChangeValue changeValue) {
+	public LinkChangeFreespeedEventImpl(double time, Id linkId, ChangeValue changeValue) {
 		super(time, linkId, changeValue);
 	}
 

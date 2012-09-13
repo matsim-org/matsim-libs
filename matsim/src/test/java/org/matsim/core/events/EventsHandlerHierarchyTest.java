@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -59,10 +60,10 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		Id dummy = new IdImpl("");
 		EventHandler cc = new B();
-		events.processEvent(new LinkLeaveEventImpl(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEventImpl(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
 		assertEquals(this.eventHandled, 1);
 	}
 
@@ -71,10 +72,10 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 		Id dummy = new IdImpl("");
 		//first test if handleEvent is not called twice for A and for C
 		C cc = new C();
-		events.processEvent(new LinkLeaveEventImpl(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
 		assertEquals(this.eventHandled, 0);
 		events.addHandler(cc);
-		events.processEvent(new LinkLeaveEventImpl(0., dummy, dummy, dummy));
+		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));
 		assertEquals(this.eventHandled, 1);
 		//then test the reset
 		events.resetHandlers(0);

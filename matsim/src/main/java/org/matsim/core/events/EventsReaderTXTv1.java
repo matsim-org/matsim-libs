@@ -24,6 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -90,14 +92,14 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 				break;
 			case 7:
 				if ("".equals(acttype) && (desc != null)) {
-					data = new ActivityStartEventImpl(time, agentId, linkId, null, desc.replace("actstart ", ""));
+					data = new ActivityStartEvent(time, agentId, linkId, null, desc.replace("actstart ", ""));
 				} else {
 					data = this.builder.createActivityStartEvent(time, agentId, linkId, null, acttype);
 				}
 				break;
 			case 8:
 				if ("".equals(acttype) && (desc != null)) {
-					data = new ActivityEndEventImpl(time, agentId, linkId, null, desc.replace("actend ", ""));
+					data = new ActivityEndEvent(time, agentId, linkId, null, desc.replace("actend ", ""));
 				} else {
 					data = this.builder.createActivityEndEvent(time, agentId, linkId, null, acttype);
 				}

@@ -24,9 +24,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.TravelledEventImpl;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 
 public class EventsToLegsTest {
@@ -38,7 +38,7 @@ public class EventsToLegsTest {
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
 		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, new IdImpl("1"), new IdImpl("l1"), "walk"));
-		eventsToLegs.handleEvent(new TravelledEventImpl(30.0, new IdImpl("1"), 50.0));
+		eventsToLegs.handleEvent(new TravelledEvent(30.0, new IdImpl("1"), 50.0));
 		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, new IdImpl("1"), new IdImpl("l2"), "walk"));
 		Assert.assertNotNull(lh.handledLeg);
 		Assert.assertEquals(10.0, lh.handledLeg.getDepartureTime(), 1e-9);

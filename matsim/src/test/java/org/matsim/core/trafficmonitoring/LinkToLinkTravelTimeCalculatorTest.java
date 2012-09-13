@@ -22,9 +22,9 @@ package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -65,15 +65,15 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 		double linkTravelTime2 = 10.0 * 60; // 10 minutes
 		double linkTravelTime3 = 16.0 * 60; // 16 minutes
 		
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1, person1.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime1 + linkTravelTime1, person1.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime1 + linkTravelTime1, person1.getId(), link2.getId(), null));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person2.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2, person3.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime2, person2.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2 + linkTravelTime2, person2.getId(), link2.getId(), null));
-		ttcalc.handleEvent(new LinkLeaveEventImpl(linkEnterTime2 + linkTravelTime3, person3.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkEnterEventImpl(linkEnterTime2 + linkTravelTime3, person3.getId(), link3.getId(), null));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, person1.getId(), link1.getId(), null));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, person1.getId(), link1.getId(), null));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1 + linkTravelTime1, person1.getId(), link2.getId(), null));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person2.getId(), link1.getId(), null));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person3.getId(), link1.getId(), null));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, person2.getId(), link1.getId(), null));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2 + linkTravelTime2, person2.getId(), link2.getId(), null));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime3, person3.getId(), link1.getId(), null));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2 + linkTravelTime3, person3.getId(), link3.getId(), null));
 
 		assertEquals(50 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60, null, null), EPSILON); // linkTravelTime1
 		assertEquals(35 * 60, ttcalc.getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 1*timeBinSize, null, null), EPSILON);  // linkTravelTime1 - 1*timeBinSize

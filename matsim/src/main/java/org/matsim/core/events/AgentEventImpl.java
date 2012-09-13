@@ -23,18 +23,20 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentEvent;
 
-public abstract class AgentEventImpl extends PersonEventImpl implements AgentEvent {
+public abstract class AgentEventImpl extends EventImpl  {
 
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEGMODE = "legMode";
+	public static final String ATTRIBUTE_PERSON = "person";
 
+	private final Id personId;
 	private final Id linkId;
 	private final String legMode;
 
-	AgentEventImpl(final double time, final Id agentId, final Id linkId, final String legMode) {
-		super(time, agentId);
+	AgentEventImpl(final double time, final Id personId, final Id linkId, final String legMode) {
+		super(time);
+		this.personId = personId;
 		this.linkId = linkId;
 		this.legMode = legMode;
 	}
@@ -46,17 +48,22 @@ public abstract class AgentEventImpl extends PersonEventImpl implements AgentEve
 		if (this.legMode != null) {
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		return attr;
 	}
 
-	@Override
 	public String getLegMode() {
 		return this.legMode;
 	}
 
-	@Override
 	public Id getLinkId() {
 		return this.linkId;
 	}
+
+
+	public Id getPersonId() {
+		return this.personId;
+	}
+	
 
 }

@@ -19,9 +19,9 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.events.EventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
 
 /**
  * The micro-simulation internal handler for entering a road.
@@ -48,9 +48,9 @@ public class EnterRoadMessage extends EventMessage {
 
 		// the first EnterLink in a leg is a Wait2LinkEvent
 		if (vehicle.getLinkIndex() == -1) {
-			event = new AgentWait2LinkEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), null);
+			event = new AgentWait2LinkEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), null);
 		} else {
-			event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), null);
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), null);
 		}
 		SimulationParameters.getProcessEventThread().processEvent(event);
 	}

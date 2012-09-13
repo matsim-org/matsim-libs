@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.AgentStuckEventImpl;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -133,7 +133,7 @@ class QueueNode implements MatsimNetworkObject {
 					this.queueNetwork.getMobsim().getAgentCounter().decLiving();
 					this.queueNetwork.getMobsim().getAgentCounter().incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
+							new AgentStuckEvent(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
 				} else {
 					link.popFirstFromBuffer();
 					veh.getDriver().notifyMoveOverNode(nextLinkId);

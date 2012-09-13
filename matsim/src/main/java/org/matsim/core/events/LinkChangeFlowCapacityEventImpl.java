@@ -26,7 +26,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 public class LinkChangeFlowCapacityEventImpl extends LinkChangeEventImpl implements LinkChangeFlowCapacityEvent {
 	
-	LinkChangeFlowCapacityEventImpl(double time, Id linkId, ChangeValue changeValue) {
+	public LinkChangeFlowCapacityEventImpl(double time, Id linkId, ChangeValue changeValue) {
 		super(time, linkId, changeValue);
 	}
 

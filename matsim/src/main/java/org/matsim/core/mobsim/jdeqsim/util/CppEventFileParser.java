@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.utils.io.IOUtils;
@@ -30,7 +31,7 @@ public class CppEventFileParser {
 	}
 
 	public void parse(final String eventFileName) {
-		setEventLog(CppEventFileParser.parseFile(eventFileName));
+		CppEventFileParser.eventLog = CppEventFileParser.parseFile(eventFileName);
 		// for (int i = 0; i < eventLog.size(); i++) {
 		// eventLog.get(i).print();
 		// }
@@ -111,55 +112,74 @@ public class CppEventFileParser {
 
 	/**
 	 * Compares events produced by java and by C++ simulation
+	 * @param personId TODO
+	 * @deprecated Use {@link #equals(Event,EventLog)} instead
 	 */
-	public static boolean equals(final PersonEvent personEvent, final EventLog deqSimEvent) {
-		if (Integer.parseInt(personEvent.getPersonId().toString()) != deqSimEvent.getVehicleId()) {
-			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
-			return false;
-		}
+	public static boolean equals(final Event personEvent, Id personId, final EventLog deqSimEvent) {
+		return equals(personEvent, deqSimEvent);
+	}
+
+	/**
+	 * Compares events produced by java and by C++ simulation
+	 */
+	public static boolean equals(final Event personEvent, final EventLog deqSimEvent) {
+
 		if (personEvent.getTime() != deqSimEvent.getTime()) {
 			CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 			return false;
 		}
 
-		if (personEvent instanceof AgentDepartureEventImpl) {
-			if (Integer.parseInt(((AgentDepartureEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof AgentDepartureEvent) {
+			if (Integer.parseInt(((AgentDepartureEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
-
+			if (Integer.parseInt(((AgentDepartureEvent) personEvent).getPersonId().toString()) != deqSimEvent.getVehicleId()) {
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
+				return false;
+			}
 			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.START_LEG)) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 		}
 
-		if (personEvent instanceof LinkEnterEventImpl) {
-			if (Integer.parseInt(((LinkEnterEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof LinkEnterEvent) {
+			if (Integer.parseInt(((LinkEnterEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
-
+			if (Integer.parseInt(((LinkEnterEvent) personEvent).getPersonId().toString()) != deqSimEvent.getVehicleId()) {
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
+				return false;
+			}
 			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.ENTER_LINK)) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 		}
 
-		if (personEvent instanceof LinkLeaveEventImpl) {
-			if (Integer.parseInt(((LinkLeaveEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof LinkLeaveEvent) {
+			if (Integer.parseInt(((LinkLeaveEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
-
+			if (Integer.parseInt(((LinkLeaveEvent) personEvent).getPersonId().toString()) != deqSimEvent.getVehicleId()) {
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
+				return false;
+			}
 			if (!deqSimEvent.getType().equalsIgnoreCase(SimulationParameters.LEAVE_LINK)) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
 		}
 
-		if (personEvent instanceof AgentArrivalEventImpl) {
-			if (Integer.parseInt(((AgentArrivalEventImpl) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+		if (personEvent instanceof AgentArrivalEvent) {
+			if (Integer.parseInt(((AgentArrivalEvent) personEvent).getLinkId().toString()) != deqSimEvent.getLinkId()) {
+				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
+				return false;
+			}
+			if (Integer.parseInt(((AgentArrivalEvent) personEvent).getPersonId().toString()) != deqSimEvent.getVehicleId()) {
 				CppEventFileParser.printNotEqualEvents(personEvent, deqSimEvent);
 				return false;
 			}
@@ -173,18 +193,10 @@ public class CppEventFileParser {
 		return true;
 	}
 
-	private static void printNotEqualEvents(final PersonEvent personEvent, final EventLog deqSimEvent) {
+	private static void printNotEqualEvents(final Event personEvent, final EventLog deqSimEvent) {
 		System.out.println("POSSIBLE PROBLEM: EVENTS NOT EQUAL");
 		System.out.println(personEvent.toString());
 		deqSimEvent.print();
-	}
-
-	public static ArrayList<EventLog> getEventLog() {
-		return eventLog;
-	}
-
-	public static void setEventLog(final ArrayList<EventLog> eventLog) {
-		CppEventFileParser.eventLog = eventLog;
 	}
 
 }

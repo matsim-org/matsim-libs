@@ -31,8 +31,8 @@ import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
@@ -130,7 +130,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 		for (QVehicle veh : this.waitingList) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}

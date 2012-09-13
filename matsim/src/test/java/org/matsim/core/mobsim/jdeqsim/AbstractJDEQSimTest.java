@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -15,16 +16,22 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
@@ -33,14 +40,14 @@ import org.matsim.testcases.MatsimTestCase;
 
 public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
-	protected HashMap<Id, LinkedList<PersonEvent>> eventsByPerson = null;
-	public LinkedList<PersonEvent> allEvents = null;
+	protected Map<Id, List<Event>> eventsByPerson = null;
+	public LinkedList<Event> allEvents = null;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.eventsByPerson = new HashMap<Id, LinkedList<PersonEvent>>();
-		this.allEvents = new LinkedList<PersonEvent>();
+		this.eventsByPerson = new HashMap<Id, List<Event>>();
+		this.allEvents = new LinkedList<Event>();
 	}
 
 	@Override
@@ -71,7 +78,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		}
 	*/
 		EventsManagerImpl events = new ParallelEventsManagerImpl(1);
-		events.addHandler(new PersonEventCollector(this.eventsByPerson, this.allEvents));
+		events.addHandler(new PersonEventCollector());
 		events.initProcessing();
 		new JDEQSimulation(scenario, events).run();
 		events.finishProcessing();
@@ -81,7 +88,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	protected void checkAscendingTimeStamps() {
 		// all events of one agent must have ascending time stamps
 		double lastTimeStamp;
-		for (LinkedList<PersonEvent> list : eventsByPerson.values()) {
+		for (List<Event> list : eventsByPerson.values()) {
 			lastTimeStamp = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < list.size(); i++) {
 				if (lastTimeStamp > list.get(i).getTime()) {
@@ -104,8 +111,9 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	 * Checks the type of the event and the linkId.
 	 */
 	protected void checkEventsCorrespondToPlans(final Population population) {
-		for (LinkedList<PersonEvent> list : eventsByPerson.values()) {
-			Person p = population.getPersons().get(list.get(0).getPersonId());
+		for (Entry<Id, List<Event>> entry : eventsByPerson.entrySet()) {
+			List<Event> list = entry.getValue();
+			Person p = population.getPersons().get(entry.getKey());
 			// printEvents(list.get(0).agentId);
 			Plan plan = p.getSelectedPlan();
 			int index = 0;
@@ -121,35 +129,35 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 						// => only for non empty car legs and non-cars legs this
 						// statement is true
 						if (leg.getMode().equals(TransportMode.car) && ((NetworkRoute) leg.getRoute()).getLinkIds().size() > 0) {
-							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
+							assertTrue(list.get(index) instanceof LinkEnterEvent);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-									((LinkEnterEventImpl) list.get(index)).getLinkId().toString()));
+									((LinkEnterEvent) list.get(index)).getLinkId().toString()));
 							index++;
 						}
 
 						// each leg ends with arrival on act link
-						assertTrue(list.get(index) instanceof AgentArrivalEventImpl);
+						assertTrue(list.get(index) instanceof AgentArrivalEvent);
 						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-								((AgentArrivalEventImpl) list.get(index)).getLinkId().toString()));
+								((AgentArrivalEvent) list.get(index)).getLinkId().toString()));
 						index++;
 
 						// each leg ends with arrival on act link
-						assertTrue(list.get(index) instanceof ActivityStartEventImpl);
-						assertEquals(act.getLinkId(), ((ActivityStartEventImpl) list.get(index)).getLinkId());
+						assertTrue(list.get(index) instanceof ActivityStartEvent);
+						assertEquals(act.getLinkId(), ((ActivityStartEvent) list.get(index)).getLinkId());
 						index++;
 					}
 				} else if (pe instanceof Leg) {
 					leg = (Leg) pe;
 
 					// act end event
-					assertTrue(list.get(index) instanceof ActivityEndEventImpl);
-					assertEquals(act.getLinkId(), ((ActivityEndEventImpl) list.get(index)).getLinkId());
+					assertTrue(list.get(index) instanceof ActivityEndEvent);
+					assertEquals(act.getLinkId(), ((ActivityEndEvent) list.get(index)).getLinkId());
 					index++;
 
 					// each leg starts with departure on act link
-					assertTrue(list.get(index) instanceof AgentDepartureEventImpl);
+					assertTrue(list.get(index) instanceof AgentDepartureEvent);
 					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-							((AgentDepartureEventImpl) list.get(index)).getLinkId().toString()));
+							((AgentDepartureEvent) list.get(index)).getLinkId().toString()));
 					index++;
 
 					// each CAR leg must enter/leave act link
@@ -159,25 +167,25 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 						// not applicable
 						if (((NetworkRoute) leg.getRoute()).getLinkIds().size() > 0) {
 							// the first LinkEnterEvent is a AgentWait2LinkEvent
-							assertTrue(list.get(index) instanceof AgentWait2LinkEventImpl);
+							assertTrue(list.get(index) instanceof AgentWait2LinkEvent);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-									((AgentWait2LinkEventImpl) list.get(index)).getLinkId().toString()));
+									((AgentWait2LinkEvent) list.get(index)).getLinkId().toString()));
 							index++;
 
-							assertTrue(list.get(index) instanceof LinkLeaveEventImpl);
+							assertTrue(list.get(index) instanceof LinkLeaveEvent);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-									((LinkLeaveEventImpl) list.get(index)).getLinkId().toString()));
+									((LinkLeaveEvent) list.get(index)).getLinkId().toString()));
 							index++;
 						}
 
 						for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 							// enter link and leave each link on route
-							assertTrue(list.get(index) instanceof LinkEnterEventImpl);
-							assertTrue(linkId.equals(	((LinkEnterEventImpl) list.get(index)).getLinkId()) );
+							assertTrue(list.get(index) instanceof LinkEnterEvent);
+							assertTrue(linkId.equals(	((LinkEnterEvent) list.get(index)).getLinkId()) );
 							index++;
 
-							assertTrue(list.get(index) instanceof LinkLeaveEventImpl);
-							assertTrue(linkId.equals( ((LinkLeaveEventImpl) list.get(index)).getLinkId()));
+							assertTrue(list.get(index) instanceof LinkLeaveEvent);
+							assertTrue(linkId.equals( ((LinkLeaveEvent) list.get(index)).getLinkId()));
 							index++;
 						}
 					}
@@ -194,12 +202,12 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	 * vehicles are dealt with in different ways
 	 */
 	protected void compareToDEQSimEvents(final String deqsimEventsFile) {
- 		LinkedList<PersonEvent> copyEventList=new LinkedList<PersonEvent>();
+ 		LinkedList<Event> copyEventList=new LinkedList<Event>();
 
  		// remove ActStartEvent and ActEndEvent, because this does not exist in
 		// c++ DEQSim
  		for (int i=0;i<allEvents.size();i++){
-	 		if (!(allEvents.get(i) instanceof ActivityStartEventImpl || allEvents.get(i) instanceof ActivityEndEventImpl)){
+	 		if (!(allEvents.get(i) instanceof ActivityStartEvent || allEvents.get(i) instanceof ActivityEndEvent)){
 				copyEventList.add(allEvents.get(i));
 			}
  		}
@@ -227,25 +235,72 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	}
 
 
-	private static class PersonEventCollector implements PersonEventHandler {
+	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler {
 
-		private final Map<Id, LinkedList<PersonEvent>> eventsByPerson;
-		private final List<PersonEvent> allEvents;
-
-		/*package*/ PersonEventCollector(Map<Id, LinkedList<PersonEvent>> eventsByPerson, List<PersonEvent> allEvents) {
-			this.eventsByPerson = eventsByPerson;
-			this.allEvents = allEvents;
+		public void reset(int iteration) {
 		}
 
-		public void handleEvent(PersonEvent event) {
+		@Override
+		public void handleEvent(AgentWait2LinkEvent event) {
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
-				eventsByPerson.put(event.getPersonId(), new LinkedList<PersonEvent>());
+				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
 			}
 			eventsByPerson.get(event.getPersonId()).add(event);
 			allEvents.add(event);
 		}
 
-		public void reset(int iteration) {
+		@Override
+		public void handleEvent(AgentArrivalEvent event) {
+			if (!eventsByPerson.containsKey(event.getPersonId())) {
+				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			}
+			eventsByPerson.get(event.getPersonId()).add(event);
+			allEvents.add(event);
+		}
+
+		@Override
+		public void handleEvent(AgentDepartureEvent event) {
+			if (!eventsByPerson.containsKey(event.getPersonId())) {
+				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			}
+			eventsByPerson.get(event.getPersonId()).add(event);
+			allEvents.add(event);
+		}
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			if (!eventsByPerson.containsKey(event.getPersonId())) {
+				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			}
+			eventsByPerson.get(event.getPersonId()).add(event);
+			allEvents.add(event);
+		}
+
+		@Override
+		public void handleEvent(LinkEnterEvent event) {
+			if (!eventsByPerson.containsKey(event.getPersonId())) {
+				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			}
+			eventsByPerson.get(event.getPersonId()).add(event);
+			allEvents.add(event);
+		}
+
+		@Override
+		public void handleEvent(ActivityEndEvent event) {
+			if (!eventsByPerson.containsKey(event.getPersonId())) {
+				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			}
+			eventsByPerson.get(event.getPersonId()).add(event);
+			allEvents.add(event);
+		}
+
+		@Override
+		public void handleEvent(ActivityStartEvent event) {
+			if (!eventsByPerson.containsKey(event.getPersonId())) {
+				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
+			}
+			eventsByPerson.get(event.getPersonId()).add(event);
+			allEvents.add(event);
 		}
 	}
 

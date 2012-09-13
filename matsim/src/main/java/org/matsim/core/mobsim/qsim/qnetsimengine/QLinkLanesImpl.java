@@ -30,8 +30,8 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -252,7 +252,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 		this.firstLane.addFromIntersection(veh );
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEventImpl(now, veh.getDriver().getId(),
+				new LinkEnterEvent(now, veh.getDriver().getId(),
 						this.getLink().getId(), veh.getId()));
 	}
 
@@ -298,7 +298,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 			}
 			movedAtLeastOne = true;
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			boolean handled = this.firstLane.addTransitToBuffer(now, veh);
 			if (!handled) {
 				this.firstLane.addWaitToBuffer(veh, now);

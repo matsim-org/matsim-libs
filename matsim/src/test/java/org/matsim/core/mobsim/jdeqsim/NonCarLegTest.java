@@ -1,13 +1,13 @@
 package org.matsim.core.mobsim.jdeqsim;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class NonCarLegTest extends AbstractJDEQSimTest {
@@ -26,12 +26,12 @@ public class NonCarLegTest extends AbstractJDEQSimTest {
 		// problem in that method (and not required).
 		boolean wasInLoop=false;
 		
-		for (LinkedList<PersonEvent> list : super.eventsByPerson.values()) {
+		for (List<Event> list : super.eventsByPerson.values()) {
 			wasInLoop=true;
-			assertTrue(list.get(0) instanceof ActivityEndEventImpl);
-			assertTrue(list.get(1) instanceof AgentDepartureEventImpl);
-			assertTrue(list.get(2) instanceof AgentArrivalEventImpl);
-			assertTrue(list.get(3) instanceof ActivityStartEventImpl);
+			assertTrue(list.get(0) instanceof ActivityEndEvent);
+			assertTrue(list.get(1) instanceof AgentDepartureEvent);
+			assertTrue(list.get(2) instanceof AgentArrivalEvent);
+			assertTrue(list.get(3) instanceof ActivityStartEvent);
 			
 		}
 		assertTrue(wasInLoop);

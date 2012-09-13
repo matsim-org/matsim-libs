@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
@@ -265,7 +265,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
-			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
+			events.processEvent(((EventsFactory) events.getFactory()).createPersonEntersVehicleEvent(time,
 					agent.getId(), this.vehicle.getVehicle().getId()));
 		}
 		return handled;
@@ -277,7 +277,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		if(handled){
 //			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEventImpl(time, passenger.getId(), this.vehicle.getVehicle().getId()));
+			events.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), this.vehicle.getVehicle().getId()));
 			
 			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.
 			// kai, sep'12

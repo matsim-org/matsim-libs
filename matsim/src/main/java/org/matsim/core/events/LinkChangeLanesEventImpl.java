@@ -26,7 +26,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 public class LinkChangeLanesEventImpl extends LinkChangeEventImpl implements LinkChangeLanesEvent {
 	
-	LinkChangeLanesEventImpl(double time, Id linkId, ChangeValue changeValue) {
+	public LinkChangeLanesEventImpl(double time, Id linkId, ChangeValue changeValue) {
 		super(time, linkId, changeValue);
 	}
 

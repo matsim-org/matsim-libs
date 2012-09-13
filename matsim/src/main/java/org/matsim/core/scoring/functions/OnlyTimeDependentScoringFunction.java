@@ -22,7 +22,7 @@ package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 
 /**
@@ -89,7 +89,7 @@ public class OnlyTimeDependentScoringFunction extends ScoringFunctionAdapter {
 
 	/**
 	 * Adds the specified amount of utility to the agent's score. This is mostly
-	 * used for handling {@link AgentMoneyEventImpl}s, allowing other parts of the
+	 * used for handling {@link AgentMoneyEvent}s, allowing other parts of the
 	 * code to influence an agent's score.
 	 *
 	 * @param amount amount to be added to the agent's score

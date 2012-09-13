@@ -42,7 +42,6 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -52,7 +51,6 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -116,7 +114,7 @@ public class EventsManagerImpl implements EventsManager {
 	private EventsFactory builder;
 
 	protected EventsManagerImpl() {
-		this.builder = new EventsFactoryImpl();
+		this.builder = new EventsFactory();
 	}
 
 	private HandlerData findHandler(final Class<?> evklass) {
@@ -359,9 +357,6 @@ public class EventsManagerImpl implements EventsManager {
 			return true;
 		} else if (klass == Event.class) {
 			((BasicEventHandler)handler).handleEvent(ev);
-			return true;
-		} else if (klass == PersonEvent.class) {
-			((PersonEventHandler)handler).handleEvent((PersonEvent)ev);
 			return true;
 		}
 		return false;

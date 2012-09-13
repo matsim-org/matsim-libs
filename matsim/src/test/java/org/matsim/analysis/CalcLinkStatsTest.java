@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -67,17 +67,17 @@ public class CalcLinkStatsTest {
 		
 		Id agentId = s.createId("1001");
 		// generate some pseudo traffic for hour 0: 3 veh on link 1; 1 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(1000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1010, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1020, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1030, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1010, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1020, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1030, agentId, link2.getId(), null));
 		
 		// generate some pseudo traffic for hour 0: 1 veh on link 1; 4 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(4000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4010, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4020, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4030, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4010, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4020, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4030, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4040, agentId, link2.getId(), null));
 		
 		cls.addData(analyzer, ttimes);
 		
@@ -88,21 +88,21 @@ public class CalcLinkStatsTest {
 		
 		analyzer.reset(1);
 		// generate some pseudo traffic for hour 0: 4 veh on link 1; 3 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(1000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1010, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1020, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1030, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1040, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1050, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1060, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1010, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1020, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1030, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1050, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1060, agentId, link2.getId(), null));
 		
 		// generate some pseudo traffic for hour 0: 4 veh on link 1; 2 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(4000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4010, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4020, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4030, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4040, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4010, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4020, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4030, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4040, agentId, link2.getId(), null));
 		
 		cls.addData(analyzer, ttimes);
 		
@@ -141,37 +141,37 @@ public class CalcLinkStatsTest {
 		
 		Id agentId = s.createId("1001");
 		// generate some pseudo traffic for hour 0: 3 veh on link 1; 1 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(1000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1010, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1020, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1030, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1010, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1020, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1030, agentId, link2.getId(), null));
 		
 		// generate some pseudo traffic for hour 0: 1 veh on link 1; 4 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(4000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4010, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4020, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4030, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4010, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4020, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4030, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4040, agentId, link2.getId(), null));
 		
 		cls.addData(analyzer, ttimes);
 		
 		analyzer.reset(1);
 		// generate some pseudo traffic for hour 0: 4 veh on link 1; 3 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(1000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1010, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1020, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1030, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1040, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1050, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(1060, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1010, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1020, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1030, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1050, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(1060, agentId, link2.getId(), null));
 		
 		// generate some pseudo traffic for hour 0: 4 veh on link 1; 2 veh on link 2
-		analyzer.handleEvent(new LinkLeaveEventImpl(4000, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4010, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4020, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4030, agentId, link1.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4040, agentId, link2.getId(), null));
-		analyzer.handleEvent(new LinkLeaveEventImpl(4040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4000, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4010, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4020, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4030, agentId, link1.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4040, agentId, link2.getId(), null));
+		analyzer.handleEvent(new LinkLeaveEvent(4040, agentId, link2.getId(), null));
 		
 		cls.addData(analyzer, ttimes);
 		

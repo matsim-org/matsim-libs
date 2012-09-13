@@ -28,11 +28,11 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.internal.MatsimNetworkObject;
-import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -186,7 +186,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		this.add(veh, now);
 		veh.setCurrentLink(this.getLink());
 		QueueSimulation.getEvents().processEvent(
-				new LinkEnterEventImpl(now,veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+				new LinkEnterEvent(now,veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 	}
 
 	/**
@@ -209,7 +209,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		for (QueueVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
+					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
 							.getDriver().getMode()));
 		}
 
@@ -225,7 +225,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		for (QueueVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
+					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
 							.getDriver().getMode()));
 		}
 
@@ -241,7 +241,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		for (QueueVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.buffer.size());
@@ -345,7 +345,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			}
 
 			QueueSimulation.getEvents().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			addToBuffer(veh, now);
 		}
 	}
@@ -551,7 +551,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		// in the buffer that is now the new
 		// front-most
 		QueueSimulation.getEvents().processEvent(
-				new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+				new LinkLeaveEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 		return veh;
 	}
 

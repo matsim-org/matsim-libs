@@ -30,12 +30,12 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.TravelEventHandler;
-import org.matsim.core.events.TravelledEvent;
+import org.matsim.core.events.TravelledEventHandler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -57,7 +57,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  * @author michaz
  *
  */
-public class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, TravelEventHandler {
+public class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, TravelledEventHandler {
 
 	public interface LegHandler {
 	    void handleLeg(Id agentId, Leg leg);

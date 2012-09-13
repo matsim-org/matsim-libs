@@ -19,10 +19,11 @@
 
 package org.matsim.core.events;
 
+import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 
-public interface TravelEventHandler extends EventHandler {
+public interface TravelledEventHandler extends EventHandler {
 
     public void handleEvent(TravelledEvent event);
 

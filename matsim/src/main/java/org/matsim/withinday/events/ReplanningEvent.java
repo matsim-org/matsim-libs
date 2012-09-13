@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningEvent.java
+ * ReplanningEventImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,14 +20,54 @@
 
 package org.matsim.withinday.events;
 
-import org.matsim.core.api.experimental.events.PersonEvent;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.events.EventImpl;
 
 /**
- * A ReplanningEvent documents any change in an agent's plan by a within-day replanner.
- * 
  * @author cdobler
  */
-public interface ReplanningEvent extends PersonEvent {
+public class ReplanningEvent extends EventImpl {
+
+	public static final String EVENT_TYPE = "replanning";
+	public static final String ATTRIBUTE_REPLANNERTYPE = "replanner";
 	
-	public String getReplannerType();
+	private final String replannerType;
+	
+	public ReplanningEvent(final double time, final Id personId, final String replannerType) {
+		super(time);
+		this.personId = personId;
+		this.replannerType = replannerType;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attr.put(ATTRIBUTE_REPLANNERTYPE, this.replannerType);
+
+		return attr;
+	}
+
+	public String getReplannerType() {
+		return this.replannerType;
+	}
+	
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+	
+
+	public static final String ATTRIBUTE_PERSON = "person";
+
+	private final Id personId;
+
+
+	public Id getPersonId() {
+		return this.personId;
+	}
+
 }

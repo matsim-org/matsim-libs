@@ -32,10 +32,10 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -204,7 +204,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		veh.setCurrentLink(this.getLink());
 		this.vehQueue.add(veh);
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEventImpl(now, veh.getDriver().getId(),
+				new LinkEnterEvent(now, veh.getDriver().getId(),
 						this.getLink().getId(), veh.getId()));
 		if ( HOLES ) {
 			holes.poll();
@@ -219,7 +219,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 		for (QVehicle veh : this.vehQueue) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -228,7 +228,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 		for (QVehicle veh : this.buffer) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -361,7 +361,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			boolean handled = this.addTransitToBuffer(now, veh);
 
 			if (!handled) {
@@ -726,7 +726,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		this.linkEnterTimeMap.remove(veh);
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 		return veh;
 	}
 

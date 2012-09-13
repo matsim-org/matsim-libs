@@ -1,11 +1,9 @@
 package org.matsim.core.api.experimental.events;
 
-import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.events.handler.EventHandler;
 
-public interface EventsManager extends MatsimToplevelContainer {
+public interface EventsManager {
 
-	@Override
 	public EventsFactory getFactory();
 
 	public void processEvent(final Event event);

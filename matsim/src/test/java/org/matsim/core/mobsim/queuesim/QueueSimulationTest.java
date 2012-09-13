@@ -41,23 +41,22 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.TravelledEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -186,11 +185,11 @@ public class QueueSimulationTest extends TestCase {
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 5, collector.getEvents().size());
-		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
-		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
-        assertEquals("wrong type of event.", TravelledEventImpl.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of event.", AgentArrivalEventImpl.class, allEvents.get(3).getClass());
-		assertEquals("wrong type of event.", ActivityStartEventImpl.class, allEvents.get(4).getClass());
+		assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
+        assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(3).getClass());
+		assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
 		assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
 		assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
 		assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
@@ -230,18 +229,18 @@ public class QueueSimulationTest extends TestCase {
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 4, allEvents.size());
-		assertEquals("wrong type of 1st event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
-		assertEquals("wrong type of 2nd event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
-		assertEquals("wrong type of 3rd event.", AgentArrivalEventImpl.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of 4th event.", ActivityStartEventImpl.class, allEvents.get(3).getClass());
+		assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
+		assertEquals("wrong type of 2nd event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
+		assertEquals("wrong type of 3rd event.", AgentArrivalEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of 4th event.", ActivityStartEvent.class, allEvents.get(3).getClass());
 		assertEquals("wrong time in 1st event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
 		assertEquals("wrong time in 2nd event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
 		assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
 		assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
-		assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEventImpl) allEvents.get(0)).getLinkId());
-		assertEquals("wrong link in 2nd event.", f.link1.getId(), ((AgentDepartureEventImpl) allEvents.get(1)).getLinkId());
-		assertEquals("wrong link in 3rd event.", f.link1.getId(), ((AgentArrivalEventImpl) allEvents.get(2)).getLinkId());
-		assertEquals("wrong link in 4th event.", f.link1.getId(), ((ActivityStartEventImpl) allEvents.get(3)).getLinkId());
+		assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId());
+		assertEquals("wrong link in 2nd event.", f.link1.getId(), ((AgentDepartureEvent) allEvents.get(1)).getLinkId());
+		assertEquals("wrong link in 3rd event.", f.link1.getId(), ((AgentArrivalEvent) allEvents.get(2)).getLinkId());
+		assertEquals("wrong link in 4th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(3)).getLinkId());
 	}
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {
@@ -572,19 +571,19 @@ public class QueueSimulationTest extends TestCase {
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 13, allEvents.size());
-		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
-		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
-		assertEquals("wrong type of event.", AgentWait2LinkEventImpl.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(3).getClass()); // link1
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(4).getClass()); // link2
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(5).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(6).getClass()); // link3
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(7).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(8).getClass()); // link4
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(9).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(10).getClass()); // link1 again
-		assertEquals("wrong type of event.", AgentArrivalEventImpl.class, allEvents.get(11).getClass());
-		assertEquals("wrong type of event.", ActivityStartEventImpl.class, allEvents.get(12).getClass());
+		assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
+		assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(3).getClass()); // link1
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(4).getClass()); // link2
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(5).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(6).getClass()); // link3
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(7).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(8).getClass()); // link4
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass()); // link1 again
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(11).getClass());
+		assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(12).getClass());
 	}
 
 	/**
@@ -630,23 +629,23 @@ public class QueueSimulationTest extends TestCase {
 		/* finish */
 		List<Event> allEvents = collector.getEvents();
 		assertEquals("wrong number of events.", 17, allEvents.size());
-		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
-		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
-		assertEquals("wrong type of event.", AgentWait2LinkEventImpl.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(3).getClass()); // link1
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(4).getClass()); // link2
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(5).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(6).getClass()); // link3
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(7).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(8).getClass()); // link4
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(9).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(10).getClass()); // link1 again
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(11).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(12).getClass()); // link2 again
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(13).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(14).getClass()); // link3 again
-		assertEquals("wrong type of event.", AgentArrivalEventImpl.class, allEvents.get(15).getClass());
-		assertEquals("wrong type of event.", ActivityStartEventImpl.class, allEvents.get(16).getClass());
+		assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
+		assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
+		assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(3).getClass()); // link1
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(4).getClass()); // link2
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(5).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(6).getClass()); // link3
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(7).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(8).getClass()); // link4
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass()); // link1 again
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(11).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(12).getClass()); // link2 again
+		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(13).getClass());
+		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(14).getClass()); // link3 again
+		assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(15).getClass());
+		assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(16).getClass());
 	}
 
 	/**

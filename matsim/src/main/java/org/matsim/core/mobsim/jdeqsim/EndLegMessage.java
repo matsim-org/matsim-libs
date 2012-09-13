@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.events.EventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -106,13 +106,13 @@ public class EndLegMessage extends EventMessage {
 		// schedule enter link event
 		// only, if car leg and is not empty
 		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car) && (vehicle.getCurrentLinkRoute()!=null && vehicle.getCurrentLinkRoute().length!=0)){
-			event = new LinkEnterEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle.getOwnerPerson().getId());
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle.getOwnerPerson().getId());
 
 			SimulationParameters.getProcessEventThread().processEvent(event);
 		}
 
 		// schedule AgentArrivalEvent
-		event = new AgentArrivalEventImpl(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), this.vehicle.getCurrentLeg().getMode());
+		event = new AgentArrivalEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), this.vehicle.getCurrentLeg().getMode());
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
@@ -124,7 +124,7 @@ public class EndLegMessage extends EventMessage {
 			actStartEventTime = this.getMessageArrivalTime();
 		}
 
-		event = new ActivityStartEventImpl(actStartEventTime, this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), nextAct.getFacilityId(), nextAct.getType());
+		event = new ActivityStartEvent(actStartEventTime, this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), nextAct.getFacilityId(), nextAct.getType());
 		SimulationParameters.getProcessEventThread().processEvent(event);
 
 	}

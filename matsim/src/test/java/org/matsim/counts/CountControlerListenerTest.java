@@ -29,11 +29,11 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -324,7 +324,7 @@ public class CountControlerListenerTest {
 		public void run() {
 			Id linkId = new IdImpl("100");
 			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEventImpl(60.0, new IdImpl(i), linkId, null));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, new IdImpl(i), linkId, null));
 			}
 		}
 	}

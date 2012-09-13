@@ -20,9 +20,9 @@
 
 package org.matsim.integration.events;
 
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -36,8 +36,8 @@ import org.matsim.testcases.utils.EventsCollector;
 public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 	public void testWriteReadTxt() {
-		final AgentMoneyEventImpl event1 = new AgentMoneyEventImpl(7.0*3600, new IdImpl(1), 2.34);
-		final AgentMoneyEventImpl event2 = new AgentMoneyEventImpl(8.5*3600, new IdImpl(2), -3.45);
+		final AgentMoneyEvent event1 = new AgentMoneyEvent(7.0*3600, new IdImpl(1), 2.34);
+		final AgentMoneyEvent event2 = new AgentMoneyEvent(8.5*3600, new IdImpl(2), -3.45);
 
 		// write some events to file
 
@@ -64,22 +64,22 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		assertEquals(2, collector.getEvents().size());
 
-		assertTrue(collector.getEvents().get(0) instanceof AgentMoneyEventImpl);
-		AgentMoneyEventImpl e1 = (AgentMoneyEventImpl) collector.getEvents().get(0);
+		assertTrue(collector.getEvents().get(0) instanceof AgentMoneyEvent);
+		AgentMoneyEvent e1 = (AgentMoneyEvent) collector.getEvents().get(0);
 		assertEquals(event1.getTime(), e1.getTime(), EPSILON);
 		assertEquals(event1.getPersonId().toString(), e1.getPersonId().toString());
 		assertEquals(event1.getAmount(), e1.getAmount(), EPSILON);
 
-		assertTrue(collector.getEvents().get(1) instanceof AgentMoneyEventImpl);
-		AgentMoneyEventImpl e2 = (AgentMoneyEventImpl) collector.getEvents().get(1);
+		assertTrue(collector.getEvents().get(1) instanceof AgentMoneyEvent);
+		AgentMoneyEvent e2 = (AgentMoneyEvent) collector.getEvents().get(1);
 		assertEquals(event2.getTime(), e2.getTime(), EPSILON);
 		assertEquals(event2.getPersonId().toString(), e2.getPersonId().toString());
 		assertEquals(event2.getAmount(), e2.getAmount(), EPSILON);
 	}
 
 	public void testWriteReadXxml() {
-		final AgentMoneyEventImpl event1 = new AgentMoneyEventImpl(7.0*3600, new IdImpl(1), 2.34);
-		final AgentMoneyEventImpl event2 = new AgentMoneyEventImpl(8.5*3600, new IdImpl(2), -3.45);
+		final AgentMoneyEvent event1 = new AgentMoneyEvent(7.0*3600, new IdImpl(1), 2.34);
+		final AgentMoneyEvent event2 = new AgentMoneyEvent(8.5*3600, new IdImpl(2), -3.45);
 
 		// write some events to file
 
@@ -106,14 +106,14 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		assertEquals(2, collector.getEvents().size());
 
-		assertTrue(collector.getEvents().get(0) instanceof AgentMoneyEventImpl);
-		AgentMoneyEventImpl e1 = (AgentMoneyEventImpl) collector.getEvents().get(0);
+		assertTrue(collector.getEvents().get(0) instanceof AgentMoneyEvent);
+		AgentMoneyEvent e1 = (AgentMoneyEvent) collector.getEvents().get(0);
 		assertEquals(event1.getTime(), e1.getTime(), EPSILON);
 		assertEquals(event1.getPersonId().toString(), e1.getPersonId().toString());
 		assertEquals(event1.getAmount(), e1.getAmount(), EPSILON);
 
-		assertTrue(collector.getEvents().get(1) instanceof AgentMoneyEventImpl);
-		AgentMoneyEventImpl e2 = (AgentMoneyEventImpl) collector.getEvents().get(1);
+		assertTrue(collector.getEvents().get(1) instanceof AgentMoneyEvent);
+		AgentMoneyEvent e2 = (AgentMoneyEvent) collector.getEvents().get(1);
 		assertEquals(event2.getTime(), e2.getTime(), EPSILON);
 		assertEquals(event2.getPersonId().toString(), e2.getPersonId().toString());
 		assertEquals(event2.getAmount(), e2.getAmount(), EPSILON);

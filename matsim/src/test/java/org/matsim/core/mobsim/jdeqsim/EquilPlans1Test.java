@@ -1,16 +1,16 @@
 package org.matsim.core.mobsim.jdeqsim;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class EquilPlans1Test extends AbstractJDEQSimTest {
@@ -27,38 +27,38 @@ public class EquilPlans1Test extends AbstractJDEQSimTest {
 		// custom checks:
 		boolean wasInLoop = false;
 		int index = 0;
-		for (LinkedList<PersonEvent> list : super.eventsByPerson.values()) {
+		for (List<Event> list : super.eventsByPerson.values()) {
 			wasInLoop = true;
 			// checking the time of the first event
 			assertEquals(21600, list.get(index).getTime(), 0.9);
-			assertTrue(list.get(index++) instanceof ActivityEndEventImpl);
-			assertTrue(list.get(index++) instanceof AgentDepartureEventImpl);
-			assertTrue(list.get(index++) instanceof AgentWait2LinkEventImpl);
-			assertTrue(list.get(index++) instanceof LinkLeaveEventImpl);
-			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
-			assertTrue(list.get(index++) instanceof LinkLeaveEventImpl);
-			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
-			assertTrue(list.get(index++) instanceof LinkLeaveEventImpl);
-			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
-			assertTrue(list.get(index++) instanceof AgentArrivalEventImpl);
-			assertTrue(list.get(index++) instanceof ActivityStartEventImpl);
-			assertTrue(list.get(index++) instanceof ActivityEndEventImpl);
-			assertTrue(list.get(index++) instanceof AgentDepartureEventImpl);
-			assertTrue(list.get(index++) instanceof AgentArrivalEventImpl);
-			assertTrue(list.get(index++) instanceof ActivityStartEventImpl);
-			assertTrue(list.get(index++) instanceof ActivityEndEventImpl);
-			assertTrue(list.get(index++) instanceof AgentDepartureEventImpl);
-			assertTrue(list.get(index++) instanceof AgentWait2LinkEventImpl);
-			assertTrue(list.get(index++) instanceof LinkLeaveEventImpl);
-			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
-			assertTrue(list.get(index++) instanceof LinkLeaveEventImpl);
-			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
-			assertTrue(list.get(index++) instanceof LinkLeaveEventImpl);
-			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
-			assertTrue(list.get(index++) instanceof LinkLeaveEventImpl);
-			assertTrue(list.get(index++) instanceof LinkEnterEventImpl);
-			assertTrue(list.get(index++) instanceof AgentArrivalEventImpl);
-			assertTrue(list.get(index) instanceof ActivityStartEventImpl);
+			assertTrue(list.get(index++) instanceof ActivityEndEvent);
+			assertTrue(list.get(index++) instanceof AgentDepartureEvent);
+			assertTrue(list.get(index++) instanceof AgentWait2LinkEvent);
+			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
+			assertTrue(list.get(index++) instanceof LinkEnterEvent);
+			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
+			assertTrue(list.get(index++) instanceof LinkEnterEvent);
+			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
+			assertTrue(list.get(index++) instanceof LinkEnterEvent);
+			assertTrue(list.get(index++) instanceof AgentArrivalEvent);
+			assertTrue(list.get(index++) instanceof ActivityStartEvent);
+			assertTrue(list.get(index++) instanceof ActivityEndEvent);
+			assertTrue(list.get(index++) instanceof AgentDepartureEvent);
+			assertTrue(list.get(index++) instanceof AgentArrivalEvent);
+			assertTrue(list.get(index++) instanceof ActivityStartEvent);
+			assertTrue(list.get(index++) instanceof ActivityEndEvent);
+			assertTrue(list.get(index++) instanceof AgentDepartureEvent);
+			assertTrue(list.get(index++) instanceof AgentWait2LinkEvent);
+			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
+			assertTrue(list.get(index++) instanceof LinkEnterEvent);
+			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
+			assertTrue(list.get(index++) instanceof LinkEnterEvent);
+			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
+			assertTrue(list.get(index++) instanceof LinkEnterEvent);
+			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
+			assertTrue(list.get(index++) instanceof LinkEnterEvent);
+			assertTrue(list.get(index++) instanceof AgentArrivalEvent);
+			assertTrue(list.get(index) instanceof ActivityStartEvent);
 			// checking the time of the last event
 			assertEquals(38039, list.get(index).getTime(), 0.9);
 		}

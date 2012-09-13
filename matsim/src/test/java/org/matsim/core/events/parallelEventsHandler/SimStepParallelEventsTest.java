@@ -26,8 +26,6 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -64,7 +62,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.removeHandler(handler);
 
-		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
 
 		for (int i = 0; i < 100; i++) {
 			events.processEvent(linkLeaveEvent);
@@ -85,7 +83,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			events.addHandler(handlers[i]);
 		}
 
-		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
 
 		for (int j = 0; j < numberOfIterations; j++) {
 
@@ -110,20 +108,20 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 
 	public void testCheckChronologicalEventsOrder() {
 		SimStepParallelEventsManagerImpl events = new SimStepParallelEventsManagerImpl(2);
-		LinkLeaveEventImpl linkLeaveEvent;
+		LinkLeaveEvent linkLeaveEvent;
 
 		/*
 		 * Use valid order
 		 */
 		events.initProcessing();
 		
-		linkLeaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl(""), new IdImpl(""), null);
+		linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
 		events.processEvent(linkLeaveEvent);
-		linkLeaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl(""), new IdImpl(""), null);
+		linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
 		events.processEvent(linkLeaveEvent);
 		events.afterSimStep(1.0);
 		
-		linkLeaveEvent = new LinkLeaveEventImpl(2.0, new IdImpl(""), new IdImpl(""), null);
+		linkLeaveEvent = new LinkLeaveEvent(2.0, new IdImpl(""), new IdImpl(""), null);
 		events.processEvent(linkLeaveEvent);
 		events.afterSimStep(2.0);
 		
@@ -135,15 +133,15 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		try {
 			events.initProcessing();
 			
-			linkLeaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl(""), new IdImpl(""), null);
+			linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
 			events.processEvent(linkLeaveEvent);
 			events.afterSimStep(1.0);
 			
-			linkLeaveEvent = new LinkLeaveEventImpl(2.0, new IdImpl(""), new IdImpl(""), null);
+			linkLeaveEvent = new LinkLeaveEvent(2.0, new IdImpl(""), new IdImpl(""), null);
 			events.processEvent(linkLeaveEvent);
 			events.afterSimStep(2.0);
 			
-			linkLeaveEvent = new LinkLeaveEventImpl(1.0, new IdImpl(""), new IdImpl(""), null);
+			linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
 			events.processEvent(linkLeaveEvent);
 			
 			events.finishProcessing();
@@ -180,7 +178,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			
 			for (int time = 0; time < 5; time++) {
 				// process event
-				LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(time, 
+				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(time, 
 						new IdImpl(""), new IdImpl(""), null);
 				events.processEvent(linkLeaveEvent);
 				
@@ -212,7 +210,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		
 		for (int time = 0; time < 5; time++) {
 			// process event
-			LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(time, 
+			LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(time, 
 					new IdImpl(""), new IdImpl(""), null);
 			events.processEvent(linkLeaveEvent);
 			
@@ -256,7 +254,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			}
 			
 			for (int i = 0; i < 100; i++) {
-				LinkEnterEventImpl linkEnterEvent = new LinkEnterEventImpl(event.getTime(), 
+				LinkEnterEvent linkEnterEvent = new LinkEnterEvent(event.getTime(), 
 						event.getPersonId(), event.getLinkId(), event.getVehicleId());
 				eventsManager.processEvent(linkEnterEvent);
 			}
@@ -293,7 +291,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler1);
 		events.addHandler(handler2);
 
-		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
 		try {
 			for (int i = 0; i < 10; i++) {
 				events.processEvent(linkLeaveEvent);

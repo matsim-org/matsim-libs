@@ -23,29 +23,38 @@ package org.matsim.core.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.LinkEvent;
 
-public abstract class LinkEventImpl extends PersonEventImpl implements LinkEvent {
+public abstract class LinkEventImpl extends EventImpl {
 
 	public static final String ATTRIBUTE_LINK = "link";
 
 	private final Id linkId;
 
 	LinkEventImpl(final double time, final Id agentId, final Id linkId) {
-		super(time, agentId);
+		super(time);
+		this.personId = agentId;
 		this.linkId = linkId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		return attr;
 	}
 
-	@Override
 	public Id getLinkId() {
 		return this.linkId;
 	}
 
+	public static final String ATTRIBUTE_PERSON = "person";
+
+	private final Id personId;
+
+
+	public Id getPersonId() {
+		return this.personId;
+	}
+	
 }

@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEvent;
-import org.matsim.core.api.experimental.events.handler.PersonEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -331,7 +331,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 	}
 
-	private static final class ScenarioCreatePersonEventHandler implements PersonEventHandler{
+	private static final class ScenarioCreatePersonEventHandler implements AgentDepartureEventHandler{
 
 		private Scenario scenario;
 
@@ -340,7 +340,7 @@ public class PlanomatTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void handleEvent(PersonEvent event) {
+		public void handleEvent(AgentDepartureEvent event) {
 			if (!this.scenario.getPopulation().getPersons().containsKey(event.getPersonId()))
 			  this.scenario.getPopulation().addPerson(this.scenario.getPopulation().getFactory().createPerson(event.getPersonId()));
 		}

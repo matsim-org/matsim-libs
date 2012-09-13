@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -40,8 +41,7 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.TravelEventHandler;
-import org.matsim.core.events.TravelledEvent;
+import org.matsim.core.events.TravelledEventHandler;
 
 /**
  * Calculates the score of the selected plans of a given scenario
@@ -60,7 +60,7 @@ import org.matsim.core.events.TravelledEvent;
  */
 public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
 AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
-LinkEnterEventHandler, TravelEventHandler {
+LinkEnterEventHandler, TravelledEventHandler {
 
 	private EventsToActivities eventsToActivities;
 	private EventsToLegs eventsToLegs;

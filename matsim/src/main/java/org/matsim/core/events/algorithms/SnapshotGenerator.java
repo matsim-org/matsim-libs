@@ -35,7 +35,6 @@ import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
@@ -97,37 +96,37 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).departure(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).departure(getEventAgent(event.getPersonId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).arrival(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).arrival(getEventAgent(event.getPersonId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event.getPersonId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event.getPersonId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final AgentWait2LinkEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event.getPersonId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final AgentStuckEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event));
+		this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event.getPersonId(), event.getTime()));
 	}
 
 	@Override
@@ -148,13 +147,13 @@ public class SnapshotGenerator implements AgentDepartureEventHandler, AgentArriv
 		this.lastSnapshotIndex = -1;
 	}
 
-	private EventAgent getEventAgent(final PersonEvent event) {
-		EventAgent agent = this.eventAgents.get(event.getPersonId());
+	private EventAgent getEventAgent(final Id id, double time) {
+		EventAgent agent = this.eventAgents.get(id);
 		if (agent == null) {
-			agent = new EventAgent(event.getPersonId(), event.getTime());
-			this.eventAgents.put(event.getPersonId(), agent);
+			agent = new EventAgent(id, time);
+			this.eventAgents.put(id, agent);
 		}
-		agent.time = event.getTime();
+		agent.time = time;
 		return agent;
 	}
 

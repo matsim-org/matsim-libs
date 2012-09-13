@@ -28,10 +28,10 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -82,7 +82,8 @@ public class MultiModalQLinkExtension {
 		this.addAgent(mobsimAgent, now);
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-			new LinkEnterEventImpl(now, mobsimAgent.getId(), qLink.getLink().getId(), null));
+
+			new LinkEnterEvent(now, mobsimAgent.getId(), qLink.getLink().getId(), null));
 	}
 
 	private void addAgent(MobsimAgent mobsimAgent, double now) {
@@ -105,7 +106,7 @@ public class MultiModalQLinkExtension {
 		this.activateLink();
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-				new AgentWait2LinkEventImpl(now, mobsimAgent.getId(), qLink.getLink().getId(), null));
+				new AgentWait2LinkEvent(now, mobsimAgent.getId(), qLink.getLink().getId(), null));
 	}
 
 	protected boolean moveLink(double now) {
@@ -179,7 +180,7 @@ public class MultiModalQLinkExtension {
 	public MobsimAgent getNextWaitingAgent(double now) {
 		MobsimAgent personAgent = waitingToLeaveAgents.poll();
 		if (personAgent != null) {
-			this.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, personAgent.getId(), qLink.getLink().getId(), null));
+			this.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, personAgent.getId(), qLink.getLink().getId(), null));
 		}
 		return personAgent;
 	}
@@ -190,7 +191,7 @@ public class MultiModalQLinkExtension {
 		for (Tuple<Double, MobsimAgent> tuple : agents) {
 			MobsimAgent personAgent = tuple.getSecond();
 			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, personAgent.getId(), qLink.getLink().getId(), personAgent.getMode()));
+					new AgentStuckEvent(now, personAgent.getId(), qLink.getLink().getId(), personAgent.getMode()));
 			this.simEngine.getMobsim().getAgentCounter().incLost();
 			this.simEngine.getMobsim().getAgentCounter().decLiving();
 		}

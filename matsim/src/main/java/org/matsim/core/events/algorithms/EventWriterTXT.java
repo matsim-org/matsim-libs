@@ -33,24 +33,15 @@ import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.events.AgentWait2LinkEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, AgentArrivalEventHandler, 
@@ -157,46 +148,46 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 8, ActivityEndEventImpl.EVENT_TYPE + " " + event.getActType());
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 8, ActivityEndEvent.EVENT_TYPE + " " + event.getActType());
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 7, ActivityStartEventImpl.EVENT_TYPE + " " + event.getActType());
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 7, ActivityStartEvent.EVENT_TYPE + " " + event.getActType());
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, AgentArrivalEventImpl.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, AgentArrivalEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, AgentDepartureEventImpl.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, AgentDepartureEvent.EVENT_TYPE);
 	}
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEventImpl.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEventImpl.EVENT_TYPE + "\t" + event.getAmount());
+		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEvent.EVENT_TYPE + "\t" + event.getAmount());
 	}
 
 	@Override
 	public void handleEvent(AgentWait2LinkEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, AgentWait2LinkEventImpl.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, AgentWait2LinkEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 5, LinkEnterEventImpl.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 5, LinkEnterEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 2, LinkLeaveEventImpl.EVENT_TYPE);
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 2, LinkLeaveEvent.EVENT_TYPE);
 	}
 }

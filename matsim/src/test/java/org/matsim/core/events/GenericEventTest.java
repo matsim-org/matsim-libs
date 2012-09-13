@@ -34,7 +34,7 @@ public class GenericEventTest extends MatsimTestCase {
 		final String TYPE = "GenericEvent";
 		final String KEY1 = "k1";
 		final String VALUE1 = "v1";
-		final EventsFactory factory= new EventsFactoryImpl();
+		final EventsFactory factory= new EventsFactory();
 		final double time = 3601;
 		
 		GenericEvent writeEvent = factory.createGenericEvent(TYPE, time);

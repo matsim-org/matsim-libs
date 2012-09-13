@@ -33,19 +33,19 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
-import org.matsim.core.events.AgentArrivalEventImpl;
-import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.events.AgentMoneyEventImpl;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
-import org.matsim.core.events.TravelledEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -57,7 +57,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -116,32 +115,32 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	private void handleFirstActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
-		eventsToScore.handleEvent(new ActivityEndEventImpl(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+		eventsToScore.handleEvent(new ActivityEndEvent(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
 	}
 
 	private void handleLastActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
-		eventsToScore.handleEvent(new ActivityStartEventImpl(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+		eventsToScore.handleEvent(new ActivityStartEvent(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
 	}
 
 	private void handleLeg(EventsToScore eventsToScore, Fixture f, Leg leg) {
-		eventsToScore.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
+		eventsToScore.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
 		if (leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-			eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId()));
+			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId()));
 			for (Id linkId : networkRoute.getLinkIds()) {
-				eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
-				eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
+				eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
+				eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
 			}
-			eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), null));
+			eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), null));
 		} else {
-			eventsToScore.handleEvent(new TravelledEventImpl(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
+			eventsToScore.handleEvent(new TravelledEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
 		}
-		eventsToScore.handleEvent(new AgentArrivalEventImpl(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), leg.getMode()));
+		eventsToScore.handleEvent(new AgentArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), leg.getMode()));
 	}
 
 	private void handleActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
-		eventsToScore.handleEvent(new ActivityStartEventImpl(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
-		eventsToScore.handleEvent(new ActivityEndEventImpl(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+		eventsToScore.handleEvent(new ActivityStartEvent(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+		eventsToScore.handleEvent(new ActivityEndEvent(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
 	}
 
 	/**
@@ -553,7 +552,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	/**
-	 * Tests if the scoring function correctly handles {@link AgentMoneyEventImpl}.
+	 * Tests if the scoring function correctly handles {@link AgentMoneyEvent}.
 	 * It generates one person with one plan having two activities (home, work)
 	 * and a car-leg in between. It then tests the scoring function by calling
 	 * several methods on an instance of the scoring function with the

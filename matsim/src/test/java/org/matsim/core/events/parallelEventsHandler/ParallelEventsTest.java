@@ -21,10 +21,10 @@ package org.matsim.core.events.parallelEventsHandler;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -63,7 +63,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.removeHandler(handler);
 
-		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
 
 		for (int i = 0; i < 100; i++) {
 			events.processEvent(linkLeaveEvent);
@@ -84,7 +84,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 			events.addHandler(handlers[i]);
 		}
 
-		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
 
 		for (int j = 0; j < numberOfIterations; j++) {
 
@@ -121,7 +121,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler1);
 		events.addHandler(handler2);
 
-		LinkLeaveEventImpl linkLeaveEvent = new LinkLeaveEventImpl(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
 		try {
 			for (int i = 0; i < 10; i++) {
 				events.processEvent(linkLeaveEvent);

@@ -26,8 +26,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -73,7 +73,7 @@ public class TransitLoadTest {
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
 
-		EventsFactoryImpl ef = new EventsFactoryImpl();
+		EventsFactory ef = new EventsFactory();
 
 		TransitLoad tl = new TransitLoad();
 

@@ -30,15 +30,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
-import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -171,12 +171,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			// next, a departure delay of 5s at the origin link is added
 			departureTime = Time.parseTime("06:05:00");
 			double depDelay = Time.parseTime("00:00:05");
-			AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(
+			AgentDepartureEvent depEvent = new AgentDepartureEvent(
 					departureTime,
 					TEST_PERSON_ID,
 					this.originAct.getLinkId(),
 					TransportMode.car);
-			LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(departureTime + depDelay, this.testPerson.getId(), this.originAct.getLinkId(), null);
+			LinkLeaveEvent leaveEvent = new LinkLeaveEvent(departureTime + depDelay, this.testPerson.getId(), this.originAct.getLinkId(), null);
 
 			for (EventImpl event : new EventImpl[]{depEvent, leaveEvent}) {
 				events.processEvent(event);
@@ -210,12 +210,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			EventImpl event = null;
 			for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 				for (int linkCnt = 0; linkCnt < linkIds.size(); linkCnt++) {
-					event = new LinkEnterEventImpl(
+					event = new LinkEnterEvent(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 							this.testPerson.getId(),
 							linkIds.get(linkCnt), null);
 					events.processEvent(event);
-					event = new LinkLeaveEventImpl(
+					event = new LinkLeaveEvent(
 							Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 							this.testPerson.getId(),
 							linkIds.get(linkCnt), null);
@@ -286,8 +286,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 
 		// this gives a delay of 36s (1/100th of an hour)
-		AgentDepartureEventImpl depEvent = new AgentDepartureEventImpl(6.03 * 3600, TEST_PERSON_ID, this.originAct.getLinkId(), TransportMode.car);
-		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(6.04 * 3600, TEST_PERSON_ID, this.originAct.getLinkId(), null);
+		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.03 * 3600, TEST_PERSON_ID, this.originAct.getLinkId(), TransportMode.car);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.04 * 3600, TEST_PERSON_ID, this.originAct.getLinkId(), null);
 
 		for (EventImpl event : new EventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -298,8 +298,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		assertEquals(delayEndTime, startTime + 36.0, EPSILON);
 
 		// let's add another delay of 72s, should result in an average of 54s
-		depEvent = new AgentDepartureEventImpl(6.02 * 3600, TEST_PERSON_ID, linkId, TransportMode.car);
-		leaveEvent = new LinkLeaveEventImpl(6.04 * 3600, TEST_PERSON_ID, linkId, null);
+		depEvent = new AgentDepartureEvent(6.02 * 3600, TEST_PERSON_ID, linkId, TransportMode.car);
+		leaveEvent = new LinkLeaveEvent(6.04 * 3600, TEST_PERSON_ID, linkId, null);
 
 		for (EventImpl event : new EventImpl[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
@@ -364,12 +364,12 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 
 		for (int eventTimesCnt = 0; eventTimesCnt < eventTimes.length; eventTimesCnt++) {
 			for (int linkCnt = 0; linkCnt < linkIds.size(); linkCnt++) {
-				event = new LinkEnterEventImpl(
+				event = new LinkEnterEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt]),
 						this.testPerson.getId(),
 						linkIds.get(linkCnt), null);
 				events.processEvent(event);
-				event = new LinkLeaveEventImpl(
+				event = new LinkLeaveEvent(
 						Time.parseTime(eventTimes[eventTimesCnt][linkCnt + 1]),
 						this.testPerson.getId(),
 						linkIds.get(linkCnt), null);
@@ -437,8 +437,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 		events.printEventHandlers();
 
 		// we have one agent on this link, taking 1 minute and 48 seconds
-		LinkEnterEventImpl enterEvent = new LinkEnterEventImpl(Time.parseTime("06:05:00"), this.testPerson.getId(), linkId, null);
-		LinkLeaveEventImpl leaveEvent = new LinkLeaveEventImpl(Time.parseTime("06:06:48"), this.testPerson.getId(), linkId, null);
+		LinkEnterEvent enterEvent = new LinkEnterEvent(Time.parseTime("06:05:00"), this.testPerson.getId(), linkId, null);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(Time.parseTime("06:06:48"), this.testPerson.getId(), linkId, null);
 
 		for (EventImpl event : new EventImpl[]{enterEvent, leaveEvent}) {
 			events.processEvent(event);
