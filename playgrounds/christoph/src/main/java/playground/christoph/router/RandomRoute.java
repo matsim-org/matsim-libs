@@ -29,9 +29,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-import playground.christoph.network.SubLink;
-import playground.christoph.network.SubNetwork;
-import playground.christoph.network.SubNode;
 import playground.christoph.router.util.SimpleRouter;
 
 public class RandomRoute extends SimpleRouter {
@@ -60,23 +57,7 @@ public class RandomRoute extends SimpleRouter {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 		 
-		Network nw = knowledgeTools.getSubNetwork(person, this.network);
-		
 		nodes.add(fromNode);
-		
-		boolean useKnowledge = false;
-		if (nw instanceof SubNetwork) {
-			SubNetwork subNetwork = (SubNetwork) nw;
-
-			/*
-			 * Replace the given Nodes with their child in the SubNetwork 
-			 */
-			currentNode = subNetwork.getNodes().get(currentNode.getId());
-			fromNode = subNetwork.getNodes().get(fromNode.getId());
-			toNode = subNetwork.getNodes().get(toNode.getId());
-			
-			useKnowledge = true;
-		}
 		
 		/*
 		 * equals checks if the Ids are identically, what they are, even if the
@@ -111,13 +92,8 @@ public class RandomRoute extends SimpleRouter {
 				break;
 			}
 			
-			if (useKnowledge) {
-				nodes.add(((SubNode)currentNode).getParentNode());
-				links.add(((SubLink)currentLink).getParentLink());
-			} else {
-				nodes.add(currentNode);
-				links.add(currentLink);
-			}
+			nodes.add(currentNode);
+			links.add(currentLink);
 		}	// while(!currentNode.equals(toNode))
 
 		Path path = new Path(nodes, links, 0, 0);

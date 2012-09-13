@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.knowledge;
+package playground.christoph.tools;
 
 import java.io.IOException;
 import java.util.ArrayList;

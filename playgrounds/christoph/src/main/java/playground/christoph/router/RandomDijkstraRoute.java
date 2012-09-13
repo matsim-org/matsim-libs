@@ -36,9 +36,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import playground.christoph.network.SubLink;
-import playground.christoph.network.SubNetwork;
-import playground.christoph.network.SubNode;
 import playground.christoph.router.util.SimpleRouter;
 
 public class RandomDijkstraRoute extends SimpleRouter {
@@ -80,30 +77,6 @@ public class RandomDijkstraRoute extends SimpleRouter {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 		
-		Network nw = knowledgeTools.getSubNetwork(person, this.network);
-		
-		boolean useKnowledge = false;
-		if (nw instanceof SubNetwork) {
-			SubNetwork subNetwork = (SubNetwork) nw;
-			
-			/*
-			 * Replace the given Nodes with their child in the SubNetwork 
-			 */
-			currentNode = subNetwork.getNodes().get(currentNode.getId());
-			fromNode = subNetwork.getNodes().get(fromNode.getId());
-			toNode = subNetwork.getNodes().get(toNode.getId());
-			
-			if (currentNode == null) {
-				log.error("null!");
-			}
-			
-			useKnowledge = true;
-			
-			if (this.leastCostPathCalculator instanceof SubNetworkDijkstra) {
-				((SubNetworkDijkstra)this.leastCostPathCalculator).setNetwork(subNetwork);
-			}
-		}
-		
 		nodes.add(fromNode);
 		
 		while(!currentNode.equals(toNode)) {
@@ -135,12 +108,6 @@ public class RandomDijkstraRoute extends SimpleRouter {
 			Link dijskstraNextLink = null;
 			if (path.links.size() > 0) dijskstraNextLink = path.links.get(0);
 			
-			// Replace the dijskstraNextLink with its child in the SubNetwork
-			if (useKnowledge) {
-				SubNetwork subNetwork = (SubNetwork) nw;
-				dijskstraNextLink = subNetwork.getLinks().get(dijskstraNextLink.getId());
-			}
-
 			// set Probabilities
 			for(int i = 0; i < dijkstraProbabilities.length; i++) {
 				Link link = linksArray[i];
@@ -192,14 +159,7 @@ public class RandomDijkstraRoute extends SimpleRouter {
 							
 				sumProb = sumProb + sumProbabilities[i];
 			}
-			
-			// Replace the nextLink with its child in the SubNetwork
-			if (useKnowledge) {
-				SubNetwork subNetwork = (SubNetwork) nw;
 				
-				nextLink = subNetwork.getLinks().get(nextLink.getId());
-			}
-			
 			// make the chosen link to the current link
 			if(nextLink != null) {
 				currentLink = nextLink;
@@ -211,13 +171,8 @@ public class RandomDijkstraRoute extends SimpleRouter {
 				break;
 			}
 			
-			if (useKnowledge) {
-				nodes.add(((SubNode)currentNode).getParentNode());
-				links.add(((SubLink)currentLink).getParentLink());
-			} else {
-				nodes.add(currentNode);
-				links.add(currentLink);
-			}
+			nodes.add(currentNode);
+			links.add(currentLink);
 		}	// while(!currentNode.equals(toNode))
 
 		Path path = new Path(nodes, links, 0, 0);

@@ -455,8 +455,8 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		super.initReplanningManager(numReplanningThreads);
 		super.getReplanningManager().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
-		Map<String, TravelTime> linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
-		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
+		Map<String, TravelTime> linkReplanningTravelTimes = this.createLinkReplanningMapTravelTimes();
+		super.createAndInitLinkReplanningMap(linkReplanningTravelTimes);
 				
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();
@@ -694,17 +694,18 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 
 	/*
 	 * The LinkReplanningMap calculates the earliest link exit time for each agent.
-	 * To do so, a MultiModalTravelTime object is required which calculates these
-	 * times. We use a MultiModalTravelTimeWrapper with walk- and bike travel times
-	 * and replace the car, ride and pt travel time calculators with free speed
-	 * travel time calculators.
+	 * Replanning are allowed if an agent is not longer than this time traveling on
+	 * a link.
+	 * We use walk- and bike travel times based on person's and link's attributes and
+	 * free speed travel time calculators for car, ride and pt travel times.
 	 */
-	private Map<String, TravelTime> createLinkReplanningMapTravelTime() {
+	private Map<String, TravelTime> createLinkReplanningMapTravelTimes() {
 		
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set a FreeSpeedTravelTimeCalculator for car mode
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
 
-		// replace modes
+		travelTimes.put(TransportMode.walk, this.walkTravelTime);
+		travelTimes.put(TransportMode.bike, this.bikeTravelTime);
 		travelTimes.put(TransportMode.car, new FreeSpeedTravelTimeCalculator());
 		travelTimes.put(TransportMode.ride, new FreeSpeedTravelTimeCalculator());
 		travelTimes.put(TransportMode.pt, new FreeSpeedTravelTimeCalculator());

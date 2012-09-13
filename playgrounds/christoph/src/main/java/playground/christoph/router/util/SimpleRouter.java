@@ -39,7 +39,6 @@ import org.matsim.vehicles.Vehicle;
  */
 public abstract class SimpleRouter implements LeastCostPathCalculator, TravelDisutility {
 	
-	protected KnowledgeTools knowledgeTools;
 	protected Network network;
 	protected Random random;
 	protected LoopRemover loopRemover;
@@ -47,7 +46,6 @@ public abstract class SimpleRouter implements LeastCostPathCalculator, TravelDis
 	
 	public SimpleRouter(Network network) {
 		this.network = network;
-		this.knowledgeTools = new KnowledgeTools();
 		this.random = MatsimRandom.getLocalInstance();
 		this.loopRemover = new LoopRemover();
 		this.tabuSelector = new TabuSelector();

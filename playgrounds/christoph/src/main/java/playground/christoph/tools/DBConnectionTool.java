@@ -1,4 +1,4 @@
-package playground.christoph.knowledge.container.dbtools;
+package playground.christoph.tools;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,75 +26,59 @@ public class DBConnectionTool {
 	private static int conCount = 50;
 	private static Object monitor;
 	
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		new DBConnectionTool().connect();
 	}
 	
 	private Connection con;
 	private MyPooledConnection myPooledCon;
 	
-	static
-	{	
+	static {	
 		monitor = new Object();
 		
 		cpdsArray = new MysqlConnectionPoolDataSource[conCount];
 		poledConArray = new MyPooledConnection[conCount];
 		
-		for (int i = 0; i < conCount; i++)
-		{
+		for (int i = 0; i < conCount; i++) {
 			cpdsArray[i] = new MysqlConnectionPoolDataSource();
 			cpdsArray[i].setUser(user);
 			cpdsArray[i].setPassword(password);
 			cpdsArray[i].setURL("jdbc:mysql://localhost:3306/" + db_name);
 						
-			try 
-			{
+			try {
 				poledConArray[i] = new DBConnectionTool().new MyPooledConnection();
 				poledConArray[i].setPooledConnection(cpdsArray[i].getPooledConnection());
 				poledConArray[i].inUse(false);
-			} 
-			catch (SQLException e) 
-			{
+			} catch (SQLException e) {
 				log.error("SQL Exception when trying to get Pooled Connection");
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	private static synchronized MyPooledConnection getConnection() throws SQLException
-	{	
+	private static synchronized MyPooledConnection getConnection() throws SQLException {	
 		// searching for not used Connection
 		boolean searching = true;
 		
-		while (searching)
-		{
-			synchronized(monitor)
-			{
-				for (int i = 0; i < conCount; i++)
-				{
+		while (searching) {
+			synchronized(monitor) {
+				for (int i = 0; i < conCount; i++) {
 					roundRobin++;
 					if (roundRobin >= conCount) roundRobin = 0;
 					
 					// if the Connection is not in Use
-					if (!poledConArray[roundRobin].inUse())
-					{
+					if (!poledConArray[roundRobin].inUse()) {
 						searching = false;
 						break;
 					}
 				}	// for
 				
 				// if no free connection was found - wait until one is released
-				if (searching) 
-				{
+				if (searching) {
 					log.warn("No free Connection was found - waiting until one is released!");
-					try 
-					{
+					try {
 						monitor.wait();
-					} 
-					catch (InterruptedException e)
-					{
-						// TODO Auto-generated catch block
+					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				} 	// if
@@ -105,186 +89,137 @@ public class DBConnectionTool {
 		return poledConArray[roundRobin];
 	}
 	
-	public void connect()
-	{
-		try
-		{
+	public void connect() {
+		try {
 			myPooledCon = getConnection();
 			con = myPooledCon.getPooledConnection().getConnection();
-		} 
-		catch (SQLException e) 
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in connect");
 			e.printStackTrace();
 		}		
 	}
 	
-	public void disconnect()
-	{
-		try 
-		{
+	public void disconnect() {
+		try {
 			con.close();
 			con = null;
 			
-			synchronized(monitor)
-			{
+			synchronized(monitor) {
 				myPooledCon.inUse(false);
 				monitor.notify();
 			}
-		} 
-		catch (SQLException e) 
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in disconnect");
 			e.printStackTrace();
-		}
-		catch (NullPointerException npe)
-		{
+		} catch (NullPointerException npe) {
 			log.error("Connection Object is null!");
 		}
 	}
 		
-	public ResultSet executeQuery(String query)
-	{
-		try
-		{
+	public ResultSet executeQuery(String query) {
+		try {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			
 			return rs;
-		} 
-		catch (SQLException e) 
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in executeQuery");
 			e.printStackTrace();
 		}
 		return null;
 	}
 		
-	public int executeUpdate(String query)
-	{
-		try
-		{
+	public int executeUpdate(String query) {
+		try {
 			Statement stmt = con.createStatement();
 			int result = stmt.executeUpdate(query);
 			
 			return result;
-		} 
-		catch (SQLException e) 
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in executeQuery");
 			e.printStackTrace();
-		}
-		catch (NullPointerException npe)
-		{
+		} catch (NullPointerException npe) {
 			log.error("Connection Object is null!");
 		}
 		return 0;
 	}
 	
-	public PreparedStatement getPreparedStatement(String sql)
-	{
-		try 
-		{
+	public PreparedStatement getPreparedStatement(String sql) {
+		try {
 			return con.prepareStatement(sql);
-		} 
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in getPreparedStatement");
 			e.printStackTrace();
 		}
 		return null;
 	}
 	
-	public int executeUpdate(PreparedStatement stmt)
-	{
-		try
-		{
+	public int executeUpdate(PreparedStatement stmt) {
+		try {
 			int result = stmt.executeUpdate();
 			
 			return result;
-		} 
-		catch (SQLException e) 
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in executeQuery");
 			e.printStackTrace();
-		}
-		catch (NullPointerException npe)
-		{
+		} catch (NullPointerException npe) {
 			log.error("Connection Object is null!");
 		}
 		return 0;
 	}
 	
-	public int[] executeBatch(String[] queries)
-	{
-		try
-		{
+	public int[] executeBatch(String[] queries) {
+		try {
 			Statement stmt = con.createStatement();
 			
-			for (String query : queries)
-			{
+			for (String query : queries) {
 				stmt.addBatch(query);
 			}
 		
 			int[] result = stmt.executeBatch();
 			
 			return result;
-		} 
-		catch (SQLException e) 
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in executeBatch");
 			e.printStackTrace();
-		}
-		catch (NullPointerException npe)
-		{
+		} catch (NullPointerException npe) {
 			log.error("Connection Object is null!");
 		}
 		return new int[0];
 	}
 	
-	public void clearTable(String table)
-	{
-		try
-		{
+	public void clearTable(String table) {
+		try {
 			Statement stmt = con.createStatement();
 		
 			String sql = "DELETE FROM " + table;
 			
 			stmt.executeQuery(sql);
-		} 
-		catch (SQLException e) 
-		{
+		} catch (SQLException e) {
 			log.error("SQL Exception in clearTable");
 			e.printStackTrace();
-		}
-		catch (NullPointerException npe)
-		{
+		} catch (NullPointerException npe) {
 			log.error("Connection Object is null!");
 		}
 	}
 	
-	protected class MyPooledConnection
-	{
+	protected class MyPooledConnection {
 		private PooledConnection connection = null;
 		private boolean inUse = false;
 		
-		public void setPooledConnection(PooledConnection con)
-		{
+		public void setPooledConnection(PooledConnection con) {
 			connection = con;
 		}
 		
-		public PooledConnection getPooledConnection()
-		{
+		public PooledConnection getPooledConnection() {
 			return connection;
 		}
 		
-		public void inUse(boolean value)
-		{
+		public void inUse(boolean value) {
 			this.inUse = value;
 		}
 		
-		public boolean inUse()
-		{
+		public boolean inUse() {
 			return inUse;
 		}
 	}

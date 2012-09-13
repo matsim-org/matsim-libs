@@ -206,32 +206,6 @@ public class BatchRun {
 		}
 	}
 
-	protected void runBatchRunWithinDayKnowledge() {
-		for (int i = 0; i < knowledgeFactors.length; i++) {
-			outputDirectory = outbase + "/output_act_end_" + knowledgeFactors[i];
-//			outputDirectory = outbase + "/output_leave_link_" + knowledgeFactors[i];
-			inputDirectory = inbase;
-
-			outputDirectory = outputDirectory.replace("/", separator);
-			inputDirectory = inputDirectory.replace("/", separator);
-
-			MatsimRandom.reset();
-
-			Config config = readConfigFile();
-
-			updateConfigData(config, knowledgeFactors[i]);
-
-			WithinDayKnowledgeControler controler = new WithinDayKnowledgeControler(config);
-			controler.tableName = "BatchTable" + knowledgeFactors[i].replace('.', '_');
-			controler.setOverwriteFiles(true);
-			controler.pInitialReplanning = 0.0;
-			controler.pActEndReplanning = 1.0;
-			controler.pLeaveLinkReplanning = 0.0;
-			controler.run();
-			controler = null;
-		}
-	}
-
 	protected void runBatchRunDoE() {
 		for (int i = 0; i < Versuchsplan.length; i++) {
 			//outputDirectory = outbase + "/LeaveLinkReplanningRouter" + "_Knowledge" + knowledgeFactors[i];

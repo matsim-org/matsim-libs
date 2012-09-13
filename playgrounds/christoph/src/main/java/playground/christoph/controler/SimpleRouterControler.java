@@ -22,14 +22,12 @@ package playground.christoph.controler;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -50,9 +48,6 @@ import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-
-import playground.christoph.knowledge.container.MapKnowledgeDB;
-import playground.christoph.knowledge.nodeselection.SelectNodes;
 
 /**
  * This Controler should give an Example what is needed to run
@@ -79,7 +74,6 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 	protected String tableName = "BatchTable1_1";
 
 	protected ArrayList<PlanAlgorithm> replanners;
-	protected ArrayList<SelectNodes> nodeSelectors;
 
 	/*
 	 * Each Person can only use one Router at a time.
@@ -234,32 +228,7 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 		ReplanningFlagInitializer rfi = new ReplanningFlagInitializer(this);
 		super.getFixedOrderSimulationListener().addSimulationInitializedListener(rfi);
 
-		if (useKnowledge) {
-			log.info("Set Knowledge Storage Type");
-			setKnowledgeStorageHandler();
-		}
-
 		super.runMobSim();
-	}
-
-	/*
-	 * How to store the known Nodes of the Agents?
-	 * Currently we store them in a Database.
-	 */
-	private void setKnowledgeStorageHandler() {
-		for(Person person : population.getPersons().values())
-		{
-			Map<String, Object> customAttributes = person.getCustomAttributes();
-
-			customAttributes.put("NodeKnowledgeStorageType", MapKnowledgeDB.class.getName());
-
-			MapKnowledgeDB mapKnowledgeDB = new MapKnowledgeDB();
-			mapKnowledgeDB.setPerson(person);
-			mapKnowledgeDB.setNetwork(network);
-			mapKnowledgeDB.setTableName(tableName);
-
-			customAttributes.put("NodeKnowledge", mapKnowledgeDB);
-		}
 	}
 
 	public static class ReplanningFlagInitializer implements MobsimInitializedListener {
