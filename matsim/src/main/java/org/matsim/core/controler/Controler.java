@@ -68,7 +68,6 @@ import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -172,7 +171,7 @@ public class Controler extends AbstractController {
 	protected final Config config;
 	protected ScenarioImpl scenarioData = null;
 
-	protected final EventsManagerImpl events;
+	protected final EventsManager events;
 
 	private final String configFileName;
 	private final String dtdFileName;
@@ -282,7 +281,7 @@ public class Controler extends AbstractController {
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
 		
-		this.events = (EventsManagerImpl) createEventsManager(this.config);
+		this.events = createEventsManager(this.config);
 		this.config.parallelEventHandling().makeLocked();
 	}
 
