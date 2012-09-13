@@ -25,11 +25,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
-import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.ReplanningManager;
@@ -173,7 +170,7 @@ public class WithinDayController extends Controler {
 
 	private void init() {
 		super.getQueueSimulationListener().add(fosl);
-
+		
 		this.replanningManager = new ReplanningManager();
 	}
 
@@ -185,33 +182,6 @@ public class WithinDayController extends Controler {
 
 		super.setUp();
 	}
-
-	@Override
-	protected EventsManager createEventsManager(final Config config) {
-		EventsManager events = super.createEventsManager(config);
-		/*
-		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
-		 * Then this piece of code could be placed in the controller.
-		 */
-		if (events instanceof ParallelEventsManagerImpl) {
-			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
-
-			final String PARALLEL_EVENT_HANDLING = "parallelEventHandling";
-			final String NUMBER_OF_THREADS = "numberOfThreads";
-			String numberOfThreads = this.config.findParam(PARALLEL_EVENT_HANDLING, NUMBER_OF_THREADS);
-
-			int numOfThreads = 1;
-			if (numberOfThreads != null) {
-				numOfThreads = Integer.parseInt(numberOfThreads);
-			}
-
-			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl(numOfThreads);
-			this.fosl.addSimulationAfterSimStepListener(manager);
-			events = manager;
-		}
-		return events;
-	}
-
 
 	@Override
 	protected void runMobSim() {
