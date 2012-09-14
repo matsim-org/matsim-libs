@@ -21,6 +21,7 @@ package air.run;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -34,6 +35,10 @@ public class DgFlightController extends Controler {
 		super(args);
 	}
 
+	public DgFlightController(ScenarioImpl scenario) {
+		super(scenario);
+	}
+
 	/**
 	 * Want to have the default scoring function -> overriding
 	 */
@@ -44,6 +49,7 @@ public class DgFlightController extends Controler {
 
 	public static void main(String[] args) {
 //		String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_3600vph/air_config.xml"};
+//		String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml"};
 		Controler controler = new DgFlightController(args); 
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.setOverwriteFiles(true);
