@@ -102,7 +102,12 @@ import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.LinkToLinkTripRouterFactory;
+import org.matsim.core.router.MultimodalSimulationTripRouterFactory;
 import org.matsim.core.router.old.InvertedNetworkLegRouter;
+import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -221,6 +226,7 @@ public class Controler extends AbstractController {
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
+	private TripRouterFactory tripRouterFactory = null;
 
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
@@ -1007,6 +1013,35 @@ public class Controler extends AbstractController {
 		
 	}
 
+	public TripRouterFactory getTripRouterFactory() {
+		if (tripRouterFactory == null) {
+			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
+				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
+						network,
+						population.getFactory(),
+						getLeastCostPathCalculatorFactory(),
+						createTravelCostCalculator(),
+						multiModalTravelTimeCalculator,
+						config.multiModal());
+			}
+			else {
+				tripRouterFactory = new TripRouterFactoryImpl( this );
+			}
+
+			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
+				tripRouterFactory = new LinkToLinkTripRouterFactory(
+						getScenario(),
+						getLeastCostPathCalculatorFactory(),
+						getTravelDisutilityFactory(),
+						getTravelTimeCalculator(),
+						getPopulation().getFactory(),
+						tripRouterFactory);
+			}
+		}
+
+		return tripRouterFactory;
+	}
+
 	/*
 	 * ===================================================================
 	 * Informational methods
@@ -1033,6 +1068,12 @@ public class Controler extends AbstractController {
 	public PlanAlgorithm createRoutingAlgorithm() {
 		return createRoutingAlgorithm(this.createTravelCostCalculator(),
 				this.getTravelTimeCalculator());
+	}
+
+	public TripRouterFactory setTripRouterFactory(final TripRouterFactory newf) {
+		TripRouterFactory old = tripRouterFactory;
+		tripRouterFactory = newf;
+		return old;
 	}
 
 	public final int getFirstIteration() {
