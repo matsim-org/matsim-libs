@@ -289,8 +289,18 @@ public class ControlerTest {
 		 * otherwise, everything is fine. */
 
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
-		assertNotNull(leg1.getRoute());
-		assertNotNull(leg2.getRoute());
+		//assertNotNull(leg1.getRoute());
+		//assertNotNull(leg2.getRoute());
+		// but do not assume that the leg will be the same instance...
+		for (Plan plan : new Plan[]{plan1, plan2}) {
+			assertEquals(
+					"unexpected plan length in "+plan.getPlanElements(),
+					3,
+					plan.getPlanElements().size());
+			assertNotNull(
+					"null route in plan "+plan.getPlanElements(),
+					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+		}
 	}
 
 	/**
@@ -367,8 +377,18 @@ public class ControlerTest {
 		assertEquals(f.link3.getId(), act2b.getLinkId());
 
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
-		assertNotNull(leg1.getRoute());
-		assertNotNull(leg2.getRoute());
+		//assertNotNull(leg1.getRoute());
+		//assertNotNull(leg2.getRoute());
+		// but do not assume that the leg will be the same instance...
+		for (Plan plan : new Plan[]{plan1, plan2}) {
+			assertEquals(
+					"unexpected plan length in "+plan.getPlanElements(),
+					3,
+					plan.getPlanElements().size());
+			assertNotNull(
+					"null route in plan "+plan.getPlanElements(),
+					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+		}
 	}
 
 	/**
