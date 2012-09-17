@@ -13,10 +13,36 @@
  * {@link org.matsim.core.router.util.TravelMinDisutility}. A few commonly used implementations of these interfaces can
  * be found in the subpackage {@link org.matsim.core.router.costcalculators costcalculators}.
  * <br>
- * Nearly in all cases, the routes of all legs of a plan should be calculated. Thus, for the most commonly used
- * routing algorithms, there are wrapper classes that wrap the routing algorithm into a
- * {@link org.matsim.population.algorithms.PlanAlgorithm} for easy usage (e.g.
- * {@link org.matsim.router.PlansCalcRouteDijkstra} and {@link org.matsim.router.PlansCalcRouteLandmarks}).
+ * <br>
+ * All modes are not necessarily routed on the network; moreover, a trip may consist
+ * in a series of stages (movements with one vehicle, reprensented by legs),
+ * which may be separated by "dummy" activities ("<i>stage activities</i>").
+ * A trip is defined as the longest sequence of consecutive plan elements
+ * consisting only of legs and stage activities.
+ * For this, the following three layer architecture
+ * is provided:
+ *
+ * <ul>
+ * <li> the {@link org.matsim.core.router.RoutingModule}s are responsible for computing trips
+ * between individual O/D couples, for a given mode. They moreover provide
+ * access to an object allowing to identify their stage activities, implementing
+ * {@link org.matsim.core.router.StageActivityTypes}.
+ * <li> the {@link org.matsim.core.router.TripRouter} registers {@link org.matsim.core.router.RoutingModule}s for each
+ * mode, and allows to route between O/D pairs for any (registered) mode.
+ * It does not modify the plan, but provides convenience methods to
+ * identify trips and easily insert a trip between two activities in a plan.
+ * <br>
+ * It moreover provides access to a {@link org.matsim.core.router.StageActivityTypes} instance allowing
+ * to identify all possible stage activities, for all modes.
+ * <li> the {@link org.matsim.core.router.PlanRouter} provides a {@link org.matsim.population.algorithms.PlanAlgorithm} to
+ * route all trips in a plan.
+ * </ul>
+ *
+ * The behaviour can be modified by implementing custom {@link org.matsim.core.router.TripRouterFactory}s.
+ * <br>
+ * The previous behavior was based on legs rather than trips: the corresponding
+ * classes are <b>temporarily</b> kept in the {@link org.matsim.core.router.old}
+ * package for backward compatibility.
  * <br>
  * Note that the routing algorithms are generally seen as <b>not thread-safe</b>! If threads are used, one
  * must ensure that each thread uses its own instance of a routing algorithm.
