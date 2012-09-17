@@ -38,7 +38,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.timegeography.ManageSubchains;
 import org.matsim.locationchoice.timegeography.SubChain;
