@@ -20,7 +20,6 @@
 
 package org.matsim.core.utils.misc;
 
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

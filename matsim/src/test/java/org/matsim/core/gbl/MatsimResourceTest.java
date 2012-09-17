@@ -22,7 +22,6 @@ package org.matsim.core.gbl;
 
 import java.awt.Image;
 
-import org.matsim.core.gbl.MatsimResource;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

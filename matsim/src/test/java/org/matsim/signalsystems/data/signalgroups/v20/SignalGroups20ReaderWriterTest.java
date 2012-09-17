@@ -34,8 +34,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
-
-
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 

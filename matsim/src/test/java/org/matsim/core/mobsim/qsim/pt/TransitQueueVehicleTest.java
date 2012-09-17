@@ -21,8 +21,6 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
-import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;

@@ -21,8 +21,8 @@
 package org.matsim.vis.snapshotwriters;
 
 import java.io.IOException;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;

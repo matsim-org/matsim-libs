@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -46,7 +47,6 @@ import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
 public class ExternalMobsim implements Mobsim {

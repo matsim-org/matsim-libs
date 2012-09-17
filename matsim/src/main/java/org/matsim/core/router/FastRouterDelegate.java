@@ -21,9 +21,9 @@
 package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.NodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
 /**

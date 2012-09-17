@@ -27,7 +27,6 @@ package org.matsim.counts.algorithms.graphs;
 
 //TRRE: import java.awt.BasicStroke;
 import java.awt.Color;
-//TRRE:  import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import org.jfree.chart.ChartFactory;
@@ -35,17 +34,18 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
-//TRRE: import org.jfree.chart.axis.NumberAxis;
-//TRRE: import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
-//TRRE: import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
-//TRRE: import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.counts.CountSimComparison;
+//TRRE:  import java.awt.geom.Rectangle2D;
+//TRRE: import org.jfree.chart.axis.NumberAxis;
+//TRRE: import org.jfree.chart.axis.ValueAxis;
+//TRRE: import org.jfree.chart.plot.DatasetRenderingOrder;
+//TRRE: import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 
 
 

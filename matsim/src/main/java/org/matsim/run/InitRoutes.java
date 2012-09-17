@@ -30,7 +30,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -39,13 +38,11 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
-import org.matsim.pt.router.TransitRouterImplFactory;
 
 /**
  * Assigns for each leg of each plan of each person an initial (freespeed) route.

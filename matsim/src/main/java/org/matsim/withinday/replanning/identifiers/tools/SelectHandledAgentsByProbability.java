@@ -37,9 +37,9 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
 public class SelectHandledAgentsByProbability implements MobsimInitializedListener {

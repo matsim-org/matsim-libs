@@ -32,7 +32,7 @@ public final class EmptyStageActivityTypes implements StageActivityTypes {
 
 	private EmptyStageActivityTypes() {}
 	@Override
-	public final boolean isStageActivity(final String activityType) {
+	public boolean isStageActivity(final String activityType) {
 		return false;
 	}
 }

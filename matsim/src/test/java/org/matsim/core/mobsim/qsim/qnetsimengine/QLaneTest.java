@@ -29,17 +29,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLane;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.lanes.data.v20.LaneData20;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestCase;
 

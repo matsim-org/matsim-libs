@@ -26,8 +26,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.matsim.core.utils.charts.BarChart;
-import org.matsim.core.utils.charts.Demo;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

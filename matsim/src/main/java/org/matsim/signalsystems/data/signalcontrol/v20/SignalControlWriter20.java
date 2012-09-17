@@ -36,15 +36,15 @@ import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.signalcontrol20.ObjectFactory;
 import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
-import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType.XMLDropping;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType.XMLOnset;
+import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLCycleTime;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLOffset;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStart;
 import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStop;
+import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
+import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 
 

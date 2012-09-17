@@ -24,8 +24,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 
-import static org.matsim.core.population.ActivityImpl.* ;
-
 /**
  * Test for convenience methods of Act.
  *

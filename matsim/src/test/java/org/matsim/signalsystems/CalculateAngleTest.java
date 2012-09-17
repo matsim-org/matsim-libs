@@ -2,8 +2,8 @@ package org.matsim.signalsystems;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;

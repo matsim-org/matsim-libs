@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.Collections;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -39,7 +37,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 

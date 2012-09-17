@@ -20,10 +20,9 @@
 package org.matsim.core.router;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.InvertedNetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;

@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.replanning.parallel;
 
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 /**

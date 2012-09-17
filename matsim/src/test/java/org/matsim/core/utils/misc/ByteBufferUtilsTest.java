@@ -20,6 +20,7 @@
 
 package org.matsim.core.utils.misc;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 import org.matsim.testcases.MatsimTestCase;

@@ -1,8 +1,5 @@
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.core.mobsim.jdeqsim.Message;
-import org.matsim.core.mobsim.jdeqsim.Scheduler;
-import org.matsim.core.mobsim.jdeqsim.SimUnit;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage1;
 import org.matsim.core.mobsim.jdeqsim.util.DummySimUnit;

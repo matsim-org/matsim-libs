@@ -21,7 +21,6 @@ package org.matsim.utils.objectattributes;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * @author mrieser

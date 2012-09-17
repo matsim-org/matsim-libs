@@ -35,12 +35,12 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.amberTimes10.ObjectFactory;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
-import org.matsim.jaxb.amberTimes10.XMLAmberTimesType;
-import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
+import org.matsim.jaxb.amberTimes10.XMLAmberTimesType;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLAmber;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLRedAmber;
+import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType.XMLAmberTimeGreen;
 
 

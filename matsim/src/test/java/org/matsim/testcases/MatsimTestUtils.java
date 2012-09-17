@@ -25,9 +25,9 @@ import org.junit.Assert;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.

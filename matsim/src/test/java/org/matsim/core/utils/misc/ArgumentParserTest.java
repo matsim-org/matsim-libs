@@ -25,7 +25,6 @@ import java.util.NoSuchElementException;
 
 import junit.framework.AssertionFailedError;
 
-import org.matsim.core.utils.misc.ArgumentParser;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

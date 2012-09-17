@@ -35,9 +35,9 @@ import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.utils.LanesCapacityCalculator;
 import org.matsim.signalsystems.CalculateAngle;
 

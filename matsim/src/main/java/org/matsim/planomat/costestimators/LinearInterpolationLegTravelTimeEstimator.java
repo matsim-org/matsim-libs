@@ -39,7 +39,6 @@ import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 

@@ -22,7 +22,6 @@ package org.matsim.pt.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;

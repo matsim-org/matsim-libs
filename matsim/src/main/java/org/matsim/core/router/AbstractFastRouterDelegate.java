@@ -24,12 +24,12 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.NodeData;
 import org.matsim.core.router.util.NodeDataFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.RoutingNetworkNode;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 
 /*package*/ abstract class AbstractFastRouterDelegate implements FastRouterDelegate {

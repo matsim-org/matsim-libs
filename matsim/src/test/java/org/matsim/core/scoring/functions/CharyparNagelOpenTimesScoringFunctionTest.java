@@ -33,8 +33,6 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;

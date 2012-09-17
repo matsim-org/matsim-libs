@@ -21,7 +21,6 @@
 package tutorial.config.example5iterations;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.run.Controler;

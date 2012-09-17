@@ -21,7 +21,6 @@
 package org.matsim.core.events;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 

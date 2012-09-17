@@ -20,37 +20,35 @@
 
 package org.matsim.planomat.costestimators;
 
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;

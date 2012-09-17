@@ -22,7 +22,6 @@ package org.matsim.core.gbl;
 
 import java.util.Random;
 
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

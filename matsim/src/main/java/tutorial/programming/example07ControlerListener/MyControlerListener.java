@@ -1,10 +1,17 @@
 package tutorial.programming.example07ControlerListener;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 

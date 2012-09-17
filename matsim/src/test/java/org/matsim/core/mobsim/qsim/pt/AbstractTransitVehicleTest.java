@@ -26,8 +26,6 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
-import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.fakes.FakePassengerAgent;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;

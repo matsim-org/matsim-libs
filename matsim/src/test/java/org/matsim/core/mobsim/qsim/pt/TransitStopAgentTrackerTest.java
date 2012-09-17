@@ -24,8 +24,6 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;

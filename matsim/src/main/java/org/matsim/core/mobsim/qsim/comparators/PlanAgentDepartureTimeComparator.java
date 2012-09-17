@@ -24,8 +24,8 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**
  * Compares two {@link MobsimDriverAgent}s according to their (planned) departure time. If the 

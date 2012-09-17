@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.qsim.agents;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.utils.misc.Time;
 

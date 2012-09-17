@@ -25,7 +25,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;

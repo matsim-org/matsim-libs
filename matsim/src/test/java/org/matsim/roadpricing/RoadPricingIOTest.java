@@ -28,10 +28,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 

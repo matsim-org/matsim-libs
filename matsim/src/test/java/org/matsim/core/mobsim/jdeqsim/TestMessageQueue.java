@@ -1,7 +1,5 @@
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.core.mobsim.jdeqsim.Message;
-import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage;
 import org.matsim.testcases.MatsimTestCase;
 

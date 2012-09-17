@@ -1,17 +1,6 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
-import org.matsim.core.mobsim.jdeqsim.EndLegMessage;
-import org.matsim.core.mobsim.jdeqsim.EndRoadMessage;
-import org.matsim.core.mobsim.jdeqsim.EnterRoadMessage;
-import org.matsim.core.mobsim.jdeqsim.LeaveRoadMessage;
-import org.matsim.core.mobsim.jdeqsim.MessageFactory;
-import org.matsim.core.mobsim.jdeqsim.Scheduler;
-import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
-import org.matsim.core.mobsim.jdeqsim.StartingLegMessage;
-import org.matsim.core.mobsim.jdeqsim.Vehicle;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 

@@ -34,7 +34,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestUtils;

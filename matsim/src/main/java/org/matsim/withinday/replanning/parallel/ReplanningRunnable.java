@@ -36,7 +36,6 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
-import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;

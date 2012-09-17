@@ -26,7 +26,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;

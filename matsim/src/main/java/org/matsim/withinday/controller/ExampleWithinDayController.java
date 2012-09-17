@@ -34,7 +34,6 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;

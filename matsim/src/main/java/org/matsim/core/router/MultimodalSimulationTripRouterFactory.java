@@ -23,12 +23,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;

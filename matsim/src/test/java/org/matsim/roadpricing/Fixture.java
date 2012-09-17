@@ -37,7 +37,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;

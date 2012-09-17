@@ -20,6 +20,7 @@
 package org.matsim.locationchoice.utils;
 
 import java.util.Collection;
+
 import org.matsim.core.utils.collections.QuadTree;
 
 public class QuadTreeRing<T> extends QuadTree<T> {

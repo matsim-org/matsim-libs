@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;

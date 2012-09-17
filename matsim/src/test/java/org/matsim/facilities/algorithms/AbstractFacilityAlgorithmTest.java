@@ -24,7 +24,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 public class AbstractFacilityAlgorithmTest extends MatsimTestCase {

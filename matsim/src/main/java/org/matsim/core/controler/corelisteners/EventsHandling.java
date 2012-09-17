@@ -37,7 +37,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 
 public class LegTravelTimeEstimatorFactory {
