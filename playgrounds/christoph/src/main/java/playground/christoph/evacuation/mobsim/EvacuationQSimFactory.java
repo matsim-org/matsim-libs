@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 
 /**
  * @author cdobler
@@ -49,16 +49,11 @@ public class EvacuationQSimFactory implements MobsimFactory {
     private final static Logger log = Logger.getLogger(EvacuationQSimFactory.class);
     
     private final PassengerDepartureHandler passengerDepartureHandler;
-    private final ReplanningManager replanningManager;
-    
-    public EvacuationQSimFactory() {
-    	this.passengerDepartureHandler = null;
-    	this.replanningManager = null;
-    }
-    
-    public EvacuationQSimFactory(PassengerDepartureHandler passengerDepartureHandler, ReplanningManager replanningManager) {
+    private final WithinDayEngine withinDayEngine;
+
+    public EvacuationQSimFactory(PassengerDepartureHandler passengerDepartureHandler, WithinDayEngine withinDayEngine) {
     	this.passengerDepartureHandler = passengerDepartureHandler;
-    	this.replanningManager = replanningManager;
+    	this.withinDayEngine = withinDayEngine;
     }
     
     @Override
@@ -107,7 +102,7 @@ public class EvacuationQSimFactory implements MobsimFactory {
          * So far, it is only added to be able to provide the InternalInterface
          * to the replanners.
          */
-        if (this.replanningManager != null) qSim.addMobsimEngine(replanningManager);
+        if (this.withinDayEngine != null) qSim.addMobsimEngine(withinDayEngine);
         
         return qSim;
     }

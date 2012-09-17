@@ -160,8 +160,8 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		/*
 		 * Create and initialize replanning manager and replanning maps.
 		 */
-		super.initReplanningManager(numReplanningThreads);
-		super.getReplanningManager().setEventsManager(this.getEvents());	// set events manager to create replanning events
+		super.initWithinDayEngine(numReplanningThreads);
+		super.getWithinDayEngine().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
 				
@@ -241,17 +241,17 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * During Activity Replanner
 		 */
 		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
-		duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		duringActivityReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
-		this.getReplanningManager().addDuringActivityReplannerFactory(duringActivityReplannerFactory);
+		this.getWithinDayEngine().addDuringActivityReplannerFactory(duringActivityReplannerFactory);
 		
 		/*
 		 * During Leg Replanner
 		 */
 		WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
-		duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, duringLegReroutingShare);
+		duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, duringLegReroutingShare);
 		duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
-		this.getReplanningManager().addDuringLegReplannerFactory(duringLegReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 	}
 	
 	private static class DummyRoutesCreator extends AbstractPersonAlgorithm implements PlanAlgorithm {

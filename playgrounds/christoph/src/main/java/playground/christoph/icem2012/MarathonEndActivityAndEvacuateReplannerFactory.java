@@ -22,7 +22,7 @@ package playground.christoph.icem2012;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -34,7 +34,7 @@ public class MarathonEndActivityAndEvacuateReplannerFactory extends WithinDayDur
 	private Scenario scenario;
 	private EndActivityAndEvacuateReplannerFactory factory;
 	
-	public MarathonEndActivityAndEvacuateReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
+	public MarathonEndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
 			EndActivityAndEvacuateReplannerFactory factory) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);

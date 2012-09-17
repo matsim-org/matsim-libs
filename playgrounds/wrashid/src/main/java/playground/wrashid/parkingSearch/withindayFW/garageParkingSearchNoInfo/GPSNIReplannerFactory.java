@@ -22,7 +22,7 @@ package playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
@@ -32,7 +32,7 @@ public class GPSNIReplannerFactory extends WithinDayDuringLegReplannerFactory {
 	private final Scenario scenario;
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	
-	public GPSNIReplannerFactory(ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
+	public GPSNIReplannerFactory(WithinDayEngine replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
 			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		

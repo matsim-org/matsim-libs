@@ -96,14 +96,14 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 				routeFactory);
 
 		// adding hight utility parking choice algo
-		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getReplanningManager(),
+		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
 				router, 1.0, this.scenarioData, parkingAgentsTracker);
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
 		parkingStrategies.add(parkingStrategy);
-		this.getReplanningManager().addDuringLegReplannerFactory(hupcReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(hupcReplannerFactory);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "home", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "work", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "shopping", parkingStrategy);
@@ -111,14 +111,14 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 
 		
 		// adding random test strategy
-		RandomSearchReplannerFactory randomReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(),
+		RandomSearchReplannerFactory randomReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(),
 				router, 1.0, this.scenarioData, parkingAgentsTracker);
 		RandomSearchIdentifier randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(randomSearchIdentifier);
 		randomReplannerFactory.addIdentifier(randomSearchIdentifier);
 		parkingStrategy = new ParkingStrategy(randomSearchIdentifier);
 		parkingStrategies.add(parkingStrategy);
-		this.getReplanningManager().addDuringLegReplannerFactory(randomReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(randomReplannerFactory);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "home", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "work", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "shopping", parkingStrategy);
@@ -127,7 +127,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 
-		this.getReplanningManager().setEventsManager(this.getEvents());
+		this.getWithinDayEngine().setEventsManager(this.getEvents());
 	
 		initParkingFacilityCapacities();
 	}

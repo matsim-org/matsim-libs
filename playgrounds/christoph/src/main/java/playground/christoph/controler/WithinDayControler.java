@@ -125,7 +125,7 @@ public class WithinDayControler extends WithinDayController {
 
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
-		super.initReplanningManager(numReplanningThreads);
+		super.initWithinDayEngine(numReplanningThreads);
 
 		super.createAndInitTravelTimeCollector();
 		travelTime = super.getTravelTimeCollector();
@@ -140,25 +140,25 @@ public class WithinDayControler extends WithinDayController {
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);
-		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
-		super.getReplanningManager().addIntialReplannerFactory(this.initialReplannerFactory);
+		super.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 
 		super.createAndInitActivityReplanningMap();
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringActivityIdentifier, this.pActEndReplanning);
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
-		super.getReplanningManager().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
+		super.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 
 		super.createAndInitLinkReplanningMap();
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringLegIdentifier, this.pLeaveLinkReplanning);
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		super.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		super.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 	
 	@Override

@@ -22,7 +22,7 @@ package playground.christoph.icem2012;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -33,7 +33,7 @@ public class SwitchToWalk2DLegReplannerFactory extends WithinDayDuringLegReplann
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	
-	public SwitchToWalk2DLegReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
+	public SwitchToWalk2DLegReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
 			CoordAnalyzer coordAnalyzer) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);

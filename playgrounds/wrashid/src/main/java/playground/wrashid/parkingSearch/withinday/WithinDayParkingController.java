@@ -104,9 +104,9 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, times, factory, routeFactory);
 	
-		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getReplanningManager(), router, 1.0, this.scenarioData, parkingAgentsTracker);
+		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(), router, 1.0, this.scenarioData, parkingAgentsTracker);
 		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
-		this.getReplanningManager().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
 	}
 	
 	/*
@@ -120,7 +120,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		// connect facilities to network
 		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 		
-		super.initReplanningManager(numReplanningThreads);
+		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
 		
@@ -138,7 +138,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
 		
-		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getReplanningManager());
+		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 		this.setMobsimFactory(mobsimFactory);
 		
 		this.initIdentifiers();

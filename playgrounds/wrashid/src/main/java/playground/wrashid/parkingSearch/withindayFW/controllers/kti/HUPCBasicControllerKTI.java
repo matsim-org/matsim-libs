@@ -124,14 +124,14 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 				routeFactory);
 		
 		// adding hight utility parking choice algo
-		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getReplanningManager(),
+		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
 				router, 1.0, this.scenarioData, parkingAgentsTracker);
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
 		parkingStrategies.add(parkingStrategy);
-		this.getReplanningManager().addDuringLegReplannerFactory(hupcReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(hupcReplannerFactory);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "home", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "work_sector2", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "work_sector3", parkingStrategy);
@@ -148,7 +148,7 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 
-		this.getReplanningManager().setEventsManager(this.getEvents());
+		this.getWithinDayEngine().setEventsManager(this.getEvents());
 	
 
 		initParkingFacilityCapacities();

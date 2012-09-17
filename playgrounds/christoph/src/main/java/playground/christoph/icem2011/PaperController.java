@@ -183,9 +183,9 @@ public class PaperController extends WithinDayController implements StartupListe
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
 		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*
@@ -195,14 +195,14 @@ public class PaperController extends WithinDayController implements StartupListe
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.initReplanningManager(numReplanningThreads);
+		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 //		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
 		
-		this.getReplanningManager().doInitialReplanning(false);
-		this.getReplanningManager().doDuringActivityReplanning(false);
-		this.getReplanningManager().doDuringLegReplanning(false);
+		this.getWithinDayEngine().doInitialReplanning(false);
+		this.getWithinDayEngine().doDuringActivityReplanning(false);
+		this.getWithinDayEngine().doDuringLegReplanning(false);
 		
 		// Module to analyze expected travel time on a single link
 		Collection<Link> changedLinks = new HashSet<Link>();
@@ -230,10 +230,10 @@ public class PaperController extends WithinDayController implements StartupListe
 		int time = (int) e.getSimulationTime();
 		if (time >= this.tWithinDayEnabled && time <= this.tWithinDayDisabled) {
 			this.enabled = true;
-			this.getReplanningManager().doDuringLegReplanning(true);
+			this.getWithinDayEngine().doDuringLegReplanning(true);
 		} else {
 			this.enabled = false;
-			this.getReplanningManager().doDuringLegReplanning(false);
+			this.getWithinDayEngine().doDuringLegReplanning(false);
 		}
 		
 		// if state has changed

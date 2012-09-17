@@ -116,21 +116,21 @@ public class DemoController extends WithinDayController implements MobsimInitial
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimes, factory, routeFactory);
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
-		this.getReplanningManager().addIntialReplannerFactory(this.initialReplannerFactory);
+		this.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 		
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
-		this.getReplanningManager().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
+		this.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 	
 	/*
@@ -140,7 +140,7 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.initReplanningManager(numReplanningThreads);
+		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();

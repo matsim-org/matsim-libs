@@ -156,11 +156,8 @@ public class AgentsInMunicipality {
 		EventsManager eventsManager = null;
 		if (numThreads < 2) eventsManager = EventsUtils.createEventsManager();
 		else eventsManager = new ParallelEventsManagerImpl(numThreads);
-			
-		if (eventsManager instanceof EventsManagerImpl) {
-			((EventsManagerImpl) eventsManager).initProcessing();
-		}
-		
+		eventsManager.initProcessing();
+	
 		// adding Handlers to EventsManager
 		log.info("\t\tAdding AgentsInMunicipalityEventsHandlers to EventsManager...");
 		for (EventHandler handler : handlers) eventsManager.addHandler(handler);

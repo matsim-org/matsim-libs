@@ -143,7 +143,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory();
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory(null, null);
 		this.setMobsimFactory(mobsimFactory);
 	}
 	

@@ -22,7 +22,7 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -38,7 +38,7 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	private final PTTravelTimeKTI ptTravelTime;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
-			ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
+			WithinDayEngine replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
 			double replanningProbability, DecisionDataProvider decisionDataProvider, ModeAvailabilityChecker modeAvailabilityChecker,
 			PTTravelTimeKTI ptTravelTime) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);

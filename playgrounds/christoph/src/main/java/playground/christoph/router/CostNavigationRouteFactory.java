@@ -26,7 +26,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -39,7 +39,7 @@ public class CostNavigationRouteFactory extends WithinDayDuringLegReplannerFacto
 	private CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
 	private LeastCostPathCalculatorFactory routerFactory;
 	
-	public CostNavigationRouteFactory(Scenario scenario, Network network, ReplanningManager replanningManager, 
+	public CostNavigationRouteFactory(Scenario scenario, Network network, WithinDayEngine replanningManager, 
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
 			CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, TravelDisutilityFactory travelCostFactory,
 			TravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {

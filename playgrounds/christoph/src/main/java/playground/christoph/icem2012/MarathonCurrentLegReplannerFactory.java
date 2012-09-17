@@ -22,7 +22,7 @@ package playground.christoph.icem2012;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -30,7 +30,7 @@ public class MarathonCurrentLegReplannerFactory extends WithinDayDuringLegReplan
 
 	private final Scenario scenario;
 	
-	public MarathonCurrentLegReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
+	public MarathonCurrentLegReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;

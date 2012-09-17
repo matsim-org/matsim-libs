@@ -155,7 +155,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		// connect facilities to network
 		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 
-		super.initReplanningManager(numReplanningThreads);
+		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
 
@@ -177,7 +177,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
 
-		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getReplanningManager());
+		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 		this.setMobsimFactory(mobsimFactory);
 
 		setDesiresIfApplicable();

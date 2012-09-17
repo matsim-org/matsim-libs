@@ -22,7 +22,7 @@ package playground.wrashid.parkingSearch.withinday;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
@@ -30,7 +30,7 @@ public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFac
 	private final Scenario scenario;
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	
-	public RandomSearchReplannerFactory(ReplanningManager replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
+	public RandomSearchReplannerFactory(WithinDayEngine replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
 			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		

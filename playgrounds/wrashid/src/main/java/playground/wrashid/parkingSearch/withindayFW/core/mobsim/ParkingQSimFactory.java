@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
@@ -58,10 +58,10 @@ public class ParkingQSimFactory implements MobsimFactory {
 
     private final InsertParkingActivities insertParkingActivities;
     private final ParkingInfrastructure parkingInfrastructure;
-    private final ReplanningManager replanningManager;
+    private final WithinDayEngine replanningManager;
     
     public ParkingQSimFactory(InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure,
-    		ReplanningManager replanningManager) {
+    		WithinDayEngine replanningManager) {
     	this.insertParkingActivities = insertParkingActivities;
     	this.parkingInfrastructure = parkingInfrastructure;
     	this.replanningManager = replanningManager;

@@ -149,10 +149,10 @@ public class CostNavigationRouteController extends WithinDayController implement
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
-		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, this.getReplanningManager(), router, 1.0, 
+		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, this.getWithinDayEngine(), router, 1.0, 
 				costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory());
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*
@@ -162,7 +162,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.initReplanningManager(numReplanningThreads);
+		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
 		

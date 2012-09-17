@@ -56,6 +56,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -106,6 +107,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private TeleportationEngine teleportationEngine;
 
+	private WithinDayEngine withindayEngine = null; 
 
 	private ActivityEngine activityEngine;
 
@@ -253,6 +255,12 @@ public final class QSim implements VisMobsim, Netsim {
 	 */
 	/*package*/ boolean doSimStep(final double time) {
 
+		/*
+		 * The WithinDayEngine has to perform its replannings before
+		 * the other engines simulate the sim step.
+		 */
+		if (withindayEngine != null) withindayEngine.doSimStep(time);
+		
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.doSimStep(time);
@@ -475,6 +483,9 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 		if (mobsimEngine instanceof TeleportationEngine) {
 			this.teleportationEngine = (TeleportationEngine) mobsimEngine;
+		}
+		if (mobsimEngine instanceof WithinDayEngine) {
+			this.withindayEngine = (WithinDayEngine) mobsimEngine;
 		}
 		mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);

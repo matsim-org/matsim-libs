@@ -137,8 +137,8 @@ public class MarathonController extends WithinDayController implements StartupLi
 
 	private final static Logger log = Logger.getLogger(MarathonController.class);
 	
-//	public static String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/";
-	public static String basePath = "/home/cdobler/workspace/matsim/mysimulations/";
+	public static String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/";
+//	public static String basePath = "/home/cdobler/workspace/matsim/mysimulations/";
 	public static String dhm25File = basePath + "networks/GIS/nodes_3d_ivtch_dhm25.shp";
 	public static String srtmFile = basePath + "networks/GIS/nodes_3d_srtm.shp";
 	public static String affectedAreaFile = basePath + "icem2012/input/affectedArea.shp";
@@ -429,8 +429,8 @@ public class MarathonController extends WithinDayController implements StartupLi
 		/*
 		 * Create and initialize replanning manager and replanning maps.
 		 */
-		super.initReplanningManager(this.config.global().getNumberOfThreads());
-		super.getReplanningManager().setEventsManager(this.getEvents());	// set events manager to create replanning events
+		super.initWithinDayEngine(this.config.global().getNumberOfThreads());
+		super.getWithinDayEngine().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
 		 Map<String, TravelTime> linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
@@ -468,9 +468,9 @@ public class MarathonController extends WithinDayController implements StartupLi
 				
 				for (WithinDayReplannerFactory<?> factory : this.initialReplannerFactories) {
 					if (factory instanceof WithinDayDuringActivityReplannerFactory) {
-						this.getReplanningManager().removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
+						this.getWithinDayEngine().removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
 					} else if(factory instanceof WithinDayDuringLegReplannerFactory) {
-						this.getReplanningManager().removeDuringLegReplannerFactory((WithinDayDuringLegReplannerFactory) factory);
+						this.getWithinDayEngine().removeDuringLegReplannerFactory((WithinDayDuringLegReplannerFactory) factory);
 					} 
 				}
 				log.info("Disabled initial within-day replanners");
@@ -773,17 +773,17 @@ public class MarathonController extends WithinDayController implements StartupLi
 		/*
 		 * During Activity Replanners
 		 */
-		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, 
+		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, 
 				(PTTravelTimeKTI) this.ptTravelTime);
-		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, 
+		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, 
 				endActivityAndEvacuateReplannerFactory);
 		this.marathonEndActivityAndEvacuateReplannerFactory.addIdentifier(this.affectedActivityPerformingIdentifier);
-		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.marathonEndActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.marathonEndActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		
-		this.extendCurrentActivityReplannerFactory = new ExtendCurrentActivityReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.extendCurrentActivityReplannerFactory = new ExtendCurrentActivityReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.extendCurrentActivityReplannerFactory.addIdentifier(this.notAffectedActivityPerformingIdentifier);
-		this.getReplanningManager().addTimedDuringActivityReplannerFactory(this.extendCurrentActivityReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.extendCurrentActivityReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		/*
 		 * During Leg Replanners
@@ -794,17 +794,17 @@ public class MarathonController extends WithinDayController implements StartupLi
 //		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		// use buffered affected area
-		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.bufferedCoordAnalyzer);
+		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, this.bufferedCoordAnalyzer);
 		this.currentLegInitialReplannerFactory.addIdentifier(this.legPerformingIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.switchWalkModeReplannerFactory = new SwitchToWalk2DLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0, this.coordAnalyzer);
+		this.switchWalkModeReplannerFactory = new SwitchToWalk2DLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, this.coordAnalyzer);
 		this.switchWalkModeReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.switchWalkModeReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.switchWalkModeReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-		this.duringLegRerouteReplannerFactory = new MarathonCurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, EvacuationConfig.duringLegReroutingShare);
+		this.duringLegRerouteReplannerFactory = new MarathonCurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, EvacuationConfig.duringLegReroutingShare);
 		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		/*
 		 * Collect Replanners that can be disabled after all agents have been informed.

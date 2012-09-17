@@ -217,9 +217,9 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 	@Override
 	protected void runMobSim() {
 		
-		super.initReplanningManager(numReplanningThreads);
-		super.getReplanningManager().doDuringActivityReplanning(false);
-		super.getReplanningManager().doDuringLegReplanning(false);
+		super.initWithinDayEngine(numReplanningThreads);
+		super.getWithinDayEngine().doDuringActivityReplanning(false);
+		super.getWithinDayEngine().doDuringLegReplanning(false);
 
 		/*
 		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
@@ -323,8 +323,8 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 				}
 
 				// (de)activate replanning if they are not needed
-				if (initialReplanningCounter == 0) simpleRouterControler.getReplanningManager().doInitialReplanning(false);
-				else simpleRouterControler.getReplanningManager().doInitialReplanning(true);
+				if (initialReplanningCounter == 0) simpleRouterControler.getWithinDayEngine().doInitialReplanning(false);
+				else simpleRouterControler.getWithinDayEngine().doInitialReplanning(true);
 			}
 			
 			CollectionAgentFilterFactory agentFilterFactory = new CollectionAgentFilterFactory();

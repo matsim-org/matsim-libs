@@ -22,7 +22,7 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -33,7 +33,7 @@ public class CurrentLegToMeetingPointReplannerFactory extends WithinDayDuringLeg
 	private final Scenario scenario;
 	private final DecisionDataProvider decisionDataProvider;
 	
-	public CurrentLegToMeetingPointReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
+	public CurrentLegToMeetingPointReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, DecisionDataProvider decisionDataProvider) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
