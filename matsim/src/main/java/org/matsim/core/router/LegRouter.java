@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LegHandler.java
+ * LegRouter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,6 +24,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 
+/**
+ * @deprecated this is part of the old (mono-leg trip) approach.
+ * Use the RoutingModule interface instead.
+ */
+@Deprecated
 public interface LegRouter {
 
 	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime);

@@ -59,7 +59,11 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * <li>Do we really need yet another plansCalcRoute.handlePlan( person, plan ) method? Presumably a leftover from the days where
  * plan did not have a back pointer to person.
  * </ul>
+ *
+ * @deprecated this class will be removed sooner or later.
+ * Use PlanRouter or TripRouter instead.
  * */
+@Deprecated
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	
 	static final Logger log = Logger.getLogger(PlansCalcRoute.class);
