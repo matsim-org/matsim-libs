@@ -40,7 +40,7 @@ public class WithinDayQSimFactoryTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		ReplanningManager replanningManager = new ReplanningManager();
+		WithinDayEngine replanningManager = new WithinDayEngine();
 		
 		QSimConfigGroup qSimConfig = new QSimConfigGroup();
 		scenario.getConfig().addQSimConfigGroup(qSimConfig);
