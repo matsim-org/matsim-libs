@@ -106,6 +106,7 @@ import org.matsim.core.router.LinkToLinkTripRouterFactory;
 import org.matsim.core.router.MultimodalSimulationTripRouterFactory;
 import org.matsim.core.router.old.InvertedNetworkLegRouter;
 import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -235,6 +236,7 @@ public class Controler extends AbstractController {
 	private boolean overwriteFiles = false;
 	private Map<String, TravelTime> multiModalTravelTimes;
 
+	private boolean useTripRouting = true;
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
@@ -905,6 +907,19 @@ public class Controler extends AbstractController {
 	 *         threads!
 	 */
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+		if ( !useTripRouting ||
+				(getScenario().getConfig().scenario().isUseRoadpricing()
+				&& RoadPricingScheme.TOLL_TYPE_AREA.equals(
+					this.scenarioData.getRoadPricingScheme().getType())) ) {
+			return createOldRoutingAlgorithm(travelCosts, travelTimes);
+		}
+
+		return new PlanRouter(
+				getTripRouterFactory().createTripRouter(),
+				getScenario().getActivityFacilities());
+	}
+
+	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
@@ -1010,10 +1025,18 @@ public class Controler extends AbstractController {
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 		}
 		return plansCalcRoute;
-		
 	}
 
 	public TripRouterFactory getTripRouterFactory() {
+		if ( !useTripRouting ) {
+			throw new IllegalStateException( "cannot get the trip router: useTripRouting is false" );
+		}
+		if ( getScenario().getConfig().scenario().isUseRoadpricing()
+				&& RoadPricingScheme.TOLL_TYPE_AREA.equals(
+					this.scenarioData.getRoadPricingScheme().getType()) ) {
+			throw new IllegalStateException( "cannot get the trip router when using road pricing" );
+		}
+
 		if (tripRouterFactory == null) {
 			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
 				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
@@ -1072,6 +1095,14 @@ public class Controler extends AbstractController {
 
 	public void setTripRouterFactory(final TripRouterFactory factory) {
 		tripRouterFactory = factory;
+	}
+
+	public void setUseTripRouting(final boolean useTripRouting) {
+		this.useTripRouting = useTripRouting;
+	}
+
+	public boolean getUseTripRouting() {
+		return useTripRouting;
 	}
 
 	public final int getFirstIteration() {
