@@ -71,6 +71,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -340,7 +341,8 @@ public class MarathonController extends WithinDayController implements StartupLi
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 		
-		PlansCalcRoute plansCalcRoute = (PlansCalcRoute) super.createRoutingAlgorithm(travelCosts, travelTimes);
+		// the contructor does not call createRoutingAlgorithm on the argument, so it is ok (td)
+		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter( this );
 		
 		TravelTime travelTime = new WalkTravelTimeFactory(config.plansCalcRoute()).createTravelTime();
 		LegRouter walk2DLegRouter = new Walk2DLegRouter(network, travelTime, (IntermodalLeastCostPathCalculator) plansCalcRoute.getLeastCostPathCalculator());

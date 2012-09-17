@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 
 import playground.sergioo.passivePlanning.core.population.decisionMakers.types.ModeRouteDecisionMaker;
@@ -21,12 +22,12 @@ public class SimpleModeRouterDecisionMaker implements ModeRouteDecisionMaker {
 	private Link endLink;
 	private Leg leg;
 	private final Set<String> modes;
-	private final PlansCalcRoute plansCalcRoute;
+	private final PlanRouterAdapter plansCalcRoute;
 	private final Person person;
 	
 	//Methods
 	public SimpleModeRouterDecisionMaker(Controler controler, Person person) {
-		plansCalcRoute = (PlansCalcRoute) controler.createRoutingAlgorithm();
+		plansCalcRoute = new PlanRouterAdapter( controler );
 		modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
 		modes.addAll(controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().keySet());

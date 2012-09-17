@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -67,7 +68,7 @@ LegTravelTimeEstimator {
 
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
-	private final PlansCalcRoute plansCalcRoute;
+	private final PlanRouterAdapter plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	private final Network network;
 
@@ -83,7 +84,7 @@ LegTravelTimeEstimator {
 	public LinearInterpolationLegTravelTimeEstimator(
 			TravelTime linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc,
-			PlansCalcRoute plansCalcRoute,
+			PlanRouterAdapter plansCalcRoute,
 			SimLegInterpretation simLegInterpretation,
 			Network network) {
 		super();

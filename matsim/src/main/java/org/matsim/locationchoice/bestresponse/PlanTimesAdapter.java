@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -58,7 +59,7 @@ public class PlanTimesAdapter {
 	}
 	
 	public void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction,
-			PlansCalcRoute router) {	
+			PlanRouterAdapter router) {	
 		
 		Activity actToMove = (Activity) plan.getPlanElements().get(actlegIndex);
 		
@@ -160,7 +161,7 @@ public class PlanTimesAdapter {
 		return distance / speed;
 	}
 	
-	private double computeTravelTime(Person person, Activity fromAct, Activity toAct, PlansCalcRoute router) {
+	private double computeTravelTime(Person person, Activity fromAct, Activity toAct, PlanRouterAdapter router) {
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);

@@ -40,6 +40,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -76,7 +77,7 @@ public class Planomat implements PlanAlgorithm {
 
 	private final LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-	private final PlansCalcRoute router;
+	private final PlanRouterAdapter router;
 	private final Network network;
 
 	private final Random seedGenerator;
@@ -88,7 +89,7 @@ public class Planomat implements PlanAlgorithm {
 			final LegTravelTimeEstimatorFactory legTravelTimeEstimatorfactory,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final PlanomatConfigGroup config,
-			final PlansCalcRoute router,
+			final PlanRouterAdapter router,
 			final Network network) {
 
 		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorfactory;

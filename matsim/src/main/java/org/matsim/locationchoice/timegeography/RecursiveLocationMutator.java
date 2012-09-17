@@ -38,6 +38,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -183,7 +184,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		leg.setTravelTime(0.0);
 		leg.setArrivalTime(0.0);
 
-		PlansCalcRoute router = (PlansCalcRoute)this.controler.createRoutingAlgorithm();
+		PlanRouterAdapter router = new PlanRouterAdapter( this.controler );
 		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();
 	}

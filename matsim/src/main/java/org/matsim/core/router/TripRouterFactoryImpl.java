@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -69,6 +70,23 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 				((PopulationFactoryImpl) (controler.getPopulation().getFactory())).getModeRouteFactory(),
 				controler.getTransitRouterFactory(),
 				controler.getScenario().getTransitSchedule());
+	}
+
+	public TripRouterFactoryImpl(
+			final Scenario scenario,
+			final TravelDisutilityFactory disutilityFactory,
+			final TravelTime travelTime,
+			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
+			final TransitRouterFactory transitRouterFactory) {
+		this( scenario.getConfig(),
+				scenario.getNetwork(),
+				disutilityFactory,
+				travelTime,
+				leastCostAlgoFactory,
+				scenario.getPopulation().getFactory(),
+				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+				transitRouterFactory,
+				scenario.getTransitSchedule());
 	}
 
 	public TripRouterFactoryImpl(

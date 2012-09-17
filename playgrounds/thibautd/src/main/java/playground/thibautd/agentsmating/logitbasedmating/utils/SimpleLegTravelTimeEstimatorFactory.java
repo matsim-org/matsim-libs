@@ -22,6 +22,7 @@ package playground.thibautd.agentsmating.logitbasedmating.utils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -37,7 +38,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 public class SimpleLegTravelTimeEstimatorFactory {
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	private final PlanomatConfigGroup.RoutingCapability routingCapability;
-	private final PlansCalcRoute routingAlgorithm;
+	private final PlanRouterAdapter routingAlgorithm;
 	private final Network network;
 
 	private final LegTravelTimeEstimatorFactory factory;
@@ -45,7 +46,7 @@ public class SimpleLegTravelTimeEstimatorFactory {
 	public SimpleLegTravelTimeEstimatorFactory (
 			final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
 			final PlanomatConfigGroup.RoutingCapability routingCapability,
-			final PlansCalcRoute routingAlgorithm,
+			final PlanRouterAdapter routingAlgorithm,
 			final Network network,
 			final TravelTime travelTime,
 			final DepartureDelayAverageCalculator delay) {

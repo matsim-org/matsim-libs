@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -44,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author thibautd
  */
-public class PlanRouter implements PlanAlgorithm {
+public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private final TripRouter routingHandler;
 	private final ActivityFacilities facilities;
 
@@ -91,6 +92,13 @@ public class PlanRouter implements PlanAlgorithm {
 		List<PlanElement> newSequence = routingHandler.tripsToLegs( plan );
 		newSequence = run( plan.getPerson() , newSequence );
 		updatePlanElements( plan , newSequence );
+	}
+
+	@Override
+	public void run(final Person person) {
+		for (Plan plan : person.getPlans()) {
+			run( plan );
+		}
 	}
 
 	/**

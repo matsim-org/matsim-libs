@@ -20,6 +20,18 @@
 
 package org.matsim.planomat.costestimators;
 
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
+
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
@@ -63,14 +75,37 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(network, 900);
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(network, config.travelTimeCalculator());
-		TravelDisutility linkTravelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(linkTravelTimeEstimator, config.planCalcScore());
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(
-				config.plansCalcRoute(),
+		TravelDisutilityFactory disutilityFactory =
+			new TravelDisutilityFactory() {
+					@Override
+					public TravelDisutility createTravelDisutility(
+							TravelTime timeCalculator,
+							PlanCalcScoreConfigGroup cnScoringGroup) {
+						return new TravelTimeAndDistanceBasedTravelDisutility(
+							timeCalculator,
+							cnScoringGroup);
+					}
+				};
+		PopulationFactory populationFactory = new PopulationFactoryImpl( ScenarioUtils.createScenario( config ));
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryImpl(
+				config,
 				network,
-				linkTravelCostEstimator,
+				disutilityFactory,
 				linkTravelTimeEstimator,
-				new ModeRouteFactory());
+				new DijkstraFactory(),
+				populationFactory,
+				new ModeRouteFactory(),
+				null,
+				null);
+
+		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter(
+				new PlanRouter( tripRouterFactory.createTripRouter() , null ),
+				network,
+				populationFactory,
+				linkTravelTimeEstimator,
+				disutilityFactory.createTravelDisutility( linkTravelTimeEstimator , config.planCalcScore() ),
+				new DijkstraFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 		LinearInterpolationLegTravelTimeEstimator testee = (LinearInterpolationLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(

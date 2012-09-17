@@ -38,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -54,11 +55,11 @@ public class ChoiceSet {
 	// *************************************	
 	private List<Id> destinations = new Vector<Id>();
 	private List<Id> notYetVisited = new Vector<Id>();
-	private PlansCalcRoute router = null;
+	private PlanRouterAdapter router = null;
 	private Network network = null;
 	private Config config;
 		
-	public ChoiceSet(int approximationLevel, PlansCalcRoute router, Network network, Config config) {
+	public ChoiceSet(int approximationLevel, PlanRouterAdapter router, Network network, Config config) {
 		this.approximationLevel = approximationLevel;
 		this.router = router;
 		this.network = network;

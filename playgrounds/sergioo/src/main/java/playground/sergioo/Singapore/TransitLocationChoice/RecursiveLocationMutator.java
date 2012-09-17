@@ -38,6 +38,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.timegeography.ManageSubchains;
@@ -51,7 +52,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 	private double recursionTravelSpeedChange = 0.1;
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
-	PlansCalcRoute router = (PlansCalcRoute)this.controler.createRoutingAlgorithm();
+	PlanRouterAdapter router = new PlanRouterAdapter( this.controler );
 
 	public RecursiveLocationMutator(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,

@@ -198,10 +198,7 @@ public class JointControler extends MultiLegRoutingControler {
 	public PlanAlgorithm createRoutingAlgorithm(
 			final TravelDisutility travelCosts,
 			final TravelTime travelTimes) {
-		PlansCalcRoute plansCalcRoute = null;
-
 		TripRouterFactory tripRouterFactory = getTripRouterFactory();
-
 		return new JointPlanRouter( tripRouterFactory.createTripRouter() );
 	}
 

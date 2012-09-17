@@ -38,6 +38,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -123,7 +124,7 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
 					Coord center = new CoordImpl(x,y);
 										
-					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, (PlansCalcRoute)this.controler.createRoutingAlgorithm(), 
+					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, new PlanRouterAdapter( controler ),
 							this.network, this.controler.getConfig());
 					this.createChoiceSetCircle(
 							center, maxRadius, this.actTypeConverter.convertType(((ActivityImpl)actToMove).getType()), cs,

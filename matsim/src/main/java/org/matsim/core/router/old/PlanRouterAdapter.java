@@ -81,6 +81,14 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	}
 
 	public PlanRouterAdapter(
+			final Controler controler) {
+		this( new PlanRouter(
+					controler.getTripRouterFactory().createTripRouter(),
+					controler.getScenario().getActivityFacilities() ),
+				controler);
+	}
+
+	public PlanRouterAdapter(
 			final PlanRouter planRouter,
 			final Controler controler) {
 		this.planRouter = planRouter;
@@ -100,6 +108,26 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		this.populationFactory = controler.getPopulation().getFactory();
 		this.routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 	}
+
+	public PlanRouterAdapter(
+			final PlanRouter planRouter,
+			final Network network,
+			final PopulationFactory populationFactory,
+			final TravelTime time,
+			final TravelDisutility disutility,
+			final LeastCostPathCalculatorFactory factory) {
+		this.planRouter = planRouter;
+
+		FreespeedTravelTimeAndDisutility ptTimeCostCalc =
+			new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
+
+		this.network = network;
+		this.routeAlgo = factory.createPathCalculator(network, disutility, time);
+		this.routeAlgoPtFreeFlow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
+		this.populationFactory = populationFactory;
+		this.routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
+	}
+
 
 	public final LeastCostPathCalculator getLeastCostPathCalculator(){
 		return this.routeAlgo;

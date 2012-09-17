@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -167,7 +168,7 @@ public class RunReducedSPModel {
 				new SimpleLegTravelTimeEstimatorFactory(
 					PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,
-					(PlansCalcRoute) controler.createRoutingAlgorithm(),
+					new PlanRouterAdapter( controler ),
 					scenario.getNetwork(),
 					controler.getTravelTimeCalculator(),
 					new DepartureDelayAverageCalculator(

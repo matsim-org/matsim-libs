@@ -41,13 +41,20 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -141,14 +148,37 @@ public class PlanomatTest extends MatsimTestCase {
 	private void runATestRun(final PlanomatTestRun testRun) {
 
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.scenario.getConfig().travelTimeCalculator());
-		TravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
+		TravelDisutilityFactory disutilityFactory =
+			new TravelDisutilityFactory() {
+					@Override
+					public TravelDisutility createTravelDisutility(
+							TravelTime timeCalculator,
+							PlanCalcScoreConfigGroup cnScoringGroup) {
+						return new TravelTimeAndDistanceBasedTravelDisutility(
+							timeCalculator,
+							cnScoringGroup);
+					}
+				};
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator, ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryImpl(
+				scenario,
+				disutilityFactory,
+				tTravelEstimator,
+				new DijkstraFactory(),
+				null);
+
+		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter(
+				new PlanRouter( tripRouterFactory.createTripRouter() , null ),
+				scenario.getNetwork(),
+				scenario.getPopulation().getFactory(),
+				tTravelEstimator,
+				disutilityFactory.createTravelDisutility( tTravelEstimator , scenario.getConfig().planCalcScore() ),
+				new DijkstraFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 //		LegTravelTimeEstimator ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
@@ -294,10 +324,33 @@ public class PlanomatTest extends MatsimTestCase {
 
 		// init LegTravelTimeEstimator
 		TravelTime tTravelEstimator = new LinearInterpolatingTTCalculator(this.scenario.getNetwork(), 900);
-		TravelDisutility travelCostEstimator = new TravelTimeAndDistanceBasedTravelDisutility(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator, ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
+		TravelDisutilityFactory disutilityFactory =
+			new TravelDisutilityFactory() {
+					@Override
+					public TravelDisutility createTravelDisutility(
+							TravelTime timeCalculator,
+							PlanCalcScoreConfigGroup cnScoringGroup) {
+						return new TravelTimeAndDistanceBasedTravelDisutility(
+							timeCalculator,
+							cnScoringGroup);
+					}
+				};
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryImpl(
+				scenario,
+				disutilityFactory,
+				tTravelEstimator,
+				new DijkstraFactory(),
+				null);
+
+		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter(
+				new PlanRouter( tripRouterFactory.createTripRouter() , null ),
+				scenario.getNetwork(),
+				scenario.getPopulation().getFactory(),
+				tTravelEstimator,
+				disutilityFactory.createTravelDisutility( tTravelEstimator , scenario.getConfig().planCalcScore() ),
+				new DijkstraFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 		ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(

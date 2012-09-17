@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
@@ -52,7 +53,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 
 	protected final TravelTime linkTravelTimeEstimator;
 	protected final DepartureDelayAverageCalculator tDepDelayCalc;
-	private final PlansCalcRoute plansCalcRoute;
+	private final PlanRouterAdapter plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	private final Network network;
 
@@ -60,7 +61,7 @@ public class FixedRouteLegTravelTimeEstimator extends AbstractLegTravelTimeEstim
 			Plan plan,
 			TravelTime linkTravelTimeEstimator,
 			DepartureDelayAverageCalculator depDelayCalc,
-			PlansCalcRoute plansCalcRoute,
+			PlanRouterAdapter plansCalcRoute,
 			PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
 			Network network) {
 		super(plan);

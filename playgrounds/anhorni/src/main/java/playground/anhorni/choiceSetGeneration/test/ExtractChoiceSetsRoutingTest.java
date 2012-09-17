@@ -30,6 +30,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -70,7 +71,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
-		PlansCalcRoute router = (PlansCalcRoute)controler.createRoutingAlgorithm();
+		PlanRouterAdapter router = new PlanRouterAdapter( controler );
 		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg;
 	}
