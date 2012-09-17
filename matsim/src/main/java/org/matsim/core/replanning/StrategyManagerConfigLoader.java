@@ -178,11 +178,11 @@ public final class StrategyManagerConfigLoader {
 				strategy.addStrategyModule(em);
 			} else if (name.equals("Planomat")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 			} else if (name.equals("PlanomatReRoute")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator());
+				PlanStrategyModule planomatStrategyModule = new PlanomatModule(controler, controler.getEvents(), controler.getNetwork(), controler.getScoringFunctionFactory(), controler.getTravelTimeCalculator());
 				strategy.addStrategyModule(planomatStrategyModule);
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (name.equals("BestScore")) {

@@ -86,7 +86,6 @@ public class PlanomatModuleTest extends MatsimTestCase {
 				emptyEvents,
 				this.scenario.getNetwork(),
 				scoringFunctionFactory,
-				travelCostEstimator,
 				tTravelEstimator);
 
 		testee.prepareReplanning();
