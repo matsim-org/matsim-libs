@@ -27,6 +27,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.Facility;
 
 /**
+ * When ActivityFacilities are not used, use this class
+ * to wrap activity geographical information (coord and linkid)
+ * in a facility interface (for example to pass to the router)
  * @author thibautd
  */
 public class ActivityWrapperFacility implements Facility {
