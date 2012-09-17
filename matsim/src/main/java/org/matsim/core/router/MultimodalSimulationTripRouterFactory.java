@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -63,27 +67,81 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 	public TripRouter createTripRouter() {
 		TripRouter instance = new TripRouter();
 
-		LeastCostPathCalculator routeAlgo =
-			leastCostAlgoFactory.createPathCalculator(
-					network,
-					travelDisutility,
-					multimodalTravelTimes.get( TransportMode.car ) );
-		instance.setRoutingModule(
-				TransportMode.car,
-				new LegRouterWrapper(
-					TransportMode.car,
-					populationFactory,
-					new NetworkLegRouter(
-						network,
-						routeAlgo,
-						((PopulationFactoryImpl) populationFactory).getModeRouteFactory())));
-
-		for ( String mode : CollectionUtils.stringToArray( configGroup.getSimulatedModes() ) ) {
-			routeAlgo =
+			
+		// Define restrictions for the different modes.
+		/*
+		 * Car
+		 */	
+		Set<String> carModeRestrictions = new HashSet<String>();
+		carModeRestrictions.add(TransportMode.car);
+		
+		/*
+		 * Walk
+		 */	
+		Set<String> walkModeRestrictions = new HashSet<String>();
+		walkModeRestrictions.add(TransportMode.bike);
+		walkModeRestrictions.add(TransportMode.walk);
+				
+		/*
+		 * Bike
+		 * Besides bike mode we also allow walk mode - but then the
+		 * agent only travels with walk speed (handled in MultiModalTravelTimeCost).
+		 */
+		Set<String> bikeModeRestrictions = new HashSet<String>();
+		bikeModeRestrictions.add(TransportMode.walk);
+		bikeModeRestrictions.add(TransportMode.bike);
+		
+		/*
+		 * PT
+		 * We assume PT trips are possible on every road that can be used by cars.
+		 * 
+		 * Additionally we also allow pt trips to use walk and / or bike only links.
+		 * On those links the traveltimes are quite high and we can assume that they
+		 * are only use e.g. to walk from the origin to the bus station or from the
+		 * bus station to the destination.
+		 */
+		Set<String> ptModeRestrictions = new HashSet<String>();
+		ptModeRestrictions.add(TransportMode.pt);
+		ptModeRestrictions.add(TransportMode.car);
+		ptModeRestrictions.add(TransportMode.bike);
+		ptModeRestrictions.add(TransportMode.walk);
+		
+		/*
+		 * Ride
+		 * We assume ride trips are possible on every road that can be used by cars.
+		 * Additionally we also allow ride trips to use walk and / or bike only links.
+		 * For those links walk travel times are used.
+		 */
+		Set<String> rideModeRestrictions = new HashSet<String>();
+		rideModeRestrictions.add(TransportMode.car);
+		rideModeRestrictions.add(TransportMode.bike);
+		rideModeRestrictions.add(TransportMode.walk);
+		
+		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(this.network);
+		for (String mode : CollectionUtils.stringToArray( configGroup.getSimulatedModes() )) {
+			
+			Set<String> modeRestrictions;
+			if (mode.equals(TransportMode.car)) {
+				modeRestrictions = carModeRestrictions;
+			} else if (mode.equals(TransportMode.walk)) {
+				modeRestrictions = walkModeRestrictions;
+			} else if (mode.equals(TransportMode.bike)) {
+				modeRestrictions = bikeModeRestrictions;
+			} else if (mode.equals(TransportMode.ride)) {
+				modeRestrictions = rideModeRestrictions;
+			} else if (mode.equals(TransportMode.pt)) {
+				modeRestrictions = ptModeRestrictions;
+			} else continue;
+			
+			Network subNetwork = NetworkImpl.createNetwork();
+			networkFilter.filter(subNetwork, modeRestrictions);
+			
+			LeastCostPathCalculator routeAlgo =
 				leastCostAlgoFactory.createPathCalculator(
-						network,
+						subNetwork,
 						travelDisutility,
-						multimodalTravelTimes.get( mode ) );
+						multimodalTravelTimes.get(mode));
+
 			instance.setRoutingModule(
 					mode,
 					new LegRouterWrapper(
