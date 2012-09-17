@@ -45,7 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * 
+ * Save waiting times of agents while mobsim is running
  * 
  * @author sergioo
  */

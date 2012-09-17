@@ -21,6 +21,8 @@
 package playground.sergioo.Singapore.TransitRouterVariable;
 
 /**
+ * Array implementation of the structure for saving wait times
+ * 
  * @author sergioo
  */
 

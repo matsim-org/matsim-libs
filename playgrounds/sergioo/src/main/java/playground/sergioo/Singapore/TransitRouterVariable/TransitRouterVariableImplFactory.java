@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,13 +19,14 @@
 
 package playground.sergioo.Singapore.TransitRouterVariable;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 
 /**
+ * Factory for the variable transit router
+ * 
  * @author sergioo
  */
 public class TransitRouterVariableImplFactory implements TransitRouterFactory {
@@ -33,18 +34,20 @@ public class TransitRouterVariableImplFactory implements TransitRouterFactory {
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private TransitRouterNetworkTravelTimeAndDisutilityVariableWW transitRouterNetworkTravelTimeCostVariable;
-	private Network network;
+	private Controler controler;
+	private WaitTime waitTime;
 	
 	public TransitRouterVariableImplFactory(final Controler controler, final TransitRouterConfig config, WaitTime waitTime) {
+		this.controler = controler;
 		this.config = config;
+		this.waitTime = waitTime;
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(controler.getNetwork(), controler.getScenario().getTransitSchedule(), this.config.beelineWalkConnectionDistance);
-		transitRouterNetworkTravelTimeCostVariable = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(config, controler.getNetwork(), routerNetwork, controler.getTravelTimeCalculator(), waitTime);
-		controler.addControlerListener(transitRouterNetworkTravelTimeCostVariable);
-		this.network = controler.getNetwork();
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeCostVariable, routerNetwork, network);
+		transitRouterNetworkTravelTimeCostVariable = new TransitRouterNetworkTravelTimeAndDisutilityVariableWW(config, controler.getNetwork(), routerNetwork, controler.getTravelTimeCalculator(), waitTime);
+		controler.addControlerListener(transitRouterNetworkTravelTimeCostVariable);
+		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeCostVariable, routerNetwork, controler.getNetwork());
 	}
 
 }
