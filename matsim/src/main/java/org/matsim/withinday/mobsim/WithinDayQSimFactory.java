@@ -46,10 +46,10 @@ public class WithinDayQSimFactory implements MobsimFactory {
 
 	private static final Logger log = Logger.getLogger(WithinDayQSimFactory.class);
 
-	private final ReplanningManager replanningManager;
+	private final WithinDayEngine withinDayEngine;
 	
-	public WithinDayQSimFactory(ReplanningManager replanningManager) {
-		this.replanningManager = replanningManager;
+	public WithinDayQSimFactory(WithinDayEngine withinDayEngine) {
+		this.withinDayEngine = withinDayEngine;
 	}
 	
     private static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events) {
@@ -99,7 +99,7 @@ public class WithinDayQSimFactory implements MobsimFactory {
 			sim = createWithinDayQSim(sc, eventsManager);
 		}
 		
-		sim.addMobsimEngine(replanningManager);
+		sim.addMobsimEngine(withinDayEngine);
 		
 		return sim;
 	}

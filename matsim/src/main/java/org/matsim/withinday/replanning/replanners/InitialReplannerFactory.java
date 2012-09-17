@@ -22,7 +22,7 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
@@ -30,7 +30,7 @@ public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 
 	private Scenario scenario;
 	
-	public InitialReplannerFactory(Scenario scenario, ReplanningManager replanningManager,
+	public InitialReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;

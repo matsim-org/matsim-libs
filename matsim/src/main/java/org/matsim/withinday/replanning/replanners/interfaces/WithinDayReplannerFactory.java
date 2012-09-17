@@ -26,19 +26,19 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningIdGenerator;
 
 public abstract class WithinDayReplannerFactory<T extends Identifier> {
 
-	private final ReplanningManager replanningManager;
+	private final WithinDayEngine replanningManager;
 	private Id id;
 	private AbstractMultithreadedModule abstractMultithreadedModule;
 	private double replanningProbability = 1.0;
 	private Set<T> identifiers = new HashSet<T>();
 	
-	public WithinDayReplannerFactory(ReplanningManager replanningManager, 
+	public WithinDayReplannerFactory(WithinDayEngine replanningManager, 
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
 		this.replanningManager = replanningManager;
 		this.abstractMultithreadedModule = abstractMultithreadedModule;
@@ -60,7 +60,7 @@ public abstract class WithinDayReplannerFactory<T extends Identifier> {
 		return this.replanningProbability;
 	}
 	
-	public final ReplanningManager getReplanningManager() {
+	public final WithinDayEngine getReplanningManager() {
 		return this.replanningManager;
 	}
 	

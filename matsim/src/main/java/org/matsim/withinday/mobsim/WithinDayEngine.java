@@ -26,8 +26,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
@@ -40,17 +38,15 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
 /**
- * This Class implements a SimulationBeforeSimStepListener.
- *
- * Each time a ListenerEvent is created it is checked
- * whether a WithinDayReplanning of the Agents Plans should
- * be done and / or is necessary.
+ * This Class implements the MobsimEngine interface. If added to a
+ * QSim, the QSim's internals ensure that WithinDayEngine.doSimStep(...)
+ * is performed before the other MobsimEngines.
  * 
- * @author: cdobler
+ * @author cdobler
  */
-public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListener {
+public class WithinDayEngine implements MobsimEngine {
 
-	private static final Logger log = Logger.getLogger(ReplanningManager.class);
+	private static final Logger log = Logger.getLogger(WithinDayEngine.class);
 	
 	private boolean initialReplanning = true;
 	private boolean duringActivityReplanning = true;
@@ -69,7 +65,7 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 	
 	private InternalInterface internalInterface;
 	
-	public ReplanningManager() {
+	public WithinDayEngine() {
 		duringActivityReplannerFactory = new LinkedHashMap<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>>();
 		duringLegReplannerFactory = new LinkedHashMap<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>>();
 	}
@@ -155,9 +151,7 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 	}
 
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		
-		double time = e.getSimulationTime();
+	public void doSimStep(double time) {
 		
 		for (Entry<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> entry : duringActivityReplannerFactory.entrySet()) {
 			if (entry.getValue().getFirst() == time) this.parallelDuringActivityReplanner.addWithinDayReplannerFactory(entry.getKey());
@@ -175,11 +169,6 @@ public class ReplanningManager implements MobsimEngine, MobsimBeforeSimStepListe
 		if (isDuringLegReplanning()) {
 			duringLegReplanningModule.doReplanning(time);
 		}
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override

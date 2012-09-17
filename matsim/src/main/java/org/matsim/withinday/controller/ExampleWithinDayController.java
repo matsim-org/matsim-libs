@@ -123,23 +123,23 @@ public class ExampleWithinDayController extends WithinDayController implements M
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
-		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
-		this.getReplanningManager().addIntialReplannerFactory(this.initialReplannerFactory);
+		this.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 		
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringActivityIdentifier, pDuringActivityReplanning);
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
-		this.getReplanningManager().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
+		this.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 				
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getReplanningManager(), router, 1.0);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getReplanningManager().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*
@@ -149,7 +149,7 @@ public class ExampleWithinDayController extends WithinDayController implements M
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.initReplanningManager(numReplanningThreads);
+		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();

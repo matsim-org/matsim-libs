@@ -21,12 +21,12 @@
 package org.matsim.withinday.replanning.replanners.interfaces;
 
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 public abstract class WithinDayDuringLegReplannerFactory extends WithinDayReplannerFactory<DuringLegIdentifier> {
 
-	public WithinDayDuringLegReplannerFactory(ReplanningManager replanningManager,
+	public WithinDayDuringLegReplannerFactory(WithinDayEngine replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 	}

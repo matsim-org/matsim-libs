@@ -29,7 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
@@ -56,8 +56,8 @@ public class WithinDayController extends Controler {
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
 
-	private boolean replanningManagerInitialized = false;
-	private ReplanningManager replanningManager;
+	private boolean withinDayEngineInitialized = false;
+	private WithinDayEngine withinDayEngine;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 
 	public WithinDayController(String[] args) {
@@ -148,17 +148,16 @@ public class WithinDayController extends Controler {
 	 * TODO: Add a Within-Day Group to the Config. Then this method
 	 * can be called on startup.
 	 */
-	public void initReplanningManager(int numOfThreads) {
-		if (!replanningManagerInitialized) {
+	public void initWithinDayEngine(int numOfThreads) {
+		if (!withinDayEngineInitialized) {
 			log.info("Initialize ReplanningManager");
-			replanningManager.initializeReplanningModules(numOfThreads);
-			fosl.addSimulationListener(replanningManager);
-			replanningManagerInitialized = true;
+			withinDayEngine.initializeReplanningModules(numOfThreads);
+			withinDayEngineInitialized = true;
 		}
 	}
 
-	public ReplanningManager getReplanningManager() {
-		return this.replanningManager;
+	public WithinDayEngine getWithinDayEngine() {
+		return this.withinDayEngine;
 	}
 
 	public FixedOrderSimulationListener getFixedOrderSimulationListener() {
@@ -171,14 +170,14 @@ public class WithinDayController extends Controler {
 	private void init() {
 		super.getQueueSimulationListener().add(fosl);
 		
-		this.replanningManager = new ReplanningManager();
+		this.withinDayEngine = new WithinDayEngine();
 	}
 
 	@Override
 	protected void setUp() {
 
 		// set WithinDayQSimFactory
-		super.setMobsimFactory(new WithinDayQSimFactory(replanningManager));
+		super.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
 
 		super.setUp();
 	}
@@ -186,10 +185,10 @@ public class WithinDayController extends Controler {
 	@Override
 	protected void runMobSim() {
 		// ensure that all modules have been initialized
-		if (replanningManager == null) {
+		if (withinDayEngine == null) {
 			log.warn("Within-day replanning modules have not been initialized! Force initialization using 1 replanning thread. " +
 					"Please call createAndInitReplanningManager(int numOfThreads).");
-			initReplanningManager(1);
+			initWithinDayEngine(1);
 		}
 
 		super.runMobSim();
