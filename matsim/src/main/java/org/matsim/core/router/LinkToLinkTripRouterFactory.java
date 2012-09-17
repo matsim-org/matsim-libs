@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,6 +33,9 @@ import org.matsim.core.router.util.TravelTime;
  * @author thibautd
  */
 public class LinkToLinkTripRouterFactory implements TripRouterFactory {
+	private static final Logger log =
+		Logger.getLogger(LinkToLinkTripRouterFactory.class);
+
 	private final TripRouterFactory delegate;
 	private final Scenario scenario;
 	private final LeastCostPathCalculatorFactory leastCostAlgoFactory;
