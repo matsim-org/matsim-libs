@@ -1021,7 +1021,7 @@ public class Controler extends AbstractController {
 						population.getFactory(),
 						getLeastCostPathCalculatorFactory(),
 						createTravelCostCalculator(),
-						multiModalTravelTimeCalculator,
+						multiModalTravelTimes,
 						config.multiModal());
 			}
 			else {
