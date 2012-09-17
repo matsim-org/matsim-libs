@@ -20,10 +20,8 @@
 
 package playground.christoph.evacuation.mobsim.decisionmodel;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.api.core.v01.Id;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
@@ -31,11 +29,12 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
+import playground.christoph.evacuation.utils.DeterministicRNG;
 
 /**
  * Calculates the latest time that a household accepts to leave the affected area.
  * The value is influenced by the household's evacuation decision (immediately, 
- * later, never). Therefore, the model cannot be run before a household has deciced
+ * later, never). Therefore, the model cannot be run before a household has decided
  * whether to evacuate or not.
  * 
  * Note: this is NOT the time when the household wants to start its evacuation trip
@@ -50,11 +49,13 @@ public class LatestAcceptedLeaveTimeModel implements HouseholdDecisionModel {
 	public static final String latestAcceptedLeaveTimeFile = "latestAcceptedLeaveTimeModel.txt.gz";
 	
 	private final DecisionDataProvider decisionDataProvider;
-	private final Random random;
+//	private final Random random;
+	private final DeterministicRNG rng;
 	
 	public LatestAcceptedLeaveTimeModel(DecisionDataProvider decisionDataProvider) {
 		this.decisionDataProvider = decisionDataProvider;
-		this.random = MatsimRandom.getLocalInstance();
+//		this.random = MatsimRandom.getLocalInstance();
+		this.rng = new DeterministicRNG(123984);
 	}
 	
 	/*
@@ -74,9 +75,16 @@ public class LatestAcceptedLeaveTimeModel implements HouseholdDecisionModel {
 		else if (evacuationDecision == EvacuationDecision.LATER) {
 			
 			// calculate random double value between 0.75 and 1.0
-			double rand = 0.75 + (this.random.nextDouble() / 4);
+//			double rand = 0.75 + (this.random.nextDouble() / 4);
+//			double dt = Math.round(EvacuationConfig.evacuationDelayTime * rand);
 			
-			double dt = Math.round(EvacuationConfig.evacuationDelayTime * rand);
+			/*
+			 * Calculate time value between 0.5 and 1.0 * EvacuationConfig.evacuationDelayTime.
+			 * The returned values are based on a Rayleigh distribution.
+			 */
+			double randomTime = calculateDepartureDelay(household.getId(), EvacuationConfig.evacuationDelayTime / 2.0);
+			double dt = Math.floor(EvacuationConfig.evacuationDelayTime / 2.0 + randomTime); 
+			
 			hdd.setLatestAcceptedLeaveTime(EvacuationConfig.evacuationTime + dt);			
 		} else if (evacuationDecision == EvacuationDecision.NEVER) {
 			hdd.setLatestAcceptedLeaveTime(EvacuationConfig.evacuationTime);
@@ -88,6 +96,29 @@ public class LatestAcceptedLeaveTimeModel implements HouseholdDecisionModel {
 //		hdd.setLatestAcceptedLeaveTime(EvacuationConfig.evacuationTime + 2*3600);
 	}
 
+	
+	/*
+	 * By Using a sigma of 950, f(3600s) returns ~ 0,9992, which we round to 1.0
+	 * We scale the time accordingly to the time window available, e.g.
+	 * departure time window = 4h; 
+	 * -> f returns 45 min for 1 hour reference;
+	 * -> departure delay = 4 * 45 min = 3h
+	 */
+	private final double sigma = 950;
+
+	private double calculateDepartureDelay(Id householdId, double tMax) {
+		
+		double rand = this.rng.idToRandomDouble(householdId);
+		
+		if (rand == 0.0) return 0.0;
+		
+		double value = Math.floor(Math.sqrt(-2 * sigma*sigma * Math.log(1 - rand)));
+		if (value > 3600.0) value = 3600.0;
+		
+		double scaleFactor = tMax / 3600.0;
+		return value * scaleFactor;
+	}
+	
 	@Override
 	public void runModel(Households households) {
 		for (Household household : households.getHouseholds().values()) runModel(household);
