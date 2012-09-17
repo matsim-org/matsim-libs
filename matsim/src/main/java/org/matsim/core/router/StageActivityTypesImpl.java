@@ -52,7 +52,7 @@ public class StageActivityTypesImpl implements StageActivityTypes {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (other.getClass().equals( this.getClass() )) {
+		if (other != null && other.getClass().equals( this.getClass() )) {
 			return types.equals( ((StageActivityTypesImpl) other).types );
 		}
 		return false;
