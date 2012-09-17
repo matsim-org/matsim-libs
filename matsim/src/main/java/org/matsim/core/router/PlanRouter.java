@@ -170,7 +170,8 @@ public class PlanRouter implements PlanAlgorithm {
 	// /////////////////////////////////////////////////////////////////////////
 	private Facility toFacility(final Activity act) {
 		if ((act.getLinkId() == null || act.getCoord() == null)
-				&& facilities != null) {
+				&& facilities != null
+				&& !facilities.getFacilities().isEmpty()) {
 			// use facilities only if the activity does not provides the required fields.
 			return facilities.getFacilities().get( act.getFacilityId() );
 		}
