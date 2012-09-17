@@ -40,6 +40,10 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -51,10 +55,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.StageActivityTypesImpl;
-import playground.thibautd.router.TripRouterFactory;
 
 /**
  * A {@link RoutingModule} which caches routes for link-to-link ODs, so that it does not

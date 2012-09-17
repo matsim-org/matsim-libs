@@ -30,10 +30,10 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 
 import playground.thibautd.router.replanning.TripsToLegModule;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.StageActivityTypesImpl;
 
 /**
  * @author thibautd

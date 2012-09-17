@@ -35,6 +35,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
@@ -42,9 +45,6 @@ import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.HitchHikingSpots;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
-import playground.thibautd.router.EmptyStageActivityTypes;
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.StageActivityTypes;
 
 /**
  * @author thibautd

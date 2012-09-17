@@ -39,6 +39,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -50,8 +52,6 @@ import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTri
 import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities.Od;
 import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities.Possibility;
 import playground.thibautd.jointtrips.population.PassengerRoute;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.TripRouter;
 
 /**
  * @author thibautd

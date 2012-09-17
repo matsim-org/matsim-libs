@@ -26,8 +26,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.StageActivityTypes;
 
-import playground.thibautd.router.StageActivityTypes;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
 

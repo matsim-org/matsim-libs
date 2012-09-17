@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.router.TripRouter;
 
-import playground.thibautd.router.TripRouter;
 
 /**
  * @author thibautd

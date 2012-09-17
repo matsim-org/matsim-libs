@@ -27,14 +27,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.HitchHikingSpots;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
-import playground.thibautd.router.TripRouter;
-import playground.thibautd.router.TripRouterFactory;
-import playground.thibautd.router.TripRouterFactoryImpl;
 
 /**
  * @author thibautd

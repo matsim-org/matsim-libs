@@ -24,14 +24,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.PlanRouter;
-import playground.thibautd.router.TripRouterFactory;
-import playground.thibautd.router.TripRouterFactoryImpl;
 
 /**
  * @author thibautd

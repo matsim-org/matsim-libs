@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StageActivityCheckerImpl.java
+ * StageActivityList.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
-
-import java.util.Collection;
-import java.util.SortedSet;
-import java.util.TreeSet;
+package org.matsim.core.router;
 
 /**
- * Default implementation of a {@link StageActivityTypes}, based on a list of types.
+ * Represents a list of activity types corresponding to stages in a trip.
+ * A trip is defined as the longest sequence of PlanElements containing only
+ * legs and stage-type activities.
+ * <br>
+ * It is used by the {@link TripRouter} to detect trips, and can be used by
+ * replanning modules as a "black list" of activities not to touch.
+ * <br>
+ * Equals and hashCode methods should be implemented so that two instances
+ * of the same implementation returning the same results are considered equal.
+ * If it is not the case, replacement of a routing module may not work as expected.
  *
  * @author thibautd
  */
-public class StageActivityTypesImpl implements StageActivityTypes {
-	// use a sorted set, so that two checkers returning the same result
-	// have equal internal collections.
-	private final SortedSet<String> types = new TreeSet<String>();
-
+public interface StageActivityTypes {
 	/**
-	 * Initialises an instance with a given list of types
-	 * @param types a Collection containing the types to consider as stage types.
-	 * It is allowed to be null, in which case the list is empty.
+	 * Checks whether an activity type is a stage type.
+	 *
+	 * @param activityType the type to check
+	 * @return true if the activity type is a stage type.
 	 */
-	public StageActivityTypesImpl(final Collection<String> types) {
-		if (types != null) {
-			this.types.addAll( types );
-		}
-	}
-
-	@Override
-	public boolean isStageActivity(final String activityType) {
-		return types.contains( activityType );
-	}
-
-
-	@Override
-	public boolean equals(final Object other) {
-		if (other.getClass().equals( this.getClass() )) {
-			return types.equals( ((StageActivityTypesImpl) other).types );
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return types.hashCode();
-	}
+	public boolean isStageActivity(String activityType);
 }
 

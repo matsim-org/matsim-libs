@@ -38,6 +38,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
@@ -45,8 +47,6 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.replanning.TransitPlanMutateTimeAllocation;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.router.StageActivityTypesImpl;
-import playground.thibautd.router.TripRouter;
 
 /**
  * @author thibautd

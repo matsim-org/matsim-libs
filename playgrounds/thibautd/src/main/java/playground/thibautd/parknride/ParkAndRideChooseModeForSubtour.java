@@ -42,6 +42,10 @@ import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLa
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -49,10 +53,6 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
 import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
-import playground.thibautd.router.ActivityWrapperFacility;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.StageActivityTypesImpl;
-import playground.thibautd.router.TripRouter;
 
 /**
  * A special module meant at handling subtour mode choice for trips,

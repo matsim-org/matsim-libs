@@ -23,11 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;

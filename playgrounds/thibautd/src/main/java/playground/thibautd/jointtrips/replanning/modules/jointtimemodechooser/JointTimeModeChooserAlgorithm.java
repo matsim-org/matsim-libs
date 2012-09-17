@@ -26,13 +26,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * StageActivityList.java
+ * TripRouterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,29 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
+package org.matsim.core.router;
+
+import org.matsim.core.api.internal.MatsimFactory;
 
 /**
- * Represents a list of activity types corresponding to stages in a trip.
- * A trip is defined as the longest sequence of PlanElements containing only
- * legs and stage-type activities.
- * <br>
- * It is used by the {@link TripRouter} to detect trips, and can be used by
- * replanning modules as a "black list" of activities not to touch.
- * <br>
- * Equals and hashCode methods should be implemented so that two instances
- * of the same implementation returning the same results are considered equal.
- * If it is not the case, replacement of a routing module may not work as expected.
- *
+ * Creates configured {@link TripRouter} instances.
+ * This interface must be implemented to implement a custom routing behaviour.
  * @author thibautd
  */
-public interface StageActivityTypes {
+public interface TripRouterFactory extends MatsimFactory {
 	/**
-	 * Checks whether an activity type is a stage type.
-	 *
-	 * @param activityType the type to check
-	 * @return true if the activity type is a stage type.
+	 * Creates a new {@link TripRouter} instance, using the registered
+	 * {@link RoutingModuleFactory}es.
+	 * @return a fully initialised {@link TripRouter}.
 	 */
-	public boolean isStageActivity(String activityType);
+	public TripRouter createTripRouter();
 }
 

@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 
 import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.router.TripRouter;
-import playground.thibautd.router.TripRouterFactory;
-import playground.thibautd.router.TripRouterFactoryImpl;
 
 /**
  * @author thibautd

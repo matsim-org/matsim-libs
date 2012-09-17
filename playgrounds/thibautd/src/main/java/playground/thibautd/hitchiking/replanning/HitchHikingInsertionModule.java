@@ -22,11 +22,11 @@ package playground.thibautd.hitchiking.replanning;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.controler.MultiLegRoutingControler;
-import playground.thibautd.router.TripRouter;
-import playground.thibautd.router.TripRouterFactory;
 
 /**
  * @author thibautd

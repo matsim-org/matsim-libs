@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -42,7 +43,6 @@ import playground.thibautd.jointtrips.population.DriverRoute;
 import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.population.PassengerRoute;
-import playground.thibautd.router.TripRouter;
 
 /**
  * An algorithm which creates joint trips from nothing,

@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.router.CompositeStageActivityTypes;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.StageActivityTypesImpl;
 
 /**
  * Executes a time allocation mutator on each individual plan.

@@ -34,6 +34,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -48,8 +50,6 @@ import playground.thibautd.parknride.routingapproach.ParkAndRideTravelTimeCost;
 import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
 import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
-import playground.thibautd.router.TripRouter;
-import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**

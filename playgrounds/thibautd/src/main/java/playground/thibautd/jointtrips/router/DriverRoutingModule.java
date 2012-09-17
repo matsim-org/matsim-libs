@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
 
 import playground.thibautd.jointtrips.population.DriverRoute;
-import playground.thibautd.router.EmptyStageActivityTypes;
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.StageActivityTypes;
 
 /**
  * @author thibautd

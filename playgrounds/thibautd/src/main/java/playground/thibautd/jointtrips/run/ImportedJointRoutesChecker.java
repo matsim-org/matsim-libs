@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 import playground.thibautd.jointtrips.population.DriverRoute;
-import playground.thibautd.router.ActivityWrapperFacility;
-import playground.thibautd.router.TripRouter;
 
 /**
  * Checks driver routes, in case only passengers were provided in the plan file

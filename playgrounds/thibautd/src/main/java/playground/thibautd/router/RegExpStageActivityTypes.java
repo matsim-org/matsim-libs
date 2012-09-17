@@ -22,6 +22,8 @@ package playground.thibautd.router;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.core.router.StageActivityTypes;
+
 
 /**
  * A {@link StageActivityTypes} using regular expressions. For example,

@@ -21,12 +21,12 @@ package playground.thibautd.router.replanning;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.CompositeStageActivityTypes;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.TripRouter;
 
 /**
  * Removes trips and replaces them by legs.

@@ -32,6 +32,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author thibautd

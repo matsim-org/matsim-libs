@@ -28,10 +28,10 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.thibautd.router.TripRouter;
-import playground.thibautd.router.TripRouterFactory;
 
 /**
  * Collects statistics to help debugging

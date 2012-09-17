@@ -29,19 +29,19 @@
  * <br>
  * It is based on a three layers architecture:
  * <ul>
- * <li> the {@link playground.thibautd.router.RoutingModule}s are responsible for computing trips
+ * <li> the {@link org.matsim.core.router.RoutingModule}s are responsible for computing trips
  * between individual O/D couples, for a given mode. They moreover provide
  * access to an object allowing to identify their stage activities, implementing
- * {@link playground.thibautd.router.StageActivityTypes}.
- * <li> the {@link playground.thibautd.router.TripRouter} registers {@link playground.thibautd.router.RoutingModule}s for each
+ * {@link org.matsim.core.router.StageActivityTypes}.
+ * <li> the {@link org.matsim.core.router.TripRouter} registers {@link org.matsim.core.router.RoutingModule}s for each
  * mode, and allows to route between O/D pairs for any mode. It does not modify the plan.
- * It moreover provides access to a {@link playground.thibautd.router.StageActivityTypes} instance allowing
+ * It moreover provides access to a {@link org.matsim.core.router.StageActivityTypes} instance allowing
  * to identify all possible stage activities, for all modes.
- * <li> the {@link playground.thibautd.router.PlanRouter} provides a {@link org.matsim.population.algorithms.PlanAlgorithm} to
+ * <li> the {@link org.matsim.core.router.PlanRouter} provides a {@link org.matsim.population.algorithms.PlanAlgorithm} to
  * route all trips in a plan.
  * </ul>
  *
- * The behaviour can be modified by implementing custom {@link playground.thibautd.router.TripRouterFactory}s.
+ * The behaviour can be modified by implementing custom {@link org.matsim.core.router.TripRouterFactory}s.
  *
  *
  * @author thibautd

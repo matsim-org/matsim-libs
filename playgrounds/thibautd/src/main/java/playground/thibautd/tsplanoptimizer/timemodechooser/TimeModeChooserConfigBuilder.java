@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;

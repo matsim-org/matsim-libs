@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
-import playground.thibautd.router.PlanRouter;
-import playground.thibautd.router.TripRouter;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 import playground.thibautd.tsplanoptimizer.framework.ValueImpl;

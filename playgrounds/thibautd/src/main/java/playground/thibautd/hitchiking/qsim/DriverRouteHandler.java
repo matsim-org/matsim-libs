@@ -34,12 +34,12 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
 import playground.thibautd.hitchiking.qsim.events.PassengerDepartsWithDriverEvent;
-import playground.thibautd.router.TripRouter;
 
 /**
  * Handler for the driver mode.

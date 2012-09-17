@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 
 import playground.thibautd.jointtrips.population.DriverRoute;
 import playground.thibautd.jointtrips.population.PassengerRoute;
-import playground.thibautd.router.PlanRouter;
-import playground.thibautd.router.TripRouter;
 
 /**
  * Based on the {@link PlanRouter}, but modifies "old" plan elements

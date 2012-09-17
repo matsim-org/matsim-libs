@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
 
-import playground.thibautd.router.StageActivityTypesImpl;
-import playground.thibautd.router.TripRouter;
 
 /**
  * @author thibautd

@@ -45,6 +45,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -70,10 +74,6 @@ import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.parknride.ParkAndRideFacilities;
 import playground.thibautd.parknride.ParkAndRideFacility;
 import playground.thibautd.parknride.routingapproach.ParkAndRideRouterNetwork.ParkAndRideLink;
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.StageActivityTypesImpl;
-import playground.thibautd.router.TransitRouterWrapper;
 
 /**
  * A routing module for park and ride access trips. It is not meant

@@ -26,10 +26,10 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDuration
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.TripRouter;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**

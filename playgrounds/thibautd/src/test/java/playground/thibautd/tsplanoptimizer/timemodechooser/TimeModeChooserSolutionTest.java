@@ -29,8 +29,8 @@ import org.junit.Test;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.TripRouter;
 
-import playground.thibautd.router.TripRouter;
 import playground.thibautd.tsplanoptimizer.framework.Value;
 
 /**

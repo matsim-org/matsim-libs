@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
-import playground.thibautd.router.ActivityWrapperFacility;
-import playground.thibautd.router.TripRouter;
 
 /**
  * Parses a plan to get pt and car trips, and chooses one at random to transform

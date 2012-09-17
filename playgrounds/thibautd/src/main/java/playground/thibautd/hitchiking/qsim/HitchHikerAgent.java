@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
+import org.matsim.core.router.TripRouter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -37,7 +38,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
-import playground.thibautd.router.TripRouter;
 
 /**
  * Agent for simulating casual car-pooling.

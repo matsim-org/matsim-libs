@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripRouterFactory.java
+ * EmptyStageActivityTypes.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
-
-import org.matsim.core.api.internal.MatsimFactory;
+package org.matsim.core.router;
 
 /**
- * Creates configured {@link TripRouter} instances.
- * This interface must be implemented to implement a custom routing behaviour.
+ * A {@link StageActivityTypes} that identifies no activity as a "stage activity".
+ * To use for modes for which no activities are generated.
  * @author thibautd
  */
-public interface TripRouterFactory extends MatsimFactory {
+public final class EmptyStageActivityTypes implements StageActivityTypes {
 	/**
-	 * Creates a new {@link TripRouter} instance, using the registered
-	 * {@link RoutingModuleFactory}es.
-	 * @return a fully initialised {@link TripRouter}.
+	 * The only instance.
 	 */
-	public TripRouter createTripRouter();
+	public static final EmptyStageActivityTypes INSTANCE = new EmptyStageActivityTypes();
+
+	private EmptyStageActivityTypes() {}
+	@Override
+	public final boolean isStageActivity(final String activityType) {
+		return false;
+	}
 }
 

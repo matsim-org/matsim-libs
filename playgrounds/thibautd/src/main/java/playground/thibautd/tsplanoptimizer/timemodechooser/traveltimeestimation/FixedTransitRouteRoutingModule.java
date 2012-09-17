@@ -36,6 +36,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TransitRouterWrapper;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -45,10 +49,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.StageActivityTypes;
-import playground.thibautd.router.TransitRouterWrapper;
-import playground.thibautd.router.TripRouterFactory;
 
 /**
  * A {@link RoutingModule} which caches routes for link-to-link ODs, so that it does not

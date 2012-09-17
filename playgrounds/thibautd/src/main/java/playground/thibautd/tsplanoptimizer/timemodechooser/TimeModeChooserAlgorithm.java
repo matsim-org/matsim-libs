@@ -23,11 +23,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.Solution;

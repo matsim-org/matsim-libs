@@ -30,6 +30,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -46,8 +48,6 @@ import playground.thibautd.jointtrips.router.DriverRoutingModule;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
 import playground.thibautd.jointtrips.router.JointTripRouterFactory;
 import playground.thibautd.jointtrips.router.PassengerRoutingModule;
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.TripRouterFactory;
 import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**

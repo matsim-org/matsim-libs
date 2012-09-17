@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.StageActivityTypes;
 
 /**
  * A time allocation mutator to use with multi-leg routing.

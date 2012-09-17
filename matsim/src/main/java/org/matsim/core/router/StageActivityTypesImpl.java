@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmptyStageActivityTypes.java
+ * StageActivityCheckerImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,23 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
+package org.matsim.core.router;
+
+import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
- * A {@link StageActivityTypes} that identifies no activity as a "stage activity".
- * To use for modes for which no activities are generated.
+ * Default implementation of a {@link StageActivityTypes}, based on a list of types.
+ *
  * @author thibautd
  */
-public final class EmptyStageActivityTypes implements StageActivityTypes {
-	/**
-	 * The only instance.
-	 */
-	public static final EmptyStageActivityTypes INSTANCE = new EmptyStageActivityTypes();
+public class StageActivityTypesImpl implements StageActivityTypes {
+	// use a sorted set, so that two checkers returning the same result
+	// have equal internal collections.
+	private final SortedSet<String> types = new TreeSet<String>();
 
-	private EmptyStageActivityTypes() {}
+	/**
+	 * Initialises an instance with a given list of types
+	 * @param types a Collection containing the types to consider as stage types.
+	 * It is allowed to be null, in which case the list is empty.
+	 */
+	public StageActivityTypesImpl(final Collection<String> types) {
+		if (types != null) {
+			this.types.addAll( types );
+		}
+	}
+
 	@Override
-	public final boolean isStageActivity(final String activityType) {
+	public boolean isStageActivity(final String activityType) {
+		return types.contains( activityType );
+	}
+
+
+	@Override
+	public boolean equals(final Object other) {
+		if (other.getClass().equals( this.getClass() )) {
+			return types.equals( ((StageActivityTypesImpl) other).types );
+		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return types.hashCode();
 	}
 }
 

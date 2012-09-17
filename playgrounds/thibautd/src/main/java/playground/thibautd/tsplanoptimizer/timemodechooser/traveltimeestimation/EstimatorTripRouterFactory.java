@@ -26,16 +26,16 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TransitRouterWrapper;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.TransitRouterWrapper;
-import playground.thibautd.router.TripRouter;
-import playground.thibautd.router.TripRouterFactory;
 
 /**
  * @author thibautd

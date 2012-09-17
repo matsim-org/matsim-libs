@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**

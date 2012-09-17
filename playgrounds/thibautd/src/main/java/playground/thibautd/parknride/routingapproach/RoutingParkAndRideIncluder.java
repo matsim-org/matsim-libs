@@ -31,14 +31,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.parknride.ParkAndRideFacilities;
 import playground.thibautd.parknride.ParkAndRideFacility;
 import playground.thibautd.parknride.ParkAndRideIncluder;
-import playground.thibautd.router.ActivityWrapperFacility;
-import playground.thibautd.router.TripRouter;
 
 /**
  * Convenience class which routes access and egress park and ride trips,

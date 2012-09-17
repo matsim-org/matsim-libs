@@ -47,6 +47,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.LegRouterWrapper;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -61,9 +64,6 @@ import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
 import playground.thibautd.parknride.routingapproach.ParkAndRideRoutingModule;
 import playground.thibautd.parknride.routingapproach.ParkAndRideTravelTimeCost;
 import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
-import playground.thibautd.router.LegRouterWrapper;
-import playground.thibautd.router.RoutingModule;
-import playground.thibautd.router.TransitRouterWrapper;
 
 /**
  * @author thibautd
