@@ -1070,10 +1070,8 @@ public class Controler extends AbstractController {
 				this.getTravelTimeCalculator());
 	}
 
-	public TripRouterFactory setTripRouterFactory(final TripRouterFactory newf) {
-		TripRouterFactory old = tripRouterFactory;
-		tripRouterFactory = newf;
-		return old;
+	public void setTripRouterFactory(final TripRouterFactory factory) {
+		tripRouterFactory = factory;
 	}
 
 	public final int getFirstIteration() {
