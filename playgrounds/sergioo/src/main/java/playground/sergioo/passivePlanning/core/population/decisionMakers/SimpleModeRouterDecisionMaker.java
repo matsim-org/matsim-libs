@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 
 import playground.sergioo.passivePlanning.core.population.decisionMakers.types.ModeRouteDecisionMaker;
 

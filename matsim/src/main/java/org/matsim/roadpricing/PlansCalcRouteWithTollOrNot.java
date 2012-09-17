@@ -29,7 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;

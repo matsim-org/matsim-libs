@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.socialnetworks.graph.social.SocialGraph;

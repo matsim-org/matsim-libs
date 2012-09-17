@@ -29,7 +29,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;

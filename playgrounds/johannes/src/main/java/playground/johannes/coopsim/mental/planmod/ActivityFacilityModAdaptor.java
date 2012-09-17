@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.old.NetworkLegRouter;
 
 import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
 import playground.johannes.coopsim.mental.choice.PlanIndexSelector;

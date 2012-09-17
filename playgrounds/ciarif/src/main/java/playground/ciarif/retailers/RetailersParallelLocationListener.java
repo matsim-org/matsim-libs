@@ -52,8 +52,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.utils.collections.QuadTree;
 

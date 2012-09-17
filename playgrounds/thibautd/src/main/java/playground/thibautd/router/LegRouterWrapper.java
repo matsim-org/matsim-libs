@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.router.LegRouter;
+import org.matsim.core.router.old.LegRouter;
 
 /**
  * Class wrapping a {@link LegRouter} in a {@link RoutingModule}.

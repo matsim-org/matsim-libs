@@ -34,7 +34,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;

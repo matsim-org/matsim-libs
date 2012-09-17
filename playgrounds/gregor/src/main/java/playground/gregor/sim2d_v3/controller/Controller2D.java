@@ -31,8 +31,8 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTim
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.LegRouter;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;

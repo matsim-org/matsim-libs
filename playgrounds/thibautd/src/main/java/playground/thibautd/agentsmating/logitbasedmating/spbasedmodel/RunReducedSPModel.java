@@ -38,7 +38,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;

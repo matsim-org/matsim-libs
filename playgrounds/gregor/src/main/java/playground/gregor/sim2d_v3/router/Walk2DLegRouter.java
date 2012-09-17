@@ -31,8 +31,8 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.LegRouter;
-import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.TravelTime;
 
 public class Walk2DLegRouter implements LegRouter {

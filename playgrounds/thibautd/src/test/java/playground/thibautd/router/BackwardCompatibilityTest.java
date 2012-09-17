@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.router.controler.MultiLegRoutingControler;

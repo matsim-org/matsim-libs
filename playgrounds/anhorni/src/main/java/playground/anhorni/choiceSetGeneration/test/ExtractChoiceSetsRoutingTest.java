@@ -30,7 +30,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {

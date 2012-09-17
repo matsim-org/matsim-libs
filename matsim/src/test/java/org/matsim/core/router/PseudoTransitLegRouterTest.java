@@ -38,6 +38,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.old.PseudoTransitLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;

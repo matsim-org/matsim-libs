@@ -35,7 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.SpanningTree;

@@ -32,8 +32,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 
 import playground.ciarif.retailers.IO.FileRetailerReader;

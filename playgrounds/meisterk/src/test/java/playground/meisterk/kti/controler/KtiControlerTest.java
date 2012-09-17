@@ -24,7 +24,7 @@ import java.io.File;
 
 import org.junit.Ignore;
 import org.matsim.core.router.AStarLandmarks;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router;
+package org.matsim.core.router.old;
 
 import java.util.HashMap;
 import java.util.Map;

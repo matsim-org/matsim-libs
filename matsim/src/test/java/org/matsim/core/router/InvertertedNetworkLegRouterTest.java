@@ -40,6 +40,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.old.InvertedNetworkLegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;

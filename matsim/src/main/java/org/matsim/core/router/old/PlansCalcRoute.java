@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
+package org.matsim.core.router.old;
 
 import java.util.Collection;
 import java.util.Map;

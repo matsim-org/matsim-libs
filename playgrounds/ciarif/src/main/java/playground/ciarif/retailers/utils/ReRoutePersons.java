@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.old.PlansCalcRoute;
 
 
 public class ReRoutePersons {

@@ -32,6 +32,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**

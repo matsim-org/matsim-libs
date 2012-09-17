@@ -23,6 +23,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.*;
+import org.matsim.core.router.old.NetworkLegRouter;
+import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.*;
