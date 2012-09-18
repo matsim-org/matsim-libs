@@ -42,7 +42,7 @@ public abstract class AbstractController {
 	};
 	
 
-	public AbstractController() {
+	protected AbstractController() {
 		OutputDirectoryLogging.catchLogEntries();
 		Gbl.printSystemInfo();
 		Gbl.printBuildInfo();
@@ -77,12 +77,12 @@ public abstract class AbstractController {
 		// one
 	}
 
-	public final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
+	protected final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
 		this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be before logging
 		OutputDirectoryLogging.initLogging(this.controlerIO); // logging needs to be early
 	}
 
-	public final void run(Config config) {
+	protected final void run(Config config) {
 		loadCoreListeners();
 		this.controlerListenerManager.fireControlerStartupEvent();
 		// make sure all routes are calculated.
@@ -91,7 +91,7 @@ public abstract class AbstractController {
 		shutdown(false);
 	}
 	
-	public final void shutdown(final boolean unexpected) {
+	final void shutdown(final boolean unexpected) {
 		this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 		try {
 			Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
