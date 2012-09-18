@@ -36,34 +36,38 @@ import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.utils.DeterministicRNG;
 
 /**
- * Get travel times from a given travel time calculator and adds a random fuzzy value.
- * This values depends on the agent, the link and the distance between the link and 
- * the agent's current position. The calculation of the fuzzy values is deterministic, 
- * multiple calls with identical parameters will result in identical return values.
+ * Get travel times from a given travel time calculator and adds a random fuzzy
+ * value. This values depends on the agent, the link and the distance between
+ * the link and the agent's current position. The calculation of the fuzzy
+ * values is deterministic, multiple calls with identical parameters will result
+ * in identical return values.
  * 
  * @author cdobler
  */
 public class FuzzyTravelTimeEstimator implements TravelTime {
 
 	private static final Logger log = Logger.getLogger(FuzzyTravelTimeEstimator.class);
-	
+
 	private final Scenario scenario;
 	private final TravelTime travelTime;
 	private final AgentsTracker agentsTracker;
 	private final VehiclesTracker vehiclesTracker;
 	private final DistanceFuzzyFactorProvider distanceFuzzyFactorProvider;
 	private final DeterministicRNG rng;
-	
-	private Id pId;
-	private int pIdHashCode;
-	private double personFuzzyFactor;
-	private AgentPosition agentPosition;
-	private Position positionType;
-	private Id fromLinkId;
-	private Link fromLink;
-	private boolean fromLinkIsObserved;
-	
-	/*package*/ FuzzyTravelTimeEstimator(Scenario scenario, TravelTime travelTime, AgentsTracker agentsTracker,
+
+	/*
+	 * Cache variables for each thread accessing the object separately.
+	 */
+	private ThreadLocal<Id> pIdCache;
+	private ThreadLocal<Integer> pIdHashCodeCache;
+	private ThreadLocal<Double> personFuzzyFactorCache;
+	private ThreadLocal<AgentPosition> agentPositionCache;
+	private ThreadLocal<Position> positionTypeCache;
+	private ThreadLocal<Id> fromLinkIdCache;
+	private ThreadLocal<Link> fromLinkCache;
+	private ThreadLocal<Boolean> fromLinkIsObservedCache;
+
+	/* package */FuzzyTravelTimeEstimator(Scenario scenario, TravelTime travelTime, AgentsTracker agentsTracker,
 			VehiclesTracker vehiclesTracker, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider) {
 		this.scenario = scenario;
 		this.travelTime = travelTime;
@@ -71,97 +75,113 @@ public class FuzzyTravelTimeEstimator implements TravelTime {
 		this.vehiclesTracker = vehiclesTracker;
 		this.distanceFuzzyFactorProvider = distanceFuzzyFactorProvider;
 		this.rng = new DeterministicRNG(213456);
+
+		this.pIdCache = new ThreadLocal<Id>();
+		this.pIdHashCodeCache = new ThreadLocal<Integer>();
+		this.personFuzzyFactorCache = new ThreadLocal<Double>();
+		this.agentPositionCache = new ThreadLocal<AgentPosition>();
+		this.positionTypeCache = new ThreadLocal<Position>();
+		this.fromLinkIdCache = new ThreadLocal<Id>();
+		this.fromLinkCache = new ThreadLocal<Link>();
+		this.fromLinkIsObservedCache = new ThreadLocal<Boolean>();
 	}
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		setPerson(person);	
+		setPerson(person);
 		double tt = this.travelTime.getLinkTravelTime(link, time, person, vehicle);
-				
+
 		double distanceFuzzyFactor = calcDistanceFuzzyFactor(link);
 		double linkFuzzyFactor = calcLinkFuzzyFactor(link);
-		
+
 		/*
 		 * personFuzzyFactor and linkFuzzyFactor are uniform distributed,
 		 * combined they result in a normal distribution.
 		 * 
-		 * "(personFuzzyFactor + linkFuzzyFactor - 1)/4" results in a 
-		 * normal distribution with values between -0.25..0.25.
+		 * "(personFuzzyFactor + linkFuzzyFactor - 1)/4" results in a normal
+		 * distribution with values between -0.25..0.25.
 		 * 
-		 * distanceFuzzyFactor is used to increase the fuzzyness for link
-		 * that are far away. Its range is from 0..1.
+		 * distanceFuzzyFactor is used to increase the fuzzyness for link that
+		 * are far away. Its range is from 0..1.
 		 * 
-		 * Multiplying the factor with "distanceFuzzyFactor + 1" (1..2)
-		 * results in a range of -0.50 .. 0.50 for the factor.
+		 * Multiplying the factor with "distanceFuzzyFactor + 1" (1..2) results
+		 * in a range of -0.50 .. 0.50 for the factor.
 		 */
-		double factor = ((personFuzzyFactor + linkFuzzyFactor - 1.0) / 4) * (distanceFuzzyFactor + 1);
+		double factor = ((personFuzzyFactorCache.get() + linkFuzzyFactor - 1.0) / 4) * (distanceFuzzyFactor + 1);
 		double ttError = tt * factor;
-		
+
 		return tt + ttError;
 	}
 
 	private void setPerson(Person person) {
 
-		/* 
-		 * Only recalculate the person's HashCode and FuzzyFactor
-		 * if the person really has changed.
+		/*
+		 * Only recalculate the person's HashCode and FuzzyFactor if the person
+		 * really has changed.
 		 */
-		if (person.getId().equals(this.pId)) return;
-		
+		if (person.getId().equals(this.pIdCache.get())) return;
+
 		// person has changed
-		this.pId = person.getId();
-		this.pIdHashCode = person.getId().hashCode();
-		this.personFuzzyFactor = rng.hashCodeToRandomDouble(pIdHashCode);
-		this.agentPosition = this.agentsTracker.getAgentPosition(pId);
-		this.positionType = agentPosition.getPositionType();
+		Id personId = person.getId();
+		int hashCode = personId.hashCode();
+		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(personId);
+
+		this.pIdCache.set(personId);
+		this.pIdHashCodeCache.set(hashCode);
+		this.personFuzzyFactorCache.set(rng.hashCodeToRandomDouble(hashCode));
+		this.agentPositionCache.set(agentPosition);
+		this.positionTypeCache.set(agentPosition.getPositionType());
 	}
 
 	/*
-	 * So far use hard-coded values between 0.017 (distance 0.0) 
-	 * and 1.0 (distance ~ 10000.0).
+	 * So far use hard-coded values between 0.017 (distance 0.0) and 1.0
+	 * (distance ~ 10000.0).
 	 */
 	private double calcDistanceFuzzyFactor(Link toLink) {
 		/*
-		 *  AgentPosition and PositionType are now updated in the setPerson(...)
-		 *  method. cdobler, jul'12.
+		 * AgentPosition and PositionType are now updated in the setPerson(...)
+		 * method. cdobler, jul'12.
 		 */
-//		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(pId);
-//		Position positionType = agentPosition.getPositionType();
+		// AgentPosition agentPosition =
+		// this.agentsTracker.getAgentPosition(pId);
+		// Position positionType = agentPosition.getPositionType();
 
 		Id fromLinkId = null;
+		Position positionType = this.positionTypeCache.get();
+		AgentPosition agentPosition = this.agentPositionCache.get();
 		if (positionType == Position.LINK) {
 			fromLinkId = agentPosition.getPositionId();
 		} else if (positionType == Position.FACILITY) {
 			fromLinkId = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
 		} else if (positionType == Position.VEHICLE) {
-			fromLinkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());			
+			fromLinkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());
 		} else {
-			log.warn("Agent's position is undefined! Id: " + this.pId);
+			log.warn("Agent's position is undefined! Id: " + this.pIdCache.get());
 			return 1.0;
 		}
-		
-		if (!fromLinkId.equals(this.fromLinkId)) {
-			this.fromLinkId = fromLinkId;
-			this.fromLink = this.scenario.getNetwork().getLinks().get(fromLinkId);
-			this.fromLinkIsObserved = distanceFuzzyFactorProvider.isLinkObserved(fromLinkId);
+
+		if (!fromLinkId.equals(this.fromLinkIdCache.get())) {
+			this.fromLinkIdCache.set(fromLinkId);
+			this.fromLinkCache.set(this.scenario.getNetwork().getLinks().get(fromLinkId));
+			this.fromLinkIsObservedCache.set(distanceFuzzyFactorProvider.isLinkObserved(fromLinkId));
 		}
-		
+
 		/*
-		 * If the agent's current link is not observed, the distance fuzzy factor is 0.0,
-		 * therefore we do not have to check the DistanceFuzzyFactorProviders return value.
-		 * cdobler, jul'12 
+		 * If the agent's current link is not observed, the distance fuzzy
+		 * factor is 0.0, therefore we do not have to check the
+		 * DistanceFuzzyFactorProviders return value. cdobler, jul'12
 		 */
-		if (!this.fromLinkIsObserved) return 0.0;
-		return distanceFuzzyFactorProvider.getFuzzyFactor(fromLink, toLink);
+		if (!this.fromLinkIsObservedCache.get()) return 0.0;
+		return distanceFuzzyFactorProvider.getFuzzyFactor(fromLinkCache.get(), toLink);
 	}
-	
+
 	/*
-	 * Returns a fuzzy value between 0.0 and 1.0 which
-	 * depends on the current person and the given link. 
+	 * Returns a fuzzy value between 0.0 and 1.0 which depends on the current
+	 * person and the given link.
 	 */
-	private double calcLinkFuzzyFactor(Link link) {	
+	private double calcLinkFuzzyFactor(Link link) {
 		int lIdHashCode = link.getId().hashCode();
-		return rng.hashCodeToRandomDouble(lIdHashCode + pIdHashCode);
+		return rng.hashCodeToRandomDouble(lIdHashCode + pIdHashCodeCache.get());
 	}
-	
+
 }
