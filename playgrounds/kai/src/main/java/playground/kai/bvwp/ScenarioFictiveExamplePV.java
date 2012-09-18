@@ -25,7 +25,7 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRoad = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValuesRoad = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValuesRoad.setByEntry( Entry.XX, 3000. ) ; // number of persons
 				pvValuesRoad.setByEntry( Entry.km, 38. ) ;
 				pvValuesRoad.setByEntry( Entry.hrs, 0.45 ) ;
@@ -35,7 +35,7 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValuesRail.setByEntry( Entry.XX, 2000. ) ; // number of persons
 				pvValuesRail.setByEntry( Entry.km, 41. ) ;
 				pvValuesRail.setByEntry( Entry.hrs, 0.43 ) ; 
@@ -63,12 +63,12 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -0.1 ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -0.1 ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByType(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta ) ;
 		}
 		return planfall;
 	}

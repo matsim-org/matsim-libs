@@ -11,12 +11,12 @@ class EconomicValues {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.23 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
 			}
 			{
-				ValuesForAUserType gvValues = roadValues.getByType(Type.GV) ;
+				ValuesForAUserType gvValues = roadValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -1.00 ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
@@ -24,12 +24,12 @@ class EconomicValues {
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType pvValues = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
 			}
 			{
-				ValuesForAUserType gvValues = railValues.getByType(Type.GV) ;
+				ValuesForAUserType gvValues = railValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -0.1 ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
@@ -43,7 +43,7 @@ class EconomicValues {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.0 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
 			}
@@ -51,7 +51,7 @@ class EconomicValues {
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType pvValues = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
 			}
@@ -65,7 +65,7 @@ class EconomicValues {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType gvValues = roadValues.getByType(Type.GV) ;
+				ValuesForAUserType gvValues = roadValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -0.00 ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
@@ -73,7 +73,7 @@ class EconomicValues {
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType gvValues = railValues.getByType(Type.GV) ;
+				ValuesForAUserType gvValues = railValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -5. ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
@@ -87,12 +87,12 @@ class EconomicValues {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvCommercialValues = roadValues.getByType(Type.PV_COMMERCIAL) ;
+				ValuesForAUserType pvCommercialValues = roadValues.getByDemandSegment(Type.PV_COMMERCIAL) ;
 				pvCommercialValues.setByEntry( Entry.km, -0.00 ) ;
 				pvCommercialValues.setByEntry( Entry.hrs, -23.50 ) ;
 			}
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.0 ) ;
 				pvValues.setByEntry( Entry.hrs, -6.30 ) ;
 			}
@@ -110,12 +110,12 @@ class EconomicValues {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.23 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
 			}
 			{
-				ValuesForAUserType gvValues = roadValues.getByType(Type.GV) ;
+				ValuesForAUserType gvValues = roadValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -1.00 ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
@@ -123,12 +123,12 @@ class EconomicValues {
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType pvValues = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
 			}
 			{
-				ValuesForAUserType gvValues = railValues.getByType(Type.GV) ;
+				ValuesForAUserType gvValues = railValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -0.1 ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
@@ -142,7 +142,7 @@ class EconomicValues {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.50 ) ;
 				pvValues.setByEntry( Entry.hrs, -6.00 ) ;
 			}
@@ -150,7 +150,7 @@ class EconomicValues {
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType pvValues = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -6.00 ) ;
 			}
@@ -164,7 +164,7 @@ class EconomicValues {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.28 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
 			}
@@ -172,7 +172,7 @@ class EconomicValues {
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType pvValues = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValues = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
 			}

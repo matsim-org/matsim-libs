@@ -18,10 +18,10 @@ public class IllustrationFictiveExamplePV {
 		// create the policy case:
 		planfall = ScenarioFictiveExamplePV.createPlanfall1(nullfall);
 
-		runRoH();
+//		runRoH();
 		runBVWP2003();
-		runBVWP2010();
-		runBVWP2015();
+//		runBVWP2010();
+//		runBVWP2015();
 	}
 
 	private static void runRoH() {

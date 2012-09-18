@@ -26,8 +26,20 @@ import playground.kai.bvwp.Values.Type;
 import playground.kai.bvwp.Values.Entry;
 
 class Values {
+	/**
+	 * Design thoughts:<ul>
+	 * <li> yyyy rename to "ODAttribute".  "Mengen" sind vielleicht nicht wirklich "Attribute" im Sinne der BVWP-Nomenklatur,
+	 * aber abgesehen davon spricht eigentlich nichts dagegen.  kai,benjamin, sep'12
+	 * </ul>
+	 */
 	enum Entry { XX, km, hrs, mon }
 
+	/**
+	 * Design thoughts:<ul>
+	 * <li> yyyy rename to "DemandSegment".  But refactoring does not seem to work.  Try with other eclipse (this one was
+	 * Galileo).  kai/benjamin, sep'12
+	 *</ul>
+	 */
 	enum Type { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL }
 
 	enum Mode { road, rail }
@@ -61,7 +73,7 @@ class ValuesForAMode {
 	ValuesForAMode createDeepCopy( ) {
 		ValuesForAMode planfall = new ValuesForAMode() ;
 		for ( Type mode : Type.values() ) {
-			ValuesForAUserType old = this.getByType(mode) ;
+			ValuesForAUserType old = this.getByDemandSegment(mode) ;
 			ValuesForAUserType tmp2 = old.createDeepCopy() ;
 			planfall.valuesByType.put( mode, tmp2 ) ;
 		}
@@ -73,7 +85,7 @@ class ValuesForAMode {
 			valuesByType.put( mode, vals ) ;
 		}
 	}
-	ValuesForAUserType getByType( Type type ) {
+	ValuesForAUserType getByDemandSegment( Type type ) {
 			return valuesByType.get(type) ;
 	}
 	void setValuesForType( Type type, ValuesForAUserType values ) {

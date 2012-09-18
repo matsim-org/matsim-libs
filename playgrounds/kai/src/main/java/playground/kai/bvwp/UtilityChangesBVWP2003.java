@@ -30,7 +30,7 @@ import playground.kai.bvwp.Values.Entry;
  * @author Ihab
  *
  */
-public class UtilityChangesBVWP2003 extends UtilityChanges {
+ class UtilityChangesBVWP2003 extends UtilityChanges {
 	
 	@Override
 	UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 

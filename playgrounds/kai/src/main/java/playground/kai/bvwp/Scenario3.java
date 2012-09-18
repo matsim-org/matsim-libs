@@ -24,7 +24,7 @@ class Scenario3 { // Relationsbezogen_mit_generalisierten_Kosten_GV
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// freight traffic:
-				ValuesForAUserType gvValues = roadValues.getByType(Type.GV) ;
+				ValuesForAUserType gvValues = roadValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.XX, 2000. ) ; // tons
 				gvValues.setByEntry( Entry.km, 41. ) ;
 			}				
@@ -49,12 +49,12 @@ class Scenario3 { // Relationsbezogen_mit_generalisierten_Kosten_GV
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.GV).incByEntry( Entry.km, -1. ) ;
+			railValues.getByDemandSegment(Type.GV).incByEntry( Entry.km, -1. ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			railValues.getByType(Type.GV).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByType(Type.GV).incByEntry(Entry.XX, -delta ) ;
+			railValues.getByDemandSegment(Type.GV).incByEntry( Entry.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.GV).incByEntry(Entry.XX, -delta ) ;
 		}
 		return planfall;
 	}

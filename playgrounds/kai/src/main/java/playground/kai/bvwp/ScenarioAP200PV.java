@@ -25,7 +25,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRoad = roadValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValuesRoad = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValuesRoad.setByEntry( Entry.XX, 1000. ) ; // number of persons
 				pvValuesRoad.setByEntry( Entry.km, 100. ) ;
 				pvValuesRoad.setByEntry( Entry.hrs, 1. ) ;
@@ -35,7 +35,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+				ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValuesRail.setByEntry( Entry.XX, 10. ) ; // number of persons
 				pvValuesRail.setByEntry( Entry.km, 100. ) ;
 				pvValuesRail.setByEntry( Entry.hrs, 6. ) ;
@@ -65,12 +65,12 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -4. ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -4. ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 90. ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByType(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta ) ;
 		}
 		return planfall;
 	}
@@ -89,12 +89,12 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -4. ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -4. ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 90. ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByType(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -0. ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -0. ) ;
 		}
 		return planfall;
 	}
@@ -113,12 +113,12 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -4. ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -4. ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 90. ;
-			railValues.getByType(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByType(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta / 2 ) ;
+			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta / 2 ) ;
 		}
 		return planfall;
 	}

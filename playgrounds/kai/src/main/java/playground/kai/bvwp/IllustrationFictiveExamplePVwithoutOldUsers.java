@@ -26,7 +26,7 @@ public class IllustrationFictiveExamplePVwithoutOldUsers {
 		ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 		{
 			// passenger traffic:
-			ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV_NON_COMMERCIAL) ;
+			ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 			pvValuesRail.setByEntry( Entry.XX, 0. ) ; // number of persons
 		}			
 
@@ -35,9 +35,9 @@ public class IllustrationFictiveExamplePVwithoutOldUsers {
 		planfall = ScenarioFictiveExamplePV.createPlanfall1(nullfall);
 
 		runBVWP2003();
-		runBVWP2010();
-		runRoH();
-		runBVWP2015();
+//		runBVWP2010();
+//		runRoH();
+//		runBVWP2015();
 	}
 
 	private static void runRoH() {
