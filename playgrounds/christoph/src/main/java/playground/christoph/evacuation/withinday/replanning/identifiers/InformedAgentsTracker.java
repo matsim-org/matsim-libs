@@ -164,7 +164,7 @@ public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListen
 			
 			// debug
 			if (!removed) {
-				log.warn("Initially replanned an agent which was not marked as to be! " + id.toString());
+				log.warn("Initially replanned an agent which was not marked as to be! Time: " + e.getSimulationTime() + ", agentId: " + id.toString());
 			}
 		}
 		this.replannedAgentsInCurrentTimeStep.clear();

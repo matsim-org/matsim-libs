@@ -61,7 +61,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		int numReplanningThreads = 1;
 
-		withinDayEngine = new WithinDayEngine();
+		withinDayEngine = new WithinDayEngine(eventsManager);
 		withinDayEngine.initializeReplanningModules(numReplanningThreads);
 
 		QSim mobsim = new WithinDayQSimFactory(withinDayEngine).createMobsim(sc, eventsManager);

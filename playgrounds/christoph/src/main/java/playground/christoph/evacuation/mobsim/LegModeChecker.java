@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.withinday.utils.EditRoutes;
 
 /**
  * Checks whether a plan contains car trips. If car trips are found, it is
@@ -53,6 +53,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 
 	private final PlanAlgorithm routingAlgorithm;
 	private final Counter counter;
+	private final EditRoutes editRoutes;
 	
 	private double toCarProbability = 0.5;
 	private Random random = MatsimRandom.getLocalInstance();
@@ -62,6 +63,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 		this.routingAlgorithm = routingAlgorithm;
 		
 		this.counter = new Counter("Adapted mode chains: ");
+		this.editRoutes = new EditRoutes();
 	}
 
 	public void setValidNonCarModes(String[] validNonCarModes) {
@@ -152,17 +154,13 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				for (int i = 1; i < plan.getPlanElements().size() - 2; i = i + 2) {
 					
 					Leg leg = (Leg) plan.getPlanElements().get(i);
-					Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
-					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
+//					Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
+//					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
 					
 					// if the route is null, create a new one
 					if (leg.getRoute() == null) {
 						adapted = true;
-						PlanImpl newPlan = new PlanImpl(plan.getPerson());
-						newPlan.addActivity(previousActivity);
-						newPlan.addLeg(leg);
-						newPlan.addActivity(nextActivity);
-						routingAlgorithm.run(newPlan);						
+						editRoutes.replanFutureLegRoute(plan, i, routingAlgorithm);
 					}
 				}
 				if (adapted) counter.incCounter();

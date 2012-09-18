@@ -124,7 +124,7 @@ class MyWithinDayControler extends Controler {
 	 * The full initialization of them is done later (we don't have all necessary Objects yet).
 	 */
 	private void createHandlersAndListeners() {
-		withinDayEngine = new WithinDayEngine();
+		withinDayEngine = new WithinDayEngine(this.getEvents());
 		withinDayEngine.initializeReplanningModules(numReplanningThreads);
 	}
 

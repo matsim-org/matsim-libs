@@ -35,14 +35,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -50,6 +48,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.households.Household;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 
@@ -64,6 +63,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	private final Counter addedCarLegsCounter;
 	private final Map<Id, Id> mapping;	// <AgentId, VehicleId>
 	private final LegModeChecker legModeChecker;
+	private final EditRoutes editRoutes;
 	
 	public AssignVehiclesToPlans(Scenario scenario, PlanAlgorithm planAlgorithm) {
 		this.scenario = scenario;
@@ -75,6 +75,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 		this.mapping = new HashMap<Id, Id>();
 		
 		this.legModeChecker = new LegModeChecker(planAlgorithm);
+		this.editRoutes = new EditRoutes();
 	}
 	
 	public void printStatistics() {
@@ -182,16 +183,27 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 				else if (distance < 5000.0) leg.setMode(TransportMode.bike);
 				else leg.setMode(TransportMode.pt);
 				
-				/*
-				 * Create a new route for the given leg.
-				 */
-				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
-				Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
-				PlanImpl newPlan = new PlanImpl(plan.getPerson());
-				newPlan.addActivity(previousActivity);
-				newPlan.addLeg(leg);
-				newPlan.addActivity(nextActivity);
-				routingAlgorithm.run(newPlan);						
+				editRoutes.replanFutureLegRoute(plan, i, routingAlgorithm);
+				
+//				/*
+//				 * Create a new route for the given leg.
+//				 */
+//				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
+//				Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
+//				PlanImpl newPlan = new PlanImpl(plan.getPerson());
+//				newPlan.addActivity(previousActivity);
+//				newPlan.addLeg(leg);
+//				newPlan.addActivity(nextActivity);
+//				routingAlgorithm.run(newPlan);
+//				
+//				/*
+//				 * Replace route in existing leg. This is necessary since the router
+//				 * creates an entirely new leg and not only replaces the route inside
+//				 * the leg.
+//				 */
+//				if (newPlan.getPlanElements().get(1) != leg) {
+//					leg.setRoute(((Leg) newPlan.getPlanElements().get(1)).getRoute());
+//				}
 			}
 		}
 	}
@@ -238,13 +250,27 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 					 * Set transport mode to car and create a new route for the given leg.
 					 */
 					leg.setMode(TransportMode.car);
-					Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
-					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
-					PlanImpl newPlan = new PlanImpl(plan.getPerson());
-					newPlan.addActivity(previousActivity);
-					newPlan.addLeg(leg);
-					newPlan.addActivity(nextActivity);
-					routingAlgorithm.run(newPlan);
+					
+					editRoutes.replanFutureLegRoute(plan, i, routingAlgorithm);
+					
+//					Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
+//					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
+//					
+//					PlanImpl newPlan = new PlanImpl(plan.getPerson());
+//					newPlan.addActivity(previousActivity);
+//					newPlan.addLeg(leg);
+//					newPlan.addActivity(nextActivity);
+//					routingAlgorithm.run(newPlan);
+//					
+//					/*
+//					 * Replace route in existing leg. This is necessary since the router
+//					 * creates an entirely new leg and not only replaces the route inside
+//					 * the leg.
+//					 */
+//					if (newPlan.getPlanElements().get(1) != leg) {
+//						leg.setRoute(((Leg) newPlan.getPlanElements().get(1)).getRoute());
+//					}
+					
 					assignVehicleToLeg(leg, vehicleId);
 					checkLegModes = true;
 					addedCarLegsCounter.incCounter();

@@ -148,9 +148,6 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 
-		this.getWithinDayEngine().setEventsManager(this.getEvents());
-	
-
 		initParkingFacilityCapacities();
 		
 		

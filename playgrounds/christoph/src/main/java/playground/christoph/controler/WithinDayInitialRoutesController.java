@@ -161,7 +161,6 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * Create and initialize replanning manager and replanning maps.
 		 */
 		super.initWithinDayEngine(numReplanningThreads);
-		super.getWithinDayEngine().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
 				

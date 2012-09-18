@@ -453,7 +453,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		 * Create and initialize replanning manager and replanning maps.
 		 */
 		super.initWithinDayEngine(numReplanningThreads);
-		super.getWithinDayEngine().setEventsManager(this.getEvents());	// set events manager to create replanning events
 		super.createAndInitActivityReplanningMap();
 		Map<String, TravelTime> linkReplanningTravelTimes = this.createLinkReplanningMapTravelTimes();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTimes);

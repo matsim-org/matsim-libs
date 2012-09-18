@@ -126,8 +126,6 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
-
-		this.getWithinDayEngine().setEventsManager(this.getEvents());
 	
 		initParkingFacilityCapacities();
 	}
