@@ -48,15 +48,15 @@ public class WalSingleIterOnlineDvrpLauncher
 
         launcher.wal = true;
     }
-    
-    
+
+
     public static void main(String... args)
         throws IOException
     {
         String dir = args[0] + "\\";
         SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher();
         processArgs(launcher, dir);
-        
+
         launcher.prepareMatsimData();
         launcher.go();
     }

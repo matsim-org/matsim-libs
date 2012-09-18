@@ -19,39 +19,28 @@
 
 package playground.michalm.vrp.data.network.shortestpath.full;
 
+import pl.poznan.put.util.lang.TimeDiscretizer;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
 
 public class FullShortestPath
     implements ShortestPath
 {
-    private int timeInterval;
-    private int intervalCoutn;
-    private boolean cyclic;
+    private final TimeDiscretizer timeDiscretizer;
 
-    SPEntry entries[];
+    final SPEntry entries[];
 
 
-    public FullShortestPath(int numIntervals, int timeInterval, boolean cyclic)
+    public FullShortestPath(TimeDiscretizer timeDiscretizer)
     {
-        this.timeInterval = timeInterval;
-        this.intervalCoutn = numIntervals;
-        this.cyclic = cyclic;
-
-        entries = new SPEntry[numIntervals];
-    }
-
-
-    private int getIdx(int departTime)
-    {
-        int idx = (departTime / timeInterval);
-        return cyclic ? (idx % intervalCoutn) : idx;
+        this.timeDiscretizer = timeDiscretizer;
+        entries = new SPEntry[timeDiscretizer.getIntervalCount()];
     }
 
 
     @Override
     public SPEntry getSPEntry(int departTime)
     {
-        return entries[getIdx(departTime)];
+        return entries[timeDiscretizer.getIdx(departTime)];
     }
 }

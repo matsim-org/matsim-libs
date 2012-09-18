@@ -43,7 +43,7 @@ public class WalTaxiAgentLogic
         this.vrpVehicle = vrpVehicle;
     }
 
-    
+
     @Override
     public DynAction computeNextAction(DynAction oldAction, double now)
     {
@@ -51,6 +51,7 @@ public class WalTaxiAgentLogic
         taxiSimEngine.nextTask(vrpVehicle);
         return nextAction;
     }
+
 
     @Override
     public void notifyMoveOverNode(Id oldLinkId, Id newLinkId)

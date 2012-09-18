@@ -29,7 +29,7 @@ import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.model.DynVehicle;
+import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.MatsimVrpGraph;
 
 
@@ -54,7 +54,7 @@ public class DepotReader
         this.scenario = scenario;
         this.data = data;
 
-        graph = data.getVrpGraph();
+        graph = data.getMatsimVrpGraph();
     }
 
 
@@ -119,7 +119,7 @@ public class DepotReader
         int t1 = getInt(atts, "t1", 24 * 60 * 60);
         int tLimit = getInt(atts, "tLimit", t1 - t0);
 
-        vehicles.add(new DynVehicle(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
+        vehicles.add(new DynAgentVehicle(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
     }
 
 

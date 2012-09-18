@@ -41,7 +41,7 @@ public class MServer
         try {
             serverSocket = new ServerSocket(SOCKET_PORT);
 
-            //WalClient.launchClient();
+            // WalClient.launchClient();
 
             clientSocket = serverSocket.accept();
 

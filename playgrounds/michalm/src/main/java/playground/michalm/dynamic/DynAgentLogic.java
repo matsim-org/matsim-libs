@@ -21,6 +21,7 @@ package playground.michalm.dynamic;
 
 import org.matsim.api.core.v01.Id;
 
+
 public interface DynAgentLogic
 {
     DynActivity init(DynAgent agent);
@@ -30,7 +31,7 @@ public interface DynAgentLogic
 
 
     DynAction computeNextAction(DynAction oldAction, double now);
-    
-    
+
+
     void notifyMoveOverNode(Id oldLinkId, Id newLinkId);
 }

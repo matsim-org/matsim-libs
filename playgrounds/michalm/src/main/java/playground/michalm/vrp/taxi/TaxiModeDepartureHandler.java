@@ -54,14 +54,14 @@ public class TaxiModeDepartureHandler
             // mobsim.getEventsManager().processEvent(
             // new TaxiRequestEventImpl(now, agent.getId(), linkId, agent.getMode()));
 
-            MatsimVrpGraph vrpGraph = data.getVrpGraph();
+            MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
 
             // TODO: Works for FixedSizeVrpGraph!
             // in case of GrowingVrpGraph: 'addVertex' must be called if 'getVertex' returns 'null'
             MatsimVertex fromVertex = vrpGraph.getVertex(linkId);
 
             Id toLinkId = agent.getDestinationLinkId();
-            //TODO: as above (works for FixedSizeVrpGraph, won't work for GrowingVrpGraph)
+            // TODO: as above (works for FixedSizeVrpGraph, won't work for GrowingVrpGraph)
             MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
 
             List<Customer> customers = data.getVrpData().getCustomers();
@@ -81,7 +81,7 @@ public class TaxiModeDepartureHandler
 
             customers.add(customer);
             requests.add(request);
-            
+
             // taxiSimEngine.getMobsim().registerAdditionalAgentOnLink(agent);
             taxiSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
 

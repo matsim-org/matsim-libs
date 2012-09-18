@@ -33,7 +33,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.model.DynVehicle;
+import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 import cern.colt.Arrays;
@@ -81,7 +81,7 @@ public class JdbcWriter
     public JdbcWriter(MatsimVrpData matsimData, String dbFileName)
     {
         this.data = matsimData.getVrpData();
-        vrpGraph = matsimData.getVrpGraph();
+        vrpGraph = matsimData.getMatsimVrpGraph();
 
         try {
             String url = DB_URL_1 + dbFileName + DB_URL_2;
@@ -207,15 +207,15 @@ public class JdbcWriter
                 vehicleInsert.setInt(6, v.getT0());
                 vehicleInsert.setInt(7, v.getT1());
                 vehicleInsert.setInt(8, v.getTimeLimit());
-                vehicleInsert.setString(9, v instanceof DynVehicle ? "V" : "R");
+                vehicleInsert.setString(9, v instanceof DynAgentVehicle ? "V" : "R");
                 vehicleInsert.executeUpdate();
 
                 scheduleInsert.setInt(1, v.getId());
                 scheduleInsert.setInt(2, v.getId());
                 scheduleInsert.setString(3, v.getSchedule().getStatus().name());
 
-                if (v instanceof DynVehicle) {
-                    scheduleInsert.setString(4, ((DynVehicle)v).getAgentLogic().getDynAgent()
+                if (v instanceof DynAgentVehicle) {
+                    scheduleInsert.setString(4, ((DynAgentVehicle)v).getAgentLogic().getDynAgent()
                             .getCurrentLinkId().toString());
                 }
                 else {

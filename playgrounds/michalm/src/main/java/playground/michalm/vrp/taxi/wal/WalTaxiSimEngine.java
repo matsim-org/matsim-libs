@@ -76,7 +76,7 @@ public class WalTaxiSimEngine
 
         this.data = data;
         this.vrpData = data.getVrpData();
-        this.vrpGraph = data.getVrpGraph();
+        this.vrpGraph = data.getMatsimVrpGraph();
         this.scenario = data.getScenario();
     }
 
@@ -169,8 +169,8 @@ public class WalTaxiSimEngine
             }
         }
 
-        //no waiting, trigger the 1st task
-        if (realVehicle.getSchedule().getStatus() == ScheduleStatus.PLANNED) { 
+        // no waiting, trigger the 1st task
+        if (realVehicle.getSchedule().getStatus() == ScheduleStatus.PLANNED) {
             realVehicle.getSchedule().nextTask();
             nextTask(realVehicle);
         }
@@ -182,7 +182,6 @@ public class WalTaxiSimEngine
             assertCommandType(command, CommandType.TASK_ENDED);
             realVehicleTaskEnded(command.getParam(0), time);
         }
-
 
         if (time >= endTime) {
             ScheduleStatus schedStatus = realVehicle.getSchedule().getStatus();// refresh!!

@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.Id;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.*;
 
+
 /**
  * It consists of ShortestPathsArcs with ShortestPath of any type (Sparse, Full or other)
  * 
  * @author michalm
- *
  */
 public class FixedSizeMatsimVrpGraph
     extends FixedSizeVrpGraph

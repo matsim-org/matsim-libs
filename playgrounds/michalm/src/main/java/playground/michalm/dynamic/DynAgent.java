@@ -59,7 +59,8 @@ public class DynAgent
 
     // =====
 
-    public DynAgent(Id id, Id startLinkId, InternalInterface internalInterface, DynAgentLogic agentLogic)
+    public DynAgent(Id id, Id startLinkId, InternalInterface internalInterface,
+            DynAgentLogic agentLogic)
     {
         this.id = id;
         this.currentLinkId = startLinkId;

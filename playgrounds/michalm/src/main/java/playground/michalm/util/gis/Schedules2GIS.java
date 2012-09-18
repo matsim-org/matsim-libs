@@ -91,7 +91,7 @@ public class Schedules2GIS
 
     private LineString createLineString(DriveTask driveTask)
     {
-        SPEntry entry = data.getVrpGraph()
+        SPEntry entry = data.getMatsimVrpGraph()
                 .getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
                 .getSPEntry(driveTask.getBeginTime());
 

@@ -46,15 +46,15 @@ public class KaiSingleIterOnlineDvrpLauncher
 
         launcher.wal = false;
     }
-    
-    
+
+
     public static void main(String... args)
         throws IOException
     {
         String dir = "D:\\PP-rad\\taxi\\mielec\\";
         SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher();
         processArgs(launcher, dir);
-        
+
         launcher.prepareMatsimData();
         launcher.go();
         launcher.generateVrpOutput();

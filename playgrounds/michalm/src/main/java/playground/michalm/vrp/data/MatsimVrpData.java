@@ -66,7 +66,7 @@ public class MatsimVrpData
     }
 
 
-    public MatsimVrpGraph getVrpGraph()
+    public MatsimVrpGraph getMatsimVrpGraph()
     {
         return (MatsimVrpGraph)vrpData.getVrpGraph();
     }

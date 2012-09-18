@@ -26,10 +26,9 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 
 /**
- * This class is used for route visualization in OTFVis 
- *
+ * This class is used for route visualization in OTFVis
+ * 
  * @author michalm
- *
  */
 public class DynAgentWithPlan
     implements MobsimDriverAgent, PlanAgent
@@ -65,11 +64,12 @@ public class DynAgentWithPlan
         dynAgent.endLegAndComputeNextState(now);
     }
 
-    @Override
-    public void abort(double now) {
-    	dynAgent.abort(now) ;
-    }
 
+    @Override
+    public void abort(double now)
+    {
+        dynAgent.abort(now);
+    }
 
 
     @Override

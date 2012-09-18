@@ -102,7 +102,7 @@ public class TaxiAgentLogic
 
         int time = (int)now;
 
-        if (status == ScheduleStatus.STARTED) {//TODO: should also be called if PLANNED???????
+        if (status == ScheduleStatus.STARTED) {// TODO: should also be called if PLANNED???????
             taxiSimEngine.updateAndOptimizeBeforeNextTask(vrpVehicle, now);
         }
 
@@ -233,8 +233,9 @@ public class TaxiAgentLogic
             @Override
             public void endLeg(double now)
             {
-            	// following line only works if PassengerAgent can indeed be cast into MobsimAgent ...
-            	// ... but that makes sense for what the current system is constructed.  kai, sep'12
+                // following line only works if PassengerAgent can indeed be cast into MobsimAgent
+                // ...
+                // ... but that makes sense for what the current system is constructed. kai, sep'12
                 MobsimAgent passenger = ((TaxiCustomer)request.getCustomer()).getPassenger();
 
                 // deliver the passenger

@@ -95,8 +95,7 @@ public class VrpOTFClientLive
                     connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
                             SimpleSceneLayer.class);
                 }
-                
-                
+
                 OTFClient otfClient = new OTFClient();
                 otfClient.setServer(server);
                 SettingsSaver saver = new SettingsSaver("otfsettings");

@@ -73,7 +73,7 @@ public class TaxiSimEngine
     // yyyy yes, definitely should not be public. One compromise is to make it "default", and have
     // everything that
     // needs access inside the same package. kai, sep'12
-    // 
+    //
     // Currently, all objects that need access to InternalInterface and only these objects
     // have access to TaxiSimEngine, therefore I will keep TaxiSimEngine.getInternalInterface()
     // public to avoid passing too many arguments through the code. michalm, sep'12

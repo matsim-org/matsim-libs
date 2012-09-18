@@ -60,7 +60,7 @@ public class VrpSchedulePlan
 
         populFactory = data.getScenario().getPopulation().getFactory();
         network = data.getScenario().getNetwork();
-        vrpGraph = data.getVrpGraph();
+        vrpGraph = data.getMatsimVrpGraph();
 
         init();
     }

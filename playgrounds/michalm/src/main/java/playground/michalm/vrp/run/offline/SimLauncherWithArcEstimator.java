@@ -24,11 +24,15 @@ import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.util.*;
 
+import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.MatsimVertexImpl;
+import playground.michalm.vrp.data.network.router.TimeAsTravelDisutility;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPathCalculator;
 import playground.michalm.vrp.data.network.shortestpath.full.*;
 
 
@@ -93,10 +97,17 @@ public class SimLauncherWithArcEstimator
                 MatsimVertexImpl.createFromXYBuilder(scenario));
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
 
-        FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
-        FullShortestPath[][] shortestPaths = spf.findShortestPaths(
-                controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
-        spf.writeShortestPaths(shortestPaths, vrpArcTimesFileName, vrpArcCostsFileName,
-                vrpArcPathsFileName);
+        TravelTime travelTime = controler.getTravelTimeCalculator();
+        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
+
+        LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory()
+                .createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
+        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
+                travelTime, travelDisutility);
+
+        FullShortestPath[][] shortestPaths = FullShortestPaths.findShortestPaths(
+                shortestPathCalculator, TimeDiscretizer.TD_24H_BY_15MIN, data.getMatsimVrpGraph());
+        FullShortestPaths.writeShortestPaths(shortestPaths, vrpArcTimesFileName,
+                vrpArcCostsFileName, vrpArcPathsFileName);
     }
 }

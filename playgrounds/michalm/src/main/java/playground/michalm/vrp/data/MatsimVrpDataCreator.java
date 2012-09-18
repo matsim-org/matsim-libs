@@ -24,10 +24,9 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 
-import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.VrpData.VrpType;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
 import playground.michalm.vrp.data.network.*;
 
 
@@ -37,7 +36,6 @@ public class MatsimVrpDataCreator
         throws IOException
     {
         VrpData vrpData = new VrpData();
-        vrpData.setType(VrpType.TAXI);
 
         List<Customer> customers = new ArrayList<Customer>();
         List<Request> requests = new ArrayList<Request>();

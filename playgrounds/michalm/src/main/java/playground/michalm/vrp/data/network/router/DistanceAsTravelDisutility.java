@@ -25,17 +25,20 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
 
-public class DistanceAsTravelCost
+public class DistanceAsTravelDisutility
     implements TravelDisutility
 {
     @Override
-    public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle)
+    public double getLinkTravelDisutility(final Link link, final double time, final Person person,
+            final Vehicle vehicle)
     {
         return link.getLength();
     }
-    
+
+
     @Override
-    public double getLinkMinimumTravelDisutility(Link link) {
-    	return link.getLength();
+    public double getLinkMinimumTravelDisutility(Link link)
+    {
+        return link.getLength();
     }
 }

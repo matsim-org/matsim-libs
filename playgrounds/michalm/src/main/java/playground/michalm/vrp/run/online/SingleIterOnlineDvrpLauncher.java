@@ -45,6 +45,7 @@ import org.matsim.vis.otfvis.gui.OTFQueryControl;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
+import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
@@ -56,7 +57,9 @@ import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.DepotReader;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPathCalculator;
 import playground.michalm.vrp.data.network.shortestpath.sparse.*;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.*;
@@ -216,11 +219,11 @@ public class SingleIterOnlineDvrpLauncher
 
         switch (algorithmConfig.tcostSource) {
             case DISTANCE:
-                tcostCalc = new DistanceAsTravelCost();
+                tcostCalc = new DistanceAsTravelDisutility();
                 break;
 
             case TIME:
-                tcostCalc = new TimeAsTravelCost(ttimeCalc);
+                tcostCalc = new TimeAsTravelDisutility(ttimeCalc);
                 break;
 
             default:
@@ -231,11 +234,14 @@ public class SingleIterOnlineDvrpLauncher
         new DepotReader(scenario, data).readFile(depotsFileName);
 
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
+        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
+                ttimeCalc, tcostCalc);
+        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
+        MatsimVrpGraph graph = data.getMatsimVrpGraph();
 
-        SparseShortestPathFinder sspf = new SparseShortestPathFinder(data, travelTimeBinSize,
-                numSlots);
-        SparseShortestPathArc[][] arcs = sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
-        ((FixedSizeVrpGraph)data.getVrpGraph()).setArcs(arcs);
+        SparseShortestPathArc[][] arcs = SparseShortestPaths.findShortestPaths(
+                shortestPathCalculator, timeDiscretizer, graph);
+        ((FixedSizeVrpGraph)graph).setArcs(arcs);
     }
 
 
@@ -337,6 +343,7 @@ public class SingleIterOnlineDvrpLauncher
 
         qSim.run();
     }
+
 
     // RunningVehicleRegister runningVehicleRegister;
 

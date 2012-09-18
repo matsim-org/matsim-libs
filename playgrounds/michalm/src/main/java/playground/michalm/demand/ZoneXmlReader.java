@@ -87,7 +87,7 @@ public class ZoneXmlReader
     private void startZone(Attributes atts)
     {
         Id id = scenario.createId(atts.getValue("id"));
-        Type type = Type.valueOf(atts.getValue("type").toUpperCase()); 
+        Type type = Type.valueOf(atts.getValue("type").toUpperCase());
         currentZone = new Zone(id, type);
 
         zones.put(id, currentZone);

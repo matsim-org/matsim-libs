@@ -29,7 +29,7 @@ public interface ShortestPath
 
     // include toLink or fromLink in time/cost (depends on the way the qsim is implemented...)
     // by default: true (toLinks are included)
-    public final static boolean INCLUDE_TO_LINK = true;
+    public static final boolean INCLUDE_TO_LINK = true;
 
 
     public static class SPEntry

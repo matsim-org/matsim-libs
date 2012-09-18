@@ -28,7 +28,7 @@ import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 public interface MatsimVertex
     extends Vertex
 {
-    //usually getCoord() == getLink().getCoord(); however not always!
+    // usually getCoord() == getLink().getCoord(); however not always!
     Coord getCoord();
 
 

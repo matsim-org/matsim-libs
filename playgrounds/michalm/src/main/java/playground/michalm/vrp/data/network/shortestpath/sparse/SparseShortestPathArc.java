@@ -19,6 +19,7 @@
 
 package playground.michalm.vrp.data.network.shortestpath.sparse;
 
+import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.data.network.shortestpath.*;
@@ -32,7 +33,7 @@ import playground.michalm.vrp.data.network.shortestpath.*;
 public class SparseShortestPathArc
     implements ShortestPathArc
 {
-    private ShortestPath shortestPath;
+    private final ShortestPath shortestPath;
 
 
     public SparseShortestPathArc(ShortestPath shortestPath)
@@ -79,20 +80,42 @@ public class SparseShortestPathArc
     public static class SparseShortestPathArcBuilder
         implements ArcBuilder
     {
-        private SparseShortestPathFinder sspFinder;
+        private final ShortestPathCalculator shortestPathCalculator;
+        private final TimeDiscretizer timeDiscretizer;
+
+        private Vertex vertexFrom;
+        private Vertex vertexTo;
 
 
-        public SparseShortestPathArcBuilder(SparseShortestPathFinder sspFinder)
+        public SparseShortestPathArcBuilder(ShortestPathCalculator shortestPathCalculator,
+                TimeDiscretizer timeDiscretizer)
         {
-            this.sspFinder = sspFinder;
+            this.shortestPathCalculator = shortestPathCalculator;
+            this.timeDiscretizer = timeDiscretizer;
         }
 
 
         @Override
-        public Arc build(Vertex vertexFrom, Vertex vertexTo)
+        public ArcBuilder setVertexFrom(Vertex vertexFrom)
         {
-            return new SparseShortestPathArc(new SparseShortestPath(sspFinder,
-                    (MatsimVertex)vertexFrom, (MatsimVertex)vertexTo));
+            this.vertexFrom = vertexFrom;
+            return this;
+        }
+
+
+        @Override
+        public ArcBuilder setVertexTo(Vertex vertexTo)
+        {
+            this.vertexTo = vertexTo;
+            return this;
+        }
+
+
+        @Override
+        public Arc build()
+        {
+            return new SparseShortestPathArc(new SparseShortestPath(shortestPathCalculator,
+                    timeDiscretizer, (MatsimVertex)vertexFrom, (MatsimVertex)vertexTo));
         }
     }
 }

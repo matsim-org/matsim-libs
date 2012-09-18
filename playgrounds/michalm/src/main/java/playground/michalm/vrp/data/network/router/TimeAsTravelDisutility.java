@@ -17,33 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.data.model;
+package playground.michalm.vrp.data.network.router;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import playground.michalm.dynamic.DynAgentLogic;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.*;
+import org.matsim.vehicles.Vehicle;
 
 
-public class DynVehicle
-    extends VehicleImpl
+public class TimeAsTravelDisutility
+    implements TravelDisutility
 {
-    private DynAgentLogic agentLogic;
+    private TravelTime travelTime;
 
 
-    public DynVehicle(int id, String name, Depot depot, int capacity, double cost, int t0, int t1,
-            int timeLimit)
+    public TimeAsTravelDisutility(TravelTime travelTime)
     {
-        super(id, name, depot, capacity, cost, t0, t1, timeLimit);
+        this.travelTime = travelTime;
     }
 
 
-    public DynAgentLogic getAgentLogic()
+    @Override
+    public double getLinkTravelDisutility(final Link link, final double time, final Person person,
+            final Vehicle vehicle)
     {
-        return agentLogic;
+        return travelTime.getLinkTravelTime(link, time, person, vehicle);
     }
 
 
-    public void setAgentLogic(DynAgentLogic agentLogic)
+    @Override
+    public double getLinkMinimumTravelDisutility(Link link)
     {
-        this.agentLogic = agentLogic;
+        return link.getLength() / link.getFreespeed();
     }
 }

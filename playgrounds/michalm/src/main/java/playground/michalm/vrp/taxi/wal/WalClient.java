@@ -72,8 +72,8 @@ public class WalClient
             throw new RuntimeException(e);
         }
     }
-    
-    
+
+
     public static void launchClient()
     {
         Runnable runnable = new Runnable() {
@@ -82,16 +82,16 @@ public class WalClient
             {
                 WalClient wClient = new WalClient();
                 wClient.initClient();
-                
+
                 wClient.writeCommand(new Command(CommandType.INIT, 600, 620, 1));
                 wClient.writeCommand(new Command(CommandType.VEHICLE, 111, 3402));
-                
-                for(;;) {
+
+                for (;;) {
                     wClient.readCommand();
                 }
             }
         };
-        
+
         new Thread(runnable).start();
     }
 }

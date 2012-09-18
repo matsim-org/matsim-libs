@@ -17,37 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.data.network.router;
+package playground.michalm.vrp.data.network.shortestpath.sparse;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.*;
-import org.matsim.vehicles.Vehicle;
+import java.lang.reflect.Array;
+import java.util.List;
+
+import pl.poznan.put.util.lang.TimeDiscretizer;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPathCalculator;
 
 
-public class TimeAsTravelCost
-    implements TravelDisutility
+public class SparseShortestPaths
 {
-    private TravelTime travelTime;
-
-
-    public TimeAsTravelCost(TravelTime travelTime)
+    public static SparseShortestPathArc[][] findShortestPaths(
+            ShortestPathCalculator shortestPathCalculator, TimeDiscretizer timeDiscretizer,
+            MatsimVrpGraph graph)
     {
-        this.travelTime = travelTime;
-    }
+        List<Vertex> vertices = graph.getVertices();
+        int n = vertices.size();
 
+        SparseShortestPathArc[][] shortestPaths = (SparseShortestPathArc[][])Array.newInstance(
+                SparseShortestPathArc.class, n, n);
 
-    @Override
-    public double getLinkTravelDisutility(final Link link, final double time, final Person person,
-            final Vehicle vehicle)
-    {
-        return travelTime.getLinkTravelTime(link, time, person, vehicle);
-    }
+        for (Vertex a : vertices) {
+            MatsimVertex vA = (MatsimVertex)a;
 
+            SparseShortestPathArc[] sPath_A = shortestPaths[vA.getId()];
 
-    @Override
-    public double getLinkMinimumTravelDisutility(Link link)
-    {
-        return link.getLength() / link.getFreespeed();
+            for (Vertex b : vertices) {
+                MatsimVertex vB = (MatsimVertex)b;
+
+                SparseShortestPathArc sPath_AB = new SparseShortestPathArc(new SparseShortestPath(
+                        shortestPathCalculator, timeDiscretizer, vA, vB));
+
+                sPath_A[vB.getId()] = sPath_AB;
+            }
+        }
+
+        return shortestPaths;
     }
 }

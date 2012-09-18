@@ -17,60 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.data.network;
+package playground.michalm.vrp.data.model;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-
-import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import pl.poznan.put.vrp.dynamic.data.model.*;
+import playground.michalm.dynamic.DynAgentLogic;
 
 
-/**
- * It consists of ShortestPathsArcs with ShortestPath of any type (Sparse, Full or other) - type of
- * the ShortestPath depends on the given ArcBuilder.
- * 
- * @author michalm
- */
-public class GrowingMatsimVrpGraph
-    extends GrowingVrpGraph
-    implements MatsimVrpGraph
+public class DynAgentVehicle
+    extends VehicleImpl
 {
-    private final Map<Id, MatsimVertex> linkIdToVertex;
+    private DynAgentLogic agentLogic;
 
 
-    public GrowingMatsimVrpGraph(ArcBuilder arcBuilder)
+    public DynAgentVehicle(int id, String name, Depot depot, int capacity, double cost, int t0,
+            int t1, int timeLimit)
     {
-        super(arcBuilder);
-        linkIdToVertex = new LinkedHashMap<Id, MatsimVertex>();
+        super(id, name, depot, capacity, cost, t0, t1, timeLimit);
     }
 
 
-    @Override
-    public MatsimVertex getVertex(Id linkId)
+    public DynAgentLogic getAgentLogic()
     {
-        return linkIdToVertex.get(linkId);
+        return agentLogic;
     }
 
 
-    @Override
-    public void addVertex(Vertex vertex)
+    public void setAgentLogic(DynAgentLogic agentLogic)
     {
-        MatsimVertex mVertex = (MatsimVertex)vertex;
-        Id linkId = mVertex.getLink().getId();
-
-        if (linkIdToVertex.put(linkId, mVertex) != null) {
-            throw new RuntimeException("Duplicated vertex for link=" + linkId);
-        }
-
-        super.addVertex(mVertex);
-    }
-
-
-    @Override
-    public ShortestPath getShortestPath(Vertex vertexFrom, Vertex vertexTo)
-    {
-        return ((ShortestPathArc)getArc(vertexFrom, vertexTo)).getShortestPath();
+        this.agentLogic = agentLogic;
     }
 }

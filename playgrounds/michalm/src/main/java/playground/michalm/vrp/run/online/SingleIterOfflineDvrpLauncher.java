@@ -52,6 +52,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
+import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.chart.ChartCreator;
 import pl.poznan.put.vrp.dynamic.chart.RouteChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
@@ -78,8 +79,9 @@ import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPathCalculator;
 import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathArc;
-import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPathFinder;
+import playground.michalm.vrp.data.network.shortestpath.sparse.SparseShortestPaths;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
 import playground.michalm.vrp.run.online.AlgorithmConfig.AlgorithmType;
 import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
@@ -148,7 +150,7 @@ public class SingleIterOfflineDvrpLauncher
 
     private void handleTaxiModeDepartures()
     {
-        MatsimVrpGraph vrpGraph = data.getVrpGraph();
+        MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
         List<Customer> customers = data.getVrpData().getCustomers();
         List<Request> requests = data.getVrpData().getRequests();
 
@@ -215,10 +217,14 @@ public class SingleIterOfflineDvrpLauncher
         handleTaxiModeDepartures();// creates Requests
 
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
+        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
+                ttimeCalc, tcostCalc);
+        TimeDiscretizer timeDiscretizer = TimeDiscretizer.TD_24H_BY_15MIN;
+        MatsimVrpGraph graph = data.getMatsimVrpGraph();
 
-        SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
-        SparseShortestPathArc[][] arcs = sspf.findShortestPaths(ttimeCalc, tcostCalc, router);
-        ((FixedSizeVrpGraph)data.getVrpGraph()).setArcs(arcs);
+        SparseShortestPathArc[][] arcs = SparseShortestPaths.findShortestPaths(
+                shortestPathCalculator, timeDiscretizer, graph);
+        ((FixedSizeVrpGraph)graph).setArcs(arcs);
     }
 
 

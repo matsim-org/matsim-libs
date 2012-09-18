@@ -29,7 +29,7 @@ import org.matsim.vehicles.VehicleUtils;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.model.DynVehicle;
+import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.MatsimVertex;
 import playground.michalm.vrp.driver.VrpSchedulePlanFactory;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
@@ -66,25 +66,24 @@ public class TaxiAgentSource
 
         for (Vehicle vrpVeh : vehicles) {
             TaxiAgentLogic taxiAgentLogic;
-            
-            if (taxiSimEngine instanceof WalTaxiSimEngine) {//TODO (temporarily, to be removed)
-                taxiAgentLogic = new WalTaxiAgentLogic(vrpVeh, data.getVrpGraph(),
+
+            if (taxiSimEngine instanceof WalTaxiSimEngine) {// TODO (temporarily, to be removed)
+                taxiAgentLogic = new WalTaxiAgentLogic(vrpVeh, data.getMatsimVrpGraph(),
                         (WalTaxiSimEngine)taxiSimEngine);
             }
             else {
-                taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getVrpGraph(),
-                        taxiSimEngine);
+                taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getMatsimVrpGraph(), taxiSimEngine);
             }
 
             taxiSimEngine.addAgentLogic(taxiAgentLogic);
-            
-            ((DynVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);
+
+            ((DynAgentVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
             Id startLinkId = ((MatsimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
 
-            DynAgent taxiAgent = new DynAgent(id, startLinkId, taxiSimEngine.getInternalInterface(),
-                    taxiAgentLogic);
+            DynAgent taxiAgent = new DynAgent(id, startLinkId,
+                    taxiSimEngine.getInternalInterface(), taxiAgentLogic);
 
             if (isAgentWithPlan) {
                 qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent,

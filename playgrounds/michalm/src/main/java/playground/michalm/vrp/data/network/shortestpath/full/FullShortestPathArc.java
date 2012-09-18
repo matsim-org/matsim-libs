@@ -19,22 +19,23 @@
 
 package playground.michalm.vrp.data.network.shortestpath.full;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.util.lang.TimeDiscretizer;
+import pl.poznan.put.vrp.dynamic.data.network.InterpolatedArc;
 import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
 public class FullShortestPathArc
-    extends InterpolatedArc
+    extends InterpolatedArc //TODO this interpolation is in conflict with SPEntry
     implements ShortestPathArc
 {
-    private FullShortestPath shortestPath;
+    private final FullShortestPath shortestPath;
 
 
-    public FullShortestPathArc(int interval, boolean cyclic, int[] timesOnDeparture,
+    public FullShortestPathArc(TimeDiscretizer timeDiscretizer, int[] timesOnDeparture,
             double[] costsOnDeparture, FullShortestPath shortestPath)
     {
-        super(interval, cyclic, timesOnDeparture, costsOnDeparture);
+        super(timeDiscretizer, timesOnDeparture, costsOnDeparture);
         this.shortestPath = shortestPath;
     }
 
@@ -46,8 +47,8 @@ public class FullShortestPathArc
     }
 
 
-    public static FullShortestPathArc createArc(FullShortestPath shortestPath, int interval,
-            boolean cyclic)
+    public static FullShortestPathArc createArc(TimeDiscretizer timeDiscretizer,
+            FullShortestPath shortestPath)
     {
         SPEntry[] entries = shortestPath.entries;
         int numSlots = entries.length;
@@ -60,7 +61,7 @@ public class FullShortestPathArc
             costsOnDeparture[k] = entries[k].travelCost;
         }
 
-        return new FullShortestPathArc(interval, cyclic, timesOnDeparture, costsOnDeparture,
+        return new FullShortestPathArc(timeDiscretizer, timesOnDeparture, costsOnDeparture,
                 shortestPath);
     }
 }

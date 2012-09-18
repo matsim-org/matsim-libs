@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
-import pl.poznan.put.vrp.cvrp.data.AlgorithmParams;
+import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.DebugPrint;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -40,12 +40,12 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizer;
 import pl.poznan.put.vrp.dynamic.optimizer.evaluation.*;
-import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.EvolutionaryVrpOptimizer;
+import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.*;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.network.MatsimVertexImpl;
+import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.full.*;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
 
@@ -145,18 +145,21 @@ public class OfflineDvrpLauncher
 
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
 
-        FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
+        TimeDiscretizer timeDiscretizer = TimeDiscretizer.TD_24H_BY_15MIN;
+
         FullShortestPath[][] shortestPaths = null;
 
         if (VRP_OUT_FILES) {
-            shortestPaths = spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName,
-                    vrpArcPathsFileName);
+            shortestPaths = FullShortestPaths.readShortestPaths(timeDiscretizer, data,
+                    vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
         }
         else {
-            shortestPaths = spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, null);
+            shortestPaths = FullShortestPaths.readShortestPaths(timeDiscretizer, data,
+                    vrpArcTimesFileName, vrpArcCostsFileName, null);
         }
 
-        spf.upadateVrpArcs(shortestPaths);
+        FullShortestPaths.upadateVrpArcs(shortestPaths, timeDiscretizer,
+                (FixedSizeMatsimVrpGraph)data.getMatsimVrpGraph());
 
         // ================================================== BELOW: only for comparison reasons...
 
