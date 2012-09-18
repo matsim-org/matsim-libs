@@ -99,6 +99,7 @@ public class BackwardCompatibilityTest {
 		controler.run();
 
 		Controler oldControler = new Controler( config );
+		oldControler.setUseTripRouting( false );
 		oldControler.setOverwriteFiles( true );
 		oldControler.run();
 
