@@ -65,45 +65,50 @@ public class EditRoutes {
 		Activity fromActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex - 1);
 		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 
-		Route oldRoute = leg.getRoute();
+//		Route oldRoute = leg.getRoute();
 		
 		/*
-		 * We create a new Plan which contains only the Leg
-		 * that should be replanned and its previous and next
-		 * Activities. By doing so the PlanAlgorithm will only
-		 * change the Route of that Leg.
-		 */
-		/*
-		 *  Create a new Plan that contains only the Leg
-		 *  which should be replanned and run the PlanAlgorithm.
+		 * We create a new Plan which contains only the Leg that should be replanned and its previous 
+		 * and next Activities. By doing so the PlanAlgorithm will only change the Route of that Leg.
+		 *
+		 * Create a new Plan that contains only the Leg which should be replanned and run the PlanAlgorithm.
 		 */
 		PlanImpl newPlan = new PlanImpl(plan.getPerson());
 		newPlan.addActivity(fromActivity);
 		newPlan.addLeg(leg);
 		newPlan.addActivity(toActivity);
 		planAlgorithm.run(newPlan);
-
+		
 		/*
-		 * If possible, reuse existing route objects. Someone might already be
-		 * using a reference to that object.
+		 * Replace route in existing leg. This is necessary since the router creates an entirely new leg 
+		 * and not only replaces the route inside the leg.
 		 */
-		Route newRoute = leg.getRoute();
-		if (oldRoute != null && oldRoute != newRoute) {
-			if (oldRoute instanceof NetworkRoute && newRoute instanceof NetworkRoute) {
-				List<Id> linkIds = ((NetworkRoute) newRoute).getLinkIds();
-				((NetworkRoute) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
-				leg.setRoute(oldRoute);
-			}
+		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
+		if (leg != newLeg) {
+			leg.setDepartureTime(newLeg.getDepartureTime());
+			leg.setTravelTime(newLeg.getTravelTime());
+			leg.setRoute(newLeg.getRoute());
 		}
+		
+//		/*
+//		 * If possible, reuse existing route objects. Someone might already be
+//		 * using a reference to that object.
+//		 */
+//		Route newRoute = leg.getRoute();
+//		if (oldRoute != null && oldRoute != newRoute) {
+//			if (oldRoute instanceof NetworkRoute && newRoute instanceof NetworkRoute) {
+//				List<Id> linkIds = ((NetworkRoute) newRoute).getLinkIds();
+//				((NetworkRoute) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
+//				leg.setRoute(oldRoute);
+//			}
+//		}
 		
 		return true;
 	}
 
 	/*
-	 * We create a new Plan which contains only the Leg
-	 * that should be replanned and its previous and next
-	 * Activities. By doing so the PlanAlgorithm will only
-	 * change the Route of that Leg.
+	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next
+	 * Activities. By doing so the PlanAlgorithm will only change the Route of that Leg.
 	 *
 	 * Use currentNodeIndex from a DriverAgent if possible!
 	 *
