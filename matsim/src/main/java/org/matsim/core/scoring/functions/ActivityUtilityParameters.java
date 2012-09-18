@@ -26,7 +26,7 @@ public class ActivityUtilityParameters implements MatsimParameters {
 
 	private final String type;
 	private final double priority;
-	private final double typicalDuration;
+	private final double typicalDuration_s;
 
 	/**
 	 * 	"duration at which the [performance] utility starts to be positive"
@@ -41,16 +41,23 @@ public class ActivityUtilityParameters implements MatsimParameters {
 	private double earliestEndTime = -1;
 	private boolean scoreAtAll=true;
 
-	public ActivityUtilityParameters(final String type, final double priority, final double typicalDuration) {
+	public ActivityUtilityParameters(final String type, final double priority, final double typicalDuration_s) {
 		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
 		// to have activities with a typical duration <=48 seconds (GL/June2011)
 		super();
 		this.type = type;
 		this.priority = priority;
-		this.typicalDuration = typicalDuration;
+		this.typicalDuration_s = typicalDuration_s;
 
-		this.zeroUtilityDuration = (typicalDuration / 3600.0)
-		* Math.exp( -10.0 / (typicalDuration / 3600.0) / priority );
+		this.zeroUtilityDuration = (typicalDuration_s / 3600.0)
+		* Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
+		// ( the 3600s are in there because the original formulation was in "hours".  So the values in seconds are first
+		// translated into hours.  kai, sep'12 )
+
+		// example: pt interaction activity with typical duration = 120sec.
+		// 120/3600 * exp( -10 / (120 / 3600) ) =  1.7 x 10^(-132)  (!!!!!!!!!!)
+		// In consequence, even a pt interaction of one seconds causes a fairly large utility.
+
 		if (this.zeroUtilityDuration <= 0.0) {
 			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
 		}
@@ -85,7 +92,7 @@ public class ActivityUtilityParameters implements MatsimParameters {
 	}
 
 	public final double getTypicalDuration() {
-		return this.typicalDuration;
+		return this.typicalDuration_s;
 	}
 
 	public final double getZeroUtilityDuration() {
