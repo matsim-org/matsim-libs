@@ -20,9 +20,13 @@
 
 package cottbus;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.pt.TransitControlerListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImplFactory;
 
 /**
  * @author fuerbas
@@ -34,9 +38,26 @@ public class SfCottbusController {
 	public static void main(String[] args) {
 		Controler con = new Controler("E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\config_1.xml");		//args: configfile
 		con.setOverwriteFiles(true);
-		ControlerListener lis = new TransitControlerListener();
+		// NOTE: this is the code for the deleted TransitControlerListener. It was added
+		// here, although if the config is properly set (ie the "useTransit" flag in the
+		// scenario config group is set to true), it is useless. td, sept. 2012
+		ControlerListener lis = new StartupListener() {
+				@Override
+				public void notifyStartup(final StartupEvent event) {
+					final Scenario scenario = event.getControler().getScenario();
+					if (event.getControler().getTransitRouterFactory() == null) {
+						
+						TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
+								scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
+								scenario.getConfig().vspExperimental());
+						
+						event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(
+								scenario.getTransitSchedule(), transitRouterConfig ));
+					}
+
+				}
+			};
 		con.addControlerListener(lis);
-		con.run();
 
 	}
 

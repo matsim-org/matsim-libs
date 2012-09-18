@@ -132,7 +132,8 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.TransitControlerListener;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -442,6 +443,42 @@ public class Controler extends AbstractController {
 			}
 		}
 
+		if ( config.scenario().isUseTransit() && getTransitRouterFactory() == null ) {
+			setTransitRouterFactory(
+					new TransitRouterImplFactory(
+						getScenario().getTransitSchedule(),
+						new TransitRouterConfig(
+							config.planCalcScore(),
+							config.plansCalcRoute(),
+							config.transitRouter(),
+							config.vspExperimental() )));
+		}
+
+		if ( getUseTripRouting() && tripRouterFactory == null ) {
+			tripRouterFactory = new TripRouterFactoryImpl( this );
+
+			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
+				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
+						network,
+						population.getFactory(),
+						getLeastCostPathCalculatorFactory(),
+						createTravelCostCalculator(),
+						multiModalTravelTimes,
+						config.multiModal(),
+						tripRouterFactory);
+			}
+
+			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
+				tripRouterFactory = new LinkToLinkTripRouterFactory(
+						getScenario(),
+						getLeastCostPathCalculatorFactory(),
+						getTravelDisutilityFactory(),
+						getTravelTimeCalculator(),
+						getPopulation().getFactory(),
+						tripRouterFactory);
+			}
+		}
+
 		/*
 		 * TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
 		 * 15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
@@ -630,7 +667,6 @@ public class Controler extends AbstractController {
 		}
 
 		if (this.config.scenario().isUseTransit()) {
-			addControlerListener(new TransitControlerListener());
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined! kai, oct'10
 				addControlerListener(new PtCountControlerListener(this.config));
@@ -1033,31 +1069,6 @@ public class Controler extends AbstractController {
 				&& RoadPricingScheme.TOLL_TYPE_AREA.equals(
 					this.scenarioData.getRoadPricingScheme().getType()) ) {
 			throw new IllegalStateException( "cannot get the trip router when using road pricing" );
-		}
-
-		if (tripRouterFactory == null) {
-			tripRouterFactory = new TripRouterFactoryImpl(this);
-			
-			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
-				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
-						network,
-						population.getFactory(),
-						getLeastCostPathCalculatorFactory(),
-						createTravelCostCalculator(),
-						multiModalTravelTimes,
-						config.multiModal(),
-						tripRouterFactory);
-			}
-
-			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
-				tripRouterFactory = new LinkToLinkTripRouterFactory(
-						getScenario(),
-						getLeastCostPathCalculatorFactory(),
-						getTravelDisutilityFactory(),
-						getTravelTimeCalculator(),
-						getPopulation().getFactory(),
-						tripRouterFactory);
-			}
 		}
 
 		return tripRouterFactory;
