@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripRouterTest.java
+ * TestActivityWrapperFacility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,60 +17,71 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
+package org.matsim.core.router;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author thibautd
  */
-public class TripRouterTest {
+public class TestActivityWrapperFacility {
+	private List<Activity> activities;
+
+	@Before
+	public void init() {
+		activities = new ArrayList<Activity>();
+
+		Activity act = new ActivityImpl(
+				"type",
+				new CoordImpl( 1 , 2 ),
+				new IdImpl( "bouh" ));
+		activities.add( act );
+
+		act = new ActivityImpl(
+				"another_type",
+				new CoordImpl( 5 , 2 ),
+				new IdImpl( "an_id" ));
+		activities.add( act );
+
+		act = new ActivityImpl(
+				"h2g2",
+				new CoordImpl( 42 , 42 ),
+				new IdImpl( "42" ));
+		activities.add( act );
+
+		act = new ActivityImpl(
+				"nothing",
+				new CoordImpl( 0 , 0 ),
+				new IdImpl( "0" ));
+		activities.add( act );
+
+	}
+
 	@Test
-	public void testTripInsertion() {
-		PlanImpl plan = new PlanImpl();
-		Activity o = plan.createAndAddActivity( "1" );
-		Activity d = plan.createAndAddActivity( "5" );
+	public void testWrapper() {
+		for (Activity activity : activities) {
+			Facility wrapper = new ActivityWrapperFacility( activity );
 
-		List<PlanElement> trip = new ArrayList<PlanElement>();
-		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , new IdImpl( "coucou" ) ) );
-		trip.add( new LegImpl( "4" ) );
+			Assert.assertEquals(
+					"wrapped activity returns incorrect coordinate!",
+					activity.getCoord(),
+					wrapper.getCoord());
 
-		TripRouter.insertTrip( plan , o , trip , d );
-
-		assertEquals(
-				"insertion did not produce the expected plan length!",
-				5,
-				plan.getPlanElements().size());
-
-		int oldIndex = 0;
-		for (PlanElement pe : plan.getPlanElements()) {
-			int newIndex = -1;
-
-			if (pe instanceof Activity) {
-				newIndex = Integer.parseInt( ((Activity) pe).getType() );
-			}
-			else {
-				newIndex = Integer.parseInt( ((Leg) pe).getMode() );
-			}
-
-			assertTrue(
-					"wrong inserted sequence: "+plan.getPlanElements(),
-					newIndex > oldIndex);
-			oldIndex = newIndex;
+			Assert.assertEquals(
+					"wrapped activity returns incorrect link id!",
+					activity.getLinkId(),
+					wrapper.getLinkId());
 		}
 	}
 }

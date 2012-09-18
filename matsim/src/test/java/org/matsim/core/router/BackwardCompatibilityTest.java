@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
+package org.matsim.core.router;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,7 +78,9 @@ public class BackwardCompatibilityTest {
 	 */
 	@Parameters
 	public static Collection<Object[]> configurations() {
-		Object[][] configurations = new Object[][]{ {"config.xml"} , {"transit/config.xml"} };
+		Object[][] configurations = new Object[][]{
+			{"test/scenarios/equil/config.xml"},
+			{"test/scenarios/pt-tutorial/config.xml"} };
 		return Arrays.asList( configurations );
 	}
 
@@ -92,7 +94,7 @@ public class BackwardCompatibilityTest {
 
 	@Before
 	public void init() {
-		Config config = utils.loadConfig( utils.getClassInputDirectory() + configName );
+		Config config = utils.loadConfig( configName );
 		config.controler().setLastIteration( 0 );
 
 		controler = new Controler( config );
