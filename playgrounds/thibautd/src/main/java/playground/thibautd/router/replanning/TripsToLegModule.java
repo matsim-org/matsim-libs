@@ -26,8 +26,6 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
-
 /**
  * Removes trips and replaces them by legs.
  * The aim is to simplify the plan before passing it to plan algorithms
@@ -36,7 +34,7 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
  * @author thibautd
  */
 public class TripsToLegModule extends AbstractMultithreadedModule {
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 	private final StageActivityTypes additionalBlackList;
 
 	/**
@@ -56,7 +54,7 @@ public class TripsToLegModule extends AbstractMultithreadedModule {
 	 */
 	public TripsToLegModule(final Controler controler, final StageActivityTypes additionalBlackList) {
 		super( controler.getConfig().global() );
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 		this.additionalBlackList = additionalBlackList;
 	}
 

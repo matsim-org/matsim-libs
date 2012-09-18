@@ -28,7 +28,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
@@ -43,13 +42,13 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 	// of files. Use with care!
 	private static final boolean DEBUG = false;
 
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 	private final DepartureDelayAverageCalculator delay;
 
 	public TimeModeChooserAlgorithm(
 			final Controler controler,
 			final DepartureDelayAverageCalculator delay ) {
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 		this.delay = delay;
 	}
 
@@ -82,7 +81,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 	private static TripRouterFactory getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
-			final MultiLegRoutingControler controler ) {
+			final Controler controler ) {
 		return new EstimatorTripRouterFactory(
 				plan,
 				((PopulationImpl) controler.getPopulation()).getFactory(),

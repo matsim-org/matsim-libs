@@ -25,20 +25,18 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
-
 /**
  * @author thibautd
  */
 public class JointTimeModeChooserModule extends AbstractMultithreadedModule {
 	private static final boolean DUMP_STATS = true;
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 	private final DepartureDelayAverageCalculator delay;
 	private StatisticsCollector statsCollector = null;
 
 	public JointTimeModeChooserModule(final Controler controler) {
 		super( controler.getConfig().global() );
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 		delay = new DepartureDelayAverageCalculator(
 				controler.getNetwork(),
 				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());

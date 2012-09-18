@@ -19,25 +19,21 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointtimeallocationmutator;
 
-import org.apache.log4j.Logger;
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
-
 /**
  * @author thibautd
  */
 public class JointTimeAllocationMutatorModule extends AbstractMultithreadedModule {
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 	private final double mutationRange;
 
 	public JointTimeAllocationMutatorModule(final Controler controler) {
 		super( controler.getConfig().global() );
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 		this.mutationRange = controler.getConfig().timeAllocationMutator().getMutationRange();
 	}
 

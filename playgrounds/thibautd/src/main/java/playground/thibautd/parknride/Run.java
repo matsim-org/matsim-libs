@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.thibautd.analysis.listeners.ActivityTypesAnalysis;
@@ -31,7 +32,6 @@ import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * Executable to run a simulation with park and ride
@@ -57,7 +57,7 @@ public class Run {
 					radius,
 					costPerSecondAtCenter);
 
-		MultiLegRoutingControler controler = new MultiLegRoutingControler( scenario );
+		Controler controler = new Controler( scenario );
 		controler.addControlerListener( ParkAndRideScoringFunctionFactory.createFactoryListener( penalty ) );
 		controler.addControlerListener(new ActivityTypesAnalysis( true ));
 		controler.addControlerListener(new ModeAnalysis( true ));

@@ -24,14 +24,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
@@ -42,12 +45,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * @author thibautd
@@ -56,9 +55,9 @@ public class HitchHikingQsimFactory implements MobsimFactory {
 
     private final static Logger log = Logger.getLogger(QSimFactory.class);
 
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 
-	public HitchHikingQsimFactory(final MultiLegRoutingControler controler) {
+	public HitchHikingQsimFactory(final Controler controler) {
 		this.controler = controler;
 	}
 

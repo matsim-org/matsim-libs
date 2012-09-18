@@ -26,18 +26,16 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
-
 /**
  * @author thibautd
  */
 public class HitchHikingInsertionModule extends AbstractMultithreadedModule {
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 
 	public HitchHikingInsertionModule(
 			final Controler controler) {
 		super( controler.getConfig().global() );
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 	}
 
 	@Override

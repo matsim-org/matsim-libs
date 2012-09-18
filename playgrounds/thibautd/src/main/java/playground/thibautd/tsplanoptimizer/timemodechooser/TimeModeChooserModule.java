@@ -24,18 +24,16 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
-
 /**
  * @author thibautd
  */
 public class TimeModeChooserModule extends AbstractMultithreadedModule {
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 	private final DepartureDelayAverageCalculator delay;
 
 	public TimeModeChooserModule(final Controler controler) {
 		super( controler.getConfig().global() );
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 		delay = new DepartureDelayAverageCalculator(
 				controler.getNetwork(),
 				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());

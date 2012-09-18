@@ -19,16 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.herbie;
 
+import herbie.running.config.HerbieConfigGroup;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-
-import herbie.running.config.HerbieConfigGroup;
+import org.matsim.core.controler.Controler;
 
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 import playground.thibautd.hitchiking.HitchHikingUtils;
 import playground.thibautd.hitchiking.spotweights.FrequentationSpotWeighter;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * @author thibautd
@@ -43,7 +43,7 @@ public class Run {
 		Scenario sc = HitchHikingUtils.loadScenario( config );
 
 		FrequentationSpotWeighter weighter = new FrequentationSpotWeighter( config );
-		MultiLegRoutingControler controler = new HHHerbieControler( sc , weighter );
+		Controler controler = new HHHerbieControler( sc , weighter );
 		controler.addControlerListener( weighter );
 		controler.addControlerListener(new ModeAnalysis( true ));
 		controler.run();

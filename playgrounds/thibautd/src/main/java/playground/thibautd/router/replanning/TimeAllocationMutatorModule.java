@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.router.replanning;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -30,13 +28,11 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
-
 /**
  * @author thibautd
  */
 public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 	private final StageActivityTypes blackList;
 
 	private final double mutationRange;
@@ -61,7 +57,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 	 */
 	public TimeAllocationMutatorModule(final Controler controler , final StageActivityTypes blackList) {
 		super( controler.getConfig().global() );
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 		this.blackList = blackList;
 
 		Config config = controler.getConfig();

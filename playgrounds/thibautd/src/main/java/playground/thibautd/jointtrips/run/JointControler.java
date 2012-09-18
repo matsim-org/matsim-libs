@@ -20,7 +20,6 @@
 package playground.thibautd.jointtrips.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
@@ -30,31 +29,25 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
 import playground.thibautd.jointtrips.qsim.JointQSimFactory;
 import playground.thibautd.jointtrips.replanning.JointPlansReplanning;
 import playground.thibautd.jointtrips.replanning.JointStrategyManager;
-import playground.thibautd.jointtrips.router.DriverRoutingModule;
 import playground.thibautd.jointtrips.router.JointPlanRouter;
 import playground.thibautd.jointtrips.router.JointTripRouterFactory;
-import playground.thibautd.jointtrips.router.PassengerRoutingModule;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * Custom controler for handling clique replanning
  * @author thibautd
  */
-public class JointControler extends MultiLegRoutingControler {
+public class JointControler extends Controler {
 	private static final Logger log =
 		Logger.getLogger(JointControler.class);
 

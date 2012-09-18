@@ -21,7 +21,6 @@ package playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser;
 
 import java.util.Random;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -33,18 +32,15 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
-import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedRouteNetworkRoutingModule;
-import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.FixedTransitRouteRoutingModule;
 
 /**
  * @author thibautd
  */
 public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 	private final DepartureDelayAverageCalculator delay;
 	private final StatisticsCollector statsCollector;
 	private final Random random;
@@ -56,7 +52,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 			final DepartureDelayAverageCalculator delay ) {
 		this.random = random;
 		this.statsCollector = statsCollector;
-		this.controler = (MultiLegRoutingControler) controler;
+		this.controler = controler;
 		this.delay = delay;
 	}
 
@@ -109,7 +105,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 	private static TripRouterFactory getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
-			final MultiLegRoutingControler controler ) {
+			final Controler controler ) {
 		return new EstimatorTripRouterFactory(
 				plan,
 				((PopulationImpl) controler.getPopulation()).getFactory(),

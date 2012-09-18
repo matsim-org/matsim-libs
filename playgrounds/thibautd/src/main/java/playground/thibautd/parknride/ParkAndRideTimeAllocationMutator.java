@@ -28,7 +28,6 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
 
 /**
@@ -43,7 +42,7 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 		addStrategyModule(
 				new TimeAllocationMutatorModule(
 					controler,
-					new BlackList( (MultiLegRoutingControler) controler ) ) );
+					new BlackList( controler ) ) );
 
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
@@ -84,10 +83,10 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 	}
 
 	private static class BlackList implements StageActivityTypes {
-		private MultiLegRoutingControler controler = null;
+		private Controler controler = null;
 		private StageActivityTypes blackList = null;
 
-		public BlackList(final MultiLegRoutingControler controler) {
+		public BlackList(final Controler controler) {
 			this.controler = controler;
 		}
 

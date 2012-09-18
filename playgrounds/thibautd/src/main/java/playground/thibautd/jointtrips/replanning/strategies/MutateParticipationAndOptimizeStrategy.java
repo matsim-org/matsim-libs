@@ -26,7 +26,6 @@ import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.Jo
 import playground.thibautd.jointtrips.replanning.modules.jointtripmutator.JointTripMutatorModule;
 import playground.thibautd.jointtrips.replanning.modules.reroute.JointReRouteModule;
 import playground.thibautd.jointtrips.replanning.selectors.RandomPlanSelectorWithoutCasts;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * @author thibautd
@@ -34,7 +33,7 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
 public class MutateParticipationAndOptimizeStrategy extends JointPlanStrategy {
 	public MutateParticipationAndOptimizeStrategy(final Controler controler) {
 		super( new RandomPlanSelectorWithoutCasts() );
-		addStrategyModule( new JointTripMutatorModule( (MultiLegRoutingControler) controler ) );
+		addStrategyModule( new JointTripMutatorModule( controler ) );
 		addStrategyModule( new JointReRouteModule( controler ) );
 		addStrategyModule( new JointTimeModeChooserModule( controler ) );
 	}

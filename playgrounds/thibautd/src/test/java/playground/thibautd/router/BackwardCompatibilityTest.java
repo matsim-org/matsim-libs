@@ -32,12 +32,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
@@ -46,8 +46,6 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestUtils;
-
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * Tests whether the wrapping PlansCalcRoute gives the same results as
@@ -62,7 +60,7 @@ public class BackwardCompatibilityTest {
 
 	private final String configName;
 
-	private MultiLegRoutingControler controler;
+	private Controler controler;
 	// the "old" plansCalcRoute
 	private PlansCalcRoute plansCalcRoute;
 	// the new object
@@ -97,7 +95,7 @@ public class BackwardCompatibilityTest {
 		Config config = utils.loadConfig( utils.getClassInputDirectory() + configName );
 		config.controler().setLastIteration( 0 );
 
-		controler = new MultiLegRoutingControler( config );
+		controler = new Controler( config );
 		controler.run();
 
 		Controler oldControler = new Controler( config );

@@ -19,20 +19,20 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointtripmutator;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * @author thibautd
  */
 public class JointTripMutatorModule extends AbstractMultithreadedModule {
-	private final MultiLegRoutingControler controler;
+	private final Controler controler;
 
-	public JointTripMutatorModule(final MultiLegRoutingControler controler) {
+	public JointTripMutatorModule(final Controler controler) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
 	}

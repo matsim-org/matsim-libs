@@ -29,21 +29,16 @@ import herbie.running.scoring.TravelScoringFunction;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * Quick and dirty way to obtain a {@link MultiLegRoutingControler} with 
@@ -52,7 +47,7 @@ import playground.thibautd.router.controler.MultiLegRoutingControler;
  *
  * @author thibautd
  */
-public class UglyHerbieMultilegControler extends MultiLegRoutingControler {
+public class UglyHerbieMultilegControler extends Controler {
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";

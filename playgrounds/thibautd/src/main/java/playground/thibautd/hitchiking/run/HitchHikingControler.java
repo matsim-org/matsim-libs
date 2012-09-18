@@ -22,6 +22,7 @@ package playground.thibautd.hitchiking.run;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
@@ -29,12 +30,11 @@ import playground.thibautd.hitchiking.HitchHikingUtils;
 import playground.thibautd.hitchiking.qsim.HitchHikingQsimFactory;
 import playground.thibautd.hitchiking.routing.HitchHikingTripRouterFactory;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
-import playground.thibautd.router.controler.MultiLegRoutingControler;
 
 /**
  * @author thibautd
  */
-public class HitchHikingControler extends MultiLegRoutingControler {
+public class HitchHikingControler extends Controler {
 	private final SpotWeighter spotWeighter;
 
 	@Override
