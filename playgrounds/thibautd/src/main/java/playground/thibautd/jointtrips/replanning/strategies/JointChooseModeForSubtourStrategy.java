@@ -20,13 +20,13 @@
 package playground.thibautd.jointtrips.replanning.strategies;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.TripsToLegModule;
 
 import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
 import playground.thibautd.jointtrips.replanning.modules.ExecuteModuleOnAllPlansModule;
 import playground.thibautd.jointtrips.replanning.modules.jointchoosemodeforsubtour.JointChooseModeForSubtourModule;
 import playground.thibautd.jointtrips.replanning.modules.reroute.JointReRouteModule;
 import playground.thibautd.jointtrips.replanning.selectors.RandomPlanSelectorWithoutCasts;
-import playground.thibautd.router.replanning.TripsToLegModule;
 
 /**
  * @author thibautd

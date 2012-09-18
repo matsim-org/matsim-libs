@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router.replanning;
+package org.matsim.population.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;

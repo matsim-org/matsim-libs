@@ -17,14 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router.replanning;
+package org.matsim.core.replanning.modules;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 
 /**
  * Removes trips and replaces them by legs.
