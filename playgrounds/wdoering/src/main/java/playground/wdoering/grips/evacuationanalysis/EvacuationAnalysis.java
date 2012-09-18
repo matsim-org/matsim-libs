@@ -75,6 +75,7 @@ import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -113,15 +114,19 @@ public class EvacuationAnalysis implements ActionListener{
 	private Polygon areaPolygon;
 	private String currentEventFile;
 	private Thread readerThread;
-	private double gridSize;
+	private double cellSize = 10;
+	private QuadTree<Cell> cellTree;
+	private EventHandler eventHandler;
+	private GraphPanel graphPanel;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-
+		
 		String wms = null;
 		String layer = null;
+		
 		if (args.length == 4) {
 			for (int i = 0; i < 4; i += 2) {
 				if (args[i].equalsIgnoreCase("-wms")) {
@@ -222,12 +227,18 @@ public class EvacuationAnalysis implements ActionListener{
 
 		this.panelDescriptions = new JPanel(new GridLayout(1, 3));
 
-		this.panelDescriptions.add(new JLabel("Road ID"));
-		this.panelDescriptions.add(new JLabel("HH"));
-		this.panelDescriptions.add(new JLabel("MM"));
+		this.panelDescriptions.add(new JLabel("graph"));
+		
+		
+		
+//		this.panelDescriptions.add(new JLabel("HH"));
+//		this.panelDescriptions.add(new JLabel("MM"));
 
 
 		this.blockPanel.add(this.panelDescriptions);
+		
+		graphPanel = new GraphPanel();
+		this.blockPanel.add(graphPanel);
 
 		this.blockPanel.setPreferredSize(new Dimension(300,300));
 
@@ -310,6 +321,7 @@ public class EvacuationAnalysis implements ActionListener{
 		if (e.getActionCommand() == "Open")
 		{
 			final JFileChooser fc = new JFileChooser();
+			fc.setCurrentDirectory(new File("C:/temp/!matsimfiles/hh/demo/output/"));
 			fc.setFileFilter(new FileFilter() {
 
 				@Override
@@ -358,6 +370,18 @@ public class EvacuationAnalysis implements ActionListener{
 				readShapeFile(shp);
 				loadMapView();
 				
+				if (eventHandler!=null)
+				{
+					System.err.print("displaying events...");
+					QuadTree<Cell> cellTree = eventHandler.getCellTree();
+					
+					if (cellTree != null)
+						jMapViewer.updateData(cellTree, cellSize);
+					System.err.println("done.");
+					
+					graphPanel.setData(cellTree, cellSize);
+				}
+				
 			} else {
 				log.info("Open command cancelled by user.");
 			}
@@ -372,9 +396,10 @@ public class EvacuationAnalysis implements ActionListener{
 		EventsManager e = EventsUtils.createEventsManager();
 		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
 		readerThread = new Thread(new EventReaderThread(reader,eventFile), "readerthread");
-		EventHandler eventHandler = new EventHandler(readerThread);
+		eventHandler = new EventHandler(this.sc, this.getGridSize(), readerThread);
 		e.addHandler(eventHandler);
 		readerThread.run();
+		
 		
 	}
 
@@ -620,11 +645,11 @@ public class EvacuationAnalysis implements ActionListener{
 	
 	public void setGridSize(double gridSize)
 	{
-		this.gridSize = gridSize;
+		this.cellSize = gridSize;
 	}
 
 	public double getGridSize()
 	{
-		return gridSize;
+		return cellSize;
 	}	
 }

@@ -47,8 +47,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.config.ToolConfig;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
@@ -90,9 +92,19 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private Polygon areaPolygon;
 	private double gridSize;
 
+	private double minX = Double.NaN;
+	private double minY = Double.NaN;
+	private double maxX = Double.NaN;
+	private double maxY = Double.NaN;
+
+	private QuadTree<Cell> cellTree;
+
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
 		super();
+		
+		this.cellTree = null;
+		
 		this.m = super.getMouseListeners();
 		for (MouseListener l : this.m) {
 			super.removeMouseListener(l);
@@ -135,6 +147,11 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			}
 			e.expandToInclude(c.getX(), c.getY());
 		}
+		
+		minX = e.getMinX();
+		minY = e.getMinY();
+		maxX = e.getMaxX();
+		maxY = e.getMaxY();
 
 		this.links = new LinkQuadTree(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 
@@ -525,6 +542,65 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 				}
 			}
+			
+			/**
+			 * draw grid
+			 * 
+			 */
+			if (!Double.isNaN(minX))
+			{
+				g.setColor(Color.BLACK);
+				g2D.setStroke(new BasicStroke(1F));
+				
+				double stepsX = (maxX-minX)/gridSize;
+				double stepsY = (maxY-minY)/gridSize;
+				
+				
+				Coord gridPointA = this.ctInverse.transform(new CoordImpl(minX,minY));
+				Point2D gridLengthA = this.getTileFactory().geoToPixel(new GeoPosition(gridPointA.getY(),gridPointA.getX()), this.getZoom());
+				
+				Coord gridPointB = this.ctInverse.transform(new CoordImpl(minX+stepsX,minY+stepsY));
+				Point2D gridLengthB = this.getTileFactory().geoToPixel(new GeoPosition(gridPointB.getY(),gridPointB.getX()), this.getZoom());
+				
+				int gridLengthX = (int)(gridLengthB.getX() - gridLengthA.getX());
+				int gridLengthY = (int)(gridLengthB.getY() - gridLengthA.getY());
+				
+				if (gridLengthX<0)
+				{
+//					minX-=gridLengthX;
+//					maxX-=gridLengthX;
+					gridLengthX*=-1;
+				}
+				
+				if (gridLengthY<0)
+				{
+//					minX-=gridLengthY;
+//					maxX-=gridLengthY;
+					gridLengthY*=-1;
+				}
+				
+//				System.out.println(gridLengthX + "|" + gridLengthY);
+				
+				for (double u = minX; u <= maxX; u+=stepsX)
+				{
+					for (double v = minY+stepsY; v <= maxY+stepsY; v+=stepsY)
+					{
+						Coord coords = this.ctInverse.transform(new CoordImpl(u,v));
+						
+						Point2D currentPoint = this.getTileFactory().geoToPixel(new GeoPosition(coords.getY(),coords.getX()), this.getZoom());
+						
+						int gridOffsetX = (int)(currentPoint.getX()-b.x);
+						int gridOffsetY = (int)(currentPoint.getY()-b.y);
+//						(int)(gridSize/(this.getZoom()+1))
+						
+						g.drawRect(gridOffsetX, gridOffsetY, gridLengthX,gridLengthY);
+						
+//						g.drawString("zoom:" + this.getZoom(), 10, 10);
+//						double cX = u;
+//						double cY = v;
+					}
+				}
+			}
 
 
 
@@ -532,6 +608,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 
 		}
+	}
+
+	public void updateData(QuadTree<Cell> cellTree, double cellSize)
+	{
+		this.cellTree = cellTree;
+		
 	}
 
 }
