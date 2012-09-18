@@ -36,6 +36,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -99,6 +100,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	private QuadTree<Cell> cellTree;
 
+	private Map<String, Object> data;
+
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
 		super();
@@ -148,19 +151,23 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			e.expandToInclude(c.getX(), c.getY());
 		}
 		
-		minX = e.getMinX();
-		minY = e.getMinY();
-		maxX = e.getMaxX();
-		maxY = e.getMaxY();
+		minX = minY = Double.MAX_VALUE;
+		maxX = maxY = Double.MIN_VALUE;
 
 		this.links = new LinkQuadTree(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 
 		NetworkImpl net = (NetworkImpl) this.evacAnalysis.getScenario().getNetwork();
 
-		for (Link link: net.getLinks().values()){
-			if (link.getId().toString().contains("el")) {
+		for (Link link: net.getLinks().values())
+		{
+			if ((link.getId().toString().contains("el")) || (link.getId().toString().contains("en")) )
 				continue;
-			}
+			
+			minX = Math.min(minX, Math.min(link.getFromNode().getCoord().getX(),link.getToNode().getCoord().getX()));
+			minY = Math.min(minY, Math.min(link.getFromNode().getCoord().getY(),link.getToNode().getCoord().getY()));
+			maxX = Math.max(maxX, Math.min(link.getFromNode().getCoord().getX(),link.getToNode().getCoord().getX()));
+			maxY = Math.max(maxY, Math.min(link.getFromNode().getCoord().getY(),link.getToNode().getCoord().getY()));
+			
 			this.links.put(link);
 
 		}
@@ -552,50 +559,85 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				g.setColor(Color.BLACK);
 				g2D.setStroke(new BasicStroke(1F));
 				
-				double stepsX = (maxX-minX)/gridSize;
-				double stepsY = (maxY-minY)/gridSize;
 				
+				double stepsX = this.getTileFactory().pixelToGeo(new Point2D.Double(gridSize, gridSize), this.getZoom()).getLatitude();
+				double stepsY = this.getTileFactory().pixelToGeo(new Point2D.Double(gridSize, gridSize), this.getZoom()).getLongitude();
+//				double stepsX = (maxX-minX)/gridSize;
+//				double stepsY = (maxY-minY)/gridSize;
 				
-				Coord gridPointA = this.ctInverse.transform(new CoordImpl(minX,minY));
-				Point2D gridLengthA = this.getTileFactory().geoToPixel(new GeoPosition(gridPointA.getY(),gridPointA.getX()), this.getZoom());
+				Coord minCoord = this.ctInverse.transform(new CoordImpl(minX,minY));
+				Coord maxCoord = this.ctInverse.transform(new CoordImpl(maxX,maxY));
+				Point2D minPixelCoord = this.getTileFactory().geoToPixel(new GeoPosition(minCoord.getY(),minCoord.getX()), this.getZoom());
+				Point2D maxPixelCoord = this.getTileFactory().geoToPixel(new GeoPosition(maxCoord.getY(),maxCoord.getX()), this.getZoom());
 				
-				Coord gridPointB = this.ctInverse.transform(new CoordImpl(minX+stepsX,minY+stepsY));
-				Point2D gridLengthB = this.getTileFactory().geoToPixel(new GeoPosition(gridPointB.getY(),gridPointB.getX()), this.getZoom());
+				int pixMinX = (int)minPixelCoord.getX();
+				int pixMaxX = (int)maxPixelCoord.getX();
+				int pixMinY = (int)minPixelCoord.getY();
+				int pixMaxY = (int)maxPixelCoord.getY();
 				
-				int gridLengthX = (int)(gridLengthB.getX() - gridLengthA.getX());
-				int gridLengthY = (int)(gridLengthB.getY() - gridLengthA.getY());
-				
-				if (gridLengthX<0)
+				if (pixMinX > pixMaxX)
 				{
-//					minX-=gridLengthX;
-//					maxX-=gridLengthX;
-					gridLengthX*=-1;
+					int temp = pixMinX;
+					pixMinX = pixMaxX;
+					pixMaxX = temp;
+				}
+				if (pixMinY > pixMaxY)
+				{
+					int temp = pixMinY;
+					pixMinY = pixMaxY;
+					pixMaxY = temp;
 				}
 				
-				if (gridLengthY<0)
-				{
-//					minX-=gridLengthY;
-//					maxX-=gridLengthY;
-					gridLengthY*=-1;
-				}
+				Coord gridPoint = this.ctInverse.transform(new CoordImpl(minX+stepsX,minY+stepsY));
+				Point2D gridLength = this.getTileFactory().geoToPixel(new GeoPosition(gridPoint.getY(),gridPoint.getX()), this.getZoom());
 				
-//				System.out.println(gridLengthX + "|" + gridLengthY);
+//				System.out.println((pixMinX - b.x) + " | " + (pixMaxX - b.x)+ "|-|" + (pixMinY - b.y) + "|" + (pixMaxY - b.y));
+//				stepsX = (maxCoord.getX()-minCoord.getX())/gridSize;
+//				Coord gridPointA = this.ctInverse.transform(new CoordImpl(minX,minY));
+//				Point2D gridLengthA = this.getTileFactory().geoToPixel(new GeoPosition(gridPointA.getY(),gridPointA.getX()), this.getZoom());
+//				
+//				int gridLengthX = (int)(gridLengthB.getX() - gridLengthA.getX());
+//				int gridLengthY = (int)(gridLengthB.getY() - gridLengthA.getY());
 				
-				for (double u = minX; u <= maxX; u+=stepsX)
+//				System.out.println("gridl:" + gridLengthX + " | gridl:" + gridLengthY);
+				
+//				if (gridLengthX<0)
+//				{
+//					gridLengthX*=-1;
+//				}
+//				
+//				if (gridLengthY<0)
+//				{
+//					gridLengthY*=-1;
+//				}
+//				
+//				System.out.println(gridLength.getX() + "|" + gridLength);
+				
+				double zoomStep = gridSize/(this.getZoom()+1);
+				
+				int i = 0;
+				for (double u = pixMinX; u < pixMaxX; u+=zoomStep)
 				{
-					for (double v = minY+stepsY; v <= maxY+stepsY; v+=stepsY)
+					i++;
+					int j = 0;
+					
+					for (double v = pixMinY; v < pixMaxY; v+=zoomStep)
 					{
-						Coord coords = this.ctInverse.transform(new CoordImpl(u,v));
+						j++;
 						
-						Point2D currentPoint = this.getTileFactory().geoToPixel(new GeoPosition(coords.getY(),coords.getX()), this.getZoom());
+//						Coord coords = this.ctInverse.transform(new CoordImpl(u,v));
+//						System.out.println("test");
+//						Point2D currentPoint = this.getTileFactory().geoToPixel(new GeoPosition(coords.getY(),coords.getX()), this.getZoom());
 						
-						int gridOffsetX = (int)(currentPoint.getX()-b.x);
-						int gridOffsetY = (int)(currentPoint.getY()-b.y);
+						int gridOffsetX = (int)(u-b.x);
+						int gridOffsetY = (int)(v-b.y);
+						
 //						(int)(gridSize/(this.getZoom()+1))
 						
-						g.drawRect(gridOffsetX, gridOffsetY, gridLengthX,gridLengthY);
+						g.drawRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
+						g.drawString("c:" + this.cellTree.get(minX+gridSize*i,minY+gridSize*j).getCount(), (int)u-b.x, (int)v-b.y);
 						
-//						g.drawString("zoom:" + this.getZoom(), 10, 10);
+						
 //						double cX = u;
 //						double cY = v;
 					}
@@ -610,9 +652,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		}
 	}
 
-	public void updateData(QuadTree<Cell> cellTree, double cellSize)
+	public void updateData(QuadTree<Cell> cellTree, double cellSize, Map<String, Object> data)
 	{
 		this.cellTree = cellTree;
+		this.gridSize = cellSize;
+		this.data = data;
+		
+		System.out.println(cellTree.size());
 		
 	}
 

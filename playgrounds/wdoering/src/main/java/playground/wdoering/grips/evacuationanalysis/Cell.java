@@ -26,6 +26,8 @@ public class Cell<T>
 	private int count;
 	private T data;
 	
+	public static String CELLSIZE = "cellsize";
+	
 	public Cell(T data)
 	{
 		this.data = data;

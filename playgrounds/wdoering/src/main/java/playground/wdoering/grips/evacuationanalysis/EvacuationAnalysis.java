@@ -114,10 +114,12 @@ public class EvacuationAnalysis implements ActionListener{
 	private Polygon areaPolygon;
 	private String currentEventFile;
 	private Thread readerThread;
-	private double cellSize = 10;
+	private double cellSize = 150;
 	private QuadTree<Cell> cellTree;
 	private EventHandler eventHandler;
 	private GraphPanel graphPanel;
+	private JPanel controlPanel;
+	private JButton calcButton;
 
 	/**
 	 * Launch the application.
@@ -137,7 +139,8 @@ public class EvacuationAnalysis implements ActionListener{
 				}
 			}
 
-		} else if (args.length != 0) {
+		} else if (args.length != 0)
+		{
 			printUsage();
 			System.exit(-1);
 		}
@@ -217,31 +220,41 @@ public class EvacuationAnalysis implements ActionListener{
 		JPanel panel = new JPanel();
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
 
+		
 		this.blockPanel = new JPanel(new GridLayout(18, 2));
-
-
-
-
 		this.blockPanel.setSize(new Dimension(200, 200));
 
 
+		//////////////////////////////////////////////////////////////////////////////
+		// DESCRIPTIONS
+		//////////////////////////////////////////////////////////////////////////////
+		
 		this.panelDescriptions = new JPanel(new GridLayout(1, 3));
-
 		this.panelDescriptions.add(new JLabel("graph"));
-		
-		
-		
-//		this.panelDescriptions.add(new JLabel("HH"));
-//		this.panelDescriptions.add(new JLabel("MM"));
 
+		
+		//////////////////////////////////////////////////////////////////////////////
+		// GRAPH PANEL
+		//////////////////////////////////////////////////////////////////////////////
+		this.graphPanel = new GraphPanel();
+		
+		//////////////////////////////////////////////////////////////////////////////
+		// CONTROL
+		//////////////////////////////////////////////////////////////////////////////
+
+		this.calcButton = new JButton("calculate");
+		this.calcButton.setEnabled(false);
+		this.calcButton.addActionListener(this);
+		
+		this.controlPanel = new JPanel(new GridLayout(1, 3));
+		this.controlPanel.add(calcButton);
+		
+		
 
 		this.blockPanel.add(this.panelDescriptions);
-		
-		graphPanel = new GraphPanel();
 		this.blockPanel.add(graphPanel);
-
+		this.blockPanel.add(controlPanel);
 		this.blockPanel.setPreferredSize(new Dimension(300,300));
-
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
 		//		this.blockFieldLink1hh.setSelectedTextColor(Color.red);
@@ -345,8 +358,6 @@ public class EvacuationAnalysis implements ActionListener{
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
-				this.openBtn.setEnabled(false);
-				this.saveButton.setEnabled(true);
 				File file = fc.getSelectedFile();
 				log.info("Opening: " + file.getAbsolutePath() + ".");
 				this.configFile = file.getAbsolutePath();
@@ -374,17 +385,31 @@ public class EvacuationAnalysis implements ActionListener{
 				{
 					System.err.print("displaying events...");
 					QuadTree<Cell> cellTree = eventHandler.getCellTree();
+					HashMap<String, Object> data = eventHandler.getStats();
+					
+					data.put(Cell.CELLSIZE, cellSize);
 					
 					if (cellTree != null)
-						jMapViewer.updateData(cellTree, cellSize);
+						jMapViewer.updateData(cellTree, cellSize, data);
+					
 					System.err.println("done.");
 					
-					graphPanel.setData(cellTree, cellSize);
+					graphPanel.setData(cellTree, data);
 				}
+				
+				//update buttons
+				this.openBtn.setEnabled(false);
+				this.saveButton.setEnabled(true);
+				this.calcButton.setEnabled(true);
 				
 			} else {
 				log.info("Open command cancelled by user.");
 			}
+		}
+		
+		if (e.getActionCommand() == "calculate")
+		{
+			System.out.println("okokok");
 		}
 
 	}

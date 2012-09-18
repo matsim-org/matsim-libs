@@ -217,6 +217,13 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		return cellTree;
 	}
 
+	public HashMap<String, Object> getStats()
+	{
+		HashMap<String, Object> a = new HashMap<String, Object>();
+		
+		return a;
+	}
+
 
 
 
