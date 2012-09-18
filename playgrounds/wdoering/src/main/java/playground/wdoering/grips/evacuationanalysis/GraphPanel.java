@@ -32,7 +32,7 @@ public class GraphPanel extends JPanel {
 	
 	private QuadTree<Cell> cellTree;
 	private double cellSize;
-	private HashMap<String, Object> data;
+	private HashMap<MetaData, Object> data;
 	
 	public GraphPanel()
 	{
@@ -40,11 +40,11 @@ public class GraphPanel extends JPanel {
 		this.setPreferredSize(new Dimension(300,300));
 	}
 
-	public void setData(QuadTree<Cell> cellTree, HashMap<String, Object> data)
+	public void updateData(QuadTree<Cell> cellTree, HashMap<MetaData, Object> data)
 	{
 		this.cellTree = cellTree;
 		this.data = data;
-		this.cellSize = (Double) data.get(Cell.CELLSIZE);
+		this.cellSize = (Double) data.get(MetaData.CELLSIZE);
 	}
 
 }

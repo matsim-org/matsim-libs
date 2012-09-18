@@ -82,6 +82,9 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private void init() {
 		
+		this.arrivals = 0;
+		this.timeSum = 0;
+		
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
@@ -217,11 +220,12 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		return cellTree;
 	}
 
-	public HashMap<String, Object> getStats()
+	public HashMap<MetaData, Object> getData()
 	{
-		HashMap<String, Object> a = new HashMap<String, Object>();
-		
-		return a;
+		HashMap<MetaData, Object> data = new HashMap<MetaData, Object>();
+		data.put(MetaData.TIMESUM, timeSum);
+		data.put(MetaData.ARRIVALS, arrivals);
+		return data;
 	}
 
 

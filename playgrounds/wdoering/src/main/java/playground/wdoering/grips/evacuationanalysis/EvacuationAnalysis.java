@@ -120,6 +120,7 @@ public class EvacuationAnalysis implements ActionListener{
 	private GraphPanel graphPanel;
 	private JPanel controlPanel;
 	private JButton calcButton;
+	
 
 	/**
 	 * Launch the application.
@@ -385,16 +386,17 @@ public class EvacuationAnalysis implements ActionListener{
 				{
 					System.err.print("displaying events...");
 					QuadTree<Cell> cellTree = eventHandler.getCellTree();
-					HashMap<String, Object> data = eventHandler.getStats();
 					
-					data.put(Cell.CELLSIZE, cellSize);
+					//build data
+					HashMap<MetaData, Object> data = eventHandler.getData();
+					data.put(MetaData.CELLSIZE, cellSize);
 					
 					if (cellTree != null)
-						jMapViewer.updateData(cellTree, cellSize, data);
+						jMapViewer.updateData(cellTree, data);
 					
 					System.err.println("done.");
 					
-					graphPanel.setData(cellTree, data);
+					graphPanel.updateData(cellTree, data);
 				}
 				
 				//update buttons

@@ -100,7 +100,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	private QuadTree<Cell> cellTree;
 
-	private Map<String, Object> data;
+	private Map<MetaData, Object> data;
 
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
@@ -591,29 +591,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				Coord gridPoint = this.ctInverse.transform(new CoordImpl(minX+stepsX,minY+stepsY));
 				Point2D gridLength = this.getTileFactory().geoToPixel(new GeoPosition(gridPoint.getY(),gridPoint.getX()), this.getZoom());
 				
-//				System.out.println((pixMinX - b.x) + " | " + (pixMaxX - b.x)+ "|-|" + (pixMinY - b.y) + "|" + (pixMaxY - b.y));
-//				stepsX = (maxCoord.getX()-minCoord.getX())/gridSize;
-//				Coord gridPointA = this.ctInverse.transform(new CoordImpl(minX,minY));
-//				Point2D gridLengthA = this.getTileFactory().geoToPixel(new GeoPosition(gridPointA.getY(),gridPointA.getX()), this.getZoom());
-//				
-//				int gridLengthX = (int)(gridLengthB.getX() - gridLengthA.getX());
-//				int gridLengthY = (int)(gridLengthB.getY() - gridLengthA.getY());
-				
-//				System.out.println("gridl:" + gridLengthX + " | gridl:" + gridLengthY);
-				
-//				if (gridLengthX<0)
-//				{
-//					gridLengthX*=-1;
-//				}
-//				
-//				if (gridLengthY<0)
-//				{
-//					gridLengthY*=-1;
-//				}
-//				
-//				System.out.println(gridLength.getX() + "|" + gridLength);
-				
 				double zoomStep = gridSize/(this.getZoom()+1);
+				
+				Double timeSum = (Double)data.get(MetaData.TIMESUM);
 				
 				int i = 0;
 				for (double u = pixMinX; u < pixMaxX; u+=zoomStep)
@@ -625,21 +605,26 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					{
 						j++;
 						
-//						Coord coords = this.ctInverse.transform(new CoordImpl(u,v));
-//						System.out.println("test");
-//						Point2D currentPoint = this.getTileFactory().geoToPixel(new GeoPosition(coords.getY(),coords.getX()), this.getZoom());
-						
 						int gridOffsetX = (int)(u-b.x);
 						int gridOffsetY = (int)(v-b.y);
 						
-//						(int)(gridSize/(this.getZoom()+1))
-						
 						g.drawRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
+						
+						Cell cell = this.cellTree.get(minX+gridSize*i,minY+gridSize*j);
+						
+						Double relTravelTime = (cell.getTimeSum()) / timeSum;
+						
+//						System.out.println(cell.getTimeSum() + "|" + cell.getCount() + "|\t" + timeSum);
+						
+						if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
+							relTravelTime = 0d;
+						
+						g.setColor(new Color((int)(255*relTravelTime),0,0,150));
+						g.fillRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
+						
+						g.setColor(Color.white);
 						g.drawString("c:" + this.cellTree.get(minX+gridSize*i,minY+gridSize*j).getCount(), (int)u-b.x, (int)v-b.y);
 						
-						
-//						double cX = u;
-//						double cY = v;
 					}
 				}
 			}
@@ -652,13 +637,11 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		}
 	}
 
-	public void updateData(QuadTree<Cell> cellTree, double cellSize, Map<String, Object> data)
+	public void updateData(QuadTree<Cell> cellTree, Map<MetaData, Object> data)
 	{
 		this.cellTree = cellTree;
-		this.gridSize = cellSize;
+		this.gridSize = (Double)data.get(MetaData.CELLSIZE);
 		this.data = data;
-		
-		System.out.println(cellTree.size());
 		
 	}
 
