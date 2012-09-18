@@ -56,8 +56,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class EditRoutesTest extends MatsimTestCase {
 	
 	static private final Logger log = Logger.getLogger(EditRoutesTest.class);
-	
-	
+		
 	private Scenario scenario;
 	private Plan plan;
 	private PlanAlgorithm planAlgorithm;
@@ -76,13 +75,13 @@ public class EditRoutesTest extends MatsimTestCase {
 		ActivityImpl activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
 		
 		// expect EditRoutes to return false if the Plan or the PlanAlgorithm is null
-		assertEquals(ed.replanFutureLegRoute(null, 1, planAlgorithm), false);
-		assertEquals(ed.replanFutureLegRoute(plan, 1, null), false);
+		assertEquals(false, ed.replanFutureLegRoute(null, 1, planAlgorithm));
+		assertEquals(false, ed.replanFutureLegRoute(plan, 1, null));
 		
 		// expect EditRoutes to return false if the index does not point to a Leg
-		assertEquals(ed.replanFutureLegRoute(plan, 0, planAlgorithm), false);
-		assertEquals(ed.replanFutureLegRoute(plan, 2, planAlgorithm), false);
-		assertEquals(ed.replanFutureLegRoute(plan, 4, planAlgorithm), false);
+		assertEquals(false, ed.replanFutureLegRoute(plan, 0, planAlgorithm));
+		assertEquals(false, ed.replanFutureLegRoute(plan, 2, planAlgorithm));
+		assertEquals(false, ed.replanFutureLegRoute(plan, 4, planAlgorithm));
 		
 		// create new, empty routes and set them in the Legs
 		NetworkRoute networkRouteHW = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(legHW.getRoute().getStartLinkId(), legHW.getRoute().getEndLinkId());
@@ -98,10 +97,19 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanFutureLegRoute(plan, 1, planAlgorithm));
 		assertEquals(true, ed.replanFutureLegRoute(plan, 3, planAlgorithm));
 		
-		// the routes have been recreated
-		assertEquals(networkRouteHW.getLinkIds().size(), 1);	// l5
-		assertEquals(networkRouteWH.getLinkIds().size(), 3);	// l4, l5, l2
+		// the legs have been replaced, the original ones should not have changed
+		assertEquals(0, networkRouteHW.getLinkIds().size());
+		assertEquals(0, networkRouteWH.getLinkIds().size());
 		
+		// get replaced legs and routes
+		legHW = (Leg) plan.getPlanElements().get(1);
+		legWH = (Leg) plan.getPlanElements().get(3);
+		networkRouteHW = (NetworkRoute) legHW.getRoute();
+		networkRouteWH = (NetworkRoute) legWH.getRoute();
+		
+		// the routes have been recreated
+		assertEquals(1, networkRouteHW.getLinkIds().size());	// l5
+		assertEquals(3, networkRouteWH.getLinkIds().size());	// l4, l5, l2
 		
 		// move the location of the activities - check whether the start and end Links of the routes are updated
 		activityH1.setLinkId(scenario.createId("l4"));
@@ -112,16 +120,22 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, ed.replanFutureLegRoute(plan, 1, planAlgorithm));
 		assertEquals(true, ed.replanFutureLegRoute(plan, 3, planAlgorithm));
 		
+		// get replaced legs and routes
+		legHW = (Leg) plan.getPlanElements().get(1);
+		legWH = (Leg) plan.getPlanElements().get(3);
+		networkRouteHW = (NetworkRoute) legHW.getRoute();
+		networkRouteWH = (NetworkRoute) legWH.getRoute();
+		
 		// check the length of the routes
-		assertEquals(networkRouteHW.getLinkIds().size(), 1);	// l5
-		assertEquals(networkRouteWH.getLinkIds().size(), 3);	// l1, l5, l3
+		assertEquals(1, networkRouteHW.getLinkIds().size());	// l5
+		assertEquals(3, networkRouteWH.getLinkIds().size());	// l1, l5, l3
 		
 		// check whether the start and end Links have been updated
-		assertEquals(networkRouteHW.getStartLinkId(), scenario.createId("l4"));
-		assertEquals(networkRouteHW.getEndLinkId(), scenario.createId("l2"));
-		assertEquals(networkRouteWH.getStartLinkId(), scenario.createId("l2"));
-		assertEquals(networkRouteWH.getEndLinkId(), scenario.createId("l4"));
-				
+		assertEquals(scenario.createId("l4"), networkRouteHW.getStartLinkId());
+		assertEquals(scenario.createId("l2"), networkRouteHW.getEndLinkId());
+		assertEquals(scenario.createId("l2"), networkRouteWH.getStartLinkId());
+		assertEquals(scenario.createId("l4"), networkRouteWH.getEndLinkId());
+		
 		// check whether non-car routes are also generated
 		legHW.setRoute(null);
 		legHW.setMode(TransportMode.walk);
