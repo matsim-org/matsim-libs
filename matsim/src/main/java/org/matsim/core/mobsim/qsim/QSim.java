@@ -263,6 +263,10 @@ public final class QSim implements VisMobsim, Netsim {
 		
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
+			
+			// withindayEngine.doSimStep(time) has already been called
+			if (mobsimEngine == this.withindayEngine) continue;
+			
 			mobsimEngine.doSimStep(time);
 		}
 
