@@ -21,9 +21,6 @@
 package playground.kai.run;
 
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
@@ -35,7 +32,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.controler.AbstractController;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
@@ -44,16 +40,6 @@ import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -61,27 +47,13 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.old.ModularPlanRouter;
-import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.PseudoTransitLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
-import org.matsim.vis.snapshotwriters.SnapshotWriter;
-import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
-import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
 /**
  * @author nagel
@@ -104,21 +76,17 @@ public class KnSimplifiedController extends AbstractController {
 
 	private TravelTimeCalculator travelTime;
 
-	// ############################################################################################################################
-	// ############################################################################################################################
-	//	stuff that is related to the control flow	
-
-
-	
 	public KnSimplifiedController(Scenario sc) {
 		this.scenario = sc;
 		this.config = sc.getConfig();
 	}
 
 	public void run() {
-		// yyyyyy move config reading into the c'tor.  Lock config there.  Force everybody who wants to modify the config to
+		// yy move config reading into the c'tor.  Lock config there.  Force everybody who wants to modify the config to
 		// do this by loading it before the controler.
-		// yyyyyy move events into the c'tor.  ... Similarly.
+		// yy move events into the c'tor.  ... Similarly.
+		// (Yet with this simplified controler you cannot get at the scenario or the events between ctor and run,
+		// so this is really of less importance here.  kai, sep'12)
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
 		this.setupOutputDirectory(config.controler().getOutputDirectory(), config.controler().getRunId(), true);
@@ -153,10 +121,10 @@ public class KnSimplifiedController extends AbstractController {
 		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, controlerIO);
 		this.addControlerListener(dumpDataAtEnd);
 		
-		final PlansScoring plansScoring = buildPlansScoring();
+		final PlansScoring plansScoring = createPlansScoring();
 		this.addControlerListener(plansScoring);
 
-		final StrategyManager strategyManager = buildStrategyManager() ;
+		final StrategyManager strategyManager = createStrategyManager() ;
 		this.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
 
 		final PlansDumping plansDumping = new PlansDumping( this.scenario, this.config.controler().getFirstIteration(), 
@@ -176,29 +144,25 @@ public class KnSimplifiedController extends AbstractController {
 	 * Design thoughts:<ul>
 	 * <li> At this point, my tendency is to not provide a default version here.  Reason is that this would need to be based
 	 * on the config to be consistent with what is done in the mobsim, router, and scoring builders.  This, however, would
-	 * obfuscale the strategy more than it would help.  kai, sep'12
+	 * obfuscate the strategy more than it would help.  kai, sep'12
 	 */
-	private StrategyManager buildStrategyManager() {
+	private StrategyManager createStrategyManager() {
 		StrategyManager strategyManager = new StrategyManager() ;
-		{
-			strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
-			strategyManager.addStrategy(strategy, 0.9) ;
-		}
-		{
-			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
-			strategy.addStrategyModule( new AbstractMultithreadedModule(this.scenario.getConfig().global().getNumberOfThreads()) {
 
-				@Override
-				public PlanAlgorithm getPlanAlgoInstance() {
-					return createRoutingAlgorithm();
-				}
-				
-			}) ;
-			strategyManager.addStrategy(strategy, 0.1) ;
-		}
+		strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
+
+		PlanStrategy strategy1 = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
+		strategyManager.addStrategy(strategy1, 0.9) ;
+
+		PlanStrategy strategy2 = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
+		strategy2.addStrategyModule( new AbstractMultithreadedModule(this.scenario.getConfig().global().getNumberOfThreads()) {
+			@Override
+			public PlanAlgorithm getPlanAlgoInstance() {
+				return createRoutingAlgorithm();
+			}
+		}) ;
+		strategyManager.addStrategy(strategy2, 0.1) ;
+
 		return strategyManager ;
 	}
 
@@ -214,114 +178,17 @@ public class KnSimplifiedController extends AbstractController {
 		});
 	}
 	
-	private PlansScoring buildPlansScoring() {
-		return buildPlansScoringDefault( this.scenario, this.events, this.controlerIO );
+	private PlansScoring createPlansScoring() {
+		return SimplifiedControlerUtils.createPlansScoringDefault( this.scenario, this.events, this.controlerIO );
 	}
 
 	private ModularPlanRouter createRoutingAlgorithm() {
-		return createRoutingAlgorithmDefault( this.scenario, this.travelTime );
+		return SimplifiedControlerUtils.createRoutingAlgorithmDefault( this.scenario, this.travelTime );
 	}
 
 	@Override
 	protected void runMobSim(int iteration) {
-		runMobsimDefault(scenario, events, iteration, controlerIO );
-	}
-	
-	// static convenience methods below
-
-	/**
-	 * Convenience method to have a default implementation of the mobsim.  It is deliberately non-configurable.  It makes
-	 * no promises about what it does, nor about stability over time.  May be used as a starting point for own variants.
-	 */
-	private static void runMobsimDefault(Scenario sc, EventsManager ev, int iteration, OutputDirectoryHierarchy controlerIO ) {
-		QSim qSim = new QSim( sc, ev ) ;
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, MatsimRandom.getRandom());
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim.addMobsimEngine(teleportationEngine);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-		if (sc.getConfig().controler().getWriteSnapshotsInterval() != 0 && iteration % sc.getConfig().controler().getWriteSnapshotsInterval() == 0) {
-			// yyyy would be nice to have the following encapsulated in some way:
-			// === begin ===
-			SnapshotWriterManager manager = new SnapshotWriterManager(sc.getConfig());
-			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
-			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-			String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
-			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, sc);
-			manager.addSnapshotWriter(snapshotWriter);
-			// === end ===
-			qSim.addQueueSimulationListeners(manager);
-		}
-		qSim.run();
-	}
-	
-	/**
-	 * Convenience method to provide a default routing algorithm.  Design thoughts:<ul>
-	 * <li> This is deliberately not configurable.  If you need configuration, copy this method and re-write.
-	 * <li> This takes deliberately the Scenario as input.  It will do something with it, but there are no promises what 
-	 * it does.  Including no promise that results will remain stable over time.
-	 * <li> A TravelTimeCalculator argument is included, since it needs to be added as an events handler, and we do not want
-	 * to do this as a side effect.
-	 * </ul>
-	 * May be used as starting point for own variants.
-	 */
-	private static ModularPlanRouter createRoutingAlgorithmDefault( Scenario sc, TravelTimeCalculator travelTime ) {
-		Population population = sc.getPopulation() ;
-		Network network = sc.getNetwork() ;
-		Config config = sc.getConfig() ;
-		
-		// factory to generate routes:
-		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (population.getFactory())).getModeRouteFactory();
-
-		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
-		
-		final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-
-		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
-		// times (e.g. for car router, pt router, ...)
-		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
-
-		// plug it together
-		final ModularPlanRouter plansCalcRoute = new ModularPlanRouter();
-		
-		Collection<String> networkModes = config.plansCalcRoute().getNetworkModes();
-		for (String mode : networkModes) {
-			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(network, 
-					leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime), routeFactory));
-		}
-		Map<String, Double> teleportedModeSpeeds = config.plansCalcRoute().getTeleportedModeSpeeds();
-		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), 
-					config.plansCalcRoute().getBeelineDistanceFactor()));
-		}
-		Map<String, Double> teleportedModeFreespeedFactors = config.plansCalcRoute().getTeleportedModeFreespeedFactors();
-		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), 
-					new PseudoTransitLegRouter(network, leastCostPathFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc), 
-							entry.getValue(), config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
-		}
-		
-		// return it:
-		return plansCalcRoute;
-	}
-	
-	/**
-	 * Convenience method to have a default implementation of the scoring.  It is deliberately non-configurable.  It makes
-	 * no promises about what it does, nor about stability over time.  May be used as a starting point for own variants.
-	 */
-	private static PlansScoring buildPlansScoringDefault( Scenario sc, EventsManager ev, OutputDirectoryHierarchy controlerIO ) {
-		Config config = sc.getConfig();
-		Network network = sc.getNetwork() ;
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( config.planCalcScore(), network );
-		final PlansScoring plansScoring = new PlansScoring( sc, ev, controlerIO, scoringFunctionFactory );
-		return plansScoring;
+		SimplifiedControlerUtils.runMobsimDefault(scenario, events, iteration, controlerIO );
 	}
 
 
