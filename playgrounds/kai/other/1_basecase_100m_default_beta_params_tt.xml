@@ -2,8 +2,8 @@
 <matsim_config 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:noNamespaceSchemaLocation="/Users/nagel/git-svnroot-matsim-2/all/matsim/src/main/resources/dtd/matsim4urbansim_v2.xsd"
->
-<!--xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/matsim4urbansim_v2.xsd" -->
+><!--
+xsi:schemaLocation="http://www.matsim.org/files/dtd/ http://www.matsim.org/files/dtd/matsim4urbansim_v2.xsd" -->
 <config>
         <matsim_config>
             <inputFile>
