@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.replanning.parallel;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -30,8 +31,8 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  */
 public class ParallelDuringLegReplanner extends ParallelReplanner<WithinDayDuringLegReplannerFactory> {
 
-	public ParallelDuringLegReplanner(int numOfThreads) {
-		super(numOfThreads);
+	public ParallelDuringLegReplanner(int numOfThreads, EventsManager eventsManager) {
+		super(numOfThreads, eventsManager);
 		this.init("ParallelDuringLegReplanner");
 	}
 	

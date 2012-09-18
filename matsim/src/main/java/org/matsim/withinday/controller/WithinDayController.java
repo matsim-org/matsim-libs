@@ -170,7 +170,7 @@ public class WithinDayController extends Controler {
 	private void init() {
 		super.getQueueSimulationListener().add(fosl);
 		
-		this.withinDayEngine = new WithinDayEngine();
+		this.withinDayEngine = new WithinDayEngine(this.getEvents());
 	}
 
 	@Override

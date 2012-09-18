@@ -59,23 +59,21 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	 */
 	private final boolean shareReplannerQueue = true;
 	
-	protected int numOfThreads = 1;	// use by default only one thread
+	protected final EventsManager eventsManager;
+	protected int numOfThreads;
+	
 	protected Set<T> replannerFactories = new LinkedHashSet<T>();
 	protected ReplanningRunnable[] replanningRunnables;
 	protected String replannerName;
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
-	protected EventsManager eventsManager;
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier betweenReplannerBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 	
-	public ParallelReplanner(int numOfThreads) {
+	public ParallelReplanner(int numOfThreads, EventsManager eventsManager) {
 		this.setNumberOfThreads(numOfThreads);
-	}
-
-	public final void setEventsManager(EventsManager eventsManager) {
-		for (ReplanningRunnable replanningThread : replanningRunnables) replanningThread.setEventsManager(eventsManager);
+		this.eventsManager = eventsManager;
 	}
 	
 	public final void init(String replannerName) {
@@ -94,7 +92,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 			replanningRunnable.setCyclicTimeStepStartBarrier(this.timeStepStartBarrier);
 			replanningRunnable.setBetweenReplannerBarrier(betweenReplannerBarrier);
 			replanningRunnable.setCyclicTimeStepEndBarrier(this.timeStepEndBarrier);
-
+			replanningRunnable.setEventsManager(eventsManager);
+			
 			replanningRunnables[i] = replanningRunnable;
 		}
 	}
@@ -230,14 +229,14 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	private final void setNumberOfThreads(int numberOfThreads) {
 		numOfThreads = Math.max(numberOfThreads, 1); // it should be at least 1 here; we allow 0 in other places for "no threads"
 
-		log.info("Using " + numOfThreads + " parallel threads to replan routes.");
+		log.info("Using " + numOfThreads + " threads for parallel within-day replanning.");
 
 		/*
 		 *  Throw error message if the number of threads is bigger than the number of available CPUs.
 		 *  This should not speed up calculation anymore.
 		 */
 		if (numOfThreads > Runtime.getRuntime().availableProcessors()) {
-			log.error("The number of parallel running replanning threads is bigger than the number of available CPUs/Cores!");
+			log.warn("The number of parallel running replanning threads is bigger than the number of available CPUs/Cores!");
 		}
 	}
 		

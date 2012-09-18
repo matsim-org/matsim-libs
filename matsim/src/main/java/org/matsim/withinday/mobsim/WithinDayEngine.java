@@ -47,6 +47,8 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
 public class WithinDayEngine implements MobsimEngine {
 
 	private static final Logger log = Logger.getLogger(WithinDayEngine.class);
+
+	private final EventsManager eventsManager;
 	
 	private boolean initialReplanning = true;
 	private boolean duringActivityReplanning = true;
@@ -65,9 +67,11 @@ public class WithinDayEngine implements MobsimEngine {
 	
 	private InternalInterface internalInterface;
 	
-	public WithinDayEngine() {
-		duringActivityReplannerFactory = new LinkedHashMap<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>>();
-		duringLegReplannerFactory = new LinkedHashMap<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>>();
+	public WithinDayEngine(EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
+		
+		this.duringActivityReplannerFactory = new LinkedHashMap<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>>();
+		this.duringLegReplannerFactory = new LinkedHashMap<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>>();
 	}
 	
 	/*
@@ -76,20 +80,14 @@ public class WithinDayEngine implements MobsimEngine {
 	public void initializeReplanningModules(int numOfThreads) {
 		
 		log.info("Initialize Parallel Replanning Modules");
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numOfThreads);
-		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(numOfThreads);
-		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numOfThreads);
+		this.parallelInitialReplanner = new ParallelInitialReplanner(numOfThreads, eventsManager);
+		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(numOfThreads, eventsManager);
+		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numOfThreads, eventsManager);
 
 		log.info("Initialize Replanning Modules");
 		this.initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		this.duringActivityReplanningModule = new DuringActivityReplanningModule(parallelDuringActivityReplanner);
 		this.duringLegReplanningModule = new DuringLegReplanningModule(parallelDuringLegReplanner);
-	}
-	
-	public void setEventsManager(EventsManager eventsManager) {
-		this.parallelInitialReplanner.setEventsManager(eventsManager);
-		this.parallelDuringActivityReplanner.setEventsManager(eventsManager);
-		this.parallelDuringLegReplanner.setEventsManager(eventsManager);
 	}
 	
 	public void doInitialReplanning(boolean value) {

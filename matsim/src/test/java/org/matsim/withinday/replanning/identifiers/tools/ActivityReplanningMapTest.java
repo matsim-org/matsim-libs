@@ -52,9 +52,9 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 
 		Controler controler = new Controler(config);
-		WithinDayEngine replanningManager = new WithinDayEngine();
-		replanningManager.initializeReplanningModules(2);
-		controler.setMobsimFactory(new WithinDayQSimFactory(replanningManager));
+		WithinDayEngine withinDayEngine = new WithinDayEngine(controler.getEvents());
+		withinDayEngine.initializeReplanningModules(2);
+		controler.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
 		ControlerListenerForTests listener = new ControlerListenerForTests();
 		controler.addControlerListener(listener);
 		controler.run();
