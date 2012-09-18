@@ -17,12 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.router;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -41,6 +43,10 @@ import org.matsim.core.utils.collections.CollectionUtils;
  * @author thibautd
  */
 public class MultimodalSimulationTripRouterFactory implements TripRouterFactory {
+	
+	protected static final Logger log = Logger.getLogger(MultimodalSimulationTripRouterFactory.class);
+	
+	private final TripRouterFactory delegateFactory;
 	private final Network network;
 	private final LeastCostPathCalculatorFactory leastCostAlgoFactory;
 	private final TravelDisutility travelDisutility;
@@ -54,20 +60,28 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
 			final TravelDisutility travelDisutility,
 			final Map<String, TravelTime> multimodalTravelTimes,
-			final MultiModalConfigGroup configGroup) {
+			final MultiModalConfigGroup configGroup,
+			final TripRouterFactory delegateFactory) {
 		this.network = network;
 		this.populationFactory = populationFactory;
 		this.leastCostAlgoFactory = leastCostAlgoFactory;
 		this.configGroup = configGroup;
 		this.travelDisutility = travelDisutility;
 		this.multimodalTravelTimes = multimodalTravelTimes;
+		this.delegateFactory = delegateFactory;
 	}
 
 	@Override
 	public TripRouter createTripRouter() {
-		TripRouter instance = new TripRouter();
-
-			
+		
+		/*
+		 * If a delegateFactory is set, use it to create a TripRouter. By doing so,
+		 * modes not simulated by the multi-modal simulation are also taken into account.
+		 */
+		TripRouter instance = null;
+		if (delegateFactory != null) instance = delegateFactory.createTripRouter();
+		else instance = new TripRouter();
+		
 		// Define restrictions for the different modes.
 		/*
 		 * Car
@@ -116,9 +130,13 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 		rideModeRestrictions.add(TransportMode.car);
 		rideModeRestrictions.add(TransportMode.bike);
 		rideModeRestrictions.add(TransportMode.walk);
-		
+			
 		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(this.network);
 		for (String mode : CollectionUtils.stringToArray( configGroup.getSimulatedModes() )) {
+			
+			if (instance.getRegisteredModes().contains(mode)) {
+				log.warn("A routing algorithm for " + mode + " is already registered. It is replaced!");
+			}
 			
 			Set<String> modeRestrictions;
 			if (mode.equals(TransportMode.car)) {

@@ -1036,6 +1036,8 @@ public class Controler extends AbstractController {
 		}
 
 		if (tripRouterFactory == null) {
+			tripRouterFactory = new TripRouterFactoryImpl(this);
+			
 			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
 				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
 						network,
@@ -1043,10 +1045,8 @@ public class Controler extends AbstractController {
 						getLeastCostPathCalculatorFactory(),
 						createTravelCostCalculator(),
 						multiModalTravelTimes,
-						config.multiModal());
-			}
-			else {
-				tripRouterFactory = new TripRouterFactoryImpl( this );
+						config.multiModal(),
+						tripRouterFactory);
 			}
 
 			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
