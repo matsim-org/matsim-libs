@@ -28,51 +28,48 @@ import junit.framework.TestCase;
 public class TestLinkVisualizationQueue extends TestCase {
 
 	public void testBasic() {
-		InductiveChargingAtRoadOutputLog log=new InductiveChargingAtRoadOutputLog();
-		
+		InductiveChargingAtRoadOutputLog log = new InductiveChargingAtRoadOutputLog();
+
 		IdImpl linkId = new IdImpl("link-1");
 		IdImpl agentId = new IdImpl("agent-1");
-		log.add(new ChargingLogRowLinkLevel(agentId, linkId, (24*3600)-10, 20, 3600*20));
-		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600*20));
-		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 90, 20, 3600*20));
-		
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, (24 * 3600) - 10, 20, 3600 * 20));
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600 * 20));
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 90, 20, 3600 * 20));
+
 		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
-		
-		
+
 		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 5));
 		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 10));
 		assertEquals(0.0, linkEventsQueue.getValue(linkId, 15));
 		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 80));
 		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 85));
-		assertEquals(2*3600.0, linkEventsQueue.getValue(linkId, 95));
+		assertEquals(2 * 3600.0, linkEventsQueue.getValue(linkId, 95));
 		assertEquals(0.0, linkEventsQueue.getValue(linkId, 130));
-		assertEquals(3600.0, linkEventsQueue.getValue(linkId, (24*3600)-10+1));
+		assertEquals(3600.0, linkEventsQueue.getValue(linkId, (24 * 3600) - 10 + 1));
 	}
-	
+
 	public void testNoValueBeginning() {
-		InductiveChargingAtRoadOutputLog log=new InductiveChargingAtRoadOutputLog();
-		
+		InductiveChargingAtRoadOutputLog log = new InductiveChargingAtRoadOutputLog();
+
 		IdImpl linkId = new IdImpl("link-1");
 		IdImpl agentId = new IdImpl("agent-1");
-		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600*20));
-		
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600 * 20));
+
 		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
-		
-		
+
 		assertEquals(0.0, linkEventsQueue.getValue(linkId, 5));
 	}
-	
+
 	public void testLinkIdDoesNotExist() {
-		InductiveChargingAtRoadOutputLog log=new InductiveChargingAtRoadOutputLog();
-		
+		InductiveChargingAtRoadOutputLog log = new InductiveChargingAtRoadOutputLog();
+
 		IdImpl linkId = new IdImpl("link-1");
 		IdImpl agentId = new IdImpl("agent-1");
-		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600*20));
-		
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600 * 20));
+
 		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
-		
-		
+
 		assertEquals(0.0, linkEventsQueue.getValue(new IdImpl("link-2"), 5));
 	}
-	
+
 }
