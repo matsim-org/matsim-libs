@@ -55,6 +55,7 @@ public class ParkingManager {
 			rect.registerCoord(parking.getCoordinate());
 		}
 		parkings=(new QuadTreeInitializer<Parking>()).getQuadTree(rect);
+		
 	}
 	
 	/**
