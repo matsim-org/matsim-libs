@@ -19,6 +19,8 @@
 
 package playground.michalm.vrp.data.network.shortestpath.sparse;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.MatsimVertex;
@@ -31,14 +33,25 @@ import playground.michalm.vrp.data.network.shortestpath.*;
  * @author michalm
  */
 public class SparseShortestPathArc
-    implements ShortestPathArc
+    implements MatsimArc
 {
-    private final ShortestPath shortestPath;
+    private final ShortestPathCalculator shortestPathCalculator;
+    private final TimeDiscretizer timeDiscretizer;
+
+    private final Link fromLink;
+    private final Link toLink;
+
+    private ShortestPath[] shortestPaths = null;// lazy initialization
 
 
-    public SparseShortestPathArc(ShortestPath shortestPath)
+    public SparseShortestPathArc(ShortestPathCalculator shortestPathCalculator,
+            TimeDiscretizer timeDiscretizer, MatsimVertex fromVertex, MatsimVertex toVertex)
     {
-        this.shortestPath = shortestPath;
+        this.shortestPathCalculator = shortestPathCalculator;
+        this.timeDiscretizer = timeDiscretizer;
+
+        fromLink = fromVertex.getLink();
+        toLink = toVertex.getLink();
     }
 
 
@@ -46,7 +59,7 @@ public class SparseShortestPathArc
     public int getTimeOnDeparture(int departureTime)
     {
         // no interpolation between consecutive timeSlices!
-        return shortestPath.getSPEntry(departureTime).travelTime;
+        return getShortestPath(departureTime).travelTime;
     }
 
 
@@ -54,7 +67,7 @@ public class SparseShortestPathArc
     public int getTimeOnArrival(int arrivalTime)
     {
         // TODO: very rough!!!
-        return shortestPath.getSPEntry(arrivalTime).travelTime;
+        return getShortestPath(arrivalTime).travelTime;
 
         // probably a bit more accurate but still rough and more time consuming
         // return shortestPath.getSPEntry(arrivalTime -
@@ -66,13 +79,27 @@ public class SparseShortestPathArc
     public double getCostOnDeparture(int departureTime)
     {
         // no interpolation between consecutive timeSlices!
-        return shortestPath.getSPEntry(departureTime).travelCost;
+        return getShortestPath(departureTime).travelCost;
     }
 
 
     @Override
-    public ShortestPath getShortestPath()
+    public ShortestPath getShortestPath(int departTime)
     {
+        // lazy initialization of the SP entries
+        if (shortestPaths == null) {
+            shortestPaths = new ShortestPath[timeDiscretizer.getIntervalCount()];
+        }
+
+        int idx = timeDiscretizer.getIdx(departTime);
+        ShortestPath shortestPath = shortestPaths[idx];
+
+        // loads necessary data on demand
+        if (shortestPath == null) {
+            shortestPath = shortestPaths[idx] = shortestPathCalculator.calculateShortestPath(
+                    fromLink, toLink, departTime);
+        }
+
         return shortestPath;
     }
 
@@ -114,8 +141,8 @@ public class SparseShortestPathArc
         @Override
         public Arc build()
         {
-            return new SparseShortestPathArc(new SparseShortestPath(shortestPathCalculator,
-                    timeDiscretizer, (MatsimVertex)vertexFrom, (MatsimVertex)vertexTo));
+            return new SparseShortestPathArc(shortestPathCalculator, timeDiscretizer,
+                    (MatsimVertex)vertexFrom, (MatsimVertex)vertexTo);
         }
     }
 }

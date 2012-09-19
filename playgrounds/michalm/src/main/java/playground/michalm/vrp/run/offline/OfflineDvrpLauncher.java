@@ -46,6 +46,7 @@ import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 import playground.michalm.vrp.data.network.shortestpath.full.*;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
 
@@ -147,7 +148,7 @@ public class OfflineDvrpLauncher
 
         TimeDiscretizer timeDiscretizer = TimeDiscretizer.TD_24H_BY_15MIN;
 
-        FullShortestPath[][] shortestPaths = null;
+        ShortestPath[][][] shortestPaths = null;
 
         if (VRP_OUT_FILES) {
             shortestPaths = FullShortestPaths.readShortestPaths(timeDiscretizer, data,

@@ -48,8 +48,8 @@ public class SparseShortestPaths
             for (Vertex b : vertices) {
                 MatsimVertex vB = (MatsimVertex)b;
 
-                SparseShortestPathArc sPath_AB = new SparseShortestPathArc(new SparseShortestPath(
-                        shortestPathCalculator, timeDiscretizer, vA, vB));
+                SparseShortestPathArc sPath_AB = new SparseShortestPathArc(shortestPathCalculator,
+                        timeDiscretizer, vA, vB);
 
                 sPath_A[vB.getId()] = sPath_AB;
             }

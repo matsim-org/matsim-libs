@@ -32,8 +32,8 @@ import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.MatsimVertexImpl;
 import playground.michalm.vrp.data.network.router.TimeAsTravelDisutility;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPathCalculator;
-import playground.michalm.vrp.data.network.shortestpath.full.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.full.FullShortestPaths;
 
 
 public class SimLauncherWithArcEstimator
@@ -105,7 +105,7 @@ public class SimLauncherWithArcEstimator
         ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
                 travelTime, travelDisutility);
 
-        FullShortestPath[][] shortestPaths = FullShortestPaths.findShortestPaths(
+        ShortestPath[][][] shortestPaths = FullShortestPaths.findShortestPaths(
                 shortestPathCalculator, TimeDiscretizer.TD_24H_BY_15MIN, data.getMatsimVrpGraph());
         FullShortestPaths.writeShortestPaths(shortestPaths, vrpArcTimesFileName,
                 vrpArcCostsFileName, vrpArcPathsFileName);

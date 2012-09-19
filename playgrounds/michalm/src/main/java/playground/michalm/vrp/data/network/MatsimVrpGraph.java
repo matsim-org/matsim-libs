@@ -21,15 +21,11 @@ package playground.michalm.vrp.data.network;
 
 import org.matsim.api.core.v01.Id;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
+import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
 
 
 public interface MatsimVrpGraph
     extends VrpGraph
 {
     MatsimVertex getVertex(Id linkId);
-
-
-    ShortestPath getShortestPath(Vertex vertexFrom, Vertex vertexTo);
 }

@@ -24,11 +24,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
-
 
 public class ShortestPathCalculator
 {
+    // include toLink or fromLink in time/cost (depends on the way the qsim is implemented...)
+    // by default: true (toLinks are included)
+    public static final boolean INCLUDE_TO_LINK = true;
+
     private final LeastCostPathCalculator router;
     private final TravelTime travelTime;
     private final TravelDisutility travelDisutility;
@@ -43,7 +45,7 @@ public class ShortestPathCalculator
     }
 
 
-    public SPEntry calculateSPEntry(Link fromLink, Link toLink, int departTime)
+    public ShortestPath calculateShortestPath(Link fromLink, Link toLink, int departTime)
     {
         if (fromLink != toLink) {
             Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
@@ -55,7 +57,7 @@ public class ShortestPathCalculator
             Id[] ids = new Id[idCount];
             int idxShift;
 
-            if (ShortestPath.INCLUDE_TO_LINK) {
+            if (INCLUDE_TO_LINK) {
                 time += travelTime.getLinkTravelTime(toLink, departTime, null, null);
                 cost += travelDisutility.getLinkTravelDisutility(toLink, time, null, null);
                 ids[idCount - 1] = toLink.getId();
@@ -72,7 +74,7 @@ public class ShortestPathCalculator
                 ids[idx + idxShift] = path.links.get(idx).getId();
             }
 
-            return new SPEntry((int)time, cost, ids);
+            return new ShortestPath((int)time, cost, ids);
         }
         else {
             return ShortestPath.ZERO_PATH_ENTRY;

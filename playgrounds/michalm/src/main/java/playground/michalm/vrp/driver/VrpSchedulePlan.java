@@ -33,7 +33,6 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
 public class VrpSchedulePlan
@@ -112,7 +111,7 @@ public class VrpSchedulePlan
     private void addLeg(MatsimVertex fromVertex, MatsimVertex toVertex, int departTime,
             int arrivalTime)
     {
-        ShortestPath sp = vrpGraph.getShortestPath(fromVertex, toVertex);
+        ShortestPath path = MatsimArcs.getShortestPath(vrpGraph, fromVertex, toVertex, departTime);
 
         Leg leg = populFactory.createLeg(TransportMode.car);
 
@@ -121,8 +120,7 @@ public class VrpSchedulePlan
         Link fromLink = fromVertex.getLink();
         Link toLink = toVertex.getLink();
 
-        SPEntry entry = sp.getSPEntry(departTime);
-        Id[] linkIds = entry.linkIds;
+        Id[] linkIds = path.linkIds;
 
         NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl)populFactory).createRoute(
                 TransportMode.car, fromLink.getId(), toLink.getId());
@@ -136,7 +134,7 @@ public class VrpSchedulePlan
                 linkIdList.add(linkIds[i]);
             }
 
-            netRoute.setLinkIds(fromLink.getId(), Arrays.asList(entry.linkIds), toLink.getId());
+            netRoute.setLinkIds(fromLink.getId(), Arrays.asList(path.linkIds), toLink.getId());
             netRoute.setDistance(RouteUtils.calcDistance(netRoute, network));
         }
         else {
@@ -146,7 +144,7 @@ public class VrpSchedulePlan
         int travelTime = arrivalTime - departTime;// According to the route
 
         netRoute.setTravelTime(travelTime);
-        netRoute.setTravelCost(entry.travelCost);
+        netRoute.setTravelCost(path.travelCost);
 
         leg.setRoute(netRoute);
         leg.setDepartureTime(departTime);

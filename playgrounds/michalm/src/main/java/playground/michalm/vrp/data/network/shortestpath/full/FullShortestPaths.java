@@ -34,7 +34,6 @@ import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.shortestpath.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
 public class FullShortestPaths
@@ -42,7 +41,7 @@ public class FullShortestPaths
     private final static Logger log = Logger.getLogger(FullShortestPaths.class);
 
 
-    public static FullShortestPath[][] findShortestPaths(
+    public static ShortestPath[][][] findShortestPaths(
             ShortestPathCalculator shortestPathCalculator, TimeDiscretizer timeDiscretizer,
             MatsimVrpGraph graph)
     {
@@ -57,8 +56,8 @@ public class FullShortestPaths
 
         int n = graph.getVertexCount();
 
-        FullShortestPath[][] shortestPaths = (FullShortestPath[][])Array.newInstance(
-                FullShortestPath.class, n, n);
+        ShortestPath[][][] sPaths = (ShortestPath[][][])Array.newInstance(ShortestPath.class, n, n,
+                timeInterval);
 
         List<Vertex> vertices = graph.getVertices();
 
@@ -66,21 +65,18 @@ public class FullShortestPaths
             MatsimVertex vA = (MatsimVertex)a;
 
             log.info("findShortestPaths ==== vertex: " + vA + " ====");
-            FullShortestPath[] sPath_A = shortestPaths[vA.getId()];
+            ShortestPath[][] sPaths_A = sPaths[vA.getId()];
             Link fromLink = vA.getLink();
 
             for (Vertex b : vertices) {
                 MatsimVertex vB = (MatsimVertex)b;
 
-                FullShortestPath sPath_AB = new FullShortestPath(timeDiscretizer);
-                sPath_A[vB.getId()] = sPath_AB;
-
+                ShortestPath[] sPaths_AB = sPaths_A[vB.getId()];
                 Link toLink = vB.getLink();
-                SPEntry[] entries = sPath_AB.entries;
 
-                for (int k = 0; k < entries.length; k++) {
+                for (int k = 0; k < sPaths_AB.length; k++) {
                     int departTime = k * timeInterval;// + travelTimeBinSize/2 TODO
-                    entries[k] = shortestPathCalculator.calculateSPEntry(fromLink, toLink,
+                    sPaths_AB[k] = shortestPathCalculator.calculateShortestPath(fromLink, toLink,
                             departTime);
                 }
             }
@@ -89,11 +85,11 @@ public class FullShortestPaths
         log.info("findShortestPaths(Controler) ==== FINISHED ====");
         // Check out "NetworkLegRouter" what one can make with Paths in order to build Routes
 
-        return shortestPaths;
+        return sPaths;
     }
 
 
-    public static void writeShortestPaths(FullShortestPath[][] shortestPaths, String timesFileName,
+    public static void writeShortestPaths(ShortestPath[][][] sPaths, String timesFileName,
             String costsFileName, String pathsFileName)
         throws IOException
     {
@@ -103,19 +99,17 @@ public class FullShortestPaths
         BufferedWriter costsBW = new BufferedWriter(new FileWriter(costsFileName));
         BufferedWriter pathsBW = new BufferedWriter(new FileWriter(pathsFileName));
 
-        for (int i = 0; i < shortestPaths.length; i++) {
-            FullShortestPath[] sPath_i = shortestPaths[i];
+        for (int i = 0; i < sPaths.length; i++) {
+            ShortestPath[][] sPaths_i = sPaths[i];
 
-            for (int j = 0; j < sPath_i.length; j++) {
-                FullShortestPath sPath_ij = sPath_i[j];
+            for (int j = 0; j < sPaths_i.length; j++) {
+                ShortestPath[] sPaths_ij = sPaths_i[j];
                 timesBW.write(i + "->" + j + "\t");
                 costsBW.write(i + "->" + j + "\t");
                 pathsBW.write(i + "->" + j + "\t");
 
-                SPEntry[] entries = sPath_ij.entries;
-
-                for (int k = 0; k < entries.length; k++) {
-                    SPEntry entry = entries[k];
+                for (int k = 0; k < sPaths_ij.length; k++) {
+                    ShortestPath entry = sPaths_ij[k];
                     timesBW.write(entry.travelTime + "\t");
                     costsBW.write(entry.travelCost + "\t");
                     pathsBW.write(entry.linkIds.length + "\t");// number of linkIds
@@ -160,7 +154,7 @@ public class FullShortestPaths
     }
 
 
-    public static FullShortestPath[][] readShortestPaths(TimeDiscretizer timeDiscretizer,
+    public static ShortestPath[][][] readShortestPaths(TimeDiscretizer timeDiscretizer,
             MatsimVrpData data, String timesFileName, String costsFileName, String pathsFileName)
         throws IOException
     {
@@ -169,15 +163,15 @@ public class FullShortestPaths
         int n = data.getMatsimVrpGraph().getVertexCount();
         boolean readPaths = pathsFileName != null;
 
-        FullShortestPath[][] shortestPaths = (FullShortestPath[][])Array.newInstance(
-                FullShortestPath.class, n, n);
+        ShortestPath[][][] sPaths = (ShortestPath[][][])Array.newInstance(ShortestPath.class, n, n,
+                timeDiscretizer.getIntervalCount());
 
         BufferedReader timesBR = getReader(new File(timesFileName));
         BufferedReader costsBR = getReader(new File(costsFileName));
         BufferedReader pathsBR = readPaths ? getReader(new File(pathsFileName)) : null;
 
         for (int i = 0; i < n; i++) {
-            FullShortestPath[] sPath_i = shortestPaths[i];
+            ShortestPath[][] sPaths_i = sPaths[i];
 
             for (int j = 0; j < n; j++) {
                 TypedStringTokenizer timesTST = new TypedStringTokenizer(timesBR.readLine(), "\t");
@@ -192,12 +186,9 @@ public class FullShortestPaths
                     pathsTST.nextToken();// line beginning
                 }
 
-                FullShortestPath sPath_ij = new FullShortestPath(timeDiscretizer);
-                sPath_i[j] = sPath_ij;
+                ShortestPath[] sPaths_ij = sPaths_i[j];
 
-                SPEntry[] entries = sPath_ij.entries;
-
-                for (int k = 0; k < entries.length; k++) {
+                for (int k = 0; k < sPaths_ij.length; k++) {
                     double travelTime = timesTST.nextDouble();
                     double travelCost = costsTST.nextDouble();
                     Id[] linkIds = null;
@@ -206,7 +197,7 @@ public class FullShortestPaths
                         int linkIdCount = pathsTST.nextInt();
 
                         if (linkIdCount == 0) {
-                            entries[k] = ShortestPath.ZERO_PATH_ENTRY;
+                            sPaths_ij[k] = ShortestPath.ZERO_PATH_ENTRY;
                             continue;
                         }
 
@@ -218,7 +209,7 @@ public class FullShortestPaths
                         }
                     }
 
-                    entries[k] = new SPEntry((int)travelTime, travelCost, linkIds);
+                    sPaths_ij[k] = new ShortestPath((int)travelTime, travelCost, linkIds);
                 }
             }
         }
@@ -231,25 +222,25 @@ public class FullShortestPaths
         }
 
         log.info("readShortestPaths() ==== FINISHED ====");
-        return shortestPaths;
+        return sPaths;
     }
 
 
     /**
      * Updates travel times and costs
      */
-    public static void upadateVrpArcs(FullShortestPath[][] shortestPaths,
-            TimeDiscretizer timeDiscretizer, FixedSizeMatsimVrpGraph graph)
+    public static void upadateVrpArcs(ShortestPath[][][] sPaths, TimeDiscretizer timeDiscretizer,
+            FixedSizeMatsimVrpGraph graph)
     {
         log.info("upadateVrpArcs() ==== STARTED ====");
         List<Vertex> vertices = graph.getVertices();
 
         for (Vertex vA : vertices) {
-            FullShortestPath[] sPath_i = shortestPaths[vA.getId()];
+            ShortestPath[][] sPaths_i = sPaths[vA.getId()];
 
             for (Vertex vB : vertices) {
                 graph.setArc(vA, vB,
-                        FullShortestPathArc.createArc(timeDiscretizer, sPath_i[vB.getId()]));
+                        FullShortestPathArc.createArc(timeDiscretizer, sPaths_i[vB.getId()]));
             }
         }
 

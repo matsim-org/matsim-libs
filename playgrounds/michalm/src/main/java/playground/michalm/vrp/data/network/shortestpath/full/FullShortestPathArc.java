@@ -22,46 +22,47 @@ package playground.michalm.vrp.data.network.shortestpath.full;
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.InterpolatedArc;
 import playground.michalm.vrp.data.network.shortestpath.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
 public class FullShortestPathArc
-    extends InterpolatedArc //TODO this interpolation is in conflict with SPEntry
-    implements ShortestPathArc
+    extends InterpolatedArc
+    // TODO this interpolation is in conflict with SPEntry
+    implements MatsimArc
 {
-    private final FullShortestPath shortestPath;
+    private final TimeDiscretizer timeDiscretizer;
+    private final ShortestPath[] shortestPaths;
 
 
     public FullShortestPathArc(TimeDiscretizer timeDiscretizer, int[] timesOnDeparture,
-            double[] costsOnDeparture, FullShortestPath shortestPath)
+            double[] costsOnDeparture, ShortestPath[] shortestPaths)
     {
         super(timeDiscretizer, timesOnDeparture, costsOnDeparture);
-        this.shortestPath = shortestPath;
-    }
-
-
-    @Override
-    public ShortestPath getShortestPath()
-    {
-        return shortestPath;
+        this.timeDiscretizer = timeDiscretizer;
+        this.shortestPaths = shortestPaths;
     }
 
 
     public static FullShortestPathArc createArc(TimeDiscretizer timeDiscretizer,
-            FullShortestPath shortestPath)
+            ShortestPath[] shortestPaths)
     {
-        SPEntry[] entries = shortestPath.entries;
-        int numSlots = entries.length;
+        int numSlots = shortestPaths.length;
 
         int[] timesOnDeparture = new int[numSlots];
         double[] costsOnDeparture = new double[numSlots];
 
         for (int k = 0; k < numSlots; k++) {
-            timesOnDeparture[k] = entries[k].travelTime;
-            costsOnDeparture[k] = entries[k].travelCost;
+            timesOnDeparture[k] = shortestPaths[k].travelTime;
+            costsOnDeparture[k] = shortestPaths[k].travelCost;
         }
 
         return new FullShortestPathArc(timeDiscretizer, timesOnDeparture, costsOnDeparture,
-                shortestPath);
+                shortestPaths);
+    }
+
+
+    @Override
+    public ShortestPath getShortestPath(int departTime)
+    {
+        return shortestPaths[timeDiscretizer.getIdx(departTime)];
     }
 }

@@ -20,8 +20,7 @@
 package playground.michalm.vrp.taxi.taxicab;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
@@ -30,7 +29,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.TaxiCustomer;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
@@ -224,8 +223,8 @@ public class TaxiAgentLogic
     private TaxiLeg createLegWithPassenger(DriveTask driveTask, int realDepartTime,
             final Request request)
     {
-        SPEntry path = vrpGraph.getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
-                .getSPEntry(realDepartTime);
+        ShortestPath path = MatsimArcs.getShortestPath(vrpGraph, driveTask.getFromVertex(),
+                driveTask.getToVertex(), realDepartTime);
 
         Id destinationLinkId = ((MatsimVertex)driveTask.getToVertex()).getLink().getId();
 
@@ -255,8 +254,8 @@ public class TaxiAgentLogic
 
     private TaxiLeg createLeg(DriveTask driveTask, int realDepartTime)
     {
-        SPEntry path = vrpGraph.getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
-                .getSPEntry(realDepartTime);
+        ShortestPath path = MatsimArcs.getShortestPath(vrpGraph, driveTask.getFromVertex(),
+                driveTask.getToVertex(), realDepartTime);
 
         Id destinationLinkId = ((MatsimVertex)driveTask.getToVertex()).getLink().getId();
 

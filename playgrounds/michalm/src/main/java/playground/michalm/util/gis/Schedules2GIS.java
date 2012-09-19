@@ -32,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.shortestpath.*;
 
 import com.vividsolutions.jts.geom.*;
 
@@ -91,11 +91,10 @@ public class Schedules2GIS
 
     private LineString createLineString(DriveTask driveTask)
     {
-        SPEntry entry = data.getMatsimVrpGraph()
-                .getShortestPath(driveTask.getFromVertex(), driveTask.getToVertex())
-                .getSPEntry(driveTask.getBeginTime());
+        ShortestPath path = MatsimArcs.getShortestPath(data.getMatsimVrpGraph(),
+                driveTask.getFromVertex(), driveTask.getToVertex(), driveTask.getBeginTime());
 
-        Id[] ids = entry.linkIds;
+        Id[] ids = path.linkIds;
 
         if (ids.length == 0) {
             return null;
@@ -104,11 +103,11 @@ public class Schedules2GIS
         List<Coordinate> coordList = new ArrayList<Coordinate>();
         Map<Id, ? extends Link> linksMap = data.getScenario().getNetwork().getLinks();
 
-        Link link = linksMap.get(entry.linkIds[0]);
+        Link link = linksMap.get(path.linkIds[0]);
         Coord c = link.getFromNode().getCoord();
         coordList.add(new Coordinate(c.getX(), c.getY()));
 
-        for (Id l : entry.linkIds) {
+        for (Id l : path.linkIds) {
             link = linksMap.get(l);
             c = link.getToNode().getCoord();
             coordList.add(new Coordinate(c.getX(), c.getY()));

@@ -35,7 +35,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.shortestpath.*;
 import cern.colt.Arrays;
 
 
@@ -279,8 +279,9 @@ public class JdbcWriter
                             driveTaskInsert.setInt(7, dt.getFromVertex().getId());
                             driveTaskInsert.setInt(8, dt.getToVertex().getId());
 
-                            SPEntry path = vrpGraph.getShortestPath(dt.getFromVertex(),
-                                    dt.getToVertex()).getSPEntry(dt.getBeginTime());
+                            ShortestPath path = MatsimArcs.getShortestPath(vrpGraph,
+                                    dt.getFromVertex(), dt.getToVertex(), dt.getBeginTime());
+
                             driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
 
                             break;
@@ -431,8 +432,9 @@ public class JdbcWriter
                             driveTaskInsert.setInt(7, dt.getFromVertex().getId());
                             driveTaskInsert.setInt(8, dt.getToVertex().getId());
 
-                            SPEntry path = vrpGraph.getShortestPath(dt.getFromVertex(),
-                                    dt.getToVertex()).getSPEntry(dt.getBeginTime());
+                            ShortestPath path = MatsimArcs.getShortestPath(vrpGraph,
+                                    dt.getFromVertex(), dt.getToVertex(), dt.getBeginTime());
+
                             driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
 
                             break;

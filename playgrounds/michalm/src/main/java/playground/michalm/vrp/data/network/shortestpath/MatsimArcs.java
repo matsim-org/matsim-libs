@@ -17,30 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.data.network.shortestpath.full;
+package playground.michalm.vrp.data.network.shortestpath;
 
-import pl.poznan.put.util.lang.TimeDiscretizer;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
 
 
-public class FullShortestPath
-    implements ShortestPath
+public class MatsimArcs
 {
-    private final TimeDiscretizer timeDiscretizer;
-
-    final SPEntry entries[];
-
-
-    public FullShortestPath(TimeDiscretizer timeDiscretizer)
+    public static ShortestPath getShortestPath(MatsimVrpGraph graph, Vertex vertexFrom,
+            Vertex vertexTo, int departTime)
     {
-        this.timeDiscretizer = timeDiscretizer;
-        entries = new SPEntry[timeDiscretizer.getIntervalCount()];
+        return ((MatsimArc)graph.getArc(vertexFrom, vertexTo)).getShortestPath(departTime);
     }
 
-
-    @Override
-    public SPEntry getSPEntry(int departTime)
-    {
-        return entries[timeDiscretizer.getIdx(departTime)];
-    }
 }

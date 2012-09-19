@@ -22,31 +22,20 @@ package playground.michalm.vrp.data.network.shortestpath;
 import org.matsim.api.core.v01.Id;
 
 
-public interface ShortestPath
+public class ShortestPath
 {
     // optimization
-    public static final SPEntry ZERO_PATH_ENTRY = new SPEntry(0, 0, new Id[0]);
+    public static final ShortestPath ZERO_PATH_ENTRY = new ShortestPath(0, 0, new Id[0]);
 
-    // include toLink or fromLink in time/cost (depends on the way the qsim is implemented...)
-    // by default: true (toLinks are included)
-    public static final boolean INCLUDE_TO_LINK = true;
+    public final int travelTime;
+    public final double travelCost;
+    public final Id[] linkIds;
 
 
-    public static class SPEntry
+    public ShortestPath(int travelTime, double travelCost, Id[] linkIds)
     {
-        public final int travelTime;
-        public final double travelCost;
-        public final Id[] linkIds;
-
-
-        public SPEntry(int travelTime, double travelCost, Id[] linkIds)
-        {
-            this.travelTime = travelTime;
-            this.travelCost = travelCost;
-            this.linkIds = linkIds;
-        }
+        this.travelTime = travelTime;
+        this.travelCost = travelCost;
+        this.linkIds = linkIds;
     }
-
-
-    SPEntry getSPEntry(int departTime);
 }

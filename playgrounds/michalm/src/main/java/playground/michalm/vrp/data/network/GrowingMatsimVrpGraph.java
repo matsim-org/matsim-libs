@@ -24,7 +24,6 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.*;
 
 
 /**
@@ -65,12 +64,5 @@ public class GrowingMatsimVrpGraph
         }
 
         super.addVertex(mVertex);
-    }
-
-
-    @Override
-    public ShortestPath getShortestPath(Vertex vertexFrom, Vertex vertexTo)
-    {
-        return ((ShortestPathArc)getArc(vertexFrom, vertexTo)).getShortestPath();
     }
 }
