@@ -49,4 +49,30 @@ public class TestLinkVisualizationQueue extends TestCase {
 		assertEquals(3600.0, linkEventsQueue.getValue(linkId, (24*3600)-10+1));
 	}
 	
+	public void testNoValueBeginning() {
+		InductiveChargingAtRoadOutputLog log=new InductiveChargingAtRoadOutputLog();
+		
+		IdImpl linkId = new IdImpl("link-1");
+		IdImpl agentId = new IdImpl("agent-1");
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600*20));
+		
+		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
+		
+		
+		assertEquals(0.0, linkEventsQueue.getValue(linkId, 5));
+	}
+	
+	public void testLinkIdDoesNotExist() {
+		InductiveChargingAtRoadOutputLog log=new InductiveChargingAtRoadOutputLog();
+		
+		IdImpl linkId = new IdImpl("link-1");
+		IdImpl agentId = new IdImpl("agent-1");
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600*20));
+		
+		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
+		
+		
+		assertEquals(0.0, linkEventsQueue.getValue(new IdImpl("link-2"), 5));
+	}
+	
 }
