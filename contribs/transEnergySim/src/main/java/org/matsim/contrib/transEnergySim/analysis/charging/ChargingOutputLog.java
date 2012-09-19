@@ -21,12 +21,19 @@ package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionLogRow;
+import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkEvent;
+import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkValueChangeEvent;
+import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkVisualizationQueue;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 public abstract class ChargingOutputLog {
 	
 	
-	private LinkedList<ChargingLogRow> log;
+	protected LinkedList<ChargingLogRow> log;
 	
 	
 	public ChargingOutputLog(){
@@ -37,7 +44,7 @@ public abstract class ChargingOutputLog {
 		log=new LinkedList<ChargingLogRow>();
 	}
 	
-	public void add(ChargingLogRow row){
+	public void add(ChargingLogRowLinkLevel row){
 		log.add(row);
 	}
 	
@@ -49,15 +56,9 @@ public abstract class ChargingOutputLog {
 		return log.size();
 	}
 	
-	public abstract String getTitleRowFileOutput();
+	protected abstract String getTitleRowFileOutput();
 	
-	public void printToConsole(){
-		System.out.println(getTitleRowFileOutput());
-		
-		for (ChargingLogRow row:log){
-			System.out.println(row.getAgentId() + "\t" + row.getLinkIdOrFacilityId() + "\t" + row.getStartChargingTime() + "\t" + row.getChargingDuration() + "\t" + row.getEnergyChargedInJoule() );
-		}
-	}
+	public abstract void printToConsole();
 	
 	public void writeToFile(String outputFile){
 		//TODO:implement this.
@@ -67,5 +68,26 @@ public abstract class ChargingOutputLog {
 		return log.size();
 	}
 	
+	public LinkVisualizationQueue getLinkEventsQueue(){
+		LinkVisualizationQueue visualizationQueue=new LinkVisualizationQueue();
+		DoubleValueHashMap<Id> initValueAtLinks=new DoubleValueHashMap<Id>();
+		
+		for (ChargingLogRow row:log){
+			double power=row.getEnergyChargedInJoule()/row.getChargingDuration();
+			Id linkId = row.getLinkId();
+			visualizationQueue.addEvent(new LinkValueChangeEvent(row.getStartChargingTime(), power, linkId));
+			double endChargingTime = GeneralLib.projectTimeWithin24Hours(row.getStartChargingTime() + row.getChargingDuration());
+			visualizationQueue.addEvent(new LinkValueChangeEvent(endChargingTime,-1.0* power, linkId));
+		
+			if (GeneralLib.isIn24HourInterval(row.getStartChargingTime(), endChargingTime, 0)){
+				initValueAtLinks.incrementBy(linkId,power);
+			}
+			
+		}
+		
+		visualizationQueue.setInitValues(initValueAtLinks);
+		
+		return visualizationQueue;
+	}
 	
 }

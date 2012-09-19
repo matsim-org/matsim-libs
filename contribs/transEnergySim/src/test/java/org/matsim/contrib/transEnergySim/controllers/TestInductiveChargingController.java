@@ -24,6 +24,8 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowFacilityLevel;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
@@ -67,6 +69,7 @@ public class TestInductiveChargingController extends MatsimTestCase {
 		
 		
 		controller.run();
+		controller.printStatisticsToConsole();
 		
 		assertEquals(7, energyConsumptionTracker.getLog().size());
 		assertEquals(7503001, energyConsumptionTracker.getLog().get(0).getEnergyConsumedInJoules(),1.0);
@@ -83,6 +86,12 @@ public class TestInductiveChargingController extends MatsimTestCase {
 		assertEquals(4129, chargingUponArrival.getLog().get(1).getChargingDuration(),1.0);
 		
 		isBatteryFullyChargedAtEndOfSimulation(vehicles, batteryCapacityInJoules, agentId);
+		
+		ChargingLogRowFacilityLevel chargingLogRow = (ChargingLogRowFacilityLevel) chargingUponArrival.getLog().get(0);
+		chargingLogRow.getFacilityId().equals("2");
+		chargingLogRow.getLinkId().equals("21");
+		chargingLogRow = (ChargingLogRowFacilityLevel) chargingUponArrival.getLog().get(1);
+		chargingLogRow.getFacilityId().equals("1");
 	}
 	
 

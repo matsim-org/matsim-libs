@@ -19,22 +19,32 @@
 
 package org.matsim.contrib.transEnergySim.analysis.charging;
 
-// note somewhere, the facilityId can be a parking facility or a normal facilityId, if parking module not used
-public class StationaryChargingOutput extends ChargingOutputLog {
+import org.matsim.api.core.v01.Id;
 
-	public StationaryChargingOutput(){
+
+public class InductiveChargingAtRoadOutputLog extends ChargingOutputLog {
+
+	public InductiveChargingAtRoadOutputLog(){
 		super();
+		
+		
 	}
-	
-	
+
 	@Override
 	public String getTitleRowFileOutput() {
-		return "agentId\tfacilityId\tstartChargingTime\tchargingDuration\tenergyChargedInJoule";
+		return "agentId\tlinkId\tstartChargingTime\tchargingDuration\tenergyChargedInJoule";
 	}
 	
+	@Override
+	public void printToConsole(){
+		System.out.println(getTitleRowFileOutput());
+		
+		for (ChargingLogRow row:log){
+			System.out.println(row.getAgentId() + "\t" + row.getLinkId() + "\t" + row.getStartChargingTime() + "\t" + row.getChargingDuration() + "\t" + row.getEnergyChargedInJoule() );
+		}
+	}
 	
-	
-	
-	
-	
+	public void readFromFile(String fileName){
+		//TODO:
+	}
 }

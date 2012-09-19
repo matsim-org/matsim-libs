@@ -17,62 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
+package org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads;
 
-import java.util.LinkedList;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
+import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutputLog;
+import org.matsim.core.basic.v01.IdImpl;
 
-/**
- * 
- * 
- * 
- * @author User
- *
- */
-public class EnergyConsumptionOutputLog {
+import junit.framework.TestCase;
 
-	private LinkedList<EnergyConsumptionLogRow> log;
+public class TestLinkVisualizationQueue extends TestCase {
 
-	public EnergyConsumptionOutputLog() {
-		reset();
-	}
-
-	public void reset() {
-		log = new LinkedList<EnergyConsumptionLogRow>();
-	}
-
-	public void add(EnergyConsumptionLogRow row) {
-		log.add(row);
-	}
-
-	public EnergyConsumptionLogRow get(int i) {
-		return log.get(i);
-	}
-
-	public int getNumberOfEntries() {
-		return log.size();
-	}
-
-	public String getTitleRowFileOutput() {
-		return "agentId\tlinkId\tenergyConsumedInJoules";
-	}
-
-	public void printToConsole() {
-		System.out.println(getTitleRowFileOutput());
+	public void testBasic() {
+		InductiveChargingAtRoadOutputLog log=new InductiveChargingAtRoadOutputLog();
 		
-		for (EnergyConsumptionLogRow row:log){
-			System.out.println(row.getAgentId() + "\t" + row.getLinkId() + "\t" + row.getEnergyConsumedInJoules());
-		}
-	}
-
-	public void writeToFile(String outputFile) {
-		// TODO:implement this.
+		IdImpl linkId = new IdImpl("link-1");
+		IdImpl agentId = new IdImpl("agent-1");
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, (24*3600)-10, 20, 3600*20));
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600*20));
+		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 90, 20, 3600*20));
+		
+		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
+		
+		
+		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 5));
+		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 10));
+		assertEquals(0.0, linkEventsQueue.getValue(linkId, 15));
+		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 80));
+		assertEquals(3600.0, linkEventsQueue.getValue(linkId, 85));
+		assertEquals(2*3600.0, linkEventsQueue.getValue(linkId, 95));
+		assertEquals(0.0, linkEventsQueue.getValue(linkId, 130));
+		assertEquals(3600.0, linkEventsQueue.getValue(linkId, (24*3600)-10+1));
 	}
 	
-	public int size(){
-		return log.size();
-	}
-
 }

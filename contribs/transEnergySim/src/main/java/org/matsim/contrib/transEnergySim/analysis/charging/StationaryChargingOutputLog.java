@@ -17,62 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
+package org.matsim.contrib.transEnergySim.analysis.charging;
 
-import java.util.LinkedList;
+// note somewhere, the facilityId can be a parking facility or a normal facilityId, if parking module not used
+public class StationaryChargingOutputLog extends ChargingOutputLog {
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
-
-/**
- * 
- * 
- * 
- * @author User
- *
- */
-public class EnergyConsumptionOutputLog {
-
-	private LinkedList<EnergyConsumptionLogRow> log;
-
-	public EnergyConsumptionOutputLog() {
-		reset();
-	}
-
-	public void reset() {
-		log = new LinkedList<EnergyConsumptionLogRow>();
-	}
-
-	public void add(EnergyConsumptionLogRow row) {
-		log.add(row);
-	}
-
-	public EnergyConsumptionLogRow get(int i) {
-		return log.get(i);
-	}
-
-	public int getNumberOfEntries() {
-		return log.size();
-	}
-
-	public String getTitleRowFileOutput() {
-		return "agentId\tlinkId\tenergyConsumedInJoules";
-	}
-
-	public void printToConsole() {
-		System.out.println(getTitleRowFileOutput());
-		
-		for (EnergyConsumptionLogRow row:log){
-			System.out.println(row.getAgentId() + "\t" + row.getLinkId() + "\t" + row.getEnergyConsumedInJoules());
-		}
-	}
-
-	public void writeToFile(String outputFile) {
-		// TODO:implement this.
+	public StationaryChargingOutputLog(){
+		super();
 	}
 	
-	public int size(){
-		return log.size();
+	
+	@Override
+	public String getTitleRowFileOutput() {
+		return "agentId\tfacilityId\tstartChargingTime\tchargingDuration\tenergyChargedInJoule";
 	}
-
+	
+	
+	@Override
+	public void printToConsole(){
+		System.out.println(getTitleRowFileOutput());
+		
+		for (ChargingLogRow row:log){
+			ChargingLogRowFacilityLevel chargingLog=(ChargingLogRowFacilityLevel) row;
+			System.out.println(row.getAgentId() + "\t" + chargingLog.getFacilityId()  + "\t" + row.getStartChargingTime() + "\t" + row.getChargingDuration() + "\t" + row.getEnergyChargedInJoule());
+		}
+	}
+	
+	
+	
 }

@@ -26,9 +26,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowFacilityLevel;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
-import org.matsim.contrib.transEnergySim.analysis.charging.StationaryChargingOutput;
+import org.matsim.contrib.transEnergySim.analysis.charging.StationaryChargingOutputLog;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPowerAtActivity;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPowerAtLink;
 import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
@@ -47,6 +48,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.network.NetworkImpl;
 
 /**
  * This module is not compatible with parking search, but should be with parking
@@ -101,8 +103,11 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 
 	private boolean loggingEnabled;
 
+	private AddHandlerAtStartupControler controller;
+
 	public ChargingUponArrival(HashMap<Id, Vehicle> vehicles, AddHandlerAtStartupControler controller) {
 		this.vehicles = vehicles;
+		this.controller = controller;
 		this.setDefaultValues(chargablePowerAtActivityTypes);
 		controller.addControlerListener(this);
 		chargablePowerAtActivityTypes = new DoubleValueHashMap<String>();
@@ -115,7 +120,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		previousCarArrivalTime = new DoubleValueHashMap<Id>();
 		firstActivityTypeAfterCarArrival = new HashMap<Id, String>();
 		firstFacilityIdAfterCarArrival = new HashMap<Id, Id>();
-		setLog(new StationaryChargingOutput());
+		setLog(new StationaryChargingOutputLog());
 		previousCarArrivalLinkId = new HashMap<Id, Id>();
 	}
 
@@ -168,7 +173,14 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		if (energyToChargeInJoules > 0) {
 			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 			if (loggingEnabled) {
-				ChargingLogRow chargingLogRow = new ChargingLogRow(personId, firstFacilityIdAfterCarArrival.get(personId),
+				Id facilityId = firstFacilityIdAfterCarArrival.get(personId);
+				Id linkId = controller.getFacilities().getFacilities().get(facilityId).getLinkId();
+				
+				if (linkId==null){
+					linkId = ((NetworkImpl) controller.getNetwork()).getNearestLink(controller.getFacilities().getFacilities().get(facilityId).getCoord()).getId();
+				}
+				
+				ChargingLogRowFacilityLevel chargingLogRow = new ChargingLogRowFacilityLevel(personId, linkId,facilityId,
 						carArrivalTime, energyToChargeInJoules / availablePowerInWatt, energyToChargeInJoules);
 				getLog().add(chargingLogRow);
 			}

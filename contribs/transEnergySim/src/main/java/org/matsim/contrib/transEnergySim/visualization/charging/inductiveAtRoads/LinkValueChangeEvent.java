@@ -17,21 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.analysis.charging;
+package org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads;
 
 import org.matsim.api.core.v01.Id;
 
+public class LinkValueChangeEvent extends LinkEvent {
 
-public class InductiveChargingAtRoadOutput extends ChargingOutputLog {
-
-	public InductiveChargingAtRoadOutput(){
-		super();
-		
-		
+	public LinkValueChangeEvent(double time, double value, Id linkId) {
+		super(time, value, linkId);
 	}
 
-	@Override
-	public String getTitleRowFileOutput() {
-		return "agentId\tlinkId\tstartChargingTime\tchargingDuration\tenergyChargedInJoule";
-	}
+	
 }

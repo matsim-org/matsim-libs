@@ -21,31 +21,13 @@ package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import org.matsim.api.core.v01.Id;
 
-public class ChargingLogRow {
+public abstract class ChargingLogRow {
 	Id agentId;
-	Id linkIdOrFacilityId;
+	Id linkId;
 	double startChargingTime;
 	double chargingDuration;
 	double energyChargedInJoule;
-
-	public ChargingLogRow(Id agentId, Id linkIdOrFacilityId, double startChargingTime, double chargingDuration,
-			double energyChargedInJoule) {
-		super();
-		this.agentId = agentId;
-		this.linkIdOrFacilityId = linkIdOrFacilityId;
-		this.startChargingTime = startChargingTime;
-		this.chargingDuration = chargingDuration;
-		this.energyChargedInJoule = energyChargedInJoule;
-	}
-
-	public Id getAgentId() {
-		return agentId;
-	}
-
-	public Id getLinkIdOrFacilityId() {
-		return linkIdOrFacilityId;
-	}
-
+	
 	public double getStartChargingTime() {
 		return startChargingTime;
 	}
@@ -57,5 +39,13 @@ public class ChargingLogRow {
 	public double getEnergyChargedInJoule() {
 		return energyChargedInJoule;
 	}
+	
+	public Id getAgentId() {
+		return agentId;
+	}
 
+	public Id getLinkId() {
+		return linkId;
+	}
+	
 }

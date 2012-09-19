@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
-import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutput;
+import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutputLog;
 import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
@@ -84,7 +84,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	public void reset(int iteration) {
 		linkEnterTime = new DoubleValueHashMap<Id>();
 		previousLinkEntered = new HashMap<Id, Id>();
-		setLog(new InductiveChargingAtRoadOutput());
+		setLog(new InductiveChargingAtRoadOutputLog());
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 
 			if (loggingEnabled) {
-				ChargingLogRow chargingLogRow = new ChargingLogRow(personId, linkId, linkEnterTime, energyToChargeInJoules
+				ChargingLogRowLinkLevel chargingLogRow = new ChargingLogRowLinkLevel(personId, linkId, linkEnterTime, energyToChargeInJoules
 						/ availablePowerInWatt, energyToChargeInJoules);
 				getLog().add(chargingLogRow);
 			}

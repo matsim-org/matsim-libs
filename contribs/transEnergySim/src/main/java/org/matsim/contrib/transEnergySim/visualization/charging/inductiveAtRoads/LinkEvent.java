@@ -17,62 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
-
-import java.util.LinkedList;
+package org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
+import org.matsim.contrib.parking.lib.GeneralLib;
 
-/**
- * 
- * 
- * 
- * @author User
- *
- */
-public class EnergyConsumptionOutputLog {
+public class LinkEvent {
 
-	private LinkedList<EnergyConsumptionLogRow> log;
+	private double time;
+	private double value;
+	private Id linkId;
 
-	public EnergyConsumptionOutputLog() {
-		reset();
+	public double getTime() {
+		return time;
 	}
 
-	public void reset() {
-		log = new LinkedList<EnergyConsumptionLogRow>();
+	public double getValue() {
+		return value;
 	}
 
-	public void add(EnergyConsumptionLogRow row) {
-		log.add(row);
+	public Id getLinkId() {
+		return linkId;
 	}
 
-	public EnergyConsumptionLogRow get(int i) {
-		return log.get(i);
+	public LinkEvent(double time, double value, Id linkId) {
+		super();
+		this.time = GeneralLib.projectTimeWithin24Hours(time);
+		this.value = value;
+		this.linkId = linkId;
 	}
-
-	public int getNumberOfEntries() {
-		return log.size();
-	}
-
-	public String getTitleRowFileOutput() {
-		return "agentId\tlinkId\tenergyConsumedInJoules";
-	}
-
-	public void printToConsole() {
-		System.out.println(getTitleRowFileOutput());
-		
-		for (EnergyConsumptionLogRow row:log){
-			System.out.println(row.getAgentId() + "\t" + row.getLinkId() + "\t" + row.getEnergyConsumedInJoules());
-		}
-	}
-
-	public void writeToFile(String outputFile) {
-		// TODO:implement this.
-	}
-	
-	public int size(){
-		return log.size();
-	}
-
 }

@@ -17,62 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
-
-import java.util.LinkedList;
+package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.network.NetworkImpl;
 
-/**
- * 
- * 
- * 
- * @author User
- *
- */
-public class EnergyConsumptionOutputLog {
+public class ChargingLogRowFacilityLevel extends ChargingLogRowLinkLevel {
 
-	private LinkedList<EnergyConsumptionLogRow> log;
-
-	public EnergyConsumptionOutputLog() {
-		reset();
-	}
-
-	public void reset() {
-		log = new LinkedList<EnergyConsumptionLogRow>();
-	}
-
-	public void add(EnergyConsumptionLogRow row) {
-		log.add(row);
-	}
-
-	public EnergyConsumptionLogRow get(int i) {
-		return log.get(i);
-	}
-
-	public int getNumberOfEntries() {
-		return log.size();
-	}
-
-	public String getTitleRowFileOutput() {
-		return "agentId\tlinkId\tenergyConsumedInJoules";
-	}
-
-	public void printToConsole() {
-		System.out.println(getTitleRowFileOutput());
-		
-		for (EnergyConsumptionLogRow row:log){
-			System.out.println(row.getAgentId() + "\t" + row.getLinkId() + "\t" + row.getEnergyConsumedInJoules());
-		}
-	}
-
-	public void writeToFile(String outputFile) {
-		// TODO:implement this.
-	}
+	private Id facilityId;
 	
-	public int size(){
-		return log.size();
+	public ChargingLogRowFacilityLevel(Id agentId, Id linkId, Id facilityId, double startChargingTime, double chargingDuration,
+			double energyChargedInJoule) {
+		super(agentId, linkId, startChargingTime, chargingDuration, energyChargedInJoule);
+		this.setFacilityId(facilityId);
+	}
+
+	public Id getFacilityId() {
+		return facilityId;
+	}
+
+	private void setFacilityId(Id facilityId) {
+		this.facilityId = facilityId;
 	}
 
 }

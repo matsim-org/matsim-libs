@@ -17,62 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
-
-import java.util.LinkedList;
+package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 
-/**
- * 
- * 
- * 
- * @author User
- *
- */
-public class EnergyConsumptionOutputLog {
+public class ChargingLogRowLinkLevel extends ChargingLogRow {
 
-	private LinkedList<EnergyConsumptionLogRow> log;
-
-	public EnergyConsumptionOutputLog() {
-		reset();
+	public ChargingLogRowLinkLevel(Id agentId, Id linkId, double startChargingTime, double chargingDuration,
+			double energyChargedInJoule) {
+		super();
+		this.agentId = agentId;
+		this.linkId = linkId;
+		this.startChargingTime = startChargingTime;
+		this.chargingDuration = chargingDuration;
+		this.energyChargedInJoule = energyChargedInJoule;
 	}
 
-	public void reset() {
-		log = new LinkedList<EnergyConsumptionLogRow>();
-	}
-
-	public void add(EnergyConsumptionLogRow row) {
-		log.add(row);
-	}
-
-	public EnergyConsumptionLogRow get(int i) {
-		return log.get(i);
-	}
-
-	public int getNumberOfEntries() {
-		return log.size();
-	}
-
-	public String getTitleRowFileOutput() {
-		return "agentId\tlinkId\tenergyConsumedInJoules";
-	}
-
-	public void printToConsole() {
-		System.out.println(getTitleRowFileOutput());
-		
-		for (EnergyConsumptionLogRow row:log){
-			System.out.println(row.getAgentId() + "\t" + row.getLinkId() + "\t" + row.getEnergyConsumedInJoules());
-		}
-	}
-
-	public void writeToFile(String outputFile) {
-		// TODO:implement this.
-	}
-	
-	public int size(){
-		return log.size();
-	}
 
 }
