@@ -42,6 +42,7 @@ import org.matsim.core.replanning.modules.ReRouteDijkstra;
 import org.matsim.core.replanning.modules.ReRouteLandmarks;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.modules.TripsToLegModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -54,6 +55,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.locationchoice.LocationChoice;
+import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
@@ -201,32 +203,36 @@ public final class StrategyManagerConfigLoader {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				strategy.addStrategyModule(new ChangeSingleLegMode(config));
 				strategy.addStrategyModule(new ReRoute(controler));
-			} else if (name.equals("TransitChangeSingleLegMode")) {
+			} else if (name.equals("TransitChangeSingleLegMode") || name.equals("ChangeSingleTripMode")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new TripsToLegModule( controler ));
 				strategy.addStrategyModule(new ChangeSingleLegMode(config));
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (name.equals("SubtourModeChoice")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				strategy.addStrategyModule(new SubtourModeChoice(config));
 				strategy.addStrategyModule(new ReRoute(controler));
-			} else if (name.equals("TransitChangeLegMode")) {
+			} else if (name.equals("TransitChangeLegMode") || name.equals("ChangeTripMode")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new TripsToLegModule( controler ));
 				strategy.addStrategyModule(new ChangeLegMode(config));
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (name.equals("TransitTimeAllocationMutator")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
 				TransitTimeAllocationMutator tam = new TransitTimeAllocationMutator(config);
 				strategy.addStrategyModule(tam);
-			} else if (name.equals("TransitTimeAllocationMutator_ReRoute")) {
+			} else if (name.equals("TransitTimeAllocationMutator_ReRoute") || name.equals( "TripTimeAllocationMutator_ReRoute" )) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new TripsToLegModule( controler ));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 				strategy.addStrategyModule(new ReRoute(controler));
-			} else if (name.equals("TransitSubtourModeChoice")) {
+			} else if (name.equals("TransitSubtourModeChoice") || name.equals("TripSubtourModeChoice")) {
 				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-				strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
+				strategy.addStrategyModule(new TripsToLegModule( controler ));
 				strategy.addStrategyModule(new SubtourModeChoice(config));
 				strategy.addStrategyModule(new ReRoute(controler));
 			} else if (name.equals("SelectPathSizeLogit")) {
