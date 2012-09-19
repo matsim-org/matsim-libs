@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.InsertionData.NoInsertionFound;
 import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
@@ -25,8 +26,8 @@ import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Service;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 /**
@@ -53,7 +54,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	
 	private Map<String, Job> jobs = new HashMap<String, Job>();
 	
-	private Map<String,TourData> offerMemory = new HashMap<String, TourData>();
+	private Map<String,InsertionData> offerMemory = new HashMap<String, InsertionData>();
 
 	private LeastCostTourCalculator leastCostTourCalculator;
 	
@@ -126,24 +127,21 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	}
 
 	
-	public Offer requestService(Job job, double bestKnownPrice) {
+	public InsertionData calculateBestInsertion(Job job, double bestKnownPrice) {
 		syncTour();
 		if(offerMemory.containsKey(job.getId())) offerMemory.remove(job.getId());
-		TourData leastCostTourData = leastCostTourCalculator.calculateLeastCostTour(job, vehicle, tour, driver, bestKnownPrice);
-		if(leastCostTourData.tourFound()){
-			memorize(job,leastCostTourData);
-			return new Offer(this,leastCostTourData.penalty);
-		}
-		else{
-			return new Offer(this,Double.MAX_VALUE);
-		}
+		InsertionData insertionData = leastCostTourCalculator.calculateLeastCostTour(job, vehicle, tour, driver, bestKnownPrice);
+		if(insertionData instanceof NoInsertionFound) return insertionData;
+		assert insertionData.getInsertionIndeces() != null : "no insertionIndeces set";
+		memorize(job,insertionData);		
+		return insertionData;
 	}
 
-	private void memorize(Job job, TourData insertionData) {
+	private void memorize(Job job, InsertionData insertionData) {
 		offerMemory.put(job.getId(), insertionData);
 	}
 
-	public void offerGranted(Job job) {
+	public void insertJob(Job job) {
 		if(offerMemory.containsKey(job.getId())){
 			jobs.put(job.getId(), job);
 			insert(job);
@@ -157,25 +155,8 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	}
 
 	private void insert(Job job) {
-		if(job instanceof Shipment){
-			Shipment shipment = (Shipment) job;
-			TourData id = offerMemory.get(job.getId());
-			tour.getActivities().add(id.deliveryInsertionIndex, new Delivery(shipment));
-			tour.getActivities().add(id.pickupInsertionIndex, new Pickup(shipment));
-		}
-		else{
-			Service service = (Service) job;
-			TourData id = offerMemory.get(job.getId());
-			tour.getActivities().add(id.deliveryInsertionIndex, new Delivery(service));
-		}
-	}
-
-
-	/* (non-Javadoc)
-	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerRejected(core.algorithms.ruinAndRecreate.RuinAndRecreate.Offer)
-	 */
-	
-	public void offerRejected(Offer offer){
+		InsertionData iData = offerMemory.get(job.getId());
+		insertJob(job, iData);
 	}
 
 	private void syncTour() {
@@ -230,5 +211,39 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 	@Override
 	public Driver getDriver() {
 		return driver;
+	}
+
+	
+	private void insertJob(Service service, int serviceInsertionIndex) {
+		tour.getActivities().add(serviceInsertionIndex, new Delivery(service));
+	}
+
+	
+	private void insertJob(Shipment shipment, int pickupInsertionIndex, int deliveryInsertionIndex) {
+		tour.getActivities().add(deliveryInsertionIndex, new Delivery(shipment));
+		tour.getActivities().add(pickupInsertionIndex, new Pickup(shipment));
+	}
+
+	@Override
+	public void updateTour() {
+		syncTour();
+	}
+
+	@Override
+	public void insertJob(Job job, InsertionData insertionData) {
+		jobs.put(job.getId(), job);
+		if(job instanceof Shipment){
+			assert insertionData.getInsertionIndeces().length == 2 : "a shipment needs two insertionIndeces. a pickupInsertionIndex and a deliveryInsertionIndex";
+			insertJob((Shipment)job, insertionData.getInsertionIndeces()[0], insertionData.getInsertionIndeces()[1]);
+		}
+		else if(job instanceof Service){
+			assert insertionData.getInsertionIndeces().length == 1 : "a service needs one insertionIndeces.";
+			insertJob((Service)job, insertionData.getInsertionIndeces()[0]);
+		}
+		else{
+			throw new IllegalStateException("a job must either be a shipment or a service");
+		}
+		tourStatusOutOfSync = true;
+		updateTour();
 	}
 }

@@ -43,7 +43,7 @@ class PickupAndDeliveryJIF extends LeastCostTourCalculator {
 	}
 
 	@Override
-	TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownPrice) {
+	InsertionData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownPrice) {
 		Shipment shipment = (Shipment)job;
 		Pickup pickup = createPickup(shipment);
 		Delivery delivery = createDelivery(shipment);
@@ -91,7 +91,7 @@ class PickupAndDeliveryJIF extends LeastCostTourCalculator {
 				}
 			}
 		}
-		return new TourData(bestMarginalCost, bestPickupInsertionIndex, bestDeliveryInsertionIndex);
+		return new InsertionData(bestMarginalCost, new int[]{bestPickupInsertionIndex, bestDeliveryInsertionIndex});
 	}
 	
 	private double getMarginalInsertionCosts(TourActivity prevAct, TourActivity nextAct, TourActivity newAct) {

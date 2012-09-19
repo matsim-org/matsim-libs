@@ -19,8 +19,8 @@ import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Service;
-import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 class ServiceDistributionLeastCostTourCalculator extends LeastCostTourCalculator{
@@ -34,11 +34,11 @@ class ServiceDistributionLeastCostTourCalculator extends LeastCostTourCalculator
 	}
 
 	@Override
-	TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownCosts) {
+	InsertionData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownCosts) {
 		Double bestCost = bestKnownCosts;
 		Service service = (Service)job;
 		if(!checkCapacity(tour,service.getDemand(),vehicle)){
-			return new TourData(Double.MAX_VALUE, null, null);
+			return InsertionData.createNoInsertionFound();
 		}
 		Delivery deliveryAct = new Delivery(service);
 		Integer insertionIndex = null;
@@ -58,9 +58,9 @@ class ServiceDistributionLeastCostTourCalculator extends LeastCostTourCalculator
 			prevAct = currAct;
 		}
 		if(insertionIndex == null){
-			return new TourData(Double.MAX_VALUE, null, null);
+			return InsertionData.createNoInsertionFound();
 		}
-		return new TourData(bestCost, 1, insertionIndex);
+		return new InsertionData(bestCost, new int[]{insertionIndex});
 	}
 
 	private boolean checkCapacity(TourImpl tour, int demand, Vehicle vehicle) {

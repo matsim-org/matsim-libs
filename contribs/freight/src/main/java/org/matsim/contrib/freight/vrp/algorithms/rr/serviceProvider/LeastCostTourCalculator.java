@@ -19,6 +19,6 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
  abstract class LeastCostTourCalculator {
 	
-	abstract TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownScore);
+	abstract InsertionData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownScore);
 
 }

@@ -19,8 +19,10 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.Offer;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.Insertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.InsertionData;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.InsertionData.NoInsertionFound;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
@@ -49,26 +51,24 @@ public final class RecreationBestInsertion implements RecreationStrategy{
 		List<Job> unassignedJobList = new ArrayList<Job>(unassignedJobs);
 		Collections.shuffle(unassignedJobList,random);
 		for(Job unassignedJob : unassignedJobList){
-			Offer bestOffer = new Offer(null,Double.MAX_VALUE);
+			Insertion bestInsertion = null;
+			double bestInsertionCost = Double.MAX_VALUE;
 			for(ServiceProviderAgent sp : serviceProviders){
-				Offer o = sp.requestService(unassignedJob, bestOffer.getPrice());
-				if(o.getPrice() < bestOffer.getPrice()){
-					bestOffer = o;
+				InsertionData iData = sp.calculateBestInsertion(unassignedJob, bestInsertionCost);
+				if(iData instanceof NoInsertionFound) continue;
+				if(iData.getInsertionCost() < bestInsertionCost){
+					assert iData.getInsertionIndeces() != null : "no insertionIndeces set";
+					bestInsertion = new Insertion(sp,iData);
+					bestInsertionCost = iData.getInsertionCost();
 				}
 			}
-			if(!isNull(bestOffer.getServiceProvider())){
-				bestOffer.getServiceProvider().offerGranted(unassignedJob);
+			if(bestInsertion != null){
+				bestInsertion.getTourAgent().insertJob(unassignedJob, bestInsertion.getInsertionData());
 			}
 			else{
 				throw new IllegalStateException("given the vehicles, could not create a valid solution");
 			}
 			
 		}
-	}
-
-	private boolean isNull(ServiceProviderAgent sp) {
-		return (sp == null);
-	}
-
-	
+	}	
 }

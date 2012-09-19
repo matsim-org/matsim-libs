@@ -46,11 +46,11 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 	}
 
 	@Override
-	TourData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownCosts) {
+	InsertionData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownCosts) {
 		Double bestPenalty = bestKnownCosts;
 		Shipment shipment = (Shipment)job;
 		if(!checkCapacity(tour,shipment,vehicle)){
-			return new TourData(Double.MAX_VALUE, null, null);
+			return InsertionData.createNoInsertionFound();
 		}
 		
 		Pickup pickup = new Pickup(shipment);
@@ -69,7 +69,7 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 			pickupInserted = true;
 			boolean isFeasible = updateTour(tourCopy, vehicle, driver);
 			if(!isFeasible){
-				return new TourData(Double.MAX_VALUE, null, null);
+				return InsertionData.createNoInsertionFound();
 			}
 		}
 		
@@ -98,13 +98,13 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 			prevAct = currAct;
 		}
 		if(insertionIndex == null){
-			return new TourData(Double.MAX_VALUE, null, null);
+			return InsertionData.createNoInsertionFound();
 		}
 		int finalInsertionIndex = insertionIndex;
 		if(pickupInserted){
 			finalInsertionIndex--;
 		}
-		return new TourData(bestPenalty, 1, finalInsertionIndex);
+		return new InsertionData(bestPenalty, new int[]{1, finalInsertionIndex});
 	}
 
 	private boolean updateTour(TourImpl tourCopy, Vehicle vehicle, Driver driver) {
