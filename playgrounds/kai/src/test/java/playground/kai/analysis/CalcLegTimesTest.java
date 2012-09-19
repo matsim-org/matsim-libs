@@ -44,7 +44,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 public class CalcLegTimesTest extends MatsimTestCase {
 
-	public static final String BASE_FILE_NAME = "tripdurations.txt";
+	public static final String BASE_FILE_NAME = "stats_";
 	public static final Id DEFAULT_PERSON_ID = new IdImpl(123);
 	public static final Id DEFAULT_LINK_ID = new IdImpl(456);
 
@@ -141,9 +141,24 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
 		// actual test: compare checksums of the files
-		final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
-		final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
-		assertEquals("Output files differ.", expectedChecksum, actualChecksum);
+		{
+			final String str = CalcLegTimesTest.BASE_FILE_NAME + "beelineDistance.txt" ;
+			final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + str);
+			final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + str);
+			assertEquals("Output files differ.", expectedChecksum, actualChecksum);
+		}
+		{
+			final String str = CalcLegTimesTest.BASE_FILE_NAME + "duration.txt" ;
+			final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + str);
+			final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + str);
+			assertEquals("Output files differ.", expectedChecksum, actualChecksum);
+		}
+		{
+			final String str = CalcLegTimesTest.BASE_FILE_NAME + "durationsOtherBins.txt" ;
+			final long expectedChecksum = CRCChecksum.getCRCFromFile(this.getInputDirectory() + str);
+			final long actualChecksum = CRCChecksum.getCRCFromFile(this.getOutputDirectory() + str);
+			assertEquals("Output files differ.", expectedChecksum, actualChecksum);
+		}
 	}
 
 }
