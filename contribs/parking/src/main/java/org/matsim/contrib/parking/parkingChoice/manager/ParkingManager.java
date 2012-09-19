@@ -22,9 +22,11 @@ package org.matsim.contrib.parking.parkingChoice.manager;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
@@ -75,6 +77,8 @@ public class ParkingManager {
 		
 		
 		
+		
+		
 		return selectParking(collection, actFacilityId, actFacilityId, actType).getId();
 	}
 
@@ -82,6 +86,16 @@ public class ParkingManager {
 	// can already make default impl. for some ev related preference.
 	protected Parking selectParking(Collection<Parking> collection,Id agentId, Id actFacilityId, String actType) {
 		// score parking in collection
+		PriorityQueue<SortableMapObject<Parking>> queue=new PriorityQueue<SortableMapObject<Parking>>();
+		
+		// walk
+		// TODO: take utility function of claude and insert it here!
+		
+		double score=0.0; // TODO: this should not be zero
+		for (Parking parking:collection){
+			queue.add(new SortableMapObject<Parking>(parking, score));
+		}
+		
 		return null;
 		
 	}
