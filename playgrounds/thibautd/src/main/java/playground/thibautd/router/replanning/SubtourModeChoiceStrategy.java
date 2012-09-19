@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.modules.TripsToLegModule;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -41,7 +41,7 @@ public class SubtourModeChoiceStrategy implements PlanStrategy {
 	public SubtourModeChoiceStrategy(final Controler controler) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-		addStrategyModule( new TripsToLegModule( controler ) );
+		addStrategyModule( new TripsToLegsModule( controler ) );
 		addStrategyModule( new SubtourModeChoice( controler.getConfig() ) );
 		addStrategyModule( new ReRoute( controler ) );
 	}

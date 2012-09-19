@@ -20,7 +20,7 @@
 package playground.thibautd.jointtrips.replanning.strategies;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.modules.TripsToLegModule;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 
 import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
 import playground.thibautd.jointtrips.replanning.modules.ExecuteModuleOnAllPlansModule;
@@ -38,7 +38,7 @@ public class JointChooseModeForSubtourStrategy extends JointPlanStrategy {
 		addStrategyModule(
 				new ExecuteModuleOnAllPlansModule(
 					controler.getConfig(),
-					new TripsToLegModule( controler ) ) );
+					new TripsToLegsModule( controler ) ) );
 		addStrategyModule(
 				new JointChooseModeForSubtourModule(
 					controler.getConfig() ) );

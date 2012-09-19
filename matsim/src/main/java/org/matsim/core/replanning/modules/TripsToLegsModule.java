@@ -33,7 +33,7 @@ import org.matsim.population.algorithms.TripsToLegsAlgorithm;
  * The plan must be re-routed before execution!
  * @author thibautd
  */
-public class TripsToLegModule extends AbstractMultithreadedModule {
+public class TripsToLegsModule extends AbstractMultithreadedModule {
 	private final Controler controler;
 	private final StageActivityTypes additionalBlackList;
 
@@ -41,7 +41,7 @@ public class TripsToLegModule extends AbstractMultithreadedModule {
 	 * Initializes an instance using the stage activity types from the controler
 	 * @param controler
 	 */
-	public TripsToLegModule(final Controler controler) {
+	public TripsToLegsModule(final Controler controler) {
 		this( controler , null );
 	}
 
@@ -52,7 +52,7 @@ public class TripsToLegModule extends AbstractMultithreadedModule {
 	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
 	 * the additionnal types
 	 */
-	public TripsToLegModule(final Controler controler, final StageActivityTypes additionalBlackList) {
+	public TripsToLegsModule(final Controler controler, final StageActivityTypes additionalBlackList) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
 		this.additionalBlackList = additionalBlackList;

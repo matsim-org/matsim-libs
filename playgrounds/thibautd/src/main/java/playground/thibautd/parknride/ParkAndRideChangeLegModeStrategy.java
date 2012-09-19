@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TripsToLegModule;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -44,7 +44,7 @@ public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	public ParkAndRideChangeLegModeStrategy(final Controler controler) {
 		StageActivityTypes pnrList = new StageActivityTypesImpl( Arrays.asList( ParkAndRideConstants.PARKING_ACT ) );
 
-		addStrategyModule( new TripsToLegModule( controler , pnrList ) );
+		addStrategyModule( new TripsToLegsModule( controler , pnrList ) );
 		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
 		addStrategyModule( new ReRoute( controler ) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );

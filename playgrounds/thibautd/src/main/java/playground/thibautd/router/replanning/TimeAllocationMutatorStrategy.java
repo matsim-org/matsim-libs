@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.replanning.modules.TripsToLegModule;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -39,7 +39,7 @@ public class TimeAllocationMutatorStrategy implements PlanStrategy {
 	public TimeAllocationMutatorStrategy(final Controler controler) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-		addStrategyModule( new TripsToLegModule( controler ) );
+		addStrategyModule( new TripsToLegsModule( controler ) );
 		addStrategyModule( new TimeAllocationMutator( controler.getConfig() ) );
 		addStrategyModule( new ReRoute( controler ) );
 	}
