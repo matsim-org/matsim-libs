@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SfCottbusController.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package cottbus;
+package org.matsim.pt;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.pt.TransitControlerListener;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImplFactory;
 
 /**
- * @author fuerbas
- *
+ * @author mrieser
  */
+public class TransitControlerListener implements StartupListener {
 
-public class SfCottbusController {
-
-	public static void main(String[] args) {
-		Controler con = new Controler("E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\config_1.xml");		//args: configfile
-		con.setOverwriteFiles(true);
-		ControlerListener lis = new TransitControlerListener();
-		con.addControlerListener(lis);
-		con.run();
+	@Override
+	public void notifyStartup(final StartupEvent event) {
+		final Scenario scenario = event.getControler().getScenario();
+		if (event.getControler().getTransitRouterFactory() == null) {
+			
+			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
+					scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
+					scenario.getConfig().vspExperimental());
+			
+			event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(
+					scenario.getTransitSchedule(), transitRouterConfig ));
+		}
 
 	}
 
 }
-
