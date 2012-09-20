@@ -17,23 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.data.network.shortestpath.sparse;
+package playground.michalm.vrp.data.network.shortestpath;
 
 import org.matsim.api.core.v01.network.Link;
 
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.network.MatsimVertex;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.*;
 
 
 /**
- * TODO The current implementation is simplistic; the class will be re-implemented in the future.
- * 
  * @author michalm
  */
-public class SparseShortestPathArc
-    implements MatsimArc
+public class SparseMatsimArc
+    extends AbstractMatsimArc
 {
     private final ShortestPathCalculator shortestPathCalculator;
     private final TimeDiscretizer timeDiscretizer;
@@ -44,7 +41,7 @@ public class SparseShortestPathArc
     private ShortestPath[] shortestPaths = null;// lazy initialization
 
 
-    public SparseShortestPathArc(ShortestPathCalculator shortestPathCalculator,
+    public SparseMatsimArc(ShortestPathCalculator shortestPathCalculator,
             TimeDiscretizer timeDiscretizer, MatsimVertex fromVertex, MatsimVertex toVertex)
     {
         this.shortestPathCalculator = shortestPathCalculator;
@@ -52,34 +49,6 @@ public class SparseShortestPathArc
 
         fromLink = fromVertex.getLink();
         toLink = toVertex.getLink();
-    }
-
-
-    @Override
-    public int getTimeOnDeparture(int departureTime)
-    {
-        // no interpolation between consecutive timeSlices!
-        return getShortestPath(departureTime).travelTime;
-    }
-
-
-    @Override
-    public int getTimeOnArrival(int arrivalTime)
-    {
-        // TODO: very rough!!!
-        return getShortestPath(arrivalTime).travelTime;
-
-        // probably a bit more accurate but still rough and more time consuming
-        // return shortestPath.getSPEntry(arrivalTime -
-        // shortestPath.getSPEntry(arrivalTime).travelTime);
-    }
-
-
-    @Override
-    public double getCostOnDeparture(int departureTime)
-    {
-        // no interpolation between consecutive timeSlices!
-        return getShortestPath(departureTime).travelCost;
     }
 
 
@@ -97,24 +66,21 @@ public class SparseShortestPathArc
         // loads necessary data on demand
         if (shortestPath == null) {
             shortestPath = shortestPaths[idx] = shortestPathCalculator.calculateShortestPath(
-                    fromLink, toLink, departTime);
+                    fromLink, toLink, timeDiscretizer.getTime(idx));
         }
 
         return shortestPath;
     }
 
 
-    public static class SparseShortestPathArcBuilder
-        implements ArcBuilder
+    public static class SparseMatsimArcFactory
+        implements ArcFactory
     {
         private final ShortestPathCalculator shortestPathCalculator;
         private final TimeDiscretizer timeDiscretizer;
 
-        private Vertex vertexFrom;
-        private Vertex vertexTo;
 
-
-        public SparseShortestPathArcBuilder(ShortestPathCalculator shortestPathCalculator,
+        public SparseMatsimArcFactory(ShortestPathCalculator shortestPathCalculator,
                 TimeDiscretizer timeDiscretizer)
         {
             this.shortestPathCalculator = shortestPathCalculator;
@@ -123,26 +89,10 @@ public class SparseShortestPathArc
 
 
         @Override
-        public ArcBuilder setVertexFrom(Vertex vertexFrom)
+        public Arc createArc(Vertex fromVertex, Vertex toVertex)
         {
-            this.vertexFrom = vertexFrom;
-            return this;
-        }
-
-
-        @Override
-        public ArcBuilder setVertexTo(Vertex vertexTo)
-        {
-            this.vertexTo = vertexTo;
-            return this;
-        }
-
-
-        @Override
-        public Arc build()
-        {
-            return new SparseShortestPathArc(shortestPathCalculator, timeDiscretizer,
-                    (MatsimVertex)vertexFrom, (MatsimVertex)vertexTo);
+            return new SparseMatsimArc(shortestPathCalculator, timeDiscretizer,
+                    (MatsimVertex)fromVertex, (MatsimVertex)toVertex);
         }
     }
 }
