@@ -50,7 +50,7 @@ import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.data.network.FixedSizeVrpGraph;
+import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import playground.michalm.demand.ODDemandGenerator;
@@ -59,8 +59,7 @@ import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.data.network.router.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPathCalculator;
-import playground.michalm.vrp.data.network.shortestpath.sparse.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
@@ -239,9 +238,9 @@ public class SingleIterOnlineDvrpLauncher
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
         MatsimVrpGraph graph = data.getMatsimVrpGraph();
 
-        SparseShortestPathArc[][] arcs = SparseShortestPaths.findShortestPaths(
-                shortestPathCalculator, timeDiscretizer, graph);
-        ((FixedSizeVrpGraph)graph).setArcs(arcs);
+        ArcFactory arcFactory = new SparseMatsimArc.SparseMatsimArcFactory(shortestPathCalculator,
+                timeDiscretizer);
+        ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
     }
 
 

@@ -32,30 +32,23 @@ import org.matsim.core.scenario.ScenarioUtils;
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.util.lang.TimeDiscretizer;
-import pl.poznan.put.vrp.dynamic.DebugPrint;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.optimizer.VrpOptimizer;
-import pl.poznan.put.vrp.dynamic.optimizer.evaluation.*;
 import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.*;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
-import playground.michalm.vrp.data.network.shortestpath.full.*;
+import playground.michalm.vrp.data.network.MatsimVertexImpl;
+import playground.michalm.vrp.data.network.shortestpath.FullMatsimArcIO;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
 
 
 public class OfflineDvrpLauncher
 {
-    // means: ArcTravelTimes and ArcTravelCosts are averaged for optimization
-    private static boolean AVG_TRAFFIC_MODE = false;// default: false
-
     // means: all requests are known a priori (in advance/static)
     private static boolean STATIC_MODE = false;// default: false
 
@@ -77,7 +70,6 @@ public class OfflineDvrpLauncher
         String algParamsFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            AVG_TRAFFIC_MODE = false;
             STATIC_MODE = false;
             VRP_OUT_FILES = true;
 
@@ -145,36 +137,16 @@ public class OfflineDvrpLauncher
         }
 
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
-
         TimeDiscretizer timeDiscretizer = TimeDiscretizer.TD_24H_BY_15MIN;
 
-        ShortestPath[][][] shortestPaths = null;
-
         if (VRP_OUT_FILES) {
-            shortestPaths = FullShortestPaths.readShortestPaths(timeDiscretizer, data,
-                    vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
+            FullMatsimArcIO.readShortestPaths(timeDiscretizer, data, vrpArcTimesFileName,
+                    vrpArcCostsFileName, vrpArcPathsFileName);
         }
         else {
-            shortestPaths = FullShortestPaths.readShortestPaths(timeDiscretizer, data,
-                    vrpArcTimesFileName, vrpArcCostsFileName, null);
+            FullMatsimArcIO.readShortestPaths(timeDiscretizer, data, vrpArcTimesFileName,
+                    vrpArcCostsFileName, null);
         }
-
-        FullShortestPaths.upadateVrpArcs(shortestPaths, timeDiscretizer,
-                (FixedSizeMatsimVrpGraph)data.getMatsimVrpGraph());
-
-        // ================================================== BELOW: only for comparison reasons...
-
-        FixedSizeVrpGraph graph = (FixedSizeVrpGraph)vrpData.getVrpGraph();
-
-        InterpolatedArc[][] simulatedArcs = null;
-
-        if (AVG_TRAFFIC_MODE) {
-            simulatedArcs = (InterpolatedArc[][])graph.getArcs();
-            graph.setArcs(ConstantArc.createArcs(simulatedArcs));
-            System.err.println("RUNNING WITH AVERAGED ArcTimes/Costs");
-        }
-
-        // ================================================== ABOVE: only for comparison reasons...
 
         // now can run the optimizer or simulated optimizer...
 
@@ -183,8 +155,6 @@ public class OfflineDvrpLauncher
 
         DeterministicSimulator simulator = new DeterministicSimulator(vrpData, 24 * 60 * 60,
                 optimizer);
-
-        // simulator.addListener(new ConsoleSimulationListener());
 
         String vrpOutDirName = vrpDirName + "\\output";
         new File(vrpOutDirName).mkdir();
@@ -212,9 +182,6 @@ public class OfflineDvrpLauncher
 
             new Schedules2GIS(vehicles, data, vrpOutDirName + "\\route_").write();
 
-            // PopulationReader popReader = new MatsimPopulationReader(scenario).readFile(dirName +
-            // );
-
             Population popul = scenario.getPopulation();
             PopulationFactory pf = popul.getFactory();
 
@@ -235,27 +202,5 @@ public class OfflineDvrpLauncher
         ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
         System.out.println("X");
-
-        // ================================================== BELOW: only for comparison reasons...
-
-        if (AVG_TRAFFIC_MODE) {
-            graph.setArcs(simulatedArcs);
-
-            new ScheduleUpdater(vrpData).updateSchedule();
-            VrpEvaluation eval = new VrpEvaluator().evaluateVrp(vrpData);
-
-            // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(vrpData));
-            ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(vrpData));
-
-            System.out.println("################################################");
-            DebugPrint.printDynamicData(vrpData, eval);
-        }
-
-        // ================================================== ABOVE: only for comparison reasons...
-
-        // TODO fix bug in Link Time Estimations ??
-
-        // ======combine population with vrpDrivers...
-
     }
 }

@@ -19,50 +19,38 @@
 
 package playground.michalm.vrp.data.network;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-
-import pl.poznan.put.vrp.dynamic.data.network.*;
-
-
 /**
- * It consists of ShortestPathsArcs with ShortestPath of any type (Sparse, Full or other) - type of
- * the ShortestPath depends on the given ArcBuilder.
+ * TODO The current implementation is simplistic; the class will be re-implemented in the future.
  * 
  * @author michalm
  */
-public class GrowingMatsimVrpGraph
-    extends GrowingVrpGraph
-    implements MatsimVrpGraph
+public abstract class AbstractMatsimArc
+    implements MatsimArc
 {
-    private final Map<Id, MatsimVertex> linkIdToVertex;
-
-
-    public GrowingMatsimVrpGraph(ArcFactory arcFactory)
+    @Override
+    public int getTimeOnDeparture(int departureTime)
     {
-        super(arcFactory);
-        linkIdToVertex = new LinkedHashMap<Id, MatsimVertex>();
+        // no interpolation between consecutive timeSlices!
+        return getShortestPath(departureTime).travelTime;
     }
 
 
     @Override
-    public MatsimVertex getVertex(Id linkId)
+    public int getTimeOnArrival(int arrivalTime)
     {
-        return linkIdToVertex.get(linkId);
+        // TODO: very rough!!!
+        return getShortestPath(arrivalTime).travelTime;
+
+        // probably a bit more accurate but still rough and more time consuming
+        // return shortestPath.getSPEntry(arrivalTime -
+        // shortestPath.getSPEntry(arrivalTime).travelTime);
     }
 
 
     @Override
-    public void addVertex(Vertex vertex)
+    public double getCostOnDeparture(int departureTime)
     {
-        MatsimVertex mVertex = (MatsimVertex)vertex;
-        Id linkId = mVertex.getLink().getId();
-
-        if (linkIdToVertex.put(linkId, mVertex) != null) {
-            throw new RuntimeException("Duplicated vertex for link=" + linkId);
-        }
-
-        super.addVertex(mVertex);
+        // no interpolation between consecutive timeSlices!
+        return getShortestPath(departureTime).travelCost;
     }
 }

@@ -19,50 +19,12 @@
 
 package playground.michalm.vrp.data.network;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
 
-/**
- * It consists of ShortestPathsArcs with ShortestPath of any type (Sparse, Full or other) - type of
- * the ShortestPath depends on the given ArcBuilder.
- * 
- * @author michalm
- */
-public class GrowingMatsimVrpGraph
-    extends GrowingVrpGraph
-    implements MatsimVrpGraph
+public interface MatsimArc
+    extends Arc
 {
-    private final Map<Id, MatsimVertex> linkIdToVertex;
-
-
-    public GrowingMatsimVrpGraph(ArcFactory arcFactory)
-    {
-        super(arcFactory);
-        linkIdToVertex = new LinkedHashMap<Id, MatsimVertex>();
-    }
-
-
-    @Override
-    public MatsimVertex getVertex(Id linkId)
-    {
-        return linkIdToVertex.get(linkId);
-    }
-
-
-    @Override
-    public void addVertex(Vertex vertex)
-    {
-        MatsimVertex mVertex = (MatsimVertex)vertex;
-        Id linkId = mVertex.getLink().getId();
-
-        if (linkIdToVertex.put(linkId, mVertex) != null) {
-            throw new RuntimeException("Duplicated vertex for link=" + linkId);
-        }
-
-        super.addVertex(mVertex);
-    }
+    ShortestPath getShortestPath(int departTime);
 }

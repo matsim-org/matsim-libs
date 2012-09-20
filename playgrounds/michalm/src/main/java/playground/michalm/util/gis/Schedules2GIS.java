@@ -32,6 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.MatsimVrpData;
+import playground.michalm.vrp.data.network.MatsimArcs;
 import playground.michalm.vrp.data.network.shortestpath.*;
 
 import com.vividsolutions.jts.geom.*;

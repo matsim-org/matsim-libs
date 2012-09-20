@@ -29,11 +29,12 @@ import org.matsim.core.router.util.*;
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
+import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.network.MatsimVertexImpl;
+import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.TimeAsTravelDisutility;
 import playground.michalm.vrp.data.network.shortestpath.*;
-import playground.michalm.vrp.data.network.shortestpath.full.FullShortestPaths;
+import playground.michalm.vrp.data.network.shortestpath.full.*;
 
 
 public class SimLauncherWithArcEstimator
@@ -105,9 +106,12 @@ public class SimLauncherWithArcEstimator
         ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
                 travelTime, travelDisutility);
 
-        ShortestPath[][][] shortestPaths = FullShortestPaths.findShortestPaths(
-                shortestPathCalculator, TimeDiscretizer.TD_24H_BY_15MIN, data.getMatsimVrpGraph());
-        FullShortestPaths.writeShortestPaths(shortestPaths, vrpArcTimesFileName,
-                vrpArcCostsFileName, vrpArcPathsFileName);
+        FixedSizeMatsimVrpGraph graph = (FixedSizeMatsimVrpGraph)data.getMatsimVrpGraph();
+        ArcFactory arcFactory = new FullMatsimArc.FullMatsimArcFactory(shortestPathCalculator,
+                TimeDiscretizer.TD_24H_BY_15MIN);
+        graph.initArcs(arcFactory);
+
+        FullMatsimArcIO.writeShortestPaths(graph, vrpArcTimesFileName, vrpArcCostsFileName,
+                vrpArcPathsFileName);
     }
 }
