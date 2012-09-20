@@ -70,6 +70,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private final Map<Id,AgentDepartureEvent> events = new HashMap<Id, AgentDepartureEvent>();
 	private double timeSum;
+	private double maxCellTimeSum;
 	private int arrivals;
 
 	public EventHandler(Scenario sc, double cellSize, Thread readerThread)
@@ -84,6 +85,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		
 		this.arrivals = 0;
 		this.timeSum = 0;
+		this.maxCellTimeSum = Double.NEGATIVE_INFINITY;
 		
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -115,7 +117,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.cellTree = new QuadTree<Cell>(minX,minY,maxX,maxY);
 		
 		for (double x = minX; x <= maxX; x += cellSize) {
-			for (double y = minY; y <= minY; y += cellSize) {
+			for (double y = minY; y <= maxY; y += cellSize) {
 				Cell<List<Event>> cell = new Cell(new LinkedList<Event>());
 				this.cellTree.put(x, y, cell);
 			}
@@ -190,8 +192,11 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		double time = event.getTime() - departure.getTime();
 
 		cell.setTimeSum(cell.getTimeSum() + time);
-		cell.incrementCount();
 		
+		//update max timesum of all cells
+		this.maxCellTimeSum = Math.max(cell.getTimeSum(), this.maxCellTimeSum);
+		
+		cell.incrementCount();
 		this.timeSum += time;
 		this.arrivals++;
 	}
@@ -222,7 +227,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	public EventData getData()
 	{
-		return new EventData(cellTree, cellSize, timeSum, arrivals);
+		return new EventData(cellTree, cellSize, timeSum, maxCellTimeSum, arrivals);
 	}
 
 

@@ -302,7 +302,8 @@ public class EvacuationAnalysis implements ActionListener{
 		if (e.getActionCommand() == "Open")
 		{
 			final JFileChooser fc = new JFileChooser();
-			fc.setCurrentDirectory(new File("C:/temp/!matsimfiles/hh/demo/output/"));
+			fc.setCurrentDirectory(new File("C:/temp/!matsimfiles/fostercityca/output/"));
+//			fc.setCurrentDirectory(new File("C:/temp/!matsimfiles/hh/demo/output/"));
 			fc.setFileFilter(new FileFilter() {
 
 				@Override
@@ -341,7 +342,7 @@ public class EvacuationAnalysis implements ActionListener{
 				int lastIteration = Integer.valueOf(this.sc.getConfig().getModule("controler").getValue("lastIteration"));
 				
 				//convention for events file?
-				currentEventFile = itersOutputDir + "/ITERS/it.0/0.events.xml.gz";
+				currentEventFile = itersOutputDir + "/ITERS/it.100/100.events.xml.gz";
 				
 				//read events if the current 
 				if (exists(currentEventFile))
@@ -355,11 +356,17 @@ public class EvacuationAnalysis implements ActionListener{
 				//read the shape file
 				readShapeFile(shp);
 				
+				//initialize map viewer
+				loadMapView();
+				
+				//get data from eventhandler (if not null)
 				if (eventHandler!=null)
 				{
 					//get data
-					EventData data = eventHandler.getData();				
-					jMapViewer.updateData(data);
+					EventData data = eventHandler.getData();
+					
+					//update data in both the map viewer and the graphs
+					jMapViewer.updateEventData(data);
 					graphPanel.updateData(data);
 				}
 				
@@ -368,8 +375,6 @@ public class EvacuationAnalysis implements ActionListener{
 				this.saveButton.setEnabled(true);
 				this.calcButton.setEnabled(true);
 				
-				//initialize map viewer
-				loadMapView();
 				
 			} else {
 				log.info("Open command cancelled by user.");

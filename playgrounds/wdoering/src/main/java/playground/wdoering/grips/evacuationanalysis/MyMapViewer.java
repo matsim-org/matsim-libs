@@ -151,8 +151,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			e.expandToInclude(c.getX(), c.getY());
 		}
 		
-		minX = minY = Double.MAX_VALUE;
-		maxX = maxY = Double.MIN_VALUE;
+		minX = minY = Double.POSITIVE_INFINITY;
+		maxX = maxY = Double.NEGATIVE_INFINITY;
 
 		this.links = new LinkQuadTree(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 
@@ -165,8 +165,10 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			
 			minX = Math.min(minX, Math.min(link.getFromNode().getCoord().getX(),link.getToNode().getCoord().getX()));
 			minY = Math.min(minY, Math.min(link.getFromNode().getCoord().getY(),link.getToNode().getCoord().getY()));
-			maxX = Math.max(maxX, Math.min(link.getFromNode().getCoord().getX(),link.getToNode().getCoord().getX()));
-			maxY = Math.max(maxY, Math.min(link.getFromNode().getCoord().getY(),link.getToNode().getCoord().getY()));
+			maxX = Math.max(maxX, Math.max(link.getFromNode().getCoord().getX(),link.getToNode().getCoord().getX()));
+			maxY = Math.max(maxY, Math.max(link.getFromNode().getCoord().getY(),link.getToNode().getCoord().getY()));
+			
+//			System.out.println(link.getFromNode().getCoord().getX() + "|\t"+ link.getToNode().getCoord().getX());
 			
 			this.links.put(link);
 
@@ -591,11 +593,20 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				Coord gridPoint = this.ctInverse.transform(new CoordImpl(minX+stepsX,minY+stepsY));
 				Point2D gridLength = this.getTileFactory().geoToPixel(new GeoPosition(gridPoint.getY(),gridPoint.getX()), this.getZoom());
 				
-				double zoomStep = gridSize/(this.getZoom()+1);
+				double zoomStep = gridSize/((double)(this.getZoom()+1));
 				
-				Double timeSum = data.getTimeSum();
+				g.setColor(Color.orange);
+				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + (this.getZoom()+1),26,26);
+				g.setColor(Color.black);
+				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + (this.getZoom()+1),25,25);
+				
+				
+				double timeSum = data.getTimeSum();
+				double maxCellTimeSum = data.getMaxCellTimeSum();
 				
 				int i = 0;
+				
+//				System.out.println("minx:"+pixMinX + "|maxx:" + pixMaxX + "|pixMinY:" + pixMinY + "|maxy:" + pixMaxY);
 				for (double u = pixMinX; u < pixMaxX; u+=zoomStep)
 				{
 					i++;
@@ -603,6 +614,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					for (double v = pixMinY; v < pixMaxY; v+=zoomStep)
 					{
+//						System.out.println("uv: \t" + u + "\t" + v);
 						j++;
 						
 						int gridOffsetX = (int)(u-b.x);
@@ -612,14 +624,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						
 						Cell cell = this.cellTree.get(minX+gridSize*i,minY+gridSize*j);
 						
-						Double relTravelTime = (cell.getTimeSum()) / timeSum;
+						Double relTravelTime = (cell.getTimeSum()) / maxCellTimeSum;
 						
 //						System.out.println(cell.getTimeSum() + "|" + cell.getCount() + "|\t" + timeSum);
 						
 						if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
 							relTravelTime = 0d;
 						
-						g.setColor(new Color((int)(255*relTravelTime),0,0,150));
+						g.setColor(new Color(0,127,255,50+(int)(205*relTravelTime)));
 						g.fillRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
 						
 						g.setColor(Color.white);
@@ -637,7 +649,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		}
 	}
 
-	public void updateData(EventData data)
+	public void updateEventData(EventData data)
 	{
 		this.data = data;
 		this.cellTree = data.getCellTree();

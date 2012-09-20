@@ -6,13 +6,15 @@ public class EventData {
 	
 	private double cellSize;
 	private double timeSum;
+	private double maxCellTimeSum;
 	private int arrivals;
 	private QuadTree<Cell> cellTree;
 	
-	public EventData(QuadTree<Cell> cellTree, double cellSize, double timeSum, int arrivals) {
+	public EventData(QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals) {
 		this.cellTree = cellTree;
 		this.cellSize = cellSize;
 		this.timeSum = timeSum;
+		this.maxCellTimeSum = maxCellTimeSum;
 		this.arrivals = arrivals;
 	}
 	
@@ -42,6 +44,14 @@ public class EventData {
 	
 	public void setCellTree(QuadTree<Cell> cellTree) {
 		this.cellTree = cellTree;
+	}
+	
+	public double getMaxCellTimeSum() {
+		return maxCellTimeSum;
+	}
+	
+	public void setMaxCellTimeSum(double maxCellTimeSum) {
+		this.maxCellTimeSum = maxCellTimeSum;
 	}
 	
 	
