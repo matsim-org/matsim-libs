@@ -26,14 +26,14 @@ import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.*;
 
 
-public class FullMatsimArc
+public class FullDiscreteMatsimArc
     extends AbstractMatsimArc
 {
     private final TimeDiscretizer timeDiscretizer;
     private final ShortestPath[] shortestPaths;
 
 
-    public FullMatsimArc(TimeDiscretizer timeDiscretizer, ShortestPath[] shortestPaths)
+    public FullDiscreteMatsimArc(TimeDiscretizer timeDiscretizer, ShortestPath[] shortestPaths)
     {
         this.timeDiscretizer = timeDiscretizer;
         this.shortestPaths = shortestPaths;
@@ -53,14 +53,14 @@ public class FullMatsimArc
     }
 
 
-    public static class FullMatsimArcFactory
+    public static class FullDiscreteMatsimArcFactory
         implements ArcFactory
     {
         private final ShortestPathCalculator shortestPathCalculator;
         private final TimeDiscretizer timeDiscretizer;
 
 
-        public FullMatsimArcFactory(ShortestPathCalculator shortestPathCalculator,
+        public FullDiscreteMatsimArcFactory(ShortestPathCalculator shortestPathCalculator,
                 TimeDiscretizer timeDiscretizer)
         {
             this.shortestPathCalculator = shortestPathCalculator;
@@ -82,7 +82,7 @@ public class FullMatsimArc
                         departTime);
             }
 
-            return new FullMatsimArc(timeDiscretizer, shortestPaths);
+            return new FullDiscreteMatsimArc(timeDiscretizer, shortestPaths);
         }
     }
 }

@@ -238,7 +238,7 @@ public class SingleIterOnlineDvrpLauncher
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
         MatsimVrpGraph graph = data.getMatsimVrpGraph();
 
-        ArcFactory arcFactory = new SparseMatsimArc.SparseMatsimArcFactory(shortestPathCalculator,
+        ArcFactory arcFactory = new SparseDiscreteMatsimArc.SparseDiscreteMatsimArcFactory(shortestPathCalculator,
                 timeDiscretizer);
         ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
     }

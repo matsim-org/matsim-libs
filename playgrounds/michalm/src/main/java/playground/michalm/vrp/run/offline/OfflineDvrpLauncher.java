@@ -43,7 +43,7 @@ import pl.poznan.put.vrp.dynamic.simulator.DeterministicSimulator;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.MatsimVertexImpl;
-import playground.michalm.vrp.data.network.shortestpath.FullMatsimArcIO;
+import playground.michalm.vrp.data.network.shortestpath.FullDiscreteMatsimArcIO;
 import playground.michalm.vrp.driver.VrpSchedulePlan;
 
 
@@ -140,11 +140,11 @@ public class OfflineDvrpLauncher
         TimeDiscretizer timeDiscretizer = TimeDiscretizer.TD_24H_BY_15MIN;
 
         if (VRP_OUT_FILES) {
-            FullMatsimArcIO.readShortestPaths(timeDiscretizer, data, vrpArcTimesFileName,
+            FullDiscreteMatsimArcIO.readShortestPaths(timeDiscretizer, data, vrpArcTimesFileName,
                     vrpArcCostsFileName, vrpArcPathsFileName);
         }
         else {
-            FullMatsimArcIO.readShortestPaths(timeDiscretizer, data, vrpArcTimesFileName,
+            FullDiscreteMatsimArcIO.readShortestPaths(timeDiscretizer, data, vrpArcTimesFileName,
                     vrpArcCostsFileName, null);
         }
 

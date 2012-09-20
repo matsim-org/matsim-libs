@@ -32,9 +32,9 @@ import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 
 
-public class FullMatsimArcIO
+public class FullDiscreteMatsimArcIO
 {
-    private final static Logger log = Logger.getLogger(FullMatsimArcIO.class);
+    private final static Logger log = Logger.getLogger(FullDiscreteMatsimArcIO.class);
 
 
     public static void writeShortestPaths(MatsimVrpGraph graph, String timesFileName,
@@ -53,7 +53,7 @@ public class FullMatsimArcIO
             int aId = arcIter.getVertexFrom().getId();
             int bId = arcIter.getVertexTo().getId();
 
-            FullMatsimArc arc = (FullMatsimArc)arcIter.getArc();
+            FullDiscreteMatsimArc arc = (FullDiscreteMatsimArc)arcIter.getArc();
             timesBW.write(aId + "->" + bId + "\t");
             costsBW.write(aId + "->" + bId + "\t");
             pathsBW.write(aId + "->" + bId + "\t");
@@ -152,7 +152,8 @@ public class FullMatsimArcIO
                 sPaths_ij[k] = new ShortestPath((int)travelTime, travelCost, linkIds);
             }
 
-            graph.setArc(fromVertex, toVertex, new FullMatsimArc(timeDiscretizer, sPaths_ij));
+            graph.setArc(fromVertex, toVertex,
+                    new FullDiscreteMatsimArc(timeDiscretizer, sPaths_ij));
         }
 
         timesBR.close();

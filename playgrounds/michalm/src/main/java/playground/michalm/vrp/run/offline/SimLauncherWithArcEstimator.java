@@ -106,11 +106,11 @@ public class SimLauncherWithArcEstimator
                 travelTime, travelDisutility);
 
         FixedSizeMatsimVrpGraph graph = (FixedSizeMatsimVrpGraph)data.getMatsimVrpGraph();
-        ArcFactory arcFactory = new FullMatsimArc.FullMatsimArcFactory(shortestPathCalculator,
+        ArcFactory arcFactory = new FullDiscreteMatsimArc.FullDiscreteMatsimArcFactory(shortestPathCalculator,
                 TimeDiscretizer.TD_24H_BY_15MIN);
         graph.initArcs(arcFactory);
 
-        FullMatsimArcIO.writeShortestPaths(graph, vrpArcTimesFileName, vrpArcCostsFileName,
+        FullDiscreteMatsimArcIO.writeShortestPaths(graph, vrpArcTimesFileName, vrpArcCostsFileName,
                 vrpArcPathsFileName);
     }
 }

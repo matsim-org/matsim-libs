@@ -29,7 +29,7 @@ import playground.michalm.vrp.data.network.*;
 /**
  * @author michalm
  */
-public class SparseMatsimArc
+public class SparseDiscreteMatsimArc
     extends AbstractMatsimArc
 {
     private final ShortestPathCalculator shortestPathCalculator;
@@ -41,7 +41,7 @@ public class SparseMatsimArc
     private ShortestPath[] shortestPaths = null;// lazy initialization
 
 
-    public SparseMatsimArc(ShortestPathCalculator shortestPathCalculator,
+    public SparseDiscreteMatsimArc(ShortestPathCalculator shortestPathCalculator,
             TimeDiscretizer timeDiscretizer, MatsimVertex fromVertex, MatsimVertex toVertex)
     {
         this.shortestPathCalculator = shortestPathCalculator;
@@ -73,14 +73,14 @@ public class SparseMatsimArc
     }
 
 
-    public static class SparseMatsimArcFactory
+    public static class SparseDiscreteMatsimArcFactory
         implements ArcFactory
     {
         private final ShortestPathCalculator shortestPathCalculator;
         private final TimeDiscretizer timeDiscretizer;
 
 
-        public SparseMatsimArcFactory(ShortestPathCalculator shortestPathCalculator,
+        public SparseDiscreteMatsimArcFactory(ShortestPathCalculator shortestPathCalculator,
                 TimeDiscretizer timeDiscretizer)
         {
             this.shortestPathCalculator = shortestPathCalculator;
@@ -91,7 +91,7 @@ public class SparseMatsimArc
         @Override
         public Arc createArc(Vertex fromVertex, Vertex toVertex)
         {
-            return new SparseMatsimArc(shortestPathCalculator, timeDiscretizer,
+            return new SparseDiscreteMatsimArc(shortestPathCalculator, timeDiscretizer,
                     (MatsimVertex)fromVertex, (MatsimVertex)toVertex);
         }
     }
