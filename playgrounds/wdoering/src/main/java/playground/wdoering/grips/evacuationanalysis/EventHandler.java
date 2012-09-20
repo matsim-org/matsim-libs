@@ -220,12 +220,9 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		return cellTree;
 	}
 
-	public HashMap<MetaData, Object> getData()
+	public EventData getData()
 	{
-		HashMap<MetaData, Object> data = new HashMap<MetaData, Object>();
-		data.put(MetaData.TIMESUM, timeSum);
-		data.put(MetaData.ARRIVALS, arrivals);
-		return data;
+		return new EventData(cellTree, cellSize, timeSum, arrivals);
 	}
 
 

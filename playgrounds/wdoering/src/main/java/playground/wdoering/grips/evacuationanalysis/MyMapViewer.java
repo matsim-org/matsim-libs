@@ -100,7 +100,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	private QuadTree<Cell> cellTree;
 
-	private Map<MetaData, Object> data;
+	private EventData data;
 
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
@@ -593,7 +593,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				
 				double zoomStep = gridSize/(this.getZoom()+1);
 				
-				Double timeSum = (Double)data.get(MetaData.TIMESUM);
+				Double timeSum = data.getTimeSum();
 				
 				int i = 0;
 				for (double u = pixMinX; u < pixMaxX; u+=zoomStep)
@@ -637,12 +637,11 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		}
 	}
 
-	public void updateData(QuadTree<Cell> cellTree, Map<MetaData, Object> data)
+	public void updateData(EventData data)
 	{
-		this.cellTree = cellTree;
-		this.gridSize = (Double)data.get(MetaData.CELLSIZE);
 		this.data = data;
-		
+		this.cellTree = data.getCellTree();
+		this.gridSize = data.getCellSize();
 	}
 
 }

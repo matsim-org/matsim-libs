@@ -49,6 +49,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -117,13 +118,16 @@ public class EvacuationAnalysis implements ActionListener{
 	private double cellSize = 150;
 	private QuadTree<Cell> cellTree;
 	private EventHandler eventHandler;
-	private GraphPanel graphPanel;
+	private AbstractGraphPanel graphPanel;
 	private JPanel controlPanel;
 	private JButton calcButton;
 	
 
 	/**
 	 * Launch the application.
+	 * 
+	 * Check for parameters such as wms / layer
+	 * 
 	 */
 	public static void main(String[] args) {
 		
@@ -149,10 +153,11 @@ public class EvacuationAnalysis implements ActionListener{
 		EventQueue.invokeLater(new Runner(wms,layer));
 	}
 
-	private static void printUsage() {
+	private static void printUsage()
+	{
 		System.out.println();
 		System.out.println(EvacuationAnalysis.class.getSimpleName());
-		System.out.println("Starts the GRIPS road closures editor.");
+		System.out.println("Starts the GRIPS evacuation analysis.");
 		System.out.println();
 		System.out.println("usage 1: " + EvacuationAnalysis.class.getSimpleName() +"\n" +
 				"         starts the editor and uses openstreetmap as backround layer\n" +
@@ -178,50 +183,24 @@ public class EvacuationAnalysis implements ActionListener{
 
 	}
 
-	private void loadMapView() {
-		if (this.wms == null) {
-			addMapViewer(TileFactoryBuilder.getOsmTileFactory());
-		} else {
-			addMapViewer(TileFactoryBuilder.getWMSTileFactory(this.wms, this.layer));
-		}
-		this.jMapViewer.setCenterPosition(getNetworkCenter());
-		this.jMapViewer.setZoom(2);
-		this.compositePanel.repaint();
-	}
-
-	private GeoPosition getNetworkCenter() {
-		if (this.networkCenter != null) {
-			return this.networkCenter;
-		}
-		Envelope e = new Envelope();
-		for (Node node : this.sc.getNetwork().getNodes().values()) {
-			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
-		}
-		Coord centerC = new CoordImpl((e.getMaxX()+e.getMinX())/2, (e.getMaxY()+e.getMinY())/2);
-		CoordinateTransformation ct2 =  new GeotoolsTransformation(this.sc.getConfig().global().getCoordinateSystem(),"EPSG:4326");
-		centerC = ct2.transform(centerC);
-		this.networkCenter = new GeoPosition(centerC.getY(),centerC.getX());
-
-		return this.networkCenter;
-	}
-
-
-
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize()
 	{
+		//////////////////////////////////////////////////////////////////////////////
+		//basic frame settings
+		//////////////////////////////////////////////////////////////////////////////
+		
 		this.frame = new JFrame();
 		this.frame.setSize(960, 768);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		this.frame.setResizable(true);
 
+		//the panel on the right hand side, to display graphs etc.
 		JPanel panel = new JPanel();
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
-
-		
 		this.blockPanel = new JPanel(new GridLayout(18, 2));
 		this.blockPanel.setSize(new Dimension(200, 200));
 
@@ -235,46 +214,41 @@ public class EvacuationAnalysis implements ActionListener{
 
 		
 		//////////////////////////////////////////////////////////////////////////////
-		// GRAPH PANEL
+		// PANELS
 		//////////////////////////////////////////////////////////////////////////////
-		this.graphPanel = new GraphPanel();
 		
-		//////////////////////////////////////////////////////////////////////////////
-		// CONTROL
-		//////////////////////////////////////////////////////////////////////////////
-
-		this.calcButton = new JButton("calculate");
-		this.calcButton.setEnabled(false);
-		this.calcButton.addActionListener(this);
-		
+		this.graphPanel = new EvacuationTimeGraphPanel();
 		this.controlPanel = new JPanel(new GridLayout(1, 3));
-		this.controlPanel.add(calcButton);
 		
-		
-
 		this.blockPanel.add(this.panelDescriptions);
 		this.blockPanel.add(graphPanel);
 		this.blockPanel.add(controlPanel);
 		this.blockPanel.setPreferredSize(new Dimension(300,300));
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+		this.compositePanel = new JPanel();
+		this.compositePanel.setBounds(new Rectangle(0, 0, 800, 800));
+		this.compositePanel.setLayout(new BorderLayout(0, 0));
+		
+		//////////////////////////////////////////////////////////////////////////////
+		// CONTROL
+		//////////////////////////////////////////////////////////////////////////////
 
-		//		this.blockFieldLink1hh.setSelectedTextColor(Color.red);
-		//		this.blockFieldLink1mm.setSelectedTextColor(Color.green);
-
+		
 		this.frame.getContentPane().add(this.blockPanel, BorderLayout.EAST);
+		this.frame.getContentPane().add(this.compositePanel, BorderLayout.CENTER);
 
 		this.openBtn = new JButton("Open");
-		panel.add(this.openBtn);
-
-
 		this.saveButton = new JButton("Save");
 		this.saveButton.setEnabled(false);
 		this.saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.calcButton = new JButton("calculate");
+		this.calcButton.setEnabled(false);
+		this.calcButton.addActionListener(this);
+		
+		this.controlPanel.add(calcButton);
+		panel.add(this.openBtn);
 		panel.add(this.saveButton);
-		this.compositePanel = new JPanel();
-		this.compositePanel.setBounds(new Rectangle(0, 0, 800, 800));
-		this.frame.getContentPane().add(this.compositePanel, BorderLayout.CENTER);
-		this.compositePanel.setLayout(new BorderLayout(0, 0));
 		
 		this.openBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
@@ -300,38 +274,31 @@ public class EvacuationAnalysis implements ActionListener{
 
 	}
 
-	public void updateMapViewerSize(int width, int height)
-	{
-		if (this.jMapViewer!=null)
-			this.jMapViewer.setBounds(0, 0, width, height);
-	}
-
-	public void addMapViewer(TileFactory tf) {
-		this.compositePanel.setLayout(null);
-		this.jMapViewer = new MyMapViewer(this);
-		this.jMapViewer.setBounds(0, 0, 800, 800);
-		this.jMapViewer.setTileFactory(tf);
-		this.jMapViewer.setPanEnabled(true);
-		this.jMapViewer.setZoomEnabled(true);
-		this.compositePanel.add(this.jMapViewer);
-	}	
-
 	/**
-	 * save and open events
+	 * save, open and (re)calculate events
 	 * 
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		if (e.getActionCommand() == "Save") {
-			this.sc.getConfig().network().setTimeVariantNetwork(true);
-			String changeEventsFile = this.scPath + "/networkChangeEvents.xml";
-			this.sc.getConfig().network().setChangeEventInputFile(changeEventsFile);
-			new ConfigWriter(this.sc.getConfig()).write(this.configFile);
+		/**
+		 * Save heatmap shape and graphs
+		 * 
+		 */
+		if (e.getActionCommand() == "Save")
+		{
+			//TODO: save Shape file and Graphs
 			
-//			saveRoadClosures(changeEventsFile, this.roadClosures);
+//			this.sc.getConfig().network().setTimeVariantNetwork(true);
+//			String changeEventsFile = this.scPath + "/networkChangeEvents.xml";
+//			this.sc.getConfig().network().setChangeEventInputFile(changeEventsFile);
+//			new ConfigWriter(this.sc.getConfig()).write(this.configFile);
 		}
 
+		/**
+		 * Open MATSim config file.
+		 * 
+		 */
 		if (e.getActionCommand() == "Open")
 		{
 			final JFileChooser fc = new JFileChooser();
@@ -359,6 +326,7 @@ public class EvacuationAnalysis implements ActionListener{
 			
 			if (returnVal == JFileChooser.APPROVE_OPTION)
 			{
+				//open file
 				File file = fc.getSelectedFile();
 				log.info("Opening: " + file.getAbsolutePath() + ".");
 				this.configFile = file.getAbsolutePath();
@@ -378,31 +346,30 @@ public class EvacuationAnalysis implements ActionListener{
 				//read events if the current 
 				if (exists(currentEventFile))
 					readEvents(currentEventFile);
+				else
+				{
+					JOptionPane.showMessageDialog(this.frame, "Could not open the specified iteration.", "Iteration unavailable", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				
+				//read the shape file
 				readShapeFile(shp);
-				loadMapView();
 				
 				if (eventHandler!=null)
 				{
-					System.err.print("displaying events...");
-					QuadTree<Cell> cellTree = eventHandler.getCellTree();
-					
-					//build data
-					HashMap<MetaData, Object> data = eventHandler.getData();
-					data.put(MetaData.CELLSIZE, cellSize);
-					
-					if (cellTree != null)
-						jMapViewer.updateData(cellTree, data);
-					
-					System.err.println("done.");
-					
-					graphPanel.updateData(cellTree, data);
+					//get data
+					EventData data = eventHandler.getData();				
+					jMapViewer.updateData(data);
+					graphPanel.updateData(data);
 				}
 				
 				//update buttons
 				this.openBtn.setEnabled(false);
 				this.saveButton.setEnabled(true);
 				this.calcButton.setEnabled(true);
+				
+				//initialize map viewer
+				loadMapView();
 				
 			} else {
 				log.info("Open command cancelled by user.");
@@ -411,23 +378,67 @@ public class EvacuationAnalysis implements ActionListener{
 		
 		if (e.getActionCommand() == "calculate")
 		{
-			System.out.println("okokok");
+			System.out.println("recalculating");
 		}
 
 	}
+	
+	/**
+	 * Initialize map viewer.
+	 */
+	private void loadMapView() {
+		if (this.wms == null) {
+			addMapViewer(TileFactoryBuilder.getOsmTileFactory());
+		} else {
+			addMapViewer(TileFactoryBuilder.getWMSTileFactory(this.wms, this.layer));
+		}
+		this.jMapViewer.setCenterPosition(getNetworkCenter());
+		this.jMapViewer.setZoom(2);
+		this.compositePanel.repaint();
+	}
+
+	private GeoPosition getNetworkCenter() {
+		if (this.networkCenter != null) {
+			return this.networkCenter;
+		}
+		Envelope e = new Envelope();
+		for (Node node : this.sc.getNetwork().getNodes().values()) {
+			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
+		}
+		Coord centerC = new CoordImpl((e.getMaxX()+e.getMinX())/2, (e.getMaxY()+e.getMinY())/2);
+		CoordinateTransformation ct2 =  new GeotoolsTransformation(this.sc.getConfig().global().getCoordinateSystem(),"EPSG:4326");
+		centerC = ct2.transform(centerC);
+		this.networkCenter = new GeoPosition(centerC.getY(),centerC.getX());
+
+		return this.networkCenter;
+	}
+	
+	
+	public void updateMapViewerSize(int width, int height)
+	{
+		if (this.jMapViewer!=null)
+			this.jMapViewer.setBounds(0, 0, width, height);
+	}
+
+	public void addMapViewer(TileFactory tf) {
+		this.compositePanel.setLayout(null);
+		this.jMapViewer = new MyMapViewer(this);
+		this.jMapViewer.setBounds(0, 0, 800, 800);
+		this.jMapViewer.setTileFactory(tf);
+		this.jMapViewer.setPanEnabled(true);
+		this.jMapViewer.setZoomEnabled(true);
+		this.compositePanel.add(this.jMapViewer);
+	}		
 
 
 	private void readEvents(String eventFile)
 	{
-		
 		EventsManager e = EventsUtils.createEventsManager();
 		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
 		readerThread = new Thread(new EventReaderThread(reader,eventFile), "readerthread");
 		eventHandler = new EventHandler(this.sc, this.getGridSize(), readerThread);
 		e.addHandler(eventHandler);
 		readerThread.run();
-		
-		
 	}
 
 	/**
@@ -444,57 +455,10 @@ public class EvacuationAnalysis implements ActionListener{
 		return false;
 	}
 
-	private synchronized void saveRoadClosures(String fileName, HashMap<Id, String> roadClosures)
+	public void setSaveButtonEnabled(boolean enabled)
 	{
-		if (roadClosures.size()>0)
-		{
-
-
-			//create change event
-			Collection<NetworkChangeEvent> evs = new ArrayList<NetworkChangeEvent>();
-			NetworkChangeEventFactory fac = new NetworkChangeEventFactoryImpl();
-
-			Iterator it = roadClosures.entrySet().iterator();
-			while (it.hasNext())
-			{
-				Map.Entry pairs = (Map.Entry)it.next();
-
-				Id currentId = (Id)pairs.getKey();
-				String timeString = (String)pairs.getValue();
-
-				try {
-					double time = Time.parseTime(timeString);
-					NetworkChangeEvent ev = fac.createNetworkChangeEvent(time);
-//					ev.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
-					ev.setFlowCapacityChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
-					
-					ev.addLink(this.sc.getNetwork().getLinks().get(currentId));
-					evs.add(ev);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-
-
-			NetworkChangeEventsWriter writer = new NetworkChangeEventsWriter();
-			if (fileName.endsWith(".xml")) {
-				writer.write(fileName, evs);
-			} else {
-				writer.write(fileName + ".xml", evs);		
-			}
-			
-			System.out.println("saved road closures");
-		}
-
-
-	}
-
-
-	public void setSaveButtonEnabled(boolean enabled) {
 		this.saveButton.setEnabled(enabled);
 	}
-
 	
 	public synchronized Link getRoadClosure(Id linkId)
 	{

@@ -20,31 +20,10 @@
 
 package playground.wdoering.grips.evacuationanalysis;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.util.HashMap;
-
-import javax.swing.JPanel;
-
-import org.matsim.core.utils.collections.QuadTree;
-
-public class GraphPanel extends JPanel {
+public interface GraphPanelInterface {
 	
-	private QuadTree<Cell> cellTree;
-	private double cellSize;
-	private HashMap<MetaData, Object> data;
-	
-	public GraphPanel()
-	{
-		this.setBackground(Color.blue);
-		this.setPreferredSize(new Dimension(300,300));
-	}
-
-	public void updateData(QuadTree<Cell> cellTree, HashMap<MetaData, Object> data)
-	{
-		this.cellTree = cellTree;
-		this.data = data;
-		this.cellSize = (Double) data.get(MetaData.CELLSIZE);
-	}
+	public abstract void resetData();
+	public abstract void updateData(EventData data);
+	public abstract void drawGraph();
 
 }
