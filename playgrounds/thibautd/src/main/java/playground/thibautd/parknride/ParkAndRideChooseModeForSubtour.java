@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -50,9 +49,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
-
-import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
-import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
 
 /**
  * A special module meant at handling subtour mode choice for trips,

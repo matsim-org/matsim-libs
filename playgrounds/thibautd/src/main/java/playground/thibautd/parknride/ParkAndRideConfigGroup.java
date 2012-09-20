@@ -29,14 +29,11 @@ import playground.thibautd.utils.ReflectiveModule;
 public class ParkAndRideConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "parkAndRide";
 
-	public static enum InsertionStrategy { Routing , Random };
-
 	private String facilities = null;
 	private String[] availableModes = new String[]{
 		TransportMode.car, TransportMode.pt, TransportMode.bike,
 			TransportMode.walk, ParkAndRideConstants.PARK_N_RIDE_LINK_MODE};
 	private String[] chainBasedModes = new String[]{ TransportMode.car , TransportMode.bike };
-	private InsertionStrategy insertionStrategy = InsertionStrategy.Random;
 	private double facilityChangeProbability = 0.9;
 	private double localSearchRadius = 5000;
 	private double priceOfDistance = 1;
@@ -100,14 +97,6 @@ public class ParkAndRideConfigGroup extends ReflectiveModule {
 
 	public String getChainBasedModesAsString() {
 		return arrayToString( chainBasedModes );
-	}
-
-	public void setInsertionStrategy(final String value) {
-		insertionStrategy = InsertionStrategy.valueOf( value );
-	}
-
-	public InsertionStrategy getInsertionStrategy() {
-		return insertionStrategy;
 	}
 
 	public void setFacilityChangeProbability(final String value) {

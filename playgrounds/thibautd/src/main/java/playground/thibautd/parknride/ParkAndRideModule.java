@@ -45,10 +45,6 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
 import playground.thibautd.parknride.mutationapproach.HeuristicParkAndRideIncluder;
-import playground.thibautd.parknride.routingapproach.ParkAndRideRoutingModule;
-import playground.thibautd.parknride.routingapproach.ParkAndRideTravelTimeCost;
-import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
-import playground.thibautd.parknride.routingapproach.RoutingParkAndRideIncluder;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 
 /**
@@ -70,18 +66,10 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 		ParkAndRideIncluder includer;
 
 		ParkAndRideConfigGroup configGroup = ParkAndRideUtils.getConfigGroup( controler.getConfig() );
-		switch (configGroup.getInsertionStrategy()) {
-			case Routing:
-				includer = createRoutingIncluder(tripRouterFactory , tripRouter);
-				break;
-			case Random:
+
 				includer = new HeuristicParkAndRideIncluder(
 						facilities,
 						tripRouter);
-				break;
-			default:
-				throw new RuntimeException();
-		}
 
 		Random rand = MatsimRandom.getLocalInstance();
 		ParkAndRideChooseModeForSubtour algo =
@@ -102,48 +90,6 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 					rand);
 
 		return algo;
-	}
-
-	private ParkAndRideIncluder createRoutingIncluder(
-			final TripRouterFactory tripRouterFactory,
-			final TripRouter tripRouter) {
-		TransitRouterConfig transitConfig =
-			new TransitRouterConfig(
-					controler.getConfig().planCalcScore(),
-					controler.getConfig().plansCalcRoute(),
-					controler.getConfig().transitRouter(),
-					controler.getConfig().vspExperimental());
-		ParkAndRideTravelTimeCost timeCost =
-			new ParkAndRideTravelTimeCost(
-					transitConfig,
-					controler.getConfig().planCalcScore());
-
-		TravelTime carTime = controler.getTravelTimeCalculator();
-		TravelDisutility carCost =
-			controler.getTravelDisutilityFactory().createTravelDisutility(
-					carTime, controler.getConfig().planCalcScore() );
-		TransitRouterNetworkTravelTimeAndDisutility ptTimeCost =
-					new TransitRouterNetworkTravelTimeAndDisutility( transitConfig );
-
-		ParkAndRideRoutingModule routingModule =
-			new ParkAndRideRoutingModule(
-					((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
-					controler.getPopulation().getFactory(),
-					controler.getNetwork(),
-					controler.getScenario().getTransitSchedule(),
-					transitConfig.beelineWalkConnectionDistance,
-					transitConfig.searchRadius,
-					ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() ),
-					transitConfig,
-					carCost,
-					carTime,
-					ptTimeCost,
-					timeCost,
-					timeCost);
-		return new RoutingParkAndRideIncluder(
-				ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() ),
-				routingModule,
-				tripRouter);
 	}
 
 	private static class ModesChecker implements PermissibleModesCalculator {

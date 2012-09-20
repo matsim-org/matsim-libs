@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import herbie.running.config.HerbieConfigGroup;
 
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
-import playground.thibautd.parknride.routingapproach.ParkAndRideUtils;
+import playground.thibautd.parknride.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
 

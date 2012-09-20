@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride.routingapproach;
+package playground.thibautd.parknride;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,9 +33,6 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.thibautd.parknride.ParkAndRideConfigGroup;
-import playground.thibautd.parknride.ParkAndRideFacilities;
-import playground.thibautd.parknride.ParkAndRideFacilitiesXmlReader;
 
 /**
  * @author thibautd
