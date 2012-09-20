@@ -130,8 +130,13 @@ public class TripsToLegsAlgorithmTest {
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				boolean isAct = pe instanceof Activity;
 				Assert.assertFalse(
-						"wrong act/trip alternance after algo: "+plan.getPlanElements(),
+						"wrong act/trip alternance (consecutive Activities) after algo: "+plan.getPlanElements(),
 						isAct && lastWasAct);
+
+				Assert.assertFalse(
+						"wrong act/trip alternance (consecutive Legs) after algo: "+plan.getPlanElements(),
+						!isAct && !lastWasAct);
+				lastWasAct = isAct;
 			}
 		}
 	}
