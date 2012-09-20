@@ -45,6 +45,7 @@ import java.util.Random;
  * little attention has been paid to proper engineering. 
  * 
  * @author Bjoern Guenzel - http://blog.blinker.net
+ * @author rashid_waraich (added some code)
  */
 public class TravelingSalesmanSolver {
 
