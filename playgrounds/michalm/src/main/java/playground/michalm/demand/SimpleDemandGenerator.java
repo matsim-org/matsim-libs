@@ -35,7 +35,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
 
 import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
-
 import cern.jet.random.Uniform;
 import cern.jet.random.engine.MersenneTwister;
 

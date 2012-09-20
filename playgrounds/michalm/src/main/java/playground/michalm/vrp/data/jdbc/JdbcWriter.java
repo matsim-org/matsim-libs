@@ -35,7 +35,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 import cern.colt.Arrays;
 
 

@@ -20,7 +20,7 @@
 package playground.michalm.vrp.taxi.wal;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.Socket;
 
 import playground.michalm.vrp.taxi.wal.Command.CommandType;
 

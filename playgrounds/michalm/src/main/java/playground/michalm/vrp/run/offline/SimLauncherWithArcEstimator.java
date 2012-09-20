@@ -34,7 +34,6 @@ import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.TimeAsTravelDisutility;
 import playground.michalm.vrp.data.network.shortestpath.*;
-import playground.michalm.vrp.data.network.shortestpath.full.*;
 
 
 public class SimLauncherWithArcEstimator
