@@ -62,109 +62,109 @@ public class AlgorithmConfig
     }
 
 
-    public static AlgorithmConfig NOS_STRAIGHT_LINE = new AlgorithmConfig(//
+    public static final AlgorithmConfig NOS_STRAIGHT_LINE = new AlgorithmConfig(//
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig NOS_TRAVEL_DISTANCE = new AlgorithmConfig(//
+    public static final AlgorithmConfig NOS_TRAVEL_DISTANCE = new AlgorithmConfig(//
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig NOS_FREE_FLOW = new AlgorithmConfig(//
+    public static final AlgorithmConfig NOS_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig NOS_24_H = new AlgorithmConfig(//
+    public static final AlgorithmConfig NOS_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig NOS_15_MIN = new AlgorithmConfig(//
+    public static final AlgorithmConfig NOS_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             NO_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig OTS_REQ_FREE_FLOW = new AlgorithmConfig(//
+    public static final AlgorithmConfig OTS_REQ_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig OTS_REQ_24_H = new AlgorithmConfig(//
+    public static final AlgorithmConfig OTS_REQ_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig OTS_REQ_15_MIN = new AlgorithmConfig(//
+    public static final AlgorithmConfig OTS_REQ_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig OTS_DRV_FREE_FLOW = new AlgorithmConfig(//
+    public static final AlgorithmConfig OTS_DRV_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static AlgorithmConfig OTS_DRV_24_H = new AlgorithmConfig(//
+    public static final AlgorithmConfig OTS_DRV_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static AlgorithmConfig OTS_DRV_15_MIN = new AlgorithmConfig(//
+    public static final AlgorithmConfig OTS_DRV_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             ONE_TIME_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static AlgorithmConfig RES_REQ_FREE_FLOW = new AlgorithmConfig(//
+    public static final AlgorithmConfig RES_REQ_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig RES_REQ_24_H = new AlgorithmConfig(//
+    public static final AlgorithmConfig RES_REQ_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig RES_REQ_15_MIN = new AlgorithmConfig(//
+    public static final AlgorithmConfig RES_REQ_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_REQUEST);//
 
-    public static AlgorithmConfig RES_DRV_FREE_FLOW = new AlgorithmConfig(//
+    public static final AlgorithmConfig RES_DRV_FREE_FLOW = new AlgorithmConfig(//
             FREE_FLOW_SPEED, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static AlgorithmConfig RES_DRV_24_H = new AlgorithmConfig(//
+    public static final AlgorithmConfig RES_DRV_24_H = new AlgorithmConfig(//
             EVENTS_24_H, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static AlgorithmConfig RES_DRV_15_MIN = new AlgorithmConfig(//
+    public static final AlgorithmConfig RES_DRV_15_MIN = new AlgorithmConfig(//
             EVENTS_15_MIN, //
             TIME, //
             RE_SCHEDULING,//
             AFTER_DRIVE_TASKS);//
 
-    public static AlgorithmConfig[] ALL = {//
+    public static final AlgorithmConfig[] ALL = {//
     NOS_STRAIGHT_LINE,//
             NOS_TRAVEL_DISTANCE,//
             NOS_FREE_FLOW,//
