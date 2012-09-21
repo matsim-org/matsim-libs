@@ -20,7 +20,7 @@ public class OSM2MATSimNetworkV2 {
 	
 	private static final String PATH = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/archive/";//"../";
 	private static final String INFILE = PATH + "belgium_incl_borderArea.osm";//"belgium_filtered.osm";
-	private static final String OUTFILE = PATH + "belgium_incl_borderArea_hierarchylayer4and5.xml.gz";
+	private static final String OUTFILE = PATH + "belgium_incl_borderArea_hierarchylayer4.xml.gz";
 	
 	public static void main(final String[] args) {
 		
@@ -59,7 +59,7 @@ public class OSM2MATSimNetworkV2 {
 		// this layer covers the greater Brussels area including
 		// OSM secondary roads or greater
 		// osmReader.setHierarchyLayer(51.328, 3.639, 50.645, 4.888, 4); // tnicolai: old layer extend too small
-		osmReader.setHierarchyLayer(51.4, 3.55, 50.3, 5.5, 5);
+		// osmReader.setHierarchyLayer(51.4, 3.55, 50.3, 5.5, 5);
 		
 		// tnicolai: this layer is removed, because of having different layers within the
 		//			 the study area that cause different network densities !!!

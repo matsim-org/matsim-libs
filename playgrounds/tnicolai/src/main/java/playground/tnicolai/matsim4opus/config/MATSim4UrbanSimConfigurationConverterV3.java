@@ -624,12 +624,14 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		
 		// set JDEQSim
 		// controlerCG.setMobsim("jdeqsim");
+		// set Qsim
+		// ØcontrolerCG.setMobsim(QSimConfigGroup.GROUP_NAME);
 		
 		log.info("ControlerConfigGroup settings:");
 		log.info("FirstIteration: " + controlerCG.getFirstIteration());
 		log.info("LastIteration: " + controlerCG.getLastIteration());
 		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
-		// log.info("Mobsim: JDEQSim");
+		// log.info("Mobsim: " + QSimConfigGroup.GROUP_NAME);
 		log.info("... done!");
 	}
 	
@@ -660,6 +662,58 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		log.info("Latest Start Time Activity_Type_1: " + workActivity.getLatestStartTime());
 		log.info("... done!");
 	}
+	
+//	/**
+//	 * setting qsim
+//	 */
+//	private void initQSim(){
+//		log.info("Setting QSimConfigGroup to config...");
+//		
+//		
+//		QSimConfigGroup qsimCG = scenario.getConfig().getQSimConfigGroup();
+//		if( qsimCG == null){		
+//			qsimCG = new QSimConfigGroup();
+//			scenario.getConfig().addQSimConfigGroup( qsimCG );
+//		}
+//		
+//		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
+//		
+//		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
+//		
+//		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
+//		qsimCG.setFlowCapFactor( popSampling );	
+//		
+//		// Adapting the storageCapFactor has the following reason:
+//		// Too low SorageCapacities especially with small sampling 
+//		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
+//		// This leads to an unstable behavior of the simulation (by breakdowns 
+//		// during the learning progress).
+//		// The correction fetch factor introduced here raises the 
+//		// storage capacity at low sampling rates and becomes flatten 
+//		// with increasing sampling rates (at a 100% sample, the 
+//		// storage capacity == 1).			tnicolai nov'11
+//		if(popSampling <= 0.){
+//			popSampling = 0.01;
+//			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
+//		}
+//		// tnicolai dec'11
+//		double fetchFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
+//		double storageCap = popSampling * fetchFactor;
+//		
+//		// setting StorageCapFactor
+//		qsimCG.setStorageCapFactor( storageCap );	
+//		
+//		boolean removeStuckVehicles = false;
+//		qsimCG.setRemoveStuckVehicles( removeStuckVehicles );
+//		qsimCG.setStuckTime(10.);
+//		
+//		log.info("QSimConfigGroup settings:");
+//		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
+//		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + fetchFactor + ")" );
+//		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
+//		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
+//		log.info("... done!");
+//	}
 	
 	/**
 	 * setting simulation

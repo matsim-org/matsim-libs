@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * improvements aug'12
  * - accessibility calculation of unified for cell- and zone-base approach
- * - Big computing savings due reduction of "least cost path tree" execution:
+ * - large computing savings due reduction of "least cost path tree" execution:
  *   In a pre-processing step all nearest nodes of measuring points (origins) are determined. 
  *   The "least cost path tree" for measuring points with the same nearest node are now only executed once. 
  *   Only the cost calculations from the measuring point to the network is done individually.
@@ -50,7 +50,7 @@ public class AccessibilityControlerListenerImpl{
 	protected boolean isParcelMode = false;
 	
 	protected static int ZONE_BASED = 0;
-	protected static int CELL_BASED = 1;
+	protected static int PARCEL_BASED = 1;
 	
 	// start points, measuring accessibility (cell based approach)
 	protected ZoneLayer<Id> measuringPointsCell;
@@ -116,45 +116,46 @@ public class AccessibilityControlerListenerImpl{
 	 */
 	protected void initAccessibilityParameter(ScenarioImpl scenario){
 		
-		AccessibilityParameterConfigModule module = ConfigurationModule.getAccessibilityParameterConfigModule(scenario);
+		AccessibilityParameterConfigModule moduleAPCM = ConfigurationModule.getAccessibilityParameterConfigModule(scenario);
+		// tnicolai TODO: use MATSimControlerConfigModuleV3 to get "timeofday", implement ConfigurationModuleVx which returns the current config modules
 		
-		useRawSum		= module.isUseRawSumsWithoutLn();
-		logitScaleParameter = module.getLogitScaleParameter();
+		useRawSum			= moduleAPCM.isUseRawSumsWithoutLn();
+		logitScaleParameter = moduleAPCM.getLogitScaleParameter();
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
 		bikeSpeedMeterPerHour = 15000.;
 		
-		betaCarTT 	   	= module.getBetaCarTravelTime();
-		betaCarTTPower	= module.getBetaCarTravelTimePower2();
-		betaCarLnTT		= module.getBetaCarLnTravelTime();
-		betaCarTD		= module.getBetaCarTravelDistance();
-		betaCarTDPower	= module.getBetaCarTravelDistancePower2();
-		betaCarLnTD		= module.getBetaCarLnTravelDistance();
-		betaCarTC		= module.getBetaCarTravelCost();
-		betaCarTCPower	= module.getBetaCarTravelCostPower2();
-		betaCarLnTC		= module.getBetaCarLnTravelCost();
+		betaCarTT 	   	= moduleAPCM.getBetaCarTravelTime();
+		betaCarTTPower	= moduleAPCM.getBetaCarTravelTimePower2();
+		betaCarLnTT		= moduleAPCM.getBetaCarLnTravelTime();
+		betaCarTD		= moduleAPCM.getBetaCarTravelDistance();
+		betaCarTDPower	= moduleAPCM.getBetaCarTravelDistancePower2();
+		betaCarLnTD		= moduleAPCM.getBetaCarLnTravelDistance();
+		betaCarTC		= moduleAPCM.getBetaCarTravelCost();
+		betaCarTCPower	= moduleAPCM.getBetaCarTravelCostPower2();
+		betaCarLnTC		= moduleAPCM.getBetaCarLnTravelCost();
 		
-		betaBikeTT		= module.getBetaBikeTravelTime();
-		betaBikeTTPower	= module.getBetaBikeTravelTimePower2();
-		betaBikeLnTT	= module.getBetaBikeLnTravelTime();
-		betaBikeTD		= module.getBetaBikeTravelDistance();
-		betaBikeTDPower	= module.getBetaBikeTravelDistancePower2();
-		betaBikeLnTD	= module.getBetaBikeLnTravelDistance();
-		betaBikeTC		= module.getBetaBikeTravelCost();
-		betaBikeTCPower	= module.getBetaBikeTravelCostPower2();
-		betaBikeLnTC	= module.getBetaBikeLnTravelCost();
+		betaBikeTT		= moduleAPCM.getBetaBikeTravelTime();
+		betaBikeTTPower	= moduleAPCM.getBetaBikeTravelTimePower2();
+		betaBikeLnTT	= moduleAPCM.getBetaBikeLnTravelTime();
+		betaBikeTD		= moduleAPCM.getBetaBikeTravelDistance();
+		betaBikeTDPower	= moduleAPCM.getBetaBikeTravelDistancePower2();
+		betaBikeLnTD	= moduleAPCM.getBetaBikeLnTravelDistance();
+		betaBikeTC		= moduleAPCM.getBetaBikeTravelCost();
+		betaBikeTCPower	= moduleAPCM.getBetaBikeTravelCostPower2();
+		betaBikeLnTC	= moduleAPCM.getBetaBikeLnTravelCost();
 		
-		betaWalkTT		= module.getBetaWalkTravelTime();
-		betaWalkTTPower	= module.getBetaWalkTravelTimePower2();
-		betaWalkLnTT	= module.getBetaWalkLnTravelTime();
-		betaWalkTD		= module.getBetaWalkTravelDistance();
-		betaWalkTDPower	= module.getBetaWalkTravelDistancePower2();
-		betaWalkLnTD	= module.getBetaWalkLnTravelDistance();
-		betaWalkTC		= module.getBetaWalkTravelCost();
-		betaWalkTCPower	= module.getBetaWalkTravelCostPower2();
-		betaWalkLnTC	= module.getBetaWalkLnTravelCost();
+		betaWalkTT		= moduleAPCM.getBetaWalkTravelTime();
+		betaWalkTTPower	= moduleAPCM.getBetaWalkTravelTimePower2();
+		betaWalkLnTT	= moduleAPCM.getBetaWalkLnTravelTime();
+		betaWalkTD		= moduleAPCM.getBetaWalkTravelDistance();
+		betaWalkTDPower	= moduleAPCM.getBetaWalkTravelDistancePower2();
+		betaWalkLnTD	= moduleAPCM.getBetaWalkLnTravelDistance();
+		betaWalkTC		= moduleAPCM.getBetaWalkTravelCost();
+		betaWalkTCPower	= moduleAPCM.getBetaWalkTravelCostPower2();
+		betaWalkLnTC	= moduleAPCM.getBetaWalkLnTravelCost();
 		
-		depatureTime 	= 8.*3600;	// tnicolai: make configurable		
+		depatureTime 	= 8.*3600;	
 		printParameterSettings();
 	}
 	
@@ -294,7 +295,7 @@ public class AccessibilityControlerListenerImpl{
 				double distanceMeasuringPoint2Road_meter 	= distance.getDisatancePoint2Road(); // distance measuring point 2 road (link or node)
 				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	 // distance intersection 2 node (only for orthogonal distance)
 				
-				double offsetWalkTime2Node_h 				= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
+				double walkTravelTimeOnNetwork2Node_h 		= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
 				double carTravelTime_meterpersec			= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
 				double freeSpeedTravelTime_meterpersec 		= nearestLink.getFreespeed();
 				
@@ -342,7 +343,7 @@ public class AccessibilityControlerListenerImpl{
 					sumGeneralizedCosts(gcs, 
 							distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
 							distanceRoad2Node_meter, 
-							offsetWalkTime2Node_h + offsetWalkTime2Opportunity_h,
+							walkTravelTimeOnNetwork2Node_h + offsetWalkTime2Opportunity_h,
 							opportunityWeight, freeSpeedTravelTime_h,
 							travelDistance_meter, bikeTravelTime_h,
 							walkTravelTime_h, congestedCarTravelTime_h);
@@ -363,7 +364,7 @@ public class AccessibilityControlerListenerImpl{
 					walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
 				}
 				
-				if(mode == CELL_BASED){ // only for cell-based accessibility computation
+				if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
 					// assign log sums to current starZone object and spatial grid
 					freeSpeedGrid.setValue(freeSpeedAccessibility, measurePoint.getGeometry().getCentroid());
 					carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());

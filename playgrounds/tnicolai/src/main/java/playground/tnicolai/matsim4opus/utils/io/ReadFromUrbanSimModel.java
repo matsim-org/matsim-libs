@@ -710,19 +710,19 @@ public class ReadFromUrbanSimModel {
 	
 	/**
 	 * Aggregates jobs with same nearest node 
-	 * @param parcels
+	 * @param parcelsOrZones
 	 * @param jobSample
 	 * @param network
 	 * @return
 	 */
-	public AggregateObject2NearestNode[] getAggregatedWorkplaces(final ActivityFacilitiesImpl parcels, final double jobSample, final NetworkImpl network, final boolean isParcel){
+	public AggregateObject2NearestNode[] getAggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcel){
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
-		List<PersonAndJobsObject> jobSampleList = readJobs(parcels, jobSample, isParcel);
+		List<PersonAndJobsObject> jobSampleList = readJobs(parcelsOrZones, jobSample, isParcel);
 		assert( jobSampleList != null );
 		
-		// Since the aggregated workplaces in jobClusterArray does contain coordinates of their nearest node 
+		// Since the aggregated opportunities in jobClusterArray does contain coordinates of their nearest node 
 		// this result is dumped out here    tnicolai dec'12
 		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		

@@ -76,7 +76,7 @@ public class MATSim4UrbanSimTEST {
 	
 	boolean isParcel = false;
 	
-	double timeOfADay;
+	double timeOfDay;
 	
 	// run selected controler
 	boolean computeCellBasedAccessibility			 = false;
@@ -174,7 +174,7 @@ public class MATSim4UrbanSimTEST {
 		// get the data from UrbanSim (parcels and persons)
 		if(getUrbanSimParameterConfig().isUseShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-					  getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
+					  getUrbanSimParameterConfig().getOpusHome() + getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
 					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
 		}
 		else
@@ -263,7 +263,7 @@ public class MATSim4UrbanSimTEST {
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler) {
 		
-		// tnicolai TODO provide Time-of-a-day as a parameter for contoler listeners ...
+		// tnicolai TODO provide Time-of-day as a parameter for contoler listeners ...
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
@@ -280,7 +280,7 @@ public class MATSim4UrbanSimTEST {
 			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones, srid);
 			
 			aggregateOpportunities(zones, parcels);
-			// creates zone based table of log sums (workplace accessibility)
+			// creates zone based table of log sums
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, 				
 																						aggregatedOpportunities, 
 																						benchmark,
@@ -322,7 +322,7 @@ public class MATSim4UrbanSimTEST {
 				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			}
 			
-			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV3(measuringPoints, 
+			controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3(measuringPoints, 
 																						 aggregatedOpportunities,
 																						 parcels,
 																						 freeSpeedGrid,
@@ -364,9 +364,9 @@ public class MATSim4UrbanSimTEST {
 	void aggregateOpportunities(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
 		if(aggregatedOpportunities == null){
 			if(isParcel)
-				aggregatedOpportunities = readFromUrbansim.getAggregatedWorkplaces(parcels, destinationSampleRate, (NetworkImpl) scenario.getNetwork(), isParcel);
+				aggregatedOpportunities = readFromUrbansim.getAggregatedOpportunities(parcels, destinationSampleRate, (NetworkImpl) scenario.getNetwork(), isParcel);
 			else
-				aggregatedOpportunities = readFromUrbansim.getAggregatedWorkplaces(zones, destinationSampleRate, (NetworkImpl) scenario.getNetwork(), isParcel);
+				aggregatedOpportunities = readFromUrbansim.getAggregatedOpportunities(zones, destinationSampleRate, (NetworkImpl) scenario.getNetwork(), isParcel);
 		}
 	}
 	
@@ -412,7 +412,7 @@ public class MATSim4UrbanSimTEST {
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
 		}
 		
-		this.timeOfADay					= moduleMATSim4UrbanSim.getTimeOfADay();
+		this.timeOfDay					= moduleMATSim4UrbanSim.getTimeOfADay();
 		
 		
 		// check which setting to use

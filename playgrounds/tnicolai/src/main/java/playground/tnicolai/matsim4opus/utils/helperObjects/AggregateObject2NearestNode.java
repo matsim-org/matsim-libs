@@ -7,7 +7,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
-public class AggregateObject2NearestNode {
+import playground.tnicolai.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
+
+public class AggregateObject2NearestNode extends AccessibilityControlerListenerImpl{
 	
 	private List<Id> objectIdList = null; // either job or person id
 	private Id zoneID;
@@ -17,14 +19,7 @@ public class AggregateObject2NearestNode {
 	private double distanceSum;
 	
 	public AggregateObject2NearestNode(Id objectID, Id parcelId, Id zoneId, Coord coordinate, double distance){
-		if(this.objectIdList == null)
-			this.objectIdList = new ArrayList<Id>();
-		this.objectIdList.add( objectID );
-		this.parcelID = parcelId;
-		this.zoneID = zoneId;
-		this.coordinate = coordinate;
-		this.nearestNode = null;
-		this.distanceSum = distance;
+		this(objectID, parcelId, zoneId, coordinate, null, distance);
 	}
 	
 	public AggregateObject2NearestNode(Id objectID, Id parcelId, Id zoneId, Coord coordinate, Node nearestNode, double distance){

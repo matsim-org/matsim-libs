@@ -97,29 +97,32 @@ import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
  * improvements aug'12
  * - the aggregated opportunities now contain the euclidian distance to the nereast node on the network. This
  *   is used to determine the total costs cij in the accessibility measure
+ *   
+ * changes sep'12
+ * - renaming from CellBasedAccessibilityControlerListenerV3 into ParcelBasedAccessibilityControlerListenerV3
  * 
  * @author thomas
  * 
  */
-public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
+public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
 	
-	private static final Logger log = Logger.getLogger(CellBasedAccessibilityControlerListenerV3.class);
+	private static final Logger log = Logger.getLogger(ParcelBasedAccessibilityControlerListenerV3.class);
 	
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public CellBasedAccessibilityControlerListenerV3(ZoneLayer<Id> startZones, 						// needed for google earth plots (not supported by now tnicolai feb'12)
+	public ParcelBasedAccessibilityControlerListenerV3(ZoneLayer<Id> startZones, 								// needed for google earth plots
 													 AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
 													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
-													 SpatialGrid freeSpeedGrid,
+													 SpatialGrid freeSpeedGrid,									// table for free speed car travel times in accessibility computation
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
 													 SpatialGrid bikeGrid,										// table for bike travel times in accessibility computation
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
 													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 Benchmark benchmark,										// Benchmark tool
-													 ScenarioImpl scenario){	
-		log.info("Initializing CellBasedAccessibilityControlerListenerV3 ...");
+													 ScenarioImpl scenario){									// contains all settings for current run
+		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 		
 		assert (startZones != null);
 		this.measuringPointsCell = startZones;
@@ -136,7 +139,7 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		assert (walkGrid != null);
 		this.walkGrid = walkGrid;
 		assert (fileExtension != null);
-		CellBasedAccessibilityControlerListenerV3.fileExtension = fileExtension;
+		ParcelBasedAccessibilityControlerListenerV3.fileExtension = fileExtension;
 		assert (benchmark != null);
 		this.benchmark = benchmark;
 
@@ -177,7 +180,7 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			accessibilityComputation(ttc, lcptFreeSpeedCarTravelTime,
 					lcptCongestedCarTravelTime, lcptTravelDistance, network,
 					measuringPointIterator, measuringPointsCell.getZones().size(),
-					CELL_BASED);
+					PARCEL_BASED);
 			
 			System.out.println();
 
@@ -240,22 +243,22 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(freeSpeedGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// freespeed results for plotting in R
 				+ "freeSpeedAccessibility_cellsize_" + freeSpeedGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV3.fileExtension
+				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(carGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
 				+ "carAccessibility_cellsize_" + carGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV3.fileExtension
+				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(bikeGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
 				+ "bikeAccessibility_cellsize_" + bikeGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV3.fileExtension
+				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
 				+ "walkAccessibility_cellsize_" + walkGrid.getResolution()
-				+ CellBasedAccessibilityControlerListenerV3.fileExtension
+				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 
 		// tnicolai: google earth outputs can be left in final release since
@@ -266,28 +269,28 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 							InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "freeSpeedAccessibility_cellsize_"
 										+ freeSpeedGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV3.fileExtension
+										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
 								carGrid,
 								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "carAccessibility_cellsize_"
 										+ carGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV3.fileExtension
+										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPointsCell,								// bike results for google earth
 								bikeGrid,
 								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "bikeAccessibility_cellsize_"
 										+ bikeGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV3.fileExtension
+										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		GridUtils.writeKMZFiles(measuringPointsCell,								// walk results for google earth
 								walkGrid,
 								InternalConstants.MATSIM_4_OPUS_TEMP
 										+ "walkAccessibility_cellsize_"
 										+ walkGrid.getResolution()
-										+ CellBasedAccessibilityControlerListenerV3.fileExtension
+										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 										+ InternalConstants.FILE_TYPE_KMZ);
 		log.info("Writing plotting files done!");
 	}

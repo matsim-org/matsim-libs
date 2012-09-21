@@ -206,7 +206,7 @@ public class MATSim4UrbanSimParcel {
 	 * @return JobClusterObject[] 
 	 */
 	AggregateObject2NearestNode[] readUrbansimJobs(ActivityFacilitiesImpl parcels, double jobSample){
-		return readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl) scenario.getNetwork(), isParcel);
+		return readFromUrbansim.getAggregatedOpportunities(parcels, jobSample, (NetworkImpl) scenario.getNetwork(), isParcel);
 	}
 	
 	/**
@@ -345,7 +345,7 @@ public class MATSim4UrbanSimParcel {
 				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			}
 			
-			controler.addControlerListener(new CellBasedAccessibilityControlerListenerV3(measuringPoints, 
+			controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3(measuringPoints, 
 																						 aggregatedOpportunities,
 																						 parcels,
 																						 freeSpeedGrid,

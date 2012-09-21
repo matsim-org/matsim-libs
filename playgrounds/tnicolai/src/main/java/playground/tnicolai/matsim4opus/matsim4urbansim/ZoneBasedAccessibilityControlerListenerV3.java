@@ -67,7 +67,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		this.aggregatedOpportunities = aggregatedOpportunities;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
-		
+
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
