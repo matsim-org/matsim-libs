@@ -152,16 +152,6 @@ public class LeastCostPathTree {
 		return this.nodeData;
 	}
 
-//	public final TravelTime getTravelTimeCalculator() {
-//		return this.ttFunction;
-//	}
-	// convenience method that is never used --> disabling it.  kai, jul'12
-
-//	public final TravelDisutility getTravelCostCalulator() {
-//		return this.tcFunction;
-//	}
-	// convenience method that is never used --> disabling it.  kai, jul'12
-
 	/**
 	 * @return Returns the root of the calculated tree, or <code>null</code> if no tree was calculated yet.
 	 */
