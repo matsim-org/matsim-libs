@@ -34,12 +34,24 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 public interface TransitSchedule extends MatsimToplevelContainer {
 
 	public abstract void addTransitLine(final TransitLine line);
+	
+	/**
+	 * @param line
+	 * @return <code>true</code> if the transit line was successfully removed from the transit schedule.
+	 */
+	public abstract boolean removeTransitLine(final TransitLine line);
 
 	public abstract void addStopFacility(final TransitStopFacility stop);
 
 	public abstract Map<Id, TransitLine> getTransitLines();
 
 	public abstract Map<Id, TransitStopFacility> getFacilities();
+	
+	/**
+	 * @param route
+	 * @return <code>true</code> if the transit stop facility was successfully removed from the transit schedule.
+	 */
+	public abstract boolean removeTransitStopFacility(final TransitStopFacility stop);
 	
 	@Override
 	public abstract TransitScheduleFactory getFactory();

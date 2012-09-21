@@ -58,6 +58,19 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 	
 	@Override
+	public boolean removeTransitLine(TransitLine line) {
+		TransitLine oldLine = this.transitLines.remove(line.getId());
+		if (oldLine == null) {
+			return false;
+		}
+		if (oldLine != line) {
+			this.transitLines.put(oldLine.getId(), line);
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
 		final Id id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
@@ -74,6 +87,19 @@ public class TransitScheduleImpl implements TransitSchedule {
 	@Override
 	public Map<Id, TransitStopFacility> getFacilities() {
 		return Collections.unmodifiableMap(this.stopFacilities);
+	}
+	
+	@Override
+	public boolean removeTransitStopFacility(TransitStopFacility stop) {
+		TransitStopFacility oldStop = this.stopFacilities.remove(stop.getId());
+		if (oldStop == null) {
+			return false;
+		}
+		if (oldStop != stop) {
+			this.stopFacilities.put(oldStop.getId(), oldStop);
+			return false;
+		}
+		return true;
 	}
 	
 	@Override

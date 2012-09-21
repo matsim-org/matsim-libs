@@ -54,6 +54,11 @@ public class TransitScheduleImpl implements TransitSchedule {
 		this.transitLines.put(id, line);
 	}
 	
+	@Override
+	public boolean removeTransitLine(TransitLine line) {
+		return this.transitLines.remove(line.getId()) != null;
+	}
+	
 	public void addStopFacility(final TransitStopFacility stop) {
 		final Id id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
@@ -68,6 +73,11 @@ public class TransitScheduleImpl implements TransitSchedule {
 	
 	public Map<Id, TransitStopFacility> getFacilities() {
 		return this.stopFacilities;
+	}
+	
+	@Override
+	public boolean removeTransitStopFacility(final TransitStopFacility stop) {
+		return this.stopFacilities.remove(stop.getId()) != null;
 	}
 	
 	public TransitScheduleFactory getFactory() {
