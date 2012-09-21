@@ -41,9 +41,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -96,13 +93,19 @@ public class BackwardCompatibilityTest {
 	public void init() {
 		Config config = utils.loadConfig( configName );
 		config.controler().setLastIteration( 0 );
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
 
 		controler = new Controler( config );
+		controler.setDumpDataAtEnd(false);
+		controler.setCreateGraphs(false);
 		controler.run();
 
 		Controler oldControler = new Controler( config );
 		oldControler.setUseTripRouting( false );
 		oldControler.setOverwriteFiles( true );
+		oldControler.setDumpDataAtEnd(false);
+		oldControler.setCreateGraphs(false);
 		oldControler.run();
 
 		plansCalcRoute = (PlansCalcRoute) oldControler.createRoutingAlgorithm();
