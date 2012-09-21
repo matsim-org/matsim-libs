@@ -64,7 +64,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 			return false;
 		}
 		if (oldLine != line) {
-			this.transitLines.put(oldLine.getId(), line);
+			this.transitLines.put(oldLine.getId(), oldLine);
 			return false;
 		}
 		return true;
@@ -90,7 +90,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 	
 	@Override
-	public boolean removeTransitStopFacility(TransitStopFacility stop) {
+	public boolean removeStopFacility(TransitStopFacility stop) {
 		TransitStopFacility oldStop = this.stopFacilities.remove(stop.getId());
 		if (oldStop == null) {
 			return false;

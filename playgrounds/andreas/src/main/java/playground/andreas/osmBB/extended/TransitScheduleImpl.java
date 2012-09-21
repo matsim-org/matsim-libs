@@ -76,7 +76,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 	
 	@Override
-	public boolean removeTransitStopFacility(final TransitStopFacility stop) {
+	public boolean removeStopFacility(final TransitStopFacility stop) {
 		return this.stopFacilities.remove(stop.getId()) != null;
 	}
 	

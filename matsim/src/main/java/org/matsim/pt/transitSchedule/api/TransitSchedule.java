@@ -51,7 +51,7 @@ public interface TransitSchedule extends MatsimToplevelContainer {
 	 * @param route
 	 * @return <code>true</code> if the transit stop facility was successfully removed from the transit schedule.
 	 */
-	public abstract boolean removeTransitStopFacility(final TransitStopFacility stop);
+	public abstract boolean removeStopFacility(final TransitStopFacility stop);
 	
 	@Override
 	public abstract TransitScheduleFactory getFactory();
