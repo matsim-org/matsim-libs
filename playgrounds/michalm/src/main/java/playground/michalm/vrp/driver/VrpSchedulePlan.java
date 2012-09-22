@@ -40,7 +40,6 @@ public class VrpSchedulePlan
 {
     private PopulationFactory populFactory;
     private Network network;
-    private MatsimVrpGraph vrpGraph;
 
     private Vehicle vehicle;
 
@@ -59,7 +58,6 @@ public class VrpSchedulePlan
 
         populFactory = data.getScenario().getPopulation().getFactory();
         network = data.getScenario().getNetwork();
-        vrpGraph = data.getMatsimVrpGraph();
 
         init();
     }
@@ -83,8 +81,7 @@ public class VrpSchedulePlan
             switch (t.getType()) {
                 case DRIVE:
                     DriveTask dt = (DriveTask)t;
-                    addLeg((MatsimVertex)dt.getFromVertex(), (MatsimVertex)dt.getToVertex(),
-                            dt.getBeginTime(), dt.getEndTime());
+                    addLeg((MatsimArc)dt.getArc(), dt.getBeginTime(), dt.getEndTime());
                     break;
 
                 case SERVE:
@@ -108,17 +105,16 @@ public class VrpSchedulePlan
     }
 
 
-    private void addLeg(MatsimVertex fromVertex, MatsimVertex toVertex, int departTime,
-            int arrivalTime)
+    private void addLeg(MatsimArc arc, int departTime, int arrivalTime)
     {
-        ShortestPath path = MatsimArcs.getShortestPath(vrpGraph, fromVertex, toVertex, departTime);
+        ShortestPath path = arc.getShortestPath(departTime);
 
         Leg leg = populFactory.createLeg(TransportMode.car);
 
         leg.setDepartureTime(departTime);
 
-        Link fromLink = fromVertex.getLink();
-        Link toLink = toVertex.getLink();
+        Link fromLink = arc.getFromVertex().getLink();
+        Link toLink = arc.getToVertex().getLink();
 
         Id[] linkIds = path.linkIds;
 

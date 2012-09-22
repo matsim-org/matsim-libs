@@ -26,5 +26,11 @@ import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 public interface MatsimArc
     extends Arc
 {
+    MatsimVertex getFromVertex();
+
+
+    MatsimVertex getToVertex();
+
+
     ShortestPath getShortestPath(int departTime);
 }

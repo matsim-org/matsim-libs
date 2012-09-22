@@ -37,7 +37,6 @@ public class TaxiAgentLogic
     implements DynAgentLogic
 {
     private final TaxiSimEngine taxiSimEngine;
-    private final MatsimVrpGraph vrpGraph;
 
     private final Vehicle vrpVehicle;
     private DynAgent agent;
@@ -45,10 +44,9 @@ public class TaxiAgentLogic
     private Request currentRequest;
 
 
-    public TaxiAgentLogic(Vehicle vrpVehicle, MatsimVrpGraph vrpGraph, TaxiSimEngine taxiSimEngine)
+    public TaxiAgentLogic(Vehicle vrpVehicle, TaxiSimEngine taxiSimEngine)
     {
         this.vrpVehicle = vrpVehicle;
-        this.vrpGraph = vrpGraph;
         this.taxiSimEngine = taxiSimEngine;
     }
 
@@ -223,10 +221,9 @@ public class TaxiAgentLogic
     private TaxiLeg createLegWithPassenger(DriveTask driveTask, int realDepartTime,
             final Request request)
     {
-        ShortestPath path = MatsimArcs.getShortestPath(vrpGraph, driveTask.getFromVertex(),
-                driveTask.getToVertex(), realDepartTime);
-
-        Id destinationLinkId = ((MatsimVertex)driveTask.getToVertex()).getLink().getId();
+        MatsimArc arc = (MatsimArc)driveTask.getArc();
+        ShortestPath path = arc.getShortestPath(realDepartTime);
+        Id destinationLinkId = arc.getToVertex().getLink().getId();
 
         return new TaxiLeg(path, destinationLinkId) {
             @Override
@@ -254,10 +251,9 @@ public class TaxiAgentLogic
 
     private TaxiLeg createLeg(DriveTask driveTask, int realDepartTime)
     {
-        ShortestPath path = MatsimArcs.getShortestPath(vrpGraph, driveTask.getFromVertex(),
-                driveTask.getToVertex(), realDepartTime);
-
-        Id destinationLinkId = ((MatsimVertex)driveTask.getToVertex()).getLink().getId();
+        MatsimArc arc = (MatsimArc)driveTask.getArc();
+        ShortestPath path = arc.getShortestPath(realDepartTime);
+        Id destinationLinkId = arc.getToVertex().getLink().getId();
 
         return new TaxiLeg(path, destinationLinkId);
     }

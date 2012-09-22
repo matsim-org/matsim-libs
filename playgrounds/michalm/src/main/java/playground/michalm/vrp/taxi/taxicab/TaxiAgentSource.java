@@ -68,11 +68,10 @@ public class TaxiAgentSource
             TaxiAgentLogic taxiAgentLogic;
 
             if (taxiSimEngine instanceof WalTaxiSimEngine) {// TODO (temporarily, to be removed)
-                taxiAgentLogic = new WalTaxiAgentLogic(vrpVeh, data.getMatsimVrpGraph(),
-                        (WalTaxiSimEngine)taxiSimEngine);
+                taxiAgentLogic = new WalTaxiAgentLogic(vrpVeh, (WalTaxiSimEngine)taxiSimEngine);
             }
             else {
-                taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getMatsimVrpGraph(), taxiSimEngine);
+                taxiAgentLogic = new TaxiAgentLogic(vrpVeh, taxiSimEngine);
             }
 
             taxiSimEngine.addAgentLogic(taxiAgentLogic);

@@ -32,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.network.MatsimArcs;
+import playground.michalm.vrp.data.network.MatsimArc;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
 import com.vividsolutions.jts.geom.*;
@@ -92,8 +92,8 @@ public class Schedules2GIS
 
     private LineString createLineString(DriveTask driveTask)
     {
-        ShortestPath path = MatsimArcs.getShortestPath(data.getMatsimVrpGraph(),
-                driveTask.getFromVertex(), driveTask.getToVertex(), driveTask.getBeginTime());
+        MatsimArc arc = (MatsimArc)driveTask.getArc();
+        ShortestPath path = arc.getShortestPath(driveTask.getBeginTime());
 
         Id[] ids = path.linkIds;
 

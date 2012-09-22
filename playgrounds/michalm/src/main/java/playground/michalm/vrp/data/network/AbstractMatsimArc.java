@@ -27,6 +27,31 @@ package playground.michalm.vrp.data.network;
 public abstract class AbstractMatsimArc
     implements MatsimArc
 {
+    protected final MatsimVertex fromVertex;
+    protected final MatsimVertex toVertex;
+
+
+    public AbstractMatsimArc(MatsimVertex fromVertex, MatsimVertex toVertex)
+    {
+        this.fromVertex = fromVertex;
+        this.toVertex = toVertex;
+    }
+
+
+    @Override
+    public MatsimVertex getFromVertex()
+    {
+        return fromVertex;
+    }
+
+
+    @Override
+    public MatsimVertex getToVertex()
+    {
+        return toVertex;
+    }
+
+
     @Override
     public int getTimeOnDeparture(int departureTime)
     {

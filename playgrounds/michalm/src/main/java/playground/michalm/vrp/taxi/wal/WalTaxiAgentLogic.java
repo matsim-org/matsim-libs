@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import playground.michalm.dynamic.DynAction;
-import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentLogic;
 
 
@@ -34,10 +33,9 @@ public class WalTaxiAgentLogic
     private final Vehicle vrpVehicle;
 
 
-    public WalTaxiAgentLogic(Vehicle vrpVehicle, MatsimVrpGraph vrpGraph,
-            WalTaxiSimEngine taxiSimEngine)
+    public WalTaxiAgentLogic(Vehicle vrpVehicle, WalTaxiSimEngine taxiSimEngine)
     {
-        super(vrpVehicle, vrpGraph, taxiSimEngine);
+        super(vrpVehicle, taxiSimEngine);
 
         this.taxiSimEngine = taxiSimEngine;
         this.vrpVehicle = vrpVehicle;

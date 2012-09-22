@@ -45,7 +45,6 @@ public class JdbcWriter
     private static final String DB_URL_2 = ";DriverID=22;READONLY=false";
 
     private VrpData data;
-    private MatsimVrpGraph vrpGraph;
 
     private Connection con;
 
@@ -81,7 +80,6 @@ public class JdbcWriter
     public JdbcWriter(MatsimVrpData matsimData, String dbFileName)
     {
         this.data = matsimData.getVrpData();
-        vrpGraph = matsimData.getMatsimVrpGraph();
 
         try {
             String url = DB_URL_1 + dbFileName + DB_URL_2;
@@ -276,11 +274,11 @@ public class JdbcWriter
                         case DRIVE:
                             taskInsert = driveTaskInsert;
                             DriveTask dt = (DriveTask)t;
-                            driveTaskInsert.setInt(7, dt.getFromVertex().getId());
-                            driveTaskInsert.setInt(8, dt.getToVertex().getId());
+                            MatsimArc arc = (MatsimArc)dt.getArc();
+                            driveTaskInsert.setInt(7, arc.getFromVertex().getId());
+                            driveTaskInsert.setInt(8, arc.getToVertex().getId());
 
-                            ShortestPath path = MatsimArcs.getShortestPath(vrpGraph,
-                                    dt.getFromVertex(), dt.getToVertex(), dt.getBeginTime());
+                            ShortestPath path = arc.getShortestPath(dt.getBeginTime());
 
                             driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
 
@@ -429,11 +427,11 @@ public class JdbcWriter
                         case DRIVE:
                             taskInsert = driveTaskInsert;
                             DriveTask dt = (DriveTask)t;
-                            driveTaskInsert.setInt(7, dt.getFromVertex().getId());
-                            driveTaskInsert.setInt(8, dt.getToVertex().getId());
+                            MatsimArc arc = (MatsimArc)dt.getArc();
+                            driveTaskInsert.setInt(7, arc.getFromVertex().getId());
+                            driveTaskInsert.setInt(8, arc.getToVertex().getId());
 
-                            ShortestPath path = MatsimArcs.getShortestPath(vrpGraph,
-                                    dt.getFromVertex(), dt.getToVertex(), dt.getBeginTime());
+                            ShortestPath path = arc.getShortestPath(dt.getBeginTime());
 
                             driveTaskInsert.setString(9, Arrays.toString(path.linkIds));
 
