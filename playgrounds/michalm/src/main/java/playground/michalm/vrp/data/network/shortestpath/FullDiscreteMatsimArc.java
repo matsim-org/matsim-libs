@@ -19,8 +19,6 @@
 
 package playground.michalm.vrp.data.network.shortestpath;
 
-import org.matsim.api.core.v01.network.Link;
-
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.*;
@@ -33,8 +31,10 @@ public class FullDiscreteMatsimArc
     private final ShortestPath[] shortestPaths;
 
 
-    public FullDiscreteMatsimArc(TimeDiscretizer timeDiscretizer, ShortestPath[] shortestPaths)
+    public FullDiscreteMatsimArc(MatsimVertex fromVertex, MatsimVertex toVertex,
+            TimeDiscretizer timeDiscretizer, ShortestPath[] shortestPaths)
     {
+        super(fromVertex, toVertex);
         this.timeDiscretizer = timeDiscretizer;
         this.shortestPaths = shortestPaths;
     }
@@ -72,17 +72,19 @@ public class FullDiscreteMatsimArc
         public Arc createArc(Vertex fromVertex, Vertex toVertex)
         {
             ShortestPath[] shortestPaths = new ShortestPath[timeDiscretizer.getIntervalCount()];
-            Link fromLink = ((MatsimVertex)fromVertex).getLink();
-            Link toLink = ((MatsimVertex)toVertex).getLink();
             int timeInterval = timeDiscretizer.getTimeInterval();
+
+            MatsimVertex fromMatsimVertex = (MatsimVertex)fromVertex;
+            MatsimVertex toMatsimVertex = (MatsimVertex)toVertex;
 
             for (int k = 0; k < shortestPaths.length; k++) {
                 int departTime = k * timeInterval;// + travelTimeBinSize/2 TODO
-                shortestPaths[k] = shortestPathCalculator.calculateShortestPath(fromLink, toLink,
-                        departTime);
+                shortestPaths[k] = shortestPathCalculator.calculateShortestPath(fromMatsimVertex,
+                        toMatsimVertex, departTime);
             }
 
-            return new FullDiscreteMatsimArc(timeDiscretizer, shortestPaths);
+            return new FullDiscreteMatsimArc(fromMatsimVertex, toMatsimVertex, timeDiscretizer,
+                    shortestPaths);
         }
     }
 }

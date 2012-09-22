@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+import playground.michalm.vrp.data.network.MatsimVertex;
+
 
 public class ShortestPathCalculator
 {
@@ -42,6 +44,13 @@ public class ShortestPathCalculator
         this.router = router;
         this.travelTime = travelTime;
         this.travelDisutility = travelDisutility;
+    }
+
+
+    public ShortestPath calculateShortestPath(MatsimVertex fromVertex, MatsimVertex tovVertex,
+            int departTime)
+    {
+        return calculateShortestPath(fromVertex.getLink(), tovVertex.getLink(), departTime);
     }
 
 

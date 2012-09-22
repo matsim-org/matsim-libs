@@ -20,6 +20,7 @@
 package playground.michalm.vrp.data.network.shortestpath;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.log4j.Logger;
@@ -27,7 +28,7 @@ import org.matsim.api.core.v01.*;
 
 import pl.poznan.put.util.TypedStringTokenizer;
 import pl.poznan.put.util.lang.TimeDiscretizer;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.network.*;
 
@@ -47,13 +48,13 @@ public class FullDiscreteMatsimArcIO
         BufferedWriter costsBW = new BufferedWriter(new FileWriter(costsFileName));
         BufferedWriter pathsBW = new BufferedWriter(new FileWriter(pathsFileName));
 
-        ArcIterator arcIter = graph.arcIterator();
+        Iterator<Arc> arcIter = graph.arcIterator();
 
         while (arcIter.hasNext()) {
-            int aId = arcIter.getVertexFrom().getId();
-            int bId = arcIter.getVertexTo().getId();
+            FullDiscreteMatsimArc arc = (FullDiscreteMatsimArc)arcIter.next();
+            int aId = arc.getFromVertex().getId();
+            int bId = arc.getToVertex().getId();
 
-            FullDiscreteMatsimArc arc = (FullDiscreteMatsimArc)arcIter.getArc();
             timesBW.write(aId + "->" + bId + "\t");
             costsBW.write(aId + "->" + bId + "\t");
             pathsBW.write(aId + "->" + bId + "\t");
@@ -123,8 +124,8 @@ public class FullDiscreteMatsimArcIO
             int fromIdx = Integer.valueOf(arcId.substring(0, arrowMarkIdx));
             int toIdx = Integer.valueOf(arcId.substring(arrowMarkIdx + 2));
 
-            Vertex fromVertex = graph.getVertex(fromIdx);
-            Vertex toVertex = graph.getVertex(toIdx);
+            MatsimVertex fromVertex = (MatsimVertex)graph.getVertex(fromIdx);
+            MatsimVertex toVertex = (MatsimVertex)graph.getVertex(toIdx);
 
             ShortestPath[] sPaths_ij = new ShortestPath[timeDiscretizer.getIntervalCount()];
 
@@ -152,8 +153,7 @@ public class FullDiscreteMatsimArcIO
                 sPaths_ij[k] = new ShortestPath((int)travelTime, travelCost, linkIds);
             }
 
-            graph.setArc(fromVertex, toVertex,
-                    new FullDiscreteMatsimArc(timeDiscretizer, sPaths_ij));
+            graph.setArc(new FullDiscreteMatsimArc(fromVertex, toVertex, timeDiscretizer, sPaths_ij));
         }
 
         timesBR.close();

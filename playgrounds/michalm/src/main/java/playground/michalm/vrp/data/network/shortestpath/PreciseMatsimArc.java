@@ -19,8 +19,6 @@
 
 package playground.michalm.vrp.data.network.shortestpath;
 
-import org.matsim.api.core.v01.network.Link;
-
 import playground.michalm.vrp.data.network.*;
 
 
@@ -29,23 +27,19 @@ public class PreciseMatsimArc
 {
     private final ShortestPathCalculator shortestPathCalculator;
 
-    private final Link fromLink;
-    private final Link toLink;
 
-
-    public PreciseMatsimArc(ShortestPathCalculator shortestPathCalculator, MatsimVertex fromVertex,
-            MatsimVertex toVertex)
+    public PreciseMatsimArc(MatsimVertex fromVertex, MatsimVertex toVertex,
+            ShortestPathCalculator shortestPathCalculator)
     {
+        super(fromVertex, toVertex);
         this.shortestPathCalculator = shortestPathCalculator;
-
-        fromLink = fromVertex.getLink();
-        toLink = toVertex.getLink();
     }
 
 
     @Override
     public ShortestPath getShortestPath(int departTime)
     {
-        return shortestPathCalculator.calculateShortestPath(fromLink, toLink, departTime);
+        return shortestPathCalculator.calculateShortestPath(fromVertex.getLink(),
+                toVertex.getLink(), departTime);
     }
 }

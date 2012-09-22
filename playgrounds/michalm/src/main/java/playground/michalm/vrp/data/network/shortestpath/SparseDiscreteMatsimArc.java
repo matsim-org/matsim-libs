@@ -19,8 +19,6 @@
 
 package playground.michalm.vrp.data.network.shortestpath;
 
-import org.matsim.api.core.v01.network.Link;
-
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.*;
@@ -35,20 +33,15 @@ public class SparseDiscreteMatsimArc
     private final ShortestPathCalculator shortestPathCalculator;
     private final TimeDiscretizer timeDiscretizer;
 
-    private final Link fromLink;
-    private final Link toLink;
-
     private ShortestPath[] shortestPaths = null;// lazy initialization
 
 
-    public SparseDiscreteMatsimArc(ShortestPathCalculator shortestPathCalculator,
-            TimeDiscretizer timeDiscretizer, MatsimVertex fromVertex, MatsimVertex toVertex)
+    public SparseDiscreteMatsimArc(MatsimVertex fromVertex, MatsimVertex toVertex,
+            ShortestPathCalculator shortestPathCalculator, TimeDiscretizer timeDiscretizer)
     {
+        super(fromVertex, toVertex);
         this.shortestPathCalculator = shortestPathCalculator;
         this.timeDiscretizer = timeDiscretizer;
-
-        fromLink = fromVertex.getLink();
-        toLink = toVertex.getLink();
     }
 
 
@@ -66,7 +59,7 @@ public class SparseDiscreteMatsimArc
         // loads necessary data on demand
         if (shortestPath == null) {
             shortestPath = shortestPaths[idx] = shortestPathCalculator.calculateShortestPath(
-                    fromLink, toLink, timeDiscretizer.getTime(idx));
+                    fromVertex, toVertex, timeDiscretizer.getTime(idx));
         }
 
         return shortestPath;
@@ -91,8 +84,8 @@ public class SparseDiscreteMatsimArc
         @Override
         public Arc createArc(Vertex fromVertex, Vertex toVertex)
         {
-            return new SparseDiscreteMatsimArc(shortestPathCalculator, timeDiscretizer,
-                    (MatsimVertex)fromVertex, (MatsimVertex)toVertex);
+            return new SparseDiscreteMatsimArc((MatsimVertex)fromVertex, (MatsimVertex)toVertex,
+                    shortestPathCalculator, timeDiscretizer);
         }
     }
 }
