@@ -28,7 +28,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.TaxiCustomer;
-import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.MatsimArc;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 import playground.michalm.vrp.taxi.TaxiSimEngine;
 
