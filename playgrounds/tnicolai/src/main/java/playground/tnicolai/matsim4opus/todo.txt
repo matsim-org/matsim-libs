@@ -11,7 +11,7 @@ Todos:
 - Compute difference in Accessibility plots... 
 - UrbanSim Runs:
 	- Ohne Developer model (da gute Accessibility durch hohe Preise kompensiert)
-	- HLCM + HRM (später mit Relocation und LocationChoice für Firmen) -> Was passiert wenn eine Frma umzieht, besteht dann noch die Verlinkung mit den Personen???
+	- HLCM + HRM (später mit Relocation und LocationChoice für Firmen) -> Was passiert wenn eine Firma umzieht, besteht dann noch die Verlinkung mit den Personen???
 - MATSim4UrbanSim Config V3: 
 	- DONE! make "opportunity" sampling rate configurable
 	- DONE! add "Radius" to spread Home/Worklocations for UrbanSim-Zone
