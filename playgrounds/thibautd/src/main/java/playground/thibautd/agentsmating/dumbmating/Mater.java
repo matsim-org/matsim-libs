@@ -38,8 +38,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.jointtrips.population.JointActingTypes;
 
 /**
  * Mates agents and creates joint plans.

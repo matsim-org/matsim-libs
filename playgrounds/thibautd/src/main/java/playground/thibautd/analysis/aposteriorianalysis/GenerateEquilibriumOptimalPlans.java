@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.aposteriorianalysis;
 
-import playground.thibautd.jointtrips.run.JointControler;
-import playground.thibautd.jointtrips.utils.JointControlerUtils;
+import playground.thibautd.cliquessim.run.JointControler;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.utils.MoreIOUtils;
 
 /**

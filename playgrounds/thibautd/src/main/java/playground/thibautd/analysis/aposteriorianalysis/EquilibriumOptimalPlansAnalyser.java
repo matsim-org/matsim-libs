@@ -46,9 +46,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.cliquessim.population.Clique;
+import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.PopulationWithCliques;
 import playground.thibautd.utils.charts.WrapperChartUtil;
 
 /**

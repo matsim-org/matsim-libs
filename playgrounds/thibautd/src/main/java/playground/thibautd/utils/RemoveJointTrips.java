@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.JointActingTypes;
 
 /**
  * @author thibautd

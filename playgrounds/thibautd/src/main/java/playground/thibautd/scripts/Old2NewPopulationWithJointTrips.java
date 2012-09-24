@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 
-import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.DriverRoute;
-import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.population.PassengerRoute;
-import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.utils.JointControlerUtils;
+import playground.thibautd.cliquessim.population.Clique;
+import playground.thibautd.cliquessim.population.DriverRoute;
+import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.JointPlan;
+import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
  * Parses a population data file as it was before the inclusion

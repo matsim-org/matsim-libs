@@ -47,7 +47,7 @@
 // 
 // import playground.thibautd.agentsmating.greedysavings.FacilitiesFactory;
 // import playground.thibautd.householdsfromcensus.CliquesWriter;
-// import playground.thibautd.jointtrips.population.JointActingTypes;
+// import playground.thibautd.cliquessim.population.JointActingTypes;
 // 
 // /**
 //  * Takes PTV carpool data and a Matsim population, and create a population

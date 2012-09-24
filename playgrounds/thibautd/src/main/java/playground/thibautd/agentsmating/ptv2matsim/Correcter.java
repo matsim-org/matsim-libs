@@ -34,10 +34,10 @@
 // import org.matsim.core.basic.v01.IdImpl;
 // import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 // 
-// import playground.thibautd.jointtrips.population.Clique;
-// import playground.thibautd.jointtrips.population.JointLeg;
-// import playground.thibautd.jointtrips.population.JointPlan;
-// import playground.thibautd.jointtrips.population.PopulationWithCliques;
+// import playground.thibautd.cliquessim.population.Clique;
+// import playground.thibautd.cliquessim.population.JointLeg;
+// import playground.thibautd.cliquessim.population.JointPlan;
+// import playground.thibautd.cliquessim.population.PopulationWithCliques;
 // 
 // /**
 //  * Aims at correcting inconsistencies in the mode chain of plans generated with

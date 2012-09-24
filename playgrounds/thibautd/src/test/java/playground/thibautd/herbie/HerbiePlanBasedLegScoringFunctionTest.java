@@ -72,7 +72,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.jointtrips.herbie.scoring.HerbieJointLegScoringFunction;
+import playground.thibautd.cliquessim.herbie.scoring.HerbieJointLegScoringFunction;
 
 /**
  * @author thibautd

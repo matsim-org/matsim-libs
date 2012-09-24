@@ -34,8 +34,8 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
 import org.xml.sax.Attributes;
 
+import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.hitchiking.HitchHikingConstants;
-import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.parknride.ParkAndRideConstants;
 
 /**

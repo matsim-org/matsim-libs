@@ -32,17 +32,17 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.DriverRoute;
-import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities.Possibility;
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities.Od;
-import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilitiesXMLWriter;
-import playground.thibautd.jointtrips.population.PassengerRoute;
-import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.utils.JointControlerUtils;
+import playground.thibautd.cliquessim.population.Clique;
+import playground.thibautd.cliquessim.population.DriverRoute;
+import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.JointPlan;
+import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
+import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLWriter;
+import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Od;
+import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Possibility;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
  * @author thibautd

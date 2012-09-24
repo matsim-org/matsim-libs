@@ -36,8 +36,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
-import playground.thibautd.jointtrips.herbie.scoring.HerbieJointActivityScoringFunction;
-import playground.thibautd.jointtrips.herbie.scoring.HerbieJointLegScoringFunction;
+import playground.thibautd.cliquessim.herbie.scoring.HerbieJointActivityScoringFunction;
+import playground.thibautd.cliquessim.herbie.scoring.HerbieJointLegScoringFunction;
 
 /**
  * @author thibautd

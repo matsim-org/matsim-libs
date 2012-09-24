@@ -33,12 +33,12 @@
 // import org.matsim.core.population.PopulationWriter;
 // 
 // import playground.thibautd.householdsfromcensus.CliquesWriter;
-// import playground.thibautd.jointtrips.population.Clique;
-// import playground.thibautd.jointtrips.population.PopulationOfCliques;
-// import playground.thibautd.jointtrips.population.PopulationWithCliques;
-// import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterHandler;
-// import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-// import playground.thibautd.jointtrips.utils.JointControlerUtils;
+// import playground.thibautd.cliquessim.population.Clique;
+// import playground.thibautd.cliquessim.population.PopulationOfCliques;
+// import playground.thibautd.cliquessim.population.PopulationWithCliques;
+// import playground.thibautd.cliquessim.population.PopulationWithJointTripsWriterHandler;
+// import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+// import playground.thibautd.cliquessim.utils.JointControlerUtils;
 // 
 // /**
 //  * Very simple utility, which creates a population without the cliques of more than 10 individuals.

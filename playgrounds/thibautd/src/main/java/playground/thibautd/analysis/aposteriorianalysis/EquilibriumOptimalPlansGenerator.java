@@ -39,13 +39,13 @@ import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 
-import playground.thibautd.jointtrips.config.CliquesConfigGroup;
-import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
-import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
-import playground.thibautd.jointtrips.run.JointControler;
+import playground.thibautd.cliquessim.config.CliquesConfigGroup;
+import playground.thibautd.cliquessim.config.JointReplanningConfigGroup;
+import playground.thibautd.cliquessim.population.Clique;
+import playground.thibautd.cliquessim.population.JointPlan;
+import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
+import playground.thibautd.cliquessim.run.JointControler;
 import playground.thibautd.utils.RemoveJointTrips;
 
 /**

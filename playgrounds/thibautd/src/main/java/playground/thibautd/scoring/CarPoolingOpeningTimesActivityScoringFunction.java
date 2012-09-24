@@ -46,7 +46,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
-import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.JointActingTypes;
 
 /**
  * Activity scoring function based on the KTI activity scoring.

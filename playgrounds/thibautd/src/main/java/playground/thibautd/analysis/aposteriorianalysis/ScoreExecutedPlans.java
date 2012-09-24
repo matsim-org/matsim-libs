@@ -26,8 +26,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
 
-import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.utils.JointControlerUtils;
+import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
  * Aims at getting the scores of executed plans for a given iteration for which

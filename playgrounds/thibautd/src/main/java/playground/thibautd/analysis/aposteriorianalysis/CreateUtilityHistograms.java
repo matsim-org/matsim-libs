@@ -43,10 +43,10 @@ import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.utils.JointControlerUtils;
+import playground.thibautd.cliquessim.population.Clique;
+import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.utils.charts.WrapperChartUtil;
 import playground.thibautd.utils.charts.XYLineHistogramDataset;
 

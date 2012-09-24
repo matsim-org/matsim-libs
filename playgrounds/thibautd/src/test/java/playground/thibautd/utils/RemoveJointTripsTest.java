@@ -34,7 +34,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
-import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.JointActingTypes;
 
 /**
  * @author thibautd

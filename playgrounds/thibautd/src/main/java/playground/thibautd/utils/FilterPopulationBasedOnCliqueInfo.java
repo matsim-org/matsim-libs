@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
-import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.PopulationOfCliques;
-import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.run.JointControler;
-import playground.thibautd.jointtrips.utils.JointControlerUtils;
+import playground.thibautd.cliquessim.population.Clique;
+import playground.thibautd.cliquessim.population.PopulationOfCliques;
+import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.run.JointControler;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
  * creates a sample of a population containing only the agents listed in

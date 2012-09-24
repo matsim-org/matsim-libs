@@ -30,9 +30,9 @@
 // import org.matsim.core.utils.io.IOUtils;
 // 
 // import playground.thibautd.householdsfromcensus.CliquesWriter;
-// import playground.thibautd.jointtrips.population.PopulationWithCliques;
-// import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterHandler;
-// import playground.thibautd.jointtrips.utils.JointControlerUtils;
+// import playground.thibautd.cliquessim.population.PopulationWithCliques;
+// import playground.thibautd.cliquessim.population.PopulationWithJointTripsWriterHandler;
+// import playground.thibautd.cliquessim.utils.JointControlerUtils;
 // 
 // /**
 //  * Corrects plans with an inconsistent mode chain.

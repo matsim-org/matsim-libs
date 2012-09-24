@@ -31,7 +31,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
 
-import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.cliquessim.population.JointActingTypes;
 
 /**
  * @author thibautd
