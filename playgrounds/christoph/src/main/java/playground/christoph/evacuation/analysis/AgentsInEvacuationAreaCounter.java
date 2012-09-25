@@ -405,27 +405,30 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		/*
 		 * write activity performing graphs
 		 */
+		String title = "agents in evacuated area";
+		String legend = "agents in evacuated area";
+		
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_activity.png");
-		writer.writeGraphic(fileName, "activity", activityBins);
+		writer.writeGraphic(fileName, title, legend, "activity", activityBins);
 
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_activity_participating.png");
-		writer.writeGraphic(fileName, "activity", activityBinsParticipating);
+		writer.writeGraphic(fileName, title, legend, "activity", activityBinsParticipating);
 		
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_activity_not_participating.png");
-		writer.writeGraphic(fileName, "activity", activityBinsNotParticipating);
+		writer.writeGraphic(fileName, title, legend, "activity", activityBinsNotParticipating);
 		
 		/*
 		 * write leg performing graphs
 		 */
 		for (String legMode : transportModes) {
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_" + legMode + ".png");
-			writer.writeGraphic(fileName, legMode, legBins.get(legMode));
+			writer.writeGraphic(fileName, title, legend, legMode, legBins.get(legMode));
 			
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_" + legMode + "_participating.png");
-			writer.writeGraphic(fileName, legMode, legBinsParticipating.get(legMode));
+			writer.writeGraphic(fileName, title, legend, legMode, legBinsParticipating.get(legMode));
 			
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_" + legMode + "_not_participating.png");
-			writer.writeGraphic(fileName, legMode, legBinsNotParticipating.get(legMode));
+			writer.writeGraphic(fileName, title, legend, legMode, legBinsNotParticipating.get(legMode));
 		}
 
 		/*
@@ -438,7 +441,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 				allAgents[i] = allAgents[i] + leg[i];
 			}
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_allAgents.png");
-			writer.writeGraphic(fileName, "all agents", allAgents);
+			writer.writeGraphic(fileName, title, legend, "all agents", allAgents);
 		}
 		
 		int[] allParticipatingAgents = activityBinsParticipating.clone();
@@ -448,7 +451,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 				allParticipatingAgents[i] = allParticipatingAgents[i] + leg[i];
 			}
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_allParticipatingAgents.png");
-			writer.writeGraphic(fileName, "participating agents", allParticipatingAgents);
+			writer.writeGraphic(fileName, title, legend, "participating agents", allParticipatingAgents);
 		}
 		
 		int[] allNotParticipatingAgents = activityBinsNotParticipating.clone();
@@ -458,7 +461,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 				allNotParticipatingAgents[i] = allNotParticipatingAgents[i] + leg[i];
 			}
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsInEvacuationArea_allNotParticipatingAgents.png");
-			writer.writeGraphic(fileName, "not participating agents", allNotParticipatingAgents);
+			writer.writeGraphic(fileName, title, legend, "not participating agents", allNotParticipatingAgents);
 		}
 		
 		/*
@@ -566,7 +569,6 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			log.info("Not participating agents using " + transportMode + " mode:\t" + notParticipatingEvacueesPerMode.get(transportMode) * scaleFactor);		
 		}
 		
-		
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByModeTotal.txt");
 		try {
 			BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
@@ -598,6 +600,37 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			Gbl.errorMsg(e);
 		}
 		
+		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByModeDetailed.txt");
+		try {
+			BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
+			bw.write("agentId");
+			bw.write("\t");
+			bw.write("transport mode");
+			bw.write("\t");
+			bw.write("left evacuation area time");
+			bw.write("\n");
+			
+			
+			for (Entry<Id, Tuple<String, Double>> entry : this.leftByMode.entrySet()) {
+				
+				Id agentId = entry.getKey();
+				String tansportMode = entry.getValue().getFirst();
+				Double time = entry.getValue().getSecond();
+				
+				bw.write(agentId.toString());
+				bw.write("\t");
+				bw.write(tansportMode);
+				bw.write("\t");
+				bw.write(time.toString());
+				bw.write("\n");
+			}
+			
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+		
 		/*
 		 * Write data and use dummies for activities since we are only interested in people traveling.
 		 */
@@ -613,15 +646,17 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		/*
 		 * write leg performing graphs
 		 */
+		title = "agents left evacuated area";
+		legend = "agents left evacuated area";
 		for (String legMode : transportModes) {
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_" + legMode + ".png");
-			writer.writeGraphic(fileName, legMode, leftByModeBins.get(legMode));
+			writer.writeGraphic(fileName, title, legend, legMode, leftByModeBins.get(legMode));
 			
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_" + legMode + "_participating.png");
-			writer.writeGraphic(fileName, legMode, participatingLeftByModeBins.get(legMode));
+			writer.writeGraphic(fileName, title, legend, legMode, participatingLeftByModeBins.get(legMode));
 			
 			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_" + legMode + "_not_participating.png");
-			writer.writeGraphic(fileName, legMode, notParticipatingLeftByModeBins.get(legMode));
+			writer.writeGraphic(fileName, title, legend, legMode, notParticipatingLeftByModeBins.get(legMode));
 		}
 	}
 

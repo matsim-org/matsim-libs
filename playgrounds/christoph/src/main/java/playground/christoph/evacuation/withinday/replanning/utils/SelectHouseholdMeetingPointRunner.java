@@ -23,6 +23,7 @@ package playground.christoph.evacuation.withinday.replanning.utils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -81,6 +82,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final DecisionDataProvider decisionDataProvider;
 	private final PlanAlgorithm toHomeFacilityPlanAlgo;
 	private final PlanAlgorithm evacuationPlanAlgo;
+	private final Map<Id, MobsimAgent> agents;
 	
 	private final List<Household> householdsToCheck;
 	private double time;
@@ -93,13 +95,15 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	public SelectHouseholdMeetingPointRunner(Scenario scenario, ReplanningModule toHomeFacilityRouter, 
 			ReplanningModule fromHomeFacilityRouter, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, 
 			ModeAvailabilityChecker modeAvailabilityChecker, DecisionDataProvider decisionDataProvider, 
-			CyclicBarrier startBarrier, CyclicBarrier endBarrier, AtomicBoolean allMeetingsPointsSelected) {
+			Map<Id, MobsimAgent> agents, CyclicBarrier startBarrier, CyclicBarrier endBarrier, 
+			AtomicBoolean allMeetingsPointsSelected) {
 		this.scenario = scenario;
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.decisionDataProvider = decisionDataProvider;
-		
+		this.agents = agents;
+
 		this.startBarrier = startBarrier;
 		this.endBarrier = endBarrier;
 		this.allMeetingsPointsSelected = allMeetingsPointsSelected;
@@ -368,7 +372,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			 * the facility is attached to the network.
 			 */
 			// get the index of the currently performed activity in the selected plan
-			MobsimAgent mobsimAgent = agentPosition.getAgent();
+			MobsimAgent mobsimAgent = agents.get(personId);
 			PlanAgent planAgent = (PlanAgent) mobsimAgent;
 			
 			PlanImpl executedPlan = (PlanImpl) planAgent.getSelectedPlan();

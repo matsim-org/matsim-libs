@@ -63,6 +63,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.households.Household;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -85,6 +86,7 @@ import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCo
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
+import playground.christoph.evacuation.analysis.TravelTimesWriter;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
@@ -334,7 +336,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents(), EvacuationConfig.informAgentsRayleighSigma);
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
-		this.householdsTracker = new HouseholdsTracker();
+		this.householdsTracker = new HouseholdsTracker(this.scenarioData);
 		this.getEvents().addHandler(householdsTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
@@ -559,6 +561,21 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		
+		// write car travel times
+		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(this.getTravelTimeCalculator(), this.getNetwork(), config.travelTimeCalculator());
+		travelTimesWriter.collectTravelTimes();
+		
+		String absoluteTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteFile);
+		String relativeTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeFile);
+		travelTimesWriter.writeAbsoluteTravelTimes(absoluteTravelTimesFile);
+		travelTimesWriter.writeRelativeTravelTimes(relativeTravelTimesFile);
+		
+		String absoluteSHPTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteSHPFile);
+		String relativeSHPTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeSHPFile);
+		travelTimesWriter.writeAbsoluteSHPTravelTimes(absoluteSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
+		travelTimesWriter.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
+		
 //		householdsUtils.printStatistics();
 //		householdsUtils.printClosingStatistics();
 		

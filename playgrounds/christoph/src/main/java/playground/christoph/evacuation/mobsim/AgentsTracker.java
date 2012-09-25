@@ -24,7 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -42,11 +45,8 @@ import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
@@ -55,9 +55,12 @@ public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEv
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, 
 		LinkEnterEventHandler, LinkLeaveEventHandler, MobsimInitializedListener {
 
+	/*package*/ final Scenario scenario;
 	/*package*/ final Map<Id, AgentPosition> agentPositions;
 	
-	public AgentsTracker() {
+	public AgentsTracker(Scenario scenario) {
+		this.scenario = scenario;
+		
 		this.agentPositions = new HashMap<Id, AgentPosition>();
 	}
 	
@@ -123,13 +126,15 @@ public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEv
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		this.agentPositions.clear();
 		
-		QSim sim = (QSim) e.getQueueSimulation();
-		for (MobsimAgent agent : sim.getAgents()) {
-						
-			PlanElement planElement = ((PlanAgent) agent).getCurrentPlanElement();
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			
+			Plan plan = person.getSelectedPlan();
+			if (plan == null || plan.getPlanElements().size() == 0) continue;
+			
+			PlanElement planElement = plan.getPlanElements().get(0);
 			Id facilityId = ((Activity) planElement).getFacilityId();
-			AgentPosition agentPosition = new AgentPosition(agent, facilityId, Position.FACILITY);
-			this.agentPositions.put(agent.getId(), agentPosition);
+			AgentPosition agentPosition = new AgentPosition(person.getId(), facilityId, Position.FACILITY);
+			this.agentPositions.put(person.getId(), agentPosition);
 		}
 	}
 	

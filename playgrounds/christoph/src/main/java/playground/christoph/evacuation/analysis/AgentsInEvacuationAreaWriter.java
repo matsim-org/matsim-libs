@@ -102,9 +102,9 @@ public class AgentsInEvacuationAreaWriter {
 		}
 	}
 
-	public void writeGraphic(final String filename, String legMode, int[] data) {
+	public void writeGraphic(final String filename, String title, String legend, String legMode, int[] data) {
 		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legMode, data), 1024, 768);
+			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(title, legend, legMode, data), 1024, 768);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -113,10 +113,10 @@ public class AgentsInEvacuationAreaWriter {
 	/**
 	 * @return a graphic showing the number of agents in the evacuated area
 	 */
-	private JFreeChart getGraphic(String modeName, int data[]) {
+	private JFreeChart getGraphic(String title, String legend, String modeName, int data[]) {
 		
 		final XYSeriesCollection xyData = new XYSeriesCollection();
-		final XYSeries dataSerie = new XYSeries("agents in evacuated area", false, true);
+		final XYSeries dataSerie = new XYSeries(legend, false, true);
 
 		for (int i = 0; i < data.length; i++) {
 			double hour = i * this.binSize / 60.0 / 60.0;
@@ -124,9 +124,8 @@ public class AgentsInEvacuationAreaWriter {
 		}
 
 		xyData.addSeries(dataSerie);
-
 		final JFreeChart chart = ChartFactory.createXYStepChart(
-	        "agents in evacuated area, " + modeName + ", it." + this.iteration,
+	        title + ", " + modeName + ", it." + this.iteration,
 	        "time", "# agents",
 	        xyData,
 	        PlotOrientation.VERTICAL,

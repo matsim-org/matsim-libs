@@ -50,9 +50,11 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -77,7 +79,6 @@ import com.vividsolutions.jts.geom.Geometry;
  * <ul>
  * 	<li>config file</li>
  * 	<li>evacuation config file</li>
- * 	<li>events file</li>
  * </ul>
  * 
  * Note: due to changes in PersonDriverAgentImpl this code does not run at the moment!
@@ -87,12 +88,12 @@ import com.vividsolutions.jts.geom.Geometry;
 public class AgentsInEvacuationAreaPostProcessing {
 
 	public static void main(String[] args) throws IOException {
-		if (args.length == 3) {
-			new AgentsInEvacuationAreaPostProcessing(args[0], args[1], args[2]);
+		if (args.length == 2) {
+			new AgentsInEvacuationAreaPostProcessing(args[0], args[1]);
 		}
 	}
 	
-	public AgentsInEvacuationAreaPostProcessing(String configFile, String evacuationConfigFile, String eventsFile) throws IOException {
+	public AgentsInEvacuationAreaPostProcessing(String configFile, String evacuationConfigFile) throws IOException {
 		
 		Config config = ConfigUtils.loadConfig(configFile);	
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -114,7 +115,18 @@ public class AgentsInEvacuationAreaPostProcessing {
 		 */
 		new PrepareEvacuationScenario().prepareScenario(scenario);
 		
-		DummyController dummyController = new DummyController(scenario);
+		/*
+		 * Create two DummyControllers which provide OutputDirectoryHierarchy that point
+		 * to the analyzed run's output directory.
+		 * Since we do not want to overwrite existing results we add an additional prefix
+		 * to the re-created outputs.
+		 */
+		DummyController dummyInputController = new DummyController(scenario);
+		
+		// add another string to the runId to not overwrite old files
+		String runId = scenario.getConfig().controler().getRunId();
+		scenario.getConfig().controler().setRunId(runId + ".postprocessed");
+		DummyController dummyOutputController = new DummyController(scenario);
 		
 		List<ControlerListener> controlerListeners = new ArrayList<ControlerListener>();
 		List<MobsimListener> mobsimListeners = new ArrayList<MobsimListener>();
@@ -127,13 +139,8 @@ public class AgentsInEvacuationAreaPostProcessing {
 		Geometry affectedArea = util.mergeGeomgetries(features);
 		
 		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
-		
-//		PostProcessingHouseholdsTracker householdsTracker = new PostProcessingHouseholdsTracker(householdObjectAttributes);
-//		householdsTracker.createAgents(scenario, eventsManager);
-//		eventsManager.addHandler(householdsTracker);
-//		mobsimListeners.add(householdsTracker);
 
-		HouseholdsTracker householdsTracker = new HouseholdsTracker();
+		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
 		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
 		
 		/*
@@ -143,32 +150,27 @@ public class AgentsInEvacuationAreaPostProcessing {
 		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
 				householdsTracker, householdObjectAttributes);	
 		
-		// create mobsim and run it for 1 second - doing so is required to create the mobsim agents
-		config.getQSimConfigGroup().setEndTime(1.0);
-		Mobsim mobsim = new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
-		// SimulationListeners are fired in reverse order! Therefore add householdsTracker after decisionDataGrabber.
-		((QSim) mobsim).addQueueSimulationListeners(decisionDataGrabber);
-		((QSim) mobsim).addQueueSimulationListeners(householdsTracker);		
-		mobsim.run();
+		householdsTracker.notifyMobsimInitialized(null);
+		decisionDataGrabber.notifyMobsimInitialized(null);
 		
 		// read people in panic from file
-		String panicFile = dummyController.getControlerIO().getIterationFilename(0, PanicModel.panicModelFile);
+		String panicFile = dummyInputController.getControlerIO().getIterationFilename(0, PanicModel.panicModelFile);
 		PanicModel panicModel = new PanicModel(decisionDataProvider, EvacuationConfig.panicShare);
 		panicModel.readDecisionsFromFile(panicFile);
 		panicModel.printStatistics();
 		
 		// read pickup behavior from file
-		String pickupFile = dummyController.getControlerIO().getIterationFilename(0, PickupModel.pickupModelFile);
+		String pickupFile = dummyInputController.getControlerIO().getIterationFilename(0, PickupModel.pickupModelFile);
 		PickupModel pickupModel = new PickupModel(decisionDataProvider);
 		pickupModel.readDecisionsFromFile(pickupFile);
 		pickupModel.printStatistics();
 		
 		// read evacuation decisions from file
-		String evacuationDecisionFile = dummyController.getControlerIO().getIterationFilename(0, EvacuationDecisionModel.evacuationDecisionModelFile);
+		String evacuationDecisionFile = dummyInputController.getControlerIO().getIterationFilename(0, EvacuationDecisionModel.evacuationDecisionModelFile);
 		EvacuationDecisionModel evacuationDecisionModel = new EvacuationDecisionModel(scenario, MatsimRandom.getLocalInstance(), decisionDataProvider);
 		evacuationDecisionModel.readDecisionsFromFile(evacuationDecisionFile);
 		evacuationDecisionModel.printStatistics();
-				
+		
 		// Create the set of analyzed modes.
 		Set<String> transportModes = new HashSet<String>();
 		transportModes.add(TransportMode.bike);
@@ -208,15 +210,41 @@ public class AgentsInEvacuationAreaPostProcessing {
 			}
 		}
 		
+		// TravelTimeCalculator
+		config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setAnalyzedModes(TransportMode.car);
+		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
+		eventsManager.addHandler((TravelTimeCalculator) travelTime);
+		
+		String eventsFile = dummyInputController.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML);
 		new EventsReaderXMLv1(eventsManager).parse(eventsFile);
 		
 		//IterationEndsListener
-		IterationEndsEvent iterationEndsEvent = new IterationEndsEvent(dummyController, 0);
+		IterationEndsEvent iterationEndsEvent = new IterationEndsEvent(dummyOutputController, 0);
 		for(ControlerListener controlerListener : controlerListeners) {
 			if (controlerListener instanceof IterationEndsListener) {
 				((IterationEndsListener) controlerListener).notifyIterationEnds(iterationEndsEvent);
 			}
 		}
+		
+		/*
+		 * Write car travel times
+		 */
+		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(travelTime, scenario.getNetwork(), config.travelTimeCalculator());
+		travelTimesWriter.collectTravelTimes();
+		
+		String absoluteTravelTimesFile = dummyOutputController.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteFile);
+		String relativeTravelTimesFile = dummyOutputController.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeFile);
+		travelTimesWriter.writeAbsoluteTravelTimes(absoluteTravelTimesFile);
+		travelTimesWriter.writeRelativeTravelTimes(relativeTravelTimesFile);
+
+		String absoluteSHPTravelTimesFile = dummyOutputController.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteSHPFile);
+		String relativeSHPTravelTimesFile = dummyOutputController.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeSHPFile);
+		travelTimesWriter.writeAbsoluteSHPTravelTimes(absoluteSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
+		travelTimesWriter.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
+
+//		dummyInputController.shutdown(false);
+//		dummyOutputController.shutdown(false);
 	}
 	
 	private static class AfterSimStepEventsCreator implements BasicEventHandler {

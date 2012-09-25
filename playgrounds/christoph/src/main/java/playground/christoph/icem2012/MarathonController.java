@@ -371,7 +371,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents(), EvacuationConfig.informAgentsRayleighSigma);
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
-		this.agentsTracker = new AgentsTracker();
+		this.agentsTracker = new AgentsTracker(this.scenarioData);
 		this.getEvents().addHandler(agentsTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(agentsTracker);
 		

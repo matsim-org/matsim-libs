@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -41,7 +42,6 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -61,7 +61,9 @@ public class HouseholdsTracker extends AgentsTracker implements
 	private final Map<Id, Id> personHouseholdMap;
 	private final Map<Id, HouseholdPosition> householdPositions;
 	
-	public HouseholdsTracker() {		
+	public HouseholdsTracker(Scenario scenario) {
+		super(scenario);
+		
 		this.householdsToUpdate = new HashSet<Id>();
 		this.personHouseholdMap = new HashMap<Id, Id>();
 		this.householdPositions = new HashMap<Id, HouseholdPosition>();
@@ -138,8 +140,7 @@ public class HouseholdsTracker extends AgentsTracker implements
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		super.notifyMobsimInitialized(e);
 		
-		QSim sim = (QSim) e.getQueueSimulation();
-		Households households = ((ScenarioImpl) sim.getScenario()).getHouseholds();
+		Households households = ((ScenarioImpl) scenario).getHouseholds();
 		for (Household household : households.getHouseholds().values()) {
 			
 			HouseholdPosition householdPosition = new HouseholdPosition();			

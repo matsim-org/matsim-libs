@@ -43,8 +43,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -87,12 +91,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author cdobler
  */
-public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener {
+public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, MobsimBeforeSimStepListener {
 
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPoint.class);
 	
 	private final Scenario scenario;
 	private final Map<String, TravelTime> travelTimes;
+	private final Map<Id, MobsimAgent> agents;
 	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
 	private final Geometry affectedArea;
@@ -138,6 +143,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
 		this.evacuationDecisionModel = decisionModelRunner.getEvacuationDecisionModel();
 		this.latestAcceptedLeaveTimeModel = decisionModelRunner.getLatestAcceptedLeaveTimeModel();
+		this.agents = new HashMap<Id, MobsimAgent>();
 		
 		init();
 	}
@@ -362,9 +368,13 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		else return this.decisionDataProvider.getHouseholdDecisionData(householdId).getHomeFacilityId();
 	}
 
-//	public Id getMeetingPoint(Id householdId) {
-//		return this.householdsTracker.getHouseholdPosition(householdId).getMeetingPointFacilityId();
-//	}
+	@Override
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		
+		this.agents.clear();
+		QSim sim = (QSim) e.getQueueSimulation();
+		for (MobsimAgent agent : sim.getAgents()) this.agents.put(agent.getId(), agent);
+	}
 	
 	/*
 	 * If the evacuation starts in the current time step, define the
@@ -487,7 +497,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, toHomeFacilityRouter, 
 					fromHomeFacilityRouter, vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance(), 
-					decisionDataProvider, startBarrier, endBarrier, allMeetingsPointsSelected);
+					decisionDataProvider, agents, startBarrier, endBarrier, allMeetingsPointsSelected);
 			runner.setTime(time);
 			runnables[i] = runner; 
 					
@@ -520,4 +530,5 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		}
 
 	}
+
 }

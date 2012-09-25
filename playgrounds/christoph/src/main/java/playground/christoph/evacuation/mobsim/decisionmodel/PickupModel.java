@@ -267,7 +267,7 @@ public class PickupModel implements PersonDecisionModel {
 		Geometry affectedArea = util.mergeGeomgetries(features);
 		
 		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
-		HouseholdsTracker householdsTracker = new HouseholdsTracker();
+		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
 		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
 		
 		/*

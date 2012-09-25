@@ -21,26 +21,25 @@
 package playground.christoph.evacuation.mobsim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
 public class AgentPosition {
 	
-	private MobsimAgent agent;
+	private Id agentId;
 	private Position position;
-	private Id id;
+	private Id id;	// agent's current positionId, i.e. vehicleId, linkId or facilityId
 	private String transportMode;
 	
-	public AgentPosition(MobsimAgent agent, Id id, Position position) {
-		this.agent = agent;
+	public AgentPosition(Id agentId, Id id, Position position) {
+		this.agentId = agentId;
 		this.position = position;
 		this.id = id;
 		this.transportMode = null;
 	}
 	
-	public MobsimAgent getAgent() {
-		return this.agent;
+	public Id getAgentId() {
+		return this.agentId;
 	}
 	
 	public Position getPositionType() {
