@@ -265,7 +265,7 @@ public class EvacuationAnalysis implements ActionListener{
 		this.controlPanel.add(new JLabel(""));
 		this.controlPanel.add(new JLabel(""));
 		this.controlPanel.add(new JLabel(""));
-		this.controlPanel.add(new JLabel(" gridsize: 100m"));
+		this.controlPanel.add(new JLabel(" gridsize: 150m"));
 		this.controlPanel.add(new JLabel(" mode: evacuation time"));
 		this.controlPanel.add(calcButton);
 		panel.add(this.openBtn);

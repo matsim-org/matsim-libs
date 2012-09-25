@@ -50,8 +50,6 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 	@Override
 	public void drawGraph()
 	{
-		//TODO: Graphen zeichnen / aktualisieren
-		
 		//if data is not set yet: do nothing
 		if (data==null)
 			return;
@@ -62,20 +60,29 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 		System.out.println("time sum:" + data.getTimeSum());
 		System.out.println("arrivals:" + data.getArrivals());
 		
+		//TODO: es gibt nun auch:
+		List<Double> arrivalTimes = data.getArrivalTimes(); //eine liste mit den ankunftzeiten
+		int arrivalTimeCount = arrivalTimes.size(); //anzahl der elemente in der liste
+		
+		//beispiel für eine schleife über alle Zeitwerte in der Liste. arrivalTime ist dann jeweils der aktuelle wert in der liste
+//		for (Double arrivalTime : arrivalTimes)
+//		{
+//		
+//		}
+		
 		List<Tuple<Double, Double>> xyData;
 		
 		XYLineChart chart = new XYLineChart("Evakuierungszeit", "x", "y");
-		
-		double [] xs = new double[10];
-		double [] ys = new double[10];
+		double [] xs = new double[arrivalTimeCount];
+		double [] ys = new double[arrivalTimeCount];
 		
 		int pos = 0;
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < arrivalTimeCount; i++)
 		{
-
+			//TODO: die entsprechende Befüllung
 			xs[i] = i;
 			ys[i] = i*i;
-		}
+		}		
 		
 		chart.addSeries("123", xs, ys);
 		

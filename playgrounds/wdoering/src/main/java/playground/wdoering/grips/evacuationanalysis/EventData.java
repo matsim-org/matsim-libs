@@ -1,4 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * RoadClosuresEditor.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+
 package playground.wdoering.grips.evacuationanalysis;
+
+import java.util.List;
 
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -9,13 +32,15 @@ public class EventData {
 	private double maxCellTimeSum;
 	private int arrivals;
 	private QuadTree<Cell> cellTree;
+	private List<Double> arrivalTimes;
 	
-	public EventData(QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals) {
+	public EventData(QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Double> arrivalTimes) {
 		this.cellTree = cellTree;
 		this.cellSize = cellSize;
 		this.timeSum = timeSum;
 		this.maxCellTimeSum = maxCellTimeSum;
 		this.arrivals = arrivals;
+		this.arrivalTimes = arrivalTimes;
 	}
 	
 	
@@ -54,7 +79,13 @@ public class EventData {
 		this.maxCellTimeSum = maxCellTimeSum;
 	}
 	
+	public List<Double> getArrivalTimes() {
+		return arrivalTimes;
+	}
 	
+	public void setArrivalTimes(List<Double> arrivalTimes) {
+		this.arrivalTimes = arrivalTimes;
+	}
 	
 
 }

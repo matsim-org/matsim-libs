@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * RoadClosuresEditor.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.evacuationanalysis;
 import java.io.File;
 import java.util.ArrayList;
@@ -72,12 +92,14 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private double timeSum;
 	private double maxCellTimeSum;
 	private int arrivals;
+	private List<Double> arrivalTimes;
 
 	public EventHandler(Scenario sc, double cellSize, Thread readerThread)
 	{
 		this.readerThread = readerThread;
 		this.network = sc.getNetwork();
 		this.cellSize = cellSize;
+		this.arrivalTimes = new ArrayList<Double>();
 		init();
 	}
 	
@@ -196,9 +218,11 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		//update max timesum of all cells
 		this.maxCellTimeSum = Math.max(cell.getTimeSum(), this.maxCellTimeSum);
 		
+		
 		cell.incrementCount();
 		this.timeSum += time;
 		this.arrivals++;
+		this.arrivalTimes.add(event.getTime());
 	}
 
 	@Override
@@ -231,7 +255,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	public EventData getData()
 	{
-		return new EventData(cellTree, cellSize, timeSum, maxCellTimeSum, arrivals);
+		return new EventData(cellTree, cellSize, timeSum, maxCellTimeSum, arrivals, arrivalTimes);
 	}
 
 
