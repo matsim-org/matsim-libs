@@ -26,39 +26,45 @@ package playground.kai.bvwp;
 import playground.kai.bvwp.Values.Entry;
 
 
+
 /**
  * @author Ihab
  *
  */
-public class UtilityChangesBVWP2015 extends UtilityChanges {
-//	UtilityChangesBVWP2015() {
-//		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
-//	}
+ class UtilityChangesBVWP2015 extends UtilityChanges {
 	
-	@Override
-	UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
-			ValuesForAUserType quantitiesPlanfall, Entry entry) {
 		
+		@Override
+		UtlChangesData utlChangePerItem(double deltaAmount,
+				double quantityNullfall, double quantityPlanfall, double margUtl) {
+
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		
-		double personenXNull = quantitiesNullfall.getByEntry(Entry.XX) * quantitiesNullfall.getByEntry(entry);
-		double personenXPlan = quantitiesPlanfall.getByEntry(Entry.XX) * quantitiesPlanfall.getByEntry(entry);
-		double diff = personenXPlan - personenXNull; // e.g. pkm
-		
-		utlChanges.utl = diff * econValues.getByEntry(entry);	
-		
-		// "halbe" Verbesserung:
-		double attributeForHalfUser = 0.5 * (quantitiesPlanfall.getByEntry(entry) + quantitiesNullfall.getByEntry(entry)) ;
-		double numberOfSwitchers = quantitiesPlanfall.getByEntry(Entry.XX) - quantitiesNullfall.getByEntry(Entry.XX) ;
-		utlChanges.utl -= numberOfSwitchers * attributeForHalfUser * econValues.getByEntry(entry);
-		// the sign of this is a miracle.  I did reverse engineering of the implicit utl calculation
-		// (see the ``alternative Rechnung'' table in ab200.tex in the ``Verlagerung'' subsubsection), followed
-		// by trial-and-error.  kai, feb'11
-		// This seems to have the curious consequence that, if there is not attribute change,
-		// the switchers add exactly the generalized costs that they would have
-		// used if they had stayed ... rendering the utility contribution of this entry exactly zero. kai, feb'11
-		
+		if ( deltaAmount > 0 ) {
+			// wir sind aufnehmend; es zaehlt der Planfall:
+			utlChanges.utl = quantityPlanfall * margUtl ;
+		} else {
+			utlChanges.utl = -quantityNullfall * margUtl ;
+		}
+
 		return utlChanges;
+	}
+
+	@Override
+	double computeImplicitUtility(ValuesForAUserType econValues,
+			ValuesForAUserType quantitiesNullfall,
+			ValuesForAUserType quantitiesPlanfall) {
+		double sum = 0. ;
+		for ( Entry entry : Entry.values() ) {
+			if ( entry != Entry.XX ) {
+				final double quantityPlanfall = quantitiesPlanfall.getByEntry(entry);
+				final double quantityNullfall = quantitiesNullfall.getByEntry(entry);
+				final double margUtl = econValues.getByEntry(entry) ;
+				
+				sum += - margUtl * (quantityPlanfall+quantityNullfall)/2. ;
+			}
+		}
+		return sum ;
 	}
 
 }

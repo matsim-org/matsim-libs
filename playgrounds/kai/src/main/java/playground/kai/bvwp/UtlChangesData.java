@@ -20,9 +20,5 @@
 package playground.kai.bvwp;
 
 public class UtlChangesData {
-	double deltaQuantity ;
-	double utlGainByOldUsers ;
-	double utlGainByNewUsers ;
-	
 	double utl ;
 }

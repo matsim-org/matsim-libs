@@ -32,8 +32,8 @@ public class UtilityChangesBVWP2010 extends UtilityChanges{
 	}
 
 	@Override
-	UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall,
-			ValuesForAUserType quantitiesPlanfall, Entry entry) {
+	UtlChangesData utlChangePerItem(double deltaAmount, double quantityNullfall,
+			double quantityPlanfall, double econVal) {
 
 		UtlChangesData utlChanges = new UtlChangesData();
 		double personenXNull;

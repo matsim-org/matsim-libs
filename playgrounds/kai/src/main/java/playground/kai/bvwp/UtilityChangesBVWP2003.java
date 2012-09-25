@@ -23,7 +23,6 @@
  */
 package playground.kai.bvwp;
 
-import playground.kai.bvwp.Values.Entry;
 
 
 /**
@@ -32,18 +31,28 @@ import playground.kai.bvwp.Values.Entry;
  */
  class UtilityChangesBVWP2003 extends UtilityChanges {
 	
-	@Override
-	UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
-			ValuesForAUserType quantitiesPlanfall, Entry entry) {
 		
+		@Override
+		UtlChangesData utlChangePerItem(double deltaAmount,
+				double quantityNullfall, double quantityPlanfall, double margUtl) {
+
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		
-		double personenXNull = quantitiesNullfall.getByEntry(Entry.XX) * quantitiesNullfall.getByEntry(entry);
-		double personenXPlan = quantitiesPlanfall.getByEntry(Entry.XX) * quantitiesPlanfall.getByEntry(entry);
-		double diff = personenXPlan - personenXNull;
-		
-		utlChanges.utl = diff * econValues.getByEntry(entry);
+		if ( deltaAmount > 0 ) {
+			// wir sind aufnehmend; es zaehlt der Planfall:
+			utlChanges.utl = quantityPlanfall * margUtl ;
+		} else {
+			utlChanges.utl = -quantityNullfall * margUtl ;
+		}
+
 		return utlChanges;
+	}
+
+	@Override
+	double computeImplicitUtility(ValuesForAUserType econValues,
+			ValuesForAUserType quantitiesNullfall,
+			ValuesForAUserType quantitiesPlanfall) {
+		return 0;
 	}
 
 }

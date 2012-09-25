@@ -1,36 +1,58 @@
-package playground.kai.bvwp;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * UtilityChangesBVWP2003.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
-import playground.kai.bvwp.Values.Entry;
+/**
+ * 
+ */
+package playground.kai.bvwp;
 
 
 
 /**
- * Example for a class to be maintained by users.
- * 
- * @author nagel
+ * @author Ihab
+ *
  */
-class UtilityChangesRuleOfHalf extends UtilityChanges {
-	UtilityChangesRuleOfHalf() {
-		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
-	}
+ class UtilityChangesRuleOfHalf extends UtilityChanges {
 	
-	@Override
-	UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall,
-			ValuesForAUserType quantitiesPlanfall, Entry entry) 
-	{
-		double deltaAmounts = quantitiesPlanfall.getByEntry(Entry.XX) - quantitiesNullfall.getByEntry(Entry.XX) ;
 		
+		@Override
+		UtlChangesData utlChangePerItem(double deltaAmount,
+				double quantityNullfall, double quantityPlanfall, double margUtl) {
+
 		UtlChangesData utlChanges = new UtlChangesData() ;
-		utlChanges.deltaQuantity = quantitiesPlanfall.getByEntry( entry ) 
-		- quantitiesNullfall.getByEntry( entry ) ;
-
-		utlChanges.utlGainByOldUsers = utlChanges.deltaQuantity * quantitiesNullfall.getByEntry( Entry.XX ) 
-		* econValues.getByEntry( entry );
-
-		if ( deltaAmounts > 0. ) {
-			// (compute only for receiving facility)
-			utlChanges.utlGainByNewUsers = 0.5 * utlChanges.deltaQuantity * deltaAmounts * econValues.getByEntry(entry);
+		
+		if ( deltaAmount > 0 ) {
+			// wir sind aufnehmend; es gilt die RoH
+			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
+		} else {
+			utlChanges.utl = 0. ;
 		}
+
 		return utlChanges;
 	}
+
+	@Override
+	double computeImplicitUtility(ValuesForAUserType econValues,
+			ValuesForAUserType quantitiesNullfall,
+			ValuesForAUserType quantitiesPlanfall) {
+		return 0;
+	}
+
 }

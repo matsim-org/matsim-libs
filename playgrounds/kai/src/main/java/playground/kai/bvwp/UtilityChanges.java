@@ -36,31 +36,34 @@ abstract class UtilityChanges {
 					ValuesForAUserType quantitiesPlanfall = quantitiesPlanfallByMode.getByDemandSegment(type) ;
 					final double amountNullfall = quantitiesNullfall.getByEntry(Entry.XX);
 					final double amountPlanfall = quantitiesPlanfall.getByEntry(Entry.XX);
-					double deltaAmounts = amountPlanfall - amountNullfall ;
 
 					if ( amountPlanfall!=0. || amountNullfall!=0. ) {
 						// (suppress output if this (relation,mode,demand_segment) is never used)
 						
+						double implicitUtl = this.computeImplicitUtility(econValues, quantitiesNullfall, quantitiesPlanfall) ;
+						
 						// ###############
 						// ALTNUTZER
-						
-						final String fmtString = "Attribut: %-10s || " +
-								"Attribut Nullfall : %10.1f; ... mal Menge: %10.1f || " +
-								"Attribut Planfall : %10.1f; ... mal Menge: %10.1f || " +
-								"Attribut Differenz: %10.1f; ... mal Menge: %10.1f || " +
-								"Nutzen Differenz: %10.1f; ... mal Menge: %10.1f\n";
+						final String fmtString = "%17s || %17.2f | %17.1f || %17.2f | %17.1f || %17.2f | %17.1f || %17.2f | %17.1f ||\n" ;
 						if ( amountNullfall < amountPlanfall ) {
-							// (wir haben nur Altnutzer nur auf dem nehmenden Verkehrsmittel!)
+							// (wir haben (relevante) Altnutzer nur auf dem nehmenden Verkehrsmittel!)
 							
 							double amountAltnutzer = amountNullfall ;
 							
-							System.out.printf("%10s; %10s; %10s; old demand: %10.1f persons/tons\n", 
+							System.out.printf("%17s; %17s; %17s; verbleibender Verkehr: %17.1f Personen/Tonnen\n", 
 									id, mode, type, amountAltnutzer );
+							System.out.printf( "%17s || %17s | %17s || %17s | %17s || %17s | %17s || %17s | %17s ||\n",
+									"Attribut",
+									"Attribut Nullfall", "... mal Menge",
+									"Attribut Planfall", "... mal Menge",
+									"Attribut Diff", "... mal Menge",
+									"Nutzen Diff", "... mal Menge") ;
 
 							for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
 								if ( entry != Entry.XX ) {
-									UtlChangesData utlChanges = computeUtilities(econValues, quantitiesNullfall, quantitiesPlanfall, entry);
-									double deltaQuantities = quantitiesPlanfall.getByEntry(entry)-quantitiesNullfall.getByEntry(entry) ; 
+									double deltaQuantities = quantitiesPlanfall.getByEntry(entry)-quantitiesNullfall.getByEntry(entry) ;
+									final double utlChangePerItem = deltaQuantities * econValues.getByEntry(entry);
+									final double utlChange = utlChangePerItem * amountAltnutzer;
 									System.out.printf(fmtString,
 											entry,
 											quantitiesNullfall.getByEntry(entry), 
@@ -68,24 +71,11 @@ abstract class UtilityChanges {
 											quantitiesPlanfall.getByEntry(entry), 
 											quantitiesPlanfall.getByEntry(entry) * amountAltnutzer,
 											deltaQuantities , deltaQuantities * amountAltnutzer ,
-											deltaQuantities * econValues.getByEntry(entry) , 
-											deltaQuantities * econValues.getByEntry(entry) * amountAltnutzer
+											utlChangePerItem , 
+											utlChange
 									) ;
+									utils += utlChange ;
 
-//									if (  deltaQuantities != 0. || utlChanges.utlGainByOldUsers!=0.
-//											|| utlChanges.utlGainByNewUsers!=0. || utlChanges.utl!=0. ) {
-//										System.out.printf("%35s change for `old' users (Altnutzer): %10.1f %-10s", "-->",
-//												deltaQuantities, entry) ;
-//									}
-//									if ( utlChanges.utlGainByOldUsers != 0. || utlChanges.utlGainByNewUsers != 0. ) {
-//										System.out.printf("; utl (gain) old//new demand: %10.1f", utlChanges.utlGainByOldUsers ) ;
-//										System.out.printf(" //%10.1f\n", utlChanges.utlGainByNewUsers ) ;
-//										utils += utlChanges.utlGainByOldUsers + utlChanges.utlGainByNewUsers  ;
-//									}
-//									else if ( utlChanges.utl != 0.){
-//										System.out.printf("; utl change: %10.1f\n", utlChanges.utl ) ;
-//										utils += utlChanges.utl;
-//									}
 								}
 							}
 						}
@@ -93,69 +83,79 @@ abstract class UtilityChanges {
 						// ###########
 						// abgegeben oder aufgenommen
 						
-						System.out.printf("%10s; %10s; %10s; old demand (for verification): %10.1f persons/tons; " +
-								"new demand (for verification): %10.1f persons/tons; " +
-						"demand change: %10.1f persons/tons\n", 
-						id, mode, type, amountNullfall, 
-						amountPlanfall, deltaAmounts ) ;
-						
-						double amountWechsler = amountPlanfall - amountNullfall ;
+						double deltaAmounts = amountPlanfall - amountNullfall ;
 
+						System.out.printf("%17s; %17s; %17s; " +
+						"wechselnder Verkehr: %17.1f Personen/Tonnen\n", 
+						id, mode, type, deltaAmounts ) ;
+						System.out.printf( "%17s || %17s | %17s || %17s | %17s || %17s | %17s || %17s | %17s ||\n",
+								"Attribut",
+								"Attribut Nullfall", "... mal Menge",
+								"Attribut Planfall", "... mal Menge",
+								"Attribut Diff", "... mal Menge",
+								"Nutzen Diff", "... mal Menge") ;
+						
 						for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
 							if ( entry != Entry.XX ) {
-								UtlChangesData utlChanges = computeUtilities(econValues, quantitiesNullfall, quantitiesPlanfall, entry);
-								double deltaQuantities = quantitiesPlanfall.getByEntry(entry)-quantitiesNullfall.getByEntry(entry) ;
+								final double quantityPlanfall = quantitiesPlanfall.getByEntry(entry);
+								final double quantityNullfall = quantitiesNullfall.getByEntry(entry);
+
+								UtlChangesData utlChangesPerItem = utlChangePerItem(deltaAmounts, quantityNullfall, 
+										quantityPlanfall, econValues.getByEntry(entry));
+								final double utlChange = utlChangesPerItem.utl * Math.abs(deltaAmounts);
+								utils += utlChange ;
 								
-								if ( amountWechsler > 0 ) {
+
+								if ( deltaAmounts > 0 ) {
 									// Wir sind aufnehmend!
-								
-								System.out.printf(fmtString,
-										entry,
-										0., 0., 
-										quantitiesPlanfall.getByEntry(entry), 
-										quantitiesPlanfall.getByEntry(entry) * amountWechsler,
-										quantitiesPlanfall.getByEntry(entry), 
-										quantitiesPlanfall.getByEntry(entry) * amountWechsler,
-										quantitiesPlanfall.getByEntry(entry) * econValues.getByEntry(entry) , 
-										quantitiesPlanfall.getByEntry(entry) * amountWechsler * econValues.getByEntry(entry) 
-								) ;
-								
+
+									System.out.printf(fmtString,
+											entry,
+											0., 0., 
+											quantityPlanfall, 
+											quantityPlanfall * deltaAmounts,
+											quantityPlanfall, 
+											quantityPlanfall * deltaAmounts,
+											utlChangesPerItem.utl , 
+											utlChange
+									) ;
+
 								} else {
 									// wir sind abgebend
 									System.out.printf(fmtString,
 											entry,
-											quantitiesNullfall.getByEntry(entry), 
-											quantitiesNullfall.getByEntry(entry) * amountWechsler,
+											quantityNullfall, 
+											quantityNullfall * deltaAmounts,
 											0., 0., 
-											quantitiesPlanfall.getByEntry(entry), 
-											quantitiesPlanfall.getByEntry(entry) * amountWechsler,
-											quantitiesPlanfall.getByEntry(entry) * econValues.getByEntry(entry) , 
-											quantitiesPlanfall.getByEntry(entry) * amountWechsler * econValues.getByEntry(entry) 
+											quantityPlanfall, 
+											quantityPlanfall * deltaAmounts,
+											utlChangesPerItem.utl , 
+											utlChange
 									) ;
 								}
 
-//								if (  deltaQuantities != 0. || utlChanges.utlGainByOldUsers!=0.
-//										|| utlChanges.utlGainByNewUsers!=0. || utlChanges.utl!=0. ) {
-//									System.out.printf("%35s change for `old' users (Altnutzer): %10.1f %-10s", "-->",
-//											deltaQuantities, entry) ;
-//								}
-//								if ( utlChanges.utlGainByOldUsers != 0. || utlChanges.utlGainByNewUsers != 0. ) {
-//									System.out.printf("; utl (gain) old//new demand: %10.1f", utlChanges.utlGainByOldUsers ) ;
-//									System.out.printf(" //%10.1f\n", utlChanges.utlGainByNewUsers ) ;
-//									utils += utlChanges.utlGainByOldUsers + utlChanges.utlGainByNewUsers  ;
-//								}
-//								else if ( utlChanges.utl != 0.){
-//									System.out.printf("; utl change: %10.1f\n", utlChanges.utl ) ;
-//									utils += utlChanges.utl;
-//								}
 							}
+						}
+						if ( implicitUtl != 0. ) {
+							final double implicitUtlOverall = implicitUtl * deltaAmounts;
+							System.out.printf(fmtString,
+									"implicit utl",
+									0.,0.,
+									0.,0.,
+									0.,0.,
+									implicitUtl, implicitUtlOverall 
+									) ;
+							utils += implicitUtlOverall ;
+
 						}
 					}
 				}
 			}
 		}
-		System.out.printf("utl gain: %10.1f\n", utils ) ;
+		System.out.printf("utl gain: %171.1f\n", utils ) ;
 	}
-	abstract UtlChangesData computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
-			ValuesForAUserType quantitiesPlanfall, Entry entry);
+	abstract UtlChangesData utlChangePerItem(double deltaAmount, double quantityNullfall, 
+			double quantityPlanfall, double econVal);
+	abstract double computeImplicitUtility(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
+			ValuesForAUserType quantitiesPlanfall) ;
 }
