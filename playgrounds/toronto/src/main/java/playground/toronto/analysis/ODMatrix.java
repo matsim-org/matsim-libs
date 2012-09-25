@@ -149,7 +149,7 @@ public class ODMatrix {
 			writer.newLine();
 			writer.write(" " + origin + " " + destination + ":" + val);
 		}
-		
+		writer.close();
 		
 	}
 	
