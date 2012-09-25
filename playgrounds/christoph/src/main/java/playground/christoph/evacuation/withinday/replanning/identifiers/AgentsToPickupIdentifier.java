@@ -170,13 +170,22 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				for (Id vehicleId : vehicleIds) {
 					Id driverId = this.vehiclesTracker.getVehicleDriverId(vehicleId);
 					
+					if (driverId == null) {
+						throw new RuntimeException("No driver for vehicle " + vehicleId.toString() +
+								" was found in VehiclesTracker at time " + time + "!");
+					}
+					
 					/*
 					 * If the vehicle could leave the link before the agent has entered it skip 
 					 * the vehicle and try the next one.
 					 * Add two seconds because the walk agent has to stop and perform the pickup
 					 * activity which takes some time.
 					 */
-					double leaveLinkTime = this.earliestLinkLeaveTime.get(driverId);
+					Double leaveLinkTime = this.earliestLinkLeaveTime.get(driverId);
+					if (leaveLinkTime == null) {
+						throw new RuntimeException("No leaveLinkTime was found for driver " + driverId.toString() +
+								" at time " + time + "!");
+					}
 					if (time + 2 > leaveLinkTime) continue;
 					
 					int capacity = this.vehiclesTracker.getFreeVehicleCapacity(vehicleId);
