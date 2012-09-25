@@ -210,6 +210,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkEnterEvent event)
 	{
+		
+		//TODO für Räumungszeiten
 
 
 	}
@@ -217,6 +219,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkLeaveEvent event)
 	{
+		//TODO für Räumungszeiten
+		
 		System.out.println("link leave: " + event.getTime() + " - agent " + event.getPersonId() + " at link " + event.getLinkId());
 		
 	}

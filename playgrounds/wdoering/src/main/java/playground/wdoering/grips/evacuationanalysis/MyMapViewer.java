@@ -467,6 +467,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				}
 			}
 
+			/*
 			//display selected roads (with arrows)
 			if ((this.freezeMode)&&(this.currentHoverLinks.size()>0))
 			{
@@ -551,6 +552,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 				}
 			}
+			*/
 			
 			/**
 			 * draw grid
@@ -559,11 +561,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			if (!Double.isNaN(minX))
 			{
 				g.setColor(Color.BLACK);
-				g2D.setStroke(new BasicStroke(1F));
+				g2D.setStroke(new BasicStroke(3F));
 				
 				
-				double stepsX = this.getTileFactory().pixelToGeo(new Point2D.Double(gridSize, gridSize), this.getZoom()).getLatitude();
-				double stepsY = this.getTileFactory().pixelToGeo(new Point2D.Double(gridSize, gridSize), this.getZoom()).getLongitude();
+//				double stepsX = this.getTileFactory().pixelToGeo(new Point2D.Double(gridSize, gridSize), this.getZoom()).getLatitude();
+//				double stepsY = this.getTileFactory().pixelToGeo(new Point2D.Double(gridSize, gridSize), this.getZoom()).getLongitude();
+				
 //				double stepsX = (maxX-minX)/gridSize;
 //				double stepsY = (maxY-minY)/gridSize;
 				
@@ -590,16 +593,24 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					pixMaxY = temp;
 				}
 				
-				Coord gridPoint = this.ctInverse.transform(new CoordImpl(minX+stepsX,minY+stepsY));
-				Point2D gridLength = this.getTileFactory().geoToPixel(new GeoPosition(gridPoint.getY(),gridPoint.getX()), this.getZoom());
 				
-				double zoomStep = gridSize/((double)(this.getZoom()+1));
+				g.drawLine(pixMinX-b.x, pixMinY-b.y, pixMaxX-b.x, pixMinY-b.y);
+				g.drawLine(pixMinX-b.x, pixMaxY-b.y, pixMaxX-b.x, pixMaxY-b.y);
 				
-				g.setColor(Color.orange);
-				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + (this.getZoom()+1),26,26);
-				g.setColor(Color.black);
-				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + (this.getZoom()+1),25,25);
+				g.drawLine(pixMinX-b.x, pixMinY-b.y, pixMinX-b.x, pixMaxY-b.y);
+				g.drawLine(pixMaxX-b.x, pixMinY-b.y, pixMaxX-b.x, pixMaxY-b.y);
 				
+				g.setColor(Color.BLACK);
+				g2D.setStroke(new BasicStroke(1F));
+				
+				//resulting length in pixels of a grid cell
+				double zoomStep = (gridSize/(Math.pow(2,this.getZoom())));
+				
+				//debug
+//				g.setColor(Color.orange);
+//				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + this.getZoom(),26,26);
+//				g.setColor(Color.black);
+//				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + this.getZoom(),25,25);
 				
 				double timeSum = data.getTimeSum();
 				double maxCellTimeSum = data.getMaxCellTimeSum();
@@ -612,13 +623,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					i++;
 					int j = 0;
 					
-					for (double v = pixMinY; v < pixMaxY; v+=zoomStep)
+					for (double v = pixMaxY; v > pixMinY-zoomStep; v-=zoomStep)
 					{
 //						System.out.println("uv: \t" + u + "\t" + v);
 						j++;
 						
 						int gridOffsetX = (int)(u-b.x);
 						int gridOffsetY = (int)(v-b.y);
+//						int gridOffsetY = (int)(v-b.y-zoomStep);
 						
 						g.drawRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
 						
@@ -631,11 +643,21 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
 							relTravelTime = 0d;
 						
-						g.setColor(new Color(0,127,255,50+(int)(205*relTravelTime)));
+						if (cell.getCount()>0)
+							g.setColor(new Color(0,127,(int)(255*relTravelTime),100));
+						else
+							g.setColor(new Color(255,0,0,30));
+							
+						
+//						g.setColor(new Color(0,127,255,50+(int)(205*relTravelTime)));
 						g.fillRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
 						
-						g.setColor(Color.white);
-						g.drawString("c:" + this.cellTree.get(minX+gridSize*i,minY+gridSize*j).getCount(), (int)u-b.x, (int)v-b.y);
+						//only show the count number if the cell size is readable
+						if (zoomStep>40)
+						{
+							g.setColor(Color.white);
+							g.drawString("c:" + this.cellTree.get(minX+gridSize*i,minY+gridSize*j).getCount(), (int)u-b.x, (int)v-b.y+20);
+						}
 						
 					}
 				}
