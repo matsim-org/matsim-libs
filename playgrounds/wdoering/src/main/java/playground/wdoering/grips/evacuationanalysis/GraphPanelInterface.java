@@ -25,5 +25,6 @@ public interface GraphPanelInterface {
 	public abstract void resetData();
 	public abstract void updateData(EventData data);
 	public abstract void drawGraph();
+	public abstract void setGraphSize(int width, int height);
 
 }

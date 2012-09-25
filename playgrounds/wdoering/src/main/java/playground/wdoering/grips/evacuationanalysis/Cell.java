@@ -20,11 +20,14 @@
 
 package playground.wdoering.grips.evacuationanalysis;
 
+import java.util.List;
+
 public class Cell<T>
 {
 	private double timeSum;
 	private int count;
 	private T data;
+	private List<Double> arrivalTimes;
 	
 	public static String CELLSIZE = "cellsize";
 	
@@ -61,6 +64,14 @@ public class Cell<T>
 	
 	public void setData(T data) {
 		this.data = data;
+	}
+	
+	public void setArrivalTimes(List<Double> arrivalTimes) {
+		this.arrivalTimes = arrivalTimes;
+	}
+	
+	public List<Double> getArrivalTimes() {
+		return arrivalTimes;
 	}
 
 }

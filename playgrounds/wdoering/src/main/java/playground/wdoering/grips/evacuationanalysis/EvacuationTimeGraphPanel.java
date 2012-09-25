@@ -27,6 +27,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
@@ -38,12 +39,13 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 	
 	//TODO: GRAPH graph;
 	
-	public EvacuationTimeGraphPanel()
+	public EvacuationTimeGraphPanel(int width, int height)
 	{
-		this.setBackground(Color.blue);
-		this.setPreferredSize(new Dimension(300,300));
+		this.setGraphSize(width, height);
+//		this.setBackground(new Color(80,140,220));
 		drawGraph();
 	}
+
 	
 	@Override
 	public void drawGraph()
@@ -54,6 +56,7 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 		if (data==null)
 			return;
 		
+		//example usage of data
 		System.out.println("EVACUATION TIME GRAPH");
 		System.out.println("cell size:" + data.getCellSize());
 		System.out.println("time sum:" + data.getTimeSum());
@@ -74,13 +77,15 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 			ys[i] = i*i;
 		}
 		
+		chart.addSeries("123", xs, ys);
+		
 		JFreeChart freeChart = chart.getChart();
+		ChartPanel chartPanel = new ChartPanel(freeChart);
+		chartPanel.setPreferredSize(new Dimension(this.width, this.height));
 		
-		Graphics g = this.getGraphics();
-		Graphics2D g2d = (Graphics2D)g;
-		
-		freeChart.draw(g2d, new Rectangle2D.Double(0,0,200,200));
-		
+		this.add(chartPanel);
+		this.validate();
+		this.setSize(this.width,this.height);
 		
 	}
 

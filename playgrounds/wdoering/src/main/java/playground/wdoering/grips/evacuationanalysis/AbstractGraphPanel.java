@@ -32,6 +32,8 @@ public abstract class AbstractGraphPanel extends JPanel implements GraphPanelInt
 	
 
 	protected EventData data;
+	protected int width;
+	protected int height;
 	
 	public AbstractGraphPanel()
 	{
@@ -50,6 +52,12 @@ public abstract class AbstractGraphPanel extends JPanel implements GraphPanelInt
 	{
 		this.data = data;
 		drawGraph();
+	}
+	
+	public void setGraphSize(int width, int height)
+	{
+		this.width = width;
+		this.height = height;
 	}
 	
 	public abstract void drawGraph();

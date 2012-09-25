@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -201,29 +202,41 @@ public class EvacuationAnalysis implements ActionListener{
 		//the panel on the right hand side, to display graphs etc.
 		JPanel panel = new JPanel();
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
-		this.blockPanel = new JPanel(new GridLayout(18, 2));
-		this.blockPanel.setSize(new Dimension(200, 200));
+		this.blockPanel = new JPanel();
+		this.blockPanel.setLayout(new BoxLayout(this.blockPanel, BoxLayout.Y_AXIS));
+		this.blockPanel.setSize(new Dimension(400, 368));
 
 
 		//////////////////////////////////////////////////////////////////////////////
 		// DESCRIPTIONS
 		//////////////////////////////////////////////////////////////////////////////
 		
-		this.panelDescriptions = new JPanel(new GridLayout(1, 3));
-		this.panelDescriptions.add(new JLabel("graph"));
+//		this.panelDescriptions = new JPanel(new GridLayout(1, 3));
+//		this.panelDescriptions.add(new JLabel("graph"));
 
 		
 		//////////////////////////////////////////////////////////////////////////////
 		// PANELS
 		//////////////////////////////////////////////////////////////////////////////
 		
-		this.graphPanel = new EvacuationTimeGraphPanel();
-		this.controlPanel = new JPanel(new GridLayout(1, 3));
+		this.graphPanel = new EvacuationTimeGraphPanel(360,280);
+		this.controlPanel = new JPanel(new GridLayout(7, 3));
+		this.controlPanel.setPreferredSize(new Dimension(360,30));
+		this.controlPanel.setSize(new Dimension(360,30));
+
+		//FIXME: this part is meant to display the graph in another window
+//		JFrame graphFrame = new JFrame();
+//		graphFrame.setPreferredSize(new Dimension(1000, 1000));
+//		graphFrame.setSize(1000, 1000);
+//		graphFrame.setLocationRelativeTo(null);
+//		graphFrame.add(graphPanel);
+//		graphFrame.setVisible(true);
+//		graphFrame.validate();
 		
-		this.blockPanel.add(this.panelDescriptions);
+//		this.blockPanel.add(this.panelDescriptions);
 		this.blockPanel.add(graphPanel);
 		this.blockPanel.add(controlPanel);
-		this.blockPanel.setPreferredSize(new Dimension(300,300));
+		this.blockPanel.setPreferredSize(new Dimension(360,700));
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		this.compositePanel = new JPanel();
@@ -245,7 +258,15 @@ public class EvacuationAnalysis implements ActionListener{
 		this.calcButton = new JButton("calculate");
 		this.calcButton.setEnabled(false);
 		this.calcButton.addActionListener(this);
+		this.calcButton.setPreferredSize(new Dimension(100,30));
+		this.calcButton.setSize(new Dimension(100,30));
 		
+		this.controlPanel.add(new JLabel(""));
+		this.controlPanel.add(new JLabel(""));
+		this.controlPanel.add(new JLabel(""));
+		this.controlPanel.add(new JLabel(""));
+		this.controlPanel.add(new JLabel(" gridsize: 100m"));
+		this.controlPanel.add(new JLabel(" mode: evacuation time"));
 		this.controlPanel.add(calcButton);
 		panel.add(this.openBtn);
 		panel.add(this.saveButton);
