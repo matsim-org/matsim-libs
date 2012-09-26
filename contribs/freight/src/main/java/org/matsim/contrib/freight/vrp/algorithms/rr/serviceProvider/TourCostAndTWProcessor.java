@@ -122,7 +122,7 @@ class TourCostAndTWProcessor extends TourStatusProcessor{
 		if(currentAct instanceof JobActivity){
 			currentAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currentAct).getCapacityDemand());
 			if(((JobActivity) currentAct).getJob() instanceof Service){
-				tour.tourData.totalLoad += ((Service)((JobActivity) currentAct).getJob()).getDemand(); 
+				tour.tourData.totalLoad += ((Service)((JobActivity) currentAct).getJob()).getCapacityDemand(); 
 			}
 			else if(currentAct instanceof Pickup){
 				tour.tourData.totalLoad += ((Pickup) currentAct).getCapacityDemand();

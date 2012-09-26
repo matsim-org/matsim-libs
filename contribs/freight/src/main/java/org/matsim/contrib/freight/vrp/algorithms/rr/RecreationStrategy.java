@@ -12,28 +12,28 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-
-
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 
-
 /**
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public interface RecreationStrategy {
-	
+
 	/**
-	 * Assigns the unassigned jobs to service-providers  
+	 * Assigns the unassigned jobs to service-providers
+	 * 
 	 * @param serviceProviders
 	 * @param unassignedJobs
+	 * @param result2beat
 	 */
-	public void recreate(Collection<? extends ServiceProviderAgent> serviceProviders, Collection<Job> unassignedJobs);
-	
+	public void recreate(
+			Collection<? extends ServiceProviderAgent> serviceProviders,
+			Collection<Job> unassignedJobs, double result2beat);
 
 }

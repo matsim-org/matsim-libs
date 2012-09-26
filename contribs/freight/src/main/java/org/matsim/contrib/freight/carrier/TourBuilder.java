@@ -13,58 +13,58 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
-
 public class TourBuilder {
 
 	private List<TourElement> tourElements = new ArrayList<TourElement>();
-	
+
 	private Set<CarrierShipment> openPickups = new HashSet<CarrierShipment>();
 
 	private Id startLinkId;
 
 	private Id endLinkId;
-	
+
 	private double earliestDeparture;
-	
+
 	private double latestDeparture;
-	
+
 	private boolean previousElementIsActivity;
-	
-	public void scheduleStart(Id startLinkId, double earliestDeparture, double latestDeparture) {
+
+	public void scheduleStart(Id startLinkId, double earliestDeparture,
+			double latestDeparture) {
 		this.startLinkId = startLinkId;
 		this.earliestDeparture = earliestDeparture;
 		this.latestDeparture = latestDeparture;
 		previousElementIsActivity = true;
 	}
-	
-	
-	
+
 	public void scheduleEnd(Id endLinkId) {
 		assertLastElementIsLeg();
 		this.endLinkId = endLinkId;
 	}
-	
-	public void addLeg(Leg leg){
+
+	public void addLeg(Leg leg) {
 		assertIsNotNull(leg);
-		if(!previousElementIsActivity){
-			throw new RuntimeException("cannot add leg, since last tour element is not an activity.");
+		if (!previousElementIsActivity) {
+			throw new RuntimeException(
+					"cannot add leg, since last tour element is not an activity.");
 		}
 		tourElements.add(leg);
 		previousElementIsActivity = false;
 	}
 
 	private void assertIsNotNull(Object o) {
-		if(o == null){
+		if (o == null) {
 			throw new RuntimeException("leg cannot be null");
 		}
-		
+
 	}
-	
+
 	public void schedulePickup(CarrierShipment shipment, double end_time) {
 		assertIsNotNull(shipment);
 		boolean wasNew = openPickups.add(shipment);
 		if (!wasNew) {
-			throw new RuntimeException("Trying to deliver something which was already picked up.");
+			throw new RuntimeException(
+					"Trying to deliver something which was already picked up.");
 		}
 		assertLastElementIsLeg();
 		Pickup pickup = createPickup(shipment);
@@ -77,7 +77,8 @@ public class TourBuilder {
 		assertIsNotNull(shipment);
 		boolean wasNew = openPickups.add(shipment);
 		if (!wasNew) {
-			throw new RuntimeException("Trying to deliver something which was already picked up.");
+			throw new RuntimeException(
+					"Trying to deliver something which was already picked up.");
 		}
 		assertLastElementIsLeg();
 		Pickup pickup = createPickup(shipment);
@@ -86,16 +87,18 @@ public class TourBuilder {
 	}
 
 	private void assertLastElementIsLeg() {
-		if(previousElementIsActivity){
-			throw new RuntimeException("cannot add activity, since last tour element is not a leg.");
+		if (previousElementIsActivity) {
+			throw new RuntimeException(
+					"cannot add activity, since last tour element is not a leg.");
 		}
 	}
-	
+
 	public void scheduleDelivery(CarrierShipment shipment, double end_time) {
 		assertIsNotNull(shipment);
 		boolean wasOpen = openPickups.remove(shipment);
 		if (!wasOpen) {
-			throw new RuntimeException("Trying to deliver something which was not picked up.");
+			throw new RuntimeException(
+					"Trying to deliver something which was not picked up.");
 		}
 		assertLastElementIsLeg();
 		Delivery delivery = createDelivery(shipment);
@@ -108,7 +111,8 @@ public class TourBuilder {
 		assertIsNotNull(shipment);
 		boolean wasOpen = openPickups.remove(shipment);
 		if (!wasOpen) {
-			throw new RuntimeException("Trying to deliver something which was not picked up.");
+			throw new RuntimeException(
+					"Trying to deliver something which was not picked up.");
 		}
 		assertLastElementIsLeg();
 		tourElements.add(createDelivery(shipment));
@@ -134,14 +138,15 @@ public class TourBuilder {
 		return new Leg();
 	}
 
-	public NetworkRoute createRoute(Id startLinkId, List<Id> linkIds, Id endLinkId) {
-		LinkNetworkRouteImpl linkNetworkRouteImpl = new LinkNetworkRouteImpl(startLinkId, endLinkId);
-		if(linkIds != null && !linkIds.isEmpty()){
+	public NetworkRoute createRoute(Id startLinkId, List<Id> linkIds,
+			Id endLinkId) {
+		LinkNetworkRouteImpl linkNetworkRouteImpl = new LinkNetworkRouteImpl(
+				startLinkId, endLinkId);
+		if (linkIds != null && !linkIds.isEmpty()) {
 			linkNetworkRouteImpl.setLinkIds(startLinkId, linkIds, endLinkId);
 		}
 		return linkNetworkRouteImpl;
-		
-	}
 
+	}
 
 }

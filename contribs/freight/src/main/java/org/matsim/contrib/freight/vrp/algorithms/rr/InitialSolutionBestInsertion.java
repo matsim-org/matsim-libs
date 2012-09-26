@@ -38,7 +38,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
-import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.DriverImpl;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -46,22 +45,26 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 
-	private static Logger logger = Logger.getLogger(InitialSolutionBestInsertion.class);
-	
+	private static Logger logger = Logger
+			.getLogger(InitialSolutionBestInsertion.class);
+
 	private ServiceProviderAgentFactory serviceProviderFactory;
-	
-	public InitialSolutionBestInsertion(ServiceProviderAgentFactory serviceProviderFactory) {
+
+	public InitialSolutionBestInsertion(
+			ServiceProviderAgentFactory serviceProviderFactory) {
 		super();
 		this.serviceProviderFactory = serviceProviderFactory;
 	}
 
 	@Override
-	public RuinAndRecreateSolution createInitialSolution(VehicleRoutingProblem vrp) {
-//		logger.info("create initial solution.");
+	public RuinAndRecreateSolution createInitialSolution(
+			VehicleRoutingProblem vrp) {
+		// logger.info("create initial solution.");
 		List<ServiceProviderAgent> serviceProviders = createEmptyServiceProviders(vrp);
 		RecreationBestInsertion bestInsertion = new RecreationBestInsertion();
-		bestInsertion.recreate(serviceProviders, getUnassignedJobs(vrp));
-		
+		bestInsertion.recreate(serviceProviders, getUnassignedJobs(vrp),
+				Double.MAX_VALUE);
+
 		return new RuinAndRecreateSolution(serviceProviders);
 	}
 
@@ -70,9 +73,10 @@ public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 		return jobs;
 	}
 
-	private List<ServiceProviderAgent> createEmptyServiceProviders(VehicleRoutingProblem vrp) {
+	private List<ServiceProviderAgent> createEmptyServiceProviders(
+			VehicleRoutingProblem vrp) {
 		List<ServiceProviderAgent> emptyTours = new ArrayList<ServiceProviderAgent>();
-		for(Vehicle v : vrp.getVehicles()){
+		for (Vehicle v : vrp.getVehicles()) {
 			DriverImpl driver = new DriverImpl("driver");
 			driver.setEarliestStart(v.getEarliestDeparture());
 			driver.setLatestEnd(v.getLatestArrival());
@@ -81,5 +85,5 @@ public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 		}
 		return emptyTours;
 	}
-	
+
 }

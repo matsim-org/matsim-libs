@@ -17,7 +17,6 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,13 +34,13 @@ import org.matsim.contrib.freight.vrp.basics.VehicleImpl;
 import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
 import org.matsim.contrib.freight.vrp.utils.VrpUtils;
 
-public class TourCostAndTWProcessorTest extends VRPTestCase{
-	
-	static class MyLocations implements Locations{
+public class TourCostAndTWProcessorTest extends VRPTestCase {
 
-		private Map<String,Coordinate> locations = new HashMap<String, Coordinate>();
+	static class MyLocations implements Locations {
 
-		public void addLocation(String id, Coordinate coord){
+		private Map<String, Coordinate> locations = new HashMap<String, Coordinate>();
+
+		public void addLocation(String id, Coordinate coord) {
 			locations.put(id, coord);
 		}
 
@@ -50,144 +49,157 @@ public class TourCostAndTWProcessorTest extends VRPTestCase{
 			return locations.get(id);
 		}
 	}
-	
+
 	TourImpl tour;
-	
+
 	Driver driver;
-	
+
 	Vehicle vehicle;
-	
+
 	TourImpl anotherTour;
-	
+
 	TourStatusProcessor statusUpdater;
-	
+
 	TourStatusProcessor tdTourStatusProcessor;
-	
+
 	@Override
-	public void setUp(){
-		
-		driver = new Driver(){};
-		
+	public void setUp() {
+
+		driver = new Driver() {
+		};
+
 		vehicle = new VehicleImpl("dummy", "dummy", null);
-		
+
 		initJobsInPlainCoordinateSystem();
-		
+
 		VrpTourBuilder tourBuilder = new VrpTourBuilder();
-		Shipment s1 = createShipment("1", makeId(0,10), makeId(0,0));
-		s1.setPickupTW(VrpUtils.createTimeWindow(8,12));
-		
-		Shipment s2 = createShipment("2", makeId(10,0), makeId(0,0));
-		s2.setPickupTW(VrpUtils.createTimeWindow(30,30));
-		
-		tourBuilder.scheduleStart(makeId(0,0), 0.0, 0.0);
+		Shipment s1 = createShipment("1", makeId(0, 10), makeId(0, 0));
+		s1.setPickupTW(VrpUtils.createTimeWindow(8, 12));
+
+		Shipment s2 = createShipment("2", makeId(10, 0), makeId(0, 0));
+		s2.setPickupTW(VrpUtils.createTimeWindow(30, 30));
+
+		tourBuilder.scheduleStart(makeId(0, 0), 0.0, 0.0);
 		tourBuilder.schedulePickup(s1);
 		tourBuilder.schedulePickup(s2);
 		tourBuilder.scheduleDelivery(s1);
 		tourBuilder.scheduleDelivery(s2);
-		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
+		tourBuilder.scheduleEnd(makeId(0, 0), 0.0, Double.MAX_VALUE);
 		tour = tourBuilder.build();
-		
+
 		statusUpdater = new TourCostAndTWProcessor(costs);
-		
+
 		MyLocations loc = new MyLocations();
-		loc.addLocation(makeId(0,10),new Coordinate(0,10));
-		loc.addLocation(makeId(10,0),new Coordinate(10,0));
-		loc.addLocation(makeId(0,0),new Coordinate(0,0));
-		
+		loc.addLocation(makeId(0, 10), new Coordinate(0, 10));
+		loc.addLocation(makeId(10, 0), new Coordinate(10, 0));
+		loc.addLocation(makeId(0, 0), new Coordinate(0, 0));
+
 		double depotClosingTime = 100.0;
 		List<Double> timeBins = new ArrayList<Double>();
-		timeBins.add(0.2*depotClosingTime);
-		timeBins.add(0.4*depotClosingTime);
-		timeBins.add(0.6*depotClosingTime);
-		timeBins.add(0.8*depotClosingTime);
-		timeBins.add(1.0*depotClosingTime);
-		
+		timeBins.add(0.2 * depotClosingTime);
+		timeBins.add(0.4 * depotClosingTime);
+		timeBins.add(0.6 * depotClosingTime);
+		timeBins.add(0.8 * depotClosingTime);
+		timeBins.add(1.0 * depotClosingTime);
+
 		List<Double> speedValues = new ArrayList<Double>();
 		speedValues.add(1.0);
 		speedValues.add(2.0);
 		speedValues.add(1.0);
 		speedValues.add(2.0);
 		speedValues.add(1.0);
-		
+
 		TDCosts tdCosts = new TDCosts(loc, timeBins, speedValues);
 		tdTourStatusProcessor = new TourCostAndTWProcessor(tdCosts);
 	}
 
-	
-	public void testCalculatedTimeWithTDCost(){
+	public void testCalculatedTimeWithTDCost() {
 		tdTourStatusProcessor.process(tour, vehicle, driver);
-		assertEquals((10.0+10.0+5.0+5.0), tour.tourData.transportTime);
+		assertEquals((10.0 + 10.0 + 5.0 + 5.0), tour.tourData.transportTime);
 	}
 
-	public void testEarliestArrStart(){
+	public void testEarliestArrStart() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(0.0,tour.getActivities().get(0).getEarliestOperationStartTime());
+		assertEquals(0.0, tour.getActivities().get(0)
+				.getEarliestOperationStartTime());
 	}
-	
-	public void testLatestArrStart(){
+
+	public void testLatestArrStart() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(0.0,tour.getActivities().get(0).getLatestOperationStartTime());
+		assertEquals(0.0, tour.getActivities().get(0)
+				.getLatestOperationStartTime());
 	}
-	
-	public void testEarliestArrAtFirstPickup(){
+
+	public void testEarliestArrAtFirstPickup() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(10.0,tour.getActivities().get(1).getEarliestOperationStartTime());
+		assertEquals(10.0, tour.getActivities().get(1)
+				.getEarliestOperationStartTime());
 	}
-	
-	public void testEarliestArrAtFirstPickupWithTDCost(){
+
+	public void testEarliestArrAtFirstPickupWithTDCost() {
 		tdTourStatusProcessor.process(tour, vehicle, driver);
-		assertEquals(10.0,tour.getActivities().get(1).getEarliestOperationStartTime());
+		assertEquals(10.0, tour.getActivities().get(1)
+				.getEarliestOperationStartTime());
 	}
-	
-	public void testLatestArrAtFirstPickup(){
+
+	public void testLatestArrAtFirstPickup() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(10.0,tour.getActivities().get(1).getLatestOperationStartTime());
+		assertEquals(10.0, tour.getActivities().get(1)
+				.getLatestOperationStartTime());
 	}
-	
-	public void testLatestArrAtFirstPickupWithTDCost(){
+
+	public void testLatestArrAtFirstPickupWithTDCost() {
 		tdTourStatusProcessor.process(tour, vehicle, driver);
-		assertEquals(12.0,tour.getActivities().get(1).getLatestOperationStartTime());
+		assertEquals(12.0, tour.getActivities().get(1)
+				.getLatestOperationStartTime());
 	}
-	
-	public void testEarliestArrAtSecondPickup(){
+
+	public void testEarliestArrAtSecondPickup() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(30.0,tour.getActivities().get(2).getEarliestOperationStartTime());
+		assertEquals(30.0, tour.getActivities().get(2)
+				.getEarliestOperationStartTime());
 	}
-	
-	public void testEarliestArrAtSecondPickupWithTDCosts(){
+
+	public void testEarliestArrAtSecondPickupWithTDCosts() {
 		tdTourStatusProcessor.process(tour, vehicle, driver);
-		assertEquals(30.0,tour.getActivities().get(2).getEarliestOperationStartTime());
+		assertEquals(30.0, tour.getActivities().get(2)
+				.getEarliestOperationStartTime());
 	}
-	
-	public void testLatestArrAtSecondPickup(){
+
+	public void testLatestArrAtSecondPickup() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(30.0,tour.getActivities().get(2).getLatestOperationStartTime());
+		assertEquals(30.0, tour.getActivities().get(2)
+				.getLatestOperationStartTime());
 	}
-	
-	public void testLatestArrAtSecondPickupWithTDCosts(){
+
+	public void testLatestArrAtSecondPickupWithTDCosts() {
 		tdTourStatusProcessor.process(tour, vehicle, driver);
-		assertEquals(30.0,tour.getActivities().get(2).getLatestOperationStartTime());
+		assertEquals(30.0, tour.getActivities().get(2)
+				.getLatestOperationStartTime());
 	}
-	
-	public void testEarliestArrAtEnd(){
+
+	public void testEarliestArrAtEnd() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(40.0,tour.getActivities().get(5).getEarliestOperationStartTime());
+		assertEquals(40.0, tour.getActivities().get(5)
+				.getEarliestOperationStartTime());
 	}
-	
-	public void testEarliestArrAtEndWithTDCosts(){
+
+	public void testEarliestArrAtEndWithTDCosts() {
 		tdTourStatusProcessor.process(tour, vehicle, driver);
-		assertEquals(35.0,tour.getActivities().get(5).getEarliestOperationStartTime());
+		assertEquals(35.0, tour.getActivities().get(5)
+				.getEarliestOperationStartTime());
 	}
-	
-	public void testLatestArrAtEnd(){
+
+	public void testLatestArrAtEnd() {
 		statusUpdater.process(tour, vehicle, driver);
-		assertEquals(Double.MAX_VALUE,tour.getActivities().get(5).getLatestOperationStartTime());
+		assertEquals(Double.MAX_VALUE, tour.getActivities().get(5)
+				.getLatestOperationStartTime());
 	}
-	
-	public void testLatestArrAtEndWithTDCosts(){
+
+	public void testLatestArrAtEndWithTDCosts() {
 		tdTourStatusProcessor.process(tour, vehicle, driver);
-		assertEquals(Double.MAX_VALUE,tour.getActivities().get(5).getLatestOperationStartTime());
+		assertEquals(Double.MAX_VALUE, tour.getActivities().get(5)
+				.getLatestOperationStartTime());
 	}
-	
 
 }

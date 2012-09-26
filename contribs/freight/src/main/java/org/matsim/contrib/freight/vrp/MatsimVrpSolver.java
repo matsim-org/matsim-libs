@@ -7,5 +7,5 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 public interface MatsimVrpSolver {
 
 	public abstract Collection<ScheduledTour> solve();
-	
+
 }

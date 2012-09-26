@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
@@ -27,41 +26,46 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 
+class MatsimVrpSolverImpl implements MatsimVrpSolver {
 
-class MatsimVrpSolverImpl implements MatsimVrpSolver{
-	
 	private static Logger logger = Logger.getLogger(MatsimVrpSolverImpl.class);
-	
+
 	private VehicleRoutingCosts costs;
-	
+
 	private VehicleRoutingProblemSolverFactory vrpSolverFactory;
 
 	private Matsim2VrpMap matsim2vrp;
 
-	MatsimVrpSolverImpl(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, VehicleRoutingCosts costs) {
+	MatsimVrpSolverImpl(Collection<CarrierShipment> shipments,
+			Collection<CarrierVehicle> vehicles, VehicleRoutingCosts costs) {
 		super();
 		this.costs = costs;
 		this.matsim2vrp = new Matsim2VrpMap(shipments, vehicles);
 	}
-	
-//	MatsimVrpSolverImpl(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, VehicleRoutingCosts costs, CarrierPlan iniPlan) {
-//		super();
-//		this.costs = costs;
-//		this.matsim2vrp = new Matsim2VrpMap(shipments, vehicles);
-//	}
 
-	public void setVrpSolverFactory(VehicleRoutingProblemSolverFactory vrpSolverFactory) {
+	// MatsimVrpSolverImpl(Collection<CarrierShipment> shipments,
+	// Collection<CarrierVehicle> vehicles, VehicleRoutingCosts costs,
+	// CarrierPlan iniPlan) {
+	// super();
+	// this.costs = costs;
+	// this.matsim2vrp = new Matsim2VrpMap(shipments, vehicles);
+	// }
+
+	public void setVrpSolverFactory(
+			VehicleRoutingProblemSolverFactory vrpSolverFactory) {
 		this.vrpSolverFactory = vrpSolverFactory;
 	}
 
 	/**
-	 * Solves the vehicle routing problem resulting from specified by the carrier's resources and shipment-contracts. 
-	 * And returns a collections of tours.
+	 * Solves the vehicle routing problem resulting from specified by the
+	 * carrier's resources and shipment-contracts. And returns a collections of
+	 * tours.
 	 */
 
+	@Override
 	public Collection<ScheduledTour> solve() {
 		verify();
-		if(matsim2vrp.getShipments().isEmpty()){
+		if (matsim2vrp.getShipments().isEmpty()) {
 			return Collections.emptyList();
 		}
 		VehicleRoutingProblem vrp = setupProblem();
@@ -79,7 +83,7 @@ class MatsimVrpSolverImpl implements MatsimVrpSolver{
 
 	private String printTours(Collection<VehicleRoute> solution) {
 		String tourString = "";
-		for(VehicleRoute r : solution){
+		for (VehicleRoute r : solution) {
 			tourString += r.getTour() + "\n";
 		}
 		return tourString;
@@ -87,31 +91,35 @@ class MatsimVrpSolverImpl implements MatsimVrpSolver{
 
 	private String printJobs(VehicleRoutingProblem vrp) {
 		String jobs = "";
-		for(Job j : vrp.getJobs().values()){
-			Shipment s = (Shipment)j;
-			jobs+= s + "\n";
+		for (Job j : vrp.getJobs().values()) {
+			Shipment s = (Shipment) j;
+			jobs += s + "\n";
 		}
 		return jobs;
 	}
 
 	private VehicleRoutingProblem setupProblem() {
-		VehicleRoutingProblem vrp = new VrpFactory(matsim2vrp, costs).createVrp();
+		VehicleRoutingProblem vrp = new VrpFactory(matsim2vrp, costs)
+				.createVrp();
 		return vrp;
 	}
 
 	private void verify() {
-		if(vrpSolverFactory == null){
-			throw new IllegalStateException("ruinAndRecreateFactory is null but must be set");
+		if (vrpSolverFactory == null) {
+			throw new IllegalStateException(
+					"ruinAndRecreateFactory is null but must be set");
 		}
-		if(matsim2vrp.getVehicles().isEmpty()){
-			throw new IllegalStateException("cannot route vehicles without vehicles");
+		if (matsim2vrp.getVehicles().isEmpty()) {
+			throw new IllegalStateException(
+					"cannot route vehicles without vehicles");
 		}
 	}
 
 	/*
 	 * translates vrp-solution (being vrp-tours) to matsim-carrier-tours
 	 */
-	private Collection<ScheduledTour> makeScheduledVehicleTours(VehicleRoutingProblemSolution vrpSolution) {
+	private Collection<ScheduledTour> makeScheduledVehicleTours(
+			VehicleRoutingProblemSolution vrpSolution) {
 		return Matsim2VrpUtils.createTours(vrpSolution, matsim2vrp);
 	}
 }

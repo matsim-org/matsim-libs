@@ -12,12 +12,10 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
+public class End implements TourActivity, TourState {
 
-
-public class End implements TourActivity, TourState{
-	
 	private String locationId;
-	
+
 	private double practical_earliestOperationStartTime;
 
 	private double practical_latestOperationStartTime;
@@ -27,7 +25,7 @@ public class End implements TourActivity, TourState{
 	private double currentCost;
 
 	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
-	
+
 	public End(String locationId) {
 		super();
 		this.locationId = locationId;
@@ -35,16 +33,18 @@ public class End implements TourActivity, TourState{
 
 	public End(End end) {
 		this.locationId = end.getLocationId();
-		practical_earliestOperationStartTime = end.getEarliestOperationStartTime();
+		practical_earliestOperationStartTime = end
+				.getEarliestOperationStartTime();
 		practical_latestOperationStartTime = end.getLatestOperationStartTime();
 		this.currentLoad = end.getCurrentLoad();
 		this.currentCost = end.getCurrentCost();
-		this.tourStateSnapshot = new TourStateSnapshot(end.getTourStateSnapshot());
+		this.tourStateSnapshot = new TourStateSnapshot(
+				end.getTourStateSnapshot());
 	}
 
 	@Override
 	public void setEarliestOperationStartTime(double early) {
-		practical_earliestOperationStartTime = early;	
+		practical_earliestOperationStartTime = early;
 	}
 
 	@Override
@@ -80,11 +80,12 @@ public class End implements TourActivity, TourState{
 	@Override
 	public void setCurrentLoad(int load) {
 		this.currentLoad = load;
-		
+
 	}
-	
-	public String toString(){
-		return "End" + " @ "+ getLocationId();
+
+	@Override
+	public String toString() {
+		return "End" + " @ " + getLocationId();
 	}
 
 	@Override
@@ -110,7 +111,7 @@ public class End implements TourActivity, TourState{
 	@Override
 	public void setTourStateSnapshot(TourStateSnapshot snapshot) {
 		this.tourStateSnapshot = snapshot;
-		
+
 	}
 
 }

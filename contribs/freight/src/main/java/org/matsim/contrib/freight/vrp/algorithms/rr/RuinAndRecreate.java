@@ -38,57 +38,58 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.core.utils.collections.Tuple;
 
-
-
 /**
- * This algorithm is basically the implementation of 
- * Schrimpf G., J. Schneider, Hermann Stamm-Wilbrandt and Gunter Dueck (2000): Record Breaking Optimization Results Using 
- * the Ruin and Recreate Principle, Journal of Computational Physics 159, 139-171 (2000).
+ * This algorithm is basically the implementation of Schrimpf G., J. Schneider,
+ * Hermann Stamm-Wilbrandt and Gunter Dueck (2000): Record Breaking Optimization
+ * Results Using the Ruin and Recreate Principle, Journal of Computational
+ * Physics 159, 139-171 (2000).
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
-public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
-	
+public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
+
 	private static Logger logger = Logger.getLogger(RuinAndRecreate.class);
-	
-	private RuinStrategyManager ruinStrategyManager; 
+
+	private RuinStrategyManager ruinStrategyManager;
 
 	private RecreationStrategy recreationStrategy;
-	
+
 	private VehicleRoutingProblem vrp;
-	
+
 	private int nOfIterations = 100;
-	
+
 	private int warmUpIterations = 10;
-	
+
 	private int currentIteration = 0;
-	
+
 	private RuinAndRecreateSolution currentSolution;
-	
+
 	private ThresholdFunction thresholdFunction;
-	
+
 	private Double initialThreshold = 0.0;
-	
+
 	private ServiceProviderAgentFactory tourAgentFactory;
-	
+
 	private InitialSolutionFactory initialSolutionFactory;
-	
+
 	private Collection<RuinAndRecreateListener> controlerListeners = new ArrayList<RuinAndRecreateListener>();
-	
+
 	private int lastPrint = 1;
 
 	public RuinAndRecreate(VehicleRoutingProblem vrp) {
 		this.vrp = vrp;
 	}
-	
-	public RuinAndRecreate(VehicleRoutingProblem vrp, RuinAndRecreateSolution initialSolution) {
+
+	public RuinAndRecreate(VehicleRoutingProblem vrp,
+			RuinAndRecreateSolution initialSolution) {
 		this.vrp = vrp;
 		this.currentSolution = initialSolution;
 	}
 
-	public void setInitialSolutionFactory(InitialSolutionFactory initialSolutionFactory) {
+	public void setInitialSolutionFactory(
+			InitialSolutionFactory initialSolutionFactory) {
 		this.initialSolutionFactory = initialSolutionFactory;
 	}
 
@@ -124,12 +125,13 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 
 	private VehicleRoutingProblemSolution createSolution() {
 		final Collection<VehicleRoute> routes = new ArrayList<VehicleRoute>();
-		for(ServiceProviderAgent spa : currentSolution.getTourAgents()){
-			if(spa.isActive()) routes.add(new VehicleRoute(spa.getTour(),spa.getVehicle()));
+		for (ServiceProviderAgent spa : currentSolution.getTourAgents()) {
+			if (spa.isActive())
+				routes.add(new VehicleRoute(spa.getTour(), spa.getVehicle()));
 		}
-		
+
 		return new VehicleRoutingProblemSolution() {
-			
+
 			@Override
 			public Collection<VehicleRoute> getRoutes() {
 				return routes;
@@ -142,17 +144,19 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 		};
 	}
 
-	public void run(){
+	public void run() {
 		verify();
 		init();
 		informAlgoStarts();
 		logger.info("run ruin-and-recreate");
-		logger.info("initialConstruction=" + initialSolutionFactory.getClass().toString());
+		logger.info("initialConstruction="
+				+ initialSolutionFactory.getClass().toString());
 		logger.info("recreation:");
 		logger.info("strat=" + recreationStrategy.getClass().toString());
 		logger.info("ruin:");
 		logStrats();
-		logger.info("#warmupIterations="+warmUpIterations+ "; #iterations="+nOfIterations);
+		logger.info("#warmupIterations=" + warmUpIterations + "; #iterations="
+				+ nOfIterations);
 		logger.info("#jobs: " + vrp.getJobs().values().size());
 		logger.info("create initial solution");
 		makeInitialSolution();
@@ -162,18 +166,21 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 		logger.info("go");
 		resetIterations();
 		informMainRunStarts();
-		while(currentIteration < nOfIterations){
-			informIterationStarts(currentIteration,currentSolution);
+		while (currentIteration < nOfIterations) {
+			informIterationStarts(currentIteration, currentSolution);
 			RuinAndRecreateSolution tentativeSolution = copySolution(currentSolution);
-			double result2beat = currentSolution.getResult() + thresholdFunction.getThreshold(currentIteration);
+			double result2beat = currentSolution.getResult()
+					+ thresholdFunction.getThreshold(currentIteration);
 			ruinAndRecreate(tentativeSolution, result2beat);
 			double tentativeResult = tentativeSolution.getResult();
 			double currentResult = currentSolution.getResult();
-			if(tentativeResult < currentResult + thresholdFunction.getThreshold(currentIteration)){
+			if (tentativeResult < currentResult
+					+ thresholdFunction.getThreshold(currentIteration)) {
 				currentSolution = tentativeSolution;
 			}
 			printNoIteration(currentIteration);
-			informIterationEnds(currentIteration,currentSolution,tentativeSolution);
+			informIterationEnds(currentIteration, currentSolution,
+					tentativeSolution);
 			currentIteration++;
 		}
 		informAlgoEnds(currentSolution);
@@ -181,33 +188,39 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informMainRunStarts() {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof MainRunStartsListener){
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof MainRunStartsListener) {
 				((MainRunStartsListener) l).informMainRunStarts();
 			}
 		}
 	}
 
-	private void informIterationEnds(int currentIteration, RuinAndRecreateSolution awardedSolution, RuinAndRecreateSolution rejectedSolution) {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof IterationEndsListener){
-				((IterationEndsListener) l).informIterationEnds(currentIteration,awardedSolution,rejectedSolution);
+	private void informIterationEnds(int currentIteration,
+			RuinAndRecreateSolution awardedSolution,
+			RuinAndRecreateSolution rejectedSolution) {
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof IterationEndsListener) {
+				((IterationEndsListener) l).informIterationEnds(
+						currentIteration, awardedSolution, rejectedSolution);
 			}
 		}
 	}
 
 	private void informAlgoEnds(RuinAndRecreateSolution currentSolution) {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof AlgorithmEndsListener){
-				((AlgorithmEndsListener) l).informAlgorithmEnds(currentSolution);
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof AlgorithmEndsListener) {
+				((AlgorithmEndsListener) l)
+						.informAlgorithmEnds(currentSolution);
 			}
 		}
 	}
 
-	private void informIterationStarts(int currentIteration, RuinAndRecreateSolution currentSolution) {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof IterationStartListener){
-				((IterationStartListener) l).informIterationStarts(currentIteration, currentSolution);
+	private void informIterationStarts(int currentIteration,
+			RuinAndRecreateSolution currentSolution) {
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof IterationStartListener) {
+				((IterationStartListener) l).informIterationStarts(
+						currentIteration, currentSolution);
 			}
 		}
 	}
@@ -217,120 +230,135 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	}
 
 	private void informWarmupStarts() {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof WarmupStartsListener){
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof WarmupStartsListener) {
 				((WarmupStartsListener) l).informWarmupStarts(currentSolution);
 			}
 		}
 	}
 
 	private void informAlgoStarts() {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof AlgorithmStartsListener){
-				((AlgorithmStartsListener) l).informAlgorithmStarts();
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof AlgorithmStartsListener) {
+				((AlgorithmStartsListener) l).informAlgorithmStarts(this);
 			}
 		}
 	}
 
-	private void makeInitialSolution(){
-		if(currentSolution == null){
+	private void makeInitialSolution() {
+		if (currentSolution == null) {
 			currentSolution = initialSolutionFactory.createInitialSolution(vrp);
 		}
 	}
 
+	public void setCurrentSolution(RuinAndRecreateSolution currentSolution) {
+		this.currentSolution = currentSolution;
+	}
+
 	private void logStrats() {
-		for(Tuple<RuinStrategy,Double> t : ruinStrategyManager.getStrategies()){
-			logger.info("strat="+t.getFirst().getClass().toString() + "; prob="+t.getSecond());
+		for (Tuple<RuinStrategy, Double> t : ruinStrategyManager
+				.getStrategies()) {
+			logger.info("strat=" + t.getFirst().getClass().toString()
+					+ "; prob=" + t.getSecond());
 		}
 	}
 
-	private RuinAndRecreateSolution copySolution(RuinAndRecreateSolution currentSolution) {
+	private RuinAndRecreateSolution copySolution(
+			RuinAndRecreateSolution currentSolution) {
 		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
-		for(ServiceProviderAgent agent : currentSolution.getTourAgents()){
-			ServiceProviderAgent newTourAgent = tourAgentFactory.createAgent(agent);
+		for (ServiceProviderAgent agent : currentSolution.getTourAgents()) {
+			ServiceProviderAgent newTourAgent = tourAgentFactory
+					.createAgent(agent);
 			agents.add(newTourAgent);
 		}
 		return new RuinAndRecreateSolution(agents);
 	}
 
 	private void verify() {
-		if(initialSolutionFactory == null) throw new IllegalStateException("no initialsolutionFactory set");	
+		if (initialSolutionFactory == null)
+			throw new IllegalStateException("no initialsolutionFactory set");
 	}
 
 	private void init() {
 		thresholdFunction.setNofIterations(nOfIterations);
-		thresholdFunction.setInitialThreshold(initialThreshold);	
+		thresholdFunction.setInitialThreshold(initialThreshold);
 	}
 
-	private void ruinAndRecreate(RuinAndRecreateSolution solution, double upperBound) {
-		informRuinStarts(solution);
+	private void ruinAndRecreate(RuinAndRecreateSolution solution,
+			double result2beat) {
 		RuinStrategy ruinStrategy = ruinStrategyManager.getRandomStrategy();
-		Collection<Job> unassignedJobs = ruinStrategy.ruin(solution.getTourAgents());
+		informRuinStarts(ruinStrategy, solution);
+		Collection<Job> unassignedJobs = ruinStrategy.ruin(solution
+				.getTourAgents());
 		informRuinEnds(solution);
-		informRecreationStarts(solution,unassignedJobs);
-		recreationStrategy.recreate(solution.getTourAgents(),unassignedJobs);
+		informRecreationStarts(solution, unassignedJobs);
+		recreationStrategy.recreate(solution.getTourAgents(), unassignedJobs,
+				result2beat);
 		informRecreationEnds(solution);
 	}
 
 	private void informRecreationEnds(RuinAndRecreateSolution solution) {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof RecreationEndsListener){
-				((RecreationEndsListener)l).informRecreationEnds(solution);
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof RecreationEndsListener) {
+				((RecreationEndsListener) l).informRecreationEnds(solution);
 			}
 		}
 	}
 
-	private void informRecreationStarts(RuinAndRecreateSolution solution, Collection<Job> unassignedJobs) {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof RecreationStartsListener){
-				((RecreationStartsListener)l).informRecreationStarts(solution,unassignedJobs);
+	private void informRecreationStarts(RuinAndRecreateSolution solution,
+			Collection<Job> unassignedJobs) {
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof RecreationStartsListener) {
+				((RecreationStartsListener) l).informRecreationStarts(solution,
+						unassignedJobs);
 			}
 		}
 	}
 
 	private void informRuinEnds(RuinAndRecreateSolution solution) {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof RuinEndsListener){
-				((RuinEndsListener)l).informRuinEnds(solution);
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof RuinEndsListener) {
+				((RuinEndsListener) l).informRuinEnds(solution);
 			}
 		}
 	}
 
-	private void informRuinStarts(RuinAndRecreateSolution solution) {
-		for(RuinAndRecreateListener l : controlerListeners){
-			if(l instanceof RuinStartsListener){
-				((RuinStartsListener)l).informRuinStarts(solution);
+	private void informRuinStarts(RuinStrategy ruinStrategy,
+			RuinAndRecreateSolution solution) {
+		for (RuinAndRecreateListener l : controlerListeners) {
+			if (l instanceof RuinStartsListener) {
+				((RuinStartsListener) l).informRuinStarts(ruinStrategy,
+						solution);
 			}
 		}
 	}
 
 	private void randomWalk(int nOfIterations) {
-		if(nOfIterations == 0){
+		if (nOfIterations == 0) {
 			return;
 		}
 		RuinAndRecreateSolution lastSolution = copySolution(currentSolution);
 		resetIterations();
 		double[] results = new double[nOfIterations];
-		for(int i=0;i<nOfIterations;i++){
+		for (int i = 0; i < nOfIterations; i++) {
 			printNoIteration(i);
 			RuinAndRecreateSolution currentSolution = copySolution(lastSolution);
 			ruinAndRecreate(currentSolution, Double.MAX_VALUE);
 			double result = currentSolution.getResult();
-			results[i]=result;
+			results[i] = result;
 			lastSolution = currentSolution;
 		}
 		StandardDeviation dev = new StandardDeviation();
 		double standardDeviation = dev.evaluate(results);
 		initialThreshold = standardDeviation / 2;
 		thresholdFunction.setInitialThreshold(initialThreshold);
-		logger.info("iniThreshold="+initialThreshold);
+		logger.info("iniThreshold=" + initialThreshold);
 	}
 
 	private void printNoIteration(int currentIteration) {
-		if(currentIteration == 0){
+		if (currentIteration == 0) {
 			logger.info(currentIteration + " iterations");
-		}
-		else if((currentIteration%lastPrint) == 0){
+		} else if ((currentIteration % lastPrint) == 0) {
 			logger.info(currentIteration + " iterations");
 			lastPrint = currentIteration;
 		}
@@ -339,8 +367,8 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 	private void resetIterations() {
 		lastPrint = 1;
 	}
-	
-	public RuinAndRecreateSolution getSolution(){
+
+	public RuinAndRecreateSolution getSolution() {
 		return currentSolution;
 	}
 
@@ -348,5 +376,4 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver{
 		nOfIterations = iterations;
 	}
 
-	
 }

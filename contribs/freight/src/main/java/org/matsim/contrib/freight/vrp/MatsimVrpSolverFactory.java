@@ -9,7 +9,10 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
 public interface MatsimVrpSolverFactory {
-	
-	public abstract MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs);
+
+	public abstract MatsimVrpSolver createSolver(
+			Collection<CarrierShipment> shipments,
+			Collection<CarrierVehicle> carrierVehicles, Network network,
+			TourCost tourCost, VehicleRoutingCosts costs);
 
 }

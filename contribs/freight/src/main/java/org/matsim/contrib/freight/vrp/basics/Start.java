@@ -12,12 +12,10 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
-
-
-public class Start implements TourActivity, TourState{
+public class Start implements TourActivity, TourState {
 
 	private String locationId;
-	
+
 	private double practical_earliestOperationStartTime;
 
 	private double practical_latestOperationStartTime;
@@ -27,7 +25,7 @@ public class Start implements TourActivity, TourState{
 	private double currentCost;
 
 	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
-	
+
 	public Start(String locationId) {
 		super();
 		this.locationId = locationId;
@@ -35,16 +33,19 @@ public class Start implements TourActivity, TourState{
 
 	public Start(Start start) {
 		this.locationId = start.getLocationId();
-		practical_earliestOperationStartTime = start.getEarliestOperationStartTime();
-		practical_latestOperationStartTime = start.getLatestOperationStartTime();
+		practical_earliestOperationStartTime = start
+				.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = start
+				.getLatestOperationStartTime();
 		this.currentLoad = start.getCurrentLoad();
 		this.currentCost = start.getCurrentCost();
-		this.tourStateSnapshot = new TourStateSnapshot(start.getTourStateSnapshot());
+		this.tourStateSnapshot = new TourStateSnapshot(
+				start.getTourStateSnapshot());
 	}
 
 	@Override
 	public void setEarliestOperationStartTime(double early) {
-		practical_earliestOperationStartTime = early;	
+		practical_earliestOperationStartTime = early;
 	}
 
 	@Override
@@ -80,11 +81,12 @@ public class Start implements TourActivity, TourState{
 	@Override
 	public void setCurrentLoad(int load) {
 		this.currentLoad = load;
-		
+
 	}
-	
-	public String toString(){
-		return "Start" + " @ "+ getLocationId();
+
+	@Override
+	public String toString() {
+		return "Start" + " @ " + getLocationId();
 	}
 
 	@Override
@@ -110,7 +112,7 @@ public class Start implements TourActivity, TourState{
 	@Override
 	public void setTourStateSnapshot(TourStateSnapshot snapshot) {
 		this.tourStateSnapshot = snapshot;
-		
+
 	}
-	
+
 }

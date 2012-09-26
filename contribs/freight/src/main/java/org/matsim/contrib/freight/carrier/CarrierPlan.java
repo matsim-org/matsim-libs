@@ -2,22 +2,22 @@ package org.matsim.contrib.freight.carrier;
 
 import java.util.Collection;
 
-
 /**
  * 
- * Ein CarrierPlan kann sinnvoll nur dem Carrier hinzugefügt werden, nach dessen CarrierCapabilities und mit dessen Shipments er erzeugt worden ist.
- * Trotzdem hat er keinen expliziten Verweis auf seinen Carrier. Naja. Mal sehen.
+ * Ein CarrierPlan kann sinnvoll nur dem Carrier hinzugefügt werden, nach dessen
+ * CarrierCapabilities und mit dessen Shipments er erzeugt worden ist. Trotzdem
+ * hat er keinen expliziten Verweis auf seinen Carrier. Naja. Mal sehen.
  * 
  * @author michaz
- *
+ * 
  */
 public class CarrierPlan {
-	
-	private Double score = null;
-	
-	private Collection<ScheduledTour> scheduledTours;
 
-	public CarrierPlan(Collection<ScheduledTour> scheduledTours) {
+	private final Collection<ScheduledTour> scheduledTours;
+
+	private Double score = null;
+
+	public CarrierPlan(final Collection<ScheduledTour> scheduledTours) {
 		this.scheduledTours = scheduledTours;
 	}
 
@@ -32,5 +32,5 @@ public class CarrierPlan {
 	public Collection<ScheduledTour> getScheduledTours() {
 		return scheduledTours;
 	}
-	
+
 }

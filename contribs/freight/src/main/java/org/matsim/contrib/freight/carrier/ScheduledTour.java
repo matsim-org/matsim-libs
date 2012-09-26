@@ -1,14 +1,15 @@
 package org.matsim.contrib.freight.carrier;
 
-
-
 public class ScheduledTour {
 
-	private Tour tour;
-	private CarrierVehicle vehicle;
-	private double departure;
+	private final Tour tour;
 
-	public ScheduledTour(Tour tour, CarrierVehicle vehicle, double departure) {
+	private final CarrierVehicle vehicle;
+
+	private final double departure;
+
+	public ScheduledTour(final Tour tour, final CarrierVehicle vehicle,
+			final double departure) {
 		this.tour = tour;
 		this.vehicle = vehicle;
 		this.departure = departure;
@@ -30,6 +31,5 @@ public class ScheduledTour {
 	public String toString() {
 		return tour.toString() + " on vehicle " + vehicle.toString();
 	}
-	
 
 }

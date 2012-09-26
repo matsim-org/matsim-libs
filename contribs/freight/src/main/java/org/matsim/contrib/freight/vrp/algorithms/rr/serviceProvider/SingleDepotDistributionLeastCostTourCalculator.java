@@ -121,7 +121,7 @@ class SingleDepotDistributionLeastCostTourCalculator extends LeastCostTourCalcul
 	}
 
 	private boolean checkCapacity(TourImpl tour, Shipment shipment, Vehicle vehicle) {
-		if(tour.tourData.totalLoad + shipment.getSize() > vehicle.getCapacity()){
+		if(tour.tourData.totalLoad + shipment.getCapacityDemand() > vehicle.getCapacity()){
 			return false;
 		}
 		return true;

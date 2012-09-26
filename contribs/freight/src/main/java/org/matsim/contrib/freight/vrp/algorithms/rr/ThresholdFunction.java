@@ -15,15 +15,15 @@ package org.matsim.contrib.freight.vrp.algorithms.rr;
 /**
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public interface ThresholdFunction {
-	
+
 	public double getThreshold(int iteration);
-	
+
 	public void setInitialThreshold(double initialThreshold);
-	
+
 	public void setNofIterations(int nOfIterations);
 
 }

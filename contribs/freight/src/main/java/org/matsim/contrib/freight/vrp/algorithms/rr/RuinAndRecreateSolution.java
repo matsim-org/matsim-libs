@@ -12,7 +12,6 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
@@ -21,44 +20,41 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourAgent;
 /**
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public class RuinAndRecreateSolution {
-	
+
 	private Collection<ServiceProviderAgent> tourAgents;
-	
+
 	private double score = 0.0;
-	
+
 	private boolean solutionSet = false;
-	
+
 	public RuinAndRecreateSolution(Collection<ServiceProviderAgent> tourAgents) {
 		super();
 		this.tourAgents = tourAgents;
 	}
-	
-	
-	
+
 	public double getResult() {
-		if(solutionSet){
+		if (solutionSet) {
 			return score;
 		}
 		double total = 0.0;
-		for(TourAgent a : tourAgents){
+		for (TourAgent a : tourAgents) {
 			total += a.getTourCost();
 		}
 		return total;
 	}
 
-	public Collection<ServiceProviderAgent> getTourAgents(){
+	public Collection<ServiceProviderAgent> getTourAgents() {
 		return tourAgents;
 	}
 
 	@Override
 	public String toString() {
-		return "totalResult="+getResult();
+		return "totalResult=" + getResult();
 	}
-
 
 	public void setScore(double score) {
 		solutionSet = true;

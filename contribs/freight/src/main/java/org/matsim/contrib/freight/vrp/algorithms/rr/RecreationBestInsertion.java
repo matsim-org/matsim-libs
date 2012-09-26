@@ -26,30 +26,30 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.InsertionDat
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
-
-
 /**
- * Simplest recreation strategy. All removed customers are inserted where insertion costs are minimal. I.e. each tour-agent is asked for
- * minimal marginal insertion costs. The tour-agent offering the lowest marginal insertion costs gets the customer/shipment.
+ * Simplest recreation strategy. All removed customers are inserted where
+ * insertion costs are minimal. I.e. each tour-agent is asked for minimal
+ * marginal insertion costs. The tour-agent offering the lowest marginal
+ * insertion costs gets the customer/shipment.
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public final class RecreationBestInsertion implements RecreationStrategy{
 	
 	private Logger logger = Logger.getLogger(RecreationBestInsertion.class);
-	
+
 	private Random random = RandomNumberGeneration.getRandom();
-	
+
 	public void setRandom(Random random) {
 		this.random = random;
 	}
 
 	@Override
-	public void recreate(Collection<? extends ServiceProviderAgent> serviceProviders, Collection<Job> unassignedJobs) {
+	public void recreate(Collection<? extends ServiceProviderAgent> serviceProviders, Collection<Job> unassignedJobs, double result2beat) {
 		List<Job> unassignedJobList = new ArrayList<Job>(unassignedJobs);
-		Collections.shuffle(unassignedJobList,random);
+		Collections.shuffle(unassignedJobList, random);
 		for(Job unassignedJob : unassignedJobList){
 			Insertion bestInsertion = null;
 			double bestInsertionCost = Double.MAX_VALUE;
@@ -64,11 +64,12 @@ public final class RecreationBestInsertion implements RecreationStrategy{
 			}
 			if(bestInsertion != null){
 				bestInsertion.getTourAgent().insertJob(unassignedJob, bestInsertion.getInsertionData());
+			} 
+			else {
+				throw new IllegalStateException(
+						"given the vehicles, could not create a valid solution");
 			}
-			else{
-				throw new IllegalStateException("given the vehicles, could not create a valid solution");
-			}
-			
+
 		}
 	}	
 }

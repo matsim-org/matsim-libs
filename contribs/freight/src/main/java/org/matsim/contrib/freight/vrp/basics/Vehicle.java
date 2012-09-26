@@ -16,5 +16,4 @@ public interface Vehicle {
 
 	public abstract int getCapacity();
 
-
 }

@@ -12,20 +12,20 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
-public class Shipment implements Job{
-	
+public class Shipment implements Job {
+
 	private String fromId;
-	
+
 	private String toId;
-	
+
 	private int size;
-	
+
 	private double pickupServiceTime;
-	
+
 	private double deliveryServiceTime;
-	
+
 	private TimeWindow pickupTW;
-	
+
 	private TimeWindow deliveryTW;
 
 	private String id;
@@ -78,7 +78,8 @@ public class Shipment implements Job{
 		return toId;
 	}
 
-	public int getSize() {
+	@Override
+	public int getCapacityDemand() {
 		return size;
 	}
 
@@ -86,9 +87,11 @@ public class Shipment implements Job{
 	public String getId() {
 		return id;
 	}
-	
-	public String toString(){
-		return "[id="+id+"][from="+fromId+"][to="+toId+"[size="+size+"]";
+
+	@Override
+	public String toString() {
+		return "[id=" + id + "][from=" + fromId + "][to=" + toId + "[size="
+				+ size + "]";
 	}
-	
+
 }

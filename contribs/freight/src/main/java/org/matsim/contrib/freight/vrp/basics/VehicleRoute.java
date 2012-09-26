@@ -13,9 +13,9 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 public class VehicleRoute {
-	
+
 	private TourImpl tour;
-	
+
 	private Vehicle vehicle;
 
 	public VehicleRoute(TourImpl tour, Vehicle vehicle) {
@@ -31,7 +31,5 @@ public class VehicleRoute {
 	public Vehicle getVehicle() {
 		return vehicle;
 	}
-	
-	
 
 }

@@ -12,27 +12,27 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
 
-
 /**
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public interface RuinStrategy {
-	
+
 	/**
-	 * Ruins a current solution, i.e. removes jobs from service providers
-	 * and returns a collection of these removed, and thus unassigned, jobs.
+	 * Ruins a current solution, i.e. removes jobs from service providers and
+	 * returns a collection of these removed, and thus unassigned, jobs.
+	 * 
 	 * @param serviceProviders
 	 * @return
 	 */
-	public Collection<Job> ruin(Collection<? extends ServiceProviderAgent> serviceProviders);
-	
+	public Collection<Job> ruin(
+			Collection<? extends ServiceProviderAgent> serviceProviders);
+
 }

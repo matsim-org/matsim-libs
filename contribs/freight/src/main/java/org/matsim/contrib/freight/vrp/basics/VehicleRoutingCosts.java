@@ -12,14 +12,13 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
-
 /**
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
-public interface VehicleRoutingCosts extends TransportTime, TransportCost, BackwardTransportCost, BackwardTransportTime{
+public interface VehicleRoutingCosts extends TransportTime, TransportCost,
+		BackwardTransportCost, BackwardTransportTime {
 
-	
 }

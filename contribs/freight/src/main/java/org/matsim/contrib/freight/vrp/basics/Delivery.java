@@ -12,63 +12,66 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
+public class Delivery implements TourActivity, JobActivity, TourState {
 
-
-public class Delivery implements TourActivity, JobActivity, TourState{
-	
 	private final Job job;
-	
+
 	private final String locationId;
 
 	private double practical_earliestOperationStartTime;
-	
+
 	private double practical_latestOperationStartTime;
 
 	private int currentLoad;
-	
+
 	private double currentCost;
-	
+
 	private final int demand;
-	
+
 	private final double serviceTime;
 
 	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
-	
+
 	public Delivery(Shipment shipment) {
 		super();
 		this.job = shipment;
 		this.locationId = shipment.getToId();
-		this.demand = shipment.getSize();
+		this.demand = shipment.getCapacityDemand();
 		this.serviceTime = shipment.getDeliveryServiceTime();
-		practical_earliestOperationStartTime = shipment.getDeliveryTW().getStart();
+		practical_earliestOperationStartTime = shipment.getDeliveryTW()
+				.getStart();
 		practical_latestOperationStartTime = shipment.getDeliveryTW().getEnd();
 	}
-	
-	public Delivery(Service deliveryService){
+
+	public Delivery(Service deliveryService) {
 		this.job = deliveryService;
 		this.locationId = deliveryService.getLocationId();
-		this.demand = deliveryService.getDemand();
+		this.demand = deliveryService.getCapacityDemand();
 		this.serviceTime = deliveryService.getServiceTime();
-		practical_earliestOperationStartTime = deliveryService.getEarliestServiceTime();
-		practical_latestOperationStartTime = deliveryService.getLatestServiceTime();
+		practical_earliestOperationStartTime = deliveryService
+				.getEarliestServiceTime();
+		practical_latestOperationStartTime = deliveryService
+				.getLatestServiceTime();
 	}
-	
-	public Delivery(Delivery delivery){
+
+	public Delivery(Delivery delivery) {
 		this.job = delivery.getJob();
 		this.locationId = delivery.getLocationId();
-		this.demand = delivery.getCapacityDemand()*-1;
+		this.demand = delivery.getCapacityDemand() * -1;
 		this.serviceTime = delivery.getOperationTime();
-		practical_earliestOperationStartTime = delivery.getEarliestOperationStartTime();
-		practical_latestOperationStartTime = delivery.getLatestOperationStartTime();
+		practical_earliestOperationStartTime = delivery
+				.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = delivery
+				.getLatestOperationStartTime();
 		this.currentLoad = delivery.getCurrentLoad();
 		this.currentCost = delivery.getCurrentCost();
-		this.tourStateSnapshot = new TourStateSnapshot(delivery.getTourStateSnapshot());
+		this.tourStateSnapshot = new TourStateSnapshot(
+				delivery.getTourStateSnapshot());
 	}
-	
-	
 
-	public int getCapacityDemand(){
-		return -1*demand;
+	@Override
+	public int getCapacityDemand() {
+		return -1 * demand;
 	}
 
 	@Override
@@ -76,10 +79,11 @@ public class Delivery implements TourActivity, JobActivity, TourState{
 		return serviceTime;
 	}
 
+	@Override
 	public String getLocationId() {
 		return locationId;
 	}
-	
+
 	@Override
 	public void setEarliestOperationStartTime(double early) {
 		practical_earliestOperationStartTime = early;
@@ -113,16 +117,18 @@ public class Delivery implements TourActivity, JobActivity, TourState{
 	@Override
 	public void setCurrentLoad(int load) {
 		this.currentLoad = load;
-		
+
 	}
 
-	public String toString(){
-		return "Delivery" + " of " + demand + " units @ "+ getLocationId()  + " @ practTW(" + round(practical_earliestOperationStartTime) + "," +
-			round(practical_latestOperationStartTime) + ")";
+	@Override
+	public String toString() {
+		return "Delivery" + " of " + demand + " units @ " + getLocationId()
+				+ " @ practTW(" + round(practical_earliestOperationStartTime)
+				+ "," + round(practical_latestOperationStartTime) + ")";
 	}
 
 	private String round(double time) {
-		if(time == Double.MAX_VALUE){
+		if (time == Double.MAX_VALUE) {
 			return "oo";
 		}
 		return "" + Math.round(time);
@@ -135,7 +141,7 @@ public class Delivery implements TourActivity, JobActivity, TourState{
 
 	@Override
 	public void setCurrentCost(double cost) {
-		currentCost=cost;
+		currentCost = cost;
 	}
 
 	@Override

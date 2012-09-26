@@ -37,7 +37,7 @@ class ServiceDistributionLeastCostTourCalculator extends LeastCostTourCalculator
 	InsertionData calculateLeastCostTour(Job job, Vehicle vehicle, TourImpl tour, Driver driver, double bestKnownCosts) {
 		Double bestCost = bestKnownCosts;
 		Service service = (Service)job;
-		if(!checkCapacity(tour,service.getDemand(),vehicle)){
+		if(!checkCapacity(tour,service.getCapacityDemand(),vehicle)){
 			return InsertionData.createNoInsertionFound();
 		}
 		Delivery deliveryAct = new Delivery(service);

@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 
-public class MatsimPersonAdapter implements Person{
-	
+public class MatsimPersonAdapter implements Person {
+
 	private Driver driver;
 
 	public MatsimPersonAdapter(Driver driver) {
@@ -41,7 +41,7 @@ public class MatsimPersonAdapter implements Person{
 	@Override
 	public void setId(Id id) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -55,7 +55,5 @@ public class MatsimPersonAdapter implements Person{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
 
 }

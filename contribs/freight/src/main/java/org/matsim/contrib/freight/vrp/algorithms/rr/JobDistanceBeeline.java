@@ -18,10 +18,10 @@ import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.Service;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 
-public class JobDistanceBeeline implements JobDistance{
+public class JobDistanceBeeline implements JobDistance {
 
 	private Locations locations;
-	
+
 	public JobDistanceBeeline(Locations locations) {
 		super();
 		this.locations = locations;
@@ -30,39 +30,37 @@ public class JobDistanceBeeline implements JobDistance{
 	@Override
 	public double calculateDistance(Job i, Job j) {
 		double avgCost = 0.0;
-		if(i instanceof Shipment && j instanceof Shipment){
-			if(i.equals(j)){
+		if (i instanceof Shipment && j instanceof Shipment) {
+			if (i.equals(j)) {
 				avgCost = 0.0;
+			} else {
+				Shipment s_i = (Shipment) i;
+				Shipment s_j = (Shipment) j;
+				double cost_i1_j1 = calcDist(s_i.getFromId(), s_j.getFromId());
+				double cost_i1_j2 = calcDist(s_i.getFromId(), s_j.getToId());
+				double cost_i2_j1 = calcDist(s_i.getToId(), s_j.getFromId());
+				double cost_i2_j2 = calcDist(s_i.getToId(), s_j.getToId());
+				avgCost = (cost_i1_j1 + cost_i1_j2 + cost_i2_j1 + cost_i2_j2) / 4;
 			}
-			else{
-				Shipment s_i = (Shipment)i;
-				Shipment s_j = (Shipment)j;
-				double cost_i1_j1 = calcDist(s_i.getFromId(),s_j.getFromId());
-				double cost_i1_j2 = calcDist(s_i.getFromId(),s_j.getToId());
-				double cost_i2_j1 = calcDist(s_i.getToId(),s_j.getFromId());
-				double cost_i2_j2 = calcDist(s_i.getToId(),s_j.getToId());
-				avgCost = (cost_i1_j1 + cost_i1_j2 + cost_i2_j1 + cost_i2_j2)/4;
-			}
-		}
-		else if(i instanceof Service && j instanceof Service){
-			if(i.equals(j)){
+		} else if (i instanceof Service && j instanceof Service) {
+			if (i.equals(j)) {
 				avgCost = 0.0;
-			}
-			else{
-				Service s_i = (Service)i;
-				Service s_j = (Service)j;
+			} else {
+				Service s_i = (Service) i;
+				Service s_j = (Service) j;
 				avgCost = calcDist(s_i.getLocationId(), s_j.getLocationId());
 			}
-		}
-		else{
-			throw new UnsupportedOperationException("currently, this class just works with shipments. when working with services " +
-					" also, implement another JobDistance");
+		} else {
+			throw new UnsupportedOperationException(
+					"currently, this class just works with shipments. when working with services "
+							+ " also, implement another JobDistance");
 		}
 		return avgCost;
 	}
 
 	private double calcDist(String from, String to) {
-		return new CrowFlyCosts(locations).getTransportCost(from, to, 0.0, null, null);
+		return new CrowFlyCosts(locations).getTransportCost(from, to, 0.0,
+				null, null);
 	}
 
 }

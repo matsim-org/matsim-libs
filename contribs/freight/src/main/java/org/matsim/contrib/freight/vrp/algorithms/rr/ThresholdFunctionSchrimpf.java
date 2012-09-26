@@ -12,33 +12,33 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-
 /**
- * See 
- * Schrimpf G., J. Schneider, Hermann Stamm-Wilbrandt and Gunter Dueck (2000): Record Breaking Optimization Results Using 
- * the Ruin and Recreate Principle, Journal of Computational Physics 159, 139-171 (2000).
+ * See Schrimpf G., J. Schneider, Hermann Stamm-Wilbrandt and Gunter Dueck
+ * (2000): Record Breaking Optimization Results Using the Ruin and Recreate
+ * Principle, Journal of Computational Physics 159, 139-171 (2000).
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public class ThresholdFunctionSchrimpf implements ThresholdFunction {
-	
+
 	private int nOfIterations;
-	
+
 	private double alpha;
-	
+
 	private double initialThreshold;
-	
+
 	public ThresholdFunctionSchrimpf(double alpha) {
 		super();
 		this.alpha = alpha;
 	}
 
 	@Override
-	public double getThreshold(int iteration){
-		double scheduleVariable = (double)iteration/(double)nOfIterations;
-		double currentThreshold = initialThreshold * Math.exp(-Math.log(2)*scheduleVariable/alpha);
+	public double getThreshold(int iteration) {
+		double scheduleVariable = (double) iteration / (double) nOfIterations;
+		double currentThreshold = initialThreshold
+				* Math.exp(-Math.log(2) * scheduleVariable / alpha);
 		return currentThreshold;
 	}
 
@@ -46,11 +46,10 @@ public class ThresholdFunctionSchrimpf implements ThresholdFunction {
 	public void setInitialThreshold(double initialThreshold) {
 		this.initialThreshold = initialThreshold;
 	}
-	
+
 	@Override
-	public void setNofIterations(int nOfIterations){
+	public void setNofIterations(int nOfIterations) {
 		this.nOfIterations = nOfIterations;
 	}
-	
 
 }

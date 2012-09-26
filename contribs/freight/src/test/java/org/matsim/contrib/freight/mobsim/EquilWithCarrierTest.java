@@ -20,54 +20,92 @@
 
 package org.matsim.contrib.freight.mobsim;
 
-import org.junit.Ignore;
-import org.matsim.contrib.freight.controler.RunMobSimWithCarrier;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierConfig;
+import org.matsim.contrib.freight.controler.CarrierControler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
-
 public class EquilWithCarrierTest extends MatsimTestCase {
-
-	@Ignore
-	public void testMobsimWithCarrier()  {
+	
+	Controler controler;
+	
+	CarrierControler carrierControler;
+	
+	public void setUp() throws Exception{
+		super.setUp();
 		String NETWORK_FILENAME = getInputDirectory() + "network.xml";
 		String PLANS_FILENAME = getInputDirectory() + "plans100.xml";
 		Config config = new Config();
 		config.addCoreModules();
+		
 		ActivityParams workParams = new ActivityParams("w");
-		workParams.setTypicalDuration(60*60*8);
+		workParams.setTypicalDuration(60 * 60 * 8);
 		config.planCalcScore().addActivityParams(workParams);
 		ActivityParams homeParams = new ActivityParams("h");
-		homeParams.setTypicalDuration(16*60*60);
+		homeParams.setTypicalDuration(16 * 60 * 60);
 		config.planCalcScore().addActivityParams(homeParams);
 		config.global().setCoordinateSystem("EPSG:32632");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(2);
 		config.network().setInputFile(NETWORK_FILENAME);
-		config.plans().setInputFile(PLANS_FILENAME);
+//		config.plans().setInputFile(PLANS_FILENAME);
 		config.addQSimConfigGroup(new QSimConfigGroup());
-		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
-		bestScore.setModuleName("BestScore");
-		bestScore.setProbability(0.9);
-		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
-		reRoute.setModuleName("ReRoute");
-		reRoute.setProbability(0.1);
-		reRoute.setDisableAfter(300);
-		config.strategy().setMaxAgentPlanMemorySize(5);
-		config.strategy().addStrategySettings(bestScore);
-		config.strategy().addStrategySettings(reRoute);
-		Controler controler = new Controler(config);
+//		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
+//		bestScore.setModuleName("BestScore");
+//		bestScore.setProbability(0.9);
+//		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+//		reRoute.setModuleName("ReRoute");
+//		reRoute.setProbability(0.1);
+//		reRoute.setDisableAfter(300);
+//		config.strategy().setMaxAgentPlanMemorySize(5);
+//		config.strategy().addStrategySettings(bestScore);
+//		config.strategy().addStrategySettings(reRoute);
+//		
+		controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
-		String CARRIER_PLANS = getInputDirectory() + "carrierPlans.xml";
-		controler.addControlerListener(new RunMobSimWithCarrier(CARRIER_PLANS));
+		CarrierConfig carrierConfig = new CarrierConfig();
+		carrierConfig.addCoreModules();
+		carrierConfig.plans().setInputFile(getInputDirectory() + "carrierPlansEquils.xml");
+		carrierControler = new CarrierControler(carrierConfig);
+		carrierControler.setCarrierScoringFunctionFactory(new ScoringFunctionFactoryForTests(controler.getNetwork()));
+		carrierControler.setCarrierPlanStrategyManagerFactory(new StrategyManagerFactoryForTests());
+		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
-		controler.run();
 	}
 
+	
+	public void testMobsimWithCarrierRunsWithoutException() {
+//		try{
+			controler.run();
+//			assertTrue(true);
+//		}
+//		catch(Exception e){
+//			assertTrue(false);
+//		}
+	}
+	
+	public void testScoringIsInlineWithSim(){
+		try{
+			controler.run();
+			
+			Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
+			assertEquals(-160000.0,carrier1.getSelectedPlan().getScore());
+			
+			Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
+			assertEquals(-85000.0,carrier2.getSelectedPlan().getScore());
+			
+		}
+		catch(Exception e){
+			assertTrue(false);
+		}
+	}
+
+	
+	
 }

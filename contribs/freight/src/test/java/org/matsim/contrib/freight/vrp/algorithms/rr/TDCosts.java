@@ -15,185 +15,199 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
 @Ignore
 public class TDCosts implements VehicleRoutingCosts {
-		
-		static class CostKey {
-			private String from;
-			private String to;
-			private double time;
-			private boolean forwardInTime;
-			public CostKey(String from, String to, double time,
-					boolean forwardInTime) {
-				super();
-				this.from = from;
-				this.to = to;
-				this.time = time;
-				this.forwardInTime = forwardInTime;
-			}
-			public String getFrom() {
-				return from;
-			}
-			public String getTo() {
-				return to;
-			}
-			public double getTime() {
-				return time;
-			}
-			public boolean isForwardInTime() {
-				return forwardInTime;
-			}
-			
-			@Override
-			public int hashCode() {
-				final int prime = 31;
-				int result = 1;
-				result = prime * result + (forwardInTime ? 1231 : 1237);
-				result = prime * result
-						+ ((from == null) ? 0 : from.hashCode());
-				long temp;
-				temp = Double.doubleToLongBits(time);
-				result = prime * result + (int) (temp ^ (temp >>> 32));
-				result = prime * result + ((to == null) ? 0 : to.hashCode());
-				return result;
-			}
-			
-			@Override
-			public boolean equals(Object obj) {
-				if (this == obj)
-					return true;
-				if (obj == null)
-					return false;
-				if (getClass() != obj.getClass())
-					return false;
-				TDCosts.CostKey other = (TDCosts.CostKey) obj;
-				if (forwardInTime != other.forwardInTime)
-					return false;
-				if (from == null) {
-					if (other.from != null)
-						return false;
-				} else if (!from.equals(other.from))
-					return false;
-				if (Double.doubleToLongBits(time) != Double
-						.doubleToLongBits(other.time))
-					return false;
-				if (to == null) {
-					if (other.to != null)
-						return false;
-				} else if (!to.equals(other.to))
-					return false;
-				return true;
-			}
-			
-		}
-		
-		private static Logger log = Logger.getLogger(TDCosts.class);
-		
-		private List<Double> timeBins;
-		
-		private List<Double> speed;
-		
-		private VehicleRoutingCosts crowFly;
-		
-		private Map<TDCosts.CostKey, Double> travelTimes = new HashMap<TDCosts.CostKey, Double>();
-		
-		public TDCosts(Locations locations, List<Double> timeBins, List<Double> speedValues) {
+
+	static class CostKey {
+		private String from;
+		private String to;
+		private double time;
+		private boolean forwardInTime;
+
+		public CostKey(String from, String to, double time,
+				boolean forwardInTime) {
 			super();
-			speed = new ArrayList<Double>(speedValues);
-			this.timeBins = new ArrayList<Double>(timeBins);
-			crowFly = new ManhattanCosts(locations);
-		}
-			
-		@Override
-		public double getTransportCost(String fromId, String toId, double departureTime, Driver driver, Vehicle vehicle) {
-			double totDistance = crowFly.getTransportCost(fromId, toId, departureTime, null, null);
-			return totDistance + getTransportTime(fromId,toId,departureTime, null, null);
-//			return getTransportTime(fromId,toId,departureTime);
-		}
-		
-		@Override
-		public double getBackwardTransportCost(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
-			return crowFly.getTransportCost(fromId, toId, arrivalTime, null, null) + getBackwardTransportTime(fromId, toId, arrivalTime, null, null);
-//			return getBackwardTransportTime(fromId, toId, arrivalTime);
+			this.from = from;
+			this.to = to;
+			this.time = time;
+			this.forwardInTime = forwardInTime;
 		}
 
-		
-
-		@Override
-		public double getTransportTime(String fromId, String toId, double departureTime, Driver driver, Vehicle vehicle) {
-			if(fromId.equals(toId)){
-				return 0.0;
-			}
-			TDCosts.CostKey key = new CostKey(fromId, toId, Math.round(departureTime), true);
-			if(travelTimes.containsKey(key)){
-				return travelTimes.get(key);
-			}
-			double totalTravelTime = 0.0;
-			double distanceToTravel = crowFly.getTransportCost(fromId, toId, departureTime, null, null);
-			double currentTime = departureTime;
-			for(int i=0;i<timeBins.size();i++){
-				double timeThreshold = timeBins.get(i);
-				if(currentTime < timeThreshold){
-					double maxReachableDistance = (timeThreshold-currentTime)*speed.get(i);
-					if(distanceToTravel > maxReachableDistance){
-						distanceToTravel = distanceToTravel - maxReachableDistance;
-						totalTravelTime += (timeThreshold-currentTime);
-						currentTime = timeThreshold;
-						continue;
-					}
-					else{ //<= maxReachableDistance
-						totalTravelTime += distanceToTravel/speed.get(i);
-						break;
-					}
-				}
-			}
-			travelTimes.put(key, totalTravelTime);
-			return totalTravelTime;
+		public String getFrom() {
+			return from;
 		}
 
+		public String getTo() {
+			return to;
+		}
+
+		public double getTime() {
+			return time;
+		}
+
+		public boolean isForwardInTime() {
+			return forwardInTime;
+		}
 
 		@Override
-		public double getBackwardTransportTime(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
-			if(fromId.equals(toId)){
-				return 0.0;
-			}
-			TDCosts.CostKey key = new CostKey(fromId, toId, Math.round(arrivalTime), false);
-			if(travelTimes.containsKey(key)){
-				return travelTimes.get(key);
-			}
-			double totalTravelTime = 0.0;
-			double distanceToTravel = crowFly.getTransportCost(fromId, toId, arrivalTime, null, null);
-			log.debug("distance2Travel="+distanceToTravel);
-			double currentTime = arrivalTime;
-			for(int i=timeBins.size()-1;i>=0;i--){
-				log.debug("timeBinIndex= " + i);
-				double timeThreshold;
-				if(i>0){
-					timeThreshold = timeBins.get(i-1);
-				}
-				else{
-					timeThreshold = 0;
-				}
-				log.debug("threshold=" + timeThreshold);
-				log.debug("currentTime=" + currentTime);
-				if(currentTime > timeThreshold){
-					double maxReachableDistance = (currentTime - timeThreshold)*speed.get(i);
-					if(distanceToTravel > maxReachableDistance){
-						distanceToTravel = distanceToTravel - maxReachableDistance;
-						totalTravelTime += (currentTime-timeThreshold);
-						currentTime = timeThreshold;
-						log.debug("dist>maxReachDist; distance2Travel=" + distanceToTravel + " totTravelTime=" + totalTravelTime);
-						continue;
-					}
-					else{ //<= maxReachableDistance
-						totalTravelTime += distanceToTravel/speed.get(i);
-						log.debug("dist<=maxReachDis; totTravelTime=" + totalTravelTime);
-						break;
-					}
-				}
-			}
-			travelTimes.put(key, totalTravelTime);
-			return totalTravelTime;
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (forwardInTime ? 1231 : 1237);
+			result = prime * result + ((from == null) ? 0 : from.hashCode());
+			long temp;
+			temp = Double.doubleToLongBits(time);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result + ((to == null) ? 0 : to.hashCode());
+			return result;
 		}
 
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TDCosts.CostKey other = (TDCosts.CostKey) obj;
+			if (forwardInTime != other.forwardInTime)
+				return false;
+			if (from == null) {
+				if (other.from != null)
+					return false;
+			} else if (!from.equals(other.from))
+				return false;
+			if (Double.doubleToLongBits(time) != Double
+					.doubleToLongBits(other.time))
+				return false;
+			if (to == null) {
+				if (other.to != null)
+					return false;
+			} else if (!to.equals(other.to))
+				return false;
+			return true;
+		}
 
-		
 	}
+
+	private static Logger log = Logger.getLogger(TDCosts.class);
+
+	private List<Double> timeBins;
+
+	private List<Double> speed;
+
+	private VehicleRoutingCosts crowFly;
+
+	private Map<TDCosts.CostKey, Double> travelTimes = new HashMap<TDCosts.CostKey, Double>();
+
+	public TDCosts(Locations locations, List<Double> timeBins,
+			List<Double> speedValues) {
+		super();
+		speed = new ArrayList<Double>(speedValues);
+		this.timeBins = new ArrayList<Double>(timeBins);
+		crowFly = new ManhattanCosts(locations);
+	}
+
+	@Override
+	public double getTransportCost(String fromId, String toId,
+			double departureTime, Driver driver, Vehicle vehicle) {
+		double totDistance = crowFly.getTransportCost(fromId, toId,
+				departureTime, null, null);
+		return totDistance
+				+ getTransportTime(fromId, toId, departureTime, null, null);
+		// return getTransportTime(fromId,toId,departureTime);
+	}
+
+	@Override
+	public double getBackwardTransportCost(String fromId, String toId,
+			double arrivalTime, Driver driver, Vehicle vehicle) {
+		return crowFly.getTransportCost(fromId, toId, arrivalTime, null, null)
+				+ getBackwardTransportTime(fromId, toId, arrivalTime, null,
+						null);
+		// return getBackwardTransportTime(fromId, toId, arrivalTime);
+	}
+
+	@Override
+	public double getTransportTime(String fromId, String toId,
+			double departureTime, Driver driver, Vehicle vehicle) {
+		if (fromId.equals(toId)) {
+			return 0.0;
+		}
+		TDCosts.CostKey key = new CostKey(fromId, toId,
+				Math.round(departureTime), true);
+		if (travelTimes.containsKey(key)) {
+			return travelTimes.get(key);
+		}
+		double totalTravelTime = 0.0;
+		double distanceToTravel = crowFly.getTransportCost(fromId, toId,
+				departureTime, null, null);
+		double currentTime = departureTime;
+		for (int i = 0; i < timeBins.size(); i++) {
+			double timeThreshold = timeBins.get(i);
+			if (currentTime < timeThreshold) {
+				double maxReachableDistance = (timeThreshold - currentTime)
+						* speed.get(i);
+				if (distanceToTravel > maxReachableDistance) {
+					distanceToTravel = distanceToTravel - maxReachableDistance;
+					totalTravelTime += (timeThreshold - currentTime);
+					currentTime = timeThreshold;
+					continue;
+				} else { // <= maxReachableDistance
+					totalTravelTime += distanceToTravel / speed.get(i);
+					break;
+				}
+			}
+		}
+		travelTimes.put(key, totalTravelTime);
+		return totalTravelTime;
+	}
+
+	@Override
+	public double getBackwardTransportTime(String fromId, String toId,
+			double arrivalTime, Driver driver, Vehicle vehicle) {
+		if (fromId.equals(toId)) {
+			return 0.0;
+		}
+		TDCosts.CostKey key = new CostKey(fromId, toId,
+				Math.round(arrivalTime), false);
+		if (travelTimes.containsKey(key)) {
+			return travelTimes.get(key);
+		}
+		double totalTravelTime = 0.0;
+		double distanceToTravel = crowFly.getTransportCost(fromId, toId,
+				arrivalTime, null, null);
+		log.debug("distance2Travel=" + distanceToTravel);
+		double currentTime = arrivalTime;
+		for (int i = timeBins.size() - 1; i >= 0; i--) {
+			log.debug("timeBinIndex= " + i);
+			double timeThreshold;
+			if (i > 0) {
+				timeThreshold = timeBins.get(i - 1);
+			} else {
+				timeThreshold = 0;
+			}
+			log.debug("threshold=" + timeThreshold);
+			log.debug("currentTime=" + currentTime);
+			if (currentTime > timeThreshold) {
+				double maxReachableDistance = (currentTime - timeThreshold)
+						* speed.get(i);
+				if (distanceToTravel > maxReachableDistance) {
+					distanceToTravel = distanceToTravel - maxReachableDistance;
+					totalTravelTime += (currentTime - timeThreshold);
+					currentTime = timeThreshold;
+					log.debug("dist>maxReachDist; distance2Travel="
+							+ distanceToTravel + " totTravelTime="
+							+ totalTravelTime);
+					continue;
+				} else { // <= maxReachableDistance
+					totalTravelTime += distanceToTravel / speed.get(i);
+					log.debug("dist<=maxReachDis; totTravelTime="
+							+ totalTravelTime);
+					break;
+				}
+			}
+		}
+		travelTimes.put(key, totalTravelTime);
+		return totalTravelTime;
+	}
+
+}

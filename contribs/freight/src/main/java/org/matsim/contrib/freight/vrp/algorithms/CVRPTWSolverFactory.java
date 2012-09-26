@@ -8,28 +8,29 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 
-public class CVRPTWSolverFactory implements VehicleRoutingProblemSolverFactory{
+public class CVRPTWSolverFactory implements VehicleRoutingProblemSolverFactory {
 
 	private int iterations;
-	
+
 	private int warmup;
-	
+
 	private boolean iterSet = false;
 
 	private Collection<RuinAndRecreateListener> listener;
-	
+
 	public CVRPTWSolverFactory() {
 		listener = Collections.EMPTY_LIST;
 	}
-	
+
 	public CVRPTWSolverFactory(int iterations, int warmupIteration) {
 		this.iterations = iterations;
 		this.warmup = warmupIteration;
 		iterSet = true;
 		listener = Collections.EMPTY_LIST;
 	}
-	
-	public CVRPTWSolverFactory(int iterations, int warmupIteration, Collection<RuinAndRecreateListener> listener) {
+
+	public CVRPTWSolverFactory(int iterations, int warmupIteration,
+			Collection<RuinAndRecreateListener> listener) {
 		this.iterations = iterations;
 		this.warmup = warmupIteration;
 		iterSet = true;
@@ -40,7 +41,7 @@ public class CVRPTWSolverFactory implements VehicleRoutingProblemSolverFactory{
 	public VehicleRoutingProblemSolver createSolver(VehicleRoutingProblem vrp) {
 		CVRPTWSolver solver = new CVRPTWSolver(vrp);
 		solver.setListener(listener);
-		if(iterSet){
+		if (iterSet) {
 			solver.setIterations(iterations);
 			solver.setWarmupIterations(warmup);
 		}

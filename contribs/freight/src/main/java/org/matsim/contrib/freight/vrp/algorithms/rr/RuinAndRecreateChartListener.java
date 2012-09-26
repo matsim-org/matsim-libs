@@ -20,32 +20,33 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.listener.AlgorithmEndsListen
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.IterationEndsListener;
 import org.matsim.core.utils.charts.XYLineChart;
 
-
 /**
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
-public class RuinAndRecreateChartListener implements IterationEndsListener, AlgorithmEndsListener {
-	
-	private static Logger log = Logger.getLogger(RuinAndRecreateChartListener.class);
-	
+public class RuinAndRecreateChartListener implements IterationEndsListener,
+		AlgorithmEndsListener {
+
+	private static Logger log = Logger
+			.getLogger(RuinAndRecreateChartListener.class);
+
 	private double[] bestResults;
-	
+
 	private double[] tentativeResults;
-	
+
 	private List<Double> bestResultList = new ArrayList<Double>();
-	
+
 	private List<Double> tentativeResultList = new ArrayList<Double>();
-	
+
 	private String filename;
-	
+
 	public RuinAndRecreateChartListener(String filename) {
 		super();
 		this.filename = filename;
 	}
-	
+
 	public RuinAndRecreateChartListener() {
 	}
 
@@ -54,8 +55,10 @@ public class RuinAndRecreateChartListener implements IterationEndsListener, Algo
 	}
 
 	@Override
-	public void informIterationEnds(int currentIteration, RuinAndRecreateSolution awardedSolution, RuinAndRecreateSolution rejectedSolution) {
-//		System.out.println()
+	public void informIterationEnds(int currentIteration,
+			RuinAndRecreateSolution awardedSolution,
+			RuinAndRecreateSolution rejectedSolution) {
+		// System.out.println()
 		bestResultList.add(awardedSolution.getResult());
 		tentativeResultList.add(rejectedSolution.getResult());
 	}
@@ -66,12 +69,12 @@ public class RuinAndRecreateChartListener implements IterationEndsListener, Algo
 		bestResults = new double[bestResultList.size()];
 		tentativeResults = new double[tentativeResultList.size()];
 		double[] mutation = new double[bestResultList.size()];
-		for(int i=0;i<bestResultList.size();i++){
+		for (int i = 0; i < bestResultList.size(); i++) {
 			bestResults[i] = bestResultList.get(i);
 			tentativeResults[i] = tentativeResultList.get(i);
-			mutation[i] = i+1;
+			mutation[i] = i + 1;
 		}
-		XYLineChart chart = new XYLineChart("Results","mutation","costs");
+		XYLineChart chart = new XYLineChart("Results", "mutation", "costs");
 		chart.addSeries("bestResults", mutation, bestResults);
 		chart.addSeries("tentativeResults", mutation, tentativeResults);
 		chart.saveAsPng(filename, 800, 600);

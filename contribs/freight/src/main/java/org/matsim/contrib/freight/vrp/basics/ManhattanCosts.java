@@ -12,49 +12,53 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
-
-
 /**
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public class ManhattanCosts implements VehicleRoutingCosts {
 
 	public double speed = 1;
-	
+
 	private Locations locations;
-		
+
 	public ManhattanCosts(Locations locations) {
 		super();
 		this.locations = locations;
 	}
 
 	@Override
-	public double getTransportCost(String fromId, String toId, double time, Driver driver, Vehicle vehicle) {
+	public double getTransportCost(String fromId, String toId, double time,
+			Driver driver, Vehicle vehicle) {
 		return calculateDistance(fromId, toId);
 	}
 
 	@Override
-	public double getTransportTime(String fromId, String toId, double time, Driver driver, Vehicle vehicle) {
-		double transportTime = calculateDistance(fromId, toId)/speed;
+	public double getTransportTime(String fromId, String toId, double time,
+			Driver driver, Vehicle vehicle) {
+		double transportTime = calculateDistance(fromId, toId) / speed;
 		return transportTime;
 	}
-	
-	private double calculateDistance(String fromId, String toId){
-		double distance = Math.abs(locations.getCoord(fromId).getX() - locations.getCoord(toId).getX()) + 
-			Math.abs(locations.getCoord(fromId).getY() - locations.getCoord(toId).getY());
+
+	private double calculateDistance(String fromId, String toId) {
+		double distance = Math.abs(locations.getCoord(fromId).getX()
+				- locations.getCoord(toId).getX())
+				+ Math.abs(locations.getCoord(fromId).getY()
+						- locations.getCoord(toId).getY());
 		return distance;
 	}
 
 	@Override
-	public double getBackwardTransportCost(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
+	public double getBackwardTransportCost(String fromId, String toId,
+			double arrivalTime, Driver driver, Vehicle vehicle) {
 		return getTransportCost(fromId, toId, arrivalTime, null, null);
 	}
 
 	@Override
-	public double getBackwardTransportTime(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
+	public double getBackwardTransportTime(String fromId, String toId,
+			double arrivalTime, Driver driver, Vehicle vehicle) {
 		return getTransportTime(fromId, toId, arrivalTime, null, null);
 	}
 

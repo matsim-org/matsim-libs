@@ -19,7 +19,7 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 import org.matsim.core.gbl.MatsimRandom;
 
-public class DTWSolverFactory implements MatsimVrpSolverFactory{
+public class DTWSolverFactory implements MatsimVrpSolverFactory {
 
 	private Random random = MatsimRandom.getRandom();
 
@@ -28,34 +28,46 @@ public class DTWSolverFactory implements MatsimVrpSolverFactory{
 	}
 
 	@Override
-	public MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
-		verifyDistributionProblem(shipments,carrierVehicles);
-		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemType.CVRPTW);
-		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(shipments, carrierVehicles, costs);
-		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
+	public MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments,
+			Collection<CarrierVehicle> carrierVehicles, Network network,
+			TourCost tourCost, VehicleRoutingCosts costs) {
+		verifyDistributionProblem(shipments, carrierVehicles);
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(
+				tourCost, costs).getFactory(VehicleRoutingProblemType.CVRPTW);
+		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(shipments,
+				carrierVehicles, costs);
+		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(
+				spFactory);
 		rrSolver.setVrpSolverFactory(ruinAndRecreateFactory);
 		return rrSolver;
 	}
 
-	private void verifyDistributionProblem(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> carrierVehicles) {
+	private void verifyDistributionProblem(
+			Collection<CarrierShipment> shipments,
+			Collection<CarrierVehicle> carrierVehicles) {
 		Id location = null;
-		for(CarrierVehicle v : carrierVehicles){
-			if(location == null){
+		for (CarrierVehicle v : carrierVehicles) {
+			if (location == null) {
 				location = v.getLocation();
-			}
-			else if(!location.toString().equals(v.getLocation().toString())){
-				throw new IllegalStateException("if you use this solver " + this.getClass().toString() + "), all vehicles must have the same depot-location. vehicle " + v.getVehicleId() + " has not.");
+			} else if (!location.toString().equals(v.getLocation().toString())) {
+				throw new IllegalStateException(
+						"if you use this solver "
+								+ this.getClass().toString()
+								+ "), all vehicles must have the same depot-location. vehicle "
+								+ v.getVehicleId() + " has not.");
 			}
 		}
-		for(CarrierShipment s : shipments){
-			if(location == null){
+		for (CarrierShipment s : shipments) {
+			if (location == null) {
 				return;
 			}
-			if(!s.getFrom().toString().equals(location.toString())){
-				throw new IllegalStateException("if you use this solver, all shipments must have the same from-location. errorShipment " + s);
+			if (!s.getFrom().toString().equals(location.toString())) {
+				throw new IllegalStateException(
+						"if you use this solver, all shipments must have the same from-location. errorShipment "
+								+ s);
 			}
 		}
-		
+
 	}
 
 }

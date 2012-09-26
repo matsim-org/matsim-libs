@@ -1,11 +1,11 @@
 package org.matsim.contrib.freight.vrp.basics;
 
-public class DriverImpl implements Driver{
-	
+public class DriverImpl implements Driver {
+
 	private String id;
-	
+
 	private double earliestStart = 0.0;
-	
+
 	private double latestEnd = Double.MAX_VALUE;
 
 	private String home;
@@ -14,7 +14,7 @@ public class DriverImpl implements Driver{
 		super();
 		this.id = id;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
@@ -36,13 +36,11 @@ public class DriverImpl implements Driver{
 	}
 
 	public void setHomeLocation(String locationId) {
-		this.home = locationId;	
+		this.home = locationId;
 	}
-	
-	public String getHomeLocation(){
+
+	public String getHomeLocation() {
 		return this.home;
 	}
-	
-	
 
 }

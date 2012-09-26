@@ -16,11 +16,12 @@ import org.matsim.contrib.freight.vrp.basics.TourPlan;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 
-
-public interface RuinAndRecreateFactory extends VehicleRoutingProblemSolverFactory{
+public interface RuinAndRecreateFactory extends
+		VehicleRoutingProblemSolverFactory {
 
 	public abstract RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp);
-	
-	public abstract RuinAndRecreate createAlgorithm(TourPlan initialSolution, VehicleRoutingProblem vrp);
-	
+
+	public abstract RuinAndRecreate createAlgorithm(TourPlan initialSolution,
+			VehicleRoutingProblem vrp);
+
 }

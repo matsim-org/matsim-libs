@@ -5,32 +5,29 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-
 public class CarrierImpl implements Carrier {
-	
-	private Id id;
-	
+
+	private final Id id;
+
+	private final Collection<CarrierPlan> plans = new ArrayList<CarrierPlan>();
+
+	private final Id depotLinkId;
+
+	private final Collection<CarrierShipment> shipments = new ArrayList<CarrierShipment>();
+
 	private CarrierPlan selectedPlan;
-	
-	private Collection<CarrierPlan> plans = new ArrayList<CarrierPlan>();
-	
-	private Id depotLinkId;
-	
-	private Collection<CarrierContract> contracts = new ArrayList<CarrierContract>();
 
 	private CarrierCapabilities carrierCapabilities;
 
-	private Collection<CarrierContract> expiredContracts = new ArrayList<CarrierContract>();
-
-	private Collection<CarrierContract> newContracts = new ArrayList<CarrierContract>();
-
-	public CarrierImpl(Id id, Id depotLinkId) {
+	public CarrierImpl(final Id id, final Id depotLinkId) {
 		super();
 		this.id = id;
 		this.depotLinkId = depotLinkId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see playground.mzilske.freight.Carrier#getId()
 	 */
 	@Override
@@ -38,7 +35,9 @@ public class CarrierImpl implements Carrier {
 		return id;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see playground.mzilske.freight.Carrier#getDepotLinkId()
 	 */
 	@Override
@@ -46,7 +45,9 @@ public class CarrierImpl implements Carrier {
 		return depotLinkId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see playground.mzilske.freight.Carrier#getPlans()
 	 */
 	@Override
@@ -54,15 +55,19 @@ public class CarrierImpl implements Carrier {
 		return plans;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see playground.mzilske.freight.Carrier#getContracts()
 	 */
 	@Override
-	public Collection<CarrierContract> getContracts() {
-		return contracts;
+	public Collection<CarrierShipment> getShipments() {
+		return shipments;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see playground.mzilske.freight.Carrier#getSelectedPlan()
 	 */
 	@Override
@@ -70,23 +75,33 @@ public class CarrierImpl implements Carrier {
 		return selectedPlan;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.mzilske.freight.Carrier#setSelectedPlan(playground.mzilske.freight.CarrierPlan)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * playground.mzilske.freight.Carrier#setSelectedPlan(playground.mzilske
+	 * .freight.CarrierPlan)
 	 */
 	@Override
 	public void setSelectedPlan(CarrierPlan selectedPlan) {
 		this.selectedPlan = selectedPlan;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.mzilske.freight.Carrier#setCarrierCapabilities(playground.mzilske.freight.CarrierCapabilities)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * playground.mzilske.freight.Carrier#setCarrierCapabilities(playground.
+	 * mzilske.freight.CarrierCapabilities)
 	 */
 	@Override
 	public void setCarrierCapabilities(CarrierCapabilities carrierCapabilities) {
 		this.carrierCapabilities = carrierCapabilities;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see playground.mzilske.freight.Carrier#getCarrierCapabilities()
 	 */
 	@Override
@@ -94,14 +109,14 @@ public class CarrierImpl implements Carrier {
 		return carrierCapabilities;
 	}
 
-	@Override
-	public Collection<CarrierContract> getNewContracts() {
-		return newContracts;
-	}
+	// @Override
+	// public Collection<CarrierContract> getNewContracts() {
+	// return newContracts;
+	// }
+	//
+	// @Override
+	// public Collection<CarrierContract> getExpiredContracts() {
+	// return expiredContracts;
+	// }
 
-	@Override
-	public Collection<CarrierContract> getExpiredContracts() {
-		return expiredContracts;
-	}
-	
 }

@@ -15,11 +15,11 @@ package org.matsim.contrib.freight.vrp.utils;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 
 public class EuclideanDistanceCalculator {
-	
-	public static double calculateDistance(Coordinate coord1, Coordinate coord2){
-		double xDiff = coord1.getX()-coord2.getX();
-		double yDiff = coord1.getY()-coord2.getY();
-		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
+
+	public static double calculateDistance(Coordinate coord1, Coordinate coord2) {
+		double xDiff = coord1.getX() - coord2.getX();
+		double yDiff = coord1.getY() - coord2.getY();
+		return Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
 	}
 
 }

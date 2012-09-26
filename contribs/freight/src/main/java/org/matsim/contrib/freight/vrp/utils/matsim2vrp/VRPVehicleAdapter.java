@@ -4,13 +4,13 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl.Type;
 
-
-public class VRPVehicleAdapter implements org.matsim.contrib.freight.vrp.basics.Vehicle{
+public class VRPVehicleAdapter implements
+		org.matsim.contrib.freight.vrp.basics.Vehicle {
 
 	private final CarrierVehicle carrierVehicle;
-	
+
 	private final Type type;
-	
+
 	public VRPVehicleAdapter(CarrierVehicle carrierVehicle) {
 		super();
 		this.carrierVehicle = carrierVehicle;
@@ -18,10 +18,16 @@ public class VRPVehicleAdapter implements org.matsim.contrib.freight.vrp.basics.
 	}
 
 	private final Type createType(CarrierVehicle carrierVehicle) {
-		Type type = VehicleImpl.getFactory().createType(carrierVehicle.getVehicleType().getId().toString(), carrierVehicle.getCapacity(), 
-				VehicleImpl.getFactory().createVehicleCostParams(carrierVehicle.getVehicleType().getVehicleCostParams().fix, 
-						carrierVehicle.getVehicleType().getVehicleCostParams().perTimeUnit, 
-						carrierVehicle.getVehicleType().getVehicleCostParams().perDistanceUnit));
+		Type type = VehicleImpl.getFactory().createType(
+				carrierVehicle.getVehicleType().getId().toString(),
+				carrierVehicle.getCapacity(),
+				VehicleImpl.getFactory().createVehicleCostParams(
+						carrierVehicle.getVehicleType()
+								.getVehicleCostInformation().fix,
+						carrierVehicle.getVehicleType()
+								.getVehicleCostInformation().perTimeUnit,
+						carrierVehicle.getVehicleType()
+								.getVehicleCostInformation().perDistanceUnit));
 		return type;
 	}
 

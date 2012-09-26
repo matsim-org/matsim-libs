@@ -15,33 +15,32 @@ package org.matsim.contrib.freight.vrp.algorithms.rr;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.AlgorithmEndsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 
-public class RuinAndRecreateReport implements AlgorithmEndsListener{
+public class RuinAndRecreateReport implements AlgorithmEndsListener {
 
-	
 	private double getTime(RuinAndRecreateSolution solution) {
 		double time = 0.0;
-		for(ServiceProviderAgent t : solution.getTourAgents()){
-			if(t.isActive()){
-				time+=t.getTour().tourData.transportTime;
+		for (ServiceProviderAgent t : solution.getTourAgents()) {
+			if (t.isActive()) {
+				time += t.getTour().tourData.transportTime;
 			}
 		}
 		return time;
 	}
 
-	private double getGenCosts(RuinAndRecreateSolution solution){
+	private double getGenCosts(RuinAndRecreateSolution solution) {
 		double dist = 0.0;
-		for(ServiceProviderAgent t : solution.getTourAgents()){
-			if(t.isActive()){
-				dist+=t.getTour().tourData.transportCosts;
+		for (ServiceProviderAgent t : solution.getTourAgents()) {
+			if (t.isActive()) {
+				dist += t.getTour().tourData.transportCosts;
 			}
 		}
 		return dist;
 	}
-	
+
 	private int getActiveTours(RuinAndRecreateSolution solution) {
 		int nOfTours = 0;
-		for(ServiceProviderAgent t : solution.getTourAgents()){
-			if(t.isActive()){
+		for (ServiceProviderAgent t : solution.getTourAgents()) {
+			if (t.isActive()) {
 				nOfTours++;
 			}
 		}
@@ -54,12 +53,11 @@ public class RuinAndRecreateReport implements AlgorithmEndsListener{
 
 	@Override
 	public void informAlgorithmEnds(RuinAndRecreateSolution currentSolution) {
-		System.out.println("totalCosts="+round(currentSolution.getResult()));
-		System.out.println("#vehicles="+getActiveTours(currentSolution));
-		System.out.println("transportCosts="+round(getGenCosts(currentSolution)));
+		System.out.println("totalCosts=" + round(currentSolution.getResult()));
+		System.out.println("#vehicles=" + getActiveTours(currentSolution));
+		System.out.println("transportCosts="
+				+ round(getGenCosts(currentSolution)));
 		System.out.println("transportTime=" + round(getTime(currentSolution)));
 	}
-	
-	
 
 }

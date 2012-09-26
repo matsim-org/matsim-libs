@@ -43,182 +43,200 @@ import org.matsim.contrib.freight.vrp.utils.VrpUtils;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
- * test case: example is take from: http://web.mit.edu/urban_or_book/www/book/chapter6/6.4.12.html
+ * test case: example is take from:
+ * http://web.mit.edu/urban_or_book/www/book/chapter6/6.4.12.html
+ * 
  * @author stefan schröder
- *
+ * 
  */
 
-public class RuinAndRecreateTest extends TestCase{
-	
+public class RuinAndRecreateTest extends TestCase {
+
 	VehicleRoutingProblem vrp;
-	
+
 	RuinAndRecreate algo;
-	
+
 	List<List<Integer>> distanceMatrix;
-	
+
 	List<Integer> demand;
-	
+
 	VehicleRoutingCosts costs;
-	
+
 	VrpBuilder vrpBuilder;
-	
+
 	ServiceProviderAgentFactory spFactory;
-	
-	public void setUp(){
+
+	@Override
+	public void setUp() {
 		Logger.getRootLogger().setLevel(Level.INFO);
 		/*
-		 * example is take from: 
-		 * 
+		 * example is take from:
 		 */
-		List<Integer> row1 = Arrays.asList(0,0,0,0,0,0,0,0,0,0);
-		List<Integer> row2 = Arrays.asList(25,0,0,0,0,0,0,0,0,0);
-		List<Integer> row3 = Arrays.asList(43,29,0,48,14,8,0,3,2,23);
-		List<Integer> row4 = Arrays.asList(57,34,52,0,55,47,15,3,6,20);
-		List<Integer> row5 = Arrays.asList(43,43,72,45,0,77,36,19,26,49);
-		List<Integer> row6 = Arrays.asList(61,68,96,71,27,0,50,36,47,86);
-		List<Integer> row7 = Arrays.asList(29,49,72,71,36,40,0,39,46,57);
-		List<Integer> row8 = Arrays.asList(41,66,81,95,65,66,31,0,78,66);
-		List<Integer> row9 = Arrays.asList(48,72,89,99,65,62,31,11,0,83);
-		List<Integer> row10 = Arrays.asList(71,91,114,108,65,46,43,46,36,0);
-		distanceMatrix = Arrays.asList(row1,row2,row3,row4,row5,row6,row7,row8,row9,row10);
-		
-		demand = Arrays.asList(0,4,6,5,4,7,3,5,4,4);
-		
+		List<Integer> row1 = Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		List<Integer> row2 = Arrays.asList(25, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		List<Integer> row3 = Arrays.asList(43, 29, 0, 48, 14, 8, 0, 3, 2, 23);
+		List<Integer> row4 = Arrays.asList(57, 34, 52, 0, 55, 47, 15, 3, 6, 20);
+		List<Integer> row5 = Arrays.asList(43, 43, 72, 45, 0, 77, 36, 19, 26,
+				49);
+		List<Integer> row6 = Arrays.asList(61, 68, 96, 71, 27, 0, 50, 36, 47,
+				86);
+		List<Integer> row7 = Arrays.asList(29, 49, 72, 71, 36, 40, 0, 39, 46,
+				57);
+		List<Integer> row8 = Arrays.asList(41, 66, 81, 95, 65, 66, 31, 0, 78,
+				66);
+		List<Integer> row9 = Arrays.asList(48, 72, 89, 99, 65, 62, 31, 11, 0,
+				83);
+		List<Integer> row10 = Arrays.asList(71, 91, 114, 108, 65, 46, 43, 46,
+				36, 0);
+		distanceMatrix = Arrays.asList(row1, row2, row3, row4, row5, row6,
+				row7, row8, row9, row10);
+
+		demand = Arrays.asList(0, 4, 6, 5, 4, 7, 3, 5, 4, 4);
+
 		costs = new VehicleRoutingCosts() {
-			
+
 			@Override
-			public double getTransportTime(String fromId, String toId, double time, Driver driver, Vehicle vehicle) {
+			public double getTransportTime(String fromId, String toId,
+					double time, Driver driver, Vehicle vehicle) {
 				int fromInt = 0;
-				try{
+				try {
 					fromInt = Integer.parseInt(fromId);
-				}
-				catch(NumberFormatException e){
+				} catch (NumberFormatException e) {
 					System.out.println("foo");
 				}
 				int toInt = Integer.parseInt(toId);
-				if(fromInt >= toInt){
+				if (fromInt >= toInt) {
 					return distanceMatrix.get(fromInt).get(toInt).doubleValue();
-				}
-				else{
+				} else {
 					return distanceMatrix.get(toInt).get(fromInt).doubleValue();
 				}
 			}
-				
+
 			@Override
-			public double getTransportCost(String fromId, String toId, double time, Driver driver, Vehicle vehicle) {
-				return getTransportTime(fromId,toId, 0.0, null, null);
+			public double getTransportCost(String fromId, String toId,
+					double time, Driver driver, Vehicle vehicle) {
+				return getTransportTime(fromId, toId, 0.0, null, null);
 			}
 
 			@Override
-			public double getBackwardTransportCost(String fromId,String toId, double arrivalTime, Driver driver, Vehicle vehicle) {
+			public double getBackwardTransportCost(String fromId, String toId,
+					double arrivalTime, Driver driver, Vehicle vehicle) {
 				return getTransportCost(fromId, toId, arrivalTime, null, null);
 			}
 
 			@Override
-			public double getBackwardTransportTime(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
+			public double getBackwardTransportTime(String fromId, String toId,
+					double arrivalTime, Driver driver, Vehicle vehicle) {
 				return getTransportTime(fromId, toId, arrivalTime, null, null);
 			}
 
-
-
 		};
 		vrpBuilder = new VrpBuilder(costs);
-//		vrpBuilder.setDepot("0", 0.0, 0.0);
-		for(Integer i=1;i<demand.size();i++){
-			vrpBuilder.addJob(VrpUtils.createShipment(i.toString(), "0", i.toString(), demand.get(i), 
-					VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
+		// vrpBuilder.setDepot("0", 0.0, 0.0);
+		for (Integer i = 1; i < demand.size(); i++) {
+			vrpBuilder.addJob(VrpUtils.createShipment(i.toString(), "0",
+					i.toString(), demand.get(i),
+					VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE),
+					VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
 		}
-		
-		TourCost tourCost = new TourCost(){
+
+		TourCost tourCost = new TourCost() {
 
 			@Override
-			public double getTourCost(TourImpl tour, Driver driver, Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver,
+					Vehicle vehicle) {
 				return tour.tourData.transportCosts;
 			}
-			
+
 		};
-		
-		spFactory = new ServiceProviderAgentFactoryFinder(tourCost,costs).getFactory(VehicleRoutingProblemType.CVRP);
-		
-//		RuinAndRecreateConfig.RadialRuinConfig.jobDistance = RuinAndRecreateConfig.RadialRuinConfig.VRPCOST;
-		
+
+		spFactory = new ServiceProviderAgentFactoryFinder(tourCost, costs)
+				.getFactory(VehicleRoutingProblemType.CVRP);
+
+		// RuinAndRecreateConfig.RadialRuinConfig.jobDistance =
+		// RuinAndRecreateConfig.RadialRuinConfig.VRPCOST;
+
 		RandomNumberGeneration.reset();
 	}
-	
-	public void testSizeOfSolution(){
+
+	public void testSizeOfSolution() {
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23, "standard"));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory).createAlgorithm(vrp);
+		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
+				.createAlgorithm(vrp);
 		algo.run();
 		int active = getActiveVehicles(getTours(algo.getSolution()));
-		assertEquals(2,active);
- 	}
-	
+		assertEquals(2, active);
+	}
+
 	private Id makeId(String string) {
 		return new IdImpl(string);
 	}
 
 	private Collection<TourImpl> getTours(RuinAndRecreateSolution solution) {
 		List<TourImpl> tours = new ArrayList<TourImpl>();
-		for(ServiceProviderAgent a : solution.getTourAgents()){
+		for (ServiceProviderAgent a : solution.getTourAgents()) {
 			tours.add(a.getTour());
 		}
- 		return tours;
+		return tours;
 	}
 
-	public void testSolutionValue(){
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 23, "standard"));
+	public void testSolutionValue() {
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23, "standard"));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory).createAlgorithm(vrp);
+		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
+				.createAlgorithm(vrp);
 		algo.run();
-		
+
 		Collection<TourImpl> solution = getTours(algo.getSolution());
 		int solVal = 0;
-		for(TourImpl t : solution){
+		for (TourImpl t : solution) {
 			solVal += t.tourData.transportCosts;
 		}
-		assertEquals(397,solVal);
- 	}
-	
-	public void testSolutionSizeWithCapacity16(){
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 16, "standard"));
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("2","0", 16, "standard"));
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("3","0", 16, "standard"));
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("4","0", 16, "standard"));
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("5","0", 16, "standard"));
-		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory).createAlgorithm(vrp);
-		algo.run();
-		int active = getActiveVehicles(getTours(algo.getSolution()));
-		assertEquals(3,active);
+		assertEquals(397, solVal);
 	}
-	
-	public void testSolutionValueWithCapacity16(){
-		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 16, "standard"));
+
+	public void testSolutionSizeWithCapacity16() {
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("4", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("5", "0", 16, "standard"));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory).createAlgorithm(vrp);
+		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
+				.createAlgorithm(vrp);
 		algo.run();
-		
+		int active = getActiveVehicles(getTours(algo.getSolution()));
+		assertEquals(3, active);
+	}
+
+	public void testSolutionValueWithCapacity16() {
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 16, "standard"));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16, "standard"));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 16, "standard"));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("4", "0", 16, "standard"));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("5", "0", 16, "standard"));
+		VehicleRoutingProblem vrp = vrpBuilder.build();
+		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
+				.createAlgorithm(vrp);
+		algo.run();
+
 		Collection<TourImpl> solution = getTours(algo.getSolution());
 		int solVal = 0;
-		for(TourImpl t : solution){
+		for (TourImpl t : solution) {
 			solVal += t.tourData.transportCosts;
 		}
-		assertEquals(solVal,445);
+		assertEquals(solVal, 445);
 	}
 
 	private int getActiveVehicles(Collection<TourImpl> solution) {
 		int active = 0;
-		for(TourImpl t : solution){
-			if(t.getActivities().size()>2){
+		for (TourImpl t : solution) {
+			if (t.getActivities().size() > 2) {
 				active++;
 			}
 		}

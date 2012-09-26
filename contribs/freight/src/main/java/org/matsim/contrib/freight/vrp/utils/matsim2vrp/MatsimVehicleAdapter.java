@@ -5,10 +5,10 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-public class MatsimVehicleAdapter implements Vehicle{
+public class MatsimVehicleAdapter implements Vehicle {
 
 	private CarrierVehicle carrierVehicle;
-	
+
 	public MatsimVehicleAdapter(VRPVehicleAdapter vrpVehicleAdapter) {
 		super();
 		this.carrierVehicle = vrpVehicleAdapter.getCarrierVehicle();
@@ -31,7 +31,5 @@ public class MatsimVehicleAdapter implements Vehicle{
 	public CarrierVehicle getCarrierVehicle() {
 		return carrierVehicle;
 	}
-	
-	
 
 }

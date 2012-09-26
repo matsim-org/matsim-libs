@@ -19,23 +19,21 @@ import java.util.Random;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 import org.matsim.core.utils.collections.Tuple;
 
-
-
 /**
  * Manages ruin algorithms.
  * 
  * @author stefan schroeder
- *
+ * 
  */
 
 public class RuinStrategyManager {
-	
+
 	private List<RuinStrategy> strategies = new ArrayList<RuinStrategy>();
-	
+
 	private List<Double> weights = new ArrayList<Double>();
-	
+
 	private Random random = RandomNumberGeneration.getRandom();
-	
+
 	public void setRandom(Random random) {
 		this.random = random;
 	}
@@ -50,27 +48,28 @@ public class RuinStrategyManager {
 	 * @param strat
 	 * @param weight
 	 */
-	public void addStrategy(RuinStrategy strat, Double weight){
+	public void addStrategy(RuinStrategy strat, Double weight) {
 		strategies.add(strat);
 		weights.add(weight);
 	}
-	
-	public RuinStrategy getRandomStrategy(){
+
+	public RuinStrategy getRandomStrategy() {
 		double randomFig = random.nextDouble();
 		double sumWeight = 0.0;
-		for(int i=0;i<weights.size();i++){
+		for (int i = 0; i < weights.size(); i++) {
 			sumWeight += weights.get(i);
-			if(randomFig < sumWeight){
+			if (randomFig < sumWeight) {
 				return strategies.get(i);
 			}
 		}
 		throw new IllegalStateException("no ruin-strategy found");
 	}
 
-	public List<Tuple<RuinStrategy,Double>> getStrategies() {
-		List<Tuple<RuinStrategy,Double>> l = new ArrayList<Tuple<RuinStrategy,Double>>();
-		for(int i=0;i<strategies.size();i++){
-			l.add(new Tuple<RuinStrategy,Double>(strategies.get(i),weights.get(i)));
+	public List<Tuple<RuinStrategy, Double>> getStrategies() {
+		List<Tuple<RuinStrategy, Double>> l = new ArrayList<Tuple<RuinStrategy, Double>>();
+		for (int i = 0; i < strategies.size(); i++) {
+			l.add(new Tuple<RuinStrategy, Double>(strategies.get(i), weights
+					.get(i)));
 		}
 		return l;
 	}

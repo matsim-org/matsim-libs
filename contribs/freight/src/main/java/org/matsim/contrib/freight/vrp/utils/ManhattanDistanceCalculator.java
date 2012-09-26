@@ -15,9 +15,10 @@ package org.matsim.contrib.freight.vrp.utils;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 
 public class ManhattanDistanceCalculator {
-	
-	public static double calculateDistance(Coordinate coord1, Coordinate coord2){
-		double distance = Math.abs(coord1.getX() - coord2.getX()) + Math.abs(coord1.getY() - coord2.getY());
+
+	public static double calculateDistance(Coordinate coord1, Coordinate coord2) {
+		double distance = Math.abs(coord1.getX() - coord2.getX())
+				+ Math.abs(coord1.getY() - coord2.getY());
 		return distance;
 	}
 

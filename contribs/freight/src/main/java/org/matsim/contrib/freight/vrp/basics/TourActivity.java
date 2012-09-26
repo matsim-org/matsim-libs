@@ -12,9 +12,8 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
-
 public interface TourActivity {
-	
+
 	public abstract String getLocationId();
 
 	public abstract void setEarliestOperationStartTime(double early);
@@ -24,20 +23,20 @@ public interface TourActivity {
 	public abstract double getLatestOperationStartTime();
 
 	public abstract void setLatestOperationStartTime(double late);
-	
+
 	public double getOperationTime();
-	
+
 	public TourActivity duplicate();
-	
+
 	@Deprecated
 	public abstract int getCurrentLoad();
-	
+
 	@Deprecated
 	public abstract void setCurrentLoad(int load);
-	
+
 	@Deprecated
 	public abstract double getCurrentCost();
-	
+
 	@Deprecated
 	public abstract void setCurrentCost(double cost);
 

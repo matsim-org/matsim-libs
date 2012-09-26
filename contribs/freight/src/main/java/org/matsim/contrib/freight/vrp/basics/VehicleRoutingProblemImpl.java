@@ -18,17 +18,19 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-public class VehicleRoutingProblemImpl implements VehicleRoutingProblem{
+public class VehicleRoutingProblemImpl implements VehicleRoutingProblem {
 
-	private static Logger logger = Logger.getLogger(VehicleRoutingProblemImpl.class);
-	
+	private static Logger logger = Logger
+			.getLogger(VehicleRoutingProblemImpl.class);
+
 	private VehicleRoutingCosts costs;
-	
-	private Map<String,Job> jobs;
-	
+
+	private Map<String, Job> jobs;
+
 	private Collection<Vehicle> vehicles;
 
-	public VehicleRoutingProblemImpl(Collection<? extends Job> jobs, Collection<Vehicle> vehicles, VehicleRoutingCosts costs) {
+	public VehicleRoutingProblemImpl(Collection<? extends Job> jobs,
+			Collection<Vehicle> vehicles, VehicleRoutingCosts costs) {
 		this.jobs = new HashMap<String, Job>();
 		mapJobs(jobs);
 		this.vehicles = vehicles;
@@ -36,15 +38,17 @@ public class VehicleRoutingProblemImpl implements VehicleRoutingProblem{
 	}
 
 	private void mapJobs(Collection<? extends Job> jobs) {
-		for(Job j : jobs){
+		for (Job j : jobs) {
 			this.jobs.put(j.getId(), j);
 		}
 	}
 
+	@Override
 	public Map<String, Job> getJobs() {
 		return jobs;
 	}
 
+	@Override
 	public Collection<Vehicle> getVehicles() {
 		return vehicles;
 	}

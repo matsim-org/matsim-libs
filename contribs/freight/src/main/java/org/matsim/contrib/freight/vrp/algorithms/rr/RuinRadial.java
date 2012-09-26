@@ -28,19 +28,19 @@ import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
-public final class RuinRadial implements RuinStrategy{
-	
+public final class RuinRadial implements RuinStrategy {
+
 	static class ReferencedJob {
 		private Job job;
 		private double distance;
-		
+
 		public ReferencedJob(Job job, double distance) {
 			super();
 			this.job = job;
 			this.distance = distance;
 		}
 
-		public Job getJob(){
+		public Job getJob() {
 			return job;
 		}
 
@@ -49,21 +49,20 @@ public final class RuinRadial implements RuinStrategy{
 		}
 	}
 
-	
 	private Logger logger = Logger.getLogger(RuinRadial.class);
-	
+
 	private VehicleRoutingProblem vrp;
-	
+
 	private double fractionOfAllNodes2beRuined;
-	
-	private Map<String,TreeSet<ReferencedJob>> distanceNodeTree = new HashMap<String,TreeSet<ReferencedJob>>();
-	
+
+	private Map<String, TreeSet<ReferencedJob>> distanceNodeTree = new HashMap<String, TreeSet<ReferencedJob>>();
+
 	private List<Job> unassignedJobs = new ArrayList<Job>();
-	
+
 	private Random random = RandomNumberGeneration.getRandom();
 
 	private JobDistance jobDistance;
-	
+
 	public void setRandom(Random random) {
 		this.random = random;
 	}
@@ -72,7 +71,8 @@ public final class RuinRadial implements RuinStrategy{
 		super();
 		this.vrp = vrp;
 		this.jobDistance = jobDistance;
-		logger.info("intialise radial ruin with jobDistance " + jobDistance.getClass().toString());
+		logger.info("intialise radial ruin with jobDistance "
+				+ jobDistance.getClass().toString());
 		calculateDistancesFromJob2Job();
 		logger.info("done");
 	}
@@ -81,55 +81,54 @@ public final class RuinRadial implements RuinStrategy{
 		this.fractionOfAllNodes2beRuined = fractionOfAllNodes;
 	}
 
-	
 	private void calculateDistancesFromJob2Job() {
-		for(Job i : vrp.getJobs().values()){
-			TreeSet<ReferencedJob> treeSet = new TreeSet<ReferencedJob>(new Comparator<ReferencedJob>() {
-				@Override
-				public int compare(ReferencedJob o1, ReferencedJob o2) {
-					if(o1.getDistance() <= o2.getDistance()){
-						return 1;
-					}
-					else{
-						return -1;
-					}
-				}
-			});
+		for (Job i : vrp.getJobs().values()) {
+			TreeSet<ReferencedJob> treeSet = new TreeSet<ReferencedJob>(
+					new Comparator<ReferencedJob>() {
+						@Override
+						public int compare(ReferencedJob o1, ReferencedJob o2) {
+							if (o1.getDistance() <= o2.getDistance()) {
+								return 1;
+							} else {
+								return -1;
+							}
+						}
+					});
 			distanceNodeTree.put(i.getId(), treeSet);
-			for(Job j : vrp.getJobs().values()){
-				double distance = jobDistance.calculateDistance(i,j);
+			for (Job j : vrp.getJobs().values()) {
+				double distance = jobDistance.calculateDistance(i, j);
 				ReferencedJob refNode = new ReferencedJob(j, distance);
 				treeSet.add(refNode);
 			}
 		}
 	}
 
-
 	@Override
-	public Collection<Job> ruin(Collection<? extends ServiceProviderAgent> serviceProviders) {
+	public Collection<Job> ruin(
+			Collection<? extends ServiceProviderAgent> serviceProviders) {
 		clear();
 		int nOfJobs2BeRemoved = getNuOfJobs2BeRemoved();
-		if(nOfJobs2BeRemoved == 0){
+		if (nOfJobs2BeRemoved == 0) {
 			return unassignedJobs;
 		}
 		Job randomJob = pickRandomJob();
 		TreeSet<ReferencedJob> tree = distanceNodeTree.get(randomJob.getId());
 		Iterator<ReferencedJob> descendingIterator = tree.descendingIterator();
 		int counter = 0;
-		while(descendingIterator.hasNext() && counter<nOfJobs2BeRemoved){
+		while (descendingIterator.hasNext() && counter < nOfJobs2BeRemoved) {
 			ReferencedJob refJob = descendingIterator.next();
 			Job job = refJob.getJob();
 			unassignedJobs.add(job);
-			agentsRemove(serviceProviders,job);
+			agentsRemove(serviceProviders, job);
 			counter++;
 		}
 		return unassignedJobs;
 	}
-	
 
-	private void agentsRemove(Collection<? extends ServiceProviderAgent> agents, Job job) {
-		for(ServiceProviderAgent sp : agents){
-			if(sp.removeJob(job)){
+	private void agentsRemove(
+			Collection<? extends ServiceProviderAgent> agents, Job job) {
+		for (ServiceProviderAgent sp : agents) {
+			if (sp.removeJob(job)) {
 				return;
 			}
 		}
@@ -146,8 +145,9 @@ public final class RuinRadial implements RuinStrategy{
 		unassignedJobs.clear();
 	}
 
-	private int getNuOfJobs2BeRemoved(){
-		return (int)Math.ceil(vrp.getJobs().values().size()*fractionOfAllNodes2beRuined);
+	private int getNuOfJobs2BeRemoved() {
+		return (int) Math.ceil(vrp.getJobs().values().size()
+				* fractionOfAllNodes2beRuined);
 	}
-	
+
 }

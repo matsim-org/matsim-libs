@@ -4,29 +4,21 @@ import org.matsim.api.core.v01.Id;
 
 public class CarrierVehicle {
 
-	private CarrierVehicleType vehicleType;
-	
-	private Id vehicleId;
-	
-	private Id location;
-	
-	private int capacity;
-	
-	private boolean active = true;
-	
-	public boolean isActive() {
-		return active;
-	}
+	private final Id location;
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+	private final Id vehicleId;
+
+	private CarrierVehicleType vehicleType;
+
+	private int capacity;
+
+	private boolean active = true;
 
 	private double earliestStartTime;
-	
+
 	private double latestEndTime;
 
-	public CarrierVehicle(Id vehicleId, Id location) {
+	public CarrierVehicle(final Id vehicleId, final Id location) {
 		this.vehicleId = vehicleId;
 		this.location = location;
 	}
@@ -38,11 +30,15 @@ public class CarrierVehicle {
 	public Id getVehicleId() {
 		return vehicleId;
 	}
-	
+
 	public int getCapacity() {
 		return capacity;
 	}
-	
+
+	public boolean isActive() {
+		return active;
+	}
+
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
@@ -55,7 +51,11 @@ public class CarrierVehicle {
 	public void setLatestEndTime(double endTime) {
 		this.latestEndTime = endTime;
 	}
-	
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 	public CarrierVehicleType getVehicleType() {
 		return vehicleType;
 	}
@@ -64,7 +64,7 @@ public class CarrierVehicle {
 		this.vehicleType = vehicleType;
 	}
 
-	public void setEarliestStartTime(double startTime){
+	public void setEarliestStartTime(double startTime) {
 		this.earliestStartTime = startTime;
 	}
 
@@ -75,12 +75,9 @@ public class CarrierVehicle {
 	public double getLatestEndTime() {
 		return latestEndTime;
 	}
-	
-	public Id getVehicleTypeId(){
+
+	public Id getVehicleTypeId() {
 		return vehicleType.getId();
 	}
-	
 
-	
-	
 }

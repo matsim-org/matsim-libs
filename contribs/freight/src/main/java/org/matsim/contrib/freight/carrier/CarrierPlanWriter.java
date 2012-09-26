@@ -16,40 +16,38 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
-
-public class CarrierPlanWriter extends MatsimXmlWriter{
+public class CarrierPlanWriter extends MatsimXmlWriter {
 
 	private static Logger logger = Logger.getLogger(CarrierPlanWriter.class);
 
 	private Collection<Carrier> carriers;
-	
+
 	private int idCounter = 0;
-	
-	private Map<CarrierShipment,Id> registeredShipments = new HashMap<CarrierShipment, Id>();
+
+	private Map<CarrierShipment, Id> registeredShipments = new HashMap<CarrierShipment, Id>();
 
 	public CarrierPlanWriter(Collection<Carrier> carriers) {
 		super();
 		this.carriers = carriers;
 	}
-	
+
 	public void write(String filename) {
 		logger.info("write carrier plans");
-		try{
+		try {
 			openFile(filename);
 			writeXmlHead();
 			startCarriers(this.writer);
-			for(Carrier carrier : carriers){
-				startCarrier(carrier,this.writer);
-				writeVehicles(carrier,this.writer);
-				writeContracts(carrier,this.writer);
-				writeScheduledTours(carrier,this.writer);
+			for (Carrier carrier : carriers) {
+				startCarrier(carrier, this.writer);
+				writeVehicles(carrier, this.writer);
+				writeShipments(carrier, this.writer);
+				writePlans(carrier, this.writer);
 				endCarrier(this.writer);
 			}
 			endCarriers(this.writer);
 			close();
 			logger.info("done");
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
 			System.exit(1);
@@ -60,23 +58,33 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		writer.write("\t<carriers>\n");
 	}
 
-	private void startCarrier(Carrier carrier, BufferedWriter writer) throws IOException {
-		writer.write("\t\t<carrier id=\"" + carrier.getId() + "\" linkId=\"" + carrier.getDepotLinkId() + "\">\n");
+	private void startCarrier(Carrier carrier, BufferedWriter writer)
+			throws IOException {
+		writer.write("\t\t<carrier id=\"" + carrier.getId() + "\" linkId=\""
+				+ carrier.getDepotLinkId() + "\">\n");
 	}
 
-	private void writeVehicles(Carrier carrier, BufferedWriter writer) throws IOException {
+	private void writeVehicles(Carrier carrier, BufferedWriter writer)
+			throws IOException {
 		writer.write("\t\t\t<vehicles>\n");
-		for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
-			writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId() + "\" linkId=\"" + v.getLocation() + "\"" +
-			" cap=\"" + v.getCapacity() + "\" typeId=\"" + v.getVehicleType().getId().toString() + "\" earliestStart=\"" + getTime(v.getEarliestStartTime()) + "\" latestEnd=\"" + getTime(v.getLatestEndTime()) + "\"/>\n");
+		for (CarrierVehicle v : carrier.getCarrierCapabilities()
+				.getCarrierVehicles()) {
+			writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId()
+					+ "\" linkId=\"" + v.getLocation() + "\"" + " cap=\""
+					+ v.getCapacity() + "\" typeId=\""
+					+ v.getVehicleType().getId().toString()
+					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
+					+ "\" latestEnd=\"" + getTime(v.getLatestEndTime())
+					+ "\"/>\n");
 		}
-		writer.write("\t\t\t</vehicles>\n");
+		writer.write("\t\t\t</vehicles>\n\n");
 	}
 
-	private void writeContracts(Carrier carrier, BufferedWriter writer) throws IOException {
+	private void writeShipments(Carrier carrier, BufferedWriter writer)
+			throws IOException {
 		writer.write("\t\t\t<shipments>\n");
-		for(CarrierContract contract : carrier.getContracts()){
-			CarrierShipment s = contract.getShipment();
+		for (CarrierShipment s : carrier.getShipments()) {
+			// CarrierShipment s = contract.getShipment();
 			Id shipmentId = createId();
 			registeredShipments.put(s, shipmentId);
 			writer.write("\t\t\t\t<shipment ");
@@ -84,71 +92,108 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 			writer.write("from=\"" + s.getFrom() + "\" ");
 			writer.write("to=\"" + s.getTo() + "\" ");
 			writer.write("size=\"" + s.getSize() + "\" ");
-			writer.write("startPickup=\"" + getTime(s.getPickupTimeWindow().getStart()) + "\" ");
-			writer.write("endPickup=\""  + getTime(s.getPickupTimeWindow().getEnd()) + "\" ");
-			writer.write("startDelivery=\"" + getTime(s.getDeliveryTimeWindow().getStart()) + "\" ");
-			writer.write("endDelivery=\"" + getTime(s.getDeliveryTimeWindow().getEnd())  + "\" ");
-			writer.write("pickupServiceTime=\"" + getTime(s.getPickupServiceTime())  + "\" ");
-			writer.write("deliveryServiceTime=\"" + getTime(s.getDeliveryServiceTime())  + "\"/>\n");		
+			writer.write("startPickup=\""
+					+ getTime(s.getPickupTimeWindow().getStart()) + "\" ");
+			writer.write("endPickup=\""
+					+ getTime(s.getPickupTimeWindow().getEnd()) + "\" ");
+			writer.write("startDelivery=\""
+					+ getTime(s.getDeliveryTimeWindow().getStart()) + "\" ");
+			writer.write("endDelivery=\""
+					+ getTime(s.getDeliveryTimeWindow().getEnd()) + "\" ");
+			writer.write("pickupServiceTime=\""
+					+ getTime(s.getPickupServiceTime()) + "\" ");
+			writer.write("deliveryServiceTime=\""
+					+ getTime(s.getDeliveryServiceTime()) + "\"/>\n");
 		}
-		writer.write("\t\t\t</shipments>\n");
+		writer.write("\t\t\t</shipments>\n\n");
 	}
 
 	private String getTime(double time) {
 		return Time.writeTime(time);
 	}
 
-	private void writeScheduledTours(Carrier carrier, BufferedWriter writer) throws IOException {
-		if(carrier.getSelectedPlan() == null){
+	private void writePlans(Carrier carrier, BufferedWriter writer)
+			throws IOException {
+		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
-		writer.write("\t\t\t<tours>\n");
-		for(ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()){
-			writer.write("\t\t\t\t<tour ");
-			writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId() + "\">\n");
-			writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START + "\" end_time=\"" + Time.writeTime(tour.getDeparture()) + "\"/>\n");
-			for(TourElement tourElement : tour.getTour().getTourElements()){
-				if(tourElement instanceof Leg){
-					Leg leg = (Leg) tourElement;
-					writer.write("\t\t\t\t\t<leg dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\" transp_time=\"" + Time.writeTime(leg.getExpectedTransportTime()) + "\">");
-					if(leg.getRoute() != null){
-						writer.write("\n");
-						writer.write("\t\t\t\t\t\t<route>");
-						boolean firstLink = true;
-						for(Id id : ((NetworkRoute)leg.getRoute()).getLinkIds()){
-							if(firstLink){
-								writer.write(id.toString());
-								firstLink = false;
-							}
-							else{
-								writer.write(" " + id.toString());
-							}
-						}
-						writer.write("</route>\n");
-						writer.write("\t\t\t\t\t</leg>\n");
-					}
-					else{
-						writer.write("</leg>\n");
-					}
-				}
-				if(tourElement instanceof ShipmentBasedActivity){
-					ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
-					writer.write("\t\t\t\t\t<act ");
-					writer.write("type=\"" + act.getActivityType() + "\" ");
-					writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\" ");
-					writer.write("end_time=\"" + Time.writeTime(act.getExpectedActEnd()) + "\"");
-					writer.write("/>\n");
-				}
-				
+		
+		for(CarrierPlan plan : carrier.getPlans()){
+			writer.write("\t\t\t<plan");
+			if(plan.getScore() != null){
+				writer.write(" score=\"" + plan.getScore().toString() + "\"");
 			}
-			writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.END + "\"/>\n");
-			writer.write("\t\t\t\t</tour>\n");
+			if(carrier.getSelectedPlan() != null){
+				if(plan == carrier.getSelectedPlan()){
+					writer.write(" selected=\"true\"");
+				}
+				else{
+					writer.write(" selected=\"false\"");
+				}
+			}
+			else{
+				writer.write(" selected=\"false\"");
+			}
+			writer.write(">\n");
+					
+			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
+				writer.write("\t\t\t\t<tour ");
+				writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId()
+						+ "\">\n");
+				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START
+						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())
+						+ "\"/>\n");
+				for (TourElement tourElement : tour.getTour().getTourElements()) {
+					if (tourElement instanceof Leg) {
+						Leg leg = (Leg) tourElement;
+						writer.write("\t\t\t\t\t<leg dep_time=\""
+								+ Time.writeTime(leg.getDepartureTime())
+								+ "\" transp_time=\""
+								+ Time.writeTime(leg.getExpectedTransportTime())
+								+ "\">");
+						if (leg.getRoute() != null) {
+							writer.write("\n");
+							writer.write("\t\t\t\t\t\t<route>");
+							boolean firstLink = true;
+							for (Id id : ((NetworkRoute) leg.getRoute())
+									.getLinkIds()) {
+								if (firstLink) {
+									writer.write(id.toString());
+									firstLink = false;
+								} else {
+									writer.write(" " + id.toString());
+								}
+							}
+							writer.write("</route>\n");
+							writer.write("\t\t\t\t\t</leg>\n");
+						} else {
+							writer.write("</leg>\n");
+						}
+					}
+					if (tourElement instanceof ShipmentBasedActivity) {
+						ShipmentBasedActivity act = (ShipmentBasedActivity) tourElement;
+						writer.write("\t\t\t\t\t<act ");
+						writer.write("type=\"" + act.getActivityType() + "\" ");
+						writer.write("shipmentId=\""
+								+ registeredShipments.get(act.getShipment())
+								+ "\" ");
+						writer.write("end_time=\""
+								+ Time.writeTime(act.getExpectedActEnd()) + "\"");
+						writer.write("/>\n");
+					}
+
+				}
+				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.END
+						+ "\"/>\n");
+				writer.write("\t\t\t\t</tour>\n");
+			}
+			writer.write("\t\t\t</plan>\n\n");
 		}
-		writer.write("\t\t\t</tours>\n");
+		
 	}
 
 	private void endCarrier(BufferedWriter writer) throws IOException {
-		writer.write("\t\t</carrier>\n");
+		writer.write("\t\t</carrier>\n\n");
 		registeredShipments.clear();
 	}
 
@@ -159,6 +204,6 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 
 	private void endCarriers(BufferedWriter writer) throws IOException {
 		writer.write("\t</carriers>\n");
-		
+
 	}
 }

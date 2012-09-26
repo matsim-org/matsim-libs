@@ -21,14 +21,12 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
-
-
 public class VrpBuilder {
-	
+
 	private VehicleRoutingCosts costs;
-	
+
 	private Collection<Job> jobs;
-	
+
 	private Collection<Vehicle> vehicles;
 
 	public VrpBuilder(VehicleRoutingCosts costs) {
@@ -37,22 +35,23 @@ public class VrpBuilder {
 		jobs = new ArrayList<Job>();
 		vehicles = new ArrayList<Vehicle>();
 	}
-	
-	public void addJob(Job job){
+
+	public void addJob(Job job) {
 		jobs.add(job);
 	}
-	
-	public void addVehicle(Vehicle vehicle){
+
+	public void addVehicle(Vehicle vehicle) {
 		vehicles.add(vehicle);
 	}
 
-	public VehicleRoutingProblem build(){
+	public VehicleRoutingProblem build() {
 		verify();
-		VehicleRoutingProblemImpl vrp = new VehicleRoutingProblemImpl(jobs, vehicles, costs);
+		VehicleRoutingProblemImpl vrp = new VehicleRoutingProblemImpl(jobs,
+				vehicles, costs);
 		return vrp;
 	}
 
 	private void verify() {
-	
+
 	}
 }

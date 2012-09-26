@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-public interface Carrier extends Actor{
+public interface Carrier {
 
 	public abstract Id getId();
 
@@ -12,7 +12,7 @@ public interface Carrier extends Actor{
 
 	public abstract Collection<CarrierPlan> getPlans();
 
-	public abstract Collection<CarrierContract> getContracts();
+	public abstract Collection<CarrierShipment> getShipments();
 
 	public abstract CarrierPlan getSelectedPlan();
 
@@ -22,9 +22,5 @@ public interface Carrier extends Actor{
 			CarrierCapabilities carrierCapabilities);
 
 	public abstract CarrierCapabilities getCarrierCapabilities();
-	
-	public abstract Collection<CarrierContract> getNewContracts();
-	
-	public abstract Collection<CarrierContract> getExpiredContracts();
 
 }

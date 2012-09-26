@@ -6,27 +6,18 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
-
+import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
 
 public class Tour {
 
 	public static abstract class TourElement {
-		
-//		public abstract String getActivityType();
-//
-//		public abstract Id getLocation();
-//
-//		public abstract double getDuration();
-//		
-//		@Deprecated
-//		public abstract CarrierShipment getShipment();
-//		
-//		public abstract TimeWindow getTimeWindow();
-		
+
+		public abstract TourElement duplicate();
+
 	};
-	
-	public static abstract class TourActivity extends TourElement{
-		
+
+	public static abstract class TourActivity extends TourElement {
+
 		public abstract String getActivityType();
 
 		public abstract Id getLocation();
@@ -34,69 +25,90 @@ public class Tour {
 		public abstract double getDuration();
 
 		public abstract TimeWindow getTimeWindow();
-		
+
 		public abstract void setExpectedActStart(double startTime);
-		
+
 		public abstract double getExpectedActStart();
-		
+
 		public abstract void setExpectedArrival(double arrivalTime);
-		
+
 		public abstract double getExpectedArrival();
 
 		public abstract void setExpectedActEnd(double currTime);
-		
+
 		public abstract double getExpectedActEnd();
 	}
-	
+
 	public static abstract class ShipmentBasedActivity extends TourActivity {
 		public abstract CarrierShipment getShipment();
 	}
-	
+
 	public static class Leg extends TourElement {
-		
+
 		private Route route;
-		
+
 		private double expTransportTime;
 
 		private double departureTime;
-		
-		public Route getRoute(){
+
+		public Leg() {
+		}
+
+		public Leg(Leg leg) {
+			this.expTransportTime = leg.getExpectedTransportTime();
+			this.departureTime = leg.getDepartureTime();
+			this.route = leg.getRoute().clone();
+		}
+
+		public Route getRoute() {
 			return route;
 		}
-		
-		public void setRoute(Route route){
+
+		public void setRoute(Route route) {
 			this.route = route;
 		}
 
 		public double getExpectedTransportTime() {
 			return expTransportTime;
 		}
-		
-		public void setExpectedTransportTime(double transportTime){
+
+		public void setExpectedTransportTime(double transportTime) {
 			this.expTransportTime = transportTime;
 		}
 
 		public void setDepartureTime(double currTime) {
 			this.departureTime = currTime;
 		}
-		
-		public double getDepartureTime(){
+
+		public double getDepartureTime() {
 			return departureTime;
 		}
+
+		@Override
+		public TourElement duplicate() {
+			return new Leg(this);
+		}
 	}
-	
+
 	public static class Pickup extends ShipmentBasedActivity {
 
-		private CarrierShipment shipment;
-		
+		private final CarrierShipment shipment;
+
 		private double expActStartTime;
-		
+
 		private double expActArrTime;
-		
+
 		private double expActEndTime;
 
 		public Pickup(CarrierShipment shipment) {
 			this.shipment = shipment;
+		}
+
+		Pickup(Pickup pickup) {
+			this.shipment = pickup.getShipment();
+			this.expActArrTime = pickup.getExpectedArrival();
+			this.expActEndTime = pickup.getExpectedActEnd();
+			this.expActStartTime = pickup.getExpectedActStart();
 		}
 
 		@Override
@@ -137,7 +149,7 @@ public class Tour {
 		@Override
 		public void setExpectedArrival(double arrivalTime) {
 			expActArrTime = arrivalTime;
-			
+
 		}
 
 		@Override
@@ -153,25 +165,35 @@ public class Tour {
 		@Override
 		public double getExpectedActEnd() {
 			return this.expActEndTime;
-			
+
 		}
-		
-		
+
+		@Override
+		public TourElement duplicate() {
+			return new Pickup(this);
+		}
 
 	};
-	
+
 	public static class Delivery extends ShipmentBasedActivity {
 
-		private CarrierShipment shipment;
-		
+		private final CarrierShipment shipment;
+
 		private double expActStartTime;
-		
+
 		private double expArrTime;
 
 		private double expActEndTime;
 
 		public Delivery(CarrierShipment shipment) {
 			this.shipment = shipment;
+		}
+
+		Delivery(Delivery delivery) {
+			this.shipment = delivery.getShipment();
+			this.expArrTime = delivery.getExpectedArrival();
+			this.expActEndTime = delivery.getExpectedActEnd();
+			this.expActStartTime = delivery.getExpectedActStart();
 		}
 
 		@Override
@@ -222,111 +244,54 @@ public class Tour {
 		@Override
 		public void setExpectedActEnd(double currTime) {
 			this.expActEndTime = currTime;
-			
+
 		}
 
 		@Override
 		public double getExpectedActEnd() {
 			return this.expActEndTime;
 		}
-		
+
+		@Override
+		public TourElement duplicate() {
+			return new Delivery(this);
+		}
+
 	};
-	
-	public static class GeneralActivity extends TourActivity {
 
-		private String type;
-		
-		private Id location;
-		
-		private Double duration;
-		
-		private Double earliestStart;
-		
-		private Double latestStart;
-		
-		private double expActStartTime;
-		
-		private double expArrTime;
+	private final List<TourElement> tourElements;
 
-		private double expActEndTime;
-		
-		public GeneralActivity(String type, Id location, Double earliestStart, Double latestStart, Double duration) {
-			super();
-			this.type = type;
-			this.location = location;
-			this.duration = duration;
-			this.earliestStart = earliestStart;
-			this.latestStart = latestStart;
-		}
+	private final Id startLinkId;
 
-		@Override
-		public String getActivityType() {
-			return type;
-		}
+	private final Id endLinkId;
 
-		@Override
-		public Id getLocation() {
-			return location;
-		}
-
-		@Override
-		public double getDuration() {
-			return this.duration;
-		}
-
-		@Override
-		public TimeWindow getTimeWindow() {
-			return new TimeWindow(earliestStart, latestStart);
-		}
-
-		@Override
-		public void setExpectedActStart(double startTime) {
-			expActStartTime = startTime;
-		}
-
-		@Override
-		public double getExpectedActStart() {
-			return expActStartTime;
-		}
-
-		@Override
-		public void setExpectedArrival(double arrivalTime) {
-			expArrTime = arrivalTime;
-		}
-
-		@Override
-		public double getExpectedArrival() {
-			return expArrTime;
-		}
-
-		@Override
-		public void setExpectedActEnd(double currTime) {
-			this.expActEndTime = currTime;
-		}
-
-		@Override
-		public double getExpectedActEnd() {
-			return this.expActEndTime;
-		}
-		
-	}
-
-	private List<TourElement> tourElements;
-	
-	private Id startLinkId;
-	
-	private Id endLinkId;
-	
 	private double earliestDeparture;
-	
+
 	private double latestDeparture;
 
-	Tour(Id startLinkId, List<TourElement> tourElements, Id endLinkId) {
+	Tour(final Id startLinkId, final List<TourElement> tourElements,
+			final Id endLinkId) {
 		this.startLinkId = startLinkId;
 		this.tourElements = Collections.unmodifiableList(tourElements);
 		this.endLinkId = endLinkId;
 		this.earliestDeparture = 0.0;
 		this.latestDeparture = 0.0;
+	}
+
+	Tour(Tour tour) {
+		this.startLinkId = tour.getStartLinkId();
+		List<TourElement> elements = new ArrayList<Tour.TourElement>();
+		for (TourElement element : tour.getTourElements()) {
+			elements.add(element.duplicate());
+		}
+		this.tourElements = elements;
+		this.endLinkId = tour.getEndLinkId();
+		this.earliestDeparture = tour.getEarliestDeparture();
+		this.latestDeparture = tour.getLatestDeparture();
+	}
+
+	public Tour duplicate() {
+		return new Tour(this);
 	}
 
 	public List<TourElement> getTourElements() {

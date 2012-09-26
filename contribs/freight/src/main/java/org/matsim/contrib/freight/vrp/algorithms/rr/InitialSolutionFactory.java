@@ -12,12 +12,11 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
-
 public interface InitialSolutionFactory {
-	
-	public RuinAndRecreateSolution createInitialSolution(VehicleRoutingProblem vrp);
+
+	public RuinAndRecreateSolution createInitialSolution(
+			VehicleRoutingProblem vrp);
 
 }

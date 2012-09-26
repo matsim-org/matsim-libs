@@ -13,9 +13,9 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 public class Coordinate {
-	
+
 	private double x;
-	
+
 	private double y;
 
 	public Coordinate(double x, double y) {
@@ -31,5 +31,5 @@ public class Coordinate {
 	public double getY() {
 		return y;
 	}
-	
+
 }

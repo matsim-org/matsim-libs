@@ -28,6 +28,7 @@
 
 package org.matsim.contrib.freight.mobsim;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.population.Plan;
@@ -38,34 +39,41 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * Created by IntelliJ IDEA.
- * User: zilske
- * Date: 10/31/11
- * Time: 5:59 PM
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change
+ * this template use File | Settings | File Templates.
  * 
  */
-public class FreightAgentSource implements AgentSource {
+class FreightAgentSource implements AgentSource {
 
-    private Collection<Plan> plans;
+	private Collection<Plan> plans;
+	
+	private Collection<MobsimAgent> mobSimAgents;
 
-    private AgentFactory agentFactory;
+	private AgentFactory agentFactory;
 
 	private QSim qsim;
 
-    public FreightAgentSource(Collection<Plan> plans, AgentFactory agentFactory, QSim qsim) {
-        this.plans = plans;
-        this.agentFactory = agentFactory;
-        this.qsim = qsim;
-    }
+	FreightAgentSource(Collection<Plan> plans, AgentFactory agentFactory, QSim qsim) {
+		this.plans = plans;
+		this.agentFactory = agentFactory;
+		this.qsim = qsim;
+		mobSimAgents = new ArrayList<MobsimAgent>();
+	}
 
-    @Override
-    public void insertAgentsIntoMobsim() {
-        for (Plan plan : plans) {
-            MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(plan.getPerson());
-    		qsim.insertAgentIntoMobsim(agent);
-            qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
-        }
-    }
+	@Override
+	public void insertAgentsIntoMobsim() {
+		for (Plan plan : plans) {
+			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(plan.getPerson());
+			qsim.insertAgentIntoMobsim(agent);
+			qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
+			mobSimAgents.add(agent);
+		}
+	}
+
+	public Collection<MobsimAgent> getMobSimAgents() {
+		return mobSimAgents;
+	}
+	
+	
 
 }

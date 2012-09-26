@@ -15,9 +15,9 @@ package org.matsim.contrib.freight.vrp.basics;
 import java.util.Collection;
 
 public class TourPlan {
-	
+
 	private Collection<VehicleRoute> vehicleRoutes;
-	
+
 	private double score;
 
 	public TourPlan(Collection<VehicleRoute> vehicleRoutes) {
@@ -36,7 +36,5 @@ public class TourPlan {
 	public void setScore(double score) {
 		this.score = score;
 	}
-	
-	
 
 }
