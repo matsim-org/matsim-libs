@@ -163,7 +163,6 @@ public class TransitRouterVariableImpl implements TransitRouter {
 				travelTime = 0;
 				stop = l.fromNode.stop;
 				coord = l.fromNode.stop.getStopFacility().getCoord();
-				time += leg.getTravelTime();
 			}
 		}
 		leg = new LegImpl(TransportMode.transit_walk);
