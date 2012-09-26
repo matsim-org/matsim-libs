@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.events.EventImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -101,7 +101,7 @@ public class EndLegMessage extends EventMessage {
 
 	@Override
 	public void processEvent() {
-		EventImpl event = null;
+		Event event = null;
 
 		// schedule enter link event
 		// only, if car leg and is not empty

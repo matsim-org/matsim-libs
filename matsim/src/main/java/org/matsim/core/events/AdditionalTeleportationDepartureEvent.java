@@ -21,6 +21,7 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * @author nagel
@@ -36,7 +37,7 @@ import org.matsim.api.core.v01.Id;
  * kai, aug'10
  */
 @Deprecated // this is a possibly temporary fix to remove the MobsimFeatures.  do not use.  kai, aug'10
-public class AdditionalTeleportationDepartureEvent extends EventImpl {
+public class AdditionalTeleportationDepartureEvent extends Event {
 
 	private final Id agentId;
 	private final Id linkId;

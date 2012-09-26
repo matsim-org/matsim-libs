@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneLeaveEventHandler
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.events.handler;
 
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
+import org.matsim.core.api.experimental.events.TravelledEvent;
 
 
+public interface TravelledEventHandler extends EventHandler {
 
-/**
- * @author dgrether
- *
- */
-public interface LaneLeaveEventHandler extends EventHandler {
+    public void handleEvent(TravelledEvent event);
 
-	public void handleEvent (LaneLeaveEvent event);
 }

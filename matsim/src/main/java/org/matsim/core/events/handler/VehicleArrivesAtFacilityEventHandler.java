@@ -20,7 +20,7 @@
 
 package org.matsim.core.events.handler;
 
-import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 
 /**
  * @author mrieser

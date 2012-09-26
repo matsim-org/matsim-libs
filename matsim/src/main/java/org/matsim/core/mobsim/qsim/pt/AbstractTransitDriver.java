@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -205,7 +205,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
-			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(), stop.getId(),
+			events.processEvent(new VehicleArrivesAtFacilityEvent(now, this.vehicle.getVehicle().getId(), stop.getId(),
 					now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		}
 	}
@@ -229,7 +229,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	private void depart(final double now) {
 		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
-		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getVehicle().getId(),
+		events.processEvent(new VehicleDepartsAtFacilityEvent(now, this.vehicle.getVehicle().getId(),
 				this.currentStop.getStopFacility().getId(),
 				now - this.getDeparture().getDepartureTime() - this.currentStop.getDepartureOffset()));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);

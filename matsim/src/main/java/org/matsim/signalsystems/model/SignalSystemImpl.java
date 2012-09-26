@@ -27,8 +27,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
-import org.matsim.core.events.SignalGroupStateChangedEventImpl;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 
 
 /**
@@ -95,7 +94,7 @@ public class SignalSystemImpl implements SignalSystem {
 		while (request != null && request.getTimeOfDay() <= timeSeconds){
 //			log.debug("system id " + this.id + " group " + request.getSignalGroupId() + " state " + request.getRequestedState() + " at time " + timeSeconds);
 			this.signalGroups.get(request.getSignalGroupId()).setState(request.getRequestedState());
-			stateEvent = new SignalGroupStateChangedEventImpl(timeSeconds, this.getId(), request.getSignalGroupId(), request.getRequestedState());
+			stateEvent = new SignalGroupStateChangedEvent(timeSeconds, this.getId(), request.getSignalGroupId(), request.getRequestedState());
 			this.getSignalSystemsManager().getEventsManager().processEvent(stateEvent);
 			this.sortedRequests.poll();
 			request = this.sortedRequests.peek();

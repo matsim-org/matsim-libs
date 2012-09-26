@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventI.java
+ * Event.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,23 +20,49 @@
 
 package org.matsim.core.api.experimental.events;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.core.api.experimental.events.Event;
 
-/**
- * The most basic interface for MATSim Events.
- * Every event must have at least a timestamp.
- * 
- * @author mrieser
- */
-public interface Event {
+public abstract class Event {
+
+	public final static String ATTRIBUTE_TIME = "time";
+	public final static String ATTRIBUTE_TYPE = "type";
+
+	private final double time;
+
+	public Event(final double time) {
+		this.time = time;
+	}
+
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = new LinkedHashMap<String, String>();
+		attr.put(ATTRIBUTE_TIME, Double.toString(this.time));
+		attr.put(ATTRIBUTE_TYPE, getEventType());
+		return attr;
+	}
+
+	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
+	abstract public String getEventType();
+
+	public double getTime() {
+		return this.time;
+	}
 	
-	/** @return the timestamp of this event */
-	public double getTime();
-
-	/** Returns a map of all the attribute names and values needed for serializing the event.
-	 *
-	 * @return Map of attribute-names and attribute-values that describe that event */
-	public Map<String, String> getAttributes();
-
+	public String toString() {
+		Map<String,String> attr = this.getAttributes() ;
+		StringBuilder eventXML = new StringBuilder("\t<event ");
+		for (Map.Entry<String, String> entry : attr.entrySet()) {
+			eventXML.append(entry.getKey());
+			eventXML.append("=\"");
+			eventXML.append(entry.getValue());
+			eventXML.append("\" ");
+		}
+		eventXML.append(" />");
+		return eventXML.toString();
+	}
+	
 }
+
+

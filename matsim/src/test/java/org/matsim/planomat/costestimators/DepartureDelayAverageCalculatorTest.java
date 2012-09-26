@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -76,7 +76,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		AgentDepartureEvent depEvent = new AgentDepartureEvent(6.01 * 3600, PERSON_ID, LINK_ID, TransportMode.car);
 		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(6.02 * 3600, PERSON_ID, LINK_ID, null);
 
-		for (EventImpl event : new EventImpl[]{depEvent, leaveEvent}) {
+		for (Event event : new Event[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 
@@ -87,7 +87,7 @@ public class DepartureDelayAverageCalculatorTest extends MatsimTestCase {
 		depEvent = new AgentDepartureEvent(6.02 * 3600, PERSON_ID, LINK_ID, TransportMode.car);
 		leaveEvent = new LinkLeaveEvent(6.04 * 3600, PERSON_ID, LINK_ID, null);
 
-		for (EventImpl event : new EventImpl[]{depEvent, leaveEvent}) {
+		for (Event event : new Event[]{depEvent, leaveEvent}) {
 			events.processEvent(event);
 		}
 

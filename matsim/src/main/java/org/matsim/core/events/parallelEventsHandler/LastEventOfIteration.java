@@ -20,14 +20,14 @@
 
 package org.matsim.core.events.parallelEventsHandler;
 
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * Special event needed for synchronizing the threads.
  *
  * @author rashid_waraich
  */
-public class LastEventOfIteration extends EventImpl {
+public class LastEventOfIteration extends Event {
 
 	public LastEventOfIteration(final double time) {
 		super(time);

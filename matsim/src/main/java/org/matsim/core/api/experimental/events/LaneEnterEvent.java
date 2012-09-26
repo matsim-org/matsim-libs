@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentWait2LinkEvent.java
+ * LaneEnterEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.api.experimental.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-public class AgentWait2LinkEvent extends Event {
 
-	public static final String EVENT_TYPE = "wait2link";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	private final Id vehicleId;
+/**
+ * @author dgrether
+ *
+ */
+public class LaneEnterEvent extends Event  {
+	
+	public static final String EVENT_TYPE = "entered lane";
 
+	public LaneEnterEvent(double time, Id agentId, Id linkId, Id laneId) {
+		super(time);
+		this.laneId = laneId;
+		this.personId = agentId;
+		this.linkId = linkId;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+	
+	public static final String ATTRIBUTE_LANE = "lane";
 	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEGMODE = "legMode";
-	public static final String ATTRIBUTE_PERSON = "person";
 
-	private final Id personId;
 	private final Id linkId;
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
-		if (this.vehicleId != null) {
-			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		}
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		attr.put(ATTRIBUTE_LANE, this.laneId.toString());
 		return attr;
 	}
 
@@ -52,29 +62,21 @@ public class AgentWait2LinkEvent extends Event {
 		return this.linkId;
 	}
 
+	public static final String ATTRIBUTE_PERSON = "person";
+
+	private final Id personId;
+
 
 	public Id getPersonId() {
 		return this.personId;
 	}
 	
 	
-	public AgentWait2LinkEvent(final double time, final Id agentId, final Id linkId, Id vehicleId) {
-		super(time);
-		this.personId = agentId;
-		this.linkId = linkId;
-		this.vehicleId = vehicleId;
+	private final Id laneId;
+
+	public Id getLaneId() {
+		return this.laneId;
 	}
 
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-
-	public String getLegMode() {
-		return null;
-	}
 
 }

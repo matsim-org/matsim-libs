@@ -41,7 +41,7 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.TravelledEventHandler;
+import org.matsim.core.events.handler.TravelledEventHandler;
 
 /**
  * Calculates the score of the selected plans of a given scenario

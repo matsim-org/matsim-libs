@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.jdeqsim;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * The micro-simulation internal handler for starting a leg.
@@ -68,7 +68,7 @@ public class StartingLegMessage extends EventMessage {
 
 	@Override
 	public void processEvent() {
-		EventImpl event = null;
+		Event event = null;
 
 		// schedule ActEndEvent
 		event = new ActivityEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle

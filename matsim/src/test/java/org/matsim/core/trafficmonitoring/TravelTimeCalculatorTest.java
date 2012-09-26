@@ -41,14 +41,14 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
@@ -345,7 +345,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
 		ttc.handleEvent(new LinkEnterEvent(150, agId2, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
-		ttc.handleEvent(new VehicleArrivesAtFacilityEventImpl(240, vehId, new IdImpl("stop"), 0));
+		ttc.handleEvent(new VehicleArrivesAtFacilityEvent(240, vehId, new IdImpl("stop"), 0));
 		ttc.handleEvent(new LinkLeaveEvent(350, agId2, link1.getId(), null));
 
 		Assert.assertEquals("The time of transit vehicles at stop should not be counted", 100.0, ttc.getLinkTravelTime(link1, 200, null, null), 1e-8);

@@ -23,9 +23,8 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
 
-public class AgentStuckEvent extends EventImpl {
+public class AgentStuckEvent extends Event {
 
 	public static final String EVENT_TYPE = "stuckAndAbort";
 	public static final String ATTRIBUTE_LINK = "link";

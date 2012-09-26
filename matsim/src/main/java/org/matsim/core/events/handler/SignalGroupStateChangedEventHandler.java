@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.events.handler;
 
-import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 
 
 /**

@@ -20,6 +20,7 @@
 
 package org.matsim.core.events;
 
+import org.matsim.core.api.experimental.events.LinkChangeLanesEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.testcases.MatsimTestCase;
@@ -32,8 +33,8 @@ public class LinkChangeLanesEventTest extends MatsimTestCase {
 	public void testWriteReadXml() {
 		
 		final NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 100.0);
-		final LinkChangeLanesEventImpl event1 = new LinkChangeLanesEventImpl(6823.8, new IdImpl("abcd"), changeValue);
-		final LinkChangeLanesEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
+		final LinkChangeLanesEvent event1 = new LinkChangeLanesEvent(6823.8, new IdImpl("abcd"), changeValue);
+		final LinkChangeLanesEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getLinkId(), event2.getLinkId());

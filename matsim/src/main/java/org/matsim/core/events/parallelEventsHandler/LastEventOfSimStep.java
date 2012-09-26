@@ -20,14 +20,14 @@
 
 package org.matsim.core.events.parallelEventsHandler;
 
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * Special event needed for synchronizing the threads at the end of each simstep.
  *
  * @author christoph dobler
  */
-public class LastEventOfSimStep extends EventImpl {
+public class LastEventOfSimStep extends Event {
 
 	public static final String EVENT_TYPE = "simstepend";
 	

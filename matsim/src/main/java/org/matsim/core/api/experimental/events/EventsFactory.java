@@ -21,19 +21,6 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.GenericEventImpl;
-import org.matsim.core.events.LinkChangeFlowCapacityEventImpl;
-import org.matsim.core.events.LinkChangeFreespeedEventImpl;
-import org.matsim.core.events.LinkChangeLanesEventImpl;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
-import org.matsim.core.events.SignalGroupStateChangedEventImpl;
-import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.signalsystems.model.SignalGroupState;
 
@@ -90,11 +77,11 @@ public class EventsFactory {
 	}
 
 	public VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
-		return new VehicleArrivesAtFacilityEventImpl(time, vehicleId, facilityId, delay);
+		return new VehicleArrivesAtFacilityEvent(time, vehicleId, facilityId, delay);
 	}
 
 	public VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
-		return new VehicleDepartsAtFacilityEventImpl(time, vehicleId, facilityId, delay);
+		return new VehicleDepartsAtFacilityEvent(time, vehicleId, facilityId, delay);
 	}
 
 	public TransitDriverStartsEvent createTransitDriverStartsEvent(final double time, final Id driverId, final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
@@ -102,23 +89,23 @@ public class EventsFactory {
 	}
 	
 	public SignalGroupStateChangedEvent createSignalGroupStateChangedEvent(double time, final Id systemId, final Id groupId, SignalGroupState newState){
-		return new SignalGroupStateChangedEventImpl(time, systemId, groupId, newState);
+		return new SignalGroupStateChangedEvent(time, systemId, groupId, newState);
 	}
 
-	public LinkChangeEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue) {
-		return new LinkChangeFlowCapacityEventImpl(time, linkId, changeValue);
+	public LinkChangeFlowCapacityEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue) {
+		return new LinkChangeFlowCapacityEvent(time, linkId, changeValue);
 	}
 
-	public LinkChangeEvent createLinkChangeFreespeedEvent(double time, Id linkId, ChangeValue changeValue) {
-		return new LinkChangeFreespeedEventImpl(time, linkId, changeValue);
+	public LinkChangeFreespeedEvent createLinkChangeFreespeedEvent(double time, Id linkId, ChangeValue changeValue) {
+		return new LinkChangeFreespeedEvent(time, linkId, changeValue);
 	}
 
-	public LinkChangeEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue) {
-		return new LinkChangeLanesEventImpl(time, linkId, changeValue);
+	public LinkChangeLanesEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue) {
+		return new LinkChangeLanesEvent(time, linkId, changeValue);
 	}
 
 	public GenericEvent createGenericEvent(String type, double time) {
-		return new GenericEventImpl( type, time ) ;
+		return new GenericEvent( type, time ) ;
 	}
 
 }

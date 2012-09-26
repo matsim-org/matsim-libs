@@ -23,6 +23,7 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,7 +31,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.testcases.MatsimTestUtils;

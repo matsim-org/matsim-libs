@@ -23,7 +23,6 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
 
 /**
  * This event specifies that an agent has gained (or paid) some money.
@@ -33,7 +32,7 @@ import org.matsim.core.events.EventImpl;
  *
  * @author mrieser
  */
-public final class AgentMoneyEvent extends EventImpl {
+public final class AgentMoneyEvent extends Event {
 
 	public static final String ATTRIBUTE_AMOUNT = "amount";
 

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * PersonEntersVehicleEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +18,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events;
+package org.matsim.core.api.experimental.events;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.testcases.MatsimTestUtils;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author mrieser
  */
-public class TransitDriverStartsEventTest {
+public class PersonEntersVehicleEvent extends Event {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	public static final String EVENT_TYPE = "PersonEntersVehicle";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String TRANSIT_ROUTE_ID = "transitRouteId";
+	private final Id vehicleId;
 
-	@Test
-	public void testWriteReadXml() {
-		final TransitDriverStartsEvent event1 = new TransitDriverStartsEvent(36095.2, new IdImpl("ptDrvr-1"), new IdImpl("vehicle-bus5"), new IdImpl("line L-1"), new IdImpl("route-R1"), new IdImpl("departure-D-1"));
-		final TransitDriverStartsEvent event2 = XmlEventsTester.testWriteReadXml(this.utils.getOutputDirectory() + "events.xml", event1);
-		Assert.assertEquals(event1.getTime(), event2.getTime(), 1.0e-9);
-		Assert.assertEquals(event1.getDriverId(), event2.getDriverId());
-		Assert.assertEquals(event1.getVehicleId(), event2.getVehicleId());
-		Assert.assertEquals(event1.getTransitRouteId(), event2.getTransitRouteId());
-		Assert.assertEquals(event1.getTransitLineId(), event2.getTransitLineId());
-		Assert.assertEquals(event1.getDepartureId(), event2.getDepartureId());
+	/*package*/ public PersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+		super(time);
+		this.personId = personId;
+		this.vehicleId = vehicleId;
 	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attrs = super.getAttributes();
+		attrs.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		return attrs;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
+	}
+
+	public static final String ATTRIBUTE_PERSON = "person";
+
+	private final Id personId;
+
+	public Id getPersonId() {
+		return this.personId;
+	}
+	
 }

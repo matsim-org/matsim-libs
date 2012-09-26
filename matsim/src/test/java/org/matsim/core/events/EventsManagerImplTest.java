@@ -22,6 +22,7 @@ package org.matsim.core.events;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -62,7 +63,7 @@ public class EventsManagerImplTest {
 		}
 	}
 
-	/*package*/ static class MyEvent extends EventImpl {
+	/*package*/ static class MyEvent extends Event {
 		public MyEvent(final double time) {
 			super(time);
 		}

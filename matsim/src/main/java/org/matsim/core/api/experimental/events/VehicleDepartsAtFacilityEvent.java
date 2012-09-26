@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentWait2LinkEvent.java
+ * VehicleArrivesAtFacilityEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -24,57 +24,50 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-public class AgentWait2LinkEvent extends Event {
+/**
+ * @author mrieser
+ */
+public class VehicleDepartsAtFacilityEvent extends Event {
 
-	public static final String EVENT_TYPE = "wait2link";
+
+	public static final String EVENT_TYPE = "VehicleDepartsAtFacility";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_FACILITY = "facility";
+	public static final String ATTRIBUTE_DELAY = "delay";
+	
 	private final Id vehicleId;
+	private final Id facilityId;
+	private final double delay;
 
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEGMODE = "legMode";
-	public static final String ATTRIBUTE_PERSON = "person";
-
-	private final Id personId;
-	private final Id linkId;
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
-		if (this.vehicleId != null) {
-			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		}
-		return attr;
-	}
-
-	public Id getLinkId() {
-		return this.linkId;
-	}
-
-
-	public Id getPersonId() {
-		return this.personId;
-	}
-	
-	
-	public AgentWait2LinkEvent(final double time, final Id agentId, final Id linkId, Id vehicleId) {
+	public VehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, double delay) {
 		super(time);
-		this.personId = agentId;
-		this.linkId = linkId;
 		this.vehicleId = vehicleId;
+		this.facilityId = facilityId;
+		this.delay = delay;
+	}
+	
+	public double getDelay() {
+		return this.delay;
+	}
+
+	public Id getFacilityId() {
+		return this.facilityId;
+	}
+
+	public Id getVehicleId() {
+		return this.vehicleId;
 	}
 
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
 
-	public Id getVehicleId() {
-		return vehicleId;
-	}
-
-	public String getLegMode() {
-		return null;
+	public Map<String, String> getAttributes() {
+		Map<String, String> attributes = super.getAttributes();
+		attributes.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attributes.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
+		attributes.put(ATTRIBUTE_DELAY, Double.toString(this.delay));
+		return attributes;
 	}
 
 }

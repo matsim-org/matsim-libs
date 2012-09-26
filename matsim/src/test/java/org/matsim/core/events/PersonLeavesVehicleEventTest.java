@@ -20,6 +20,7 @@
 
 package org.matsim.core.events;
 
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;

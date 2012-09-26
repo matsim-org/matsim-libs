@@ -25,8 +25,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreensForSignalSystemData;
 

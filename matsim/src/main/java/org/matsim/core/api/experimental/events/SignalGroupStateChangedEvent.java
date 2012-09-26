@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentWait2LinkEvent.java
+ * SignalSystemStateChangedEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,64 +17,58 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.api.experimental.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-
-public class AgentWait2LinkEvent extends Event {
-
-	public static final String EVENT_TYPE = "wait2link";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	private final Id vehicleId;
-
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LEGMODE = "legMode";
-	public static final String ATTRIBUTE_PERSON = "person";
-
-	private final Id personId;
-	private final Id linkId;
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
-		if (this.vehicleId != null) {
-			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		}
-		return attr;
-	}
-
-	public Id getLinkId() {
-		return this.linkId;
-	}
+import org.matsim.signalsystems.model.SignalGroupState;
 
 
-	public Id getPersonId() {
-		return this.personId;
-	}
+/**
+ * @author dgrether
+ *
+ */
+public class SignalGroupStateChangedEvent extends Event {
 	
+	public final static String EVENT_TYPE = "signalGroupStateChangedEvent";
 	
-	public AgentWait2LinkEvent(final double time, final Id agentId, final Id linkId, Id vehicleId) {
+	public final static String ATTRIBUTE_SIGNALSYSTEM_ID = "signalSystemId";
+	public final static String ATTRIBUTE_SIGNALGROUP_ID = "signalGroupId";
+	public final static String ATTRIBUTE_SIGNALGROUP_STATE = "signalGroupState";
+	
+	private SignalGroupState newState;
+	private Id signalGroupId;
+	private Id signalSystemId;
+
+	public SignalGroupStateChangedEvent(double time, Id systemId, Id groupId, SignalGroupState newState) {
 		super(time);
-		this.personId = agentId;
-		this.linkId = linkId;
-		this.vehicleId = vehicleId;
+		this.signalSystemId = systemId;
+		this.signalGroupId = groupId;
+		this.newState = newState;
+	}
+
+	public SignalGroupState getNewState() {
+		return this.newState;
+	}
+	
+	public Map<String, String> getAttributes() {
+		Map<String, String> m = super.getAttributes();
+		m.put(ATTRIBUTE_SIGNALSYSTEM_ID, this.signalSystemId.toString());
+		m.put(ATTRIBUTE_SIGNALGROUP_ID, this.signalGroupId.toString());
+		m.put(ATTRIBUTE_SIGNALGROUP_STATE, this.newState.toString());
+		return m;
 	}
 
 	public String getEventType() {
-		return EVENT_TYPE;
+		return SignalGroupStateChangedEvent.EVENT_TYPE;
 	}
 
-	public Id getVehicleId() {
-		return vehicleId;
+	public Id getSignalGroupId() {
+		return signalGroupId;
 	}
 
-	public String getLegMode() {
-		return null;
+	public Id getSignalSystemId() {
+		return signalSystemId;
 	}
-
 }

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.events.handler;
 
-import org.matsim.core.events.LaneEnterEvent;
+import org.matsim.core.api.experimental.events.LaneEnterEvent;
 
 
 /**

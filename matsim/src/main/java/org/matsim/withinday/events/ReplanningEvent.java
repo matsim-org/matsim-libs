@@ -23,12 +23,12 @@ package org.matsim.withinday.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * @author cdobler
  */
-public class ReplanningEvent extends EventImpl {
+public class ReplanningEvent extends Event {
 
 	public static final String EVENT_TYPE = "replanning";
 	public static final String ATTRIBUTE_REPLANNERTYPE = "replanner";
