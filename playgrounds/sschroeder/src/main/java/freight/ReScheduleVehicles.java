@@ -7,6 +7,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategyModule;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolver;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolverFactoryImpl;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
