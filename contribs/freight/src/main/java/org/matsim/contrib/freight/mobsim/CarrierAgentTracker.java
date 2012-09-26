@@ -99,7 +99,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	}
 
 	public void notifyPickedUp(Id carrierId, Id driverId, CarrierShipment shipment, double time) {
-		processEvent(new ShipmentPickedUpEvent(carrierId, driverId, shipment,time));
+		processEvent(new ShipmentPickedUpEvent(carrierId, driverId, shipment, time));
 	}
 
 	public void notifyDelivered(Id carrierId, Id driverId, CarrierShipment shipment, double time) {

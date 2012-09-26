@@ -1,28 +1,20 @@
 package org.matsim.contrib.freight.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
-
 import org.matsim.core.api.experimental.events.Event;
 
-public class ShipmentDeliveredEvent implements Event {
+public class ShipmentDeliveredEvent extends Event {
 
-	private final Id carrierId;
-
-	private final Id driverId;
-
-	private final CarrierShipment shipment;
-
-	private final double time;
-
-	public ShipmentDeliveredEvent(Id carrierId, Id driverId,
-			CarrierShipment shipment, double time) {
-		this.carrierId = carrierId;
-		this.time = time;
+	private CarrierShipment shipment;
+	private Id carrierId;
+	private Id driverId;
+	
+	public ShipmentDeliveredEvent(Id carrierId, Id driverId, CarrierShipment shipment, double time) {
+		super(time);
 		this.shipment = shipment;
 		this.driverId = driverId;
+		this.carrierId = carrierId;
 	}
 
 	public Id getCarrierId() {
@@ -38,12 +30,9 @@ public class ShipmentDeliveredEvent implements Event {
 	}
 
 	@Override
-	public double getTime() {
-		return time;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
+	public String getEventType() {
+		// TODO Auto-generated method stub
 		return null;
 	}
+	
 }

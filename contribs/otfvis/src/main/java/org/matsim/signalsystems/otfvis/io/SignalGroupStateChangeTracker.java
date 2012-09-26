@@ -22,7 +22,7 @@ package org.matsim.signalsystems.otfvis.io;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 
 

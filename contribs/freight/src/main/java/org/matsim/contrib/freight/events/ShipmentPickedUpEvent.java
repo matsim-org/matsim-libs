@@ -1,31 +1,19 @@
 package org.matsim.contrib.freight.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.core.api.experimental.events.Event;
 
-public class ShipmentPickedUpEvent implements Event {
+public class ShipmentPickedUpEvent extends Event {
 
-	private final Id carrierId;
-
-	private final Id driverId;
-
-	private final CarrierShipment shipment;
-
-	private final double time;
-
-	public ShipmentPickedUpEvent(Id carrierId, Id driverId,
-			CarrierShipment shipment, double time) {
-		this.carrierId = carrierId;
-		this.time = time;
+	private CarrierShipment shipment;
+	
+	private Id driverId;
+	
+	public ShipmentPickedUpEvent(Id carrierId, Id driverId, CarrierShipment shipment, double time) {
+		super(time);
 		this.shipment = shipment;
 		this.driverId = driverId;
-	}
-
-	public Id getCarrierId() {
-		return carrierId;
 	}
 
 	public Id getDriverId() {
@@ -37,12 +25,8 @@ public class ShipmentPickedUpEvent implements Event {
 	}
 
 	@Override
-	public double getTime() {
-		return time;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
+	public String getEventType() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

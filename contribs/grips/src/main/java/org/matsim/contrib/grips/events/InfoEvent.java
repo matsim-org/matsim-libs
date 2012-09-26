@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.grips.events;
 
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
-public class InfoEvent extends EventImpl {
+public class InfoEvent extends Event {
 	public static final String EVENT_TYPE = "InfoEvent";
 	private final String info;
 	public InfoEvent(double time, String info) {

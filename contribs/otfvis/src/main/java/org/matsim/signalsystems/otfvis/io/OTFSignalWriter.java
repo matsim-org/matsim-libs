@@ -24,8 +24,8 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
