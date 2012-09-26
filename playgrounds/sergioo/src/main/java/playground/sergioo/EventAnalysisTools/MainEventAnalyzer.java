@@ -197,7 +197,7 @@ public class MainEventAnalyzer {
 							numTrains++;
 		System.out.println(numBuses+" "+numTrains);
 	}*/
-	/* Paint links where people is waiting*/
+	/* Paint links where people is waiting
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
@@ -232,7 +232,7 @@ public class MainEventAnalyzer {
 		JFrame window = new SimpleNetworkWindow("Links where people is waiting", networkPainter);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
-	}
+	}*/
 	/* Trip distance time bins
 	public static void main(String[] args) throws IOException {
 		final String CSV_SEPARATOR = "\t";
@@ -404,5 +404,59 @@ public class MainEventAnalyzer {
 		reader.close();
 		writer.close();
 	}*/
+	/*PT routing in congested network*/
+	public static void main(String[] args) throws IOException {
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		scenario.getConfig().scenario().setUseTransit(true);
+		new TransitScheduleReaderV1(scenario).parse("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
+		TravelTimeCalculator ttc = new TravelTimeCalculator(scenario.getNetwork(), 15*60, 30*3600, scenario.getConfig().travelTimeCalculator());
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		events.addHandler(ttc);
+		new MatsimEventsReader(events).readFile("./data/MS2/output/ITERS/it.100/100.events.xml.gz");
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig());
+		TransitRouter transitRouter = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig).createTransitRouter();
+		BufferedReader reader = new BufferedReader(new FileReader(new File("./data/home_work_locations.csv")));
+		PrintWriter writer = new PrintWriter(new File("./data/home_work_tt.csv"));
+		writer.println("IdHousehold,IdPerson,TTCar,TTPT,DistanceCar,DistancePT");
+		String line=reader.readLine();
+		line=reader.readLine();
+		int i=0;
+		while(line!=null) {
+			String[] parts=line.split(",");
+			Coord start = coordinateTransformation.transform(new CoordImpl(parts[2], parts[3]));
+			Coord end = coordinateTransformation.transform(new CoordImpl(parts[4], parts[5]));
+			double distance = 0;
+			List<Leg> legs = transitRouter.calcRoute(start, end, new Double(parts[6]), null);
+			double distancePT = 0, timePT = 0;
+			if(legs!=null) {
+				for(Leg leg:legs) {
+					if(leg.getRoute() instanceof NetworkRoute)
+						for(Id linkId:((NetworkRoute)leg.getRoute()).getLinkIds()) {
+							distancePT+=scenario.getNetwork().getLinks().get(linkId).getLength();
+							timePT += ttc.getLinkTravelTime(linkId, new Double(parts[6]));
+						}
+					else {
+						timePT += leg.getTravelTime();
+						if(leg.getRoute()!=null && leg.getRoute().getStartLinkId()!=null && leg.getRoute().getEndLinkId()!=null)
+							distancePT+=CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), (scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord()));
+						else if(leg.getMode().equals("transit_walk"))
+							distancePT+=4*leg.getTravelTime()/3.6;
+						else
+							System.out.println("Bad "+leg.getMode());
+					}
+				}
+				writer.println(parts[0]+","+parts[1]+","+timePT+","+distance+","+distancePT);
+				if(++i%1000==0)
+					System.out.println(i);
+			}
+			else
+				System.out.println("No PT route for: "+parts[0]);
+			line=reader.readLine();
+		}
+		reader.close();
+		writer.close();
+	}
 
 }
