@@ -123,7 +123,7 @@ public class PlanWrapper {
 							ActivityImpl dummyActivity = new ActivityImpl(first.getType(), ba.getCoord());
 							dummyActivity.setStartTime(this.tw);
 							dummyActivity.setFacilityId(ba.getFacilityId());
-							dummyPlan.getPlanElements().add(dummyActivity);
+							dummyPlan.addActivity(dummyActivity);
 							result.add(dummyPlan);
 
 							/*
@@ -133,7 +133,7 @@ public class PlanWrapper {
 							dummyPlan = new PlanImpl(null);
 							ba.setStartTime(ba.getStartTime() - this.tw);
 							ba.setEndTime(ba.getEndTime() - this.tw);
-							dummyPlan.getPlanElements().add(ba);
+							dummyPlan.addActivity(ba);
 							index++;
 							while(index < plan.getPlanElements().size()){
 								Object dummyObject = plan.getPlanElements().get(index);
@@ -145,14 +145,14 @@ public class PlanWrapper {
 									ba2.setEndTime((ba2.getEndTime() - this.tw) >= 0 ?
 											ba2.getEndTime() - this.tw :
 											Double.NEGATIVE_INFINITY );
-									dummyPlan.getPlanElements().add(ba2);
+									dummyPlan.addActivity(ba2);
 									index++;
 								} else if(dummyObject instanceof Leg){
 									Leg bl2 = (Leg) dummyObject;
 									bl2.setDepartureTime( bl2.getDepartureTime() >= 0 ?
 											bl2.getDepartureTime() :
 											Double.NEGATIVE_INFINITY );
-									dummyPlan.getPlanElements().add(bl2);
+									dummyPlan.addLeg(bl2);
 									index++;
 								} else{
 									System.err.println("Plan element is neither a BasicActivity nor a BasicLeg!!");
@@ -170,7 +170,7 @@ public class PlanWrapper {
 						}
 					} else if(object instanceof Leg){
 						Leg bl = (Leg) object;
-						dummyPlan.getPlanElements().add(bl);
+						dummyPlan.addLeg(bl);
 						index++;
 					} else{
 						System.err.println("Plan element is neither an Activity nor a Leg!!");
