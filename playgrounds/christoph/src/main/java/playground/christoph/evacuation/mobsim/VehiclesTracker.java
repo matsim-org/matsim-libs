@@ -273,14 +273,13 @@ public class VehiclesTracker implements MobsimInitializedListener, MobsimEngine,
 		 * If they are not, we assume that its the driver who enters the vehicle.
 		 * TODO: this is NOT safe, so find a better solution...
 		 */
+		boolean isDriver = false;
 		boolean isPassenger = passengerVehicleMap.containsKey(event.getPersonId());
 		if (!isPassenger) {
 			driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
 			vehicleDriverMap.put(event.getVehicleId(), event.getPersonId());
-		}
-		
-		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
-		if (isDriver) {
+
+			isDriver = true;
 			this.driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
 			this.enrouteVehicles.add(event.getVehicleId());
 			this.parkedVehicles.remove(event.getVehicleId());
@@ -288,7 +287,18 @@ public class VehiclesTracker implements MobsimInitializedListener, MobsimEngine,
 			Id linkId = this.agents.get(event.getPersonId()).getCurrentLinkId();
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(linkId);
 			vehicleIds.add(event.getVehicleId());
-		} 
+		}
+		
+//		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
+//		if (isDriver) {
+//			this.driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
+//			this.enrouteVehicles.add(event.getVehicleId());
+//			this.parkedVehicles.remove(event.getVehicleId());
+//			
+//			Id linkId = this.agents.get(event.getPersonId()).getCurrentLinkId();
+//			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(linkId);
+//			vehicleIds.add(event.getVehicleId());
+//		} 
 		
 		// consistency checks
 		Id expectedId;
