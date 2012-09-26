@@ -122,6 +122,7 @@ public class PlanWrapper {
 							 */
 							ActivityImpl dummyActivity = new ActivityImpl(first.getType(), ba.getCoord());
 							dummyActivity.setStartTime(this.tw);
+							dummyActivity.setFacilityId(ba.getFacilityId());
 							dummyPlan.getPlanElements().add(dummyActivity);
 							result.add(dummyPlan);
 
