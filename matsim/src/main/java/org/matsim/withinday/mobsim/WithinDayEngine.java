@@ -54,6 +54,8 @@ public class WithinDayEngine implements MobsimEngine {
 	private boolean duringActivityReplanning = true;
 	private boolean duringLegReplanning = true;
 
+	private boolean initialReplanningPerformed = false;
+	
 	private InitialReplanningModule initialReplanningModule;
 	private DuringActivityReplanningModule duringActivityReplanningModule;
 	private DuringLegReplanningModule duringLegReplanningModule;
@@ -150,6 +152,16 @@ public class WithinDayEngine implements MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
+	
+		/*
+		 * Initial replanning (so far?) cannot be performed in the onPrepareSim()
+		 * method since the identifiers and replanners do not know the agents at
+		 * that point in time. 
+		 */
+		if (!initialReplanningPerformed && isInitialReplanning()) {
+			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
+			initialReplanningPerformed = true;
+		}
 		
 		for (Entry<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> entry : duringActivityReplannerFactory.entrySet()) {
 			if (entry.getValue().getFirst() == time) this.parallelDuringActivityReplanner.addWithinDayReplannerFactory(entry.getKey());
@@ -175,14 +187,12 @@ public class WithinDayEngine implements MobsimEngine {
 		this.parallelDuringActivityReplanner.onPrepareSim();
 		this.parallelDuringLegReplanner.onPrepareSim();
 		
-		if (isInitialReplanning()) {
-			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
-		}
-		
 		// reset all replanners
-		parallelInitialReplanner.resetReplanners();
-		parallelDuringActivityReplanner.resetReplanners();
-		parallelDuringLegReplanner.resetReplanners();
+		this.parallelInitialReplanner.resetReplanners();
+		this.parallelDuringActivityReplanner.resetReplanners();
+		this.parallelDuringLegReplanner.resetReplanners();
+		
+		this.initialReplanningPerformed = false;
 	}
 
 	@Override
