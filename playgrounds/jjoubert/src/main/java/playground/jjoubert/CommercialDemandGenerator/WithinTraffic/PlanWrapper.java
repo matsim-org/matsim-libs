@@ -23,7 +23,6 @@ package playground.jjoubert.CommercialDemandGenerator.WithinTraffic;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -74,18 +73,18 @@ public class PlanWrapper {
 
 		Object firstActivity = plan.getPlanElements().get(0);
 		// Checks that the first plan element is an activity
-		if ( !(firstActivity instanceof Activity) ){
+		if ( !(firstActivity instanceof ActivityImpl) ){
 			System.err.println("The last activity of the chain is not of type BasicActivity!!");
 		}
-		Activity first = (Activity) firstActivity;
+		ActivityImpl first = (ActivityImpl) firstActivity;
 
 		Object lastActivity = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
 
 		// Checks that the last plan element is an activity.
-		if( !(lastActivity instanceof Activity) ){
+		if( !(lastActivity instanceof ActivityImpl) ){
 			System.err.println("The last activity of the chain is not of type BasicActivity!!");
 		} else{
-			Activity la = (Activity) lastActivity;
+			ActivityImpl la = (ActivityImpl) lastActivity;
 			if(la.getStartTime() <= this.tw){
 				/*
 				 * The whole plan fits within the time window. Just return the complete plan.
@@ -105,8 +104,8 @@ public class PlanWrapper {
 				int index = 0;
 				while(index < plan.getPlanElements().size()){
 					Object object = plan.getPlanElements().get(index);
-					if(object instanceof Activity ){
-						Activity ba = (Activity) object;
+					if(object instanceof ActivityImpl ){
+						ActivityImpl ba = (ActivityImpl) object;
 						if(ba.getEndTime() < this.tw){
 							/*
 							 * If the activity ends within the current time window, simply add the
@@ -121,7 +120,7 @@ public class PlanWrapper {
 							 *         forcing the traveling (if required) to occur in the current plan; the
 							 *         activity type is the same as the first activity of the current plan.
 							 */
-							Activity dummyActivity = new ActivityImpl(first.getType(), ba.getCoord());
+							ActivityImpl dummyActivity = new ActivityImpl(first.getType(), ba.getCoord());
 							dummyActivity.setStartTime(this.tw);
 							dummyPlan.getPlanElements().add(dummyActivity);
 							result.add(dummyPlan);
@@ -137,8 +136,8 @@ public class PlanWrapper {
 							index++;
 							while(index < plan.getPlanElements().size()){
 								Object dummyObject = plan.getPlanElements().get(index);
-								if(dummyObject instanceof Activity){
-									Activity ba2 = (Activity) dummyObject;
+								if(dummyObject instanceof ActivityImpl){
+									ActivityImpl ba2 = (ActivityImpl) dummyObject;
 									ba2.setStartTime( (ba2.getStartTime() - this.tw) >= 0 ?
 											ba2.getStartTime() - this.tw :
 											Double.NEGATIVE_INFINITY );
