@@ -118,6 +118,7 @@ public class BenchmarkV2 {
 			Link workRegionLink = null;
 			Coord workCoord = null;
 			while (!linkIsInRange && counter < 100000) {
+				counter++;
 				workRegionLink = links[r.nextInt(links.length)];
 				workCoord = new CoordImpl(
 						(workRegionLink.getToNode().getCoord().getX() + workRegionLink.getFromNode().getCoord().getX()) / 2 + r.nextInt(1000) - 500,
