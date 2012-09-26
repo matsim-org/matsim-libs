@@ -20,8 +20,13 @@
 
 package playground.christoph.evacuation.mobsim.decisionmodel;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
@@ -131,7 +136,34 @@ public class LatestAcceptedLeaveTimeModel implements HouseholdDecisionModel {
 
 	@Override
 	public void writeDecisionsToFile(String file) {
-		// So far, we do not write this model's results to a file.
+		
+		try {
+			BufferedWriter modelWriter = IOUtils.getBufferedWriter(file);
+			
+			writeHeader(modelWriter);
+			writeRows(modelWriter);
+			
+			modelWriter.flush();
+			modelWriter.close();			
+		} catch (IOException e) {
+			Gbl.errorMsg(e);
+		}
+	}
+
+	private void writeHeader(BufferedWriter modelWriter) throws IOException {
+		modelWriter.write("householdId");
+		modelWriter.write(delimiter);
+		modelWriter.write("latest accepted leave time");
+		modelWriter.write(newLine);
+	}
+	
+	private void writeRows(BufferedWriter modelWriter) throws IOException {
+		for (HouseholdDecisionData hdd : this.decisionDataProvider.getHouseholdDecisionData()) {
+			modelWriter.write(hdd.getHouseholdId().toString());
+			modelWriter.write(delimiter);
+			modelWriter.write(String.valueOf(hdd.getLatestAcceptedLeaveTime()));
+			modelWriter.write(newLine);
+		}
 	}
 
 	@Override

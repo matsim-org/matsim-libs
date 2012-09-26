@@ -86,7 +86,8 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 //	protected int binSize = 300; // by default 5 minutes
 	protected int binSize = 60; // by default 1 minute
-	protected int nofBins = 36 * 3600 / binSize; // by default 36 hours
+	protected int nofPictureBins = 36 * 3600 / binSize; // by default 36 hours
+	protected int nofBins = 96 * 3600 / binSize; // by default 96 hours
 	protected int currentBin = 0; // current time bin slot
 
 	protected final Scenario scenario;
@@ -388,7 +389,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		
 		String fileName = null;
 
-		AgentsInEvacuationAreaWriter writer = new AgentsInEvacuationAreaWriter(this.binSize, event.getIteration());
+		AgentsInEvacuationAreaWriter writer = new AgentsInEvacuationAreaWriter(this.binSize, this.nofPictureBins, event.getIteration());
 
 		/*
 		 * write text files
@@ -634,14 +635,19 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		/*
 		 * Write data and use dummies for activities since we are only interested in people traveling.
 		 */
-		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode.txt");
-		writer.write(fileName, new int[nofBins], leftByModeBins);
+		String absoluteFileName;
+		String relativeFileName;
+		absoluteFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_absolute.txt");
+		relativeFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_relative.txt");
+		writer.write(absoluteFileName, relativeFileName, leftByModeBins);
 		
-		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_participating.txt");
-		writer.write(fileName, new int[nofBins], participatingLeftByModeBins);
+		absoluteFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_absolute_participating.txt");
+		relativeFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_relative_participating.txt");
+		writer.write(absoluteFileName, relativeFileName, participatingLeftByModeBins);
 		
-		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_not_participating.txt");
-		writer.write(fileName, new int[nofBins], notParticipatingLeftByModeBins);
+		absoluteFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_absolute_not_participating.txt");
+		relativeFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByMode_relative_not_participating.txt");
+		writer.write(absoluteFileName, relativeFileName, notParticipatingLeftByModeBins);
 		
 		/*
 		 * write leg performing graphs
