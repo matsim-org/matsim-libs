@@ -19,6 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.population;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+
 /**
  * Defines different naming constants related to joint actings.
  * @author thibautd
@@ -26,9 +32,12 @@ package playground.thibautd.cliquessim.population;
 public interface JointActingTypes {
 	public static final String PICK_UP = "pick_up";
 	public static final String DROP_OFF = "drop_off";
+	public static final StageActivityTypes JOINT_STAGE_ACTS =
+		new StageActivityTypesImpl( Arrays.asList( PICK_UP , DROP_OFF ) );
 
 	public static final String PASSENGER = "car_passenger";
 	public static final String DRIVER = "car_driver";
+	public static final List<String> JOINT_MODES = Arrays.asList( PASSENGER , DRIVER );
 
 	//planFile constants
 	public static final String PICK_UP_SPLIT_EXPR = "_";
