@@ -41,7 +41,7 @@ public interface RoutingModule {
 	 * {@link #getStageActivityTypes()} method.
 	 * <br>
 	 * <b>important:</b> if route computation relies on a shortest path algorithm
-	 * using {@link PersonalizableTravelTime} and/or {@link PersonalizableTravelDisutility}
+	 * using {@link TravelTime} and/or {@link PersonalizableTravelDisutility}
 	 * estimators, this method is responsible for setting the person to the argument
 	 * person in those estimators before running the shortest path algorithm.
 	 *

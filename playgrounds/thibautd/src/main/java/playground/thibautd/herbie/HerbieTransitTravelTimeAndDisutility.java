@@ -27,7 +27,7 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * Travel time disutility taking into account travel distance
  * @author thibautd
  */
-public class HerbieTransitTravelTimeAndDisutility implements PersonalizableTravelTime, TransitTravelDisutility {
+public class HerbieTransitTravelTimeAndDisutility implements TravelTime, TransitTravelDisutility {
 	private final boolean CONSIDER_NEGATIVE_WALK_TIMES = true;
 	private final boolean USE_CUSTOM_IV_COSTS = false;
 	private final TransitRouterNetworkTravelTimeAndDisutility timeCost;

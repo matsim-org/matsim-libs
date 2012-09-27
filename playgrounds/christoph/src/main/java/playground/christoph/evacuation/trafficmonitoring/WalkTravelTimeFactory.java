@@ -21,10 +21,10 @@
 package playground.christoph.evacuation.trafficmonitoring;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 
-public class WalkTravelTimeFactory implements PersonalizableTravelTimeFactory {
+public class WalkTravelTimeFactory implements TravelTimeFactory {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	
