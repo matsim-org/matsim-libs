@@ -48,6 +48,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.core.utils.misc.Time;
 
 class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler{
 
@@ -130,14 +131,17 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			}
 			currentActivity.setEndTime(event.getTime());
 			scoringFunction.handleActivity(currentActivity);
-			activityFinished(event.getActType(), event.getTime());
+			activityFinished(event.getActType(), event.getTime()); 
 		}
 
-
-		 public void handleEvent(ActivityStartEvent event) {
-			 ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
-//			 activity.setFacilityId(event.getFacilityId());
+		public void handleEvent(ActivityStartEvent event) {
+			 ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId()); 
+			 activity.setFacilityId(event.getFacilityId());
 			 activity.setStartTime(event.getTime());
+			 if(event.getActType().equals(FreightConstants.END)){
+				 activity.setEndTime(Time.MIDNIGHT);
+				 scoringFunction.handleActivity(activity);
+			 }
 			 currentActivity = activity;
 		 }
 
@@ -192,6 +196,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
 		this.id = carrier.getId();
+		assert scoringFunctionFactory != null : "scoringFunctionFactory is null. this must not be.";
 		this.scoringFunction = scoringFunctionFactory.createScoringFunction(carrier);
 	}
 
