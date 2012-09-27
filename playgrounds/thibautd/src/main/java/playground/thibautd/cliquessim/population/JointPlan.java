@@ -49,9 +49,6 @@ import playground.thibautd.cliquessim.scoring.ScoresAggregatorFactory;
  * @author thibautd
  */
 public class JointPlan implements Plan {
-	private static final Logger log =
-		Logger.getLogger(JointPlan.class);
-
 	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
 	private final boolean setAtIndividualLevel;
 
@@ -60,11 +57,6 @@ public class JointPlan implements Plan {
 	private ScoresAggregator aggregator = null;
 	// for replanning modules to be able to replicate aggregator
 	private final ScoresAggregatorFactory aggregatorFactory;
-	//private final String individualPlanType;
-	//private JointTripPossibilities jointTripPossibilities = null;
-
-	//private Id currentIndividual = null;
-	//private Iterator<Id> individualsIterator;
 
 	/**
 	 * Creates a joint plan from individual plans.
@@ -234,30 +226,6 @@ public class JointPlan implements Plan {
 		return this.clique;
 	}
 
-	/**
-	 * returns the list of plan elements for each agent. List are immutable.
-	 * @return a map linking agents Id the the list of their plan elements,
-	 * in correct temporal sequence.
-	 */
-	public Map<Id, List<PlanElement>> getIndividualPlanElements() {
-		Map<Id, List<PlanElement>> output = new TreeMap<Id, List<PlanElement>>();
-
-		for (Map.Entry<Id, Plan> entry : this.individualPlans.entrySet()) {
-			output.put(
-					entry.getKey(),
-					// do not make the lists unmodifiable: acting
-					// on the plan element list is the only way to
-					// change plan structure, andwe do not track anything,
-					// so that it is safe.
-					// It would be possible by getting the plan elements from the
-					// individual plans anyway...
-					//Collections.unmodifiableList( entry.getValue().getPlanElements() ));
-					entry.getValue().getPlanElements() );
-		}
-
-		return output;
-	}
-
 	public Plan getIndividualPlan(final Person person) {
 		return this.getIndividualPlan(person.getId());
 	}
@@ -346,25 +314,6 @@ public class JointPlan implements Plan {
 		return output;
 	}
 
-	///**
-	// * Returns a leg given its Id.
-	// * used to resolve links between joint legs.
-	// *
-	// * @throws LinkedElementsResolutionException if the corresponding leg is not found
-	// */
-	//public JointLeg getLegById(final Id legId) {
-	//	throw new UnsupportedOperationException( "will be removed" );
-	//}
-
-	///**
-	// * Returns an act given its Id.
-	// *
-	// * @throws LinkedElementsResolutionException if the corresponding leg is not found
-	// */
-	//public JointActivity getActById(final Id actId) {
-	//	throw new UnsupportedOperationException( "will be removed" );
-	//}
-
 	/**
 	 */
 	public String getType() {
@@ -373,27 +322,11 @@ public class JointPlan implements Plan {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": clique="+clique+", elements="+getIndividualPlanElements()+", plans="+getIndividualPlans()+", addAtIndividualLevel="+
+		return getClass().getSimpleName()+": clique="+clique+", plans="+getIndividualPlans()+", addAtIndividualLevel="+
 			setAtIndividualLevel+", isSelected="+this.isSelected();
 	}
 
 	public ScoresAggregatorFactory getScoresAggregatorFactory() {
 		return this.aggregatorFactory;
 	}
-
-	//public JointTripPossibilities getJointTripPossibilities() {
-	//	return jointTripPossibilities;
-	//}
-
-	///**
-	// * Sets the joint trip possibilities information
-	// * @param possibilities the information to set (can be null)
-	// * @return the previously set possibilities information (can be null)
-	// */
-	//public JointTripPossibilities setJointTripPossibilities(
-	//		final JointTripPossibilities possibilities) {
-	//	JointTripPossibilities old = this.jointTripPossibilities;
-	//	this.jointTripPossibilities = possibilities;
-	//	return old;
-	//}
 }

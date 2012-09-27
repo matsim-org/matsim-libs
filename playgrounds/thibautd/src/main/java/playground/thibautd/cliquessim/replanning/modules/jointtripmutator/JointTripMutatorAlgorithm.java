@@ -112,8 +112,8 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 	private boolean mutate(
 			final JointPlan plan,
 			final Possibility toMutate) {
-		Iterator<PlanElement> passengerElements = plan.getIndividualPlanElements().get( toMutate.getPassenger() ).iterator();
-		List<PlanElement> driverElements = plan.getIndividualPlanElements().get( toMutate.getDriver() );
+		Iterator<PlanElement> passengerElements = plan.getIndividualPlans().get( toMutate.getPassenger() ).getPlanElements().iterator();
+		List<PlanElement> driverElements = plan.getIndividualPlans().get( toMutate.getDriver() ).getPlanElements();
 		List<Tuple<Integer, Integer>> performedJointTrips = new ArrayList<Tuple<Integer, Integer>>();
 
 		Activity origin = null;
@@ -133,7 +133,8 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 						((Activity) driverElement).getLinkId().equals( toMutate.getDriverOd().getDestinationLinkId() ) ) {
 						// get the passenger information
 						int passengerLegIndex = 
-							plan.getIndividualPlanElements().get( toMutate.getPassenger() ).indexOf(
+							plan.getIndividualPlans().get( toMutate.getPassenger() )
+								.getPlanElements().indexOf(
 									getNextPassengerLeg( passengerElements , toMutate ) );
 						performedJointTrips.add( new Tuple<Integer, Integer>( driverLegIndex , passengerLegIndex ) );
 					}
@@ -171,8 +172,8 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 		int driverLegIndex = toRemove.getFirst();
 		int passengerLegIndex = toRemove.getSecond();
 
-		List<PlanElement> driverPes = plan.getIndividualPlanElements().get( toMutate.getDriver() );
-		List<PlanElement> passengerPes = plan.getIndividualPlanElements().get( toMutate.getPassenger() );
+		List<PlanElement> driverPes = plan.getIndividualPlans().get( toMutate.getDriver() ).getPlanElements();
+		List<PlanElement> passengerPes = plan.getIndividualPlans().get( toMutate.getPassenger() ).getPlanElements();
 		
 		Leg driverLeg = (Leg) driverPes.get( driverLegIndex );
 		DriverRoute driverRoute = (DriverRoute) driverLeg.getRoute();
@@ -226,9 +227,9 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 	private void insert(final JointPlan plan, final Possibility toMutate) {
 		// plans structures
 		List<PlanElement> driverElements =
-			plan.getIndividualPlanElements().get( toMutate.getDriver() );
+			plan.getIndividualPlans().get( toMutate.getDriver() ).getPlanElements();
 		List<PlanElement> passengerElements =
-			plan.getIndividualPlanElements().get( toMutate.getPassenger() );
+			plan.getIndividualPlans().get( toMutate.getPassenger() ).getPlanElements();
 
 		List<PlanElement> driverStructure = tripRouter.tripsToLegs( driverElements , checker );
 		List<PlanElement> passengerStructure = tripRouter.tripsToLegs( passengerElements , checker);

@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Counter;
@@ -65,11 +66,11 @@ public class ExtractPossibilitiesFromPlansWithJointTrips {
 			JointPlan plan = (JointPlan) cl.getSelectedPlan();
 			TripCount tripCount = new TripCount();
 
-			for (Map.Entry<Id, List<PlanElement>> entry : plan.getIndividualPlanElements().entrySet() ) {
+			for (Map.Entry<Id, Plan> entry : plan.getIndividualPlans().entrySet() ) {
 				Id driver = entry.getKey();
 				Activity origin = null;
 				DriverRoute driverRoute = null;
-				for (PlanElement driverEl : entry.getValue()) {
+				for (PlanElement driverEl : entry.getValue().getPlanElements()) {
 					if (driverEl instanceof Activity) {
 						String type = ((Activity) driverEl).getType();
 						if (type.equals( JointActingTypes.PICK_UP ) ||
@@ -86,7 +87,7 @@ public class ExtractPossibilitiesFromPlansWithJointTrips {
 								tripCount.incCount( driver , passenger );
 								int tripToFind = tripCount.getCount( driver , passenger );
 								int currentTrip = 0;
-								for (PlanElement passengerEl : plan.getIndividualPlanElements().get( passenger )) {
+								for (PlanElement passengerEl : plan.getIndividualPlans().get( passenger ).getPlanElements()) {
 									if (passengerEl instanceof Leg && ((Leg) passengerEl).getMode().equals( JointActingTypes.PASSENGER )) {
 										PassengerRoute pr = (PassengerRoute) ((Leg) passengerEl).getRoute();
 

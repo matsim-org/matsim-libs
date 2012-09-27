@@ -360,9 +360,9 @@ public class JointTimeModeChooserSolution implements Solution {
 	}	
 
 	private void enforceTimeConsistency(final JointPlan plan) {
-		for (Map.Entry< Id , List<PlanElement> > entry : plan.getIndividualPlanElements().entrySet()) {
+		for (Map.Entry< Id , Plan > entry : plan.getIndividualPlans().entrySet()) {
 			Id currentAgent = entry.getKey();
-			List<PlanElement> planElements = entry.getValue();
+			List<PlanElement> planElements = entry.getValue().getPlanElements();
 			double now = 0;
 			for (PlanElement pe : planElements) {
 				if (pe instanceof Activity) {
@@ -426,7 +426,7 @@ public class JointTimeModeChooserSolution implements Solution {
 			final Id passenger) {
 		// FIXME: invalid if several joint trips with the same OD (the
 		// tt for the first driver trip will always be considered)
-		for (PlanElement pe : plan.getIndividualPlanElements().get( driver )) {
+		for (PlanElement pe : plan.getIndividualPlans().get( driver ).getPlanElements()) {
 			if (pe instanceof Leg) {
 				Route r = ((Leg) pe).getRoute();
 
@@ -453,13 +453,13 @@ public class JointTimeModeChooserSolution implements Solution {
 		log.error( "passenger: "+passenger+", with OD "+origin+" -> "+destination );
 		log.error( "with plan:" );
 		int i=1;
-		for (PlanElement pe : plan.getIndividualPlanElements().get( passenger )) {
+		for (PlanElement pe : plan.getIndividualPlans().get( passenger ).getPlanElements()) {
 			log.error( (i++)+": "+pe );
 		}
 		log.error( "driver: "+driver);
 		log.error( "with plan:" );
 		i=1;
-		for (PlanElement pe : plan.getIndividualPlanElements().get( driver )) {
+		for (PlanElement pe : plan.getIndividualPlans().get( driver ).getPlanElements()) {
 			log.error( (i++)+": "+pe );
 		}
 		throw new RuntimeException( "could not find a valid driver trip!" );
