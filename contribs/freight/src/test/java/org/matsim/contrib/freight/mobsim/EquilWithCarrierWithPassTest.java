@@ -30,7 +30,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
-public class EquilWithCarrierTest extends MatsimTestCase {
+public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 	
 	Controler controler;
 	
@@ -53,7 +53,7 @@ public class EquilWithCarrierTest extends MatsimTestCase {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(2);
 		config.network().setInputFile(NETWORK_FILENAME);
-//		config.plans().setInputFile(PLANS_FILENAME);
+		config.plans().setInputFile(PLANS_FILENAME);
 		config.addQSimConfigGroup(new QSimConfigGroup());
 //		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
 //		bestScore.setModuleName("BestScore");
@@ -73,29 +73,19 @@ public class EquilWithCarrierTest extends MatsimTestCase {
 		carrierConfig.addCoreModules();
 		carrierConfig.plans().setInputFile(getInputDirectory() + "carrierPlansEquils.xml");
 		carrierControler = new CarrierControler(carrierConfig);
-		carrierControler.setCarrierScoringFunctionFactory(new ScoringFunctionFactoryForTests(controler.getNetwork()));
 		carrierControler.setCarrierPlanStrategyManagerFactory(new StrategyManagerFactoryForTests());
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
 	}
 
 	
-	public void testMobsimWithCarrierRunsWithoutException() {
-//		try{
-			controler.run();
-//			assertTrue(true);
-//		}
-//		catch(Exception e){
-//			assertTrue(false);
-//		}
-	}
-	
-	public void testScoringIsInlineWithSim(){
+	public void testScoringInMeters(){
 		try{
+			carrierControler.setCarrierScoringFunctionFactory(new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
 			controler.run();
 			
 			Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
-			assertEquals(-160000.0,carrier1.getSelectedPlan().getScore());
+			assertEquals(-170000.0,carrier1.getSelectedPlan().getScore());
 			
 			Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
 			assertEquals(-85000.0,carrier2.getSelectedPlan().getScore());
@@ -106,6 +96,25 @@ public class EquilWithCarrierTest extends MatsimTestCase {
 		}
 	}
 
+	public void testScoringInSeconds(){
+//		try{
+			carrierControler.setCarrierScoringFunctionFactory(new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
+			controler.run();
+			
+			Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
+			assertEquals(-8040.0,carrier1.getSelectedPlan().getScore());
+			
+			Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
+			assertEquals(-6662.0,carrier2.getSelectedPlan().getScore());
+			
+			Carrier carrier3 = carrierControler.getCarriers().get(new IdImpl("carrier3"));
+			assertEquals(-7862.0,carrier3.getSelectedPlan().getScore());
+			
+//		}
+//		catch(Exception e){
+//			assertTrue(false);
+//		}
+	}
 	
 	
 }

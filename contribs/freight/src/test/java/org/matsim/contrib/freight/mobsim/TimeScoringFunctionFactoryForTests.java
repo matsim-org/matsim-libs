@@ -21,7 +21,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 
 @Ignore
-public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
+public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
 	 static class DriverLegScoring implements BasicScoring, LegScoring{
 			
@@ -80,22 +80,40 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
 					if(!employedVehicles.contains(vehicle)){
 						employedVehicles.add(vehicle);
+						score += (-1)*getFixEmploymentCost(vehicle);
 					}
 					double distance = 0.0;
+					double toll = 0.0;
 					if(currentLeg.getRoute() instanceof NetworkRoute){
 						distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
 						for(Id linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
 							distance += network.getLinks().get(linkId).getLength();
+							toll += getToll(linkId, vehicle, null);
 						}
 						distance += network.getLinks().get(currentLeg.getRoute().getEndLinkId()).getLength();
+						toll += getToll(currentLeg.getRoute().getEndLinkId(), vehicle, null);
 					}
+					score += (-1)*(time-currentLegStartTime)*getTimeParameter(vehicle,null);
 					score += (-1)*distance*getDistanceParameter(vehicle,null);
+					score += (-1)*toll;
 				}
 				
 			}
 			
+			private double getFixEmploymentCost(CarrierVehicle vehicle) {
+				return vehicle.getVehicleType().getVehicleCostInformation().fix;
+			}
+
+			private double getToll(Id linkId, CarrierVehicle vehicle, Person driver) {
+				return 0;
+			}
+
 			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
 				return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
+			}
+
+			private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
+				return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
 			}
 
 			private CarrierVehicle getVehicle(Id vehicleId) {
@@ -143,7 +161,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 
 		@Override
 		public double getScore() {
-			return Math.round((-1)*(startTimeOfEnd-startTime)/3600.0*amountPerHour);
+			return Math.round((-1)*(startTimeOfEnd-startTime));
 		}
 
 		@Override
@@ -188,7 +206,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 	 
 	 private Network network;
 	
-	public ScoringFunctionFactoryForTests(Network network) {
+	public TimeScoringFunctionFactoryForTests(Network network) {
 		super();
 		this.network = network;
 	}
@@ -197,8 +215,8 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
 		DriverLegScoring driverLegScoring = new DriverLegScoring(carrier, network);
-		sf.addScoringFunction(driverLegScoring);
-		sf.addScoringFunction(new NumberOfToursAward(carrier));
+//		sf.addScoringFunction(driverLegScoring);
+//		sf.addScoringFunction(new NumberOfToursAward(carrier));
 		sf.addScoringFunction(new DriverActScoring());
 		return sf;
 	}
