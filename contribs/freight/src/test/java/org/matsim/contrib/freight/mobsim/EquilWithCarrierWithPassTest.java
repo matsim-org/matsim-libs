@@ -80,7 +80,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 
 	
 	public void testScoringInMeters(){
-		try{
+//		try{
 			carrierControler.setCarrierScoringFunctionFactory(new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
 			controler.run();
 			
@@ -90,10 +90,10 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 			Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
 			assertEquals(-85000.0,carrier2.getSelectedPlan().getScore());
 			
-		}
-		catch(Exception e){
-			assertTrue(false);
-		}
+//		}
+//		catch(Exception e){
+//			assertTrue(false);
+//		}
 	}
 
 	public void testScoringInSeconds(){
