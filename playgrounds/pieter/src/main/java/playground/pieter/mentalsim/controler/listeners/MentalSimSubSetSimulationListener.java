@@ -1,22 +1,11 @@
 package playground.pieter.mentalsim.controler.listeners;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
-import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.pieter.mentalsim.controler.MentalSimControler;
-import playground.pieter.mentalsim.mobsim.MentalSimFactory;
 
 /**
  * @author fouriep
