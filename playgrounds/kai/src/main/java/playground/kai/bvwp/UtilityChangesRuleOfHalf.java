@@ -40,7 +40,7 @@ import playground.kai.bvwp.Values.Entry;
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		
-		if ( deltaAmount > 0  && !entry.equals(Entry.priceProduction)) {
+		if ( deltaAmount > 0  && !entry.equals(Entry.costOfProduction)) {
 			// wir sind aufnehmend; es gilt die RoH
 			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
 		} else {

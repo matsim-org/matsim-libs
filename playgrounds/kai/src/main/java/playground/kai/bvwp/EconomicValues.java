@@ -172,7 +172,7 @@ class EconomicValues {
 				pvValues.setByEntry( Entry.km, -0.28 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
 				pvValues.setByEntry( Entry.priceUser, -1. ) ;
-				pvValues.setByEntry( Entry.priceProduction, -1. ) ;
+				pvValues.setByEntry( Entry.costOfProduction, -1. ) ;
 			}
 		}
 		{
@@ -182,10 +182,82 @@ class EconomicValues {
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
 				pvValues.setByEntry( Entry.priceUser, -1. ) ;
-				pvValues.setByEntry( Entry.priceProduction, -1. ) ;
+				pvValues.setByEntry( Entry.costOfProduction, -1. ) ;
 			}
 		}
 	
+		return economicValues ;
+	}
+
+	static Values createEconomicValuesFictiveExampleGV() {
+		Values economicValues = new Values() ;
+		{
+			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
+			{
+				ValuesForAUserType values = roadValues.getByDemandSegment(Type.GV) ;
+				values.setByEntry( Entry.km, -0.28 ) ;
+				values.setByEntry( Entry.hrs, -0.00 ) ;
+				values.setByEntry( Entry.priceUser, -1. ) ;
+				values.setByEntry( Entry.costOfProduction, -1. ) ;
+			}
+		}
+		{
+			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
+			{
+				ValuesForAUserType values = railValues.getByDemandSegment(Type.GV) ;
+				values.setByEntry( Entry.km, -0.00 ) ;
+				values.setByEntry( Entry.hrs, -0.00 ) ;
+				values.setByEntry( Entry.priceUser, -1. ) ;
+				values.setByEntry( Entry.costOfProduction, -1. ) ;
+			}
+		}
+	
+		return economicValues ;
+	}
+
+	public static Values createEconomicValuesBVWP2015() {
+		Values economicValues = new Values() ;
+		{
+			ValuesForAMode valuesForAMode = economicValues.getByMode(Mode.road) ;
+			{
+				ValuesForAUserType valuesForAModeAndDemandSegment = valuesForAMode.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.km, -0.28 ) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.hrs, -18.00 ) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.priceUser, -1. ) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.costOfProduction, -1. ) ;
+			}
+		}
+		{
+			ValuesForAMode valuesForAMode = economicValues.getByMode(Mode.rail) ;
+			{
+				ValuesForAUserType valuesForAModeAndDemandSegment = valuesForAMode.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.km, -0.1 ) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.hrs, -18.00 ) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.priceUser, -1. ) ;
+				valuesForAModeAndDemandSegment.setByEntry( Entry.costOfProduction, -1. ) ;
+			}
+		}
+		{
+			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
+			{	
+				ValuesForAUserType values = roadValues.getByDemandSegment(Type.GV) ;
+				values.setByEntry( Entry.km, -0.28 ) ;
+				values.setByEntry( Entry.hrs, -0.00 ) ;
+				values.setByEntry( Entry.priceUser, -1. ) ;
+				values.setByEntry( Entry.costOfProduction, -1. ) ;
+			}
+		}
+		{
+			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
+			{
+				ValuesForAUserType values = railValues.getByDemandSegment(Type.GV) ;
+				values.setByEntry( Entry.km, -0.00 ) ; // no user costs per km
+				values.setByEntry( Entry.hrs, -1.00 ) ; // NEW: a value of time per ton
+				values.setByEntry( Entry.priceUser, -1. ) ;
+				values.setByEntry( Entry.costOfProduction, -1. ) ;
+			}
+		}
+
 		return economicValues ;
 	}
 

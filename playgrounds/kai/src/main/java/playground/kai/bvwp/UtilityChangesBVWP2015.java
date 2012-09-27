@@ -60,7 +60,7 @@ import playground.kai.bvwp.Values.Entry;
 			ValuesForAUserType quantitiesPlanfall) {
 		double sum = 0. ;
 		for ( Entry entry : Entry.values() ) {
-			if ( entry != Entry.XX && entry != Entry.priceProduction ) {
+			if ( entry != Entry.XX && entry != Entry.costOfProduction ) {
 				final double quantityPlanfall = quantitiesPlanfall.getByEntry(entry);
 				final double quantityNullfall = quantitiesNullfall.getByEntry(entry);
 				final double margUtl = econValues.getByEntry(entry) ;
