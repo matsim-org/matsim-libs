@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 
 /**

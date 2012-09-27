@@ -20,7 +20,7 @@
 package playground.andreas.bvgAna.level1;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 
 /**
  * Collects the <code>VehicleDepartsAtFacilityEvent</code> of one vehicle and the event of its following vehicle to calculate their planned and realized headway.

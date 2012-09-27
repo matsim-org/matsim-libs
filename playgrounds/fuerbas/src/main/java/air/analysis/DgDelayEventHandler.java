@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;

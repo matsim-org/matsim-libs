@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
-public class NoiseEventImpl extends EventImpl implements NoiseEvent {
+public class NoiseEventImpl extends Event implements NoiseEvent {
 	private final Id linkId;
 	private final Map<String , Double> L_mE;
 	private final Double L_DEN ;

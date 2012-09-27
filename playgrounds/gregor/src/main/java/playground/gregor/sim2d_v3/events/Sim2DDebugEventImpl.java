@@ -3,9 +3,9 @@ package playground.gregor.sim2d_v3.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
-public class Sim2DDebugEventImpl extends EventImpl implements Sim2DDebugEvent {
+public class Sim2DDebugEventImpl extends Event implements Sim2DDebugEvent {
 
 	private static final String EVENT_TYPE = "Sim2DDebugEvent";
 	

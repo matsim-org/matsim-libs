@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 import playground.andreas.aas.modules.multiAnalyzer.emissions.types.ColdPollutant;
 
@@ -31,7 +31,7 @@ import playground.andreas.aas.modules.multiAnalyzer.emissions.types.ColdPollutan
  * @author benjamin
  * 
  */
-public class ColdEmissionEventImpl extends EventImpl implements ColdEmissionEvent{
+public class ColdEmissionEventImpl extends Event implements ColdEmissionEvent{
 	private final Id linkId;
 	private final Id vehicleId;
 	private final Map<ColdPollutant, Double> coldEmissions;

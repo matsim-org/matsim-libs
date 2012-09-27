@@ -20,7 +20,6 @@
 package playground.gregor.sim2d_v3.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -30,7 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public interface XYVxVyEvent extends Event {
+public interface XYVxVyEvent {
 
 	public double getX();
 
@@ -44,4 +43,7 @@ public interface XYVxVyEvent extends Event {
 	public Coordinate getCoordinate();
 	
 	public Id getPersonId();
+	
+	public double getTime();
+	
 }

@@ -9,9 +9,9 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 

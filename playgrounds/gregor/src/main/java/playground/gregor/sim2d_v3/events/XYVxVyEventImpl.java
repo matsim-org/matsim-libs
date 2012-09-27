@@ -22,11 +22,11 @@ package playground.gregor.sim2d_v3.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class XYVxVyEventImpl extends EventImpl implements XYVxVyEvent {
+public class XYVxVyEventImpl extends Event implements XYVxVyEvent {
 
 	public static final String EVENT_TYPE = "XYVxVyEvent";
 	public static final String ATTRIBUTE_X = "x";

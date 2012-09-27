@@ -29,10 +29,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;

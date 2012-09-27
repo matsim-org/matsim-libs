@@ -22,7 +22,7 @@ package playground.andreas.bvgAna.level1;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 
 /**
  * Collects planned and realized departures at one stop.

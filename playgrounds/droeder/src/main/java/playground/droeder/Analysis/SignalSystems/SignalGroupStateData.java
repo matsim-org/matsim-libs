@@ -22,7 +22,7 @@ package playground.droeder.Analysis.SignalSystems;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 /**

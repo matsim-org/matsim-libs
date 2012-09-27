@@ -27,7 +27,6 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -96,7 +95,7 @@ public class ExtractHitchHikersFakeActivities {
 
 		@Override
 		public void handleEvent(final Event event) {
-			if (event.getAttributes().get( EventImpl.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
+			if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
 				writer.handleEvent(
 						factory.createActivityStartEvent(
 							event.getTime(),
@@ -105,7 +104,7 @@ public class ExtractHitchHikersFakeActivities {
 							null,
 							WAIT_ACT_TYPE));
 			}
-			else if (event.getAttributes().get( EventImpl.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
+			else if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
 				writer.handleEvent(
 						factory.createActivityEndEvent(
 							event.getTime(),

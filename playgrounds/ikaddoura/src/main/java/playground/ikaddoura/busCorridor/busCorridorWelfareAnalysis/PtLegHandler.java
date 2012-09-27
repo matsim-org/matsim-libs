@@ -29,9 +29,9 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 
 /**

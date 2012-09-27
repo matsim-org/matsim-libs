@@ -19,12 +19,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.TransitDriverStartsEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -724,7 +724,7 @@ public class RblMerger {
 	}
 
 	/**
-	 * Creates events from a given transit schedule. Currently only {@link TransitDriverStartsEvent}, {@link VehicleArrivesAtFacilityEventImpl} and {@link VehicleDepartsAtFacilityEventImpl} are supported.
+	 * Creates events from a given transit schedule. Currently only {@link TransitDriverStartsEvent}, {@link VehicleArrivesAtFacilityEvent} and {@link VehicleDepartsAtFacilityEvent} are supported.
 	 * 
 	 * @param newTransitSchedule
 	 * @param eventsFromTransitScheduleOutFile
@@ -744,8 +744,8 @@ public class RblMerger {
 					
 //					double departureAtLastStop = Double.NaN;
 					for (TransitRouteStop stop : routeEntry.getValue().getStops()) {
-						events.add(new VehicleArrivesAtFacilityEventImpl(departure.getDepartureTime() + stop.getArrivalOffset(), departure.getVehicleId(), stop.getStopFacility().getId(), 0.0));
-						events.add(new VehicleDepartsAtFacilityEventImpl(departure.getDepartureTime() + stop.getDepartureOffset(), departure.getVehicleId(), stop.getStopFacility().getId(), 0.0));
+						events.add(new VehicleArrivesAtFacilityEvent(departure.getDepartureTime() + stop.getArrivalOffset(), departure.getVehicleId(), stop.getStopFacility().getId(), 0.0));
+						events.add(new VehicleDepartsAtFacilityEvent(departure.getDepartureTime() + stop.getDepartureOffset(), departure.getVehicleId(), stop.getStopFacility().getId(), 0.0));
 //						departureAtLastStop = departure.getDepartureTime() + stop.getDepartureOffset();
 					}
 					

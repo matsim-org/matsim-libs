@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v3.events.debug;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public class ArrowEvent extends EventImpl {
+public class ArrowEvent extends Event {
 	
 	public static final String ATTRIBUTE_FROM_X = "fromX";
 	public static final String ATTRIBUTE_FROM_Y = "fromY";

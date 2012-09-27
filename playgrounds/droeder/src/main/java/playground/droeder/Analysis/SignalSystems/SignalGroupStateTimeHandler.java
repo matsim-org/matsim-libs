@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.model.SignalGroupState;

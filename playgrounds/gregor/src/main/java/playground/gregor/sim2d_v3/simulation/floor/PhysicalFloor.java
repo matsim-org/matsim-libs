@@ -412,7 +412,7 @@ public class PhysicalFloor implements Floor {
 
 			// if events should be emitted
 			if (this.emitXYZAzimuthEvents) {
-				XYVxVyEvent e = new XYVxVyEventImpl(agent.getDelegate().getId(), agent.getPosition().x, agent.getPosition().y, agent.getVx(), agent.getVy(), time);
+				XYVxVyEventImpl e = new XYVxVyEventImpl(agent.getDelegate().getId(), agent.getPosition().x, agent.getPosition().y, agent.getVx(), agent.getVy(), time);
 
 				// if events are not filtered or the filter decides to process the event
 				if (!this.filterEvents || this.xyDataFilter.processXYVxVyEvent(e)) {

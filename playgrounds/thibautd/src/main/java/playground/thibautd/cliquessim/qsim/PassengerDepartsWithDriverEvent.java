@@ -22,13 +22,12 @@ package playground.thibautd.cliquessim.qsim;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
-import org.matsim.core.events.LinkEventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * @author thibautd
  */
-public class PassengerDepartsWithDriverEvent extends EventImpl {
+public class PassengerDepartsWithDriverEvent extends Event {
 	public static final String EVENT_TYPE = "passengerdepartswithdriver";
 	public static final String ATTRIBUTE_DRIVER = "driverId";
 	public static final String ATTRIBUTE_PASSENGER = "passengerId";
@@ -83,7 +82,7 @@ public class PassengerDepartsWithDriverEvent extends EventImpl {
 		Map<String, String> atts = super.getAttributes();
 		atts.put( ATTRIBUTE_DRIVER , ""+driver );
 		atts.put( ATTRIBUTE_PASSENGER , ""+passenger );
-		atts.put( LinkEventImpl.ATTRIBUTE_LINK , ""+link );
+		atts.put( "link" , ""+link );
 		return atts;
 	}
 

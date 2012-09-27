@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 
 /**
  * Simple data container to store departure time and agent enters vehicle time for each agent at different stops.

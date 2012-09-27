@@ -2,12 +2,12 @@ package playground.gregor.sim2d_v3.events;
 
 import java.util.Map;
 
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class DoubleValueStringKeyAtCoordinateEvent extends EventImpl{
+public class DoubleValueStringKeyAtCoordinateEvent extends Event{
 
 	public static final String EVENT_TYPE = "DoubleValueStringKeyAtCoordinate";
 	public static final String ATTRIBUTE_CENTER_X = "x";

@@ -28,11 +28,11 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.utils.DgSignalEventsCollector;

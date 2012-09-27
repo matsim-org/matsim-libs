@@ -28,7 +28,6 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -64,12 +63,12 @@ public class ExtractHitchHikersWaitingTimes {
 
 		@Override
 		public void handleEvent(final Event event) {
-			if (event.getAttributes().get( EventImpl.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
+			if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
 				waitStarts.put(
 						event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ),
 						event.getTime());
 			}
-			else if (event.getAttributes().get( EventImpl.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
+			else if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
 				Double start = waitStarts.remove( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) );
 
 				try {

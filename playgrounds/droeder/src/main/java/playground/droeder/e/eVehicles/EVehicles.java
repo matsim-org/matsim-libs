@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.dgrether.energy.validation.ValidationInfoWriter;

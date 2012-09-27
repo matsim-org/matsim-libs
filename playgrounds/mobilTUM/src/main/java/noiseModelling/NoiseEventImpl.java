@@ -1,12 +1,15 @@
 package noiseModelling;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
-public class NoiseEventImpl extends EventImpl implements NoiseEvent {
+public class NoiseEventImpl extends Event {
+	
+
+	public final static String EVENT_TYPE = "NoiseEvent";
+	public final static String ATTRIBUTE_LINK_ID = "linkId";
 	private final Id linkId;
 	//private final Map<Double , Double> L_mE;
 	private final Double L_DEN ;
@@ -17,18 +20,11 @@ public class NoiseEventImpl extends EventImpl implements NoiseEvent {
 		//this.L_mE = L_mE ;		
 		this.L_DEN = L_DEN ;
 	}
-	
 
-	@Override
 	public Id getLinkId() {
-		// TODO Auto-generated method stub
 		return linkId ;
 	}
 
-	/*@Override
-	public Map<String, Double> getL_mE() {
-		return L_mE;
-	}*/
 	public Double getL_DEN (){
 		return L_DEN;
 	}
@@ -36,7 +32,7 @@ public class NoiseEventImpl extends EventImpl implements NoiseEvent {
 	@Override
 	public String getEventType() {
 		// TODO Auto-generated method stub
-		return NoiseEvent.EVENT_TYPE;
+		return EVENT_TYPE;
 	}
 
 	public Map<String, String> getAttributes(){

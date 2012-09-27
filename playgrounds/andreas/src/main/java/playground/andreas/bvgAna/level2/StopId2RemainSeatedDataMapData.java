@@ -19,7 +19,7 @@
 
 package playground.andreas.bvgAna.level2;
 
-import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 
 /**
  * Collects occupancy at arrival and number of agents leaving the vehicle for on <code>VehicleArrivesAtFacilityEvent</code>

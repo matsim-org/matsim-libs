@@ -22,7 +22,6 @@ package playground.benjamin.emissions.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
 
 import playground.benjamin.emissions.types.WarmPollutant;
 
@@ -31,7 +30,7 @@ import playground.benjamin.emissions.types.WarmPollutant;
  * @author benjamin
  *
  */
-public interface WarmEmissionEvent extends Event{
+public interface WarmEmissionEvent {
 
 	public final static String EVENT_TYPE = "warmEmissionEvent";
 	
@@ -43,4 +42,7 @@ public interface WarmEmissionEvent extends Event{
 	public Id getVehicleId();
 
 	public Map<WarmPollutant, Double> getWarmEmissions();
+	
+	public double getTime();
+	
 }

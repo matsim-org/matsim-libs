@@ -142,7 +142,7 @@ public class Mat2XYVxVyEvents {
 				Coordinate v = ped.velocities.get(time);
 
 
-				XYVxVyEvent ev = new XYVxVyEventImpl(id, c, v.x, v.y, time);
+				XYVxVyEventImpl ev = new XYVxVyEventImpl(id, c, v.x, v.y, time);
 				manager.processEvent(ev);
 
 				if (time == ped.arrived) {

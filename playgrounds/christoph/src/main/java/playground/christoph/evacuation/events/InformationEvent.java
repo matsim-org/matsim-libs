@@ -21,7 +21,6 @@
 
 package playground.christoph.evacuation.events;
 
-import org.matsim.core.api.experimental.events.Event;
 
 /**
  * @author cdobler

@@ -26,9 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
-import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
 import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -154,7 +154,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		EventsManager events = this.simEngine.getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
-			events.processEvent(new VehicleArrivesAtFacilityEventImpl(now, this.vehicle.getId(), stop.getId(), Double.NaN));
+			events.processEvent(new VehicleArrivesAtFacilityEvent(now, this.vehicle.getId(), stop.getId(), Double.NaN));
 		}
 	}
 
@@ -197,7 +197,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 
 	private void depart(final double now) {
 		EventsManager events = this.simEngine.getEventsManager();
-		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getId(),
+		events.processEvent(new VehicleDepartsAtFacilityEvent(now, this.vehicle.getId(),
 				this.currentStop.getStopFacility().getId(), Double.NaN));
 		if ((this.nextStopIndex + 1) < this.stops.length) {
 			this.nextStopIndex++;

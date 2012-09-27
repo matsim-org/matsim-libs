@@ -22,7 +22,6 @@ package playground.andreas.aas.modules.multiAnalyzer.emissions.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
 
 import playground.andreas.aas.modules.multiAnalyzer.emissions.types.ColdPollutant;
 
@@ -31,7 +30,7 @@ import playground.andreas.aas.modules.multiAnalyzer.emissions.types.ColdPollutan
  * @author benjamin
  *
  */
-public interface ColdEmissionEvent extends Event{
+public interface ColdEmissionEvent {
 
 	public final static String EVENT_TYPE = "coldEmissionEvent";
 	
@@ -43,4 +42,7 @@ public interface ColdEmissionEvent extends Event{
 	public Id getVehicleId();
 
 	public Map<ColdPollutant, Double> getColdEmissions();
+	
+	public double getTime();
+	
 }

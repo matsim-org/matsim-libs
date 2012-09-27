@@ -23,12 +23,12 @@ package playground.christoph.evacuation.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * @author cdobler
  */
-public class PersonInformationEventImpl extends EventImpl implements PersonInformationEvent {
+public class PersonInformationEventImpl extends Event implements PersonInformationEvent {
 
 	private final Id personId;
 

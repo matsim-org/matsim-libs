@@ -26,7 +26,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.SignalGroupStateChangedEvent;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 
 

@@ -31,7 +31,7 @@ import playground.andreas.aas.modules.multiAnalyzer.emissions.types.WarmPollutan
  * @author benjamin
  *
  */
-public interface WarmEmissionEvent extends Event{
+public interface WarmEmissionEvent {
 
 	public final static String EVENT_TYPE = "warmEmissionEvent";
 	

@@ -31,7 +31,7 @@ import playground.benjamin.emissions.types.ColdPollutant;
  * @author benjamin
  *
  */
-public interface ColdEmissionEvent extends Event{
+public interface ColdEmissionEvent {
 
 	public final static String EVENT_TYPE = "coldEmissionEvent";
 	
@@ -43,4 +43,7 @@ public interface ColdEmissionEvent extends Event{
 	public Id getVehicleId();
 
 	public Map<ColdPollutant, Double> getColdEmissions();
+	
+	public double getTime();
+	
 }

@@ -30,7 +30,6 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.MatsimEventsReader;
@@ -114,7 +113,7 @@ public class ExtractExecutedWaitingTimes {
 		}
 
 		private boolean handleJointDeparture(final Event event) {
-			if ( event.getAttributes().get( EventImpl.ATTRIBUTE_TYPE ).equals( PassengerDepartsWithDriverEvent.EVENT_TYPE ) ) {
+			if ( event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( PassengerDepartsWithDriverEvent.EVENT_TYPE ) ) {
 				String driverId = event.getAttributes().get( PassengerDepartsWithDriverEvent.ATTRIBUTE_DRIVER );
 				String passengerId = event.getAttributes().get( PassengerDepartsWithDriverEvent.ATTRIBUTE_PASSENGER );
 
