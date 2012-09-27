@@ -32,7 +32,7 @@ class Values {
 	 * aber abgesehen davon spricht eigentlich nichts dagegen.  kai,benjamin, sep'12
 	 * </ul>
 	 */
-	enum Entry { XX, km, hrs, mon }
+	enum Entry { XX, km, hrs, priceUser, priceProduction }
 
 	/**
 	 * Design thoughts:<ul>

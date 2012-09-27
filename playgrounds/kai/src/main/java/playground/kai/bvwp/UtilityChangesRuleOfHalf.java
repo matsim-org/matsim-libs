@@ -23,6 +23,8 @@
  */
 package playground.kai.bvwp;
 
+import playground.kai.bvwp.Values.Entry;
+
 
 
 /**
@@ -33,12 +35,12 @@ package playground.kai.bvwp;
 	
 		
 		@Override
-		UtlChangesData utlChangePerItem(double deltaAmount,
-				double quantityNullfall, double quantityPlanfall, double margUtl) {
+		UtlChangesData utlChangePerEntry(Entry entry,
+				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		
-		if ( deltaAmount > 0 ) {
+		if ( deltaAmount > 0  && !entry.equals(Entry.priceProduction)) {
 			// wir sind aufnehmend; es gilt die RoH
 			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
 		} else {

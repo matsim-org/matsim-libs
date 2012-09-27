@@ -14,11 +14,13 @@ class EconomicValues {
 				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.23 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
+				pvValues.setByEntry( Entry.priceUser, -1. ) ;
 			}
 			{
 				ValuesForAUserType gvValues = roadValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -1.00 ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
+				gvValues.setByEntry( Entry.priceUser, -1. ) ;
 			}
 		}
 		{
@@ -27,11 +29,13 @@ class EconomicValues {
 				ValuesForAUserType pvValues = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -5.00 ) ;
+				pvValues.setByEntry( Entry.priceUser, -1. ) ;
 			}
 			{
 				ValuesForAUserType gvValues = railValues.getByDemandSegment(Type.GV) ;
 				gvValues.setByEntry( Entry.km, -0.1 ) ;
 				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
+				gvValues.setByEntry( Entry.priceUser, -1. ) ;
 			}
 		}
 	
@@ -167,6 +171,8 @@ class EconomicValues {
 				ValuesForAUserType pvValues = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.28 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
+				pvValues.setByEntry( Entry.priceUser, -1. ) ;
+				pvValues.setByEntry( Entry.priceProduction, -1. ) ;
 			}
 		}
 		{
@@ -175,6 +181,8 @@ class EconomicValues {
 				ValuesForAUserType pvValues = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Entry.km, -0.1 ) ;
 				pvValues.setByEntry( Entry.hrs, -18.00 ) ;
+				pvValues.setByEntry( Entry.priceUser, -1. ) ;
+				pvValues.setByEntry( Entry.priceProduction, -1. ) ;
 			}
 		}
 	

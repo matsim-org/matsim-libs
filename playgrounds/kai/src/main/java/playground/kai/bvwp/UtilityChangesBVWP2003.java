@@ -23,6 +23,8 @@
  */
 package playground.kai.bvwp;
 
+import playground.kai.bvwp.Values.Entry;
+
 
 
 /**
@@ -33,8 +35,8 @@ package playground.kai.bvwp;
 	
 		
 		@Override
-		UtlChangesData utlChangePerItem(double deltaAmount,
-				double quantityNullfall, double quantityPlanfall, double margUtl) {
+		UtlChangesData utlChangePerEntry(Entry entry,
+				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		

@@ -35,16 +35,20 @@ import playground.kai.bvwp.Values.Entry;
 	
 		
 		@Override
-		UtlChangesData utlChangePerItem(double deltaAmount,
-				double quantityNullfall, double quantityPlanfall, double margUtl) {
+		UtlChangesData utlChangePerEntry(Entry entry,
+				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		
-		if ( deltaAmount > 0 ) {
-			// wir sind aufnehmend; es zaehlt der Planfall:
-			utlChanges.utl = quantityPlanfall * margUtl ;
+		if ( entry.equals(Entry.priceUser)) {
+			utlChanges.utl = 0. ;
 		} else {
-			utlChanges.utl = -quantityNullfall * margUtl ;
+			if ( deltaAmount > 0 ) {
+				// wir sind aufnehmend; es zaehlt der Planfall:
+				utlChanges.utl = quantityPlanfall * margUtl ;
+			} else {
+				utlChanges.utl = -quantityNullfall * margUtl ;
+			}
 		}
 
 		return utlChanges;
@@ -56,7 +60,7 @@ import playground.kai.bvwp.Values.Entry;
 			ValuesForAUserType quantitiesPlanfall) {
 		double sum = 0. ;
 		for ( Entry entry : Entry.values() ) {
-			if ( entry != Entry.XX ) {
+			if ( entry != Entry.XX && entry != Entry.priceProduction ) {
 				final double quantityPlanfall = quantitiesPlanfall.getByEntry(entry);
 				final double quantityNullfall = quantitiesNullfall.getByEntry(entry);
 				final double margUtl = econValues.getByEntry(entry) ;

@@ -60,7 +60,10 @@ abstract class UtilityChanges {
 									"Nutzen Diff", "... mal Menge") ;
 
 							for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
-								if ( entry != Entry.XX ) {
+								if ( entry != Entry.XX && entry != Entry.priceUser ) {
+									// yyyy not so great: if policy measure = price change, then RoH and resource consumption are
+									// different here.  kai/benjamin, sep'12
+									
 									double deltaQuantities = quantitiesPlanfall.getByEntry(entry)-quantitiesNullfall.getByEntry(entry) ;
 									final double utlChangePerItem = deltaQuantities * econValues.getByEntry(entry);
 									final double utlChange = utlChangePerItem * amountAltnutzer;
@@ -96,12 +99,12 @@ abstract class UtilityChanges {
 								"Nutzen Diff", "... mal Menge") ;
 						
 						for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
-							if ( entry != Entry.XX ) {
+							if ( entry != Entry.XX && entry != Entry.priceUser ) {
 								final double quantityPlanfall = quantitiesPlanfall.getByEntry(entry);
 								final double quantityNullfall = quantitiesNullfall.getByEntry(entry);
 
-								UtlChangesData utlChangesPerItem = utlChangePerItem(deltaAmounts, quantityNullfall, 
-										quantityPlanfall, econValues.getByEntry(entry));
+								UtlChangesData utlChangesPerItem = utlChangePerEntry(entry, deltaAmounts, 
+										quantityNullfall, quantityPlanfall, econValues.getByEntry(entry));
 								final double utlChange = utlChangesPerItem.utl * Math.abs(deltaAmounts);
 								utils += utlChange ;
 								
@@ -111,7 +114,7 @@ abstract class UtilityChanges {
 
 									System.out.printf(fmtString,
 											entry,
-											0., 0., 
+											quantityNullfall, 0., 
 											quantityPlanfall, 
 											quantityPlanfall * deltaAmounts,
 											quantityPlanfall, 
@@ -126,7 +129,7 @@ abstract class UtilityChanges {
 											entry,
 											quantityNullfall, 
 											quantityNullfall * deltaAmounts,
-											0., 0., 
+											quantityPlanfall, 0., 
 											quantityPlanfall, 
 											quantityPlanfall * deltaAmounts,
 											utlChangesPerItem.utl , 
@@ -154,8 +157,8 @@ abstract class UtilityChanges {
 		}
 		System.out.printf("utl gain: %171.1f\n", utils ) ;
 	}
-	abstract UtlChangesData utlChangePerItem(double deltaAmount, double quantityNullfall, 
-			double quantityPlanfall, double econVal);
+	abstract UtlChangesData utlChangePerEntry(Entry entry, double deltaAmount, 
+			double quantityNullfall, double quantityPlanfall, double econVal);
 	abstract double computeImplicitUtility(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
 			ValuesForAUserType quantitiesPlanfall) ;
 }
