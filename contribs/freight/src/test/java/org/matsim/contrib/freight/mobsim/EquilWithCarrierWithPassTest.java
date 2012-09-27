@@ -27,6 +27,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -55,16 +56,16 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
 		config.addQSimConfigGroup(new QSimConfigGroup());
-//		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
-//		bestScore.setModuleName("BestScore");
-//		bestScore.setProbability(0.9);
-//		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
-//		reRoute.setModuleName("ReRoute");
-//		reRoute.setProbability(0.1);
-//		reRoute.setDisableAfter(300);
-//		config.strategy().setMaxAgentPlanMemorySize(5);
-//		config.strategy().addStrategySettings(bestScore);
-//		config.strategy().addStrategySettings(reRoute);
+		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
+		bestScore.setModuleName("BestScore");
+		bestScore.setProbability(1.0);
+		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+		reRoute.setModuleName("ReRoute");
+		reRoute.setProbability(0.0);
+		reRoute.setDisableAfter(300);
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		config.strategy().addStrategySettings(bestScore);
+		config.strategy().addStrategySettings(reRoute);
 //		
 		controler = new Controler(config);
 		controler.setWriteEventsInterval(1);
