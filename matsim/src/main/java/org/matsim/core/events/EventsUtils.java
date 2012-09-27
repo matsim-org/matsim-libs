@@ -11,10 +11,6 @@ public class EventsUtils {
 		return new EventsManagerImpl();
 	}
 	
-	
-	/**
-	 * select if single cpu handler to use or parallel
-	 */
 	public static EventsManager createEventsManager(Config config) {
 		EventsManager events;
 
@@ -23,11 +19,6 @@ public class EventsUtils {
 		Boolean synchronizeOnSimSteps = config.parallelEventHandling().getSynchronizeOnSimSteps();		
 		
 		if (numberOfThreads != null) {
-			/*
-			 * If events have to be fully processed at the end of a time step,
-			 * a SimStepParallelEventsManagerImpl is used. Note that this has to be
-			 * registered as a MobsimListener!
-			 */
 			if (synchronizeOnSimSteps != null && synchronizeOnSimSteps) {
 				events = new SimStepParallelEventsManagerImpl(numberOfThreads);
 			} else {
@@ -38,7 +29,7 @@ public class EventsUtils {
 				}				
 			}
 		} else {
-			events = EventsUtils.createEventsManager();
+			events = new EventsManagerImpl();
 		}
 
 		return events;
