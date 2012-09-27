@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LastEventOfSimStep.java
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,26 +18,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events.parallelEventsHandler;
+package org.matsim.core.events;
 
-import org.matsim.core.api.experimental.events.Event;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
- * Special event needed for synchronizing the threads at the end of each simstep.
+ * This implementation of a concurrent list is optimized for the single producer - single consumer threading.
+ * It can be used by multiple producers, but it is not optimized for that case.
  *
- * @author christoph dobler
+ * @author rashid_waraich
  */
-public class LastEventOfSimStep extends Event {
+public class ConcurrentListSPSC<T> {
+	private LinkedList<T> inputBuffer = new LinkedList<T>();
+	private LinkedList<T> outputBuffer = new LinkedList<T>();
 
-	public static final String EVENT_TYPE = "simstepend";
-	
-	public LastEventOfSimStep(final double time) {
-		super(time);
+	public void add(T element) {
+		synchronized (inputBuffer) {
+			inputBuffer.add(element);
+		}
 	}
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
+	// the input list will be emptied
+	public void add(ArrayList<T> list) {
+		synchronized (inputBuffer) {
+			inputBuffer.addAll(list);
+		}
 	}
 
+	// returns null, if empty, else the first element
+	public T remove() {
+		if (outputBuffer.size() > 0) {
+			return outputBuffer.poll();
+		}
+		if (inputBuffer.size() > 0) {
+			synchronized (inputBuffer) {
+				// swap buffers
+				LinkedList<T> tempList = null;
+				tempList = inputBuffer;
+				inputBuffer = outputBuffer;
+				outputBuffer = tempList;
+			}
+			return outputBuffer.poll();
+		}
+		return null;
+	}
 }

@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
+import org.matsim.core.events.ParallelEventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.routes.NetworkRoute;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events.parallelEventsHandler;
+package org.matsim.core.events;
 
 import org.matsim.core.api.experimental.events.Event;
 

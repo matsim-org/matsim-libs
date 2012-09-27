@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events.parallelEventsHandler;
+package org.matsim.core.events;
 
 import java.util.ArrayList;
 

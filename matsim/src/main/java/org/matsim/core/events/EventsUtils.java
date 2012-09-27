@@ -2,8 +2,6 @@ package org.matsim.core.events;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
-import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 
 public class EventsUtils {
 

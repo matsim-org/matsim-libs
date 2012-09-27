@@ -23,7 +23,7 @@ package org.matsim.integration.controler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
+import org.matsim.core.events.ParallelEventsManagerImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -49,7 +49,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 		final Controler controler = new Controler(config);
 		controler.run();
 		EventsManager events = controler.getEvents();
-		assertEquals(org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl.class, events.getClass());
+		assertEquals(org.matsim.core.events.ParallelEventsManagerImpl.class, events.getClass());
 	}
 
 }
