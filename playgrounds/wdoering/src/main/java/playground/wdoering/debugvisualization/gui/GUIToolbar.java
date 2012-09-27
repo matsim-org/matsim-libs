@@ -1,21 +1,16 @@
 package playground.wdoering.debugvisualization.gui;
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 
 import playground.wdoering.debugvisualization.controller.Controller;
-
-import processing.core.PApplet;
 
 
 public class GUIToolbar extends JPanel {
@@ -25,6 +20,13 @@ public class GUIToolbar extends JPanel {
 	JButton buttonPlay;
 	JButton buttonPause;
 	JButton buttonTool;
+	JButton buttonSetOffset;
+	
+	JTextField textXPos;
+	JTextField textYPos;
+	
+	JLabel xPos;
+	JLabel yPos;
 	
 	JSlider sliderSpeed;
 	
@@ -46,16 +48,26 @@ public class GUIToolbar extends JPanel {
         buttonPause = new JButton("pause");
         buttonPlay = new JButton("play");
         buttonTool = new JButton("test");
+        buttonSetOffset = new JButton("update");
+         
+        xPos = new JLabel(" X offset: ");
+        yPos = new JLabel(" Y offset: ");
+        
+        textXPos = new JTextField("0", 10);
+        textYPos = new JTextField("0", 10);
+        
+        
         
         
         buttonPlay.addActionListener(new ActionPlay());
         buttonPause.addActionListener(new ActionPause());
         buttonRewind.addActionListener(new ActionRewind());
         buttonTool.addActionListener(new ActionTool());
+        buttonSetOffset.addActionListener(new ActionSetOffset());
         
         JPanel panelButtons;
         
-    	panelButtons = new JPanel(new GridLayout(0,5));
+    	panelButtons = new JPanel(new GridLayout(0,12));
     	
         if (!controller.isLiveMode())
         {
@@ -64,12 +76,28 @@ public class GUIToolbar extends JPanel {
         }
         
         panelButtons.add(buttonPause);
+        panelButtons.add(xPos);
+        panelButtons.add(textXPos);
+        panelButtons.add(yPos);
+        panelButtons.add(textYPos);
+        panelButtons.add(buttonSetOffset);
         //panelButtons.add(buttonTool);
         	
         
         add(panelButtons, BorderLayout.NORTH);
         add(labelTitle, BorderLayout.CENTER);
         
+	}
+	
+	class ActionSetOffset implements ActionListener
+	{
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			controller.setOffset(Integer.valueOf(textXPos.getText()), Integer.valueOf(textYPos.getText()));
+		}
+	
 	}
 	
 	class ActionPlay implements ActionListener {
@@ -132,6 +160,16 @@ public class GUIToolbar extends JPanel {
 	
 	public void setPositionRange(Point min, Point max)
 	{
+		
+	}
+
+	public void setOffsetText(int x, int y)
+	{
+		if ((textXPos != null) || (textYPos != null))
+		{
+			textXPos.setText(""+ x);
+			textYPos.setText(""+ y);
+		}
 		
 	}
 	

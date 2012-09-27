@@ -35,21 +35,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
@@ -61,12 +54,9 @@ import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 import org.matsim.api.core.v01.Id;
 
-
-
 public class EvacuationAreaSelector implements ActionListener{
 
 	private static final Logger log = Logger.getLogger(EvacuationAreaSelector.class);
-	
 	private JFrame frame;
 	private JPanel compositePanel;
 	private MyMapViewer jMapViewer;
@@ -80,41 +70,32 @@ public class EvacuationAreaSelector implements ActionListener{
 	private HashMap<Id, String> roadClosures;
 	private Id currentLinkId1 = null;
 	private Id currentLinkId2 = null;
-	
 	private int activeLink = 0;
-
 	private ShapeToStreetSnapperThreadWrapper snapper;
-
 	private JPanel blockPanel;
-
 	private JLabel blockLabel;
-
 	private JButton blockButtonOK;
-
 	private JCheckBox cbLink1;
-
 	private JCheckBox cbLink2;
-
-
 	private JPanel panelLink1;
-
 	private JPanel panelLink2;
-	
 	private boolean saveLink1 = false;
 	private boolean saveLink2 = false;
-
 	private JPanel panelDescriptions;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		final String config = "";//args[0];
 		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
-			public void run() {
-				try {
+			public void run()
+			{
+				try
+				{
 					EvacuationAreaSelector window = new EvacuationAreaSelector();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -305,7 +286,8 @@ public class EvacuationAreaSelector implements ActionListener{
 		
 		frame.addComponentListener(new ComponentListener() 
 		{  
-		        public void componentResized(ComponentEvent evt)
+		        @Override
+				public void componentResized(ComponentEvent evt)
 		        {
 		            Component src = (Component)evt.getSource();
 		            Dimension newSize = src.getSize();

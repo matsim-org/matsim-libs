@@ -34,8 +34,7 @@ public abstract class ToolConfig {
 	public static Color COLOR_ROAD_2 = new Color(0,255,0);
 	
 	//hovering
-	public static Color COLOR_ROAD_HOVER = new Color(255,255,0,100);
-	public static Color COLOR_AREA_HOVER = new Color(0,255,100,128);
+	public static Color COLOR_HOVER = new Color(255,255,0,100);
 	
 	//selected
 	public static Color COLOR_ROAD_SELECTED = new Color(0,0,255,190);
@@ -43,4 +42,7 @@ public abstract class ToolConfig {
 	
 	//misc
 	public static Color COLOR_ROAD_CLOSED = new Color(150,0,0,220);
+	public static Color COLOR_DISABLED_TRANSPARENT = new Color(150,150,150,80);
+	
+
 }

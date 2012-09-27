@@ -35,21 +35,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileFilter;
@@ -347,7 +340,8 @@ public class BusStopSelector implements ActionListener{
 		
 		frame.addComponentListener(new ComponentListener() 
 		{  
-		        public void componentResized(ComponentEvent evt)
+		        @Override
+				public void componentResized(ComponentEvent evt)
 		        {
 		            Component src = (Component)evt.getSource();
 		            Dimension newSize = src.getSize();

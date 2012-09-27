@@ -1,6 +1,4 @@
 package playground.wdoering.debugvisualization.model;
-import java.awt.Point;
-import java.sql.Timestamp;
 
 
 public class DataPoint {
@@ -61,6 +59,7 @@ public class DataPoint {
 		this.posY = posY;
 	}
 	
+	@Override
 	public String toString()
 	{
 		 return "[time: " + this.time + " | posX: " + posX + " | posY: " + posY +"]";

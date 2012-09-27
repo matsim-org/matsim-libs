@@ -2,15 +2,12 @@ package playground.wdoering.debugvisualization.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
-import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.swing.JFrame;
 
 import playground.wdoering.debugvisualization.controller.Controller;
-import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.Scene;
@@ -52,7 +49,7 @@ public class GUI extends JFrame {
 		
 		//this.rendererThread = new Thread(renderer = new P3DRenderer(controller, traceTimeRange, width, (int)(height), visualizationMode), "readerthread"); 
 		//renderer = rendererThread.getClass();
-		renderer = new P3DRenderer(controller, traceTimeRange, width, (int)(height), visualizationMode);
+		renderer = new P3DRenderer(controller, traceTimeRange, width, (height), visualizationMode);
 		guiInfo = new GUIInfo(controller);
 		
 		//guiInfo.disableUpdate(true);
@@ -190,13 +187,15 @@ public class GUI extends JFrame {
 	public void setOffset(int x, int y)
 	{
 		renderer.setOffset(x,y);
+		guiToolbar.setOffsetText(x,y);
 		
 	}
 
 	public void updateView(Double time, HashMap<String, Agent> agents)
 	{
 		renderer.updateView(time, agents);
-		guiInfo.updateView(time);
+		
+		//guiInfo.updateView(time);
 		
 	}
 	

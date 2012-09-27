@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.helper.Algorithms;
 import org.matsim.contrib.grips.helper.shapetostreetsnapper.LinkSorter;
 import org.matsim.contrib.grips.helper.shapetostreetsnapper.TravelCost;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;

@@ -32,6 +32,7 @@ import playground.wdoering.debugvisualization.controller.ConsoleImpl;
 import playground.wdoering.debugvisualization.controller.Controller;
 import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
 
+
 /**
  * Debug Visualization
  *
@@ -57,8 +58,6 @@ public class DebugVisualization {
 		//sc.getNetwork().get -> nur über Links (hat from / to nodes (getcoord (get x y)))
 		
 		EventsManager e = EventsUtils.createEventsManager();
-		
-		
 		
 		//argument syntax: DebugSim.java eventfile.xml networkfile.xml shapefile.shp liveMode [=true / false / null||else(=false) ]
 		if ((args.length > 0) && (!args[0].equals("")))

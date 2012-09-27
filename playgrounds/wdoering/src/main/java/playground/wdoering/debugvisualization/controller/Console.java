@@ -1,5 +1,4 @@
 package playground.wdoering.debugvisualization.controller;
-import java.util.HashMap;
 
 
 public interface Console

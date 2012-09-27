@@ -429,6 +429,10 @@ public class EvacuationAnalysis implements ActionListener{
 		}
 		Envelope e = new Envelope();
 		for (Node node : this.sc.getNetwork().getNodes().values()) {
+			
+			//ignore end nodes
+			if (node.getId().toString().contains("en")) continue;
+			
 			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
 		}
 		Coord centerC = new CoordImpl((e.getMaxX()+e.getMinX())/2, (e.getMaxY()+e.getMinY())/2);

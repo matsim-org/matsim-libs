@@ -1,31 +1,19 @@
 package playground.wdoering.debugvisualization.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.Panel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Vector;
-
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
 import playground.wdoering.debugvisualization.controller.AgentDataController;
 import playground.wdoering.debugvisualization.controller.Controller;
-import playground.wdoering.debugvisualization.gui.GUIToolbar.ActionPause;
-import playground.wdoering.debugvisualization.gui.GUIToolbar.ActionPlay;
-import playground.wdoering.debugvisualization.gui.GUIToolbar.ActionRewind;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.XYVxVyAgent;
 import playground.wdoering.debugvisualization.model.XYVxVyDataPoint;

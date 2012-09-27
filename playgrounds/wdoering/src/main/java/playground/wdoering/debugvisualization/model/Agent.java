@@ -1,8 +1,5 @@
 package playground.wdoering.debugvisualization.model;
-import java.awt.Point;
-import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 
 public class Agent {
@@ -55,7 +52,7 @@ public class Agent {
 
 	public DataPoint getDataPoint(double index)
 	{
-		return (DataPoint)this.dataPoints.get(index);
+		return this.dataPoints.get(index);
 	}
 	
 }

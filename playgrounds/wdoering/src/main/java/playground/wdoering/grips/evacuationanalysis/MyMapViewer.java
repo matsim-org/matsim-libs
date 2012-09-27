@@ -382,11 +382,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				g.fillPolygon(x, y, areaPolygon.getExteriorRing().getNumPoints());
 			}
 
-			if ((!this.freezeMode)&&(this.currentHoverLinks.size()>0))
-				this.currentHoverLinks.clear();
+//			if ((!this.freezeMode)&&(this.currentHoverLinks.size()>0))
+//				this.currentHoverLinks.clear();
+//
+//			GeoPosition wPoint = null;
 
-			GeoPosition wPoint = null;
-
+			/*
+			 * 
 			//get geo mouseposition
 			if (this.currentMousePosition!=null){
 				Point wldPoint = new Point(this.currentMousePosition.x+b.x,this.currentMousePosition.y+b.y);
@@ -466,6 +468,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					g.drawLine(x1,y1,x2,y2);
 				}
 			}
+			*/
 
 			/*
 			//display selected roads (with arrows)
@@ -643,14 +646,28 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
 							relTravelTime = 0d;
 						
+
 						if (cell.getCount()>0)
 							g.setColor(new Color(0,127,(int)(255*relTravelTime),100));
 						else
-							g.setColor(new Color(255,0,0,30));
-							
+							g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT);
 						
 //						g.setColor(new Color(0,127,255,50+(int)(205*relTravelTime)));
 						g.fillRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
+
+						if (currentMousePosition!=null)
+						{
+							int mouseX = this.currentMousePosition.x;
+							int mouseY = this.currentMousePosition.y;
+							
+							if ((mouseX>gridOffsetX) && (mouseX<gridOffsetX+zoomStep) && (mouseY>gridOffsetY) && (mouseY<gridOffsetY+zoomStep))
+							{
+								g.setColor(ToolConfig.COLOR_HOVER);
+								g.fillRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
+								g2D.setStroke(new BasicStroke(3F));
+								g.drawRect(gridOffsetX+1, gridOffsetY+1, (int)zoomStep-1, (int)zoomStep-1);
+							}
+						}
 						
 						//only show the count number if the cell size is readable
 						if (zoomStep>40)
@@ -658,6 +675,10 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							g.setColor(Color.white);
 							g.drawString("c:" + this.cellTree.get(minX+gridSize*i,minY+gridSize*j).getCount(), (int)u-b.x, (int)v-b.y+20);
 						}
+						
+						g.setColor(Color.black);
+						g2D.setStroke(new BasicStroke(1F));
+
 						
 					}
 				}

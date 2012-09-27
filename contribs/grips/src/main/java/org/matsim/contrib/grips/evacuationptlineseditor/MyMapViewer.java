@@ -399,7 +399,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 				g2D.setStroke(new BasicStroke(3F));
 
-				g.setColor(ToolConfig.COLOR_ROAD_HOVER);
+				g.setColor(ToolConfig.COLOR_HOVER);
 
 				int x = (x2-x1);
 				int y = (y2-y1);
@@ -432,7 +432,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 							}
 							g2D.setStroke(new BasicStroke(8F));
-							g.setColor(ToolConfig.COLOR_ROAD_HOVER);
+							g.setColor(ToolConfig.COLOR_HOVER);
 						}
 
 					}

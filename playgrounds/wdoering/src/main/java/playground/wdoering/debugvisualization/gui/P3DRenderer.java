@@ -1,23 +1,16 @@
 package playground.wdoering.debugvisualization.gui;
 
-import java.awt.Color;
 import java.awt.Point;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 import playground.wdoering.debugvisualization.controller.AgentDataController;
 import playground.wdoering.debugvisualization.controller.Console;
 import playground.wdoering.debugvisualization.controller.Controller;
-
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.Scene;
@@ -26,7 +19,9 @@ import playground.wdoering.debugvisualization.model.XYVxVyDataPoint;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
-import processing.core.PShapeSVG.Font;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 //import processing.core.*;
 //import processing.opengl.*;
@@ -42,6 +37,8 @@ import processing.core.PShapeSVG.Font;
  */
 public class P3DRenderer extends PApplet
 {
+	
+	private String prefix = "real";
 
 	private final float agentSize = 12; //(meter / si units)
 	private HashMap<String, Agent> agents;
@@ -60,6 +57,8 @@ public class P3DRenderer extends PApplet
 	private boolean paused;
 	private boolean rewind;
 	private final boolean liveMode;
+	
+	private boolean saveToDisk = true;
 
 	private float factorX;
 	private float factorY;
@@ -69,11 +68,16 @@ public class P3DRenderer extends PApplet
 	private double maxPosX;
 	private double minPosY;
 	private double maxPosY;
-	private double currentTime;
+	
+	private int savedFrame = 0;
+	
+	private Double currentTime;
+    DecimalFormat decim = new DecimalFormat("0.000");
+
+	
 	private boolean displayingData = false;
 	private int currentFrame = 1;
 	private Double avgRenderingTime = 1d;
-	private Visualization visualization;
 	private boolean mousePressed = false;
 	private final Console console;
 	private int traceTimeRange = 3;
@@ -89,7 +93,7 @@ public class P3DRenderer extends PApplet
 	private Point panOffset = new Point(0,0);
 	private Point offset = new Point(0,0);
 	
-	private float zoomFactor = 10;
+	private float zoomFactor = 23;
 	private AgentDataController agentDataController;
 	
 	
@@ -218,10 +222,12 @@ public class P3DRenderer extends PApplet
 		return agentSize;
 	}
 
+	@Override
 	public int getWidth() {
 		return width;
 	}
 
+	@Override
 	public int getHeight() {
 		return height;
 	}
@@ -259,8 +265,8 @@ public class P3DRenderer extends PApplet
 	public P3DRenderer(Controller controller, int traceTimeRange, int width, int height, int visualizationMode)
 	{
 		
-		if (visualizationMode == controller.VIS_XYVXVY)
-			this.mode = controller.VIS_XYVXVY;
+		if (visualizationMode == Controller.VIS_XYVXVY)
+			this.mode = Controller.VIS_XYVXVY;
 		
 		this.traceTimeRange = traceTimeRange;
 		
@@ -279,6 +285,8 @@ public class P3DRenderer extends PApplet
 		setAgentColors(2500);
 
 	}
+	
+	
 
 	public void setExtremeValues(Double[] extremeValues)
 	{
@@ -301,7 +309,7 @@ public class P3DRenderer extends PApplet
 	 */
 	public void setAgentColors(int agentCount)
 	{
-		
+		System.out.println("setting agent colors (count: " + agentCount +")");
 		int agentColorCount;
 		
 		if (agentCount > 255)
@@ -314,9 +322,12 @@ public class P3DRenderer extends PApplet
 		{
 			
 			//determine color
-			int[] color = {(int)((((float)agentColorCount-(float)j)/agentColorCount)*255),
-						   (int)((double)(((float)agentColorCount-(float)j)/agentColorCount)*255),
-						   (int)(255-(double)(((float)agentColorCount-(float)j)/agentColorCount)*255)};
+//			int[] color = {(int)((((float)agentColorCount-(float)j)/agentColorCount)*255),
+//						   (int)((double)(((float)agentColorCount-(float)j)/agentColorCount)*255),
+//						   (int)(255-(double)(((float)agentColorCount-(float)j)/agentColorCount)*255)};
+			
+			int[] color = {100,160,255};
+			//int[] color = {(int)random(120), (int)random(255), (int)random(100) + 155};
 
 			//console.println(color[0] + "|" + color[1] + "|" + color[2]);
 
@@ -465,7 +476,8 @@ public class P3DRenderer extends PApplet
 	{
 		
 		 addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
-			    public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
+			    @Override
+				public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
 			      mouseWheel(evt.getWheelRotation());
 			  }}); 		
 		
@@ -544,11 +556,24 @@ public class P3DRenderer extends PApplet
 				offset.y = panOffset.y = offset.y + mouseY - mouseDragBeginPosition.y;
 				//offset.y = panOffset.y;
 				panOffset.x = panOffset.y = 0;
+				
+				controller.setOffset(offset.x, offset.y);
 		}
 		
 	}
 	
 	private int fr = 0;
+	private int[] lastPixels;
+
+	private float timeTraceFactor;
+
+	private Double lastTime = 0d;
+
+	private boolean afterFade = false;
+
+	private boolean saveFrame = false;
+
+	private boolean viewUpdated = false;
 
 	/**
 	 * draw function. calculating proportions.
@@ -560,6 +585,8 @@ public class P3DRenderer extends PApplet
 	public void draw()
 	{
 		fr++;
+		
+		
 		
 		if ((this.extremeValues != null) && (this.factorX == 0.0f))
 		{
@@ -623,18 +650,117 @@ public class P3DRenderer extends PApplet
 		double timeMeasDiff= System.currentTimeMillis()-timeMeas;
 		avgRenderingTime += timeMeasDiff;
 		
-		fill(255,255,255);
-		text("time: " + currentTime, 1,30);
+		if (currentTime!=null)
+		{
+			
+			fill(0,0,0);
+			rect(0,15,200,20);
+			
+			fill(255,255,255);
+			text("time: " + decim.format(currentTime), 1,30);
+		}
+		
 		if(keyPressed)
 		{
 		    if (key == 'b' || key == 'B') 
 		    	text("offset: (" + offset.x + "," + offset.y + ")", 1,60);;
 		    
-		  }
+		  }		
 
 		
 		
-		//save("C:/temp/f" + String.format("%04d", fr) +".png");
+		
+		
+		
+		loadPixels();
+		
+		//if the current time changed or a transition frame needs to be saved
+		if ((currentTime!=null) && ((currentTime != lastTime ) || afterFade ))
+		{
+			//if before the fade
+			if (!afterFade)
+			{
+				if (lastPixels!=null)
+				{
+					//make a faded frame
+					if (lastPixels.length == pixels.length)
+					{
+						for (int i=0;i<pixels.length;i++)
+						{
+							
+							timeTraceFactor = 1f;
+							
+							int red =   (int)((     (  red(pixels[i]) * timeTraceFactor +   red(lastPixels[i]))   )*0.5f );
+							int green = (int)((   (  green(pixels[i]) * timeTraceFactor + green(lastPixels[i]))   )*0.5f );
+							int blue =  (int)((   (   blue(pixels[i]) * timeTraceFactor +  blue(lastPixels[i]))   )*0.5f );
+							
+//							int red =   (int)((     (red(pixels[i])*timeTraceFactor + red(lastPixels[i]))*(1-timeTraceFactor))*0.5f );
+//							int green = (int)((  (green(pixels[i])*timeTraceFactor+ green(lastPixels[i]))*(1-timeTraceFactor))*0.5f );
+//							int blue =  (int)((   ( blue(pixels[i])*timeTraceFactor+  blue(lastPixels[i]))*(1-timeTraceFactor))*0.5f );
+							
+							pixels[i] = color(red,green,blue);
+						}
+					}	
+				}
+				
+				//save it
+				fill(0,255,255);
+				rect(0,0,10,10);
+				
+				saveFrame = true;
+				afterFade = true;
+			}
+			else
+			{
+				//save it (after the transition)
+				fill(255,0,0);
+				rect(0,0,10,10);
+				
+				saveFrame  = true;
+				afterFade = false;
+			}
+			
+			lastTime = currentTime;
+			
+		}
+		
+		lastPixels = pixels.clone();
+		updatePixels();
+
+		if (saveFrame)
+		{
+			savedFrame++;
+			
+			if ((!saveToDisk))
+				save("C:/temp/gr90new/real/gr90_new_real_" + String.format("%04d", savedFrame) +".png");
+			
+			saveFrame = false;
+		}
+		
+		/*
+		if (lastPixels!=null)
+		{
+			if (lastPixels.length == pixels.length)
+			{
+				for (int i=0;i<pixels.length;i++)
+				{
+					
+					timeTraceFactor = 0.4f;
+//					timeTraceFactor = 3f/5f;
+					
+					int red =   (int)((     (red(pixels[i])*timeTraceFactor + red(lastPixels[i]))*(1-timeTraceFactor))*1.2f );
+					int green = (int)((  (green(pixels[i])*timeTraceFactor+ green(lastPixels[i]))*(1-timeTraceFactor))*1.2f );
+					int blue =  (int)((   ( blue(pixels[i])*timeTraceFactor+  blue(lastPixels[i]))*(1-timeTraceFactor))*1.2f );
+					
+					pixels[i] = color(red,green,blue);
+				}
+			}
+		}*/
+		
+		
+		
+		
+//		save("C:/temp/gr90_r/gr90_"+prefix+"_" + String.format("%04d", fr) +".png");
 		
 
 
@@ -664,8 +790,45 @@ public class P3DRenderer extends PApplet
 									//draw a line (from - to - datapoint)
 									line((float)((coordinates[i].x-this.minPosX)/this.factorX*(this.zoomFactor/10f))+panOffset.x+offset.x,
 											(float)(height-((coordinates[i].y-this.minPosY))/this.factorY*(this.zoomFactor/10f))+panOffset.y+offset.y,
-											(float)((lastCoordinate.x-this.minPosX)/this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x,
-											(float)(height-((lastCoordinate.y-this.minPosY))/this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y);
+											(float)((lastCoordinate.x-this.minPosX)/this.factorX*(this.zoomFactor/10f))+panOffset.x+offset.x,
+											(float)(height-((lastCoordinate.y-this.minPosY))/this.factorY*(this.zoomFactor/10f))+panOffset.y+offset.y);
+
+									
+									
+									
+//									int x1 = (int)(coordinates[i].x-this.minPosX + .5d);
+//									int x2 = (int)(lastCoordinate.x-this.minPosX + .5d);
+//									int y1 = height - (int)(coordinates[i].y-this.minPosY + .5d);
+//									int y2 = height - (int)(lastCoordinate.y-this.minPosY + 0.5d);
+//									
+//									//Calculated Factor
+//									x1 /= (factorX * (zoomFactor/10f) );
+//									x2 /= (factorX * (zoomFactor/10f) );
+//									y1 /= (factorY * (zoomFactor/10f) );
+//									y2 /= (factorY * (zoomFactor/10f) );
+//									
+////									//User Zoomfactor
+////									x1 *= (zoomFactor/10f);
+////									x2 *= (zoomFactor/10f);
+////									y1 *= (zoomFactor/10f);
+////									y2 *= (zoomFactor/10f);
+//									
+//									
+//									//User Offset
+//									x1 += panOffset.x + offset.x;
+//									x2 += panOffset.x + offset.x;
+//									y1 += panOffset.y + offset.y;
+//									y2 += panOffset.y + offset.y;
+//									
+									
+//									(height-((coordinates[i].y-this.minPosY))/this.factorY*(this.zoomFactor/10f))+panOffset.y+offset.y
+//									
+//									((lastCoordinate.x-this.minPosX)/this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x
+//									
+//									(height-((lastCoordinate.y-this.minPosY))/this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y)
+									
+									//draw a line (from - to - datapoint)
+//									line(x1,y1,x2,y2);
 								}
 								lastCoordinate = coordinates[i];
 							}
@@ -765,48 +928,7 @@ public class P3DRenderer extends PApplet
 	
 							//draw node trajectories if there is more then one datapoint for the current agent
 							//if (dataPoints.size() > 1)
-							{
-								//number of lines (trajectories) to draw (between 2 and traceTimeRange)
-								//int traceDisplayCount = Math.min(this.traceTimeRange, dataPoints.size());
-	
-								//loop through the datapoints with the corresponding timesteps
-								//for (int timeStep = 0; timeStep < traceDisplayCount-2; timeStep++)
-								{
-	
-									//this.console.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + this.timeSteps.size());
-	
-									//extract current and next datapoint (to draw a trajectory line)
-									//DataPoint currentDataPoint = currentAgent.getCurrentDataPoint();
-//									DataPoint currentDataPoint = dataPoints.get(this.timeSteps.get(timeStep));
-									//DataPoint nextDataPoint = dataPoints.get(this.timeSteps.get(timeStep+1));
-									/*
-	
-									if ((currentDataPoint != null )) //&&(nextDataPoint != null))
-									{
-										//pick line color and make far away trajectories more transparent
-										float jFloat = timeStep;
-										float iFloat = traceDisplayCount;
-										stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
-	
-										this.console.println("@@@ cdp:" + currentDataPoint.toString());
-										this.console.println("@@@ x:"+ currentDataPoint.getPosX());
-										this.console.println("@@@ mipX:"+ this.minPosX);
-										this.console.println("@@@ fX:"+ this.factorX);
-	
-										//draw line
-										line((float)(((currentDataPoint.getPosX() - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
-												(float)((height-(currentDataPoint.getPosY() - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y),
-												(float)(((nextDataPoint.getPosX()    - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
-												(float)((height-(nextDataPoint.getPosY()    - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y));
-									}
-	
-									 */
-								}
-	
-	
-	
-	
-							}
+
 							noStroke();
 	
 							//XYVxVyDataPoint lastDataPoint = (XYVxVyDataPoint)dataPoints.get(this.currentTime);
@@ -865,7 +987,18 @@ public class P3DRenderer extends PApplet
 									drawTooltip = true;
 								}
 								else
-									fill(color(agentColor[0], agentColor[1],agentColor[2],255));
+								{
+									if (currentAgentID.substring(0, 1).equals("r"))
+									{
+										fill(color(255,0,0));
+									}
+									else
+									{
+										fill(color(0,255,0));
+									}
+									
+//									fill(color(agentColor[0], agentColor[1],agentColor[2],255));
+								}
 	
 								ellipse (posX, posY, this.agentSize * (zoomFactor/10.01f), this.agentSize * (zoomFactor/10.01f));
 	
@@ -971,7 +1104,7 @@ public class P3DRenderer extends PApplet
 						if (dataPoints.get(this.timeSteps.get(this.iInt)) != null)
 						{
 							//get the datapoint
-							DataPoint currentDataPoint = (XYVxVyDataPoint)dataPoints.get((this.timeSteps.get(this.iInt)));
+							DataPoint currentDataPoint = dataPoints.get((this.timeSteps.get(this.iInt)));
 
 							float posX;
 							float posY;
@@ -1160,8 +1293,16 @@ public class P3DRenderer extends PApplet
 		//setAgentColors(agents.size());
 		this.agents = agents;
 		//this.timeSteps = time;
+		
+//		if (currentTime != null)
+//		{
+//			if ((time > currentTime - .01d))
+//				viewUpdated  = true;
+//		}
+		
 		this.currentTime = time;
 		this.console.println("update view at " + this.currentTime + "!");
+		
 	}
 
 	/**

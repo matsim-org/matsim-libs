@@ -1,8 +1,6 @@
 package playground.wdoering.debugvisualization.gui;
 import java.awt.BorderLayout;
 import java.awt.Point;
-import java.awt.event.WindowEvent;
-
 import javax.swing.JFrame;
 
 import playground.wdoering.debugvisualization.controller.Console;

@@ -35,24 +35,17 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-import java.net.ConnectException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWheelListener, KeyListener, MouseMotionListener {
 
@@ -410,8 +403,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						
 						if ((mouseX <= maxX) && (mouseX >= minX) && (mouseY <= maxY) && (mouseY >= minY))
 						{
-							float r1 = ((float)mouseX - (float)x1) / (float)x;
-							float r2 = ((float)mouseY - (float)y1) / (float)y;
+							float r1 = ((float)mouseX - (float)x1) / x;
+							float r2 = ((float)mouseY - (float)y1) / y;
 							
 							//if cursor is nearby, draw roads in another color
 							if ((r1 - .3f < r2) && (r1 + .3f > r2))

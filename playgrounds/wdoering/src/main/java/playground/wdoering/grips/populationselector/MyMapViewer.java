@@ -411,7 +411,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				
 //				g.setColor(new Color(255,127,0,255));
 //				g.drawOval(sc0.x-r, sc0.y-r, 2*r, 2*r);
-				g.setColor(ToolConfig.COLOR_AREA_HOVER);
+				g.setColor(ToolConfig.COLOR_HOVER);
 				g.fillOval(sc0.x-r+1, sc0.y-r+1, 2*r-2, 2*r-2);
 				
 			}

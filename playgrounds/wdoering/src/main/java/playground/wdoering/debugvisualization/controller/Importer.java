@@ -50,6 +50,11 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 	private Thread readerThread;
 
 	private ShapeFileReader shapeFileReader;
+	private double lastEventsTime = 0;
+	private double lastTime;
+	private double 	step = 0.066745068285285;
+	
+	private ArrayList<Double> times;
 
 
 	public Importer(Controller controller)
@@ -464,19 +469,77 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 	@Override
 	public void handleEvent(XYVxVyEvent event)
 	{
+		//syncTime(event.getTime());
+		
+
+		try {
+			
+//			if (lastTime != event.getTime())
+			
+			if (times==null)
+				times = new ArrayList<Double>();
+			
+			if (times.size() == 0)
+				times.add(event.getTime());
+			else
+			{
+				if ((times.indexOf(event.getTime())) == -1)
+				{
+					times.add(event.getTime());
+					Thread.sleep(250); //////////////////////////////////////////////////// SLEEP /////////////////
+				}
+			}
+
+			
+				
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		this.lastTime = event.getTime();
+		
+		//testWait(e.getTime());
 		if (this.controller!=null)
 		{
 
 			this.controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
 			this.controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getVX(), event.getVY(), event.getTime());
 		}
+		
+		this.lastTime = (long) event.getTime();
 
 	}
 
+	private void syncTime(double d) {
+
+		if (d == this.lastEventsTime) {
+			return;
+		}
+		
+//		double step = ((d - this.lastEventsTime) * 1000);
+		
+		
+		long currentTime = System.currentTimeMillis();
+		long diff = (long) ((step*1000) - (currentTime - this.lastTime))*2;
+		if (diff > 0) {
+			try {
+				
+				Thread.sleep(diff);
+				
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		this.lastEventsTime = d;
+		this.lastTime = System.currentTimeMillis();//currentTime;
+		
+	}
+
+
+
 	@Override
 	public void run() {
-		System.out.println("importer: go go!");
-		// TODO Auto-generated method stub
 
 	}
 
