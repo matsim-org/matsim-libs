@@ -311,6 +311,95 @@ public class JointPlanUtilsTest {
 					new JointPlan(
 						new Clique( null ),
 						plans )));
+
+		// plan 4
+		// two passengers, "midle trip"
+		plans = new HashMap<Id, Plan>();
+		jointTrips = new ArrayList<JointTrip>();
+		plan = new PlanImpl( driver );
+		plan.createAndAddActivity( "home" , link1 );
+		plan.createAndAddLeg( TransportMode.walk );
+		plan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		driverLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverLeg.setRoute( new DriverRoute(
+					new LinkNetworkRouteImpl( link2 , link3 ),
+					Arrays.asList( passenger1.getId() )));
+
+		plan.createAndAddActivity( JointActingTypes.PICK_UP , link3 );
+		driverLeg2 = plan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverLeg2.setRoute( new DriverRoute(
+					new LinkNetworkRouteImpl( link3 , link4 ),
+					Arrays.asList(
+						passenger1.getId(),
+						passenger2.getId())));
+		plan.createAndAddActivity( JointActingTypes.DROP_OFF , link4 );
+		driverLeg3 = plan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverLeg3.setRoute( new DriverRoute(
+					new LinkNetworkRouteImpl( link4 , link1 ),
+					Arrays.asList(
+						passenger1.getId())));
+		plan.createAndAddActivity( JointActingTypes.DROP_OFF , link1 );
+		plan.createAndAddLeg( TransportMode.walk );
+		plan.createAndAddActivity( "home" , link1 );
+
+		plans.put( driver.getId() , plan );
+
+		plan = new PlanImpl( passenger1 );
+		plan.createAndAddActivity( "home" , link1 );
+		plan.createAndAddLeg( TransportMode.walk );
+		plan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		passengerLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerRoute = new PassengerRoute( link2 , link1);
+		passengerRoute.setDriverId( driver.getId() );
+		passengerLeg.setRoute( passengerRoute );
+		plan.createAndAddActivity( JointActingTypes.DROP_OFF , link1 );
+		plan.createAndAddLeg( TransportMode.walk );
+		plan.createAndAddActivity( "home" , link1);
+
+		plans.put( passenger1.getId() , plan );
+
+		plan = new PlanImpl( passenger2 );
+		plan.createAndAddActivity( "home" , link1 );
+		plan.createAndAddLeg( TransportMode.walk );
+		plan.createAndAddActivity( JointActingTypes.PICK_UP , link3 );
+		passengerLeg2 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerRoute = new PassengerRoute( link3 , link4 );
+		passengerRoute.setDriverId( driver.getId() );
+		passengerLeg2.setRoute( passengerRoute );
+		plan.createAndAddActivity( JointActingTypes.DROP_OFF , link4 );
+		plan.createAndAddLeg( TransportMode.walk );
+		plan.createAndAddActivity( "home" , link1);
+
+		plans.put( passenger2.getId() , plan );
+
+		driverTrip = new DriverTrip( driver.getId() );
+		driverTrip.driverTrip.add( driverLeg );
+		driverTrip.driverTrip.add( driverLeg2 );
+		driverTrip.driverTrip.add( driverLeg3 );
+		driverTrip.passengerOrigins.put( passenger1.getId() , link2 );
+		driverTrip.passengerDestinations.put( passenger1.getId() , link1 );
+		driverTrip.passengerOrigins.put( passenger2.getId() , link3 );
+		driverTrip.passengerDestinations.put( passenger2.getId() , link4 );
+
+		fixtures.add(
+				new Fixture(
+					"two passengers",
+					Arrays.asList( driverTrip ),
+					new JointTravelStructure(
+						Arrays.asList(
+							new JointTrip(
+								driver.getId(),
+								Arrays.asList( driverLeg , driverLeg2 , driverLeg3 ),
+								passenger1.getId(),
+								passengerLeg),
+							new JointTrip(
+								driver.getId(),
+								Arrays.asList( driverLeg2 ),
+								passenger2.getId(),
+								passengerLeg2))),
+					new JointPlan(
+						new Clique( null ),
+						plans )));
 	}
 
 	@Test
