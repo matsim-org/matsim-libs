@@ -14,15 +14,17 @@ import org.matsim.vehicles.Vehicle;
 public class NullFareCalculator implements FareCalculator {
 
 	@Override
-	public double getLinkFare(Person person, Vehicle vehicle,
+	public double getTransferFare(Person person, Vehicle vehicle,
 			TransitRouterNetworkLink link, double now) {
 		return 0;
 	}
 
 	@Override
-	public double getLinkFareDisutility(Person person, Vehicle vehicle,
+	public double getInVehicleFare(Person person, Vehicle vehicle,
 			TransitRouterNetworkLink link, double now) {
 		return 0;
 	}
+
+
 
 }

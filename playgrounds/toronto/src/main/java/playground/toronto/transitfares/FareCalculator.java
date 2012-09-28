@@ -10,9 +10,9 @@ import org.matsim.vehicles.Vehicle;
  * @author pkucirek
  */
 public interface FareCalculator {
-
+	
 	/**
-	 * Calculates the actual link fare.
+	 * Calculates the actual link fare on access, egress, and transfer links
 	 * 
 	 * @param person The agent being looked at.
 	 * @param vehicle The vehicle the agent is traveling in.
@@ -20,17 +20,17 @@ public interface FareCalculator {
 	 * @param now The current Matsim time (sec past midnight).
 	 * @return The actual fare (in user-defined currency).
 	 */
-	public double getLinkFare(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);	
+	public double getTransferFare(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);	
 	
 	/**
-	 * Calculates the disutility of fares on the link.
+	 *  Calculates the actual link fare on in-vehicle links
 	 * 
 	 * @param person The agent being looked at.
 	 * @param vehicle The vehicle the agent is traveling in.
 	 * @param link The TransitRouterNetworkLink being considered.
 	 * @param now The current Matsim time (sec past midnight).
-	 * @return The generalized disutility of fare on the link.
+	 * @return The actual fare (in user-defined currency).
 	 */
-	public double getLinkFareDisutility(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);
+	public double getInVehicleFare(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);
 	
 }
