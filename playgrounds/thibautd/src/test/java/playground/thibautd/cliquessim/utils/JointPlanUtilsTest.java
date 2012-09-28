@@ -409,8 +409,8 @@ public class JointPlanUtilsTest {
 
 			Assert.assertEquals(
 					"wrong structure for fixture "+f.name+
-					" of size "+f.structure.jointTrips.size()+
-					" compared to result of size "+struct.jointTrips.size(),
+					" of size "+f.structure.getJointTrips().size()+
+					" compared to result of size "+struct.getJointTrips().size(),
 					f.structure,
 					struct);
 		}

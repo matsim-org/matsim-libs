@@ -243,31 +243,35 @@ public class JointPlanUtils {
 	 * to the relevant plan elements.
 	 */
 	public static final class JointTravelStructure {
-		public final List<JointTrip> jointTrips;
+		private final List<JointTrip> jointTrips;
 
 		public JointTravelStructure(
 				final List<JointTrip> jointTrips) {
 			this.jointTrips = jointTrips;
 		}	
 
+		public List<JointTrip> getJointTrips() {
+			return jointTrips;
+		}
+
 		@Override
 		public int hashCode() {
-			return jointTrips.hashCode();
+			return getJointTrips().hashCode();
 		}
 
 		@Override
 		public boolean equals(final Object o) {
 			if (o != null && o instanceof JointTravelStructure) {
 				JointTravelStructure other = (JointTravelStructure) o;
-				return other.jointTrips.size() == jointTrips.size() &&
-					other.jointTrips.containsAll( jointTrips );
+				return other.getJointTrips().size() == getJointTrips().size() &&
+					other.getJointTrips().containsAll( getJointTrips() );
 			}
 			return false;
 		}
 
 		@Override
 		public String toString() {
-			return "[JointTravelStructure: "+jointTrips+"]";
+			return "[JointTravelStructure: "+getJointTrips()+"]";
 		}
 	}
 
@@ -278,10 +282,10 @@ public class JointPlanUtils {
 	 * if the driver drives several passengers at the same time.
 	 */
 	public static final class JointTrip {
-		public final Id driverId;
-		public final Id passengerId;
-		public final List<Leg> driverLegs;
-		public final Leg passengerLeg;
+		private final Id driverId;
+		private final Id passengerId;
+		private final List<Leg> driverLegs;
+		private final Leg passengerLeg;
 
 		public JointTrip(
 				final Id driverId,
@@ -294,14 +298,30 @@ public class JointPlanUtils {
 			this.passengerLeg = passengerLeg;
 		}
 
+		public List<Leg> getDriverLegs() {
+			return driverLegs;
+		}
+
+		public Id getDriverId() {
+			return driverId;
+		}
+
+		public Id getPassengerId() {
+			return passengerId;
+		}
+
+		public Leg getPassengerLeg() {
+			return passengerLeg;
+		}
+
 		@Override
 		public int hashCode() {
 			int c = 0;
 
-			c += driverId.hashCode();
-			c += passengerId.hashCode();
-			c += driverLegs.hashCode();
-			c += passengerLeg.hashCode(); 
+			c += getDriverId().hashCode();
+			c += getPassengerId().hashCode();
+			c += getDriverLegs().hashCode();
+			c += getPassengerLeg().hashCode(); 
 
 			return c;
 		}
@@ -310,20 +330,20 @@ public class JointPlanUtils {
 		public boolean equals(final Object o) {
 			if (o != null && o instanceof JointTrip) {
 				JointTrip other = (JointTrip) o;
-				return other.driverId.equals( driverId ) &&
-					other.passengerId.equals( passengerId ) &&
-					other.driverLegs.equals( driverLegs ) &&
-					other.passengerLeg.equals( passengerLeg );
+				return other.getDriverId().equals( getDriverId() ) &&
+					other.getPassengerId().equals( getPassengerId() ) &&
+					other.getDriverLegs().equals( getDriverLegs() ) &&
+					other.getPassengerLeg().equals( getPassengerLeg() );
 			}
 			return false;
 		}
 
 		@Override
 		public String toString() {
-			return "[JointTrip: driver="+driverId
-				+", driverTrip="+driverLegs
-				+", passenger="+passengerId
-				+", passengerLeg="+passengerLeg+"]";
+			return "[JointTrip: driver="+getDriverId()
+				+", driverTrip="+getDriverLegs()
+				+", passenger="+getPassengerId()
+				+", passengerLeg="+getPassengerLeg()+"]";
 		}
 	}
 }
