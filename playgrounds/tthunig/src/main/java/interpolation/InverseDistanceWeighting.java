@@ -81,14 +81,14 @@ class InverseDistanceWeighting {
 				double y1= yCoord-yDif;
 				double y2= y1+sg.getResolution();
 				p1= factory.createPoint(new Coordinate(x2, y1));
-				p2= factory.createPoint(new Coordinate(x2, y2));
+				p4= factory.createPoint(new Coordinate(x2, y2));
 				if(yDif<sg.getResolution()/2){
 					p3= factory.createPoint(new Coordinate(x1, y1));
-					p4= factory.createPoint(new Coordinate(x3, y1));
+					p2= factory.createPoint(new Coordinate(x3, y1));
 				}
 				else{ //TODO? Spezialfall betrachten: wenn yDif=res/2
 					p3= factory.createPoint(new Coordinate(x1, y2));
-					p4= factory.createPoint(new Coordinate(x3, y2));
+					p2= factory.createPoint(new Coordinate(x3, y2));
 				}
 			}
 		}
@@ -127,11 +127,11 @@ class InverseDistanceWeighting {
 		double d_p4= Math.pow(distance(p4.getX(), p4.getY(), xCoord, yCoord), exp);
 		
 		//interpolation on the boundary
-		if (xCoord == sg.getXmax()){
+		if (xCoord == sg.getXmax() || xCoord == sg.getXmin()){
 			//consider only 2 neighbors (up and down)
 			return (sg.getValue(p1)/d_p1 + sg.getValue(p4)/d_p4) / (1/d_p1 + 1/d_p4);
 		}
-		if (yCoord == sg.getYmax()){
+		if (yCoord == sg.getYmax() || yCoord == sg.getYmin()){
 			//consider only 2 neighbors (left and right)
 			return (sg.getValue(p1)/d_p1 + sg.getValue(p2)/d_p2) / (1/d_p1 + 1/d_p2);
 		}
