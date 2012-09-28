@@ -1,31 +1,40 @@
 package playground.toronto.analysis.handlers;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.misc.Time;
 
-public class AgentStoryHandler implements ActivityEndEventHandler, ActivityStartEventHandler, 
+public class AgentStoryHandler implements TransitDriverStartsEventHandler, ActivityEndEventHandler, ActivityStartEventHandler, 
 	AgentDepartureEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentArrivalEventHandler{
 
-	Id pid;
-	String story;
-	int eventsHandled;
+	private final Id pid;
+	private String story;
+	private HashMap<Id, Id> vehicleLineMap;
 	
 	public AgentStoryHandler(Id pid){
 		this.pid = pid;
+		this.vehicleLineMap = new HashMap<Id, Id>();
 		this.story = "Story for agent \"" + this.pid.toString() + "\":";
-		this.eventsHandled = 0;
+	}
+	public AgentStoryHandler(String pid){
+		this.pid = new IdImpl(pid);
+		this.vehicleLineMap = new HashMap<Id, Id>();
+		this.story = "Story for agent \"" + this.pid.toString() + "\":";
 	}
 	
 	public String getStory(){
@@ -34,7 +43,7 @@ public class AgentStoryHandler implements ActivityEndEventHandler, ActivityStart
 	
 	@Override
 	public void reset(int iteration) {
-		this.eventsHandled = 0;
+		this.vehicleLineMap = new HashMap<Id, Id>();
 		this.story = "Story for agent \"" + this.pid.toString() + "\":";
 	}
 
@@ -43,25 +52,6 @@ public class AgentStoryHandler implements ActivityEndEventHandler, ActivityStart
 		if (event.getPersonId().equals(this.pid)){
 			this.story += "\n" + Time.writeTime(event.getTime()) + ": AgentArrivalEvent [mode='" +
 					event.getLegMode() + "',link='" + event.getLinkId().toString() + "']";
-			this.eventsHandled++;
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (event.getPersonId().equals(this.pid)){
-			this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonLeavesVehicleEvent [veh='" + 
-					event.getVehicleId() + "']";
-			this.eventsHandled++;
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {		
-		if (event.getPersonId().equals(this.pid)){
-			this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonEntersVehicleEvent [veh='" +
-					event.getVehicleId() + "']";
-			this.eventsHandled++;
 		}
 	}
 
@@ -70,7 +60,6 @@ public class AgentStoryHandler implements ActivityEndEventHandler, ActivityStart
 		if (event.getPersonId().equals(this.pid)){
 			this.story += "\n" + Time.writeTime(event.getTime()) + ": AgentDepartureEvent [mode='" +
 					event.getLegMode() + "',link='" + event.getLinkId() + "']";
-			this.eventsHandled++;
 		}
 	}
 
@@ -79,7 +68,6 @@ public class AgentStoryHandler implements ActivityEndEventHandler, ActivityStart
 		if (event.getPersonId().equals(this.pid)){
 			this.story += "\n" + Time.writeTime(event.getTime()) + ": ActivityStartEvent [type='" + 
 					event.getActType() + "']";
-			this.eventsHandled++;
 		}
 	}
 
@@ -88,7 +76,37 @@ public class AgentStoryHandler implements ActivityEndEventHandler, ActivityStart
 		if (this.pid.equals(event.getPersonId())){
 			this.story += "\n" + Time.writeTime(event.getTime()) + ": ActivityEndEvent [type='" +
 					event.getActType() + "']";
-			this.eventsHandled++;
 		}
+	}
+	@Override
+	public void handleEvent(
+			org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent event) {
+		if (event.getPersonId().equals(this.pid)){
+			Id lineId = this.vehicleLineMap.get(event.getVehicleId());
+			if (lineId != null){
+				this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonLeavesVehicleEvent [line='" +
+						lineId.toString() + "']";
+			}else {
+				this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonLeavesVehicleEvent [veh='" +
+					event.getVehicleId() + "']";
+			}
+		}
+	}
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (event.getPersonId().equals(this.pid)){
+			Id lineId = this.vehicleLineMap.get(event.getVehicleId());
+			if (lineId != null){
+				this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonEntersVehicleEvent [line='" +
+						lineId.toString() + "']";
+			}else {
+				this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonEntersVehicleEvent [veh='" +
+					event.getVehicleId() + "']";
+			}
+		}
+	}
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.vehicleLineMap.put(event.getVehicleId(), event.getTransitLineId());
 	}
 }
