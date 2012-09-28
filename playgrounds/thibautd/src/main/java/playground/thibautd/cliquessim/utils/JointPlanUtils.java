@@ -237,6 +237,11 @@ public class JointPlanUtils {
 
 	// /////////////////////////////////////////////////////////////////////////
 	// Data structures
+	/**
+	 * Represents the "joint travel structure" of the plan, that is,
+	 * who travels with whom from where to where, with references
+	 * to the relevant plan elements.
+	 */
 	public static final class JointTravelStructure {
 		public final List<JointTrip> jointTrips;
 
@@ -266,6 +271,12 @@ public class JointPlanUtils {
 		}
 	}
 
+	/**
+	 * Gathers information releted to one joint trip, that is,
+	 * one (and <b>only one</b>) passenger being driven.
+	 * Note that driver legs may pertain to several joint trips,
+	 * if the driver drives several passengers at the same time.
+	 */
 	public static final class JointTrip {
 		public final Id driverId;
 		public final Id passengerId;
