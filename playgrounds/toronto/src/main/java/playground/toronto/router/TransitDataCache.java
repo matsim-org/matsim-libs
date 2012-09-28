@@ -254,9 +254,9 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		}
 	}
 
+
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-	
 		if (this.vehInfo.containsKey(event.getVehicleId())){
 			TransitRouteStop trStop = this.getVehicleStop(event.getVehicleId(), event.getFacilityId());
 			if (trStop == null){
@@ -280,6 +280,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 			this.vehicleDepartureCache.remove(event.getVehicleId());
 		}
 	}
+
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
