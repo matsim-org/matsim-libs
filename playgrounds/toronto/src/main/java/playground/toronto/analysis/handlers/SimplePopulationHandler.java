@@ -11,7 +11,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
-public class SimplePopulationHandler implements ActivityEndEventHandler, TransitDriverStartsEventHandler {
+public class SimplePopulationHandler implements TransitDriverStartsEventHandler, ActivityEndEventHandler {
 
 	private HashSet<Id> pop;
 	private HashSet<Id> transitDrivers;
@@ -49,12 +49,13 @@ public class SimplePopulationHandler implements ActivityEndEventHandler, Transit
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		this.transitDrivers.add(event.getDriverId());
+		this.transitDrivers.add(event.getDriverId());		
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (this.transitDrivers.contains(event.getPersonId())) return;
 		this.pop.add(event.getPersonId());
+		
 	}
 }

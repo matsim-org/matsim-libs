@@ -1,9 +1,13 @@
 package playground.toronto.analysis.handlers;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -20,6 +24,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 import playground.toronto.analysis.ODMatrix;
 import playground.toronto.analysis.tripchains.AutoDriveComponent;
@@ -54,15 +59,17 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 	private HashSet<Id> driverIds;
 	
 	//Internal sets for assembling trip chains
-	private HashMap<Id, Trip> currentTrips;
-	private HashMap<Id, TripComponent> currentComponents;
+	private HashMap<Id, Trip> tripsBuffer;
+	private HashMap<Id, TripComponent> componentsBuffer;
 	private HashMap<Id, Tuple<Id,Id>> vehicleIdLineIdMap;
+	
+	double finalTime = 0;
 	
 	////////////////////////////////////////////////////////////////////////////////
 	public AgentTripChainHandler(){
 		this.personTripChainMap = new HashMap<Id, List<Trip>>();
-		this.currentComponents = new HashMap<Id, TripComponent>();
-		this.currentTrips = new HashMap<Id, Trip>();
+		this.componentsBuffer = new HashMap<Id, TripComponent>();
+		this.tripsBuffer = new HashMap<Id, Trip>();
 		this.linkToZoneMap = null;	
 		this.driverIds = new HashSet<Id>();
 		this.vehicleIdLineIdMap = new HashMap<Id, Tuple<Id,Id>>();
@@ -82,7 +89,7 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 	
 	private void addTripComponent(Id pid, TripComponent tcc){
 		if (this.driverIds.contains(pid)) return;
-		Trip trip = this.currentTrips.get(pid);
+		Trip trip = this.tripsBuffer.get(pid);
 		if (trip == null){
 			log.error("Could not find valid trip for agent " + pid + "!");
 			return;
@@ -94,6 +101,30 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 	
 	public Trip getTrip(Id pid, int t){
 		return this.personTripChainMap.get(pid).get(t);
+	}
+	
+	public int getTripsInTimePeriod(double start, double end){
+		int result = 0;
+		
+		for (List<Trip> tour : this.personTripChainMap.values()){
+			for (Trip trip : tour){
+				if (trip.getStartTime() >= start && trip.getStartTime() <= end) result++;
+			}
+		}
+		
+		return result;
+	}
+	public int getTransitTripsInTimePeriod(double start, double end){
+		int result = 0;
+		
+		for (List<Trip> tour : this.personTripChainMap.values()){
+			for (Trip trip : tour){
+				if (trip.getAutoDriveTime() >0) continue;
+				if (trip.getStartTime() >= start && trip.getStartTime() <= end) result++;
+			}
+		}
+		
+		return result;
 	}
 	
 	public int getTripSize(Id pid){
@@ -130,52 +161,124 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 		return this.getComponentAverageTime(AutoDriveComponent.class, startTime, endTime, boundedByTripEndTimes);
 	}
 	
+	public HashMap<String, Integer> getStuckTripStats(){
+		HashMap<String, Integer> stats = new HashMap<String, Integer>();
+		
+		int stuckTrips = this.tripsBuffer.size();
+		int stuckWalk = 0;
+		int stuckWait = 0;
+		int stuckInVeh = 0;
+		int stuckDrive = 0;
+		
+		for (TripComponent tc : this.componentsBuffer.values()){
+			if (tc instanceof WalkComponent) stuckWalk++;
+			else if (tc instanceof WaitForTransitComponent) stuckWait++;
+			else if (tc instanceof InTransitVehicleComponent) stuckInVeh++;
+			else if (tc instanceof AutoDriveComponent) stuckDrive++;
+		}
+		
+		stats.put("all", stuckTrips);
+		stats.put("walk", stuckWalk);
+		stats.put("wait", stuckWait);
+		stats.put("veh", stuckInVeh);
+		stats.put("drive", stuckDrive);
+		
+		return stats;
+	}
+	
+	public int allWalkTrips(){
+		int c = 0;
+		for (List<Trip> tour : this.personTripChainMap.values()){
+			for (Trip t : tour){
+				if (t.getAutoDriveTime() > 0)  continue;
+				if (t.getIVTT() == 0.0) c++;
+			}
+		}
+		return c;
+	}
+	
+	public int nonWalkTrips(){
+		int c = 0;
+		for (List<Trip> tour : this.personTripChainMap.values()){
+			for (Trip t : tour){
+				if (t.getAutoDriveTime() > 0)  continue;
+				if (t.getWalkTime() == 0.0) c++;
+			}
+		}
+		return c;
+	}
+	
+	public HashMap<String, Double> getAvgComponentsByTime(double start, double end){
+		 HashMap<String, Double> stats = new HashMap<String, Double>();
+		
+		int totalTrips = 0;
+		double walkSum = 0.0;
+		double waitSum = 0.0;
+		double rideSum = 0.0;
+		
+		for (List<Trip> tour : this.personTripChainMap.values()){
+			for (Trip t : tour){
+				if (t.getAutoDriveTime() > 0) continue; //skip auto trips
+				if (t.getStartTime() < start || t.getStartTime() > end) continue;
+				totalTrips++;
+				walkSum += t.getWalkTime();
+				waitSum += t.getWaitTime();
+				rideSum += t.getIVTT();
+			}
+		}
+		
+		stats.put("total", (double) totalTrips);
+		stats.put("walk.avg", walkSum / totalTrips);
+		stats.put("wait.avg", waitSum / totalTrips);
+		stats.put("ivtt.avg", rideSum / totalTrips);
+		
+		return stats;
+	}
+	
+	public void exportTripsTable(String fileName) throws IOException{
+		BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
+		bw.write("pid,trip.number,start.time,end.time,ivtt.time,wait.time,walk.time");
+		
+		for (Entry<Id, List<Trip>> tour : this.personTripChainMap.entrySet()){
+			int i = 0;
+			for (Trip trip : tour.getValue()){
+				if (trip.getAutoDriveTime() > 0 ) continue; //skip auto trips
+				
+				bw.newLine();
+				bw.write(tour.getKey().toString() + "," + i++ + "," + Time.writeTime(trip.getStartTime()) + "," +
+						Time.writeTime(trip.getEndTime()) + "," + trip.getIVTT() + ","
+						+ trip.getWaitTime() + "," + trip.getWalkTime());
+			}
+		}
+		bw.close();
+		log.info("Trips exported to " + fileName);
+	}
+	
 	///////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void reset(int iteration) {
-		this.currentComponents = new HashMap<Id, TripComponent>();
-		this.currentTrips = new HashMap<Id, Trip>();
-		this.currentComponents = new HashMap<Id, TripComponent>();
+		this.componentsBuffer.clear();
+		this.tripsBuffer.clear();
+		this.componentsBuffer.clear();
+		this.driverIds.clear();
+		this.vehicleIdLineIdMap.clear();
+		this.finalTime = 0;
+		this.personTripChainMap.clear();
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		Id pid = event.getPersonId();
-		TripComponent tcc = this.currentComponents.get(pid);
+		TripComponent tcc = this.componentsBuffer.get(pid);
 		if (tcc == null){
 			log.error("Could not find valid trip chain component for agent " + pid + "!");
 			return;
 		}
 		tcc.finishComponent(event.getTime());
 		this.addTripComponent(pid, tcc);
-		this.currentComponents.remove(pid);
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (!this.vehicleIdLineIdMap.containsKey(event.getVehicleId()))
-			return; //Skips vehicles which are not transit vehicles
-		if (this.driverIds.contains(event.getPersonId()))
-			return; //skips transit drivers entering vehicles
-
-		Id pid = event.getPersonId();
-		TripComponent tcc = this.currentComponents.get(pid);
-		if (tcc == null){
-			log.error("Could not find valid trip chain component for agent " + pid + "!");
-			return;
-		}else if (tcc instanceof WaitForTransitComponent){
-			//End wait episode
-			WaitForTransitComponent wftc = (WaitForTransitComponent) tcc;
-			wftc.finishComponent(event.getTime());
-			this.addTripComponent(pid, wftc);
-			currentComponents.remove(pid); 
-			
-			//Start an in-vehicle episode
-			InTransitVehicleComponent itvc = new InTransitVehicleComponent(event.getTime());
-			Tuple<Id, Id> tup = this.vehicleIdLineIdMap.get(event.getVehicleId());
-			if (tup != null) itvc.setRouteInfo(tup.getFirst(), tup.getSecond());
-			currentComponents.put(pid, itvc);
-		}
+		this.componentsBuffer.remove(pid);
+		
+		if (event.getTime() > this.finalTime) finalTime = event.getTime();
 	}
 	
 	@Override
@@ -185,17 +288,19 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 
 		if (mode.equals(LegModes.transitWalkMode)){
 			WalkComponent tcc = new WalkComponent(event.getTime());
-			currentComponents.put(pid, tcc);
+			componentsBuffer.put(pid, tcc);
 		} else if (mode.equals(LegModes.inVehicleMode)){
 			//the in-vehicle component begins with a wait time.
 			WaitForTransitComponent tcc = new WaitForTransitComponent(event.getTime());
-			currentComponents.put(pid, tcc);
+			componentsBuffer.put(pid, tcc);
 		}else if (mode.equals(LegModes.carMode)){
 			AutoDriveComponent tcc = new AutoDriveComponent(event.getTime());
-			currentComponents.put(pid, tcc);
+			componentsBuffer.put(pid, tcc);
 		}else{
 			log.error("Leg mode '" + mode + "' is not recognized/supported!");
 		}
+		
+		if (event.getTime() > this.finalTime) finalTime = event.getTime();
 	}
 	
 	@Override
@@ -208,7 +313,9 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 			if (this.linkToZoneMap != null){
 				trip.zone_o = this.linkToZoneMap.getZoneOfLink(event.getLinkId());
 			}
-			this.currentTrips.put(pid, trip);
+			this.tripsBuffer.put(pid, trip);
+			
+			if (event.getTime() > this.finalTime) finalTime = event.getTime();
 		}
 		
 	}
@@ -217,12 +324,14 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 	public void handleEvent(ActivityStartEvent event) {
 		if (!event.getActType().equals(LegModes.interactionAct)){
 			Id pid = event.getPersonId();
-			Trip trip = this.currentTrips.get(pid);
+			Trip trip = this.tripsBuffer.get(pid);
 			if (this.linkToZoneMap != null){
 				trip.zone_d = this.linkToZoneMap.getZoneOfLink(event.getLinkId());
 			}
 			this.addTrip(pid, trip);
-			this.currentTrips.remove(pid);
+			this.tripsBuffer.remove(pid);
+			
+			if (event.getTime() > this.finalTime) finalTime = event.getTime();
 		}
 	}
 	///////////////////////////////////////////////////////////////////////////////
@@ -262,12 +371,41 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 		public static final String interactionAct = "pt interaction";
 	}
 
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!this.vehicleIdLineIdMap.containsKey(event.getVehicleId()))
+			return; //Skips vehicles which are not transit vehicles
+		if (this.driverIds.contains(event.getPersonId()))
+			return; //skips transit drivers entering vehicles
+
+		Id pid = event.getPersonId();
+		TripComponent tcc = this.componentsBuffer.get(pid);
+		if (tcc == null){
+			log.error("Could not find valid trip chain component for agent " + pid + "!");
+			return;
+		}else if (tcc instanceof WaitForTransitComponent){
+			//End wait episode
+			WaitForTransitComponent wftc = (WaitForTransitComponent) tcc;
+			wftc.finishComponent(event.getTime());
+			this.addTripComponent(pid, wftc);
+			componentsBuffer.remove(pid); 
+			
+			//Start an in-vehicle episode
+			InTransitVehicleComponent itvc = new InTransitVehicleComponent(event.getTime());
+			Tuple<Id, Id> tup = this.vehicleIdLineIdMap.get(event.getVehicleId());
+			if (tup != null) itvc.setRouteInfo(tup.getFirst(), tup.getSecond());
+			componentsBuffer.put(pid, itvc);
+		}
+		
+		if (event.getTime() > this.finalTime) finalTime = event.getTime();
+	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		this.driverIds.add(event.getDriverId());
 		this.vehicleIdLineIdMap.put(event.getVehicleId(), new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId()));
 		
+		if (event.getTime() > this.finalTime) finalTime = event.getTime();
 	}
 	
 }

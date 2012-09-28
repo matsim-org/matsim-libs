@@ -7,17 +7,14 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -33,36 +30,54 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author pkucirek
  *
  */
-public class AggregateBoardingsOverTimePeriodHandler implements PersonEntersVehicleEventHandler {
+public class AggregateBoardingsOverTimePeriodHandler implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler {
 
 	private static final Logger log = Logger.getLogger(AggregateBoardingsOverTimePeriodHandler.class);
 	
 	private final double periodStart;
 	private final double periodEnd;
-	private final TransitSchedule schedule;
 	
 	private HashMap<Id, Integer> periodBoardings;
 	private HashMap<Id, Id> vehicleIdLineIdMap;
-	private HashSet<Id> activeVehicles;
-
-	public AggregateBoardingsOverTimePeriodHandler(TransitSchedule schedule){
+	private HashSet<Id> drivers;
+	private HashMap<Id, String> lineModeMap;
+	
+	public AggregateBoardingsOverTimePeriodHandler(){
 		this.periodStart = 0;
 		this.periodEnd = Double.POSITIVE_INFINITY;
-		this.schedule = schedule;
 		this.periodBoardings = new HashMap<Id, Integer>();
-		this.activeVehicles = new HashSet<Id>();
-		
-		this.buildVehIdLineIdMap();
+		this.vehicleIdLineIdMap = new HashMap<Id, Id>();
+		this.drivers = new HashSet<Id>();
 	}
 	
-	public AggregateBoardingsOverTimePeriodHandler(double startTime, double endTime, TransitSchedule schedule){
+	public AggregateBoardingsOverTimePeriodHandler(double startTime, double endTime){
 		this.periodStart = startTime;
 		this.periodEnd = endTime;
-		this.schedule = schedule;
 		this.periodBoardings = new HashMap<Id, Integer>();
-		this.activeVehicles = new HashSet<Id>();
+		this.vehicleIdLineIdMap = new HashMap<Id, Id>();
+		this.drivers = new HashSet<Id>();
+	}
+	
+	public void MapLineModes(TransitSchedule schedule){
+		this.lineModeMap = new HashMap<Id, String>();
 		
-		this.buildVehIdLineIdMap();
+		for (TransitLine line : schedule.getTransitLines().values()){
+			String mode = "";
+			for (TransitRoute r :line.getRoutes().values()){
+				mode = r.getTransportMode();
+				break;
+			}
+			this.lineModeMap.put(line.getId(), mode);
+		}
+	}
+	
+	public int getBoardingsByMode(String mode){
+		int c = 0;
+		for (Entry<Id, Integer> line : this.periodBoardings.entrySet()){
+			if (this.lineModeMap.get(line.getKey()).equals(mode))
+				c += line.getValue();
+		}
+		return c;
 	}
 	
 	public void printResults(){
@@ -73,28 +88,69 @@ public class AggregateBoardingsOverTimePeriodHandler implements PersonEntersVehi
 	}
 	
 	public int getTotalBoardings(Id lineId){
+		if (!this.periodBoardings.containsKey(lineId)) return 0;
 		return this.periodBoardings.get(lineId);
+	}
+	public int getTotalBoardings(){
+		int c = 0;
+		for (Integer i : this.periodBoardings.values()) c += i;
+		return c;
 	}
 	
 	@Override
 	public void reset(int iteration) {
 		this.periodBoardings = new HashMap<Id, Integer>();
-		this.activeVehicles = new HashSet<Id>();
+		this.vehicleIdLineIdMap = new HashMap<Id, Id>();
+		this.drivers = new HashSet<Id>();
+	}
+		
+	public static void main(String[] args){
+		String eventsFile = args[0];
+		
+		String startTime = null;
+		String endTime = null;
+		if (args.length == 3){
+			startTime = args[1];
+			endTime = args[2];
+		}
+
+		
+		AggregateBoardingsOverTimePeriodHandler abotph;
+		SimplePopulationHandler sph = new SimplePopulationHandler();
+		
+		if (args.length == 3){
+			try {
+				double start = Time.parseTime(startTime);
+				double end = Time.parseTime(endTime);
+				abotph = new AggregateBoardingsOverTimePeriodHandler(start, end);
+			} catch (NumberFormatException e) {
+				abotph = new AggregateBoardingsOverTimePeriodHandler();
+			}
+		}else{
+			abotph = new AggregateBoardingsOverTimePeriodHandler();
+		}
+		
+		EventsManager em = EventsUtils.createEventsManager();
+		em.addHandler(abotph);
+		em.addHandler(sph);
+		
+		MatsimEventsReader reader = new MatsimEventsReader(em);
+		reader.readFile(eventsFile);
+		
+		abotph.printResults();
+		System.out.println("Events contained " + sph.getPop().size() + " persons.");
+		Toolkit.getDefaultToolkit().beep(); //*beep*
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		//Assuming that the first PersonentersVehicleEvent for each vehicle is the driver entering
-		if (!this.activeVehicles.contains(event.getVehicleId())){
-			this.activeVehicles.add(event.getVehicleId());
-			return; //does not add the driver.
-		}
+		if (this.drivers.contains(event.getPersonId())) return; //skip drivers
 		
 		if (event.getTime() < this.periodStart || event.getTime() > this.periodEnd) return; //ignores non-driver agents who are boarding outside of the period of interest.
 		
 		Id lineId = this.vehicleIdLineIdMap.get(event.getVehicleId());
 		if (lineId == null) {
-			log.warn("Could not find a line Id for vehicle id = " + event.getVehicleId() + "!");
+			//log.warn("Could not find a line Id for vehicle id = " + event.getVehicleId() + "!");
 			return;
 		}
 		
@@ -105,57 +161,13 @@ public class AggregateBoardingsOverTimePeriodHandler implements PersonEntersVehi
 		}
 			
 	}
-	
-	private void buildVehIdLineIdMap(){
-		this.vehicleIdLineIdMap = new HashMap<Id, Id>();
-		
-		for (TransitLine line : this.schedule.getTransitLines().values()){
-			for (TransitRoute route : line.getRoutes().values()){
-				for (Departure dep : route.getDepartures().values()){
-					vehicleIdLineIdMap.put(dep.getVehicleId(), line.getId());
-				}
-			}
-		}
-	}
-	
-	public static void main(String[] args){
-		String eventsFile = args[0];
-		String scheduleFile = args[1];
-		
-		String startTime = null;
-		String endTime = null;
-		if (args.length == 4){
-			startTime = args[2];
-			endTime = args[3];
-		}
 
-		Config config = ConfigUtils.createConfig();
-		config.setParam("scenario", "useTransit", "true");
-		config.setParam("transit", "transitScheduleFile", scheduleFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		TransitSchedule schedule = scenario.getTransitSchedule();
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.drivers.add(event.getDriverId());
+		this.vehicleIdLineIdMap.put(event.getVehicleId(), event.getTransitLineId());
 		
-		AggregateBoardingsOverTimePeriodHandler abotph;
-		
-		if (args.length == 4){
-			try {
-				double start = Time.parseTime(startTime);
-				double end = Time.parseTime(endTime);
-				abotph = new AggregateBoardingsOverTimePeriodHandler(start, end, schedule);
-			} catch (NumberFormatException e) {
-				abotph = new AggregateBoardingsOverTimePeriodHandler(schedule);
-			}
-		}else{
-			abotph = new AggregateBoardingsOverTimePeriodHandler(schedule);
-		}
-		
-		EventsManager em = EventsUtils.createEventsManager();
-		em.addHandler(abotph);
-		
-		MatsimEventsReader reader = new MatsimEventsReader(em);
-		reader.readFile(eventsFile);
-		
-		abotph.printResults();
-		Toolkit.getDefaultToolkit().beep(); //*beep*
 	}
+
+	
 }

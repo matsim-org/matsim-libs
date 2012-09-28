@@ -7,9 +7,13 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
@@ -26,10 +30,35 @@ public class LineBoardingAndAlightingsByTimeBines implements
 	
 	public LineBoardingAndAlightingsByTimeBines(String binsFile) throws IOException{
 		this.timeBins = generateBinsFromFile(binsFile);
+		this.vehicleLineCache = new HashMap<Id, Id>();
+		this.lineAlightings = new HashMap<Id, int[]>();
+		this.lineBoardings = new HashMap<Id, int[]>();
 	}
 	
 	private int[] getEmptyBins(){
 		return new int[this.timeBins.size()];
+	}
+	
+	public void printLineResults(Id lineId){
+		int[] boardings = this.lineBoardings.get(lineId);
+		int[] alightings = this.lineAlightings.get(lineId);
+		
+		System.out.println("Boardings/Alightings for Line " + lineId);
+		System.out.println("from\tto\tboardings\talightings");
+		
+		Double prevTime = null;
+		int i = 0;
+		for (Double d : this.timeBins.navigableKeySet()){
+			String out = "";
+			if (prevTime != null) out += Time.writeTime(prevTime);
+			out += "\t" + Time.writeTime(d);
+			out += "\t" + boardings[i] + "\t" + alightings[i++];
+			
+			System.out.println(out);
+			
+			prevTime = d;
+		}
+		
 	}
 	
 	private TreeMap<Double, Integer> generateBinsFromFile(String fileName) throws IOException{
@@ -64,6 +93,30 @@ public class LineBoardingAndAlightingsByTimeBines implements
 		// TODO Auto-generated method stub
 
 	}
+	
+	public static void main(String[] args) throws IOException{
+		String eventsFile = args[0];
+		String binsFile = args[1];
+		
+		IdImpl YUS = new IdImpl(21948);
+		IdImpl BLR = new IdImpl(21945);
+		IdImpl SHE = new IdImpl(21946);
+		IdImpl SRT = new IdImpl(21947);
+		
+		LineBoardingAndAlightingsByTimeBines handler = new LineBoardingAndAlightingsByTimeBines(binsFile);
+		
+		EventsManager em = EventsUtils.createEventsManager();
+		em.addHandler(handler);
+		
+		new MatsimEventsReader(em).readFile(eventsFile);
+		
+		handler.printLineResults(YUS);
+		handler.printLineResults(BLR);
+		handler.printLineResults(SHE);
+		//handler.printLineResults(SRT);
+		
+		
+	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -90,7 +143,6 @@ public class LineBoardingAndAlightingsByTimeBines implements
 			}
 			this.lineBoardings.get(lineId)[this.timeBins.ceilingEntry(event.getTime()).getValue()]++;
 		}
-
 	}
 
 }
