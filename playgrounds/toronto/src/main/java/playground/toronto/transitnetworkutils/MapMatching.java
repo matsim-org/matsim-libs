@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.config.ConfigUtils;
@@ -34,6 +35,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -143,24 +145,28 @@ public class MapMatching {
 				//pather uses a SimpleTravelTimeCalculator to produce travel times and costs based on freeflow speed.
 				LeastCostPathCalculator pather = null;
 				Network subNetwork = null;
+				
+				FreeSpeedTravelTimeCalculator freespeedCalc = new FreeSpeedTravelTimeCalculator();
+				OnlyTimeDependentTravelDisutilityCalculator disutilityCalc = new OnlyTimeDependentTravelDisutilityCalculator(freespeedCalc);
+				
 				if (route.mode == "train"){					
-					pather = new Dijkstra(TrainNetwork, new SimpleTravelTimeCalculator(), new SimpleTravelTimeCalculator());
+					pather = new Dijkstra(TrainNetwork, disutilityCalc, freespeedCalc);
 					// line#   mode   veh   hdwy   speed   descr   ut1   ut2   ut3
 					EMMESequence += " r 1 5 99";
 					subNetwork = TrainNetwork;
 				}
 				else if (route.mode == "subway"){
-					pather = new Dijkstra(SubwayNetwork, new SimpleTravelTimeCalculator(), new SimpleTravelTimeCalculator());
+					pather = new Dijkstra(SubwayNetwork,disutilityCalc,freespeedCalc);
 					EMMESequence += " m 2 5 99";
 					subNetwork = SubwayNetwork;
 				}
 				else if (route.mode == "streetcar"){
-					pather = new Dijkstra(StreetcarNetwork, new SimpleTravelTimeCalculator(), new SimpleTravelTimeCalculator());
+					pather = new Dijkstra(StreetcarNetwork, disutilityCalc, freespeedCalc);
 					EMMESequence += " l 5 5 99";
 					subNetwork = StreetcarNetwork;
 				}
 				else { //default mode is bus
-					pather = new Dijkstra(BusNetwork, new SimpleTravelTimeCalculator(), new SimpleTravelTimeCalculator());
+					pather = new Dijkstra(BusNetwork,disutilityCalc, freespeedCalc);
 					EMMESequence += " b 7 5 99";
 					subNetwork = BusNetwork;
 				}
