@@ -35,23 +35,6 @@ public class TestScenario {
 	private static File outputFile= new File("Z:/WinHome/Docs/Interpolation/zurich_test/Evaluation_" + filename_data200 + ".txt");
 	private static FileWriter out;
 	
-//	//variables to save comparison results
-//	private static double interpolationTime_bilinear = Double.MAX_VALUE;
-//	private static double interpolationTime_bicubic = Double.MAX_VALUE;
-//	private static double interpolationTime_idw = Double.MAX_VALUE;
-//	private static double[] difference_bilinear;
-//	private static double[] difference_bicubic;
-//	private static double[] difference_idw_all_exp1;
-//	private static double[] difference_idw_all_exp2;
-//	private static double[] difference_idw_all_exp5;
-//	private static double[] difference_idw_all_exp6;
-//	private static double[] difference_idw_all_exp7;
-//	private static double[] difference_idw_four_exp1;
-//	private static double[] difference_idw_four_exp2;
-//	private static double[] difference_idw_four_exp5;
-//	private static double[] difference_idw_four_exp6;
-//	private static double[] difference_idw_four_exp7;
-	
 	/**
 	 * reads the data from the scenario and interpolates the grid of known values to a higher resolution first with bilinear interpolation second with bicubic spline interpolation
 	 * 
@@ -99,67 +82,6 @@ public class TestScenario {
 		}
 		
 		log.info("interpolation test done");
-		
-		//TODO: raus
-//		log.info("Interpolate file " + filename_data200 + ":");
-//		SpatialGrid sg200_bilinear= interpolateSG(sg200, Interpolation.BILINEAR);
-//		SpatialGrid sg200_bicubic= interpolateSG(sg200, Interpolation.BICUBIC);
-//		SpatialGrid sg200_idw_all_exp1= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 1.);
-//		SpatialGrid sg200_idw_all_exp2= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 2.);
-//		SpatialGrid sg200_idw_all_exp5= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 5.);
-//		SpatialGrid sg200_idw_all_exp6= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 6.);
-//		SpatialGrid sg200_idw_all_exp7= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, true, 7.);
-//		SpatialGrid sg200_idw_four_exp1= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 1.);
-//		SpatialGrid sg200_idw_four_exp2= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 2.);
-//		SpatialGrid sg200_idw_four_exp5= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 5.);
-//		SpatialGrid sg200_idw_four_exp6= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 6.);
-//		SpatialGrid sg200_idw_four_exp7= interpolateSG(sg200, Interpolation.INVERSE_DISTANCE_WEIGHTING, false, 7.);
-//		log.info("Interpolation of file " + filename_data200 + " is completed.");
-//		
-//		log.info("Writing interpolated data...");
-//		sg200_bilinear.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.BILINEAR+ ".txt"); //TODO in resources speichern
-//		sg200_bicubic.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.BICUBIC+ ".txt"); //TODO in resources speichern
-//		sg200_idw_all_exp1.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_all_exp1.txt"); //TODO in resources speichern
-//		sg200_idw_all_exp2.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_all_exp2.txt"); //TODO in resources speichern
-//		sg200_idw_all_exp5.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_all_exp5.txt"); //TODO in resources speichern
-//		sg200_idw_all_exp6.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_all_exp6.txt"); //TODO in resources speichern
-//		sg200_idw_all_exp7.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_all_exp7.txt"); //TODO in resources speichern
-//		sg200_idw_four_exp1.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_four_exp1.txt"); //TODO in resources speichern
-//		sg200_idw_four_exp2.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_four_exp2.txt"); //TODO in resources speichern
-//		sg200_idw_four_exp5.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_four_exp5.txt"); //TODO in resources speichern
-//		sg200_idw_four_exp6.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_four_exp6.txt"); //TODO in resources speichern
-//		sg200_idw_four_exp7.writeToFile("Z:/WinHome/Docs/Interpolation/zurich_test/" + filename_data200 + "_" + Interpolation.INVERSE_DISTANCE_WEIGHTING+ "_four_exp7.txt"); //TODO in resources speichern
-//		
-//		log.info("Computation of interpolation differences of the different methods...");
-//		difference_bilinear = differenceComputation(sg100, sg200_bilinear);
-//		difference_bicubic = differenceComputation(sg100, sg200_bicubic);
-//		difference_idw_all_exp1 = differenceComputation(sg100, sg200_idw_all_exp1);
-//		difference_idw_all_exp2 = differenceComputation(sg100, sg200_idw_all_exp2);
-//		difference_idw_all_exp5 = differenceComputation(sg100, sg200_idw_all_exp5);
-//		difference_idw_all_exp6 = differenceComputation(sg100, sg200_idw_all_exp6);
-//		difference_idw_all_exp7 = differenceComputation(sg100, sg200_idw_all_exp7);
-//		difference_idw_four_exp1 = differenceComputation(sg100, sg200_idw_four_exp1);
-//		difference_idw_four_exp2 = differenceComputation(sg100, sg200_idw_four_exp1);
-//		difference_idw_four_exp5 = differenceComputation(sg100, sg200_idw_four_exp1);
-//		difference_idw_four_exp6 = differenceComputation(sg100, sg200_idw_four_exp1);
-//		difference_idw_four_exp7 = differenceComputation(sg100, sg200_idw_four_exp1);
-		
-//		log.info("Comparison of interpolation differences and interpolation time of the different methods:");
-//		System.out.println("interpolation method \t\t" + "interpolation time \t" + "sum of absolute interpolation difference to known data at the same resolution" + "relative absolute difference" + "sum of quadratic difference" + "relative quadratic difference");
-//		System.out.println("-----------------------------------------------------------------------------------------------------");
-//		System.out.println("bilinear interpolation \t\t\t" + interpolationTime_bilinear + "ms \t\t\t" + difference_bilinear[0] + "\t\t" + difference_bilinear[0]/difference_bilinear[2] + "\t\t" + difference_bilinear[1] + "\t\t" + difference_bilinear[1]/difference_bilinear[2]);
-//		System.out.println("bicubic interpolation \t\t\t" + interpolationTime_bicubic + "ms \t\t" + difference_bicubic[0] + "\t\t" + difference_bicubic[0]/difference_bicubic[2] + "\t\t" + difference_bicubic[1] + "\t\t" + difference_bicubic[1]/difference_bicubic[2]);
-//		System.out.println("idw with all neighbors and exp 1 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_all_exp1[0] + "\t\t" + difference_idw_all_exp1[0]/difference_idw_all_exp1[2] + "\t\t" + difference_idw_all_exp1[1] + "\t\t" + difference_idw_all_exp1[1]/difference_idw_all_exp1[2]);
-//		System.out.println("idw with all neighbors and exp 2 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_all_exp2[0] + "\t\t" + difference_idw_all_exp2[0]/difference_idw_all_exp2[2] + "\t\t" + difference_idw_all_exp2[1] + "\t\t" + difference_idw_all_exp2[1]/difference_idw_all_exp2[2]);
-//		System.out.println("idw with all neighbors and exp 5 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_all_exp5[0] + "\t\t" + difference_idw_all_exp5[0]/difference_idw_all_exp5[2] + "\t\t" + difference_idw_all_exp5[1] + "\t\t" + difference_idw_all_exp5[1]/difference_idw_all_exp5[2]);
-//		System.out.println("idw with all neighbors and exp 6 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_all_exp6[0] + "\t\t" + difference_idw_all_exp6[0]/difference_idw_all_exp6[2] + "\t\t" + difference_idw_all_exp6[1] + "\t\t" + difference_idw_all_exp6[1]/difference_idw_all_exp6[2]);
-//		System.out.println("idw with all neighbors and exp 7 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_all_exp7[0] + "\t\t" + difference_idw_all_exp7[0]/difference_idw_all_exp7[2] + "\t\t" + difference_idw_all_exp7[1] + "\t\t" + difference_idw_all_exp7[1]/difference_idw_all_exp7[2]);
-//		System.out.println("idw with four neighbors and exp 1 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_four_exp1[0] + "\t\t" + difference_idw_four_exp1[0]/difference_idw_four_exp1[2] + "\t\t" + difference_idw_four_exp1[1] + "\t\t" + difference_idw_four_exp1[1]/difference_idw_four_exp1[2]);
-//		System.out.println("idw with four neighbors and exp 2 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_four_exp2[0] + "\t\t" + difference_idw_four_exp2[0]/difference_idw_four_exp2[2] + "\t\t" + difference_idw_four_exp2[1] + "\t\t" + difference_idw_four_exp2[1]/difference_idw_four_exp2[2]);
-//		System.out.println("idw with four neighbors and exp 5 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_four_exp5[0] + "\t\t" + difference_idw_four_exp5[0]/difference_idw_four_exp5[2] + "\t\t" + difference_idw_four_exp5[1] + "\t\t" + difference_idw_four_exp5[1]/difference_idw_four_exp5[2]);
-//		System.out.println("idw with four neighbors and exp 6 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_four_exp6[0] + "\t\t" + difference_idw_four_exp6[0]/difference_idw_four_exp6[2] + "\t\t" + difference_idw_four_exp6[1] + "\t\t" + difference_idw_four_exp6[1]/difference_idw_four_exp6[2]);
-//		System.out.println("idw with four neighbors and exp 7 \t" + interpolationTime_idw + "ms \t\t" + difference_idw_four_exp7[0] + "\t\t" + difference_idw_four_exp7[0]/difference_idw_four_exp7[2] + "\t\t" + difference_idw_four_exp7[1] + "\t\t" + difference_idw_four_exp7[1]/difference_idw_four_exp7[2]);
-//		
 	}
 	
 	private static void testOneMethod(int interpolationMethod, boolean allNeighbors, double exponent){
@@ -190,7 +112,6 @@ public class TestScenario {
 		log.info("Computation of interpolation differences...");
 		double[] difference = differenceComputation(sg100, interp_sg);
 		
-		//TODO: Auswertungszeile in .txt schreiben
 		String evalMethod= "";
 		switch (interpolationMethod){
 			case 0: evalMethod= "bilinear interpolation \t\t\t"; break;
@@ -205,40 +126,6 @@ public class TestScenario {
 			e.printStackTrace();
 		}
 	}
-	
-//	/**
-//	 * Interpolates the grid with one chosen interpolation method to one resolution higher.
-//	 * Writes the interpolated SpatialGrid out.
-//	 * 
-//	 * @param sg
-//	 * @param interpolationMethod
-//	 * @param allNeighbors only necessary, if interpolationMethod is 2 (inverse distance weighting). Sets whether inverse distance weighting with all or four neighbors should be used.
-//	 * @param exponent only necessary, if interpolationMethod is 2 (inverse distance weighting). Sets the exponent for the inverse distance weighting.
-//	 */
-//	private static SpatialGrid interpolateSG(SpatialGrid sg, int interpolationMethod, boolean allNeighbors , double exponent){
-//		long startTime= System.currentTimeMillis();
-//		Interpolation interpolation = new Interpolation(sg, interpolationMethod, allNeighbors, exponent);
-//		
-//		SpatialGrid sg_new = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
-//		// calculate new values for higher resolution
-//		for (double y = sg.getYmin(); y <= sg.getYmax(); y += sg.getResolution()/2) {
-//			for (double x = sg.getXmin(); x <= sg.getXmax(); x += sg.getResolution()/2) {
-//				sg_new.setValue(interpolation.interpolate(x, y), x, y);
-//			}
-//		}
-//		//TODO: zeit zurückgeben. wird dort eingetragen
-//		switch(interpolationMethod){
-//			case 0: interpolationTime_bilinear= System.currentTimeMillis()-startTime;
-//			case 1: interpolationTime_bicubic= System.currentTimeMillis()-startTime;
-//			case 2: if (allNeighbors){
-//						interpolationTime_idw_all= System.currentTimeMillis()-startTime;
-//					}else{
-//						interpolationTime_idw_four= System.currentTimeMillis()-startTime;
-//					}
-//		}
-//		
-//		return sg_new;
-//	}
 	
 	/**
 	 * Compares the differences between the interpolated SpatialGrid with resolution 200 and the original SpatialGrid with resolution 100.
