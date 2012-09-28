@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripInsertorStrategy.java
+ * JointTripInsertorModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.replanning.strategies;
+package playground.thibautd.cliquessim.replanning.modules.jointtripinsertor;
 
 import org.matsim.core.controler.Controler;
-
-import playground.thibautd.cliquessim.replanning.JointPlanStrategy;
-import playground.thibautd.cliquessim.replanning.modules.jointtimemodechooser.JointTimeModeChooserModule;
-import playground.thibautd.cliquessim.replanning.modules.jointtripinsertor.JointTripInsertorModule;
-import playground.thibautd.cliquessim.replanning.modules.reroute.JointReRouteModule;
-import playground.thibautd.cliquessim.replanning.selectors.RandomPlanSelectorWithoutCasts;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author thibautd
  */
-public class JointTripInsertorStrategy extends JointPlanStrategy {
+public class JointTripInsertorAndRemoverModule extends AbstractMultithreadedModule {
+	private final Controler controler;
 
-	public JointTripInsertorStrategy(final Controler controler) {
-		super( new RandomPlanSelectorWithoutCasts() );
+	public JointTripInsertorAndRemoverModule(final Controler controler) {
+		super( controler.getConfig().global() );
+		this.controler = controler;
+	}
 
-		addStrategyModule( new JointTripInsertorModule( controler ) );
-		addStrategyModule( new JointReRouteModule( controler ) );
-		addStrategyModule( new JointTimeModeChooserModule( controler ) );
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new JointTripInsertorAndRemoverAlgorithm(
+				controler.getConfig(),
+				controler.getTripRouterFactory().createTripRouter(),
+				MatsimRandom.getLocalInstance());
 	}
 }
 
