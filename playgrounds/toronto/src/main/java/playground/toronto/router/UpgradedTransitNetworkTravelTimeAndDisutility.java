@@ -12,6 +12,9 @@ import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 
+import playground.toronto.transitfares.FareCalculator;
+import playground.toronto.transitfares.NullFareCalculator;
+
 /**
  * A significantly upgraded version of the base {@link TransitNetworkTravelTimeAndDisutility} calculator for transit, with several differences:
  *  <ul>
@@ -32,6 +35,7 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 	//inherited properties
 	final static double MIDNIGHT = 24.0*3600;
 	protected final TransitRouterConfig config;
+	private final FareCalculator fareCalc;
 	private Link previousLink = null;
 	private double previousTime = Double.NaN;
 	private double cachedWalkTime = Double.NaN;
@@ -42,6 +46,13 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 	public UpgradedTransitNetworkTravelTimeAndDisutility(final TransitDataCache cache, final TransitRouterConfig config){
 		this.config = config;
 		this.dataCache = cache;
+		this.fareCalc = new NullFareCalculator();
+	}
+	
+	public UpgradedTransitNetworkTravelTimeAndDisutility(final TransitDataCache cache, final TransitRouterConfig config, final FareCalculator fareCalculator){
+		this.config = config;
+		this.dataCache = cache;
+		this.fareCalc = fareCalculator;
 	}
 	
 	
