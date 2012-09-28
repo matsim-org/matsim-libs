@@ -58,15 +58,13 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 
 	public TripRouterFactoryImpl(final Controler controler) {
 		this(
-				controler.getConfig(),
-				controler.getScenario().getNetwork(),
+				controler.getScenario(),
 				controler.getTravelDisutilityFactory(),
 				controler.getTravelTimeCalculator(),
 				controler.getLeastCostPathCalculatorFactory(),
-				controler.getPopulation().getFactory(),
-				((PopulationFactoryImpl) (controler.getPopulation().getFactory())).getModeRouteFactory(),
-				controler.getTransitRouterFactory(),
-				controler.getScenario().getTransitSchedule());
+				controler.getScenario().getConfig().scenario().isUseTransit() ?
+					controler.getTransitRouterFactory() :
+					null);
 	}
 
 	public TripRouterFactoryImpl(
@@ -83,7 +81,9 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 				scenario.getPopulation().getFactory(),
 				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
 				transitRouterFactory,
-				scenario.getTransitSchedule());
+				scenario.getConfig().scenario().isUseTransit() ?
+					scenario.getTransitSchedule() :
+					null);
 	}
 
 	public TripRouterFactoryImpl(
