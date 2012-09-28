@@ -314,33 +314,35 @@ public class TripRouter {
 			final Activity origin,
 			final List<? extends PlanElement> trip,
 			final Activity destination) {
-		List<PlanElement> oldTrip = new ArrayList<PlanElement>();
+		int indexOfOrigin = -1;
+		int indexOfDestination = -1;
 
-		int index = plan.indexOf( origin );
-		if (index == -1) {
-			throw new IllegalArgumentException( origin+" does not belongs to "+plan );
+		// search the trip
+		int currentIndex = 0;
+		for (PlanElement pe : plan) {
+			if (pe == origin) {
+				indexOfOrigin = currentIndex;
+			}
+			if (pe == destination) {
+				indexOfDestination = currentIndex;
+				break;
+			}
+			currentIndex++;
 		}
 
-		int indexOfDestination = plan.indexOf( destination );
-		if (indexOfDestination == -1) {
-			throw new IllegalArgumentException( destination+" does not belongs to "+plan );
+		// check validity
+		if (indexOfOrigin < 0) {
+			throw new RuntimeException( "could not find origin "+origin+" in "+plan ); 
+		}
+		if (indexOfDestination < 0) {
+			throw new RuntimeException( "could not find destination "+destination+" in "+plan ); 
 		}
 
-		// go to the trip
-		index++;
-
-		// remove it
-		int toRemove = indexOfDestination - index;
-		while (toRemove > 0) {
-			oldTrip.add( plan.remove( index ) );
-			toRemove--;
-		}
-
-		// insert new trip
-		for (PlanElement pe : trip) {
-			plan.add( index , pe );
-			index++;
-		}
+		// replace the trip and return the former one
+		List<PlanElement> seq = plan.subList( indexOfOrigin + 1 , indexOfDestination );
+		List<PlanElement> oldTrip = new ArrayList<PlanElement>( seq );
+		seq.clear();
+		seq.addAll( trip );
 
 		return oldTrip;
 	}

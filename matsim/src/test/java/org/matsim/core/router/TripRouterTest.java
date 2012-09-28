@@ -25,6 +25,7 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -41,8 +42,16 @@ public class TripRouterTest {
 	@Test
 	public void testTripInsertion() {
 		PlanImpl plan = new PlanImpl();
+		plan.createAndAddActivity( "-4" );
+		plan.createAndAddLeg( "-3" );
+		plan.createAndAddActivity( "-2" );
+		plan.createAndAddLeg( "-1" );
 		Activity o = plan.createAndAddActivity( "1" );
 		Activity d = plan.createAndAddActivity( "5" );
+		plan.createAndAddLeg( "6" );
+		plan.createAndAddActivity( "7" );
+		plan.createAndAddLeg( "8" );
+		plan.createAndAddActivity( "9" );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
@@ -53,10 +62,10 @@ public class TripRouterTest {
 
 		assertEquals(
 				"insertion did not produce the expected plan length!",
-				5,
+				13,
 				plan.getPlanElements().size());
 
-		int oldIndex = 0;
+		int oldIndex = Integer.MIN_VALUE;
 		for (PlanElement pe : plan.getPlanElements()) {
 			int newIndex = -1;
 
@@ -71,6 +80,100 @@ public class TripRouterTest {
 					"wrong inserted sequence: "+plan.getPlanElements(),
 					newIndex > oldIndex);
 			oldIndex = newIndex;
+		}
+	}
+
+	@Test
+	public void testTripInsertionIfActivitiesImplementEquals() {
+		PlanImpl plan = new PlanImpl();
+		plan.addActivity( new EqualsActivity( "-4" , new IdImpl( 1 ) ) );
+		plan.createAndAddLeg( "-3" );
+		plan.addActivity( new EqualsActivity( "-2" , new IdImpl( 1 ) ) );
+		plan.createAndAddLeg( "-1" );
+		Activity o = new EqualsActivity( "1" , new IdImpl( 1 ) );
+		plan.addActivity( o );
+		Activity d = new EqualsActivity( "5" , new IdImpl( 1 ) );
+		plan.addActivity( d );
+		plan.createAndAddLeg( "6" );
+		plan.addActivity( new EqualsActivity( "7" , new IdImpl( 1 ) ) );
+		plan.createAndAddLeg( "8" );
+		plan.addActivity( new EqualsActivity( "9" , new IdImpl( 1 ) ) );
+
+		List<PlanElement> trip = new ArrayList<PlanElement>();
+		trip.add( new LegImpl( "2" ) );
+		trip.add( new ActivityImpl( "3" , new IdImpl( "coucou" ) ) );
+		trip.add( new LegImpl( "4" ) );
+
+		TripRouter.insertTrip( plan , o , trip , d );
+
+		assertEquals(
+				"insertion did not produce the expected plan length!",
+				13,
+				plan.getPlanElements().size());
+
+		int oldIndex = Integer.MIN_VALUE;
+		for (PlanElement pe : plan.getPlanElements()) {
+			int newIndex = -1;
+
+			if (pe instanceof Activity) {
+				newIndex = Integer.parseInt( ((Activity) pe).getType() );
+			}
+			else {
+				newIndex = Integer.parseInt( ((Leg) pe).getMode() );
+			}
+
+			assertTrue(
+					"wrong inserted sequence: "+plan.getPlanElements(),
+					newIndex > oldIndex);
+			oldIndex = newIndex;
+		}
+	}
+
+	@Test
+	public void testReturnedOldTrip() throws Exception {
+		List<PlanElement> expected = new ArrayList<PlanElement>();
+
+		PlanImpl plan = new PlanImpl();
+		plan.createAndAddActivity( "-4" );
+		plan.createAndAddLeg( "-3" );
+		plan.createAndAddActivity( "-2" );
+		plan.createAndAddLeg( "-1" );
+		Activity o = plan.createAndAddActivity( "1" );
+		expected.add( plan.createAndAddLeg( "some mode" ) );
+		expected.add( plan.createAndAddActivity( "stage" ) );
+		expected.add( plan.createAndAddLeg( "some other mode" ) );
+		expected.add( plan.createAndAddActivity( "another stage" ) );
+		expected.add( plan.createAndAddLeg( "yet  another mode" ) );
+		Activity d = plan.createAndAddActivity( "5" );
+		plan.createAndAddLeg( "6" );
+		plan.createAndAddActivity( "7" );
+		plan.createAndAddLeg( "8" );
+		plan.createAndAddActivity( "9" );
+		
+		List<PlanElement> trip = new ArrayList<PlanElement>();
+		trip.add( new LegImpl( "2" ) );
+		trip.add( new ActivityImpl( "3" , new IdImpl( "coucou" ) ) );
+		trip.add( new LegImpl( "4" ) );
+
+		assertEquals(
+				"wrong old trip",
+				expected,
+				TripRouter.insertTrip( plan , o , trip , d ) );
+	}
+
+	private static class EqualsActivity extends ActivityImpl {
+		public EqualsActivity(final String type, final Id link) {
+			super( type , link );
+		}
+
+		@Override
+		public int hashCode() {
+			return 1;
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			return true;
 		}
 	}
 }
