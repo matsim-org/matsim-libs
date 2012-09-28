@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -102,7 +103,8 @@ public class ODMatrix {
 				Double.NaN : this.defaultValue / divisor.defaultValue;
 		ODMatrix result = new ODMatrix(allZones, newDefaultValue);
 		
-		Set<String> keySet = divisor.mappedValues.keySet();
+		Set<String> keySet = new HashSet<String>();
+		keySet.addAll( divisor.mappedValues.keySet());
 		keySet.addAll(this.mappedValues.keySet());
 		for (String key : keySet){
 			double denominator = divisor.getODvale(key);
@@ -122,7 +124,8 @@ public class ODMatrix {
 		double newDefaultValue = this.defaultValue + matrix.defaultValue;
 		ODMatrix result = new ODMatrix(allZones, newDefaultValue);
 		
-		Set<String> keySet = matrix.mappedValues.keySet();
+		Set<String> keySet = new HashSet<String>();
+		keySet.addAll(matrix.mappedValues.keySet());
 		keySet.addAll(this.mappedValues.keySet());
 		for (String key : keySet){
 			double res = this.getODvale(key) + matrix.getODvale(key);
