@@ -15,11 +15,11 @@ import playground.tnicolai.matsim4opus.gis.SpatialGrid;
  * 
  * Bicubic spline interpolation:
  * 	Uses BicubicSplineInterpolator from apache (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
- * 	Wave effect occurs.
+ * 	Wave effects may occur.
  * 
  * Inverse distance weighting:
- *  Uses inverse distance weighting for the 4 nearest known values. Own implementation.
- *  Peaks and valleys occur.
+ *  Uses inverse distance weighting with consideration of either four or all sampling points. Own implementation.
+ *  Peaks and valleys may occur, if the choosen exponent is not suitable.
  *  For more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
  *  or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (in German).
  * 
@@ -40,21 +40,35 @@ public class Interpolation {
 	private InverseDistanceWeighting inverseDistanceWeighting = null;
 	
 	/** exponent and boolean only necessary for the inverse distance weighting method **/
-	private double exp = 1.;
-	private boolean allNeighbors = true;
+	private double exp = Double.NaN;
+	private boolean allNeighbors = false;
 	private int interpolationMethod = -1;
 	
 	/**
 	 * Prepares interpolation with the selected interpolation method.
 	 * 
-	 * If inverse distance weighting is chosen, the exponent for weights will be the default value 1. TODO
+	 * If inverse distance weighting is chosen, the exponent for weights will be NaN and an error occurs,
+	 * because there is no default exponent. You have to choose a suitable one for your application.
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @param method the interpolation method
 	 */
 	public Interpolation(SpatialGrid sg, final int method ){
-		
-		this(sg, method, true, 1.);
+		this(sg, method, false, Double.NaN);
+	}
+	
+	/**
+	 * Prepares interpolation with the selected interpolation method.
+	 * 
+	 * If inverse distance weighting is chosen, the interpolation will consider only the four nearest
+	 * neighboring sampling points, because this method needs much less computation time.
+	 * 
+	 * @param sg the SpatialGrid to interpolate
+	 * @param method the interpolation method
+	 * @param exp the exponent for weights. only necessary if interpolation method is inverse distance weighting.
+	 */
+	public Interpolation(SpatialGrid sg, final int method, final double exp ){
+		this(sg, method, false, exp);
 	}
 	
 	/**
@@ -62,10 +76,10 @@ public class Interpolation {
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 * @param method the interpolation method
-	 * @param exp the exponent for weights. only necessary if interpolation method is inverse distance weighting. standard values are one or two.
+	 * @param exp the exponent for weights. only necessary if interpolation method is inverse distance weighting.
 	 * @param allNeighbors sets, whether the inverse distance weighting with all or four neighbors should be used. only necessary if interpolation method is inverse distance weighting.
 	 */
-	public Interpolation(SpatialGrid sg, final int method, final boolean allNeighbors , final double exp ){
+	public Interpolation(SpatialGrid sg, final int method, final boolean allNeighbors, final double exp ){
 		
 		this.sg = sg;
 		this.interpolationMethod = method;
@@ -81,6 +95,8 @@ public class Interpolation {
 			this.biCubicInterpolator = new BiCubicInterpolator(this.sg);
 		}
 		if(this.interpolationMethod == INVERSE_DISTANCE_WEIGHTING){
+			if(Double.isNaN(this.exp))
+				log.error("There is no default exponent for the inverse distance weighting. You have to choose a suitable one for your application.");
 			log.info("Preparing interpolation with the inverse distance weighting method ...");
 			this.inverseDistanceWeighting = new InverseDistanceWeighting(this.sg);
 		}

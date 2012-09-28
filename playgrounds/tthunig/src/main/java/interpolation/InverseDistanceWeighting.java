@@ -11,7 +11,7 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * Requires values on a SpatialGrid.
  * 
- * Problem: Peaks and valleys occur.
+ * Problem: Peaks and valleys may occur, if the user chooses unsuitable parameters (exponent of weights and number of sampling points to consider).
  * 
  * For more information see e.g.: http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture11/concepts/Inverse%20Distance%20Weighted.htm
  * or: http://gisbsc.gis-ma.org/GISBScL7/de/html/VL7a_V_lo7.html (German).
@@ -33,16 +33,15 @@ class InverseDistanceWeighting {
 	}
 	
 	/**
-	 * Interpolates the value on a arbitrary point with inverse distance weighting.
-	 * Considers only four neighboring values because this method needs less time for calculation than considering all known values and the result is even more suitable for accessibility interpolation.
+	 * Initiates the interpolation of the value on an arbitrary point with inverse distance weighting.
+	 * Attention: Using shapefile data, the inverse distance weighting isn't correct on the boundary. Please use bounding box data.
 	 * 
 	 * @param xCoord the x-coordinate of the point to interpolate
 	 * @param yCoord the y-coordinate of the point to interpolate
-	 * @param allNeighbors sets, whether the inverse distance weighting with all or four neighbors should be used. only necessary if interpolation method is inverse distance weighting.
+	 * @param allNeighbors sets, whether the inverse distance weighting with all or four neighbors should be used.
 	 * @param exponent the exponent for the inverse distance weighting
 	 * @return interpolated value on the point (xCoord, yCoord) 
 	 */
-	//Attention: Using shapefile data the inverse distance weighting isn't correct on the boundary. Please use bounding box data.
 	double inverseDistanceWeighting(double xCoord, double yCoord, boolean allNeighbors, double exponent){
 		if (allNeighbors)
 			return allValuesIDW(this.sg, xCoord, yCoord, exponent);
@@ -75,14 +74,42 @@ class InverseDistanceWeighting {
 		if (xDif==0){
 			if (yDif==0){//the point is a grid point, so the value is known
 				return sg.getValue(xCoord, yCoord);
-//			}else{ //the point lies on a cell boundary parallel to the y-axis (only xDif=0)
-//				//TODO
+			}else{ //the point lies on a cell boundary parallel to the y-axis (only xDif=0)
+				double x2= xCoord;
+				double x1= x2-sg.getResolution();
+				double x3= x2+sg.getResolution();
+				double y1= yCoord-yDif;
+				double y2= y1+sg.getResolution();
+				p1= factory.createPoint(new Coordinate(x2, y1));
+				p2= factory.createPoint(new Coordinate(x2, y2));
+				if(yDif<sg.getResolution()/2){
+					p3= factory.createPoint(new Coordinate(x1, y1));
+					p4= factory.createPoint(new Coordinate(x3, y1));
+				}
+				else{ //TODO? Spezialfall betrachten: wenn yDif=res/2
+					p3= factory.createPoint(new Coordinate(x1, y2));
+					p4= factory.createPoint(new Coordinate(x3, y2));
+				}
 			}
 		}
-//		else if (yDif==0){ //the point lies on a cell boundary parallel to the x-axis (only yDif=0)
-//			//TODO
-//		}
-//		else{ //the point lies in a grid cell
+		else if (yDif==0){ //the point lies on a cell boundary parallel to the x-axis (only yDif=0)
+			double y2= yCoord;
+			double y1= y2-sg.getResolution();
+			double y3= y2+sg.getResolution();
+			double x1= xCoord-xDif;
+			double x2= x1+sg.getResolution();
+			p1= factory.createPoint(new Coordinate(x1, y2));
+			p2= factory.createPoint(new Coordinate(x2, y2));
+			if(xDif<sg.getResolution()/2){
+				p3= factory.createPoint(new Coordinate(x1, y1));
+				p4= factory.createPoint(new Coordinate(x1, y3));
+			}
+			else{ //TODO? Spezialfall betrachten: wenn yDif=res/2
+				p3= factory.createPoint(new Coordinate(x2, y1));
+				p4= factory.createPoint(new Coordinate(x2, y3));
+			}
+		}
+		else{ //the point lies in a grid cell
 			double x1= xCoord-xDif;
 			double x2= x1+sg.getResolution();
 			double y1= yCoord-yDif;
@@ -91,7 +118,7 @@ class InverseDistanceWeighting {
 			p2= factory.createPoint(new Coordinate(x2, y1));
 			p3= factory.createPoint(new Coordinate(x2, y2));
 			p4= factory.createPoint(new Coordinate(x1, y2));
-//		}
+		}
 		
 		//calculate distances to the 4 nearest neighbors
 		double d_p1= Math.pow(distance(p1.getX(), p1.getY(), xCoord, yCoord), exp);
@@ -185,9 +212,10 @@ class InverseDistanceWeighting {
 	}
 	
 	/**
-	 * Interpolates a value at the given point (xCoord, yCoord) with the inverse distance weighting with variable power of weights:
+	 * Interpolates a value at the given point (xCoord, yCoord) with inverse distance weighting with variable power of weights.
+	 * The interpolation considers all sampling points:
 	 * z(u_0)= Sum((1/d_i^exp)*z(u_i)) / Sum (1/d_i^exp).
-	 * Needs more time for calculation than fourNeighborsIDW.
+	 * Attention: This interpolation needs much more calculation time than the interpolation with consideration of only four neighbors.
 	 * 
 	 * @param sg the SpatialGrid with the known values
 	 * @param xCoord

@@ -29,18 +29,14 @@ class BiCubicInterpolator {
 	
 	/**
 	 * Prepares bicubic spline interpolation:
-	 * Generates interpolation function with BicubicSplineInterpolator from apache (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
+	 * Generates interpolation function with BicubicSplineInterpolator from apache
+	 * (http://commons.apache.org/math/apidocs/org/apache/commons/math3/analysis/interpolation/BicubicSplineInterpolator.html).
 	 * 
 	 * @param sg the SpatialGrid to interpolate
 	 */
 	BiCubicInterpolator(SpatialGrid sg){
 		this.sg= sg;
 		sgNaNcheck();
-		
-//		//create default coordinates for interpolation and compatible array of values
-//		double[] x_default= coord(0, sg.getNumCols(0)-1, 1);
-//		double[] y_default= coord(0, sg.getNumRows()-1, 1);
-//		double[][] mirroredValues= sg.getMatrix();
 		
 		//create coordinate vectors and compatible array of values
 		double[] x_coord= coord(this.sg.getXmin(), this.sg.getXmax(), this.sg.getResolution());
@@ -49,7 +45,6 @@ class BiCubicInterpolator {
 		
 		BivariateRealGridInterpolator interpolator = new BicubicSplineInterpolator();
 		try {
-//			interpolatingFunction = interpolator.interpolate(y_default, x_default, mirroredValues); //needs default coordinates (0,1,2,...)
 			interpolatingFunction = interpolator.interpolate(y_coord, x_coord, mirroredValues);
 		} catch (MathException e) {
 			e.printStackTrace();
@@ -76,24 +71,11 @@ class BiCubicInterpolator {
 	 */
 	double biCubicInterpolation(double xCoord, double yCoord){
 		try {
-//			return interpolatingFunction.value(transform(yCoord, this.sg.getYmin(), this.sg.getResolution()), transform(xCoord, this.sg.getXmin(), this.sg.getResolution()));
 			return interpolatingFunction.value(yCoord, xCoord);
 		} catch (FunctionEvaluationException e) {
 			e.printStackTrace();
 		}
 		return Double.NaN;
-	}
-	
-	/**
-	 * Transforms a given coordinate into their default value in the system of base coordinates (0,1,...).
-	 * 
-	 * @param coord 
-	 * @param min the minimum value for this coordinate where a value is known at
-	 * @param res the resolution of the SpatialGrid
-	 * @return transformed coordinate between 0 and the number of known values in this coordinate direction
-	 */
-	private static double transform(double coord, double min, double res) {
-		return (coord-min)/res;
 	}
 
 	/**
