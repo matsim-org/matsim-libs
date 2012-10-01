@@ -256,10 +256,7 @@ public final class OTFFileReader implements OTFServer {
 	}
 
 	private OTFVisConfigGroup readConfigOrUseDefaults() {
-		OTFVisConfigGroup otfVisConfig2 = tryToReadSettingsFromOldBinaryFormat();
-		if (otfVisConfig2 == null) {
-			otfVisConfig2 = tryToReadSettingsFromFileNextToMovie();
-		}
+		OTFVisConfigGroup otfVisConfig2 = tryToReadSettingsFromFileNextToMovie();
 		if (otfVisConfig2 == null) {
 			otfVisConfig2 = new OTFVisConfigGroup();
 		}
@@ -267,7 +264,7 @@ public final class OTFFileReader implements OTFServer {
 		return otfVisConfig2;
 	}
 
-	private void setEffectiveLaneWidthIfNull(OTFVisConfigGroup c){
+	private void setEffectiveLaneWidthIfNull(OTFVisConfigGroup c) {
 		if (c.getEffectiveLaneWidth() == null){
 			c.setEffectiveLaneWidth(3.75); //default value
 		}
@@ -279,24 +276,5 @@ public final class OTFFileReader implements OTFServer {
 		OTFVisConfigGroup settingsFromFile = saver.tryToReadSettingsFile();
 		return settingsFromFile;
 	}
-
-	private OTFVisConfigGroup tryToReadSettingsFromOldBinaryFormat() {
-		try {
-			ZipFile zipFile = new ZipFile(this.sourceZipFile, ZipFile.OPEN_READ);
-			ZipEntry infoEntry = zipFile.getEntry("config.bin");
-			if (infoEntry != null) {
-				ObjectInputStream inFile = new ObjectInputStream(zipFile.getInputStream(infoEntry));
-				OTFVisConfigGroup cfg = (OTFVisConfigGroup) inFile.readObject();
-				setDelayParameterIfZero(cfg);
-				return cfg;
-			}
-		} catch (ClassNotFoundException e) {
-			log.error("Not able to load config from file. This is not fatal. file=" + this.fileName, e);
-		} catch (IOException e) {
-			log.error("Not able to load config from file. This is not fatal. file=" + this.fileName, e);
-		}
-		return null;
-	}
-
 
 }
