@@ -52,9 +52,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		Assert.assertNull(map.put(id1, to1));
 		Assert.assertEquals(1, map.size());
@@ -78,9 +78,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		Assert.assertNull(map.put(to1));
 		Assert.assertEquals(1, map.size());
@@ -104,9 +104,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		Assert.assertEquals(1, map.size());
@@ -136,7 +136,7 @@ public class IdentifiableArrayMapTest {
 		Id id2a = new IdImpl(2);
 		Id id2b = new IdImpl(2);
 		
-		TO to2 = new TO(id2a, "zwei");
+		TO to2 = new TO(id2a);
 		
 		map.put(id2a, to2);
 		Assert.assertEquals(1, map.size());
@@ -152,10 +152,10 @@ public class IdentifiableArrayMapTest {
 		Id id2b = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2a = new TO(id2a, "zweiA");
-		TO to2b = new TO(id2b, "zweiB");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2a = new TO(id2a);
+		TO to2b = new TO(id2b);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		Assert.assertEquals(1, map.size());
@@ -180,9 +180,9 @@ public class IdentifiableArrayMapTest {
 		Id id2b = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		Assert.assertFalse(map.containsKey(id1));
 		Assert.assertFalse(map.containsKey(id2));
@@ -216,9 +216,9 @@ public class IdentifiableArrayMapTest {
 		Id id2b = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		Assert.assertFalse(map.containsValue(to1));
 		Assert.assertFalse(map.containsValue(to2));
@@ -247,9 +247,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -270,9 +270,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -293,9 +293,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -316,9 +316,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -340,9 +340,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -363,9 +363,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -386,9 +386,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -406,9 +406,9 @@ public class IdentifiableArrayMapTest {
 		Id id2 = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
-		TO to1 = new TO(id1, "eins");
-		TO to2 = new TO(id2, "zwei");
-		TO to3 = new TO(id3, "drei");
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
 		
 		map.put(id1, to1);
 		map.put(id2, to2);
@@ -437,7 +437,7 @@ public class IdentifiableArrayMapTest {
 		Map<Id, TO> map = new IdentifiableArrayMap<TO>();
 		Id id1 = new IdImpl(1);
 		
-		TO to1 = new TO(id1, "eins");
+		TO to1 = new TO(id1);
 		
 		map.put(id1, to1);
 		
@@ -449,11 +449,9 @@ public class IdentifiableArrayMapTest {
 	private static class TO implements Identifiable {
 
 		private final Id id;
-		private final String value;
 		
-		public TO(final Id id, final String value) {
+		public TO(final Id id) {
 			this.id = id;
-			this.value = value;
 		}
 		
 		@Override
