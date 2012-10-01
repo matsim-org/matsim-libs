@@ -55,12 +55,12 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		public void reset();
 	}
 	
-	public interface ActivityScoring {
+	public interface ActivityScoring extends BasicScoring {
 		void startActivity(final double time, final Activity act);
 		void endActivity(final double time, final Activity act);
 	}
 
-	public interface LegScoring {
+	public interface LegScoring extends BasicScoring {
 		void startLeg(final double time, final Leg leg);
 		void endLeg(final double time);
 	}

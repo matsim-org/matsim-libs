@@ -41,11 +41,11 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;
-    protected Network network;
+	protected Network network;
 
-    public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
+	public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
 		this.params = new CharyparNagelScoringParameters(config);
-        this.network = network;
+		this.network = network;
 	}
 
 	public CharyparNagelScoringFunctionFactory(CharyparNagelScoringParameters params, Network network) {

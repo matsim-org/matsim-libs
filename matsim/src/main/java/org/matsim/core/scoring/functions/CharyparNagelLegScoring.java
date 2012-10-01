@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -35,7 +34,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelLegScoring implements LegScoring, BasicScoring {
+public class CharyparNagelLegScoring implements LegScoring {
 
 	protected double score;
 	private double lastTime;
@@ -46,11 +45,11 @@ public class CharyparNagelLegScoring implements LegScoring, BasicScoring {
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 	private Leg currentLeg;
-    protected Network network;
+	protected Network network;
 
-    public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
-		this.params = params;
-        this.network = network;
+	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
+  	this.params = params;
+  	this.network = network;
 		this.reset();
 	}
 
