@@ -38,8 +38,6 @@ import org.matsim.core.config.Module;
  */
 public class OTFVisConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "otfvis";
 
 	public static final String AGENT_SIZE = "agentSize";

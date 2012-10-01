@@ -70,8 +70,6 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "vspExperimental";
 
 	// ---

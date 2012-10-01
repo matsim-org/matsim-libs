@@ -33,8 +33,6 @@ import org.matsim.core.config.Module;
  */
 public class TravelTimeCalculatorConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUPNAME = "travelTimeCalculator";
 
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";

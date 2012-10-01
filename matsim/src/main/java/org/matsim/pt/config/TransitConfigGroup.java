@@ -35,8 +35,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class TransitConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "transit";
 
 	/*package*/ static final String TRANSIT_SCHEDULE_FILE = "transitScheduleFile";

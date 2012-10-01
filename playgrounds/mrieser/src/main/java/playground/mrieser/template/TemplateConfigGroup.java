@@ -25,8 +25,6 @@ import java.util.Map;
 
 public class TemplateConfigGroup extends org.matsim.core.config.Module {
 
-	private static final long serialVersionUID = 1L;
-
 	/*package*/ static final String GROUP_NAME = "myPlugin";
 	private static final String SOMEVALUE_NAME = "someValue";
 

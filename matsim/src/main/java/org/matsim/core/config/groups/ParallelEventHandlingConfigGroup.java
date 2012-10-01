@@ -31,8 +31,6 @@ import org.matsim.core.config.Module;
  */
 public class ParallelEventHandlingConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "parallelEventHandling";
 
 	final String NUMBER_OF_THREADS = "numberOfThreads";

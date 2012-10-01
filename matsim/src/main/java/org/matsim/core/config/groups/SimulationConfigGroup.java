@@ -30,7 +30,6 @@ import org.matsim.core.utils.misc.Time;
 public class SimulationConfigGroup extends Module implements MobsimConfigGroupI {
 
 	private final static Logger log = Logger.getLogger(SimulationConfigGroup.class);
-	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "simulation";
 

@@ -39,7 +39,6 @@ public class JointReplanningConfigGroup extends Module {
 
 	private static final Logger log = Logger.getLogger(JointReplanningConfigGroup.class);
 
-	private static final long serialVersionUID = 1L;
 	public static final String GROUP_NAME = "JointReplanning";
 
 	//parameter names

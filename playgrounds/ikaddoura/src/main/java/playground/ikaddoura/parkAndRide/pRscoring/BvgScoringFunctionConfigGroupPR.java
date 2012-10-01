@@ -32,13 +32,8 @@ import org.matsim.core.config.Module;
  * @author aneumann, adjusted for P+R by ikaddoura
  *
  */
-public class BvgScoringFunctionConfigGroupPR extends Module{
+public class BvgScoringFunctionConfigGroupPR extends Module {
 	
-	/**
-	 * TODO [AN] This one has to be checked
-	 */
-	private static final long serialVersionUID = 4840713748058034511L;
-
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionConfigGroupPR.class);
 	
 	// Tags
@@ -87,7 +82,6 @@ public class BvgScoringFunctionConfigGroupPR extends Module{
 	public BvgScoringFunctionConfigGroupPR() {
 		super(GROUP_NAME);
 		log.info("Started...");
-		log.warn("SerialVersionUID has to be checked. Current one is " + BvgScoringFunctionConfigGroupPR.serialVersionUID);
 	}
 	
 	public BvgScoringFunctionConfigGroupPR(Config config) {

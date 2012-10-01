@@ -28,8 +28,6 @@ import org.matsim.core.config.Module;
 
 public class MeisterkConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "meisterk";
 
 	private final static Logger logger = Logger.getLogger(MeisterkConfigGroup.class);

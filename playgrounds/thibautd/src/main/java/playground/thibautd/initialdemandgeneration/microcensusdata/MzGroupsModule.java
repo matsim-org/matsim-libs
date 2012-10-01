@@ -38,8 +38,6 @@ public class MzGroupsModule extends Module {
 	private static final Logger log =
 		Logger.getLogger(MzGroupsModule.class);
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String NAME = "MzGroups";
 
 	private boolean isModifiable = true;

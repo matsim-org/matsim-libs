@@ -27,18 +27,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 
 /**
- * Cnofig group to configure missing scoring paramteters of {@link BvgLegScoringFunction}
+ * Cnofig group to configure missing scoring parameters of {@link BvgLegScoringFunction}
  * 
  * @author aneumann
  *
  */
-public class BvgScoringFunctionConfigGroup extends Module{
+public class BvgScoringFunctionConfigGroup extends Module {
 	
-	/**
-	 * TODO [AN] This one has to be checked
-	 */
-	private static final long serialVersionUID = 4840713748058034511L;
-
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionConfigGroup.class);
 	
 	// Tags
@@ -83,7 +78,6 @@ public class BvgScoringFunctionConfigGroup extends Module{
 	public BvgScoringFunctionConfigGroup() {
 		super(GROUP_NAME);
 		log.info("Started...");
-		log.warn("SerialVersionUID has to be checked. Current one is " + BvgScoringFunctionConfigGroup.serialVersionUID);
 	}
 	
 	public BvgScoringFunctionConfigGroup(Config config) {

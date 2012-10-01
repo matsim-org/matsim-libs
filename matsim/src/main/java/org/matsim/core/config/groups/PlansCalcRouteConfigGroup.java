@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-
 /**
  * Config Module for PlansCalcRoute class.
  * Here you can specify the scale factors of freespeed travel time which are used
@@ -45,8 +44,6 @@ public class PlansCalcRouteConfigGroup extends Module {
 	private static final String UNDEFINED = "undefined";
 
 	public enum PtSpeedMode {freespeed, beeline}
-
-	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "planscalcroute";
 

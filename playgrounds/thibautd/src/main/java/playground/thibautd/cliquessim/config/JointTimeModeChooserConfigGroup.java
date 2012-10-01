@@ -30,7 +30,6 @@ import org.matsim.core.config.Module;
  * @author thibautd
  */
 public class JointTimeModeChooserConfigGroup extends Module {
-	private static final long serialVersionUID = 1L;
 	public static final String GROUP_NAME = "jointTimeModeChooser";
 
 	//parameter names

@@ -25,7 +25,6 @@ import playground.thibautd.utils.ReflectiveModule;
  * @author thibautd
  */
 public class JointTripPossibilitiesConfigGroup extends ReflectiveModule {
-	private static final long serialVersionUID = 1L;
 	public static final String GROUP_NAME = "jointTripPossibilities";
 
 	private String possibilitiesFile = null;

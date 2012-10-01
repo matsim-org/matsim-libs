@@ -23,7 +23,6 @@ import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
 
-
 /**
  * This config Module can be used to specify the paths to the
  * xml files configuring the signal systems.
@@ -32,8 +31,6 @@ import org.matsim.core.config.Module;
  *
  */
 public class SignalSystemsConfigGroup extends Module {
-
-	private static final long serialVersionUID = 2346649035049406334L;
 
 	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public  static final String SIGNALCONTROL_FILE = "signalcontrol";

@@ -26,8 +26,6 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 
 public class HerbieConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "herbie";
 
 	private final static Logger logger = Logger.getLogger(HerbieConfigGroup.class);

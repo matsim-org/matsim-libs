@@ -22,12 +22,10 @@ package playground.thibautd.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Module;
 
 /**
@@ -54,7 +52,6 @@ public class ReflectiveModule extends Module {
 	private static final Logger log =
 		Logger.getLogger(ReflectiveModule.class);
 
-	private static final long serialVersionUID = 1L;
 	private final Map<String, Field> fields;
 	private final Map<String, Method> setters;
 	private final Map<String, Method> stringGetters;

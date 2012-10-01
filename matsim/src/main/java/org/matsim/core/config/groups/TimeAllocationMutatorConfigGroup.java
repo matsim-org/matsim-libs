@@ -28,8 +28,6 @@ import org.matsim.core.config.Module;
 
 public class TimeAllocationMutatorConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "TimeAllocationMutator";
 	
 	public static final String MUTATION_RANGE = "mutationRange" ;

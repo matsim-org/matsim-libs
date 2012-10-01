@@ -37,8 +37,6 @@ public class ControlerConfigGroup extends Module {
 
 	public enum EventsFileFormat {txt, xml}
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "controler";
 
 	private static final String OUTPUT_DIRECTORY = "outputDirectory";

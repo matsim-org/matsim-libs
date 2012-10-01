@@ -32,8 +32,6 @@ public class JointTripsMutatorConfigGroup extends Module {
 	private static final Logger log =
 		Logger.getLogger(JointTripsMutatorConfigGroup.class);
 
-	private static final long serialVersionUID = 1;
-
 	public static enum SelectorName {
 		EXP_BETA, BEST_SCORE, RANDOM, SELECTED;
 	}

@@ -25,10 +25,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
-
 public class LocationChoiceConfigGroup extends Module {
-
-	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "locationchoice";
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";

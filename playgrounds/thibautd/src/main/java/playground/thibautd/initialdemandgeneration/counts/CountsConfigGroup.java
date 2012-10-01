@@ -29,7 +29,6 @@ import playground.thibautd.initialdemandgeneration.counts.TimeFilter.DayFilter;
  * @author thibautd
  */
 public class CountsConfigGroup extends Module {
-	private static final long serialVersionUID = 1L;
 
 	public static final String NAME = "countsGeneration";
 

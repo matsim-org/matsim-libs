@@ -27,8 +27,6 @@ import org.matsim.core.config.Module;
 
 public class PlansConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "plans";
 
 	public abstract static class NetworkRouteType {

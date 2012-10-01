@@ -26,8 +26,6 @@ import org.matsim.core.config.Module;
 
 public class FacilitiesConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "facilities";
 
 	private static final String INPUT_FILE= "inputFacilitiesFile";

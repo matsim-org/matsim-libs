@@ -31,8 +31,6 @@ import org.matsim.core.config.Module;
  */
 public class CountsConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "counts";
 
 	private static final String OUTPUTFORMAT = "outputformat";

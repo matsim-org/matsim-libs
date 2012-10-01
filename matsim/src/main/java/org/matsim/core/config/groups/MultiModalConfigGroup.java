@@ -27,8 +27,6 @@ import org.matsim.core.config.Module;
 
 public class MultiModalConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "multimodal";
 	
 	private static final String MULTI_MODAL_SIMULATION_ENABLED = "multiModalSimulationEnabled";

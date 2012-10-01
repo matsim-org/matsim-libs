@@ -26,10 +26,8 @@ import org.matsim.core.config.Module;
 
 /**
  * @author thomas
- *
  */
 public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
-	private static final long serialVersionUID = 3L;
 	
 	public static final String GROUP_NAME = "matsim4urbansimControler";
 	

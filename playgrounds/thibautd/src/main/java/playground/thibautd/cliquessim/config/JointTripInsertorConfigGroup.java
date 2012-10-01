@@ -30,7 +30,6 @@ import playground.thibautd.utils.ReflectiveModule;
  * @author thibautd
  */
 public class JointTripInsertorConfigGroup extends ReflectiveModule {
-	private static final long serialVersionUID = 1L;
 
 	public static final String GROUP_NAME = "jointTripInsertor";
 

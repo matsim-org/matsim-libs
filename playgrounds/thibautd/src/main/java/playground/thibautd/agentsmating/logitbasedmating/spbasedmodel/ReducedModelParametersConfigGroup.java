@@ -27,7 +27,6 @@ import org.matsim.core.config.Module;
  * @author thibautd
  */
 public class ReducedModelParametersConfigGroup extends Module {
-	private static final long serialVersionUID = 1L;
 
 	public static final String NAME = "ReducedSPModelParameters";
 

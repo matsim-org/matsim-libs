@@ -84,8 +84,6 @@ public class ConfigTest {
 
 	private static class ConfigTestGroup extends Module {
 
-		private static final long serialVersionUID = 1L;
-
 		public static final String GROUP_NAME = "ctg";
 
 		private static final String PARAM_A = "a";

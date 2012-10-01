@@ -24,14 +24,11 @@ import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
 
-
 /**
  * @author dgrether
  *
  */
 public class ScenarioConfigGroup extends Module {
-
-	private static final long serialVersionUID = -1279388236689564520L;
 
 	public static final String GROUP_NAME = "scenario";
 

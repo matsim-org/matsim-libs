@@ -46,8 +46,6 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	private static final Logger log = Logger.getLogger(PlanCalcScoreConfigGroup.class);
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "planCalcScore";
 
 	private static final String LEARNING_RATE = "learningRate";

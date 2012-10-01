@@ -37,8 +37,6 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
  */
 public class CadytsPtConfigGroup extends Module {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String GROUP_NAME = "cadytsPt";
 
 	public static final String REGRESSION_INERTIA = "regressionInertia";
