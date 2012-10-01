@@ -62,6 +62,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(configFile);
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
 		c.run();
 		
 			//iteration 0 

@@ -70,11 +70,14 @@ public class PlanomatRunTest extends MatsimTestCase {
 		}
 
 		config.plans().setInputFile(plansInputFile);
+		
+		config.controler().setWritePlansInterval(0);
 
 		Controler testee = new Controler(config);
 		testee.addControlerListener(new SelectedPlansScoreTest(expectedScores, 10));
 		testee.setCreateGraphs(false);
 		testee.setWriteEventsInterval(0);
+		testee.setDumpDataAtEnd(false);
 		testee.run();
 
 	}

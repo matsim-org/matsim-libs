@@ -57,6 +57,10 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		controler.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
 		ControlerListenerForTests listener = new ControlerListenerForTests();
 		controler.addControlerListener(listener);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.setWriteEventsInterval(0);
+		controler.getConfig().controler().setWritePlansInterval(0);
 		controler.run();
 	}
 
