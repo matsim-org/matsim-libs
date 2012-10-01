@@ -61,11 +61,9 @@ public class CreatePseudoNetwork {
 	private final Map<Tuple<Node, Node>, Link> links = new HashMap<Tuple<Node, Node>, Link>();
 	private final Map<Tuple<Node, Node>, TransitStopFacility> stopFacilities = new HashMap<Tuple<Node, Node>, TransitStopFacility>();
 	private final Map<TransitStopFacility, Node> nodes = new HashMap<TransitStopFacility, Node>();
-	private final Map<TransitStopFacility, Node> startNodes = new HashMap<TransitStopFacility, Node>();
 	private final Map<TransitStopFacility, List<TransitStopFacility>> facilityCopies = new HashMap<TransitStopFacility, List<TransitStopFacility>>();
 
 	private long linkIdCounter = 0;
-	private long nodeIdCounter = 0;
 
 	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
 
@@ -112,7 +110,6 @@ public class CreatePseudoNetwork {
 		if (fromNode == null) {
 			fromNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), fromFacility.getCoord());
 			this.network.addNode(fromNode);
-			++nodeIdCounter;
 			this.nodes.put(toFacility, fromNode);
 		}
 
@@ -120,7 +117,6 @@ public class CreatePseudoNetwork {
 		if (toNode == null) {
 			toNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), toFacility.getCoord());
 			this.network.addNode(toNode);
-			++nodeIdCounter;
 			this.nodes.put(toFacility, toNode);
 		}
 
