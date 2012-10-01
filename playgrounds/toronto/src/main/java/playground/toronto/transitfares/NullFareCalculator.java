@@ -6,7 +6,7 @@ import org.matsim.vehicles.Vehicle;
 
 
 /**
- * Essentially a null calculator; always returns a 0 fare.
+ * Always returns 0 disutility of fares.
  * 
  * @author pkucirek
  *
@@ -14,13 +14,13 @@ import org.matsim.vehicles.Vehicle;
 public class NullFareCalculator implements FareCalculator {
 
 	@Override
-	public double getTransferFare(Person person, Vehicle vehicle,
+	public double getDisutilityOfTransferFare(Person person, Vehicle vehicle,
 			TransitRouterNetworkLink link, double now) {
 		return 0;
 	}
 
 	@Override
-	public double getInVehicleFare(Person person, Vehicle vehicle,
+	public double getDisutilityOfInVehicleFare(Person person, Vehicle vehicle,
 			TransitRouterNetworkLink link, double now) {
 		return 0;
 	}

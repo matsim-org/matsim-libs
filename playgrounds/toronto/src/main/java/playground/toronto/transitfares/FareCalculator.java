@@ -5,14 +5,16 @@ import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * A calculator which returns information about transit fares.
+ * <p>A calculator which returns the disutility of transit fares.</p>
+ * <p>Has two methods: <code>getDisutilityOfTransferFare</code> for transferring to/from transit, and <code>
+ * getDisutilityOfInVehicleFare</code> which is accrued in-vehicle.</p>
  * 
  * @author pkucirek
  */
 public interface FareCalculator {
 	
 	/**
-	 * Calculates the actual link fare on access, egress, and transfer links
+	 * Calculates the disutility of fare(s) on access, egress, and transfer links
 	 * 
 	 * @param person The agent being looked at.
 	 * @param vehicle The vehicle the agent is traveling in.
@@ -20,10 +22,10 @@ public interface FareCalculator {
 	 * @param now The current Matsim time (sec past midnight).
 	 * @return The actual fare (in user-defined currency).
 	 */
-	public double getTransferFare(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);	
+	public double getDisutilityOfTransferFare(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);	
 	
 	/**
-	 *  Calculates the actual link fare on in-vehicle links
+	 *  Calculates the disutility of fare(s) on in-vehicle links
 	 * 
 	 * @param person The agent being looked at.
 	 * @param vehicle The vehicle the agent is traveling in.
@@ -31,6 +33,6 @@ public interface FareCalculator {
 	 * @param now The current Matsim time (sec past midnight).
 	 * @return The actual fare (in user-defined currency).
 	 */
-	public double getInVehicleFare(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);
+	public double getDisutilityOfInVehicleFare(Person person, Vehicle vehicle, TransitRouterNetworkLink link, double now);
 	
 }

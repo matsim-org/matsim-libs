@@ -16,14 +16,14 @@ import playground.toronto.transitfares.FareCalculator;
 import playground.toronto.transitfares.NullFareCalculator;
 
 /**
- * A significantly upgraded version of the base {@link TransitNetworkTravelTimeAndDisutility} calculator for transit, with several differences:
+ * <p>A significantly upgraded version of the base {@link TransitNetworkTravelTimeAndDisutility} calculator for transit, with several differences:
  *  <ul>
  *  	<li>Uses a {@link TransitDataCache} to remember as-simulated transit arrivals/departures, for use in congested transit simulation.</li>
- *  	<li>Changes the disutility calculation to explicitly use agent waiting time to boarding transit. </li>
- *  </ul>
- *  
- *  Right now, in-vehicle times are calculated to include dwell times at stops; which may cause problems with agents egressing from stops
- *  with long dwell times. This was done because there can only be one travel time for each {@link TransitRouterNetworkLink}. 
+ *  	<li>Changes the disutility calculation to explicitly use agent waiting time to boarding transit.</li>
+ *  	<li>Includes the effects of transit fare disutility through the {@link FareCalculator} interface (will default to 0). </li>
+ *  </ul></p>
+ *  <p>Right now, in-vehicle times are calculated to include dwell times at stops; which may cause problems with agents egressing from stops
+ *  with long dwell times. This was done because there can only be one travel time for each {@link TransitRouterNetworkLink}.</p> 
  * 
  * @author pkucirek
  *
@@ -62,21 +62,25 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 		double cost;
 			
 		if (((TransitRouterNetworkLink) link).getRoute() == null) {
-						
+				
+			//TODO: This should be done dynamically, i.e. the waiting time should be based on time + walkTime
+			//TODO: In this case, where does the additional transfer time get applied? -pkucirek Oct '12 
 			double waitTime = getWaitTime((TransitRouterNetworkLink)link, time);
 			double walkTime = getWalkTime((TransitRouterNetworkLink)link, time) + this.config.additionalTransferTime;
-			double fare = getLinkFare((TransitRouterNetworkLink) link, time); //TODO use this in the utility calculation
+			double fareCost = this.fareCalc.getDisutilityOfTransferFare(person, vehicle, (TransitRouterNetworkLink)link, time);
 			
 			cost = -walkTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
 				       - waitTime * this.config.getMarginalUtiltityOfWaiting_utl_s()
-				       - this.config.getUtilityOfLineSwitch_utl();
+				       - this.config.getUtilityOfLineSwitch_utl()
+				       - fareCost;
 			
 		}else{
 			
-			double fare = getLinkFare((TransitRouterNetworkLink) link, time);
+			double fareCost = this.fareCalc.getDisutilityOfInVehicleFare(person, vehicle, (TransitRouterNetworkLink)link, time);
 			
 			cost = - getInVehicleTravelTime((TransitRouterNetworkLink) link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-				       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+				       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m()
+				       - fareCost;
 		}
 				
 		this.previousLink = link;
@@ -131,13 +135,6 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 		return ttime;
 	}
 	
-	private double getLinkFare(TransitRouterNetworkLink link, double time){
-		
-		//TODO implement fares 
-		
-		return 0;
-	}
-
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		
@@ -147,6 +144,8 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 			TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 
 			if (wrapped.getRoute() == null){
+				
+				//TODO: This should be done dynamically, i.e. the waiting time should be based on time + walkTime @pkucirek Oct '12
 				double waitTime = getWaitTime((TransitRouterNetworkLink)link, time);
 				double walkTime = getWalkTime((TransitRouterNetworkLink)link, time);
 				
