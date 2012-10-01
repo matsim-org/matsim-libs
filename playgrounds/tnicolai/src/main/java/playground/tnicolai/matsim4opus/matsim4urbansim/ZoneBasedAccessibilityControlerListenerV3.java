@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -16,10 +17,10 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
+import playground.tnicolai.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
-import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisZoneCSVWriterV2;
 import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
@@ -54,19 +55,23 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public ZoneBasedAccessibilityControlerListenerV3(ZoneLayer<Id>  startZones, 
-												   AggregateObject2NearestNode[] aggregatedOpportunities, 
+	public ZoneBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,
+												   ZoneLayer<Id>  startZones, 
+												   ActivityFacilitiesImpl zones,
 												   Benchmark benchmark,
 												   ScenarioImpl scenario){
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
+		assert (main != null);
+		this.main = main;
 		assert(startZones != null);
 		this.measuringPointsZone = startZones;
-		assert(aggregatedOpportunities != null);
-		this.aggregatedOpportunities = aggregatedOpportunities;
+		assert(zones != null);
+		this.zones = zones;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
+		assert(scenario != null);
 
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
@@ -84,10 +89,13 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
 		
-		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
-		
 		// get the controller and scenario
 		Controler controler = event.getControler();
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+		
+		this.aggregatedOpportunities = this.aggregatedOpportunities(this.zones, this.main.getOpportunitySampleRate(), network, this.main.isParcelMode());
+		
+		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
 		
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// get the free-speed car travel times (in seconds)
@@ -96,8 +104,6 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		LeastCostPathTree lcptCongestedCarTravelTime = new LeastCostPathTree( ttc, new TravelTimeCostCalculator(ttc) );
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
-		
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );

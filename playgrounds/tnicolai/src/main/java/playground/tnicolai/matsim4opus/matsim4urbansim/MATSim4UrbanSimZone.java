@@ -25,12 +25,18 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
+import playground.tnicolai.matsim4opus.gis.GridUtils;
+import playground.tnicolai.matsim4opus.gis.SpatialGrid;
+import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 
@@ -73,7 +79,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	MATSim4UrbanSimZone(String args[]){
 		super(args);
 		// set flag to false (needed for ReadFromUrbanSimModel to choose the right method)
-		isParcel = false;
+		isParcelMode = false;
 	}
 	
 	/**
@@ -188,27 +194,69 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark));
 		
 		if(computeZoneBasedAccessibilities){
+
+			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones, srid);
 			
-			// init aggregatedWorkplaces
-			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
-			// creates zone based table of log sums (workplace accessibility)
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV2(zones, 				
-																						aggregatedOpportunities, 
+			// creates zone based table of log sums
+			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3( this,
+																						measuringPoints, 				
+																						zones,
 																						benchmark,
 																						this.scenario));
 		}
 		
-		if(dumpPopulationData)
-			readFromUrbansim.readAndDumpPersons2CSV(zones, 
-												 	controler.getNetwork());
-		
-		if(dumpAggegatedWorkplaceData){
-			// init aggregatedWorkplaces
-			if(aggregatedOpportunities == null)
-				aggregatedOpportunities = readUrbansimJobs(zones, destinationSampleRate);
-			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(aggregatedOpportunities);
+		if(computeParcelBasedAccessibility){
+			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
+			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
+			
+			ZoneLayer<Id>  measuringPoints;
+			String fileExtension;
+
+			if(computeParcelBasedAccessibilitiesNetwork){
+				fileExtension = ParcelBasedAccessibilityControlerListenerV3.NETWORK;
+				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
+																			   nwBoundaryBox.getBoundingBox(),
+																			   srid);
+				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				bikeGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+			}
+			else{
+				fileExtension = ParcelBasedAccessibilityControlerListenerV3.SHAPE_FILE;
+				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
+																				   boundary, 
+																				   srid);
+				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				bikeGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
+			}
+			
+			controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
+																						 measuringPoints, 
+																						 null,
+																						 freeSpeedGrid,
+																						 carGrid,
+																						 bikeGrid,
+																						 walkGrid, 
+																						 fileExtension, 
+																						 benchmark,
+																						 this.scenario));
 		}
+		
+		if(dumpPopulationData)
+			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
+		
+//		if(dumpAggegatedWorkplaceData){
+//			// init aggregatedWorkplaces
+//			if(aggregatedOpportunities == null)
+//				aggregatedOpportunities = readUrbansimJobs(zones, opportunitySampleRate);
+//			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(aggregatedOpportunities);
+//		}
 	}
 
 	/**

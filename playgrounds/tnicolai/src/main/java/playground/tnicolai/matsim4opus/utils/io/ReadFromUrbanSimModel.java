@@ -45,10 +45,8 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2Neare
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
-import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.misc.RandomLocationDistributor;
-import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
 
 /**
  * improvements aug'12
@@ -687,13 +685,12 @@ public class ReadFromUrbanSimModel {
 			
 			if( jobClusterMap.containsKey( jo.getParcelID() ) ){
 				AggregateObject2NearestNode jco = jobClusterMap.get( jo.getParcelID() );
-				jco.addObject( jo.getObjectID(), 0. );
+				jco.addObject( jo.getObjectID(), 0.);
 			}
 			else
 				jobClusterMap.put(
 						jo.getParcelID(),
-						new AggregateObject2NearestNode(jo.getObjectID(), jo
-								.getParcelID(), jo.getZoneID(), jo.getCoord(),
+						new AggregateObject2NearestNode(jo.getObjectID(), jo.getParcelID(), jo.getZoneID(), jo.getCoord(),
 								0.));
 		}
 		
@@ -708,65 +705,65 @@ public class ReadFromUrbanSimModel {
 		return jobClusterArray;
 	}
 	
-	/**
-	 * Aggregates jobs with same nearest node 
-	 * @param parcelsOrZones
-	 * @param jobSample
-	 * @param network
-	 * @return
-	 */
-	public AggregateObject2NearestNode[] getAggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcel){
-		
-		// readJobs creates a hash map of job with key = job id
-		// this hash map includes jobs according to job sample size
-		List<PersonAndJobsObject> jobSampleList = readJobs(parcelsOrZones, jobSample, isParcel);
-		assert( jobSampleList != null );
-		
-		// Since the aggregated opportunities in jobClusterArray does contain coordinates of their nearest node 
-		// this result is dumped out here    tnicolai dec'12
-		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
-		
-		log.info("Aggregating workplaces with identical nearest node ...");
-		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
-		
-		ProgressBar bar = new ProgressBar( jobSampleList.size() );
-
-		for(int i = 0; i < jobSampleList.size(); i++){
-			bar.update();
-			
-			PersonAndJobsObject jo = jobSampleList.get( i );
-			assert( jo.getCoord() != null );
-			Node nearestNode = network.getNearestNode( jo.getCoord() );
-			assert( nearestNode != null );
-
-			// get euclidian distance to nearest node
-			double distance = NetworkUtil.getEuclidianDistance(jo.getCoord(), nearestNode.getCoord());
-			
-			if( jobClusterMap.containsKey( nearestNode.getId() ) ){
-				AggregateObject2NearestNode jco = jobClusterMap.get( nearestNode.getId() );
-				jco.addObject( jo.getObjectID(), distance );
-			}
-			else
-				jobClusterMap.put(
-						nearestNode.getId(),
-						new AggregateObject2NearestNode(jo.getObjectID(), 
-														jo.getParcelID(), 
-														jo.getZoneID(), 
-														nearestNode.getCoord(), 
-														nearestNode, 
-														distance));
-		}
-
-		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ jobClusterMap.size() ];
-		Iterator<AggregateObject2NearestNode> jobClusterIterator = jobClusterMap.values().iterator();
-
-		for(int i = 0; jobClusterIterator.hasNext(); i++)
-			jobClusterArray[i] = jobClusterIterator.next();
-		
-		log.info("Aggregated " + jobSampleList.size() + " number of workplaces (sampling rate: " + jobSample + ") to " + jobClusterArray.length + " nodes.");
-		
-		return jobClusterArray;
-	}
+//	/**
+//	 * Aggregates jobs with same nearest node 
+//	 * @param parcelsOrZones
+//	 * @param jobSample
+//	 * @param network
+//	 * @return
+//	 */
+//	public AggregateObject2NearestNode[] getAggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcel){
+//		
+//		// readJobs creates a hash map of job with key = job id
+//		// this hash map includes jobs according to job sample size
+//		List<PersonAndJobsObject> jobSampleList = readJobs(parcelsOrZones, jobSample, isParcel);
+//		assert( jobSampleList != null );
+//		
+//		// Since the aggregated opportunities in jobClusterArray does contain coordinates of their nearest node 
+//		// this result is dumped out here    tnicolai dec'12
+//		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
+//		
+//		log.info("Aggregating workplaces with identical nearest node ...");
+//		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
+//		
+//		ProgressBar bar = new ProgressBar( jobSampleList.size() );
+//
+//		for(int i = 0; i < jobSampleList.size(); i++){
+//			bar.update();
+//			
+//			PersonAndJobsObject jo = jobSampleList.get( i );
+//			assert( jo.getCoord() != null );
+//			Node nearestNode = network.getNearestNode( jo.getCoord() );
+//			assert( nearestNode != null );
+//
+//			// get euclidian distance to nearest node
+//			double distance = NetworkUtil.getEuclidianDistance(jo.getCoord(), nearestNode.getCoord());
+//			
+//			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
+//				AggregateObject2NearestNode jco = opportunityClusterMap.get( nearestNode.getId() );
+//				jco.addObject( jo.getObjectID(), distance );
+//			}
+//			else
+//				opportunityClusterMap.put(
+//						nearestNode.getId(),
+//						new AggregateObject2NearestNode(jo.getObjectID(), 
+//														jo.getParcelID(), 
+//														jo.getZoneID(), 
+//														nearestNode.getCoord(), 
+//														nearestNode, 
+//														distance));
+//		}
+//
+//		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ opportunityClusterMap.size() ];
+//		Iterator<AggregateObject2NearestNode> jobClusterIterator = opportunityClusterMap.values().iterator();
+//
+//		for(int i = 0; jobClusterIterator.hasNext(); i++)
+//			jobClusterArray[i] = jobClusterIterator.next();
+//		
+//		log.info("Aggregated " + jobSampleList.size() + " number of workplaces (sampling rate: " + jobSample + ") to " + jobClusterArray.length + " nodes.");
+//		
+//		return jobClusterArray;
+//	}
 
 	/**
 	 * reads jobs from UrbanSim output and return a list of jobs according
@@ -776,11 +773,11 @@ public class ReadFromUrbanSimModel {
 	 * @param jobSample
 	 * @return
 	 */
-	private List<PersonAndJobsObject> readJobs(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final boolean isParcel) {
+	public List<PersonAndJobsObject> readJobs(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final boolean isParcel) {
 		
 		JobCounter cnt = new JobCounter();
 		
-		List<PersonAndJobsObject> jobSampleList = new ArrayList<PersonAndJobsObject>();
+ 		List<PersonAndJobsObject> jobSampleList = new ArrayList<PersonAndJobsObject>();
 		List<PersonAndJobsObject> backupList = new ArrayList<PersonAndJobsObject>();
 		
 		
@@ -822,7 +819,8 @@ public class ReadFromUrbanSimModel {
 								parts);
 					else			// zone based approach
 						createJobZone(cnt, jobSampleList, backupList,
-								facilityMap, indexJobID, indexZoneID, isBackup, parts);
+								facilityMap, indexJobID, indexZoneID, isBackup, 
+								parts);
 				}
 				
 				reader.close();
@@ -1052,7 +1050,7 @@ public class ReadFromUrbanSimModel {
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){
 								AggregateObject2NearestNode co = personClusterMap.get( nearestNode.getId() );
-								co.addObject( personId, 0. );
+								co.addObject( personId, 0.);
 							}
 							else
 								personClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(personId,

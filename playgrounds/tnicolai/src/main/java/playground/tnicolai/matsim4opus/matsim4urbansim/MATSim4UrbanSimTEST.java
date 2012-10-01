@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,12 +41,12 @@ import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
+import playground.tnicolai.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
-import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.network.NetworkBoundaryBox;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -56,7 +55,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author thomas
  *
  */
-public class MATSim4UrbanSimTEST {
+public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 	
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcel.class);
@@ -74,14 +73,14 @@ public class MATSim4UrbanSimTEST {
 	// needed for controler listeners
 	AggregateObject2NearestNode[] aggregatedOpportunities = null;
 	
-	boolean isParcel = false;
+	boolean isParcelMode = false;
 	
-	double timeOfDay;
+	double timeOfDay	 = -1.;
 	
 	// run selected controler
-	boolean computeCellBasedAccessibility			 = false;
-	boolean computeCellBasedAccessibilitiesShapeFile = false;
-	boolean computeCellBasedAccessibilitiesNetwork 	 = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
+	boolean computeParcelBasedAccessibility			 = false;
+	boolean computeParcelBasedAccessibilitiesShapeFile= false;
+	boolean computeParcelBasedAccessibilitiesNetwork = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
 	boolean computeZoneBasedAccessibilities			 = false;
 	boolean computeZone2ZoneImpedance		   		 = false;
 	boolean computeAgentPerformance					 = false;
@@ -89,7 +88,7 @@ public class MATSim4UrbanSimTEST {
 	boolean dumpAggegatedWorkplaceData 			  	 = false;
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
-	double destinationSampleRate 					 = 1.;
+	double opportunitySampleRate 					 = 1.;
 	NetworkBoundaryBox nwBoundaryBox				 = null;
 	
 	int srid										 = -1;
@@ -142,7 +141,7 @@ public class MATSim4UrbanSimTEST {
 		ActivityFacilitiesImpl parcels = null;
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		
-		if(isParcel){
+		if(isParcelMode){
 			parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 			// initializing parcels and zones from UrbanSim input
 			readFromUrbansim.readFacilitiesParcel(parcels, zones);
@@ -220,7 +219,7 @@ public class MATSim4UrbanSimTEST {
 
 		// read UrbanSim persons. Generates hwh acts as side effect
 		Population newPopulation;
-		if(isParcel)
+		if(isParcelMode)
 			newPopulation = readFromUrbansim.readPersonsParcel( oldPopulation, parcels, network, uspModule.getPopulationSampleRate() );
 		else
 			newPopulation = readFromUrbansim.readPersonsZone( oldPopulation, zones, network, uspModule.getPopulationSampleRate() );
@@ -244,7 +243,7 @@ public class MATSim4UrbanSimTEST {
 		
 		log.info("Adding controler listener ...");
 		addControlerListener(zones, parcels, controler);
-		if(isParcel)
+		if(isParcelMode)
 			addFurtherControlerListener(controler, parcels);
 		else
 			addFurtherControlerListener(controler, zones);
@@ -279,16 +278,21 @@ public class MATSim4UrbanSimTEST {
 			
 			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones, srid);
 			
-			aggregateOpportunities(zones, parcels);
+			ActivityFacilitiesImpl zonesOrParcels;
+			if(this.isParcelMode)
+				zonesOrParcels = parcels;
+			else
+				zonesOrParcels = zones;
+
 			// creates zone based table of log sums
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, 				
-																						aggregatedOpportunities, 
+			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3( this,
+																						measuringPoints, 				
+																						zonesOrParcels,
 																						benchmark,
 																						this.scenario));
 		}
 		
-		// new method
-		if(computeCellBasedAccessibility){
+		if(computeParcelBasedAccessibility){
 			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
@@ -296,12 +300,9 @@ public class MATSim4UrbanSimTEST {
 			
 			ZoneLayer<Id>  measuringPoints;
 			String fileExtension;
-			
-			// aggregate destinations (opportunities) on the nearest node on the road network to speed up accessibility computation
-			aggregateOpportunities(zones, parcels);
-			
-			if(computeCellBasedAccessibilitiesNetwork){
-				fileExtension = CellBasedAccessibilityControlerListenerV2.NETWORK;
+
+			if(computeParcelBasedAccessibilitiesNetwork){
+				fileExtension = ParcelBasedAccessibilityControlerListenerV3.NETWORK;
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
 																			   nwBoundaryBox.getBoundingBox(),
 																			   srid);
@@ -311,7 +312,7 @@ public class MATSim4UrbanSimTEST {
 				walkGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			else{
-				fileExtension = CellBasedAccessibilityControlerListenerV2.SHAPE_FILE;
+				fileExtension = ParcelBasedAccessibilityControlerListenerV3.SHAPE_FILE;
 				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
 																				   boundary, 
@@ -322,22 +323,22 @@ public class MATSim4UrbanSimTEST {
 				walkGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			}
 			
-			controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3(measuringPoints, 
-																						 aggregatedOpportunities,
+			controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
+																						 measuringPoints, 
 																						 parcels,
 																						 freeSpeedGrid,
 																						 carGrid,
 																						 bikeGrid,
 																						 walkGrid, 
 																						 fileExtension, 
-																						 benchmark, 
+																						 benchmark,
 																						 this.scenario));
 		}
 		
 		// From here output writer for debugging purposes only
 		
 		if(dumpPopulationData){
-			if(isParcel)
+			if(isParcelMode)
 				readFromUrbansim.readAndDumpPersons2CSV(parcels, 
 												 	controler.getNetwork());
 			else
@@ -345,11 +346,11 @@ public class MATSim4UrbanSimTEST {
 					 								controler.getNetwork());
 		}
 		
-		if(dumpAggegatedWorkplaceData){
-			// init aggregatedWorkplaces
-			aggregateOpportunities(zones, parcels);
-			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(aggregatedOpportunities);
-		}
+//		if(dumpAggegatedWorkplaceData){
+//			// init aggregatedWorkplaces
+//			aggregateOpportunities(zones, parcels);
+//			AnalysisWorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(aggregatedOpportunities);
+//		}
 		
 		// to count number of cars per h on a link
 		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
@@ -357,18 +358,18 @@ public class MATSim4UrbanSimTEST {
 		// see also http://matsim.org/docs/controler
 	}
 
-	/**
-	 * @param zones
-	 * @param parcels
-	 */
-	void aggregateOpportunities(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
-		if(aggregatedOpportunities == null){
-			if(isParcel)
-				aggregatedOpportunities = readFromUrbansim.getAggregatedOpportunities(parcels, destinationSampleRate, (NetworkImpl) scenario.getNetwork(), isParcel);
-			else
-				aggregatedOpportunities = readFromUrbansim.getAggregatedOpportunities(zones, destinationSampleRate, (NetworkImpl) scenario.getNetwork(), isParcel);
-		}
-	}
+//	/**
+//	 * @param zones
+//	 * @param parcels
+//	 */
+//	void aggregateOpportunities(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
+//		if(aggregatedOpportunities == null){
+//			if(isParcelMode)
+//				aggregatedOpportunities = readFromUrbansim.getAggregatedOpportunities(parcels, opportunitySampleRate, (NetworkImpl) scenario.getNetwork(), isParcelMode);
+//			else
+//				aggregatedOpportunities = readFromUrbansim.getAggregatedOpportunities(zones, opportunitySampleRate, (NetworkImpl) scenario.getNetwork(), isParcelMode);
+//		}
+//	}
 	
 	/**
 	 * This method allows to add additional listener
@@ -385,14 +386,14 @@ public class MATSim4UrbanSimTEST {
 		MATSim4UrbanSimControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbaSimControlerConfig();
 		UrbanSimParameterConfigModuleV3 moduleUrbanSimParameter = getUrbanSimParameterConfig();
 		
-		this.destinationSampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
+		this.opportunitySampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
 
 		this.computeAgentPerformance	= moduleMATSim4UrbanSim.isAgentPerformance();
 		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = moduleMATSim4UrbanSim.isZoneBasedAccessibility();
-		this.computeCellBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
-		this.computeCellBasedAccessibilitiesShapeFile = moduleMATSim4UrbanSim.isCellBasedAccessibilityShapeFile();
-		this.computeCellBasedAccessibilitiesNetwork = moduleMATSim4UrbanSim.isCellBasedAccessibilityNetwork();
+		this.computeParcelBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
+		this.computeParcelBasedAccessibilitiesShapeFile = moduleMATSim4UrbanSim.isCellBasedAccessibilityShapeFile();
+		this.computeParcelBasedAccessibilitiesNetwork = moduleMATSim4UrbanSim.isCellBasedAccessibilityNetwork();
 		this.dumpPopulationData 		= false;
 		this.dumpAggegatedWorkplaceData = true;
 		
@@ -417,16 +418,16 @@ public class MATSim4UrbanSimTEST {
 		
 		// check which setting to use
 		if(moduleUrbanSimParameter.getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_BRUSSELS_ZONE)){
-			this.isParcel = false;
+			this.isParcelMode = false;
 			this.srid = InternalConstants.SRID_BELGIUM;
 		}
 		else if(moduleUrbanSimParameter.getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_ZURICH_PARCEL)){
-			this.isParcel = true;
+			this.isParcelMode = true;
 			this.srid = InternalConstants.SRID_SWITZERLAND;
 		}
 		else if(moduleUrbanSimParameter.getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_SEATTLE_PARCEL) ||
 				connector.getUrbanSimParameterConfig().getProjectName().equalsIgnoreCase(InternalConstants.PROJECT_NAME_PSRC_PARCEL)){
-			this.isParcel = true;
+			this.isParcelMode = true;
 			this.srid = InternalConstants.SRID_WASHINGTON_NORTH;
 		}
 	}
@@ -538,4 +539,15 @@ public class MATSim4UrbanSimTEST {
 		return MATSim4UrbanSimParcel.isSuccessfulMATSimRun;
 	}
 
+	public ReadFromUrbanSimModel getReadFromUrbanSimModel(){
+		return this.readFromUrbansim;
+	}
+	
+	public boolean isParcelMode(){
+		return this.isParcelMode;
+	}
+	
+	public double getOpportunitySampleRate(){
+		return this.opportunitySampleRate;
+	}
 }

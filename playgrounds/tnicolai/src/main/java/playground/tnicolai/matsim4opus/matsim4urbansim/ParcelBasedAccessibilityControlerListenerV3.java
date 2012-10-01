@@ -23,11 +23,11 @@ import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
+import playground.tnicolai.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import playground.tnicolai.matsim4opus.interpolation.Interpolation;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
-import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
 import playground.tnicolai.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
@@ -112,8 +112,9 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public ParcelBasedAccessibilityControlerListenerV3(ZoneLayer<Id> startZones, 								// needed for google earth plots
-													 AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
+	public ParcelBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,	
+													 ZoneLayer<Id> startZones, 								// needed for google earth plots
+													 // AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
 													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
 													 SpatialGrid freeSpeedGrid,									// table for free speed car travel times in accessibility computation
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
@@ -121,13 +122,16 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
 													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 Benchmark benchmark,										// Benchmark tool
-													 ScenarioImpl scenario){									// contains all settings for current run
+													 ScenarioImpl scenario){
+								
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 		
+		assert (main != null);
+		this.main = main;
 		assert (startZones != null);
 		this.measuringPointsCell = startZones;
-		assert (aggregatedOpportunities != null);
-		this.aggregatedOpportunities = aggregatedOpportunities;
+		// assert (aggregatedOpportunities != null);
+		// this.aggregatedOpportunities = aggregatedOpportunities;
 		assert (parcels != null);
 		this.parcels = parcels;
 		assert (freeSpeedGrid != null);
@@ -155,10 +159,13 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 	public void notifyShutdown(ShutdownEvent event){
 		log.info("Entering notifyShutdown ..." );
 		
-		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
-		
 		// get the controller and scenario
 		Controler controler = event.getControler();
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+		
+		this.aggregatedOpportunities = this.aggregatedOpportunities(this.parcels, this.main.getOpportunitySampleRate(), network, this.main.isParcelMode());
+		
+		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
 		
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// get the free-speed car travel times (in seconds)
@@ -167,8 +174,6 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		LeastCostPathTree lcptCongestedCarTravelTime = new LeastCostPathTree( ttc, new TravelTimeCostCalculator(ttc) );
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
-		
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");
@@ -177,10 +182,14 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 			Iterator<Zone<Id>> measuringPointIterator = measuringPointsCell.getZones().iterator();
 			log.info(measuringPointsCell.getZones().size() + " measurement points are now processing ...");
 			
-			accessibilityComputation(ttc, lcptFreeSpeedCarTravelTime,
-					lcptCongestedCarTravelTime, lcptTravelDistance, network,
-					measuringPointIterator, measuringPointsCell.getZones().size(),
-					PARCEL_BASED);
+			accessibilityComputation(ttc, 
+									 lcptFreeSpeedCarTravelTime,
+									 lcptCongestedCarTravelTime, 
+									 lcptTravelDistance, 
+									 network,
+									 measuringPointIterator, 
+									 measuringPointsCell.getZones().size(),
+									 PARCEL_BASED);
 			
 			System.out.println();
 

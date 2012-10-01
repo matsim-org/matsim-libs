@@ -192,12 +192,16 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					double congestedCarTravelTime_h = (arrivalTime - depatureTime) / 3600. + offsetCongestedCarTime_h;
 
 					sumGeneralizedCosts(gcs, 
+							this.aggregatedOpportunities[i],
 							distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
 							distanceRoad2Node_meter, 
+							travelDistance_meter, 
 							offsetWalkTime2Node_h + offsetWalkTime2Opportunity_h,
-							opportunityWeight, freeSpeedTravelTime_h,
-							travelDistance_meter, bikeTravelTime_h,
-							walkTravelTime_h, congestedCarTravelTime_h);
+							freeSpeedTravelTime_h,
+							bikeTravelTime_h,
+							walkTravelTime_h, 
+							congestedCarTravelTime_h,
+							opportunityWeight);
 				}
 				
 				// aggregated value
