@@ -43,7 +43,7 @@ public class SfMatsimAirport {
 	public static final double runwayLength = 1500.0;
 	public static final double taxiwayLength = 500.0;
 	public static final double taxiwayFreespeed = 20.0 / 3.6;
-	public static final double runwayFreespeed = 220.0 / 2.6;
+	public static final double runwayFreespeed = 220.0 / 3.6;
 	public static final double TAXI_TOL_TIME = 3 * (taxiwayLength / taxiwayFreespeed) + // time for taxi out and taxi in
 			2 * (runwayLength / runwayFreespeed); // time for take-off and landing (TOL)
 
