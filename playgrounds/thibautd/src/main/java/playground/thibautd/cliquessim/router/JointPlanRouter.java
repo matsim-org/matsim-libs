@@ -61,26 +61,36 @@ public class JointPlanRouter extends PlanRouter {
 	public void updatePlanElements(
 			final Plan plan,
 			final List<PlanElement> newPlanElements) {
-		// "transmit" joint info before update
-		JointRouteIterator oldPlan = new JointRouteIterator( plan.getPlanElements() );
-		JointRouteIterator newPlan = new JointRouteIterator( newPlanElements ) ;
+		try {
+			// "transmit" joint info before update
+			JointRouteIterator oldPlan = new JointRouteIterator( plan.getPlanElements() );
+			JointRouteIterator newPlan = new JointRouteIterator( newPlanElements ) ;
 
-		Route oldRoute = oldPlan.nextJointRoute();
-		Route newRoute = newPlan.nextJointRoute();
+			Route oldRoute = oldPlan.nextJointRoute();
+			Route newRoute = newPlan.nextJointRoute();
 
-		while (oldRoute != null) {
-			if (oldRoute instanceof DriverRoute) {
-				((DriverRoute) newRoute).setPassengerIds( ((DriverRoute) oldRoute).getPassengersIds() );
+			while (oldRoute != null) {
+				if (oldRoute instanceof DriverRoute) {
+					((DriverRoute) newRoute).setPassengerIds(
+						((DriverRoute) oldRoute).getPassengersIds() );
+				}
+				else {
+					((PassengerRoute) newRoute).setDriverId(
+						((PassengerRoute) oldRoute).getDriverId() );
+				}
+
+				oldRoute = oldPlan.nextJointRoute();
+				newRoute = newPlan.nextJointRoute();
 			}
-			else {
-				((PassengerRoute) newRoute).setDriverId( ((PassengerRoute) oldRoute).getDriverId() );
-			}
 
-			oldRoute = oldPlan.nextJointRoute();
-			newRoute = newPlan.nextJointRoute();
+			super.updatePlanElements( plan , newPlanElements );
 		}
-
-		super.updatePlanElements( plan , newPlanElements );
+		catch (Exception e) {
+			throwInformativeError(
+					plan.getPlanElements(),
+					newPlanElements,
+					e);
+		}
 	}
 
 	private static class JointRouteIterator {
