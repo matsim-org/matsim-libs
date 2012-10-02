@@ -24,7 +24,6 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
@@ -108,12 +107,12 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 			final Controler controler ) {
 		return new EstimatorTripRouterFactory(
 				plan,
-				((PopulationImpl) controler.getPopulation()).getFactory(),
+				controler.getPopulation().getFactory(),
 				controler.getNetwork(),
 				controler.getTravelTimeCalculator(),
 				controler.getTravelDisutilityFactory(),
 				controler.getLeastCostPathCalculatorFactory(),
-				((PopulationFactoryImpl) ((PopulationImpl) controler.getPopulation()).getFactory()).getModeRouteFactory(),
+				((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
 				controler.getScenario().getTransitSchedule(),
 				controler.getConfig().plansCalcRoute(),
 				controler.getConfig().planCalcScore(),

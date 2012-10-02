@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
@@ -39,7 +38,7 @@ public class JointTripRouterFactory implements TripRouterFactory {
 
 	public JointTripRouterFactory(final Controler controler) {
 		defaultFactory = new TripRouterFactoryImpl( controler );
-		populationFactory = ((PopulationImpl) controler.getPopulation()).getFactory();
+		populationFactory = controler.getPopulation().getFactory();
 	}
 
 	@Override
