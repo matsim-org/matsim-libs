@@ -21,7 +21,9 @@ package playground.thibautd.cliquessim.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.corelisteners.RoadPricing;
@@ -155,6 +157,9 @@ public class JointControler extends Controler {
 		 * order is contrary to the order the listeners are added to the list.
 		 */
 
+		if (this.dumpDataAtEnd) {
+			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, controlerIO));
+		}
 
 		this.plansScoring = new PlansScoring(this.scenarioData, this.events, controlerIO, this.scoringFunctionFactory ) ;
 
@@ -170,9 +175,14 @@ public class JointControler extends Controler {
 		}
 
 		this.addCoreControlerListener(new JointPlansReplanning());
-		this.addCoreControlerListener(new PlansDumping());
+		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
+				this.stopwatch, this.controlerIO ));
 
-		this.addCoreControlerListener(new EventsHandling(this.events));
+		this.addCoreControlerListener(new LegTimesListener(getLegTimes(), controlerIO));
+		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(),
+				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
+
+		loadControlerListeners();
 	}
 
 	@Override
