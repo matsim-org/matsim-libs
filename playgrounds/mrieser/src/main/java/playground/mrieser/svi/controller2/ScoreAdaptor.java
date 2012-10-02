@@ -19,29 +19,9 @@
 
 package playground.mrieser.svi.controller2;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+public class ScoreAdaptor {
 
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
-
-/**
- * @author mrieser
- */
-public class DynusTMobsimFactory implements MobsimFactory {
-
-	private final DynusTConfig dc;
-	private final DynamicTravelTimeMatrix ttMatrix;
-
-	public DynusTMobsimFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix) {
-		this.dc = dc;
-		this.ttMatrix = ttMatrix;
+	public void run() {
+		
 	}
-
-	@Override
-	public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-		return new DynusTMobsim(this.dc, this.ttMatrix, sc, eventsManager);
-	}
-
 }

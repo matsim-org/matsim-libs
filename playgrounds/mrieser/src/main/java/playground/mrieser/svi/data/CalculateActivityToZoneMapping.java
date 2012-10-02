@@ -35,10 +35,12 @@ public class CalculateActivityToZoneMapping {
 
 	private final ActivityToZoneMapping mapping;
 	private final Zones zones;
+	private final String idAttributeName;
 
-	public CalculateActivityToZoneMapping(final ActivityToZoneMapping mapping, final Zones zones) {
+	public CalculateActivityToZoneMapping(final ActivityToZoneMapping mapping, final Zones zones, final String idAttributeName) {
 		this.mapping = mapping;
 		this.zones = zones;
+		this.idAttributeName = idAttributeName;
 	}
 
 	public void run(final Population population) {
@@ -50,7 +52,7 @@ public class CalculateActivityToZoneMapping {
 					Activity act = (Activity) pe;
 					Feature zone = this.zones.getContainingZone(act.getCoord().getX(), act.getCoord().getY());
 					if (zone != null) {
-						zoneIds.add(zone.getAttribute("id").toString());
+						zoneIds.add(zone.getAttribute(this.idAttributeName).toString());
 					} else {
 						zoneIds.add(null);
 					}

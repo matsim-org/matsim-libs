@@ -39,16 +39,18 @@ public class DynusTMobsim implements Mobsim {
 
 	private final DynusTConfig dc;
 	private final Scenario scenario;
+	private final DynamicTravelTimeMatrix ttMatrix;
 
-	public DynusTMobsim(final DynusTConfig dc, final Scenario sc, final EventsManager eventsManager) {
+	public DynusTMobsim(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final Scenario sc, final EventsManager eventsManager) {
 		this.dc = dc;
 		this.scenario = sc;
+		this.ttMatrix = ttMatrix;
 	}
 
 	@Override
 	public void run() {
 		// prepare matrix
-		DynamicODMatrix odm = new DynamicODMatrix(10*60, 24*60*60);
+		DynamicODMatrix odm = new DynamicODMatrix(this.dc.getTimeBinSize_min()*60, 24*60*60);
 		DynamicODDemandCollector collector = new DynamicODDemandCollector(odm, this.dc.getActToZoneMapping());
 
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
@@ -66,8 +68,7 @@ public class DynusTMobsim implements Mobsim {
 
 		// read in data, convert it somehow to score the plans
 		String vehTrajFilename = this.dc.getOutputDirectory() + "/VehTrajectory.dat";
-		DynamicTravelTimeMatrix matrix = new DynamicTravelTimeMatrix(600, 30*3600.0); // 10min time bins, at most 30 hours
-		CalculateTravelTimeMatrixFromVehTrajectories ttmCalc = new CalculateTravelTimeMatrixFromVehTrajectories(matrix);
+		CalculateTravelTimeMatrixFromVehTrajectories ttmCalc = new CalculateTravelTimeMatrixFromVehTrajectories(this.ttMatrix);
 		new VehicleTrajectoriesReader(ttmCalc, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
 		// TODO do something useful with matrix, i.e. pass it on to scoring etc.
 	}

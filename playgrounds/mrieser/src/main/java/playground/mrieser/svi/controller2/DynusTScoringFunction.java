@@ -19,15 +19,41 @@
 
 package playground.mrieser.svi.controller2;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
+
+import playground.mrieser.svi.data.ActivityToZoneMapping;
+import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
 
 /**
  * @author mrieser
  */
 public class DynusTScoringFunction implements ScoringFunction {
 
+	private final Plan plan;
+	private final DynamicTravelTimeMatrix ttMatrix;
+	private final ActivityToZoneMapping act2zoneMapping;
+	private double score = Double.NaN;
+	private final LegScoring legScorer;
+	private final ActivityScoring actScorer;
+	
+	public DynusTScoringFunction(final Plan plan, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zoneMapping, final LegScoring legScorer, final ActivityScoring actScorer) {
+		this.plan = plan;
+		this.ttMatrix = ttMatrix;
+		this.act2zoneMapping = act2zoneMapping;
+		this.legScorer = legScorer;
+		this.actScorer = actScorer;
+	}
+	
 	@Override
 	public void handleActivity(final Activity activity) {
 	}
@@ -38,29 +64,82 @@ public class DynusTScoringFunction implements ScoringFunction {
 
 	@Override
 	public void agentStuck(final double time) {
-		// TODO
 	}
 
 	@Override
 	public void addMoney(final double amount) {
-		// TODO
 	}
 
 	@Override
 	public void finish() {
-
 	}
 
 	@Override
 	public double getScore() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (Double.isNaN(this.score)) {
+			
+			Leg prevLeg = null;
+			Activity prevAct = null;
+			int actIndex = 0;
+			for (PlanElement pe : this.plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					prevLeg = leg;
+				}
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+
+					if (!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+						if (prevAct == null) {
+							// the first act
+							actScorer.endActivity(act.getEndTime(), act);
+						}
+						if (prevAct != null && prevLeg != null) {
+							if (prevLeg.getMode().equals(TransportMode.car)) {
+								
+								String[] zones = this.act2zoneMapping.getAgentActivityZones(plan.getPerson().getId());
+								double tt = this.ttMatrix.getAverageTravelTime(prevAct.getEndTime(), zones[actIndex-1], zones[actIndex]);
+								
+								legScorer.startLeg(prevAct.getEndTime(), prevLeg);
+								legScorer.endLeg(prevAct.getEndTime() + tt);
+								
+								actScorer.startActivity(prevAct.getEndTime() + tt, act);
+								if (act.getEndTime() != Time.UNDEFINED_TIME) {
+									actScorer.endActivity(act.getEndTime(), act);
+								}
+								
+							} else if (prevLeg.getMode().equals(TransportMode.pt)) {
+								// currently, only teleportation based
+								double dist = CoordUtils.calcDistance(prevAct.getCoord(), act.getCoord());
+								double tt = dist / 5.0; // assume average speed of 18km/h
+								
+								legScorer.startLeg(prevAct.getEndTime(), prevLeg);
+								legScorer.endLeg(prevAct.getEndTime() + tt);
+								
+								actScorer.startActivity(prevAct.getEndTime() + tt, act);
+								if (act.getEndTime() != Time.UNDEFINED_TIME) {
+									actScorer.endActivity(act.getEndTime(), act);
+								}
+							}
+						}
+						
+						prevAct = act;
+						actIndex++;
+					}
+					prevLeg = null;
+				}
+			}
+
+			this.actScorer.finish();
+			this.legScorer.finish();
+			this.score = this.actScorer.getScore() + this.legScorer.getScore();
+		}
+		return this.score;
 	}
 
 	@Override
 	public void reset() {
-		// TODO
+		this.score = Double.NaN;
 	}
-
 
 }

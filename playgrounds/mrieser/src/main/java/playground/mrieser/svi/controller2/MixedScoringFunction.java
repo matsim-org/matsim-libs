@@ -19,38 +19,64 @@
 
 package playground.mrieser.svi.controller2;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.mrieser.svi.data.ActivityToZoneMapping;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+public class MixedScoringFunction implements ScoringFunction {
 
-/**
- * @author mrieser
- */
-public class DynusTScoringFunctionFactory implements ScoringFunctionFactory {
-
-	private final DynusTConfig dc;
-	private final DynamicTravelTimeMatrix ttMatrix;
-	private final ActivityToZoneMapping act2zones;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringFunction delegate;
 	
-	public DynusTScoringFunctionFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zones, final CharyparNagelScoringParameters params) {
-		this.dc = dc;
-		this.ttMatrix = ttMatrix;
-		this.act2zones = act2zones;
-		this.params = params;
+	public MixedScoringFunction(final CharyparNagelScoringParameters params) {
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, null));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		this.delegate = scoringFunctionAccumulator;
 	}
-	
+
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		return new DynusTScoringFunction(plan, this.ttMatrix, this.act2zones,
-				new CharyparNagelLegScoring(this.params, null),
-				new CharyparNagelActivityScoring(this.params));
+	public void handleActivity(Activity activity) {
+		this.delegate.handleActivity(activity);
+	}
+
+	@Override
+	public void handleLeg(Leg leg) {
+		this.delegate.handleLeg(leg);
+	}
+
+	@Override
+	public void agentStuck(double time) {
+		this.delegate.agentStuck(time);
+	}
+
+	@Override
+	public void addMoney(double amount) {
+		this.delegate.addMoney(amount);
+	}
+
+	@Override
+	public void finish() {
+		this.delegate.finish();
+	}
+
+	@Override
+	public double getScore() {
+		// TODO adapt score based on DynusT
+		throw new RuntimeException("not yet implemented");
+//		return this.delegate.getScore();
+	}
+
+	@Override
+	public void reset() {
+		this.delegate.reset();
 	}
 
 }

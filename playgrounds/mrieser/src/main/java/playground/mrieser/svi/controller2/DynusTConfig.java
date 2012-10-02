@@ -34,11 +34,12 @@ public class DynusTConfig {
 	private String zonesShapeFile = null;
 	private String zoneIdToIndexMappingFile = null;
 	private double demandFactor = 1.0;
+	private String zoneIdAttributeName = "id";
+	private int timeBinSize_min = 10;
 
 	private final Zones zones = new Zones();
 	private final ActivityToZoneMapping actToZoneMapping = new ActivityToZoneMapping();
 	private final ZoneIdToIndexMapping zoneIdToIndexMapping = new ZoneIdToIndexMapping();
-
 
 	public String getDynusTDirectory() {
 		return this.dynusTDirectory;
@@ -100,4 +101,20 @@ public class DynusTConfig {
 		return this.demandFactor;
 	}
 
+	public String getZoneIdAttributeName() {
+		return zoneIdAttributeName;
+	}
+	
+	public void setZoneIdAttributeName(String zoneIdAttributeName) {
+		this.zoneIdAttributeName = zoneIdAttributeName;
+	}
+
+	public int getTimeBinSize_min() {
+		return timeBinSize_min;
+	}
+	
+	public void setTimeBinSize_min(int timeBinSize_min) {
+		this.timeBinSize_min = timeBinSize_min;
+	}
+	
 }

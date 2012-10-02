@@ -45,6 +45,10 @@ public class DynamicTravelTimeMatrix {
 	public int getNOfBins() {
 		return (int) this.maxTime / this.binSize;
 	}
+	
+	public void clear() {
+		this.odms.clear();
+	}
 
 	public void addTravelTime(final double depTime, final double travelTime, final String fromZoneId, final String toZoneId) {
 		int slot = getTimeSlot(depTime);

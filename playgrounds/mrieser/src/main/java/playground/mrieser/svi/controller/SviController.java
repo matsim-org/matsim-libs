@@ -51,6 +51,7 @@ import playground.mrieser.svi.replanning.DynamicODDemandCollector;
 /**
  * @author mrieser / senozon
  */
+@Deprecated
 public class SviController {
 
 	private final static Logger log = Logger.getLogger(SviController.class);
@@ -100,7 +101,7 @@ public class SviController {
 
 	public void run() {
 		log.info("Analyzing zones for Population...");
-		new CalculateActivityToZoneMapping(this.actToZoneMapping, this.zones).run(this.scenario.getPopulation());
+		new CalculateActivityToZoneMapping(this.actToZoneMapping, this.zones, "id").run(this.scenario.getPopulation());
 		new ActivityToZoneMappingWriter(this.actToZoneMapping).writeFile("actToZoneMapping.txt");
 
 		log.info("Starting Iterations...");

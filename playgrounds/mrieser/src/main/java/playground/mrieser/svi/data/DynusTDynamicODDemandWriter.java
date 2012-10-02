@@ -56,6 +56,8 @@ public class DynusTDynamicODDemandWriter {
 		int nOfZones = this.zoneMapping.getNumberOfZones();
 		String[] zoneIds = this.zoneMapping.getIndexToIdMapping();
 
+		log.info("Writing dynamic demand for Dynus-T, consisting of " + nOfZones + " zones.");
+		
 		try {
 			writer.write(Integer.toString(nOfTimeBins));
 			writer.write(" ");
