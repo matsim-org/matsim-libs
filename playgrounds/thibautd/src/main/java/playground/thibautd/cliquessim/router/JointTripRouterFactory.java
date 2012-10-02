@@ -121,8 +121,7 @@ public class JointTripRouterFactory implements TripRouterFactory {
 				JointActingTypes.PASSENGER,
 				new PassengerRoutingModule(
 					JointActingTypes.PASSENGER,
-					populationFactory,
-					((PopulationFactoryImpl) populationFactory).getModeRouteFactory()));
+					populationFactory));
 
 		return instance;
 	}

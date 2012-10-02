@@ -28,27 +28,24 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 
+import playground.thibautd.cliquessim.population.PassengerRoute;
 
 /**
  * @author thibautd
  */
 public class PassengerRoutingModule implements RoutingModule {
 	private final PopulationFactory popFactory;
-	private final ModeRouteFactory routeFactory;
 	private final String modeName;
 
 	public PassengerRoutingModule(
 			final String modeName,
-			final PopulationFactory popFactory,
-			final ModeRouteFactory routeFactory) {
+			final PopulationFactory popFactory) {
 		this.modeName = modeName;
 		this.popFactory = popFactory;
-		this.routeFactory = routeFactory;
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class PassengerRoutingModule implements RoutingModule {
 			final Person person) {
 		Leg l = popFactory.createLeg( modeName );
 		l.setDepartureTime( departureTime );
-		Route r = routeFactory.createRoute( modeName , fromFacility.getLinkId() , toFacility.getLinkId() );
+		Route r = new PassengerRoute( fromFacility.getLinkId() , toFacility.getLinkId() );
 		l.setRoute( r );
 		return Collections.singletonList( l );
 	}
