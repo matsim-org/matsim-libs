@@ -505,6 +505,15 @@ public class JointTripRemoverAlgorithmTest {
 					"wrong passenger ids",
 					actIds.containsAll( expIds ));
 		}
+		else if ( exp.getMode().equals( JointActingTypes.PASSENGER ) ) {
+			Id expId = ((PassengerRoute) exp.getRoute()).getDriverId();
+			Id actId = ((PassengerRoute) act.getRoute()).getDriverId();
+
+			assertEquals(
+					"wrong driver Id",
+					expId,
+					actId);
+		}
 	}
 
 	private void assertActivitiesMatch(final Activity exp, final Activity act) {
