@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointChooseModeForSubtourStrategy.java
+ * JointTripsToLegsModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.replanning.strategies;
+package playground.thibautd.cliquessim.router;
 
 import org.matsim.core.controler.Controler;
-
-import playground.thibautd.cliquessim.replanning.JointPlanStrategy;
-import playground.thibautd.cliquessim.replanning.modules.ExecuteModuleOnAllPlansModule;
-import playground.thibautd.cliquessim.replanning.modules.jointchoosemodeforsubtour.JointChooseModeForSubtourModule;
-import playground.thibautd.cliquessim.replanning.modules.reroute.JointReRouteModule;
-import playground.thibautd.cliquessim.replanning.selectors.RandomPlanSelectorWithoutCasts;
-import playground.thibautd.cliquessim.router.JointTripsToLegsModule;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author thibautd
  */
-public class JointChooseModeForSubtourStrategy extends JointPlanStrategy {
+public class JointTripsToLegsModule extends AbstractMultithreadedModule {
+	private final TripRouterFactory tripRouterFactory;
 
-	public JointChooseModeForSubtourStrategy(final Controler controler) {
-		super( new RandomPlanSelectorWithoutCasts() );
-		addStrategyModule(
-				new ExecuteModuleOnAllPlansModule(
-					controler.getConfig(),
-					new JointTripsToLegsModule( controler ) ) );
-		addStrategyModule(
-				new JointChooseModeForSubtourModule(
-					controler.getConfig() ) );
-		addStrategyModule(
-				new JointReRouteModule(
-					controler ) );
+	public JointTripsToLegsModule(final Controler controler) {
+		super( controler.getConfig().global() );
+		this.tripRouterFactory = controler.getTripRouterFactory();
+	}
+
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new JointTripsToLegsAlgorithm( tripRouterFactory.createTripRouter() );
 	}
 }
+
