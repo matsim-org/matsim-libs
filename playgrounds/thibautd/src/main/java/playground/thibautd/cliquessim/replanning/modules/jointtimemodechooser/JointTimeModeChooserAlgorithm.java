@@ -113,7 +113,9 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 				controler.getTravelDisutilityFactory(),
 				controler.getLeastCostPathCalculatorFactory(),
 				((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
-				controler.getScenario().getTransitSchedule(),
+				controler.getConfig().scenario().isUseTransit() ?
+					controler.getScenario().getTransitSchedule() :
+					null,
 				controler.getConfig().plansCalcRoute(),
 				controler.getConfig().planCalcScore(),
 				delay,
