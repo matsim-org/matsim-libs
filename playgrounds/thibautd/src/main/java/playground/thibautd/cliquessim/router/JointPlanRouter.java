@@ -35,16 +35,17 @@ import playground.thibautd.cliquessim.population.DriverRoute;
 import playground.thibautd.cliquessim.population.PassengerRoute;
 
 /**
- * Based on the {@link PlanRouter}, but modifies "old" plan elements
- * rather than inserting new ones. 
+ * Based on the {@link PlanRouter}, but transmits passenger information
+ * in the new plan elements.
+ *
+ * Note that this implies that using the trip router alone will loose
+ * this information!
  *
  * @author thibautd
  */
 public class JointPlanRouter extends PlanRouter {
 	private static final Logger log =
 		Logger.getLogger(JointPlanRouter.class);
-
-	//private final CarPassengerLegRouter passengerRouter = new CarPassengerLegRouter();
 
 	public JointPlanRouter(
 			final TripRouter routingHandler,
