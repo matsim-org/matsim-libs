@@ -34,12 +34,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.LinkFactoryImpl;
@@ -56,8 +59,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-
-import playgrounds.ssix.LinkStatusSpy;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
  * Class doing a simple one road straight line simulation.
@@ -93,6 +96,10 @@ public class LangeStreckeSzenario {
 		
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
+		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.ABORT) ;
+
 		this.scenario = ScenarioUtils.createScenario(config);
 	}
 
@@ -105,7 +112,7 @@ public class LangeStreckeSzenario {
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)5000, 2);
+		createPopulation((long)5000, 3600/400);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		LinkStatusSpy linkSpy = new LinkStatusSpy(/*this.scenario,*/ (Id) new IdImpl((long)(1)));
@@ -155,6 +162,10 @@ public class LangeStreckeSzenario {
 		Node endNode = new NetworkFactoryImpl(network).createNode(id, coord);
 		network.addNode(endNode);
 		
+// preferred syntax:
+//		Link link = network.getFactory().createLink(id, startNode, endNode) ;
+//		link.setCapacity(50.) ;
+//		network.addLink(link) ;
 		
 		//links
 		for (int i = 0; i<numberOfLinks; i++){
@@ -207,9 +218,9 @@ public class LangeStreckeSzenario {
 		Netsim qSim = new QSimFactory().createMobsim(scenario, events);
 		prepareForSim();
 		
-		//OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
 		
-		//OTFClientLive.run(scenario.getConfig(), server);
+		OTFClientLive.run(scenario.getConfig(), server);
 		qSim.run();
 	}
 	
@@ -218,13 +229,13 @@ public class LangeStreckeSzenario {
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
 		
 		Random r = new Random();
-		/*Method 1: The order of leaving people is guaranteed by the minimum time step between people: first person 1 leaves, then 2, then 3 etc...
+//		Method 1: The order of leaving people is guaranteed by the minimum time step between people: first person 1 leaves, then 2, then 3 etc...
 		long plannedEndTime = 6*3600 + (identifier-1)*sekundenFrequenz;
 		double endTime = plannedEndTime - sekundenFrequenz/2.0 + r.nextDouble()*sekundenFrequenz;
-		*/
+
 		///*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
-		long TimeChunkSize = scenario.getPopulation().getPersons().size() * sekundenFrequenz;
-		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
+//		long TimeChunkSize = scenario.getPopulation().getPersons().size() * sekundenFrequenz;
+//		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
 		//*/
 		//NB:Method 2 is significantly better for the quality of fundamental diagrams;
 		activity.setEndTime(endTime);
