@@ -248,4 +248,12 @@ public class NetworkUtils {
 		return false;
 	}
 
+	public static Link getConnectingLink(final Node fromNode, final Node toNode) {
+		for (Link link : fromNode.getOutLinks().values()) {
+			if (link.getToNode() == toNode) {
+				return link;
+			}
+		}
+		return null;
+	}
 }

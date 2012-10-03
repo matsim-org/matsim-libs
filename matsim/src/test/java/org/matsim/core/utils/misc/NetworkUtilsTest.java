@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -264,6 +265,22 @@ public class NetworkUtilsTest {
 		Assert.assertTrue(NetworkUtils.isMultimodal(f.network));
 	}
 
+	@Test
+	public void testGetConnectingLink() {
+		Network net = getTestNetwork();
+		Node node1 = net.getNodes().get(new IdImpl(1));
+		Node node2 = net.getNodes().get(new IdImpl(2));
+		Node node3 = net.getNodes().get(new IdImpl(3));
+		Link link1 = net.getLinks().get(new IdImpl(1));
+		Link link2 = net.getLinks().get(new IdImpl(2));
+		
+		Assert.assertEquals(link1, NetworkUtils.getConnectingLink(node1, node2));
+		Assert.assertEquals(link2, NetworkUtils.getConnectingLink(node2, node3));
+		Assert.assertNull(NetworkUtils.getConnectingLink(node1, node3)); // skip one node
+		Assert.assertNull(NetworkUtils.getConnectingLink(node3, node2)); // backwards
+		Assert.assertNull(NetworkUtils.getConnectingLink(node2, node1)); // backwards
+	}
+	
 	private static class PseudoLink extends FakeLink {
 		private final double nOfLanes;
 		public PseudoLink(final double nOfLanes) {
@@ -317,4 +334,5 @@ public class NetworkUtilsTest {
 			}
 		}
 	}
+	
 }
