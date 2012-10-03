@@ -351,7 +351,10 @@ public class TravelTimeCalculator
 		return this.numSlots;
 	}
 
-	public int getTimeSlice(){
+	/**
+	 * @return the size of a time bin in seconds.
+	 */
+	public int getTimeSlice() {
 		return this.timeSlice;
 	}
 	
