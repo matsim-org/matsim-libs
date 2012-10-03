@@ -26,9 +26,11 @@ import org.geotools.feature.Feature;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -38,11 +40,14 @@ import playground.mrieser.svi.data.CalculateActivityToZoneMapping;
 import playground.mrieser.svi.data.ShapeZonesReader;
 import playground.mrieser.svi.data.ZoneIdToIndexMappingReader;
 import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.pt.PtLines;
+import playground.mrieser.svi.pt.PtLinesReader;
+import playground.mrieser.svi.pt.PtLinesStatistics;
 
 /**
  * @author mrieser
  */
-public class DynusTControlerListener implements StartupListener, IterationStartsListener, AfterMobsimListener {
+public class DynusTControlerListener implements StartupListener, IterationStartsListener, AfterMobsimListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(DynusTControlerListener.class);
 
@@ -50,6 +55,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 	private boolean isFirstIteration = true;
 	private boolean useOnlyDynusT = false;
 	private final DynamicTravelTimeMatrix ttMatrix = new DynamicTravelTimeMatrix(600, 30*3600.0); // 10min time bins, at most 30 hours
+	private PtLines ptLines = null;
 
 	public DynusTControlerListener(final DynusTConfig dc) {
 		this.dc = dc;
@@ -68,6 +74,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 		if (config.findParam("dynus-t", "timeBinSize_min") != null) {
 			this.dc.setTimeBinSize_min(Integer.parseInt(config.getParam("dynus-t", "timeBinSize_min")));
 		}
+		this.dc.setPtLinesFile(config.findParam("dynus-t", "ptLinesFile"));
 		this.useOnlyDynusT = Boolean.parseBoolean(config.getParam("dynus-t", "useOnlyDynusT"));
 
 		if (this.useOnlyDynusT) {
@@ -77,7 +84,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 		} else {
 			c.setScoringFunctionFactory(new MixedScoringFunctionFactory(this.dc, this.ttMatrix, this.dc.getActToZoneMapping(), new CharyparNagelScoringParameters(config.planCalcScore())));
 		}
-	}
+			}
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -108,6 +115,12 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 				}
 			}
 
+			if (this.dc.getPtLinesFile() != null) {
+				this.ptLines = new PtLines();
+				log.info("reading pt lines from " + this.dc.getPtLinesFile());
+				new PtLinesReader(this.ptLines, c.getNetwork());
+			}
+			
 			this.isFirstIteration = false;
 		}
 	}
@@ -120,4 +133,15 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 			new ScoreAdaptor().run();
 		}
 	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		if (this.ptLines != null) {
+			log.info("dump pt statistics...");
+			new PtLinesStatistics(this.ptLines).writeStatsToFile(
+					event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "ptStats.txt"),
+					this.dc.getTravelTimeCalculator());
+		}
+	}
+	
 }

@@ -30,7 +30,8 @@ public class VehicleTrajectory {
 	private final String destZ;
 	private final double startTime;
 	private final double travelTime;
-	private int[] travelledNodes;
+	private int[] travelledNodes = null;
+	private double[] travelledNodeTimes = null;
 
 	/**
 	 * @param vehNr
@@ -56,7 +57,15 @@ public class VehicleTrajectory {
 	public int[] getTravelledNodes() {
 		return this.travelledNodes;
 	}
+	
+	public void setTravelledNodeTimes(final double[] times) {
+		this.travelledNodeTimes = times;
+	}
 
+	public double[] getTravelledNodeTimes() {
+		return this.travelledNodeTimes;
+	}
+	
 	public int getVehNr() {
 		return this.vehNr;
 	}

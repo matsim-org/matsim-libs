@@ -19,6 +19,8 @@
 
 package playground.mrieser.svi.controller2;
 
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+
 import playground.mrieser.svi.data.ActivityToZoneMapping;
 import playground.mrieser.svi.data.ZoneIdToIndexMapping;
 import playground.mrieser.svi.data.Zones;
@@ -36,6 +38,8 @@ public class DynusTConfig {
 	private double demandFactor = 1.0;
 	private String zoneIdAttributeName = "id";
 	private int timeBinSize_min = 10;
+	private String ptLinesFile = null;
+	private TravelTimeCalculator ttc = null;
 
 	private final Zones zones = new Zones();
 	private final ActivityToZoneMapping actToZoneMapping = new ActivityToZoneMapping();
@@ -116,5 +120,20 @@ public class DynusTConfig {
 	public void setTimeBinSize_min(int timeBinSize_min) {
 		this.timeBinSize_min = timeBinSize_min;
 	}
+
+	public String getPtLinesFile() {
+		return this.ptLinesFile;
+	}
 	
+	public void setPtLinesFile(String ptLinesFile) {
+		this.ptLinesFile = ptLinesFile;
+	}
+
+	public void setTravelTimeCalculator(final TravelTimeCalculator ttc) {
+		this.ttc = ttc;
+	}
+	
+	public TravelTimeCalculator getTravelTimeCalculator()	 {
+		return this.ttc;
+	}
 }

@@ -97,15 +97,17 @@ public class VehicleTrajectoriesReader {
 		int[] nodes = new int[nOfNodes];
 
 		int nOfLines = 0;
-		int nodesIdx = 0;
-		while (nodesIdx < nOfNodes) {
-			nOfLines++;
-			line = reader.readLine();
-			String parts[] = line.split("\\s+");
-			for (String part : parts) {
-				if (part.length() > 0) {
-					nodes[nodesIdx] = Integer.parseInt(part);
-					nodesIdx++;
+		{
+			int nodesIdx = 0;
+			while (nodesIdx < nOfNodes) {
+				nOfLines++;
+				line = reader.readLine();
+				String parts[] = line.split("\\s+");
+				for (String part : parts) {
+					if (part.length() > 0) {
+						nodes[nodesIdx] = Integer.parseInt(part);
+						nodesIdx++;
+					}
 				}
 			}
 		}
@@ -116,8 +118,20 @@ public class VehicleTrajectoriesReader {
 		}
 
 		// travel time between nodes
-		for (int i = 0; i < nOfLines; i++) {
-			line = reader.readLine(); // currently ignore
+		double[] travelTimes = new double[nOfNodes];
+		{
+			int nodesIdx = 0;
+			for (int i = 0; i < nOfLines; i++) {
+				line = reader.readLine(); // currently ignore
+				
+				String parts[] = line.split("\\s+");
+				for (String part : parts) {
+					if (part.length() > 0) {
+						travelTimes[nodesIdx] = Double.parseDouble(part) * 60.0; // convert minutes to seconds
+						nodesIdx++;
+					}
+				}
+			}
 		}
 
 		// delay times at nodes
@@ -127,6 +141,7 @@ public class VehicleTrajectoriesReader {
 
 		VehicleTrajectory traj = new VehicleTrajectory(vehNr, tag, this.zoneIdxToIdMapping[origZ], this.zoneIdxToIdMapping[destZ], sTime, travelTime);
 		traj.setTravelledNodes(nodes);
+		traj.setTravelledNodeTimes(travelTimes);
 		return traj;
 	}
 }
