@@ -34,7 +34,7 @@ public class GUI extends JFrame {
 	private void init() {
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setTitle("Sioux Falls Evacuation - Summer School Oldenburg");
+		this.setTitle("Sioux Falls Evacuation");
 		this.setContentPane(new ConfigPanel());
 		this.setVisible(true);
 		this.setSize(800, 600);

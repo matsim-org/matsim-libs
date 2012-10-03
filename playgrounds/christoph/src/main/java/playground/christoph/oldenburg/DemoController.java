@@ -25,17 +25,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -51,6 +54,9 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -75,7 +81,7 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 2;
+	protected int numReplanningThreads = 1;
 
 	protected InitialIdentifier initialIdentifier;
 	protected DuringActivityIdentifier duringActivityIdentifier;
@@ -93,6 +99,10 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	}
 
 	private void init() {
+		
+		// let Agents adapt their original plans
+		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+		
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
 		
@@ -153,6 +163,16 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {		
 		initReplanners((QSim)e.getQueueSimulation());
+		
+		VehiclesFactory vehiclesFactory = VehicleUtils.getFactory();
+		VehicleType vehicleType = VehicleUtils.getDefaultVehicleType();
+		QSim qsim = (QSim) e.getQueueSimulation();
+		for (MobsimAgent agent : qsim.getAgents()) {
+			Id agentId = agent.getId();
+			Id linkId = agent.getCurrentLinkId();
+			
+			qsim.createAndParkVehicleOnLink(vehiclesFactory.createVehicle(agentId, vehicleType), linkId);			
+		}
 	}
 	
 	@Override
@@ -187,9 +207,9 @@ public class DemoController extends WithinDayController implements MobsimInitial
 					
 					for (MobsimVehicle mvehicle : vehicles) {
 						QVehicle vehicle = (QVehicle) mvehicle ;
-						double before = vehicle.getEarliestLinkExitTime();
+//						double before = vehicle.getEarliestLinkExitTime();
 						vehicle.setEarliestLinkExitTime(e.getSimulationTime() + link.getLength() / link.getFreespeed(e.getSimulationTime()));
-						double after = vehicle.getEarliestLinkExitTime();
+//						double after = vehicle.getEarliestLinkExitTime();
 					}
 				}
 			}
@@ -201,13 +221,7 @@ public class DemoController extends WithinDayController implements MobsimInitial
 		log.info("Longest evacuation time: " + Time.writeTime(evacuationTimeAnalyzer.longestEvacuationTime));
 		log.info("Mean evacuation time: " + Time.writeTime(evacuationTimeAnalyzer.sumEvacuationTimes / scenarioData.getPopulation().getPersons().size()));
 	}
-	
-	@Override
-	protected void runMobSim() {
 		
-		super.runMobSim();
-	}
-	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
