@@ -142,6 +142,15 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 					event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "ptStats.txt"),
 					this.dc.getTravelTimeCalculator());
 		}
+		// clean up tmp directory
+		log.info("removing unnecessary files.");
+		File outDir = new File(this.dc.getOutputDirectory());
+		for (File f : outDir.listFiles()) {
+			if (f.isFile() && !f.getName().equals("VehTrajectory.dat")) {
+				log.info("   deleting file " + f.getAbsolutePath());
+				f.delete();
+			}
+		}
 	}
 	
 }
