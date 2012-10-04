@@ -22,8 +22,8 @@ package playground.kai.bvwp;
 import java.util.Map;
 import java.util.TreeMap;
 
-import playground.kai.bvwp.Values.Type;
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.DemandSegment;
+import playground.kai.bvwp.Values.Attribute;
 
 class Values {
 	/**
@@ -32,7 +32,7 @@ class Values {
 	 * aber abgesehen davon spricht eigentlich nichts dagegen.  kai,benjamin, sep'12
 	 * </ul>
 	 */
-	enum Entry { XX, km, hrs, priceUser, costOfProduction }
+	enum Attribute { XX, km, hrs, priceUser, costOfProduction }
 
 	/**
 	 * Design thoughts:<ul>
@@ -40,7 +40,7 @@ class Values {
 	 * Galileo).  kai/benjamin, sep'12
 	 *</ul>
 	 */
-	enum Type { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL }
+	enum DemandSegment { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL }
 
 	enum Mode { road, rail }
 	
@@ -71,11 +71,11 @@ class Values {
 		StringBuilder str = new StringBuilder() ;
 		for ( Mode mode : Mode.values() ) {
 			ValuesForAMode valForMode = this.getByMode(mode) ;
-			for ( Type type : Type.values() ) {
-				str.append( "\n" + mode + "; " + type + "\n" ) ;
-				ValuesForAUserType valByDemandSegment = valForMode.getByDemandSegment(type);
-				for ( Entry entry : Entry.values() ) {
-					str.append( entry.toString() + ": " + valByDemandSegment.getByEntry(entry) + ";" ) ;
+			for ( DemandSegment demandSegment : DemandSegment.values() ) {
+				str.append( "\n" + mode + "; " + demandSegment + "\n" ) ;
+				ValuesForAUserType valByDemandSegment = valForMode.getByDemandSegment(demandSegment);
+				for ( Attribute attribute : Attribute.values() ) {
+					str.append( attribute.toString() + ": " + valByDemandSegment.getByEntry(attribute) + ";" ) ;
 				}
 				str.append( "\n" ) ;
 			}
@@ -86,10 +86,10 @@ class Values {
 }
 
 class ValuesForAMode {
-	Map<Type,ValuesForAUserType> valuesByType = new TreeMap<Type,ValuesForAUserType>() ;
+	Map<DemandSegment,ValuesForAUserType> valuesByType = new TreeMap<DemandSegment,ValuesForAUserType>() ;
 	ValuesForAMode createDeepCopy( ) {
 		ValuesForAMode planfall = new ValuesForAMode() ;
-		for ( Type mode : Type.values() ) {
+		for ( DemandSegment mode : DemandSegment.values() ) {
 			ValuesForAUserType old = this.getByDemandSegment(mode) ;
 			ValuesForAUserType tmp2 = old.createDeepCopy() ;
 			planfall.valuesByType.put( mode, tmp2 ) ;
@@ -97,40 +97,40 @@ class ValuesForAMode {
 		return planfall ; 
 	}
 	ValuesForAMode() {
-		for ( Type mode : Type.values() ) {
+		for ( DemandSegment mode : DemandSegment.values() ) {
 			ValuesForAUserType vals = new ValuesForAUserType() ;
 			valuesByType.put( mode, vals ) ;
 		}
 	}
-	ValuesForAUserType getByDemandSegment( Type type ) {
-			return valuesByType.get(type) ;
+	ValuesForAUserType getByDemandSegment( DemandSegment demandSegment ) {
+			return valuesByType.get(demandSegment) ;
 	}
-	void setValuesForType( Type type, ValuesForAUserType values ) {
-		valuesByType.put( type, values ) ;
+	void setValuesForType( DemandSegment demandSegment, ValuesForAUserType values ) {
+		valuesByType.put( demandSegment, values ) ;
 	}
 }
 
 class ValuesForAUserType {
-	Map<Entry,Double> quantities = new TreeMap<Entry,Double>() ;
+	Map<Attribute,Double> quantities = new TreeMap<Attribute,Double>() ;
 	ValuesForAUserType() {
-		for ( Entry entry : Entry.values() ) {
-			this.setByEntry( entry, 0. ) ;
+		for ( Attribute attribute : Attribute.values() ) {
+			this.setByEntry( attribute, 0. ) ;
 		}
 	}
-	double getByEntry( Entry entry ) {
-		return quantities.get(entry) ;
+	double getByEntry( Attribute attribute ) {
+		return quantities.get(attribute) ;
 	}
-	void setByEntry( Entry entry, double dbl ) {
-		quantities.put( entry, dbl ) ;
+	void setByEntry( Attribute attribute, double dbl ) {
+		quantities.put( attribute, dbl ) ;
 	}
-	void incByEntry( Entry entry, double dbl ) {
-		double tmp = quantities.get( entry ) ;
-		quantities.put( entry, tmp + dbl ) ;
+	void incByEntry( Attribute attribute, double dbl ) {
+		double tmp = quantities.get( attribute ) ;
+		quantities.put( attribute, tmp + dbl ) ;
 	}
 	ValuesForAUserType createDeepCopy() {
 		ValuesForAUserType newValues = new ValuesForAUserType() ;
-		for ( Entry entry : Entry.values() ) {
-			newValues.setByEntry( entry, this.getByEntry(entry) ) ;
+		for ( Attribute attribute : Attribute.values() ) {
+			newValues.setByEntry( attribute, this.getByEntry(attribute) ) ;
 		}
 		return newValues ;
 	}

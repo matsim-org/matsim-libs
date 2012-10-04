@@ -2,9 +2,9 @@ package playground.kai.bvwp;
 
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 import playground.kai.bvwp.Values.Mode;
-import playground.kai.bvwp.Values.Type;
+import playground.kai.bvwp.Values.DemandSegment;
 
 /**
  * @author Ihab
@@ -25,20 +25,20 @@ class ScenarioFictiveExamplePVRailSlowerThanCar { // Relationsbezogen_mit_genera
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRoad = roadValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
-				pvValuesRoad.setByEntry( Entry.XX, 3000. ) ; // number of persons
-				pvValuesRoad.setByEntry( Entry.km, 38. ) ;
-				pvValuesRoad.setByEntry( Entry.hrs, 0.3 ) ;
+				ValuesForAUserType pvValuesRoad = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				pvValuesRoad.setByEntry( Attribute.XX, 3000. ) ; // number of persons
+				pvValuesRoad.setByEntry( Attribute.km, 38. ) ;
+				pvValuesRoad.setByEntry( Attribute.hrs, 0.3 ) ;
 			}			
 			
 			// construct values for the rail mode for this OD relation:
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
-				pvValuesRail.setByEntry( Entry.XX, 2000. ) ; // number of persons
-				pvValuesRail.setByEntry( Entry.km, 41. ) ;
-				pvValuesRail.setByEntry( Entry.hrs, 0.43 ) ; 
+				ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				pvValuesRail.setByEntry( Attribute.XX, 2000. ) ; // number of persons
+				pvValuesRail.setByEntry( Attribute.km, 41. ) ;
+				pvValuesRail.setByEntry( Attribute.hrs, 0.43 ) ; 
 				// (yyyyyy: I think this should be _larger_ than for road for a convincing example.  kai, feb'12) 
 			}			
 			
@@ -63,12 +63,12 @@ class ScenarioFictiveExamplePVRailSlowerThanCar { // Relationsbezogen_mit_genera
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.hrs, -0.1 ) ;
+			railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry( Attribute.hrs, -0.1 ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.PV_NON_COMMERCIAL).incByEntry(Entry.XX, -delta ) ;
+			railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry( Attribute.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -delta ) ;
 		}
 		return planfall;
 	}

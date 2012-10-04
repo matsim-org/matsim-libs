@@ -2,9 +2,9 @@ package playground.kai.bvwp;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 import playground.kai.bvwp.Values.Mode;
-import playground.kai.bvwp.Values.Type;
+import playground.kai.bvwp.Values.DemandSegment;
 
 
 /**
@@ -33,12 +33,12 @@ abstract class UtilityChanges {
 				ValuesForAMode econValuesByMode = economicValues.getByMode(mode) ;
 				ValuesForAMode quantitiesNullfallByMode = nullfallForODRelation.getByMode(mode) ;
 				ValuesForAMode quantitiesPlanfallByMode = planfallForODRelation.getByMode(mode) ;
-				for ( Type type : Type.values() ) { // for all types (e.g. PV or GV)
-					ValuesForAUserType econValues = econValuesByMode.getByDemandSegment(type) ;
-					ValuesForAUserType quantitiesNullfall = quantitiesNullfallByMode.getByDemandSegment(type) ;
-					ValuesForAUserType quantitiesPlanfall = quantitiesPlanfallByMode.getByDemandSegment(type) ;
-					final double amountNullfall = quantitiesNullfall.getByEntry(Entry.XX);
-					final double amountPlanfall = quantitiesPlanfall.getByEntry(Entry.XX);
+				for ( DemandSegment demandSegment : DemandSegment.values() ) { // for all types (e.g. PV or GV)
+					ValuesForAUserType econValues = econValuesByMode.getByDemandSegment(demandSegment) ;
+					ValuesForAUserType quantitiesNullfall = quantitiesNullfallByMode.getByDemandSegment(demandSegment) ;
+					ValuesForAUserType quantitiesPlanfall = quantitiesPlanfallByMode.getByDemandSegment(demandSegment) ;
+					final double amountNullfall = quantitiesNullfall.getByEntry(Attribute.XX);
+					final double amountPlanfall = quantitiesPlanfall.getByEntry(Attribute.XX);
 
 					if ( amountPlanfall!=0. || amountNullfall!=0. ) {
 						// (suppress output if this (relation,mode,demand_segment) is never used)
@@ -53,7 +53,7 @@ abstract class UtilityChanges {
 							double amountAltnutzer = amountNullfall ;
 							
 							System.out.printf("%17s; %17s; %17s; verbleibender Verkehr: %17.1f Personen/Tonnen\n", 
-									id, mode, type, amountAltnutzer );
+									id, mode, demandSegment, amountAltnutzer );
 
 							utils = computeAndPrintValuesForAltnutzer(utils,
 									econValues, quantitiesNullfall,
@@ -71,7 +71,7 @@ abstract class UtilityChanges {
 
 						System.out.printf("%17s; %17s; %17s; " +
 						"wechselnder Verkehr: %17.1f Personen/Tonnen\n", 
-						id, mode, type, deltaAmounts ) ;
+						id, mode, demandSegment, deltaAmounts ) ;
 						System.out.printf( "%17s || %17s | %17s || %17s | %17s || %17s | %17s || %17s | %17s ||\n",
 								"Attribut",
 								"Attribut Nullfall", "... mal Menge",
@@ -79,13 +79,13 @@ abstract class UtilityChanges {
 								"Attribut Diff", "... mal Menge",
 								"Nutzen Diff", "... mal Menge") ;
 						
-						for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
-							if ( entry != Entry.XX && entry != Entry.priceUser ) {
-								final double attributeValuePlanfall = quantitiesPlanfall.getByEntry(entry);
-								final double attributeValueNullfall = quantitiesNullfall.getByEntry(entry);
+						for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
+							if ( attribute != Attribute.XX && attribute != Attribute.priceUser ) {
+								final double attributeValuePlanfall = quantitiesPlanfall.getByEntry(attribute);
+								final double attributeValueNullfall = quantitiesNullfall.getByEntry(attribute);
 
-								UtlChangesData utlChangesPerItem = utlChangePerEntry(entry, deltaAmounts, 
-										attributeValueNullfall, attributeValuePlanfall, econValues.getByEntry(entry));
+								UtlChangesData utlChangesPerItem = utlChangePerEntry(attribute, deltaAmounts, 
+										attributeValueNullfall, attributeValuePlanfall, econValues.getByEntry(attribute));
 								final double utlChange = utlChangesPerItem.utl * Math.abs(deltaAmounts);
 								utils += utlChange ;
 								
@@ -93,7 +93,7 @@ abstract class UtilityChanges {
 								if ( deltaAmounts > 0 ) {
 									// Wir sind aufnehmend!
 
-									System.out.printf(fmtString,entry,
+									System.out.printf(fmtString,attribute,
 											attributeValueNullfall, 0., 
 											attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 											attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
@@ -102,7 +102,7 @@ abstract class UtilityChanges {
 
 								} else {
 									// wir sind abgebend
-									System.out.printf(fmtString, entry,
+									System.out.printf(fmtString, attribute,
 											attributeValueNullfall, attributeValueNullfall * deltaAmounts,
 											attributeValuePlanfall, 0., 
 											attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
@@ -127,16 +127,16 @@ abstract class UtilityChanges {
 					}
 					// compute user gains according to RoH: improvement * <x>
 					final double averageOfXX = (amountPlanfall + amountNullfall)/2. ;
-					for ( Entry entry : Entry.values() ) {
-						if ( entry!=Entry.XX && entry!=Entry.costOfProduction ) {
-							final double improvementOfAttribute = quantitiesPlanfall.getByEntry(entry) - quantitiesNullfall.getByEntry(entry);
-							utilsUserFromRoH += improvementOfAttribute * averageOfXX * econValues.getByEntry(entry);
+					for ( Attribute attribute : Attribute.values() ) {
+						if ( attribute!=Attribute.XX && attribute!=Attribute.costOfProduction ) {
+							final double improvementOfAttribute = quantitiesPlanfall.getByEntry(attribute) - quantitiesNullfall.getByEntry(attribute);
+							utilsUserFromRoH += improvementOfAttribute * averageOfXX * econValues.getByEntry(attribute);
 						}
 					}
-					final double revenueNullfall = quantitiesNullfall.getByEntry(Entry.priceUser) * amountNullfall ;
-					final double revenuePlanfall = quantitiesPlanfall.getByEntry(Entry.priceUser) * amountPlanfall ;
-					final double operatorCostNullfall = quantitiesNullfall.getByEntry(Entry.costOfProduction) * amountNullfall ;
-					final double operatorCostPlanfall = quantitiesPlanfall.getByEntry(Entry.costOfProduction) * amountPlanfall ;
+					final double revenueNullfall = quantitiesNullfall.getByEntry(Attribute.priceUser) * amountNullfall ;
+					final double revenuePlanfall = quantitiesPlanfall.getByEntry(Attribute.priceUser) * amountPlanfall ;
+					final double operatorCostNullfall = quantitiesNullfall.getByEntry(Attribute.costOfProduction) * amountNullfall ;
+					final double operatorCostPlanfall = quantitiesPlanfall.getByEntry(Attribute.costOfProduction) * amountPlanfall ;
 					operatorProfit +=  -(revenueNullfall - operatorCostNullfall) + (revenuePlanfall - operatorCostPlanfall) ;
 				}
 			}
@@ -161,20 +161,20 @@ abstract class UtilityChanges {
 				"Attribut Diff", "... mal Menge",
 				"Nutzen Diff", "... mal Menge") ;
 
-		for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
-			if ( entry != Entry.XX && entry != Entry.priceUser ) {
+		for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
+			if ( attribute != Attribute.XX && attribute != Attribute.priceUser ) {
 				// yyyy not so great: if policy measure = price change, then RoH and resource consumption are
 				// different here.  kai/benjamin, sep'12
 				
-				double deltaQuantities = quantitiesPlanfall.getByEntry(entry)-quantitiesNullfall.getByEntry(entry) ;
-				final double utlChangePerItem = deltaQuantities * econValues.getByEntry(entry);
+				double deltaQuantities = quantitiesPlanfall.getByEntry(attribute)-quantitiesNullfall.getByEntry(attribute) ;
+				final double utlChangePerItem = deltaQuantities * econValues.getByEntry(attribute);
 				final double utlChange = utlChangePerItem * amountAltnutzer;
 				System.out.printf(fmtString,
-						entry,
-						quantitiesNullfall.getByEntry(entry), 
-						quantitiesNullfall.getByEntry(entry) * amountAltnutzer,
-						quantitiesPlanfall.getByEntry(entry), 
-						quantitiesPlanfall.getByEntry(entry) * amountAltnutzer,
+						attribute,
+						quantitiesNullfall.getByEntry(attribute), 
+						quantitiesNullfall.getByEntry(attribute) * amountAltnutzer,
+						quantitiesPlanfall.getByEntry(attribute), 
+						quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
 						deltaQuantities , deltaQuantities * amountAltnutzer ,
 						utlChangePerItem , 
 						utlChange
@@ -185,7 +185,7 @@ abstract class UtilityChanges {
 		}
 		return utils;
 	}
-	abstract UtlChangesData utlChangePerEntry(Entry entry, double deltaAmount, 
+	abstract UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, 
 			double quantityNullfall, double quantityPlanfall, double econVal);
 	abstract double computeImplicitUtility(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
 			ValuesForAUserType quantitiesPlanfall) ;

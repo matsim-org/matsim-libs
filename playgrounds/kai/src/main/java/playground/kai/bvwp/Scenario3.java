@@ -1,9 +1,9 @@
 package playground.kai.bvwp;
 
 import org.matsim.core.basic.v01.IdImpl;
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 import playground.kai.bvwp.Values.Mode;
-import playground.kai.bvwp.Values.Type;
+import playground.kai.bvwp.Values.DemandSegment;
 
 /**
  * @author Ihab
@@ -24,9 +24,9 @@ class Scenario3 { // Relationsbezogen_mit_generalisierten_Kosten_GV
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// freight traffic:
-				ValuesForAUserType gvValues = roadValues.getByDemandSegment(Type.GV) ;
-				gvValues.setByEntry( Entry.XX, 2000. ) ; // tons
-				gvValues.setByEntry( Entry.km, 41. ) ;
+				ValuesForAUserType gvValues = roadValues.getByDemandSegment(DemandSegment.GV) ;
+				gvValues.setByEntry( Attribute.XX, 2000. ) ; // tons
+				gvValues.setByEntry( Attribute.km, 41. ) ;
 			}				
 			
 			// rail values are just a copy of the road values:
@@ -49,12 +49,12 @@ class Scenario3 { // Relationsbezogen_mit_generalisierten_Kosten_GV
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByDemandSegment(Type.GV).incByEntry( Entry.km, -1. ) ;
+			railValues.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.km, -1. ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			railValues.getByDemandSegment(Type.GV).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.GV).incByEntry(Entry.XX, -delta ) ;
+			railValues.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).incByEntry(Attribute.XX, -delta ) ;
 		}
 		return planfall;
 	}

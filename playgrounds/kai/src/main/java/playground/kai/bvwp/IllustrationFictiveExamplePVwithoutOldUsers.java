@@ -2,9 +2,9 @@ package playground.kai.bvwp;
 
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 import playground.kai.bvwp.Values.Mode;
-import playground.kai.bvwp.Values.Type;
+import playground.kai.bvwp.Values.DemandSegment;
 
 
 public class IllustrationFictiveExamplePVwithoutOldUsers {
@@ -26,8 +26,8 @@ public class IllustrationFictiveExamplePVwithoutOldUsers {
 		ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 		{
 			// passenger traffic:
-			ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(Type.PV_NON_COMMERCIAL) ;
-			pvValuesRail.setByEntry( Entry.XX, 0. ) ; // number of persons
+			ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+			pvValuesRail.setByEntry( Attribute.XX, 0. ) ; // number of persons
 		}			
 
 

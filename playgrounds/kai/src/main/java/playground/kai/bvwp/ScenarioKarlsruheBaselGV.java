@@ -2,9 +2,9 @@ package playground.kai.bvwp;
 
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 import playground.kai.bvwp.Values.Mode;
-import playground.kai.bvwp.Values.Type;
+import playground.kai.bvwp.Values.DemandSegment;
 
 class ScenarioKarlsruheBaselGV {
 
@@ -21,23 +21,23 @@ class ScenarioKarlsruheBaselGV {
 			{
 				ValuesForAMode valuesForAMode = nullfallForOD.getByMode(Mode.road) ;
 				{
-					ValuesForAUserType valuesForModeAndDemandSegment = valuesForAMode.getByDemandSegment(Type.GV) ;
-					valuesForModeAndDemandSegment.setByEntry( Entry.XX, 2.6e8 ) ; // number of tons.  Irrelevant dummy value.
-					valuesForModeAndDemandSegment.setByEntry( Entry.km, 200. ) ;
-					valuesForModeAndDemandSegment.setByEntry( Entry.hrs, 3. ) ;
-					valuesForModeAndDemandSegment.setByEntry( Entry.priceUser, 200.*0.1 ) ;
-					valuesForModeAndDemandSegment.setByEntry( Entry.costOfProduction, 200.*0.1 ) ;
+					ValuesForAUserType valuesForModeAndDemandSegment = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
+					valuesForModeAndDemandSegment.setByEntry( Attribute.XX, 2.6e8 ) ; // number of tons.  Irrelevant dummy value.
+					valuesForModeAndDemandSegment.setByEntry( Attribute.km, 200. ) ;
+					valuesForModeAndDemandSegment.setByEntry( Attribute.hrs, 3. ) ;
+					valuesForModeAndDemandSegment.setByEntry( Attribute.priceUser, 200.*0.1 ) ;
+					valuesForModeAndDemandSegment.setByEntry( Attribute.costOfProduction, 200.*0.1 ) ;
 				}
 			}
 			{
 				ValuesForAMode valuesForAMode = nullfallForOD.getByMode(Mode.rail) ;
 				{
-					ValuesForAUserType valuesForModeAndDemandSegment = valuesForAMode.getByDemandSegment(Type.GV) ;
-					valuesForModeAndDemandSegment.setByEntry( Entry.XX, 2.6e7 ) ; // number of tons
-					valuesForModeAndDemandSegment.setByEntry( Entry.km, 200. ) ;
-					valuesForModeAndDemandSegment.setByEntry( Entry.hrs, 10. ) ; 
-					valuesForModeAndDemandSegment.setByEntry( Entry.priceUser, 200.*0.1 ) ;
-					valuesForModeAndDemandSegment.setByEntry( Entry.costOfProduction, 200.*0.1 ) ;
+					ValuesForAUserType valuesForModeAndDemandSegment = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
+					valuesForModeAndDemandSegment.setByEntry( Attribute.XX, 2.6e7 ) ; // number of tons
+					valuesForModeAndDemandSegment.setByEntry( Attribute.km, 200. ) ;
+					valuesForModeAndDemandSegment.setByEntry( Attribute.hrs, 10. ) ; 
+					valuesForModeAndDemandSegment.setByEntry( Attribute.priceUser, 200.*0.1 ) ;
+					valuesForModeAndDemandSegment.setByEntry( Attribute.costOfProduction, 200.*0.1 ) ;
 				}
 			}
 			
@@ -58,12 +58,12 @@ class ScenarioKarlsruheBaselGV {
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode valuesForAMode = planfallForOD.getByMode( Mode.rail ) ;
-			valuesForAMode.getByDemandSegment(Type.GV).incByEntry( Entry.hrs, -6. ) ;
+			valuesForAMode.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.hrs, -6. ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 0. ;
-			valuesForAMode.getByDemandSegment(Type.GV).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl(relation)).getByMode(Mode.road).getByDemandSegment(Type.GV).incByEntry(Entry.XX, -delta ) ;
+			valuesForAMode.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl(relation)).getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).incByEntry(Attribute.XX, -delta ) ;
 		}
 		return planfall;
 	}

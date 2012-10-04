@@ -23,7 +23,7 @@
  */
 package playground.kai.bvwp;
 
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 
 
 
@@ -35,12 +35,12 @@ import playground.kai.bvwp.Values.Entry;
 	
 		
 		@Override
-		UtlChangesData utlChangePerEntry(Entry entry,
+		UtlChangesData utlChangePerEntry(Attribute attribute,
 				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		
-		if ( entry.equals(Entry.priceUser)) {
+		if ( attribute.equals(Attribute.priceUser)) {
 			utlChanges.utl = 0. ;
 		} else {
 			if ( deltaAmount > 0 ) {
@@ -59,11 +59,11 @@ import playground.kai.bvwp.Values.Entry;
 			ValuesForAUserType quantitiesNullfall,
 			ValuesForAUserType quantitiesPlanfall) {
 		double sum = 0. ;
-		for ( Entry entry : Entry.values() ) {
-			if ( entry != Entry.XX && entry != Entry.costOfProduction ) {
-				final double quantityPlanfall = quantitiesPlanfall.getByEntry(entry);
-				final double quantityNullfall = quantitiesNullfall.getByEntry(entry);
-				final double margUtl = econValues.getByEntry(entry) ;
+		for ( Attribute attribute : Attribute.values() ) {
+			if ( attribute != Attribute.XX && attribute != Attribute.costOfProduction ) {
+				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
+				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
+				final double margUtl = econValues.getByEntry(attribute) ;
 				
 				sum += - margUtl * (quantityPlanfall+quantityNullfall)/2. ;
 			}

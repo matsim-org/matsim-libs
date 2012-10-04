@@ -2,9 +2,9 @@ package playground.kai.bvwp;
 
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 import playground.kai.bvwp.Values.Mode;
-import playground.kai.bvwp.Values.Type;
+import playground.kai.bvwp.Values.DemandSegment;
 
 /**
  * @author Ihab
@@ -25,22 +25,22 @@ class ScenarioFictiveExampleSep2012GV { // Relationsbezogen_mit_generalisierten_
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType valuesRoad = roadValues.getByDemandSegment(Type.GV) ;
-				valuesRoad.setByEntry( Entry.XX, 3000. ) ; // number of persons
-				valuesRoad.setByEntry( Entry.km, 38. ) ;
-				valuesRoad.setByEntry( Entry.hrs, 0.3 ) ;
+				ValuesForAUserType valuesRoad = roadValues.getByDemandSegment(DemandSegment.GV) ;
+				valuesRoad.setByEntry( Attribute.XX, 3000. ) ; // number of persons
+				valuesRoad.setByEntry( Attribute.km, 38. ) ;
+				valuesRoad.setByEntry( Attribute.hrs, 0.3 ) ;
 			}			
 			
 			// construct values for the rail mode for this OD relation:
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType valuesRail = railValues.getByDemandSegment(Type.GV) ;
-				valuesRail.setByEntry( Entry.XX, 2000. ) ; // number of persons
-				valuesRail.setByEntry( Entry.km, 41. ) ;
-				valuesRail.setByEntry( Entry.hrs, 0.43 ) ; 
-				valuesRail.setByEntry( Entry.priceUser, 41.*0.1 ) ;
-				valuesRail.setByEntry( Entry.costOfProduction, 41.*0.1 ) ;
+				ValuesForAUserType valuesRail = railValues.getByDemandSegment(DemandSegment.GV) ;
+				valuesRail.setByEntry( Attribute.XX, 2000. ) ; // number of persons
+				valuesRail.setByEntry( Attribute.km, 41. ) ;
+				valuesRail.setByEntry( Attribute.hrs, 0.43 ) ; 
+				valuesRail.setByEntry( Attribute.priceUser, 41.*0.1 ) ;
+				valuesRail.setByEntry( Attribute.costOfProduction, 41.*0.1 ) ;
 			}			
 			
 //			
@@ -64,12 +64,12 @@ class ScenarioFictiveExampleSep2012GV { // Relationsbezogen_mit_generalisierten_
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByDemandSegment(Type.GV).incByEntry( Entry.hrs, -0.1 ) ;
+			railValues.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.hrs, -0.1 ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			railValues.getByDemandSegment(Type.GV).incByEntry( Entry.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(Type.GV).incByEntry(Entry.XX, -delta ) ;
+			railValues.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).incByEntry(Attribute.XX, -delta ) ;
 		}
 		return planfall;
 	}

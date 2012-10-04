@@ -23,7 +23,7 @@
  */
 package playground.kai.bvwp;
 
-import playground.kai.bvwp.Values.Entry;
+import playground.kai.bvwp.Values.Attribute;
 
 
 
@@ -35,12 +35,12 @@ class UtilityChangesBVWP2010 extends UtilityChanges {
 
 
 	@Override
-	UtlChangesData utlChangePerEntry(Entry entry,
+	UtlChangesData utlChangePerEntry(Attribute attribute,
 			double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 
-		if ( entry.equals(Entry.hrs) ) {
+		if ( attribute.equals(Attribute.hrs) ) {
 			if ( deltaAmount > 0 ) {
 				// wir sind aufnehmend; es gilt die RoH
 				utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
