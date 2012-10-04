@@ -99,6 +99,8 @@ public class LangeStreckeSzenario {
 		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.ABORT) ;
+		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
+		// to me (kn).
 
 		this.scenario = ScenarioUtils.createScenario(config);
 	}
