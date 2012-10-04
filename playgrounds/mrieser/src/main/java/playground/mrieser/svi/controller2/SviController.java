@@ -33,9 +33,9 @@ public class SviController {
 		Controler controler = new Controler(args);
 
 		// only for demo
-		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+//		controler.setOverwriteFiles(true);
+//		controler.setCreateGraphs(false);
+//		controler.setDumpDataAtEnd(false);
 		// ------------
 
 		DynusTUtils.integrate(controler);
