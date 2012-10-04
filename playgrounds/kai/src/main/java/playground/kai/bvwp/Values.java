@@ -66,6 +66,23 @@ class Values {
 	void setValuesForMode( Mode mode, ValuesForAMode values ) {
 		valuesByMode.put( mode, values ) ;
 	}
+	@Override
+	public String toString() {
+		StringBuilder str = new StringBuilder() ;
+		for ( Mode mode : Mode.values() ) {
+			ValuesForAMode valForMode = this.getByMode(mode) ;
+			for ( Type type : Type.values() ) {
+				str.append( "\n" + mode + "; " + type + "\n" ) ;
+				ValuesForAUserType valByDemandSegment = valForMode.getByDemandSegment(type);
+				for ( Entry entry : Entry.values() ) {
+					str.append( entry.toString() + ": " + valByDemandSegment.getByEntry(entry) + ";" ) ;
+				}
+				str.append( "\n" ) ;
+			}
+			
+		}
+		return str.toString() ;
+	}
 }
 
 class ValuesForAMode {

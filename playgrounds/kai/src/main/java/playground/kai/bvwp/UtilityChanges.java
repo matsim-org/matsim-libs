@@ -14,7 +14,8 @@ import playground.kai.bvwp.Values.Type;
  */
 abstract class UtilityChanges {
 	UtilityChanges() {
-		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
+		System.out.println("\n==================================================================================================================================");
+		System.out.println("Setting utility computation method to " + this.getClass() ) ;
 	}
 	
 	final void utilityChange( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall ) {

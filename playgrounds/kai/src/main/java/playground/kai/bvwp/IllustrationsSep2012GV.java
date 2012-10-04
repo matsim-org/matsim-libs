@@ -17,6 +17,8 @@ public class IllustrationsSep2012GV {
 
 		// create the policy case:
 		planfall = ScenarioFictiveExampleSep2012GV.createPlanfall1(nullfall);
+		
+		System.out.print(economicValues.toString()) ;
 
 		runBVWP2003();
 //		runBVWP2010();
@@ -25,32 +27,21 @@ public class IllustrationsSep2012GV {
 	}
 
 	private static void runRoH() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung entspricht exakt ``rechnungen>javaRechnungen>RoH_PV.xlsx'' (EconomicValues, Scenario und Methodik) ");
-
 		UtilityChanges utilityChanges = new UtilityChangesRuleOfHalf();
 		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;		
 	}
 
 	private static void runBVWP2003() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung entspricht exakt ``rechnungen>javaRechnungen>BVWP2003.xlsx'' (EconomicValues, Scenario und Methodik) ");
-
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2003();
 		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
 	}
 
 	private static void runBVWP2010() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung versucht die Methodik der Bedarfsplanüberprüfung Schiene 2010 zu nachzuvollziehen. ");
-		
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2010();
 		utilityChanges.utilityChange(economicValues, nullfall, planfall);
 	}
 
 	private static void runBVWP2015() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung ergibt das gleiche Ergebnis wie RoH.");
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2015();
 		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
 	}
