@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
@@ -118,8 +119,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		this.simulation.getEventsManager().processEvent(
-				this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(
+		this.simulation.getEventsManager().processEvent(new AgentArrivalEvent(
 						now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
 		if(!this.currentLinkId.equals(this.cachedDestinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
