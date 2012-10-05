@@ -645,7 +645,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						int gridOffsetX = (int)(u-b.x);
 						int gridOffsetY = (int)(v-b.y);
 //						int gridOffsetY = (int)(v-b.y-zoomStep);
-						
+						g.setColor(ToolConfig.COLOR_GRID);						
 						g.drawRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
 						
 						Cell cell = this.cellTree.get(minX+gridSize*i,minY+gridSize*j);
