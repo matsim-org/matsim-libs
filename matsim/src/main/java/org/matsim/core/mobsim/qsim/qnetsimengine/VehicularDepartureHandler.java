@@ -88,7 +88,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 	}
 
 	/**
-	 * Design thoughs:<ul>
+	 * Design thoughts:<ul>
 	 * <li> yyyyyy It is not completely clear what happens when the vehicle is used by someone else. kai, nov'11
 	 * <li> Seems to me that a parked vehicle is teleported. kai, nov'11
 	 * <li> yyyyyy Seems to me that a non-parked vehicle will end up with two references to it, with race conditions???? kai, nov11
