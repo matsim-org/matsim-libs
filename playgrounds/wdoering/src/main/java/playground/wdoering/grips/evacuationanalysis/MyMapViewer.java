@@ -102,6 +102,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	private EventData data;
 
+	private boolean drawNetworkBoundingBox = false;
+
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
 		super();
@@ -597,11 +599,14 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				}
 				
 				
-				g.drawLine(pixMinX-b.x, pixMinY-b.y, pixMaxX-b.x, pixMinY-b.y);
-				g.drawLine(pixMinX-b.x, pixMaxY-b.y, pixMaxX-b.x, pixMaxY-b.y);
 				
-				g.drawLine(pixMinX-b.x, pixMinY-b.y, pixMinX-b.x, pixMaxY-b.y);
-				g.drawLine(pixMaxX-b.x, pixMinY-b.y, pixMaxX-b.x, pixMaxY-b.y);
+				if (drawNetworkBoundingBox )
+				{
+					g.drawLine(pixMinX-b.x, pixMinY-b.y, pixMaxX-b.x, pixMinY-b.y);
+					g.drawLine(pixMinX-b.x, pixMaxY-b.y, pixMaxX-b.x, pixMaxY-b.y);
+					g.drawLine(pixMinX-b.x, pixMinY-b.y, pixMinX-b.x, pixMaxY-b.y);
+					g.drawLine(pixMaxX-b.x, pixMinY-b.y, pixMaxX-b.x, pixMaxY-b.y);
+				}
 				
 				g.setColor(Color.BLACK);
 				g2D.setStroke(new BasicStroke(1F));

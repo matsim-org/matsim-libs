@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -41,12 +42,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -122,6 +126,10 @@ public class EvacuationAnalysis implements ActionListener{
 	private AbstractGraphPanel graphPanel;
 	private JPanel controlPanel;
 	private JButton calcButton;
+	private ArrayList<File> eventFiles;
+	private JComboBox iterationsList;
+	private JTextField gridSizeField;
+	private JComboBox modeList;
 	
 
 	/**
@@ -261,13 +269,42 @@ public class EvacuationAnalysis implements ActionListener{
 		this.calcButton.setPreferredSize(new Dimension(100,30));
 		this.calcButton.setSize(new Dimension(100,30));
 		
+		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		this.iterationsList = new JComboBox();
+		this.iterationsList.addActionListener(this);
+		this.iterationsList.setPreferredSize(new Dimension(220,24));
+		iterationSelectionPanel.add(new JLabel(" event file: ", SwingConstants.RIGHT));
+		iterationSelectionPanel.add(this.iterationsList);
+		
+		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		this.gridSizeField = new JTextField(""+cellSize);
+		this.gridSizeField.addActionListener(this);
+		this.gridSizeField.setPreferredSize(new Dimension(220,24));
+		gridSizeSelectionPanel.add(new JLabel(" grid size: ", SwingConstants.RIGHT));
+		gridSizeSelectionPanel.add(this.gridSizeField);
+		
+		JPanel modeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		modeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+		this.modeList = new JComboBox(new String[]{"evacuation time", "clearing time", "link utilization"});
+		this.modeList.addActionListener(this);
+		this.modeList.setPreferredSize(new Dimension(220,24));
+		modeSelectionPanel.add(new JLabel(" mode: ", SwingConstants.RIGHT));
+		modeSelectionPanel.add(this.modeList);
+		
+		JPanel calculateButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); 
+		calculateButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 7));
+		calculateButtonPanel.add(new JLabel(""));
+		calculateButtonPanel.add(calcButton);
+		calculateButtonPanel.setPreferredSize(new Dimension(220,40));
+		
 		this.controlPanel.add(new JLabel(""));
 		this.controlPanel.add(new JLabel(""));
-		this.controlPanel.add(new JLabel(""));
-		this.controlPanel.add(new JLabel(""));
-		this.controlPanel.add(new JLabel(" gridsize: 150m"));
-		this.controlPanel.add(new JLabel(" mode: evacuation time"));
-		this.controlPanel.add(calcButton);
+		this.controlPanel.add(iterationSelectionPanel);
+		this.controlPanel.add(gridSizeSelectionPanel);
+		this.controlPanel.add(modeSelectionPanel);
+		this.controlPanel.add(calculateButtonPanel);
 		panel.add(this.openBtn);
 		panel.add(this.saveButton);
 		
@@ -359,20 +396,30 @@ public class EvacuationAnalysis implements ActionListener{
 				
 				//get events file, check if there is at least the very first iteration 
 				String itersOutputDir = this.sc.getConfig().getModule("controler").getValue("outputDirectory");
-				int firstIteration = Integer.valueOf(this.sc.getConfig().getModule("controler").getValue("firstIteration"));
-				int lastIteration = Integer.valueOf(this.sc.getConfig().getModule("controler").getValue("lastIteration"));
 				
-				//convention for events file?
-				currentEventFile = itersOutputDir + "/ITERS/it.100/100.events.xml.gz";
+//				int firstIteration = Integer.valueOf(this.sc.getConfig().getModule("controler").getValue("firstIteration"));
+//				int lastIteration = Integer.valueOf(this.sc.getConfig().getModule("controler").getValue("lastIteration"));
 				
-				//read events if the current 
-				if (exists(currentEventFile))
-					readEvents(currentEventFile);
-				else
+				//get all available events 
+				eventFiles = getAvailableEventFiles(itersOutputDir);
+				
+				//check if empty
+				if (eventFiles.isEmpty())
 				{
-					JOptionPane.showMessageDialog(this.frame, "Could not open the specified iteration.", "Iteration unavailable", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this.frame, "Could not find any event files", "Event files unavailable", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				
+				iterationsList.removeAllItems();
+				for (File eventFile : eventFiles)
+				{
+					String shortenedFileName = eventFile.getName();
+					iterationsList.addItem(shortenedFileName);
+				}
+				
+				//just read the first file in the list
+				currentEventFile = eventFiles.get(0).toString();
+				readEvents(currentEventFile);
 				
 				//read the shape file
 				readShapeFile(shp);
@@ -409,6 +456,32 @@ public class EvacuationAnalysis implements ActionListener{
 
 	}
 	
+	private ArrayList<File> getAvailableEventFiles(String dirString)
+	{
+		File dir = new File(dirString);
+		Stack<File> directoriesToScan = new Stack<File>();
+		ArrayList<File> files = new ArrayList<File>();
+		
+		directoriesToScan.add(dir);
+		
+		while (!directoriesToScan.isEmpty())
+		{
+			File currentDir = directoriesToScan.pop();
+			File[] filesToCheck = currentDir.listFiles(new EventFileFilter());
+			
+			for (File currentFile : filesToCheck)
+			{
+				if (currentFile.isDirectory())
+					directoriesToScan.push(currentFile);
+				else
+					files.add(currentFile);
+			}
+			
+		}
+		
+		return files;
+	}
+
 	/**
 	 * Initialize map viewer.
 	 */
@@ -580,7 +653,21 @@ public class EvacuationAnalysis implements ActionListener{
 		}
 
 	}
-
+	
+	class EventFileFilter implements java.io.FileFilter
+	{
+		
+		@Override
+		public boolean accept(File f) {
+			if (f.isDirectory()) {
+				return true;
+			}
+			if (f.getName().endsWith(".events.xml.gz")){
+				return true;
+			}
+			return false;
+		}
+	}
 
 	class TypeMinute implements KeyListener 
 	{
