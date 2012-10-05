@@ -46,6 +46,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -79,7 +80,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 //	private ShapeFileReader shapeFileReader;
 	private double lastEventsTime = 0;
-	private double lastTime;
+	private double lastTime = Double.NaN;
 	private double 	step = 0.066745068285285;
 	
 	private ArrayList<Double> times;
@@ -92,14 +93,14 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private double timeSum;
 	private double maxCellTimeSum;
 	private int arrivals;
-	private List<Double> arrivalTimes;
+	private List<Tuple<Double, Integer>> arrivalTimes;
 
 	public EventHandler(Scenario sc, double cellSize, Thread readerThread)
 	{
 		this.readerThread = readerThread;
 		this.network = sc.getNetwork();
 		this.cellSize = cellSize;
-		this.arrivalTimes = new ArrayList<Double>();
+		this.arrivalTimes = new ArrayList<Tuple<Double, Integer>>();
 		init();
 	}
 	
@@ -218,11 +219,16 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		//update max timesum of all cells
 		this.maxCellTimeSum = Math.max(cell.getTimeSum(), this.maxCellTimeSum);
 		
-		
 		cell.incrementCount();
 		this.timeSum += time;
 		this.arrivals++;
-		this.arrivalTimes.add(event.getTime());
+		
+		if (lastTime!=event.getTime())
+		{
+			this.arrivalTimes.add(new Tuple(event.getTime(), this.arrivals));
+			lastTime = event.getTime();
+		}
+		
 	}
 
 	@Override
@@ -257,8 +263,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	{
 		return new EventData(cellTree, cellSize, timeSum, maxCellTimeSum, arrivals, arrivalTimes);
 	}
-
-
 
 
 }

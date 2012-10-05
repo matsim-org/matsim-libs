@@ -65,51 +65,30 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 		System.out.println("time sum:" + data.getTimeSum());
 		System.out.println("arrivals:" + data.getArrivals());
 		
-		//TODO: es gibt nun auch:
-		List<Double> arrivalTimes = data.getArrivalTimes(); //eine liste mit den ankunftzeiten
+		List<Tuple<Double,Integer>> arrivalTimes = data.getArrivalTimes(); //eine liste mit den ankunftzeiten
 		int arrivalTimeCount = arrivalTimes.size(); //anzahl der elemente in der liste
 		
-		double lastTime = -1;
-		int pos = -1;	
-		int uniqueArrivalTimes = 0;
-		
-		ArrayList<Integer> arrivals = new ArrayList<Integer>();
-		int currentArrivals = 0;
-		
-		for (Double currentArrivalTime : arrivalTimes)
-		{
-			currentArrivals++;
-			
-			if (currentArrivalTime != lastTime)
-			{
-				lastTime = currentArrivalTime;
-				uniqueArrivalTimes++;
-				arrivals.add(currentArrivals);
-			}
-		}
-		
-		double [] xs = new double[uniqueArrivalTimes];
+		double [] xs = new double[arrivalTimeCount];
 		double [] ys = new double[arrivalTimeCount];
 		
 		XYLineChart chart = new XYLineChart("Evakuierungszeit", "x", "y");
-		
-		for (int i = 0; i < uniqueArrivalTimes; i++)
+		for (int i = 0; i < arrivalTimeCount; i++)
 		{
-			xs[i] = i;
-			ys[i] = arrivals.get(i);
+			xs[i] = arrivalTimes.get(i).getFirst();
+			ys[i] = arrivalTimes.get(i).getSecond();
 		}		
 		
 		chart.addSeries("123", xs, ys);
 		
 		JFreeChart freeChart = chart.getChart();
-		HistogramDataset histogram = new HistogramDataset();
+//		HistogramDataset histogram = new HistogramDataset();
+//		
+//		histogram.setType(HistogramType.SCALE_AREA_TO_1);
+//        histogram.addSeries("Histogram",ys,uniqueArrivalTimes);
+//		JFreeChart histogramChart = ChartFactory.createHistogram("123", "time", "arrivals", histogram, PlotOrientation.VERTICAL, false, false, false);
+//		ChartPanel chartPanel = new ChartPanel(histogramChart);
+		ChartPanel chartPanel = new ChartPanel(freeChart);
 		
-		histogram.setType(HistogramType.SCALE_AREA_TO_1);
-        histogram.addSeries("Histogram",ys,uniqueArrivalTimes);
-		JFreeChart histogramChart = ChartFactory.createHistogram("123", "time", "arrivals", histogram, PlotOrientation.VERTICAL, false, false, false);
-		ChartPanel chartPanel = new ChartPanel(histogramChart);
-		
-//		ChartPanel chartPanel = new ChartPanel(freeChart);
 		chartPanel.setPreferredSize(new Dimension(this.width, this.height));
 		
 		this.add(chartPanel);
@@ -118,4 +97,25 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 		
 	}
 
+}
+
+class TimeArrivals
+{
+	private double time;
+	private int arrivals;
+	
+	public TimeArrivals(double time, int arrivals)
+	{
+		this.time = time;
+		this.arrivals = arrivals;
+	}
+	
+	public double getTime() {
+		return time;
+	}
+	
+	public int getArrivals() {
+		return arrivals;
+	}
+	
 }

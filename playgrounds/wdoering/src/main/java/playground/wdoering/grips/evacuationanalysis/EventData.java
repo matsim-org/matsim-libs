@@ -24,6 +24,7 @@ package playground.wdoering.grips.evacuationanalysis;
 import java.util.List;
 
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 
 public class EventData {
 	
@@ -32,9 +33,9 @@ public class EventData {
 	private double maxCellTimeSum;
 	private int arrivals;
 	private QuadTree<Cell> cellTree;
-	private List<Double> arrivalTimes;
+	private List<Tuple<Double, Integer>> arrivalTimes;
 	
-	public EventData(QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Double> arrivalTimes) {
+	public EventData(QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Tuple<Double,Integer>> arrivalTimes) {
 		this.cellTree = cellTree;
 		this.cellSize = cellSize;
 		this.timeSum = timeSum;
@@ -79,13 +80,12 @@ public class EventData {
 		this.maxCellTimeSum = maxCellTimeSum;
 	}
 	
-	public List<Double> getArrivalTimes() {
+	public List<Tuple<Double, Integer>> getArrivalTimes() {
 		return arrivalTimes;
 	}
 	
-	public void setArrivalTimes(List<Double> arrivalTimes) {
+	public void setArrivalTimes(List<Tuple<Double, Integer>> arrivalTimes) {
 		this.arrivalTimes = arrivalTimes;
 	}
-	
 
 }
