@@ -8,7 +8,7 @@ Release "not yet released" (version 0.5.0)
 Changes:
 
 - Configuration Changes:
-  -
+  - Changed default population file format to v5 (r20926)
   
 - New Features:
   - VehicleType now has size in passenger car equivalents (pce), and QSim honors
@@ -21,10 +21,14 @@ Changes:
   - Preprocessing for AStarLandmarks router is now faster thanks to multithreading (r18734)
 
 - BugFix:
+  - Fixed a bug during preprocessing for routing algorithms, removing the (wrong) warning "All incident nodes of X are dead ends" in the logfile. (mrieser, r20547)
   - 
 
-- Chagnes for developers:
-  -  
+- Changes for developers:
+  - Class hierarchy of events is now much simpler (r21016)
+  - Improved router integration for newer types of routers (e.g. transit router) (r21034 and other commits)
+  - config modules are no longer serializable (r21205)
+  - 
 
 
 
