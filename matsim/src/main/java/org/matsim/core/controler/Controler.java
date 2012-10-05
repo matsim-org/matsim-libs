@@ -132,11 +132,11 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.PlansCalcTransitRoute;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
@@ -180,7 +180,6 @@ public class Controler extends AbstractController {
 	protected final EventsManager events;
 
 	private final String configFileName;
-	private final String dtdFileName;
 
 	protected Network network = null;
 	protected Population population = null;
@@ -248,24 +247,23 @@ public class Controler extends AbstractController {
 	 *            the configuration file.
 	 */
 	public Controler(final String[] args) {
-		this(args.length > 0 ? args[0] : null, args.length > 1 ? args[1] : null, null, null);
+		this(args.length > 0 ? args[0] : null, null, null);
 	}
 
 	public Controler(final String configFileName) {
-		this(configFileName, null, null, null);
+		this(configFileName, null, null);
 	}
 
 	public Controler(final Config config) {
-		this(null, null, config, null);
+		this(null, config, null);
 	}
 
 	public Controler(final Scenario scenario) {
-		this(null, null, null, scenario);
+		this(null, null, scenario);
 	}
 
-	private Controler(final String configFileName, final String dtdFileName, final Config config, final Scenario scenario) {
+	private Controler(final String configFileName, final Config config, final Scenario scenario) {
 		this.configFileName = configFileName;
-		this.dtdFileName = dtdFileName;
 		if (scenario != null) {
 			this.scenarioLoaded = true;
 			this.scenarioData = (ScenarioImpl) scenario;
