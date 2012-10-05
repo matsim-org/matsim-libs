@@ -291,8 +291,14 @@ public class NmbmSurveyParser {
 						}
 						Activity act = population.getFactory().createActivityFromCoord(activityTypeOrigin, coordFrom);
 						act.setEndTime(startTime);
+						
+						/*TODO Remove validation after debugging. */
+						if(act.getStartTime() >= 0 && act.getEndTime() - act.getStartTime() < 0){
+							LOG.error("Negative duration: " + enu + "; " + hhn + "; " + hhPerson + "; " + legNumber);
+						}
+						
 						plan.addActivity(act);
-						person.addPlan(plan);
+						person.addPlan(plan);					
 					} else{
 						/* Check that the person's trip being read is the same as the current person. */
 						if(!person.getId().equals(personId)){
@@ -301,6 +307,11 @@ public class NmbmSurveyParser {
 						/* Update the previous activity's duration. */
 						Activity a = plan.getLastActivity();
 						a.setEndTime(startTime);
+
+						/*TODO Remove validation after debugging. */
+						if(a.getEndTime() - a.getStartTime() < 0){
+							LOG.error("Negative duration: " + enu + "; " + hhn + "; " + hhPerson + "; " + legNumber);
+						}
 					}
 					/* Add the leg and destination activity. */
 					Leg leg = population.getFactory().createLeg(mode);
@@ -369,6 +380,8 @@ public class NmbmSurveyParser {
 			}
 		}
 		LOG.info("  new population size: " + population.getPersons().size() + " (" + cleaned + " removed)");
+		
+		
 	}
 	
 	

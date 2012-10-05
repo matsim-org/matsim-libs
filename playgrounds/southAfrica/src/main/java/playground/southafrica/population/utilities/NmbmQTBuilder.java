@@ -86,7 +86,7 @@ public class NmbmQTBuilder {
 	
 	private final String[] employmentClasses = {"1", "0"};
 	private final String[] ageClasses = {"5", "12", "23", "45", "68","120"};
-	private final String[] incomeClasses = {"800", "3200", "12800", "51200", "500000"};
+	private final String[] incomeClasses = {"800", "3200", "12800", "51200", "5000000"};
 	private final String[] householdSizeClasses = {"2", "10", "30"};//{"1","2","5","15","50"};
 	private List<String[]> qtSpace;
 	private final int ipfYear = 2001;
@@ -338,6 +338,10 @@ public class NmbmQTBuilder {
 					Income income = new IncomeImpl(
 							SouthAfricaInflationCorrector.convert(censusIncome,	ipfYear, populationYear),
 							IncomePeriod.month);
+					if(income.getIncome() < 0){
+						LOG.error("Negative income.");
+					}
+					
 					hh.setIncome(income);
 					
 					/*TODO Living quarter type */
@@ -667,7 +671,7 @@ public class NmbmQTBuilder {
 		case 11:
 			return getRandomRighTailedTriangularIncome(434446, 1737786);
 		case 12:
-			return getRandomRighTailedTriangularIncome(4915200, 1737786);
+			return getRandomRighTailedTriangularIncome(1737786, 4915200);
 		default:
 			break;
 		}
@@ -795,7 +799,8 @@ public class NmbmQTBuilder {
 				}
 			}
 			if(!foundIncomeClass){
-				LOG.error("Could not find an income class for the value " + income);
+				LOG.error("Could not find an income class for the value " + income.getIncome() + ". Using highest value.");
+				i = incomeClasses.length-1;
 			}
 			String incomeCode = incomeClasses[i];
 			return new IdImpl(employment + "_" + ageCode + "_" + incomeCode + "_" + householdSizeCode) ;

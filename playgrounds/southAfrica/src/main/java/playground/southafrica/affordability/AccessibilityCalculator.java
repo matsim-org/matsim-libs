@@ -1,6 +1,7 @@
 package playground.southafrica.affordability;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,6 +35,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
@@ -491,21 +493,82 @@ public class AccessibilityCalculator {
 	/**
 	 * Get the average walking time from the given {@link Person}'s home location 
 	 * (assumed to be the first activity in the selected plan) to the five closest 
-	 * shopping and leisure facilities.
+	 * (euclidean distance) shopping and leisure facilities.
 	 * @param person
 	 * @return walking time (in seconds) (TODO check that it is indeed seconds)
 	 * @see {@link #setupRouterForWalking(PreProcessLandmarks)}
 	 */
 	private double getTravelTimeToShopping(Person person){
-		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		CoordImpl homeCoord = (CoordImpl) ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		
-		Coord healthcareCoord = healthcareQT.get(homeCoord.getX(), homeCoord.getY()).getCoord();
-		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
+		int numberOfClosestShops = 5;
 		
-		Path path = routerWalk.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
+		List<Tuple<ActivityFacility, Double>> closestShops = getClosestShops(homeCoord, shoppingQT, numberOfClosestShops);
+		double sum = 0.0;
+		for(Tuple<ActivityFacility, Double> tuple : closestShops){
+			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(tuple.getFirst().getCoord());
+			Path path = routerWalk.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
+			sum += path.travelTime;
+		}
 		
-		return path.travelTime;		
+		return sum / ((double) closestShops.size());		
+	}
+	
+	
+	private List<Tuple<ActivityFacility, Double>> getClosestShops(Coord c, QuadTree<ActivityFacility> qt, int number){
+		List<Tuple<ActivityFacility, Double>> list = new ArrayList<Tuple<ActivityFacility,Double>>();
+		List<Tuple<ActivityFacility, Double>> tuples = new ArrayList<Tuple<ActivityFacility,Double>>();
+		
+		/* Quickly scan distance in QuadTree to limit the ranking later-on. */ 
+		Collection<ActivityFacility> shopsToRank = null;
+		if(qt.values().size() > number){
+		 /* Start the search radius with the distance to the closest person. */
+			ActivityFacility af = qt.get(c.getX(), c.getY());
+			double radius = ((CoordImpl) c).calcDistance( af.getCoord() );
+			Collection<ActivityFacility> shops = qt.get(c.getX(), c.getY(), radius);
+			while(shops.size() < number){
+				/* Double the radius. If the radius happens to be zero (0), 
+				 * then you stand the chase of running into an infinite loop.
+				 * Hence, add a minimum of 1m to move on. */
+				radius += Math.max(radius, 1.0);
+				shops = qt.get(c.getX(), c.getY(), radius);
+			}
+			shopsToRank = shops;
+		} else{
+			shopsToRank = qt.values();
+		}
+		
+		/* Rank the plans based on distance. */
+		for(ActivityFacility af : shopsToRank){
+			double d = ((CoordImpl)c).calcDistance( af.getCoord() );
+			Tuple<ActivityFacility, Double> thisTuple = new Tuple<ActivityFacility, Double>(af, d);
+			if(tuples.size() == 0){
+				tuples.add(thisTuple);
+			} else{
+				int index = 0;
+				boolean found = false;
+				while(!found && index < tuples.size()){
+					if(d <= tuples.get(index).getSecond()){
+						found = true;
+					} else{
+						index++;
+					}
+				}
+				if(found){
+					tuples.add(index, thisTuple);
+				} else{
+					tuples.add(thisTuple);
+				}
+			}
+		}
+		
+		/* Add the number of plans requested, or the  number of the plans in 
+		 * the QuadTree, whichever is less, to the results, and return. */
+		for(int i = 0; i < Math.min(number, tuples.size()); i++){
+			list.add(tuples.get(i));
+		}
+		return list;
 	}
 
 	
