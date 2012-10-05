@@ -94,9 +94,12 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private double maxCellTimeSum;
 	private int arrivals;
 	private List<Tuple<Double, Integer>> arrivalTimes;
+	
+	private String eventName;
 
-	public EventHandler(Scenario sc, double cellSize, Thread readerThread)
+	public EventHandler(String eventFilename, Scenario sc, double cellSize, Thread readerThread)
 	{
+		this.eventName = eventFilename;
 		this.readerThread = readerThread;
 		this.network = sc.getNetwork();
 		this.cellSize = cellSize;
@@ -261,7 +264,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	public EventData getData()
 	{
-		return new EventData(cellTree, cellSize, timeSum, maxCellTimeSum, arrivals, arrivalTimes);
+		return new EventData(eventName, cellTree, cellSize, timeSum, maxCellTimeSum, arrivals, arrivalTimes);
 	}
 
 

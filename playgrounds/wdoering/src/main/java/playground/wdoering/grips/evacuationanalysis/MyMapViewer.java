@@ -68,6 +68,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 	boolean editMode = false;
 	boolean freezeMode = false;
+	
+	private enum ColoringMode { RYG };
 
 
 	private final MouseListener m [];
@@ -76,6 +78,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private final KeyListener k [];
 
 
+	private ColoringMode coloringMode = ColoringMode.RYG;
 
 
 	private LinkQuadTree links;
@@ -103,6 +106,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private EventData data;
 
 	private boolean drawNetworkBoundingBox = false;
+	
+	private float cellTransparency;
 
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
@@ -134,6 +139,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 		this.evacAnalysis = evacAnalysis;
 		this.gridSize = evacAnalysis.getGridSize();
+		this.cellTransparency = evacAnalysis.getCellTransparency();
 
 		this.ct = new GeotoolsTransformation("EPSG:4326",this.evacAnalysis.getScenario().getConfig().global().getCoordinateSystem());
 		this.ctInverse = new GeotoolsTransformation(this.evacAnalysis.getScenario().getConfig().global().getCoordinateSystem(),"EPSG:4326");
@@ -653,7 +659,29 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						
 
 						if (cell.getCount()>0)
-							g.setColor(new Color(0,127,(int)(255*relTravelTime),100));
+						{
+							if (coloringMode.equals(ColoringMode.RYG))
+							{
+								int red,green,blue;
+								
+								if (relTravelTime>.5)
+								{
+									red = 255;
+									green = (int)(255 - 255*(relTravelTime-.5)*2);
+									blue = 0;
+								}
+								else
+								{
+									red = (int)(255*relTravelTime*2);
+									green = 255;
+									blue = 0;
+									
+								}
+								g.setColor(new Color(red,green,blue,(int)(255*cellTransparency)));
+							}
+							else
+								g.setColor(new Color(0,127,(int)(255*relTravelTime),100));
+						}
 						else
 							g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT);
 						
@@ -702,6 +730,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		this.data = data;
 		this.cellTree = data.getCellTree();
 		this.gridSize = data.getCellSize();
+	}
+
+
+	public void setCellTransparency(float cellTransparency)
+	{
+		this.cellTransparency = cellTransparency;
+		this.repaint();
 	}
 
 }

@@ -28,6 +28,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 public class EventData {
 	
+	private String eventName;	
 	private double cellSize;
 	private double timeSum;
 	private double maxCellTimeSum;
@@ -35,7 +36,8 @@ public class EventData {
 	private QuadTree<Cell> cellTree;
 	private List<Tuple<Double, Integer>> arrivalTimes;
 	
-	public EventData(QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Tuple<Double,Integer>> arrivalTimes) {
+	public EventData(String eventName, QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Tuple<Double,Integer>> arrivalTimes) {
+		this.eventName = eventName;
 		this.cellTree = cellTree;
 		this.cellSize = cellSize;
 		this.timeSum = timeSum;
@@ -86,6 +88,14 @@ public class EventData {
 	
 	public void setArrivalTimes(List<Tuple<Double, Integer>> arrivalTimes) {
 		this.arrivalTimes = arrivalTimes;
+	}
+	
+	public String getEventName() {
+		return eventName;
+	}
+	
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
 	}
 
 }

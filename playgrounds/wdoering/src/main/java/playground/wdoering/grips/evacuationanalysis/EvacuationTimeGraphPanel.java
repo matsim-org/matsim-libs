@@ -39,6 +39,9 @@ import org.matsim.core.utils.collections.Tuple;
 
 public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 	
+	private ChartPanel chartPanel;
+
+
 	//inherited field:
 	//protected EventData data
 	
@@ -48,6 +51,7 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 	{
 		this.setGraphSize(width, height);
 //		this.setBackground(new Color(80,140,220));
+		
 		drawGraph();
 	}
 
@@ -61,6 +65,7 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 		
 		//example usage of data
 		System.out.println("EVACUATION TIME GRAPH");
+		System.out.println("for event " + data.getEventName());
 		System.out.println("cell size:" + data.getCellSize());
 		System.out.println("time sum:" + data.getTimeSum());
 		System.out.println("arrivals:" + data.getArrivals());
@@ -71,14 +76,14 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 		double [] xs = new double[arrivalTimeCount];
 		double [] ys = new double[arrivalTimeCount];
 		
-		XYLineChart chart = new XYLineChart("Evakuierungszeit", "x", "y");
+		XYLineChart chart = new XYLineChart("evacuated persons", "time", "# evacuated persons");
 		for (int i = 0; i < arrivalTimeCount; i++)
 		{
 			xs[i] = arrivalTimes.get(i).getFirst();
 			ys[i] = arrivalTimes.get(i).getSecond();
 		}		
 		
-		chart.addSeries("123", xs, ys);
+		chart.addSeries(data.getEventName(), xs, ys);
 		
 		JFreeChart freeChart = chart.getChart();
 //		HistogramDataset histogram = new HistogramDataset();
@@ -87,35 +92,23 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 //        histogram.addSeries("Histogram",ys,uniqueArrivalTimes);
 //		JFreeChart histogramChart = ChartFactory.createHistogram("123", "time", "arrivals", histogram, PlotOrientation.VERTICAL, false, false, false);
 //		ChartPanel chartPanel = new ChartPanel(histogramChart);
-		ChartPanel chartPanel = new ChartPanel(freeChart);
 		
-		chartPanel.setPreferredSize(new Dimension(this.width, this.height));
-		
-		this.add(chartPanel);
-		this.validate();
-		this.setSize(this.width,this.height);
+		if (chartPanel!=null)
+		{
+			chartPanel.setChart(freeChart);
+			chartPanel.repaint();
+			return;
+		}
+		else
+		{
+			chartPanel = new ChartPanel(freeChart);
+			chartPanel.setPreferredSize(new Dimension(this.width, this.height));
+			
+			this.add(chartPanel);
+			this.validate();
+			this.setSize(this.width,this.height);
+		}
 		
 	}
 
-}
-
-class TimeArrivals
-{
-	private double time;
-	private int arrivals;
-	
-	public TimeArrivals(double time, int arrivals)
-	{
-		this.time = time;
-		this.arrivals = arrivals;
-	}
-	
-	public double getTime() {
-		return time;
-	}
-	
-	public int getArrivals() {
-		return arrivals;
-	}
-	
 }
