@@ -1,5 +1,7 @@
 package playground.southafrica.affordability;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,19 +13,21 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -37,27 +41,43 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.utilities.Header;
 
+/**
+ * Calculating the accessibility of households. Currently (Sep '12) the calculations
+ * are based on the final project work of Jeanette de Hoog.
+ *  
+ * @author jwjoubert
+ */
 public class AccessibilityCalculator {
 	private final static Logger LOG = Logger.getLogger(AccessibilityCalculator.class);
 	
 	private ScenarioImpl sc;
 	private Households hhs;
+	private Network transitNetwork;
+	
 	private QuadTree<ActivityFacility> facilityQT;
 	private QuadTree<ActivityFacility> schoolQT;
 	private QuadTree<ActivityFacility> healthcareQT;
 	private QuadTree<ActivityFacility> shoppingQT;
+	private QuadTree<Coord> busStops;
+	private QuadTree<Coord> railStops;
+	private QuadTree<Coord> taxiStops;
+	
 	private Map<Integer, String> classDescription = new TreeMap<Integer, String>();
 	private AStarEuclidean routerDrive;
 	private AStarEuclidean routerWalk;
@@ -69,7 +89,20 @@ public class AccessibilityCalculator {
 	private static int noEducationCounter = 0;
 
 	/**
-	 * @param args
+	 * Run this class to generate the accessibility scores for households. The
+	 * class requires the following arguments. 
+	 * @param args absolute paths of the following files:
+	 * <ol>
+	 * 		<li> household file;
+	 * 		<li> population (plans) file;
+	 * 		<li> person attributes file;
+	 * 		<li> consolidated facilities file;
+	 * 		<li> network file;
+	 * 		<li> transit schedule;
+	 * 		<li> transit network file. This is necessary since the transit 
+	 * 			 network may have additional links resulting from the 
+	 * 			 <code>GTFS2MATSim</code> contribution;
+	 * 		<li> the output folder.
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(AccessibilityCalculator.class.toString(), args);
@@ -113,7 +146,6 @@ public class AccessibilityCalculator {
 		
 		/* Read facilities */
 		String facilitiesFile = args[3];
-		ActivityFacilities afs = new ActivityFacilitiesImpl();
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
 		fr.readFile(facilitiesFile);
 		LOG.info("Number of facilities: " + sc.getActivityFacilities().getFacilities().size());
@@ -139,13 +171,18 @@ public class AccessibilityCalculator {
 		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
 		mnr.readFile(networkFile);
 		
+		
 		/* Read the transit schedule. */
 		String transitFile = args[5];
 		TransitScheduleReader tsr = new TransitScheduleReader(sc);
 		tsr.readFile(transitFile);
+		Scenario scTransit = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimNetworkReader transitNetworkReader = new MatsimNetworkReader(scTransit);
+		transitNetworkReader.readFile(args[6]);
 		
-		AccessibilityCalculator ac = new AccessibilityCalculator(sc, hhs);
-		ac.testRun();
+		AccessibilityCalculator ac = new AccessibilityCalculator(sc, hhs, scTransit.getNetwork());
+		String outputFolder = args[7];
+		ac.run(outputFolder);
 		
 		/* Report some statistics. */
 		LOG.info("----------------------------------------------------");
@@ -157,9 +194,23 @@ public class AccessibilityCalculator {
 	}
 	
 	
-	public AccessibilityCalculator(Scenario scenario, Households households) {
+	/**
+	 * Constructor to set up accessibility calculator. A number of procedures
+	 * are executed:
+	 * <ol>
+	 * 		<li> {@link QuadTree}s are set up for all facilities, distinguishing
+	 * 			 between school, health care and shopping facilities;
+	 * 		<li> {@link QuadTree}s are set up for all taxi, bus and rail stops.
+	 * 		<li> two routers are created, one for driving and another for 
+	 * 			 walking.
+	 * @param scenario
+	 * @param households
+	 * @param transitNetwork
+	 */
+	public AccessibilityCalculator(Scenario scenario, Households households, Network transitNetwork) {
 		this.sc = (ScenarioImpl) scenario;
 		this.hhs = households;
+		this.transitNetwork = transitNetwork;
 		
 		/* Build QuadTree of facilities. */
 		Map<Id, ActivityFacility> facilities = sc.getActivityFacilities().getFacilities();
@@ -177,6 +228,10 @@ public class AccessibilityCalculator {
 		this.schoolQT = new QuadTree<ActivityFacility>(minX, minY, maxX, maxY);
 		this.healthcareQT = new QuadTree<ActivityFacility>(minX, minY, maxX, maxY);
 		this.shoppingQT = new QuadTree<ActivityFacility>(minX, minY, maxX, maxY);
+		
+		this.busStops = new QuadTree<Coord>(minX, minY, maxX, maxY);
+		this.railStops = new QuadTree<Coord>(minX, minY, maxX, maxY);
+		this.taxiStops = new QuadTree<Coord>(minX, minY, maxX, maxY);
 		
 		for(ActivityFacility af : facilities.values()){
 			this.facilityQT.put(af.getCoord().getX(), af.getCoord().getY(), af);
@@ -218,6 +273,10 @@ public class AccessibilityCalculator {
 		setupRouterForDriving(pp);
 		setupRouterForWalking(pp);
 
+		/* Set up the transit QuadTrees. */
+		setupTransitQuadTrees();
+		
+		
 		/* Validation */
 		numberInClasses = new ArrayList<Integer>();
 		for(int i = 0; i < 6; i++){
@@ -242,7 +301,11 @@ public class AccessibilityCalculator {
 
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				return link.getLength() / (3 / (60 * 60));
+				double travelTime = link.getLength() / (3.0*1000.0 / (60.0 * 60.0));
+				if(Double.isNaN(travelTime)){
+					LOG.warn("NaN travel time.");
+				}
+				return travelTime;
 			}
 		};
 		routerWalk = new AStarEuclidean(sc.getNetwork(), pp, travelTimeWalk);
@@ -259,39 +322,190 @@ public class AccessibilityCalculator {
 
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				return (link.getLength() / link.getFreespeed()) * 1.2;
+				double travelTime = (link.getLength() / link.getFreespeed()) * 1.2;
+				if(Double.isNaN(travelTime)){
+					LOG.warn("NaN travel time.");
+				}
+				return travelTime;
 			}
 		};
 		routerDrive = new AStarEuclidean(sc.getNetwork(), pp, travelTimeDrive);
 	}
 	
 	
-	public void testRun(){
-		LOG.info("Start running...");
-		Counter counter = new Counter("   person # ");
-		for(Person person : this.sc.getPopulation().getPersons().values()){
-			calculateAccessibility((PersonImpl)person);
+	/**
+	 * Setting up the {@link QuadTree}s for transit stops. For bus and rail
+	 * we simply get the {@link TransitStopFacility}s of all lines., and add 
+	 * their {@link Coord}s to the associated {@link QuadTree}. For paratransit,
+	 * i.e. minibus taxis, we use the bus lines, and add all intersections,
+	 * that is {@link Node}s with more than two {@link Link}s connected to it.
+	 * We do ensure (currently, Sep '12) that no paratransit stops are within
+	 * 200m of one another.  
+	 */
+	private void setupTransitQuadTrees(){
+		Map<Id, TransitLine> lines = sc.getTransitSchedule().getTransitLines();
+		LOG.info("Setting up the transit QuadTrees... (" + lines.size() + ")");
+		Counter counter = new Counter("   lines # ");
+		for(TransitLine line : lines.values()){
+			for(TransitRoute route : line.getRoutes().values()){
+				if(route.getTransportMode().equalsIgnoreCase("bus")){
+					for(TransitRouteStop trs : route.getStops()){
+						Coord busStop = trs.getStopFacility().getCoord();
+						Coord albersBusStop = new CoordImpl(busStop.getX(), busStop.getY());
+						busStops.put(
+								albersBusStop.getX(), 
+								albersBusStop.getY(), 
+								albersBusStop);
+					}
+					
+					/* Also need to deal with taxis here. */
+					for(Id linkId : route.getRoute().getLinkIds()){
+						NodeImpl toNode = (NodeImpl) transitNetwork.getLinks().get(linkId).getToNode();
+						if(toNode.getOutLinks().size() > 1 || toNode.getInLinks().size() > 1){
+							/* Only consider intersections. */
+							CoordImpl albersIntersection = (CoordImpl) new CoordImpl(toNode.getCoord().getX(), toNode.getCoord().getY());
+							CoordImpl closestTaxiStop = (CoordImpl) taxiStops.get(albersIntersection.getX(), albersIntersection.getY());
+							if(closestTaxiStop == null){
+								taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
+							} else{
+								double distanceToClosestTaxiStop = albersIntersection.calcDistance(closestTaxiStop); 
+//								LOG.info("Distance: " + distanceToClosestTaxiStop);
+								if( distanceToClosestTaxiStop > 200){
+									taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
+								}
+							}
+						}
+					}
+				} else if(route.getTransportMode().equalsIgnoreCase("rail")){
+					for(TransitRouteStop trs : route.getStops()){
+						Coord railStop = trs.getStopFacility().getCoord();
+						Coord albersRailStop = new CoordImpl(railStop.getX(), railStop.getY());
+						railStops.put(
+								albersRailStop.getX(), 
+								albersRailStop.getY(), 
+								albersRailStop);
+					}
+				
+				} else {
+					LOG.warn("Could not find mode " + route.getTransportMode());
+				}
+			}
 			counter.incCounter();
 		}
 		counter.printCounter();
+		LOG.info("Done setting up transit QuadTrees.");
+		LOG.info("    Bus: " + busStops.size());
+		LOG.info("   Taxi: " + taxiStops.size());
+		LOG.info("   Rail: " + railStops.size());
+	}
+	
+	
+	/**
+	 * Method executing the overall accessibility calculation. It includes
+	 * the writing of the final output.
+	 * @param outputFolder
+	 */
+	public void run(String outputFolder){
+		LOG.info("Start running...");
+		Counter counter = new Counter("   person # ");
+		
+		Map<Id, Tuple<Double, Integer>> householdScoreMap = new TreeMap<Id, Tuple<Double,Integer>>();
+
+		String bwName = outputFolder + "accessibility.txt";
+		BufferedWriter bw = IOUtils.getBufferedWriter(bwName);
+		try{
+			for(Person person : this.sc.getPopulation().getPersons().values()){
+				/* Calculate the individual's accessibility score. */
+				double accessibility = calculateAccessibility((PersonImpl)person);
+				
+				/* Add the individual's score to that of the household. */
+				Id householdId = (Id) person.getCustomAttributes().get("householdId");
+				if(!householdScoreMap.containsKey(householdId)){
+					householdScoreMap.put(householdId, new Tuple<Double, Integer>(accessibility, 1));
+				} else{
+					double oldScore = householdScoreMap.get(householdId).getFirst();
+					int oldCount = householdScoreMap.get(householdId).getSecond();
+					householdScoreMap.put(householdId, new Tuple<Double, Integer>(oldScore + accessibility, oldCount + 1));
+				}
+				
+				bw.write(String.valueOf(accessibility));
+				bw.newLine();
+				counter.incCounter();
+			}
+			counter.printCounter();
+		} catch (IOException e) {
+			Gbl.errorMsg("Could not write to BufferedWriter " + bwName);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				Gbl.errorMsg("Could not close BufferedWriter " + bwName);
+			}
+		}
 		
 		LOG.info("----------------------------------------------------");
 		LOG.info("Number of persons in different classes:");
 		for(int i = 0; i < numberInClasses.size(); i++){
 			LOG.info("   " + i + ": " + numberInClasses.get(i));
 		}
+		
+		LOG.info("----------------------------------------------------");
+		LOG.info("Number of households observed: " + householdScoreMap.size());
+		bwName = outputFolder + "householdAccessibility.txt";
+		bw = IOUtils.getBufferedWriter(bwName);
+		try{
+			bw.write("Id,Long,Lat,AccessScore");
+			bw.newLine();
+			
+			/* Calculate the household average. */
+			for(Id householdId : householdScoreMap.keySet()){
+				Tuple<Double, Integer> tuple = householdScoreMap.get(householdId);
+				double householdAverage = tuple.getFirst() / ((double) tuple.getSecond());
+				
+				/* Find an individual in the household to get their home coordinate. */
+				List<Id> members = hhs.getHouseholds().get(householdId).getMemberIds();
+				Person person = null;
+				int index = 0;
+				while(person == null && index < members.size()){
+					person = sc.getPopulation().getPersons().get(members.get(index));
+					index++;
+				}
+				if(person != null){
+					Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();					
+					bw.write(String.format("%s,%.0f,%.0f,%.2f\n", householdId, homeCoord.getX(), homeCoord.getY(), householdAverage));
+				} else{
+					LOG.warn("Couldn't find any members for household " + householdId + " - household is ignored.");
+				}
+			}
+		} catch (IOException e) {
+			Gbl.errorMsg("Could not write to BufferedWriter " + bwName);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				Gbl.errorMsg("Could not close BufferedWriter " + bwName);
+			}
+		}
 	}	
 	
 	
+	/**
+	 * 
+	 * @param person
+	 * @return
+	 */
 	public double calculateAccessibility(PersonImpl person){
 	
-		getMobilityScore(person);
-		return 0.0;
+		double mobility = getMobilityScore(person);
+		double transportOptions = getTransportOptionsScore(person);
+		double chosenMode = getChosenModeScore(person);
+		double availableFacilities = getAvailableFacilityScore(person);
+		
+		return 10*mobility + 10*transportOptions + 10*chosenMode + 10*availableFacilities;
 	}
 	
 	
 	private double getMobilityScore(PersonImpl person){
-		double score = 0;
 		int accessibilityClass = getAccessibilityClass(person);
 		
 		/*TODO Remove after validation */
@@ -299,42 +513,275 @@ public class AccessibilityCalculator {
 		numberInClasses.set(accessibilityClass, oldValue+1);
 		
 		CoordImpl homeCoord = (CoordImpl) ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+
+		/*--- Mobility ---*/
 		double tt_work;
 		double tt_education;
 		double tt_healthcare;
 		double tt_shopping;
+		double score_mobility = 0;
 		
 		switch (accessibilityClass) {
 		case 1:
-			tt_education = getTravelTimeToEducation(person);
-			tt_healthcare = getTravelTimeToHealthcare(person);
-			tt_shopping = getTravelTimeToShopping(person);
+			/* Education */
+			double s1 = getEducationScore( getTravelTimeToEducation(person) );
+			s1 += getHealthcareScore( getTravelTimeToHealthcare(person) );
+			s1 += getShoppingScore( getTravelTimeToShopping(person) );
+			score_mobility = s1/3;
 			break;
 		case 2:
-			tt_work = getTravelTimeToWork(person);
-			tt_education = getTravelTimeToEducation(person);
-			tt_healthcare = getTravelTimeToHealthcare(person);
-			
+			double s2 = getWorkScore( getTravelTimeToWork(person) );
+			s2 += getEducationScore( getTravelTimeToEducation(person) );
+			s2 += getHealthcareScore( getTravelTimeToHealthcare(person) );
+			s2 += getShoppingScore( getTravelTimeToShopping(person) );
+			score_mobility = s2/4;
 			break;
 		case 3:
-			tt_work = getTravelTimeToWork(person);
-			tt_healthcare = getTravelTimeToHealthcare(person);
-			
+			double s3 = getWorkScore( getTravelTimeToWork(person) );
+			s3 += getHealthcareScore( getTravelTimeToHealthcare(person) );
+			s3 += getShoppingScore( getTravelTimeToShopping(person) );
+			score_mobility = s3/3;
 			break;
 		case 4:
-			tt_education = getTravelTimeToEducation(person);
-			tt_healthcare = getTravelTimeToHealthcare(person);
-			
+			double s4 = getEducationScore( getTravelTimeToEducation(person) );
+			s4 += getHealthcareScore( getTravelTimeToHealthcare(person) );
+			s4 += getShoppingScore( getTravelTimeToShopping(person) );
+			score_mobility = s4/3;
 			break;
 		case 5:
-			tt_healthcare = getTravelTimeToHealthcare(person);
-			
+			double s5 = getHealthcareScore( getTravelTimeToHealthcare(person) );
+			s5 += getShoppingScore( getTravelTimeToShopping(person) );
+			score_mobility = s5/2;
 			break;			
 		default:
 			break;
 		}
-		
+		return score_mobility;
+	}
+	
+	private double getEducationScore(double traveltime){
+		double score = 0.0;
+		if(traveltime <= 30*60){
+			score = 2.0;
+		} else if(traveltime <= 60*60){
+			score = 1.0;
+		} 
 		return score;
+	}
+
+	private double getWorkScore(double traveltime){
+		double score = 0.0;
+		if(traveltime <= 30*60){
+			score = 2.0;
+		} else if(traveltime <= 90*60){
+			score = 1.0;
+		} 
+		return score;
+	}
+
+	private double getHealthcareScore(double traveltime){
+		double score = 0.0;
+		if(traveltime <= 30*60){
+			score = 2.0;
+		} else if(traveltime <= 60*60){
+			score = 1.0;
+		} 
+		return score;
+	}
+
+	private double getShoppingScore(double traveltime){
+		double score = 0.0;
+		if(traveltime <= 15*60){
+			score = 2.0;
+		} else if(traveltime <= 30*60){
+			score = 1.0;
+		} 
+		return score;
+	}
+	
+	private double getTransportOptionsScore(Person person){
+		
+		/*TODO Remove after debugging. */
+//		LOG.info("                              Person " + person.getId());
+		if(person.getId().toString().equalsIgnoreCase("1000928")){
+//			LOG.info("... found looping person...");
+		}
+		
+
+		Coord homeCoord = ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+
+		double score = 0.0;
+		
+		/* Car. Assuming that if you have a car, you'll use it. Therefore,
+		 * check if any leg mode contains "car". */
+		score += travelByCar(person.getSelectedPlan()) ? 5 : 0;
+		
+		/* Check for short distance walking to destination. */
+		score += hasClosePrimaryActivity(person.getSelectedPlan()) ? 4 : 0;
+		
+		/* check for transit access. */
+		score += hasTransitAccess(homeCoord, taxiStops) ? 3 : 0;
+		score += hasTransitAccess(homeCoord, busStops) ? 2 : 0;
+		score += hasTransitAccess(homeCoord, railStops) ? 1 : 0;
+		
+		if(score <= 2){
+			return 0.0;
+		} else if (score <= 9){
+			return 1.0;
+		} else{
+			return 2;
+		}
+	}
+
+
+	private double getChosenModeScore(Person person){
+		double time = 0.0;
+		for(int i = 0; i < person.getSelectedPlan().getPlanElements().size()-1; i++){
+			PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
+			if(pe instanceof ActivityImpl){
+				ActivityImpl act = (ActivityImpl) pe;
+				Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(i+1);
+				String chosenMode = leg.getMode();
+				if(chosenMode.equalsIgnoreCase("car")){
+					/* Keep the zero time. */
+				} else if(chosenMode.equalsIgnoreCase("walk")){
+					/* Use the entire journey's travel time. */
+					time += leg.getTravelTime();
+				} else if(chosenMode.equalsIgnoreCase("pt1")){ /*TODO Change if "pt1" becomes "bus" */
+					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
+					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(busStops.get(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
+					time += path.travelTime;
+				} else if(chosenMode.equalsIgnoreCase("pt2")){ /*TODO Change if "pt2" becomes "rail" */
+					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
+					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(railStops.get(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
+					time += path.travelTime;
+				}else if(chosenMode.equalsIgnoreCase("taxi")){
+					Node fromNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(act.getCoord());
+					Node toNode = ((NetworkImpl)sc.getNetwork()).getNearestNode(taxiStops.get(fromNode.getCoord().getX(), fromNode.getCoord().getY()));
+					Path path = routerWalk.calcLeastCostPath(fromNode, toNode, act.getEndTime(), null, null);
+					time += path.travelTime;
+				}
+			}
+		}
+		double avgTime = time / ( (person.getSelectedPlan().getPlanElements().size()-1) / 2);
+		if(avgTime <= 15*60){
+			return 2.0;
+		} else if(avgTime <= 30){
+			return 1.0;
+		} else{
+			return 0.0;
+		}
+	}
+	
+	
+	private double getAvailableFacilityScore(Person person){
+		Coord homeCoord = ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		
+		Collection<ActivityFacility> facilities = facilityQT.get(homeCoord.getX(), homeCoord.getY(), 1000);
+		if(facilities.size() <= 5){
+			return 0.0;
+		} else if(facilities.size() <= 10){
+			return 1.0;
+		} else{
+			return 2.0;
+		}
+	}
+	
+	private boolean travelByCar(Plan plan){
+		for(PlanElement pe : plan.getPlanElements()){
+			if(pe instanceof Leg){
+				Leg leg = (Leg) pe;
+				if(leg.getMode().equalsIgnoreCase("car") || leg.getMode().equalsIgnoreCase("ride")){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	private boolean hasClosePrimaryActivity(Plan plan){
+		Coord homeCoord = ((ActivityImpl)plan.getPlanElements().get(0)).getCoord();
+		Node homeNode = ((NetworkImpl) sc.getNetwork()).getNearestNode(homeCoord);
+		
+		ActivityImpl primary = null;
+		ActivityImpl secondary = null;
+		int index = 0;
+		while(primary == null && index < plan.getPlanElements().size()){
+			PlanElement pe = plan.getPlanElements().get(index);
+			if(pe instanceof ActivityImpl){
+				ActivityImpl act = (ActivityImpl) pe;
+				if(act.getType().contains("w") || act.getType().contains("e1")){
+					primary = act;
+				} else if(act.getType().contains("s") ){
+					/* Implication... keep track of FIRST secondary activity. */
+					if(secondary == null){
+						secondary = act;	
+					} 
+					index++;
+				} else {
+					index++;
+				}
+			} else{
+				index++;
+			}
+		}
+		
+		if(primary != null){
+			Node primaryNode = ((NetworkImpl) sc.getNetwork()).getNearestNode(primary.getCoord());
+			Path path = routerWalk.calcLeastCostPath(homeNode, primaryNode, 25200, null, null);
+			
+			double travelTime = path.travelTime;
+			
+			/*TODO Remove after debugging. */
+			if(Double.isNaN(travelTime)){
+				LOG.warn("Travel time is NaN.");
+			}
+			
+			if(travelTime <= 20*60){
+				return true;
+			}
+		} else if (secondary != null){
+			/* See if there is a shopping activity close by. */
+			Node secondaryNode = ((NetworkImpl) sc.getNetwork()).getNearestNode(secondary.getCoord());
+			Path path = routerWalk.calcLeastCostPath(homeNode, secondaryNode, 25200, null, null);
+			
+			double travelTime = path.travelTime;
+			
+			/*TODO Remove after debugging. */
+			if(Double.isNaN(travelTime)){
+				LOG.warn("Travel time is NaN.");
+			}
+			
+			if(travelTime <= 20*60){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	private boolean hasTransitAccess(Coord coord, QuadTree<Coord> qt){
+		Node homeNode = ((NetworkImpl) transitNetwork).getNearestNode(coord);
+		Node transitNode = ((NetworkImpl) transitNetwork).getNearestNode(qt.get(coord.getX(), coord.getY()));
+		Path path = routerWalk.calcLeastCostPath(homeNode, transitNode, 25200, null, null);
+		if(path == null){
+			LOG.error("No route found!");
+		}
+		double travelTime = path.travelTime;
+		
+		/*TODO Remove after debugging. */
+		if(Double.isNaN(travelTime)){
+			LOG.warn("Travel time is NaN.");
+		}
+		
+		if(travelTime <= 20*60){
+			return true;
+		}
+		return false;
 	}
 	
 	
@@ -361,9 +808,14 @@ public class AccessibilityCalculator {
 		/* Or using the A*-Euclidean router. */
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(coord);
 		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(qt.get(coord.getX(), coord.getY()));
-		Path path = routerDrive.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
+		Path path = routerDrive.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 		time = path.travelTime;		
-		
+
+		/*TODO Remove after debugging. */
+		if(Double.isNaN(time)){
+			LOG.warn("Travel time is NaN.");
+		}
+
 		return time;
 	}
 	
@@ -391,10 +843,16 @@ public class AccessibilityCalculator {
 			Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(coord);
 			if(toNode != null){
-				Path path = routerDrive.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
+				Path path = routerDrive.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 				time = path.travelTime;		
 			}
 		}
+		
+		/*TODO Remove after debugging. */
+		if(Double.isNaN(time)){
+			LOG.warn("Travel time is NaN.");
+		}
+
 		
 		return time;
 	}
@@ -417,7 +875,7 @@ public class AccessibilityCalculator {
 	 * @see {@link #setupRouterForDriving(PreProcessLandmarks)}
 	 */
 	private double getTravelTimeToEducation(Person person){
-		double time = 0.0;
+		Double time = 0.0;
 		String educationType = null;
 		
 		CoordImpl homeCoord = (CoordImpl) ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
@@ -456,14 +914,20 @@ public class AccessibilityCalculator {
 
 		Path path = null;
 		if(educationType.equalsIgnoreCase("e1")){
-			path = routerWalk.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
+			path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 		} else {
-			path = routerDrive.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
+			path = routerDrive.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 		}
 
 		//			if(toNode != null){
 		time = path.travelTime;		
 		//			}
+		
+		/*TODO Remove after debugging. */
+		if(Double.isNaN(time)){
+			LOG.warn("Travel time is NaN.");
+		}
+//		LOG.info("Time: " + time);
 		
 		return time;
 	}
@@ -484,7 +948,7 @@ public class AccessibilityCalculator {
 		Coord healthcareCoord = healthcareQT.get(homeCoord.getX(), homeCoord.getY()).getCoord();
 		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
 		
-		Path path = routerWalk.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
+		Path path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 		
 		return path.travelTime;		
 	}
@@ -493,82 +957,21 @@ public class AccessibilityCalculator {
 	/**
 	 * Get the average walking time from the given {@link Person}'s home location 
 	 * (assumed to be the first activity in the selected plan) to the five closest 
-	 * (euclidean distance) shopping and leisure facilities.
+	 * shopping and leisure facilities.
 	 * @param person
 	 * @return walking time (in seconds) (TODO check that it is indeed seconds)
 	 * @see {@link #setupRouterForWalking(PreProcessLandmarks)}
 	 */
 	private double getTravelTimeToShopping(Person person){
-		CoordImpl homeCoord = (CoordImpl) ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		
-		int numberOfClosestShops = 5;
+		Coord healthcareCoord = healthcareQT.get(homeCoord.getX(), homeCoord.getY()).getCoord();
+		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
 		
-		List<Tuple<ActivityFacility, Double>> closestShops = getClosestShops(homeCoord, shoppingQT, numberOfClosestShops);
-		double sum = 0.0;
-		for(Tuple<ActivityFacility, Double> tuple : closestShops){
-			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(tuple.getFirst().getCoord());
-			Path path = routerWalk.calcLeastCostPath(fromNode, toNode, Time.UNDEFINED_TIME, null, null);
-			sum += path.travelTime;
-		}
+		Path path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
 		
-		return sum / ((double) closestShops.size());		
-	}
-	
-	
-	private List<Tuple<ActivityFacility, Double>> getClosestShops(Coord c, QuadTree<ActivityFacility> qt, int number){
-		List<Tuple<ActivityFacility, Double>> list = new ArrayList<Tuple<ActivityFacility,Double>>();
-		List<Tuple<ActivityFacility, Double>> tuples = new ArrayList<Tuple<ActivityFacility,Double>>();
-		
-		/* Quickly scan distance in QuadTree to limit the ranking later-on. */ 
-		Collection<ActivityFacility> shopsToRank = null;
-		if(qt.values().size() > number){
-		 /* Start the search radius with the distance to the closest person. */
-			ActivityFacility af = qt.get(c.getX(), c.getY());
-			double radius = ((CoordImpl) c).calcDistance( af.getCoord() );
-			Collection<ActivityFacility> shops = qt.get(c.getX(), c.getY(), radius);
-			while(shops.size() < number){
-				/* Double the radius. If the radius happens to be zero (0), 
-				 * then you stand the chase of running into an infinite loop.
-				 * Hence, add a minimum of 1m to move on. */
-				radius += Math.max(radius, 1.0);
-				shops = qt.get(c.getX(), c.getY(), radius);
-			}
-			shopsToRank = shops;
-		} else{
-			shopsToRank = qt.values();
-		}
-		
-		/* Rank the plans based on distance. */
-		for(ActivityFacility af : shopsToRank){
-			double d = ((CoordImpl)c).calcDistance( af.getCoord() );
-			Tuple<ActivityFacility, Double> thisTuple = new Tuple<ActivityFacility, Double>(af, d);
-			if(tuples.size() == 0){
-				tuples.add(thisTuple);
-			} else{
-				int index = 0;
-				boolean found = false;
-				while(!found && index < tuples.size()){
-					if(d <= tuples.get(index).getSecond()){
-						found = true;
-					} else{
-						index++;
-					}
-				}
-				if(found){
-					tuples.add(index, thisTuple);
-				} else{
-					tuples.add(thisTuple);
-				}
-			}
-		}
-		
-		/* Add the number of plans requested, or the  number of the plans in 
-		 * the QuadTree, whichever is less, to the results, and return. */
-		for(int i = 0; i < Math.min(number, tuples.size()); i++){
-			list.add(tuples.get(i));
-		}
-		return list;
+		return path.travelTime;		
 	}
 
 	

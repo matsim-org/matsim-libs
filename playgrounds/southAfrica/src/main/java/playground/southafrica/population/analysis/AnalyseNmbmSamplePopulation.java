@@ -26,22 +26,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.southafrica.utilities.Header;
 
@@ -61,90 +61,9 @@ public class AnalyseNmbmSamplePopulation {
 		pr.parse(args[1]);
 		
 		/* Determine statistics for activity types. */
-		extractActivityCoordinates(outputFolder, sc);
-		extractActivityDurations(outputFolder, sc);
+		Map<String, List<Coord>> typeCoords = new TreeMap<String, List<Coord>>();
+		List<Tuple<String, String>> stats = new ArrayList<Tuple<String,String>>();
 		
-		
-		Header.printFooter();
-	}
-
-	
-	private static void extractActivityDurations(String outputFolder, Scenario sc) {
-		List<Tuple<String, Double>> durations = new ArrayList<Tuple<String,Double>>();
-		for(Person person : sc.getPopulation().getPersons().values()){
-			Plan selectedPlan = person.getSelectedPlan();
-			for(int i = 0; i < selectedPlan.getPlanElements().size(); i++){
-				PlanElement pe = selectedPlan.getPlanElements().get(i);
-				if(pe instanceof Activity){
-					double duration = 0.0;
-					ActivityImpl act = (ActivityImpl) pe;
-					if(i == 0){
-						/* It is the first (home) activity. */
-						if(!act.getType().equalsIgnoreCase("h")){
-							LOG.warn("Chain starting with activity other than `home': " 
-									+ act.getType() + " (" + person.getId() + ")");
-						}
-						duration = act.getEndTime();
-						durations.add(new Tuple<String, Double>("h1", duration));
-						if(duration < 0){
-							LOG.warn("First!! Negative duration: " + duration);
-						}
-					} else if(i < selectedPlan.getPlanElements().size() - 1){
-						/* It can be any activity. */
-						if(act.getType().equalsIgnoreCase("h")){
-							durations.add(new Tuple<String, Double>("h3", act.getEndTime() - act.getStartTime()));
-						} else {
-							duration = act.getEndTime() - act.getStartTime();
-							durations.add(new Tuple<String, Double>(act.getType(), duration));
-						}
-						if(duration < 0){
-							LOG.warn("Mid!! Negative duration: " + duration);
-						}
-					} else {
-						/* It is the final (home) activity. */
-						if(!act.getType().equalsIgnoreCase("h")){
-							LOG.warn("Chain ending with activity other than `home': " 
-									+ act.getType() + " (" + person.getId() + ")");
-						}
-						duration = 24*60*60 - act.getStartTime();
-						durations.add(new Tuple<String, Double>("h2", duration));
-						if(duration < 0){
-							LOG.warn("LAST!! Negative duration: " + duration);
-						}
-					}
-				}
-			}
-		}
-		
-		/* Write the output. */
-		String filename = outputFolder + "activityDurations.csv";
-		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-		try {
-			bw.write("Type,Duration");
-			bw.newLine();
-			for(Tuple<String, Double> tuple : durations){
-				bw.write(tuple.getFirst());
-				/* In minutes. */
-				bw.write(String.format(",%.0f\n", tuple.getSecond() / 60)); 
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Could not read from BufferedWriter "
-					+ filename);
-		} finally {
-			try {
-				bw.close();
-			} catch (IOException e) {
-				throw new RuntimeException("Could not close BufferedWriter "
-						+ filename);
-			}
-		}
-	}
-	
-	
-	
-	
-	private static void extractActivityCoordinates(String outputFolder, Scenario sc) {
-		Map<String, List<Coord>> typeCoords = new HashMap<String, List<Coord>>();
 		for(Id person : sc.getPopulation().getPersons().keySet()){
 			Plan plan = sc.getPopulation().getPersons().get(person).getSelectedPlan();
 			for(PlanElement pe : plan.getPlanElements()){
@@ -154,31 +73,74 @@ public class AnalyseNmbmSamplePopulation {
 						typeCoords.put(act.getType(), new ArrayList<Coord>());
 					}
 					typeCoords.get(act.getType()).add(act.getCoord());
+
+					/* Duration. */
+					String stat = "";
+					double startTime = act.getStartTime();
+					double endTime = act.getEndTime();
+					double duration = endTime - startTime;
+					if(duration != Double.POSITIVE_INFINITY && duration != Double.NEGATIVE_INFINITY){
+						/* TODO How do we handle negative duration? Assuming this 
+						 * happens when an activity runs over midnight. For 
+						 * now, simply add one day. */
+						if(duration < 0){
+//							LOG.info("Check negativity");
+//							duration += 24*60*60;
+							duration = startTime - endTime;
+							stat = Time.writeTime(endTime) + "," + Time.writeTime(startTime) + "," + Time.writeTime(duration);							
+						} else{
+							stat = Time.writeTime(startTime) + "," + Time.writeTime(endTime) + "," + Time.writeTime(duration);
+						}
+						stats.add(new Tuple<String, String>(act.getType(), stat));
+					}
 				}
 			}
 		}
 		LOG.info("----------------------------------------------------------------------");
 		LOG.info("Activity types:");
 		for(String type : typeCoords.keySet()){
-			BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "coords_" + type + ".txt"); 
+			BufferedWriter bwCoord = IOUtils.getBufferedWriter(outputFolder + "coords_" + type + ".txt"); 
 			LOG.info("   " + type + ": " + typeCoords.get(type).size());
 			try{
-				bw.write("Long,Lat");
-				bw.newLine();
+				bwCoord.write("Long,Lat");
+				bwCoord.newLine();
 				for(Coord c : typeCoords.get(type)){
-					bw.write(String.format("%.0f,%.0f\n", c.getX(), c.getY() ) ) ;
+					bwCoord.write(String.format("%.0f,%.0f\n", c.getX(), c.getY() ) ) ;
 				}				
 			} catch (IOException e) {
 				Gbl.errorMsg("Could not write to BufferedWriter.");
 			} finally{
 				try {
-					bw.close();
+					bwCoord.close();
 				} catch (IOException e) {
 					Gbl.errorMsg("Could not close BufferedWriter.");
 				}
 			}
 		}
 		LOG.info("----------------------------------------------------------------------");
+		BufferedWriter bwDuration = IOUtils.getBufferedWriter(outputFolder + "activityDurations.txt"); 
+		try{
+			bwDuration.write("Type,Start,End,Duration");
+			bwDuration.newLine();
+			for(Tuple<String, String> t : stats){
+				String [] sa = t.getSecond().split(",");
+				bwDuration.write(String.format("%s,%.0f,%.0f,%.0f\n", 
+						t.getFirst(), 
+						Time.parseTime(sa[0]),
+						Time.parseTime(sa[1]),
+						Time.parseTime(sa[2])));
+			}
+		} catch (IOException e) {
+			Gbl.errorMsg("Could not write to BufferedWriter.");
+		} finally{
+			try {
+				bwDuration.close();
+			} catch (IOException e) {
+				Gbl.errorMsg("Could not close BufferedWriter.");
+			}
+		}
+		
+		Header.printFooter();
 	}
 
 }

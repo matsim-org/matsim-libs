@@ -519,9 +519,9 @@ public class NmbmSurveyParser {
 		case 10:
 			mode = "taxi"; break;
 		case 11:
-			mode = "pt1"; break;
+			mode = "bus"; break;
 		case 12:
-			mode = "pt2"; break;
+			mode = "train"; break;
 		case 0:
 		case 13:
 		case 14:

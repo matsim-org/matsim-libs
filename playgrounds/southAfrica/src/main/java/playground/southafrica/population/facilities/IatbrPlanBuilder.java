@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -45,7 +44,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -67,6 +65,7 @@ public class IatbrPlanBuilder {
 	private static QuadTree<ActivityFacilityImpl> educationQT;
 	private static QuadTree<ActivityFacilityImpl> shoppingQT;
 	private static QuadTree<ActivityFacilityImpl> leisureQT;
+	private static ObjectAttributes sacscAttributes;
 	/**
 	 * @param args
 	 */
@@ -97,8 +96,8 @@ public class IatbrPlanBuilder {
 		processSacscQT(sc);
 		
 		/* Read SACSC shopping facility attributes */
-		ObjectAttributes facilityAttributes = new ObjectAttributes();
-		ObjectAttributesXmlReader or = new ObjectAttributesXmlReader(facilityAttributes);
+		sacscAttributes = new ObjectAttributes();
+		ObjectAttributesXmlReader or = new ObjectAttributesXmlReader(sacscAttributes);
 		or.parse(sacscAttributeFile);
 		
 		/* Read the general amenities file. */
@@ -260,14 +259,13 @@ public class IatbrPlanBuilder {
 				firstActivity.setCoord(home.getCoord());
 				lastActivity.setFacilityId(home.getId());
 				lastActivity.setCoord(home.getCoord());
-				
-				
 
-				for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+				for(int i = 1; i < person.getSelectedPlan().getPlanElements().size()-1; i++){
+					PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 					if(pe instanceof Activity){
 						ActivityImpl act = (ActivityImpl) pe;
 						if(act.getType().equalsIgnoreCase("h")){
-							/* Do nothing, it is already assigned a home facility. */
+							act.setFacilityId(home.getId());
 						} else if(act.getType().equalsIgnoreCase("w")){
 							/* Check for work activity */
 							ActivityFacilityImpl closestMall = sacscQT.get(act.getCoord().getX(), act.getCoord().getY());
@@ -307,12 +305,12 @@ public class IatbrPlanBuilder {
 							/* Pick the closest shopping facility */
 							ActivityFacilityImpl closestShop = shoppingQT.get(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestShop.getId());
-							act.setCoord(closestShop.getCoord());							 
+							act.setCoord(closestShop.getCoord());			
 						} else if(act.getType().equalsIgnoreCase("l")){
 							/* Pick the closest leisure facility. */
 							ActivityFacilityImpl closestLeisure = leisureQT.get(act.getCoord().getX(), act.getCoord().getY());
 							act.setFacilityId(closestLeisure.getId());
-							act.setCoord(closestLeisure.getCoord());							 
+							act.setCoord(closestLeisure.getCoord());	
 						} else{
 							/* Just pick the closest amenity facility. 
 							 * I (JWJ Jun '12) realized that the LocationChoice 

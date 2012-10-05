@@ -20,6 +20,7 @@
 
 package playground.southafrica.utilities.network;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkWriter;
@@ -35,13 +36,18 @@ import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 
-public class ConvertOsmToMatsim {
+import playground.southafrica.utilities.Header;
 
+public class ConvertOsmToMatsim {
+	final private static Logger LOG = Logger.getLogger(ConvertOsmToMatsim.class);
+	
 	/**
 	 * Class to 
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Header.printHeader(ConvertOsmToMatsim.class.toString(), args);
+		
 		String inputFile = null;
 		String outputFile = null;
 		String shapefileLinks = null;
@@ -61,12 +67,20 @@ public class ConvertOsmToMatsim {
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network nw = sc.getNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, CRS);
-		OsmNetworkReader onr = new OsmNetworkReader(nw, ct);
+		OsmNetworkReader onr = new OsmNetworkReader(nw, ct, true);
 		onr.setKeepPaths(fullNetwork);
 		/*
 		 * Configure the highway classification.
 		 */
+		LOG.info("Overwriting some highway defaults...");
+		onr.setHighwayDefaults(1, "trunk", 1, 120/3.6, 1, 2000);
+		onr.setHighwayDefaults(1, "primary", 2, 80/3.6, 1, 1500);
+		onr.setHighwayDefaults(1, "secondary", 1, 80/3.6, 1, 1000);
+		onr.setHighwayDefaults(1, "tertiary", 1, 60/3.6, 1, 1000);
+		onr.setHighwayDefaults(1, "unclassified", 1, 60/3.6, 1, 800);
+		onr.setHighwayDefaults(1, "residential", 1, 45/3.6, 1, 600);
 		
+		LOG.info("Parsing the OSM file...");
 		onr.parse(inputFile);
 		
 		NetworkCleaner nc = new NetworkCleaner();
@@ -83,6 +97,7 @@ public class ConvertOsmToMatsim {
 		if(shapefileLinks != null){
 			new Links2ESRIShape(nw, shapefileLinks, builder).write();
 		}
+		Header.printFooter();
 	}
 
 }
