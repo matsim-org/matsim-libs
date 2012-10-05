@@ -44,5 +44,7 @@ public abstract class ToolConfig {
 	public static Color COLOR_ROAD_CLOSED = new Color(150,0,0,220);
 	public static Color COLOR_DISABLED_TRANSPARENT = new Color(150,150,150,80);
 	
+	//grid
+	public static final Color COLOR_GRID = new Color(0,0,0,150);
 
 }
