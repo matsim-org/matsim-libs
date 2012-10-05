@@ -63,29 +63,9 @@ public abstract class ActivityTypeManipulator {
 					log.warn("Person " + person.getId() + " has multiple plans. " +
 							"Only the selected plan will be adapted.");
 				}
-				Plan plan = person.getSelectedPlan();
-				for(int i = 0; i < plan.getPlanElements().size(); i++){
-					PlanElement pe = plan.getPlanElements().get(i);
-					if(pe instanceof ActivityImpl){
-						ActivityImpl act = (ActivityImpl) pe;
-						double estimatedDuration = 0.0;
-						if(i == 0){
-							/* It is the first activity, and it is assumed it 
-							 * started at 00:00:00. */
-							estimatedDuration = act.getEndTime();
-						} else{
-							/* Since the method getStartTime is deprecated,
-							 * estimate the start time as the end time of the
-							 * previous activity plus the duration of the trip. */
-							double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
-							double tripDuration = ((Leg)person.getSelectedPlan().getPlanElements().get(i-1)).getTravelTime();
-							estimatedDuration = act.getEndTime() - (previousEndTime + tripDuration);
-						}
-						act.setType(getAdaptedActivityType(act.getType(), estimatedDuration));
-					}
-				}
+				this.adaptActivityTypes(person.getSelectedPlan());
+				counter.incCounter();
 			}
-			counter.incCounter();
 		}
 		counter.printCounter();
 		log.info("Done manipulating plans.");
@@ -95,6 +75,6 @@ public abstract class ActivityTypeManipulator {
 		return this.sc;
 	}
 	
-	abstract protected String getAdaptedActivityType(String activityType, double activityDuration);
+	abstract protected void adaptActivityTypes(Plan plan);
 
 }

@@ -215,9 +215,14 @@ public class NmbmSurveyParser {
 				String activityTypeDestination = getActivityTypeFromCode(Integer.parseInt(sa[9]));
 				
 				/* Parse the trip start and end time, in seconds from midnight. */
-				int startTime = Integer.parseInt(sa[10].substring(11, 13))*3600 + Integer.parseInt(sa[10].substring(14, 16))*60;
-				int endTime = Integer.parseInt(sa[11].substring(11, 13))*3600 + Integer.parseInt(sa[11].substring(14, 16))*60;
-				
+				int startTime;
+				int endTime;
+				try{
+					startTime = Integer.parseInt(sa[10].substring(11, 13))*3600 + Integer.parseInt(sa[10].substring(14, 16))*60;
+					endTime = Integer.parseInt(sa[11].substring(11, 13))*3600 + Integer.parseInt(sa[11].substring(14, 16))*60;
+				} catch(NumberFormatException e){
+					throw new RuntimeException(enu + "; " + hhn + "; " + hhPerson + "; " + legNumber);
+				}
 				String zoneFrom = sa[12];
 				Coord coordFrom = getLocalScrambledCoord(getCoord(zoneFrom));
 				String zoneTo = sa[13];
