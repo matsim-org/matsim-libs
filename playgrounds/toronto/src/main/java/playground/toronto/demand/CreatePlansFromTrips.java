@@ -707,6 +707,8 @@ public class CreatePlansFromTrips {
 		for(Person P : scenario.getPopulation().getPersons().values()) if (P.getSelectedPlan() == null) personsToRemove.add(P.getId());
 		for(Id i : personsToRemove) scenario.getPopulation().getPersons().remove(i);
 		log.info(personsToRemove.size() + " blank persons removed from population.");
+		log.info("FINAL POPULATION SIZE: " + scenario.getPopulation().getPersons().size());
+		
 
 	}
 
