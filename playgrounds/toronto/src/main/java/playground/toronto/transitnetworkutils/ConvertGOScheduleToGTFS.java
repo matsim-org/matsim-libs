@@ -2,6 +2,7 @@ package playground.toronto.transitnetworkutils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,12 +18,15 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
+import playground.toronto.demand.util.TableReader;
+
 
 public class ConvertGOScheduleToGTFS {
 
 	private static final Logger log = Logger.getLogger(ConvertGOScheduleToGTFS.class);
 	
 	private static HashSet<RouteTable> routeTables;
+	private static HashMap<String, String> stops = null;
 	
 	private static void loadGOSchedule(String filename) throws IOException{
 		//factory = new TransitScheduleFactoryImpl();
@@ -72,7 +76,7 @@ public class ConvertGOScheduleToGTFS {
 		String inFileName = args[0];
 		String tempFileName = args[1];
 		String gtfsFolder = args[2];
-		
+						
 		loadGOSchedule(inFileName);
 
 		/*
@@ -84,90 +88,142 @@ public class ConvertGOScheduleToGTFS {
 		}
 		*/
 		
-		GOtoGTFS(gtfsFolder);
+		String stopMap = null;
+		if (args.length == 4){
+			stopMap = args[3];
+			
+			RenameStops(stopMap);
+		}
+		
+		GO2GTFS(gtfsFolder);
 		
 
 	}
 
-	private static void GOtoGTFS(String foldername) throws IOException{
+	private static void RenameStops(String mapName) throws FileNotFoundException, IOException{
+		int stopNumber = 100;
 		
-		//Get all the routes
-		HashMap<String, Boolean> routeHasTrainTrips = new HashMap<String, Boolean>();
-		for (RouteTable rt : routeTables) 
-			routeHasTrainTrips.put(rt.routeName, rt.hasMixedModeTrips());
-			
+		HashMap<String, String> converter = new HashMap<String, String>();
+		stops = new HashMap<String, String>();
 		
-		//Write routes.txt
-		BufferedWriter bw1 = new BufferedWriter(new FileWriter(foldername + "/routes.txt"));
-		bw1.write("route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color");
-		for (String route : routeHasTrainTrips.keySet()){
+		TableReader tr = new TableReader(mapName);
+		tr.ignoreTrailingBlanks(true);
+		tr.open();
+		while(tr.next()){
+			String name = tr.current().get("stop_name");
+			String desc = tr.current().get("stop_desc");
+			String lon = tr.current().get("stop_lon");
+			String lat = tr.current().get("stop_lat");
 			
-			String sName = route.substring(0, 2);
-			String lName = route.substring(3);
-			
-			if (routeHasTrainTrips.get(route)){
-				//Write entry for bus route
-				bw1.write("\n" + "GO" + sName + "b,2," + sName + "," + lName + ",,3,,,");
-				//write entry for train route
-				bw1.write("\n" + "GO" + sName + "t,2," + sName + "," + lName + ",,2,,,");
-			}else{
-				//Assume bus-only route
-				bw1.write("\n" + "GO" + sName + "b,2," + sName + "," + lName + ",,3,,,");
-			}
+			String oldId = desc + ": " + name;
+			//stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station
+			String data = stopNumber + ",," + name + "," + desc + "," + lat + "," + lon; 
+			converter.put(oldId, "" + stopNumber);
+			stops.put("" + stopNumber++, data);
 		}
-		bw1.close();
+		tr.close();
 		
-		//Write trips and stop_times simultaneously...each departure will be given its own trip & a random id
-		bw1 = new BufferedWriter(new FileWriter(foldername + "/trips.txt"));
-		bw1.write("route_id,service_id,trip_id,trip_headsign,direction_id,shape_id");
-		BufferedWriter bw2 = new BufferedWriter(new FileWriter(foldername + "/stop_times.txt"));
-		bw2.write("trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type");
-
-		HashMap<String, HashSet<String>> routeDirectionMap = new HashMap<String, HashSet<String>>();
-		HashMap<String, Integer> routeCurrentDirection = new HashMap<String, Integer>();
+		HashSet<String> missingStops = new HashSet<String>();
 		
-		int currentTrip = 2000;
-		
-		for (RouteTable route : routeTables){
-			String sName = route.routeName.substring(0, 2);
-			
-			//Get current direction #
-			if (!routeDirectionMap.containsKey(route.routeName)){
-				routeDirectionMap.put(route.routeName, new HashSet<String>());
-				routeCurrentDirection.put(route.routeName, 0);
-			}
-			if (!routeDirectionMap.get(route.routeName).contains(route.direction)){
-				routeDirectionMap.get(route.routeName).add(route.direction);
-				routeCurrentDirection.put(route.routeName, routeCurrentDirection.get(route.routeName) + 1);
-			}
-			int directionNum = routeCurrentDirection.get(route.routeName);
-			
-			for (int currentDep = 0; currentDep < route.times.size(); currentDep++){
-				List<Tuple<Double, Double>> departure = route.times.get(currentDep);
-				String route_id = "GO" + sName + (route.trainTrips.get(currentDep) ? "t" : "b");
-				String trip_id = "" + ++currentTrip;
-				
-				//Write to trips file.
-				bw1.write("\n" + route_id + ",1," + trip_id + ",," + directionNum + ",");
-				
-				for (int i = 0, j = 1; i < departure.size(); i++){
-					String stop = route.stopsHeader.get(i);
-					if (stop == null || stop.equals("")) continue;
-					Tuple<Double, Double> tup = departure.get(i);
-					if (tup == null) continue; // VIA stops will NOT be exported!
-					
-					double arr = tup.getFirst();
-					double dep = tup.getSecond();
-					bw2.write("\n" + trip_id + "," + Time.writeTime(arr) + "," + Time.writeTime(dep)
-							+ ",\"" + stop + "\"," + (j++) + ",,0,0");
+		for (RouteTable table : routeTables){
+			ArrayList<String> newHeader = new ArrayList<String>();
+			for (String oldName : table.stopsHeader){
+				String newName = converter.get(oldName);
+				if (newName == null){
+					missingStops.add(oldName);
+					newHeader.add(oldName);
+				}else{
+					newHeader.add(newName);
 				}
 			}
-			log.info("Exported " + route.routeName + " (" + route.direction + ")");
-			
+			table.stopsHeader = newHeader;
 		}
 		
-		bw1.close();
-		bw2.close();
+		for (String str : missingStops) log.warn("Could not find stop id for \"" + str + "\"!");
+	}
+	
+	private static void GO2GTFS(String foldername) throws IOException{
+		BufferedWriter routeFile = new BufferedWriter(new FileWriter(foldername + "/routes.txt"));
+		routeFile.write("route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color");
+		BufferedWriter tripsFile = new BufferedWriter(new FileWriter(foldername + "/trips.txt"));
+		tripsFile.write("route_id,service_id,trip_id,direction_id,shape_id");
+		BufferedWriter stopTimesFile = new BufferedWriter(new FileWriter(foldername + "/stop_times.txt"));
+		stopTimesFile.write("trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type");
+		
+		if (stops != null){
+			BufferedWriter bw = new BufferedWriter(new FileWriter(foldername + "/stops.txt"));
+			bw.write("stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station");
+			for (String s : stops.values()){
+				bw.newLine();
+				bw.write(s);
+			}
+			bw.close();
+		}
+		
+		//Default is that there is one RT for each direction, so these need to be grouped when exporting.
+		//Additionally, there needs to be one route for each mode
+		//One trip entry is created for each row in the RouteTable (grouping will be done later)
+		//Stop times will be created this way as well
+		
+		HashSet<String> routes = new HashSet<String>();
+		int tripNumber = 2000;
+		
+		for (RouteTable table : routeTables){
+			String sName = table.routeName.substring(0, 2);
+			String lName = table.routeName.substring(3);
+				
+			String busRoute = "GO" + sName + "b,2," + sName + "," + lName + ",,3,,,";
+			String trainRoute = "GO" + sName + "t,2," + sName + "," + lName + ",,2,,,";
+			
+			int direction = 0; //Assuming that each route has only two directions.
+			if (routes.contains(trainRoute) || routes.contains(busRoute)) direction = 1;
+			
+			if (table.trainTrips.contains(false)){
+				routes.add(busRoute);
+			}
+			if (table.trainTrips.contains(true)){
+				routes.add(trainRoute);
+			}
+			if (table.trainTrips.size() == 0){
+				log.info("No trips recorded for table " + table.routeName);
+				continue;
+			}
+			
+			for (int i = 0; i < table.times.size(); i++){
+				//Write trip entry.
+				int tripId = tripNumber++;
+				tripsFile.newLine();
+				if (table.trainTrips.get(i)){
+					tripsFile.write(trainRoute.split(",")[0] + ",1," + tripId + "," + direction); //train trip
+				}else{
+					tripsFile.write(busRoute.split(",")[0] + ",1," + tripId + "," + direction); //bus trip
+				}
+				
+				//Write stop times entries
+				List<Tuple<Double, Double>> trip = table.times.get(i);
+				List<String> headers = table.stopsHeader; 
+				//trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type
+				int seq = 1;
+				for (int j = 0; j < trip.size(); j++){
+					Tuple<Double, Double> stopTimes = trip.get(j);
+					if (stopTimes == null) continue;
+					
+					String stop = headers.get(j);
+					stopTimesFile.newLine();
+					stopTimesFile.write(tripId + "," + Time.writeTime(stopTimes.getFirst()) + "," + Time.writeTime(stopTimes.getSecond())
+							+ "," + stop + "," + seq++ + ",0,0");
+				}
+			}
+		}
+		
+		for (String rt : routes){
+			routeFile.newLine();
+			routeFile.write(rt);
+		}
+		
+		routeFile.close();
+		tripsFile.close();
+		stopTimesFile.close();
 	}
 	
 	private static class RouteTable {
@@ -223,17 +279,7 @@ public class ConvertGOScheduleToGTFS {
 		}
 		
 		public boolean hasMixedModeTrips(){
-			int busCount = 0;
-			int trainCount = 0;
-			for (Boolean b : this.trainTrips) {
-				if (b){
-					trainCount++;
-				}else{
-					busCount++;
-				}
-			}
-			
-			return ((busCount > 0) && (trainCount > 0));
+			return ((this.trainTrips.contains(true)) && (this.trainTrips.contains(false)));
 		}
 		
 		private boolean checkTableConsistency(String filename) throws IOException{

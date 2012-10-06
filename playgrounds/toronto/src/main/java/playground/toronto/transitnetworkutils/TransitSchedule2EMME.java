@@ -154,7 +154,7 @@ public class TransitSchedule2EMME {
 				
 				//write initial node, with path setting, dwell time, and TTF.
 				String prevNode = fixTurnNode(nodeIdSequence.get(0));
-				writer.write(" path=no " + prevNode + " dwt=#.00 ttf=0");
+				writer.write(" path=no " + prevNode + " dwt=+.00 ttf=0");
 				
 				//writes the node sequence. fixes bugs that happen when dealing with Turn Links
 				int col = 3;
