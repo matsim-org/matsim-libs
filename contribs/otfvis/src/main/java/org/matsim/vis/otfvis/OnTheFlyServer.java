@@ -123,7 +123,11 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
 
-	private Semaphore accessToQNetwork = new Semaphore(1);
+	// A fair semaphore used to control access to the simulation data.
+	// If you remove the fairness option ("true"), the simulation will
+	// probably 'barge', i.e. the visualizer will not take turn for long times
+	// and the GUI will freeze.
+	private Semaphore accessToQNetwork = new Semaphore(1, true);
 
 	private Scenario scenario;
 
@@ -388,7 +392,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 			@Override
 			public void endSnapshot() {
-				updateStatus(localTime);
+				
 			}
 
 			@Override

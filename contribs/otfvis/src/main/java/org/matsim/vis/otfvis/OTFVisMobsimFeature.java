@@ -106,10 +106,10 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 	
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
-		this.server.unblockUpdates();
 		double time = event.getSimulationTime() ;
 		this.updateTeleportedAgents(time);
 		this.visualizeTrackedAndTeleportingAgents(time);
+		this.server.unblockUpdates();
 		this.server.updateStatus(time);
 	}
 
