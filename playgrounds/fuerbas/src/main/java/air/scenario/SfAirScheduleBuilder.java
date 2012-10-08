@@ -251,6 +251,7 @@ public class SfAirScheduleBuilder {
 									this.airportsInModel.put(originAirport, this.availableAirportCoordinates.get(originAirport));
 									this.airportsInModel.put(destinationAirport, this.availableAirportCoordinates.get(destinationAirport));
 							}
+//								used to generate air traffic of an entire week with departures being shifted 24 hours for each day
 								else if (!DgCreateDgFlightScenario.useSingleDayOfOperation) {
 									flightDesignator = flightDesignator+"_"+opsDays[dayCount];
 									int opsDay = Integer.parseInt(String.valueOf(opsDays[dayCount]));
