@@ -63,6 +63,7 @@ public class DgCreateDgFlightScenario {
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
 	private boolean useAirportCapacities = false;
+	public static final boolean useSingleDayOfOperation = true;
 	private String airportCapacityFile = dataBaseDirectory + "shared-svn/projects/throughFlightData/airportCapacityData/2012-08-14_airport_capacity_from_www.csv";
 	
 	private ScenarioImpl initScenario(){
