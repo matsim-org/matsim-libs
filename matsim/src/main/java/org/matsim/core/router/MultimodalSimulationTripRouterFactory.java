@@ -20,6 +20,7 @@
 
 package org.matsim.core.router;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
+ * @author cdobler
  * @author thibautd
  */
 public class MultimodalSimulationTripRouterFactory implements TripRouterFactory {
@@ -53,7 +55,9 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 	private final MultiModalConfigGroup configGroup;
 	private final PopulationFactory populationFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
-
+	private final Map<String, Network> multimodalSubNetworks;
+	private final Map<String, Set<String>> modeRestrictions;
+	
 	public MultimodalSimulationTripRouterFactory(
 			final Network network,
 			final PopulationFactory populationFactory,
@@ -69,25 +73,23 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 		this.travelDisutility = travelDisutility;
 		this.multimodalTravelTimes = multimodalTravelTimes;
 		this.delegateFactory = delegateFactory;
+		
+		this.modeRestrictions = new HashMap<String, Set<String>>();
+		this.multimodalSubNetworks = new HashMap<String, Network>();
+		
+		initModeRestrictions();
 	}
 
-	@Override
-	public TripRouter createTripRouter() {
-		
-		/*
-		 * If a delegateFactory is set, use it to create a TripRouter. By doing so,
-		 * modes not simulated by the multi-modal simulation are also taken into account.
-		 */
-		TripRouter instance = null;
-		if (delegateFactory != null) instance = delegateFactory.createTripRouter();
-		else instance = new TripRouter();
-		
-		// Define restrictions for the different modes.
+	/*
+	 * Define restrictions for the supported modes.
+	 */
+	/*package*/ void initModeRestrictions() {
 		/*
 		 * Car
 		 */	
 		Set<String> carModeRestrictions = new HashSet<String>();
 		carModeRestrictions.add(TransportMode.car);
+		this.modeRestrictions.put(TransportMode.car, carModeRestrictions);
 		
 		/*
 		 * Walk
@@ -95,6 +97,7 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 		Set<String> walkModeRestrictions = new HashSet<String>();
 		walkModeRestrictions.add(TransportMode.bike);
 		walkModeRestrictions.add(TransportMode.walk);
+		this.modeRestrictions.put(TransportMode.walk, walkModeRestrictions);
 				
 		/*
 		 * Bike
@@ -104,6 +107,7 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 		Set<String> bikeModeRestrictions = new HashSet<String>();
 		bikeModeRestrictions.add(TransportMode.walk);
 		bikeModeRestrictions.add(TransportMode.bike);
+		this.modeRestrictions.put(TransportMode.bike, bikeModeRestrictions);
 		
 		/*
 		 * PT
@@ -119,6 +123,7 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 		ptModeRestrictions.add(TransportMode.car);
 		ptModeRestrictions.add(TransportMode.bike);
 		ptModeRestrictions.add(TransportMode.walk);
+		this.modeRestrictions.put(TransportMode.pt, ptModeRestrictions);
 		
 		/*
 		 * Ride
@@ -130,30 +135,38 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 		rideModeRestrictions.add(TransportMode.car);
 		rideModeRestrictions.add(TransportMode.bike);
 		rideModeRestrictions.add(TransportMode.walk);
-			
-		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(this.network);
+		this.modeRestrictions.put(TransportMode.ride, rideModeRestrictions);
+	}
+	
+	@Override
+	public TripRouter createTripRouter() {
+		
+		/*
+		 * If a delegateFactory is set, use it to create a TripRouter. By doing so,
+		 * modes not simulated by the multi-modal simulation are also taken into account.
+		 */
+		TripRouter instance = null;
+		if (delegateFactory != null) instance = delegateFactory.createTripRouter();
+		else instance = new TripRouter();
+					
 		for (String mode : CollectionUtils.stringToArray( configGroup.getSimulatedModes() )) {
 			
 			if (instance.getRegisteredModes().contains(mode)) {
 				log.warn("A routing algorithm for " + mode + " is already registered. It is replaced!");
 			}
 			
-			Set<String> modeRestrictions;
-			if (mode.equals(TransportMode.car)) {
-				modeRestrictions = carModeRestrictions;
-			} else if (mode.equals(TransportMode.walk)) {
-				modeRestrictions = walkModeRestrictions;
-			} else if (mode.equals(TransportMode.bike)) {
-				modeRestrictions = bikeModeRestrictions;
-			} else if (mode.equals(TransportMode.ride)) {
-				modeRestrictions = rideModeRestrictions;
-			} else if (mode.equals(TransportMode.pt)) {
-				modeRestrictions = ptModeRestrictions;
-			} else continue;
+			Set<String> restrictions;
+			restrictions = this.modeRestrictions.get(mode);
+			if (restrictions == null) continue;
 			
-			Network subNetwork = NetworkImpl.createNetwork();
-			networkFilter.filter(subNetwork, modeRestrictions);
-			
+			Network subNetwork = multimodalSubNetworks.get(mode);
+			if (subNetwork == null) {
+				subNetwork = NetworkImpl.createNetwork();
+				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(this.network);
+				networkFilter.filter(subNetwork, restrictions);
+				multimodalSubNetworks.put(mode, subNetwork);
+			}
+						
 			LeastCostPathCalculator routeAlgo =
 				leastCostAlgoFactory.createPathCalculator(
 						subNetwork,
@@ -174,4 +187,3 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 		return instance;
 	}
 }
-
