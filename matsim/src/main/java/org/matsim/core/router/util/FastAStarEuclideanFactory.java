@@ -20,6 +20,9 @@
 
 package org.matsim.core.router.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarEuclidean;
@@ -35,7 +38,7 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 	private final FastRouterType fastRouterType;
 	private final PreProcessEuclidean preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
-	private RoutingNetwork routingNetwork;
+	private final Map<Network, RoutingNetwork> routingNetworks;
 
 	public FastAStarEuclideanFactory(Network network, final TravelDisutility fsttc) {
 		this(network, fsttc, FastRouterType.ARRAY);		
@@ -45,8 +48,9 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 			FastRouterType fastRouterType) {
 		this.preProcessData = new PreProcessEuclidean(fsttc);
 		this.preProcessData.run(network);
-
 		this.fastRouterType = fastRouterType;
+
+		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
 		
 		if (fastRouterType == FastRouterType.ARRAY) {
 			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
@@ -64,11 +68,13 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 		FastRouterDelegateFactory fastRouterFactory = null;
 		RoutingNetwork rn = null;
 		
-		if (fastRouterType == FastRouterType.ARRAY) {		
-			if (this.routingNetwork == null) {
-				this.routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+		if (fastRouterType == FastRouterType.ARRAY) {	
+			RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+			if (routingNetwork == null) {
+				routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+				this.routingNetworks.put(network, routingNetwork);
 			}
-			rn = this.routingNetwork;
+			rn = routingNetwork;
 			fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		} else if (fastRouterType == FastRouterType.POINTER) {
 			// Create a new instance since routing data is stored in the network!

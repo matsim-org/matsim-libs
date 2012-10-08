@@ -20,6 +20,9 @@
 
 package org.matsim.core.router.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastDijkstra;
@@ -32,7 +35,7 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 	private final FastRouterType fastRouterType;
 	private final PreProcessDijkstra preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
-	private RoutingNetwork routingNetwork;
+	private final Map<Network, RoutingNetwork> routingNetworks;
 	
 	public FastDijkstraFactory() {
 		this(null, FastRouterType.ARRAY);
@@ -50,6 +53,8 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 		this.preProcessData = preProcessData;
 		this.fastRouterType = fastRouterType;
 		
+		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
+		
 		if (fastRouterType == FastRouterType.ARRAY) {
 			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
 		} else if (fastRouterType == FastRouterType.POINTER) {			
@@ -65,11 +70,13 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 		FastRouterDelegateFactory fastRouterFactory = null;
 		RoutingNetwork rn = null;
 		
-		if (fastRouterType == FastRouterType.ARRAY) {		
-			if (this.routingNetwork == null) {
-				this.routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+		if (fastRouterType == FastRouterType.ARRAY) {
+			RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+			if (routingNetwork == null) {
+				routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+				this.routingNetworks.put(network, routingNetwork);
 			}
-			rn = this.routingNetwork;
+			rn = routingNetwork;
 			fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		} else if (fastRouterType == FastRouterType.POINTER) {
 			// Create a new instance since routing data is stored in the network!
