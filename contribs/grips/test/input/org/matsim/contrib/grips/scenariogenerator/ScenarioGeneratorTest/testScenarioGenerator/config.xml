@@ -565,7 +565,7 @@
 		<!-- indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal utilities of time.
 		Default is false although some of us (bk, kn) think this should always be true.
 		This is only a suggestion since there is (by matsim design) no way to enforce that mental modules obey this. -->
-		<param name="usingOpportunityCostOfTimeForPtRouting" value="false" />
+		<param name="usingOpportunityCostOfTimeForPtRouting" value="true" />
 
 		<!-- Options: `ignore', `warn', `abort'.  Default: either `ignore' or `warn'.
 		When violating VSP defaults, this results in nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
