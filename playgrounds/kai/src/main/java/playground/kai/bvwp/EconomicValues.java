@@ -214,47 +214,59 @@ class EconomicValues {
 	
 		return economicValues ;
 	}
-
-	public static Values createEconomicValuesBVWP2015() {
+	
+	/**
+	 * Attempt to recreate values of BVWP'10.  Changes to this should be done elsewhere.
+	 */
+	public static Values createEconomicValuesBVWP2010() {
 		Values economicValues = new Values() ;
+
+		// PV_NON_COMMERCIAL:
 		{
 			ValuesForAMode valuesForAMode = economicValues.getByMode(Mode.road) ;
 			{
 				ValuesForAUserType valuesForAModeAndDemandSegment = valuesForAMode.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
-				valuesForAModeAndDemandSegment.setByEntry( Attribute.km, -0.28 ) ;
 				valuesForAModeAndDemandSegment.setByEntry( Attribute.hrs, -18.00 ) ;
-				valuesForAModeAndDemandSegment.setByEntry( Attribute.priceUser, -1. ) ;
-				valuesForAModeAndDemandSegment.setByEntry( Attribute.costOfProduction, -1. ) ;
 			}
 		}
 		{
 			ValuesForAMode valuesForAMode = economicValues.getByMode(Mode.rail) ;
 			{
 				ValuesForAUserType valuesForAModeAndDemandSegment = valuesForAMode.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
-				valuesForAModeAndDemandSegment.setByEntry( Attribute.km, -0.1 ) ;
 				valuesForAModeAndDemandSegment.setByEntry( Attribute.hrs, -18.00 ) ;
-				valuesForAModeAndDemandSegment.setByEntry( Attribute.priceUser, -1. ) ;
-				valuesForAModeAndDemandSegment.setByEntry( Attribute.costOfProduction, -1. ) ;
 			}
 		}
+		
+		// GV:
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{	
 				ValuesForAUserType values = roadValues.getByDemandSegment(DemandSegment.GV) ;
-				values.setByEntry( Attribute.km, -0.28 ) ;
-				values.setByEntry( Attribute.hrs, -0.00 ) ;
-				values.setByEntry( Attribute.priceUser, -1. ) ;
-				values.setByEntry( Attribute.costOfProduction, -1. ) ;
+				values.setByEntry( Attribute.hrs, -0.00 ) ; 
 			}
 		}
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
 				ValuesForAUserType values = railValues.getByDemandSegment(DemandSegment.GV) ;
-				values.setByEntry( Attribute.km, -0.00 ) ; // no user costs per km
-				values.setByEntry( Attribute.hrs, -1.00 ) ; // NEW: a value of time per ton
-				values.setByEntry( Attribute.priceUser, -1. ) ;
-				values.setByEntry( Attribute.costOfProduction, -1. ) ;
+				values.setByEntry( Attribute.hrs, -0.00 ) ;
+			}
+		}
+		
+		// General settings:
+		for ( Mode mode : Mode.values() ) {
+			for ( DemandSegment segment : DemandSegment.values() ) {
+				ValuesForAUserType vv = economicValues.getByMode(mode).getByDemandSegment(segment);
+
+				// all monetary values are always -1:
+				vv.setByEntry( Attribute.priceUser, -1. ) ;
+				vv.setByEntry( Attribute.costOfProduction, -1. ) ;
+				
+				// all distance values are always 0 (included in cost of production):
+				vv.setByEntry( Attribute.km, -0.0 ) ; // VoD = 0
+				
+				// there was no VoR in BVWP'03/'10:
+				vv.setByEntry( Attribute.excess_hrs, 0. ) ;
 			}
 		}
 

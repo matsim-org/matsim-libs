@@ -35,7 +35,7 @@ public class BvwpTest extends MatsimTestCase {
 		
 		ScenarioForEvalData planfall = ScenarioForTest1.createPlanfallForTest(nullfall);
 		
-		new UtilityChangesRuleOfHalf().utilityChange(economicValues, nullfall, planfall) ;
+		new UtilityChangesRuleOfHalf().computeAndPrintResults(economicValues, nullfall, planfall) ;
 		
 	}
 

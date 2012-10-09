@@ -28,22 +28,22 @@ public class IllustrationsSep2012GV {
 
 	private static void runRoH() {
 		UtilityChanges utilityChanges = new UtilityChangesRuleOfHalf();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;		
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;		
 	}
 
 	private static void runBVWP2003() {
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2003();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;
 	}
 
 	private static void runBVWP2010() {
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2010();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall);
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
 	}
 
 	private static void runBVWP2015() {
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2015();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;
 	}
 
 }

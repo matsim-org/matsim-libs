@@ -1,5 +1,11 @@
 package playground.kai.bvwp;
 
+import org.matsim.api.core.v01.Id;
+
+import playground.kai.bvwp.Values.Attribute;
+import playground.kai.bvwp.Values.DemandSegment;
+import playground.kai.bvwp.Values.Mode;
+
 
 public class IllustrationsKarlsruheBaselGV {
 
@@ -10,7 +16,7 @@ public class IllustrationsKarlsruheBaselGV {
 	public static void main(String[] args) {
 
 		// create the economic values
-		economicValues = EconomicValues.createEconomicValuesBVWP2015();
+		economicValues = EconomicValues.createEconomicValuesBVWP2010();
 
 		// create the base case:
 		nullfall = ScenarioKarlsruheBaselGV.createNullfall1();
@@ -18,41 +24,81 @@ public class IllustrationsKarlsruheBaselGV {
 		// create the policy case:
 		planfall = ScenarioKarlsruheBaselGV.createPlanfall1(nullfall);
 
-		runBVWP2003();
-//		runBVWP2010();
-//		runRoH();
-		runBVWP2015();
+		System.out.println(economicValues) ;
+
+		{
+			Html html = new Html("bvwp2003") ;
+			System.out.println("\n==================================================================================================================================");
+			html.multiFmtComment("bvwp'03/'10 for comparison:" ) ;
+			html.endParagraph() ;
+			UtilityChanges utilityChanges = new UtilityChangesBVWP2003();
+			utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall, html) ;
+			html.endBody() ;
+			html.endHtml() ;
+		}
+		{
+			Html html = new Html("bvwp2015base") ;
+			System.out.println("\n==================================================================================================================================");
+			html.multiFmtComment("bvwp2015 w/ implicit utl. but w/o anything else:" );
+			UtilityChanges utilityChanges1 = new UtilityChangesBVWP2015();
+			utilityChanges1.computeAndPrintResults(economicValues, nullfall, planfall, html) ;
+			html.multiFmtComment( "Comment: implicit utl just compensates for bvwp03 gain.  Can't get gain in RoH when VoX is zero in " +
+			"improved attribute X." );
+			html.endBody() ;
+			html.endHtml() ;
+		}
+		{
+			Html html = new Html("bvwp2015wVoTgoods") ;
+			System.out.println("\n==================================================================================================================================");
+			html.multiFmtComment("bvwp2015 w/ implicit utl. and w/ VoT for goods:") ;
+			Values economicValuesTmp = economicValues.createDeepCopy() ;
+			economicValuesTmp.getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).setByEntry(Attribute.hrs, -1.00 ) ;
+			economicValuesTmp.getByMode(Mode.rail).getByDemandSegment(DemandSegment.GV).setByEntry(Attribute.hrs, -1.00 ) ;
+			UtilityChanges utilityChanges1 = new UtilityChangesBVWP2015();
+			utilityChanges1.computeAndPrintResults(economicValuesTmp, nullfall, planfall,html) ;
+			html.multiFmtComment("Comment: VoT_goods!=0 means large gains for acceleration of freight!!!" );
+			html.endBody() ;
+			html.endHtml() ;
+		}
+		{
+			Html html = new Html("bvwp2015wRoadPriceAsScarcityPrice") ;
+			System.out.println("\n==================================================================================================================================");
+			html.multiFmtComment("bvwp2015 w/ implicit utl. and w/ road price as user price for rail in nullfall:") ;
+			ScenarioForEvalData nullfallTmp = nullfall.createDeepCopy() ;
+			for ( Id id : nullfallTmp.getAllRelations() ) {
+				final Values attribsForOd = nullfall.getByODRelation(id);
+				double roadPrice = attribsForOd.getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).getByEntry(Attribute.priceUser) ;
+				attribsForOd.getByMode(Mode.rail).getByDemandSegment(DemandSegment.GV).setByEntry(Attribute.priceUser, roadPrice ) ;
+			}
+			UtilityChanges utilityChanges1 = new UtilityChangesBVWP2015();
+				utilityChanges1.computeAndPrintResults(economicValues, nullfall, planfall,html) ;
+			html.multiFmtComment("Using road price as scarcity price results in 1/2 of benefits as computation according to resource consumption.") ;
+			html.endBody() ;
+			html.endHtml() ;
+		}
+		{
+			Html html = new Html("bvwp15wVoRgoods") ;
+			System.out.println("\n==================================================================================================================================");
+			html.multiFmtComment("bvwp2015 w/ implicit utl. and w/ VoR for goods:") ;
+			Values economicValuesTmp = economicValues.createDeepCopy() ;
+			economicValuesTmp.getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).setByEntry(Attribute.excess_hrs, -1.00 ) ;
+			economicValuesTmp.getByMode(Mode.rail).getByDemandSegment(DemandSegment.GV).setByEntry(Attribute.excess_hrs, -1.00 ) ;
+			UtilityChanges utilityChanges1 = new UtilityChangesBVWP2015();
+			utilityChanges1.computeAndPrintResults(economicValuesTmp, nullfall, planfall,html) ;
+			html.multiFmtComment("Comment: With these values, same as w/ VoT for goods.  However, with VoR no gains for pure GV accelerations.") ;
+			html.endBody() ;
+			html.endHtml() ;
+		}
 	}
 
 	private static void runRoH() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung entspricht exakt ``rechnungen>javaRechnungen>RoH_PV.xlsx'' (EconomicValues, Scenario und Methodik) ");
-
 		UtilityChanges utilityChanges = new UtilityChangesRuleOfHalf();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;		
-	}
-
-	private static void runBVWP2003() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung entspricht exakt ``rechnungen>javaRechnungen>BVWP2003.xlsx'' (EconomicValues, Scenario und Methodik) ");
-
-		UtilityChanges utilityChanges = new UtilityChangesBVWP2003();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;		
 	}
 
 	private static void runBVWP2010() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung versucht die Methodik der Bedarfsplanüberprüfung Schiene 2010 zu nachzuvollziehen. ");
-		
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2010();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall);
-	}
-
-	private static void runBVWP2015() {
-		System.out.println("\n==================================================================================================================================\n" +
-				"Folgende Rechnung ergibt das gleiche Ergebnis wie RoH.");
-		UtilityChanges utilityChanges = new UtilityChangesBVWP2015();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
 	}
 
 }

@@ -74,28 +74,28 @@ public class IllustrationAP200PV {
 		System.out.println("\n==================================================================================================================================");
 
 		UtilityChanges utilityChanges = new UtilityChangesRuleOfHalf();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;		
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;		
 	}
 
 	private static void runBVWP2003() {
 		System.out.println("\n==================================================================================================================================");
 
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2003();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;
 	}
 
 	private static void runBVWP2010() {
 		System.out.println("\n==================================================================================================================================");
 
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2010();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall);
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall);
 	}
 
 	private static void runBVWP2015() {
 		System.out.println("\n==================================================================================================================================");
 
 		UtilityChanges utilityChanges = new UtilityChangesBVWP2015();
-		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;
+		utilityChanges.computeAndPrintResults(economicValues, nullfall, planfall) ;
 	}
 
 }

@@ -19,13 +19,15 @@
  * *********************************************************************** */
 package playground.kai.bvwp;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
 class ScenarioForEvalData {
-		Map<Id,Values> values = new TreeMap<Id,Values>();
+		private Map<Id,Values> values = new TreeMap<Id,Values>();
 		ScenarioForEvalData() {
 //			for ( Id id : values.keySet() ) {
 //				Values vals = new Values() ;
@@ -46,5 +48,8 @@ class ScenarioForEvalData {
 		}
 		void setValuesForODRelation( Id id , Values tmp ) {
 			values.put( id, tmp ) ;
+		}
+		Set<Id> getAllRelations() {
+			return Collections.unmodifiableSet(values.keySet()) ;
 		}
 	}

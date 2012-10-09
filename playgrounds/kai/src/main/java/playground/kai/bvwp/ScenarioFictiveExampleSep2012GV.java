@@ -54,7 +54,8 @@ class ScenarioFictiveExampleSep2012GV { // Relationsbezogen_mit_generalisierten_
 	}
 
 	static ScenarioForEvalData createPlanfall1(ScenarioForEvalData nullfall) {
-		// (construct the policy case.  The base case can be used to simplify things ...)
+		System.out.println("This is an example where (1) the rail GV travel time is improved; (2) additional demand switches to rail in consequence.") ;
+		System.out.println("As long as the VoT is zero, this will NOT lead to benefits according to RoH or with implicit utility.") ;
 		
 		// The policy case is initialized as a complete copy of the base case:
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;

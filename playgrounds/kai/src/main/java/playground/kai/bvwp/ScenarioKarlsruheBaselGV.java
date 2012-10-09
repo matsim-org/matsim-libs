@@ -21,23 +21,46 @@ class ScenarioKarlsruheBaselGV {
 			{
 				ValuesForAMode valuesForAMode = nullfallForOD.getByMode(Mode.road) ;
 				{
-					ValuesForAUserType valuesForModeAndDemandSegment = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
-					valuesForModeAndDemandSegment.setByEntry( Attribute.XX, 2.6e8 ) ; // number of tons.  Irrelevant dummy value.
-					valuesForModeAndDemandSegment.setByEntry( Attribute.km, 200. ) ;
-					valuesForModeAndDemandSegment.setByEntry( Attribute.hrs, 3. ) ;
-					valuesForModeAndDemandSegment.setByEntry( Attribute.priceUser, 200.*0.1 ) ;
-					valuesForModeAndDemandSegment.setByEntry( Attribute.costOfProduction, 200.*0.1 ) ;
+					ValuesForAUserType vv = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
+					vv.setByEntry( Attribute.XX, 2.6e8 ) ; // number of tons.  Irrelevant dummy value.
+					vv.setByEntry( Attribute.km, 200. ) ;
+					vv.setByEntry( Attribute.hrs, 3. ) ;
+					{		
+						double distance = vv.getByEntry(Attribute.km) ;
+						double ttime = vv.getByEntry(Attribute.hrs ) ;
+						double costOfProduction = distance * 1. + ttime * 0.28 ;  // VoD of vehicle; VoT of vehicle + of driver 
+
+						vv.setByEntry( Attribute.costOfProduction, costOfProduction ) ;
+					}
+
+					vv.setByEntry( Attribute.priceUser, vv.getByEntry( Attribute.costOfProduction ) ) ; // competetive assumption
 				}
 			}
 			{
 				ValuesForAMode valuesForAMode = nullfallForOD.getByMode(Mode.rail) ;
 				{
-					ValuesForAUserType valuesForModeAndDemandSegment = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
-					valuesForModeAndDemandSegment.setByEntry( Attribute.XX, 2.6e7 ) ; // number of tons
-					valuesForModeAndDemandSegment.setByEntry( Attribute.km, 200. ) ;
-					valuesForModeAndDemandSegment.setByEntry( Attribute.hrs, 10. ) ; 
-					valuesForModeAndDemandSegment.setByEntry( Attribute.priceUser, 200.*0.1 ) ;
-					valuesForModeAndDemandSegment.setByEntry( Attribute.costOfProduction, 200.*0.1 ) ;
+					ValuesForAUserType vv = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
+					vv.setByEntry( Attribute.XX, 2.6e7 ) ; // number of tons
+					vv.setByEntry( Attribute.km, 200. ) ;
+					vv.setByEntry( Attribute.hrs, 10. ) ;
+					vv.setByEntry( Attribute.excess_hrs, 6. ) ;
+					{
+						double distance = vv.getByEntry(Attribute.km) ;
+						double ttime = vv.getByEntry(Attribute.hrs ) ;
+						double costOfProduction = distance * 0.1 + ttime * 0.0 ;  // VoD of vehicle; VoT of vehicle + of driver 
+
+						vv.setByEntry( Attribute.costOfProduction, costOfProduction ) ; 
+						// Needs to be "per ton" since this is the normal computation: xx * attribute * economicValue
+					}
+					
+					double costOfProduction = vv.getByEntry( Attribute.costOfProduction ) ;
+//					double userPriceOnRoad = nullfallForOD.getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).getByEntry(Attribute.priceUser) ;
+//					
+//					// assume price before measure is same as road price (scarcity price):
+//					double userPrice = Math.max(costOfProduction, userPriceOnRoad) ;
+
+					vv.setByEntry( Attribute.priceUser, costOfProduction ) ; 
+					
 				}
 			}
 			
@@ -48,24 +71,33 @@ class ScenarioKarlsruheBaselGV {
 	}
 
 	static ScenarioForEvalData createPlanfall1(ScenarioForEvalData nullfall) {
-		// (construct the policy case.  The base case can be used to simplify things ...)
-		
-		// The policy case is initialized as a complete copy of the base case:
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
-		// we are now looking at one specific OD relation (for this scenario, there is only one!)
 		Values planfallForOD = planfall.getByODRelation(new IdImpl(relation)) ;
 		{
-			// modify the travel times for the rail mode:
 			ValuesForAMode valuesForAMode = planfallForOD.getByMode( Mode.rail ) ;
-			valuesForAMode.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.hrs, -6. ) ;
-			
-			// modify some demand (presumably as a result):
-			double delta = 0. ;
-			valuesForAMode.getByDemandSegment(DemandSegment.GV).incByEntry( Attribute.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl(relation)).getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).incByEntry(Attribute.XX, -delta ) ;
+			{
+				final ValuesForAUserType vv = valuesForAMode.getByDemandSegment(DemandSegment.GV);
+
+				// modify the travel times for the rail mode:
+				double deltaTtime = -6. ;
+				vv.incByEntry( Attribute.hrs, deltaTtime ) ;
+				vv.setByEntry(Attribute.excess_hrs, 0. ) ;
+
+				// user price = cost of production (should be same as in nullfall, but we keep modifying it there)
+				vv.setByEntry(Attribute.priceUser, vv.getByEntry(Attribute.costOfProduction) ) ;
+
+				// modify some demand (presumably as a result):
+				double delta = 100. ;
+				vv.incByEntry( Attribute.XX, delta ) ;
+				planfall.getByODRelation(new IdImpl(relation)).getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).incByEntry(Attribute.XX, -delta ) ;
+			}
 		}
 		return planfall;
+	}
+	
+	public static void main( String[] args ) {
+		IllustrationsKarlsruheBaselGV.main(args) ;
 	}
 
 }

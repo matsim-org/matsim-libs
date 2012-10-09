@@ -32,7 +32,7 @@ class Values {
 	 * aber abgesehen davon spricht eigentlich nichts dagegen.  kai,benjamin, sep'12
 	 * </ul>
 	 */
-	enum Attribute { XX, km, hrs, priceUser, costOfProduction }
+	enum Attribute { XX, km, hrs, priceUser, costOfProduction, excess_hrs }
 
 	/**
 	 * Design thoughts:<ul>
@@ -72,10 +72,10 @@ class Values {
 		for ( Mode mode : Mode.values() ) {
 			ValuesForAMode valForMode = this.getByMode(mode) ;
 			for ( DemandSegment demandSegment : DemandSegment.values() ) {
-				str.append( "\n" + mode + "; " + demandSegment + "\n" ) ;
+				str.append( "--> " + mode + "; " + demandSegment + " : " ) ;
 				ValuesForAUserType valByDemandSegment = valForMode.getByDemandSegment(demandSegment);
 				for ( Attribute attribute : Attribute.values() ) {
-					str.append( attribute.toString() + ": " + valByDemandSegment.getByEntry(attribute) + ";" ) ;
+					str.append( attribute.toString() + ": " + valByDemandSegment.getByEntry(attribute) + "; " ) ;
 				}
 				str.append( "\n" ) ;
 			}

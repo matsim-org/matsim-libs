@@ -31,16 +31,17 @@ import playground.kai.bvwp.Values.Attribute;
  * @author Ihab
  *
  */
- class UtilityChangesBVWP2015 extends UtilityChanges {
-	
-		
-		@Override
-		UtlChangesData utlChangePerEntry(Attribute attribute,
-				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
+class UtilityChangesBVWP2015 extends UtilityChanges {
+
+
+	@Override
+	UtlChangesData utlChangePerEntry(Attribute attribute,
+			double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
-		
-		if ( attribute.equals(Attribute.priceUser)) {
+
+		if ( attribute.equals(Attribute.priceUser) ) {
+			// (Nutzerpreis hat keine Auswirkungen auf Resourcenverzehr!)
 			utlChanges.utl = 0. ;
 		} else {
 			if ( deltaAmount > 0 ) {
@@ -64,7 +65,7 @@ import playground.kai.bvwp.Values.Attribute;
 				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
 				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
 				final double margUtl = econValues.getByEntry(attribute) ;
-				
+
 				sum += - margUtl * (quantityPlanfall+quantityNullfall)/2. ;
 			}
 		}
