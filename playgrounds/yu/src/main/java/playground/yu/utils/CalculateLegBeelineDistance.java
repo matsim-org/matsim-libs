@@ -28,21 +28,35 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class CalculateLegBeelineDistance {
-	public static double getBeelineDistance(Network network, Leg leg) {
+	public static double getBeelineDistance_link(Network network, Leg leg) {
 		Route route = leg.getRoute();
 		Id startLinkId = route.getStartLinkId();
 		Id endLinkId = route.getEndLinkId();
 		Map<Id, ? extends Link> links = network.getLinks();
 		return CoordUtils.calcDistance(links.get(startLinkId).getToNode()
 				.getCoord(), links.get(endLinkId).getToNode().getCoord());
+	}
+
+	public static double getBeelineDistance_coord(Network network,
+			Activity preAct, Activity nextAct) {
+		double geoDist = CoordUtils.calcDistance(preAct.getCoord(),
+				nextAct.getCoord());
+
+		if (Double.isNaN(geoDist)) {
+			throw new RuntimeException("geoDist=NaN, " + "\npreAct coord\t"
+					+ preAct.getCoord() + "\tnextAct coord\t"
+					+ nextAct.getCoord());
+		}
+		return geoDist;
 	}
 }
