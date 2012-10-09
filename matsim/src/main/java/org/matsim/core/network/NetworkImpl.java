@@ -185,7 +185,7 @@ public final class NetworkImpl implements Network, BasicLocations {
 	}
 
 	public void setEffectiveLaneWidth(final double effectiveLaneWidth) {
-		if (!Double.isNaN(this.effectiveLaneWidth)) {
+		if (!Double.isNaN(this.effectiveLaneWidth) && this.effectiveLaneWidth != effectiveLaneWidth) {
 			log.warn(this + "[effectiveLaneWidth=" + this.effectiveLaneWidth + " already set. Will be overwritten with " + effectiveLaneWidth + "]");
 		}
 		this.effectiveLaneWidth = effectiveLaneWidth;
