@@ -110,4 +110,9 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	public String getRouteType() {
 		return "experimentalPt1";
 	}
+	
+	@Override
+	public String toString() {
+		return "[ExpTransitRoute: access=" + this.accessStopId.toString() + " egress=" + this.egressStopId + " line=" + this.lineId + " route=" + this.routeId + " ]";
+	}
 }

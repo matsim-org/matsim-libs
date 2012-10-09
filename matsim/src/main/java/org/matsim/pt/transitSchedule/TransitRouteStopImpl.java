@@ -108,5 +108,10 @@ public class TransitRouteStopImpl implements TransitRouteStop {
 	public int hashCode() {
 		return stop.hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		return "[TransitRouteStop stop=" + this.stop.getId() + " offset=" + this.departureOffset +" ]";
+	}
 
 }
