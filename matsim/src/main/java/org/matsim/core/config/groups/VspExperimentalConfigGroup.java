@@ -115,15 +115,17 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 //	private String coloring = COLORING_STANDARD ;
 
 	// ---
-	@Deprecated //somewhen should be deleted, Yu 03.2011
+//	@Deprecated //somewhen should be deleted, Yu 03.2011
 //	private static final String OFFSET_WALK = "offsetWalk";
 	// private double offsetWalk = 0d;
 
 	// ---
 
+	@Deprecated
 	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING =
 		"usingOpportunityCostOfTimeForPtRouting" ;
-	private boolean isUsingOpportunityCostOfTimeInPtRouting = false ;
+	@Deprecated
+	private boolean isUsingOpportunityCostOfTimeInPtRouting = true ;
 
 	// ---
 
@@ -339,34 +341,34 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		return map;
 	}
 
-	@Override
-	protected void checkConsistency() throws RuntimeException {
-		log.info( "entering checkVspDefaults ...") ;
-
-		// begin vsp default definitions
-		final boolean usingOpportunityCostOfTimeInPtRoutingDefault = true ;
-		// end vsp default definitions
-
-		boolean problem = false ;
-		if ( this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.WARN )
-				|| this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
-
-			if ( this.isUsingOpportunityCostOfTimeInPtRouting() != usingOpportunityCostOfTimeInPtRoutingDefault ) {
-				log.warn( "violating VSP defaults; "+USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + "  should be set to: " +
-						usingOpportunityCostOfTimeInPtRoutingDefault + " in module: " + GROUP_NAME) ;
-				problem = true ;
-			}
-
-		}
-
-		if ( this.getVspDefaultsCheckingLevel().equals(VspExperimentalConfigGroup.ABORT) && problem ) {
-			String str = "violating VSP defaults and vspDefaultsCheckingLevel set to `abort', thus aborting ..." ;
-			log.fatal( str ) ;
-			throw new RuntimeException( str ) ;
-		}
-
-		log.info( "leaving checkVspDefaults ...") ;
-	}
+//	@Override
+//	protected void checkConsistency() throws RuntimeException {
+//		log.info( "entering checkVspDefaults ...") ;
+//
+//		// begin vsp default definitions
+//		final boolean usingOpportunityCostOfTimeInPtRoutingDefault = true ;
+//		// end vsp default definitions
+//
+//		boolean problem = false ;
+//		if ( this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.WARN )
+//				|| this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
+//
+//			if ( this.isUsingOpportunityCostOfTimeInPtRouting() != usingOpportunityCostOfTimeInPtRoutingDefault ) {
+//				log.warn( "violating VSP defaults; "+USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + "  should be set to: " +
+//						usingOpportunityCostOfTimeInPtRoutingDefault + " in module: " + GROUP_NAME) ;
+//				problem = true ;
+//			}
+//
+//		}
+//
+//		if ( this.getVspDefaultsCheckingLevel().equals(VspExperimentalConfigGroup.ABORT) && problem ) {
+//			String str = "violating VSP defaults and vspDefaultsCheckingLevel set to `abort', thus aborting ..." ;
+//			log.fatal( str ) ;
+//			throw new RuntimeException( str ) ;
+//		}
+//
+//		log.info( "leaving checkVspDefaults ...") ;
+//	}
 
 
 
@@ -442,10 +444,12 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
 	}
 
+	@Deprecated // should always return true; switch is only there for backwards compatibility
 	public boolean isUsingOpportunityCostOfTimeInPtRouting() {
 		return this.isUsingOpportunityCostOfTimeInPtRouting;
 	}
 
+	@Deprecated // switch is only there for backwards compatibility
 	public void setUsingOpportunityCostOfTimeInPtRouting(final boolean tmp) {
 		this.isUsingOpportunityCostOfTimeInPtRouting = tmp;
 	}

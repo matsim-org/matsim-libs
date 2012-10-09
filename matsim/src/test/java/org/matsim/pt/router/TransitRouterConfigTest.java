@@ -58,9 +58,16 @@ public class TransitRouterConfigTest {
 		{
 		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting, vspConfig );
 		
-		Assert.assertEquals(-9.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
-		Assert.assertEquals(-11.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-13.0/3600, config.getMarginalUtiltityOfWaiting_utl_s(), 1e-8);
+//		Assert.assertEquals(-9.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+//		Assert.assertEquals(-11.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+//		Assert.assertEquals(-13.0/3600, config.getMarginalUtiltityOfWaiting_utl_s(), 1e-8);
+		// a number of changes related to the fact that the opportunity cost of time is now 
+		// included in the pt routing.  Either the test here or some scoring
+		// test needs to be adapted; this seems the better place. kai/benjamin, oct'12
+		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaiting_utl_s(), 1e-8);
+
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		
