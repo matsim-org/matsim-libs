@@ -46,7 +46,7 @@ public class VisumNodesRowHandler implements VisumNetworkRowHandler {
 		if (xStr == null || yStr == null) {
 			return;
 		}
-		System.out.println("xStr:" + xStr + "\tyStr:" + yStr);
+//		System.out.println("xStr:" + xStr + "\tyStr:" + yStr);
 		Coord coord = new CoordImpl(Double.parseDouble(xStr.replace(',', '.')),
 				Double.parseDouble(yStr.replace(',', '.')));
 		network.createAndAddNode(id, coord);

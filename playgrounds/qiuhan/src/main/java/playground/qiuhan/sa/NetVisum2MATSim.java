@@ -78,6 +78,7 @@ public class NetVisum2MATSim {
 	}
 
 	public void cleanNetwork() {
+		/*only 4 TESTS with exclusive car-network (pseudo pt)*/
 		new NetworkCleaner().run(this.network);
 	}
 
@@ -85,15 +86,20 @@ public class NetVisum2MATSim {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputMATSimNetworkFile = "output/matsimNetwork/networkBerlin.xml";
+		/* original Tests */
+		String outputMATSimNetworkFile = "output/matsimNetwork/networkBerlin2.xml";
 		String inputVisumNetFile = "input/visumNet/netall.net";
-		String outputZoneFile = "output/matsimNetwork/Zone.log";
-
+		String outputZoneFile = "output/matsimNetwork/Zone2.log";
+		/* Test with exclusive car-network (pseudo pt) */
+		
+		/* Test with exclusive pt-network (real pt) */
+		
+		
 		NetVisum2MATSim n2m = new NetVisum2MATSim();
 
 		n2m.readVisumNets(inputVisumNetFile);
 		n2m.convertNetwork(inputVisumNetFile, outputZoneFile);
-		// n2m.cleanNetwork();
+//		n2m.cleanNetwork();
 		n2m.writeMATSimNetwork(outputMATSimNetworkFile);
 	}
 

@@ -23,6 +23,7 @@ package playground.qiuhan.sa;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -42,30 +44,45 @@ import org.matsim.matrices.Matrix;
 
 public class MatrixToPersons {
 
-	private Matrix m;
-	private Map<Id, Person> persons;
-	private Map<String, Coord> zoneIdCoords;
+	private final Matrix m;
+	private final Map<Id, Person> persons;
+	private final Map<String, Coord> zoneIdCoords;
 	private static String DUMMY = "dummy";
-	private Random random;
+	private final Random random;
+	private Set<String> legModes = null;
+	private final NetworkImpl network;
 
 	/**
 	 * @param m
 	 *            a Matrix in one time interval (e.g. hour)
 	 * @param zoneIdCoords
 	 */
-	public MatrixToPersons(Matrix m, Map<String, Coord> zoneIdCoords) {
+	private MatrixToPersons(Matrix m, Map<String, Coord> zoneIdCoords,
+			NetworkImpl network) {
 		this.m = m;
 		this.persons = new HashMap<Id, Person>();
 		this.zoneIdCoords = zoneIdCoords;
 		this.random = MatsimRandom.getRandom();
-		this.createPersons();
+		this.network = network;
 	}
 
-	public Map<Id, Person> getPersons() {
-		return persons;
+	/**
+	 * @param m
+	 *            a Matrix in one time interval (e.g. hour)
+	 * @param zoneIdCoords
+	 * @param legModes
+	 *            if legModes==null, the mode of legs will be automatically set
+	 *            to "pseudo-pt"
+	 */
+	public MatrixToPersons(Matrix m, Map<String, Coord> zoneIdCoords,
+			NetworkImpl network, Set<String> legModes) {
+
+		this(m, zoneIdCoords, network);
+		this.legModes = legModes;
+
 	}
 
-	private void createPersons() {
+	public Map<Id, Person> createPersons() {
 		for (Id from : this.m.getFromLocations().keySet()) {
 			Coord fromZone = this.zoneIdCoords.get(from.toString());
 
@@ -73,7 +90,7 @@ public class MatrixToPersons {
 				Id toZoneId = entry.getToLocation();
 				Coord toZone = this.zoneIdCoords.get(toZoneId.toString());
 
-				int numberPersons = (int) (entry.getValue());
+				int numberPersons = (int) entry.getValue();
 
 				for (int i = 0; i < numberPersons; i++) {
 					Id personId = new IdImpl(this.m.getId() + "-" + from + "-"
@@ -82,16 +99,42 @@ public class MatrixToPersons {
 				}
 			}
 		}
+		return persons;
 	}
 
+	/**
+	 * @param personId
+	 * @param from
+	 * @param to
+	 */
 	private void createPerson(Id personId, Coord from, Coord to) {
 		Person per = new PersonImpl(personId);
 
+		createPlans(per, from, to);
+
+		this.persons.put(personId, per);
+	}
+
+	private void createPlans(Person per, Coord from, Coord to) {
+		if (this.legModes != null && !this.legModes.isEmpty()) {
+			for (String legMode : this.legModes) {
+				per.addPlan(createPlan(legMode, from, to));
+			}
+
+		} else {
+			per.addPlan(createPlan(TransportMode.car, from, to));
+			// TODO with pseudo pt or not?
+			// per.addPlan(createPlan(TransportMode.pt, from, to));
+		}
+	}
+
+	private Plan createPlan(String legMode, Coord from, Coord to) {
 		Plan plan = new PlanImpl();
+		((PlanImpl) plan).setType(legMode);
 
-		per.addPlan(plan);
-
-		Activity firstAct = new ActivityImpl(DUMMY, from);
+		Activity firstAct = new ActivityImpl(DUMMY, from,
+				XY2NearestPassableLink.getNearestPassableLink(from, network)
+						.getId());
 		int time = Integer.parseInt(this.m.getId());
 
 		double endTime = (time - 1) * 3600 + this.random.nextDouble() * 3600d;
@@ -99,12 +142,13 @@ public class MatrixToPersons {
 
 		plan.addActivity(firstAct);
 
-		Leg leg = new LegImpl(TransportMode.pt);
+		Leg leg = new LegImpl(legMode);
 		plan.addLeg(leg);
 
-		Activity lastAct = new ActivityImpl(DUMMY, to);
+		Activity lastAct = new ActivityImpl(DUMMY, to, XY2NearestPassableLink
+				.getNearestPassableLink(to, network).getId());
 		plan.addActivity(lastAct);
 
-		this.persons.put(personId, per);
+		return plan;
 	}
 }

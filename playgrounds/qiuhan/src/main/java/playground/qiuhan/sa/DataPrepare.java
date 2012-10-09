@@ -59,30 +59,52 @@ import playground.mrieser.pt.converter.Visum2TransitSchedule;
 import playground.mrieser.pt.utils.MergeNetworks;
 
 public class DataPrepare {
-
+	/* original Tests */
 	private static final Logger log = Logger.getLogger(DataPrepare.class);
 
 	// INPUT FILES
 	private final static String VISUM_FILE = "input/visumNet/netall.net";
-	private final static String NETWORK_FILE = "output/matsimNetwork/networkBerlin.xml";
-	private final static String INPUT_PLANS_FILE = "output/population/pop.xml.gz";
+	// private final static String NETWORK_FILE =
+	// "output/matsimNetwork/networkBerlin2.xml";
+	// private final static String INPUT_PLANS_FILE =
+	// "output/population/pop1pct2.xml";
+	//
+	// // INTERMEDIARY FILES
+	// private final static String TRANSIT_NETWORK_FILE =
+	// "output/matsimNetwork/network.oevModell2.xml";
+	// private final static String TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE =
+	// "output/schedule/transitSchedule2.xml";
+	//
+	// // OUTPUT FILEs
+	// private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE =
+	// "output/schedule/transitSchedule.network2.xml";
+	// private final static String VEHICLE_FILE =
+	// "output/vehicle/vehicles2.xml";
+	// private final static String MULTIMODAL_NETWORK_FILE =
+	// "output/matsimNetwork/network.multimodal2.xml";
+	// private final static String ROUTED_PLANS_FILE =
+	// "output/population/routedOevModell2.xml.gz";
+
+	/* Test with anIV+slOeV-network */
+	private final static String NETWORK_FILE = "output/matsimNetwork/combi.xml.gz";
+	private final static String INPUT_PLANS_FILE = "output/population/pop2wnplCombiTest.xml.gz";
 
 	// INTERMEDIARY FILES
-	private final static String TRANSIT_NETWORK_FILE = "output/matsimNetwork/network.oevModell.xml";
-	private final static String TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE = "output/schedule/transitSchedule.xml";
+	private final static String TRANSIT_NETWORK_FILE = "output/matsimNetwork/network.oevModellCombi2.xml";
+	private final static String TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE = "output/schedule/transitScheduleCombi2.xml";
 
-	// OUTPUT FILES
-	private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "output/schedule/transitSchedule.network.xml";
-	private final static String VEHICLE_FILE = "output/vehicle/vehicles.xml";
-	private final static String MULTIMODAL_NETWORK_FILE = "output/matsimNetwork/network.multimodal.xml";
-	private final static String ROUTED_PLANS_FILE = "output/population/routedOevModell.xml.gz";
-
+	// OUTPUT FILEs
+	private final static String TRANSIT_SCHEDULE_WITH_NETWORK_FILE = "output/schedule/transitSchedule.networkCombi2.xml";
+	private final static String VEHICLE_FILE = "output/vehicle/vehiclesCombi2.xml";
+	private final static String MULTIMODAL_NETWORK_FILE = "output/matsimNetwork/network.multimodalCombi2.xml";
+	private final static String ROUTED_PLANS_FILE = "output/population/routedOevModellCombi2.xml.gz";
 
 	private final ScenarioImpl scenario;
 	private final Config config;
 
 	public DataPrepare() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 		this.config = this.scenario.getConfig();
 	}
 
@@ -96,7 +118,8 @@ public class DataPrepare {
 		log.info("reading visum network.");
 		new VisumNetworkReader(vNetwork).read(VISUM_FILE);
 		log.info("converting visum data to TransitSchedule.");
-		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
+		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork,
+				this.scenario.getTransitSchedule(), this.scenario.getVehicles());
 
 		// configure how transport modes must be converted
 		// the ones for Berlin
@@ -113,30 +136,37 @@ public class DataPrepare {
 		converter.registerTransportMode("W", "bus");
 		converter.registerTransportMode("Z", "train");
 
-
 		converter.convert();
 		log.info("writing TransitSchedule to file.");
-		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
+		new TransitScheduleWriterV1(this.scenario.getTransitSchedule())
+				.write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
 		log.info("writing vehicles to file.");
-		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(VEHICLE_FILE);
+		new VehicleWriterV1(this.scenario.getVehicles())
+				.writeFile(VEHICLE_FILE);
 	}
 
 	protected void createNetworkFromSchedule() {
 		NetworkImpl network = NetworkImpl.createNetwork();
-		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network, "tr_").createNetwork();
+		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), network,
+				"tr_").createNetwork();
 		new NetworkWriter(network).write(TRANSIT_NETWORK_FILE);
-		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
+		new TransitScheduleWriter(this.scenario.getTransitSchedule())
+				.writeFile(TRANSIT_SCHEDULE_WITH_NETWORK_FILE);
 	}
 
 	protected void mergeNetworks() {
-		ScenarioImpl transitScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl transitScenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network transitNetwork = transitScenario.getNetwork();
-		ScenarioImpl streetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl streetScenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network streetNetwork = streetScenario.getNetwork();
 		new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
 		new MatsimNetworkReader(streetScenario).parse(NETWORK_FILE);
-		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
-		new NetworkWriter(this.scenario.getNetwork()).write(MULTIMODAL_NETWORK_FILE);
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "",
+				(NetworkImpl) this.scenario.getNetwork());
+		new NetworkWriter(this.scenario.getNetwork())
+				.write(MULTIMODAL_NETWORK_FILE);
 	}
 
 	protected void routePopulation() {
@@ -145,30 +175,39 @@ public class DataPrepare {
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		ModeRouteFactory routeFactory = new ModeRouteFactory();
-		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());
+		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(
+				this.scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
-		TransitRouterConfig tRConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(), 
-				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
+		TransitRouterConfig tRConfig = new TransitRouterConfig(this.scenario
+				.getConfig().planCalcScore(), this.scenario.getConfig()
+				.plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
-		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
-				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, routeFactory,
-				transitConfig, new TransitRouterImpl(tRConfig, this.scenario.getTransitSchedule() ), this.scenario.getTransitSchedule());
+		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario
+				.getConfig().plansCalcRoute(), this.scenario.getNetwork(),
+				timeCostCalculator, timeCostCalculator, dijkstraFactory,
+				routeFactory, transitConfig, new TransitRouterImpl(tRConfig,
+						this.scenario.getTransitSchedule()),
+				this.scenario.getTransitSchedule());
 		log.info("start pt-router");
 		router.run(pop);
 		log.info("write routed plans out.");
-		new PopulationWriter(pop, this.scenario.getNetwork()).write(ROUTED_PLANS_FILE);
+		new PopulationWriter(pop, this.scenario.getNetwork())
+				.write(ROUTED_PLANS_FILE);
 	}
 
 	protected void visualizeRouterNetwork() {
-		TransitRouterConfig tRConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(), 
-				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
+		TransitRouterConfig tRConfig = new TransitRouterConfig(this.scenario
+				.getConfig().planCalcScore(), this.scenario.getConfig()
+				.plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
 
-		TransitRouterImpl router = new TransitRouterImpl(tRConfig, this.scenario.getTransitSchedule() );
+		TransitRouterImpl router = new TransitRouterImpl(tRConfig,
+				this.scenario.getTransitSchedule());
 		Network routerNet = router.getTransitRouterNetwork();
 
 		log.info("create vis network");
-		ScenarioImpl visScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl visScenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network visNet = visScenario.getNetwork();
 
 		for (Node node : routerNet.getNodes().values()) {
@@ -176,7 +215,8 @@ public class DataPrepare {
 			visNet.addNode(node);
 		}
 		for (Link link : routerNet.getLinks().values()) {
-			Link l = visNet.getFactory().createLink(link.getId(), link.getFromNode(), link.getToNode());
+			Link l = visNet.getFactory().createLink(link.getId(),
+					link.getFromNode(), link.getToNode());
 			l.setLength(link.getLength());
 			l.setFreespeed(link.getFreespeed());
 			l.setCapacity(link.getCapacity());
@@ -188,8 +228,12 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(visScenario, events);
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+
+		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(visScenario,
+				events);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(
+				scenario.getConfig(), scenario, events, otfVisQSim);
+
 		OTFClientLive.run(scenario.getConfig(), server);
 		otfVisQSim.run();
 	}
@@ -198,10 +242,10 @@ public class DataPrepare {
 		DataPrepare app = new DataPrepare();
 		app.prepareConfig();
 		app.convertSchedule();
-//		app.createNetworkFromSchedule();
-//		app.mergeNetworks();
-//		app.routePopulation();
-//		app.visualizeRouterNetwork();
+		app.createNetworkFromSchedule();
+		app.mergeNetworks();
+		app.routePopulation();
+		// app.visualizeRouterNetwork();
 
 		log.info("done.");
 	}

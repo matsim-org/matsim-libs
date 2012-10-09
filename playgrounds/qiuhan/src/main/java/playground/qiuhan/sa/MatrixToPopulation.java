@@ -3,16 +3,20 @@
  */
 package playground.qiuhan.sa;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -25,10 +29,18 @@ import org.matsim.visum.VisumMatrixReader;
  * 
  */
 public class MatrixToPopulation {
+	private Set<String> legModes = null;
 	Population pop;
+	private final Scenario scenario;
 
-	public MatrixToPopulation(Scenario scenario) {
+	private MatrixToPopulation(Scenario scenario) {
+		this.scenario = scenario;
 		this.pop = new PopulationImpl((ScenarioImpl) scenario);
+	}
+
+	public MatrixToPopulation(Scenario scenario, Set<String> legModes) {
+		this(scenario);
+		this.legModes = legModes;
 	}
 
 	public void readMatrices(String matricesPath,
@@ -42,8 +54,9 @@ public class MatrixToPopulation {
 
 			// this.smallMs.put(i, smallM);
 
-			Map<Id, Person> persons = new MatrixToPersons(smallM, zoneIdCoords)
-					.getPersons();
+			Map<Id, Person> persons = new MatrixToPersons(smallM, zoneIdCoords,
+					(NetworkImpl) this.scenario.getNetwork(), this.legModes)
+			.createPersons();
 			for (Person per : persons.values()) {
 				this.pop.addPerson(per);
 			}
@@ -57,12 +70,42 @@ public class MatrixToPopulation {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void runClassic(String[] args) {
 		// TODO read 24 matrices to population and write a population file
-		String matricesPath = "output/matrices/";
-		String zoneFilename = "output/matsimNetwork/Zone.log";
-		String networkFilename = "output/matsimNetwork/networkBerlin.xml";
-		String outputPopulationFilename = "output/population/pop.xml";
+		String matricesPath = "output/matrices2/";
+		String zoneFilename = "output/matsimNetwork/Zone2.log";
+		
+//		String networkFilename = "output/matsimNetwork/networkBerlin2.xml";
+//		String outputPopulationFilename = "output/population/pop2wnplTest.xml.gz";
+//		
+		// String outputPopulationFilename = "output/population/pop2.xml";
+		
+		String networkFilename = "output/matsimNetwork/combi.xml.gz";
+		String outputPopulationFilename = "output/population/pop2wnplCombiTest.xml.gz";
+		
+			
+		ZoneReader zones = new ZoneReader();
+		zones.readFile(zoneFilename);
+		Map<String, Coord> zoneIdCoords = zones.getZoneIdCoords();
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+
+		MatrixToPopulation mtp = new MatrixToPopulation(scenario, null);
+		mtp.readMatrices(matricesPath, zoneIdCoords);
+		mtp.writePopulation(outputPopulationFilename, scenario.getNetwork());
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void run4carSubNetwork(String[] args) {
+		// TODO read 24 matrices to population and write a population file
+		String matricesPath = "output/matrices2/";
+		String zoneFilename = "output/matsimNetwork/Zone2.log";
+		String networkFilename = "output/matsimNetwork/networkBerlin2car.xml";
+		String outputPopulationFilename = "output/population/pop4carNetwork.xml";
 
 		ZoneReader zones = new ZoneReader();
 		zones.readFile(zoneFilename);
@@ -72,8 +115,19 @@ public class MatrixToPopulation {
 				.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
-		MatrixToPopulation mtp = new MatrixToPopulation(scenario);
+		Set<String> legModes = new HashSet<String>();
+		legModes.add(TransportMode.car);
+		legModes.add(TransportMode.pt);
+		MatrixToPopulation mtp = new MatrixToPopulation(scenario, legModes);
 		mtp.readMatrices(matricesPath, zoneIdCoords);
 		mtp.writePopulation(outputPopulationFilename, scenario.getNetwork());
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		runClassic(args);
+		// run4carSubNetwork(args);
 	}
 }

@@ -36,8 +36,8 @@ import playground.mzilske.bvg09.VisumNetworkRowHandler;
 
 public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 
-	private NetworkImpl network;
-	private VisumNetwork visumNetwork;
+	private final NetworkImpl network;
+	private final VisumNetwork visumNetwork;
 
 	public VisumLinksRowHandler(NetworkImpl network, VisumNetwork visumNetwork) {
 		this.network = network;
@@ -75,16 +75,16 @@ public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 		String mode = null;
 		for (String vsys : vsyss) {
 			if (vsys.equals("B")) {
-				mode = "Bus";
+				mode = "bus";
 
 			} else if (vsys.equals("F")) {
 				mode = TransportMode.walk;
 
 			} else if (vsys.equals("K")) {
-				mode = "Kurzstrecke";
+				mode = "bus";//kurzstrecke
 
 			} else if (vsys.equals("L")) {
-				mode = "LKW";
+				mode = "other";//LKW
 
 			} else if (vsys.equals("P")) {
 				mode = TransportMode.car;
@@ -93,19 +93,19 @@ public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 				mode = TransportMode.bike;
 
 			} else if (vsys.equals("T")) {
-				mode = "Tram";
+				mode = "tram";
 
 			} else if (vsys.equals("U")) {
-				mode = "Metro";
+				mode = "train";
 
 			} else if (vsys.equals("S")) {
-				mode = "S-Bahn";
+				mode = "train";
 
 			} else if (vsys.equals("W")) {
-				mode = "Bus (Umland)";
+				mode = "bus";
 
 			} else if (vsys.equals("Z")) {
-				mode = "Regionalzuege";// TODO
+				mode = "train";// regionalZug
 
 			}
 			modes.add(mode);
