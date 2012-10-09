@@ -37,7 +37,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author yu
  * 
  */
-public class CalculateLegBeelineDistance {
+public class LegBeelineDistanceCalculator {
 	public static double getBeelineDistance_link(Network network, Leg leg) {
 		Route route = leg.getRoute();
 		Id startLinkId = route.getStartLinkId();

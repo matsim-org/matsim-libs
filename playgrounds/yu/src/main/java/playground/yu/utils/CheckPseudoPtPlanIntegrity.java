@@ -49,9 +49,9 @@ import org.matsim.core.scenario.ScenarioUtils;
  * {@code Leg} {@code TransportMode}), this class will set the corresponding
  * beeline distance to the {@code Route} and estimated beeline traveltime to the
  * {@code Leg}.
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class CheckPseudoPtPlanIntegrity {
 	public static Plan check(Network network, Plan plan, Config config) {
@@ -63,7 +63,7 @@ public class CheckPseudoPtPlanIntegrity {
 					Route route = leg.getRoute();
 					if (Double.isNaN(route.getDistance())
 							|| Double.isInfinite(leg.getTravelTime())) {
-						double distance = CalculateLegBeelineDistance
+						double distance = LegBeelineDistanceCalculator
 								.getBeelineDistance_link(network, leg);
 
 						route.setDistance(distance);
