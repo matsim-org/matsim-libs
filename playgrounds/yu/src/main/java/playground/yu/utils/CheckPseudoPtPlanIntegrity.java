@@ -64,7 +64,7 @@ public class CheckPseudoPtPlanIntegrity {
 					if (Double.isNaN(route.getDistance())
 							|| Double.isInfinite(leg.getTravelTime())) {
 						double distance = CalculateLegBeelineDistance
-								.getBeelineDistance(network, leg);
+								.getBeelineDistance_link(network, leg);
 
 						route.setDistance(distance);
 
