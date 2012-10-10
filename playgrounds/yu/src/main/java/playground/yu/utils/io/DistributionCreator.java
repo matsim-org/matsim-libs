@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.charts.ChartUtil;
@@ -72,12 +72,13 @@ public class DistributionCreator {
 	}
 
 	private double[] data;
-	private Map<Double, Integer> dataMap = new HashMap<Double, Integer>();
+	private final Map<Double, Integer> dataMap = new HashMap<Double, Integer>();
 
-	private double interval;
+	private final double interval;
 
 	private Map<String, double[]> datas = null;
 	private Map<String, Map<Double, Integer>> dataMaps = null;
+	private boolean isLogarithmicAxis=true;
 
 	/**
 	 * no interval of the x-axis data means all data records will be used
@@ -141,8 +142,8 @@ public class DistributionCreator {
 		datas = new HashMap<String, double[]>();
 		dataMaps = new HashMap<String, Map<Double, Integer>>();
 		for (Entry<String, List<Double>> entry : dataList.entrySet()) {
-			datas.put(entry.getKey(), Collection2Array.toArrayFromDouble(entry
-					.getValue()));
+			datas.put(entry.getKey(),
+					Collection2Array.toArrayFromDouble(entry.getValue()));
 		}
 		this.interval = interval;
 		initialize2();
@@ -150,16 +151,32 @@ public class DistributionCreator {
 
 	public void createChart(String filename, String title, String xAxisLabel,
 			String yAxisLabel) {
-		XYScatterChart chart = new XYScatterChart(title, xAxisLabel, yAxisLabel);
+		createChart(filename, title, xAxisLabel, yAxisLabel,
+				this.isLogarithmicAxis);
+	}
+
+	public void createChart(String filename, String title, String xAxisLabel,
+			String yAxisLabel, boolean isLogarithmicAxis) {
+		this.isLogarithmicAxis = isLogarithmicAxis;
+		XYScatterChart chart = new XYScatterChart(title, xAxisLabel,
+				yAxisLabel, this.isLogarithmicAxis);
 		double xs[] = Collection2Array.toArrayFromDouble(dataMap.keySet());
 		double ys[] = Collection2Array.toDoubleArray(dataMap.values());
 		chart.addSeries(title, xs, ys);
-		chart.saveAsPng(filename, 1024, 768);
+		chart.saveAsPng(filename, 800, 600);
 	}
 
 	public void createChartPercent(String filename, String title,
 			String xAxisLabel, String yAxisLabel) {
-		XYScatterChart chart = new XYScatterChart(title, xAxisLabel, yAxisLabel);
+		createChartPercent(filename, title, xAxisLabel, yAxisLabel,
+				this.isLogarithmicAxis);
+	}
+
+	public void createChartPercent(String filename, String title,
+			String xAxisLabel, String yAxisLabel, boolean isLogarithmicAxis) {
+		this.isLogarithmicAxis = isLogarithmicAxis;
+		XYScatterChart chart = new XYScatterChart(title, xAxisLabel,
+				yAxisLabel, this.isLogarithmicAxis);
 		double xs[] = Collection2Array.toArrayFromDouble(dataMap.keySet());
 
 		Collection<Integer> values = dataMap.values();
@@ -171,7 +188,7 @@ public class DistributionCreator {
 		}
 
 		chart.addSeries(title, xs, ys);
-		chart.saveAsPng(filename, 640, 480);
+		chart.saveAsPng(filename, 800, 600);
 	}
 
 	/**
@@ -232,6 +249,13 @@ public class DistributionCreator {
 
 		for (int i = 0; i < data.length; i++) {
 			key = interval > 0d ? getXAxisValue(data[i]) : data[i];
+			if (key <= 0) {
+				System.out.println(">>>>>data[" + i + "]\t=\t" + data[i]);
+				if (this.isLogarithmicAxis) {
+					key = 1;
+				}
+				System.out.println(">>>>>key<=0!!!");
+			}
 			Integer cnt = dataMap.get(key);
 			if (cnt == null) {
 				dataMap.put(key, 1);
@@ -249,7 +273,13 @@ public class DistributionCreator {
 			double key;
 			for (int i = 0; i < aData.length; i++) {
 				key = interval > 0d ? getXAxisValue(aData[i]) : aData[i];
-
+				if (key <= 0) {
+					System.out.println(">>>>>data[" + i + "]\t=\t" + data[i]);
+					if (this.isLogarithmicAxis) {
+						key = 1;
+					}
+					System.out.println(">>>>>key<=0!!!");
+				}
 				Map<Double, Integer> aDataMap = dataMaps.get(mapKey);
 				if (aDataMap == null) {
 					aDataMap = new HashMap<Double, Integer>();
