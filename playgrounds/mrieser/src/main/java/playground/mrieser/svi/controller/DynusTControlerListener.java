@@ -23,6 +23,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -33,8 +34,10 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
+import playground.mrieser.svi.converters.DynusTNetworkReader;
 import playground.mrieser.svi.data.ActivityToZoneMappingWriter;
 import playground.mrieser.svi.data.CalculateActivityToZoneMapping;
 import playground.mrieser.svi.data.ShapeZonesReader;
@@ -56,6 +59,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 	private boolean useOnlyDynusT = false;
 	private final DynamicTravelTimeMatrix ttMatrix = new DynamicTravelTimeMatrix(600, 30*3600.0); // 10min time bins, at most 30 hours
 	private PtLines ptLines = null;
+	private Network dynusTNetwork = null;
 
 	public DynusTControlerListener(final DynusTConfig dc) {
 		this.dc = dc;
@@ -77,8 +81,12 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 		this.dc.setPtLinesFile(config.findParam("dynus-t", "ptLinesFile"));
 		this.useOnlyDynusT = Boolean.parseBoolean(config.getParam("dynus-t", "useOnlyDynusT"));
 
+		log.info("Reading DynusT-network..." + this.dc.getModelDirectory());
+		this.dynusTNetwork = NetworkImpl.createNetwork();
+		new DynusTNetworkReader(this.dynusTNetwork).readFiles(this.dc.getModelDirectory() + "/xy.dat", this.dc.getModelDirectory()+ "/network.dat");
+		
 		if (this.useOnlyDynusT) {
-			c.setMobsimFactory(new DynusTMobsimFactory(this.dc, this.ttMatrix));
+			c.setMobsimFactory(new DynusTMobsimFactory(this.dc, this.ttMatrix, this.dynusTNetwork));
 			log.info("DynusT will be used as exclusive mobility simulation. Make sure that re-routing is *not* enabled as replanning strategy, as it will have no effect.");
 			c.setScoringFunctionFactory(new DynusTScoringFunctionFactory(this.dc, this.ttMatrix, this.dc.getActToZoneMapping(), new CharyparNagelScoringParameters(config.planCalcScore())));
 		} else {
@@ -118,7 +126,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 			if (this.dc.getPtLinesFile() != null) {
 				this.ptLines = new PtLines();
 				log.info("reading pt lines from " + this.dc.getPtLinesFile());
-				new PtLinesReader(this.ptLines, c.getNetwork());
+				new PtLinesReader(this.ptLines, this.dynusTNetwork);
 			}
 			
 			this.isFirstIteration = false;
@@ -129,7 +137,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		if (!this.useOnlyDynusT) {
 			// run DynusT now
-			new DynusTMobsim(this.dc, this.ttMatrix, event.getControler().getScenario(), event.getControler().getEvents()).run();
+			new DynusTMobsim(this.dc, this.ttMatrix, event.getControler().getScenario(), event.getControler().getEvents(), this.dynusTNetwork).run();
 			new ScoreAdaptor().run();
 		}
 	}

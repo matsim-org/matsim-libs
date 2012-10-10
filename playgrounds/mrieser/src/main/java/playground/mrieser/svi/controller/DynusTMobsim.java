@@ -21,6 +21,7 @@ package playground.mrieser.svi.controller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,11 +46,14 @@ public class DynusTMobsim implements Mobsim {
 	private final DynusTConfig dc;
 	private final Scenario scenario;
 	private final DynamicTravelTimeMatrix ttMatrix;
+	private final Network dynusTnet;
 
-	public DynusTMobsim(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final Scenario sc, final EventsManager eventsManager) {
+	public DynusTMobsim(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final Scenario sc, final EventsManager eventsManager,
+			final Network dynusTnet) {
 		this.dc = dc;
 		this.scenario = sc;
 		this.ttMatrix = ttMatrix;
+		this.dynusTnet = dynusTnet;
 	}
 
 	@Override
@@ -80,8 +84,8 @@ public class DynusTMobsim implements Mobsim {
 		CalculateTravelTimeMatrixFromVehTrajectories ttmCalc = new CalculateTravelTimeMatrixFromVehTrajectories(this.ttMatrix);
 		new VehicleTrajectoriesReader(ttmCalc, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
 
-		TravelTimeCalculator ttc = new TravelTimeCalculator(this.scenario.getNetwork(), this.scenario.getConfig().travelTimeCalculator());
-		CalculateLinkTravelTimesFromVehTrajectories lttCalc = new CalculateLinkTravelTimesFromVehTrajectories(ttc, this.scenario.getNetwork());
+		TravelTimeCalculator ttc = new TravelTimeCalculator(this.dynusTnet, this.scenario.getConfig().travelTimeCalculator());
+		CalculateLinkTravelTimesFromVehTrajectories lttCalc = new CalculateLinkTravelTimesFromVehTrajectories(ttc, this.dynusTnet);
 		new VehicleTrajectoriesReader(lttCalc, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
 		this.dc.setTravelTimeCalculator(ttc);
 	}

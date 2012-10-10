@@ -20,6 +20,7 @@
 package playground.mrieser.svi.controller;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -33,15 +34,17 @@ public class DynusTMobsimFactory implements MobsimFactory {
 
 	private final DynusTConfig dc;
 	private final DynamicTravelTimeMatrix ttMatrix;
+	private final Network dynusTnet;
 
-	public DynusTMobsimFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix) {
+	public DynusTMobsimFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final Network dynusTnet) {
 		this.dc = dc;
 		this.ttMatrix = ttMatrix;
+		this.dynusTnet = dynusTnet;
 	}
 
 	@Override
 	public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-		return new DynusTMobsim(this.dc, this.ttMatrix, sc, eventsManager);
+		return new DynusTMobsim(this.dc, this.ttMatrix, sc, eventsManager, this.dynusTnet);
 	}
 
 }
