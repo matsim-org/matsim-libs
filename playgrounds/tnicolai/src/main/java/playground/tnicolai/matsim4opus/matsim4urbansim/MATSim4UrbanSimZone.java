@@ -38,7 +38,6 @@ import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
-import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 
 
 /**
@@ -238,7 +237,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			
 			controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
 																						 measuringPoints, 
-																						 null,
+																						 zones,
 																						 freeSpeedGrid,
 																						 carGrid,
 																						 bikeGrid,

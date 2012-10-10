@@ -25,6 +25,8 @@ package playground.tnicolai.matsim4opus.config;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
@@ -35,8 +37,10 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -73,6 +77,10 @@ import playground.tnicolai.matsim4opus.utils.io.Paths;
  *   - added a field "project_name" of the UrbanSim sceanario as an identifier
  *   - added a time-of-a-day parameter
  *   - added beta parameter for mode bike
+ *   
+ * improvements/changes oct'12
+ * - switched to qsim
+ * 
  */
 public class MATSim4UrbanSimConfigurationConverterV3 {
 	
@@ -148,9 +156,10 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 			initInputPlansFile(matsimParameter);
 			initControler(matsimParameter);
 			initPlanCalcScore(matsimParameter);
-			initSimulation();
+			// initSimulation(); // tnicolai: this is replaced by "initQSim"
 			initStrategy(matsimParameter);
 			initPlanCalcRoute();
+			initQSim();
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -620,18 +629,16 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 //		hs.add("otfvis");
 //		controlerCG.setSnapshotFormat(Collections.unmodifiableSet(hs));
 		controlerCG.setSnapshotFormat(Arrays.asList("otfvis")); // otfvis dosn't work ???
-		controlerCG.setWriteSnapshotsInterval( 0 ); // disabling snapshots
-		
-		// set JDEQSim
-		// controlerCG.setMobsim("jdeqsim");
+		controlerCG.setWriteSnapshotsInterval( 0 ); // 0 = disabling snapshots
+
 		// set Qsim
-		// ØcontrolerCG.setMobsim(QSimConfigGroup.GROUP_NAME);
+		controlerCG.setMobsim(QSimConfigGroup.GROUP_NAME);
 		
 		log.info("ControlerConfigGroup settings:");
 		log.info("FirstIteration: " + controlerCG.getFirstIteration());
 		log.info("LastIteration: " + controlerCG.getLastIteration());
 		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
-		// log.info("Mobsim: " + QSimConfigGroup.GROUP_NAME);
+		log.info("Mobsim: " + controlerCG.getMobsim());
 		log.info("... done!");
 	}
 	
@@ -663,77 +670,25 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		log.info("... done!");
 	}
 	
-//	/**
-//	 * setting qsim
-//	 */
-//	private void initQSim(){
-//		log.info("Setting QSimConfigGroup to config...");
-//		
-//		
-//		QSimConfigGroup qsimCG = scenario.getConfig().getQSimConfigGroup();
-//		if( qsimCG == null){		
-//			qsimCG = new QSimConfigGroup();
-//			scenario.getConfig().addQSimConfigGroup( qsimCG );
-//		}
-//		
-//		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
-//		
-//		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
-//		
-//		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
-//		qsimCG.setFlowCapFactor( popSampling );	
-//		
-//		// Adapting the storageCapFactor has the following reason:
-//		// Too low SorageCapacities especially with small sampling 
-//		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
-//		// This leads to an unstable behavior of the simulation (by breakdowns 
-//		// during the learning progress).
-//		// The correction fetch factor introduced here raises the 
-//		// storage capacity at low sampling rates and becomes flatten 
-//		// with increasing sampling rates (at a 100% sample, the 
-//		// storage capacity == 1).			tnicolai nov'11
-//		if(popSampling <= 0.){
-//			popSampling = 0.01;
-//			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
-//		}
-//		// tnicolai dec'11
-//		double fetchFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
-//		double storageCap = popSampling * fetchFactor;
-//		
-//		// setting StorageCapFactor
-//		qsimCG.setStorageCapFactor( storageCap );	
-//		
-//		boolean removeStuckVehicles = false;
-//		qsimCG.setRemoveStuckVehicles( removeStuckVehicles );
-//		qsimCG.setStuckTime(10.);
-//		
-//		log.info("QSimConfigGroup settings:");
-//		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
-//		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + fetchFactor + ")" );
-//		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
-//		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
-//		log.info("... done!");
-//	}
-	
 	/**
-	 * setting simulation
+	 * setting qsim
 	 */
-	private void initSimulation(){
-		log.info("Setting SimulationConfigGroup to config...");
+	private void initQSim(){
+		log.info("Setting QSimConfigGroup to config...");
 		
-		
-		SimulationConfigGroup simulation = scenario.getConfig().simulation();
-		if( simulation == null){		
-			simulation = new SimulationConfigGroup();
-			scenario.getConfig().addSimulationConfigGroup( simulation );
+		QSimConfigGroup qsimCG = scenario.getConfig().getQSimConfigGroup();
+		if( qsimCG == null){		
+			qsimCG = new QSimConfigGroup();
+			scenario.getConfig().addQSimConfigGroup( qsimCG );
 		}
 		
+		// setting number of threads
+		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+		
 		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
-		
 		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
-		
 		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
-		simulation.setFlowCapFactor( popSampling );	
+		qsimCG.setFlowCapFactor( popSampling );	
 		
 		// Adapting the storageCapFactor has the following reason:
 		// Too low SorageCapacities especially with small sampling 
@@ -749,23 +704,76 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
 		}
 		// tnicolai dec'11
-		double fetchFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
-		double storageCap = popSampling * fetchFactor;
-		
+		double storageCapCorrectionFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
+		double storageCap = popSampling * storageCapCorrectionFactor;
 		// setting StorageCapFactor
-		simulation.setStorageCapFactor( storageCap );	
+		qsimCG.setStorageCapFactor( storageCap );	
 		
 		boolean removeStuckVehicles = false;
-		simulation.setRemoveStuckVehicles( removeStuckVehicles );
-		simulation.setStuckTime(10.);
+		qsimCG.setRemoveStuckVehicles( removeStuckVehicles );
+		qsimCG.setStuckTime(10.);
+		qsimCG.setEndTime(30.*3600.); // 30h
 		
-		log.info("SimulationConfigGroup settings:");
-		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
-		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + fetchFactor + ")" );
+		log.info("QSimConfigGroup settings:");
+		log.info("Number of Threads: " + qsimCG.getNumberOfThreads());
+		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().getQSimConfigGroup().getFlowCapFactor());
+		log.warn("StorageCapFactor: " + scenario.getConfig().getQSimConfigGroup().getStorageCapFactor() + " (with correction factor = " + storageCapCorrectionFactor + ")" );
 		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
-		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
+		log.info("StuckTime: " + scenario.getConfig().getQSimConfigGroup().getStuckTime());
+		log.info("End Time: " + qsimCG.getEndTime());
 		log.info("... done!");
 	}
+	
+//	/**
+//	 * setting simulation
+//	 */
+//	private void initSimulation(){
+//		log.info("Setting SimulationConfigGroup to config...");
+//		
+//		SimulationConfigGroup simulation = scenario.getConfig().simulation();
+//		if( simulation == null){		
+//			simulation = new SimulationConfigGroup();
+//			scenario.getConfig().addSimulationConfigGroup( simulation );
+//		}
+//		
+//		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
+//		
+//		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
+//		
+//		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
+//		simulation.setFlowCapFactor( popSampling );	
+//		
+//		// Adapting the storageCapFactor has the following reason:
+//		// Too low SorageCapacities especially with small sampling 
+//		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
+//		// This leads to an unstable behavior of the simulation (by breakdowns 
+//		// during the learning progress).
+//		// The correction fetch factor introduced here raises the 
+//		// storage capacity at low sampling rates and becomes flatten 
+//		// with increasing sampling rates (at a 100% sample, the 
+//		// storage capacity == 1).			tnicolai nov'11
+//		if(popSampling <= 0.){
+//			popSampling = 0.01;
+//			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
+//		}
+//		// tnicolai dec'11
+//		double storageCapCorrectionFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
+//		double storageCap = popSampling * storageCapCorrectionFactor;
+//		
+//		// setting StorageCapFactor
+//		simulation.setStorageCapFactor( storageCap );	
+//		
+//		boolean removeStuckVehicles = false;
+//		simulation.setRemoveStuckVehicles( removeStuckVehicles );
+//		simulation.setStuckTime(10.);
+//		
+//		log.info("SimulationConfigGroup settings:");
+//		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
+//		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + storageCapCorrectionFactor + ")" );
+//		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
+//		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
+//		log.info("... done!");
+//	}
 	
 	/**
 	 * setting strategy
@@ -803,10 +811,17 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		reroute.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(reroute);
 		
+		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
+		changeSingleLegMode.setModuleName("ChangeSingleLegMode");
+		changeSingleLegMode.setProbability( 0.1 ); // tnicolai: make configurable via "matsimParameter", should be something like 0.1
+		changeSingleLegMode.setDisableAfter(disableStrategyAfterIteration);
+		scenario.getConfig().strategy().addStrategySettings(changeSingleLegMode);
+		
 		log.info("StrategyConfigGroup settings:");
-		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter()); 
-		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability());
+		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter() ); 
+		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability() );
 		log.info("Strategy_3: " + reroute.getModuleName() + " Probability: " + reroute.getProbability() + " Disable After Itereation: " + reroute.getDisableAfter() );
+		log.info("Strategy_4: " + changeSingleLegMode.getModuleName() + " Probability: " + changeSingleLegMode.getProbability() + " Disable After Itereation: " + changeSingleLegMode.getDisableAfter() );
 		log.info("... done!");
 	}
 	
@@ -815,9 +830,24 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 	 */
 	private void initPlanCalcRoute(){
 		log.info("Setting PlanCalcRouteGroup to config...");
-		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- and -- 0.833333333333333m/s corresponds to 3km/h
-		log.info("PlanCalcRouteGroup settings:");							 // 4.16666666m/s corresponds to 15 km/h
-		log.info("WalkSpeed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
+		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
+		scenario.getConfig().plansCalcRoute().setBikeSpeed(4.16666666); // 4.16666666m/s corresponds to 15 km/h
+		scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
+		// tnicolai: should the pt speed be set?
+//		scenario.getConfig().plansCalcRoute().setPtSpeed( ??? );
+//		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(mode, speed);
+		Map<String, Double> tms = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds();
+		Collection<String> nm = scenario.getConfig().plansCalcRoute().getNetworkModes();
+		
+		log.info("PlanCalcRouteGroup settings:");							 
+		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
+		log.info("Bike Speed: " + scenario.getConfig().plansCalcRoute().getBikeSpeed() );
+		log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
+		// show default settings
+		log.info("(Default) Beeline Distance Factor: " + scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor() );
+//		log.info("(Default) Pt Speed Factor: " + scenario.getConfig().plansCalcRoute().getPtSpeedFactor() );
+//		log.info("(Default) Undefined Mode Speed: " + scenario.getConfig().plansCalcRoute().getUndefinedModeSpeed() );
+		
 		log.info("...done!");
 	}
 	

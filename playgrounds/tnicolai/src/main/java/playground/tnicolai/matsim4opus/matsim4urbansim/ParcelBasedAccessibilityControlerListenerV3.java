@@ -270,42 +270,41 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 				+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
 				+ InternalConstants.FILE_TYPE_TXT);
 
-		// tnicolai: google earth outputs can be left in final release since
-		// this can be used for a quick analysis without any further scripts or
-		// so...
-		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
-							freeSpeedGrid,
-							InternalConstants.MATSIM_4_OPUS_TEMP
-										+ "freeSpeedAccessibility_cellsize_"
-										+ freeSpeedGrid.getResolution()
-										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-										+ InternalConstants.FILE_TYPE_KMZ);
-		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
-								carGrid,
-								InternalConstants.MATSIM_4_OPUS_TEMP
-										+ "carAccessibility_cellsize_"
-										+ carGrid.getResolution()
-										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-										+ InternalConstants.FILE_TYPE_KMZ);
-		GridUtils.writeKMZFiles(measuringPointsCell,								// bike results for google earth
-								bikeGrid,
-								InternalConstants.MATSIM_4_OPUS_TEMP
-										+ "bikeAccessibility_cellsize_"
-										+ bikeGrid.getResolution()
-										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-										+ InternalConstants.FILE_TYPE_KMZ);
-		GridUtils.writeKMZFiles(measuringPointsCell,								// walk results for google earth
-								walkGrid,
-								InternalConstants.MATSIM_4_OPUS_TEMP
-										+ "walkAccessibility_cellsize_"
-										+ walkGrid.getResolution()
-										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
-										+ InternalConstants.FILE_TYPE_KMZ);
+
+//		// tnicolai: disabled google earth outputs for final release 
+//		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
+//							freeSpeedGrid,
+//							InternalConstants.MATSIM_4_OPUS_TEMP
+//										+ "freeSpeedAccessibility_cellsize_"
+//										+ freeSpeedGrid.getResolution()
+//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+//										+ InternalConstants.FILE_TYPE_KMZ);
+//		GridUtils.writeKMZFiles(measuringPointsCell,								// car results for google earth
+//								carGrid,
+//								InternalConstants.MATSIM_4_OPUS_TEMP
+//										+ "carAccessibility_cellsize_"
+//										+ carGrid.getResolution()
+//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+//										+ InternalConstants.FILE_TYPE_KMZ);
+//		GridUtils.writeKMZFiles(measuringPointsCell,								// bike results for google earth
+//								bikeGrid,
+//								InternalConstants.MATSIM_4_OPUS_TEMP
+//										+ "bikeAccessibility_cellsize_"
+//										+ bikeGrid.getResolution()
+//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+//										+ InternalConstants.FILE_TYPE_KMZ);
+//		GridUtils.writeKMZFiles(measuringPointsCell,								// walk results for google earth
+//								walkGrid,
+//								InternalConstants.MATSIM_4_OPUS_TEMP
+//										+ "walkAccessibility_cellsize_"
+//										+ walkGrid.getResolution()
+//										+ ParcelBasedAccessibilityControlerListenerV3.fileExtension
+//										+ InternalConstants.FILE_TYPE_KMZ);
 		log.info("Writing plotting files done!");
 	}
 	
 	/**
-	 * 
+	 * writing out accessibilities values per parcel. These values are interpolated from the grid.
 	 */
 	private void writeInterpolatedParcelAccessibilities() {
 		// from here accessibility feedback for each parcel
