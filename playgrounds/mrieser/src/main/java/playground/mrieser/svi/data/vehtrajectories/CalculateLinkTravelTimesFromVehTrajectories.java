@@ -19,6 +19,7 @@
 
 package playground.mrieser.svi.data.vehtrajectories;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,6 +35,8 @@ import org.matsim.core.utils.misc.NetworkUtils;
  */
 public class CalculateLinkTravelTimesFromVehTrajectories implements VehicleTrajectoryHandler {
 
+	private final static Logger log = Logger.getLogger(CalculateLinkTravelTimesFromVehTrajectories.class);
+	
 	private final TravelTimeCalculator ttcalc;
 	private final Network network;
 	
@@ -51,9 +54,13 @@ public class CalculateLinkTravelTimesFromVehTrajectories implements VehicleTraje
 		
 		Node prevNode = null;
 		for (int i = 0; i < nodes.length; i++) {
-			Node node = this.network.getNodes().get(new IdImpl(i));
+			Node node = this.network.getNodes().get(new IdImpl(nodes[i]));
 			if (prevNode != null) {
 				Link link = NetworkUtils.getConnectingLink(prevNode, node);
+				if (link == null) {
+					log.error("No link found from " + prevNode.getId() + " to " + node.getId() + " for trajectory " + trajectory.getVehNr());
+					break;
+				}
 				double linkTime = times[i];
 				Id id = new IdImpl(trajectory.getVehNr());
 				this.ttcalc.handleEvent(new LinkEnterEvent(time, id, link.getId(), id));

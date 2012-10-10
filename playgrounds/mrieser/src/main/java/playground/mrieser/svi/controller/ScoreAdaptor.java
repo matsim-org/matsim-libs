@@ -17,17 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.controller2;
+package playground.mrieser.svi.controller;
 
-import org.matsim.core.controler.Controler;
+public class ScoreAdaptor {
 
-/**
- * @author mrieser
- */
-public abstract class DynusTUtils {
-
-	public static final void integrate(final Controler controler) {
-		DynusTConfig dc = new DynusTConfig();
-		controler.addControlerListener(new DynusTControlerListener(dc));
+	public void run() {
+		
 	}
 }

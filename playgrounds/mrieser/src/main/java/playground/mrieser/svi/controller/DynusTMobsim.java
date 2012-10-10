@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.controller2;
+package playground.mrieser.svi.controller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;

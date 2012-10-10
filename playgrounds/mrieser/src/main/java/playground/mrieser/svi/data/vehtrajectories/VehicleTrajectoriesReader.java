@@ -79,7 +79,7 @@ public class VehicleTrajectoriesReader {
 		if (line.contains("###")) {
 			return null;
 		}
-		String[] header = line.split("\\s+");
+		String[] header = line.replace("=", "= ").split("\\s+"); // make sure there is a space after every =, I've had a file where STime=1000.00 was written...
 		if (header.length != 31) {
 			log.warn("Line could not be parsed: " + line);
 			return null;

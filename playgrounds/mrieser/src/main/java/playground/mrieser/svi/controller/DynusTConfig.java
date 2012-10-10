@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.controller2;
+package playground.mrieser.svi.controller;
 
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 

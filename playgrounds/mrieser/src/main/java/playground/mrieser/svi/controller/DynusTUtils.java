@@ -17,40 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.controller2;
+package playground.mrieser.svi.controller;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
-import playground.mrieser.svi.data.ActivityToZoneMapping;
-import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import org.matsim.core.controler.Controler;
 
 /**
  * @author mrieser
  */
-public class DynusTScoringFunctionFactory implements ScoringFunctionFactory {
+public abstract class DynusTUtils {
 
-	private final DynusTConfig dc;
-	private final DynamicTravelTimeMatrix ttMatrix;
-	private final ActivityToZoneMapping act2zones;
-	private final CharyparNagelScoringParameters params;
-	
-	public DynusTScoringFunctionFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zones, final CharyparNagelScoringParameters params) {
-		this.dc = dc;
-		this.ttMatrix = ttMatrix;
-		this.act2zones = act2zones;
-		this.params = params;
+	public static final void integrate(final Controler controler) {
+		DynusTConfig dc = new DynusTConfig();
+		controler.addControlerListener(new DynusTControlerListener(dc));
 	}
-	
-	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		return new DynusTScoringFunction(plan, this.ttMatrix, this.act2zones,
-				new CharyparNagelLegScoring(this.params, null),
-				new CharyparNagelActivityScoring(this.params));
-	}
-
 }

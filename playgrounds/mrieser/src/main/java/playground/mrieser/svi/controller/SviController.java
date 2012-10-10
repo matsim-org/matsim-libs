@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.controller2;
+package playground.mrieser.svi.controller;
 
 import org.matsim.core.controler.Controler;
 
@@ -26,9 +26,9 @@ import org.matsim.core.controler.Controler;
  */
 public class SviController {
 
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
 
-//		args = new String[] {"src/main/java/playground/mrieser/svi/configZH.xml"};
+//		args = new String[] {"/Volumes/Data/virtualbox/exchange/kreuzlingen/matsim/configDynusT.xml"};
 
 		Controler controler = new Controler(args);
 

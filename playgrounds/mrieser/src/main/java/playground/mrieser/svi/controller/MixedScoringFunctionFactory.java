@@ -17,31 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.controller2;
+package playground.mrieser.svi.controller;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
+import playground.mrieser.svi.data.ActivityToZoneMapping;
 import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
 
-/**
- * @author mrieser
- */
-public class DynusTMobsimFactory implements MobsimFactory {
+public class MixedScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final DynusTConfig dc;
-	private final DynamicTravelTimeMatrix ttMatrix;
+	private final CharyparNagelScoringParameters params;
 
-	public DynusTMobsimFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix) {
-		this.dc = dc;
-		this.ttMatrix = ttMatrix;
+	public MixedScoringFunctionFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zones, final CharyparNagelScoringParameters params) {
+		this.params = params;
 	}
 
 	@Override
-	public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-		return new DynusTMobsim(this.dc, this.ttMatrix, sc, eventsManager);
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		return new MixedScoringFunction(this.params);
 	}
 
 }
