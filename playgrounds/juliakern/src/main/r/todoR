@@ -1,5 +1,11 @@
 r-plots
 
+allgemein
+- Methoden auslagern? welche?
+- wie viel Dokumentation in welcher Form?
+- was soll für die anderen (anders als Emissionen) Module dargestellt werden? 
+- wie den Aufruf der R-Skripte regeln? Bash, R, Java? (xml-)config für die Parameter?
+
 alle skripte
 - komplette inputdateien übergeben, nicht vorhandene dateien auffangen
 - anleitung/hilfetext, Quellen, Autoren
