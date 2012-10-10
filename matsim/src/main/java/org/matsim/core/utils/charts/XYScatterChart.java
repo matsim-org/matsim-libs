@@ -22,21 +22,31 @@ package org.matsim.core.utils.charts;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.LogarithmicAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  * Creates a new XY-ScatterChart.
- *
+ * 
  * @author mrieser
  */
 public class XYScatterChart extends ChartUtil {
 
 	private final XYSeriesCollection dataset;
+	private final boolean isLogarithmicAxis;
 
-	public XYScatterChart(final String title, final String xAxisLabel, final String yAxisLabel) {
+	public XYScatterChart(final String title, final String xAxisLabel,
+			final String yAxisLabel) {
+		this(title, xAxisLabel, yAxisLabel, false);
+	}
+
+	public XYScatterChart(final String title, final String xAxisLabel,
+			final String yAxisLabel, boolean isLogarithmicAxis) {
 		super(title, xAxisLabel, yAxisLabel);
+		this.isLogarithmicAxis = isLogarithmicAxis;
 		this.dataset = new XYSeriesCollection();
 		this.chart = createChart(title, xAxisLabel, yAxisLabel, this.dataset);
 		addDefaultFormatting();
@@ -47,25 +57,39 @@ public class XYScatterChart extends ChartUtil {
 		return this.chart;
 	}
 
-	private JFreeChart createChart(final String title, final String categoryAxisLabel,
-			final String valueAxisLabel, final XYSeriesCollection dataset) {
-		return ChartFactory.createScatterPlot(title, categoryAxisLabel, valueAxisLabel,
-				dataset, PlotOrientation.VERTICAL, true, // legend?
+	private JFreeChart createChart(final String title,
+			final String categoryAxisLabel, final String valueAxisLabel,
+			final XYSeriesCollection dataset) {
+		JFreeChart c = ChartFactory.createScatterPlot(title, categoryAxisLabel,
+				valueAxisLabel, dataset, PlotOrientation.VERTICAL, true, // legend?
 				false, // tooltips?
 				false // URLs?
 				);
+		if (this.isLogarithmicAxis) {
+			XYPlot p = (XYPlot) c.getPlot();
+			LogarithmicAxis axis_x = new LogarithmicAxis(this.xAxisLabel);
+			LogarithmicAxis axis_y = new LogarithmicAxis(this.yAxisLabel);
+			axis_x.setAllowNegativesFlag(false);
+			axis_y.setAllowNegativesFlag(false);
+			p.setDomainAxis(axis_x);
+			p.setRangeAxis(axis_y);
+		}
+		return c;
 	}
 
 	/**
 	 * Adds a new data series to the chart with the specified title.
-	 * <code>xs<code> and <code>ys</code> should have the same length. If not, only as many items
-	 * are shown as the shorter array contains.
-	 *
+	 * <code>xs<code> and <code>ys</code> should have the same length. If not,
+	 * only as many items are shown as the shorter array contains.
+	 * 
 	 * @param title
-	 * @param xs The x values.
-	 * @param ys The y values.
+	 * @param xs
+	 *            The x values.
+	 * @param ys
+	 *            The y values.
 	 */
-	public void addSeries(final String title, final double[] xs, final double[] ys) {
+	public void addSeries(final String title, final double[] xs,
+			final double[] ys) {
 		XYSeries series = new XYSeries(title, false, true);
 		for (int i = 0, n = Math.min(xs.length, ys.length); i < n; i++) {
 			series.add(xs[i], ys[i]);
