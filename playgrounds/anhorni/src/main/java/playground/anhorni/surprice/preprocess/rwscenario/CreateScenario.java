@@ -19,7 +19,9 @@
 
 package playground.anhorni.surprice.preprocess.rwscenario;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
@@ -65,6 +67,7 @@ public class CreateScenario {
 	private Random random = new Random(102830259L);
 	private TreeMap<Id, PersonWeeks> personWeeksMZ = new TreeMap<Id, PersonWeeks>();
 	private Config config;
+	private int [] incomeCategoryFrequencies = new int[9];
 		
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
 		
@@ -100,18 +103,21 @@ public class CreateScenario {
 				
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
-		this.writeIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+		this.createIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), 
+				config.findParam(Surprice.SURPRICE_PREPROCESS, "mzIncomeFile"));
 		
 		this.createPreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
 	
 	private void createPreferences(String path) {
 		ObjectAttributes preferences = new ObjectAttributes();
-		for (String day : Surprice.days) {
-			// choose random plan for day
-			for (Person person : this.scenario.getPopulation().getPersons().values()) {		
-			preferences.putAttribute(person.getId().toString(), day, this.random.nextDouble());
-			}
+		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
+			
+				double alpha = personWeeks.getIncome() + this.random.nextDouble();
+				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "alpha", alpha);
+				
+				double gamma = 1.0 / (personWeeks.getIncome() + 1.0) + 0.1 * this.random.nextDouble();
+				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "gamma", gamma);
 		}
 		this.writePreferences(path, preferences);
 	}
@@ -122,23 +128,71 @@ public class CreateScenario {
 		attributesWriter.writeFile(path + "/preferences.xml"); 
 	}
 	
+	private void createIncomes(String outPath, String mzIncomeFile) {
+		TreeMap<Double, Integer> incomesNormalized = new TreeMap<Double, Integer>();
+		try {
+			this.readMZIncomes(mzIncomeFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		this.normalizeIncomes(incomesNormalized);
+		this.drawIncomes(incomesNormalized);
+		this.writeIncomes(outPath);
+	}
+	
 	private void writeIncomes(String outPath) {
 		ObjectAttributes incomes = new ObjectAttributes();
 		
-		for (PersonWeeks personWeeks : personWeeksMZ.values()) {		
-			double income = personWeeks.getIncome();
-						
-			// income null
-			if (income < 0.0) {
-				income = 0.0;
-			}			
-			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", income);
+		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
+			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", personWeeks.getIncome());
 		}		
 		log.info("Writing incomes to " + outPath + "/incomes.xml");
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(incomes);
 		attributesWriter.writeFile(outPath + "/incomes.xml");
 	}
 	
+	private void drawIncomes(TreeMap<Double, Integer> incomesNormalized) {
+		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
+			double randomScore = random.nextDouble();
+			double income = -99.0;
+			for (Entry<Double, Integer> entry : incomesNormalized.entrySet()) {				
+		        if (entry.getKey() > randomScore + 0.000000000000000001) {
+		        	income = entry.getValue();
+		        	break;	
+		        }
+		    }
+			personWeeks.setIncome(income);
+		}
+	}
+	
+	private void readMZIncomes(String mzIncomeFile) throws Exception {	
+		FileReader fr = new FileReader(mzIncomeFile);
+		BufferedReader br = new BufferedReader(fr);
+		String curr_line = br.readLine(); // Skip header
+		while ((curr_line = br.readLine()) != null) {
+			String[] entrs = curr_line.split("\t", -1);			
+			int income = Integer.parseInt(entrs[0].trim());
+						
+			if (income > 0) {
+				this.incomeCategoryFrequencies[income - 1] = this.incomeCategoryFrequencies[income - 1] + 1;
+			}
+		}
+	}
+	
+	private void normalizeIncomes(TreeMap<Double, Integer> mapNormalized) {
+		double sum = 0.0;
+		for (int i = 0; i < this.incomeCategoryFrequencies.length; i++) {
+			sum += this.incomeCategoryFrequencies[i];
+		}
+		
+		double lastKey = 0.0;
+		for (int i = 0; i < this.incomeCategoryFrequencies.length; i++) {			
+			double key = lastKey + (double)this.incomeCategoryFrequencies[i] / sum;
+			lastKey = key;
+			mapNormalized.put(key, i);
+		}
+	}
+		
 	private void createToll(String outPath) {	
 		
 		NetworkImpl network = (NetworkImpl)this.scenario.getNetwork();
@@ -331,7 +385,6 @@ public class CreateScenario {
 				this.personWeeksMZ.get(person.getId()).setCurrentWeek(week);
 			}
 			this.personWeeksMZ.get(person.getId()).addDay(dow, person.getSelectedPlan());
-			this.personWeeksMZ.get(person.getId()).setIncome((Double)thurgauPerson.getCustomAttributes().get("income"));
 		}
 	}
 	
@@ -429,12 +482,12 @@ public class CreateScenario {
 		return totalScore;
 	}
 	
-	private void normalizeMap(TreeMap<Double, PersonWeeks> mapNormalized, TreeMap<Id, PersonWeeks> map) {
+	private void normalizeMap(TreeMap<Double, PersonWeeks> mapNormalized, TreeMap<Id, PersonWeeks> map) {		
 		double sumScore = 0.0;
 		for (PersonWeeks personWeeks : map.values()) {
 			double score = personWeeks.getPweight();
 			sumScore += (score / this.getTotalScore(map));				
 			mapNormalized.put(sumScore, personWeeks);	
 		}
-	}	
+	}
 }

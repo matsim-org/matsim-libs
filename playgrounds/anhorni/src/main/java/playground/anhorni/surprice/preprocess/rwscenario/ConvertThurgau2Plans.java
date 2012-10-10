@@ -278,7 +278,6 @@ public class ConvertThurgau2Plans {
 				this.personWeeks.get(pid).addDay((int) Math.floor(plan.getScore()), plan);
 			}		
 			this.personWeeks.get(pid).setIsWorker();
-			this.personWeeks.get(pid).setIncome((Double)person.getCustomAttributes().get("income"));
 		}
 	}
 	
@@ -308,35 +307,18 @@ public class ConvertThurgau2Plans {
 			else { 
 				Gbl.errorMsg("pid=" + id + ": g=" + g + " not known!");
 			}
-			String houseHoldIncomeString = entrs[95].trim();
-			int householdIncome = -99;
-			if (!houseHoldIncomeString.equals("")) {
-				householdIncome = Integer.parseInt(houseHoldIncomeString);
-			}			
+//			String houseHoldIncomeString = entrs[95].trim();
+//			int householdIncome = -99;
+//			if (!houseHoldIncomeString.equals("")) {
+//				householdIncome = Integer.parseInt(houseHoldIncomeString);
+//			}			
 			PersonImpl person = new PersonImpl(id);
 			person.setAge(age);
 			person.setSex(gender);
 			population.addPerson(person);
-			
-			double income = this.convertIncome(householdIncome);
-			person.getCustomAttributes().put("income", income);
 		}
 	}
-	
-	private double convertIncome(int householdIncome) {
-		// TODO: more sophisticated conversion here
-		/* 1: below 2000 CHF
-		 * 2: 2001 - 3000 CHF
-		 * 3: 3001 - 4000 CHF
-		 * 4: 4001 - 5000 CHF
-		 * 5: 5001 - 7500 CHF
-		 * 6: 7501 - 10000 CHF
-		 * 7: beyond 10000 CHF 
-		 */	
-		if (householdIncome == -99) householdIncome = 4;
-		return householdIncome;
-	}
-	
+		
 	private void write() {
 		log.info("Writing population with plans ...");
 		log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());
