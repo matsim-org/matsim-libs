@@ -25,9 +25,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 
 /**
  * @author nagel
@@ -99,7 +100,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
 		// todo
 		
-		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
+		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals( VspExperimentalConfigGroup.ABORT ) ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
 			log.fatal( str ) ; 
 			throw new RuntimeException( str ) ;
