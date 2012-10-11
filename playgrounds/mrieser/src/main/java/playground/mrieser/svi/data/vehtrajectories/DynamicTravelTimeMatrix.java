@@ -82,10 +82,33 @@ public class DynamicTravelTimeMatrix {
 	 */
 	public double getAverageTravelTime(final double depTime, final String fromZoneId, final String toZoneId) {
 		int slot = getTimeSlot(depTime);
-		Map<String, Map<String, Tuple<Double, Integer>>> odm = this.odms.get(slot);
+		double tt = getAverageTravelTime(slot, fromZoneId, toZoneId);
+		if (!Double.isNaN(tt)) {
+			return tt;
+		}
+		while (slot > 0) {
+			slot--;
+			tt = getAverageTravelTime(slot, fromZoneId, toZoneId);
+			if (!Double.isNaN(tt)) {
+				return tt;
+			}
+		}
+		slot = getTimeSlot(depTime);
+		while (slot*this.binSize < this.maxTime) {
+			slot++;
+			tt = getAverageTravelTime(slot, fromZoneId, toZoneId);
+			if (!Double.isNaN(tt)) {
+				return tt;
+			}
+		}
+		return 5.0*60; // well, then... we have to return something, otherwise the scores will be all NaN
+	}
+	
+	private double getAverageTravelTime(final int timeSlot, final String fromZoneId, final String toZoneId) {
+		Map<String, Map<String, Tuple<Double, Integer>>> odm = this.odms.get(timeSlot);
 		if (odm == null) {
 			odm = new HashMap<String, Map<String, Tuple<Double, Integer>>>();
-			this.odms.put(slot, odm);
+			this.odms.put(timeSlot, odm);
 		}
 		Map<String, Tuple<Double, Integer>> toValues = odm.get(fromZoneId);
 		if (toValues == null) {

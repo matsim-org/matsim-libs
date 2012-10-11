@@ -19,15 +19,55 @@
 
 package playground.mrieser.svi.controller;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import playground.mrieser.svi.converters.DynusTNetworkReader;
+import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
 
 /**
  * @author mrieser
  */
 public abstract class DynusTUtils {
 
+	private final static Logger log = Logger.getLogger(DynusTUtils.class);
+	
+	
 	public static final void integrate(final Controler controler) {
+		log.info("Integrate functionality required for Dynus-T-Support in MATSim");
 		DynusTConfig dc = new DynusTConfig();
-		controler.addControlerListener(new DynusTControlerListener(dc));
+		
+		Config config = controler.getConfig();
+		dc.setDynusTDirectory(config.getParam("dynus-t", "dynusTDirectory"));
+		dc.setModelDirectory(config.getParam("dynus-t", "modelDirectory"));
+		dc.setZonesShapeFile(config.getParam("dynus-t", "zonesShpFile"));
+		dc.setZoneIdToIndexMappingFile(config.findParam("dynus-t", "zoneIdToIndexMapping"));
+		dc.setDemandFactor(Double.parseDouble(config.getParam("dynus-t", "dynusTDemandFactor")));
+		dc.setZoneIdAttributeName(config.getParam("dynus-t", "zoneIdAttributeName"));
+		if (config.findParam("dynus-t", "timeBinSize_min") != null) {
+			dc.setTimeBinSize_min(Integer.parseInt(config.getParam("dynus-t", "timeBinSize_min")));
+		}
+		dc.setPtLinesFile(config.findParam("dynus-t", "ptLinesFile"));
+		
+		final DynamicTravelTimeMatrix ttMatrix = new DynamicTravelTimeMatrix(600, 30*3600.0); // 10min time bins, at most 30 hours
+		
+		log.info("Reading DynusT-network..." + dc.getModelDirectory());
+		Network dynusTNetwork = NetworkImpl.createNetwork();
+		new DynusTNetworkReader(dynusTNetwork).readFiles(dc.getModelDirectory() + "/xy.dat", dc.getModelDirectory()+ "/network.dat");
+		
+		controler.addControlerListener(new DynusTControlerListener(dc, ttMatrix, dynusTNetwork));
+
+		boolean useOnlyDynusT = Boolean.parseBoolean(controler.getConfig().getParam("dynus-t", "useOnlyDynusT"));
+		if (useOnlyDynusT) {
+			controler.setMobsimFactory(new DynusTMobsimFactory(dc, ttMatrix, dynusTNetwork));
+			log.info("DynusT will be used as exclusive mobility simulation. Make sure that re-routing is *not* enabled as replanning strategy, as it will have no effect.");
+			controler.setScoringFunctionFactory(new DynusTScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), new CharyparNagelScoringParameters(config.planCalcScore())));
+		} else {
+			controler.setScoringFunctionFactory(new MixedScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), new CharyparNagelScoringParameters(config.planCalcScore())));
+		}
 	}
 }
