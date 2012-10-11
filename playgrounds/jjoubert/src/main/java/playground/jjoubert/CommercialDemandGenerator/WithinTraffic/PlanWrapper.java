@@ -73,6 +73,7 @@ public class PlanWrapper {
 			if(pe instanceof Leg){
 				/* Just add the leg. */
 				segment.addLeg((Leg) pe);
+				index++;
 			} else {
 				/* Handle the facility. */
 				Activity act = (Activity) pe;
