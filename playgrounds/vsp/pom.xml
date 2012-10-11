@@ -6,6 +6,6 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
-  <artifactId>_template</artifactId>
-  <name>_template</name>
+  <artifactId>vsp</artifactId>
+  <name>vsp</name>
 </project>

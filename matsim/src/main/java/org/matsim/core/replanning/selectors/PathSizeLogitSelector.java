@@ -150,6 +150,8 @@ public final class PathSizeLogitSelector implements PlanSelector {
 						for (double dbl : linksInTime.get(linkId)){
 							//TODO this is just for testing (those legs where the departure time differs more then 3600 seconds will not compared to each other) - need a
 							//little bit to brood on it - gl
+							// An alternative might be to use a kernal, e.g. a Gaussian.  Something like
+							// denominator += exp( (dbl-currentTime)^2 / sigma^2 ) .  kai, oct'12
 							if (Math.abs(dbl - currentTime) <= 3600)
 								denominator++;
 						}

@@ -24,7 +24,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Time;
 
-//interface ConfigKey {}
+interface ConfigKey {}
 
 /**
  * config group for experimental parameters. this group and its parameters should not be used outside of vsp.
@@ -39,13 +39,15 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	// The idea is essentially based on the fact that "toString()" of an enum type returns the enum type string.
 	// Unfortunately, I did not get around to finishing this.
 
-	//	private enum VspExperimentalConfigKey implements ConfigKey {
-	//		activityDurationInterpretation,
-	//		vspDefaultsCheckingLevel
-	//	}
-	//
-	//	private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
-	//
+		private enum VspExperimentalConfigKey implements ConfigKey {
+//			activityDurationInterpretation,
+			vspDefaultsCheckingLevel,
+			logitScaleParamForPlansRemoval
+		}
+	
+		private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
+	
+		// this should eventually be able to replace the @Override addParam( String, String )
 	//	private void addParamNew( final String keyStr, final String value ) {
 	//		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
 	//			if ( keyStr.equalsIgnoreCase( key.toString() ) ) {
@@ -54,17 +56,17 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	//		}
 	//		throw new RuntimeException("keyStr was not found as key: " + keyStr ) ;
 	//	}
-	//
-	//	private void addParam( final ConfigKey key, final String value ) {
-	//		String retVal = this.typedParam.put( key,value );
-	//		if ( !retVal.equals(value) ) {
-	//			Logger.getLogger(this.getClass()).warn("parameter was already there; overwriting ...") ;
-	//		}
-	//	}
-	//
-	//	private String getValue( final ConfigKey key ) {
-	//		return this.typedParam.get(key) ;
-	//	}
+	
+		private void addParam( final ConfigKey key, final String value ) {
+			String retVal = this.typedParam.put( key,value );
+			if ( !retVal.equals(value) ) {
+				Logger.getLogger(this.getClass()).warn("parameter was already there; overwriting ...") ;
+			}
+		}
+	
+		private String getValue( final ConfigKey key ) {
+			return this.typedParam.get(key) ;
+		}
 
 	// === testing area end ===
 
@@ -84,12 +86,6 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	
 	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, endTimeOnly } ;
 
-//	public static final String MIN_OF_DURATION_AND_END_TIME="minOfDurationAndEndTime" ;
-//	public static final String TRY_END_TIME_THEN_DURATION="tryEndTimeThenDuration" ;
-//	public static final String END_TIME_ONLY="endTimeOnly" ;
-
-	//	@Deprecated
-	//	private boolean useActivityDurations = true;
 	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime ;
 
 	// ---
@@ -107,20 +103,6 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	// ---
 
-//	private static final String COLORING="coloring" ;
-//
-//	public static final String COLORING_STANDARD = "standard" ;
-//	public static final String COLORING_BVG = "bvg" ;
-//
-//	private String coloring = COLORING_STANDARD ;
-
-	// ---
-//	@Deprecated //somewhen should be deleted, Yu 03.2011
-//	private static final String OFFSET_WALK = "offsetWalk";
-	// private double offsetWalk = 0d;
-
-	// ---
-
 	@Deprecated
 	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING =
 		"usingOpportunityCostOfTimeForPtRouting" ;
@@ -129,13 +111,13 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	// ---
 
-	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
+//	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
 
 	public static final String IGNORE = "ignore" ;
 	public static final String WARN = "warn" ;
 	public static final String ABORT = "abort" ;
 
-	private String vspDefaultsCheckingLevel = IGNORE ;
+//	private String vspDefaultsCheckingLevel = IGNORE ;
 
 	// ---
 
@@ -174,6 +156,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
+		this.addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, IGNORE ) ;
 	}
 
 	@Override
@@ -203,7 +186,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors");
 
-		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
+		map.put(VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString(), 
+				"Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n\t\t" +
 				"When violating VSP defaults, this results in " +
 		"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
@@ -273,7 +257,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		} else if ("offsetWalk".equalsIgnoreCase(key)) {
 			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
 			"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
-		} else if ( VSP_DEFAULTS_CHECKING_LEVEL.equals(key) ) {
+		} else if ( VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString().equals(key) ) {
 			this.setVspDefaultsCheckingLevel(value) ;
 		} else if ( EMISSION_ROADTYPE_MAPPING_FILE.equals(key)){
 			this.setEmissionRoadTypeMappingFile(value);
@@ -302,7 +286,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		//		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
+
 		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation().toString()) ;
 
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, Boolean.toString(isRemovingUnneccessaryPlanAttributes()) ) ;
@@ -312,13 +296,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(MODES_FOR_SUBTOURMODECHOICE, getModesForSubTourModeChoice() ) ;
 		map.put(CHAIN_BASED_MODES, getChainBasedModes() );
 
-		//		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
-
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				Boolean.toString( this.isUsingOpportunityCostOfTimeInPtRouting()) ) ;
-//		map.put(COLORING, getColoring() ) ;
 
-		map.put( VSP_DEFAULTS_CHECKING_LEVEL, this.getVspDefaultsCheckingLevel() ) ;
+		map.put(VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString(), this.getVspDefaultsCheckingLevel() ) ;
 
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, this.getEmissionRoadTypeMappingFile());
 
@@ -455,11 +436,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	public void setVspDefaultsCheckingLevel(final String vspDefaultsCheckingLevel) {
-		this.vspDefaultsCheckingLevel = vspDefaultsCheckingLevel;
+		this.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, vspDefaultsCheckingLevel) ;
 	}
 
 	public String getVspDefaultsCheckingLevel() {
-		return this.vspDefaultsCheckingLevel;
+		return this.getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel ) ;
 	}
 
 	public void setEmissionRoadTypeMappingFile(String roadTypeMappingFile) {

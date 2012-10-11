@@ -116,6 +116,7 @@
 		<module>ucsb</module>
 		<module>vgfeller</module>
 		<module>vsptelematics</module>
+		<module>vsp</module>
 		<module>ssix</module>
 	</modules>
 	<repositories>
