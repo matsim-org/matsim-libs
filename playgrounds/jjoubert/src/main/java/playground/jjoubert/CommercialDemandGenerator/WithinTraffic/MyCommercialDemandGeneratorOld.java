@@ -33,6 +33,7 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
@@ -193,10 +194,9 @@ public class MyCommercialDemandGeneratorOld {
 				majorActivityEnd.setStartTime(endTime);
 				plan.getPlanElements().add(majorActivityEnd);
 
-				PlanWrapper pw = new PlanWrapper(86400, 0);
-				ArrayList<PlanImpl> planList = pw.wrapPlan(plan);
+				List<Plan> planList = PlanWrapper.wrapPlan(plan, "24:00:00");
 
-				for (PlanImpl pp : planList) {
+				for (Plan pp : planList) {
 					// Create a truck agent
 					Id id = sc.createId(Long.toString(agentId));
 					PersonImpl truck = (PersonImpl) pb.createPerson(id);

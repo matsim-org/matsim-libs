@@ -21,170 +21,157 @@
 package playground.jjoubert.CommercialDemandGenerator.WithinTraffic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 
 /**
- * A class to wrap a plan around a given time window. This is achieved by adding a <i>dummy</i>
- * activity at the end of each <i>circulation</i>. The dummy activity has the same location as
- * the first activity of the new <i>circulation</i>, forcing the travel leg to be executed in the
- * current <i>circulation</i>. The dummy activity shares the same activity type as the first
- * activity of the current <i>circulation</i>.
+ * A class to wrap a plan around a given time window. This is achieved by 
+ * <i>chopping</i> the chain at midnight. If midnight occurs on a {@link Leg} 
+ * between {@link Activity} <i>A</i> and <i>B</i>, a dummy {@link Activity} 
+ * with type <i>chop</i> is added at midnight, and the chain segment is 
+ * ended. The location of the dummy activity is on the line connecting 
+ * <i>AB</i>, and the distance from <i>A</i> is proportional to the {@link 
+ * Leg} time. That is, 
+ * <br><br><i> (midnight  - A's end time) / (B's start time - A's end time) </i> <br><br>
+ * 
+ * The {@link Leg} mode is the same as between <i>A</i> and <i>B</i>. The next
+ * segment starts with the dummy activity, followed by a {@link Leg} with the
+ * same mode as on <i>AB</i>, then {@link Activity} <i>B</i> followed by the 
+ * remainder of the chain.
  *
- * @author johanwjoubert
- *
+ * @author jwjoubert
  */
 public class PlanWrapper {
-	private final int tw;						// Time window
-	private final int squeezeThreshold;			// Threshold
-	private final Logger log = Logger.getLogger(PlanWrapper.class);
-
-	/**
-	 * Constructor to create a <i>plan wrapper</i>
-	 *
-	 * @param populationBuilder used to build temporary plans.
-	 * @param timeWindow the time window (expressed in minutes), around which the plans will be
-	 *        <i>wrapped</i>.
-	 * @param squeezeThreshold a time threshold (expressed in minutes after the time window ends)
-	 *        before which the plan will be squeezed proportionally to fit into one time window,
-	 *        rather than being <i>wrapped</i> around the time window.
-	 *
-	 * <h4>Note:</h4>
-	 * TODO I am not quite sure if the <code>populationBuilder</code> is required. Maybe
-	 * one can rather create a new one locally?
-	 */
-	public PlanWrapper(int timeWindow, int squeezeThreshold){
-		this.tw = timeWindow;
-		this.squeezeThreshold = squeezeThreshold;
-	}
-
+	private final static Logger LOG = Logger.getLogger(PlanWrapper.class);
+	
 	/**
 	 * The method receives an activity plan, which may or may not span a given time window, and
 	 * <i>wrap</i> it into separate plans, each fitting within the time window.
 	 *
-	 * @param plan of type {@code BasicPlan}
+	 * @param plan of type {@link Plan}
 	 * @return an {@code ArrayList} of {@code BasicPlan}s
 	 */
-	public ArrayList<PlanImpl> wrapPlan(PlanImpl plan) {
-		ArrayList<PlanImpl> result = new ArrayList<PlanImpl>();
-
-		Object firstActivity = plan.getPlanElements().get(0);
-		// Checks that the first plan element is an activity
-		if ( !(firstActivity instanceof ActivityImpl) ){
-			System.err.println("The last activity of the chain is not of type BasicActivity!!");
-		}
-		ActivityImpl first = (ActivityImpl) firstActivity;
-
-		Object lastActivity = plan.getPlanElements().get(plan.getPlanElements().size() - 1);
-
-		// Checks that the last plan element is an activity.
-		if( !(lastActivity instanceof ActivityImpl) ){
-			System.err.println("The last activity of the chain is not of type BasicActivity!!");
-		} else{
-			ActivityImpl la = (ActivityImpl) lastActivity;
-			if(la.getStartTime() <= this.tw){
-				/*
-				 * The whole plan fits within the time window. Just return the complete plan.
-				 */
-				result.add(plan);
-			} else if( la.getStartTime() > this.tw && la.getStartTime() <= (this.tw + this.squeezeThreshold)){
-				/*
-				 * TODO Squeeze the plan.
-				 */
-				log.info("Squeeze the plan.");
-			} else if(la.getStartTime() > (this.tw + this.squeezeThreshold)){
-				/*
-				 * Wrap the plan
-				 */
-				PlanImpl dummyPlan = new PlanImpl(null);
-
-				int index = 0;
-				while(index < plan.getPlanElements().size()){
-					Object object = plan.getPlanElements().get(index);
-					if(object instanceof ActivityImpl ){
-						ActivityImpl ba = (ActivityImpl) object;
-						if(ba.getEndTime() < this.tw){
-							/*
-							 * If the activity ends within the current time window, simply add the
-							 * activity to the current dummy plan.
-							 */
-							dummyPlan.getPlanElements().add(ba);
-							index++;
-						} else{
-							/*
-							 * STEP 1: Create a dummy activity to add at the end of the first plan. The location
-							 *         of the dummy activity is then same as first activity of the new 'day':
-							 *         forcing the traveling (if required) to occur in the current plan; the
-							 *         activity type is the same as the first activity of the current plan.
-							 */
-							ActivityImpl dummyActivity = new ActivityImpl(first.getType(), ba.getCoord());
-							dummyActivity.setStartTime(this.tw);
-							dummyActivity.setFacilityId(ba.getFacilityId());
-							dummyPlan.addActivity(dummyActivity);
-							result.add(dummyPlan);
-
-							/*
-							 * STEP 2: Create a new dummy plan, and add the remaining plan elements to it, adjusting
-							 *         the end times of each activity.
-							 */
-							dummyPlan = new PlanImpl(null);
-							ba.setStartTime(ba.getStartTime() - this.tw);
-							ba.setEndTime(ba.getEndTime() - this.tw);
-							dummyPlan.addActivity(ba);
-							index++;
-							while(index < plan.getPlanElements().size()){
-								Object dummyObject = plan.getPlanElements().get(index);
-								if(dummyObject instanceof ActivityImpl){
-									ActivityImpl ba2 = (ActivityImpl) dummyObject;
-									ba2.setStartTime( (ba2.getStartTime() - this.tw) >= 0 ?
-											ba2.getStartTime() - this.tw :
-											Double.NEGATIVE_INFINITY );
-									ba2.setEndTime((ba2.getEndTime() - this.tw) >= 0 ?
-											ba2.getEndTime() - this.tw :
-											Double.NEGATIVE_INFINITY );
-									dummyPlan.addActivity(ba2);
-									index++;
-								} else if(dummyObject instanceof Leg){
-									Leg bl2 = (Leg) dummyObject;
-									bl2.setDepartureTime( bl2.getDepartureTime() >= 0 ?
-											bl2.getDepartureTime() :
-											Double.NEGATIVE_INFINITY );
-									dummyPlan.addLeg(bl2);
-									index++;
-								} else{
-									System.err.println("Plan element is neither a BasicActivity nor a BasicLeg!!");
-								}
-							}
-
-							/*
-							 * STEP 3: Check the new dummy plan.
-							 */
-							PlanWrapper pw = new PlanWrapper(this.tw,squeezeThreshold);
-							ArrayList<PlanImpl> recursivePlans = pw.wrapPlan(dummyPlan);
-							for (PlanImpl bp : recursivePlans) {
-								result.add(bp);
-							}
-						}
-					} else if(object instanceof Leg){
-						Leg bl = (Leg) object;
-						dummyPlan.addLeg(bl);
-						index++;
+	public static List<Plan> wrapPlan(Plan plan, String timeWindow) {
+		List<Plan> list = new ArrayList<Plan>();
+		PlanImpl tmpPlan = new PlanImpl();
+		tmpPlan.copyPlan(plan);
+		
+		PlanImpl segment = new PlanImpl();
+		int index = 0;
+		while(index < tmpPlan.getPlanElements().size()){
+			PlanElement pe = tmpPlan.getPlanElements().get(index);
+			if(pe instanceof Leg){
+				/* Just add the leg. */
+				segment.addLeg((Leg) pe);
+			} else {
+				/* Handle the facility. */
+				Activity act = (Activity) pe;
+				double startTime = index == 0 ? 0 : act.getStartTime();
+				double endTime = index == plan.getPlanElements().size()-1 ? Math.max(Time.MIDNIGHT, act.getStartTime()) : act.getEndTime();
+				
+				if(startTime < Time.MIDNIGHT){
+					if(endTime < Time.MIDNIGHT){
+						/* The activity can simply be added as it is entire wholly
+						 * or partially within the current day. */
+						segment.addActivity(act);
+						index++;						
 					} else{
-						System.err.println("Plan element is neither an Activity nor a Leg!!");
+						/* The activity itself runs over midnight. Check the
+						 * activity type, though. */
+						if(act.getType().contains("minor")){
+							/* Split it up proportionally. */
+							ActivityImpl end = new ActivityImpl(act);
+							end.setEndTime(Time.MIDNIGHT);
+							segment.addActivity(end);
+							
+							PlanImpl p = new PlanImpl();
+							p.copyPlan(segment);
+							list.add(p);
+												
+							/* Start a new segment. */
+							Activity start = new ActivityImpl(act);
+							start.setStartTime(Time.MIDNIGHT);
+							segment = new PlanImpl();
+							segment.addActivity(start);
+							index++;					
+						} else{
+							/* It is most probably the end of the chain. */
+							if(index != tmpPlan.getPlanElements().size()){
+								LOG.error("Non-minor activity in the middle of the chain: " 
+										+ act.getType() + ". Behaviour not guaranteed!!");
+							}
+							segment.addActivity(act);
+							PlanImpl p = new PlanImpl();
+							p.copyPlan(segment);
+							list.add(p);	
+							
+							/* Start a new segment. */
+							ActivityImpl start = new ActivityImpl(act);
+							segment = new PlanImpl();
+							segment.addActivity(start);
+							index++;
+						}
 					}
+				} else {
+					/* The activity starts in a new day. Add a dummy activity
+					 * midnight, the location being proportionally between the
+					 * two activities. */
+					Activity previousActivity = tmpPlan.getPreviousActivity(tmpPlan.getPreviousLeg(act));
+					double chopFraction = (Time.MIDNIGHT - previousActivity.getEndTime()) / (act.getStartTime() - previousActivity.getEndTime());
+					double distance = ((CoordImpl) act.getCoord()).calcDistance(previousActivity.getCoord()) * chopFraction;
+					double dy = act.getCoord().getY() - previousActivity.getCoord().getY();
+					double dx = act.getCoord().getX() - previousActivity.getCoord().getX();
+					double angle = Math.atan(dy / dx);
+					Coord coord = new CoordImpl(distance*Math.cos(angle), distance*Math.sin(angle));
+					
+					ActivityImpl chopEnd = new ActivityImpl("chopEnd", coord);
+					chopEnd.setEndTime(Time.MIDNIGHT);
+					ActivityImpl chopStart = new ActivityImpl("chopStart", coord);
+					chopStart.setEndTime(Time.MIDNIGHT);
+					
+					/* Finish off the current segment. */
+					segment.addActivity(chopEnd);
+					PlanImpl p = new PlanImpl();
+					p.copyPlan(segment);
+					list.add(p);
+										
+					/* Start a new segment. */
+					segment = new PlanImpl();
+					segment.addActivity(chopStart);
+					segment.addLeg(tmpPlan.getPreviousLeg(act));
+					segment.addActivity(act);
+					
+					index++;					
 				}
-
+				
 			}
 		}
-		return result;
-	}
 
-
-	public Integer getTimeWindow() {
-		return this.tw;
-	}
-
+		/* Run through the list of plans, and update all activity times 
+		 * of those in subsequent days. */
+		for(Plan subplan : list){
+			int daysToSubtract = (int) Math.floor(((PlanImpl)subplan).getFirstActivity().getStartTime() / Time.MIDNIGHT);
+			for(int i = 0; i < daysToSubtract; i++){
+				for(PlanElement pe : subplan.getPlanElements()){
+					if(pe instanceof Activity){
+						Activity act = (Activity)pe;
+						act.setStartTime(act.getStartTime() - daysToSubtract*Time.MIDNIGHT);
+						act.setEndTime(act.getEndTime() - daysToSubtract*Time.MIDNIGHT);
+					}
+				}
+			}
+		}
+		return list;
+	}	
+	
 }
