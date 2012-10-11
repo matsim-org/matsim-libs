@@ -113,10 +113,11 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
 			Leg leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+			double walkDistance = CoordUtils.calcDistance(fromCoord, toCoord);
 			Route walkRoute = new GenericRouteImpl(null, null);
+			walkRoute.setDistance(walkDistance);
 			leg.setRoute(walkRoute);
-			leg.setTravelTime(walkTime);
+			leg.setTravelTime(walkDistance/this.config.getBeelineWalkSpeed());
 			legs.add(leg);
 			return legs;
 		}
