@@ -76,7 +76,7 @@ public class DynusTMobsim implements Mobsim {
 		// run DynusT
 		log.info("run Dynus-T");
 		DynusTExe exe = new DynusTExe(this.dc.getDynusTDirectory(), this.dc.getModelDirectory(), this.dc.getOutputDirectory());
-//		exe.runDynusT(true);
+		exe.runDynusT(true);
 
 		// read in data, convert it somehow to score the plans
 		log.info("read in Vehicle Trajectories from DynusT");
