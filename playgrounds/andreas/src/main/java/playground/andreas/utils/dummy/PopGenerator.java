@@ -55,11 +55,12 @@ public class PopGenerator {
 		PopGenerator.createPopT1(networkFilename, nPersons, outputDir + "pop_corr_t_1.xml");
 		PopGenerator.createPopT2(networkFilename, nPersons, outputDir + "pop_corr_t_2.xml");
 		PopGenerator.createPopT3(networkFilename, nPersons, outputDir + "pop_corr_t_3.xml");
+		PopGenerator.createPopT4(networkFilename, nPersons, outputDir + "pop_corr_t_4.xml");
 		
 		PopGenerator.createPopS1(networkFilename, nPersons, outputDir + "pop_corr_s_1.xml");
 		PopGenerator.createPopS2(networkFilename, nPersons, outputDir + "pop_corr_s_2.xml");
 		PopGenerator.createPopS3(networkFilename, nPersons, outputDir + "pop_corr_s_3.xml");
-
+		PopGenerator.createPopS4(networkFilename, nPersons, outputDir + "pop_corr_s_4.xml");
 	}
 
 	private static void createPopT1(String networkFilename, int nPersons, String outFilename) {
@@ -124,6 +125,32 @@ public class PopGenerator {
 		// create additional trips from node 2 to node 6 and trips from node 6 to node 2, 6-20
 		createPersons(rnd, pop, nPersons, node2Coord, node6Coord, 6, 20);
 		createPersons(rnd, pop, nPersons, node6Coord, node2Coord, 6, 20);
+						
+		new PopulationWriter(pop, null).write(outFilename);
+	}
+	
+	private static void createPopT4(String networkFilename, int nPersons, String outFilename) {
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(sc).readFile(networkFilename);
+		Population pop = sc.getPopulation();
+		
+		MatsimRandom.reset(4711);
+		Random rnd = MatsimRandom.getLocalInstance();
+		
+		Coord node2Coord = sc.getNetwork().getNodes().get(new IdImpl(2)).getCoord();
+		Coord node6Coord = sc.getNetwork().getNodes().get(new IdImpl(6)).getCoord();
+		
+		// create trips from node 2 to node 6 and trips from node 6 to node 2, 6-10
+		createPersons(rnd, pop, nPersons, node2Coord, node6Coord, 6, 10);
+		createPersons(rnd, pop, nPersons, node6Coord, node2Coord, 6, 10);
+		
+		// create additional trips from node 2 to node 6 and trips from node 6 to node 2, 16-20
+		createPersons(rnd, pop, nPersons, node2Coord, node6Coord, 16, 20);
+		createPersons(rnd, pop, nPersons, node6Coord, node2Coord, 16, 20);
+		
+		// create additional trips from node 2 to node 6 and trips from node 6 to node 2, 6-16
+		createPersons(rnd, pop, nPersons, node2Coord, node6Coord, 6, 16);
+		createPersons(rnd, pop, nPersons, node6Coord, node2Coord, 6, 16);
 						
 		new PopulationWriter(pop, null).write(outFilename);
 	}
@@ -194,6 +221,34 @@ public class PopGenerator {
 		// create additional trips from node 3 to node 5 and trips from node 5 to node 3, 6-10
 		createPersons(rnd, pop, nPersons, node3Coord, node5Coord, 6, 10);
 		createPersons(rnd, pop, nPersons, node5Coord, node3Coord, 6, 10);
+						
+		new PopulationWriter(pop, null).write(outFilename);
+	}
+	
+	private static void createPopS4(String networkFilename, int nPersons, String outFilename) {
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(sc).readFile(networkFilename);
+		Population pop = sc.getPopulation();
+		
+		MatsimRandom.reset(4711);
+		Random rnd = MatsimRandom.getLocalInstance();
+		
+		Coord node2Coord = sc.getNetwork().getNodes().get(new IdImpl(2)).getCoord();
+		Coord node3Coord = sc.getNetwork().getNodes().get(new IdImpl(3)).getCoord();
+		Coord node5Coord = sc.getNetwork().getNodes().get(new IdImpl(5)).getCoord();
+		Coord node6Coord = sc.getNetwork().getNodes().get(new IdImpl(6)).getCoord();
+		
+		// create trips from node 2 to node 3 and trips from node 3 to node 2, 6-10
+		createPersons(rnd, pop, nPersons, node2Coord, node3Coord, 6, 10);
+		createPersons(rnd, pop, nPersons, node3Coord, node2Coord, 6, 10);
+		
+		// create additional trips from node 5 to node 6 and trips from node 6 to node 5, 6-10
+		createPersons(rnd, pop, nPersons, node5Coord, node6Coord, 6, 10);
+		createPersons(rnd, pop, nPersons, node6Coord, node5Coord, 6, 10);
+		
+		// create additional trips from node 2 to node 5 and trips from node 5 to node 2, 6-10
+		createPersons(rnd, pop, nPersons, node2Coord, node5Coord, 6, 10);
+		createPersons(rnd, pop, nPersons, node5Coord, node2Coord, 6, 10);
 						
 		new PopulationWriter(pop, null).write(outFilename);
 	}
