@@ -52,9 +52,11 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     
     private String day;
     private AgentMemory memory;
-    private double income;
-    private double preference;
     private Config config;
+    
+    private double alpha;
+    private double gamma;
+    private double alphaTrip;
     
     private double constantCar;
     private double constantPt;
@@ -62,15 +64,17 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private double constantWalk;    
 
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
-    		String day, double income, double preference) {
+    		String day, double alpha, double gamma, double alphaTrip) {
 		this.params = params;
         this.network = network;
+        this.config = config;
         
         this.memory = memory;
         this.day = day;
-        this.income = income;
-        this.preference = preference;
-        this.config = config;
+        this.alpha = alpha;
+        this.gamma = gamma;
+        this.alphaTrip = alphaTrip;
+        
 		this.reset();		
 				
 		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
@@ -84,20 +88,20 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     	this.constantBike = this.params.constantBike;
     	this.constantWalk = this.params.constantWalk;  
     	
-    	double f = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "f_lagged"));
+    	double f_lagged = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "f_lagged"));
     	
 		// adapt for tue - sun: 
 		if (!this.day.equals("mon")) {
 			String mode = this.memory.getMainModePreviousDay(this.day);
 			
 			if (mode.equals("car")) {
-				this.constantCar *= f;
+				this.constantCar *= f_lagged;
 			} else if (mode.equals("pt")) {
-				this.constantPt *= f;
+				this.constantPt *= f_lagged;
 			} else if (mode.equals("bike")) {
-				this.constantBike *= f;			
+				this.constantBike *= f_lagged;			
 			} else if (mode.equals("walk")) {
-				this.constantWalk *= f;
+				this.constantWalk *= f_lagged;
 			}
 			else {
 				// do nothing
@@ -131,27 +135,29 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
 		
-		double f = 1.0;
-		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncome"))) {
-			f = this.income / 7.0;
+		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePrefs"))) {
+			this.alpha = 1.0;
+			this.gamma = 1.0;
+			this.alphaTrip = 1.0;
+		}
+		
+		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useAlphaTrip"))) {
+			this.alphaTrip = 1.0;
 		}
 		
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
 		
 		// ============= CAR =======================================================
-		// add additional gain if trip purpose is shop or leisure according to individual preference		
+		// apply alpha_trip to car:
 		if (TransportMode.car.equals(leg.getMode())) {
 			double dist = 0.0; // distance in meters
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			double p = 1.0;
-			if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePreferenceVar"))) {
-				p = 1.0 - preference; // due to marginal ut of traveling < 0. Essentially does not play a role but to be consistent with act scoring
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * f * p + this.params.marginalUtilityOfDistanceCar_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * (alpha + alphaTrip) + 
+					this.gamma * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.constantCar;
 			
 		// ============= CAR =======================================================
@@ -161,15 +167,11 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s * f + this.params.marginalUtilityOfDistancePt_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s * alpha + 
+					this.gamma * this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfDistancePt_m * dist;
 			tmpScore += this.constantPt;
 		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
-			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s * f + this.params.marginalUtilityOfDistanceWalk_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
 			tmpScore +=  this.constantWalk;
 		} else if (TransportMode.bike.equals(leg.getMode())) {
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
@@ -181,7 +183,8 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 				dist = getDistance(route);
 			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * f + this.params.marginalUtilityOfDistanceCar_m * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * alpha + 
+					this.gamma * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.constantCar;
 		}
 		return tmpScore;

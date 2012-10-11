@@ -19,6 +19,9 @@
 
 package playground.anhorni.surprice.scoring;
 
+import java.util.Random;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -37,6 +40,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 	private String day;
 	private ObjectAttributes incomes;
 	private ObjectAttributes preferences;
+	private Random random;
 
 	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
 			AgentMemories memories, String day, ObjectAttributes incomes, ObjectAttributes preferences) {
@@ -45,16 +49,24 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		this.memories = memories;
 		this.day = day;
 		this.incomes = incomes;
-		this.preferences = preferences;
+		this.preferences = preferences;	
 	}
 	
-	public ScoringFunction createNewScoringFunction(Plan plan) {			
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+	public ScoringFunction createNewScoringFunction(Plan plan) {	
 		
+		// generate alpha_trip with id of agent
+		this.random = new Random(Integer.parseInt(plan.getPerson().getId().toString()));
+		
+		for (int i = 0; i < 100; i++) {
+			this.random.nextDouble();
+		}
+		double alphaTrip = 0.1 * this.random.nextDouble();		
+		
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+				
 		SurpriceActivityScoringFunction scoringFunction = new SurpriceActivityScoringFunction(
-				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(),
-				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"), 
-				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), this.day),
+				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(), 
+				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "alpha"),
 				this.day);
 		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
@@ -63,8 +75,9 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 				super.getParams(), controler.getNetwork(), controler.getConfig(),
 				this.memories.getMemory(plan.getPerson().getId()),
 				this.day,
-				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"),
-				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), this.day)));
+				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "alpha"),
+				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma"),
+				alphaTrip));
 		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;

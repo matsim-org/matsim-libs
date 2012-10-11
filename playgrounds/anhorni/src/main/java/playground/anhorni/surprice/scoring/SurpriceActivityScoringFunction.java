@@ -22,6 +22,7 @@ package playground.anhorni.surprice.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -42,21 +43,20 @@ import playground.anhorni.surprice.Surprice;
 public class SurpriceActivityScoringFunction extends CharyparNagelActivityScoring {
 	
 	private CharyparNagelScoringParameters params;
-	private double income;
-	private double preference;
+	private double alpha;
 	private Config config;
 	private final ActivityFacilities facilities;
 	private DayType day;
 	private Plan plan;
+	private final static Logger log = Logger.getLogger(SurpriceActivityScoringFunction.class);
 		
 	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
-			ActivityFacilities facilities, double income, double preference, String day) {
+			ActivityFacilities facilities, double alpha, String day) {
 		super(params);
 		super.reset();
 		this.params = params;
 		this.config = config;
-		this.income = income;
-		this.preference = preference;
+		this.alpha = alpha;
 		this.facilities = facilities;
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
@@ -64,16 +64,9 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		
-		double f = 1.0;
-		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncomes"))) {
-			f = this.income / 7.0;
+		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncomes"))) {
+			this.alpha = 1.0;
 		}
-
-//		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
-//		if (actParams == null) {
-//			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
-//					"(module name=\"planCalcScore\" in the config file).");
-//		}
 
 		double tmpScore = 0.0;
 		double[] openingInterval = this.getOpeningInterval(act);
@@ -100,26 +93,25 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			tmpScore += this.params.marginalUtilityOfWaiting_s * f * (activityStart - arrivalTime);
+			tmpScore += this.params.marginalUtilityOfWaiting_s * this.alpha * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
 		double latestStartTime = closingTime;
 		if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-			tmpScore += this.params.marginalUtilityOfLateArrival_s * f * (activityStart - latestStartTime);
+			tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
 		}
 
 		// utility of performing an action, duration is >= 1, thus log is no problem
 		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
-
 		if (duration > 0) {
 			double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0));
-			double utilPerf = this.params.marginalUtilityOfPerforming_s * f * typicalDuration
+			double utilPerf = this.params.marginalUtilityOfPerforming_s * this.alpha * typicalDuration
 					* Math.log((duration / 3600.0) / zeroUtilityDuration);
-			double utilWait = this.params.marginalUtilityOfWaiting_s * f * duration;
+			double utilWait = this.params.marginalUtilityOfWaiting_s * this.alpha * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
-			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * f * Math.abs(duration);
+			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * this.alpha * Math.abs(duration);
 		}
 
 //		// disutility if stopping too early
@@ -128,15 +120,15 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 //			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * f * (earliestEndTime - activityEnd);
 //		}
 
-		// disutility if going away to late
+		// disutility if going away too late
 		if (activityEnd < departureTime) {
-			tmpScore += this.params.marginalUtilityOfWaiting_s * f * (departureTime - activityEnd);
+			tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
 		}
 
 		// disutility if duration was too short
 		double minimalDuration = typicalDuration / 3.0;
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * f * (minimalDuration - duration);
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
 		}
 		return tmpScore;
 	}

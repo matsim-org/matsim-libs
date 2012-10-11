@@ -249,7 +249,7 @@ public class CreateScenario {
 			log.info("Writing population with plans ..." + outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 			new File(outPath + "/" + DayConverter.getDayString(dow) + "/").mkdirs();
 			new PopulationWriter(
-					this.scenario.getPopulation(), scenario.getNetwork()).write(outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
+					this.scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 		}	
 	}
 		
@@ -390,15 +390,9 @@ public class CreateScenario {
 	
 	private void createDesiresForPersons() {
 		log.info("creating desires");
-		int counter = 0;
-		int nextMsg = 1;
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {			
-			counter++;
-			if (counter % nextMsg == 0) {
-				nextMsg *= 2;
-				log.info(" person # " + counter);
-			}
-			((PersonImpl)person).getDesires().getActivityDurations().clear();
+			if (((PersonImpl)person).getDesires() == null) ((PersonImpl)person).createDesires("");
+			else ((PersonImpl)person).getDesires().getActivityDurations().clear();
 			
 			double wDur = 0.0; int wCount = 0;
 			double sDur = 0.0; int sCount = 0;
