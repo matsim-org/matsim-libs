@@ -179,7 +179,7 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 						mode,
 						populationFactory,
 						new NetworkLegRouter(
-							network,
+							subNetwork,
 							routeAlgo,
 							((PopulationFactoryImpl) populationFactory).getModeRouteFactory())));
 		}
