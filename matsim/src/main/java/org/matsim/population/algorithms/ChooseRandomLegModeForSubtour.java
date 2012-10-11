@@ -45,7 +45,6 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
  *
  * @author michaz
  * @see SubtourModeChoice
- * 
  */
 public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
@@ -57,8 +56,8 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	}
 
 	private Collection<String> modes;
-
 	private final Collection<String> chainBasedModes;
+	private Collection<String> singleTripSubtourModes;
 
 	private final Random rng;
 
@@ -76,14 +75,30 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.modes = Arrays.asList(modes);
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
+		this.singleTripSubtourModes = this.chainBasedModes;
+		
 		this.rng = rng;
 		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		logger.info("Chain based modes: " + this.chainBasedModes.toString());
 	}
 
+	/**
+	 * Some subtour consist of only a single trip, e.g. if a trip starts and ends on the same link or facility.
+	 * By default, for those modes, the normal chain based modes are available. But in certain cases, not all
+	 * the modes should be available for such trips (e.g. car-sharing does not make much sense for such a trip),
+	 * thus the list of modes available for single-trip subtours can be specified independently. As mentioned,
+	 * it is initialized by the constructor to the full list of chain based modes.
+	 * 
+	 * @param singleTripSubtourModes
+	 */
+	public void setSingleTripSubtourModes(final String[] singleTripSubtourModes) {
+		this.singleTripSubtourModes = Arrays.asList(singleTripSubtourModes);
+	}
+	
 	@Override
 	public void run(final Plan plan) {
 		this.plan = plan;
+		
 		if (plan.getPlanElements().size() > 1) {
 			if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
 				homeLocation = ((Activity) plan.getPlanElements().get(0)).getLinkId();
@@ -97,18 +112,13 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
 				List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
 				changeLegModeTo(subTour, whatToDo.newTransportMode);
-//				logger.debug("Agent " + plan.getPerson().getId() + " changed their mode on subtour #"+whatToDo.subTourIndex+" to " + whatToDo.newTransportMode);
 			}
-//		} else {
-			// Nothing to do - the whole plan does not contain a
-			// subtour. It isn't even its own subtour because it isn't a
-			// tour.
 		}
 	}
 
 	private List<Candidate> determineChoiceSet(Collection<String> permissibleModesForThisPerson) {
 		ArrayList<Candidate> choiceSet = new ArrayList<Candidate>();
-		for (Integer subTourIndex : planAnalyzeSubtours.getSubtourIndexation()) {
+		for (int subTourIndex : planAnalyzeSubtours.getSubtourIndexation()) {
 			if (subTourIndex < 0) {
 				continue;
 			}
@@ -126,7 +136,11 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				throw new RuntimeException();
 			}
 			
-			for (String mode : chainBasedModes) {
+			Collection<String> testingModes = chainBasedModes;
+			if (subTour.size() == 3) {
+				testingModes = singleTripSubtourModes;
+			}
+			for (String mode : testingModes) {
 				Id vehicleLocation = homeLocation;
 				Activity lastAct = findLastLegUsing(plan.getPlanElements().subList(0, plan.getPlanElements().indexOf(subTour.get(0)) + 1), mode);
 				if (lastAct != null) {

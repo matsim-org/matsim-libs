@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.BasicLocations;
@@ -43,6 +45,8 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -143,7 +147,70 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		testCarDoesntTeleport((NetworkImpl) network, config.planomat(), TransportMode.pt, TransportMode.car);
 	}
 
-	public void testSubTourMutationToCar(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+	public void testSingleTripSubtourHandling() {
+		String[] modes = new String[] {"car", "pt", "walk"};
+		
+		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, new Random(15102011));
+		testee.setTripStructureAnalysisLayer(TripStructureAnalysisLayerOption.link);
+		Person person = new PersonImpl(new IdImpl("1000"));
+		Plan plan = new PlanImpl();
+		person.addPlan(plan);
+		Id linkId = new IdImpl(1);
+		Activity home1 = new ActivityImpl("home", linkId);
+		Leg leg = new LegImpl("car");
+		Activity home2 = new ActivityImpl("home", linkId);
+		plan.addActivity(home1);
+		plan.addLeg(leg);
+		plan.addActivity(home2);
+		
+		{ // test default
+			boolean hasCar = false;
+			boolean hasPt = false;
+			boolean hasWalk = false;
+			
+			for (int i = 0; i < 5; i++) {
+				testee.run(plan);
+				if (leg.getMode().equals("car")) {
+					hasCar = true;
+				}
+				if (leg.getMode().equals("pt")) {
+					hasPt = true;
+				}
+				if (leg.getMode().equals("walk")) {
+					hasWalk = true;
+				}
+			}
+			assertTrue(hasCar);
+			assertTrue(hasPt);
+			assertTrue(hasWalk);
+		}
+		{ // test with special single trip subtour settings
+			testee.setSingleTripSubtourModes(new String[] {"pt", "walk"});
+			boolean hasCar = false;
+			boolean hasPt = false;
+			boolean hasWalk = false;
+			
+			for (int i = 0; i < 50; i++) {
+				testee.run(plan);
+				if (leg.getMode().equals("car")) {
+					hasCar = true;
+				}
+				if (leg.getMode().equals("pt")) {
+					hasPt = true;
+				}
+				if (leg.getMode().equals("walk")) {
+					hasWalk = true;
+				}
+			}
+			assertFalse(hasCar);
+			assertTrue(hasPt);
+			assertTrue(hasWalk);
+		}
+
+	}
+
+
+	private void testSubTourMutationToCar(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		String expectedMode = TransportMode.car;
 		String originalMode = TransportMode.pt;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -161,7 +228,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	}
 	
-	public void testUnknownModeDoesntMutate(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+	private void testUnknownModeDoesntMutate(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		String originalMode = TransportMode.walk;
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
@@ -178,7 +245,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	}
 
-	public void testSubTourMutationToPt(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
+	private void testSubTourMutationToPt(BasicLocations layer, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
 		String expectedMode = TransportMode.pt;
 		String originalMode = TransportMode.car;
 		String[] modes = new String[] {expectedMode, originalMode};
@@ -196,7 +263,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	}
 
-	public void testCarDoesntTeleport(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup, String originalMode, String otherMode) {
+	private void testCarDoesntTeleport(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup, String originalMode, String otherMode) {
 		String[] modes = new String[] {originalMode, otherMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setTripStructureAnalysisLayer(planomatConfigGroup.getTripStructureAnalysisLayer());
