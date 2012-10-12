@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
@@ -33,8 +33,8 @@ import playground.mrieser.core.mobsim.impl.DefaultMobsimVehicle;
 
 public class DefaultTransitMobsimVehicle extends DefaultMobsimVehicle implements TransitMobsimVehicle {
 
-	private final List<PassengerAgent> passengers = new ArrayList<PassengerAgent>();
-	private final List<PassengerAgent> safePassengers = Collections.unmodifiableList(this.passengers);
+	private final List<PTPassengerAgent> passengers = new ArrayList<PTPassengerAgent>();
+	private final List<PTPassengerAgent> safePassengers = Collections.unmodifiableList(this.passengers);
 	private final double passengerCapacity;
 	private double availCapacity = 0.0;
 	private final TransitStopHandler stopHandler;
@@ -52,7 +52,7 @@ public class DefaultTransitMobsimVehicle extends DefaultMobsimVehicle implements
 	}
 
 	@Override
-	public boolean addPassenger(PassengerAgent passenger) {
+	public boolean addPassenger(PTPassengerAgent passenger) {
 		if (passenger.getWeight() < this.availCapacity) {
 			this.passengers.add(passenger);
 			this.availCapacity -= passenger.getWeight();
@@ -62,7 +62,7 @@ public class DefaultTransitMobsimVehicle extends DefaultMobsimVehicle implements
 	}
 
 	@Override
-	public boolean removePassenger(PassengerAgent passenger) {
+	public boolean removePassenger(PTPassengerAgent passenger) {
 		boolean removed = this.passengers.remove(passenger);
 		if (removed) {
 			this.availCapacity += passenger.getWeight();
@@ -71,7 +71,7 @@ public class DefaultTransitMobsimVehicle extends DefaultMobsimVehicle implements
 	}
 
 	@Override
-	public Collection<PassengerAgent> getPassengers() {
+	public Collection<PTPassengerAgent> getPassengers() {
 		return this.safePassengers;
 	}
 

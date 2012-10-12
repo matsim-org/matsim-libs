@@ -22,14 +22,15 @@ package playground.mrieser.core.mobsim.transit;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-/*package*/ class PassengerAgentImpl implements PassengerAgent {
+/*package*/ class PassengerAgentImpl implements PTPassengerAgent {
 
 	private final Id id;
 	private final ExperimentalTransitRoute route;
@@ -78,6 +79,30 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 	public Id getDesiredAccessStopId() {
 		// Probably not used in your simulation because you ask this before you pass the route in. //mz
 		return route.getAccessStopId();
+	}
+
+	@Override
+	public void setVehicle(MobsimVehicle veh) {
+	}
+
+	@Override
+	public MobsimVehicle getVehicle() {
+		return null;
+	}
+
+	@Override
+	public Id getPlannedVehicleId() {
+		return null;
+	}
+
+	@Override
+	public Id getCurrentLinkId() {
+		return null;
+	}
+
+	@Override
+	public Id getDestinationLinkId() {
+		return null;
 	}
 
 }

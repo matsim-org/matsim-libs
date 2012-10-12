@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.UmlaufStueckI;
@@ -158,10 +158,10 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		}
 	}
 
-	private List<PassengerAgent> findPassengersEntering(final TransitStopFacility stop, final double freeCapacity) {
+	private List<PTPassengerAgent> findPassengersEntering(final TransitStopFacility stop, final double freeCapacity) {
 		double availCap = freeCapacity;
-		ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
-		for (PassengerAgent agent : this.ptFeature.getAgentTracker().getAgentsAtStop(stop.getId())) {
+		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<PTPassengerAgent>();
+		for (PTPassengerAgent agent : this.ptFeature.getAgentTracker().getAgentsAtStop(stop.getId())) {
 			if (availCap < agent.getWeight()) {
 				break;
 			}
@@ -175,9 +175,9 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		return passengersEntering;
 	}
 
-	private ArrayList<PassengerAgent> findPassengersLeaving(final TransitStopFacility stop) {
-		ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
-		for (PassengerAgent passenger : this.vehicle.getPassengers()) {
+	private ArrayList<PTPassengerAgent> findPassengersLeaving(final TransitStopFacility stop) {
+		ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<PTPassengerAgent>();
+		for (PTPassengerAgent passenger : this.vehicle.getPassengers()) {
 			if (passenger.getExitAtStop(stop)) {
 				passengersLeaving.add(passenger);
 			}
@@ -223,12 +223,12 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		TransitStopFacility stopFac = stop.getStopFacility();
 		assertExpectedStop(stopFac);
 		processEventVehicleArrives(stopFac, time);
-		ArrayList<PassengerAgent> passengersLeaving = findPassengersLeaving(stopFac);
+		ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(stopFac);
 		double freeCapacity = this.vehicle.getFreeCapacity();
-		for (PassengerAgent a : passengersLeaving) {
+		for (PTPassengerAgent a : passengersLeaving) {
 			freeCapacity += a.getWeight();
 		}
-		List<PassengerAgent> passengersEntering = findPassengersEntering(stopFac, freeCapacity);
+		List<PTPassengerAgent> passengersEntering = findPassengersEntering(stopFac, freeCapacity);
 		double stopTime = this.vehicle.getStopHandler().handleTransitStop(stopFac, time, passengersLeaving, passengersEntering, this);
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(time, stopTime);
@@ -240,7 +240,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerEntering(final PassengerAgent agent, final double time) {
+	public boolean handlePassengerEntering(final PTPassengerAgent agent, final double time) {
 		boolean handled = this.vehicle.addPassenger(agent);
 		if (handled) {
 			this.ptFeature.getAgentTracker().removeAgentFromStop(agent, this.currentStop.getStopFacility().getId());
@@ -252,7 +252,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerLeaving(final PassengerAgent agent, final double time) {
+	public boolean handlePassengerLeaving(final PTPassengerAgent agent, final double time) {
 		boolean handled = this.vehicle.removePassenger(agent);
 		if (handled) {
 			EventsManager events = this.simEngine.getEventsManager();

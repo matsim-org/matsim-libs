@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -91,7 +92,7 @@ class KaiHiResLink extends QLinkInternalI {
 	}
 
 	@Override
-	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
+	void letVehicleDepart(QVehicle vehicle, double now) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
@@ -103,7 +104,7 @@ class KaiHiResLink extends QLinkInternalI {
 	}
 
 	@Override
-	void registerAgentWaitingForCar(MobsimDriverAgent agent) {
+	void registerDriverAgentWaitingForCar(MobsimDriverAgent agent) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
@@ -190,6 +191,50 @@ class KaiHiResLink extends QLinkInternalI {
 	public VisData getVisData() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	QVehicle getParkedVehicle(Id vehicleId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId,
+			double now) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	void registerDriverAgentWaitingForPassengers(MobsimDriverAgent agent) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	MobsimAgent unregisterDriverAgentWaitingForPassengers(Id agentId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent,
+			Id vehicleId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	Set<MobsimAgent> getAgentsWaitingForCar(Id vehicleId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

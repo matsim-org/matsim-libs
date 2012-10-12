@@ -21,7 +21,7 @@ package playground.mrieser.core.mobsim.transit;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
@@ -44,7 +44,7 @@ public class TransitDepartureHandler implements DepartureHandler {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 		Id accessStopId = route.getAccessStopId();
-		PassengerAgent passenger = new PassengerAgentImpl(agent.getPlan().getPerson().getId(), route, agent.getWeight());
+		PTPassengerAgent passenger = new PassengerAgentImpl(agent.getPlan().getPerson().getId(), route, agent.getWeight());
 		this.agentTracker.addAgentToStop(passenger, accessStopId);
 	}
 
