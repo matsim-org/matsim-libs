@@ -199,6 +199,14 @@ public class PPlan {
 
 	public boolean isSameButVehSize(PPlan testPlan) {
 		
+		if(this.startTime != testPlan.getStartTime()){
+			return false;
+		}
+		
+		if(this.endTime != testPlan.getEndTime()){
+			return false;
+		}
+
 		if (testPlan.getStopsToBeServed().size() != this.getStopsToBeServed().size()) {
 			return false;
 		}
@@ -207,14 +215,6 @@ public class PPlan {
 			if(!this.stopsToBeServed.get(i).getId().toString().equalsIgnoreCase(testPlan.getStopsToBeServed().get(i).getId().toString())){
 				return false;
 			}			
-		}
-		
-		if(this.startTime != testPlan.getStartTime()){
-			return false;
-		}
-		
-		if(this.endTime != testPlan.getEndTime()){
-			return false;
 		}
 		
 		return true;
