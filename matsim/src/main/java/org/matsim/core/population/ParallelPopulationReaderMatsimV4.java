@@ -41,6 +41,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -246,6 +247,11 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 			return population.getFactory();
 		}
 
+		@Override
+		public ObjectAttributes getPersonAttributes() {
+			return population.getPersonAttributes();
+		}
+		
 		@Override
 		public String getName() {
 			throw new RuntimeException("Calls to this method are not expected to happen...");

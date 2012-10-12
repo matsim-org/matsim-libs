@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Root class of the population description (previously also called "plans file")
@@ -54,6 +55,8 @@ public class PopulationImpl implements Population {
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
 	private final PopulationFactory pb ;
+	
+	private final ObjectAttributes personAttributes = new ObjectAttributes();
 	
 
 	// constructors:
@@ -153,9 +156,14 @@ public class PopulationImpl implements Population {
 		return this.isStreaming;
 	}
   
-  public final void setIsStreaming(final boolean isStreaming) {
-  	this.isStreaming = isStreaming;
-  }
+	public final void setIsStreaming(final boolean isStreaming) {
+		this.isStreaming = isStreaming;
+	}
+
+	@Override
+	public ObjectAttributes getPersonAttributes() {
+		return this.personAttributes;
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// print methods

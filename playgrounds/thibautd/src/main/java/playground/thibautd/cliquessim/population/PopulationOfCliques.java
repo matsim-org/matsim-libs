@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Container aimed at handling the population of cliques from within the default
@@ -53,6 +54,7 @@ public class PopulationOfCliques implements Population {
 
 	private Map<Id, Clique> cliques = new TreeMap<Id, Clique>();
 	private final PopulationFactory factory;
+	private final ObjectAttributes personAttributes = new ObjectAttributes();
 
 	/*
 	 * =========================================================================
@@ -136,6 +138,11 @@ public class PopulationOfCliques implements Population {
 					"Failed to add agent "+p+": is not a Clique!",
 					e);
 		}
+	}
+
+	@Override
+	public ObjectAttributes getPersonAttributes() {
+		return this.personAttributes;
 	}
 }
 

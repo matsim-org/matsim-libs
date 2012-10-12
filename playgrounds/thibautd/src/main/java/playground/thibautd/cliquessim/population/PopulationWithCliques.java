@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Encapsulate a {@link Population} Object and a {@link PopulationWithCliques}
@@ -96,6 +97,11 @@ public class PopulationWithCliques implements Population {
 		populationDelegate.addPerson(p);
 	}
 
+	@Override
+	public ObjectAttributes getPersonAttributes() {
+		return this.populationDelegate.getPersonAttributes();
+	}
+	
 	/*
 	 * =========================================================================
 	 * PopulationWithCliques-specific Methods

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Root class of the population description (previously also called "plans file")
@@ -40,5 +41,7 @@ public interface Population extends MatsimToplevelContainer {
 	public Map<Id,? extends Person> getPersons();
 
 	public void addPerson(final Person p);
+	
+	public ObjectAttributes getPersonAttributes();
 
 }
