@@ -20,7 +20,11 @@
 
 package playground.wdoering.grips.evacuationanalysis;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class Cell<T>
 {
@@ -28,6 +32,9 @@ public class Cell<T>
 	private int count;
 	private T data;
 	private List<Double> arrivalTimes;
+	private List<Double> linkLeaveTimes;
+	private List<Double> linkEnterTimes;
+	private CoordImpl centroid;
 	
 	public static String CELLSIZE = "cellsize";
 	
@@ -72,6 +79,44 @@ public class Cell<T>
 	
 	public List<Double> getArrivalTimes() {
 		return arrivalTimes;
+	}
+	
+	public List<Double> getLinkEnterTimes() {
+		return linkEnterTimes;
+	}
+	
+	public List<Double> getLinkLeaveTimes() {
+		return linkLeaveTimes;
+	}
+	
+	public void setLinkEnterTimes(List<Double> linkEnterTimes) {
+		this.linkEnterTimes = linkEnterTimes;
+	}
+	
+	public void setLinkLeaveTimes(List<Double> linkLeaveTimes) {
+		this.linkLeaveTimes = linkLeaveTimes;
+	}
+	
+	public void addLinkEnterTime(Double time)
+	{
+		if (this.linkEnterTimes==null)
+			this.linkEnterTimes = new ArrayList<Double>();
+		this.linkEnterTimes.add(time);
+	}
+	
+	public void addLinkLeaveTime(Double time)
+	{
+		if (this.linkLeaveTimes==null)
+			this.linkLeaveTimes = new ArrayList<Double>();
+		this.linkLeaveTimes.add(time);
+	}
+	
+	public void setCentroid(CoordImpl centroid) {
+		this.centroid = centroid;
+	}
+	
+	public CoordImpl getCentroid() {
+		return centroid;
 	}
 
 }

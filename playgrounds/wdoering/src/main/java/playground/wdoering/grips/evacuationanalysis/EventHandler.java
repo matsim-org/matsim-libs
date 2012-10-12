@@ -46,7 +46,9 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -89,11 +91,13 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private double cellSize;
 	private QuadTree<Cell> cellTree;
 	
-	private final Map<Id,AgentDepartureEvent> events = new HashMap<Id, AgentDepartureEvent>();
+	private final Map<Id,Event> events = new HashMap<Id, Event>();
 	private double timeSum;
 	private double maxCellTimeSum;
 	private int arrivals;
 	private List<Tuple<Double, Integer>> arrivalTimes;
+	
+	private Rect boundingBox;
 	
 	private String eventName;
 
@@ -109,6 +113,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private void init() {
 		
+		int putCounter = 0; //FIXME: is not necessary
 		this.arrivals = 0;
 		this.timeSum = 0;
 		this.maxCellTimeSum = Double.NEGATIVE_INFINITY;
@@ -119,6 +124,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		double maxY = Double.NEGATIVE_INFINITY;
 		
 		for (org.matsim.api.core.v01.network.Node n : this.network.getNodes().values()) {
+			
+			if ((n.getId().toString().contains("en")) || (n.getId().toString().contains("el")))
+				continue;
+			
 			double x = n.getCoord().getX();
 			double y = n.getCoord().getY();
 			
@@ -139,16 +148,25 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 		}
 		
+		this.boundingBox = new Rect(minX,minY,maxX,maxY);
 		
 		this.cellTree = new QuadTree<Cell>(minX,minY,maxX,maxY);
 		
 		for (double x = minX; x <= maxX; x += cellSize) {
 			for (double y = minY; y <= maxY; y += cellSize) {
 				Cell<List<Event>> cell = new Cell(new LinkedList<Event>());
+				
+				cell.setCentroid(new CoordImpl(x, y));
+				
 				this.cellTree.put(x, y, cell);
+				putCounter++;
 			}
 			
 		}
+		
+		System.out.println("put:" + putCounter);
+//		System.exit(0);
+		
 		
 	}
 	
@@ -192,7 +210,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.events.put(event.getPersonId(), event);
 		
 		//get cell from person id
-		AgentDepartureEvent departure = this.events.get(event.getPersonId());
+		AgentDepartureEvent departure = (AgentDepartureEvent)this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
@@ -206,7 +224,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public void handleEvent(AgentArrivalEvent event)
 	{
 		//get cell from person id
-		AgentDepartureEvent departure = this.events.get(event.getPersonId());
+		AgentDepartureEvent departure = (AgentDepartureEvent)this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
@@ -243,8 +261,19 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkEnterEvent event)
 	{
+		//get cell from person id
+		Link link = this.network.getLinks().get(event.getLinkId());
+		Coord c = link.getCoord();
+		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
+		cell.addLinkEnterTime(event.getTime());
+
+		//		
+//		//get the cell data, store event to it 
+//		List<Event> cellEvents = cell.getData();
+//		cellEvents.add(event);
 		
-		//TODO für Räumungszeiten
+		
+//		enterTimes.add(event.)
 
 
 	}
@@ -252,9 +281,15 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkLeaveEvent event)
 	{
-		//TODO für Räumungszeiten
+
+		//get cell from person id
+		Link link = this.network.getLinks().get(event.getLinkId());
+		Coord c = link.getCoord();
+		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
+		cell.addLinkLeaveTime(event.getTime());
 		
-		System.out.println("link leave: " + event.getTime() + " - agent " + event.getPersonId() + " at link " + event.getLinkId());
+		
+//		System.out.println("link leave: " + event.getTime() + " - agent " + event.getPersonId() + " at link " + event.getLinkId());
 		
 	}
 	
@@ -264,7 +299,18 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	public EventData getData()
 	{
-		return new EventData(eventName, cellTree, cellSize, timeSum, maxCellTimeSum, arrivals, arrivalTimes);
+		LinkedList<Cell> cells = new LinkedList<Cell>();
+		cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
+		
+		for (Cell cell : cells)
+		{
+			if (cell.getCount()>0)
+				System.out.println(cell.getCount());
+		}
+		
+		System.err.println("cell count: " + cells.size());
+		
+		return new EventData(eventName, cellTree, cellSize, timeSum, maxCellTimeSum, arrivals, arrivalTimes, boundingBox);
 	}
 
 

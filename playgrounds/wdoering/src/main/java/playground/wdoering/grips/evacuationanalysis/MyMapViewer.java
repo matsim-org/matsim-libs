@@ -38,6 +38,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -52,6 +53,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
@@ -108,6 +110,8 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private boolean drawNetworkBoundingBox = false;
 	
 	private float cellTransparency;
+
+	private Cell selectedCell;
 
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
@@ -181,6 +185,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			this.links.put(link);
 
 		}
+		
+		
+		
 
 	}
 
@@ -618,103 +625,172 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				g2D.setStroke(new BasicStroke(1F));
 				
 				//resulting length in pixels of a grid cell
-				double zoomStep = (gridSize/(Math.pow(2,this.getZoom())));
+//				double zoomStep = (gridSize/(Math.pow(2,this.getZoom())));
+//				
+//				//debug
+////				g.setColor(Color.orange);
+////				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + this.getZoom(),26,26);
+////				g.setColor(Color.black);
+////				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + this.getZoom(),25,25);
+//				
+//				
+//				int i = 0;
+//				
+////				System.out.println("minx:"+pixMinX + "|maxx:" + pixMaxX + "|pixMinY:" + pixMinY + "|maxy:" + pixMaxY);
+//				for (double u = pixMinX; u < pixMaxX; u+=zoomStep)
+//				{
+//					i++;
+//					int j = 0;
+//					
+//					for (double v = pixMaxY; v > pixMinY-zoomStep; v-=zoomStep)
+//					{
+////						System.out.println("uv: \t" + u + "\t" + v);
+//						j++;
+//						
+//						int gridOffsetX = (int)(u-b.x);
+//						int gridOffsetY = (int)(v-b.y);
+////						int gridOffsetY = (int)(v-b.y-zoomStep);
+//						g.setColor(ToolConfig.COLOR_GRID);						
+//						g.drawRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
+//						
+//						Cell cell = this.cellTree.get(minX+gridSize*i,minY+gridSize*j);
+//						
+//						Double relTravelTime = (cell.getTimeSum()) / maxCellTimeSum;
+//						
+////						System.out.println(cell.getTimeSum() + "|" + cell.getCount() + "|\t" + timeSum);
+//						
+//
+//						
+//						//only show the count number if the cell size is readable
+//						if (zoomStep>40)
+//						{
+//							g.setColor(Color.white);
+//							g.drawString("c:" + this.cellTree.get(minX+gridSize*i,minY+gridSize*j).getCount(), (int)u-b.x, (int)v-b.y+20);
+//						}
+//						
+//						g.setColor(Color.black);
+//
+//						g2D.setStroke(new BasicStroke(1F));
+//						
+//					}
+//				}
 				
-				//debug
-//				g.setColor(Color.orange);
-//				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + this.getZoom(),26,26);
-//				g.setColor(Color.black);
-//				g.drawString("zoomStep: " + zoomStep + "|gridsize:"+gridSize+"|zoom:" + this.getZoom(),25,25);
 				
-				double timeSum = data.getTimeSum();
 				double maxCellTimeSum = data.getMaxCellTimeSum();
 				
-				int i = 0;
 				
-//				System.out.println("minx:"+pixMinX + "|maxx:" + pixMaxX + "|pixMinY:" + pixMinY + "|maxy:" + pixMaxY);
-				for (double u = pixMinX; u < pixMaxX; u+=zoomStep)
+				//////////////////////////////////
+				//////////////////////////////////
+				LinkedList<Cell> cells = new LinkedList<Cell>();
+				cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
+				
+				this.selectedCell = null;
+				for (Cell ccell : cells)
 				{
-					i++;
-					int j = 0;
+					g2D.setStroke(new BasicStroke(1F));
 					
-					for (double v = pixMaxY; v > pixMinY-zoomStep; v-=zoomStep)
-					{
-//						System.out.println("uv: \t" + u + "\t" + v);
-						j++;
-						
-						int gridOffsetX = (int)(u-b.x);
-						int gridOffsetY = (int)(v-b.y);
-//						int gridOffsetY = (int)(v-b.y-zoomStep);
-						g.setColor(ToolConfig.COLOR_GRID);						
-						g.drawRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
-						
-						Cell cell = this.cellTree.get(minX+gridSize*i,minY+gridSize*j);
-						
-						Double relTravelTime = (cell.getTimeSum()) / maxCellTimeSum;
-						
-//						System.out.println(cell.getTimeSum() + "|" + cell.getCount() + "|\t" + timeSum);
-						
-						if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
-							relTravelTime = 0d;
-						
+					Double relTravelTime = (ccell.getTimeSum()) / maxCellTimeSum;
+					
+//					System.out.println(cell.getTimeSum() + "|" + cell.getCount() + "|\t" + timeSum);
+					
+					if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
+						relTravelTime = 0d;
+					
 
-						if (cell.getCount()>0)
+					if (ccell.getCount()>0)
+					{
+						if (coloringMode.equals(ColoringMode.RYG))
 						{
-							if (coloringMode.equals(ColoringMode.RYG))
+							int red,green,blue;
+							
+							if (relTravelTime>.5)
 							{
-								int red,green,blue;
-								
-								if (relTravelTime>.5)
-								{
-									red = 255;
-									green = (int)(255 - 255*(relTravelTime-.5)*2);
-									blue = 0;
-								}
-								else
-								{
-									red = (int)(255*relTravelTime*2);
-									green = 255;
-									blue = 0;
-									
-								}
-								g.setColor(new Color(red,green,blue,(int)(255*cellTransparency)));
+								red = 255;
+								green = (int)(255 - 255*(relTravelTime-.5)*2);
+								blue = 0;
 							}
 							else
-								g.setColor(new Color(0,127,(int)(255*relTravelTime),100));
+							{
+								red = (int)(255*relTravelTime*2);
+								green = 255;
+								blue = 0;
+								
+							}
+							g.setColor(new Color(red,green,blue,(int)(255*cellTransparency)));
 						}
 						else
-							g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT);
-						
-//						g.setColor(new Color(0,127,255,50+(int)(205*relTravelTime)));
-						g.fillRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
-
-						if (currentMousePosition!=null)
-						{
-							int mouseX = this.currentMousePosition.x;
-							int mouseY = this.currentMousePosition.y;
-							
-							if ((mouseX>gridOffsetX) && (mouseX<gridOffsetX+zoomStep) && (mouseY>gridOffsetY) && (mouseY<gridOffsetY+zoomStep))
-							{
-								g.setColor(ToolConfig.COLOR_HOVER);
-								g.fillRect(gridOffsetX, gridOffsetY, (int)zoomStep, (int)zoomStep);
-								g2D.setStroke(new BasicStroke(3F));
-								g.drawRect(gridOffsetX+1, gridOffsetY+1, (int)zoomStep-1, (int)zoomStep-1);
-							}
-						}
-						
-						//only show the count number if the cell size is readable
-						if (zoomStep>40)
-						{
-							g.setColor(Color.white);
-							g.drawString("c:" + this.cellTree.get(minX+gridSize*i,minY+gridSize*j).getCount(), (int)u-b.x, (int)v-b.y+20);
-						}
-						
-						g.setColor(Color.black);
-						g2D.setStroke(new BasicStroke(1F));
-
-						
+							g.setColor(new Color(0,127,(int)(255*relTravelTime),100));
 					}
+					else
+						g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT);					
+					
+					CoordImpl centroid = ccell.getCentroid();
+					
+					Coord centroidCoord = this.ctInverse.transform(new CoordImpl(centroid.getX(), centroid.getY()));
+					Point2D centroidP2D = this.getTileFactory().geoToPixel(new GeoPosition(centroidCoord.getY(),centroidCoord.getX()), this.getZoom());
+					
+					Coord centroidPlusGridCoord = this.ctInverse.transform(new CoordImpl(centroid.getX()+gridSize, centroid.getY()+gridSize));
+					Point2D centroidPlusGridP2D = this.getTileFactory().geoToPixel(new GeoPosition(centroidPlusGridCoord.getY(),centroidPlusGridCoord.getX()), this.getZoom());
+					
+					int gridX1 = (int)centroidP2D.getX()-b.x;
+					int gridY1 = (int)centroidP2D.getY()-b.y;
+					int gridX2 = (int)centroidPlusGridP2D.getX()-b.x;
+					int gridY2 = (int)centroidPlusGridP2D.getY()-b.y;
+					
+					if (gridX1>gridX2)
+					{
+						int temp = gridX2;
+						gridX2 = gridX1;
+						gridX1 = temp;
+					}
+					if (gridY1>gridY2)
+					{
+						int temp = gridY2;
+						gridY2 = gridY1;
+						gridY1 = temp;
+					}
+					
+					g.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+					g.setColor(ToolConfig.COLOR_GRID);
+					g.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+					
+					if (currentMousePosition!=null)
+					{
+						int mouseX = this.currentMousePosition.x;
+						int mouseY = this.currentMousePosition.y;
+						
+						if ((mouseX>=gridX1) && (mouseX<gridX2) && (mouseY>=gridY1) && (mouseY<gridY2))
+						{
+							g.setColor(ToolConfig.COLOR_HOVER);
+							g.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+							g2D.setStroke(new BasicStroke(3F));
+							g.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+							
+							
+							
+							this.selectedCell = ccell; 
+						}
+						
+					}		
+					
+					
+					
+					
 				}
+				
+				if ((this.selectedCell!=null) && (this.currentMousePosition!=null))
+				{
+					g.setColor(Color.white);
+					g.fillRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 50);
+					g.setColor(Color.black);
+					g.drawRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 50);
+					
+					g.drawString("person count: " + selectedCell.getCount(), this.currentMousePosition.x-15, this.currentMousePosition.y+50);
+					
+				}
+				g.setColor(Color.black);
+				//////////////////////////////////
+				//////////////////////////////////
 			}
 
 
@@ -730,6 +806,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		this.data = data;
 		this.cellTree = data.getCellTree();
 		this.gridSize = data.getCellSize();
+		
+		System.out.println("data bb: \t\t" + this.data.getBoundingBox().toString());
+		Rect mvbb = new Rect(minX,minY,maxX,maxY);
+		System.out.println("network link / mv bb: \t" + mvbb.toString());
+		
+		
 	}
 
 
