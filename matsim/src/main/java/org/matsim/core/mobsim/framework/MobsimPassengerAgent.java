@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * MobsimPassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,24 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.pt;
+package org.matsim.core.mobsim.framework;
 
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.vehicles.Vehicle;
-
-
-public interface TransitVehicle extends MobsimVehicle {
-
-	/**
-	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
-	 */
-	@Override
-	public Vehicle getVehicle();
-
-	@Override
-	public MobsimDriverAgent getDriver();
-	
-	public TransitStopHandler getStopHandler();
+public interface MobsimPassengerAgent extends MobsimAgent, PassengerAgent {
 
 }

@@ -31,8 +31,8 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 	private TransitStopFacility lastHandledStop = null;
 
 	@Override
-	public double handleTransitStop(TransitStopFacility stop, double now, List<PassengerAgent> leavingPassengers,
-			List<PassengerAgent> enteringPassengers, PassengerAccessEgress handler) {
+	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
+			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler) {
 		int cntEgress = leavingPassengers.size();
 		int cntAccess = enteringPassengers.size();
 		double stopTime = 0;
@@ -41,10 +41,10 @@ public class SimpleTransitStopHandler implements TransitStopHandler {
 			if (this.lastHandledStop != stop) {
 				stopTime += 15.0; // add fixed amount of time for door-operations and similar stuff
 			}
-			for (PassengerAgent passenger : leavingPassengers) {
+			for (PTPassengerAgent passenger : leavingPassengers) {
 				handler.handlePassengerLeaving(passenger, now);
 			}
-			for (PassengerAgent passenger : enteringPassengers) {
+			for (PTPassengerAgent passenger : enteringPassengers) {
 				handler.handlePassengerEntering(passenger, now);
 			}
 		}

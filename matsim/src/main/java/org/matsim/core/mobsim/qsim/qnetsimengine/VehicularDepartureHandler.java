@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -94,17 +93,19 @@ class VehicularDepartureHandler implements DepartureHandler {
 			if (vehicleBehavior == VehicleBehavior.TELEPORT) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 				teleportVehicleTo(vehicle, linkId);
-				qlink.letAgentDepartWithVehicle(agent, vehicle, now);
+				vehicle.setDriver(agent);
+				qlink.letVehicleDepart(vehicle, now);
 				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
 				// logic.  kai, nov'11)
 			} else if (vehicleBehavior == VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG) {
 				// While we are waiting for our car
-				qlink.registerAgentWaitingForCar(agent);
+				qlink.registerDriverAgentWaitingForCar(agent);
 			} else {
 				throw new RuntimeException("vehicle not available for agent " + agent.getId() + " on link " + linkId);
 			}
 		} else {
-			qlink.letAgentDepartWithVehicle(agent, vehicle, now);
+			vehicle.setDriver(agent);
+			qlink.letVehicleDepart(vehicle, now);
 		}
 	}
 

@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.mobsim.framework.MobsimAgentMarkerInterface;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -34,7 +34,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public interface PassengerAgent extends MobsimAgentMarkerInterface, Identifiable {
+public interface PTPassengerAgent extends PassengerAgent, Identifiable {
 
 	/**
 	 * Informs a passenger waiting at a stop that a transit line

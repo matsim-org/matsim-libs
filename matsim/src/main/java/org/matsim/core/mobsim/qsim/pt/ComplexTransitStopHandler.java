@@ -55,8 +55,8 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	}
 
 	@Override
-	public double handleTransitStop(TransitStopFacility stop, double now, List<PassengerAgent> leavingPassengers,
-			List<PassengerAgent> enteringPassengers, PassengerAccessEgress handler) {
+	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
+			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler) {
 		
 		if(this.doorOperationMode == VehicleType.DoorOperationMode.parallel){			
 			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler);			
@@ -68,7 +68,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 		}		
 	}
 	
-	private double handleSerialStop(TransitStopFacility stop, double now, List<PassengerAgent> leavingPassengers, List<PassengerAgent> enteringPassengers, PassengerAccessEgress handler){
+	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler){
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -193,7 +193,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 		return stopTime;
 	}
 	
-	private double handleParallelStop(TransitStopFacility stop, double now, List<PassengerAgent> leavingPassengers, List<PassengerAgent> enteringPassengers, PassengerAccessEgress handler){
+	private double handleParallelStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler){
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();

@@ -33,39 +33,39 @@ import org.matsim.api.core.v01.Id;
  */
 public class TransitStopAgentTracker {
 
-	private final Map<Id, List<PassengerAgent>> agentsAtStops = new HashMap<Id, List<PassengerAgent>>();
+	private final Map<Id, List<PTPassengerAgent>> agentsAtStops = new HashMap<Id, List<PTPassengerAgent>>();
 
-	public void addAgentToStop(final PassengerAgent agent, final Id stopId) {
+	public void addAgentToStop(final PTPassengerAgent agent, final Id stopId) {
 		if (stopId == null) {
 			throw new NullPointerException("stop must not be null.");
 		}
-		List<PassengerAgent> agents = this.agentsAtStops.get(stopId);
+		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
-			agents = new LinkedList<PassengerAgent>();
+			agents = new LinkedList<PTPassengerAgent>();
 			this.agentsAtStops.put(stopId, agents);
 		}
 		agents.add(agent);
 	}
 
-	public void removeAgentFromStop(final PassengerAgent agent, final Id stopId) {
+	public void removeAgentFromStop(final PTPassengerAgent agent, final Id stopId) {
 		if (stopId == null) {
 			throw new NullPointerException("stopId must not be null.");
 		}
-		List<PassengerAgent> agents = this.agentsAtStops.get(stopId);
+		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents != null) {
 			agents.remove(agent);
 		}
 	}
 
-	public List<PassengerAgent> getAgentsAtStop(final Id stopId) {
-		List<PassengerAgent> agents = this.agentsAtStops.get(stopId);
+	public List<PTPassengerAgent> getAgentsAtStop(final Id stopId) {
+		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
 			return Collections.emptyList();
 		}
 		return Collections.unmodifiableList(agents);
 	}
 
-	public Map<Id, List<PassengerAgent>> getAgentsAtStop() {
+	public Map<Id, List<PTPassengerAgent>> getAgentsAtStop() {
 		return this.agentsAtStops;
 	}
 }

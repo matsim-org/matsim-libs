@@ -36,8 +36,8 @@ public interface TransitStopHandler {
 	 * <p>Handles the loading and unloading for a transit vehicle. Given a list of passengers that
 	 * want to either board or exit the vehicle, the method can define a behavior for the
 	 * process of entering and leaving passengers. The method has to specifically call
-	 * {@link PassengerAccessEgress#handlePassengerEntering(PassengerAgent, double)} and
-	 * {@link PassengerAccessEgress#handlePassengerLeaving(PassengerAgent, double)} to let
+	 * {@link PassengerAccessEgress#handlePassengerEntering(PTPassengerAgent, double)} and
+	 * {@link PassengerAccessEgress#handlePassengerLeaving(PTPassengerAgent, double)} to let
 	 * passengers in and out the vehicle. This allows implementations of this interface to
 	 * define different strategies, e.g. a very simple one where everybody enters and leaves at
 	 * the same time, or one where first all passengers leave, and at a later time all passengers
@@ -56,7 +56,7 @@ public interface TransitStopHandler {
 	 * @return the time (in seconds) how long the vehicle will stay at least at this stop.
 	 */
 	public double handleTransitStop(final TransitStopFacility stop, final double now,
-			final List<PassengerAgent> leavingPassengers, final List<PassengerAgent> enteringPassengers,
+			final List<PTPassengerAgent> leavingPassengers, final List<PTPassengerAgent> enteringPassengers,
 			final PassengerAccessEgress handler);
 
 }

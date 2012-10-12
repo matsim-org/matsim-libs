@@ -20,7 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.interfaces;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
@@ -28,13 +31,35 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
  *
  */
 public interface MobsimVehicle extends VisVehicle{
+	
 	public Link getCurrentLink();
 	
 	public abstract double getSizeInEquivalents();
 	
+	/**
+	 * Adds a passenger to this vehicle.
+	 *
+	 * @param passenger
+	 * @return <tt>true</tt> when the agent was added as a passenger (as per the general contract of the Collection.add method).
+	 */
+	public boolean addPassenger(final PassengerAgent passenger);
 
-	
+	/**
+	 * Removes the passenger from this vehicle.
+	 *
+	 * @param passenger
+	 * @return <tt>true</tt> when the agent was removed as a passenger, <tt>false</tt> if the agent was not a passenger of this vehicle or could not be removed for other reasons
+	 */
+	public boolean removePassenger(final PassengerAgent passenger);
 
-	
+	/**
+	 * @return an immutable Collection of all passengers in this vehicle
+	 */
+	public Collection<? extends PassengerAgent> getPassengers();
+
+	/**
+	 * @return number of passengers this vehicle can transport
+	 */
+	public int getPassengerCapacity();
 
 }

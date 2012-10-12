@@ -23,7 +23,8 @@ package org.matsim.pt.fakes;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.pt.PassengerAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -31,12 +32,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**
- * A very simple implementation of the interface {@link PassengerAgent} for
+ * A very simple implementation of the interface {@link PTPassengerAgent} for
  * use in tests. Enters every available line and exits at the specified stop.
  *
  * @author mrieser
  */
-public class FakePassengerAgent implements PassengerAgent {
+public class FakePassengerAgent implements PTPassengerAgent {
 
 	private final TransitStopFacility exitStop;
 
@@ -70,6 +71,30 @@ public class FakePassengerAgent implements PassengerAgent {
 
 	@Override
 	public Id getDesiredAccessStopId() {
+		return null;
+	}
+
+	@Override
+	public void setVehicle(MobsimVehicle veh) {
+	}
+
+	@Override
+	public MobsimVehicle getVehicle() {
+		return null;
+	}
+
+	@Override
+	public Id getPlannedVehicleId() {
+		return null;
+	}
+
+	@Override
+	public Id getCurrentLinkId() {
+		return null;
+	}
+
+	@Override
+	public Id getDestinationLinkId() {
 		return null;
 	}
 

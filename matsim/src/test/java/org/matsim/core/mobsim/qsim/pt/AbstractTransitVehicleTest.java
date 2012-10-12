@@ -86,16 +86,16 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
-		ArrayList<PassengerAgent> passengers = new ArrayList<PassengerAgent>(veh.getPassengerCapacity());
+		ArrayList<PTPassengerAgent> passengers = new ArrayList<PTPassengerAgent>(veh.getPassengerCapacity());
 		for (int i = 0; i < veh.getPassengerCapacity(); i++) {
-			PassengerAgent passenger = new FakePassengerAgent(null);
+			PTPassengerAgent passenger = new FakePassengerAgent(null);
 			passengers.add(passenger);
 			assertFalse(veh.getPassengers().contains(passenger));
 			assertTrue(veh.addPassenger(passenger));
 			assertTrue(veh.getPassengers().contains(passenger));
 		}
 		assertEquals(passengers.size(), veh.getPassengers().size());
-		for (PassengerAgent passenger : passengers) {
+		for (PTPassengerAgent passenger : passengers) {
 			assertTrue(veh.getPassengers().contains(passenger));
 		}
 		assertFalse(veh.addPassenger(new FakePassengerAgent(null)));
@@ -109,9 +109,9 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		TransitVehicle veh = createTransitVehicle(vehicle);
 
-		PassengerAgent passenger1 = new FakePassengerAgent(null);
-		PassengerAgent passenger2 = new FakePassengerAgent(null);
-		PassengerAgent passenger3 = new FakePassengerAgent(null);
+		PTPassengerAgent passenger1 = new FakePassengerAgent(null);
+		PTPassengerAgent passenger2 = new FakePassengerAgent(null);
+		PTPassengerAgent passenger3 = new FakePassengerAgent(null);
 		assertTrue(veh.addPassenger(passenger1));
 		assertTrue(veh.addPassenger(passenger2));
 		assertTrue(veh.addPassenger(passenger3));
@@ -130,24 +130,6 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		assertTrue(veh.removePassenger(passenger1));
 		assertTrue(veh.removePassenger(passenger3));
 		assertEquals(0, veh.getPassengers().size());
-	}
-
-	public void testGetPassengers_Immutable() {
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
-		TransitVehicle veh = createTransitVehicle(vehicle);
-
-		PassengerAgent passenger1 = new FakePassengerAgent(null);
-		try {
-			veh.getPassengers().add(passenger1);
-			fail("missing exception.");
-		}
-		catch (UnsupportedOperationException e) {
-			log.info("catched expected exception.", e);
-		}
 	}
 
 }

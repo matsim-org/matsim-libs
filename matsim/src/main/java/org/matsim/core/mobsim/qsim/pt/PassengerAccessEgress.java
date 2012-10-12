@@ -30,14 +30,14 @@ public interface PassengerAccessEgress {
 	 * @param time time the agent should be handled
 	 * @return true, if handled correctly, otherwise false, e.g. vehicle has no capacity left
 	 */
-	public boolean handlePassengerEntering(final PassengerAgent agent, final double time);
+	public boolean handlePassengerEntering(final PTPassengerAgent agent, final double time);
 
 	/** 
 	 * @param agent agent to be handled
 	 * @param time time the agent should be handled
 	 * @return true, if handled correctly, otherwise false
 	 */
-	public boolean handlePassengerLeaving(final PassengerAgent agent, final double time);
+	public boolean handlePassengerLeaving(final PTPassengerAgent agent, final double time);
 
 	/**
 	 * @return the number of passengers currently still in the vehicle, including those about to leave the vehicle.

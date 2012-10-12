@@ -40,6 +40,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -252,11 +253,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
-		PassengerAgent agent1 = new FakeAgent(null, stop3);
-		PassengerAgent agent2 = new FakeAgent(null, stop3);
-		PassengerAgent agent3 = new FakeAgent(null, stop3);
-		PassengerAgent agent4 = new FakeAgent(null, stop3);
-		PassengerAgent agent5 = new FakeAgent(null, stop3);
+		PTPassengerAgent agent1 = new FakeAgent(null, stop3);
+		PTPassengerAgent agent2 = new FakeAgent(null, stop3);
+		PTPassengerAgent agent3 = new FakeAgent(null, stop3);
+		PTPassengerAgent agent4 = new FakeAgent(null, stop3);
+		PTPassengerAgent agent5 = new FakeAgent(null, stop3);
 
 		tracker.addAgentToStop(agent1, stop1.getId());
 		tracker.addAgentToStop(agent2, stop1.getId());
@@ -327,10 +328,10 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
-		PassengerAgent agent1 = new FakeAgent(null, stop1);
-		PassengerAgent agent2 = new FakeAgent(null, stop1);
-		PassengerAgent agent3 = new FakeAgent(null, stop2);
-		PassengerAgent agent4 = new FakeAgent(null, stop2);
+		PTPassengerAgent agent1 = new FakeAgent(null, stop1);
+		PTPassengerAgent agent2 = new FakeAgent(null, stop1);
+		PTPassengerAgent agent3 = new FakeAgent(null, stop2);
+		PTPassengerAgent agent4 = new FakeAgent(null, stop2);
 
 		queueVehicle.addPassenger(agent1);
 		queueVehicle.addPassenger(agent2);
@@ -529,7 +530,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 
-		PassengerAgent agent1 = new FakeAgent(stop2, stop1);
+		PTPassengerAgent agent1 = new FakeAgent(stop2, stop1);
 		tracker.addAgentToStop(agent1, stop2.getId());
 
 		assertEquals(0, queueVehicle.getPassengers().size());
@@ -550,7 +551,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		}
 	}
 
-	protected static class SpyAgent implements PassengerAgent {
+	protected static class SpyAgent implements PTPassengerAgent {
 		public TransitLine offeredLine;
 
 		@Override
@@ -577,6 +578,30 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 		@Override
 		public Id getDesiredAccessStopId() {
+			return null;
+		}
+		
+		@Override
+		public void setVehicle(MobsimVehicle veh) {
+		}
+
+		@Override
+		public MobsimVehicle getVehicle() {
+			return null;
+		}
+
+		@Override
+		public Id getPlannedVehicleId() {
+			return null;
+		}
+
+		@Override
+		public Id getCurrentLinkId() {
+			return null;
+		}
+
+		@Override
+		public Id getDestinationLinkId() {
 			return null;
 		}
 	}

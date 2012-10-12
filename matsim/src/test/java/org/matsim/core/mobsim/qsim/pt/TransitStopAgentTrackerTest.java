@@ -41,9 +41,9 @@ public class TransitStopAgentTrackerTest extends TestCase {
 	public void testAddAgent() {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PassengerAgent agent1 = new FakeAgent(null, null);
-		PassengerAgent agent2 = new FakeAgent(null, null);
-		PassengerAgent agent3 = new FakeAgent(null, null);
+		PTPassengerAgent agent1 = new FakeAgent(null, null);
+		PTPassengerAgent agent2 = new FakeAgent(null, null);
+		PTPassengerAgent agent3 = new FakeAgent(null, null);
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
@@ -65,9 +65,9 @@ public class TransitStopAgentTrackerTest extends TestCase {
 	public void testRemoveAgent() {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PassengerAgent agent1 = new FakeAgent(null, null);
-		PassengerAgent agent2 = new FakeAgent(null, null);
-		PassengerAgent agent3 = new FakeAgent(null, null);
+		PTPassengerAgent agent1 = new FakeAgent(null, null);
+		PTPassengerAgent agent2 = new FakeAgent(null, null);
+		PTPassengerAgent agent3 = new FakeAgent(null, null);
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
@@ -89,7 +89,7 @@ public class TransitStopAgentTrackerTest extends TestCase {
 	public void testGetAgentsAtStopImmutable() {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		PassengerAgent agent1 = new FakeAgent(null, null);
+		PTPassengerAgent agent1 = new FakeAgent(null, null);
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 
 		try {

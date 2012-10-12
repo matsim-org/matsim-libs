@@ -109,9 +109,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	@Override
 	public void afterSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
-		for (Entry<Id, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
+		for (Entry<Id, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
-			for (PassengerAgent agent : agentsAtStop.getValue()) {
+			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
 				this.qSim.getEventsManager().processEvent(new AgentStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
 				this.qSim.getAgentCounter().decLiving();
 				this.qSim.getAgentCounter().incLost();
@@ -187,7 +187,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id linkId) {
 		// this puts the agent into the transit stop.
-		Id accessStopId = ((PassengerAgent) planAgent).getDesiredAccessStopId();
+		Id accessStopId = ((PTPassengerAgent) planAgent).getDesiredAccessStopId();
 		if (accessStopId == null) {
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it
@@ -198,7 +198,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		}
 		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-			this.agentTracker.addAgentToStop((PassengerAgent) planAgent, stop.getId());
+			this.agentTracker.addAgentToStop((PTPassengerAgent) planAgent, stop.getId());
 			this.internalInterface.registerAdditionalAgentOnLink(planAgent) ;
 		} else {
 			throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");

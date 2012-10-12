@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -44,12 +45,17 @@ abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
 	 * add vehicle at "activity" location
 	 */
 	abstract void addParkedVehicle(MobsimVehicle vehicle) ;
-
+	
 	/**
 	 * remove vehicle from "activity" location
 	 */
 	abstract QVehicle removeParkedVehicle(Id vehicleId) ;
 
+	/**
+	 * returns the vehicle if it is parked at the link
+	 */
+	abstract QVehicle getParkedVehicle(Id vehicleId) ; 
+	
 	/**
 	 * if you want an agent visualized while he/she is computationally not on the link, register him/her here
 	 * (has --hopefully-- no effect on dynamics)
@@ -76,13 +82,30 @@ abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
 	 * Agent that ends a leg or an activity is computationally passed to the QSim.  If the next PlanElement is a leg,
 	 * and the leg is treated by _this_ NetsimEngine, then the QSim passes it to the NetsimEngine, which inserts it here.
 	 */
-	abstract void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) ;
+//	abstract void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) ;
+	abstract void letVehicleDepart(QVehicle vehicle, double now) ;
 
+	abstract boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId, double now);
+	
 	abstract QVehicle getVehicle(Id vehicleId) ;
 	
 	/**
-	 * this is for agents who want to depart but their car is not (yet) there.  Subject to design change.
+	 * this is for driver agents who want to depart but their car is not (yet) there.  Subject to design change.
 	 */
-	abstract void registerAgentWaitingForCar(MobsimDriverAgent agent) ;
+	abstract void registerDriverAgentWaitingForCar(MobsimDriverAgent agent) ;
+	
+	/**
+	 * this is for driver agents who want to depart but not all passengers are (yet) there.  Subject to design change.
+	 */
+	abstract void registerDriverAgentWaitingForPassengers(MobsimDriverAgent agent) ;
+	abstract MobsimAgent unregisterDriverAgentWaitingForPassengers(Id agentId) ;
+	
+	/**
+	 * this is for passenger agents who want to depart but their car is not (yet) there.  Subject to design change.
+	 * TODO: create something like a PassengerAgent which knows the vehicle it is waiting for. 
+	 */
+	abstract void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) ;
+	abstract MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) ;
+	abstract Set<MobsimAgent> getAgentsWaitingForCar(Id vehicleId) ;
 	
 }

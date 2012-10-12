@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -146,9 +147,9 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	public double handleTransitStop(final TransitStopFacility stop, final double now) {
 		assertExpectedStop(stop);
 		processEventVehicleArrives(stop, now);
-		ArrayList<PassengerAgent> passengersLeaving = findPassengersLeaving(stop);
+		ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(stop);
 		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size() + passengersLeaving.size();
-		List<PassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
+		List<PTPassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
 		double stopTime = this.vehicle.getStopHandler().handleTransitStop(stop, now, passengersLeaving, passengersEntering, this);
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
@@ -253,7 +254,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public boolean handlePassengerEntering(final PassengerAgent passenger, final double time) {
+	public boolean handlePassengerEntering(final PTPassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility().getId());
@@ -272,7 +273,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	@Override
-	public boolean handlePassengerLeaving(final PassengerAgent passenger, final double time) {
+	public boolean handlePassengerLeaving(final PTPassengerAgent passenger, final double time) {
 		boolean handled = this.vehicle.removePassenger(passenger);
 		if(handled){
 //			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
@@ -296,10 +297,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return this.vehicle.getPassengers().size();
 	}
 
-	private List<PassengerAgent> findPassengersEntering(
+	private List<PTPassengerAgent> findPassengersEntering(
 			final TransitStopFacility stop, int freeCapacity) {
-		ArrayList<PassengerAgent> passengersEntering = new ArrayList<PassengerAgent>();
-		for (PassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
+		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<PTPassengerAgent>();
+		for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
 			if (freeCapacity == 0) {
 				break;
 			}
@@ -313,12 +314,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		return passengersEntering;
 	}
 
-	private ArrayList<PassengerAgent> findPassengersLeaving(
+	private ArrayList<PTPassengerAgent> findPassengersLeaving(
 			final TransitStopFacility stop) {
-		ArrayList<PassengerAgent> passengersLeaving = new ArrayList<PassengerAgent>();
+		ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<PTPassengerAgent>();
 		for (PassengerAgent passenger : this.vehicle.getPassengers()) {
-			if (passenger.getExitAtStop(stop)) {
-				passengersLeaving.add(passenger);
+			if (((PTPassengerAgent) passenger).getExitAtStop(stop)) {
+				passengersLeaving.add((PTPassengerAgent) passenger);
 			}
 		}
 		return passengersLeaving;

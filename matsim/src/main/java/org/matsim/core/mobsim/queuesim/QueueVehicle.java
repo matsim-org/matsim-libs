@@ -20,10 +20,13 @@
 
 package org.matsim.core.mobsim.queuesim;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
@@ -139,6 +142,26 @@ class QueueVehicle implements MobsimVehicle {
 	public String toString() {
 		return "Vehicle Id " + getId() + ", driven by (personId) " + this.driver.getId()
 				+ ", on link " + this.currentLink.getId();
+	}
+
+	@Override
+	public boolean addPassenger(PassengerAgent passenger) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean removePassenger(PassengerAgent passenger) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Collection<? extends PassengerAgent> getPassengers() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getPassengerCapacity() {
+		throw new UnsupportedOperationException();
 	}
 
 }

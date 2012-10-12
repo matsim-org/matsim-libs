@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Vehicle.java
+ * PassengerAgent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,24 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.pt;
+package org.matsim.core.mobsim.framework;
 
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.vehicles.Vehicle;
 
-
-public interface TransitVehicle extends MobsimVehicle {
+public interface PassengerAgent extends NetworkAgent, Identifiable {
 
 	/**
-	 * @return the <code>BasicVehicle</code> that this simulation vehicle represents
+	 * DriverAgent offers the same method. Is this a problem? 
+	 * @param veh
 	 */
-	@Override
-	public Vehicle getVehicle();
-
-	@Override
-	public MobsimDriverAgent getDriver();
+	public void setVehicle(final MobsimVehicle veh);
 	
-	public TransitStopHandler getStopHandler();
-
+	/**
+	 * Design thoughts:<ul>
+	 * <li> MZ states (in his AdapterAgent) that the DriverAgent should not have this reference.  
+	 * I am, in fact, not so sure (any more); maybe it is not so bad to have this.  Clearly, symmetric
+	 * connectors would be better.  kai, nov'11
+	 * </ul>
+	 */
+	public MobsimVehicle getVehicle();
+	
+	public Id getPlannedVehicleId();
 }

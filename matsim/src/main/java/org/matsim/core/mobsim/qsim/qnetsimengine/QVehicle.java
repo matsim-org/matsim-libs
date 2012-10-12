@@ -20,12 +20,21 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
 
 /**
  * interface to the ``Q'' implementation of the MobsimVehicle.  
@@ -42,15 +51,34 @@ import org.matsim.vehicles.Vehicle;
 
 public class QVehicle extends QItem implements MobsimVehicle {
 
+	private static final Logger log = Logger.getLogger(QVehicle.class);
+	
+	private static int warnCount = 0;
+	
 	private double earliestLinkExitTime = 0;
 	private DriverAgent driver = null;
+	protected Collection<PassengerAgent> passengers = null;
 	private Id id;
 	private Link currentLink = null;
 	private Vehicle basicVehicle;
+	private final int passengerCapacity;
 	
 	public QVehicle(final Vehicle basicVehicle) {
 		this.id = basicVehicle.getId();
 		this.basicVehicle = basicVehicle;
+		this.passengers = new ArrayList<PassengerAgent>();
+		
+		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
+		if (capacity == null) {
+			this.passengerCapacity = 4;
+			if (warnCount < 10) {
+				log.warn("No VehicleCapacity set in Vehicle. Use default value of 4.");
+				warnCount++;
+			}
+		} else {
+			this.passengerCapacity = capacity.getSeats().intValue() +
+					(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue() )- 1; //the driver takes also the seat			
+		}
 	}
 
 	public void setCurrentLink(final Link link) {
@@ -114,6 +142,19 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	}
 
 	public void setDriver(final DriverAgent driver) {
+		if (driver != null) {
+			if (this.driver != null && !this.driver.getId().equals(driver.getId())) {
+				throw new RuntimeException( "A driver (" + this.driver.getId() +") " + 
+						"is already set in vehicle " + this.getId() + ". " +
+						"Setting agent " + driver.getId().toString() + " is not possible!");
+			}			
+		}
+		// TODO: To make this check possible, we would need something like removeDriver().
+//		else {
+//			throw new RuntimeException( "Driver to be set in vehicle " + this.getId() +
+//					" is null!");
+//		}
+		
 		this.driver = driver;
 	}
 
@@ -141,5 +182,27 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	public double getMaximumVelocity() {
 		return basicVehicle.getType().getMaximumVelocity();
 	}
+	
+	@Override
+	public Collection<? extends PassengerAgent> getPassengers() {
+		return Collections.unmodifiableCollection(this.passengers);
+	}
+	
+	@Override
+	public boolean addPassenger(PassengerAgent passenger) {
+		if (this.passengers.size() < this.passengerCapacity) {
+			return this.passengers.add(passenger);
+		}
+		return false;
+	}
 
+	@Override
+	public boolean removePassenger(PassengerAgent passenger) {
+		return this.passengers.remove(passenger);
+	}
+	
+	@Override
+	public int getPassengerCapacity() {
+		return this.passengerCapacity;
+	}
 }
