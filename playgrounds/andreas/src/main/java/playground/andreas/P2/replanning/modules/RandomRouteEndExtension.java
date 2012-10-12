@@ -219,8 +219,8 @@ public class RandomRouteEndExtension extends AbstractPStrategyModule {
 		double minX, minY, maxX, maxY, x,y;
 		minX = Double.MAX_VALUE;
 		minY = Double.MAX_VALUE;
-		maxX = Double.MIN_VALUE;
-		maxY = Double.MIN_VALUE;
+		maxX = - Double.MAX_VALUE;
+		maxY = - Double.MAX_VALUE;
 		
 		for(Coordinate c: g.getCoordinates()){
 			x = c.x;
