@@ -34,13 +34,16 @@ public class Cell<T>
 	private List<Double> arrivalTimes;
 	private List<Double> linkLeaveTimes;
 	private List<Double> linkEnterTimes;
-	private CoordImpl centroid;
+	private CoordImpl coord;
 	
 	public static String CELLSIZE = "cellsize";
 	
 	public Cell(T data)
 	{
 		this.data = data;
+		this.linkLeaveTimes = new ArrayList<Double>();
+		this.linkEnterTimes = new ArrayList<Double>();
+		this.arrivalTimes = new ArrayList<Double>();
 	}
 	
 	
@@ -111,12 +114,12 @@ public class Cell<T>
 		this.linkLeaveTimes.add(time);
 	}
 	
-	public void setCentroid(CoordImpl centroid) {
-		this.centroid = centroid;
+	public void setCoord(CoordImpl centroid) {
+		this.coord = centroid;
 	}
 	
-	public CoordImpl getCentroid() {
-		return centroid;
+	public CoordImpl getCoord() {
+		return coord;
 	}
 
 }

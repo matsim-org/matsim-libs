@@ -95,6 +95,7 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
 import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -107,6 +108,8 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class EvacuationAnalysis implements ActionListener{
 
+	public static enum Mode { EVACUATION, UTILIZATION };
+	
 	private static final Logger log = Logger.getLogger(EvacuationAnalysis.class);
 	private JFrame frame;
 	private JPanel compositePanel;
@@ -138,6 +141,8 @@ public class EvacuationAnalysis implements ActionListener{
 	private float cellTransparency;
 	private String itersOutputDir;
 	private boolean firstLoad;
+	private Mode mode = Mode.EVACUATION;
+	
 	
 
 	/**
@@ -291,6 +296,7 @@ public class EvacuationAnalysis implements ActionListener{
 		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		this.gridSizeField = new JTextField(""+cellSize);
+		this.gridSizeField.setActionCommand("changeIteration");
 		this.gridSizeField.addActionListener(this);
 		this.gridSizeField.addKeyListener(new TypeNumber());
 		this.gridSizeField.setPreferredSize(new Dimension(220,24));
@@ -300,6 +306,7 @@ public class EvacuationAnalysis implements ActionListener{
 		JPanel modeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		modeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		this.modeList = new JComboBox(new String[]{"evacuation time", "clearing time", "link utilization"});
+		this.modeList.setActionCommand("changeMode");
 		this.modeList.addActionListener(this);
 		this.modeList.setPreferredSize(new Dimension(220,24));
 		modeSelectionPanel.add(new JLabel(" mode: ", SwingConstants.RIGHT));
@@ -476,13 +483,39 @@ public class EvacuationAnalysis implements ActionListener{
 				this.jMapViewer.repaint();
 		}
 
-		if ((e.getActionCommand() == "comboBoxChanged") && (e.getSource() instanceof JComboBox) && (!firstLoad)) 
+		if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) 
 		{
 			File newFile = getEventPathFromName(""+iterationsList.getSelectedItem());
 			if (newFile!=null)
 				currentEventFile = newFile;
 		}
 		
+		if (e.getActionCommand() == "changeMode")
+		{
+			if (modeList.getSelectedItem().toString().contains("evacuation"))
+			{
+				setMode(Mode.EVACUATION);
+			}
+			else if (modeList.getSelectedItem().toString().contains("utilization"))
+			{
+				setMode(Mode.UTILIZATION);
+			}
+				
+		}
+		
+	}
+
+	private void setMode(Mode mode)
+	{
+		this.mode = mode;
+		
+		if (jMapViewer!=null)
+			jMapViewer.setMode(mode);
+		
+	}
+	
+	public Mode getMode() {
+		return mode;
 	}
 
 	private File getEventPathFromName(String selectedItem)

@@ -45,6 +45,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
@@ -94,12 +95,19 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private final Map<Id,Event> events = new HashMap<Id, Event>();
 	private double timeSum;
 	private double maxCellTimeSum;
+	private int maxUtilization;
 	private int arrivals;
 	private List<Tuple<Double, Integer>> arrivalTimes;
 	
-	private Rect boundingBox;
+	private ArrayList<Link> links;
 	
+	private Rect boundingBox;
 	private String eventName;
+	
+	private HashMap<Id, List<Double>> linkEnterTimes;
+	private HashMap<Id, List<Double>> linkLeaveTimes;
+	
+	
 
 	public EventHandler(String eventFilename, Scenario sc, double cellSize, Thread readerThread)
 	{
@@ -113,40 +121,58 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private void init() {
 		
-		int putCounter = 0; //FIXME: is not necessary
 		this.arrivals = 0;
 		this.timeSum = 0;
+		this.maxUtilization = 0;
 		this.maxCellTimeSum = Double.NEGATIVE_INFINITY;
+		this.linkEnterTimes = new HashMap<Id, List<Double>>();
+		this.linkLeaveTimes = new HashMap<Id, List<Double>>();
 		
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
 		
-		for (org.matsim.api.core.v01.network.Node n : this.network.getNodes().values()) {
-			
-			if ((n.getId().toString().contains("en")) || (n.getId().toString().contains("el")))
+		this.links = new ArrayList<Link>();
+		
+		for (Link link: this.network.getLinks().values())
+		{
+			if ((link.getId().toString().contains("el")) || (link.getId().toString().contains("en")) )
 				continue;
 			
-			double x = n.getCoord().getX();
-			double y = n.getCoord().getY();
+			minX = Math.min(minX, Math.min(link.getFromNode().getCoord().getX(),link.getToNode().getCoord().getX()));
+			minY = Math.min(minY, Math.min(link.getFromNode().getCoord().getY(),link.getToNode().getCoord().getY()));
+			maxX = Math.max(maxX, Math.max(link.getFromNode().getCoord().getX(),link.getToNode().getCoord().getX()));
+			maxY = Math.max(maxY, Math.max(link.getFromNode().getCoord().getY(),link.getToNode().getCoord().getY()));
 			
-			if (x < minX) {
-				minX = x;
-			}
-			
-			if (x > maxX) {
-				maxX = x;
-			}
-			
-			if (y < minY) {
-				minY = y;
-			}
-			
-			if (y > maxY) {
-				maxY = y;
-			}
-		}
+			this.links.add(link);
+
+		}		
+		
+//		for (org.matsim.api.core.v01.network.Node n : this.network.getNodes().values()) {
+//			
+//			if ((n.getId().toString().contains("en")) || (n.getId().toString().contains("el")))
+//				continue;
+//			
+//			double x = n.getCoord().getX();
+//			double y = n.getCoord().getY();
+//			
+//			if (x < minX) {
+//				minX = x;
+//			}
+//			
+//			if (x > maxX) {
+//				maxX = x;
+//			}
+//			
+//			if (y < minY) {
+//				minY = y;
+//			}
+//			
+//			if (y > maxY) {
+//				maxY = y;
+//			}
+//		}
 		
 		this.boundingBox = new Rect(minX,minY,maxX,maxY);
 		
@@ -156,16 +182,13 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			for (double y = minY; y <= maxY; y += cellSize) {
 				Cell<List<Event>> cell = new Cell(new LinkedList<Event>());
 				
-				cell.setCentroid(new CoordImpl(x, y));
+				cell.setCoord(new CoordImpl(x, y));
 				
 				this.cellTree.put(x, y, cell);
-				putCounter++;
 			}
 			
 		}
 		
-		System.out.println("put:" + putCounter);
-//		System.exit(0);
 		
 		
 	}
@@ -261,56 +284,80 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkEnterEvent event)
 	{
+		//get link id
+		Id linkId = event.getLinkId();
+		
 		//get cell from person id
-		Link link = this.network.getLinks().get(event.getLinkId());
+		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
+		
+		//update cell link enter time
 		cell.addLinkEnterTime(event.getTime());
-
-		//		
-//		//get the cell data, store event to it 
-//		List<Event> cellEvents = cell.getData();
-//		cellEvents.add(event);
+		
+		//check for highest global utilization of a single link
+		int enterCount = cell.getLinkEnterTimes().size();
+		maxUtilization = Math.max(maxUtilization, enterCount);
+		
+		//update global link enter times
+		List<Double> times;
+		if (linkEnterTimes.containsKey(linkId))
+			times = linkEnterTimes.get(linkId);
+		else
+			times = new LinkedList<Double>();
+		times.add(event.getTime());
+		linkEnterTimes.put(linkId, times);
 		
 		
-//		enterTimes.add(event.)
-
 
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event)
 	{
-
+		//get link id
+		Id linkId = event.getLinkId();
+		
 		//get cell from person id
-		Link link = this.network.getLinks().get(event.getLinkId());
+		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
+		
+		//update cell link leave time
 		cell.addLinkLeaveTime(event.getTime());
 		
+		//update global link leave times
+		List<Double> times;
+		if (linkLeaveTimes.containsKey(linkId))
+			times = linkLeaveTimes.get(linkId);
+		else
+			times = new LinkedList<Double>();
 		
-//		System.out.println("link leave: " + event.getTime() + " - agent " + event.getPersonId() + " at link " + event.getLinkId());
-		
+		times.add(event.getTime());
+		linkLeaveTimes.put(linkId, times);
 	}
 	
 	public QuadTree<Cell> getCellTree() {
 		return cellTree;
 	}
-
+ 
 	public EventData getData()
 	{
-		LinkedList<Cell> cells = new LinkedList<Cell>();
-		cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
 		
-		for (Cell cell : cells)
-		{
-			if (cell.getCount()>0)
-				System.out.println(cell.getCount());
-		}
+		EventData eventData = new EventData(eventName);
 		
-		System.err.println("cell count: " + cells.size());
+		eventData.setCellTree(cellTree);
+		eventData.setCellSize(cellSize);
+		eventData.setTimeSum(timeSum);
+		eventData.setMaxCellTimeSum(maxCellTimeSum);
+		eventData.setArrivals(arrivals);
+		eventData.setArrivalTimes(arrivalTimes);
+		eventData.setBoundingBox(boundingBox);
+		eventData.setLinkEnterTimes(linkEnterTimes);
+		eventData.setLinkLeaveTimes(linkLeaveTimes);
+		eventData.setMaxUtilization(maxUtilization);
 		
-		return new EventData(eventName, cellTree, cellSize, timeSum, maxCellTimeSum, arrivals, arrivalTimes, boundingBox);
+		return eventData;
 	}
 
 
