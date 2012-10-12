@@ -20,6 +20,8 @@
 
 package playground.ssix;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
@@ -40,6 +42,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -57,19 +60,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.misc.PopulationUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -137,12 +131,13 @@ public class DreieckStreckeSzenario {
 
 		@Override
 		public Id chooseNextLinkId() {
-			Id forcedLeftTurnLinkId = new IdImpl((long)(DreieckStreckeSzenario.subdivisionFactor - 1));
+			Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckStreckeSzenario.subdivisionFactor - 1));
 			if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){
 				return delegate.chooseNextLinkId();
 			}
-			Id afterLeftTurnLinkId = new IdImpl((long)(DreieckStreckeSzenario.subdivisionFactor));
+			Id afterLeftTurnLinkId = new IdImpl((long)(0));
 			delegate.setCachedNextLinkId(afterLeftTurnLinkId);
+			delegate.setCurrentLinkIdIndex(0);
 			return afterLeftTurnLinkId;
 		}
 
@@ -196,21 +191,27 @@ public class DreieckStreckeSzenario {
 
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
+		
+		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
+		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
+		// to me (kn).
+		
 		this.scenario = ScenarioUtils.createScenario(config);
 	}
 	
 	public static void main(String[] args) {
-		new DreieckStreckeSzenario(5000.0,500).run();
+		new DreieckStreckeSzenario(500.0,500).run();
 	}
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)1000,3);
+		createPopulation((long)200,3);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		runqsim(events);
-		//TODO:eventually complete this basic scheme.
+		//TODO:eventually complete this basic scheme with some data processing.
 	}
 
 	private void fillNetworkData(){
@@ -309,6 +310,18 @@ public class DreieckStreckeSzenario {
 			Plan plan = population.getFactory().createPlan();
 			plan.addActivity(createHome(sekundenFrequenz, i+1));
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
+			//this modification goes with the modification in the prepareForSim method
+			final Id startLinkId = new IdImpl(-1);
+			final Id endLinkId = new IdImpl(3*DreieckStreckeSzenario.subdivisionFactor);
+			//NetworkRoute route = new CompressedNetworkRouteImpl();
+			List<Id> routeDescription = new ArrayList<Id>();
+			for (long j=0; j<3*DreieckStreckeSzenario.subdivisionFactor;j++){
+				routeDescription.add(new IdImpl(j));
+			}
+			NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+			route.setLinkIds(startLinkId, routeDescription, endLinkId);
+			leg.setRoute(route);
+			//end of modification//works!
 			plan.addLeg(leg);
 			plan.addActivity(createWork());
 			
@@ -327,11 +340,7 @@ public class DreieckStreckeSzenario {
 		
 		//Modified QSim with modified agents that go round and round.
 		Netsim qSim = createModifiedQSim(this.scenario, events);
-		
-		
-		
-		
-		
+
 		prepareForSim();
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
@@ -342,6 +351,10 @@ public class DreieckStreckeSzenario {
 	
 	private void prepareForSim() {
 		// make sure all routes are calculated.
+		/*Calculating routes this way will make them direct. On the contrary we want the drivers to go all the way around
+		// * All routes are implemented in the createPopulation method while creating legs
+		
+		
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), scenario.getConfig().global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
@@ -352,6 +365,9 @@ public class DreieckStreckeSzenario {
 				return new PersonPrepareForSim(plansCalcRoute, (ScenarioImpl)scenario);
 			}
 		});
+		//*/
+		
+		
 	}
 	
 	private QSim createModifiedQSim(Scenario sc, EventsManager events){
