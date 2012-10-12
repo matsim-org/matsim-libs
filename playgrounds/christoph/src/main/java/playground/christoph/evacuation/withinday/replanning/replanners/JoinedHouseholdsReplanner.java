@@ -40,7 +40,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
@@ -118,7 +118,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		
 		/*
 		 * Create Leg from the current Activity to the Meeting Point
-		 */		
+		 */
 		// identify the TransportMode
 		String transportMode = this.identifier.getTransportModeMapping().get(withinDayAgent.getId());
 		
@@ -127,7 +127,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 * the router cannot handle it.
 		 */
 		Leg legToMeeting;
-		if (transportMode.equals(PassengerDepartureHandler.passengerTransportMode)) {
+		if (transportMode.equals(OldPassengerDepartureHandler.passengerTransportMode)) {
 			legToMeeting = scenario.getPopulation().getFactory().createLeg(TransportMode.ride);
 		} else {
 			legToMeeting = scenario.getPopulation().getFactory().createLeg(transportMode);

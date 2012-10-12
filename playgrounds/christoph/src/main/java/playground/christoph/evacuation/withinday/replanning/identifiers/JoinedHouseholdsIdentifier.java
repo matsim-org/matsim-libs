@@ -20,9 +20,11 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -35,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -140,23 +143,28 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			Id householdId = entry.getKey();
 			HouseholdDeparture householdDeparture = entry.getValue();
 			
+			/*
+			 * If the household departs in the current time step.
+			 */
 			if (householdDeparture.getDepartureTime() == time) {
 				
 				Id facilityId = householdDeparture.getFacilityId();
+				Id linkId = this.facilities.getFacilities().get(facilityId).getLinkId();
 				Id meetingPointId = selectHouseholdMeetingPoint.selectNextMeetingPoint(householdId);
 				householdMeetingPointMapping.put(householdId, meetingPointId);
 				Household household = households.getHouseholds().get(householdId);
 
 				/*
-				 * Store mapping
+				 * Store mapping which is read by the replanners
 				 */
 				HouseholdModeAssignment assignment = modeAvailabilityChecker.getHouseholdModeAssignment(household, facilityId);	
 				driverVehicleMapping.putAll(assignment.getDriverVehicleMap());
 				transportModeMapping.putAll(assignment.getTransportModeMap());
 				
-				for (Entry<Id, Id> e : assignment.getPassengerVehicleMap().entrySet()) {
-					vehiclesTracker.addPassengerToVehicle(e.getKey(), e.getValue());
-				}
+				/*
+				 * Create and add joint departures in the departure handler for the mobsim.
+				 */
+				createJointDepartures(assignment, linkId);
 				
 				// finally add agents to replanning set
 				agentIds.addAll(household.getMemberIds());
@@ -170,6 +178,22 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		for (Id agentId : agentIds) agentsToReplan.add(agentMapping.get(agentId));
 		
 		return agentsToReplan;
+	}
+	
+	private void createJointDepartures(HouseholdModeAssignment assignment, Id linkId) {
+		Set<Id> driverIds = assignment.getDriverVehicleMap().keySet();
+		
+		for (Id driverId : driverIds) {
+			Id vehicleId = assignment.getDriverVehicleMap().get(driverId);
+			List<Id> passengerIds = new ArrayList<Id>();
+			for (Entry<Id, Id> entry : assignment.getPassengerVehicleMap().entrySet()) {
+				if (entry.getValue().equals(vehicleId)) {
+					passengerIds.add(entry.getKey());
+				}
+			}
+			
+			this.vehiclesTracker.createJointDeparture(linkId, vehicleId, driverId, passengerIds);			
+		}
 	}
 	
 	/**

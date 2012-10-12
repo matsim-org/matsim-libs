@@ -62,7 +62,7 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.controler.PrepareEvacuationScenario;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
@@ -178,7 +178,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 		transportModes.add(TransportMode.pt);
 		transportModes.add(TransportMode.ride);
 		transportModes.add(TransportMode.walk);
-		transportModes.add(PassengerDepartureHandler.passengerTransportMode);
+		transportModes.add(OldPassengerDepartureHandler.passengerTransportMode);
 		
 		/*
 		 * Class to create dummy MobsimAfterSimStepEvents.

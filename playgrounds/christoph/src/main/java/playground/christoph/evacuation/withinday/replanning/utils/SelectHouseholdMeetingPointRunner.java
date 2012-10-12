@@ -56,7 +56,7 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.AgentPosition;
-import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -472,7 +472,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 				} else continue;
 			}
 			else if (mode.equals(TransportMode.ride)) continue;
-			else if (mode.equals(PassengerDepartureHandler.passengerTransportMode)) continue;
+			else if (mode.equals(OldPassengerDepartureHandler.passengerTransportMode)) continue;
 			else {
 				double tt = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
 				if (tt > nonVehicularTravelTime) nonVehicularTravelTime = tt;

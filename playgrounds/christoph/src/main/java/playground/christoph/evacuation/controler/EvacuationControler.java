@@ -50,6 +50,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -92,7 +94,7 @@ import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
-import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -109,6 +111,8 @@ import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter.FilterType;
@@ -118,6 +122,7 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHo
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
@@ -148,6 +153,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected DuringActivityIdentifier joinedHouseholdsIdentifier;
 	protected DuringActivityIdentifier activityPerformingIdentifier;
 	protected DuringLegIdentifier legPerformingIdentifier;
+	protected DuringLegIdentifier agentsToDropOffIdentifier;
 	protected DuringLegIdentifier agentsToPickupIdentifier;
 	protected DuringLegIdentifier duringLegRerouteIdentifier;
 	
@@ -157,6 +163,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected WithinDayDuringActivityReplannerFactory currentActivityToMeetingPointReplannerFactory;
 	protected WithinDayDuringActivityReplannerFactory joinedHouseholdsReplannerFactory;
 	protected WithinDayDuringLegReplannerFactory currentLegToMeetingPointReplannerFactory;
+	protected WithinDayDuringLegReplannerFactory dropOffAgentsReplannerFactory;
 	protected WithinDayDuringLegReplannerFactory pickupAgentsReplannerFactory;
 	protected WithinDayDuringLegReplannerFactory duringLegRerouteReplannerFactory;
 	
@@ -174,10 +181,10 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
 	
+	protected JointDepartureOrganizer jointDepartureOrganizer;
 	protected InformedHouseholdsTracker informedHouseholdsTracker;
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
-	protected PassengerDepartureHandler passengerDepartureHandler;
 	protected DecisionDataProvider decisionDataProvider;
 	protected DecisionDataGrabber decisionDataGrabber;
 	protected DecisionModelRunner decisionModelRunner;
@@ -205,6 +212,11 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 
 	public EvacuationControler(String[] args) {
 		super(args);
+		
+		/*
+		 * Set ride_passenger mode in PassengerDepartureHandler
+		 */
+		PassengerDepartureHandler.passengerMode = OldPassengerDepartureHandler.passengerTransportMode;
 		
 		/*
 		 * Create the empty object. They are filled in the loadData() method.
@@ -340,7 +352,9 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.getEvents().addHandler(householdsTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
-		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
+		this.jointDepartureOrganizer = new JointDepartureOrganizer();
+		
+		this.vehiclesTracker = new VehiclesTracker(jointDepartureOrganizer);
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
@@ -348,9 +362,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.decisionDataProvider, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.householdObjectAttributes);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.decisionDataGrabber);
-		
-		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), vehiclesTracker);
-		
+				
 		this.decisionModelRunner = new DecisionModelRunner(this.scenarioData, this.decisionDataProvider);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
 		this.addControlerListener(this.decisionModelRunner);
@@ -410,7 +422,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.passengerDepartureHandler, this.getWithinDayEngine());
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getWithinDayEngine(), this.jointDepartureOrganizer);
 		this.setMobsimFactory(mobsimFactory);
 		
 		/*
@@ -422,7 +434,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		transportModes.add(TransportMode.pt);
 		transportModes.add(TransportMode.ride);
 		transportModes.add(TransportMode.walk);
-		transportModes.add(PassengerDepartureHandler.passengerTransportMode);
+		transportModes.add(OldPassengerDepartureHandler.passengerTransportMode);
 
 		/*
 		 * intialize analyse modules
@@ -510,12 +522,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		
-		/*
-		 * Need to do this since this does not only create events, but also behaves 
-		 * like a Mobsim Engine by ending (passenger) legs.  kai, dec'11 
-		 */
-		((QSim)e.getQueueSimulation()).addMobsimEngine(this.vehiclesTracker);
 			
 		this.initReplanners((QSim)e.getQueueSimulation());
 		
@@ -615,6 +621,12 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		duringLegFactory = new LegPerformingIdentifierFactory(this.getLinkReplanningMap());
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
+
+		duringLegFactory = new AgentsToDropOffIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker); 
+		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
+		this.agentsToDropOffIdentifier = duringLegFactory.createIdentifier();
+		this.getEvents().addHandler((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
+		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
 		
 		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, 
 				this.walkTravelTime, this.decisionDataProvider); 
@@ -690,7 +702,11 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, decisionDataProvider);
 		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-				
+
+		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
 		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
 		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);

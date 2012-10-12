@@ -52,6 +52,8 @@ import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
  */
 public class PrepareEvacuationScenario {
 
+	public static final String pickupDropOffSuffix = "_pickup_dropoff";
+	
 	public void prepareScenario(Scenario scenario) {
 		
 		Config config = scenario.getConfig();
@@ -80,13 +82,18 @@ public class PrepareEvacuationScenario {
 		// Add pickup facilities to Links.
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			/*
-			 * Create and add the pickup facility and add activity option ("pickup")
+			 * Create and add the pickup and drop off facility and add activity option ("pickup", "dropoff")
 			 */
-			String idString = link.getId().toString() + "_pickup";
-			ActivityFacility secureFacility = ((ActivityFacilitiesImpl) facilities).createFacility(scenario.createId(idString), link.getCoord());
-			((ActivityFacilityImpl)secureFacility).setLinkId(((LinkImpl)link).getId());
+			String idString = link.getId().toString() + pickupDropOffSuffix;
+			ActivityFacility pickupDropOffFacility = ((ActivityFacilitiesImpl) facilities).createFacility(scenario.createId(idString), link.getCoord());
+			((ActivityFacilityImpl) pickupDropOffFacility).setLinkId(((LinkImpl)link).getId());
 			
-			ActivityOption activityOption = ((ActivityFacilityImpl)secureFacility).createActivityOption("pickup");
+			ActivityOption activityOption;
+			activityOption = ((ActivityFacilityImpl) pickupDropOffFacility).createActivityOption("pickup");
+			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption.setCapacity(Double.MAX_VALUE);
+			
+			activityOption = ((ActivityFacilityImpl) pickupDropOffFacility).createActivityOption("dropoff");
 			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 			activityOption.setCapacity(Double.MAX_VALUE);
 		}

@@ -36,13 +36,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
 /**
@@ -115,7 +116,13 @@ public class ModeAvailabilityChecker {
 		List<Id> availableVehicles = new ArrayList<Id>();
 		
 		for (Id vehicleId : vehicles) {
-			Id carLinkId = this.vehiclesTracker.getParkedVehicles().get(vehicleId);
+			MobsimVehicle vehicle = this.vehiclesTracker.getVehicle(vehicleId);
+			
+			// if the driver is null, the vehicle is parked 
+			boolean isParked = (vehicle.getDriver() == null);
+			if (!isParked) continue;
+			
+			Id carLinkId = vehicle.getCurrentLink().getId();
 			if (carLinkId == null) continue;
 			else if (carLinkId.equals(facility.getLinkId())) {
 				availableVehicles.add(vehicleId);
@@ -144,10 +151,14 @@ public class ModeAvailabilityChecker {
 
 		// Check whether a vehicleId was found.
 		if (possibleVehicleId != null) {
-			// Check whether the vehicle is currently parked.
-			Id linkId = this.vehiclesTracker.getParkedVehicles().get(possibleVehicleId);
 			
-			if (linkId != null) {
+			MobsimVehicle vehicle = this.vehiclesTracker.getVehicle(possibleVehicleId);
+			
+			// if the driver is null, the vehicle is parked 
+			boolean isParked = (vehicle.getDriver() == null);
+			if (isParked) {
+				Id linkId = vehicle.getCurrentLink().getId();
+				
 				// Check whether the vehicle is parked at the same link where the agent performs its activity.
 				if (linkId.equals(currentActivity.getLinkId())) carAvailable = true;
 			}
@@ -257,7 +268,7 @@ public class ModeAvailabilityChecker {
 				}
 				
 				passengers.add(passengerId);
-				assignment.addTransportModeMapping(passengerId, PassengerDepartureHandler.passengerTransportMode);
+				assignment.addTransportModeMapping(passengerId, OldPassengerDepartureHandler.passengerTransportMode);
 				seats--;
 			}
 			

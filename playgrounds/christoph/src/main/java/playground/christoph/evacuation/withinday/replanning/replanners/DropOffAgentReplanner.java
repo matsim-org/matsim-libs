@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PickupAgentReplanner.java
+ * DropOffAgentReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -29,16 +29,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
+import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.controler.PrepareEvacuationScenario;
 import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
@@ -47,19 +47,17 @@ import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
  * 
  * @author cdobler
  */
-public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
+public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 
-	private static final Logger log = Logger.getLogger(PickupAgentReplanner.class);
+	private static final Logger log = Logger.getLogger(DropOffAgentReplanner.class);
 	
-	private static final String activityType = "pickup";
+	private static final String activityType = "dropoff";
 	
-	private final RouteFactory carRouteFactory;
-	private final RouteFactory rideRouteFactory;
+	private final RouteFactory routeFactory;
 	
-	/*package*/ PickupAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
 		super(id, scenario, internalInterface);
-		this.carRouteFactory = new LinkNetworkRouteFactory(); 
-		this.rideRouteFactory = new GenericRouteFactory();
+		this.routeFactory = new LinkNetworkRouteFactory();
 	}
 
 	@Override
@@ -73,7 +71,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		
 		if (withinDayAgent.getMode().equals(TransportMode.car)) {
 			return replanDriver(withinDayAgent);
-		} else if (withinDayAgent.getMode().equals(TransportMode.walk)) {
+		} else if (withinDayAgent.getMode().equals(OldPassengerDepartureHandler.passengerTransportMode)) {
 			return replanPassenger(withinDayAgent);
 		} else {
 			log.warn("Unexpected mode was found: " + withinDayAgent.getMode());
@@ -96,17 +94,19 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		List<Id> subRoute;
 		
 		/*
-		 * Create new pickup activity.
+		 * Create new drop off activity.
+		 * After the linkMinTravelTime the vehicle is removed from the links buffer.
+		 * At this point it is checked whether the vehicle should be parked at the link.
 		 */
 		double departureTime = this.time + 60.0;
-		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
-		waitForPickupActivity.setType(activityType);
-		waitForPickupActivity.setStartTime(this.time);
-		waitForPickupActivity.setEndTime(departureTime);
+		Activity dropOffActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
+		dropOffActivity.setType(activityType);
+		dropOffActivity.setStartTime(this.time);
+		dropOffActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + PrepareEvacuationScenario.pickupDropOffSuffix;
-		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
-		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
-		
+		((ActivityImpl) dropOffActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl) dropOffActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
+			
 		/*
 		 * Create new car leg from the current position to the current legs destination.
 		 * Re-use existing routes vehicle.
@@ -129,7 +129,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 				subRoute.addAll(currentRoute.getLinkIds().subList(currentLinkIndex, currentRoute.getLinkIds().size()));				
 			}
 		}
-		NetworkRoute carRoute = (NetworkRoute) carRouteFactory.createRoute(currentLinkId, currentRoute.getEndLinkId());
+		NetworkRoute carRoute = (NetworkRoute) routeFactory.createRoute(currentLinkId, currentRoute.getEndLinkId());
 		carRoute.setLinkIds(currentLinkId, subRoute, currentRoute.getEndLinkId());
 		carRoute.setVehicleId(currentVehicleId);
 		carLeg.setRoute(carRoute);
@@ -146,11 +146,11 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		}
 		currentRoute.setLinkIds(currentRoute.getStartLinkId(), subRoute, currentLinkId);
 		currentLeg.setTravelTime(this.time - currentLeg.getDepartureTime());
-			
+		
 		/*
-		 * Insert pickup activity and driver leg into agent's plan.
+		 * Insert drop off activity and driver leg into agent's plan.
 		 */
-		executedPlan.getPlanElements().add(currentLegIndex + 1, waitForPickupActivity);
+		executedPlan.getPlanElements().add(currentLegIndex + 1, dropOffActivity);
 		executedPlan.getPlanElements().add(currentLegIndex + 2, carLeg);
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
@@ -166,46 +166,50 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		if (executedPlan == null) return false;
 		
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
-		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
-		Id currentLinkId = withinDayAgent.getCurrentLinkId();
 		Leg currentLeg = withinDayAgent.getCurrentLeg();
 		
 		/*
-		 * Create new pickup activity.
+		 * Get agent's current link from the vehicle since the agent's
+		 * current link is not updated. 
+		 */
+		PassengerAgent passenger = (PassengerAgent) withinDayAgent;
+		Id currentLinkId = passenger.getVehicle().getCurrentLink().getId();
+		
+		/*
+		 * Create new drop off activity.
 		 */
 		double departureTime = this.time + 60.0;
-		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
-		waitForPickupActivity.setType(activityType);
-		waitForPickupActivity.setStartTime(this.time);
-		waitForPickupActivity.setEndTime(departureTime);
+		Activity dropOffActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
+		dropOffActivity.setType(activityType);
+		dropOffActivity.setStartTime(this.time);
+		dropOffActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + PrepareEvacuationScenario.pickupDropOffSuffix;
-		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
-		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
+		((ActivityImpl) dropOffActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl) dropOffActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 				
-		/*
-		 * Create new ride_passenger leg to the rescue facility.
-		 * Set mode to ride, then create route for the leg, then
-		 * set the mode to the correct value (ride_passenger).
-		 */
-		Leg ridePassengerLeg = scenario.getPopulation().getFactory().createLeg(OldPassengerDepartureHandler.passengerTransportMode);
-		ridePassengerLeg.setDepartureTime(departureTime);
-		Route ridePassengerRoute = rideRouteFactory.createRoute(currentLinkId, currentLeg.getRoute().getEndLinkId());
-		ridePassengerLeg.setRoute(ridePassengerRoute);
-		
-		/*
-		 * Insert pickup activity and ride_passenger leg into agent's plan.
-		 */
-		executedPlan.getPlanElements().add(currentLegIndex + 1, waitForPickupActivity);
-		executedPlan.getPlanElements().add(currentLegIndex + 2, ridePassengerLeg);
-		
 		/*
 		 * End agent's current leg at the current link.
 		 */
-		NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
-		List<Id> subRoute = new ArrayList<Id>(route.getLinkIds().subList(0, currentLinkIndex));
-		route.setLinkIds(route.getStartLinkId(), subRoute, currentLinkId);
-		currentLeg.setTravelTime(this.time - currentLeg.getDepartureTime());	
+		currentLeg.getRoute().setEndLinkId(currentLinkId);
+		currentLeg.setTravelTime(this.time - currentLeg.getDepartureTime());
 		
+		/*
+		 * Create new walk leg to the agents destination.
+		 */
+		Leg walkLeg = scenario.getPopulation().getFactory().createLeg(TransportMode.walk);
+		walkLeg.setDepartureTime(departureTime);
+				
+		/*
+		 * Insert drop off activity and walk leg into agent's plan.
+		 */
+		executedPlan.getPlanElements().add(currentLegIndex + 1, dropOffActivity);
+		executedPlan.getPlanElements().add(currentLegIndex + 2, walkLeg);
+		
+		/*
+		 * Create a new route for the walk leg.
+		 */
+		new EditRoutes().replanFutureLegRoute(executedPlan, currentLegIndex + 2, this.routeAlgo);
+				
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();
 		

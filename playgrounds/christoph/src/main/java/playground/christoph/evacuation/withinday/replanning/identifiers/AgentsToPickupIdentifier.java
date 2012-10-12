@@ -21,6 +21,8 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +54,8 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -60,9 +64,7 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -85,6 +87,14 @@ import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHou
 public class AgentsToPickupIdentifier extends DuringLegIdentifier implements LinkEnterEventHandler, LinkLeaveEventHandler,
 		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, MobsimInitializedListener {
 
+	/*
+	 * If true, agents are only picked up if their destination
+	 * matches the drivers destination. If false, agents are picked up
+	 * and dropped of as soon as the vehicle has left the affected
+	 * area.
+	 */
+	private final static boolean destinationsMustMatch = false;
+	
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
@@ -97,13 +107,14 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final Set<Id> insecureWalkLegPerformingAgents;
 	private final DecisionDataProvider decisionDataProvider;
 	
+	
 	/*
 	 * Queue that contains information on when agents are going to leave one
 	 * link and enter another one.
 	 */
 	private final Queue<Tuple<Double, MobsimAgent>> agentsLeaveLinkQueue = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
 
-	/* package */AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, TravelTime walkTravelTime,
+	/*package*/ AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, TravelTime walkTravelTime,
 			DecisionDataProvider decisionDataProvider) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
@@ -146,15 +157,15 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 			if (!agentIds.contains(agent.getId())) iter.remove();
 		}
 		
-		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();		
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		Map<Id, AtomicInteger> reservedCapacities = new HashMap<Id, AtomicInteger>();
+		Map<Id, PlannedDeparture> plannedDepartures = new HashMap<Id, PlannedDeparture>();
 		
 		for (MobsimAgent personAgent : insecureLegPerformingAgents) {
 			
 			/*
 			 * The agent wants to be picked up if its leg mode is walk and if
-			 * its activity is not from type rescue.
+			 * its activity is from type rescue.
 			 */
 			if (personAgent.getMode().equals(TransportMode.walk)) {
 
@@ -166,13 +177,31 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				 * Check whether there are vehicle available on the link.
 				 * If vehicles are found, check whether one of them has free capacity.
 				 */
-				List<Id> vehicleIds = vehiclesTracker.getEnrouteVehiclesOnLink(personAgent.getCurrentLinkId());
+				Id linkId = personAgent.getCurrentLinkId();
+				List<Id> vehicleIds = vehiclesTracker.getEnrouteVehiclesOnLink(linkId);
 				for (Id vehicleId : vehicleIds) {
-					Id driverId = this.vehiclesTracker.getVehicleDriverId(vehicleId);
+					MobsimDriverAgent driver = this.vehiclesTracker.getVehicleDriver(vehicleId);
 					
-					if (driverId == null) {
+					if (driver == null) {
 						throw new RuntimeException("No driver for vehicle " + vehicleId.toString() +
 								" was found in VehiclesTracker at time " + time + "!");
+					}
+					Id driverId = driver.getId();
+					
+					Id driversDestinationLinkId = driver.getDestinationLinkId();
+
+					// check whether the drivers destination is in a secure area
+					Link driversDestinationLink = scenario.getNetwork().getLinks().get(driversDestinationLinkId);
+					if (this.coordAnalyzer.isLinkAffected(driversDestinationLink)) continue;
+					
+					/*
+					 * If only agents with exactly the same destination are picked up,
+					 * check it. Otherwise pick up every agent and drop those with a different
+					 * destination after the evacuation area has be left.
+					 */
+					if (destinationsMustMatch) {
+						Id agentDestinationLinkId = personAgent.getDestinationLinkId();
+						if (!driversDestinationLinkId.equals(agentDestinationLinkId)) continue;						
 					}
 					
 					/*
@@ -188,35 +217,25 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 					}
 					if (time + 2 > leaveLinkTime) continue;
 					
-					int capacity = this.vehiclesTracker.getFreeVehicleCapacity(vehicleId);
+					int freeCapacity = this.vehiclesTracker.getFreeVehicleCapacity(vehicleId);
 					
 					/*
-					 * If already other agents have reserved a place in that vehicle, reduce
+					 * If already other agents have reserved a seat in that vehicle, reduce
 					 * the vehicle's available capacity.
 					 */
 					AtomicInteger reservedCapacity = reservedCapacities.get(vehicleId);			
-					if (reservedCapacity != null) capacity -= reservedCapacity.get();
+					if (reservedCapacity != null) freeCapacity -= reservedCapacity.get();
 					
 					/*
-					 * Check whether the available capacity equals the total
-					 * capacity. If true, the vehicle has no free seats left.
+					 * Check whether free capacity is available in the vehicle. 
 					 */
-					int seats = vehicles.getVehicles().get(vehicleId).getType().getCapacity().getSeats();
-					if (seats == capacity) continue;
-					
-					/*
-					 * Check whether the vehicle has the same destination as
-					 * the agent has.
-					 */
-					Id vehicleDestinationLinkId = this.vehiclesTracker.getVehicleDestination(vehicleId);
-					Id agentDestinationLinkId = ((ExperimentalBasicWithindayAgent) personAgent).getCurrentLeg().getRoute().getEndLinkId();
-					if (!vehicleDestinationLinkId.equals(agentDestinationLinkId)) continue;
+					if (freeCapacity <= 0) continue;
 					
 					/*
 					 * Check whether the driver would pick up the person.
 					 */
-					Person driver = this.scenario.getPopulation().getPersons().get(driverId);
-					PickupDecision decision = checkPickup(((HasPerson) personAgent).getPerson(), driver);
+					Person driverPerson = ((HasPerson) driver).getPerson();
+					PickupDecision decision = checkPickup(((HasPerson) personAgent).getPerson(), driverPerson);
 					
 					boolean pickup;
 					if (decision == PickupDecision.ALWAYS) pickup = true;
@@ -226,7 +245,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 						 * Return true if after picking up the person at least one seat remains free,
 						 * otherwise return false.
 						 */
-						if (seats + 1 < capacity) pickup = true;
+						if (freeCapacity > 1) pickup = true;
 						else pickup = false;
 					} else {
 						throw new RuntimeException("Undefined pickup agents behavior found: " + decision);
@@ -240,14 +259,49 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 					/*
 					 * mark the agent as to be replanned and add an entry in the map which 
 					 * connects the agent and the vehicle that will pick him up.
+					 * Also replan the driver which has to perform a pickup activity.
 					 */
 					agentsToReplan.add((PlanBasedWithinDayAgent) personAgent);
+					agentsToReplan.add((PlanBasedWithinDayAgent) driver);
 					
-					// inform vehiclesTracker
-					this.vehiclesTracker.addPlannedPickupVehicle(personAgent.getId(), vehicleId);
+					/*
+					 * Create a joint departure object
+					 */
+					PlannedDeparture plannedDeparture = plannedDepartures.get(driverId);
+					if (plannedDeparture == null) {
+						plannedDeparture = new PlannedDeparture();
+						plannedDepartures.put(driverId, plannedDeparture);
+						plannedDeparture.driverId = driverId;
+						plannedDeparture.linkId = linkId;
+						plannedDeparture.vehicleId = vehicleId;
+						plannedDeparture.passengerIds = new ArrayList<Id>();
+						
+						/*
+						 * Check which existing passengers will stay in the vehicle
+						 * and therefore have to be included in the new JointDeparture.
+						 */
+						Collection<? extends PassengerAgent> currentPassengers = this.vehiclesTracker.getVehiclePassengers(vehicleId);
+						for (PassengerAgent passenger : currentPassengers) {
+							if (!passenger.getDestinationLinkId().equals(linkId)) {								
+								plannedDeparture.passengerIds.add(passenger.getId());
+							}
+						}
+					}
+					
+					// add the agent to be picked up
+					plannedDeparture.passengerIds.add(personAgent.getId());
+					
+					// agent is being picked up, therefore stop searching
 					break;
-				}
+				}	// for possible vehicles that could pick up the agent
 			}
+		}
+		
+		/*
+		 * Create joint departures for all planned pickups
+		 */
+		for (PlannedDeparture pd : plannedDepartures.values()) {
+			this.vehiclesTracker.createJointDeparture(pd.linkId, pd.vehicleId, pd.driverId, pd.passengerIds);
 		}
 		
 		return agentsToReplan;
@@ -356,6 +410,13 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		}
 	}
 
+	private static class PlannedDeparture {
+		Id driverId;
+		Id linkId;
+		Id vehicleId;
+		List<Id> passengerIds;
+	}
+	
 	private static class TravelTimeComparator implements Comparator<Tuple<Double, MobsimAgent>>, Serializable {
 		private static final long serialVersionUID = 1L;
 

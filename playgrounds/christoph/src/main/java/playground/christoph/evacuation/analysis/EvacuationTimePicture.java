@@ -337,7 +337,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					/*
 					 * Use the link where the vehicle is currently located.
 					 */
-					Id linkId = this.vehiclesTracker.getVehicleDestination(positionId);
+					Id linkId = this.vehiclesTracker.getVehicleLinkId(positionId);
 					Link link = scenario.getNetwork().getLinks().get(linkId);
 					boolean isAffected = coordAnalyzer.isLinkAffected(link);
 										
@@ -412,7 +412,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					/*
 					 * Use the link where the vehicle is currently located.
 					 */
-					Id linkId = this.vehiclesTracker.getVehicleDestination(positionId);
+					Id linkId = this.vehiclesTracker.getVehicleLinkId(positionId);
 					Link link = scenario.getNetwork().getLinks().get(linkId);
 					isInsideArea = coordAnalyzer.isLinkAffected(link);
 					

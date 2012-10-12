@@ -36,8 +36,9 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
@@ -48,12 +49,13 @@ public class EvacuationQSimFactory implements MobsimFactory {
 
     private final static Logger log = Logger.getLogger(EvacuationQSimFactory.class);
     
-    private final PassengerDepartureHandler passengerDepartureHandler;
     private final WithinDayEngine withinDayEngine;
-
-    public EvacuationQSimFactory(PassengerDepartureHandler passengerDepartureHandler, WithinDayEngine withinDayEngine) {
-    	this.passengerDepartureHandler = passengerDepartureHandler;
+    private final JointDepartureOrganizer jointDepartureOrganizer;
+    
+    public EvacuationQSimFactory(WithinDayEngine withinDayEngine,
+    		JointDepartureOrganizer jointDepartureOrganizer) {
     	this.withinDayEngine = withinDayEngine;
+    	this.jointDepartureOrganizer = jointDepartureOrganizer;
     }
     
     @Override
@@ -82,9 +84,20 @@ public class EvacuationQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+		/*
+		 * Create a PassengerQNetsimEngine and add its PassengerDepartureHandler
+		 * as well as its (super)VehicularDepartureHandler to the QSim.
+		 * The later one handles non-joint departures.
+		 */
+		PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim,
+				MatsimRandom.getLocalInstance(), jointDepartureOrganizer); 
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
+		
+//		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+//		qSim.addMobsimEngine(netsimEngine);
+//		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
@@ -92,8 +105,6 @@ public class EvacuationQSimFactory implements MobsimFactory {
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim);
         qSim.addAgentSource(agentSource);
-        
-        if (this.passengerDepartureHandler != null) qSim.addDepartureHandler(passengerDepartureHandler);
         
         /*
          * Once the ReplanningManager is a full MobsimEngine and performs

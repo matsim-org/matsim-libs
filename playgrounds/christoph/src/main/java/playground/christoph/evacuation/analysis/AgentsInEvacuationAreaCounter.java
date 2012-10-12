@@ -65,7 +65,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
+import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 
@@ -188,7 +188,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		Set<Id> passengerSet = null;
 		if (vehicleId != null) {
 			passengers = vehiclePassengersMap.get(vehicleId);
-			passengerSet = legAgentsInEvacuationArea.get(PassengerDepartureHandler.passengerTransportMode);
+			passengerSet = legAgentsInEvacuationArea.get(OldPassengerDepartureHandler.passengerTransportMode);
 		}
 		
 		boolean wasAffected = set.contains(event.getPersonId()); 
@@ -217,7 +217,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 				this.leftByMode.put(event.getPersonId(), new Tuple<String, Double>(transportMode, event.getTime()));
 				if (passengers != null) {
 					for (Id passengerId : passengers) {
-						this.leftByMode.put(passengerId, new Tuple<String, Double>(PassengerDepartureHandler.passengerTransportMode, event.getTime()));
+						this.leftByMode.put(passengerId, new Tuple<String, Double>(OldPassengerDepartureHandler.passengerTransportMode, event.getTime()));
 					}
 				}
 			}
