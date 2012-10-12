@@ -43,15 +43,18 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 	
 	private final int mutationRange;
 	private final int timeBinSize;
+	private final boolean searchInBothDirections;
 	
 	public MaxRandomEndTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 1){
+		if(parameter.size() != 3){
 			log.error("Parameter 1: Mutation range in seconds");
 			log.error("Parameter 2: Time bin size in seconds");
+			log.error("Parameter 3: Search in both directions true/false. Setting it true will double the total mutation range.");
 		}
 		this.mutationRange = Integer.parseInt(parameter.get(0));
 		this.timeBinSize = Integer.parseInt(parameter.get(1));
+		this.searchInBothDirections = Boolean.parseBoolean(parameter.get(2));
 	}
 	
 	@Override
@@ -66,12 +69,24 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
 		
 		// get a valid new end time
-		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + MatsimRandom.getRandom().nextDouble() * this.mutationRange);
+		double timeMutation;
+		if (searchInBothDirections) {
+			timeMutation = (MatsimRandom.getRandom().nextDouble() - 0.5) * 2.0 * this.mutationRange;
+		} else {
+			timeMutation = MatsimRandom.getRandom().nextDouble() * this.mutationRange;
+		}
+		
+		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + timeMutation);
 		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime());
 		
 		// cast time to time bin size
 		newEndTime = this.getTimeSlotForTime(newEndTime) * this.timeBinSize;
 		newPlan.setEndTime(newEndTime);
+		
+		if(newPlan.getEndTime() <= newPlan.getStartTime()){
+			// Could not find a valid new plan
+			return null;
+		}
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 		

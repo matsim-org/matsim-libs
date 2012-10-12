@@ -43,15 +43,18 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	
 	private final int mutationRange;
 	private final int timeBinSize;
+	private final boolean searchInBothDirections;
 	
 	public MaxRandomStartTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 2){
+		if(parameter.size() != 3){
 			log.error("Parameter 1: Mutation range in seconds");
 			log.error("Parameter 2: Time bin size in seconds");
+			log.error("Parameter 3: Search in both directions true/false. Setting it true will double the total mutation range.");
 		}
 		this.mutationRange = Integer.parseInt(parameter.get(0));
 		this.timeBinSize = Integer.parseInt(parameter.get(1));
+		this.searchInBothDirections = Boolean.parseBoolean(parameter.get(2));
 	}
 
 	@Override
@@ -65,14 +68,26 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time
-		double newStartTime = Math.max(0.0, cooperative.getBestPlan().getStartTime() - MatsimRandom.getRandom().nextDouble() * this.mutationRange);
+		double timeMutation;
+		if (searchInBothDirections) {
+			timeMutation = (MatsimRandom.getRandom().nextDouble() - 0.5) * 2.0 * this.mutationRange;
+		} else {
+			timeMutation = MatsimRandom.getRandom().nextDouble() * this.mutationRange;
+		}
+		
+		double newStartTime = Math.max(0.0, cooperative.getBestPlan().getStartTime() - timeMutation);
 		newStartTime = Math.min(newStartTime, cooperative.getBestPlan().getEndTime() - cooperative.getMinOperationTime());
 		
 		// cast time to time bin size
 		newStartTime = this.getTimeSlotForTime(newStartTime) * this.timeBinSize;
 		newPlan.setStartTime(newStartTime);
-		
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
+		
+		if(newPlan.getEndTime() <= newPlan.getStartTime()){
+			// Could not find a valid new plan
+			return null;
+		}
+		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStopsToBeServed(), new IdImpl(cooperative.getCurrentIteration())));
 
 		return newPlan;

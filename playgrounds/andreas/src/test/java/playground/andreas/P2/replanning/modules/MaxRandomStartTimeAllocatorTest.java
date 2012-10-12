@@ -42,6 +42,7 @@ public class MaxRandomStartTimeAllocatorTest {
 		ArrayList<String> param = new ArrayList<String>();
 		param.add("0");
 		param.add("1");
+		param.add("false");
 		MaxRandomStartTimeAllocator strat = new MaxRandomStartTimeAllocator(param);
 		PPlan testPlan = null;
 		
@@ -72,6 +73,7 @@ public class MaxRandomStartTimeAllocatorTest {
 		param = new ArrayList<String>();
 		param.add("900");
 		param.add("10");
+		param.add("false");
 		strat = new MaxRandomStartTimeAllocator(param);
 		
 		// enough vehicles for testing

@@ -42,6 +42,7 @@ public class MaxRandomEndTimeAllocatorTest {
 		ArrayList<String> param = new ArrayList<String>();
 		param.add("0");
 		param.add("1");
+		param.add("false");
 		MaxRandomEndTimeAllocator strat = new MaxRandomEndTimeAllocator(param);
 		PPlan testPlan = null;
 		
@@ -72,6 +73,7 @@ public class MaxRandomEndTimeAllocatorTest {
 		param = new ArrayList<String>();
 		param.add("900");
 		param.add("10");
+		param.add("false");
 		strat = new MaxRandomEndTimeAllocator(param);
 		
 		// enough vehicles for testing
