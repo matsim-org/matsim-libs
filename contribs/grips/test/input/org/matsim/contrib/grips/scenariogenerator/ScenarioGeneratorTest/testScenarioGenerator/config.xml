@@ -208,7 +208,7 @@
 
 	<module name="planCalcScore" >
 
-		<!-- [1/utils] conversion factor of utility model for use in logit-based choice model.  Set to 1 if your utl function is estimated -->
+		<!-- logit model scale parameter. default: 2.  Has name and default value for historical reasons (see Bryan Raney's phd thesis).  Should be in strategyConfigGroup. -->
 		<param name="BrainExpBeta" value="2.0" />
 		<param name="PathSizeLogitBeta" value="1.0" />
 		<param name="activityClosingTime_0" value="00:00:49" />
@@ -549,6 +549,7 @@
 
 		<!-- Set this filename of MZ05 daily analysis -->
 		<param name="inputMZ05File" value="" />
+		<param name="logitScaleParamForPlansRemoval" value="1." />
 
 		<!-- changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats -->
 		<param name="matsimGlobalTimeformat" value="HH:mm:ss" />
@@ -558,12 +559,13 @@
 
 		<!-- (not yet implemented) will remove plan attributes that are presumably not used, such as activityStartTime. default=false -->
 		<param name="removingUnnecessaryPlanAttributes" value="false" />
+		<param name="scoreMSAStartsAtIteration" value="null" />
 
 		<!-- if true then detailed emission factor files must be provided! -->
 		<param name="usingDetailedEmissionCalculation" value="false" />
 
 		<!-- indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal utilities of time.
-		Default is false although some of us (bk, kn) think this should always be true.
+		Default is true; false is possible only for backwards compatibility.
 		This is only a suggestion since there is (by matsim design) no way to enforce that mental modules obey this. -->
 		<param name="usingOpportunityCostOfTimeForPtRouting" value="true" />
 
