@@ -101,7 +101,7 @@ public class DynamicTravelTimeMatrix {
 				return tt;
 			}
 		}
-		return 5.0*60; // well, then... we have to return something, otherwise the scores will be all NaN
+		return 15.0*60; // well, then... we have to return something, otherwise the scores will be all NaN
 	}
 	
 	private double getAverageTravelTime(final int timeSlot, final String fromZoneId, final String toZoneId) {

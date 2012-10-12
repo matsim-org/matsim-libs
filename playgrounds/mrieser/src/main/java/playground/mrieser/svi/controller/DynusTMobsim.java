@@ -67,6 +67,7 @@ public class DynusTMobsim implements Mobsim {
 			Plan plan = person.getSelectedPlan();
 			collector.run(plan);
 		}
+		log.info("Number of Trips handed over to DynusT: " + collector.getCounter());
 
 		log.info("write demand for Dynus-T");
 		DynusTDynamicODDemandWriter writer = new DynusTDynamicODDemandWriter(odm, this.dc.getZoneIdToIndexMapping());

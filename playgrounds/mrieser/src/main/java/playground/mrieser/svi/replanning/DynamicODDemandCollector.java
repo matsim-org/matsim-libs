@@ -37,6 +37,7 @@ public class DynamicODDemandCollector implements PlanAlgorithm {
 
 	private final DynamicODMatrix odm;
 	private final ActivityToZoneMapping mapping;
+	private int counter = 0;
 	
 	public DynamicODDemandCollector(final DynamicODMatrix odm, final ActivityToZoneMapping actToZoneMapping) {
 		this.odm = odm;
@@ -69,6 +70,7 @@ public class DynamicODDemandCollector implements PlanAlgorithm {
 					}
 					
 					this.odm.addTrip(tripStartTime, lastZoneId, zoneId);
+					this.counter++;
 				}
 
 				lastLeg = null;
@@ -77,6 +79,10 @@ public class DynamicODDemandCollector implements PlanAlgorithm {
 				idx++;
 			}
 		}
+	}
+	
+	public int getCounter() {
+		return counter;
 	}
 
 }
