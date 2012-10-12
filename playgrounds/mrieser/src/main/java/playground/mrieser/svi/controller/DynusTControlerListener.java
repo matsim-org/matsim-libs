@@ -103,7 +103,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 			if (this.dc.getPtLinesFile() != null) {
 				this.ptLines = new PtLines();
 				log.info("reading pt lines from " + this.dc.getPtLinesFile());
-				new PtLinesReader(this.ptLines, this.dynusTNetwork);
+				new PtLinesReader(this.ptLines, this.dynusTNetwork).readFile(this.dc.getPtLinesFile());
 			}
 			
 			this.isFirstIteration = false;
