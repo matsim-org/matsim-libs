@@ -42,7 +42,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		public static enum VspExperimentalConfigKey implements ConfigKey {
 //			activityDurationInterpretation,
 			vspDefaultsCheckingLevel,
-			logitScaleParamForPlansRemoval
+			logitScaleParamForPlansRemoval,
+			scoreMSAStartsAtIteration
 		}
 	
 		private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
@@ -167,8 +168,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			case logitScaleParamForPlansRemoval:
 				this.addParam( key, "1." ) ; 
 				break;
-			default:
-				throw new RuntimeException("parameter default entry missing; aborting ...") ;
+			case scoreMSAStartsAtIteration:
+				this.addParam( key, "null") ;
+				break;
 			}
 		}
 	}
@@ -235,6 +237,18 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				"Default is true; false is possible only for backwards compatibility.\n\t\t" +
 				"This is only a suggestion since there is (by matsim design) no way to enforce that mental modules " +
 		"obey this." ) ;
+		
+		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
+			switch(key) {
+			case logitScaleParamForPlansRemoval:
+//				map.put(key.toString(), "comment") ;
+				break;
+			case scoreMSAStartsAtIteration:
+				break;
+			case vspDefaultsCheckingLevel:
+				break;
+			}
+		}
 		return map;
 	}
 

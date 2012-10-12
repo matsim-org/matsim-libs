@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -71,6 +73,8 @@ public final class StrategyManagerConfigLoader {
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
+
+	private static int locachoiceWrnCnt;
 
 	/**
 	 * Reads and instantiates the strategy modules specified in the config-object.
@@ -250,7 +254,18 @@ public final class StrategyManagerConfigLoader {
 				}
 				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
 				strategy.addStrategyModule(new ReRoute(controler));
+
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
+				if ( locachoiceWrnCnt < 1 ) {
+					locachoiceWrnCnt ++ ;
+					Logger.getLogger("dummy").warn("I don't think that using TimeAllocationMutator as last step of locationchoice" +
+							" (or of any strategy, for that matter) makes sense. --> please remove from code.   kai, oct'12") ;
+					// yyyy
+					if ( config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals(VspExperimentalConfigGroup.ABORT) ) {
+						throw new RuntimeException("will not use locachoice followed by TimeMutation within VSP. Aborting ...") ;
+					}
+				}
+				
 			} else {
 				strategy = tryToLoadPlanStrategyByName(controler, name);
 			}
