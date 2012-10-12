@@ -27,11 +27,15 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -49,7 +53,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);
 
 		events.processEvent(new AgentMoneyEvent(3600.0, person.getId(), 3.4));
@@ -64,6 +68,50 @@ public class EventsToScoreTest extends MatsimTestCase {
 		assertEquals(0, sfFactory.sf.cntReset);
 		assertEquals(0, sfFactory.sf.cntStuck);
 		assertEquals(1, sfFactory.sf.cntMoney);
+	}
+	public void testMsaAveraging() {
+		Config config = ConfigUtils.createConfig() ;
+		config.vspExperimental().addParam(VspExperimentalConfigKey.scoreMSAStartsAtIteration, "100") ;
+		config.planCalcScore().setMarginalUtilityOfMoney(1.);
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        Population population = scenario.getPopulation();
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		population.addPerson(person);
+		PlanImpl plan = new PlanImpl() ;
+		person.addPlan(plan);
+		
+		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), null);
+		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(e2s);
+		
+		for ( int mockIteration = 99 ; mockIteration <= 102 ; mockIteration++ ) {
+
+			events.resetHandlers(mockIteration) ;
+
+			events.processEvent(new AgentMoneyEvent(3600.0, person.getId(), mockIteration-98 ));
+			
+			e2s.finish() ;
+			
+			System.out.println( "score: " + person.getSelectedPlan().getScore() ) ;
+			
+			switch(mockIteration){
+			case 99:
+				assertEquals(1.0, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 100:
+				assertEquals(2.0, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 101:
+				assertEquals(3.0, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 102:
+				assertEquals(3.5, person.getSelectedPlan().getScore() ) ;
+				break ;
+			}
+			
+		}
 	}
 
 	private static class MockScoringFunctionFactory implements ScoringFunctionFactory {

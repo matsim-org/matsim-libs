@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.handler.TravelledEventHandler;
 
 /**
@@ -69,9 +70,12 @@ LinkEnterEventHandler, TravelledEventHandler {
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private double learningRate;
 	private boolean finished = false;
+	
+	private int iteration = -1 ;
 
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
+	private Integer scoreMSAstartsAtIteration;
 	
 
 	/**
@@ -89,6 +93,13 @@ LinkEnterEventHandler, TravelledEventHandler {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
 		initHandlers(scenario, scoringFunctionFactory, learningRate);
+		
+		String str = this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.scoreMSAStartsAtIteration) ;
+		if ( str.equals("null") ) {
+			this.scoreMSAstartsAtIteration = null ;
+		} else {
+			this.scoreMSAstartsAtIteration = Integer.valueOf(str) ;
+		}
 	}
 
 	private void initHandlers(final Scenario scenario,
@@ -158,6 +169,8 @@ LinkEnterEventHandler, TravelledEventHandler {
 	 * I think this should be split into two methods: One can want to close the ScoringFunctions to look
 	 * at scores WITHOUT wanting something to be written into Plans.
 	 * Actually, I think the two belong in different classes. michaz '12
+	 * <p/>
+	 * yy Absolutely.  kai, oct'12
 	 */
 	public void finish() {
 		eventsToActivities.finish();	
@@ -165,7 +178,7 @@ LinkEnterEventHandler, TravelledEventHandler {
 		assignNewScores();
 		finished = true;
 	}
-
+	
 	private void assignNewScores() {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
@@ -175,7 +188,21 @@ LinkEnterEventHandler, TravelledEventHandler {
 			if (oldScore == null) {
 				plan.setScore(score);
 			} else {
-				plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
+				if ( this.scoreMSAstartsAtIteration == null || this.iteration <= this.scoreMSAstartsAtIteration ) {
+					plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
+				} else {
+					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration) ;
+					plan.setScore( alpha * score + (1.-alpha) * oldScore ) ;
+					// the above is some variant of MSA (method of successive
+					// averages). It is not the same as MSA since
+					// a plan is typically not scored in every iteration.
+					// However, plans are called with rates, for example
+					// only every 10th iteration. Yet, something like 1/(10x)
+					// still diverges in the same way as 1/x
+					// when integrated, so MSA should still converge to the
+					// correct result. kai, oct'12
+					// yyyy this has never been tested, and there is no test case.  :-(  kai, oct'12
+				}
 			}
 
 			this.scoreSum += score;
@@ -223,6 +250,8 @@ LinkEnterEventHandler, TravelledEventHandler {
 		this.eventsToLegs.reset(iteration);
 		initHandlers(scenario, scoringFunctionFactory, learningRate);
 		finished = false;
+		this.iteration = iteration ;
+		// ("reset" is called just before the mobsim starts, so it probably has the correct iteration number for our purposes) 
 	}
 
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
