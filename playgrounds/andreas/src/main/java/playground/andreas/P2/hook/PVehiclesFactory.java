@@ -34,7 +34,6 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants;
 
 /**
  * Generates vehicles for a whole transit schedule
@@ -65,8 +64,8 @@ public class PVehiclesFactory {
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
-		vehType.setAccessTime(PConstants.pVehAccessTime);
-		vehType.setEgressTime(PConstants.pVehEgressTime);
+		vehType.setAccessTime(this.pConfig.getDelayPerBoardingPassenger());
+		vehType.setEgressTime(this.pConfig.getDelayPerAlightingPassenger());
 		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
 	
 		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {

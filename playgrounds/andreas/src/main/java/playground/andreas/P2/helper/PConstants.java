@@ -26,9 +26,6 @@ public class PConstants {
 
 	public static final String statsOutputFolder = "/pStats/";
 	
-	public static final double pVehAccessTime = 2.0;
-	public static final double pVehEgressTime = 1.0;
-	
 	public enum CoopState {
 	    PROSPECTING, INBUSINESS, BANKRUPT
 	}
