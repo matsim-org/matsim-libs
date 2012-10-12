@@ -140,10 +140,11 @@ public class MultiPlanCooperative extends AbstractCooperative{
 					this.findWorstPlanAndRemoveOneVehicle(this.plans);
 
 //					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
-					this.bestPlan = null;
 					this.plans.add(newPlan);
 				}
 			}
+			
+			this.bestPlan = null;
 		}
 		
 //		// Fourth, redistribute vehicles from plans with one vehicle only
