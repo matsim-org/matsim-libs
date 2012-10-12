@@ -20,17 +20,58 @@
 
 package playground.ssix;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.utils.misc.PopulationUtils;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class DreieckStreckeSzenario {
 
@@ -38,15 +79,119 @@ public class DreieckStreckeSzenario {
 	 * @param args
 	 */
 	
+	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
+		
+		private MyPersonDriverAgentImpl delegate;
+		
+		public MyRoundAndRoundAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
+			delegate = new MyPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
+			}
+
+		public final void endActivityAndComputeNextState(double now) {
+			delegate.endActivityAndComputeNextState(now);
+		}
+
+		public final void endLegAndComputeNextState(double now) {
+			delegate.endLegAndComputeNextState(now);
+		}
+
+		public final void abort(double now) {
+			delegate.abort(now);
+		}
+
+		public boolean equals(Object obj) {
+			return delegate.equals(obj);
+		}
+
+		public final double getActivityEndTime() {
+			return delegate.getActivityEndTime();
+		}
+
+		public final Id getCurrentLinkId() {
+			return delegate.getCurrentLinkId();
+		}
+
+		public final Double getExpectedTravelTime() {
+			return delegate.getExpectedTravelTime();
+		}
+
+		public final String getMode() {
+			return delegate.getMode();
+		}
+
+		public final Id getDestinationLinkId() {
+			return delegate.getDestinationLinkId();
+		}
+
+		public final Id getId() {
+			return delegate.getId();
+		}
+
+		public State getState() {
+			return delegate.getState();
+		}
+
+		public final void notifyTeleportToLink(Id linkId) {
+			delegate.notifyTeleportToLink(linkId);
+		}
+
+		@Override
+		public Id chooseNextLinkId() {
+			Id forcedLeftTurnLinkId = new IdImpl((long)(DreieckStreckeSzenario.subdivisionFactor - 1));
+			if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){
+				return delegate.chooseNextLinkId();
+			}
+			Id afterLeftTurnLinkId = new IdImpl((long)(DreieckStreckeSzenario.subdivisionFactor));
+			delegate.setCachedNextLinkId(afterLeftTurnLinkId);
+			return afterLeftTurnLinkId;
+		}
+
+		@Override
+		public void notifyMoveOverNode(Id newLinkId) {
+			delegate.notifyMoveOverNode(newLinkId);
+		}
+
+		@Override
+		public void setVehicle(MobsimVehicle veh) {
+			delegate.setVehicle(veh);
+		}
+
+		@Override
+		public MobsimVehicle getVehicle() {
+			return delegate.getVehicle();
+		}
+
+		@Override
+		public Id getPlannedVehicleId() {
+			return delegate.getPlannedVehicleId();
+		}
+	}
+	
+	private static class MyAgentFactory implements AgentFactory {
+
+		private QSim qSim;
+
+		public MyAgentFactory(QSim qSim) {
+		this.qSim = qSim;
+		}
+
+		@Override
+		public MobsimAgent createMobsimAgentFromPerson(Person p) {
+			MyRoundAndRoundAgent agent = new MyRoundAndRoundAgent(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.qSim);
+			return agent;
+		}
+
+	}
+	
+	private static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
+	
 	private Scenario scenario;
 	
 	private double length;
-	private int subdivisionFactor;//all sides of the triangle will be divided into subdivisionFactor links
 	private int networkCapacity;//the capacity all links of the network will have
 	
-	public DreieckStreckeSzenario(double length, int subdivisionFactor, int networkCapacity){
+	public DreieckStreckeSzenario(double length, int networkCapacity){
 		this.length = length;
-		this.subdivisionFactor = subdivisionFactor;
 		this.networkCapacity = networkCapacity;
 
 		Config config = ConfigUtils.createConfig();
@@ -55,13 +200,17 @@ public class DreieckStreckeSzenario {
 	}
 	
 	public static void main(String[] args) {
-		new DreieckStreckeSzenario(5000.0,2,500).run();
+		new DreieckStreckeSzenario(5000.0,500).run();
 	}
 	
 	public void run(){
 		fillNetworkData();
 		createPopulation((long)1000,3);
-		//TODO
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		
+		runqsim(events);
+		//TODO:eventually complete this basic scheme.
 	}
 
 	private void fillNetworkData(){
@@ -74,7 +223,7 @@ public class DreieckStreckeSzenario {
 			double x=0, y=0;
 			if (i>0){
 				for (int j=0; j<i; j++){
-					x += this.length/this.subdivisionFactor;
+					x += this.length/DreieckStreckeSzenario.subdivisionFactor;
 				}
 			}
 			Coord coord = scenario.createCoord(x, y);
@@ -84,21 +233,21 @@ public class DreieckStreckeSzenario {
 			network.addNode(node);	
 		}
 		//nodes of the triangle right side
-		for (int i = 0; i<this.subdivisionFactor; i++){
-			double x = this.length - (this.length/(2*this.subdivisionFactor))*(i+1);
+		for (int i = 0; i<DreieckStreckeSzenario.subdivisionFactor; i++){
+			double x = this.length - (this.length/(2*DreieckStreckeSzenario.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*(this.length-x);
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl((long)(this.subdivisionFactor+i+1));
+			Id id = new IdImpl((long)(DreieckStreckeSzenario.subdivisionFactor+i+1));
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);
 		}
 		//nodes of the triangle left side
-		for (int i = 0; i<this.subdivisionFactor-1; i++){
-			double x = this.length/2 - (this.length/(2*this.subdivisionFactor))*(i+1);
+		for (int i = 0; i<DreieckStreckeSzenario.subdivisionFactor-1; i++){
+			double x = this.length/2 - (this.length/(2*DreieckStreckeSzenario.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*x;
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl((long)(2*this.subdivisionFactor+i+1));
+			Id id = new IdImpl((long)(2*DreieckStreckeSzenario.subdivisionFactor+i+1));
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);
@@ -109,16 +258,16 @@ public class DreieckStreckeSzenario {
 		Node startNode = scenario.getNetwork().getFactory().createNode(startId, coord);
 		network.addNode(startNode);
 		coord = scenario.createCoord(this.length+50.0, 0.0);
-		Id endId = new IdImpl(3*this.subdivisionFactor);
+		Id endId = new IdImpl(3*DreieckStreckeSzenario.subdivisionFactor);
 		Node endNode = scenario.getNetwork().getFactory().createNode(endId, coord);
 		network.addNode(endNode);
 		
 		//LINKS
 		//all triangle links
-		for (int i = 0; i<3*this.subdivisionFactor; i++){
+		for (int i = 0; i<3*DreieckStreckeSzenario.subdivisionFactor; i++){
 			Id idFrom = new IdImpl((long)i);
 			Id idTo;
-			if (i != 3*this.subdivisionFactor-1)
+			if (i != 3*DreieckStreckeSzenario.subdivisionFactor-1)
 				idTo = new IdImpl((long)(i+1));
 			else
 				idTo = new IdImpl(0);
@@ -139,7 +288,7 @@ public class DreieckStreckeSzenario {
 		startLink.setLength(50.);
 		startLink.setNumberOfLanes(1.);
 		network.addLink(startLink);
-		Link endLink = this.scenario.getNetwork().getFactory().createLink(endId, this.scenario.getNetwork().getNodes().get(new IdImpl(this.subdivisionFactor)), endNode);
+		Link endLink = this.scenario.getNetwork().getFactory().createLink(endId, this.scenario.getNetwork().getNodes().get(new IdImpl(DreieckStreckeSzenario.subdivisionFactor)), endNode);
 		endLink.setCapacity(capMax);
 		endLink.setFreespeed(50./3.6);
 		endLink.setLength(50.);
@@ -151,8 +300,125 @@ public class DreieckStreckeSzenario {
 		//writer.write("./output/dreieck_network.xml");
 	}
 	
-	private void createPopulation(long numberOfPeople, int sekundenfrequenz){
-		//TODO
+	private void createPopulation(long numberOfPeople, int sekundenFrequenz){
+		Population population = scenario.getPopulation();
+		
+		for (long i = 0; i<numberOfPeople; i++){
+			
+			Person person = population.getFactory().createPerson(createId(i+1));
+			Plan plan = population.getFactory().createPlan();
+			plan.addActivity(createHome(sekundenFrequenz, i+1));
+			Leg leg = population.getFactory().createLeg(TransportMode.car);
+			plan.addLeg(leg);
+			plan.addActivity(createWork());
+			
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
+		
+		//check with xml
+		//PopulationWriter writer = new PopulationWriter(population, scenario.getNetwork());
+		//writer.write("./input/plans.xml");
+	}
+	
+	private void runqsim(EventsManager events){
+		//Normal QSim with default agents (will go to work right away)
+		//Netsim qSim = new QSimFactory().createMobsim(scenario, events);
+		
+		//Modified QSim with modified agents that go round and round.
+		Netsim qSim = createModifiedQSim(this.scenario, events);
+		
+		
+		
+		
+		
+		prepareForSim();
+		
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, (QSim)qSim);
+		
+		OTFClientLive.run(scenario.getConfig(), server);
+		qSim.run();
+	}
+	
+	private void prepareForSim() {
+		// make sure all routes are calculated.
+		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), scenario.getConfig().global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				TravelTimeCalculator travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+				TravelDisutility travelCosts = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimes, scenario.getConfig().planCalcScore());
+				PlansCalcRoute plansCalcRoute = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), travelCosts, travelTimes, new DijkstraFactory(), ((PopulationFactoryImpl)(scenario.getPopulation().getFactory())).getModeRouteFactory());
+				return new PersonPrepareForSim(plansCalcRoute, (ScenarioImpl)scenario);
+			}
+		});
+	}
+	
+	private QSim createModifiedQSim(Scenario sc, EventsManager events){
+		//From QSimFactory inspired code
+		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+        if (conf == null) {
+            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+        }
+        // Get number of parallel Threads
+        int numOfThreads = conf.getNumberOfThreads();
+        QNetsimEngineFactory netsimEngFactory;
+        if (numOfThreads > 1) {
+            events = new SynchronizedEventsManagerImpl(events);
+            netsimEngFactory = new ParallelQNetsimEngineFactory();
+            //log.info("Using parallel QSim with " + numOfThreads + " threads.");
+        } else {
+            netsimEngFactory = new DefaultQSimEngineFactory();
+        }
+        
+        QSim qSim = new QSim(sc, events);
+        ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
+        
+		//This is the modification
+		AgentFactory agentFactory = new MyAgentFactory(qSim);
+		
+		if (sc.getConfig().network().isTimeVariantNetwork()) {
+			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+		}
+        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
+        return qSim;
+	}
+	
+	private Activity createHome(int sekundenFrequenz, long identifier){
+		Id homeLinkId = new IdImpl(-1);
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
+		
+		Random r = new Random();
+		///*Method 1: The order of leaving people is guaranteed by the minimum time step between people: first person 1 leaves, then 2, then 3 etc...
+		long plannedEndTime = 6*3600 + (identifier-1)*sekundenFrequenz;
+		double endTime = plannedEndTime - sekundenFrequenz/2.0 + r.nextDouble()*sekundenFrequenz;
+		//*/
+		/*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
+		long TimeChunkSize = scenario.getPopulation().getPersons().size() * sekundenFrequenz;
+		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
+		*/
+		//NB:Method 2 is significantly better for the quality of fundamental diagrams;
+		activity.setEndTime(endTime);
+		
+		return activity;
+	}
+	
+	private Activity createWork(){
+		Id workLinkId = new IdImpl(3*DreieckStreckeSzenario.subdivisionFactor);
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", workLinkId);
+		return activity;
+	}
+	
+	private Id createId(long id){
+		return new IdImpl(id);
 	}
 	
 	private double calculateLength(Node from, Node to){
