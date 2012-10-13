@@ -20,11 +20,15 @@
 
 package playground.qiuhan.sa;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,14 +43,19 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+
+import com.vividsolutions.jts.geom.Point;
 
 public class MatrixToPersons {
 
 	private final Matrix m;
 	private final Map<Id, Person> persons;
-	private final Map<String, Coord> zoneIdCoords;
+	private Map<String, Coord> zoneIdCoords = null;
+	private Map<String, Feature> zoneIdFeatures = null;
 	private static String DUMMY = "dummy";
 	private final Random random;
 	private Set<String> legModes = null;
@@ -60,9 +69,9 @@ public class MatrixToPersons {
 	private MatrixToPersons(Matrix m, Map<String, Coord> zoneIdCoords,
 			NetworkImpl network) {
 		this.m = m;
-		this.persons = new HashMap<Id, Person>();
+		persons = new HashMap<Id, Person>();
 		this.zoneIdCoords = zoneIdCoords;
-		this.random = MatsimRandom.getRandom();
+		random = MatsimRandom.getRandom();
 		this.network = network;
 	}
 
@@ -82,24 +91,85 @@ public class MatrixToPersons {
 
 	}
 
+	/**
+	 * @param smallM
+	 * @param fts
+	 * @param network2
+	 * @param legModes2
+	 */
+	public MatrixToPersons(Matrix m, FeatureSource fts, NetworkImpl network,
+			Set<String> legModes) {
+		this(m, null, network);
+		zoneIdFeatures = new HashMap<String, Feature>();
+
+		// Iterator to iterate over the features from the shape file
+		try {
+			Iterator<Feature> it = fts.getFeatures().iterator();
+			while (it.hasNext()) {
+				Feature ft = it.next();
+				String zoneId = ft.getAttribute("NO").toString();
+				zoneIdFeatures.put(zoneId, ft);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.legModes = legModes;
+	}
+
 	public Map<Id, Person> createPersons() {
-		for (Id from : this.m.getFromLocations().keySet()) {
-			Coord fromZone = this.zoneIdCoords.get(from.toString());
+		for (Id fromZoneId : m.getFromLocations().keySet()) {
+			if (zoneIdCoords == null)/* zoneIdFeatures!=0 */{
+				Feature fromZoneFeature = zoneIdFeatures.get(fromZoneId
+						.toString());
 
-			for (Entry entry : this.m.getFromLocEntries(from)) {
-				Id toZoneId = entry.getToLocation();
-				Coord toZone = this.zoneIdCoords.get(toZoneId.toString());
-
-				int numberPersons = (int) entry.getValue();
-
-				for (int i = 0; i < numberPersons; i++) {
-					Id personId = new IdImpl(this.m.getId() + "-" + from + "-"
-							+ toZoneId + "-" + i);
-					createPerson(personId, fromZone, toZone);
+				for (Entry entry : m.getFromLocEntries(fromZoneId)) {
+					Id toZoneId = entry.getToLocation();
+					Feature toZoneFeature = zoneIdFeatures.get(toZoneId
+							.toString());
+					int numberPersons = (int) entry.getValue();
+					for (int i = 0; i < numberPersons; i++) {
+						Id personId = new IdImpl(m.getId() + "-" + fromZoneId
+								+ "-" + toZoneId + "-" + i);
+						Coord fromCoord = this
+								.getRandomPointInFeature(fromZoneFeature);
+						Coord toCoord = this
+								.getRandomPointInFeature(toZoneFeature);
+						createPerson(personId, fromCoord, toCoord);
+					}
 				}
+			} else {
+
+				Coord fromZone = zoneIdCoords.get(fromZoneId.toString());
+
+				for (Entry entry : m.getFromLocEntries(fromZoneId)) {
+					Id toZoneId = entry.getToLocation();
+					Coord toZone = zoneIdCoords.get(toZoneId.toString());
+
+					int numberPersons = (int) entry.getValue();
+
+					for (int i = 0; i < numberPersons; i++) {
+						Id personId = new IdImpl(m.getId() + "-" + fromZoneId
+								+ "-" + toZoneId + "-" + i);
+						createPerson(personId, fromZone, toZone);
+					}
+				}
+
 			}
 		}
 		return persons;
+	}
+
+	private Coord getRandomPointInFeature(Feature ft) {
+		Point p = null;
+		double x, y;
+		do {
+			x = ft.getBounds().getMinX() + random.nextDouble()
+					* (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
+			y = ft.getBounds().getMinY() + random.nextDouble()
+					* (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
+			p = MGC.xy2Point(x, y);
+		} while (ft.getDefaultGeometry().contains(p));
+		return new CoordImpl(x, y);
 	}
 
 	/**
@@ -112,12 +182,12 @@ public class MatrixToPersons {
 
 		createPlans(per, from, to);
 
-		this.persons.put(personId, per);
+		persons.put(personId, per);
 	}
 
 	private void createPlans(Person per, Coord from, Coord to) {
-		if (this.legModes != null && !this.legModes.isEmpty()) {
-			for (String legMode : this.legModes) {
+		if (legModes != null && !legModes.isEmpty()) {
+			for (String legMode : legModes) {
 				per.addPlan(createPlan(legMode, from, to));
 			}
 
@@ -135,9 +205,9 @@ public class MatrixToPersons {
 		Activity firstAct = new ActivityImpl(DUMMY, from,
 				XY2NearestPassableLink.getNearestPassableLink(from, network)
 						.getId());
-		int time = Integer.parseInt(this.m.getId());
+		int time = Integer.parseInt(m.getId());
 
-		double endTime = (time - 1) * 3600 + this.random.nextDouble() * 3600d;
+		double endTime = (time - 1) * 3600 + random.nextDouble() * 3600d;
 		firstAct.setEndTime(endTime);
 
 		plan.addActivity(firstAct);
