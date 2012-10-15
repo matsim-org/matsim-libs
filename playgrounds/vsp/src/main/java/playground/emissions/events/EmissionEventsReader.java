@@ -33,8 +33,8 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import playground.benjamin.emissions.types.ColdPollutant;
-import playground.benjamin.emissions.types.WarmPollutant;
+import playground.emissions.types.ColdPollutant;
+import playground.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin
@@ -51,7 +51,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 	public EmissionEventsReader(EventsManager events) {
 		super();
 		this.eventsManager = events;
-		this.builder = (EventsFactory) events.getFactory();
+		this.builder = events.getFactory();
 		setValidating(false); // events-files have no DTD, thus they cannot validate
 	}
 

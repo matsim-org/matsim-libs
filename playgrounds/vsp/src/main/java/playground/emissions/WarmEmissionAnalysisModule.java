@@ -57,6 +57,8 @@ public class WarmEmissionAnalysisModule {
 
 	int vehAttributesNotSpecifiedCnt = 0;
 	final int maxWarnCnt = 3;
+	
+	// The following was tested to slow down significantly, therefore counters were commented out:
 //	Set<Id> vehAttributesNotSpecified = Collections.synchronizedSet(new HashSet<Id>());
 //	Set<Id> vehicleIdSet = Collections.synchronizedSet(new HashSet<Id>());
 
@@ -316,15 +318,18 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	public double getKmCounter() {
-		return BkNumberUtils.roundDouble((kmCounter / WarmPollutant.values().length), 3);
+//		return BkNumberUtils.roundDouble((kmCounter / WarmPollutant.values().length), 3);
+		return kmCounter / WarmPollutant.values().length;
 	}
 
 	public double getFreeFlowKmCounter() {
-		return BkNumberUtils.roundDouble((freeFlowKmCounter / WarmPollutant.values().length), 3);
+//		return BkNumberUtils.roundDouble((freeFlowKmCounter / WarmPollutant.values().length), 3);
+		return freeFlowKmCounter / WarmPollutant.values().length;
 	}
 
 	public double getStopGoKmCounter() {
-		return BkNumberUtils.roundDouble((stopGoKmCounter / WarmPollutant.values().length), 3);
+//		return BkNumberUtils.roundDouble((stopGoKmCounter / WarmPollutant.values().length), 3);
+		return stopGoKmCounter / WarmPollutant.values().length;
 	}
 
 	public int getWarmEmissionEventCounter() {
