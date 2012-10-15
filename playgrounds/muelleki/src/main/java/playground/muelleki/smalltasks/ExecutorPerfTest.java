@@ -2,6 +2,7 @@ package playground.muelleki.smalltasks;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Random;
 
 public class ExecutorPerfTest {
@@ -136,6 +137,13 @@ public class ExecutorPerfTest {
 		TimeStamps.add(System.nanoTime());
 		System.gc();
 		TimeStamps.add(System.nanoTime());
-		System.out.printf("%s\n", TimeStamps.toString());
+		Iterator<Long> it = TimeStamps.iterator();
+		long t = it.next();
+		while (it.hasNext()) {
+			long tn = it.next();
+			System.out.printf("%d, ", tn - t);
+			t = tn;
+		}
+		System.out.printf("\n", TimeStamps.toString());
 	}
 }
