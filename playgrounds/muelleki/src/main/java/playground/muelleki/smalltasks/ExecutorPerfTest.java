@@ -23,9 +23,9 @@ public class ExecutorPerfTest {
 
 		@Override
 		public void run() {
-			//Random r = R.get();
+			Random r = R.get();
 			for (int i = 0; i < nTasks * nSubTasks; i++)
-				Math.sin(i);
+				r.nextDouble();
 		}
 	}
 
@@ -33,10 +33,9 @@ public class ExecutorPerfTest {
 		private final class RandomGenerating implements RunnableCallable {
 			@Override
 			public void run() {
-				//Random r = R.get();
+				Random r = R.get();
 				for (int j = 0; j < nSubTasks; j++)
-					//r.nextDouble();
-					Math.sin(j);
+					r.nextDouble();
 			}
 
 			@Override
@@ -68,9 +67,9 @@ public class ExecutorPerfTest {
 		public void init() {
 			for (int k = 0; k < this.nThreads; k++) {
 				ArrayList<RunnableCallable> taskList = new ArrayList<RunnableCallable>();
-				taskLists.add(taskList);
 				for (int i = nTasks * k / this.nThreads; i < nTasks * (k+1) / this.nThreads; i++)
 					taskList.add(new RandomGenerating());
+				taskLists.add(taskList);
 			}
 		}
 
@@ -118,6 +117,6 @@ public class ExecutorPerfTest {
 		long t2 = System.nanoTime();
 		System.gc();
 		long t3 = System.nanoTime();
-		System.out.printf("%d, %d, %d\n", t1 - t0, t2 - t1, t3 - t2);
+		System.out.printf("%d, %d, %d, %d, %d, %d\n", t1 - t0, t2 - t1, t3 - t2, t2 - t0, t3 - t1, t3 - t0);
 	}
 }
