@@ -3,7 +3,6 @@ package playground.muelleki.smalltasks;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Random;
 
 public class ExecutorPerfTest {
 	private static final int RUNS = 3;
@@ -12,29 +11,13 @@ public class ExecutorPerfTest {
 	private final int nTasks;
 	private final int nSubTasks;
 
-	static final ThreadLocal<Random> R = new ThreadLocal<Random>() {
-		@Override
-		protected synchronized Random initialValue() {
-			return new Random();
-		}
-	};
-
 	private TaskFactory getTaskFactory() {
 		return new TaskFactory() {
 			@Override
 			public RunnableCallable create() {
-				return new RandomGenerating();
+				return new RandomGenerating(nSubTasks);
 			}
 		};
-	}
-
-	private final class RandomGenerating extends RunnableCallable {
-		@Override
-		public void run() {
-			Random r = R.get();
-			for (int j = 0; j < nSubTasks; j++)
-				r.nextDouble();
-		}
 	}
 
 	public class SeqTest implements Initializable {
