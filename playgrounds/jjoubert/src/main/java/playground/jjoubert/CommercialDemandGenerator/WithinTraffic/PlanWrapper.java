@@ -66,6 +66,8 @@ public class PlanWrapper {
 		PlanImpl tmpPlan = new PlanImpl();
 		tmpPlan.copyPlan(plan);
 		
+		int dayCount = 1;
+		
 		PlanImpl segment = new PlanImpl();
 		int index = 0;
 		while(index < tmpPlan.getPlanElements().size()){
@@ -80,10 +82,12 @@ public class PlanWrapper {
 				double startTime = index == 0 ? 0 : act.getStartTime();
 				double endTime = index == plan.getPlanElements().size()-1 ? Math.max(Time.MIDNIGHT, act.getStartTime()) : act.getEndTime();
 				
-				if(startTime < Time.MIDNIGHT){
-					if(endTime < Time.MIDNIGHT){
+				if(startTime < Time.MIDNIGHT*dayCount){
+					if(endTime < Time.MIDNIGHT*dayCount){
 						/* The activity can simply be added as it is entire wholly
 						 * or partially within the current day. */
+						act.setStartTime(act.getStartTime() - Time.MIDNIGHT*dayCount);
+						act.setEndTime(act.getEndTime() - Time.MIDNIGHT*dayCount);
 						segment.addActivity(act);
 						index++;						
 					} else{
@@ -91,7 +95,8 @@ public class PlanWrapper {
 						 * activity type, though. */
 						if(act.getType().contains("minor")){
 							/* Split it up proportionally. */
-							ActivityImpl end = new ActivityImpl(act);
+							Activity end = new ActivityImpl(act);
+							end.setStartTime(end.getStartTime() - Time.MIDNIGHT*(dayCount-1));
 							end.setEndTime(Time.MIDNIGHT);
 							segment.addActivity(end);
 							
@@ -101,44 +106,51 @@ public class PlanWrapper {
 												
 							/* Start a new segment. */
 							Activity start = new ActivityImpl(act);
-							start.setStartTime(Time.MIDNIGHT);
+							start.setStartTime(Time.parseTime("00:00:00"));
+							start.setEndTime(start.getEndTime() - Time.MIDNIGHT*(dayCount));
 							segment = new PlanImpl();
 							segment.addActivity(start);
-							index++;					
+							dayCount++;
+							index++;		
 						} else{
 							/* It is most probably the end of the chain. */
 							if(index != tmpPlan.getPlanElements().size()){
 								LOG.error("Non-minor activity in the middle of the chain: " 
 										+ act.getType() + ". Behaviour not guaranteed!!");
 							}
+							act.setStartTime(act.getStartTime() - Time.MIDNIGHT*(dayCount-1));
+							act.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount-1));
 							segment.addActivity(act);
 							PlanImpl p = new PlanImpl();
 							p.copyPlan(segment);
 							list.add(p);	
 							
 							/* Start a new segment. */
-							ActivityImpl start = new ActivityImpl(act);
+							Activity start = new ActivityImpl(act);
+							start.setStartTime(Time.parseTime("00:00:00"));
+							start.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount));
 							segment = new PlanImpl();
 							segment.addActivity(start);
+							dayCount++;
 							index++;
 						}
 					}
 				} else {
 					/* The activity starts in a new day. Add a dummy activity
-					 * midnight, the location being proportionally between the
-					 * two activities. */
+					 * at midnight, the location being proportionally between 
+					 * the two activities. */
 					Activity previousActivity = tmpPlan.getPreviousActivity(tmpPlan.getPreviousLeg(act));
-					double chopFraction = (Time.MIDNIGHT - previousActivity.getEndTime()) / (act.getStartTime() - previousActivity.getEndTime());
+					double chopFraction = (Time.MIDNIGHT*dayCount - previousActivity.getEndTime()) / (act.getStartTime() - previousActivity.getEndTime());
 					double distance = ((CoordImpl) act.getCoord()).calcDistance(previousActivity.getCoord()) * chopFraction;
 					double dy = act.getCoord().getY() - previousActivity.getCoord().getY();
 					double dx = act.getCoord().getX() - previousActivity.getCoord().getX();
 					double angle = Math.atan(dy / dx);
 					Coord coord = new CoordImpl(distance*Math.cos(angle), distance*Math.sin(angle));
 					
-					ActivityImpl chopEnd = new ActivityImpl("chopEnd", coord);
+					Activity chopEnd = new ActivityImpl("chopEnd", coord);
 					chopEnd.setEndTime(Time.MIDNIGHT);
-					ActivityImpl chopStart = new ActivityImpl("chopStart", coord);
-					chopStart.setEndTime(Time.MIDNIGHT);
+					Activity chopStart = new ActivityImpl("chopStart", coord);
+					chopStart.setEndTime(Time.parseTime("00:00:00"));
 					
 					/* Finish off the current segment. */
 					segment.addActivity(chopEnd);
@@ -150,11 +162,14 @@ public class PlanWrapper {
 					segment = new PlanImpl();
 					segment.addActivity(chopStart);
 					segment.addLeg(tmpPlan.getPreviousLeg(act));
+					Activity firstRealActivity = new ActivityImpl(act);
+					firstRealActivity.setStartTime(act.getStartTime() - Time.MIDNIGHT*dayCount);
+					firstRealActivity.setEndTime(act.getEndTime() - Time.MIDNIGHT*dayCount);
 					segment.addActivity(act);
 					
+					dayCount++;
 					index++;					
 				}
-				
 			}
 		}
 
