@@ -178,15 +178,14 @@ public class DreieckStreckeSzenario {
 
 	}
 	
-	private static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
+	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
+	public static double length = 500.;
 	
 	private Scenario scenario;
 	
-	private double length;
 	private int networkCapacity;//the capacity all links of the network will have
 	
 	public DreieckStreckeSzenario(double length, int networkCapacity){
-		this.length = length;
 		this.networkCapacity = networkCapacity;
 
 		Config config = ConfigUtils.createConfig();
@@ -209,6 +208,8 @@ public class DreieckStreckeSzenario {
 		createPopulation((long)200,3);
 		
 		EventsManager events = EventsUtils.createEventsManager();
+		FundamentalDiagramsV2 fundi2 = new FundamentalDiagramsV2(this.scenario);
+		events.addHandler(fundi2);
 		
 		runqsim(events);
 		//TODO:eventually complete this basic scheme with some data processing.
@@ -224,7 +225,7 @@ public class DreieckStreckeSzenario {
 			double x=0, y=0;
 			if (i>0){
 				for (int j=0; j<i; j++){
-					x += this.length/DreieckStreckeSzenario.subdivisionFactor;
+					x += DreieckStreckeSzenario.length/DreieckStreckeSzenario.subdivisionFactor;
 				}
 			}
 			Coord coord = scenario.createCoord(x, y);
@@ -235,8 +236,8 @@ public class DreieckStreckeSzenario {
 		}
 		//nodes of the triangle right side
 		for (int i = 0; i<DreieckStreckeSzenario.subdivisionFactor; i++){
-			double x = this.length - (this.length/(2*DreieckStreckeSzenario.subdivisionFactor))*(i+1);
-			double y = Math.sqrt(3.)*(this.length-x);
+			double x = DreieckStreckeSzenario.length - (DreieckStreckeSzenario.length/(2*DreieckStreckeSzenario.subdivisionFactor))*(i+1);
+			double y = Math.sqrt(3.)*(DreieckStreckeSzenario.length-x);
 			Coord coord = scenario.createCoord(x, y);
 			Id id = new IdImpl((long)(DreieckStreckeSzenario.subdivisionFactor+i+1));
 			
@@ -245,7 +246,7 @@ public class DreieckStreckeSzenario {
 		}
 		//nodes of the triangle left side
 		for (int i = 0; i<DreieckStreckeSzenario.subdivisionFactor-1; i++){
-			double x = this.length/2 - (this.length/(2*DreieckStreckeSzenario.subdivisionFactor))*(i+1);
+			double x = DreieckStreckeSzenario.length/2 - (DreieckStreckeSzenario.length/(2*DreieckStreckeSzenario.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*x;
 			Coord coord = scenario.createCoord(x, y);
 			Id id = new IdImpl((long)(2*DreieckStreckeSzenario.subdivisionFactor+i+1));
@@ -258,7 +259,7 @@ public class DreieckStreckeSzenario {
 		Id startId = new IdImpl(-1);
 		Node startNode = scenario.getNetwork().getFactory().createNode(startId, coord);
 		network.addNode(startNode);
-		coord = scenario.createCoord(this.length+50.0, 0.0);
+		coord = scenario.createCoord(DreieckStreckeSzenario.length+50.0, 0.0);
 		Id endId = new IdImpl(3*DreieckStreckeSzenario.subdivisionFactor);
 		Node endNode = scenario.getNetwork().getFactory().createNode(endId, coord);
 		network.addNode(endNode);
