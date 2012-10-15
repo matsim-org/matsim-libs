@@ -19,6 +19,15 @@ public class ExecutorPerfTest {
 		}
 	};
 
+	private TaskFactory getTaskFactory() {
+		return new TaskFactory() {
+			@Override
+			public RunnableCallable create() {
+				return new RandomGenerating();
+			}
+		};
+	}
+
 	private final class RandomGenerating implements RunnableCallable {
 		@Override
 		public void run() {
@@ -35,16 +44,17 @@ public class ExecutorPerfTest {
 	}
 
 	public class SeqTest implements Initializable {
+		private RunnableCallable task;
+
 		@Override
 		public void init() {
-			return;
+			task = getTaskFactory().create();
 		}
 
 		@Override
 		public void run() {
-			Random r = R.get();
-			for (int i = 0; i < ITERATIONS * nTasks * nSubTasks; i++)
-				r.nextDouble();
+			for (int i = 0; i < ITERATIONS * nTasks; i++)
+				task.run();
 		}
 
 		@Override
@@ -77,11 +87,13 @@ public class ExecutorPerfTest {
 
 		@Override
 		public void init() {
+			TaskFactory taskFactory = getTaskFactory();
 			Collection<Collection<RunnableCallable>> taskLists = new ArrayList<Collection<RunnableCallable>>(nTasks);
 			for (int k = 0; k < this.nThreads; k++) {
 				ArrayList<RunnableCallable> taskList = new ArrayList<RunnableCallable>();
-				for (int i = nTasks * k / this.nThreads; i < nTasks * (k+1) / this.nThreads; i++)
-					taskList.add(new RandomGenerating());
+				for (int i = nTasks * k / this.nThreads; i < nTasks * (k+1) / this.nThreads; i++) {
+					taskList.add(taskFactory.create());
+				}
 				taskLists.add(taskList);
 			}
 			es.init(taskLists);
@@ -111,9 +123,9 @@ public class ExecutorPerfTest {
 
 	private void start(String[] args) {
 		final Initializable r;
-		
+
 		System.out.printf("Size(%d, %d, %d): ", ITERATIONS, nTasks, this.nSubTasks);
-		
+
 		if (args.length == 1) {
 			System.out.printf("SeqTest(1, plain): ");
 			r = new SeqTest();
