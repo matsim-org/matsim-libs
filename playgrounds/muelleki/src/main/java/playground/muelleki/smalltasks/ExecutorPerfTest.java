@@ -61,6 +61,8 @@ public class ExecutorPerfTest {
 				es = new SmallTaskExecutorServicePrefWithAtomicInteger(nThreads);
 			else if (name.equalsIgnoreCase("prefintdc"))
 				es = new SmallTaskExecutorServicePrefWithAtomicIntegerDC(nThreads);
+			else if (name.equalsIgnoreCase("prescheduled"))
+				es = new SmallTaskExecutorServicePrescheduled(nThreads);
 			else
 				throw new IllegalArgumentException("Unknown small task executor: " + name);
 		}
