@@ -10,14 +10,19 @@ public class ExecutorPerfTest {
 	private static final int TOTAL_TASKS = ITERATIONS * 1000000;
 	private final int nTasks;
 	private final int nSubTasks;
+	private final String taskType;
 
 	private TaskFactory getTaskFactory() {
-		return new TaskFactory() {
-			@Override
-			public RunnableCallable create() {
-				return new RandomGenerating(nSubTasks);
-			}
-		};
+		if (taskType == "random") {
+			return new TaskFactory() {
+				@Override
+				public RunnableCallable create() {
+					return new RandomGenerating(nSubTasks);
+				}
+			};
+		}
+
+		throw new IllegalArgumentException("Unknown task type: " + taskType);
 	}
 
 	public class SeqTest implements Initializable {
@@ -88,7 +93,8 @@ public class ExecutorPerfTest {
 		}
 	}
 
-	public ExecutorPerfTest(int nSubTasks) {
+	public ExecutorPerfTest(String taskType, int nSubTasks) {
+		this.taskType = taskType;
 		this.nTasks = TOTAL_TASKS / ITERATIONS / nSubTasks;
 		this.nSubTasks = nSubTasks;
 	}
@@ -97,6 +103,7 @@ public class ExecutorPerfTest {
 		static int c = 0;
 		@SuppressWarnings("unused")
 		public static final int d = 0
+		, TASKTYPE = c++
 		, SUBTASKS = c++
 		, THREADS = c++
 		, NAME = c++
@@ -104,14 +111,14 @@ public class ExecutorPerfTest {
 	}
 
 	public static void main(String[] args) {
-		ExecutorPerfTest executorPerfTest = new ExecutorPerfTest(Integer.parseInt(args[Args.SUBTASKS]));
+		ExecutorPerfTest executorPerfTest = new ExecutorPerfTest(args[Args.TASKTYPE], Integer.parseInt(args[Args.SUBTASKS]));
 		executorPerfTest.start(args);
 	}
 
 	private void start(String[] args) {
 		final Initializable r;
 
-		System.out.printf("Size(%s, %d, %d, %d): ", ITERATIONS, nTasks, this.nSubTasks);
+		System.out.printf("Size(%s, %d, %d, %d): ", taskType, ITERATIONS, nTasks, this.nSubTasks);
 
 		if (args.length == 1) {
 			System.out.printf("SeqTest(1, plain): ");
