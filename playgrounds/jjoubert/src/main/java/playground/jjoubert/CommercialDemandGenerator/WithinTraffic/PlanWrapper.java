@@ -175,18 +175,19 @@ public class PlanWrapper {
 
 		/* Run through the list of plans, and update all activity times 
 		 * of those in subsequent days. */
-		for(Plan subplan : list){
-			int daysToSubtract = (int) Math.floor(((PlanImpl)subplan).getFirstActivity().getStartTime() / Time.MIDNIGHT);
-			for(int i = 0; i < daysToSubtract; i++){
-				for(PlanElement pe : subplan.getPlanElements()){
-					if(pe instanceof Activity){
-						Activity act = (Activity)pe;
-						act.setStartTime(act.getStartTime() - daysToSubtract*Time.MIDNIGHT);
-						act.setEndTime(act.getEndTime() - daysToSubtract*Time.MIDNIGHT);
-					}
-				}
-			}
-		}
+		/*TODO I don't think this is necessary anymore. */
+//		for(Plan subplan : list){
+//			int daysToSubtract = (int) Math.floor(((PlanImpl)subplan).getFirstActivity().getStartTime() / Time.MIDNIGHT);
+//			for(int i = 0; i < daysToSubtract; i++){
+//				for(PlanElement pe : subplan.getPlanElements()){
+//					if(pe instanceof Activity){
+//						Activity act = (Activity)pe;
+//						act.setStartTime(act.getStartTime() - daysToSubtract*Time.MIDNIGHT);
+//						act.setEndTime(act.getEndTime() - daysToSubtract*Time.MIDNIGHT);
+//					}
+//				}
+//			}
+//		}
 		return list;
 	}	
 	
