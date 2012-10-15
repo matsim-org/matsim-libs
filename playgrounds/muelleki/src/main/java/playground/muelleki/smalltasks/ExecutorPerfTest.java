@@ -53,12 +53,14 @@ public class ExecutorPerfTest {
 			this.nThreads = nThreads;
 			if (name.equalsIgnoreCase("simple"))
 				es = new SmallTaskExecutorServiceSimple(nThreads);
-			else if (name.equalsIgnoreCase("prefint"))
-				es = new SmallTaskExecutorServicePrefWithAtomicInteger(nThreads);
 			else if (name.equalsIgnoreCase("prefintarray"))
 				es = new SmallTaskExecutorServicePrefWithAtomicIntegerArray(nThreads);
 			else if (name.equalsIgnoreCase("vanilla"))
 				es = new SmallTaskExecutorServiceVanilla(nThreads);
+			else if (name.equalsIgnoreCase("prefint"))
+				es = new SmallTaskExecutorServicePrefWithAtomicInteger(nThreads);
+			else if (name.equalsIgnoreCase("prefintdc"))
+				es = new SmallTaskExecutorServicePrefWithAtomicIntegerDC(nThreads);
 			else
 				throw new IllegalArgumentException("Unknown small task executor: " + name);
 		}
