@@ -19,6 +19,21 @@ public class ExecutorPerfTest {
 		}
 	};
 
+	private final class RandomGenerating implements RunnableCallable {
+		@Override
+		public void run() {
+			Random r = R.get();
+			for (int j = 0; j < nSubTasks; j++)
+				r.nextDouble();
+		}
+
+		@Override
+		public Object call() throws Exception {
+			run();
+			return null;
+		}
+	}
+
 	public class SeqTest implements Initializable {
 		@Override
 		public void init() {
@@ -39,21 +54,6 @@ public class ExecutorPerfTest {
 	}
 
 	public class ExecutorTest implements Initializable {
-		private final class RandomGenerating implements RunnableCallable {
-			@Override
-			public void run() {
-				Random r = R.get();
-				for (int j = 0; j < nSubTasks; j++)
-					r.nextDouble();
-			}
-
-			@Override
-			public Object call() throws Exception {
-				run();
-				return null;
-			}
-		}
-
 		private final SmallTaskExecutorService es;
 		private final int nThreads;
 
