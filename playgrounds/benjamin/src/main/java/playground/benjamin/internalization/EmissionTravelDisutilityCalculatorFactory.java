@@ -30,7 +30,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import playground.benjamin.emissions.EmissionModule;
+import playground.emissions.EmissionModule;
 
 /**
  * @author benjamin

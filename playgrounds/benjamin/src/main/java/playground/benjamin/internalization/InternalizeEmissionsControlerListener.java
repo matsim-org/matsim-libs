@@ -35,7 +35,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.benjamin.emissions.EmissionModule;
+import playground.emissions.EmissionModule;
 
 /**
  * @author benjamin

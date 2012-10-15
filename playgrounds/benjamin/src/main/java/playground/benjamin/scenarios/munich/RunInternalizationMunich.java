@@ -25,10 +25,10 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.benjamin.emissions.EmissionModule;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
+import playground.emissions.EmissionModule;
 
 /**
  * @author benjamin

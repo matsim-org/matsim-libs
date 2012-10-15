@@ -57,12 +57,12 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.emissions.events.EmissionEventsReader;
-import playground.benjamin.emissions.types.ColdPollutant;
-import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkWarmEventHandler;
+import playground.emissions.events.EmissionEventsReader;
+import playground.emissions.types.ColdPollutant;
+import playground.emissions.types.WarmPollutant;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
