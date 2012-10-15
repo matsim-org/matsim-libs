@@ -37,10 +37,11 @@ public class ConvertToCsv extends MatsimXmlParser implements MatsimSomeReader {
 	int numberOfPrices = 0;
 	double priceSum = 0;
 	double maxPrice = 0;
+	private String separater;
 
 	public ConvertToCsv() {
 		super(false);
-		System.out.println("lat,lng,num,name");
+		System.out.println("name" + separater + "lat" + separater + "lng" + separater + "num" + separater + "price");
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class ConvertToCsv extends MatsimXmlParser implements MatsimSomeReader {
 						double hourlyPrice = parsedAmount / numberOfMins * 60;
 
 						if (hourlyPrice > 30) {
-							System.out.println("###" + duration + " -> " + hours + " -> " + atts.getValue("amount"));
+							//System.out.println("###" + duration + " -> " + hours + " -> " + atts.getValue("amount"));
 						}
 
 						priceSum += hourlyPrice;
@@ -162,7 +163,8 @@ public class ConvertToCsv extends MatsimXmlParser implements MatsimSomeReader {
 				pricePrint = "";
 			}
 
-			System.out.println(this.name + "," + lat + "," + lng + "," + numPrint + "," + pricePrint);
+			separater = "$";
+			System.out.println(this.name + separater + lat + separater + lng + separater + numPrint + separater + pricePrint);
 			totalNumberOfParking++;
 		}
 
