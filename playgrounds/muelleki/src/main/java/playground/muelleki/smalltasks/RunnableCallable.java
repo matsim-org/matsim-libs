@@ -2,6 +2,10 @@ package playground.muelleki.smalltasks;
 
 import java.util.concurrent.Callable;
 
-public interface RunnableCallable extends Runnable, Callable<Object> {
-
+public abstract class RunnableCallable implements Runnable, Callable<Object> {
+	@Override
+	public Object call() throws Exception {
+		run();
+		return null;
+	}
 }

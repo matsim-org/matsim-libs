@@ -28,18 +28,12 @@ public class ExecutorPerfTest {
 		};
 	}
 
-	private final class RandomGenerating implements RunnableCallable {
+	private final class RandomGenerating extends RunnableCallable {
 		@Override
 		public void run() {
 			Random r = R.get();
 			for (int j = 0; j < nSubTasks; j++)
 				r.nextDouble();
-		}
-
-		@Override
-		public Object call() throws Exception {
-			run();
-			return null;
 		}
 	}
 
