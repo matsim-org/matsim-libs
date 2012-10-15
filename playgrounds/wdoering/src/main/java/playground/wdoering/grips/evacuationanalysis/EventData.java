@@ -39,8 +39,8 @@ public class EventData {
 	private QuadTree<Cell> cellTree;
 	private List<Tuple<Double, Integer>> arrivalTimes;
 	private Rect boundingBox;
-	private HashMap<Id, List<Double>> linkLeaveTimes;
-	private HashMap<Id, List<Double>> linkEnterTimes;
+	private HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes;
+	private HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes;
 	private int maxUtilization;
 	
 	public EventData(String eventName, QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Tuple<Double,Integer>> arrivalTimes, Rect boundingBox) {
@@ -121,20 +121,20 @@ public class EventData {
 	}
 
 
-	public void setLinkEnterTimes(HashMap<Id, List<Double>> linkEnterTimes) {
+	public void setLinkEnterTimes(HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes) {
 		this.linkEnterTimes = linkEnterTimes;
 	}
 
 
-	public void setLinkLeaveTimes(HashMap<Id, List<Double>> linkLeaveTimes) {
+	public void setLinkLeaveTimes(HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes) {
 		this.linkLeaveTimes = linkLeaveTimes;
 	}
 	
-	public HashMap<Id, List<Double>> getLinkEnterTimes() {
+	public HashMap<Id, List<Tuple<Id,Double>>> getLinkEnterTimes() {
 		return linkEnterTimes;
 	}
 	
-	public HashMap<Id, List<Double>> getLinkLeaveTimes() {
+	public HashMap<Id, List<Tuple<Id,Double>>> getLinkLeaveTimes() {
 		return linkLeaveTimes;
 	}
 

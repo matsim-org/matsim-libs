@@ -55,6 +55,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -589,12 +590,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			if (mode.equals(Mode.UTILIZATION))
 			{
 			
-				HashMap<Id, List<Double>> linkLeaveTimes = data.getLinkLeaveTimes();
-				HashMap<Id, List<Double>> linkEnterTimes = data.getLinkEnterTimes();
+				HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes = data.getLinkLeaveTimes();
+				HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes = data.getLinkEnterTimes();
 				for (Link link : this.links)
 				{
-					List<Double> leaveTimes = linkLeaveTimes.get(link.getId());
-					List<Double> enterTimes = linkEnterTimes.get(link.getId());
+					List<Tuple<Id,Double>> leaveTimes = linkLeaveTimes.get(link.getId());
+					List<Tuple<Id,Double>> enterTimes = linkEnterTimes.get(link.getId());
 					
 					if ((enterTimes != null) && (enterTimes.size() > 0) && (leaveTimes!=null))
 					{

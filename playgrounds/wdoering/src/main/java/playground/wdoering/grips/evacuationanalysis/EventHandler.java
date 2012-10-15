@@ -104,8 +104,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private Rect boundingBox;
 	private String eventName;
 	
-	private HashMap<Id, List<Double>> linkEnterTimes;
-	private HashMap<Id, List<Double>> linkLeaveTimes;
+	private HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes;
+	private HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes;
 	
 	
 
@@ -125,8 +125,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.timeSum = 0;
 		this.maxUtilization = 0;
 		this.maxCellTimeSum = Double.NEGATIVE_INFINITY;
-		this.linkEnterTimes = new HashMap<Id, List<Double>>();
-		this.linkLeaveTimes = new HashMap<Id, List<Double>>();
+		this.linkEnterTimes = new HashMap<Id, List<Tuple<Id,Double>>>();
+		this.linkLeaveTimes = new HashMap<Id, List<Tuple<Id,Double>>>();
 		
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -286,6 +286,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	{
 		//get link id
 		Id linkId = event.getLinkId();
+		Id personId = event.getPersonId();
 		
 		//get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -300,12 +301,13 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		maxUtilization = Math.max(maxUtilization, enterCount);
 		
 		//update global link enter times
-		List<Double> times;
+		List<Tuple<Id,Double>> times;
 		if (linkEnterTimes.containsKey(linkId))
 			times = linkEnterTimes.get(linkId);
 		else
-			times = new LinkedList<Double>();
-		times.add(event.getTime());
+			times = new LinkedList<Tuple<Id,Double>>();
+		times.add(new Tuple(personId,event.getTime()));
+		
 		linkEnterTimes.put(linkId, times);
 		
 		
@@ -317,6 +319,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	{
 		//get link id
 		Id linkId = event.getLinkId();
+		Id personId = event.getPersonId();
 		
 		//get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -327,13 +330,13 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		cell.addLinkLeaveTime(event.getTime());
 		
 		//update global link leave times
-		List<Double> times;
+		List<Tuple<Id,Double>> times;
 		if (linkLeaveTimes.containsKey(linkId))
 			times = linkLeaveTimes.get(linkId);
 		else
-			times = new LinkedList<Double>();
+			times = new LinkedList<Tuple<Id,Double>>();
+		times.add(new Tuple(personId,event.getTime()));
 		
-		times.add(event.getTime());
 		linkLeaveTimes.put(linkId, times);
 	}
 	
