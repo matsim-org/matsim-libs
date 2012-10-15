@@ -93,23 +93,33 @@ public class ExecutorPerfTest {
 		this.nSubTasks = nSubTasks;
 	}
 
+	private static class Args {
+		static int c = 0;
+		@SuppressWarnings("unused")
+		public static final int d = 0
+		, SUBTASKS = c++
+		, THREADS = c++
+		, NAME = c++
+		;
+	}
+
 	public static void main(String[] args) {
-		ExecutorPerfTest executorPerfTest = new ExecutorPerfTest(Integer.parseInt(args[0]));
+		ExecutorPerfTest executorPerfTest = new ExecutorPerfTest(Integer.parseInt(args[Args.SUBTASKS]));
 		executorPerfTest.start(args);
 	}
 
 	private void start(String[] args) {
 		final Initializable r;
 
-		System.out.printf("Size(%d, %d, %d): ", ITERATIONS, nTasks, this.nSubTasks);
+		System.out.printf("Size(%s, %d, %d, %d): ", ITERATIONS, nTasks, this.nSubTasks);
 
 		if (args.length == 1) {
 			System.out.printf("SeqTest(1, plain): ");
 			r = new SeqTest();
 		}
 		else {
-			final int nThreads = Integer.parseInt(args[1]);
-			String name = args[2];
+			final int nThreads = Integer.parseInt(args[Args.THREADS]);
+			String name = args[Args.NAME];
 			System.out.printf("ExecutorTest(%d, %s): ", nThreads, name);
 			r = new ExecutorTest(nThreads, name);
 		}
