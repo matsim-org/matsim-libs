@@ -30,10 +30,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import playground.benjamin.emissions.events.EmissionEventsReader;
-import playground.benjamin.emissions.types.ColdPollutant;
-import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
+import playground.emissions.events.EmissionEventsReader;
+import playground.emissions.types.ColdPollutant;
+import playground.emissions.types.WarmPollutant;
 
 
 /**
