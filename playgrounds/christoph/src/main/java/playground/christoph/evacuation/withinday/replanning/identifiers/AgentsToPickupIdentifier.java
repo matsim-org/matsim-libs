@@ -63,6 +63,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -105,6 +106,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final Set<Id> carLegPerformingAgents;
 	private final Set<Id> walkLegPerformingAgents;
 	private final Set<Id> insecureWalkLegPerformingAgents;
+	private final InformedAgentsTracker informedAgentsTracker;
 	private final DecisionDataProvider decisionDataProvider;
 	
 	
@@ -115,15 +117,16 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final Queue<Tuple<Double, MobsimAgent>> agentsLeaveLinkQueue = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
 
 	/*package*/ AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, TravelTime walkTravelTime,
-			DecisionDataProvider decisionDataProvider) {
+			InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
+		this.informedAgentsTracker = informedAgentsTracker;
 		this.walkTravelTime = walkTravelTime;
 
 		this.agents = new HashMap<Id, MobsimAgent>();
 		this.earliestLinkLeaveTime = new HashMap<Id, Double>();
-		this.carLegPerformingAgents= new HashSet<Id>();
+		this.carLegPerformingAgents = new HashSet<Id>();
 		this.walkLegPerformingAgents = new HashSet<Id>();
 		this.insecureWalkLegPerformingAgents = new HashSet<Id>();
 		this.decisionDataProvider = decisionDataProvider;
@@ -187,6 +190,12 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 								" was found in VehiclesTracker at time " + time + "!");
 					}
 					Id driverId = driver.getId();
+					
+					/*
+					 * Check whether the driver is already informed. If not, we ignore him since he
+					 * might change its destination after being informed to a not secure location.
+					 */
+					if (!this.informedAgentsTracker.isAgentInformed(driverId)) continue;
 					
 					Id driversDestinationLinkId = driver.getDestinationLinkId();
 
@@ -354,9 +363,13 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 				this.agentsLeaveLinkQueue.add(new Tuple<Double, MobsimAgent>(departureTime, agent));
 			}
 		} else if (this.carLegPerformingAgents.contains(event.getPersonId())) {
-			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-			double minTravelTime = Math.floor(link.getLength() / link.getFreespeed(event.getTime()));
-			this.earliestLinkLeaveTime.put(event.getPersonId(), event.getTime() + minTravelTime);
+			
+//			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
+//			double minTravelTime = Math.floor(link.getLength() / link.getFreespeed(event.getTime()));
+//			this.earliestLinkLeaveTime.put(event.getPersonId(), event.getTime() + minTravelTime);
+			QVehicle vehicle = (QVehicle) this.vehiclesTracker.getVehicle(event.getVehicleId());
+			vehicle.getEarliestLinkExitTime();
+			this.earliestLinkLeaveTime.put(event.getPersonId(), vehicle.getEarliestLinkExitTime());
 		}
 	}
 

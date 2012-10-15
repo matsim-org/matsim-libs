@@ -186,14 +186,14 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	private void checkDeparture(JointDeparture jointDeparture, QVehicle vehicle) {
 		if (!vehicle.getCurrentLink().getId().equals(jointDeparture.getLinkId())) {
 			throw new RuntimeException("JointDeparture " + jointDeparture.getId().toString() +
-					"Vehicle " + vehicle.getId().toString() + 
+					"V ehicle " + vehicle.getId().toString() + 
 					" is at link " + vehicle.getCurrentLink().getId().toString() +
 					" but was scheduled to be at " + jointDeparture.getLinkId().toString() +
 					"!");
 		}
 		if (!vehicle.getDriver().getId().equals(jointDeparture.getDriverId())) {
 			throw new RuntimeException("JointDeparture " + jointDeparture.getId().toString() +
-					"Vehicle " + vehicle.getId().toString() + 
+					" Vehicle " + vehicle.getId().toString() + 
 					" has driver " + vehicle.getDriver().getId().toString() +
 					" but agent " + jointDeparture.getDriverId().toString() +
 					" was scheduled as driver!");
@@ -201,7 +201,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		for (PassengerAgent passenger : vehicle.getPassengers()) {
 			if (!jointDeparture.getPassengerIds().contains(passenger.getId())) {
 				throw new RuntimeException("JointDeparture " + jointDeparture.getId().toString() +
-						"Passenger " + passenger.getId().toString() + 
+						" Passenger " + passenger.getId().toString() + 
 						" found in vehicle " + vehicle.getId().toString() +
 						" but was not scheduled as passenger!");
 			}

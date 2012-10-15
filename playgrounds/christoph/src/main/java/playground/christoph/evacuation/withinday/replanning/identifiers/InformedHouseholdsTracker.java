@@ -88,6 +88,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 	}
 	
 	public boolean isHouseholdInformed(Id id) {
+		if (allHouseholdsInformed) return true;
 		return this.informedHouseholds.contains(id);
 	}
 

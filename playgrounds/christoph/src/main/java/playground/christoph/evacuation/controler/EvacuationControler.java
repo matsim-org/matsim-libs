@@ -31,7 +31,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -40,7 +39,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -52,7 +50,6 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeF
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -140,7 +137,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 
 	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
 	
-	protected boolean adaptOriginalPlans = false;
+	protected boolean adaptOriginalPlans = true;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -212,6 +209,13 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 
 	public EvacuationControler(String[] args) {
 		super(args);
+		
+		/*
+		 * Change the persons' plans. Doing so might simplify bug-tracking.
+		 */
+		if (adaptOriginalPlans) {
+			ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+		}
 		
 		/*
 		 * Set ride_passenger mode in PassengerDepartureHandler
@@ -523,27 +527,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			
-		this.initReplanners((QSim)e.getQueueSimulation());
-		
-		/*
-		 * We replace the selected plan of each agent with the executed plan which
-		 * is adapted by the within day replanning modules.
-		 * So far, this is necessary because some modules, like e.g. EventsToScore,
-		 * use person.getSelectedPlan(). However, when using within-day replanning
-		 * the selected plan might be different than the executed plan which
-		 * in turn will result in code that crashes...
-		 */
-		if (adaptOriginalPlans) {
-			for (MobsimAgent agent : ((QSim)e.getQueueSimulation()).getAgents()) {
-				if (agent instanceof ExperimentalBasicWithindayAgent) {
-					Plan executedPlan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
-					PersonImpl person = (PersonImpl)((ExperimentalBasicWithindayAgent) agent).getPerson();
-					person.removePlan(person.getSelectedPlan());
-					person.addPlan(executedPlan);
-					person.setSelectedPlan(executedPlan);
-				}
-			}
-		}	
+		this.initReplanners((QSim)e.getQueueSimulation());		
 	}
 	
 	@Override
@@ -629,7 +613,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
 		
 		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, 
-				this.walkTravelTime, this.decisionDataProvider); 
+				this.walkTravelTime, this.informedHouseholdsTracker, this.decisionDataProvider); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.agentsToPickupIdentifier = duringLegFactory.createIdentifier();
 		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);

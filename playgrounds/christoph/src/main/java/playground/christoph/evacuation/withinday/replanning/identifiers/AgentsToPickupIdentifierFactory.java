@@ -35,21 +35,23 @@ public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory 
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final TravelTime travelTime;
+	private final InformedAgentsTracker informedAgentsTracker;
 	private final DecisionDataProvider decisionDataProvider;
 	
 	public AgentsToPickupIdentifierFactory(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, 
-			TravelTime walkTravelTime, DecisionDataProvider decisionDataProvider) {
+			TravelTime walkTravelTime, InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.travelTime = walkTravelTime;
+		this.informedAgentsTracker = informedAgentsTracker;
 		this.decisionDataProvider = decisionDataProvider;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, coordAnalyzer.createInstance(), 
-				vehiclesTracker, travelTime, decisionDataProvider);
+				vehiclesTracker, travelTime, informedAgentsTracker, decisionDataProvider);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

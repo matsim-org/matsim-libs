@@ -85,7 +85,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier implements Li
 		this.vehiclesTracker = vehiclesTracker;
 
 		this.agents = new HashMap<Id, MobsimAgent>();
-		this.carLegPerformingAgents= new HashSet<Id>();
+		this.carLegPerformingAgents = new HashSet<Id>();
 		this.potentialDropOffVehicles = new HashSet<Id>();
 	}
 
@@ -99,6 +99,15 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier implements Li
 			QVehicle vehicle = (QVehicle) this.vehiclesTracker.getVehicle(vehicleId);
 			agentsLeaveVehicle.clear();
 			driverFilterSet.clear();
+			
+			/*
+			 * If the link is very short (min travel time < 1 second), the vehicle is already 
+			 * in the outgoing buffer and therefore cannot stop at the current link anymore.
+			 * Probably "vehicle.getEarliestLinkExitTime() < time" would be also fine...
+			 */
+			if (vehicle.getEarliestLinkExitTime() <= time) {
+				continue;
+			}
 			
 			// identify passengers that have a different destination than the driver
 			MobsimDriverAgent driver = vehicle.getDriver();

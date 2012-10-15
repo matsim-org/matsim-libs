@@ -82,10 +82,12 @@ public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListen
 	}
 	
 	public boolean isAgentInformed(Id id) {
+		if (allAgentsInformed) return true;
 		return this.informedAgents.contains(id);
 	}
 	
 	public boolean isAgentNotInformed(Id id) {
+		if (allAgentsInformed) return false;
 		return this.notInformedAgents.contains(id);
 	}
 	
