@@ -2,7 +2,6 @@ package playground.muelleki.smalltasks;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 public class ExecutorPerfTest {
 	private static final int RUNS = 3;
@@ -26,7 +25,7 @@ public class ExecutorPerfTest {
 			return new TaskFactory() {
 				@Override
 				public RunnableCallable create() {
-					return new Copier(nSubTasks, RUNS * TOTAL_TASKS);
+					return new Copier(nSubTasks);
 				}
 			};
 		}
@@ -82,9 +81,9 @@ public class ExecutorPerfTest {
 			Collection<Collection<RunnableCallable>> taskLists = new ArrayList<Collection<RunnableCallable>>(nTasks);
 			for (int k = 0; k < this.nThreads; k++) {
 				ArrayList<RunnableCallable> taskList = new ArrayList<RunnableCallable>();
-				for (int i = nTasks * k / this.nThreads; i < nTasks * (k+1) / this.nThreads; i++) {
-					taskList.add(taskFactory.create());
-				}
+				RunnableCallable task = taskFactory.create();
+				for (int i = nTasks * k / this.nThreads; i < nTasks * (k+1) / this.nThreads; i++)
+					taskList.add(task);
 				taskLists.add(taskList);
 			}
 			es.init(taskLists);
@@ -129,7 +128,7 @@ public class ExecutorPerfTest {
 
 		System.out.printf("Size(%s, %d, %d, %d): ", taskType, ITERATIONS, nTasks, this.nSubTasks);
 
-		if (args.length == 1) {
+		if (args.length == Args.THREADS) {
 			System.out.printf("SeqTest(1, plain): ");
 			r = new SeqTest();
 		}
@@ -139,25 +138,17 @@ public class ExecutorPerfTest {
 			System.out.printf("ExecutorTest(%d, %s): ", nThreads, name);
 			r = new ExecutorTest(nThreads, name);
 		}
-		ArrayList<Long> TimeStamps = new ArrayList<Long>(20);
-		TimeStamps.add(System.nanoTime());
+		
+		TimeKeeper t = new TimeKeeper();
 		r.init();
-		TimeStamps.add(System.nanoTime());
+		System.out.printf("%d, ", t.add());
 		for (int i = 0; i < RUNS; i++) {
 			r.run();
-			TimeStamps.add(System.nanoTime());
+			System.out.printf("%d, ", t.add());
 		}
 		r.shutdown();
-		TimeStamps.add(System.nanoTime());
+		System.out.printf("%d, ", t.add());
 		System.gc();
-		TimeStamps.add(System.nanoTime());
-		Iterator<Long> it = TimeStamps.iterator();
-		long t = it.next();
-		while (it.hasNext()) {
-			long tn = it.next();
-			System.out.printf("%d, ", tn - t);
-			t = tn;
-		}
-		System.out.printf("\n", TimeStamps.toString());
+		System.out.printf("%d\n", t.add());
 	}
 }
