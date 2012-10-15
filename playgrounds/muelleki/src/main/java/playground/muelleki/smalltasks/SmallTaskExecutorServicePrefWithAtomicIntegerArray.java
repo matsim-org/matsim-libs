@@ -3,8 +3,6 @@ package playground.muelleki.smalltasks;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class SmallTaskExecutorServicePrefWithAtomicIntegerArray implements SmallTaskExecutorService {
@@ -18,6 +16,9 @@ public class SmallTaskExecutorServicePrefWithAtomicIntegerArray implements Small
 		@Override
 		public Integer call() throws Exception {
 			int nTasks = 0;
+			int nThreads = helper.getNThreads();
+			ArrayList<ArrayList<Runnable>> taskLists = helper.taskLists;
+
 			for (int i = thread;;) {
 				ArrayList<Runnable> taskList = taskLists.get(i);
 				int task;
@@ -36,33 +37,34 @@ public class SmallTaskExecutorServicePrefWithAtomicIntegerArray implements Small
 		}
 	}
 
-	private final ExecutorService threadPool;
-	private ArrayList<ArrayList<Runnable>> taskLists;
+	final SmallTaskExecutorHelper helper;
+	private Collection<Callable<Integer>> superTasks;
+
 	private AtomicIntegerArray currentTasks;
-	private final int nThreads;
 
 	public SmallTaskExecutorServicePrefWithAtomicIntegerArray(int nThreads) {
-		this.nThreads = nThreads;
-		threadPool = Executors.newFixedThreadPool(nThreads);
+		helper = new SmallTaskExecutorHelper(nThreads);
+		superTasks = new ArrayList<Callable<Integer>>(nThreads);
+		for (int i = 0; i < nThreads; i++)
+			superTasks.add(new SuperTask(i));
+
 		currentTasks = new AtomicIntegerArray(nThreads);
 	}
 
-	public void invokeAll(Collection<Collection<RunnableCallable>> tasks) throws InterruptedException {
-		if (tasks.size() != nThreads)
-			throw new IllegalArgumentException("Size of collection must match number of threads.");
-		this.taskLists = new ArrayList<ArrayList<Runnable>>(tasks.size());
-		for (Collection<RunnableCallable> r : tasks)
-			this.taskLists.add(new ArrayList<Runnable>(r));
-		for (int i = 0; i < nThreads; i++)
-			currentTasks.set(i, 0);
-
-		Collection<Callable<Integer>> superTasks = new ArrayList<Callable<Integer>>(nThreads);
-		for (int i = 0; i < nThreads; i++)
-			superTasks.add(new SuperTask(i));
-		threadPool.invokeAll(superTasks);
+	@Override
+	public void init(Collection<Collection<RunnableCallable>> tasks) {
+		helper.doInit(tasks);
 	}
 
+	@Override
+	public void invokeAll() {
+		for (int i = 0; i < helper.getNThreads(); i++)
+			currentTasks.set(i, 0);
+		helper.doInvokeAll(superTasks);
+	}
+
+	@Override
 	public void shutdown() {
-		threadPool.shutdown();
+		helper.doShutdown();
 	}
 }

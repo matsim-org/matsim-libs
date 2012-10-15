@@ -54,7 +54,6 @@ public class ExecutorPerfTest {
 		}
 
 		private final SmallTaskExecutorService es;
-		private Collection<Collection<RunnableCallable>> taskLists = new ArrayList<Collection<RunnableCallable>>(nTasks);
 		private final int nThreads;
 
 		public ExecutorTest(int nThreads, String name) {
@@ -77,21 +76,19 @@ public class ExecutorPerfTest {
 
 		@Override
 		public void init() {
+			Collection<Collection<RunnableCallable>> taskLists = new ArrayList<Collection<RunnableCallable>>(nTasks);
 			for (int k = 0; k < this.nThreads; k++) {
 				ArrayList<RunnableCallable> taskList = new ArrayList<RunnableCallable>();
 				for (int i = nTasks * k / this.nThreads; i < nTasks * (k+1) / this.nThreads; i++)
 					taskList.add(new RandomGenerating());
 				taskLists.add(taskList);
 			}
+			es.init(taskLists);
 		}
 
 		@Override
 		public void run() {
-			try {
-				es.invokeAll(taskLists);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
+			es.invokeAll();
 		}
 
 		@Override

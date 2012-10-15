@@ -4,8 +4,9 @@ import java.util.Collection;
 
 public interface SmallTaskExecutorService {
 
-	public abstract void invokeAll(Collection<Collection<RunnableCallable>> tasks)
-			throws InterruptedException;
+	public abstract void init(Collection<Collection<RunnableCallable>> tasks);
+
+	public abstract void invokeAll();
 
 	public abstract void shutdown();
 

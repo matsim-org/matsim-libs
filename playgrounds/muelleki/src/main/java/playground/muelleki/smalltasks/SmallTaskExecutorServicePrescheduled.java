@@ -3,8 +3,6 @@ package playground.muelleki.smalltasks;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SmallTaskExecutorServicePrescheduled implements SmallTaskExecutorService {
 	private final class SuperTask implements Callable<Integer> {
@@ -17,6 +15,8 @@ public class SmallTaskExecutorServicePrescheduled implements SmallTaskExecutorSe
 		@Override
 		public Integer call() throws Exception {
 			int nTasks = 0;
+			ArrayList<ArrayList<Runnable>> taskLists = helper.taskLists;
+
 			int i = thread;
 			ArrayList<Runnable> taskList = taskLists.get(i);
 			
@@ -29,30 +29,27 @@ public class SmallTaskExecutorServicePrescheduled implements SmallTaskExecutorSe
 		}
 	}
 
-	private final ExecutorService threadPool;
-	private ArrayList<ArrayList<Runnable>> taskLists;
-	private final int nThreads;
+	final SmallTaskExecutorHelper helper;
+	private Collection<Callable<Integer>> superTasks;
 
 	public SmallTaskExecutorServicePrescheduled(int nThreads) {
-		this.nThreads = nThreads;
-		threadPool = Executors.newFixedThreadPool(nThreads);
+		helper = new SmallTaskExecutorHelper(nThreads);
+		superTasks = new ArrayList<Callable<Integer>>(nThreads);
+		for (int i = 0; i < nThreads; i++)
+			superTasks.add(new SuperTask(i));
+	}
+
+	@Override
+	public void init(Collection<Collection<RunnableCallable>> tasks) {
+		helper.doInit(tasks);
 	}
 
 	/* (non-Javadoc)
 	 * @see playground.muelleki.perftests.SmallTaskExecutorService#invokeAll(java.util.Collection)
 	 */
 	@Override
-	public void invokeAll(Collection<Collection<RunnableCallable>> tasks) throws InterruptedException {
-		if (tasks.size() != nThreads)
-			throw new IllegalArgumentException("Size of collection must match number of threads.");
-		this.taskLists = new ArrayList<ArrayList<Runnable>>(tasks.size());
-		for (Collection<RunnableCallable> r : tasks)
-			this.taskLists.add(new ArrayList<Runnable>(r));
-
-		Collection<Callable<Integer>> superTasks = new ArrayList<Callable<Integer>>(nThreads);
-		for (int i = 0; i < nThreads; i++)
-			superTasks.add(new SuperTask(i));
-		threadPool.invokeAll(superTasks);
+	public void invokeAll() {
+		helper.doInvokeAll(superTasks);
 	}
 
 	/* (non-Javadoc)
@@ -60,6 +57,6 @@ public class SmallTaskExecutorServicePrescheduled implements SmallTaskExecutorSe
 	 */
 	@Override
 	public void shutdown() {
-		threadPool.shutdown();
+		helper.doShutdown();
 	}
 }
