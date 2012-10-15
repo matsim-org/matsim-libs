@@ -7,7 +7,8 @@ import java.util.Random;
 
 public class ExecutorPerfTest {
 	private static final int RUNS = 3;
-	private static final int TOTAL_TASKS = 20000000;
+	private static final int ITERATIONS = 10;
+	private static final int TOTAL_TASKS = ITERATIONS * 1000000;
 	private final int nTasks;
 	private final int nSubTasks;
 
@@ -27,7 +28,7 @@ public class ExecutorPerfTest {
 		@Override
 		public void run() {
 			Random r = R.get();
-			for (int i = 0; i < nTasks * nSubTasks; i++)
+			for (int i = 0; i < ITERATIONS * nTasks * nSubTasks; i++)
 				r.nextDouble();
 		}
 
@@ -88,7 +89,8 @@ public class ExecutorPerfTest {
 
 		@Override
 		public void run() {
-			es.invokeAll();
+			for (int i = 0; i < ITERATIONS; i++)
+				es.invokeAll();
 		}
 
 		@Override
@@ -98,7 +100,7 @@ public class ExecutorPerfTest {
 	}
 
 	public ExecutorPerfTest(int nSubTasks) {
-		this.nTasks = TOTAL_TASKS / nSubTasks;
+		this.nTasks = TOTAL_TASKS / ITERATIONS / nSubTasks;
 		this.nSubTasks = nSubTasks;
 	}
 
@@ -110,7 +112,7 @@ public class ExecutorPerfTest {
 	private void start(String[] args) {
 		final Initializable r;
 		
-		System.out.printf("Size(%d, %d): ", nTasks, this.nSubTasks);
+		System.out.printf("Size(%d, %d, %d): ", ITERATIONS, nTasks, this.nSubTasks);
 		
 		if (args.length == 1) {
 			System.out.printf("SeqTest(1, plain): ");
