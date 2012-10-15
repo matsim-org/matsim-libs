@@ -13,11 +13,20 @@ public class ExecutorPerfTest {
 	private final String taskType;
 
 	private TaskFactory getTaskFactory() {
-		if (taskType == "random") {
+		if (taskType.equals("random")) {
 			return new TaskFactory() {
 				@Override
 				public RunnableCallable create() {
 					return new RandomGenerating(nSubTasks);
+				}
+			};
+		}
+
+		if (taskType.equals("copy")) {
+			return new TaskFactory() {
+				@Override
+				public RunnableCallable create() {
+					return new Copier(nSubTasks, RUNS * TOTAL_TASKS);
 				}
 			};
 		}
