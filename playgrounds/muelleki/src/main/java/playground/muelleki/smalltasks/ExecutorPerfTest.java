@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Random;
 
 public class ExecutorPerfTest {
+	private static final int RUNS = 3;
 	private static final int TOTAL_TASKS = 20000000;
 	private final int nTasks;
 	private final int nSubTasks;
@@ -19,6 +20,7 @@ public class ExecutorPerfTest {
 	public class SeqTest implements Initializable {
 		@Override
 		public void init() {
+			return;
 		}
 
 		@Override
@@ -26,6 +28,11 @@ public class ExecutorPerfTest {
 			Random r = R.get();
 			for (int i = 0; i < nTasks * nSubTasks; i++)
 				r.nextDouble();
+		}
+
+		@Override
+		public void shutdown() {
+			return;
 		}
 	}
 
@@ -82,10 +89,13 @@ public class ExecutorPerfTest {
 			try {
 				es.invokeAll(taskLists);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} finally {
-				es.shutdown();
+				throw new RuntimeException(e);
 			}
+		}
+
+		@Override
+		public void shutdown() {
+			es.shutdown();
 		}
 	}
 
@@ -114,13 +124,18 @@ public class ExecutorPerfTest {
 			System.out.printf("ExecutorTest(%d, %s): ", nThreads, name);
 			r = new ExecutorTest(nThreads, name);
 		}
-		long t0 = System.nanoTime();
+		ArrayList<Long> TimeStamps = new ArrayList<Long>(20);
+		TimeStamps.add(System.nanoTime());
 		r.init();
-		long t1 = System.nanoTime();
-		r.run();
-		long t2 = System.nanoTime();
+		TimeStamps.add(System.nanoTime());
+		for (int i = 0; i < RUNS; i++) {
+			r.run();
+			TimeStamps.add(System.nanoTime());
+		}
+		r.shutdown();
+		TimeStamps.add(System.nanoTime());
 		System.gc();
-		long t3 = System.nanoTime();
-		System.out.printf("%d, %d, %d, %d, %d, %d\n", t1 - t0, t2 - t1, t3 - t2, t2 - t0, t3 - t1, t3 - t0);
+		TimeStamps.add(System.nanoTime());
+		System.out.printf("%s\n", TimeStamps.toString());
 	}
 }
