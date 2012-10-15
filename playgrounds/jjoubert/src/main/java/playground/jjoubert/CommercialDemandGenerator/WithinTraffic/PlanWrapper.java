@@ -86,8 +86,8 @@ public class PlanWrapper {
 					if(endTime < Time.MIDNIGHT*dayCount){
 						/* The activity can simply be added as it is entire wholly
 						 * or partially within the current day. */
-						act.setStartTime(act.getStartTime() - Time.MIDNIGHT*dayCount);
-						act.setEndTime(act.getEndTime() - Time.MIDNIGHT*dayCount);
+						act.setStartTime(act.getStartTime() - Time.MIDNIGHT*(dayCount-1));
+						act.setEndTime(act.getEndTime() - Time.MIDNIGHT*(dayCount-1));
 						segment.addActivity(act);
 						index++;						
 					} else{
