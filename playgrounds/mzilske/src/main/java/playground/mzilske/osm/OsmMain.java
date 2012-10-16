@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
@@ -46,14 +47,14 @@ public class OsmMain {
 	public static void main(String[] args) {
 		Scenario scenario = createScenario();
 		new NetworkCleaner().run(scenario.getNetwork());
-		new NetworkWriter(scenario.getNetwork()).write("/Users/michaelzilske/sotm-paper/osm-work/network.xml");
+		new NetworkWriter(scenario.getNetwork()).write("/Users/zilske/d4d/output/network.xml");
 	}
 
 	private static Scenario createScenario() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Map<String, Set<String>> tagKeyValues = new HashMap<String, Set<String>>();
 		tagKeyValues.put("highway", new HashSet<String>(Arrays.asList("motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street")));
-		String filename = "/Users/michaelzilske/sotm-paper/osm-work/berlin-filtered.osm";
+		String filename = "/Users/zilske/d4d/ivory_coast.osm";
 		Set<String> tagKeys = Collections.emptySet();
 		TagFilter tagFilter = new TagFilter("accept-way", tagKeys, tagKeyValues);
 		
@@ -61,7 +62,7 @@ public class OsmMain {
 		
 		SimplifyTask simplify = new SimplifyTask(IdTrackerType.BitSet);
 		
-		CoordinateTransformation coordinateTransformation = new WGS84ToMercator.Project(18);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 		NetworkSink sink = new NetworkSink(scenario.getNetwork(), coordinateTransformation);
 		sink.setHighwayDefaults(1, "motorway",      2, 120.0/3.6, 1.0, 2000, true);
 		sink.setHighwayDefaults(1, "motorway_link", 1,  80.0/3.6, 1.0, 1500, true);

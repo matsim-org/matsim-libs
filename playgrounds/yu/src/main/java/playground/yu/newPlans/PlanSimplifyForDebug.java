@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.yu.newPlans;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,6 +38,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * @author mrieser

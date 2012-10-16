@@ -55,6 +55,6 @@
  * the agents' score.
  *
  *
- * @see org.matsim.population.algorithms.PlanAverageScore
+ * @see playground.meisterk.org.matsim.run.westumfahrung.PlanAverageScore
  */
 package org.matsim.core.scoring;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonRemovePlansWithoutLegs.java
+ * ActLinkFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,38 +18,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.meisterk.org.matsim.run.westumfahrung;
 
-import org.matsim.api.core.v01.population.Person;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.filters.AbstractPlanFilter;
 
 /**
- * @author Marcel Rieser
+ * Filters all plans where activities of the same type take place at the same link or set of links.
+ * For example: Filter all agents who are neighbors (have their home location on the same link)
  *
- * This algorithm filters out all persons' plans which do not contain a leg.<br/>
- * If combined with the algorithm 'PlansFilterPersonHasPlans' it can reduce
- * the number of persons in plans which would not be simulated anyway and
- * thus speeding up reading, handling, and writing of plans.
+ * @author meisterk
  */
-public class PersonRemovePlansWithoutLegs extends AbstractPersonAlgorithm {
+public class ActLinkFilter extends AbstractPlanFilter {
 
-	public PersonRemovePlansWithoutLegs() {
-		super();
+	private final Set<Id> linkIds;
+	private final String actTypePattern;
+
+	public ActLinkFilter(final String actTypePattern, final PlanAlgorithm nextAlgo) {
+		this.nextAlgorithm = nextAlgo;
+		this.linkIds = new HashSet<Id>();
+		this.actTypePattern = actTypePattern;
 	}
 
+	public void addLink(final Id linkId) {
+		this.linkIds.add(linkId);
+	}
 
 	@Override
-	public void run(final Person person) {
-		for (int i = 0; i < person.getPlans().size(); i++) {
-			Plan plan = person.getPlans().get(i);
-
-			int size = plan.getPlanElements().size();
-			if (size < 3) {
-				// there cannot be a leg between two acts with at most 2 entries in the list!
-				person.getPlans().remove(i);
-				i--;
+	public boolean judge(final Plan plan) {
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				if (Pattern.matches(actTypePattern, act.getType()) && (this.linkIds.contains(act.getLinkId()))) {
+					return true;
+				}
 			}
 		}
+		return false;
 	}
 
 }

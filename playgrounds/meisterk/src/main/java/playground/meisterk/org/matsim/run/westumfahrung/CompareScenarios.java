@@ -50,11 +50,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PersonIdRecorder;
-import org.matsim.population.algorithms.PlanAverageScore;
-import org.matsim.population.filters.ActLinkFilter;
 import org.matsim.population.filters.PersonFilter;
-import org.matsim.population.filters.PersonIdFilter;
 import org.matsim.population.filters.RouteLinkFilter;
 import org.matsim.population.filters.SelectedPlanFilter;
 

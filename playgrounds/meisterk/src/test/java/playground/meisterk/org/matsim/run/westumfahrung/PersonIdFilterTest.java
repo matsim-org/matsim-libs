@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package playground.meisterk.org.matsim.run.westumfahrung;
 
 import java.util.TreeMap;
 

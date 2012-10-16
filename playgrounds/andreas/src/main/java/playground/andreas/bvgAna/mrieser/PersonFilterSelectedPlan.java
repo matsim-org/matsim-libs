@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonIdRecorder.java
+ * PersonFilterSelectedPlan.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.andreas.bvgAna.mrieser;
 
-import java.util.HashSet;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-public class PersonIdRecorder extends AbstractPersonAlgorithm implements PlanAlgorithm {
+/**
+ * Removes all non-selected plans from a person. If a person has no
+ * plan selected, the person will be left with zero plans.
+ *
+ * @author mrieser
+ */
+public class PersonFilterSelectedPlan extends AbstractPersonAlgorithm {
 
-	private HashSet<Id> ids = new HashSet<Id>();
-
-	public HashSet<Id> getIds() {
-		return ids;
+	public PersonFilterSelectedPlan() {
+		super();
 	}
 
 	@Override
-	public void run(Person person) {
-		ids.add(person.getId());	
-}
+	public void run(final Person person) {
+		int nofPlans = person.getPlans().size();
 
-	@Override
-	public void run(Plan plan) {
-		this.run(plan.getPerson());
+		for (int planId = 0; planId < nofPlans; planId++) {
+			Plan plan = person.getPlans().get(planId);
+			if (!plan.isSelected()) {
+				person.getPlans().remove(planId);
+				planId--;
+				nofPlans--;
+			}
+		}
 	}
-
 }

@@ -65,7 +65,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PersonFilterSelectedPlan;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.Departure;

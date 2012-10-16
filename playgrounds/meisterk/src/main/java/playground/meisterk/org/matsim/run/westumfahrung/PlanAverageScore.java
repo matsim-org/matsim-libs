@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilterSelectedPlan.java
+ * PlanAverageScore.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,34 +18,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.meisterk.org.matsim.run.westumfahrung;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-/**
- * Removes all non-selected plans from a person. If a person has no
- * plan selected, the person will be left with zero plans.
- *
- * @author mrieser
- */
-public class PersonFilterSelectedPlan extends AbstractPersonAlgorithm {
+public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	public PersonFilterSelectedPlan() {
+	private double sumScores = 0.0;
+	private long cntScores = 0;
+	
+	public PlanAverageScore() {
 		super();
 	}
-
+	
 	@Override
-	public void run(final Person person) {
-		int nofPlans = person.getPlans().size();
-
-		for (int planId = 0; planId < nofPlans; planId++) {
-			Plan plan = person.getPlans().get(planId);
-			if (!plan.isSelected()) {
-				person.getPlans().remove(planId);
-				planId--;
-				nofPlans--;
+	public void run(Person person) {
+		for (Plan plan : person.getPlans()) {
+			if (plan.isSelected()) {
+				run(plan);
 			}
 		}
 	}
+	
+	@Override
+	public final void run(Plan plan) {
+		Double score = plan.getScore();
+
+		if ((score != null) && (!score.isInfinite()) && (!score.isNaN())) {
+			sumScores += score.doubleValue();
+			cntScores++;
+		}
+	}
+	
+	public final double getAverage() {
+		return (sumScores / cntScores);
+	}
+	
+	public final long getCount() {
+		return cntScores;
+	}
+	
 }
+

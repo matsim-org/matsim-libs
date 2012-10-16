@@ -36,7 +36,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.population.algorithms.PlanSimplifyForDebug;
 
 /**
  * @author ychen

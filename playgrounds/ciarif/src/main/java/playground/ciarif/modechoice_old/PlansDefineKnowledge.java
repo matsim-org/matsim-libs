@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.ciarif.modechoice_old;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -35,9 +35,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
-import org.matsim.population.algorithms.PersonCreatePlanFromKnowledge;
-import org.matsim.population.algorithms.PlansCreateFromNetwork;
-import org.matsim.population.algorithms.PlansDefineKnowledge;
 
 import playground.balmermi.world.MatsimWorldReader;
 import playground.balmermi.world.World;

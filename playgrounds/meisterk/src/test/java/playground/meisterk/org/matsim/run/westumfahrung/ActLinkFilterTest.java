@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package playground.meisterk.org.matsim.run.westumfahrung;
 
 import java.util.TreeMap;
 
@@ -29,6 +29,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.meisterk.org.matsim.run.westumfahrung.ActLinkFilter;
 
 public class ActLinkFilterTest extends MatsimTestCase {
 

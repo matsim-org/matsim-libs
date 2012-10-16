@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonRemoveLinkAndRoute.java
+ * PersonIdRecorder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,31 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.meisterk.org.matsim.run.westumfahrung;
 
-import org.matsim.api.core.v01.population.Leg;
+import java.util.HashSet;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class PersonRemoveLinkAndRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
+public class PersonIdRecorder extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	@Override
-	public void run(final Person person) {
-		for (Plan plan : person.getPlans()) {
-			run(plan);
-		}
+	private HashSet<Id> ids = new HashSet<Id>();
+
+	public HashSet<Id> getIds() {
+		return ids;
 	}
 
 	@Override
-	public void run(final Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				((ActivityImpl) pe).setLinkId(null);
-			} else if (pe instanceof Leg) {
-				((Leg) pe).setRoute(null);
-			}
-		}
+	public void run(Person person) {
+		ids.add(person.getId());	
+}
+
+	@Override
+	public void run(Plan plan) {
+		this.run(plan.getPerson());
 	}
+
 }

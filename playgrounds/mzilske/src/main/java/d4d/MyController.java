@@ -3,7 +3,6 @@ package d4d;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -35,8 +34,6 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class MyController extends AbstractController {
 
@@ -101,10 +98,10 @@ public class MyController extends AbstractController {
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config,scenario, eventsManager, qSim);
-		OTFClientLive.run(config, server);
+//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config,scenario, eventsManager, qSim);
+//		OTFClientLive.run(config, server);
 		
-		qSim.run();
+//		qSim.run();
 	}
 
 	@Override

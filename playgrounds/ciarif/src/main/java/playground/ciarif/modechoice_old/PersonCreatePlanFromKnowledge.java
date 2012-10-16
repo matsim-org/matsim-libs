@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.algorithms;
+package playground.ciarif.modechoice_old;
 
 import java.util.ArrayList;
 
@@ -32,6 +32,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.Knowledges;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonCreatePlanFromKnowledge extends AbstractPersonAlgorithm {
 
