@@ -28,7 +28,8 @@ public class UrbanSimPersonCSVWriter {
 							    "home2work_travel_time_min," +
 								"home2work_distance_meter," + 
 								"work2home_travel_time_min," +
-								"work2home_distance_meter");
+								"work2home_distance_meter," +
+								"mode");
 			personWriter.newLine();
 			
 			log.info("... done!");
@@ -46,7 +47,7 @@ public class UrbanSimPersonCSVWriter {
 	 * @param work2HomeTravelTime
 	 * @param work2HomeDistance
 	 */
-	public static void write(String personID, double home2WorkTravelTime, double home2WorkDistance, double work2HomeTravelTime, double work2HomeDistance) {
+	public static void write(String personID, double home2WorkTravelTime, double home2WorkDistance, double work2HomeTravelTime, double work2HomeDistance, String mode) {
 
 		try {
 			assert (UrbanSimPersonCSVWriter.personWriter != null);
@@ -54,7 +55,8 @@ public class UrbanSimPersonCSVWriter {
 							   String.valueOf(home2WorkTravelTime) + "," +
 							   String.valueOf(home2WorkDistance) + "," +
 							   String.valueOf(work2HomeTravelTime) + "," +
-							   String.valueOf(work2HomeDistance));
+							   String.valueOf(work2HomeDistance) + "," +
+							   mode);
 			personWriter.newLine();
 		} catch (Exception e) {
 			e.printStackTrace();

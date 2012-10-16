@@ -25,10 +25,9 @@ package playground.tnicolai.matsim4opus.config;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -38,9 +37,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -793,7 +790,7 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 			scenario.getConfig().strategy().getStrategySettings().clear();
 		
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
-		timeAlocationMutator.setModuleName("TimeAllocationMutator");
+		timeAlocationMutator.setModuleName("TimeAllocationMutator"); 	// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		timeAlocationMutator.setProbability( matsimParameter.getStrategy().getTimeAllocationMutatorProbability() ); // should be something like 0.1
 		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(timeAlocationMutator);
@@ -801,21 +798,23 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		scenario.getConfig().setParam("TimeAllocationMutator", "mutationRange", "7200"); 
 		
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
-		changeExpBeta.setModuleName("ChangeExpBeta");
+		changeExpBeta.setModuleName("ChangeExpBeta");					// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		changeExpBeta.setProbability( matsimParameter.getStrategy().getChangeExpBetaProbability() ); // should be something like 0.9
 		scenario.getConfig().strategy().addStrategySettings(changeExpBeta);
 		
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
-		reroute.setModuleName("ReRoute_Dijkstra");
+		reroute.setModuleName("ReRoute_Dijkstra");						// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		reroute.setProbability( matsimParameter.getStrategy().getReRouteDijkstraProbability() ); // should be something like 0.1
 		reroute.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(reroute);
 		
 		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
-		changeSingleLegMode.setModuleName("ChangeSingleLegMode");
+		changeSingleLegMode.setModuleName("ChangeSingleLegMode");		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		changeSingleLegMode.setProbability( 0.1 ); // tnicolai: make configurable via "matsimParameter", should be something like 0.1
 		changeSingleLegMode.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(changeSingleLegMode);
+		// this sets some additional modes. by default car and pt is available
+		scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
 		
 		log.info("StrategyConfigGroup settings:");
 		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter() ); 
@@ -830,23 +829,24 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 	 */
 	private void initPlanCalcRoute(){
 		log.info("Setting PlanCalcRouteGroup to config...");
+		// setting teleportation speeds in router
 		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
 		scenario.getConfig().plansCalcRoute().setBikeSpeed(4.16666666); // 4.16666666m/s corresponds to 15 km/h
 		scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
-		// tnicolai: should the pt speed be set?
-//		scenario.getConfig().plansCalcRoute().setPtSpeed( ??? );
-//		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(mode, speed);
-		Map<String, Double> tms = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds();
-		Collection<String> nm = scenario.getConfig().plansCalcRoute().getNetworkModes();
+		// scenario.getConfig().plansCalcRoute().setTeleportedModeFreespeedFactor(TransportMode.pt, 2); // tnicolai: if this is enabled the router uses freespeed car * freespeed factor instead of PtSpeed!!!
+//		Map<String, Double> tms = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds();
+//		Collection<String> nm = scenario.getConfig().plansCalcRoute().getNetworkModes();
+		
+		// tnicolai: add additional "NetworkModes", i.e. modes for which the router is supposed to generate network routes (like car)
+		//			 currently NetworkModes contain only car and ride
+		// 
 		
 		log.info("PlanCalcRouteGroup settings:");							 
 		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
 		log.info("Bike Speed: " + scenario.getConfig().plansCalcRoute().getBikeSpeed() );
 		log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
-		// show default settings
-		log.info("(Default) Beeline Distance Factor: " + scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor() );
-//		log.info("(Default) Pt Speed Factor: " + scenario.getConfig().plansCalcRoute().getPtSpeedFactor() );
-//		log.info("(Default) Undefined Mode Speed: " + scenario.getConfig().plansCalcRoute().getUndefinedModeSpeed() );
+//		log.info("Pt Speed Factor: " + scenario.getConfig().plansCalcRoute().getPtSpeedFactor() );
+		log.info("Beeline Distance Factor: " + scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor() );
 		
 		log.info("...done!");
 	}

@@ -131,7 +131,7 @@ public class AccessibilityControlerListenerImpl{
 		logitScaleParameter = moduleAPCM.getLogitScaleParameter();
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
-		bikeSpeedMeterPerHour = 15000.;
+		bikeSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
 		
 		betaCarTT 	   	= moduleAPCM.getBetaCarTravelTime();
 		betaCarTTPower	= moduleAPCM.getBetaCarTravelTimePower2();
@@ -175,8 +175,8 @@ public class AccessibilityControlerListenerImpl{
 		log.info("Returning raw sum (not logsum): " + useRawSum);
 		log.info("Logit Scale Parameter: " + logitScaleParameter);
 		log.info("Inverse of logit Scale Parameter: " + inverseOfLogitScaleParameter);
-		log.info("Bike speed (meter/h): " + this.bikeSpeedMeterPerHour);
-		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + " ("+this.walkSpeedMeterPerHour/3600. +"meter/s)");
+		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + " ("+this.walkSpeedMeterPerHour/3600. +" meter/s)");
+		log.info("Bike speed (meter/h): " + this.bikeSpeedMeterPerHour + " ("+this.bikeSpeedMeterPerHour/3600. +" meter/s)");
 		log.info("Depature time (in seconds): " + depatureTime);
 		log.info("Beta Car Travel Time: " + betaCarTT );
 		log.info("Beta Car Travel Time Power2: " + betaCarTTPower );
@@ -464,8 +464,8 @@ public class AccessibilityControlerListenerImpl{
 					walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
 				}
 				
-				writeCSVData(measurePoint, coordFromZone,
-						fromNode, freeSpeedAccessibility, carAccessibility,
+				writeCSVData(measurePoint, coordFromZone, fromNode, 
+						freeSpeedAccessibility, carAccessibility,
 						bikeAccessibility, walkAccessibility);
 			}
 		}

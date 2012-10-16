@@ -64,6 +64,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 			double distance_home_work_meter	= -1.;
 			double duration_work_home_min	= -1.;
 			double distance_work_home_meter	= -1.;
+			String mode						= "none";
 			
 			Person p = persons.next();
 			// dumping out travel times/distances from selected plan
@@ -75,7 +76,8 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 			// what happens with persons which no activities???
 			if(plan.getPlanElements().size() <= 1){
 				write(duration_home_work_min, distance_home_work_meter,
-						duration_work_home_min, distance_work_home_meter, p);
+					  duration_work_home_min, distance_work_home_meter, 
+					  mode, p);
 				continue;
 			}
 			
@@ -90,6 +92,8 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 				}
 				else if(pe instanceof Leg){
 					Leg leg = (Leg) pe;
+					//mode
+					mode = ((Leg) pe).getMode();
 					// if pe is a leg
 					Route route = leg.getRoute();
 					// tnicolai: or should we use route.getDistance ???
@@ -109,7 +113,8 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 				}
 			}
 			write(duration_home_work_min, distance_home_work_meter,
-					duration_work_home_min, distance_work_home_meter, p);
+				  duration_work_home_min, distance_work_home_meter, 
+				  mode, p);
 			// for debugging
 			// String personID = p.getId().toString();
 			// log.info("Person[" + personID + "],Home2WorkTravelTime[" + duration_home_work_min
@@ -142,12 +147,13 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	 */
 	private void write(double duration_home_work_min,
 			double distance_home_work_meter, double duration_work_home_min,
-			double distance_work_home_meter, Person p) {
+			double distance_work_home_meter, String mode, Person p) {
 		
 		UrbanSimPersonCSVWriter.write(p.getId().toString(), 
 									  duration_home_work_min,
 									  distance_home_work_meter, 
 									  duration_work_home_min,
-									  distance_work_home_meter);
+									  distance_work_home_meter,
+									  mode);
 	}
 }
