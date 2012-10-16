@@ -17,13 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions.events;
+package playground.vsp.emissions.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.ColdPollutant;
 
 /**
  * Event to indicate that cold emissions were produced.

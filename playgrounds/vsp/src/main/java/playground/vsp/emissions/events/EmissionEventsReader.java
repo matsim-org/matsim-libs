@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions.events;
+package playground.vsp.emissions.events;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +33,8 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import playground.emissions.types.ColdPollutant;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

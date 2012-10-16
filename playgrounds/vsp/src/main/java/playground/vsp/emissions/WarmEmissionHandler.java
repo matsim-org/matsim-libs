@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions;
+package playground.vsp.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +42,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import playground.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

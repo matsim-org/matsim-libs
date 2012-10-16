@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions.events;
+package playground.vsp.emissions.events;
 
 import org.matsim.core.events.handler.EventHandler;
 

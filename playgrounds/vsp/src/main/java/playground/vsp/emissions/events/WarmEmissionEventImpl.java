@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions.events;
+package playground.vsp.emissions.events;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

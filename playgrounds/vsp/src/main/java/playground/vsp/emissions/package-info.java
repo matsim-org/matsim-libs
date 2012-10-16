@@ -1,14 +1,14 @@
-package playground.emissions;
+package playground.vsp.emissions;
 
 /**
  * This package provides a tool for exhaust emission calculation based on
  * the ``Handbook on Emission Factors for Road Transport'' (HBEFA), version 3.1 (see <a href="http://www.hbefa.net">http://www.hbefa.net</a>).
  * 
  * <h2>Usage</h2>
- * Execute {@link playground.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline} or {@link playground.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline} from the example package.
+ * Execute {@link playground.vsp.emissions.example.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline} or {@link playground.vsp.emissions.example.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline} from the example package.
  * <ul>
- * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline}: Produces an emission events file during the simulation. </li>
- * <li> {@link playground.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline}: Produces an emission events file based on a standard MATSim eventsfile. </li>
+ * <li> {@link playground.vsp.emissions.example.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline}: Produces an emission events file during the simulation. </li>
+ * <li> {@link playground.vsp.emissions.example.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline}: Produces an emission events file based on a standard MATSim eventsfile. </li>
  * </ul>
  * In both cases you will have to specify several input files. See the above classes as examples and the following section for details.
  *
@@ -40,8 +40,8 @@ package playground.emissions;
  * </ul>
  *
  * Optional: To use detailed emission calculation set isUsingDetailedEmissionCalculation to <code>true</code> in the
- * {@link playground.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline} or 
- * {@link playground.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline} class. 
+ * {@link playground.vsp.emissions.example.benjamin.emissions.example.RunEmissionToolOnline RunEmissionToolOnline} or 
+ * {@link playground.vsp.emissions.example.benjamin.emissions.example.RunEmissionToolOffline RunEmissionToolOffline} class. 
  * Define the input paths for
  * <ul>
  * 

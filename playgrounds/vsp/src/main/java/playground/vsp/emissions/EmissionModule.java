@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions;
+package playground.vsp.emissions;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -36,17 +36,17 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import playground.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import playground.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import playground.emissions.types.ColdPollutant;
-import playground.emissions.types.HbefaColdEmissionFactor;
-import playground.emissions.types.HbefaColdEmissionFactorKey;
-import playground.emissions.types.HbefaTrafficSituation;
-import playground.emissions.types.HbefaVehicleAttributes;
-import playground.emissions.types.HbefaVehicleCategory;
-import playground.emissions.types.HbefaWarmEmissionFactor;
-import playground.emissions.types.HbefaWarmEmissionFactorKey;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
+import playground.vsp.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.HbefaColdEmissionFactor;
+import playground.vsp.emissions.types.HbefaColdEmissionFactorKey;
+import playground.vsp.emissions.types.HbefaTrafficSituation;
+import playground.vsp.emissions.types.HbefaVehicleAttributes;
+import playground.vsp.emissions.types.HbefaVehicleCategory;
+import playground.vsp.emissions.types.HbefaWarmEmissionFactor;
+import playground.vsp.emissions.types.HbefaWarmEmissionFactorKey;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

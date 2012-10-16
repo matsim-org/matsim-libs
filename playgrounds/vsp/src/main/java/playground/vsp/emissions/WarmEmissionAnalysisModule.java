@@ -19,7 +19,7 @@
  *                                                                         *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions;
+package playground.vsp.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +32,13 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.emissions.events.WarmEmissionEventImpl;
-import playground.emissions.types.HbefaTrafficSituation;
-import playground.emissions.types.HbefaVehicleAttributes;
-import playground.emissions.types.HbefaVehicleCategory;
-import playground.emissions.types.HbefaWarmEmissionFactor;
-import playground.emissions.types.HbefaWarmEmissionFactorKey;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.events.WarmEmissionEventImpl;
+import playground.vsp.emissions.types.HbefaTrafficSituation;
+import playground.vsp.emissions.types.HbefaVehicleAttributes;
+import playground.vsp.emissions.types.HbefaVehicleCategory;
+import playground.vsp.emissions.types.HbefaWarmEmissionFactor;
+import playground.vsp.emissions.types.HbefaWarmEmissionFactorKey;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

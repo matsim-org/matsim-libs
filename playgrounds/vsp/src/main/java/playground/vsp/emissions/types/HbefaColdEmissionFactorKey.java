@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.emissions.types;
+package playground.vsp.emissions.types;
 
 /**
  * @author benjamin

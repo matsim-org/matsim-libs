@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.emissions.example;
+package playground.vsp.emissions.example;
 
 import java.util.HashSet;
 import java.util.Set;

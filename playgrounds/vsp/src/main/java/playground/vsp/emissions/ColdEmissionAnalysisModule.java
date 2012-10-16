@@ -19,7 +19,7 @@
  *                                                                         *
  *                                                                         
  * *********************************************************************** */
-package playground.emissions;
+package playground.vsp.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +32,12 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.emissions.events.ColdEmissionEventImpl;
-import playground.emissions.types.ColdPollutant;
-import playground.emissions.types.HbefaColdEmissionFactor;
-import playground.emissions.types.HbefaColdEmissionFactorKey;
-import playground.emissions.types.HbefaVehicleAttributes;
-import playground.emissions.types.HbefaVehicleCategory;
+import playground.vsp.emissions.events.ColdEmissionEventImpl;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.HbefaColdEmissionFactor;
+import playground.vsp.emissions.types.HbefaColdEmissionFactorKey;
+import playground.vsp.emissions.types.HbefaVehicleAttributes;
+import playground.vsp.emissions.types.HbefaVehicleCategory;
 
 /**
  * 2 categories for distance driven AFTER coldstart:
