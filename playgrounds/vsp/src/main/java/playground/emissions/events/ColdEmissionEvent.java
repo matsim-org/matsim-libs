@@ -22,9 +22,8 @@ package playground.emissions.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
 
-import playground.benjamin.emissions.types.ColdPollutant;
+import playground.emissions.types.ColdPollutant;
 
 /**
  * Event to indicate that cold emissions were produced.

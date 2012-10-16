@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.emissions.types.WarmPollutant;
+import playground.emissions.types.WarmPollutant;
 
 /**
  * Event to indicate that warm emissions were produced.
