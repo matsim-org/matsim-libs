@@ -72,11 +72,11 @@ public class PassengerDepartureHandler implements DepartureHandler {
 			handlePassengerDeparture(jointDeparture, vehicle, qlink, agent, now);
 		} else return false;
 		
-		if (canDepart(jointDeparture, vehicle, qlink)) {
-			checkDeparture(jointDeparture, vehicle);	// throws an exception if something seems to be wrong
-			jointDeparture.setDeparted();	// departure has been performed, therefore invalidate it
-			handleJointDeparture(now, vehicle, qlink);
-		}
+//		if (canDepart(jointDeparture, vehicle, qlink)) {
+//			checkDeparture(jointDeparture, vehicle);	// throws an exception if something seems to be wrong
+//			jointDeparture.setDeparted();	// departure has been performed, therefore invalidate it
+//			handleJointDeparture(now, vehicle, qlink);
+//		}
 		
 		return true;
 	}
@@ -106,6 +106,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	private void handleDriverDeparture(JointDeparture jointDeparture, QVehicle vehicle,
 			QLinkInternalI qlink, MobsimDriverAgent driver, double now) {
 		
+		boolean canDepart = true;
 		Id vehicleId = driver.getPlannedVehicleId();
 		
 		if (!vehicleId.equals(jointDeparture.getVehicleId())) {
@@ -118,17 +119,22 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		// check whether the driver has to wait for passengers
 		if (!allPassengersWaiting(jointDeparture, vehicle, qlink)) {
 			qlink.registerDriverAgentWaitingForPassengers(driver);
+			canDepart = false;
 		}
 		
 		// TODO: implement vehicle behavior as in VehicularDepartureHandler?
 		// if the vehicle is not yet there
 		if (vehicle == null) {
 			qlink.registerDriverAgentWaitingForCar(driver);
-//			qlink.registerPassengerAgentWaitingForCar(driver, vehicleId);
+			canDepart = false;
 		}
 		else {
 			vehicle.setDriver(driver);
-		}	
+		}
+		
+		if (canDepart) {
+			handleJointDeparture(jointDeparture, vehicle, qlink, now);
+		}
 	}
 	
 	private void handlePassengerDeparture(JointDeparture jointDeparture, QVehicle vehicle, 
@@ -154,9 +160,21 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		 * is already available.
 		 */
 		if (allPassengersWaiting(jointDeparture, vehicle, qlink)) {
-			MobsimAgent driver = qlink.unregisterDriverAgentWaitingForPassengers(jointDeparture.getDriverId());
-			if (driver != null && vehicle != null) vehicle.setDriver((MobsimDriverAgent) driver);
-		}
+			if (vehicle != null) {
+				MobsimAgent driver = qlink.unregisterDriverAgentWaitingForPassengers(jointDeparture.getDriverId());
+				if (driver != null) {
+					/*
+					 * Joint Departure can be performed since
+					 * - all passengers are available
+					 * - driver is available
+					 * - vehicle is available
+					 */
+					vehicle.setDriver((MobsimDriverAgent) driver);
+					handleJointDeparture(jointDeparture, vehicle, qlink, now);
+				}
+			} else return;
+			
+		} else return;
 	}
 	
 	private boolean allPassengersWaiting(JointDeparture jointDeparture, QVehicle vehicle,
@@ -172,12 +190,12 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		return (waitingInVehicle + waitingOnLink) == jointDeparture.getPassengerIds().size();
 	}
 	
-	private boolean canDepart(JointDeparture jointDeparture, QVehicle vehicle, QLinkInternalI qlink) {
-		if (vehicle == null) return false;
-		else if (vehicle.getDriver() == null) return false;
-		else if (!allPassengersWaiting(jointDeparture, vehicle, qlink)) return false;
-		else return true;
-	}
+//	private boolean canDepart(JointDeparture jointDeparture, QVehicle vehicle, QLinkInternalI qlink) {
+//		if (vehicle == null) return false;
+//		else if (vehicle.getDriver() == null) return false;
+//		else if (!allPassengersWaiting(jointDeparture, vehicle, qlink)) return false;
+//		else return true;
+//	}
 	
 	/*
 	 * Check whether the driver and all passengers in the vehicle are as
@@ -208,8 +226,17 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		}
 	}
 	
-	private void handleJointDeparture(double now, QVehicle vehicle, QLinkInternalI qlink) {
+	private void handleJointDeparture(JointDeparture jointDeparture, QVehicle vehicle, QLinkInternalI qlink, double now) {
 
+		// throws an exception if something seems to be wrong
+		checkDeparture(jointDeparture, vehicle);
+		
+		/*
+		 * Departure will be performed therefore invalidate it to
+		 * ensure that it is not performed a second time. 
+		 */
+		jointDeparture.setDeparted();
+		
 		/*
 		 * Check whether the driver's next leg ends at the current link.
 		 */
