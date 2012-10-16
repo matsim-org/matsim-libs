@@ -1,4 +1,4 @@
-package playground.demandde.pendlermatrix;
+package playground.vsp.demandde.pendlermatrix;
 
 import java.io.IOException;
 import java.util.Collection;

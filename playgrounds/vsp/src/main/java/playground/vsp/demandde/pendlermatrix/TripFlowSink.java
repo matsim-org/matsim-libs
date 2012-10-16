@@ -1,4 +1,4 @@
-package playground.demandde.pendlermatrix;
+package playground.vsp.demandde.pendlermatrix;
 
 public interface TripFlowSink {
 	
