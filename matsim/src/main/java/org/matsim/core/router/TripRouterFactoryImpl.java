@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.Collections;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -200,6 +202,16 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 								modeRouteFactory,
 								routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
 								routeConfigGroup.getBeelineDistanceFactor()))));
+
+			// restrict the mode, to be sure not to route cars on pt links (railways, etc.)
+			if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+				((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
+					Collections.singleton(TransportMode.car));
+			}
+			if (routeAlgoPtFreeFlow instanceof IntermodalLeastCostPathCalculator) {
+				((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
+					Collections.singleton(TransportMode.car));
+			}
 		}
 
 		return tripRouter;
