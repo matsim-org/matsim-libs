@@ -35,7 +35,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
-import playground.emissions.events.EmissionEventsReader;
+import playground.vsp.emissions.events.EmissionEventsReader;
 
 /**
  * @author friederike 
