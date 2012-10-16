@@ -16,8 +16,8 @@ package playground.vsp.emissions;
  * Required files are:
  * <ul>
  * <li>roadTypeMappingFile: This file needs to map road types in your network to Hbefa 3.1 road types. 
- * See the parser {@link playground.emissions.EmissionModule#createRoadTypeMapping createRoadTypeMapping} 
- * at the {@link playground.emissions.EmissionModule EmissionModule} 
+ * See the parser {@link playground.vsp.emissions.EmissionModule#createRoadTypeMapping createRoadTypeMapping} 
+ * at the {@link playground.vsp.emissions.EmissionModule EmissionModule} 
  * or see {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for a detailed description.
  * 
  * <li>emissionVehicleFile: This data type is defined in the VspExperimentalConfigGroup, 
@@ -29,13 +29,13 @@ package playground.vsp.emissions;
  *  HbefaVehicleAttributes ("Technology;SizeClasse;EmConcept"), corresponding to the strings in detailedWarmEmissionFactorsFile (see below)) </li>
  * </ul>
  * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from Hbefa 3.1. 
- * See the parser {@link playground.emissions.EmissionModule#createAvgHbefaWarmTable createAvgHbefaWarmTable}
- *  at the {@link playground.emissions.EmissionModule EmissionModule} 
+ * See the parser {@link playground.vsp.emissions.EmissionModule#createAvgHbefaWarmTable createAvgHbefaWarmTable}
+ *  at the {@link playground.vsp.emissions.EmissionModule EmissionModule} 
  *  or see the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for a detailed description. </li>
  *
  * <li>averageFleetColdEmissionFactorsFile: This file can be exported from Hbefa 3.1.
- * See the parser {@link playground.emissions.EmissionModule#createAvgHbefaColdTable createAvgHbefaColdTable}
- * at the {@link playground.emissions.EmissionModule EmissionModule} 
+ * See the parser {@link playground.vsp.emissions.EmissionModule#createAvgHbefaColdTable createAvgHbefaColdTable}
+ * at the {@link playground.vsp.emissions.EmissionModule EmissionModule} 
  * or see the {@link org.matsim.core.config.groups.VspExperimentalConfigGroup VspExperimentalConfigGroup} for a detailed description. </li>
  * </ul>
  *
@@ -46,18 +46,18 @@ package playground.vsp.emissions;
  * <ul>
  * 
  * <li>detailedWarmEmissionFactorsFile: See the parser 
- * {@link playground.emissions.EmissionModule#createDetailedHbefaWarmTable createDetailedHbefaWarmTable}
- * at the {@link playground.emissions.EmissionModule EmissionModule} for details. </li>
+ * {@link playground.vsp.emissions.EmissionModule#createDetailedHbefaWarmTable createDetailedHbefaWarmTable}
+ * at the {@link playground.vsp.emissions.EmissionModule EmissionModule} for details. </li>
  *
  * <li>and detailedColdEmissionFactorsFile: 
- * {@link playground.emissions.EmissionModule#createDetailedHbefaColdTable createDetailedHbefaColdTable}
- * at the {@link playground.emissions.EmissionModule EmissionModule} for details.
+ * {@link playground.vsp.emissions.EmissionModule#createDetailedHbefaColdTable createDetailedHbefaColdTable}
+ * at the {@link playground.vsp.emissions.EmissionModule EmissionModule} for details.
  * </li>
  * </ul>
  * 
  *  All emission factor files represent tables from Hbefa 3.1, which are read columnwise. 
  *  Their column headers need to match the parser definition 
- *  in the respective method of the {@link playground.emissions.EmissionModule EmissionModule}.
+ *  in the respective method of the {@link playground.vsp.emissions.EmissionModule EmissionModule}.
  *  Variable detailed vehicle types and traffic situations definitions are mapped to emission values and types. 
  *
  * <h2>Model description</h2>
