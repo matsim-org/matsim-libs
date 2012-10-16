@@ -23,10 +23,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.emissions.events.ColdEmissionEvent;
-import playground.emissions.events.ColdEmissionEventHandler;
-import playground.emissions.events.WarmEmissionEvent;
-import playground.emissions.events.WarmEmissionEventHandler;
+import playground.vsp.emissions.events.ColdEmissionEvent;
+import playground.vsp.emissions.events.ColdEmissionEventHandler;
+import playground.vsp.emissions.events.WarmEmissionEvent;
+import playground.vsp.emissions.events.WarmEmissionEventHandler;
 
 /**
  * @author benjamin

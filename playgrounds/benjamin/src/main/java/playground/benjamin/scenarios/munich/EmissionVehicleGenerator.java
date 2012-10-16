@@ -35,8 +35,8 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-import playground.emissions.types.HbefaVehicleAttributes;
-import playground.emissions.types.HbefaVehicleCategory;
+import playground.vsp.emissions.types.HbefaVehicleAttributes;
+import playground.vsp.emissions.types.HbefaVehicleCategory;
 
 /**
  * @author benjamin

@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import playground.emissions.types.ColdPollutant;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

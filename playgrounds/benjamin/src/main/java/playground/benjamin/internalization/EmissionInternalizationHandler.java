@@ -28,10 +28,10 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 
-import playground.emissions.events.ColdEmissionEvent;
-import playground.emissions.events.ColdEmissionEventHandler;
-import playground.emissions.events.WarmEmissionEvent;
-import playground.emissions.events.WarmEmissionEventHandler;
+import playground.vsp.emissions.events.ColdEmissionEvent;
+import playground.vsp.emissions.events.ColdEmissionEventHandler;
+import playground.vsp.emissions.events.WarmEmissionEvent;
+import playground.vsp.emissions.events.WarmEmissionEventHandler;
 
 
 /**

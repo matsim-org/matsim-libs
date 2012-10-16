@@ -33,9 +33,9 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import playground.emissions.EmissionModule;
-import playground.emissions.WarmEmissionAnalysisModule;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.EmissionModule;
+import playground.vsp.emissions.WarmEmissionAnalysisModule;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

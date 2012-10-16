@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.population.Population;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.emissions.types.ColdPollutant;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

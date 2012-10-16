@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
-import playground.emissions.events.WarmEmissionEvent;
-import playground.emissions.events.WarmEmissionEventHandler;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.events.WarmEmissionEvent;
+import playground.vsp.emissions.events.WarmEmissionEventHandler;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

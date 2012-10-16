@@ -28,7 +28,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
-import playground.emissions.EmissionModule;
+import playground.vsp.emissions.EmissionModule;
 
 /**
  * @author benjamin

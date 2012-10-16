@@ -41,9 +41,9 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonWarmEventHandler;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
-import playground.emissions.events.EmissionEventsReader;
-import playground.emissions.types.ColdPollutant;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.events.EmissionEventsReader;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

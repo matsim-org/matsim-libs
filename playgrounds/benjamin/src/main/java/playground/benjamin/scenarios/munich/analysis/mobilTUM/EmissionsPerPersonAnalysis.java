@@ -35,9 +35,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.benjamin.scenarios.munich.analysis.EmissionWriter;
-import playground.emissions.events.EmissionEventsReader;
-import playground.emissions.types.ColdPollutant;
-import playground.emissions.types.WarmPollutant;
+import playground.vsp.emissions.events.EmissionEventsReader;
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
 
 /**
