@@ -34,14 +34,14 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.dgrether.energy.validation.ValidationInfoReader;
-import playground.dgrether.energy.validation.ValidationInformation;
 import playground.droeder.e.ePlans.EVehiclesPlanReader;
 import playground.droeder.e.eVehicles.EVehicles;
 import playground.droeder.e.energy.ChargingProfiles;
 import playground.droeder.e.energy.DisChargingProfiles;
 import playground.droeder.e.energy.EmobEnergyProfileReader;
 import playground.droeder.e.poi.PoiList;
+import playground.vsp.energy.validation.ValidationInfoReader;
+import playground.vsp.energy.validation.ValidationInformation;
 
 /**
  * @author droeder

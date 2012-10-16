@@ -34,11 +34,11 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.dgrether.energy.validation.ValidationInfoWriter;
-import playground.dgrether.energy.validation.ValidationInformation;
 import playground.droeder.e.energy.ChargingProfiles;
 import playground.droeder.e.energy.DisChargingProfiles;
 import playground.droeder.e.poi.PoiList;
+import playground.vsp.energy.validation.ValidationInfoWriter;
+import playground.vsp.energy.validation.ValidationInformation;
 
 /**
  * @author droeder

@@ -26,9 +26,9 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.dgrether.energy.validation.PoiInfo;
-import playground.dgrether.energy.validation.PoiTimeInfo;
-import playground.dgrether.energy.validation.ValidationInformation;
+import playground.vsp.energy.validation.PoiInfo;
+import playground.vsp.energy.validation.PoiTimeInfo;
+import playground.vsp.energy.validation.ValidationInformation;
 
 /**
  * @author droeder

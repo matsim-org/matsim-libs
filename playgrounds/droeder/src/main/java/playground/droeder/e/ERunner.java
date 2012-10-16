@@ -29,7 +29,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.dgrether.energy.trafficstate.TrafficStateControlerListener;
+import playground.vsp.energy.trafficstate.TrafficStateControlerListener;
 
 
 /**
