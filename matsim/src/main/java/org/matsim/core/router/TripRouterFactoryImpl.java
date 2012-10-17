@@ -21,6 +21,8 @@ package org.matsim.core.router;
 
 import java.util.Collections;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -39,6 +41,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -48,6 +51,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author thibautd
  */
 public class TripRouterFactoryImpl implements TripRouterFactory {
+	private static final Logger log =
+		Logger.getLogger(TripRouterFactoryImpl.class);
+
 	private final Config config;
 	private final Network network;
 	private final TravelDisutilityFactory travelDisutilityFactory;
@@ -145,10 +151,24 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 					ptTimeCostCalc,
 					ptTimeCostCalc);
 
-		//if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-		//	((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(Collections.singleton(TransportMode.car));
-		//	((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(Collections.singleton(TransportMode.car));
-		//}
+		if ( NetworkUtils.isMultimodal( network ) ) {
+			// note: LinkImpl has a default allowed mode of "car" so that all links
+			// of a monomodal network are actually restricted to car, making the check
+			// of multimodality unecessary from a behavioral point of view.
+			// However, checking the mode restriction for each link is expensive,
+			// so it is not worth doing it if it is not necessary. (td, oct. 2012)
+			if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
+				((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
+					Collections.singleton( TransportMode.car ));
+				((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
+					Collections.singleton( TransportMode.car ));
+			}
+			else {
+				// this is impossible to reach when using the algorithms of org.matsim.*
+				// (all implement IntermodalLeastCostPathCalculator)
+				log.warn( "network is multimodal but least cost path algorithm is not an instance of IntermodalLeastCostPathCalculator!" );
+			}
+		}
 
 		for (String mainMode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
 			tripRouter.setRoutingModule(
@@ -202,16 +222,6 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 								modeRouteFactory,
 								routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
 								routeConfigGroup.getBeelineDistanceFactor()))));
-
-			// restrict the mode, to be sure not to route cars on pt links (railways, etc.)
-			if (routeAlgo instanceof IntermodalLeastCostPathCalculator) {
-				((IntermodalLeastCostPathCalculator) routeAlgo).setModeRestriction(
-					Collections.singleton(TransportMode.car));
-			}
-			if (routeAlgoPtFreeFlow instanceof IntermodalLeastCostPathCalculator) {
-				((IntermodalLeastCostPathCalculator) routeAlgoPtFreeFlow).setModeRestriction(
-					Collections.singleton(TransportMode.car));
-			}
 		}
 
 		return tripRouter;
