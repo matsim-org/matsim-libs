@@ -419,8 +419,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 
 		@Override
 		public Id getId() {
-			// TODO Auto-generated method stub
-			return null;
+			return id;
 		}
 
 		@Override
