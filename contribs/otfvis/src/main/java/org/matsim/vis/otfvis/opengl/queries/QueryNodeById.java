@@ -29,8 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vis.otfvis.VisMobsimFeature;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -57,9 +56,8 @@ public class QueryNodeById extends AbstractQuery implements OTFQuery {
 	}
 
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events,
-			OTFServerQuadTree quad) {
-		Network net = queueSimulation.getVisMobsim().getVisNetwork().getNetwork();
+	public void installQuery(SimulationViewForQueries simulationView) {
+		Network net = simulationView.getNetwork();
 		this.fillResult(net);
 	}
 

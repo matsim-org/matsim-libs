@@ -44,19 +44,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.VisMobsimFeature;
-import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -64,7 +60,6 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.snapshotwriters.VisLink;
-import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
 import com.sun.opengl.util.BufferUtil;
@@ -211,6 +206,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 	protected Id queryLinkId;
 	private transient Map<Id, Integer> drivenLinks = null;
+	private SimulationViewForQueries simulationView;
 
 	private static boolean tripOnly = false;
 	private static boolean nowOnly = false;
@@ -240,7 +236,6 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		SynchBox.setSelected(false);
 		SynchBox.addItemListener(this);
 		com.add(SynchBox);
-
 		return com;
 	}
 
@@ -250,9 +245,9 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		else  this.drivenLinks.put(linkId, count + 1);
 	}
 
-	protected List<Plan> getPersonsNOW(Population plans, VisNetwork net) {
+	private List<Plan> getPersonsNOW() {
 		List<Plan> actPersons = new ArrayList<Plan>();
-		VisLink link = net.getVisLinks().get(this.queryLinkId);
+		VisLink link = simulationView.getVisNetwork().getVisLinks().get(this.queryLinkId);
 		Collection<? extends VisVehicle> vehs = link.getAllVehicles();
 		for( VisVehicle veh : vehs) {
 			if ( veh.getDriver() instanceof PlanAgent ) {
@@ -260,15 +255,12 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 				actPersons.add( plan );
 			}
 		}
-
 		return actPersons;
 	}
 
-	protected List<Plan> getPersons(Population plans, VisNetwork net) {
+	private List<Plan> getPersons(Map<Id, Plan> plans) {
 		List<Plan> actPersons = new ArrayList<Plan>();
-
-		for (Person person : plans.getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
+		for (Plan plan : plans.values()) {
 			List<PlanElement> actslegs = plan.getPlanElements();
 			for (PlanElement pe : actslegs) {
 				if (pe instanceof Activity) {
@@ -341,14 +333,13 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 	}
 
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
-		VisNetwork net = queueSimulation.getVisMobsim().getVisNetwork();
-		Population plans = queueSimulation.getVisMobsim().getScenario().getPopulation();
+	public void installQuery(SimulationViewForQueries simulationView) {
+		this.simulationView = simulationView;
 		this.result = new Result();
 		result.linkIdString = this.queryLinkId.toString();
 		this.drivenLinks = new HashMap<Id, Integer>();
 
-		List<Plan> actPersons = nowOnly ? getPersonsNOW(plans, net) : getPersons(plans, net);
+		List<Plan> actPersons = nowOnly ? getPersonsNOW() : getPersons(simulationView.getPlans());
 
 		if(tripOnly) collectLinksFromLeg(actPersons);
 		else collectLinks(actPersons);
@@ -360,7 +351,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		result.count = new int[this.drivenLinks.size()];
 		int pos = 0;
 		for(Id linkId : this.drivenLinks.keySet()) {
-			Link link = net.getNetwork().getLinks().get(linkId);
+			Link link = simulationView.getNetwork().getLinks().get(linkId);
 			result.count[pos/4] = this.drivenLinks.get(linkId);
 			Node node = link.getFromNode();
 			result.vertex[pos++] = (float)node.getCoord().getX();

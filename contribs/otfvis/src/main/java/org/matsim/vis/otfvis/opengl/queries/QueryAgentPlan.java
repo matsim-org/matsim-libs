@@ -44,12 +44,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
-import org.matsim.vis.otfvis.VisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
@@ -80,32 +78,18 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	private Id agentId;
 
 	private transient Result result;
-
-
-	private VisMobsimFeature otfVisMobsimFeature;
+	
+	private SimulationViewForQueries simulationView;
 
 	@Override
-	public void installQuery(SimulationViewForQueries queueModel) {
-		Network net = queueModel.getNetwork();
-		Plan plan = queueModel.getPlans().get(this.agentId);
+	public void installQuery(SimulationViewForQueries simulationView) {
+		this.simulationView = simulationView;
+		Network net = simulationView.getNetwork();
+		Plan plan = simulationView.getPlans().get(this.agentId);
 		result = new Result();
 		result.agentId = this.agentId.toString();
 		if (plan != null) {
-			fillResult(net, plan);
-		} else {
-			log.error("No plan found for id " + this.agentId);
-		}
-	}
-
-	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
-		this.otfVisMobsimFeature = queueSimulation;
-		Network net = queueSimulation.getVisMobsim().getVisNetwork().getNetwork();
-		result = new Result();
-		result.agentId = this.agentId.toString();
-		Plan plan = queueSimulation.findPlan(this.agentId);
-		if (plan != null) {
-			queueSimulation.addTrackedAgent(this.agentId);
+			simulationView.addTrackedAgent(this.agentId);
 			fillResult(net, plan);
 		} else {
 			log.error("No plan found for id " + this.agentId);
@@ -176,9 +160,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public void uninstall() {
-		if (otfVisMobsimFeature != null) {
-			otfVisMobsimFeature.removeTrackedAgent(this.agentId);
-		}
+		simulationView.removeTrackedAgent(this.agentId);
 	}
 
 	public static class Result implements OTFQueryResult {

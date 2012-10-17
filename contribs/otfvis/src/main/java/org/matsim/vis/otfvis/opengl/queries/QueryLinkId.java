@@ -27,12 +27,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.VisMobsimFeature;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -135,9 +134,9 @@ public class QueryLinkId extends AbstractQuery {
 	}
 	
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
+	public void installQuery(SimulationViewForQueries simulationView) {
 		this.result = new Result();
-		// just look in a certain region around the actual point, 
+		OTFServerQuadTree quad = simulationView.getNetworkQuadTree();
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
 		double regionHeight = (quad.getMaxNorthing()-quad.getMinNorthing())*0.1;
 

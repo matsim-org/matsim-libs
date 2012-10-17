@@ -32,15 +32,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.VisMobsimFeature;
-import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
@@ -175,15 +172,15 @@ public class QueryAgentPTBus extends AbstractQuery {
 	}
 
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
-		this.net = queueSimulation.getVisMobsim().getVisNetwork().getNetwork();
+	public void installQuery(SimulationViewForQueries simulationView) {
+		this.net = simulationView.getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		for(Person person : queueSimulation.getVisMobsim().getScenario().getPopulation().getPersons().values()) {
-			if(person.getId().toString().startsWith(prefix, 0)) allIds.add(person.getId().toString());
+		for(Id planId : simulationView.getPlans().keySet()) {
+			if(planId.toString().startsWith(prefix, 0)) allIds.add(planId.toString());
 		}
 		if (allIds.size()==0) return;
-		Plan plan = queueSimulation.getVisMobsim().getScenario().getPopulation().getPersons().get(new IdImpl(allIds.get(0))).getSelectedPlan();
+		Plan plan = simulationView.getPlans().get(new IdImpl(allIds.get(0)));
 		this.result.vertex = buildRoute(plan);
 	}
 

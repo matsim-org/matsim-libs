@@ -48,8 +48,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.vis.otfvis.VisMobsimFeature;
-import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -99,8 +98,8 @@ public class QueryAgentEvents extends AbstractQuery implements AgentDepartureEve
 	private Result result = null;
 	
 	@Override
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad) {
-		this.eventsManager = events;
+	public void installQuery(SimulationViewForQueries simulationView) {
+		this.eventsManager = simulationView.getEvents();
 		result = new Result();
 		result.agentId = agentId.toString();
 		eventsManager.addHandler(this);

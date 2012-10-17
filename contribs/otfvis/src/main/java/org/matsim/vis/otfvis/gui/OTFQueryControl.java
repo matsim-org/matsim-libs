@@ -51,7 +51,6 @@ import org.matsim.vis.otfvis.opengl.queries.QueryLinkById;
 import org.matsim.vis.otfvis.opengl.queries.QueryLinkId;
 import org.matsim.vis.otfvis.opengl.queries.QueryNodeById;
 import org.matsim.vis.otfvis.opengl.queries.QuerySpinne;
-import org.matsim.vis.otfvis.opengl.queries.QuerySpinneNOW;
 
 /**
  * This class is only used with the "live" OTFVis. It represents th Query
@@ -85,9 +84,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 									"highlight all buses of a given line",
 									QueryAgentPTBus.class), new QueryEntry(
 											"linkSpinneALL", "show Spinne of ALL traffic",
-											QuerySpinne.class), new QueryEntry("linkSpinneNOW",
-													"show Spinne of all veh on the link NOW",
-													QuerySpinneNOW.class), 
+											QuerySpinne.class), 
 													new QueryEntry("linkById", "show link(s) by comma separated link id", QueryLinkById.class),
 													new QueryEntry("nodeById", "show node(s) by comma separated node id", QueryNodeById.class)));
 

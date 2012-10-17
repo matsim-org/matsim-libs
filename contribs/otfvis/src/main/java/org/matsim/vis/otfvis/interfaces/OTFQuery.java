@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis.interfaces;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.VisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 
@@ -73,7 +74,7 @@ public interface OTFQuery {
 	 * will actually only transport NEW objects.
 	 *
 	 */
-	public void installQuery(VisMobsimFeature queueSimulation, EventsManager events, OTFServerQuadTree quad);
+	public void installQuery(SimulationViewForQueries queueModel);
 
 	public void uninstall();
 

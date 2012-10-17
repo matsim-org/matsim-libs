@@ -54,6 +54,7 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.
@@ -83,6 +84,31 @@ public class OnTheFlyServer implements OTFLiveServer {
 		@Override
 		public Network getNetwork() {
 			return scenario.getNetwork();
+		}
+
+		@Override
+		public EventsManager getEvents() {
+			return events;
+		}
+
+		@Override
+		public void addTrackedAgent(Id agentId) {
+			otfVisQueueSimFeature.addTrackedAgent(agentId);
+		}
+
+		@Override
+		public void removeTrackedAgent(Id agentId) {
+			otfVisQueueSimFeature.removeTrackedAgent(agentId);
+		}
+
+		@Override
+		public VisNetwork getVisNetwork() {
+			return otfVisQueueSimFeature.getVisMobsim().getVisNetwork();
+		}
+
+		@Override
+		public OTFServerQuadTree getNetworkQuadTree() {
+			return quad;
 		}
 
 	}
@@ -325,11 +351,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
-		if (this.otfVisQueueSimFeature == null) {
-			query.installQuery(currentTimeStepView);
-		} else {
-			query.installQuery(otfVisQueueSimFeature, events, quad);
-		}
+		query.installQuery(currentTimeStepView);
 		activeQueries.add(query);
 		return query;
 	}
