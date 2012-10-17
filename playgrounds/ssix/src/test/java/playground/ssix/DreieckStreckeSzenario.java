@@ -124,9 +124,10 @@ public class DreieckStreckeSzenario {
 		public State getState() {
 			return delegate.getState();
 		}
-
-		public final void notifyTeleportToLink(Id linkId) {
-			delegate.notifyTeleportToLink(linkId);
+		
+		@Override
+		public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+			 delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);	
 		}
 
 		@Override
@@ -160,6 +161,7 @@ public class DreieckStreckeSzenario {
 		public Id getPlannedVehicleId() {
 			return delegate.getPlannedVehicleId();
 		}
+
 	}
 	
 	private static class MyAgentFactory implements AgentFactory {
