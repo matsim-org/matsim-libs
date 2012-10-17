@@ -137,9 +137,9 @@ public class MultiPlanCooperative extends AbstractCooperative{
 				
 				if (newPlan != null) {
 					// remove vehicle from worst plan
-					this.findWorstPlanAndRemoveOneVehicle(this.plans);
+//					this.findWorstPlanAndRemoveOneVehicle(this.plans);
 
-//					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
 					this.plans.add(newPlan);
 				}
 			}
@@ -147,13 +147,25 @@ public class MultiPlanCooperative extends AbstractCooperative{
 			this.bestPlan = null;
 		}
 		
-//		// Fourth, redistribute vehicles from plans with one vehicle only
+		// Fourth, move one vehicle from the worst negative plan to the best plan, if possible
+		if (this.plans.size() > 1) {
+			if (this.findWorstNegativePlanAndRemoveOneVehicle(this.plans)) {
+				this.findBestPlanAndAddOneVehicle(this.plans);
+			}
+		}
+		
+		
+//		// Fourth, redistribute vehicles from plans with negative score
 //		List<PPlan> plansToKeep = new LinkedList<PPlan>();
 //		int numberOfVehiclesToRedistribute = 0;
 //		for (PPlan plan : this.plans) {
-//			if (plan.getPlannedScorePerVehicle() < 0 && plan.getNVehicles() == 1) {
-//				// this plan will not make any profit, drop it
-//				numberOfVehiclesToRedistribute += plan.getNVehicles();
+//			if (plan.getPlannedScorePerVehicle() < 0) {
+//				// negative score, remove one vehicle from plan
+//				plan.setNVehicles(plan.getNVehicles() - 1);
+//				numberOfVehiclesToRedistribute++;
+//				if (plan.getNVehicles() > 0) {
+//					plansToKeep.add(plan);
+//				}
 //			} else {
 //				// keep the plan
 //				plansToKeep.add(plan);
@@ -167,33 +179,8 @@ public class MultiPlanCooperative extends AbstractCooperative{
 //			numberOfVehiclesToRedistribute--;
 //		}
 		
-		
-		// Fourth, redistribute vehicles from plans with negative score
-		List<PPlan> plansToKeep = new LinkedList<PPlan>();
-		int numberOfVehiclesToRedistribute = 0;
-		for (PPlan plan : this.plans) {
-			if (plan.getPlannedScorePerVehicle() < 0) {
-				// negative score, remove one vehicle from plan
-				plan.setNVehicles(plan.getNVehicles() - 1);
-				numberOfVehiclesToRedistribute++;
-				if (plan.getNVehicles() > 0) {
-					plansToKeep.add(plan);
-				}
-			} else {
-				// keep the plan
-				plansToKeep.add(plan);
-			}
-		}
-		if (plansToKeep.size() > 0) {
-			this.plans = plansToKeep;
-		}
-		while (numberOfVehiclesToRedistribute > 0) {
-			this.findBestPlanAndAddOneVehicle(this.plans);
-			numberOfVehiclesToRedistribute--;
-		}
-		
 		// remove all plans with no vehicles
-		plansToKeep = new LinkedList<PPlan>();
+		List<PPlan> plansToKeep = new LinkedList<PPlan>();
 		for (PPlan plan : this.plans) {
 			if (plan.getNVehicles() > 0) {
 				plansToKeep.add(plan);
@@ -213,6 +200,39 @@ public class MultiPlanCooperative extends AbstractCooperative{
 	}
 	
 	/**
+	 * Find worst negative plan (worst score per vehicle). Removes one vehicle. Removes the whole plan, if no vehicle is left.
+	 * 
+	 * @param plans
+	 * @return true if one vehicle was removed
+	 */
+	private boolean findWorstNegativePlanAndRemoveOneVehicle(List<PPlan> plans){
+		PPlan worstPlan = null;
+		for (PPlan plan : this.plans) {
+			if (plan.getScorePerVehicle() < 0.0) {
+				if (worstPlan == null) {
+					worstPlan = plan;
+				} else {
+					if (plan.getScorePerVehicle() < worstPlan.getScorePerVehicle()) {
+						worstPlan = plan;
+					}
+				}
+			}
+		}
+		
+		if (worstPlan != null) {
+			// remove one vehicle
+			worstPlan.setNVehicles(worstPlan.getNVehicles() - 1);
+			// remove plan, if not served anymore
+			if (worstPlan.getNVehicles() == 0) {
+				this.plans.remove(worstPlan);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
 	 * Find plan with the worst score per vehicle. Removes one vehicle. Removes the whole plan, if no vehicle is left.
 	 * 
 	 * @param plans
@@ -224,7 +244,7 @@ public class MultiPlanCooperative extends AbstractCooperative{
 			if (worstPlan == null) {
 				worstPlan = plan;
 			} else {
-				if (plan.getPlannedScorePerVehicle() < worstPlan.getPlannedScorePerVehicle()) {
+				if (plan.getScorePerVehicle() < worstPlan.getScorePerVehicle()) {
 					worstPlan = plan;
 				}
 			}
@@ -250,7 +270,7 @@ public class MultiPlanCooperative extends AbstractCooperative{
 			if (bestPlan == null) {
 				bestPlan = plan;
 			} else {
-				if (plan.getPlannedScorePerVehicle() > bestPlan.getPlannedScorePerVehicle()) {
+				if (plan.getScorePerVehicle() > bestPlan.getScorePerVehicle()) {
 					bestPlan = plan;
 				}
 			}
