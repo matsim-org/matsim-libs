@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -44,11 +43,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -116,6 +110,12 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	public WithinDayInitialRoutesController(String[] args) {
 		super(args);
 		
+		/*
+		 * Change the persons' original plans. By doing so, the (hopefully) optimized
+		 * routes are written to the output plans file.
+		 */
+		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+		
 		// register this as a Controller and Simulation Listener
 		super.getFixedOrderSimulationListener().addSimulationListener(this);
 		super.addControlerListener(this);
@@ -126,7 +126,9 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		super.loadData();
 		
 		/*
-		 * Create dummy car routes, if routes are not already present.
+		 * Create dummy car routes, if routes are not already present. By doing so,
+		 * PersonPrepareForSim does not pre-calculate routes which would be deleted
+		 * anyway when the agents depart.
 		 */
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
 		DummyRoutesCreator dummyRoutesCreator = new DummyRoutesCreator(routeFactory);		
@@ -155,7 +157,6 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
 		super.createAndInitTravelTimeCollector(analyzedModes);
-//		PersonalizableTravelTimeFactory travelTimeCollectorWrapperFactory = new TravelTimeFactoryWrapper(this.getTravelTimeCollector());
 		
 		/*
 		 * Create and initialize replanning manager and replanning maps.
@@ -176,22 +177,6 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * Give agents to the filter which removes agents with non-car legs.
 		 */
 		carLegAgentsFilterFactory.setAgents(((QSim) e.getQueueSimulation()).getAgents());
-		
-		/*
-		 * We replace the selected plan of each agent with the executed plan which
-		 * is adapted by the within day replanning modules. As a result, the adapted 
-		 * plans are written after the simulation has ended to the output plans
-		 * file, which in turn can be used as input file for another simulation.
-		 */
-		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
-			if (agent instanceof ExperimentalBasicWithindayAgent) {
-				Plan executedPlan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
-				PersonImpl person = (PersonImpl)((ExperimentalBasicWithindayAgent) agent).getPerson();
-				person.removePlan(person.getSelectedPlan());
-				person.addPlan(executedPlan);
-				person.setSelectedPlan(executedPlan);
-			}
-		}
 	}
 	
 	private void initIdentifiers() {
@@ -217,18 +202,8 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
 								
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		
-		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();	
 		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());
-		travelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
-		travelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
-				new WalkTravelTime(configGroup)));
-		travelTimes.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
-				new WalkTravelTime(configGroup)));
-		travelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-				this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
-		
 		
 		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
