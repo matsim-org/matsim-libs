@@ -27,6 +27,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -110,6 +111,8 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		this.pTransitRouterFactory.createTransitRouterConfig(event.getControler().getConfig());
 		this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
 		
+		event.getControler().setTripRouterFactory(new TripRouterFactoryImpl(event.getControler()));
+		
 		if(this.agentsStuckHandler != null){
 			event.getControler().getEvents().addHandler(this.agentsStuckHandler);
 		}
@@ -129,6 +132,8 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
 			
 			this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
+			
+			event.getControler().setTripRouterFactory(new TripRouterFactoryImpl(event.getControler()));
 			
 			if(this.agentsStuckHandler != null){
 				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
