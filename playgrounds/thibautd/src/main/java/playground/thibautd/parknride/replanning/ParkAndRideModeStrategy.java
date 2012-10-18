@@ -36,7 +36,7 @@ public class ParkAndRideModeStrategy implements PlanStrategy {
 
 	public ParkAndRideModeStrategy(final Controler controler) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
-		addStrategyModule( new ParkAndRideModule(controler) );
+		addStrategyModule( new ParkAndRideChooseModeForSubtourModule(controler) );
 		addStrategyModule( new ReRoute( controler ) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}

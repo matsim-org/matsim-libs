@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParkAndRideModule.java
+ * ParkAndRideChooseModeForSubtourModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -53,10 +53,10 @@ import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 /**
  * @author thibautd
  */
-public class ParkAndRideModule extends AbstractMultithreadedModule {
+public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreadedModule {
 	private final Controler controler;
 
-	public ParkAndRideModule(final Controler controler) {
+	public ParkAndRideChooseModeForSubtourModule(final Controler controler) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
 	}

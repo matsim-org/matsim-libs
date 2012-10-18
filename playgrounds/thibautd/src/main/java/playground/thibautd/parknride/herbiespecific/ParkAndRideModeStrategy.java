@@ -37,7 +37,7 @@
 //
 //	public ParkAndRideModeStrategy(final Controler controler) {
 //		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
-//		addStrategyModule( new ParkAndRideModule((MultiLegRoutingControler) controler) );
+//		addStrategyModule( new ParkAndRideChooseModeForSubtourModule((MultiLegRoutingControler) controler) );
 //	}
 //
 //	@Override

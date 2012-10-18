@@ -1,6 +1,6 @@
 ///* *********************************************************************** *
 // * project: org.matsim.*
-// * ParkAndRideModule.java
+// * ParkAndRideChooseModeForSubtourModule.java
 // *                                                                         *
 // * *********************************************************************** *
 // *                                                                         *
@@ -58,10 +58,10 @@
 // * An ugly copy-pasted module, to change the cost for pnr change using the strange herbie walk cost
 // * @author thibautd
 // */
-//public class ParkAndRideModule extends AbstractMultithreadedModule {
+//public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreadedModule {
 //	private final MultiLegRoutingControler controler;
 //
-//	public ParkAndRideModule(final MultiLegRoutingControler controler) {
+//	public ParkAndRideChooseModeForSubtourModule(final MultiLegRoutingControler controler) {
 //		super( controler.getConfig().global() );
 //		this.controler = controler;
 //	}
