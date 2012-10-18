@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.replanning;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +44,10 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
+import playground.thibautd.parknride.ParkAndRideConfigGroup;
+import playground.thibautd.parknride.ParkAndRideConstants;
+import playground.thibautd.parknride.ParkAndRideFacilities;
+import playground.thibautd.parknride.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 
 /**

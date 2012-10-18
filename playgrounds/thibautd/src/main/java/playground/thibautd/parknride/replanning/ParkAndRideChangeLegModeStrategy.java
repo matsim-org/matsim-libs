@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParkAndRideReRouteStrategy.java
+ * ParkAndRideChangeLegModeStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,61 +17,75 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.replanning;
+
+import java.util.Arrays;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+
+import playground.thibautd.parknride.ParkAndRideConstants;
+
 
 /**
  * @author thibautd
  */
-public class ParkAndRideReRouteStrategy implements PlanStrategy {
-	private final PlanStrategy delegate;
+public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
+	private final PlanStrategy strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-	public ParkAndRideReRouteStrategy(final Controler controler) {
-		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
+	public ParkAndRideChangeLegModeStrategy(final Controler controler) {
+		StageActivityTypes pnrList = new StageActivityTypesImpl( Arrays.asList( ParkAndRideConstants.PARKING_ACT ) );
+
+		addStrategyModule( new TripsToLegsModule( controler , pnrList ) );
+		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
 		addStrategyModule( new ReRoute( controler ) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 
 	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
-		delegate.addStrategyModule(module);
+		strategy.addStrategyModule(module);
 	}
 
 	@Override
 	public int getNumberOfStrategyModules() {
-		return delegate.getNumberOfStrategyModules();
+		return strategy.getNumberOfStrategyModules();
 	}
 
 	@Override
 	public void run(final Person person) {
-		delegate.run(person);
+		strategy.run(person);
 	}
 
 	@Override
 	public void init() {
-		delegate.init();
+		strategy.init();
 	}
 
 	@Override
 	public void finish() {
-		delegate.finish();
+		strategy.finish();
 	}
 
 	@Override
 	public String toString() {
-		return delegate.toString();
+		return strategy.toString();
 	}
 
 	@Override
 	public PlanSelector getPlanSelector() {
-		return delegate.getPlanSelector();
+		return strategy.getPlanSelector();
 	}
+
 }
+

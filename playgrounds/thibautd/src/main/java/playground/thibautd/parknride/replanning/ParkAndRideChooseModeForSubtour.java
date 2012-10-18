@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.replanning;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +49,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+
+import playground.thibautd.parknride.ParkAndRideConstants;
+import playground.thibautd.parknride.ParkAndRideUtils;
 
 /**
  * A special module meant at handling subtour mode choice for trips,

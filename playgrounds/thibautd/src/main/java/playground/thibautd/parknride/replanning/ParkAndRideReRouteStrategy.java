@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ParkAndRideTimeAllocationMutator.java
+ * ParkAndRideReRouteStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,90 +17,61 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride;
+package playground.thibautd.parknride.replanning;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.StageActivityTypes;
-
-import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
 
 /**
  * @author thibautd
  */
-public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
-	private final PlanStrategy strategy;
+public class ParkAndRideReRouteStrategy implements PlanStrategy {
+	private final PlanStrategy delegate;
 
-	public ParkAndRideTimeAllocationMutator(final Controler controler) {
-		strategy = new PlanStrategyImpl( new RandomPlanSelector() );
-
-		addStrategyModule(
-				new TimeAllocationMutatorModule(
-					controler,
-					new BlackList( controler ) ) );
-
+	public ParkAndRideReRouteStrategy(final Controler controler) {
+		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
+		addStrategyModule( new ReRoute( controler ) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 
 	@Override
 	public void addStrategyModule(final PlanStrategyModule module) {
-		strategy.addStrategyModule(module);
+		delegate.addStrategyModule(module);
 	}
 
 	@Override
 	public int getNumberOfStrategyModules() {
-		return strategy.getNumberOfStrategyModules();
+		return delegate.getNumberOfStrategyModules();
 	}
 
 	@Override
 	public void run(final Person person) {
-		strategy.run(person);
+		delegate.run(person);
 	}
 
 	@Override
 	public void init() {
-		strategy.init();
+		delegate.init();
 	}
 
 	@Override
 	public void finish() {
-		strategy.finish();
+		delegate.finish();
 	}
 
 	@Override
 	public String toString() {
-		return strategy.toString();
+		return delegate.toString();
 	}
 
 	@Override
 	public PlanSelector getPlanSelector() {
-		return strategy.getPlanSelector();
-	}
-
-	private static class BlackList implements StageActivityTypes {
-		private Controler controler = null;
-		private StageActivityTypes blackList = null;
-
-		public BlackList(final Controler controler) {
-			this.controler = controler;
-		}
-
-		@Override
-		public boolean isStageActivity(final String activityType) {
-			if (blackList == null) {
-				// we need this hack, because when initialising the strategy the router factory
-				// may not be set correctly yet...
-				blackList = controler.getTripRouterFactory().createTripRouter().getStageActivityTypes();
-				controler = null;
-			}
-
-			return blackList.isStageActivity( activityType ) || ParkAndRideConstants.PARKING_ACT.equals( activityType );
-		}
+		return delegate.getPlanSelector();
 	}
 }
-
