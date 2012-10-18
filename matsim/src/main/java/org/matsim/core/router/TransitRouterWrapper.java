@@ -21,7 +21,6 @@ package org.matsim.core.router;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
@@ -33,15 +32,10 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Wraps a {@link TransitRouter}.
@@ -50,8 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitRouterWrapper implements RoutingModule {
 	private static final StageActivityTypes CHECKER =
-		new StageActivityTypesImpl(
-				Arrays.asList( new String[]{ PtConstants.TRANSIT_ACTIVITY_TYPE } ) );
+		new StageActivityTypesImpl( Arrays.asList( PtConstants.TRANSIT_ACTIVITY_TYPE ) );
 	private final TransitRouter router;
 	private final RoutingModule walkRouter;
 	private final TransitSchedule transitSchedule;
@@ -85,26 +78,13 @@ public class TransitRouterWrapper implements RoutingModule {
 				departureTime,
 				person);
 
-		if (baseTrip != null) {
-			for (Leg leg : baseTrip) {
-				Route route = leg.getRoute();
-
-				if (route instanceof ExperimentalTransitRoute) {
-					route.setDistance(
-							calcDistance(
-								(ExperimentalTransitRoute) route,
-								transitSchedule) );
-				}
-			}
-
-			return fillWithActivities( baseTrip , fromFacility , toFacility );
-		}
-
-		return 
-			// the previous approach was to return null and not to replace the trip if so.
-			// However, this makes the output of routing modules more tricky to handle.
-			// Thus, every module should return a valid trip. When available, the "main
-			// mode" flag should be put to the mode of the routing module.
+		// the previous approach was to return null when no trip was found and
+		// not to replace the trip if so.
+		// However, this makes the output of routing modules more tricky to handle.
+		// Thus, every module should return a valid trip. When available, the "main
+		// mode" flag should be put to the mode of the routing module.
+		return baseTrip != null ?
+			fillWithActivities( baseTrip , fromFacility , toFacility ) :
 			walkRouter.calcRoute( fromFacility , toFacility , departureTime , person );
 	}
 
@@ -179,46 +159,5 @@ public class TransitRouterWrapper implements RoutingModule {
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
 		return CHECKER;
-	}
-
-	public static double calcDistance(
-			final ExperimentalTransitRoute route,
-			final TransitSchedule schedule) {
-		double accumulatedDistance = 0;
-
-		Id start = route.getAccessStopId();
-		Id end = route.getEgressStopId();
-		TransitLine line = schedule.getTransitLines().get( route.getLineId() );
-		TransitRoute transitRoute = line.getRoutes().get( route.getRouteId() );
-		Iterator<TransitRouteStop> stops = transitRoute.getStops().iterator();
-
-		// normally, if a route was found, there are at least two stops on the
-		// route... So no need to check.
-		TransitStopFacility currentStop = stops.next().getStopFacility();
-
-		while (!currentStop.getId().equals( start )) {
-			if (stops.hasNext()) {
-				currentStop = stops.next().getStopFacility();
-			}
-			else {
-				throw new RuntimeException( "start stop "+start+" in O/D "+start+"->"+end+" not found in "+transitRoute.getStops() );
-			}
-		}
-
-		while (!currentStop.getId().equals( end )) {
-			if (stops.hasNext()) {
-				TransitStopFacility nextStop = stops.next().getStopFacility();
-				accumulatedDistance +=
-					CoordUtils.calcDistance(
-							currentStop.getCoord(),
-							currentStop.getCoord() );
-				currentStop = nextStop;
-			}
-			else {
-				throw new RuntimeException( "end stop "+end+" in O/D "+start+"->"+end+" not found in "+transitRoute.getStops() );
-			}
-		}
-
-		return accumulatedDistance;
 	}
 } 
