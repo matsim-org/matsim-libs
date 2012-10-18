@@ -8,8 +8,7 @@ public class ScheduledTour {
 
 	private final double departure;
 
-	public ScheduledTour(final Tour tour, final CarrierVehicle vehicle,
-			final double departure) {
+	public ScheduledTour(final Tour tour, final CarrierVehicle vehicle, final double departure) {
 		this.tour = tour;
 		this.vehicle = vehicle;
 		this.departure = departure;

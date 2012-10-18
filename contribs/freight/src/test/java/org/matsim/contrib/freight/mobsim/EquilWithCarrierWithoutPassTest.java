@@ -72,8 +72,8 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.addCoreModules();
 		carrierConfig.plans().setInputFile(getInputDirectory() + "carrierPlansEquils.xml");
+		carrierConfig.setWithinDayReScheduling(true);
 		carrierControler = new CarrierControler(carrierConfig);
-		
 		carrierControler.setCarrierPlanStrategyManagerFactory(new StrategyManagerFactoryForTests());
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
@@ -117,7 +117,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 			assertEquals(-8040.0,carrier1.getSelectedPlan().getScore());
 			
 			Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
-			assertEquals(-3097.0,carrier2.getSelectedPlan().getScore());
+			assertEquals(-3062.0,carrier2.getSelectedPlan().getScore());
 			
 //		}
 //		catch(Exception e){

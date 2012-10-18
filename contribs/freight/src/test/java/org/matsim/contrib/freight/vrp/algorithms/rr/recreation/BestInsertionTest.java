@@ -68,8 +68,7 @@ public class BestInsertionTest extends VRPTestCase {
 		TourCost tourCost = new TourCost() {
 
 			@Override
-			public double getTourCost(TourImpl tour, Driver driver,
-					Vehicle vehicle) {
+			public double getTourCost(TourImpl tour, Driver driver,Vehicle vehicle) {
 				return 100 + tour.tourData.transportCosts;
 			}
 
@@ -78,9 +77,7 @@ public class BestInsertionTest extends VRPTestCase {
 				tourCost, vrp.getCosts())
 				.getFactory(VehicleRoutingProblemType.CVRPTW);
 
-		tourAgent1 = spFactory.createAgent(vrp.getVehicles().iterator().next(),
-				new Driver() {
-				}, tourBuilder.build());
+		tourAgent1 = spFactory.createAgent(vrp.getVehicles().iterator().next(),new Driver() {}, tourBuilder.build());
 
 		VrpTourBuilder anotherTourBuilder = new VrpTourBuilder();
 		Shipment s2 = createShipment("2", makeId(10, 0), makeId(0, 0));
@@ -88,14 +85,13 @@ public class BestInsertionTest extends VRPTestCase {
 		anotherTourBuilder.schedulePickup(s2);
 		anotherTourBuilder.scheduleDelivery(s2);
 		anotherTourBuilder.scheduleEnd(makeId(0, 0), 0.0, Double.MAX_VALUE);
-		tourAgent2 = spFactory.createAgent(vrp.getVehicles().iterator().next(),
-				new Driver() {
-				}, anotherTourBuilder.build());
+		tourAgent2 = spFactory.createAgent(vrp.getVehicles().iterator().next(),new Driver() {}, anotherTourBuilder.build());
 
 		Collection<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
 		agents.add(tourAgent1);
 		agents.add(tourAgent2);
-		solution = new RuinAndRecreateSolution(agents);
+		
+		solution = new RuinAndRecreateSolution(agents, getTotalCost(agents));
 
 		bestInsertion = new RecreationBestInsertion();
 		unassignedJobs = new ArrayList<Job>();
@@ -104,38 +100,41 @@ public class BestInsertionTest extends VRPTestCase {
 		unassignedJobs.add(s3);
 	}
 
+	private double getTotalCost(Collection<ServiceProviderAgent> agents) {
+		double c = 0.0;
+		for(ServiceProviderAgent a : agents){
+			c += a.getTourCost();
+		}
+		return c;
+	}
+
 	public void testSizeOfNewSolution() {
-		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,
-				Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,Double.MAX_VALUE);
 		assertEquals(2, solution.getTourAgents().size());
 	}
 
 	public void testNuOfActivitiesOfAgent1() {
-		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,
-				Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,Double.MAX_VALUE);
 		assertEquals(6, tourAgent1.getTour().getActivities().size());
 	}
 
 	public void testNuOfActivitiesOfAgent2() {
-		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,
-				Double.MAX_VALUE);
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,Double.MAX_VALUE);
 		assertEquals(4, tourAgent2.getTour().getActivities().size());
 	}
 
 	public void testMarginalCostOfInsertion() {
 		double oldCost = solution.getResult();
-		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,
-				Double.MAX_VALUE);
-		double newCost = solution.getResult();
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,Double.MAX_VALUE);
+		double newCost = getTotalCost(solution.getTourAgents());
 		assertEquals(4.0, newCost - oldCost);
 	}
 
 	public void testTotalCost() {
 		double oldCost = solution.getResult();
 		assertEquals(240.0, oldCost);
-		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,
-				Double.MAX_VALUE);
-		double newCost = solution.getResult();
+		bestInsertion.recreate(solution.getTourAgents(), unassignedJobs,Double.MAX_VALUE);
+		double newCost = getTotalCost(solution.getTourAgents());
 		assertEquals(244.0, newCost);
 	}
 

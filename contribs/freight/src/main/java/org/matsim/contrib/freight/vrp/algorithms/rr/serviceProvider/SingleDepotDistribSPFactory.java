@@ -25,7 +25,7 @@ class SingleDepotDistribSPFactory implements ServiceProviderAgentFactory{
 		a.setTourCost(tourCost);
 		SingleDepotDistributionLeastCostTourCalculator bestJobInsertionFinder = new SingleDepotDistributionLeastCostTourCalculator(vehicleRoutingCost);
 		bestJobInsertionFinder.setMarginalCostCalculator(new LocalMCCalculator(vehicleRoutingCost));
-		a.setBestJobInsertionFinder(bestJobInsertionFinder);
+		a.setLeastCostTourCalculator(bestJobInsertionFinder);
 		return a;
 	}
 

@@ -18,6 +18,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.FreightActivity;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
@@ -58,7 +59,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		
 		private LegImpl currentLeg;
 		
-		private ActivityImpl currentActivity;
+		private Activity currentActivity;
 		
 		private List<Id> currentRoute;
 		
@@ -105,6 +106,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	            genericRoute.setDistance(0.0);
 	            currentLeg.setRoute(genericRoute);
 	        }
+//	        logger.info(driverId + " arrives, time " + Time.writeTime(event.getTime()));
 	        scoringFunction.handleLeg(currentLeg);
 	    }
 		
@@ -113,36 +115,49 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	        leg.setDepartureTime(event.getTime());
 	        currentLeg = leg;
 	        currentRoute = new ArrayList<Id>();
+//	        logger.info(driverId + " departs, time " + Time.writeTime(event.getTime()));
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
+//			logger.info(driverId + " enters link " + event.getLinkId() + " at time " + Time.writeTime(event.getTime()));
 			currentRoute.add(event.getLinkId());
 		}
 		
 		public void handleEvent(LinkLeaveEvent event) {
-			
+//			logger.info(driverId + " left link " + event.getLinkId() + " at time " + Time.writeTime(event.getTime()));
 		}
 
 		public void handleEvent(ActivityEndEvent event) {
 			if (currentActivity == null) {
 				ActivityImpl firstActivity = new ActivityImpl(event.getActType(), event.getLinkId());
 				firstActivity.setFacilityId(event.getFacilityId());
+//				TourActivity tourActivity = getTourActivity();
+//				FreightActivity firstFreightActivity = new FreightActivity(firstActivity, tourActivity.getTimeWindow());
 				currentActivity = firstActivity;
 			}
+//			logger.info(driverId + " ends " + currentActivity.getType() + " time " + Time.writeTime(event.getTime()));
 			currentActivity.setEndTime(event.getTime());
 			scoringFunction.handleActivity(currentActivity);
 			activityFinished(event.getActType(), event.getTime()); 
+		}
+
+		private TourActivity getTourActivity() {
+			return (TourActivity) this.scheduledTour.getTour().getTourElements().get(activityCounter);
 		}
 
 		public void handleEvent(ActivityStartEvent event) {
 			 ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId()); 
 			 activity.setFacilityId(event.getFacilityId());
 			 activity.setStartTime(event.getTime());
+//			 logger.info(driverId + " starts " + activity.getType() + " time " + Time.writeTime(event.getTime()));
 			 if(event.getActType().equals(FreightConstants.END)){
-				 activity.setEndTime(Time.MIDNIGHT);
+				 activity.setEndTime(Time.UNDEFINED_TIME);
 				 scoringFunction.handleActivity(activity);
 			 }
-			 currentActivity = activity;
+			 else{
+				 FreightActivity freightActivity = new FreightActivity(activity, getTourActivity().getTimeWindow());
+				 currentActivity = freightActivity; 
+			 }
 		 }
 
 		private void activityFinished(String activityType, double time) {

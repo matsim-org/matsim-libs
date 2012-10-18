@@ -27,24 +27,16 @@ public class RuinAndRecreateSolution {
 
 	private Collection<ServiceProviderAgent> tourAgents;
 
-	private double score = 0.0;
+	private double totalCosts;
 
-	private boolean solutionSet = false;
-
-	public RuinAndRecreateSolution(Collection<ServiceProviderAgent> tourAgents) {
+	public RuinAndRecreateSolution(Collection<ServiceProviderAgent> tourAgents, double totalCosts) {
 		super();
 		this.tourAgents = tourAgents;
+		this.totalCosts = totalCosts;
 	}
 
 	public double getResult() {
-		if (solutionSet) {
-			return score;
-		}
-		double total = 0.0;
-		for (TourAgent a : tourAgents) {
-			total += a.getTourCost();
-		}
-		return total;
+		return totalCosts;
 	}
 
 	public Collection<ServiceProviderAgent> getTourAgents() {
@@ -56,8 +48,4 @@ public class RuinAndRecreateSolution {
 		return "totalResult=" + getResult();
 	}
 
-	public void setScore(double score) {
-		solutionSet = true;
-		this.score = score;
-	}
 }

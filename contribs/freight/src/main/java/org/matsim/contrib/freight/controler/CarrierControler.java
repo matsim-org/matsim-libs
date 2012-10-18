@@ -74,9 +74,12 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 	private CarrierAgentTracker carrierAgentTracker;
 	
 	private Carriers carriers;
+	
+	private CarrierConfig carrierConfig;
 
 	public CarrierControler(CarrierConfig carrierConfig) {
 		this.carrierFilename = carrierConfig.plans().getInputFile();
+		this.carrierConfig = carrierConfig;
 	}
 
 	public Map<Id,Carrier> getCarriers() {
@@ -114,6 +117,7 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 		Controler controler = event.getControler();
 		carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork(), carrierScoringFunctionFactory);
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
+		mobsimFactory.setWithinDayActivityReScheduling(carrierConfig.isWithinDayReScheduling());
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
 		carrierAgentTracker.createPlans();
@@ -146,10 +150,8 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String dir = event.getControler().getControlerIO()
-				.getIterationPath(event.getIteration());
-		new CarrierPlanWriter(carriers.getCarriers().values()).write(dir + "/"
-				+ event.getIteration() + ".carrierPlans.xml");
+		String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
+		new CarrierPlanWriter(carriers.getCarriers().values()).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 	}
 
 	@Override

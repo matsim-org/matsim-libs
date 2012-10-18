@@ -89,6 +89,16 @@ public class CarrierConfig {
 	private PlansConfigGroup plans = null;
 	
 	private VehiclesConfigGroup vehicles = null;
+
+	public boolean isWithinDayReScheduling() {
+		return withinDayReScheduling;
+	}
+
+	public void setWithinDayReScheduling(boolean withinDayReScheduling) {
+		this.withinDayReScheduling = withinDayReScheduling;
+	}
+
+	private boolean withinDayReScheduling = false;
 	
 	public void addCoreModules(){
 		plans = new PlansConfigGroup();

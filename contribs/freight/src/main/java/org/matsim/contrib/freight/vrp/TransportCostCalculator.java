@@ -126,8 +126,7 @@ public class TransportCostCalculator implements VehicleRoutingCosts, TourCost {
 
 	private Counter ttRequestedCounter;
 
-	public TransportCostCalculator(LeastCostPathCalculator pathCalculator,
-			Network network, int timeSliceWidth) {
+	public TransportCostCalculator(LeastCostPathCalculator pathCalculator,Network network, int timeSliceWidth) {
 		super();
 		this.router = pathCalculator;
 		this.network = network;

@@ -7,6 +7,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
+import org.matsim.core.population.routes.NetworkRoute;
 
 public class Tour {
 

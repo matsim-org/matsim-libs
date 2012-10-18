@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
@@ -42,9 +42,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-public class RouteVehicles implements CarrierPlanStrategyModule{
+public class ReRouteVehicles implements CarrierPlanStrategyModule{
 
-	private static Logger logger = Logger.getLogger(RouteVehicles.class);
+	private static Logger logger = Logger.getLogger(ReRouteVehicles.class);
 	
 	private LeastCostPathCalculator router;
 	
@@ -52,7 +52,7 @@ public class RouteVehicles implements CarrierPlanStrategyModule{
 	
 	private TravelTime travelTime;
 	
-	public RouteVehicles(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
+	public ReRouteVehicles(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
 		super();
 		this.router = router;
 		this.network = network;
@@ -60,15 +60,13 @@ public class RouteVehicles implements CarrierPlanStrategyModule{
 	}
 
 	@Override
-	public void handleCarrier(Carrier carrier) {
-		if(carrier.getSelectedPlan() == null){
-			return;
-		}
-		route(carrier.getSelectedPlan().getScheduledTours());
+	public void handlePlan(CarrierPlan carrierPlan) {
+		assert carrierPlan != null : "cannot handle plan. plan is null";
+		route(carrierPlan);
 	}
 	
-	private void route(Collection<ScheduledTour> scheduledTours) {
-		for(ScheduledTour tour : scheduledTours){
+	private void route(CarrierPlan carrierPlan) {
+		for(ScheduledTour tour : carrierPlan.getScheduledTours()){
 			MatsimVehicleAdapter matsimVehicle = new MatsimVehicleAdapter(tour.getVehicle());
 			double currTime = tour.getDeparture();
 			Id prevLink = tour.getTour().getStartLinkId();
@@ -107,6 +105,9 @@ public class RouteVehicles implements CarrierPlanStrategyModule{
 		}
 		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getDepartureTime(), person, vehicle);
 		double travelTime = path.travelTime;
+		/*
+		 *ACHTUNG. Konsistenz zu VRP 
+		 */
 		double toLinkTravelTime = this.travelTime.getLinkTravelTime(network.getLinks().get(toLinkId),prevLeg.getDepartureTime()+travelTime, person, vehicle);
 		travelTime += toLinkTravelTime;
 		prevLeg.setExpectedTransportTime(travelTime);

@@ -5,6 +5,8 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 
 public interface Carrier {
+	
+	public static int PLAN_MEMORY = 5;
 
 	public abstract Id getId();
 
@@ -18,8 +20,7 @@ public interface Carrier {
 
 	public abstract void setSelectedPlan(CarrierPlan selectedPlan);
 
-	public abstract void setCarrierCapabilities(
-			CarrierCapabilities carrierCapabilities);
+	public abstract void setCarrierCapabilities(CarrierCapabilities carrierCapabilities);
 
 	public abstract CarrierCapabilities getCarrierCapabilities();
 

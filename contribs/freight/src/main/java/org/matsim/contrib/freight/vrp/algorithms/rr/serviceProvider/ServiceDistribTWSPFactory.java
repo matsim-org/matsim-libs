@@ -25,7 +25,7 @@ public class ServiceDistribTWSPFactory implements ServiceProviderAgentFactory{
 		a.setTourCost(tourCost);
 		ServiceDistributionLeastCostTourCalculator bestJobInsertionFinder = new ServiceDistributionLeastCostTourCalculator();
 		bestJobInsertionFinder.setMarginalCostCalculator(new LocalMCCalculator(vehicleRoutingCost));
-		a.setBestJobInsertionFinder(bestJobInsertionFinder);
+		a.setLeastCostTourCalculator(bestJobInsertionFinder);
 		return a;
 	}
 

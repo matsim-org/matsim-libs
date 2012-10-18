@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 
@@ -40,6 +41,18 @@ public class CVRPTWSolverFactory implements VehicleRoutingProblemSolverFactory {
 	@Override
 	public VehicleRoutingProblemSolver createSolver(VehicleRoutingProblem vrp) {
 		CVRPTWSolver solver = new CVRPTWSolver(vrp);
+		solver.setListener(listener);
+		if (iterSet) {
+			solver.setIterations(iterations);
+			solver.setWarmupIterations(warmup);
+		}
+		return solver;
+	}
+
+	@Override
+	public VehicleRoutingProblemSolver createSolver(VehicleRoutingProblem vrp, VehicleRoutingProblemSolution initialSolution) {
+		if(initialSolution == null) return createSolver(vrp);
+		CVRPTWSolver solver = new CVRPTWSolver(vrp,initialSolution);
 		solver.setListener(listener);
 		if (iterSet) {
 			solver.setIterations(iterations);

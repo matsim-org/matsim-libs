@@ -38,6 +38,8 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver {
 	private int warmupIterations = 10;
 
 	private Collection<RuinAndRecreateListener> listener;
+	
+	private VehicleRoutingProblemSolution iniSolution;
 
 	public CVRPTWSolver(final VehicleRoutingProblem vrp) {
 		super();
@@ -45,14 +47,19 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver {
 		listener = Collections.EMPTY_LIST;
 	}
 
+	public CVRPTWSolver(VehicleRoutingProblem vrp, VehicleRoutingProblemSolution initialSolution) {
+		this.vrp = vrp;
+		this.iniSolution = initialSolution;
+	}
+
 	@Override
 	public VehicleRoutingProblemSolution solve() {
 		checkWhetherProblemIsOfCorrectType();
 
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp);
-		InitialSolutionFactory iniSolutionFactory = new InitialSolutionBestInsertion(
-				getSPFactory());
+		InitialSolutionFactory iniSolutionFactory = new InitialSolutionBestInsertion(getSPFactory());
 		ruinAndRecreateAlgo.setInitialSolutionFactory(iniSolutionFactory);
+		
 		ruinAndRecreateAlgo.setIterations(iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmupIterations);
 		ruinAndRecreateAlgo.setTourAgentFactory(getSPFactory());

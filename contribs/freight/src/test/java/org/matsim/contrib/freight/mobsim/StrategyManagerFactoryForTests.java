@@ -6,15 +6,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategy;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManager;
-import org.matsim.contrib.freight.replanning.modules.MemorizeSelectedPlan;
-import org.matsim.contrib.freight.replanning.modules.RouteVehicles;
-import org.matsim.contrib.freight.replanning.modules.SelectBestPlan;
-import org.matsim.contrib.freight.vrp.TransportCostCalculator;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateChartListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
-import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.TourImpl;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
+import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
+import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -57,69 +50,18 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
 	}
 	
 	public CarrierPlanStrategyManager createStrategyManager(Controler controler){
-		CarrierPlanStrategy planStrat_reSchedule = new CarrierPlanStrategy();
 
-		final LeastCostPathCalculator router = new FastDijkstraFactory()
-				.createPathCalculator(controler.getScenario()
+		final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(controler.getScenario()
 						.getNetwork(), new MyTravelCosts(controler
 						.getTravelTimeCalculator()), controler
 						.getTravelTimeCalculator());
 
-		// final LeastCostPathCalculator router =
-		// event.getControler().getLeastCostPathCalculatorFactory().createPathCalculator(event.getControler().getScenario().getNetwork(),
-		// event.getControler().createTravelCostCalculator(),
-		// event.getControler().getTravelTimeCalculator());
 
-		VehicleRoutingCosts costs = new TransportCostCalculator(router, controler.getNetwork(), controler.getConfig()
-				.travelTimeCalculator().getTraveltimeBinSize());
 
-		String filename = controler.getControlerIO()
-				.getIterationPath(controler.getIterationNumber())
-				+ "/" + controler.getIterationNumber() + ".vrp.png";
-		RuinAndRecreateChartListener chartListener = new RuinAndRecreateChartListener();
-		chartListener.setFilename(filename);
-
-		TourCost tourCost = new TourCost() {
-
-			@Override
-			public double getTourCost(TourImpl tour, Driver driver,
-					org.matsim.contrib.freight.vrp.basics.Vehicle vehicle) {
-				return vehicle.getType().vehicleCostParams.fix
-						+ tour.tourData.transportCosts;
-			}
-
-		};
-
-//		ReScheduleVehicles vehicleReRouter = new ReScheduleVehicles(controler.getNetwork(), costs, tourCost);
-//		// vehicleReRouter.listeners.add(chartListener);
-//
-//		planStrat_reSchedule.addModule(new MemorizeSelectedPlan());
-//		planStrat_reSchedule.addModule(vehicleReRouter);
-//		planStrat_reSchedule.addModule(new ReRouteVehicles(router, controler.getNetwork(), controler
-//				.getTravelTimeCalculator()));
-//
-//		ScheduleVehicles vehicleRouter = new ScheduleVehicles(controler.getNetwork(), tourCost, costs,
-//				new DTWSolverFactory());
-//
-//		CarrierPlanStrategy planStrat_schedule = new CarrierPlanStrategy();
-//		planStrat_schedule.addModule(new MemorizeSelectedPlan());
-//		planStrat_schedule.addModule(vehicleRouter);
-//		planStrat_schedule.addModule(new ReRouteVehicles(router, controler.getNetwork(),controler
-//				.getTravelTimeCalculator()));
-//
-//		CarrierPlanStrategy planStrat_bestPlan = new CarrierPlanStrategy();
-//		planStrat_bestPlan.addModule(new MemorizeSelectedPlan());
-//		planStrat_bestPlan.addModule(new SelectBestPlan());
-
-		CarrierPlanStrategy planStrat_reRoutePlan = new CarrierPlanStrategy();
-		planStrat_reRoutePlan.addModule(new MemorizeSelectedPlan());
-		planStrat_reRoutePlan.addModule(new SelectBestPlan());
-		planStrat_reRoutePlan.addModule(new RouteVehicles(router, controler.getNetwork(),controler.getTravelTimeCalculator()));
+		CarrierPlanStrategy planStrat_reRoutePlan = new CarrierPlanStrategy(new SelectBestPlan());
+		planStrat_reRoutePlan.addModule(new ReRouteVehicles(router, controler.getNetwork(),controler.getTravelTimeCalculator()));
 
 		CarrierPlanStrategyManager stratManager = new CarrierPlanStrategyManager();
-//		stratManager.addStrategy(planStrat_reSchedule, 0.0);
-		// stratManager.addStrategy(planStrat_schedule, 0.1);
-//		stratManager.addStrategy(planStrat_bestPlan, 0.0);
 		stratManager.addStrategy(planStrat_reRoutePlan, 1.0);
 
 		return stratManager;

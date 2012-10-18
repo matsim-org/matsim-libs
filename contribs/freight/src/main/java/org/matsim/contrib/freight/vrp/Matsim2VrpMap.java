@@ -122,8 +122,7 @@ class Matsim2VrpMap {
 
 	private MatSim2VRPShipmentMap shipmentMap;
 
-	Matsim2VrpMap(Collection<CarrierShipment> shipments,
-			Collection<CarrierVehicle> vehicles) {
+	Matsim2VrpMap(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> vehicles) {
 		vehicleMap = new MatSimVrpVehicleMap(vehicles);
 		shipmentMap = new MatSim2VRPShipmentMap(shipments);
 	}

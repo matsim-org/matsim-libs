@@ -78,7 +78,7 @@ class RRDriverAgent implements ServiceProviderAgent, TourAgent {
 		iniJobs();
 	}
 
-	public void setBestJobInsertionFinder(LeastCostTourCalculator bestJobInsertionFinder) {
+	public void setLeastCostTourCalculator(LeastCostTourCalculator bestJobInsertionFinder) {
 		this.leastCostTourCalculator = bestJobInsertionFinder;
 	}
 

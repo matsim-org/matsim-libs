@@ -32,8 +32,6 @@ public interface RecreationStrategy {
 	 * @param unassignedJobs
 	 * @param result2beat
 	 */
-	public void recreate(
-			Collection<? extends ServiceProviderAgent> serviceProviders,
-			Collection<Job> unassignedJobs, double result2beat);
+	public void recreate(Collection<? extends ServiceProviderAgent> serviceProviders,Collection<Job> unassignedJobs, double result2beat);
 
 }

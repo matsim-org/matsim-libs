@@ -18,17 +18,12 @@ public class CarrierFactory {
 		return new CarrierVehicle(vehicleId, linkId);
 	}
 
-	public CarrierShipment createShipment(Id from, Id to, int size,
-			TimeWindow pickupTW, TimeWindow deliveryTW) {
+	public CarrierShipment createShipment(Id from, Id to, int size,TimeWindow pickupTW, TimeWindow deliveryTW) {
 		return new CarrierShipment(from, to, size, pickupTW, deliveryTW);
 	}
 
-	public CarrierShipment createShipment(String from, String to, int size,
-			double pickupStart, double pickupEnd, double deliveryStart,
-			double deliveryEnd) {
-		return createShipment(createId(from), createId(to), size,
-				createTimeWindow(pickupStart, pickupEnd),
-				createTimeWindow(deliveryStart, deliveryEnd));
+	public CarrierShipment createShipment(String from, String to, int size,double pickupStart, double pickupEnd, double deliveryStart,double deliveryEnd) {
+		return createShipment(createId(from), createId(to), size,createTimeWindow(pickupStart, pickupEnd),createTimeWindow(deliveryStart, deliveryEnd));
 	}
 
 	public TimeWindow createTimeWindow(double start, double end) {
@@ -39,12 +34,7 @@ public class CarrierFactory {
 		return new CarrierCapabilities();
 	}
 
-	// public CarrierContract createContract(CarrierShipment shipment){
-	// return new CarrierContract(shipment, null);
-	// }
-
-	public ScheduledTour createScheduledTour(Tour tour, CarrierVehicle vehicle,
-			double departureTime) {
+	public ScheduledTour createScheduledTour(Tour tour, CarrierVehicle vehicle,double departureTime) {
 		return new ScheduledTour(tour, vehicle, departureTime);
 	}
 
@@ -60,45 +50,33 @@ public class CarrierFactory {
 		return new IdImpl(id);
 	}
 
-	public CarrierPlan createPlan(Collection<ScheduledTour> sTours) {
-		return new CarrierPlan(sTours);
+	public CarrierPlan createPlan(Carrier carrier, Collection<ScheduledTour> sTours) {
+		return new CarrierPlan(carrier, sTours);
 	}
 
-	public CarrierVehicleType createVehicleType(String id, double fix,
-			double costPerTimeUnit, double costPerDistanceUnit) {
+	public CarrierVehicleType createVehicleType(String id, double fix,double costPerTimeUnit, double costPerDistanceUnit) {
 		CarrierVehicleType t = new CarrierVehicleType(createId(id));
-		t.setVehicleCostParams(new VehicleCostInformation(fix,
-				costPerDistanceUnit, costPerTimeUnit));
+		t.setVehicleCostParams(new VehicleCostInformation(fix,costPerDistanceUnit, costPerTimeUnit));
 		return t;
 	}
 
-	public CarrierVehicle createVehicle(String vehicleId,
-			String vehicleLocationId, int vehicleCapacity,
-			CarrierVehicleType vehicleType) {
-		CarrierVehicle vehicle = new CarrierVehicle(createId(vehicleId),
-				createId(vehicleLocationId));
+	public CarrierVehicle createVehicle(String vehicleId,String vehicleLocationId, int vehicleCapacity,CarrierVehicleType vehicleType) {
+		CarrierVehicle vehicle = new CarrierVehicle(createId(vehicleId),createId(vehicleLocationId));
 		vehicle.setCapacity(vehicleCapacity);
 		// vehicleType.setFreightCapacity(vehicleCapacity);
 		vehicle.setVehicleType(vehicleType);
 		return vehicle;
 	}
 
-	public CarrierVehicle createAndAddVehicle(Carrier carrier,
-			String vehicleId, String vehicleLocationId, int vehicleCapacity,
-			String type, double earliestOperationStart,
-			double latestOperationEnd) {
-		CarrierVehicle v = createAndAddVehicle(carrier, vehicleId,
-				vehicleLocationId, vehicleCapacity, type);
+	public CarrierVehicle createAndAddVehicle(Carrier carrier,String vehicleId, String vehicleLocationId, int vehicleCapacity,String type, double earliestOperationStart,double latestOperationEnd) {
+		CarrierVehicle v = createAndAddVehicle(carrier, vehicleId,vehicleLocationId, vehicleCapacity, type);
 		v.setEarliestStartTime(earliestOperationStart);
 		v.setLatestEndTime(latestOperationEnd);
 		return v;
 	}
 
-	public CarrierVehicle createAndAddVehicle(Carrier carrier,
-			String vehicleId, String vehicleLocationId, int vehicleCapacity,
-			String type) {
-		CarrierVehicle vehicle = new CarrierVehicle(createId(vehicleId),
-				createId(vehicleLocationId));
+	public CarrierVehicle createAndAddVehicle(Carrier carrier,String vehicleId, String vehicleLocationId, int vehicleCapacity,String type) {
+		CarrierVehicle vehicle = new CarrierVehicle(createId(vehicleId),createId(vehicleLocationId));
 		vehicle.setCapacity(vehicleCapacity);
 		CarrierVehicleType vehicleType = new CarrierVehicleType(createId(type));
 		// vehicleType.setFreightCapacity(vehicleCapacity);
@@ -113,45 +91,8 @@ public class CarrierFactory {
 		return vehicle;
 	}
 
-	// public Collection<CarrierShipment>
-	// getShipments(Collection<CarrierContract> contracts) {
-	// Collection<CarrierShipment> shipments = new ArrayList<CarrierShipment>();
-	// for(CarrierContract c : contracts){
-	// shipments.add((CarrierShipment)c.getShipment());
-	// }
-	// return shipments;
-	// }
-
-	public Collection<CarrierVehicle> getVehicles(
-			CarrierCapabilities carrierCapabilities) {
-		return new ArrayList<CarrierVehicle>(
-				carrierCapabilities.getCarrierVehicles());
+	public Collection<CarrierVehicle> getVehicles(CarrierCapabilities carrierCapabilities) {
+		return new ArrayList<CarrierVehicle>(carrierCapabilities.getCarrierVehicles());
 	}
-
-	// public Tour copyTour(Tour tour) {
-	// TourBuilder tourBuilder = new TourBuilder();
-	// tourBuilder.scheduleStart(tour.getStartLinkId(),
-	// tour.getEarliestDeparture(), tour.getLatestDeparture());
-	// for(TourElement e : tour.getTourElements()){
-	// if(e instanceof Pickup){
-	// tourBuilder.schedulePickup(((Pickup) e).getShipment());
-	// }
-	// else if(e instanceof Delivery){
-	// tourBuilder.scheduleDelivery(((Delivery) e).getShipment());
-	// }
-	// if(e instanceof Leg){
-	// Leg leg = tourBuilder.createLeg();
-	// leg.setDepartureTime(((Leg) e).getDepartureTime());
-	// leg.setExpectedTransportTime(((Leg) e).getExpectedTransportTime());
-	// NetworkRoute oldRoute = (NetworkRoute) ((Leg) e).getRoute();
-	// NetworkRoute route =
-	// tourBuilder.createRoute(oldRoute.getStartLinkId(),oldRoute.getLinkIds(),oldRoute.getEndLinkId());
-	// leg.setRoute(route);
-	// tourBuilder.addLeg(leg);
-	// }
-	// }
-	// tourBuilder.scheduleEnd(tour.getEndLinkId());
-	// return tourBuilder.build();
-	// }
 
 }

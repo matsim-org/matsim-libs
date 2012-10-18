@@ -7,6 +7,7 @@ import java.util.Random;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -37,6 +38,8 @@ public class RuinAndRecreateAlgorithmBuilder {
 
 	private ServiceProviderAgentFactory serviceProviderAgentFactory;
 
+	private VehicleRoutingProblemSolution iniSolution;
+
 	public void setRandom(Random random) {
 		this.random = random;
 	}
@@ -56,8 +59,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 		this.serviceProviderAgentFactory = serviceProviderAgentFactory;
 	}
 
-	public void setInitialSolutionFactory(
-			InitialSolutionFactory initialSolutionFactory) {
+	public void setInitialSolutionFactory(InitialSolutionFactory initialSolutionFactory) {
 		this.initialSolutionFactory = initialSolutionFactory;
 	}
 
@@ -67,6 +69,10 @@ public class RuinAndRecreateAlgorithmBuilder {
 
 	public void setRecreationStrategy(RecreationStrategy recreationStrategy) {
 		this.recreationStrategy = recreationStrategy;
+	}
+	
+	public void setInitialSolution(VehicleRoutingProblemSolution iniSolution){
+		this.iniSolution = iniSolution;
 	}
 
 	public void setWarmupIterations(int value) {
@@ -82,14 +88,15 @@ public class RuinAndRecreateAlgorithmBuilder {
 			throw new IllegalStateException("no warmup iterations set");
 		if (iterations == null)
 			throw new IllegalStateException("no iterations set");
-		if (initialSolutionFactory == null)
-			throw new IllegalStateException("no initialsolutionfactory set");
+		if (initialSolutionFactory == null && iniSolution == null)
+			throw new IllegalStateException("set either an initial solutionFactory or a concrete initial solution");
 		if (recreationStrategy == null)
 			throw new IllegalStateException("no recreationstrategy set");
 		if (serviceProviderAgentFactory == null)
 			throw new IllegalStateException("no serviceproviderFactory set");
 		checkRuinManager();
 		RuinAndRecreate rr = new RuinAndRecreate(vrp);
+		rr.setCurrentSolution(iniSolution);
 		rr.setInitialSolutionFactory(initialSolutionFactory);
 		rr.setIterations(iterations);
 		rr.setWarmUpIterations(warmup);

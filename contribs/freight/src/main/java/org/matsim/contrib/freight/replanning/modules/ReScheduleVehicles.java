@@ -1,15 +1,18 @@
 package org.matsim.contrib.freight.replanning.modules;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyModule;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolver;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolverFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
-public class ScheduleVehicles implements CarrierPlanStrategyModule {
+public class ReScheduleVehicles implements CarrierPlanStrategyModule {
 
 	private Network network;
 
@@ -19,7 +22,7 @@ public class ScheduleVehicles implements CarrierPlanStrategyModule {
 
 	private TourCost tourCost;
 
-	public ScheduleVehicles(Network network, TourCost tourCost, VehicleRoutingCosts costs, MatsimVrpSolverFactory vrpSolverFactory) {
+	public ReScheduleVehicles(Network network, TourCost tourCost, VehicleRoutingCosts costs, MatsimVrpSolverFactory vrpSolverFactory) {
 		super();
 		this.network = network;
 		this.costs = costs;
@@ -28,10 +31,14 @@ public class ScheduleVehicles implements CarrierPlanStrategyModule {
 	}
 
 	@Override
-	public void handleCarrier(Carrier carrier) {
-		MatsimVrpSolver solver = vrpSolverFactory.createSolver(carrier.getShipments(), carrier.getCarrierCapabilities().getCarrierVehicles(), network, tourCost, costs);
-		CarrierPlan plan = new CarrierPlan(solver.solve());
-		carrier.setSelectedPlan(plan);
+	public void handlePlan(CarrierPlan carrierPlan) {
+		assert carrierPlan != null : "cannot handle plan. plan is null";
+		Carrier carrier = carrierPlan.getCarrier();
+		MatsimVrpSolver solver = vrpSolverFactory.createSolver(carrier, network, tourCost, costs);
+		Collection<ScheduledTour> tours = solver.solve();
+		carrierPlan.getScheduledTours().clear();
+		carrierPlan.getScheduledTours().addAll(tours);
+		carrierPlan.setScore(null);
 	}
 
 }

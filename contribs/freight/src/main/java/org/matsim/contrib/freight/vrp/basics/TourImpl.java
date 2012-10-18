@@ -26,11 +26,13 @@ public class TourImpl implements Tour {
 		public double transportTime;
 		public double transportCosts;
 		public int totalLoad;
+		public double totalCost;
 
 		public void reset() {
 			transportTime = 0.0;
 			transportCosts = 0.0;
 			totalLoad = 0;
+			totalCost = 0.0;
 		}
 
 	}
@@ -46,6 +48,7 @@ public class TourImpl implements Tour {
 		this.tourData.transportCosts = tour2copy.tourData.transportCosts;
 		this.tourData.transportTime = tour2copy.tourData.transportTime;
 		this.tourData.totalLoad = tour2copy.tourData.totalLoad;
+		this.tourData.totalCost = tour2copy.tourData.totalCost;
 	}
 
 	public TourImpl() {

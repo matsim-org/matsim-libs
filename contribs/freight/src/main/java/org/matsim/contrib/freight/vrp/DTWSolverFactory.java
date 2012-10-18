@@ -9,6 +9,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
@@ -28,23 +29,16 @@ public class DTWSolverFactory implements MatsimVrpSolverFactory {
 	}
 
 	@Override
-	public MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments,
-			Collection<CarrierVehicle> carrierVehicles, Network network,
-			TourCost tourCost, VehicleRoutingCosts costs) {
-		verifyDistributionProblem(shipments, carrierVehicles);
-		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(
-				tourCost, costs).getFactory(VehicleRoutingProblemType.CVRPTW);
-		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(shipments,
-				carrierVehicles, costs);
-		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(
-				spFactory);
+	public MatsimVrpSolver createSolver(Carrier carrier,Network network, TourCost tourCost,VehicleRoutingCosts costs) {
+		verifyDistributionProblem(carrier.getShipments(), carrier.getCarrierCapabilities().getCarrierVehicles());
+		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, costs).getFactory(VehicleRoutingProblemType.CVRPTW);
+		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(carrier,costs);
+		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
 		rrSolver.setVrpSolverFactory(ruinAndRecreateFactory);
 		return rrSolver;
 	}
 
-	private void verifyDistributionProblem(
-			Collection<CarrierShipment> shipments,
-			Collection<CarrierVehicle> carrierVehicles) {
+	private void verifyDistributionProblem(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles) {
 		Id location = null;
 		for (CarrierVehicle v : carrierVehicles) {
 			if (location == null) {

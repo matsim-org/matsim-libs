@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.AlgorithmEndsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.IterationEndsListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.listener.MainRunStartsListener;
 import org.matsim.core.utils.charts.XYLineChart;
 
 /**
@@ -26,11 +27,9 @@ import org.matsim.core.utils.charts.XYLineChart;
  * 
  */
 
-public class RuinAndRecreateChartListener implements IterationEndsListener,
-		AlgorithmEndsListener {
+public class RuinAndRecreateChartListener implements IterationEndsListener, AlgorithmEndsListener, MainRunStartsListener {
 
-	private static Logger log = Logger
-			.getLogger(RuinAndRecreateChartListener.class);
+	private static Logger log = Logger.getLogger(RuinAndRecreateChartListener.class);
 
 	private double[] bestResults;
 
@@ -55,9 +54,7 @@ public class RuinAndRecreateChartListener implements IterationEndsListener,
 	}
 
 	@Override
-	public void informIterationEnds(int currentIteration,
-			RuinAndRecreateSolution awardedSolution,
-			RuinAndRecreateSolution rejectedSolution) {
+	public void informIterationEnds(int currentIteration,RuinAndRecreateSolution awardedSolution,RuinAndRecreateSolution rejectedSolution) {
 		// System.out.println()
 		bestResultList.add(awardedSolution.getResult());
 		tentativeResultList.add(rejectedSolution.getResult());
@@ -72,12 +69,17 @@ public class RuinAndRecreateChartListener implements IterationEndsListener,
 		for (int i = 0; i < bestResultList.size(); i++) {
 			bestResults[i] = bestResultList.get(i);
 			tentativeResults[i] = tentativeResultList.get(i);
-			mutation[i] = i + 1;
+			mutation[i] = i;
 		}
 		XYLineChart chart = new XYLineChart("Results", "mutation", "costs");
 		chart.addSeries("bestResults", mutation, bestResults);
 		chart.addSeries("tentativeResults", mutation, tentativeResults);
 		chart.saveAsPng(filename, 800, 600);
+	}
+
+	@Override
+	public void informMainRunStarts(RuinAndRecreateSolution initialSolution) {
+		informIterationEnds(0, initialSolution, initialSolution);
 	}
 
 }

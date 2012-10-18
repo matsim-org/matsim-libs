@@ -66,10 +66,9 @@ public final class RecreationBestInsertion implements RecreationStrategy{
 				bestInsertion.getTourAgent().insertJob(unassignedJob, bestInsertion.getInsertionData());
 			} 
 			else {
-				throw new IllegalStateException(
-						"given the vehicles, could not create a valid solution");
+				throw new IllegalStateException("given the vehicles, could not create a valid solution");
 			}
-
 		}
+		
 	}	
 }

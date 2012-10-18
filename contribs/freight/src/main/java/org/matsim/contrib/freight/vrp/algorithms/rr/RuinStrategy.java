@@ -32,7 +32,6 @@ public interface RuinStrategy {
 	 * @param serviceProviders
 	 * @return
 	 */
-	public Collection<Job> ruin(
-			Collection<? extends ServiceProviderAgent> serviceProviders);
+	public Collection<Job> ruin(Collection<? extends ServiceProviderAgent> serviceProviders);
 
 }

@@ -1,9 +1,9 @@
 package org.matsim.contrib.freight.replanning;
 
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 
 public interface CarrierPlanStrategyModule {
 
-	public void handleCarrier(Carrier carrier);
+	public void handlePlan(CarrierPlan carrierPlan);
 
 }

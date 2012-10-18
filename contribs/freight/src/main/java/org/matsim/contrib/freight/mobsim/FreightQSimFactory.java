@@ -82,6 +82,7 @@ public class FreightQSimFactory implements MobsimFactory {
 	}
 	
 	private CarrierAgentTracker carrierAgentTracker;
+	private boolean withinDayReScheduling;
 
 	public FreightQSimFactory(CarrierAgentTracker carrierAgentTracker) {
 		this.carrierAgentTracker = carrierAgentTracker;
@@ -102,8 +103,13 @@ public class FreightQSimFactory implements MobsimFactory {
 		sim.addAgentSource(agentSource);
 		Internals internals = new Internals();
 		sim.addMobsimEngine(internals);
-//		sim.addQueueSimulationListeners(new WithinDayActivityReScheduling(agentSource,internals.getInternalInterface(), carrierAgentTracker));
-		
+		if(withinDayReScheduling){
+			sim.addQueueSimulationListeners(new WithinDayActivityReScheduling(agentSource,internals.getInternalInterface(), carrierAgentTracker));
+		}
 		return sim;
+	}
+
+	public void setWithinDayActivityReScheduling(boolean withinDayReScheduling) {
+		this.withinDayReScheduling = withinDayReScheduling;
 	}
 }

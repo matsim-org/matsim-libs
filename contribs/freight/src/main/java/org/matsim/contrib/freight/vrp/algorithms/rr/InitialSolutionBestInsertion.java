@@ -57,15 +57,21 @@ public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 	}
 
 	@Override
-	public RuinAndRecreateSolution createInitialSolution(
-			VehicleRoutingProblem vrp) {
+	public RuinAndRecreateSolution createInitialSolution(VehicleRoutingProblem vrp) {
 		// logger.info("create initial solution.");
 		List<ServiceProviderAgent> serviceProviders = createEmptyServiceProviders(vrp);
 		RecreationBestInsertion bestInsertion = new RecreationBestInsertion();
-		bestInsertion.recreate(serviceProviders, getUnassignedJobs(vrp),
-				Double.MAX_VALUE);
+		bestInsertion.recreate(serviceProviders, getUnassignedJobs(vrp),Double.MAX_VALUE);
+		double totalCost = getTotalCost(serviceProviders);
+		return new RuinAndRecreateSolution(serviceProviders, totalCost);
+	}
 
-		return new RuinAndRecreateSolution(serviceProviders);
+	private double getTotalCost(List<ServiceProviderAgent> serviceProviders) {
+		double c = 0.0;
+		for(ServiceProviderAgent a : serviceProviders){
+			c += a.getTourCost();
+		}
+		return c;
 	}
 
 	private List<Job> getUnassignedJobs(VehicleRoutingProblem vrp) {

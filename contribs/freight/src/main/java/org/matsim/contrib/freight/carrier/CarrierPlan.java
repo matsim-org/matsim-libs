@@ -13,12 +13,19 @@ import java.util.Collection;
  */
 public class CarrierPlan {
 
+	private final Carrier carrier;
+	
 	private final Collection<ScheduledTour> scheduledTours;
 
 	private Double score = null;
 
-	public CarrierPlan(final Collection<ScheduledTour> scheduledTours) {
+	public CarrierPlan(final Carrier carrier, final Collection<ScheduledTour> scheduledTours) {
 		this.scheduledTours = scheduledTours;
+		this.carrier = carrier;
+	}
+
+	public Carrier getCarrier() {
+		return carrier;
 	}
 
 	public Double getScore() {

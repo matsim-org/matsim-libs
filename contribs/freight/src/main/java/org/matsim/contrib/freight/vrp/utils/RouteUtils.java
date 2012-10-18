@@ -21,4 +21,12 @@ public class RouteUtils {
 		}
 		return time;
 	}
+	
+	public static double getTotalCost(Collection<VehicleRoute> routes){
+		double total = 0.0;
+		for (VehicleRoute r : routes) {
+			total += r.getTour().tourData.totalCost;
+		}
+		return total;
+	}
 }

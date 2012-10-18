@@ -136,7 +136,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 			}
 			writer.write(">\n");
 					
-			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
+			for (ScheduledTour tour : plan.getScheduledTours()) {
 				writer.write("\t\t\t\t<tour ");
 				writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId()
 						+ "\">\n");

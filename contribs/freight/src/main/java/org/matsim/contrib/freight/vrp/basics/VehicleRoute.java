@@ -17,11 +17,21 @@ public class VehicleRoute {
 	private TourImpl tour;
 
 	private Vehicle vehicle;
+	
+	private Driver driver;
 
 	public VehicleRoute(TourImpl tour, Vehicle vehicle) {
 		super();
 		this.tour = tour;
 		this.vehicle = vehicle;
+		this.driver = null;
+	}
+	
+	public VehicleRoute(TourImpl tour, Driver driver, Vehicle vehicle) {
+		super();
+		this.tour = tour;
+		this.vehicle = vehicle;
+		this.driver = driver;
 	}
 
 	public TourImpl getTour() {
@@ -30,6 +40,10 @@ public class VehicleRoute {
 
 	public Vehicle getVehicle() {
 		return vehicle;
+	}
+
+	public Driver getDriver() {
+		return driver;
 	}
 
 }

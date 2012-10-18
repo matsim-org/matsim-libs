@@ -45,7 +45,7 @@ public class VrpTourBuilder {
 	}
 
 	public VrpTourBuilder(TourImpl tour) {
-		tour = tour;
+		this.tour = tour;
 	}
 
 	public Start scheduleStart(String locationId, double earliestDeparture,
@@ -61,8 +61,7 @@ public class VrpTourBuilder {
 		return start;
 	}
 
-	public Collection<JobActivity> addShipment(Shipment shipment,
-			int pickupIndex, int deliveryIndex) {
+	public Collection<JobActivity> addShipment(Shipment shipment,int pickupIndex, int deliveryIndex) {
 		Pickup pickup = new Pickup(shipment);
 		Delivery delivery = new Delivery(shipment);
 		tour.getActivities().add(deliveryIndex, delivery);

@@ -18,7 +18,7 @@ public class CarrierImpl implements Carrier {
 	private CarrierPlan selectedPlan;
 
 	private CarrierCapabilities carrierCapabilities;
-
+	
 	public CarrierImpl(final Id id, final Id depotLinkId) {
 		super();
 		this.id = id;
@@ -109,14 +109,5 @@ public class CarrierImpl implements Carrier {
 		return carrierCapabilities;
 	}
 
-	// @Override
-	// public Collection<CarrierContract> getNewContracts() {
-	// return newContracts;
-	// }
-	//
-	// @Override
-	// public Collection<CarrierContract> getExpiredContracts() {
-	// return expiredContracts;
-	// }
 
 }

@@ -11,7 +11,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierFactory;
+import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
@@ -40,14 +42,13 @@ public class RRVRPSolverTest extends TestCase {
 
 		@Override
 		public MatsimVrpSolver createSolver(
-				Collection<CarrierShipment> shipments,
-				Collection<CarrierVehicle> carrierVehicles, Network network,
-				TourCost tourCost, VehicleRoutingCosts costs) {
+				Carrier carrier,
+				Network network, TourCost tourCost,
+				VehicleRoutingCosts costs) {
 			ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(
 					tourCost, costs)
 					.getFactory(VehicleRoutingProblemType.CVRPTW);
-			MatsimVrpSolverImpl solver = new MatsimVrpSolverImpl(shipments,
-					carrierVehicles, costs);
+			MatsimVrpSolverImpl solver = new MatsimVrpSolverImpl(carrier,costs);
 			RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(
 					spFactory);
 			solver.setVrpSolverFactory(ruinAndRecreateFactory);
@@ -141,24 +142,26 @@ public class RRVRPSolverTest extends TestCase {
 	}
 
 	public void testSolveWithNoShipments() {
-		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"),
-				makeId("vehicleLocation"));
+		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"),makeId("vehicleLocation"));
 		vehicle.setVehicleType(new CarrierVehicleType(makeId("standard")));
 		vehicle.setCapacity(10);
 		vehicles.add(vehicle);
-		Collection<ScheduledTour> tours = new MyVRPSolverFactory()
-				.createSolver(shipments, vehicles, scenario.getNetwork(),
-						tourCost, costs).solve();
+		Carrier carrier = new CarrierFactory().createCarrier("c", "l1");
+		carrier.setCarrierCapabilities(new CarrierFactory().createCapabilities());
+		carrier.getCarrierCapabilities().getCarrierVehicles().add(vehicle);
+		carrier.getShipments().addAll(shipments);
+		Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(carrier, scenario.getNetwork(), tourCost,costs).solve();
 		assertTrue(tours.isEmpty());
 	}
 
 	public void testSolveWithNoVehicles() {
 		vehicles.clear();
 		shipments.add(makeShipment("depotLocation", "customerLocation", 20));
+		Carrier carrier = new CarrierFactory().createCarrier("c", "l1");
+		carrier.setCarrierCapabilities(new CarrierFactory().createCapabilities());
+		carrier.getShipments().addAll(shipments);
 		try {
-			Collection<ScheduledTour> tours = new MyVRPSolverFactory()
-					.createSolver(shipments, vehicles, scenario.getNetwork(),
-							tourCost, costs).solve();
+			Collection<ScheduledTour> tours = new MyVRPSolverFactory().createSolver(carrier, scenario.getNetwork(), tourCost,costs).solve();
 			assertTrue(false);
 		} catch (IllegalStateException e) {
 			assertTrue(true);

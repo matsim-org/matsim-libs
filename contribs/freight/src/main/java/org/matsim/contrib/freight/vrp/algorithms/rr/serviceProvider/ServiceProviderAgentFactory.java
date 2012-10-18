@@ -24,8 +24,6 @@ public interface ServiceProviderAgentFactory {
 	public ServiceProviderAgent createAgent(Vehicle vehicle, Driver driver);
 	
 	
-//	public ServiceProviderAgent createAgent(Driver driver);
-	
 	/**
 	 * copies an agent
 	 * @param agent

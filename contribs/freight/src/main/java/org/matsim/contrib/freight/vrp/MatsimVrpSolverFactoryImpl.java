@@ -4,10 +4,12 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 
@@ -16,29 +18,29 @@ public class MatsimVrpSolverFactoryImpl implements MatsimVrpSolverFactory {
 	private VehicleRoutingProblemSolverFactory vrpSolverFactory;
 
 	private VehicleRoutingProblemType vrpType;
+	
+	private boolean useSelectedPlan = false;
 
-	public MatsimVrpSolverFactoryImpl(
-			VehicleRoutingProblemSolverFactory solverFactory,
-			VehicleRoutingProblemType vrpType) {
+	public MatsimVrpSolverFactoryImpl(VehicleRoutingProblemSolverFactory solverFactory,VehicleRoutingProblemType vrpType) {
 		super();
 		this.vrpSolverFactory = solverFactory;
 		this.vrpType = vrpType;
 	}
 
 	@Override
-	public MatsimVrpSolver createSolver(Collection<CarrierShipment> shipments,
-			Collection<CarrierVehicle> carrierVehicles, Network network,
-			TourCost tourCost, VehicleRoutingCosts costs) {
-		verifyVehicleRouteProblem(shipments, carrierVehicles);
-		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(shipments,
-				carrierVehicles, costs);
+	public MatsimVrpSolver createSolver(Carrier carrier, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
+		verifyVehicleRouteProblem(carrier.getShipments(), carrier.getCarrierCapabilities().getCarrierVehicles());
+		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(carrier,costs);
 		rrSolver.setVrpSolverFactory(vrpSolverFactory);
+		rrSolver.useSelectedPlanAsInitialSolution(useSelectedPlan);
 		return rrSolver;
 	}
 
-	protected void verifyVehicleRouteProblem(
-			Collection<CarrierShipment> shipments,
-			Collection<CarrierVehicle> carrierVehicles) {
+	public void useSelectedPlanAsInitialSolution(boolean value) {
+		useSelectedPlan = value;
+	}
+
+	protected void verifyVehicleRouteProblem(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles) {
 		if (vrpType.equals(VehicleRoutingProblemType.CVRP)
 				|| vrpType.equals(VehicleRoutingProblemType.CVRPTW)
 				|| vrpType.equals(VehicleRoutingProblemType.TDCVRPTW)) {
