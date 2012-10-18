@@ -45,7 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author thibautd
  */
 public class HerbieTransitRouterFactory implements TransitRouterFactory {
-	private final boolean USE_HERBIE_COST_IN_ROUTING = false;
+	private static final boolean USE_HERBIE_COST_IN_ROUTING = false;
 
 	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;
