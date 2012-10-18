@@ -98,8 +98,6 @@ public class UglyHerbieMultilegControler extends Controler {
 		
 		this.setTravelDisutilityFactory(costCalculatorFactory);
 		
-		super.setUp();
-
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.
 		setTransitRouterFactory(
@@ -112,6 +110,8 @@ public class UglyHerbieMultilegControler extends Controler {
 						config.vspExperimental()),
 					herbieConfigGroup,
 					new TravelScoringFunction( params, herbieConfigGroup ) ) );
+
+		super.setUp();
 	}
 	
 	
