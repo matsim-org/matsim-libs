@@ -42,7 +42,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
@@ -65,8 +64,6 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		Logger.getLogger(ParkAndRideChooseModeForSubtour.class);
 	// enable during developement to get more checks
 	private static final boolean SELF_CHECKING = true;
-	private static final StageActivityTypes PNR_TYPES = new StageActivityTypesImpl( Collections.singleton(ParkAndRideConstants.PARKING_ACT) );
-
 	private static class Candidate {
 		Integer subTourIndex;
 		String newTransportMode;
@@ -129,7 +126,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		List<PlanElement> planStructure =
 			ParkAndRideUtils.extractPlanStructure(
 					tripRouter,
-					PNR_TYPES,
+					ParkAndRideConstants.PARKING_ACT_TYPE,
 					plan );
 		checkSequence( planStructure );
 		planAnalyzeSubtours.setTripStructureAnalysisLayer( tripStructureAnalysisLayer );
@@ -189,7 +186,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		List<PlanElement> planStructure =
 			ParkAndRideUtils.extractPlanStructure(
 					tripRouter,
-					PNR_TYPES,
+					ParkAndRideConstants.PARKING_ACT_TYPE,
 					plan );
 		checkSequence( planStructure );
 		Id homeLocation = null;
@@ -263,7 +260,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 
 	private static boolean isPnrPlan(final List<PlanElement> seq) {
 		for (PlanElement e : seq) {
-			if (e instanceof Activity && PNR_TYPES.isStageActivity(((Activity) e).getType())) {
+			if (e instanceof Activity && ParkAndRideConstants.PARKING_ACT_TYPE.isStageActivity(((Activity) e).getType())) {
 				return true;
 			}
 		}

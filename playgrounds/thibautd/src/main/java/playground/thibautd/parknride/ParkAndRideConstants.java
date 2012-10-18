@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.parknride;
 
+import java.util.Arrays;
+
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+
 /**
  * defines some constants for P n R
  * @author thibautd
@@ -35,6 +40,7 @@ public class ParkAndRideConstants {
 	 * type of a park and ride "interaction"
 	 */
 	public static final String PARKING_ACT = "park_n_ride_interaction";
+	public static final StageActivityTypes PARKING_ACT_TYPE = new StageActivityTypesImpl( Arrays.asList( PARKING_ACT ) );
 
 	public static final String PARK_N_RIDE_PLAN_TYPE = "parkAndRide";
 }
