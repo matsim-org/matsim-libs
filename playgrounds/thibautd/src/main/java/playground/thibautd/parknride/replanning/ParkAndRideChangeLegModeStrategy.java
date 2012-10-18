@@ -38,6 +38,8 @@ import playground.thibautd.parknride.ParkAndRideConstants;
 
 
 /**
+ * Change trip modes for the whole plan. This has the side effect of removing
+ * all park and ride trips.
  * @author thibautd
  */
 public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
