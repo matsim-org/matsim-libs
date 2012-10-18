@@ -44,7 +44,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
-import playground.thibautd.parknride.mutationapproach.HeuristicParkAndRideIncluder;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 
 /**
