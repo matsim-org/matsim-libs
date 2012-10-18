@@ -84,4 +84,10 @@ public class HerbieRoutingWalkCostEstimator {
 
 		return cost;
 	}
+
+	public static double getTransitRouterInitialWalkCost(
+			final TransitRouterConfig config,
+			final double travelTime) {
+		return -travelTime * config.getMarginalUtilityOfTravelTimeWalk_utl_s();
+	}
 }

@@ -114,7 +114,7 @@ public class HerbieTransitRouter implements TransitRouter {
 		for (TransitRouterNetworkNode node : fromNodes) {
 			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
-			double initialCost = HerbieRoutingWalkCostEstimator.getWalkCost( config , distance , initialTime );
+			double initialCost = HerbieRoutingWalkCostEstimator.getTransitRouterInitialWalkCost( config , initialTime );
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
@@ -130,7 +130,7 @@ public class HerbieTransitRouter implements TransitRouter {
 		for (TransitRouterNetworkNode node : toNodes) {
 			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
-			double initialCost = HerbieRoutingWalkCostEstimator.getWalkCost( config , distance , initialTime );
+			double initialCost = HerbieRoutingWalkCostEstimator.getTransitRouterInitialWalkCost( config , initialTime );
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 
