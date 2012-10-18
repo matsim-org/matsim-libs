@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.parknride.utils;
+package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
