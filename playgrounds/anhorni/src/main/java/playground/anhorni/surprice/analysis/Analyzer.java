@@ -48,6 +48,7 @@ public class Analyzer {
 	private double tt[] = new double[8]; 
 	private double td[] = new double[8]; 
 	private double tolltd[] = new double[8];
+	private double utilities[] = new double[8];
 	
 	public static void main (final String[] args) {		
 		if (args.length != 1) {
@@ -81,12 +82,14 @@ public class Analyzer {
 			String eventsfile = outPath + "/" + day + "/ITERS/it.100." + day + ".100.events.xml.gz";
 			this.readEvents(eventsfile, day);
 			
+			double avgUtility = 0.0;
 			CalcAverageTripLength tdCalculator = new CalcAverageTripLength(this.scenario.getNetwork());
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
 				tdCalculator.run(person);
+				avgUtility += person.getSelectedPlan().getScore() / this.scenario.getPopulation().getPersons().size();
 			}
-			this.td[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();
-			
+			this.td[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();	
+			this.utilities[Surprice.days.indexOf(day)] = avgUtility;
 		}	
 		this.write(outPath);
 	}
@@ -143,6 +146,18 @@ public class Analyzer {
 				avgTollTD += tolltd / Surprice.days.size();
 			}	
 			line += avgTollTD + "\n";
+			bufferedWriter.append(line);
+			bufferedWriter.newLine();
+			
+			bufferedWriter.write("utility\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
+			line = "utility\t";
+			double avgUtility = 0.0;
+			for (String day : Surprice.days) {	
+				double utility = this.utilities[Surprice.days.indexOf(day)];
+				line += formatter.format(utility + "\t");			
+				avgUtility += utility / Surprice.days.size();
+			}	
+			line += avgUtility + "\n";
 			bufferedWriter.append(line);
 			bufferedWriter.newLine();
 			
