@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.TransitTravelDisutility;
+
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.TravelScoringFunction;
 
@@ -41,6 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author thibautd
  */
 public class HerbieTransitRouterFactory implements TransitRouterFactory {
+	private final boolean USE_HERBIE_COST_IN_ROUTING = false;
 
 	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;
@@ -63,15 +68,17 @@ public class HerbieTransitRouterFactory implements TransitRouterFactory {
 	@Override
 	public TransitRouter createTransitRouter() {
 		//TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
-		HerbieTransitTravelTimeAndDisutility ttCalculator =
+		TransitTravelDisutility ttCalculator =
+			USE_HERBIE_COST_IN_ROUTING ?
 			new HerbieTransitTravelTimeAndDisutility(
 					herbieConfig,
 					config,
-					travelScoring);
+					travelScoring) :
+			new TransitRouterNetworkTravelTimeAndDisutility( config );
 		return new HerbieTransitRouter(
 				this.config,
 				this.routerNetwork,
-				ttCalculator,
+				(TravelTime) ttCalculator,
 				ttCalculator,
 				travelScoring);
 	}
