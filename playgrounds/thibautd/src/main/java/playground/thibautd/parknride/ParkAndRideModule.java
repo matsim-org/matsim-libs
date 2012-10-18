@@ -66,7 +66,7 @@ public class ParkAndRideModule extends AbstractMultithreadedModule {
 
 		ParkAndRideConfigGroup configGroup = ParkAndRideUtils.getConfigGroup( controler.getConfig() );
 
-				includer = new HeuristicParkAndRideIncluder(
+				includer = new ParkAndRideIncluder(
 						facilities,
 						tripRouter);
 

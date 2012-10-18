@@ -19,17 +19,138 @@
  * *********************************************************************** */
 package playground.thibautd.parknride;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
+
 
 /**
  * @author thibautd
  */
-public interface ParkAndRideIncluder {
+public class ParkAndRideIncluder {
+	private final QuadTree<ParkAndRideFacility> quadTree;
+	private final TripRouter tripRouter;
+
+	public ParkAndRideIncluder(
+			final ParkAndRideFacilities facilities,
+			final TripRouter router) {
+		quadTree = createQuadTree( facilities );
+		tripRouter = router;
+	}
+
 	public boolean routeAndIncludePnrTrips(
-			Activity accessOriginActivity,
-			Activity accessDestinationActivity,
-			Activity egressOriginActivity,
-			Activity egressDestinationActivity,
-			Plan plan);
+			final Activity accessOriginActivity,
+			final Activity accessDestinationActivity,
+			final Activity egressOriginActivity,
+			final Activity egressDestinationActivity,
+			final Plan plan) {
+		Coord anchor = accessOriginActivity.getCoord();
+		Coord access = accessDestinationActivity.getCoord();
+		Coord egress = egressOriginActivity.getCoord();
+
+		// we take the facility which is the closest to the centroid
+		ParkAndRideFacility fac = quadTree.get( 
+				(anchor.getX() + access.getX() + egress.getX()) / 3d,
+				(anchor.getY() + access.getY() + egress.getY()) / 3d);
+
+		routeAndIncludePnr(
+				plan,
+				accessOriginActivity,
+				accessDestinationActivity,
+				fac,
+				TransportMode.car,
+				TransportMode.pt);
+
+		routeAndIncludePnr(
+				plan,
+				egressOriginActivity,
+				egressDestinationActivity,
+				fac,
+				TransportMode.pt,
+				TransportMode.car);
+
+		return true;
+	}
+
+	private void routeAndIncludePnr(
+			final Plan plan,
+			final Activity origin,
+			final Activity destination,
+			final ParkAndRideFacility fac,
+			final String firstMode,
+			final String lastMode) {
+		List<PlanElement> trip = new ArrayList<PlanElement>();
+		ActivityImpl change =
+			new ActivityImpl(
+					ParkAndRideConstants.PARKING_ACT,
+					fac.getCoord(),
+					fac.getLinkId());
+		change.setFacilityId( fac.getId() );
+		change.setMaximumDuration( 0 );
+
+		double depTime = origin.getEndTime();
+		trip.addAll( tripRouter.calcRoute(
+					firstMode,
+					new ActivityWrapperFacility( origin ),
+					fac,
+					depTime,
+					plan.getPerson()) );
+
+		for (PlanElement pe : trip) {
+			if (pe instanceof Leg) depTime += ((Leg) pe).getTravelTime();
+		}
+
+		trip.add( change );
+		trip.addAll( tripRouter.calcRoute(
+					lastMode,
+					fac,
+					new ActivityWrapperFacility( destination ),
+					depTime,
+					plan.getPerson()) );
+
+		tripRouter.insertTrip(
+				plan,
+				origin,
+				trip,
+				destination);
+	}
+
+	private static QuadTree<ParkAndRideFacility> createQuadTree(
+			final ParkAndRideFacilities facilities) {
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+
+		for (ParkAndRideFacility f : facilities.getFacilities().values()) {
+			double x = f.getCoord().getX();
+			double y = f.getCoord().getY();
+			minX = x < minX ? x : minX;
+			minY = y < minY ? y : minY;
+			maxX = x > maxX ? x : maxX;
+			maxY = y > maxY ? y : maxY;
+		}
+
+		QuadTree<ParkAndRideFacility> qt =
+			new QuadTree<ParkAndRideFacility>(
+					minX, minY, maxX, maxY);
+
+		for (ParkAndRideFacility f : facilities.getFacilities().values()) {
+			qt.put( f.getCoord().getX() , f.getCoord().getY() , f );
+		}
+
+		return qt;
+	}
 }
+
