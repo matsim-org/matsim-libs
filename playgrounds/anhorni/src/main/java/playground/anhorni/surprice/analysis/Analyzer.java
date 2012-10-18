@@ -79,7 +79,7 @@ public class Analyzer {
 			populationReader.readFile(plansFilePath);						
 			this.scenario.getPopulation().getPersons().clear();
 			
-			String eventsfile = outPath + "/" + day + "/ITERS/it.100." + day + ".100.events.xml.gz";
+			String eventsfile = outPath + "/" + day + "/ITERS/it.100/" + day + ".100.events.xml.gz";
 			this.readEvents(eventsfile, day);
 			
 			double avgUtility = 0.0;
