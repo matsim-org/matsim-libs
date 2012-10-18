@@ -56,11 +56,12 @@ public class MultiDayControler {
 			
 			DayControler controler = new DayControler(config, memories, day, incomes, preferences);
 			controler.run();
-		}		
-		UtilityAnalyzer analyzer = new UtilityAnalyzer();
-		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreateSC.xml");
-		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
-		analyzer.analyze(config, outPath, sideLength);
+		}
+		// only used for small-scale scenario
+//		UtilityAnalyzer analyzer = new UtilityAnalyzer();
+//		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreateSC.xml");
+//		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
+//		analyzer.analyze(config, outPath, sideLength);
 		
 		log.info("Week simulated, yep, .................................................................");
     }
