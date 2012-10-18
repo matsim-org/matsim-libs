@@ -48,4 +48,40 @@ public class HerbieRoutingWalkCostEstimator {
 		
 		return walkCost;
 	}
+
+	/**
+	 * Several attempts were made, with different versions of the routing cost.
+	 * Due to errors in eclipse configuration, different states of the modifications
+	 * of the local copies where mixed together at compile time to create the JARs
+	 * used for production run. Thus, we need the diverse versions to use them
+	 * in the places where they where used in the jars...
+	 */
+	public static double getFormerWalkCost(
+			final TransitRouterConfig config,
+			final double distance, 
+			final double travelTime) {
+		double timeThreashold1 = 20.0 * 60.0; // sec
+		double cost = -travelTime * config.getMarginalUtilityOfTravelTimeWalk_utl_s();
+
+		if(travelTime > timeThreashold1) {
+			cost -= 6 * (travelTime - timeThreashold1) * config.getMarginalUtilityOfTravelTimeWalk_utl_s();
+		}
+
+		cost += distance * 0.00065d;
+
+		return cost;
+	}
+
+	public static double getFormerWalkCostNoDistance(
+			final TransitRouterConfig config,
+			final double travelTime) {
+		double timeThreashold1 = 20.0 * 60.0; // sec
+		double cost = travelTime * (-config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+
+		if(travelTime > timeThreashold1) {
+			cost += 6 * (travelTime - timeThreashold1) * (-config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		}
+
+		return cost;
+	}
 }

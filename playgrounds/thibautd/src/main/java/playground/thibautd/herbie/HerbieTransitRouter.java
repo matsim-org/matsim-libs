@@ -143,7 +143,7 @@ public class HerbieTransitRouter implements TransitRouter {
 
 		double directDist = CoordUtils.calcDistance(fromCoord, toCoord);
 		double directWalkTime = directDist / this.config.getBeelineWalkSpeed();
-		double directWalkCost = HerbieRoutingWalkCostEstimator.getWalkCost( config , directDist , directWalkTime );
+		double directWalkCost = HerbieRoutingWalkCostEstimator.getFormerWalkCostNoDistance( config , directWalkTime );
 
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
