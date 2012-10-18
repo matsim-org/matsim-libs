@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.ePlans;
+package playground.vsp.energy.ePlans;
 
 import org.matsim.api.core.v01.Id;
 

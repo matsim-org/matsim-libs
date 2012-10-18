@@ -16,15 +16,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.eVehicles;
+package playground.vsp.energy.eVehicles;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.droeder.e.ePlans.EVehiclePlan;
-import playground.droeder.e.poi.PoiList;
+import playground.vsp.energy.ePlans.EVehiclePlan;
+import playground.vsp.energy.poi.PoiList;
 
 /**
  * @author droeder

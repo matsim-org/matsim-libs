@@ -17,14 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.energy;
+package playground.vsp.energy.energy;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
-
-import playground.droeder.DaFileReader;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author droeder
@@ -36,7 +39,7 @@ public class EmobEnergyProfileReader {
 	
 	public static ChargingProfiles readChargingProfiles(String file){
 		ChargingProfiles p = new ChargingProfiles();
-		Set<String[]> values = DaFileReader.readFileContent(file, "\t", true);
+		Set<String[]> values = readFileContent(file, "\t", true);
 		
 		for(String[] s: values){
 			p.addValue(new IdImpl(s[0]), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
@@ -46,7 +49,7 @@ public class EmobEnergyProfileReader {
 
 	public static DisChargingProfiles readDisChargingProfiles(String file){
 		DisChargingProfiles p = new DisChargingProfiles();
-		Set<String[]> values = DaFileReader.readFileContent(file, "\t", true);
+		Set<String[]> values = readFileContent(file, "\t", true);
 		
 		Double f = 500.;
 		log.warn("currently a factor of " + f + " is used for the discharging-Profiles, because the given values are to low...");
@@ -54,5 +57,39 @@ public class EmobEnergyProfileReader {
 			p.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), f * Double.parseDouble(s[3]));
 		}
 		return p;
+	}
+	
+	private static Set<String[]> readFileContent(String inFile, String splitByExpr, boolean hasHeader){
+		
+		boolean first = hasHeader;
+		Set<String[]> lines = new LinkedHashSet<String[]>();
+		
+		String line;
+		try {
+			log.info("start reading content of " + inFile);
+			BufferedReader reader = IOUtils.getBufferedReader(inFile);
+			line = reader.readLine();
+			do{
+				if(!(line == null)){
+					String[] columns = line.split(splitByExpr);
+					if(first == true){
+						first = false;
+					}else{
+						lines.add(columns);
+					}
+					
+					line = reader.readLine();
+				}
+			}while(!(line == null));
+			reader.close();
+			log.info("finished...");
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return lines;
 	}
 }

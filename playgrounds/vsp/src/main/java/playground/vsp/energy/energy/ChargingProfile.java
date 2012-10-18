@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.energy;
+package playground.vsp.energy.energy;
 
 import java.util.Map.Entry;
 import java.util.SortedMap;

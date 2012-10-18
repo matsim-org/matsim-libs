@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.ePlans;
+package playground.vsp.energy.ePlans;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -24,7 +24,7 @@ import java.util.ListIterator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.droeder.e.energy.ChargingProfiles;
+import playground.vsp.energy.energy.ChargingProfiles;
 
 /**
  * @author droeder

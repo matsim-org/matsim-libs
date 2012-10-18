@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e;
+package playground.vsp.energy;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;

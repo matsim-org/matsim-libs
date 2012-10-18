@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.eVehicles;
+package playground.vsp.energy.eVehicles;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,9 +34,9 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.droeder.e.energy.ChargingProfiles;
-import playground.droeder.e.energy.DisChargingProfiles;
-import playground.droeder.e.poi.PoiList;
+import playground.vsp.energy.energy.ChargingProfiles;
+import playground.vsp.energy.energy.DisChargingProfiles;
+import playground.vsp.energy.poi.PoiList;
 import playground.vsp.energy.validation.ValidationInfoWriter;
 import playground.vsp.energy.validation.ValidationInformation;
 

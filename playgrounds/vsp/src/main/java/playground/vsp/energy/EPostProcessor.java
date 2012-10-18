@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e;
+package playground.vsp.energy;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -34,12 +34,12 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.droeder.e.ePlans.EVehiclesPlanReader;
-import playground.droeder.e.eVehicles.EVehicles;
-import playground.droeder.e.energy.ChargingProfiles;
-import playground.droeder.e.energy.DisChargingProfiles;
-import playground.droeder.e.energy.EmobEnergyProfileReader;
-import playground.droeder.e.poi.PoiList;
+import playground.vsp.energy.ePlans.EVehiclesPlanReader;
+import playground.vsp.energy.eVehicles.EVehicles;
+import playground.vsp.energy.energy.ChargingProfiles;
+import playground.vsp.energy.energy.DisChargingProfiles;
+import playground.vsp.energy.energy.EmobEnergyProfileReader;
+import playground.vsp.energy.poi.PoiList;
 import playground.vsp.energy.validation.ValidationInfoReader;
 import playground.vsp.energy.validation.ValidationInformation;
 

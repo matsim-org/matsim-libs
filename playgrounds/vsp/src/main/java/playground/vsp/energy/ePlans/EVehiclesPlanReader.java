@@ -16,25 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.ePlans;
+package playground.vsp.energy.ePlans;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.IOUtils;
 
-import playground.droeder.DaFileReader;
-import playground.droeder.e.EPostProcessor;
-import playground.droeder.e.eVehicles.EVehicle;
-import playground.droeder.e.eVehicles.EVehicles;
+import playground.vsp.energy.EPostProcessor;
+import playground.vsp.energy.eVehicles.EVehicle;
+import playground.vsp.energy.eVehicles.EVehicles;
 
 /**
  * @author droeder
  *
  */
 public class EVehiclesPlanReader {
+	
+	private static final Logger log = Logger.getLogger(EVehiclesPlanReader.class);
 
 	private EVehicles vehicles;
 
@@ -49,7 +56,7 @@ public class EVehiclesPlanReader {
 	 * @param vehiclePlans
 	 */
 	public void read(String vehiclePlans) {
-		Set<String[]> appointments = DaFileReader.readFileContent(vehiclePlans, "\t", true);
+		Set<String[]> appointments = readFileContent(vehiclePlans, "\t", true);
 		EVehicle v = null;
 		EVehiclePlan plan;
 		List<EVehiclePlanElement> elements = null;
@@ -93,6 +100,40 @@ public class EVehiclesPlanReader {
 		String[] t = s.split(":");
 		time = Double.parseDouble(t[0]) * 3600 + Double.parseDouble(t[1]) * 60 + Double.parseDouble(t[2]);   
 		return time;
+	}
+	
+	private static Set<String[]> readFileContent(String inFile, String splitByExpr, boolean hasHeader){
+		
+		boolean first = hasHeader;
+		Set<String[]> lines = new LinkedHashSet<String[]>();
+		
+		String line;
+		try {
+			log.info("start reading content of " + inFile);
+			BufferedReader reader = IOUtils.getBufferedReader(inFile);
+			line = reader.readLine();
+			do{
+				if(!(line == null)){
+					String[] columns = line.split(splitByExpr);
+					if(first == true){
+						first = false;
+					}else{
+						lines.add(columns);
+					}
+					
+					line = reader.readLine();
+				}
+			}while(!(line == null));
+			reader.close();
+			log.info("finished...");
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return lines;
 	}
 	
 }

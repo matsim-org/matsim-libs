@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.poi;
+package playground.vsp.energy.poi;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.e.energy;
+package playground.vsp.energy.energy;
 
 import java.util.HashMap;
 
@@ -28,44 +28,46 @@ import org.matsim.core.basic.v01.IdImpl;
  * @author droeder
  *
  */
-public class DisChargingProfiles {
+public class ChargingProfiles {
+	
 	public static final Id NONE = new IdImpl("none");
+	
+	private HashMap<Id, ChargingProfile> profiles;
 
-	private HashMap<Id, DisChargingProfile> profiles;
-
-	public DisChargingProfiles(){
-		this.profiles = new HashMap<Id , DisChargingProfile>();
+	public ChargingProfiles(){
+		this.profiles = new HashMap<Id , ChargingProfile>();
 	}
 	
-	public void addValue(Id id, Double slope, Double speed, double usagePerKm){
+	public void addValue(Id id, Double currentState, Double duration, double newState){
 		if(!this.profiles.containsKey(id)){
-			this.profiles.put(id, new DisChargingProfile(id));
+			this.profiles.put(id, new ChargingProfile(id));
 		}
-		this.profiles.get(id).addNewEntry(slope, speed, usagePerKm);
+		this.profiles.get(id).addNewEntry(currentState, duration, newState);
 	}
 	
-	public Double getJoulePerKm(Id id, Double  speed, Double slope){
+	public Double getNewState(Id id, Double  duration, Double currentState){
 		if(this.profiles.containsKey(id)){
-			return this.profiles.get(id).getNewState(speed, slope);
+			return this.profiles.get(id).getNewState(duration, currentState);
 		}else{
-			return 0.0;
+			return currentState;
 		}
 	}
 	
-//	//TODO probably own reader
+//	// TODO probably own reader
 //	public void readAndAddDataFromFile(String inputFile){
 //		Set<String[]> values = DaFileReader.readFileContent(inputFile, "\t", true);
 //		
 //		for(String[] s: values){
-//			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), Double.parseDouble(s[3]));
+//			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
 //		}
+//		
 //	}
 	
 	@Override
 	public String toString(){
 		StringBuffer b = new StringBuffer();
 		
-		for(DisChargingProfile p: this.profiles.values()){
+		for(ChargingProfile p: this.profiles.values()){
 			b.append(p.toString());
 			b.append("\n");
 		}
@@ -74,11 +76,11 @@ public class DisChargingProfiles {
 	}
 	
 	public static void main(String[] args){
-		String inputFile =  "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/DrivingLookupTable_2011-11-25.txt";
-		DisChargingProfiles profiles = EmobEnergyProfileReader.readDisChargingProfiles(inputFile);
+		String inputFile =  "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
+		ChargingProfiles profiles = EmobEnergyProfileReader.readChargingProfiles(inputFile);
 		
-		System.out.println(profiles.toString());
-		System.out.println(profiles.getJoulePerKm(new IdImpl("LOW"), 21.773336, 22.));
-		System.out.println(profiles.getJoulePerKm(new IdImpl("LOW"), 21.773336, 20.));
+//		System.out.println(profiles.toString());
+		System.out.println(profiles.getNewState(new IdImpl("SLOW"), 60., 20.));
 	}
+
 }
