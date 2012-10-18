@@ -13,7 +13,7 @@ public class MVIVisualizer {
 
 		
 		
-		OTFVis.playNetwork("/Users/stefan/Documents/workspace/contrib/freight/test/input/org/matsim/contrib/freight/mobsim/EquilWithCarrierTest/testMobsimWithCarrierRunsWithoutException/network.xml");
+		OTFVis.playNetwork("/Users/stefan/Documents/workspace/sschroeder_vrp/test/matsim/network.xml");
 
 //		String[] arguments = { "-convert",events, network, mvi, "60" };
 //		OTFVis.convert(arguments);

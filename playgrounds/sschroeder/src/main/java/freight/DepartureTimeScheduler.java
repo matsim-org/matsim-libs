@@ -3,7 +3,6 @@ package freight;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
@@ -13,17 +12,16 @@ import org.matsim.core.gbl.MatsimRandom;
 public class DepartureTimeScheduler implements CarrierPlanStrategyModule {
 
 	@Override
-	public void handleCarrier(Carrier carrier) {
+	public void handlePlan(CarrierPlan carrierPlan) {
 		List<ScheduledTour> sTours = new ArrayList<ScheduledTour>();
-		for (ScheduledTour sTour : carrier.getSelectedPlan()
-				.getScheduledTours()) {
+		for (ScheduledTour sTour : carrierPlan.getScheduledTours()) {
 			ScheduledTour newScheduledTour = new CarrierFactory()
 					.createScheduledTour(sTour.getTour(), sTour.getVehicle(),
 							sTour.getTour().getEarliestDeparture());
 			sTours.add(newScheduledTour);
 		}
-		CarrierPlan plan = new CarrierFactory().createPlan(sTours);
-		carrier.setSelectedPlan(plan);
+		carrierPlan.getScheduledTours().clear();
+		carrierPlan.getScheduledTours().addAll(sTours);
 	}
 
 	private double getRandomDepartureTime(double earliestDeparture,
