@@ -8,9 +8,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
 import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.core.events.ActEndEventTest;
+import org.matsim.contrib.freight.carrier.CarrierShipment.TimeWindow;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -19,7 +18,6 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.misc.Time;
 
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener{
 
