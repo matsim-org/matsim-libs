@@ -39,6 +39,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.anhorni.surprice.Surprice;
 
@@ -74,38 +77,52 @@ public class Analyzer {
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
 						
 		for (String day : Surprice.days) {
+			log.info("Analyzing " + day + " --------------------------------------------");
 			String plansFilePath = outPath + "/" + day + "/" + day + ".output_plans.xml.gz";
 			MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 			populationReader.readFile(plansFilePath);						
-			this.scenario.getPopulation().getPersons().clear();
 			
 			String eventsfile = outPath + "/" + day + "/ITERS/it.100/" + day + ".100.events.xml.gz";
-			this.readEvents(eventsfile, day);
+			this.readEvents(eventsfile, day, config);
 			
 			double avgUtility = 0.0;
 			CalcAverageTripLength tdCalculator = new CalcAverageTripLength(this.scenario.getNetwork());
+			
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
 				tdCalculator.run(person);
 				avgUtility += person.getSelectedPlan().getScore() / this.scenario.getPopulation().getPersons().size();
 			}
 			this.td[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();	
 			this.utilities[Surprice.days.indexOf(day)] = avgUtility;
+			
+			this.scenario.getPopulation().getPersons().clear();
 		}	
 		this.write(outPath);
 	}
 	
-	private void readEvents(String eventsfile, String day) {
+	private void readEvents(String eventsfile, String day, Config config) {
 		EventsManager events = EventsUtils.createEventsManager();
-		new MatsimEventsReader(events).readFile(eventsfile);
+		
 		CalcLegTimes ttCalculator = new CalcLegTimes();
 		events.addHandler(ttCalculator);
+		
+		RoadPricingScheme scheme = this.scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scheme);
+		try {
+			rpReader.parse(config.roadpricing().getTollLinksFile());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		CalcAverageTolledTripLength tollCalculator = new CalcAverageTolledTripLength(this.scenario.getNetwork(), scheme);
+		events.addHandler(tollCalculator);
+		
+		new MatsimEventsReader(events).readFile(eventsfile);
+
 		this.tt[Surprice.days.indexOf(day)] = ttCalculator.getAverageTripDuration();
-		
-		CalcAverageTolledTripLength tollCalculator = new CalcAverageTolledTripLength(this.scenario.getNetwork(), 
-				this.scenario.getRoadPricingScheme());
-		
-		events.addHandler(tollCalculator);	
-		this.tolltd[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();
+			
+		// TODO:
+		this.tolltd[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();		
 	}
 			
 	private void write(String outPath) {
@@ -118,10 +135,10 @@ public class Analyzer {
 			double avgTT = 0.0;
 			for (String day : Surprice.days) {	
 				double tt = this.tt[Surprice.days.indexOf(day)];
-				line += formatter.format(tt + "\t");			
+				line += formatter.format(tt) + "\t";			
 				avgTT += tt / Surprice.days.size();
 			}	
-			line += avgTT + "\n";
+			line += formatter.format(avgTT) + "\n";
 			bufferedWriter.append(line);
 			bufferedWriter.newLine();
 			
@@ -130,10 +147,10 @@ public class Analyzer {
 			double avgTD = 0.0;
 			for (String day : Surprice.days) {	
 				double td = this.td[Surprice.days.indexOf(day)];
-				line += formatter.format(td + "\t");			
+				line += formatter.format(td) + "\t";			
 				avgTD += td / Surprice.days.size();
 			}	
-			line += avgTD + "\n";
+			line += formatter.format(avgTD) + "\n";
 			bufferedWriter.append(line);
 			bufferedWriter.newLine();
 			
@@ -142,10 +159,10 @@ public class Analyzer {
 			double avgTollTD = 0.0;
 			for (String day : Surprice.days) {	
 				double tolltd = this.tolltd[Surprice.days.indexOf(day)];
-				line += formatter.format(tolltd + "\t");			
+				line += formatter.format(tolltd) + "\t";			
 				avgTollTD += tolltd / Surprice.days.size();
 			}	
-			line += avgTollTD + "\n";
+			line += formatter.format(avgTollTD) + "\n";
 			bufferedWriter.append(line);
 			bufferedWriter.newLine();
 			
@@ -154,10 +171,10 @@ public class Analyzer {
 			double avgUtility = 0.0;
 			for (String day : Surprice.days) {	
 				double utility = this.utilities[Surprice.days.indexOf(day)];
-				line += formatter.format(utility + "\t");			
+				line += formatter.format(utility) + "\t";			
 				avgUtility += utility / Surprice.days.size();
 			}	
-			line += avgUtility + "\n";
+			line += formatter.format(avgUtility) + "\n";
 			bufferedWriter.append(line);
 			bufferedWriter.newLine();
 			
