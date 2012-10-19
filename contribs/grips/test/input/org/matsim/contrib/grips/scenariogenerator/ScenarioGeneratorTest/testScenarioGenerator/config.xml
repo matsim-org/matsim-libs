@@ -549,6 +549,7 @@
 
 		<!-- Set this filename of MZ05 daily analysis -->
 		<param name="inputMZ05File" value="" />
+		<param name="isGeneratingBoardingDeniedEvent" value="false" />
 		<param name="logitScaleParamForPlansRemoval" value="1." />
 
 		<!-- changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats -->
