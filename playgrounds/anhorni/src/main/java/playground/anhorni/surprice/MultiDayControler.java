@@ -25,6 +25,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.anhorni.surprice.analysis.Analyzer;
+
 public class MultiDayControler {
 	
 	private final static Logger log = Logger.getLogger(MultiDayControler.class);
@@ -62,6 +64,10 @@ public class MultiDayControler {
 //		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreateSC.xml");
 //		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
 //		analyzer.analyze(config, outPath, sideLength);
+		
+		Analyzer analyzer = new Analyzer();
+		analyzer.init(config);
+		analyzer.run();
 		
 		log.info("Week simulated, yep, .................................................................");
     }

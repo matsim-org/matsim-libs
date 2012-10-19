@@ -40,13 +40,13 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.anhorni.surprice.Surprice;
 
 public class Analyzer {
-	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+	private ScenarioImpl scenario = null; 
+	private Config config = null;
 	private final static Logger log = Logger.getLogger(Analyzer.class);
 	private double tt[] = new double[8]; 
 	private double td[] = new double[8]; 
@@ -58,21 +58,28 @@ public class Analyzer {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
 		}
-		
 		Analyzer analyzer = new Analyzer();
-		
 		String configFile = args[0];
-		
-		Config config = ConfigUtils.loadConfig(configFile);
+		analyzer.init(configFile);
+		analyzer.run();	
+	}
+	
+	public void init(String configFile) {
+		this.config = ConfigUtils.loadConfig(configFile);
+		this.init(config);
+	}
+	
+	public void init(Config config) {
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+	}
+	
+	public void run() {
 		String outPath = config.controler().getOutputDirectory();
-		
-		
-		analyzer.analyze(config, outPath);
-		
+		this.analyze(outPath);
 		log.info("=================== Finished analyses ====================");
 	}
 		
-	public void analyze(Config config, String outPath) {		
+	public void analyze(String outPath) {		
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());		
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
 						
@@ -89,7 +96,7 @@ public class Analyzer {
 			CalcAverageTripLength tdCalculator = new CalcAverageTripLength(this.scenario.getNetwork());
 			
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
-				tdCalculator.run(person);
+//				tdCalculator.run(person.getSelectedPlan());
 				avgUtility += person.getSelectedPlan().getScore() / this.scenario.getPopulation().getPersons().size();
 			}
 			this.td[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();	
@@ -106,8 +113,13 @@ public class Analyzer {
 		CalcLegTimes ttCalculator = new CalcLegTimes();
 		events.addHandler(ttCalculator);
 		
-		RoadPricingScheme scheme = this.scenario.getRoadPricingScheme();
-		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scheme);
+		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl)this.scenario.getRoadPricingScheme();
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+		
+		log.info(config.scenario().isUseRoadpricing());
+		scheme.setName("test");
+		
+		
 		try {
 			rpReader.parse(config.roadpricing().getTollLinksFile());
 		} catch (Exception e) {
