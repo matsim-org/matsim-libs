@@ -20,6 +20,7 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +53,7 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		
-		Set<Id> legPerformingAgents = linkReplanningMap.getLegPerformingAgents();
+		Set<Id> legPerformingAgents = new HashSet<Id>(linkReplanningMap.getLegPerformingAgents());
 		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
 		
 		// apply filter to remove agents that should not be replanned

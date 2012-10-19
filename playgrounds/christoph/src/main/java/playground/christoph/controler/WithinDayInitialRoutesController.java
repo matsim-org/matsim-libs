@@ -20,10 +20,8 @@
 
 package playground.christoph.controler;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,11 +35,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -52,18 +45,13 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.LegStartedIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
-import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 /**
@@ -77,15 +65,14 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  *  
  * @author cdobler
  */
-public class WithinDayInitialRoutesController extends WithinDayController implements StartupListener, MobsimInitializedListener {
-
-	private DuringActivityIdentifierFactory duringActivityFactory;
-	private DuringActivityIdentifier activityPerformingIdentifier;
+public class WithinDayInitialRoutesController extends WithinDayController implements StartupListener {
 
 	private DuringLegIdentifierFactory duringLegFactory;
+	private DuringLegIdentifierFactory startedLegFactory;
 	private DuringLegIdentifier legPerformingIdentifier;
+	private DuringLegIdentifier legStartedIdentifier;
 	
-	private CarLegAgentsFilterFactory carLegAgentsFilterFactory;
+	private TransportModeFilterFactory carLegAgentsFilterFactory;
 	
 	private double duringLegReroutingShare = 0.10;
 	
@@ -116,8 +103,7 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 */
 		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
 		
-		// register this as a Controller and Simulation Listener
-		super.getFixedOrderSimulationListener().addSimulationListener(this);
+		// register this as a Controller Listener
 		super.addControlerListener(this);
 	}
 
@@ -162,40 +148,30 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * Create and initialize replanning manager and replanning maps.
 		 */
 		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitActivityReplanningMap();
 		super.createAndInitLinkReplanningMap();
-				
+			
 		// initialize Identifiers and Replanners
 		this.initIdentifiers();
 		this.initReplanners();
-	}
-
-
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		/*
-		 * Give agents to the filter which removes agents with non-car legs.
-		 */
-		carLegAgentsFilterFactory.setAgents(((QSim) e.getQueueSimulation()).getAgents());
 	}
 	
 	private void initIdentifiers() {
 		
 		/*
-		 * Activity End Identifier
-		 */
-		carLegAgentsFilterFactory = new CarLegAgentsFilterFactory(); 
-		duringActivityFactory = new ActivityEndIdentifierFactory(this.getActivityReplanningMap());
-		duringActivityFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
-		activityPerformingIdentifier = duringActivityFactory.createIdentifier();
-		
-		/*
-		 * During Leg Identifier
+		 * During Leg Identifiers
 		 */		
 		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
 		duringLegRerouteTransportModes.add(TransportMode.car);
+		
+		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
+		this.getQueueSimulationListener().add(carLegAgentsFilterFactory);
+
 		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes); 
-		this.legPerformingIdentifier = duringLegFactory.createIdentifier();		
+		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
+		
+		startedLegFactory = new LegStartedIdentifierFactory(this.getLinkReplanningMap());
+		startedLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
+		this.legStartedIdentifier = startedLegFactory.createIdentifier();
 	}
 	
 	private void initReplanners() {
@@ -212,19 +188,16 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, travelTimes, factory, routeFactory);
 		
 		/*
-		 * During Activity Replanner
-		 */
-		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
-		duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
-		duringActivityReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
-		this.getWithinDayEngine().addDuringActivityReplannerFactory(duringActivityReplannerFactory);
-		
-		/*
 		 * During Leg Replanner
 		 */
 		WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
+		
 		duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, duringLegReroutingShare);
 		duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
+		this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+		
+		duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+		duringLegReplannerFactory.addIdentifier(this.legStartedIdentifier);
 		this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 	}
 	
@@ -261,45 +234,4 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		}
 	}
 	
-	private static class CarLegAgentsFilterFactory implements AgentFilterFactory {
-
-		private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
-			
-		public void setAgents(Collection<MobsimAgent> mobsimAgents) {
-			agents.clear();
-			for (MobsimAgent agent : mobsimAgents) this.agents.put(agent.getId(), agent);
-		}
-		
-		@Override
-		public AgentFilter createAgentFilter() {
-			return new CarLegAgentsFilter(this.agents);
-		}
-		
-	}
-	
-	/*
-	 * Used by agents that are going to end their current activity. If an agent's next
-	 * leg's transport mode is car, the agent remains in the set, otherwise it is removed.
-	 */
-	private static class CarLegAgentsFilter implements AgentFilter {
-
-		private final Map<Id, MobsimAgent> agents;
-		
-		public CarLegAgentsFilter(Map<Id, MobsimAgent> agents) {
-			this.agents = agents;
-		}
-		
-		@Override
-		public void applyAgentFilter(Set<Id> set, double time) {
-			Iterator<Id> iter = set.iterator();
-			while (iter.hasNext()) {
-				Id id = iter.next();
-				MobsimAgent agent = agents.get(id);
-				PlanAgent planAgent = (PlanAgent) agent;
-				Leg nextLeg = (Leg) planAgent.getNextPlanElement();
-				if (!nextLeg.getMode().equals(TransportMode.car)) iter.remove();
-			}
-		}
-		
-	}
 }
