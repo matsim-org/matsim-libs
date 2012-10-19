@@ -22,6 +22,8 @@ package org.matsim.core.events.algorithms;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.util.Map;
 
 import org.matsim.core.api.experimental.events.Event;
@@ -34,12 +36,28 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 	public EventWriterXML(final String filename) {
 		init(filename);
 	}
+	/**Constructor so you can pass System.out or System.err to the writer to see the result on the console.
+	 * 
+	 * @param stream
+	 */
+	public EventWriterXML(final PrintStream stream ) {
+		this.out = new BufferedWriter(new OutputStreamWriter(stream)) ;
+		try {
+			this.out.write("<events>\n") ;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void closeFile() {
 		if (this.out != null)
 			try {
 				this.out.write("</events>");
+				// I added a "\n" to make it look nicer on the console.  Can't say if this may have unintended side
+				// effects anywhere else.  kai, oct'12
+				// fails signalsystems test (and presumably other tests in contrib/playground) since they compare
+				// checksums of event files.  Removed that change again.  kai, oct'12
 				this.out.close();
 				this.out = null;
 			} catch (IOException e) {
