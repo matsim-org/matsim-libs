@@ -38,7 +38,6 @@ public class LeaveLinkIdentifier extends DuringLegIdentifier {
 	// use the Factory!
 	/*package*/ LeaveLinkIdentifier(LinkReplanningMap linkReplanningMap, Set<String> transportModes) {
 		this.linkReplanningMap = linkReplanningMap;
-		this.transportModes = transportModes;
 	}
 	
 	@Override

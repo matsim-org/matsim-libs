@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LegPerformingIdentifier.java
+ * LegStartedIdentifierFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,39 +20,24 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class LegPerformingIdentifier extends DuringLegIdentifier {
+public class LegStartedIdentifierFactory extends DuringLegIdentifierFactory {
 
-	protected LinkReplanningMap linkReplanningMap;
+	private LinkReplanningMap linkReplanningMap;
 	
-	// use the Factory!
-	/*package*/ LegPerformingIdentifier(LinkReplanningMap linkReplanningMap) {
+	public LegStartedIdentifierFactory(LinkReplanningMap linkReplanningMap) {
 		this.linkReplanningMap = linkReplanningMap;
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<Id> legPerformingAgents = new HashSet<Id>(linkReplanningMap.getLegPerformingAgents());
-		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
-
-		// apply filter to remove agents that should not be replanned
-		this.applyFilters(legPerformingAgents, time);
-		
-		// create set of PlanBasedWithinDayAgent
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		for (Id id : legPerformingAgents) agentsToReplan.add(mapping.get(id));
-
-		return agentsToReplan;
+	public DuringLegIdentifier createIdentifier() {
+		DuringLegIdentifier identifier = new LegStartedIdentifier(linkReplanningMap);
+		this.addAgentFiltersToIdentifier(identifier);
+		identifier.setIdentifierFactory(this);
+		return identifier;
 	}
 
 }

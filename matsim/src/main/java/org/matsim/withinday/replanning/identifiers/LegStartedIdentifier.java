@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LegPerformingIdentifier.java
+ * LegStartedIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -31,26 +31,26 @@ import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class LegPerformingIdentifier extends DuringLegIdentifier {
+public class LegStartedIdentifier extends DuringLegIdentifier {
 
-	protected LinkReplanningMap linkReplanningMap;
+	private LinkReplanningMap linkReplanningMap;
 	
 	// use the Factory!
-	/*package*/ LegPerformingIdentifier(LinkReplanningMap linkReplanningMap) {
+	/*package*/ LegStartedIdentifier(LinkReplanningMap linkReplanningMap) {
 		this.linkReplanningMap = linkReplanningMap;
 	}
 	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<Id> legPerformingAgents = new HashSet<Id>(linkReplanningMap.getLegPerformingAgents());
+		Set<Id> legStartedAgents = new HashSet<Id>(linkReplanningMap.getLegStartedAgents());
 		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
 
 		// apply filter to remove agents that should not be replanned
-		this.applyFilters(legPerformingAgents, time);
+		this.applyFilters(legStartedAgents, time);
 		
 		// create set of PlanBasedWithinDayAgent
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		for (Id id : legPerformingAgents) agentsToReplan.add(mapping.get(id));
+		for (Id id : legStartedAgents) agentsToReplan.add(mapping.get(id));
 
 		return agentsToReplan;
 	}

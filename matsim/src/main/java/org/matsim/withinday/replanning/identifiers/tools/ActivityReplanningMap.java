@@ -66,7 +66,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * Contains the Agents that are currently performing an Activity.
 	 */
 	private Set<Id> replanningSet;	// PersonDriverAgentId
-
+	
 	/*
 	 * Mapping between the PersonDriverAgents and the PersonIds.
 	 * The events only contain a PersonId.
@@ -122,7 +122,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 */
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-
+		
 		for (Id id : startingAgents) {
 			MobsimAgent personAgent = personAgentMapping.get(id);
 
@@ -160,8 +160,9 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 */
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		startingAgents.remove(event.getPersonId());
-		replanningSet.remove(event.getPersonId());
+		Id id = event.getPersonId();
+		this.startingAgents.remove(id);
+		this.replanningSet.remove(id);
 	}
 
 	/*
@@ -178,14 +179,14 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * Returns a List of all Agents, that are currently performing an Activity.
 	 */
 	public Set<Id> getActivityPerformingAgents() {
-		return Collections.unmodifiableSet(replanningSet);
+		return Collections.unmodifiableSet(this.replanningSet);
 	}
-
+	
 	/*
-	 * TODO: find a better name
-	 * Returns a List of all agents that are going to end their activity right now
+	 * Returns a List of all agents that are going to end their activity
+	 * in the current time step.
 	 */
-	public Set<PlanBasedWithinDayAgent> getEndActivityAgents(double time) {
+	public Set<PlanBasedWithinDayAgent> getActivityEndingAgents(double time) {
 		Set<PlanBasedWithinDayAgent> personAgentsToReplanActivityEnd = new HashSet<PlanBasedWithinDayAgent>();
 		
 		Iterator<Id> ids = replanningSet.iterator();

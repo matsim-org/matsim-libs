@@ -33,12 +33,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
@@ -46,7 +50,9 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -77,7 +83,8 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 		AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
-		AgentStuckEventHandler, MobsimInitializedListener {
+		AgentStuckEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, 
+		MobsimInitializedListener, MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
 
@@ -103,6 +110,9 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	
 	private final Set<Id> enrouteAgents;
 	
+	private final Set<Id> legJustStartedAgents;
+	private double currentTime = 0.0;
+		
 	private final Map<Id, String> agentTransportModeMap;
 	
 	public LinkReplanningMap(Network network) {
@@ -118,6 +128,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 		this.multiModalTravelTime = multiModalTravelTime;
 		
 		this.enrouteAgents = new HashSet<Id>();
+		this.legJustStartedAgents = new HashSet<Id>();
 		this.replanningMap = new HashMap<Id, Double>();
 		this.personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.agentTransportModeMap = new HashMap<Id, String>();
@@ -210,15 +221,45 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		replanningMap.remove(event.getPersonId());
-		enrouteAgents.remove(event.getPersonId());
-		agentTransportModeMap.remove(event.getPersonId());
+		this.replanningMap.remove(event.getPersonId());
+		this.enrouteAgents.remove(event.getPersonId());
+		this.agentTransportModeMap.remove(event.getPersonId());
+		this.legJustStartedAgents.remove(event.getPersonId());
+	}
+	
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		checkTime(event.getTime());
+		this.legJustStartedAgents.add(event.getPersonId());	
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		this.legJustStartedAgents.remove(event.getPersonId());
+	}
+	
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		checkTime(e.getSimulationTime());
+	}
+	
+	/*
+	 * If time > currentTime, then legJustStartedAgents is not up to date
+	 * anymore, therefore we clear all entries and update currentTime.
+	 */
+	private void checkTime(double time) {
+		if (time > currentTime) {
+			this.currentTime = time;
+			this.legJustStartedAgents.clear();
+		}
 	}
 	
 	@Override
 	public void reset(int iteration) {
+		currentTime = 0.0;
 		this.replanningMap.clear();
 		this.enrouteAgents.clear();
+		this.legJustStartedAgents.clear();
 		this.agentTransportModeMap.clear();
 	}
 	
@@ -346,44 +387,15 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * some of them might be limited in the available replanning operations! 
 	 */
 	public Set<Id> getLegPerformingAgents() {
-		Set<String> transportModes = null;
-		return this.getLegPerformingAgents(transportModes);
-	}
-	
-	/**
-	 * @param transportMode
-	 * @return A list of all agents that are currently performing a leg with the
-	 * given transport mode. Note that some of them might be limited in the available 
-	 * replanning operations! 
-	 */
-	public Set<Id> getLegPerformingAgents(final String transportMode) {
-		Set<String> transportModes = new HashSet<String>();
-		transportModes.add(transportMode);
-		return this.getLegPerformingAgents(transportModes);
-	}
-
-	/**
-	 * @param transportModes
-	 * @return A list of Ids of all agents that are currently performing a leg with the
-	 * given transport mode. Note that some of them might be limited in the available 
-	 * replanning operations! 
-	 */
-	public Set<Id> getLegPerformingAgents(final Set<String> transportModes) {
-		Set<Id> legPerformingAgents = new HashSet<Id>();
+		return Collections.unmodifiableSet(this.enrouteAgents);
 		
-		for (Id id : this.enrouteAgents) {
-			
-			// check transport mode
-			if (transportModes != null) {
-				String mode = this.agentTransportModeMap.get(id);
-				if (!transportModes.contains(mode)) continue;
-			}
-			
-			// the check did not fail therefore add agent to the replanning set
-			legPerformingAgents.add(id);
-		}
-
-		return legPerformingAgents;
 	}
 
+	/**
+	 * @return A list of all agents that have just started a leg. Note that
+	 * they cannot end their leg on their current link!
+	 */
+	public Set<Id> getLegStartedAgents() {
+		return Collections.unmodifiableSet(this.legJustStartedAgents);
+	}
 }
