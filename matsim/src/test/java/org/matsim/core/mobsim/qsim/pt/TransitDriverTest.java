@@ -29,11 +29,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -202,9 +208,21 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		final Config config = ConfigUtils.createConfig() ;
+		config.vspExperimental().addParam(VspExperimentalConfigKey.isGeneratingDeniedBoardingEvent, "true") ;
+//		config.scenario().setUseTransit(true) ;
+		
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, EventsUtils.createEventsManager());
+
+		final EventsManager events = EventsUtils.createEventsManager();
+
+		final EventHandlerForTesting handler = new EventHandlerForTesting() ;
+		events.addHandler(handler) ;
+		events.initProcessing() ;
+
+		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
@@ -256,6 +274,25 @@ public class TransitDriverTest extends MatsimTestCase {
 		tracker.addAgentToStop(agent5, stop2.getId());
 		assertEquals("vehicle should have reached capacity, so not more passenger can enter.",
 				0.0, driver.handleTransitStop(stop2, 170), MatsimTestCase.EPSILON);
+		
+		events.finishProcessing() ;
+		assertTrue(handler.isOk) ;
+	}
+	class EventHandlerForTesting implements EventHandler, BasicEventHandler {
+		boolean isOk = false ;
+		@Override
+		public void reset(int iteration) {
+		}
+		@Override
+		public void handleEvent(Event ev ) {
+			if ( ev instanceof BoardingDeniedEvent) {
+				BoardingDeniedEvent eve = (BoardingDeniedEvent) ev ;
+				assertEquals( "1", eve.getPersonId().toString() ) ;
+				assertEquals( "1976", eve.getVehicleId().toString() ) ;
+				isOk = true ;
+			}
+		}
+		
 	}
 
 	public void testHandleStop_ExitPassengers() {

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
@@ -34,6 +35,7 @@ import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -63,6 +65,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
 	private InternalInterface internalInterface;
+	private final boolean isGeneratingDeniedBoardingEvents ;
 	
 	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
 	// yy not so great: implicit instantiation at activity.  kai, nov'11
@@ -84,6 +87,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		super();
 		this.internalInterface = internalInterface;
 		this.agentTracker = agentTracker2;
+		if ( this.internalInterface != null ) {
+			this.isGeneratingDeniedBoardingEvents = Boolean.parseBoolean(
+					this.internalInterface.getMobsim().getScenario().getConfig().vspExperimental().getValue(
+							VspExperimentalConfigKey.isGeneratingDeniedBoardingEvent
+					) ) ;
+		} else {
+			this.isGeneratingDeniedBoardingEvents = false ;
+		}
 	}
 
 	protected void init() {
@@ -149,7 +160,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		processEventVehicleArrives(stop, now);
 		ArrayList<PTPassengerAgent> passengersLeaving = findPassengersLeaving(stop);
 		int freeCapacity = this.vehicle.getPassengerCapacity() - this.vehicle.getPassengers().size() + passengersLeaving.size();
-		List<PTPassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity);
+		List<PTPassengerAgent> passengersEntering = findPassengersEntering(stop, freeCapacity, now);
 		double stopTime = this.vehicle.getStopHandler().handleTransitStop(stop, now, passengersLeaving, passengersEntering, this);
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
@@ -298,17 +309,36 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	}
 
 	private List<PTPassengerAgent> findPassengersEntering(
-			final TransitStopFacility stop, int freeCapacity) {
+			final TransitStopFacility stop, int freeCapacity, double now) {
 		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<PTPassengerAgent>();
 		for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
-			if (freeCapacity == 0) {
-				break;
+			if ( !this.isGeneratingDeniedBoardingEvents ) {
+				if (freeCapacity == 0) {
+					break;
+				}
 			}
 			List<TransitRouteStop> stops = getTransitRoute().getStops();
 			List<TransitRouteStop> stopsToCome = stops.subList(stopIterator.nextIndex(), stops.size());
 			if (agent.getEnterTransitRoute(getTransitLine(), getTransitRoute(), stopsToCome)) {
-				passengersEntering.add(agent);
-				freeCapacity--;
+				if ( !this.isGeneratingDeniedBoardingEvents ) {
+					// this tries to leave the pre-existing code intact; thus the replication of code below
+					passengersEntering.add(agent);
+					freeCapacity--;
+				} else {
+					if ( freeCapacity >= 1 ) {
+						passengersEntering.add(agent);
+						freeCapacity--;
+					} else {
+//						double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
+						// does not work for test (when machinery is not initialized). kai, oct'12
+						
+						Id vehicleId = this.vehicle.getId() ;
+						Id agentId = agent.getId() ;
+						this.internalInterface.getMobsim().getEventsManager().processEvent(
+								new BoardingDeniedEvent(now, agentId, vehicleId)
+								) ;
+					}
+				}
 			}
 		}
 		return passengersEntering;

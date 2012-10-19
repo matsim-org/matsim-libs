@@ -43,7 +43,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 //			activityDurationInterpretation,
 			vspDefaultsCheckingLevel,
 			logitScaleParamForPlansRemoval,
-			scoreMSAStartsAtIteration
+			scoreMSAStartsAtIteration,
+			isGeneratingDeniedBoardingEvent
 		}
 	
 		private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
@@ -61,7 +62,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		public void addParam( final ConfigKey key, final String value ) {
 			String retVal = this.typedParam.put( key,value );
 			if ( retVal != null ) {
-				Logger.getLogger(this.getClass()).warn("parameter was already there; overwriting ...") ;
+				Logger.getLogger(this.getClass()).info(key + ": replacing >" + retVal + "< (old) with >" + value + "< (new)") ;
 			}
 		}
 	
@@ -171,6 +172,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			case scoreMSAStartsAtIteration:
 				this.addParam( key, "null") ;
 				break;
+			case isGeneratingDeniedBoardingEvent:
+				this.addParam( key, "false" ) ; // default is that this event is NOT generated.  kai, oct'12 
+				break;
 			}
 		}
 	}
@@ -247,6 +251,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				break;
 			case vspDefaultsCheckingLevel:
 				break;
+			case isGeneratingDeniedBoardingEvent:
+				break;
 			}
 		}
 		return map;
@@ -261,6 +267,20 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
+		for ( VspExperimentalConfigKey keyTmp : VspExperimentalConfigKey.values() ) {
+			switch(keyTmp) {
+			case isGeneratingDeniedBoardingEvent:
+			case logitScaleParamForPlansRemoval:
+			case scoreMSAStartsAtIteration:
+			case vspDefaultsCheckingLevel:
+				if ( keyTmp.toString().equals(key) ) {
+					this.addParam(keyTmp, value ) ;
+				}
+				return ;
+			}
+			// the above feels really odd.  Problem is that we can convert keys to strings, but not the other way round.
+			// alternative might be some lookup table.  kai, oct'12
+		}
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 			//			this.setUseActivityDurations(Boolean.parseBoolean(value));
 			if ( Boolean.parseBoolean(value) ) {
@@ -286,10 +306,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		} else if ("offsetWalk".equalsIgnoreCase(key)) {
 			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
 			"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
-		} else if ( VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString().equals(key) ) {
-			this.addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, value) ;
-		} else if ( VspExperimentalConfigKey.logitScaleParamForPlansRemoval.toString().equals(key) ) {
-			this.addParam( VspExperimentalConfigKey.logitScaleParamForPlansRemoval, value) ;
+//		} else if ( VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString().equals(key) ) {
+//			this.addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, value) ;
+//		} else if ( VspExperimentalConfigKey.logitScaleParamForPlansRemoval.toString().equals(key) ) {
+//			this.addParam( VspExperimentalConfigKey.logitScaleParamForPlansRemoval, value) ;
 		} else if ( EMISSION_ROADTYPE_MAPPING_FILE.equals(key)){
 			this.setEmissionRoadTypeMappingFile(value);
 		} else if ( EMISSION_VEHICLE_FILE.equals(key)){
