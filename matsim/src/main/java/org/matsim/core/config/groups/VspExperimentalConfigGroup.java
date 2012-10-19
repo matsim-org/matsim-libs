@@ -44,7 +44,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			vspDefaultsCheckingLevel,
 			logitScaleParamForPlansRemoval,
 			scoreMSAStartsAtIteration,
-			isGeneratingDeniedBoardingEvent
+			isGeneratingBoardingDeniedEvent
 		}
 	
 		private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
@@ -172,7 +172,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			case scoreMSAStartsAtIteration:
 				this.addParam( key, "null") ;
 				break;
-			case isGeneratingDeniedBoardingEvent:
+			case isGeneratingBoardingDeniedEvent:
 				this.addParam( key, "false" ) ; // default is that this event is NOT generated.  kai, oct'12 
 				break;
 			}
@@ -251,7 +251,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				break;
 			case vspDefaultsCheckingLevel:
 				break;
-			case isGeneratingDeniedBoardingEvent:
+			case isGeneratingBoardingDeniedEvent:
 				break;
 			}
 		}
@@ -269,7 +269,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public void addParam(final String key, final String value) {
 		for ( VspExperimentalConfigKey keyTmp : VspExperimentalConfigKey.values() ) {
 			switch(keyTmp) {
-			case isGeneratingDeniedBoardingEvent:
+			case isGeneratingBoardingDeniedEvent:
 			case logitScaleParamForPlansRemoval:
 			case scoreMSAStartsAtIteration:
 			case vspDefaultsCheckingLevel:

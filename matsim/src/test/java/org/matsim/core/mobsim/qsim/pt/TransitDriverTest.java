@@ -210,7 +210,7 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
 
 		final Config config = ConfigUtils.createConfig() ;
-		config.vspExperimental().addParam(VspExperimentalConfigKey.isGeneratingDeniedBoardingEvent, "true") ;
+		config.vspExperimental().addParam(VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent, "true") ;
 //		config.scenario().setUseTransit(true) ;
 		
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);

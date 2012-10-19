@@ -90,7 +90,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		if ( this.internalInterface != null ) {
 			this.isGeneratingDeniedBoardingEvents = Boolean.parseBoolean(
 					this.internalInterface.getMobsim().getScenario().getConfig().vspExperimental().getValue(
-							VspExperimentalConfigKey.isGeneratingDeniedBoardingEvent
+							VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent
 					) ) ;
 		} else {
 			this.isGeneratingDeniedBoardingEvents = false ;
