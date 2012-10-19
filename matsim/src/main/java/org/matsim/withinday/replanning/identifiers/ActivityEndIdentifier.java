@@ -47,7 +47,7 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		
-		Set<PlanBasedWithinDayAgent> endActivityAgents = activityReplanningMap.getActivityEndingAgents(time);
+		Set<PlanBasedWithinDayAgent> endActivityAgents = activityReplanningMap.getEndActivityAgents(time);
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
 		/*
