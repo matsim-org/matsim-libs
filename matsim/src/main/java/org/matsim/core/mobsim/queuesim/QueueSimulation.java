@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -56,6 +57,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -68,7 +70,6 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dgrether
  */
 public final class QueueSimulation implements VisMobsim, Netsim {
-	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0; 	/* time since lasat snapshot */
@@ -409,11 +410,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public VisNetwork getVisNetwork() {
-		return this.network ;
-	}
-
-	@Override
 	public Scenario getScenario() {
 		return this.scenario;
 	}
@@ -436,8 +432,20 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	}
 
 	@Override
+	public VisNetwork getVisNetwork() {
+		return network;
+	}
+
+	@Override
 	public Collection<MobsimAgent> getAgents() {
-		throw new UnsupportedOperationException() ;
+		throw new RuntimeException();
+	}
+
+	@Override
+	public Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots() {
+		// This simulation simulates only agents on the network.
+		// We do not keep physical positions for teleporting agents, and other modes do not exist.
+		return Collections.emptyList();
 	}
 
 }

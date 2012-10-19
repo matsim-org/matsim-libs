@@ -62,7 +62,7 @@ import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimListener;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
@@ -206,11 +206,9 @@ public class OTFVis {
 
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(scenario, server, qSim);
+		OTFVisMobsimListener queueSimulationFeature = new OTFVisMobsimListener(server);
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
-		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
-		queueSimulationFeature.setVisualizeTeleportedAgents(config.otfVis().isShowTeleportedAgents());
-		server.setSimulation(queueSimulationFeature);
+		server.setSimulation(qSim);
 		
 		if (config.scenario().isUseTransit()) {
 			

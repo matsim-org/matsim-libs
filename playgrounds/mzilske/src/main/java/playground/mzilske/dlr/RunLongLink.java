@@ -54,7 +54,7 @@ import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
+import org.matsim.vis.otfvis.OTFVisMobsimListener;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
@@ -246,11 +246,9 @@ public class RunLongLink {
 
 	public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(scenario, server, qSim);
+		OTFVisMobsimListener queueSimulationFeature = new OTFVisMobsimListener(server);
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
-		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
-		queueSimulationFeature.setVisualizeTeleportedAgents(config.otfVis().isShowTeleportedAgents());
-		server.setSimulation(queueSimulationFeature);
+		server.setSimulation(qSim);
 
 		if (config.scenario().isUseTransit()) {
 

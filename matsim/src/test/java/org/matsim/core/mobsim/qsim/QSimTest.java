@@ -64,7 +64,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -263,19 +262,17 @@ public class QSimTest {
 		QSim sim = createQSim(f, events);
 		sim.run();
 
-		/* finish */
-		int offset=1 ; // "1" if there is an additional teleportation dp event.  kai, aug'10
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", offset+5, collector.getEvents().size());
+		Assert.assertEquals("wrong number of events.", 5, collector.getEvents().size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
-        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(offset+2).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(offset+3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(offset+4).getClass());
+        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(2).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
 		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in event.", 6.0*3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(offset+2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(offset+3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0*3600 + 15, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
 	}
 
 	/**
@@ -655,24 +652,22 @@ public class QSimTest {
 		QSim sim = createQSim(f, events);
 		sim.run();
 
-		/* finish */
-		int offset=1 ; // "1" if there is an additional teleportation dp event.  kai, aug'10
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", offset+14, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 14, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
-        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(offset+2).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(offset+3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(offset+4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(offset+5).getClass());
-		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(offset+6).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(offset+7).getClass());
-		Assert.assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(offset+8).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(offset+9).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(offset+10).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(offset+11).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(offset+12).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(offset+13).getClass());
+        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(2).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
+		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(6).getClass());
+		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(7).getClass());
+		Assert.assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(8).getClass());
+		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
+		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(11).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(12).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(13).getClass());
 	}
 
 	
@@ -734,37 +729,35 @@ public class QSimTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 30, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 28, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", AdditionalTeleportationDepartureEvent.class, allEvents.get(2).getClass());
-        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(7).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(8).getClass());
-		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(9).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(11).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(13).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(14).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(15).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(16).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(17).getClass());
-		Assert.assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(18).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(19).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(20).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(21).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(22).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(23).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(24).getClass());
-		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(25).getClass());
-		Assert.assertEquals("wrong type of event.", AdditionalTeleportationDepartureEvent.class, allEvents.get(26).getClass());
-        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(27).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(28).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(29).getClass());
+        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(2).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
+		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(6).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(7).getClass());
+		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(8).getClass());
+		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(9).getClass());
+		Assert.assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(10).getClass());
+		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(11).getClass());
+		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(12).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(13).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(14).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(15).getClass());
+		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(16).getClass());
+		Assert.assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(17).getClass());
+		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(18).getClass());
+		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(19).getClass());
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(20).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(21).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(22).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(23).getClass());
+		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(24).getClass());
+        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(25).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(26).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(27).getClass());
 	}
 	
 	/**
@@ -806,17 +799,15 @@ public class QSimTest {
 			log.info("catched expected RuntimeException: " + e.getMessage());
 		}
 
-		/* finish */
-		int offset=1 ; // "1" if there is an additional teleportation dp event.  kai, aug'10
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", offset+7, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 7, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
-        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(offset+2).getClass());
-		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(offset+3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(offset+4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(offset+5).getClass());
-		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(offset+6).getClass());
+        Assert.assertEquals("wrong type of event.", TravelledEvent.class, allEvents.get(2).getClass());
+		Assert.assertEquals("wrong type of event.", AgentArrivalEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
+		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
+		Assert.assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(6).getClass());
 	}
 
 	/**

@@ -54,6 +54,7 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
@@ -93,17 +94,17 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 		@Override
 		public void addTrackedAgent(Id agentId) {
-			otfVisQueueSimFeature.addTrackedAgent(agentId);
+			
 		}
 
 		@Override
 		public void removeTrackedAgent(Id agentId) {
-			otfVisQueueSimFeature.removeTrackedAgent(agentId);
+			
 		}
 
 		@Override
 		public VisNetwork getVisNetwork() {
-			return otfVisQueueSimFeature.getVisMobsim().getVisNetwork();
+			return visMobsim.getVisNetwork();
 		}
 
 		@Override
@@ -141,10 +142,8 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private volatile double stepToTime = 0;
 
-	private VisMobsimFeature otfVisQueueSimFeature;
-
-	private final OTFAgentsListHandler.Writer teleportationWriter;
-
+	private VisMobsim visMobsim;
+	
 	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
 
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
@@ -162,9 +161,6 @@ public class OnTheFlyServer implements OTFLiveServer {
 	OnTheFlyServer(Scenario scenario, EventsManager events) {
 		this.scenario = scenario;
 		this.events = events; 
-		this.teleportationWriter = new OTFAgentsListHandler.Writer();
-		this.teleportationWriter.setSrc(visData.values());
-		addAdditionalElement(teleportationWriter);
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			this.plans.put(person.getId(), plan);
@@ -292,12 +288,21 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 				});
 			}
-			if (this.otfVisQueueSimFeature != null) {
-				quad = new LiveServerQuadTree(this.otfVisQueueSimFeature.getVisMobsim().getVisNetwork());
+			if (this.visMobsim != null) {
+				quad = new LiveServerQuadTree(this.visMobsim.getVisNetwork());
+				OTFAgentsListHandler.Writer teleportationWriter;
+				teleportationWriter = new OTFAgentsListHandler.Writer();
+				teleportationWriter.setSrc(this.visMobsim.getNonNetwokAgentSnapshots());
+				quad.addAdditionalElement(teleportationWriter);
 			} else {
 				quad = new SnapshotWriterQuadTree(this.scenario.getNetwork());
+				OTFAgentsListHandler.Writer teleportationWriter;
+				teleportationWriter = new OTFAgentsListHandler.Writer();
+				teleportationWriter.setSrc(visData.values());
+				quad.addAdditionalElement(teleportationWriter);
 			}
 			quad.initQuadTree(connect);
+			
 			for(OTFDataWriter<?> writer : additionalElements) {
 				log.info("Adding additional element: " + writer.getClass().getName());
 				quad.addAdditionalElement(writer);
@@ -374,8 +379,8 @@ public class OnTheFlyServer implements OTFLiveServer {
 		this.additionalElements.add(element);
 	}
 
-	public void setSimulation(VisMobsimFeature otfVisQueueSimFeature) {
-		this.otfVisQueueSimFeature = otfVisQueueSimFeature;
+	public void setSimulation(VisMobsim visMobsim) {
+		this.visMobsim = visMobsim;
 	}
 
 	@Override

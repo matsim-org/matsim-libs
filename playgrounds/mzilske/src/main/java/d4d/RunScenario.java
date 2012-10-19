@@ -124,6 +124,11 @@ public class RunScenario {
 			}
 		});
 
+		// runStatistics();
+	}
+
+
+	private void runStatistics() {
 		System.out.println(scenario.getPopulation().getPersons().size());
 		new InitialStatistics("").run(scenario.getPopulation());
 		

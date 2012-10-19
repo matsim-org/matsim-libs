@@ -46,8 +46,6 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
-import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -69,7 +67,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	AgentWait2LinkEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
 	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, AdditionalTeleportationDepartureEventHandler {
+	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
 
@@ -146,11 +144,6 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		log.info("VehicleDepartsAtFacilityEvent at " + Time.writeTime(event.getTime()) + " facility id " + event.getFacilityId() + " vehicle id " + event.getVehicleId() + " delay " + event.getDelay());
-	}
-
-	@Override
-	public void handleEvent(AdditionalTeleportationDepartureEvent eve) {
-		log.info("AdditionTeleportationDepartureEvent at " + Time.writeTime(eve.getTime()) + " " + eve.getMode() + " " + eve.getTravelTime());
 	}
 
 }

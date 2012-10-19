@@ -144,7 +144,6 @@ import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
-import org.matsim.vis.snapshotwriters.VisMobsim;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -726,7 +725,7 @@ public class Controler extends AbstractController {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}
 		}
-		if (simulation instanceof VisMobsim) {
+		if (simulation instanceof ObservableMobsim) {
 			int itNumber = this.getIterationNumber();
 			if (config.controler().getWriteSnapshotsInterval() != 0 && itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);

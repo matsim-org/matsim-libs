@@ -20,10 +20,7 @@
 
 package org.matsim.vis.otfvis.interfaces;
 
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
-import org.matsim.vis.otfvis.VisMobsimFeature;
-import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 
 /**
  * An interface for the live version of the OTFVis.

@@ -7,13 +7,10 @@ import javax.swing.SwingUtilities;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
-import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
-import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -23,7 +20,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.otfvis.VisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -45,8 +41,8 @@ import playground.gregor.sim2d_v3.events.XYVxVyEvent;
 import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
 
 
-public class OTFVisMobsimFeature implements XYVxVyEventsHandler, VisMobsimFeature, MobsimInitializedListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener,
-AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler{
+public class OTFVisMobsimFeature implements XYVxVyEventsHandler, MobsimInitializedListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener,
+AgentArrivalEventHandler {
 
 	protected OnTheFlyServer server = null;
 	private final VisMobsim queueSimulation;
@@ -63,7 +59,7 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler{
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		this.server = OnTheFlyServer.createInstance(this.queueSimulation.getScenario(), this.eventsManager);
-		this.server.setSimulation(this);
+		this.server.setSimulation(queueSimulation);
 
 
 		this.walk2dWriter = new OTFAgentsListHandler.Writer();
@@ -139,35 +135,6 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler{
 
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void handleEvent(AdditionalTeleportationDepartureEvent eve) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public VisMobsim getVisMobsim() {
-		return this.queueSimulation;
-	}
-
-	@Override
-	public Plan findPlan(Id agentId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addTrackedAgent(Id agentId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void removeTrackedAgent(Id agentId) {
 		// TODO Auto-generated method stub
 
 	}

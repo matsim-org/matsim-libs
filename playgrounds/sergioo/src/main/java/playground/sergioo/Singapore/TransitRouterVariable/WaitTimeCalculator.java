@@ -33,8 +33,6 @@ import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
-import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.Time;
@@ -50,7 +48,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author sergioo
  */
 
-public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AdditionalTeleportationDepartureEventHandler, AgentStuckEventHandler {
+public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
+	
+	// , AdditionalTeleportationDepartureEventHandler
 	
 	//Constants
 	private final static String SEPARATOR = "===";
@@ -151,26 +151,28 @@ public class WaitTimeCalculator implements WaitTime, AgentDepartureEventHandler,
 				}
 		}
 	}
-	@Override
-	public void handleEvent(AdditionalTeleportationDepartureEvent event) {
-		Double startWaitingTime = agentsWaitingData.get(event.getAgentId());
-		if(startWaitingTime!=null) {
-			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getAgentId());
-			PLAN_ELEMENTS:
-			for(PlanElement planElement:population.getPersons().get(event.getAgentId()).getSelectedPlan().getPlanElements())
-				if(planElement instanceof Leg) {
-					if(currentLeg==legs) {
-						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
-						waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
-						agentsWaitingData.remove(event.getAgentId());
-						break PLAN_ELEMENTS;
-					}
-					else
-						legs++;
-				}
-		}
-	}
+	
+//	@Override
+//	public void handleEvent(AdditionalTeleportationDepartureEvent event) {
+//		Double startWaitingTime = agentsWaitingData.get(event.getAgentId());
+//		if(startWaitingTime!=null) {
+//			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getAgentId());
+//			PLAN_ELEMENTS:
+//			for(PlanElement planElement:population.getPersons().get(event.getAgentId()).getSelectedPlan().getPlanElements())
+//				if(planElement instanceof Leg) {
+//					if(currentLeg==legs) {
+//						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+//						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
+//						waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+//						agentsWaitingData.remove(event.getAgentId());
+//						break PLAN_ELEMENTS;
+//					}
+//					else
+//						legs++;
+//				}
+//		}
+//	}
+	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());

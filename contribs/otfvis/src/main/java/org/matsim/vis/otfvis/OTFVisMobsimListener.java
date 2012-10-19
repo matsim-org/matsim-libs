@@ -1,6 +1,5 @@
 /* *********************************************************************** *
- * project: matsim
- * AdditionalTeleportationDepartureEventHandler.java
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,17 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.events.handler;
+package org.matsim.vis.otfvis;
 
-import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
-/**
- * @author nagel
- *
- */
-@Deprecated // this is a possibly temporary fix to remove the MobsimFeatures.  do not use.  kai, aug'10
-public interface AdditionalTeleportationDepartureEventHandler extends EventHandler {
+public class OTFVisMobsimListener implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener, MobsimBeforeCleanupListener {
+
+	private final OnTheFlyServer server;
+
+	public OTFVisMobsimListener(OnTheFlyServer server) {
+		this.server = server;
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
+		this.server.getSnapshotReceiver().finish();
+	}
+
+
+	@Override
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
+		this.server.blockUpdates();
+	}
 	
-	public void handleEvent( AdditionalTeleportationDepartureEvent eve ) ;
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
+		double time = event.getSimulationTime();
+		this.server.unblockUpdates();
+		this.server.updateStatus(time);
+	}
 
 }

@@ -30,4 +30,6 @@ public interface VisMobsim {
 	 */
 	Collection<MobsimAgent> getAgents() ;
 
+	Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots();
+
 }
