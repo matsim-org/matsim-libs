@@ -45,7 +45,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
 
 /**
- * @author benjamin after fhuelsmann
+ * @author benjamin
  *
  */
 public class SpatialAveragingForLinkDemand {

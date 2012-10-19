@@ -21,7 +21,7 @@ package playground.benjamin.scenarios.munich.analysis.nectar;
 
 
 /**
- * @author benjamin after fhuelsmann
+ * @author benjamin
  *
  */
 
@@ -86,6 +86,7 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		this.linkenter.put(event.getPersonId(), linkId2Time);
 	}
 	
+	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		Id linkId = event.getLinkId();
 		double linkLeaveTime = event.getTime();
