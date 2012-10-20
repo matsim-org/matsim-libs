@@ -186,7 +186,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * Returns a List of all agents that are going to end their activity
 	 * in the current time step.
 	 */
-	public Set<PlanBasedWithinDayAgent> getEndActivityAgents(double time) {
+	public Set<PlanBasedWithinDayAgent> getActivityEndingAgents(double time) {
 		Set<PlanBasedWithinDayAgent> personAgentsToReplanActivityEnd = new HashSet<PlanBasedWithinDayAgent>();
 		
 		Iterator<Id> ids = replanningSet.iterator();
