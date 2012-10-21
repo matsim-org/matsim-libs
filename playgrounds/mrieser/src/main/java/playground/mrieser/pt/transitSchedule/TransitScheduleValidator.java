@@ -178,6 +178,26 @@ public abstract class TransitScheduleValidator {
 		v.add(v4);
 		return v;
 	}
+	
+	public static void printResult(final ValidationResult result) {
+		if (result.isValid()) {
+			System.out.println("Schedule appears valid!");
+		} else {
+			System.out.println("Schedule is NOT valid!");
+		}
+		if (result.getErrors().size() > 0) {
+			System.out.println("Validation errors:");
+			for (String e : result.getErrors()) {
+				System.out.println(e);
+			}
+		}
+		if (result.getWarnings().size() > 0) {
+			System.out.println("Validation warnings:");
+			for (String w : result.getWarnings()) {
+				System.out.println(w);
+			}
+		}
+	}
 
 	/**
 	 * @param args [0] path to transitSchedule.xml, [1] path to network.xml
@@ -204,23 +224,7 @@ public abstract class TransitScheduleValidator {
 		new TransitScheduleReader(s).readFile(args[0]);
 
 		ValidationResult v = validateAll(ts, net);
-		if (v.isValid()) {
-			System.out.println("Schedule appears valid!");
-		} else {
-			System.out.println("Schedule is NOT valid!");
-		}
-		if (v.getErrors().size() > 0) {
-			System.out.println("Validation errors:");
-			for (String e : v.getErrors()) {
-				System.out.println(e);
-			}
-		}
-		if (v.getWarnings().size() > 0) {
-			System.out.println("Validation warnings:");
-			for (String w : v.getWarnings()) {
-				System.out.println(w);
-			}
-		}
+		printResult(v);
 	}
 
 	public static class ValidationResult {
