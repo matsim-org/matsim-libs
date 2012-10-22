@@ -268,28 +268,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @return a list of agents who might need a replanning
 	 */
 	public Set<Id> getReplanningAgents(final double time) {
-		Set<String> transportModes = null;
-		return this.getReplanningAgents(time, transportModes);
-	}
-
-	/**
-	 * @param time
-	 * @param transportMode
-	 * @return a list of agents who might need a replanning and use the given transport mode
-	 */
-	public Set<Id> getReplanningAgents(final double time, final String transportMode) {
-		Set<String> transportModes = new HashSet<String>();
-		transportModes.add(transportMode);
-		return this.getReplanningAgents(time, transportModes);
-	}
-	
-	/**
-	 * @param time
-	 * @param transportModes
-	 * @return a list of agents who might need a replanning and use one of the given transport modes
-	 */
-	public Set<Id> getReplanningAgents(final double time, final Set<String> transportModes) {
-		return this.filterAgents(time, transportModes, TimeFilterMode.EXACT);
+		return this.filterAgents(time, TimeFilterMode.EXACT);
 	}
 
 	/**
@@ -297,28 +276,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @return a list of agents who might need an unrestricted replanning and use the given transport mode
 	 */
 	public Set<Id> getUnrestrictedReplanningAgents(final double time) {
-		Set<String> transportModes = null;
-		return this.getUnrestrictedReplanningAgents(time, transportModes);
-	}
-	
-	/**
-	 * @param time
-	 * @param transportMode
-	 * @return a list of agents who might need an unrestricted replanning and use the given transport mode
-	 */
-	public Set<Id> getUnrestrictedReplanningAgents(final double time, final String transportMode) {
-		Set<String> transportModes = new HashSet<String>();
-		transportModes.add(transportMode);
-		return this.getUnrestrictedReplanningAgents(time, transportModes);
-	}
-	
-	/**
-	 * @param time
-	 * @param transportModes
-	 * @return a list of agents who might need an unrestricted replanning and use one of the given transport modes
-	 */
-	public Set<Id> getUnrestrictedReplanningAgents(final double time, final Set<String> transportModes) {
-		return this.filterAgents(time, transportModes, TimeFilterMode.UNRESTRICTED);
+		return this.filterAgents(time, TimeFilterMode.UNRESTRICTED);
 	}
 	
 	/**
@@ -326,31 +284,10 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * @return a list of agents who might need a restricted replanning and use the given transport mode
 	 */
 	public Set<Id> getRestrictedReplanningAgents(final double time) {
-		Set<String> transportModes = null;
-		return this.getRestrictedReplanningAgents(time, transportModes);
+		return this.filterAgents(time, TimeFilterMode.RESTRICTED);
 	}
-	
-	/**
-	 * @param time
-	 * @param transportMode
-	 * @return a list of agents who might need a restricted replanning and use the given transport mode
-	 */
-	public Set<Id> getRestrictedReplanningAgents(final double time, final String transportMode) {
-		Set<String> transportModes = new HashSet<String>();
-		transportModes.add(transportMode);
-		return this.getRestrictedReplanningAgents(time, transportModes);
-	}
-	
-	/**
-	 * @param time
-	 * @param transportModes
-	 * @return a list of agents who might need a restricted replanning and use one of the given transport modes
-	 */
-	public Set<Id> getRestrictedReplanningAgents(final double time, final Set<String> transportModes) {
-		return this.filterAgents(time, transportModes, TimeFilterMode.RESTRICTED);
-	}
-	
-	private Set<Id> filterAgents(final double time, final Set<String> transportModes, final TimeFilterMode timeMode) {
+		
+	private Set<Id> filterAgents(final double time, final TimeFilterMode timeMode) {
 		Set<Id> set = new HashSet<Id>();
 		
 		Iterator<Entry<Id, Double>> entries = replanningMap.entrySet().iterator();
@@ -368,12 +305,6 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 			} else if (timeMode == TimeFilterMode.UNRESTRICTED) {
 				if (time > replanningTime) continue;
 			}
-
-			// check transport mode
-			if (transportModes != null) {
-				String mode = this.agentTransportModeMap.get(personId);
-				if (!transportModes.contains(mode)) continue;
-			}
 			
 			// non of the checks fails therefore add agent to the replanning set
 			set.add(personId);	
@@ -388,7 +319,6 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 */
 	public Set<Id> getLegPerformingAgents() {
 		return Collections.unmodifiableSet(this.enrouteAgents);
-		
 	}
 
 	/**

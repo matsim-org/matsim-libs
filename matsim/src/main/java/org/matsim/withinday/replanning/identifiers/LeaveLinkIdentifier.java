@@ -33,16 +33,15 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 public class LeaveLinkIdentifier extends DuringLegIdentifier {
 
 	protected LinkReplanningMap linkReplanningMap;
-	protected Set<String> transportModes;
 	
 	// use the Factory!
-	/*package*/ LeaveLinkIdentifier(LinkReplanningMap linkReplanningMap, Set<String> transportModes) {
+	/*package*/ LeaveLinkIdentifier(LinkReplanningMap linkReplanningMap) {
 		this.linkReplanningMap = linkReplanningMap;
 	}
 	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<Id> legPerformingAgents = linkReplanningMap.getReplanningAgents(time, transportModes);
+		Set<Id> legPerformingAgents = linkReplanningMap.getReplanningAgents(time);
 		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
 
 		// apply filter to remove agents that should not be replanned
