@@ -166,7 +166,8 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
 		this.getQueueSimulationListener().add(carLegAgentsFilterFactory);
 
-		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes); 
+		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap());
+		duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 		
 		startedLegFactory = new LegStartedIdentifierFactory(this.getLinkReplanningMap());
@@ -215,12 +216,10 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 				PlanElement planElement = plan.getPlanElements().get(i);
 				if (planElement instanceof Leg) {
 					Leg leg = (Leg) planElement;
-					if (leg.getMode().equals(TransportMode.car)) {
-						if (leg.getRoute() == null) {
-							Id startLinkId = ((Activity) plan.getPlanElements().get(i - 1)).getLinkId();
-							Id endLinkId = ((Activity) plan.getPlanElements().get(i + 1)).getLinkId();
-							leg.setRoute(routeFactory.createRoute(TransportMode.car, startLinkId, endLinkId));
-						}
+					if (leg.getRoute() == null) {
+						Id startLinkId = ((Activity) plan.getPlanElements().get(i - 1)).getLinkId();
+						Id endLinkId = ((Activity) plan.getPlanElements().get(i + 1)).getLinkId();
+						leg.setRoute(routeFactory.createRoute(TransportMode.car, startLinkId, endLinkId));
 					}
 				}
 			}
