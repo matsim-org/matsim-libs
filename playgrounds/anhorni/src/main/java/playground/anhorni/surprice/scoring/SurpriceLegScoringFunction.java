@@ -34,9 +34,6 @@ import org.matsim.core.utils.misc.RouteUtils;
 import playground.anhorni.surprice.AgentMemory;
 import playground.anhorni.surprice.Surprice;
 
-/**
- * anhorni
- */
 public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 	protected double score;
@@ -205,6 +202,6 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 	@Override
 	public double getScore() {
-		return 0;
+		return this.score;
 	}
 }
