@@ -27,7 +27,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+//import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.AgentMemories;
@@ -76,7 +76,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma"),
 				alphaTrip));
 		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
+		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;
 	}
 }

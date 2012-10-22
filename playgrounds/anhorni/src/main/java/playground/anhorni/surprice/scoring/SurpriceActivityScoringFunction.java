@@ -64,7 +64,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		
-		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useIncomes"))) {
+		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePrefs"))) {
 			this.alpha = 1.0;
 		}
 
@@ -93,7 +93,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		// disutility if too early
 		if (arrivalTime < activityStart) {
 			// agent arrives to early, has to wait
-			tmpScore += this.params.marginalUtilityOfWaiting_s * this.alpha * (activityStart - arrivalTime);
+			tmpScore += this.params.marginalUtilityOfWaiting_s * (activityStart - arrivalTime);
 		}
 
 		// disutility if too late
@@ -108,10 +108,10 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 			double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0));
 			double utilPerf = this.params.marginalUtilityOfPerforming_s * this.alpha * typicalDuration
 					* Math.log((duration / 3600.0) / zeroUtilityDuration);
-			double utilWait = this.params.marginalUtilityOfWaiting_s * this.alpha * duration;
+			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
-			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * this.alpha * Math.abs(duration);
+			tmpScore += 2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(duration);
 		}
 
 //		// disutility if stopping too early
