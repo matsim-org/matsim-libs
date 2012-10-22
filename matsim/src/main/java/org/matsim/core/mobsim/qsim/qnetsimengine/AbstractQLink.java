@@ -34,6 +34,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -59,6 +60,8 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
+	private static Logger log = Logger.getLogger(AbstractQLink.class);
+	
 	final Link link;
 
 	final QNetwork network;	
@@ -286,7 +289,14 @@ abstract class AbstractQLink extends QLinkInternalI {
 			registerPassengerAgentWaitingForCar(passenger, vehicleId);
 			return false;
 		} else {
-			vehicle.addPassenger((PassengerAgent) passenger);
+			boolean added = vehicle.addPassenger((PassengerAgent) passenger);
+			if (!added) {
+				log.warn("Passenger " + passenger.getId().toString() + 
+				" could not be inserted into vehicle " + vehicleId.toString() +
+				" since there is no free seat available!");
+				return false;
+			}
+			
 			((PassengerAgent) passenger).setVehicle(vehicle);
 			EventsManager eventsManager = network.simEngine.getMobsim().getEventsManager();
 			eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, passenger.getId(), vehicle.getId()));
