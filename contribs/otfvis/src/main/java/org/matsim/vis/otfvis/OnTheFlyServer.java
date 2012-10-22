@@ -73,11 +73,6 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
 		@Override
-		public Collection<AgentSnapshotInfo> getSnapshot() {
-			return visData.values();
-		}
-
-		@Override
 		public Map<Id, Plan> getPlans() {
 			return plans;
 		}
@@ -110,6 +105,16 @@ public class OnTheFlyServer implements OTFLiveServer {
 		@Override
 		public OTFServerQuadTree getNetworkQuadTree() {
 			return quad;
+		}
+		
+		@Override
+		public
+		Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots() {
+			if (visMobsim != null) {
+				return visMobsim.getNonNetwokAgentSnapshots();
+			} else {
+				return visData.values();
+			}
 		}
 
 	}

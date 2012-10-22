@@ -19,8 +19,6 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  *
  */
 public interface SimulationViewForQueries {
-
-	Collection<AgentSnapshotInfo> getSnapshot();
 	
 	Map<Id, Plan> getPlans();
 	
@@ -35,5 +33,7 @@ public interface SimulationViewForQueries {
 	VisNetwork getVisNetwork();
 
 	OTFServerQuadTree getNetworkQuadTree();
+	
+	Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots();
 
 }

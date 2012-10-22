@@ -76,7 +76,7 @@ public class QueryAgentId extends AbstractQuery {
 		for(VisLink qlink : simulationView.getVisNetwork().getVisLinks().values()) {
 			qlink.getVisData().getVehiclePositions(positions);
 		}
-		positions.addAll(simulationView.getSnapshot());
+		positions.addAll(simulationView.getNonNetwokAgentSnapshots());
 		for(AgentSnapshotInfo info : positions) {
 			if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
 			java.awt.geom.Point2D.Double xy = OTFServerQuadTree.transform(new CoordImpl(info.getEasting(), info.getNorthing()));
