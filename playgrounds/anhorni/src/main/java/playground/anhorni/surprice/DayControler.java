@@ -36,7 +36,6 @@ public class DayControler extends Controler {
 		super.setOverwriteFiles(true);
 		this.memories = memories;	
 		this.day = day;
-		this.incomes = incomes;
 		this.preferences = preferences;
 	} 
 		
@@ -44,7 +43,7 @@ public class DayControler extends Controler {
 	    super.setUp();	
 	    	    
 	  	SurpriceScoringFunctionFactory scoringFunctionFactory = new SurpriceScoringFunctionFactory(
-	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.incomes, this.preferences);	  		
+	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
 	  	this.setScoringFunctionFactory(scoringFunctionFactory);
 	  	
 	  	//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!

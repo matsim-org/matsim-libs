@@ -21,7 +21,6 @@ package playground.anhorni.surprice.scoring;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -38,17 +37,15 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
 	private String day;
-	private ObjectAttributes incomes;
 	private ObjectAttributes preferences;
 	private Random random;
 
 	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
-			AgentMemories memories, String day, ObjectAttributes incomes, ObjectAttributes preferences) {
+			AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(configGroup, network);
 		this.controler = controler;
 		this.memories = memories;
 		this.day = day;
-		this.incomes = incomes;
 		this.preferences = preferences;	
 	}
 	
