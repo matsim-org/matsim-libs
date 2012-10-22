@@ -40,11 +40,7 @@ public class MultiDayControler {
 		Config config = ConfigUtils.loadConfig(configFile);
 		String path = config.plans().getInputFile();
 		String outPath = config.controler().getOutputDirectory();
-				
-	    ObjectAttributes incomes = new ObjectAttributes();		    
-	    ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(incomes);
-		attributesReader.parse(path + "/incomes.xml");
-		
+						
 		ObjectAttributes preferences = new ObjectAttributes();
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(preferences);
 		preferencesReader.parse(path + "/preferences.xml");
@@ -56,7 +52,7 @@ public class MultiDayControler {
 			
 			AgentMemories memories = new AgentMemories();
 			
-			DayControler controler = new DayControler(config, memories, day, incomes, preferences);
+			DayControler controler = new DayControler(config, memories, day, preferences);
 			controler.run();
 		}
 		// only used for small-scale scenario

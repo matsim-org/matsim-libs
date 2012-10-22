@@ -31,7 +31,7 @@ public class DayControler extends Controler {
 	ObjectAttributes incomes;
 	ObjectAttributes preferences;
 	
-	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes incomes, ObjectAttributes preferences) {
+	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(config);	
 		super.setOverwriteFiles(true);
 		this.memories = memories;	
