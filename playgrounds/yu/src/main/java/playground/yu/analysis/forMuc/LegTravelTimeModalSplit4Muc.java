@@ -199,7 +199,7 @@ public class LegTravelTimeModalSplit4Muc extends LegTravelTimeModalSplit
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingSchemeImpl toll = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl toll = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
 		tollReader.parse(tollFilename);
 

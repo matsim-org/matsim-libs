@@ -34,6 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.analysis.DailyEnRouteTime;
 import playground.yu.utils.charts.PieChart;
@@ -740,15 +741,14 @@ public class DailyEnRouteTime4Muc extends DailyEnRouteTime implements
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyEnRouteTime4Muc ert = new DailyEnRouteTime4Muc(scenario
-				.getRoadPricingScheme());
+		DailyEnRouteTime4Muc ert = new DailyEnRouteTime4Muc((RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class));
 		ert.run(population);
 		ert.write(outputFilename);
 

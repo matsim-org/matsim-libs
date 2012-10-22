@@ -39,7 +39,6 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.benjamin.scoring.income.IncomeScoringFunctionFactory;
 import playground.benjamin.scoring.income.IncomeTollTravelCostCalculatorFactory;
 import playground.benjamin.scoring.income.IncomeTravelCostCalculatorFactory;
-import playground.benjamin.scoring.income.old.BkControlerIncome;
 
 
 /**
@@ -159,7 +158,7 @@ public class BkScoringTest extends MatsimTestCase {
 	private void installTravelCostCalculatorFactory(Controler controler, PersonHouseholdMapping personHouseholdMapping) {
 		// returns null, if there is no road pricing
 		if (controler.getConfig().scenario().isUseRoadpricing()){
-			RoadPricingScheme roadPricingScheme = controler.getRoadPricing().getRoadPricingScheme();
+			RoadPricingScheme roadPricingScheme = (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.class);
 			TravelDisutilityFactory travelCostCalculatorFactory = 
 				new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme);
 			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);

@@ -47,6 +47,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.utils.TollTools;
 import playground.yu.utils.container.CollectionMath;
@@ -345,7 +346,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(scenario.getRoadPricingScheme());
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
 		tollReader.parse(tollFilename);
 
 		EventsManager events = EventsUtils.createEventsManager();

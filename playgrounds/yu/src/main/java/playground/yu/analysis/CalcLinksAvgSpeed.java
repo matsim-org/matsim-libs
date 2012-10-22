@@ -54,6 +54,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleWriter;
@@ -417,10 +418,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				scenario.getRoadPricingScheme());
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
 		tollReader.parse(roadPricingFilename);
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network,
-				scenario.getRoadPricingScheme());
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
 		events.addHandler(clas);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);

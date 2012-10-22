@@ -91,6 +91,7 @@
 		<module>otfvis</module>
 		<module>parking</module>
 		<module>transEnergySim</module>
+		<module>roadpricing</module>
 	</modules>
 	<repositories>
 		<repository>

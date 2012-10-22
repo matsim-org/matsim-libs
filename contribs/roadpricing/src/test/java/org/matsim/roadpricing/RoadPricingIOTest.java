@@ -28,9 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
@@ -57,11 +54,8 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final Id id2 = new IdImpl(2);
 		final Id id3 = new IdImpl(3);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
-		scenario.getConfig().scenario().setUseRoadpricing(true);
-		Fixture.createNetwork1(scenario);
 		// first, read the scheme from file
-		RoadPricingSchemeImpl scheme1 = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl scheme1 = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);
 		reader1.parse(origFile);
 
@@ -89,10 +83,10 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		assertFalse(costIter.hasNext());
 		assertTrue(scheme1.getCostsForLink().containsKey(id1));
 		assertNull(scheme1.getCostsForLink().get(id1));
-    assertTrue(scheme1.getCostsForLink().containsKey(id2));
-    assertNull(scheme1.getCostsForLink().get(id2));
-    assertTrue(scheme1.getCostsForLink().containsKey(id3));
-    assertNotNull(scheme1.getCostsForLink().get(id3));
+		assertTrue(scheme1.getCostsForLink().containsKey(id2));
+		assertNull(scheme1.getCostsForLink().get(id2));
+		assertTrue(scheme1.getCostsForLink().containsKey(id3));
+		assertNotNull(scheme1.getCostsForLink().get(id3));
 
 		// write the scheme to a file
 		RoadPricingWriterXMLv1 writer1 = new RoadPricingWriterXMLv1(scheme1);
@@ -104,9 +98,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 * than the written one. Thus, read this file again and write it again and
 		 * compare them.
 		 */
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    scenario.getConfig().scenario().setUseRoadpricing(true);
-    RoadPricingSchemeImpl scheme2 = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl scheme2 = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);
 		reader2.parse(tmpFile1);
 

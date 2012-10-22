@@ -26,6 +26,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.roadpricing.RoadPricingScheme;
 
 /**
  * @author yu
@@ -50,8 +51,7 @@ public class MZComparisonListener implements IterationEndsListener,
 			OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
 			Population pop = ctl.getPopulation();
 
-			MZComparisonData mzcd = new MZComparisonData(ctl.getScenario()
-					.getRoadPricingScheme());
+			MZComparisonData mzcd = new MZComparisonData((RoadPricingScheme) ctl.getScenario().getScenarioElement(RoadPricingScheme.class));
 			mzcd.run(pop);
 			mzcdi.setData2Compare(mzcd);
 			mzcdi.write(ctlIO.getIterationFilename(iter, "MZ05Comparison"));

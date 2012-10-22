@@ -26,7 +26,6 @@ import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.StrategyManager;
@@ -37,6 +36,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.roadpricing.RoadPricing;
 
 import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.qsim.JointQSimFactory;

@@ -18,13 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.controler.corelisteners;
+package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -36,11 +33,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 
 /**
  * Integrates the RoadPricing functionality into the MATSim Controler.
@@ -49,33 +41,24 @@ import org.matsim.roadpricing.TravelDisutilityIncludingToll;
  */
 public class RoadPricing implements StartupListener, AfterMobsimListener, IterationEndsListener {
 
-	private RoadPricingSchemeImpl scheme = null;
+	private final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 	private CalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
 
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
-
+	
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
 		// read the road pricing scheme from file
-		this.scheme = controler.getScenario().getRoadPricingScheme();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
 		try {
 			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
-		if (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scheme.getType())) {
-			// checks that the replanning strategies don't specify a certain router, as we need a special router ourselves.
-			final StrategyConfigGroup config = controler.getConfig().strategy();
-			for (StrategySettings settings : config.getStrategySettings()) {
-				if (settings.getModuleName().startsWith("ReRoute_")) {
-					throw new RuntimeException("The replanning module " + settings.getModuleName() + " is not supported together with an area toll. Please use the normal \"ReRoute\" instead.");
-				}
-			}
-		}
+		
+		event.getControler().getScenario().addScenarioElement(scheme);
 
 		// add the events handler to calculate the tolls paid by agents
 		this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme);

@@ -66,7 +66,6 @@ import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.controler.corelisteners.RoadPricing;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.external.ExternalMobsim;
@@ -137,8 +136,6 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
-import org.matsim.roadpricing.PlansCalcAreaTollRoute;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
@@ -206,7 +203,6 @@ public class Controler extends AbstractController {
 	private boolean createGraphs = true;
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
-	private RoadPricing roadPricing = null;
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
 
@@ -611,13 +607,6 @@ public class Controler extends AbstractController {
 		// the default handling of plans
 		this.plansScoring = new PlansScoring( this.scenarioData, this.events, controlerIO, this.scoringFunctionFactory );
 		this.addCoreControlerListener(this.plansScoring);
-
-		// load road pricing, if requested
-		if (this.config.scenario().isUseRoadpricing()) {
-			this.roadPricing = new RoadPricing();
-			this.addCoreControlerListener(this.roadPricing);
-		}
-
 		this.addCoreControlerListener(new PlansReplanning( this.strategyManager, this.population ));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
 				this.stopwatch, this.controlerIO ));
@@ -938,10 +927,7 @@ public class Controler extends AbstractController {
 	 *         threads!
 	 */
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		if ( !useTripRouting ||
-				(getScenario().getConfig().scenario().isUseRoadpricing()
-				&& RoadPricingScheme.TOLL_TYPE_AREA.equals(
-					this.scenarioData.getRoadPricingScheme().getType())) ) {
+		if ( !useTripRouting ) {
 			return createOldRoutingAlgorithm(travelCosts, travelTimes);
 		}
 
@@ -950,17 +936,12 @@ public class Controler extends AbstractController {
 				getScenario().getActivityFacilities());
 	}
 
+	
+	
 	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
-
-		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
-				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
-			plansCalcRoute = new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts,
-					travelTimes, this.getLeastCostPathCalculatorFactory(),routeFactory, this.scenarioData.getRoadPricingScheme());
-			log.warn("As roadpricing with area toll is enabled a leg router for area tolls is used. Other features, " +
-					"e.g. transit or multimodal simulation may not work as expected.");
-		} else if (this.config.scenario().isUseTransit()) {
+		if (this.config.scenario().isUseTransit()) {
 			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts,
 					travelTimes, this.getLeastCostPathCalculatorFactory(),routeFactory, this.config.transit(),
 					this.transitRouterFactory.createTransitRouter(), this.scenarioData.getTransitSchedule());
@@ -1062,12 +1043,6 @@ public class Controler extends AbstractController {
 		if ( !useTripRouting ) {
 			throw new IllegalStateException( "cannot get the trip router: useTripRouting is false" );
 		}
-		if ( getScenario().getConfig().scenario().isUseRoadpricing()
-				&& RoadPricingScheme.TOLL_TYPE_AREA.equals(
-					this.scenarioData.getRoadPricingScheme().getType()) ) {
-			throw new IllegalStateException( "cannot get the trip router when using road pricing" );
-		}
-
 		return tripRouterFactory;
 	}
 
@@ -1167,14 +1142,6 @@ public class Controler extends AbstractController {
 
 	public VolumesAnalyzer getVolumes() {
 		return this.volumes;
-	}
-
-	/**
-	 * @return Returns the RoadPricing-ControlerListener, or null if no road
-	 *         pricing is simulated.
-	 */
-	public final RoadPricing getRoadPricing() {
-		return this.roadPricing;
 	}
 
 	/**

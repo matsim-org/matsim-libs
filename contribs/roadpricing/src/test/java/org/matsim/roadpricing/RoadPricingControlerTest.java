@@ -20,7 +20,6 @@
 
 package org.matsim.roadpricing;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -34,9 +33,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author mrieser
  */
 public class RoadPricingControlerTest extends MatsimTestCase {
-
-	static private final Logger log = Logger.getLogger(RoadPricingControlerTest.class);
-
+	
 	/**
 	 * Make sure that the road-pricing classes are not loaded when no road pricing is simulated.
 	 */
@@ -44,12 +41,11 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
-		Controler controler = new TestControler(config);
+		Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
-		assertNull("RoadPricing must not be loaded in case case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("BaseCase must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelCostCalculator();
@@ -62,12 +58,12 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
-		Controler controler = new TestControler(config);
+		Controler controler = new Controler(config);
+		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
-		assertNotNull("RoadPricing must be loaded in distance toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("Distance toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelCostCalculator();
@@ -80,12 +76,12 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "cordonToll.xml");
-		Controler controler = new TestControler(config);
+		Controler controler = new Controler(config);
+		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
-		assertNotNull("RoadPricing must be loaded in cordon toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertFalse("Cordon toll must not use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelCostCalculator();
@@ -98,82 +94,18 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
-		Controler controler = new TestControler(config);
+		Controler controler = new AreaTollControler(config);
+		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.setWriteEventsInterval(0);
 		controler.run();
-		assertNotNull("RoadPricing should be loaded in area toll case.", controler.getRoadPricing());
 		PlanAlgorithm router = controler.createRoutingAlgorithm();
 		assertTrue("Area toll should use area-toll router.", router instanceof PlansCalcAreaTollRoute);
 		TravelDisutility travelCosts = controler.createTravelCostCalculator();
 		assertFalse("Area toll must not use TollTravelCostCalculator.", travelCosts instanceof TravelDisutilityIncludingToll);
 	}
 
-	/** Checks that inconsistencies in the configuration are recognized, namely with the replanning strategies.
-	 *
-	 * @author mrieser
-	 */
-	public void testAreaTollStrategyConfig() {
-		// start with the default configuration, which is ok.
-		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(0);
-		config.controler().setWritePlansInterval(0);
-		config.scenario().setUseRoadpricing(true);
-		config.roadpricing().setTollLinksFile(getInputDirectory() + "areaToll.xml");
-		try {
-			Controler controler = new TestControler(config);
-			controler.setCreateGraphs(false);
-			controler.setDumpDataAtEnd(false);
-			controler.setWriteEventsInterval(0);
-			controler.run();
-		} catch (RuntimeException unexpected) {
-			throw unexpected;
-		}
-
-		// now add a strategy that is not okay
-		int index = config.strategy().getStrategySettings().size() + 1;
-		config.strategy().addParam("Module_" + index, "ReRoute_Landmarks");
-		config.strategy().addParam("ModuleProbability_" + index, "0.1");
-		try {
-			Controler controler = new TestControler(config);
-			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(false);
-			controler.setDumpDataAtEnd(false);
-			controler.setWriteEventsInterval(0);
-			controler.run();
-			fail("Expected RuntimeException because of ReRoute_Landmarks, but got none.");
-		} catch (RuntimeException expected) {
-			log.info("Catched RuntimeException as expected: " + expected.getMessage());
-		}
-
-		// try to fix the strategy, but fail again
-		config.strategy().addParam("Module_" + index, "ReRoute_Dijkstra");
-		try {
-			Controler controler = new TestControler(config);
-			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(false);
-			controler.setDumpDataAtEnd(false);
-			controler.setWriteEventsInterval(0);
-			controler.run();
-			fail("Expected RuntimeException because of ReRoute_Dijkstra, but got none.");
-		} catch (RuntimeException expected) {
-			log.info("Catched RuntimeException as expected: " + expected.getMessage());
-		}
-
-		// now fix it
-		config.strategy().addParam("Module_" + index, "ReRoute");
-		try {
-			Controler controler = new TestControler(config);
-			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(false);
-			controler.setDumpDataAtEnd(false);
-			controler.setWriteEventsInterval(0);
-			controler.run();
-		} catch (RuntimeException unexpected) {
-			throw unexpected;
-		}
-	}
 
 	/** Tests that paid tolls end up in the score. */
 	public void testTollScores() {
@@ -195,6 +127,7 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
+		controler2.addControlerListener(new RoadPricing());
 		controler2.setCreateGraphs(false);
 		controler2.setDumpDataAtEnd(false);
 		controler2.setWriteEventsInterval(0);
@@ -205,20 +138,5 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		assertEquals(3.0, scoreBasecase - scoreTollcase, EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
 	}
 
-	/** Just a simple Controler that does not run the mobsim, as we're not interested in that part here. */
-	private static class TestControler extends Controler {
-
-		protected TestControler(final Config config) {
-			super(config);
-			setCreateGraphs(false);
-			setWriteEventsInterval(0);
-		}
-
-		@Override
-		protected void runMobSim() {
-			// do not run the mobsim, as we're not interested in that here, so we can save this time.
-		}
-
-	}
 
 }

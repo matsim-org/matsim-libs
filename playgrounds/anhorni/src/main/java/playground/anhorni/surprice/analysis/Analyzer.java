@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +38,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.anhorni.surprice.Surprice;
@@ -113,7 +114,7 @@ public class Analyzer {
 		CalcLegTimes ttCalculator = new CalcLegTimes();
 		events.addHandler(ttCalculator);
 		
-		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl)this.scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		
 		log.info(config.scenario().isUseRoadpricing());

@@ -788,7 +788,7 @@ public class DailyDistance4Muc extends DailyDistance implements Analysis4Muc {
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);
-		RoadPricingSchemeImpl toll = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl toll = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(toll);
 		tollReader.parse(tollFilename);
 

@@ -45,7 +45,6 @@ import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -73,7 +72,6 @@ public class ScenarioImpl implements Scenario {
 
 	//non-mandatory attributes
 	private LaneDefinitions laneDefinitions;
-	private RoadPricingSchemeImpl roadPricingScheme;
 	private TransitSchedule transitSchedule = null;
 
 	private Households households;
@@ -100,9 +98,6 @@ public class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseLanes()){
 			this.createLaneDefinitionsContainer();
 		}
-		if (this.config.scenario().isUseRoadpricing()){
-			this.createRoadPricingScheme();
-		}
 		if (this.config.scenario().isUseKnowledges()){
 			this.createKnowledges();
 		}
@@ -124,10 +119,6 @@ public class ScenarioImpl implements Scenario {
 
 	protected void createKnowledges() {
 		this.knowledges = new KnowledgesImpl();
-	}
-
-	protected void createRoadPricingScheme() {
-		this.roadPricingScheme = new RoadPricingSchemeImpl();
 	}
 
 	protected void createLaneDefinitionsContainer() {
@@ -188,16 +179,6 @@ public class ScenarioImpl implements Scenario {
 		return laneDefinitions;
 	}
 
-	public RoadPricingSchemeImpl getRoadPricingScheme() {
-		if ((this.roadPricingScheme == null) && this.config.scenario().isUseRoadpricing()){
-			this.createRoadPricingScheme();
-		}
-		else if (!this.config.scenario().isUseRoadpricing()){
-			log.warn("road pricing: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
-		return roadPricingScheme;
-	}
-
 	@Deprecated
 	public void setNetwork(Network network) {
 		this.network = network;
@@ -206,11 +187,6 @@ public class ScenarioImpl implements Scenario {
 	@Deprecated
 	public void setPopulation(Population population) {
 		this.population = population;
-	}
-
-	@Deprecated
-	public void setLaneDefinitions(LaneDefinitions laneDefs){
-		this.laneDefinitions = laneDefs;
 	}
 
 	public Households getHouseholds() {

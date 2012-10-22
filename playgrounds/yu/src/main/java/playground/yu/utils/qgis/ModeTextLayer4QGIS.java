@@ -32,6 +32,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.analysis.PlanModeJudger;
 
@@ -96,11 +97,11 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				scenario.getRoadPricingScheme());
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
 		tollReader.parse(tollFilename);
 
 		ModeTextLayer4QGIS mtl = new ModeTextLayer4QGIS(textFilename,
-				scenario.getRoadPricingScheme());
+				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class));
 		mtl.run(population);
 		mtl.close();
 

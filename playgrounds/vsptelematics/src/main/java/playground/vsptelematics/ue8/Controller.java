@@ -36,6 +36,8 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.vsptelematics.common.IncidentGenerator;
 import playground.vsptelematics.ha2.RouteTTObserver;
@@ -114,8 +116,9 @@ public class Controller {
 			prediction2 = Double.parseDouble(con.getScenario().getConfig().getParam("telematics", "predictedTravelTimeRoute2"));
 
 			double time = 18.0 * 3600.0;
-			tollRoute1 = con.getScenario().getRoadPricingScheme().getLinkCostInfo(new IdImpl("2"), time , null).amount;
-			tollRoute2 = con.getScenario().getRoadPricingScheme().getLinkCostInfo(new IdImpl("3"), time, null).amount;
+			RoadPricingSchemeImpl roadPricingScheme = (RoadPricingSchemeImpl) con.getScenario().getScenarioElement(RoadPricingScheme.class);
+			tollRoute1 = roadPricingScheme.getLinkCostInfo(new IdImpl("2"), time , null).amount;
+			tollRoute2 = roadPricingScheme.getLinkCostInfo(new IdImpl("3"), time, null).amount;
 //			log.error("using prediction1: " + prediction1 + " prediction2: " + prediction2 + " toll1: " + tollRoute1 + " toll2: " + tollRoute2);
 		
 			Population pop = con.getScenario().getPopulation();

@@ -191,7 +191,7 @@ public class LegNoModalSplit extends AbstractPersonAlgorithm implements
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 
-		RoadPricingSchemeImpl tollScheme = scenario.getRoadPricingScheme();
+		RoadPricingSchemeImpl tollScheme = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
 				tollScheme);
 		tollReader.parse(tollFilename);

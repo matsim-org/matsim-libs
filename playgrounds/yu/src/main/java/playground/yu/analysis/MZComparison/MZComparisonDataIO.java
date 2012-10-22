@@ -42,6 +42,8 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.yu.utils.charts.StackedBarChart;
 
@@ -190,14 +192,14 @@ public class MZComparisonDataIO implements TabularFileHandler {
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				scenario.getRoadPricingScheme());
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		MZComparisonData mzcd = new MZComparisonData(
-				scenario.getRoadPricingScheme());
+				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class));
 		mzcd.run(population);
 
 		mzcdi.setData2Compare(mzcd);

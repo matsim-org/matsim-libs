@@ -23,6 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -74,7 +75,7 @@ public class BkControlerIncome extends BkControler {
 	private void installTravelCostCalculatorFactory() {
 		//returns null, if there is no road pricing
 		if (config.scenario().isUseRoadpricing()){
-			RoadPricingScheme roadPricingScheme = super.getRoadPricing().getRoadPricingScheme();
+			RoadPricingScheme roadPricingScheme = (RoadPricingScheme) ((ScenarioImpl) this.scenarioData).getScenarioElement(RoadPricingScheme.class);
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
