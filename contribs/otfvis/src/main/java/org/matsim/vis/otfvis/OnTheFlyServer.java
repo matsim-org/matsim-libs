@@ -361,7 +361,14 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
-		query.installQuery(currentTimeStepView);
+		try {
+			accessToQNetwork.acquire();
+			query.installQuery(currentTimeStepView);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} finally {
+			accessToQNetwork.release();
+		}
 		activeQueries.add(query);
 		return query;
 	}
