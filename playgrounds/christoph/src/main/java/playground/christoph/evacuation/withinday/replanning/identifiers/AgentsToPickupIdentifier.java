@@ -33,7 +33,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -161,7 +160,6 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		}
 		
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		Map<Id, AtomicInteger> reservedCapacities = new HashMap<Id, AtomicInteger>();
 		Map<Id, PlannedDeparture> plannedDepartures = new HashMap<Id, PlannedDeparture>();
 		
 		for (MobsimAgent personAgent : insecureLegPerformingAgents) {
@@ -232,13 +230,14 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 					 * If already other agents have reserved a seat in that vehicle, reduce
 					 * the vehicle's available capacity.
 					 */
-					AtomicInteger reservedCapacity = reservedCapacities.get(vehicleId);			
-					if (reservedCapacity != null) freeCapacity -= reservedCapacity.get();
+					int reservedCapacity = this.vehiclesTracker.getReservedVehicleCapacity(vehicleId);
+					
+					int remainingCapacity = freeCapacity - reservedCapacity;
 					
 					/*
 					 * Check whether free capacity is available in the vehicle. 
 					 */
-					if (freeCapacity <= 0) continue;
+					if (remainingCapacity <= 0) continue;
 					
 					/*
 					 * Check whether the driver would pick up the person.
@@ -254,7 +253,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 						 * Return true if after picking up the person at least one seat remains free,
 						 * otherwise return false.
 						 */
-						if (freeCapacity > 1) pickup = true;
+						if (remainingCapacity > 1) pickup = true;
 						else pickup = false;
 					} else {
 						throw new RuntimeException("Undefined pickup agents behavior found: " + decision);
@@ -262,8 +261,10 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 					
 					/*
 					 * If the driver will not pick up the possible passenger, go on an try the next vehicle.
+					 * Otherwise reserve seat in vehicle.
 					 */
 					if (!pickup) continue;
+					else this.vehiclesTracker.reserveSeat(vehicleId);
 					
 					/*
 					 * mark the agent as to be replanned and add an entry in the map which 

@@ -49,6 +49,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -179,6 +180,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
 	
 	protected JointDepartureOrganizer jointDepartureOrganizer;
+	protected JointDepartureWriter jointDepartureWriter;
 	protected InformedHouseholdsTracker informedHouseholdsTracker;
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
@@ -357,8 +359,10 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
 		this.jointDepartureOrganizer = new JointDepartureOrganizer();
+		this.jointDepartureWriter = new JointDepartureWriter(this.jointDepartureOrganizer);
+		this.addControlerListener(this.jointDepartureWriter);
 		
-		this.vehiclesTracker = new VehiclesTracker(jointDepartureOrganizer);
+		this.vehiclesTracker = new VehiclesTracker(jointDepartureOrganizer, this.jointDepartureWriter);
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		

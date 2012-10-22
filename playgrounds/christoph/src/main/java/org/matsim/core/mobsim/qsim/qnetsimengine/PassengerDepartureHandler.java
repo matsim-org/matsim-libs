@@ -62,7 +62,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		
 		JointDeparture jointDeparture = getJointDeparture(agent.getId());
 		if (jointDeparture == null) return false;
-				
+		
 		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.getParkedVehicle(jointDeparture.getVehicleId());
 		
@@ -71,12 +71,6 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		} else if (passengerMode.equals(agent.getMode())) {
 			handlePassengerDeparture(jointDeparture, vehicle, qlink, agent, now);
 		} else return false;
-		
-//		if (canDepart(jointDeparture, vehicle, qlink)) {
-//			checkDeparture(jointDeparture, vehicle);	// throws an exception if something seems to be wrong
-//			jointDeparture.setDeparted();	// departure has been performed, therefore invalidate it
-//			handleJointDeparture(now, vehicle, qlink);
-//		}
 		
 		return true;
 	}
@@ -115,7 +109,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 					" does not match the vehicle scheduled in the joint departure " +
 					jointDeparture.getVehicleId().toString() + "!");
 		}
-				
+		
 		// check whether the driver has to wait for passengers
 		if (!allPassengersWaiting(jointDeparture, vehicle, qlink)) {
 			qlink.registerDriverAgentWaitingForPassengers(driver);
@@ -150,7 +144,13 @@ public class PassengerDepartureHandler implements DepartureHandler {
 			 * The qlink checks whether the vehicle is already available for the 
 			 * passenger to enter. If not, the agent is added to a waiting list.
 			 */
-			qlink.insertPassengerIntoVehicle(passenger, jointDeparture.getVehicleId(), now);
+			boolean inserted = qlink.insertPassengerIntoVehicle(passenger, jointDeparture.getVehicleId(), now);
+			
+			if (!inserted && vehicle != null) {
+				throw new RuntimeException("Passenger " + passenger.getId().toString() + 
+						" could not be inserted into vehicle " + jointDeparture.getVehicleId().toString() +
+						"! Probably there is no free seat left!");
+			}
 		}
 		
 		/*
@@ -204,7 +204,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	private void checkDeparture(JointDeparture jointDeparture, QVehicle vehicle) {
 		if (!vehicle.getCurrentLink().getId().equals(jointDeparture.getLinkId())) {
 			throw new RuntimeException("JointDeparture " + jointDeparture.getId().toString() +
-					"V ehicle " + vehicle.getId().toString() + 
+					" Vehicle " + vehicle.getId().toString() + 
 					" is at link " + vehicle.getCurrentLink().getId().toString() +
 					" but was scheduled to be at " + jointDeparture.getLinkId().toString() +
 					"!");
@@ -237,6 +237,9 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		 */
 		jointDeparture.setDeparted();
 		
+		JointDepartureEvent event = new JointDepartureEvent(now, jointDeparture.getId());
+		qNetsimEngine.getMobsim().getEventsManager().processEvent(event);
+		
 		/*
 		 * Check whether the driver's next leg ends at the current link.
 		 */
@@ -245,7 +248,6 @@ public class PassengerDepartureHandler implements DepartureHandler {
 
 			driver.endLegAndComputeNextState(now);
 			
-//			qlink.addParkedVehicle(vehicle);
 			this.qNetsimEngine.internalInterface.arrangeNextAgentState(driver);
 			
 			/*

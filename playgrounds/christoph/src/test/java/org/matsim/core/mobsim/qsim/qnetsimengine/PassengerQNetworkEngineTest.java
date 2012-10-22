@@ -104,6 +104,47 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 	}
 	
 	/*
+	 * Departure is scheduled at another link than defined in the agent's plan
+	 */
+	public void testTooManyPassengers() {
+		Scenario scenario = makeScenario();
+		
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		eventsManager.addHandler(new EventsPrinter());
+		
+		makeNetwork(scenario.getNetwork());
+		makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		makeNonStopPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		makeNonStopPassenger(new IdImpl("p3"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		makeNonStopPassenger(new IdImpl("p4"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		makeNonStopPassenger(new IdImpl("p5"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		makeNonStopPassenger(new IdImpl("p6"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		
+		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
+		QSim qSim = tuple.getFirst();
+		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+
+		List<Id> passengerIds = new ArrayList<Id>();
+		passengerIds.add(new IdImpl("p2"));
+		passengerIds.add(new IdImpl("p3"));
+		passengerIds.add(new IdImpl("p4"));
+		passengerIds.add(new IdImpl("p5"));
+		passengerIds.add(new IdImpl("p6"));
+		jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		
+		boolean caughtException = false;
+		try {
+			qSim.run();			
+		} catch (RuntimeException e) {
+			log.info("Caught expected runtime exception.");
+			caughtException = true;
+		}
+		assertEquals(true, caughtException);
+	}
+	
+	/*
 	 * Only driver from l1 to l3
 	 */
 	public void testOnlyDriver() {

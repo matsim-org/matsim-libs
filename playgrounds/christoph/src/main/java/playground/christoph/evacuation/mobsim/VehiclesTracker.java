@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,6 +44,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
@@ -50,6 +52,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
@@ -60,7 +63,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
  */
 public class VehiclesTracker implements MobsimInitializedListener,
 	LinkEnterEventHandler, LinkLeaveEventHandler, PersonLeavesVehicleEventHandler,
-	AgentDepartureEventHandler,  AgentArrivalEventHandler {
+	AgentDepartureEventHandler, AgentArrivalEventHandler {
 	
 	// currently active drivers
 	private final Set<Id> drivers;
@@ -70,24 +73,38 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	
 	// vehicles currently enroute on a given link
 	private final Map<Id, List<Id>> enrouteVehiclesOnLink;
-		
+	
+	/*
+	 * Reserved capacities for passengers planned to enter.
+	 * So far, we reserve seats only on link level, meaning
+	 * we assume that an agent which is picked up reserves
+	 * a seat when the picking up vehicle in on the same link.
+	 */
+	private final Map<Id, AtomicInteger> reservedCapacities;
+	
 	private final JointDepartureOrganizer jointDepartureOrganizer;
+	private final JointDepartureWriter jointDepartureWriter;
+	private MobsimTimer mobsimTimer;
 	
 	private int jointDeparturesCounter = 0;
 		
-	public VehiclesTracker(JointDepartureOrganizer jointDepartureOrganizer) {
+	public VehiclesTracker(JointDepartureOrganizer jointDepartureOrganizer, JointDepartureWriter jointDepartureWriter) {
 		
 		this.jointDepartureOrganizer = jointDepartureOrganizer; 
+		this.jointDepartureWriter = jointDepartureWriter;
 		
 		this.drivers = new HashSet<Id>();
 		this.vehicles = new HashMap<Id, MobsimVehicle>();	
 		this.enrouteVehiclesOnLink = new HashMap<Id, List<Id>>();
+		this.reservedCapacities = new HashMap<Id, AtomicInteger>();
 	}
 	
 	public JointDeparture createJointDeparture(Id linkId, Id vehicleId, Id driverId, 
 			Collection<Id> passengerIds) {
 		Id id = new IdImpl("jd" + jointDeparturesCounter++);
-		return this.jointDepartureOrganizer.createJointDeparture(id, linkId, vehicleId, driverId, passengerIds);
+		JointDeparture jointDeparture = this.jointDepartureOrganizer.createJointDeparture(id, linkId, vehicleId, driverId, passengerIds);
+		this.jointDepartureWriter.writeDeparture(this.mobsimTimer.getTimeOfDay(), jointDeparture);
+		return jointDeparture;
 	}
 	
 	public Id getVehicleLinkId(Id vehicleId) {
@@ -98,17 +115,28 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		return this.enrouteVehiclesOnLink.get(linkId);
 	}
 	
-	// Returns: number of seats - 1 (driver) - number of passengers
 	public int getFreeVehicleCapacity(Id vehicleId) {
 		
 		QVehicle vehicle = (QVehicle) this.vehicles.get(vehicleId);
 		
-		int capacity = vehicle.getVehicle().getType().getCapacity().getSeats();
+		int passengerCapacity = vehicle.getPassengerCapacity();
 		int passengers = vehicle.getPassengers().size();
+		int freeCapacity = passengerCapacity - passengers;
 		
-		return capacity - (1 + passengers);
+		return freeCapacity;
 	}
-
+	
+	public int getReservedVehicleCapacity(Id vehicleId) {
+		AtomicInteger reserved = this.reservedCapacities.get(vehicleId);
+		if (reserved == null) return 0;
+		else return reserved.get();
+	}
+	
+	public void reserveSeat(Id vehicleId) {
+		AtomicInteger reserved = this.reservedCapacities.get(vehicleId);
+		reserved.incrementAndGet();
+	}
+	
 	public MobsimVehicle getVehicle(Id vehicleId) {
 		return this.vehicles.get(vehicleId);
 	}
@@ -121,11 +149,12 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		QVehicle vehicle = (QVehicle) this.vehicles.get(vehicleId);
 		return vehicle.getPassengers();
 	}
-		
+	
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
-			
+		this.mobsimTimer = sim.getSimTimer();
+		
 		// collect all vehicles
 		for (NetsimLink netsimLink : sim.getNetsimNetwork().getNetsimLinks().values()) {
 			for (MobsimVehicle mobsimVehicle : netsimLink.getAllVehicles()) {
@@ -170,6 +199,8 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		if (isDriver) {
 			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(event.getLinkId());
 			vehicleIds.add(event.getVehicleId());
+			
+			reservedCapacities.put(event.getVehicleId(), new AtomicInteger(0));
 		}
 	}
 	
