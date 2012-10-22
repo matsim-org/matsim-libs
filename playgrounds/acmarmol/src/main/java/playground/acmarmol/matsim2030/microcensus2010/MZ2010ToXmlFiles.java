@@ -83,7 +83,7 @@ public class MZ2010ToXmlFiles {
 		System.out.println("MATSim-DB: creates population, vehicles and households and xml files from MicroCensus 2010 database \n");
 		
 		//args = getLocalFileArgs();
-		//args = getNetworkFileArgs();
+		args = getNetworkFileArgs();
 		
 		if (args.length != 2) {
 			log.error("MZ2010ToXmlFiles inputBase outputBase");
@@ -307,7 +307,7 @@ public class MZ2010ToXmlFiles {
 		System.out.println("  done.");
 		
 		}else{System.out.println("      NO PEOPLE WITH PLANS COMPLETELY OUT OF SWITZERLAND \n");}
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 		
 		
 		//NOTE: after handling border crossing tips, references to weges and etappen are lost
@@ -366,6 +366,19 @@ public class MZ2010ToXmlFiles {
 
 
 //////////////////////////////////////////////////////////////////////
+
+
+		System.out.println("-----------------------------------------------------------------------------------------------------------");
+		log.info("changing  MZ modes to matsim modes...");
+		MZPopulationUtils.changeToMatsimModes(population);
+		new PopulationWriter(population, null).write(outputBase+"population.13.xml");
+		System.out.println("  done.");
+
+
+
+//////////////////////////////////////////////////////////////////////
+		
+		
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("Finished filtering population. Las population size = "+ population.getPersons().size());
 

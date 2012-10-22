@@ -610,7 +610,10 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						}
 					}
 				}
-				if(out){ids.add(person.getId());}
+				if(out){
+					ids.add(person.getId());
+					person.getPlans().clear();
+				}
 				
 			}
 		}
@@ -775,8 +778,62 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	}
 	
 //////////////////////////////////////////////////////////////////////	
+	
+ public static void changeToMatsimModes(Population population){
+	 
+	 for(Person person: population.getPersons().values()){
+		 
+		 Plan plan = person.getSelectedPlan();
+			
+			if(plan!=null){
+				for(PlanElement pe: plan.getPlanElements()){
+					
+					if(pe instanceof Leg){
+						Leg leg = (Leg) pe;
+						
+						String mode = leg.getMode();
+						if(mode.equals(MZConstants.PLANE) |
+						   mode.equals(MZConstants.TRAIN) |
+						   mode.equals(MZConstants.SHIP) |
+						   mode.equals(MZConstants.SONSTINGER_OEV)|
+						   mode.equals(MZConstants.TAXI)|
+						   mode.equals(MZConstants.TRUCK)|
+						   mode.equals(MZConstants.TRAM)|
+						   mode.equals(MZConstants.BUS)|
+						   mode.equals(MZConstants.SONSTINGER_OEV)|
+						   mode.equals(MZConstants.POSTAUTO)|
+						   mode.equals(MZConstants.REISECAR)|
+						   mode.equals(MZConstants.TRAIN)
+						   ){
+							leg.setMode(TransportMode.pt);   //PUBLIC TRANSPORT
+						}else if(mode.equals(MZConstants.WALK)){
+							leg.setMode(TransportMode.walk);  //WALK
+							
+						}else if(mode.equals(MZConstants.BYCICLE)){
+							leg.setMode(TransportMode.bike);  //BICYCLE
+							
+						}else if(mode.equals(MZConstants.CAR)){
+							leg.setMode(TransportMode.car);  //CAR
+							
+						}
+						
+						
+					}		
+				}
+			}
+		 
+		 
+	 }
+	 
+	 
+	 
+ }
+	
 //////////////////////////////////////////////////////////////////////
 
-	
+
+//	public static final String MOTORCYCLE = "motorcycle";
+//	public static final String MOFA = "mofa";
+//	public static final String SKATEBOARD = "skateboard";
 	
 }

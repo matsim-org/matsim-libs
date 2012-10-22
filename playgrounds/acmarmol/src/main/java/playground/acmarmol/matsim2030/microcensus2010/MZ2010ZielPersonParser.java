@@ -172,7 +172,7 @@ public class MZ2010ZielPersonParser {
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.TOTAL_TRIPS_DURATION, wege_time);
 		
 		//total wege distance
-		String wege_dist = entries[198];
+		String wege_dist = entries[196];
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.TOTAL_TRIPS_DISTANCE, wege_dist);
 		
 		
