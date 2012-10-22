@@ -22,10 +22,8 @@ package playground.acmarmol.matsim2030.microcensus2010;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -42,10 +40,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.core.utils.collections.Tuple;
 
 /**
 * 
@@ -792,27 +789,30 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						Leg leg = (Leg) pe;
 						
 						String mode = leg.getMode();
-						if(mode.equals(MZConstants.PLANE) |
-						   mode.equals(MZConstants.TRAIN) |
-						   mode.equals(MZConstants.SHIP) |
-						   mode.equals(MZConstants.SONSTINGER_OEV)|
-						   mode.equals(MZConstants.TAXI)|
-						   mode.equals(MZConstants.TRUCK)|
-						   mode.equals(MZConstants.TRAM)|
-						   mode.equals(MZConstants.BUS)|
-						   mode.equals(MZConstants.SONSTINGER_OEV)|
-						   mode.equals(MZConstants.POSTAUTO)|
-						   mode.equals(MZConstants.REISECAR)|
-						   mode.equals(MZConstants.TRAIN)
-						   ){
+						if (mode.equals(MZConstants.PLANE)
+								|| mode.equals(MZConstants.TRAIN)
+								|| mode.equals(MZConstants.SHIP)
+								|| mode.equals(MZConstants.TAXI)
+								|| mode.equals(MZConstants.TRAM)
+								|| mode.equals(MZConstants.BUS)
+								|| mode.equals(MZConstants.SONSTINGER_OEV)
+								|| mode.equals(MZConstants.POSTAUTO)
+								|| mode.equals(MZConstants.REISECAR)
+								|| mode.equals(MZConstants.TRAIN)
+						){
 							leg.setMode(TransportMode.pt);   //PUBLIC TRANSPORT
-						}else if(mode.equals(MZConstants.WALK)){
+						} else if (mode.equals(MZConstants.WALK)) {
 							leg.setMode(TransportMode.walk);  //WALK
 							
-						}else if(mode.equals(MZConstants.BYCICLE)){
+						} else if (mode.equals(MZConstants.BYCICLE)
+								|| mode.equals(MZConstants.SKATEBOARD)
+								|| mode.equals(MZConstants.MOFA)) {
 							leg.setMode(TransportMode.bike);  //BICYCLE
 							
-						}else if(mode.equals(MZConstants.CAR)){
+						}else if(mode.equals(MZConstants.CAR)
+								|| mode.equals(MZConstants.MOTORCYCLE)
+								|| mode.equals(MZConstants.TRUCK)
+								){
 							leg.setMode(TransportMode.car);  //CAR
 							
 						}
@@ -830,10 +830,4 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
  }
 	
 //////////////////////////////////////////////////////////////////////
-
-
-//	public static final String MOTORCYCLE = "motorcycle";
-//	public static final String MOFA = "mofa";
-//	public static final String SKATEBOARD = "skateboard";
-	
 }
