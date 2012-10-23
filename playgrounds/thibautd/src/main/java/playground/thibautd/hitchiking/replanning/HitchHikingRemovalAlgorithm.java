@@ -65,7 +65,7 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 		for (PlanElement pe : toActOn.getPlanElements()) {
 			if ( !(pe instanceof Leg) ) continue;
 			Leg l = (Leg) pe;
-			if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) &&
+			if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) ||
 					HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
 				eligibleLegs.add( l );
 			}

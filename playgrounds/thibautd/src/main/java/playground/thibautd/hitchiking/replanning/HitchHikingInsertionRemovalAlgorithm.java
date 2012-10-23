@@ -51,7 +51,7 @@ public class HitchHikingInsertionRemovalAlgorithm implements PlanAlgorithm {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if ( !(pe instanceof Leg) ) continue;
 			Leg l = (Leg) pe;
-			if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) &&
+			if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) ||
 					HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
 				// there is one HH trip
 				if ( random.nextDouble() < PROB_REMOVAL ) {
