@@ -20,6 +20,7 @@
 package playground.thibautd.hitchiking.replanning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
@@ -65,22 +67,18 @@ public class HitchHikingInsertionAlgorithm implements PlanAlgorithm {
 		List<Od> carOds = new ArrayList<Od>();
 		List<Od> ptOds = new ArrayList<Od>();
 
-		double now = 0;
 		Activity origin = (Activity) structure.next();
-		now = TripRouter.calcEndOfPlanElement( now , origin );
 		while (structure.hasNext()) {
 			Leg trip = (Leg) structure.next();
 			Activity destination = (Activity) structure.next();
 
 			if ( canBeDriver && TransportMode.car.equals( trip.getMode() ) ) {
-				carOds.add( new Od( origin , destination , now ) );
+				carOds.add( new Od( origin , destination ) );
 			}
 			else if ( TransportMode.pt.equals( trip.getMode() ) ) {
-				ptOds.add( new Od( origin , destination , now ) );
+				ptOds.add( new Od( origin , destination ) );
 			}
 
-			now = TripRouter.calcEndOfPlanElement( now , trip );
-			now = TripRouter.calcEndOfPlanElement( now , destination );
 			origin = destination;
 		}
 
@@ -102,29 +100,18 @@ public class HitchHikingInsertionAlgorithm implements PlanAlgorithm {
 			mode = HitchHikingConstants.PASSENGER_MODE;
 		}
 
-		List<? extends PlanElement> hhTrip =
-				router.calcRoute(
-						mode,
-						new ActivityWrapperFacility( od.o ),
-						new ActivityWrapperFacility( od.d ),
-						od.departureTime,
-						person);
-
-		TripRouter.insertTrip( plan , od.o , hhTrip , od.d );
+		TripRouter.insertTrip( plan , od.o , Arrays.asList( new LegImpl( mode ) ) , od.d );
 	}
 
 	private static class Od {
 		public final Activity o;
 		public final Activity d;
-		public final double departureTime;
 
 		public Od(
 				final Activity o,
-				final Activity d,
-				final double depTime) {
+				final Activity d) {
 			this.o = o;
 			this.d = d;
-			this. departureTime = depTime;
 		}
 	}
 }

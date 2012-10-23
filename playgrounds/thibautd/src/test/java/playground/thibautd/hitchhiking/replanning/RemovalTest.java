@@ -139,12 +139,6 @@ public class RemovalTest {
 	@Test
 	public void testInsertion() throws Exception {
 		TripRouter router = new TripRouter();
-		router.setRoutingModule(
-				HitchHikingConstants.PASSENGER_MODE,
-				new DummyRoutingModule( HitchHikingConstants.PASSENGER_MODE ));
-		router.setRoutingModule(
-				HitchHikingConstants.DRIVER_MODE,
-				 new DummyRoutingModule( HitchHikingConstants.DRIVER_MODE ));
 		HitchHikingInsertionAlgorithm testee =
 			new HitchHikingInsertionAlgorithm(
 					new Random( 1 ),
@@ -174,12 +168,6 @@ public class RemovalTest {
 	public void testInsertionRemoval() throws Exception {
 		Random r = new Random( 1 );
 		TripRouter router = new TripRouter();
-		router.setRoutingModule(
-				HitchHikingConstants.PASSENGER_MODE,
-				new DummyRoutingModule( HitchHikingConstants.PASSENGER_MODE ));
-		router.setRoutingModule(
-				HitchHikingConstants.DRIVER_MODE,
-				 new DummyRoutingModule( HitchHikingConstants.DRIVER_MODE ));
 		int insertions = 0;
 		int removals = 0;
 
@@ -237,28 +225,6 @@ public class RemovalTest {
 
 	private static String toString(final Plan plan) {
 		return plan.getPerson().getId()+": "+plan.getPlanElements();
-	}
-
-	private static class DummyRoutingModule implements RoutingModule {
-		private final String mode;
-
-		public DummyRoutingModule( final String m ) {
-			this.mode = m;
-		}
-
-		@Override
-		public List<? extends PlanElement> calcRoute(
-				final Facility fromFacility,
-				final Facility toFacility,
-				final double departureTime,
-				final Person person) {
-			return Arrays.asList( new LegImpl( mode ) );
-		}
-
-		@Override
-		public StageActivityTypes getStageActivityTypes() {
-			return EmptyStageActivityTypes.INSTANCE;
-		}
 	}
 }
 
