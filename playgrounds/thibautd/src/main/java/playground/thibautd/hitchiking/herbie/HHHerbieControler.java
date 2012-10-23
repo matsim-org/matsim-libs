@@ -91,8 +91,6 @@ public class HHHerbieControler extends HitchHikingControler {
 		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 		
 		this.setTravelDisutilityFactory(costCalculatorFactory);
-		
-		super.setUp();
 
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.
@@ -106,6 +104,8 @@ public class HHHerbieControler extends HitchHikingControler {
 						config.vspExperimental()),
 					herbieConfigGroup,
 					new TravelScoringFunction( params, herbieConfigGroup ) ) );
+
+		super.setUp();
 	}
 	
 	
