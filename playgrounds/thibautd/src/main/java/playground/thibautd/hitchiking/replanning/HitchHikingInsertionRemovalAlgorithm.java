@@ -33,7 +33,7 @@ import playground.thibautd.hitchiking.HitchHikingConstants;
  * @author thibautd
  */
 public class HitchHikingInsertionRemovalAlgorithm implements PlanAlgorithm {
-	private final static double PROB_REMOVAL = 0.25;
+	private final static double PROB_REMOVAL = 0.5;
 	private final Random random;
 	private final HitchHikingInsertionAlgorithm insertionAlgorithm;
 	private final HitchHikingRemovalAlgorithm removalAlgorithm;
