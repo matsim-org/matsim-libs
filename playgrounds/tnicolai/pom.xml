@@ -8,6 +8,12 @@
   <groupId>playground</groupId>
   <artifactId>tnicolai</artifactId>
   <name>tnicolai</name>
+  <repositories>
+	<repository>
+		<id>openstreetmap-snapshots</id>
+		<url>http://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
+	</repository>
+  </repositories>
   <dependencies>
   	<dependency>
   		<groupId>playground</groupId>

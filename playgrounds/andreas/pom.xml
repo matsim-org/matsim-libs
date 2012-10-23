@@ -8,7 +8,12 @@
   <groupId>playground</groupId>
   <artifactId>andreas</artifactId>
   <name>andreas</name>
-
+  <repositories>
+	<repository>
+		<id>openstreetmap-snapshots</id>
+		<url>http://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
+	</repository>
+  </repositories>
   <dependencies>
   	 <dependency>
   		<groupId>trove</groupId>

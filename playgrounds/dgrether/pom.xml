@@ -8,13 +8,14 @@
   <groupId>playground</groupId>
   <artifactId>dgrether</artifactId>
   <name>dgrether</name>
+  
 
   <dependencies>
-  		<dependency>
-			<groupId>org.openstreetmap.osmosis</groupId>
-			<artifactId>osmosis</artifactId>
-			<version>0.32.1-SNAPSHOT</version>
-		</dependency>
+  	<dependency>
+		<groupId>org.openstreetmap.osmosis</groupId>
+		<artifactId>osmosis</artifactId>
+		<version>0.32.1-SNAPSHOT</version>
+	</dependency>
   	<dependency>
       <groupId>de.micromata.jak</groupId>
       <artifactId>JavaAPIforKml</artifactId>
@@ -35,6 +36,10 @@
   </dependencies>
 
 		<repositories>
+				<repository>
+					<id>openstreetmap-snapshots</id>
+					<url>http://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
+				</repository>
 				<repository>
 						<id>maven2-repository.dev.java.net</id>
 						<name>Java.net Maven 2 Repository</name>

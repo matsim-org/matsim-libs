@@ -215,6 +215,11 @@
   </dependencies>
   
   		<repositories>
+  				<repository>
+					<id>openstreetmap-snapshots</id>
+					<url>http://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
+				</repository>
+  				
 				<repository>
 						<id>GeoTools-Maven-Repository</id>
 						<name>GeoTools-Maven-Repository</name>
