@@ -48,6 +48,8 @@ public class HitchHikingInsertionRemovalAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
+		boolean hasNonHhTrips = false;
+
 		for (PlanElement pe : plan.getPlanElements()) {
 			if ( !(pe instanceof Leg) ) continue;
 			Leg l = (Leg) pe;
@@ -61,9 +63,18 @@ public class HitchHikingInsertionRemovalAlgorithm implements PlanAlgorithm {
 					return;
 				}
 			}
+			else {
+				hasNonHhTrips = true;
+			}
 		}
 
-		insertionAlgorithm.run( plan );
+		if (hasNonHhTrips) {
+			insertionAlgorithm.run( plan );
+		}
+		else {
+			// there are only HH trips (or no trip, which make no sense and will crash)
+			removalAlgorithm.run( plan );
+		}
 	}
 }
 
