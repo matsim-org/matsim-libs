@@ -107,8 +107,8 @@ public class SubtourStructure {
 		}
 
 		for (int i=0; i < subtourElements.size(); i++) {
-			int parent = parentTourIndices.get( i );
-			if (parent != UNDEFINED) {
+			Integer parent = parentTourIndices.get( i );
+			if (parent != null) {
 				subtours.get( i ).parent = subtours.get( parent );
 			}
 		}
