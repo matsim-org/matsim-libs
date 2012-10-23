@@ -26,6 +26,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
@@ -39,6 +40,8 @@ import playground.thibautd.utils.SubtourStructure.Subtour;
  */
 public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 	private final Random random;
+	private static final String DEFAULT_REPL_MODE_DRIVER = TransportMode.car;
+	private static final String DEFAULT_REPL_MODE_PASSENGER = TransportMode.pt;
 
 	public HitchHikingRemovalAlgorithm(final Random random) {
 		this.random = random;
@@ -50,16 +53,7 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 
 		Subtour toActOn = getRandomHhSubtour( structure );
 
-		String mode = null;
-		for (PlanElement pe : toActOn.getPlanElements()) {
-			if ( !(pe instanceof Leg) ) continue;
-			Leg l = (Leg) pe;
-			if ( !HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) &&
-					!HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
-				mode = l.getMode();
-				break;
-			}
-		}
+		String mode = getNonHhMode( toActOn );
 
 		List<Leg> eligibleLegs = new ArrayList<Leg>();
 		for (PlanElement pe : toActOn.getPlanElements()) {
@@ -72,8 +66,30 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 		}
 
 		Leg leg = eligibleLegs.get( random.nextInt( eligibleLegs.size() ) );
-		leg.setMode( mode );
+		leg.setMode( mode != null ? mode : defaultReplacementMode( leg ) );
 		leg.setRoute( null );
+	}
+
+	private final String defaultReplacementMode(final Leg leg) {
+		String oldMode = leg.getMode();
+		if (oldMode.equals( HitchHikingConstants.DRIVER_MODE )) return DEFAULT_REPL_MODE_DRIVER;
+		if (oldMode.equals( HitchHikingConstants.PASSENGER_MODE )) return DEFAULT_REPL_MODE_PASSENGER;
+		throw new IllegalArgumentException( oldMode );
+	}
+
+	private static String getNonHhMode(final Subtour s) {
+		if (s == null) return null;
+
+		for (PlanElement pe : s.getPlanElements()) {
+			if ( !(pe instanceof Leg) ) continue;
+			Leg l = (Leg) pe;
+			if ( !HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) &&
+					!HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
+				return l.getMode();
+			}
+		}
+
+		return getNonHhMode( s.getParent() );
 	}
 
 	private Subtour getRandomHhSubtour(final SubtourStructure structure) {
