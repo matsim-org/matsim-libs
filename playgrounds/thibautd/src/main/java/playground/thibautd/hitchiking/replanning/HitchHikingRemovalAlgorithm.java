@@ -61,15 +61,19 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 			}
 		}
 
+		List<Leg> eligibleLegs = new ArrayList<Leg>();
 		for (PlanElement pe : toActOn.getPlanElements()) {
 			if ( !(pe instanceof Leg) ) continue;
 			Leg l = (Leg) pe;
 			if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) &&
 					HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
-				l.setMode( mode );
-				l.setRoute( null );
+				eligibleLegs.add( l );
 			}
 		}
+
+		Leg leg = eligibleLegs.get( random.nextInt( eligibleLegs.size() ) );
+		leg.setMode( mode );
+		leg.setRoute( null );
 	}
 
 	private Subtour getRandomHhSubtour(final SubtourStructure structure) {
@@ -81,8 +85,9 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 				Leg l = (Leg) pe;
 				if ( HitchHikingConstants.DRIVER_MODE.equals( l.getMode() ) ||
 						HitchHikingConstants.PASSENGER_MODE.equals( l.getMode() ) ) {
+					// add once per leg, so that probability of selecting a subtour
+					// is proportional to the number of HH trips in it.
 					eligibleSubtours.add( s );
-					break;
 				}
 			}
 		}
