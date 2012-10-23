@@ -20,6 +20,7 @@
 package playground.thibautd.hitchhiking.replanning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -29,15 +30,24 @@ import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
+import playground.thibautd.hitchiking.replanning.HitchHikingInsertionRemovalAlgorithm;
 import playground.thibautd.hitchiking.replanning.HitchHikingRemovalAlgorithm;
+import playground.thibautd.hitchiking.routing.HitchHikingTripRouterFactory;
 
 /**
  * @author thibautd
@@ -54,53 +64,53 @@ public class RemovalTest {
 
 		PlanImpl plan = new PlanImpl( new PersonImpl( new IdImpl( "one passenger trip" ) ) );
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
 		plan.createAndAddActivity( "h" , link1 );
 
 		plan = new PlanImpl( new PersonImpl( new IdImpl( "one driver trip" ) ) );
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
 		plan.createAndAddActivity( "h" , link1 );
 
 		plan = new PlanImpl( new PersonImpl( new IdImpl( "one tour with one passenger trip" ) ) );
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 );
+		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
 		plan.createAndAddActivity( "h" , link1 );
 
 		plan = new PlanImpl( new PersonImpl( new IdImpl( "one tour with one driver trip" ) ) );
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
-		plan.createAndAddActivity( "w" , link2 );
+		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.car );
 		plan.createAndAddActivity( "h" , link1 );
 
 		plan = new PlanImpl( new PersonImpl( new IdImpl( "two tours with one passenger trip each" ) ) );
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 );
+		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 3 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 );
+		plan.createAndAddActivity( "w" , link2 ).setEndTime( 4 );
 		plan.createAndAddLeg( TransportMode.pt );
 		plan.createAndAddActivity( "h" , link1 );
 
 		plan = new PlanImpl( new PersonImpl( new IdImpl( "two tours with one and two passenger trips" ) ) );
 		plans.add( plan );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 );
+		plan.createAndAddActivity( "w" , link2 ).setEndTime( 2 );
 		plan.createAndAddLeg( TransportMode.pt );
-		plan.createAndAddActivity( "h" , link1 );
+		plan.createAndAddActivity( "h" , link1 ).setEndTime( 3 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
-		plan.createAndAddActivity( "w" , link2 );
+		plan.createAndAddActivity( "w" , link2 ).setEndTime( 4 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
 		plan.createAndAddActivity( "h" , link1 );
 	}
@@ -112,10 +122,54 @@ public class RemovalTest {
 			int n = countHhTrips( plan );
 			testee.run( plan );
 			assertEquals(
-					"unexpected number of Hh trips after removal in "+plan,
+					"unexpected number of Hh trips after removal in "+toString( plan ),
 					n -1,
 					countHhTrips( plan ));
 		}
+	}
+
+	@Test
+	public void testInsertionRemoval() throws Exception {
+		Random r = new Random( 1 );
+		TripRouter router = new TripRouter();
+		router.setRoutingModule(
+				HitchHikingConstants.PASSENGER_MODE,
+				new DummyRoutingModule( HitchHikingConstants.PASSENGER_MODE ));
+		router.setRoutingModule(
+				HitchHikingConstants.DRIVER_MODE,
+				 new DummyRoutingModule( HitchHikingConstants.DRIVER_MODE ));
+		int insertions = 0;
+		int removals = 0;
+
+		for (int i=0; i<100; i++) {
+			HitchHikingInsertionRemovalAlgorithm testee =
+				new HitchHikingInsertionRemovalAlgorithm(
+						r,
+						router);
+			for (Plan plan : plans) {
+				int oldCount = countHhTrips( plan );
+				testee.run( plan );
+				int newCount = countHhTrips( plan );
+
+				if ( newCount > oldCount ) {
+					insertions++;
+				}
+				else if ( newCount < oldCount ) {
+					removals++;
+				}
+				else {
+					fail( "neither insertion nor removal on "+toString( plan ) );
+				}
+			}
+		}
+
+		assertTrue(
+				"no insertion performed!",
+				insertions > 0);
+
+		assertTrue(
+				"no removal performed!",
+				removals > 0);
 	}
 
 	private static int countHhTrips(final Plan plan) {
@@ -129,6 +183,32 @@ public class RemovalTest {
 			}
 		}
 		return c;
+	}
+
+	private static String toString(final Plan plan) {
+		return plan.getPerson().getId()+": "+plan.getPlanElements();
+	}
+
+	private static class DummyRoutingModule implements RoutingModule {
+		private final String mode;
+
+		public DummyRoutingModule( final String m ) {
+			this.mode = m;
+		}
+
+		@Override
+		public List<? extends PlanElement> calcRoute(
+				final Facility fromFacility,
+				final Facility toFacility,
+				final double departureTime,
+				final Person person) {
+			return Arrays.asList( new LegImpl( mode ) );
+		}
+
+		@Override
+		public StageActivityTypes getStageActivityTypes() {
+			return EmptyStageActivityTypes.INSTANCE;
+		}
 	}
 }
 
