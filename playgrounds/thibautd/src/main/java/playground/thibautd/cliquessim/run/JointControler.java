@@ -36,7 +36,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.roadpricing.RoadPricing;
 
 import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.qsim.JointQSimFactory;
@@ -164,15 +163,6 @@ public class JointControler extends Controler {
 		this.plansScoring = new PlansScoring(this.scenarioData, this.events, controlerIO, this.scoringFunctionFactory ) ;
 
 		this.addControlerListener(this.plansScoring);
-
-		// load road pricing, if requested
-		if (this.config.scenario().isUseRoadpricing()) {
-			//this.roadPricing = new RoadPricing(); //XXX roadProcing is private!
-			//this.addCoreControlerListener(this.roadPricing);
-			this.addCoreControlerListener(new RoadPricing());
-			log.warn("RoadPricing set in JointControler: getRoadPricing will be"
-					+" broken.");
-		}
 
 		this.addCoreControlerListener(new JointPlansReplanning());
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
