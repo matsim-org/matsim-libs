@@ -45,9 +45,9 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
+import playground.thibautd.hitchiking.replanning.HitchHikingInsertionAlgorithm;
 import playground.thibautd.hitchiking.replanning.HitchHikingInsertionRemovalAlgorithm;
 import playground.thibautd.hitchiking.replanning.HitchHikingRemovalAlgorithm;
-import playground.thibautd.hitchiking.routing.HitchHikingTripRouterFactory;
 
 /**
  * @author thibautd
@@ -118,13 +118,55 @@ public class RemovalTest {
 	@Test
 	public void testRemoval() throws Exception {
 		HitchHikingRemovalAlgorithm testee = new HitchHikingRemovalAlgorithm( new Random( 1 ) );
+
 		for (Plan plan : plans) {
-			int n = countHhTrips( plan );
+			int oldHhCount = countHhTrips( plan );
+			int oldCount = countTrips( plan );
 			testee.run( plan );
+
 			assertEquals(
 					"unexpected number of Hh trips after removal in "+toString( plan ),
-					n -1,
+					oldHhCount -1,
 					countHhTrips( plan ));
+
+			assertEquals(
+					"unexpected number of trips after removal in "+toString( plan ),
+					oldCount,
+					countTrips( plan ));
+		}
+	}
+
+	@Test
+	public void testInsertion() throws Exception {
+		TripRouter router = new TripRouter();
+		router.setRoutingModule(
+				HitchHikingConstants.PASSENGER_MODE,
+				new DummyRoutingModule( HitchHikingConstants.PASSENGER_MODE ));
+		router.setRoutingModule(
+				HitchHikingConstants.DRIVER_MODE,
+				 new DummyRoutingModule( HitchHikingConstants.DRIVER_MODE ));
+		HitchHikingInsertionAlgorithm testee =
+			new HitchHikingInsertionAlgorithm(
+					new Random( 1 ),
+					router );
+
+		for (Plan plan : plans) {
+			int oldHhCount = countHhTrips( plan );
+			int oldCount = countTrips( plan );
+
+			if ( oldCount - oldHhCount > 0 ) {
+				testee.run( plan );
+
+				assertEquals(
+						"unexpected number of Hh trips after insertion in "+toString( plan ),
+						oldHhCount + 1,
+						countHhTrips( plan ));
+
+				assertEquals(
+						"unexpected number of trips after removal in "+toString( plan ),
+						oldCount,
+						countTrips( plan ));
+			}
 		}
 	}
 
@@ -181,6 +223,14 @@ public class RemovalTest {
 					m.equals( HitchHikingConstants.DRIVER_MODE ) ) {
 				c++;
 			}
+		}
+		return c;
+	}
+
+	private static int countTrips(final Plan plan) {
+		int c = 0;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if ( pe instanceof Leg ) c++;
 		}
 		return c;
 	}
