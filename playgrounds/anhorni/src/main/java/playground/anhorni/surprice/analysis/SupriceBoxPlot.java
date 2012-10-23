@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice;
+package playground.anhorni.surprice.analysis;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -34,29 +34,33 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 
-public class UtilitiesBoxPlot {
+public class SupriceBoxPlot {
 	
 	private JFreeChart chart_;
 	private String chartTitle;
 	private DefaultBoxAndWhiskerCategoryDataset dataset;
+	private String xAxisName = "";
+	private String yAxisName = "";
 
-	public UtilitiesBoxPlot(final String chartTitle) {
+	public SupriceBoxPlot(final String chartTitle, String xAxisName, String yAxisName) {
 		dataset = new DefaultBoxAndWhiskerCategoryDataset();
-		this.chartTitle = chartTitle;	
+		this.chartTitle = chartTitle;
+		this.xAxisName = xAxisName;
+		this.yAxisName = yAxisName;
 	}
-	
-	public void addUtilities(ArrayList<Double> utilities, String day) {
-		dataset.add(utilities, "Utilities", day);
+		
+	public void addValuesPerDay(ArrayList<Double> values, String day, String name) {
+		dataset.add(values, name, day);
 	}
 
 	public JFreeChart createChart() {	
 		String title = chartTitle;
 		
-		final CategoryAxis xAxis = new CategoryAxis("Hour");
+		final CategoryAxis xAxis = new CategoryAxis(this.xAxisName);
 		xAxis.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 10));
 		xAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
 		
-		final NumberAxis yAxis = new NumberAxis("Utility");
+		final NumberAxis yAxis = new NumberAxis(this.yAxisName);
 		yAxis.setAutoRangeIncludesZero(true);
 
 		final BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();

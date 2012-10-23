@@ -23,8 +23,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.CalcAverageTolledTripLength;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.population.Person;
@@ -38,7 +40,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
@@ -136,6 +137,51 @@ public class Analyzer {
 			
 		// TODO:
 		this.tolltd[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();		
+	}
+	
+	public void analyze(Config config, String outPath, double sideLength) {		
+		SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
+		SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
+		
+		ArrayList<Double> utilitiesRelative = new ArrayList<Double>();
+		ArrayList<Double> utilitiesAbsolute = new ArrayList<Double>();
+		
+		for (String day : Surprice.days) {
+			String plansFilePath = outPath + "/" + day + "/" + day + ".output_plans.xml.gz";
+			MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
+			populationReader.readFile(plansFilePath);
+
+			this.computeUtilities(utilitiesRelative, day, "rel");
+			boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
+			
+			this.computeUtilities(utilitiesAbsolute, day, "abs");
+			boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");
+						
+			this.scenario.getPopulation().getPersons().clear();
+		}	
+		boxPlotRelative.createChart();
+		boxPlotRelative.saveAsPng(outPath + "/utilitiesRelative.png", 400, 300);
+		
+		boxPlotAbsolute.createChart();
+		boxPlotAbsolute.saveAsPng(outPath + "/utilitiesAbsolute.png", 400, 300);
+	}
+		
+	private void computeUtilities(ArrayList<Double> utilities, String day, String type) {		
+		double avgUtility = 0.0;
+		int n = 0;
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			avgUtility += person.getSelectedPlan().getScore();
+			n++;
+		}
+		avgUtility /= n;
+		
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			if (type.equals("rel")) {
+				utilities.add(person.getSelectedPlan().getScore() / avgUtility);
+			} else {
+				utilities.add(person.getSelectedPlan().getScore());
+			}
+		}		
 	}
 			
 	private void write(String outPath) {

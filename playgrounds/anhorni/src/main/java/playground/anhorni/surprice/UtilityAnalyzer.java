@@ -41,14 +41,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.anhorni.surprice.analysis.SupriceBoxPlot;
 import playground.anhorni.surprice.preprocess.miniscenario.Zone;
 
 public class UtilityAnalyzer {
 	
 	private List<Zone> zones = new Vector<Zone>();
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private UtilitiesBoxPlot boxPlotRelative = new UtilitiesBoxPlot("Utilities");
-	private UtilitiesBoxPlot boxPlotAbsolute = new UtilitiesBoxPlot("Utilities");
+	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
+	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
 	
 	private final static Logger log = Logger.getLogger(UtilityAnalyzer.class);
 	
@@ -91,10 +92,10 @@ public class UtilityAnalyzer {
 
 			this.computeZoneUtilities(utilitiesPerZone, day);
 			this.computeUtilities(utilitiesRelative, day, "rel");
-			this.boxPlotRelative.addUtilities(utilitiesRelative, day);
+			this.boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
 			
 			this.computeUtilities(utilitiesAbsolute, day, "abs");
-			this.boxPlotAbsolute.addUtilities(utilitiesAbsolute, day);
+			this.boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");
 						
 			this.scenario.getPopulation().getPersons().clear();
 		}	
