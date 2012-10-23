@@ -29,10 +29,10 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * @author thibautd
  */
-public class HitchHikingInsertionModule extends AbstractMultithreadedModule {
+public class HitchHikingInsertionRemovalModule extends AbstractMultithreadedModule {
 	private final Controler controler;
 
-	public HitchHikingInsertionModule(
+	public HitchHikingInsertionRemovalModule(
 			final Controler controler) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
@@ -44,7 +44,7 @@ public class HitchHikingInsertionModule extends AbstractMultithreadedModule {
 
 		TripRouter tripRouter = factory.createTripRouter();
 
-		return new HitchHikingInsertionAlgorithm(
+		return new HitchHikingInsertionRemovalAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				tripRouter);
 	}

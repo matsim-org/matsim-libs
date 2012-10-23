@@ -30,13 +30,13 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 /**
  * @author thibautd
  */
-public class HitchHikingInsertionStrategy implements PlanStrategy {
+public class HitchHikingInsertionRemovalStrategy implements PlanStrategy {
 	private final PlanStrategy delegate;
 
-	public HitchHikingInsertionStrategy(
+	public HitchHikingInsertionRemovalStrategy(
 			final Controler controler) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
-		delegate.addStrategyModule( new HitchHikingInsertionModule( controler ) );
+		delegate.addStrategyModule( new HitchHikingInsertionRemovalModule( controler ) );
 	}
 
 	@Override
