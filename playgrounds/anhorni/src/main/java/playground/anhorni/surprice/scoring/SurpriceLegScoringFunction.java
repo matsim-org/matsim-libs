@@ -153,7 +153,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * (alpha + alphaTrip) + 
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * Math.min(alpha + alphaTrip, 0.0) + 
 					this.gamma * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.constantCar;
 			

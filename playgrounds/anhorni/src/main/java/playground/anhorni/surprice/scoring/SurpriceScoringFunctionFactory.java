@@ -57,7 +57,9 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		for (int i = 0; i < 100; i++) {
 			this.random.nextDouble();
 		}
-		double alphaTrip = 0.1 * this.random.nextDouble();		
+		// 1.0 - rn
+		// to make it symmetric
+		double alphaTrip = 0.5 * (1.0 - this.random.nextDouble());		
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				
