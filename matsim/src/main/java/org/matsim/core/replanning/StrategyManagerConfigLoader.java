@@ -29,8 +29,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -56,7 +54,6 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.locationchoice.LocationChoice;
 import org.matsim.pt.replanning.TransitTimeAllocationMutator;
 
 /**
@@ -71,8 +68,6 @@ public final class StrategyManagerConfigLoader {
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
-
-	private static int locachoiceWrnCnt;
 
 	/**
 	 * Reads and instantiates the strategy modules specified in the config-object.
@@ -151,7 +146,7 @@ public final class StrategyManagerConfigLoader {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory();
 		Config config = controler.getConfig();
 		
-		PlanStrategy strategy = null;
+		PlanStrategy strategy;
 		
 		if (name.equals("KeepLastSelected")) {
 			strategy = new PlanStrategyImpl(new KeepSelected());
@@ -239,30 +234,7 @@ public final class StrategyManagerConfigLoader {
 		} else if (name.equals("SelectPathSizeLogit")) {
 			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore()));
 		} else if (name.equals("LocationChoice")) {
-			String planSelector = config.locationchoice().getPlanSelector();
-			if (planSelector.equals("BestScore")) {
-				strategy = new PlanStrategyImpl(new BestPlanSelector());
-			} else if (planSelector.equals("ChangeExpBeta")) {
-				strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
-			} else if (planSelector.equals("SelectRandom")) {
-				strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			} else {
-				strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
-			}
-			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
-			strategy.addStrategyModule(new ReRoute(controler));
-
-			strategy.addStrategyModule(new TimeAllocationMutator(config));
-			if ( locachoiceWrnCnt < 1 ) {
-				locachoiceWrnCnt ++ ;
-				Logger.getLogger("dummy").warn("I don't think that using TimeAllocationMutator as last step of locationchoice" +
-						" (or of any strategy, for that matter) makes sense. --> please remove from code.   kai, oct'12") ;
-				// yyyy
-				if ( config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals(VspExperimentalConfigGroup.ABORT) ) {
-					throw new RuntimeException("will not use locachoice followed by TimeMutation within VSP. Aborting ...") ;
-				}
-			}
-			
+			strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
 		} else {
 			strategy = tryToLoadPlanStrategyByName(controler, name);
 		}
@@ -270,12 +242,11 @@ public final class StrategyManagerConfigLoader {
 	}
 
 	private static PlanStrategy tryToLoadPlanStrategyByName(final Controler controler, final String name) {
-		PlanStrategy strategy = null;
+		PlanStrategy strategy;
 		//classes loaded by name must not be part of the matsim core
 		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
-			log.error("Strategies in the org.matsim package must not be loaded by name!");
-		}
-		else {
+			throw new RuntimeException("Strategies in the org.matsim package must not be loaded by name!");
+		} else {
 			try {
 				Class<? extends PlanStrategy> klas = (Class<? extends PlanStrategy>) Class.forName(name);
 				Class<?>[] args = new Class[1];
@@ -290,13 +261,12 @@ public final class StrategyManagerConfigLoader {
 					"single argument is recommended!" );
 					log.info("(People who need access to events should ignore this warning.)") ;
 					// I think that one needs events fairly often. kai, sep'10
-				}
-				if (c == null){
 					args[0] = Controler.class;
 					c = klas.getConstructor(args);
 					strategy = c.newInstance(controler);
+					log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
 				}
-				log.info("Loaded PlanStrategy (known as `module' in the config) from class " + name);
+				
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			} catch (InstantiationException e) {

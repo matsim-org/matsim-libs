@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.Module;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -31,7 +33,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.energyflows.controller.EnergyFlowsController;
@@ -125,7 +126,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				this.scenarioData,
 				this.ktiConfigGroup,
-				this.getFacilityPenalties(),
+				this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(),
 				this.getFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
@@ -141,7 +142,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		super.loadControlerListeners();
 
 		// the scoring function processes facility loads
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
+		this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
 		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));

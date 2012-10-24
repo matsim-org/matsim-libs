@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.locationchoice.analysis.Bins;
 
 import playground.anhorni.utils.Utils;
 

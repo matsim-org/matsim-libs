@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -57,7 +58,6 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.Desires;
 import org.matsim.testcases.MatsimTestCase;
 

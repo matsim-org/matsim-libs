@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -46,8 +48,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
-import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 

@@ -19,11 +19,12 @@
 
 package playground.anhorni.locationchoice.run;
 
+import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.anhorni.locationchoice.analysis.PrintShopAndLeisureLocations;
@@ -54,7 +55,7 @@ public class TRBControler extends Controler {
 			new TRBScoringFunctionFactory(this.config.planCalcScore(), this);
 		this.setScoringFunctionFactory(trbScoringFunctionFactory);
 
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
+		this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
 		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes.txt", false));
 		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes_wayThere.txt", true));

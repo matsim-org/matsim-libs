@@ -59,7 +59,12 @@
 		<dependency>
   			<groupId>org.matsim.contrib</groupId>
   			<artifactId>roadpricing</artifactId>
-  		<version>0.5.0-SNAPSHOT</version>
-  	</dependency>
+  			<version>0.5.0-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>org.matsim.contrib</groupId>
+  			<artifactId>locationchoice</artifactId>
+  			<version>0.5.0-SNAPSHOT</version>
+  		</dependency>
 	</dependencies>
 </project>

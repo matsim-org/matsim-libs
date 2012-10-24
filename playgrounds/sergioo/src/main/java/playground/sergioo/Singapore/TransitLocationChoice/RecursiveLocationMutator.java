@@ -32,6 +32,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.LocationMutator;
+import org.matsim.contrib.locationchoice.timegeography.ManageSubchains;
+import org.matsim.contrib.locationchoice.timegeography.SubChain;
+import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -39,11 +43,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.locationchoice.LocationMutator;
-import org.matsim.locationchoice.timegeography.ManageSubchains;
-import org.matsim.locationchoice.timegeography.SubChain;
-import org.matsim.locationchoice.utils.QuadTreeRing;
 
 public class RecursiveLocationMutator extends LocationMutator {
 

@@ -21,12 +21,12 @@ package playground.anhorni.LEGO.miniscenario.create;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.utils.RandomFromVarDistr;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.locationchoice.utils.RandomFromVarDistr;
 
 
 public class CreateScenario {

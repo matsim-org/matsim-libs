@@ -19,12 +19,12 @@
 
 package playground.anhorni.PLOC;
 
+import org.matsim.contrib.locationchoice.analysis.DistanceStats;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.locationchoice.analysis.DistanceStats;
-import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
-import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.locationchoice.utils.ActTypeConverter;
-import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.PLOC.analysis.ShoppingCalculator;

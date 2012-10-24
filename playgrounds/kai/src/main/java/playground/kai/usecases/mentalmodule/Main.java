@@ -35,7 +35,7 @@ public class Main {
 			@Override
 			public void notifyStartup(StartupEvent controlerEvent) {
 				PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
-				strategy.addStrategyModule(new MyTimeMutator() ) ;
+				((PlanStrategyImpl) strategy).addStrategyModule(new MyTimeMutator() ) ;
 				controler.getStrategyManager().addStrategy(strategy, 0.1 ) ;
 			}
 		}) ;

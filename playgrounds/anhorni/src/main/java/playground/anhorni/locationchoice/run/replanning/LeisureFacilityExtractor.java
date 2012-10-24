@@ -24,11 +24,11 @@ import java.util.Collection;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.locationchoice.utils.QuadTreeRing;
 
 public class LeisureFacilityExtractor {
 

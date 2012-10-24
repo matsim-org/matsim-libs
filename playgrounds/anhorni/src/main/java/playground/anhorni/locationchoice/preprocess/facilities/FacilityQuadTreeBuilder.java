@@ -24,11 +24,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.locationchoice.LocationMutator;
+import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.locationchoice.LocationMutator;
-import org.matsim.locationchoice.utils.QuadTreeRing;
 
 
 public class FacilityQuadTreeBuilder {

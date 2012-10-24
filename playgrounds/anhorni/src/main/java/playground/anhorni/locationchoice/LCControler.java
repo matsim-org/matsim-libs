@@ -23,9 +23,9 @@ package playground.anhorni.locationchoice;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.controler.Controler;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 
 public class LCControler extends Controler {

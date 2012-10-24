@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
@@ -42,8 +44,6 @@ import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
 /**
  * This class implements the activity scoring as used in Year 3 of the KTI

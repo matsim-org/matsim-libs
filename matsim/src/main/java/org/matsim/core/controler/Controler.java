@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
@@ -39,7 +38,6 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -124,7 +122,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -206,7 +203,6 @@ public class Controler extends AbstractController {
 	private ScoreStats scoreStats = null;
 	private TravelDistanceStats travelDistanceStats = null;
 
-	private TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 	/**
 	 * Attribute for the routing factory
 	 */
@@ -743,37 +739,6 @@ public class Controler extends AbstractController {
 	}
 
 
-
-	/*
-	 * ===================================================================
-	 * methods for core ControlerListeners
-	 * ===================================================================
-	 */
-
-//	/**
-//	 * Add a core ControlerListener to the Controler instance
-//	 *
-//	 * @param l
-//	 */
-//	protected final void addCoreControlerListener(final ControlerListener l) {
-//		this.controlerListenerManager.addCoreControlerListener(l);
-//	}
-
-	/*
-	 * ===================================================================
-	 * methods for ControlerListeners
-	 * ===================================================================
-	 */
-
-//	/**
-//	 * Add a ControlerListener to the Controler instance
-//	 *
-//	 * @param l
-//	 */
-//	public final void addControlerListener(final ControlerListener l) {
-//		this.controlerListenerManager.addControlerListener(l);
-//	}
-
 	/**
 	 * Removes a ControlerListener from the Controler instance
 	 *
@@ -929,14 +894,12 @@ public class Controler extends AbstractController {
 	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		if ( !useTripRouting ) {
 			return createOldRoutingAlgorithm(travelCosts, travelTimes);
+		} else {
+			return new PlanRouter(
+					getTripRouterFactory().createTripRouter(),
+					getScenario().getActivityFacilities());
 		}
-
-		return new PlanRouter(
-				getTripRouterFactory().createTripRouter(),
-				getScenario().getActivityFacilities());
-	}
-
-	
+	}	
 	
 	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
@@ -1149,10 +1112,6 @@ public class Controler extends AbstractController {
 	 */
 	public ScoreStats getScoreStats() {
 		return this.scoreStats;
-	}
-
-	public TreeMap<Id, FacilityPenalty> getFacilityPenalties() {
-		return this.facilityPenalties;
 	}
 
 	public static void main(final String[] args) {

@@ -29,6 +29,7 @@ import herbie.running.scoring.HerbieScoringFunctionFactory;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
@@ -71,7 +72,7 @@ public class HerbieControler extends Controler {
 		HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
-				this.getFacilityPenalties(),
+				this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(),
 				this.getFacilities(),
 				this.getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);

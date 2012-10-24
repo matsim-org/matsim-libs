@@ -24,6 +24,8 @@ package playground.duncan.archive;
 
 import java.io.PrintWriter;
 
+import org.matsim.contrib.locationchoice.LocationMutator;
+import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -37,8 +39,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.LocationMutator;
-import org.matsim.locationchoice.random.RandomLocationMutator;
 
 public class ConnectHomesAndWorkplaces {
 

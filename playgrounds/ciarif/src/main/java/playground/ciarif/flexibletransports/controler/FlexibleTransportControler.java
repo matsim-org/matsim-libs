@@ -20,11 +20,12 @@
 package playground.ciarif.flexibletransports.controler;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
@@ -88,7 +89,7 @@ public class FlexibleTransportControler extends Controler
     FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
       this.config, 
       this.ftConfigGroup, 
-      this.getFacilityPenalties(), 
+      this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), 
       this.getFacilities(), network);
     this.setScoringFunctionFactory(ftScoringFunctionFactory);
 
@@ -102,7 +103,7 @@ public class FlexibleTransportControler extends Controler
   {
     super.loadControlerListeners();
 
-    this.addControlerListener(new FacilitiesLoadCalculator(getFacilityPenalties()));
+    this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
     this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
     this.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt", "legTravelTimeDistribution.txt"));
     this.addControlerListener(new LegDistanceDistributionWriter("legDistanceDistribution.txt"));

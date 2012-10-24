@@ -19,10 +19,10 @@
 
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
+import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.locationchoice.utils.QuadTreeRing;
 
 
 public class AssignInitalShopFacilities {

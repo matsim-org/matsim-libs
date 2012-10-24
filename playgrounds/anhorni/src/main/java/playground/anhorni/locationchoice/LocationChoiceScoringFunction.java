@@ -28,12 +28,12 @@ import java.util.Vector;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
 /*
  * Scoring function factoring in capacity restraints

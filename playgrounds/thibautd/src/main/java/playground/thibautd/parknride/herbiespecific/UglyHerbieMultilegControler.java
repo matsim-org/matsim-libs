@@ -29,6 +29,7 @@ import herbie.running.scoring.TravelScoringFunction;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -81,7 +82,7 @@ public class UglyHerbieMultilegControler extends Controler {
 			new HerbiePlanBasedScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
-				this.getFacilityPenalties(),
+				this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(),
 				this.getFacilities(),
 				this.getNetwork());
 

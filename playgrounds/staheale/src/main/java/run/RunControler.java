@@ -8,14 +8,14 @@ import occupancy.FacilityOccupancy;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.locationchoice.analysis.DistanceStats;
+import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.locationchoice.analysis.DistanceStats;
-import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.locationchoice.utils.ActTypeConverter;
-import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import scoring.AgentInteractionScoringFunctionFactory;

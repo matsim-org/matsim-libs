@@ -86,6 +86,7 @@
 		<module>gtfs2matsimtransitschedule</module>
 		<module>freight</module>
 		<module>grips</module>
+		<module>locationchoice</module>
 		<module>matsim4urbansim</module>
 		<module>networkEditor</module>
 		<module>otfvis</module>
