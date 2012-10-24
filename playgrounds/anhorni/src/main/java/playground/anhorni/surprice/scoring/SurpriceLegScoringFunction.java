@@ -20,6 +20,7 @@
 
 package playground.anhorni.surprice.scoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -33,6 +34,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.anhorni.surprice.AgentMemory;
 import playground.anhorni.surprice.Surprice;
+import playground.anhorni.surprice.analysis.Analyzer;
 
 public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
@@ -58,7 +60,9 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private double constantCar;
     private double constantPt;
     private double constantBike;
-    private double constantWalk;    
+    private double constantWalk;  
+    
+    private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
 
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
     		String day, double alpha, double gamma, double alphaTrip) {
@@ -135,11 +139,11 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePrefs"))) {
 			this.alpha = 1.0;
 			this.gamma = 1.0;
-			this.alphaTrip = 1.0;
+			this.alphaTrip = 0.0;
 		}
 		
 		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useAlphaTrip"))) {
-			this.alphaTrip = 1.0;
+			this.alphaTrip = 0.0;
 		}
 		
 		double tmpScore = 0.0;
@@ -153,6 +157,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 				Route route = leg.getRoute();
 				dist = getDistance(route);
 			}
+						
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * Math.min(alpha + alphaTrip, 0.0) + 
 					this.gamma * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.constantCar;
