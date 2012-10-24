@@ -22,6 +22,7 @@ package playground.thibautd.hitchiking.spotweights;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -56,14 +57,15 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	public static final String CONFIG_PARAM_RATE = "learningRate";
 	public static final String CONFIG_PARAM_BASE_WEIGHT = "baseWeight";
 	public static final String CONFIG_PARAM_WRITE_INTERVAL = "writeInterval";
+	private final double binSize = 30 * 60;
 	private final double learningRate;
 	private final double baseWeight;
 	private final int writeInterval;
 
 	private StatsWriter statsWriter = null;
 
-	private final Map<Id, MyDouble> weightsForDrivers = new TreeMap<Id, MyDouble>();
-	private final Map<Id, MyDouble> weightsForPassengers = new TreeMap<Id, MyDouble>();
+	private final Map<Id, WeightsPerTimeBin> weightsForDrivers = new TreeMap<Id, WeightsPerTimeBin>();
+	private final Map<Id, WeightsPerTimeBin> weightsForPassengers = new TreeMap<Id, WeightsPerTimeBin>();
 
 	private int currentIter = -1;
 
@@ -115,7 +117,7 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 			final double departureTime,
 			final Id originLink,
 			final Id destinationLink) {
-		return baseWeight + getValue( originLink , weightsForDrivers ).value;
+		return baseWeight + getValue( originLink , departureTime , weightsForDrivers ).value;
 	}
 
 	@Override
@@ -123,7 +125,7 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 			final double departureTime,
 			final Id originLink,
 			final Id destinationLink) {
-		return baseWeight + getValue( originLink , weightsForPassengers ).value;
+		return baseWeight + getValue( originLink , departureTime , weightsForPassengers ).value;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////////
@@ -138,11 +140,11 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 				statsWriter.writeStats( iteration );
 			}
 
-			for (MyDouble v : weightsForDrivers.values()) {
-				v.value *= learningRate;
+			for (WeightsPerTimeBin ws  : weightsForDrivers.values()) {
+				for (MyDouble v : ws.weights.values()) v.value *= learningRate;
 			}
-			for (MyDouble v : weightsForPassengers.values()) {
-				v.value *= learningRate;
+			for (WeightsPerTimeBin ws : weightsForPassengers.values()) {
+				for (MyDouble v : ws.weights.values()) v.value *= learningRate;
 			}
 		}
 	}
@@ -150,11 +152,13 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		final String mode = event.getLegMode();
+
+		// XXX: what is the time of the departure event for passengers?
 		if (mode.equals( HitchHikingConstants.DRIVER_MODE )) {
-			getValue( event.getLinkId() , weightsForPassengers ).value++;
+			getValue( event.getLinkId() , event.getTime() , weightsForPassengers ).value++;
 		}
 		else if (mode.equals( HitchHikingConstants.PASSENGER_MODE )) {
-			getValue( event.getLinkId() , weightsForDrivers ).value++;
+			getValue( event.getLinkId() , event.getTime() , weightsForDrivers ).value++;
 		}
 	}
 
@@ -171,17 +175,34 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 		public double value = 0;
 	}
 
-	private static MyDouble getValue(
+	private class WeightsPerTimeBin {
+		private final Map<Integer, MyDouble> weights = new HashMap<Integer, MyDouble>();
+
+		public MyDouble getValue(final double time) {
+			int bin = (int) (time / binSize);
+			MyDouble v = weights.get( bin );
+
+			if (v == null) {
+				v = new MyDouble();
+				weights.put( bin , v );
+			}
+
+			return v;
+		}
+	}
+
+	private MyDouble getValue(
 			final Id key,
-			final Map<Id, MyDouble> map) {
-		MyDouble val = map.get( key );
+			final double time,
+			final Map<Id, WeightsPerTimeBin> map) {
+		WeightsPerTimeBin val = map.get( key );
 
 		if (val == null) {
-			val = new MyDouble();
+			val = new WeightsPerTimeBin();
 			map.put( key , val );
 		}
 
-		return val;
+		return val.getValue( time );
 	}
 
 	private class StatsWriter {
@@ -203,13 +224,17 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 
 		private void write(
 				final String fileName,
-				final Map<Id, MyDouble> weights) throws IOException {
+				final Map<Id, WeightsPerTimeBin> weights) throws IOException {
 			BufferedWriter writer = IOUtils.getBufferedWriter( fileName ); 
 
-			writer.write( "linkId\tweight" );
-			for (Map.Entry<Id, MyDouble> entry : weights.entrySet()) {
-				writer.newLine();
-				writer.write( entry.getKey() +"\t" +(entry.getValue().value + baseWeight) );
+			writer.write( "linkId\tbinStart\tbinEnd\tweight" );
+			for (Map.Entry<Id, WeightsPerTimeBin> entry : weights.entrySet()) {
+				Id id = entry.getKey();
+				for ( Map.Entry<Integer, MyDouble> w : entry.getValue().weights.entrySet() ) {
+					writer.newLine();
+					int bin = w.getKey();
+					writer.write( id +"\t" +(bin * binSize)+"\t"+((bin + 1) * binSize)+"\t"+(w.getValue().value + baseWeight) );
+				}
 			}
 			writer.close();
 		}
