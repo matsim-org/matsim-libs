@@ -26,7 +26,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -40,7 +39,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.anhorni.surprice.Surprice;
@@ -101,9 +99,9 @@ public class Analyzer {
 			this.readEvents(eventsfile, day, config);
 			
 			
-			CalcAverageTripLength tdCalculator = new CalcAverageTripLength(this.scenario.getNetwork());			
+			TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork());			
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
-//				tdCalculator.run(person.getSelectedPlan());
+				tdCalculator.run(person.getSelectedPlan());
 			}
 			this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();	
 			
@@ -123,8 +121,8 @@ public class Analyzer {
 		
 		TravelTimeCalculator ttCalculator = new TravelTimeCalculator();
 		events.addHandler(ttCalculator);
-		
-		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
+
+		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl(); //(RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);		
 		try {
 			log.info("parsing " + config.roadpricing().getTollLinksFile());
@@ -134,14 +132,12 @@ public class Analyzer {
 		}
 		
 		CalcAverageTolledTripLength tollCalculator = new CalcAverageTolledTripLength(this.scenario.getNetwork(), scheme);
-//		events.addHandler(tollCalculator);
+		events.addHandler(tollCalculator);
 		
 		new MatsimEventsReader(events).readFile(eventsfile);
 		this.ttAvg[Surprice.days.indexOf(day)] = ttCalculator.getAverageTripDuration();
-		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");
-			
-		// TODO:
-		this.tolltdAvg[Surprice.days.indexOf(day)] = 0.0; //tollCalculator.getAverageTripLength();		
+		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");			
+		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();		
 	}
 	
 	public void writeBoxPlots(String outPath) {			
