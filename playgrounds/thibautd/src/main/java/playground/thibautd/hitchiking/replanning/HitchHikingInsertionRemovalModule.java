@@ -22,8 +22,6 @@ package playground.thibautd.hitchiking.replanning;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -40,13 +38,9 @@ public class HitchHikingInsertionRemovalModule extends AbstractMultithreadedModu
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TripRouterFactory factory = controler.getTripRouterFactory();
-
-		TripRouter tripRouter = factory.createTripRouter();
 
 		return new HitchHikingInsertionRemovalAlgorithm(
-				MatsimRandom.getLocalInstance(),
-				tripRouter);
+				MatsimRandom.getLocalInstance());
 	}
 }
 

@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -37,6 +38,7 @@ public class HitchHikingInsertionRemovalStrategy implements PlanStrategy {
 	public HitchHikingInsertionRemovalStrategy(
 			final Controler controler) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
+		delegate.addStrategyModule( new TripsToLegsModule( controler ) );
 		delegate.addStrategyModule( new HitchHikingInsertionRemovalModule( controler ) );
 		delegate.addStrategyModule( new ReRoute( controler ) );
 	}

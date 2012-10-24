@@ -138,11 +138,9 @@ public class RemovalTest {
 
 	@Test
 	public void testInsertion() throws Exception {
-		TripRouter router = new TripRouter();
-		HitchHikingInsertionAlgorithm testee =
+		HitchHikingInsertionAlgorithm testee = 
 			new HitchHikingInsertionAlgorithm(
-					new Random( 1 ),
-					router );
+					new Random( 1 ) );
 
 		for (Plan plan : plans) {
 			int oldHhCount = countHhTrips( plan );
@@ -166,16 +164,13 @@ public class RemovalTest {
 
 	@Test
 	public void testInsertionRemoval() throws Exception {
-		Random r = new Random( 1 );
-		TripRouter router = new TripRouter();
+		HitchHikingInsertionRemovalAlgorithm testee =
+			new HitchHikingInsertionRemovalAlgorithm(
+					new Random( 1 ) );
 		int insertions = 0;
 		int removals = 0;
 
 		for (int i=0; i<100; i++) {
-			HitchHikingInsertionRemovalAlgorithm testee =
-				new HitchHikingInsertionRemovalAlgorithm(
-						r,
-						router);
 			for (Plan plan : plans) {
 				int oldCount = countHhTrips( plan );
 				testee.run( plan );

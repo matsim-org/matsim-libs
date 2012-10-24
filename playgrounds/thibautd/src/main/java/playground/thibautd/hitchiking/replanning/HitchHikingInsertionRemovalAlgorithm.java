@@ -24,7 +24,6 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
@@ -38,11 +37,9 @@ public class HitchHikingInsertionRemovalAlgorithm implements PlanAlgorithm {
 	private final HitchHikingInsertionAlgorithm insertionAlgorithm;
 	private final HitchHikingRemovalAlgorithm removalAlgorithm;
 
-	public HitchHikingInsertionRemovalAlgorithm(
-			final Random random,
-			final TripRouter tripRouter) {
+	public HitchHikingInsertionRemovalAlgorithm(final Random random) {
 		this.random = random;
-		insertionAlgorithm = new HitchHikingInsertionAlgorithm( random , tripRouter );
+		insertionAlgorithm = new HitchHikingInsertionAlgorithm( random );
 		removalAlgorithm = new HitchHikingRemovalAlgorithm( random );
 	}
 
