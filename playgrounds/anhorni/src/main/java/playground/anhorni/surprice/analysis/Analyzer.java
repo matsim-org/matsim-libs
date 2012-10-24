@@ -55,6 +55,7 @@ public class Analyzer {
 	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
 	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
 	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt");
+	private SupriceBoxPlot boxPlotTravelDistancesCar = new SupriceBoxPlot("Travel Distances Car", "Day", "td");
 	
 	public static void main (final String[] args) {		
 		if (args.length != 1) {
@@ -96,27 +97,30 @@ public class Analyzer {
 			populationReader.readFile(plansFilePath);						
 			
 			String eventsfile = outPath + "/" + day + "/ITERS/it.100/" + day + ".100.events.xml.gz";
-			this.readEvents(eventsfile, day, config);
-			
-			
-			TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork());			
-			for (Person person : this.scenario.getPopulation().getPersons().values()) {
-				tdCalculator.run(person.getSelectedPlan());
-			}
-			this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();	
-			
-			this.computeUtilities(utilitiesRelative, day, "rel");
-			boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
-			
-			this.utilitiesAvg[Surprice.days.indexOf(day)] = this.computeUtilities(utilitiesAbsolute, day, "abs");
-			boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");
-					
+			this.analyzeDay(eventsfile, day, config, utilitiesRelative,utilitiesAbsolute);
+		
 			this.scenario.getPopulation().getPersons().clear();
 		}	
 		this.write(outPath);
 	}
 	
-	private void readEvents(String eventsfile, String day, Config config) {
+	private void analyzeDay(String eventsfile, String day, Config config, 
+			ArrayList<Double> utilitiesRelative, ArrayList<Double> utilitiesAbsolute) {
+		
+		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork());			
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			tdCalculator.run(person.getSelectedPlan());
+		}
+		this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();
+		this.boxPlotTravelDistancesCar.addValuesPerDay(tdCalculator.getTravelDistances(), day, "Travel Distances Car");
+		
+		this.computeUtilities(utilitiesRelative, day, "rel");
+		boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
+		
+		this.utilitiesAvg[Surprice.days.indexOf(day)] = this.computeUtilities(utilitiesAbsolute, day, "abs");
+		boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");	
+		
+		
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		TravelTimeCalculator ttCalculator = new TravelTimeCalculator();
@@ -129,15 +133,15 @@ public class Analyzer {
 			rpReader.parse(config.roadpricing().getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}
-		
+		}		
 		CalcAverageTolledTripLength tollCalculator = new CalcAverageTolledTripLength(this.scenario.getNetwork(), scheme);
 		events.addHandler(tollCalculator);
 		
 		new MatsimEventsReader(events).readFile(eventsfile);
+				
 		this.ttAvg[Surprice.days.indexOf(day)] = ttCalculator.getAverageTripDuration();
-		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");			
-		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();		
+		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();	
+		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");
 	}
 	
 	public void writeBoxPlots(String outPath) {			
@@ -149,6 +153,9 @@ public class Analyzer {
 		
 		this.boxPlotTravelTimes.createChart();
 		this.boxPlotTravelTimes.saveAsPng(outPath + "/traveltimes.png", 800, 600);
+		
+		this.boxPlotTravelDistancesCar.createChart();
+		this.boxPlotTravelDistancesCar.saveAsPng(outPath + "/traveldistances.png", 800, 600);
 	}
 			
 	private double computeUtilities(ArrayList<Double> utilities, String day, String type) {		

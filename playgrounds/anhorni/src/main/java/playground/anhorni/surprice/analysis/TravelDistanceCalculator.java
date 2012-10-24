@@ -19,6 +19,8 @@ package playground.anhorni.surprice.analysis;
  *                                                                         *
  * *********************************************************************** */
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,6 +37,7 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
 	private final Network network;
+	private final ArrayList<Double> travelDistances = new ArrayList<Double>();
 
 	public TravelDistanceCalculator(final Network network) {
 		this.network = network;
@@ -55,7 +58,9 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 				if (route != null && route instanceof  NetworkRoute) {
 					double dist = RouteUtils.calcDistance((NetworkRoute) route, this.network);
 					if (route.getEndLinkId() != null && route.getStartLinkId() != route.getEndLinkId()) {
-						dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
+						double d = this.network.getLinks().get(route.getEndLinkId()).getLength();
+						dist += d;
+						this.travelDistances.add(d);
 					}
 					this.sumLength += dist;
 					this.cntTrips++;
@@ -69,6 +74,10 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 			return 0;
 		}
 		return (this.sumLength / this.cntTrips);
+	}
+
+	public ArrayList<Double> getTravelDistances() {
+		return travelDistances;
 	}
 }
 
