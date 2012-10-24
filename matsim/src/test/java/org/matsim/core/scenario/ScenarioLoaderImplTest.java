@@ -23,6 +23,8 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -34,11 +36,19 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadTransitData() {
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(util.getClassInputDirectory() + "transitConfig.xml");
-		Assert.assertEquals(0, sl.getScenario().getTransitSchedule().getTransitLines().size());
-		Assert.assertEquals(0, sl.getScenario().getTransitSchedule().getFacilities().size());
-		sl.loadScenario();
-		Assert.assertEquals(1, sl.getScenario().getTransitSchedule().getTransitLines().size());
-		Assert.assertEquals(2, sl.getScenario().getTransitSchedule().getFacilities().size());
+		Scenario scenario = ScenarioUtils.createScenario(util.loadConfig(util.getClassInputDirectory() + "transitConfig.xml"));
+		Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
+		Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
+		ScenarioUtils.loadScenario(scenario);
+		Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
+		Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+	}
+	
+	@Test
+	public void testLoadScenario_loadPersonAttributes() {
+		Config config = util.loadConfig(util.getClassInputDirectory() + "personAttributesConfig.xml");
+		config.plans().addParam("inputPersonAttributesFile", util.getClassInputDirectory() + "personAttributes.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Assert.assertEquals("world", scenario.getPopulation().getPersonAttributes().getAttribute("1", "hello"));
 	}
 }

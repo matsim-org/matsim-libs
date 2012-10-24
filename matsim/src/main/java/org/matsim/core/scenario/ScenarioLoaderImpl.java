@@ -43,6 +43,7 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
 /**
@@ -150,7 +151,7 @@ public class ScenarioLoaderImpl {
 		if (this.config.scenario().isUseSignalSystems()){
 			this.loadSignalSystems();
 		}
-		return getScenario();
+		return this.scenario;
 	}
 
 	/**
@@ -214,11 +215,10 @@ public class ScenarioLoaderImpl {
 	 */
 	@Deprecated
 	public void loadPopulation() {
-		// make sure that world, facilities and network are loaded as well
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			new MatsimPopulationReader(this.getScenario()).parse(populationFileName);
+			new MatsimPopulationReader(this.scenario).parse(populationFileName);
 			
 			if (this.scenario.getPopulation() instanceof PopulationImpl) {
 				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
@@ -226,6 +226,14 @@ public class ScenarioLoaderImpl {
 		}
 		else {
 			log.info("no population file set in config, not able to load population");
+		}
+		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
+			String personAttributesFileName = this.config.plans().getInputPersonAttributeFile();
+			log.info("loading person attributes from " + personAttributesFileName);
+			new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes()).parse(personAttributesFileName);
+		}
+		else {
+			log.info("no person-attributes file set in config, not loading any person attributes");
 		}
 	}
 

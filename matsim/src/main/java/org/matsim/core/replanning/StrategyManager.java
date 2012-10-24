@@ -47,6 +47,8 @@ public class StrategyManager implements MatsimManager {
 
 	private final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
+	private final List<PlanStrategy> unmodifiableStrategies = Collections.unmodifiableList(this.strategies);
+	private final List<Double> unmodifiableWeights = Collections.unmodifiableList(this.weights);
 	private double totalWeights = 0.0;
 	private int maxPlansPerAgent = 0;
 
@@ -282,14 +284,14 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	public final List<PlanStrategy> getStrategies() {
-		return Collections.unmodifiableList(this.strategies);
+		return this.unmodifiableStrategies;
 	}
 
 	/**
 	 * @return the weights of the strategies, in the same order as the strategies returned by {@link #getStrategies()}
 	 */
 	public final List<Double> getWeights() {
-		return Collections.unmodifiableList(this.weights);
+		return this.unmodifiableWeights;
 	}
 
 }
