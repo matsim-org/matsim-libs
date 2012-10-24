@@ -35,10 +35,12 @@ public class PlansConfigGroup extends Module {
 	}
 
 	private static final String INPUT_FILE = "inputPlansFile";
+	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
 
 	private String inputFile = null;
 	private String networkRouteType = NetworkRouteType.LinkNetworkRoute;
+	private String inputPersonAttributeFile = null;
 
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
@@ -60,6 +62,8 @@ public class PlansConfigGroup extends Module {
 			setInputFile(value.replace('\\', '/'));
 		} else if (NETWORK_ROUTE_TYPE.equals(key)) {
 			setNetworkRouteType(value);
+		} else if (INPUT_PERSON_ATTRIBUTES_FILE.equals(key)) {
+			setInputPersonAttributeFile(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -69,6 +73,7 @@ public class PlansConfigGroup extends Module {
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(NETWORK_ROUTE_TYPE, "Defines how routes are stored in memory. Currently supported: " + NetworkRouteType.LinkNetworkRoute + ", " + NetworkRouteType.CompressedNetworkRoute + ".");
+		comments.put(INPUT_PERSON_ATTRIBUTES_FILE, "Path to a file containing person attributes (required file format: ObjectAttributes).");
 		return comments;
 	}
 
@@ -76,6 +81,7 @@ public class PlansConfigGroup extends Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		addParameterToMap(map, INPUT_FILE);
+		map.put(INPUT_PERSON_ATTRIBUTES_FILE, this.inputPersonAttributeFile == null ? "null" : this.inputPersonAttributeFile);
 		map.put(NETWORK_ROUTE_TYPE, this.networkRouteType);
 		return map;
 	}
@@ -88,6 +94,14 @@ public class PlansConfigGroup extends Module {
 
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
+	}
+	
+	public String getInputPersonAttributeFile() {
+		return this.inputPersonAttributeFile;
+	}
+
+	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
+		this.inputPersonAttributeFile = inputPersonAttributeFile;
 	}
 
 	public String getNetworkRouteType() {
