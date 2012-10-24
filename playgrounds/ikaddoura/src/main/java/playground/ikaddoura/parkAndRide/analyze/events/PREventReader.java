@@ -48,6 +48,7 @@ public class PREventReader {
 	static String networkFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/input/PRnetwork_berlin.xml";
 	static String eventFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/berlin_run1_transferPenalty0/ITERS/it.100/100.events.xml.gz";
 	
+	
 	// output
 	static String prTimesFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/PRana_times_run1.txt";
 	static String prUsersFile = "/Users/Ihab/ils4/kaddoura/parkAndRide/output/PRana_users_run1.txt";
