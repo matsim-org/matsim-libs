@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
-import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -50,10 +49,14 @@ public class Analyzer {
 	private ScenarioImpl scenario = null; 
 	private Config config = null;
 	private final static Logger log = Logger.getLogger(Analyzer.class);
-	private double tt[] = new double[8]; 
-	private double td[] = new double[8]; 
-	private double tolltd[] = new double[8];
-	private double utilities[] = new double[8];
+	private double ttAvg[] = new double[8]; 
+	private double tdAvg[] = new double[8]; 
+	private double tolltdAvg[] = new double[8];
+	private double utilitiesAvg[] = new double[8];
+	
+	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
+	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
+	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt");
 	
 	public static void main (final String[] args) {		
 		if (args.length != 1) {
@@ -84,6 +87,9 @@ public class Analyzer {
 	public void analyze(String outPath) {		
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());		
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
+		
+		ArrayList<Double> utilitiesRelative = new ArrayList<Double>();
+		ArrayList<Double> utilitiesAbsolute = new ArrayList<Double>();
 						
 		for (String day : Surprice.days) {
 			log.info("Analyzing " + day + " --------------------------------------------");
@@ -94,16 +100,19 @@ public class Analyzer {
 			String eventsfile = outPath + "/" + day + "/ITERS/it.100/" + day + ".100.events.xml.gz";
 			this.readEvents(eventsfile, day, config);
 			
-			double avgUtility = 0.0;
-			CalcAverageTripLength tdCalculator = new CalcAverageTripLength(this.scenario.getNetwork());
 			
+			CalcAverageTripLength tdCalculator = new CalcAverageTripLength(this.scenario.getNetwork());			
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {
 //				tdCalculator.run(person.getSelectedPlan());
-				avgUtility += person.getSelectedPlan().getScore() / this.scenario.getPopulation().getPersons().size();
 			}
-			this.td[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();	
-			this.utilities[Surprice.days.indexOf(day)] = avgUtility;
+			this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();	
 			
+			this.computeUtilities(utilitiesRelative, day, "rel");
+			boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
+			
+			this.utilitiesAvg[Surprice.days.indexOf(day)] = this.computeUtilities(utilitiesAbsolute, day, "abs");
+			boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");
+					
 			this.scenario.getPopulation().getPersons().clear();
 		}	
 		this.write(outPath);
@@ -112,61 +121,41 @@ public class Analyzer {
 	private void readEvents(String eventsfile, String day, Config config) {
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		CalcLegTimes ttCalculator = new CalcLegTimes();
+		TravelTimeCalculator ttCalculator = new TravelTimeCalculator();
 		events.addHandler(ttCalculator);
 		
 		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
-		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
-		
-		log.info(config.scenario().isUseRoadpricing());
-		scheme.setName("test");
-		
-		
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);		
 		try {
+			log.info("parsing " + config.roadpricing().getTollLinksFile());
 			rpReader.parse(config.roadpricing().getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
 		CalcAverageTolledTripLength tollCalculator = new CalcAverageTolledTripLength(this.scenario.getNetwork(), scheme);
-		events.addHandler(tollCalculator);
+//		events.addHandler(tollCalculator);
 		
 		new MatsimEventsReader(events).readFile(eventsfile);
-
-		this.tt[Surprice.days.indexOf(day)] = ttCalculator.getAverageTripDuration();
+		this.ttAvg[Surprice.days.indexOf(day)] = ttCalculator.getAverageTripDuration();
+		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");
 			
 		// TODO:
-		this.tolltd[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();		
+		this.tolltdAvg[Surprice.days.indexOf(day)] = 0.0; //tollCalculator.getAverageTripLength();		
 	}
 	
-	public void analyze(Config config, String outPath, double sideLength) {		
-		SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
-		SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
+	public void writeBoxPlots(String outPath) {			
+		this.boxPlotRelative.createChart();
+		this.boxPlotRelative.saveAsPng(outPath + "/utilitiesRelative.png", 800, 600);
 		
-		ArrayList<Double> utilitiesRelative = new ArrayList<Double>();
-		ArrayList<Double> utilitiesAbsolute = new ArrayList<Double>();
+		this.boxPlotAbsolute.createChart();
+		this.boxPlotAbsolute.saveAsPng(outPath + "/utilitiesAbsolute.png", 800, 600);
 		
-		for (String day : Surprice.days) {
-			String plansFilePath = outPath + "/" + day + "/" + day + ".output_plans.xml.gz";
-			MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
-			populationReader.readFile(plansFilePath);
-
-			this.computeUtilities(utilitiesRelative, day, "rel");
-			boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
-			
-			this.computeUtilities(utilitiesAbsolute, day, "abs");
-			boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");
-						
-			this.scenario.getPopulation().getPersons().clear();
-		}	
-		boxPlotRelative.createChart();
-		boxPlotRelative.saveAsPng(outPath + "/utilitiesRelative.png", 400, 300);
-		
-		boxPlotAbsolute.createChart();
-		boxPlotAbsolute.saveAsPng(outPath + "/utilitiesAbsolute.png", 400, 300);
+		this.boxPlotTravelTimes.createChart();
+		this.boxPlotTravelTimes.saveAsPng(outPath + "/traveltimes.png", 800, 600);
 	}
-		
-	private void computeUtilities(ArrayList<Double> utilities, String day, String type) {		
+			
+	private double computeUtilities(ArrayList<Double> utilities, String day, String type) {		
 		double avgUtility = 0.0;
 		int n = 0;
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
@@ -181,10 +170,14 @@ public class Analyzer {
 			} else {
 				utilities.add(person.getSelectedPlan().getScore());
 			}
-		}		
+		}
+		return avgUtility;
 	}
 			
 	private void write(String outPath) {
+		
+		this.writeBoxPlots(outPath);
+		
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt")); 
@@ -193,7 +186,7 @@ public class Analyzer {
 			String line = "tt\t";
 			double avgTT = 0.0;
 			for (String day : Surprice.days) {	
-				double tt = this.tt[Surprice.days.indexOf(day)];
+				double tt = this.ttAvg[Surprice.days.indexOf(day)];
 				line += formatter.format(tt) + "\t";			
 				avgTT += tt / Surprice.days.size();
 			}	
@@ -205,7 +198,7 @@ public class Analyzer {
 			line = "td\t";
 			double avgTD = 0.0;
 			for (String day : Surprice.days) {	
-				double td = this.td[Surprice.days.indexOf(day)];
+				double td = this.tdAvg[Surprice.days.indexOf(day)];
 				line += formatter.format(td) + "\t";			
 				avgTD += td / Surprice.days.size();
 			}	
@@ -217,7 +210,7 @@ public class Analyzer {
 			line = "tolltd\t";
 			double avgTollTD = 0.0;
 			for (String day : Surprice.days) {	
-				double tolltd = this.tolltd[Surprice.days.indexOf(day)];
+				double tolltd = this.tolltdAvg[Surprice.days.indexOf(day)];
 				line += formatter.format(tolltd) + "\t";			
 				avgTollTD += tolltd / Surprice.days.size();
 			}	
@@ -229,7 +222,7 @@ public class Analyzer {
 			line = "utility\t";
 			double avgUtility = 0.0;
 			for (String day : Surprice.days) {	
-				double utility = this.utilities[Surprice.days.indexOf(day)];
+				double utility = this.utilitiesAvg[Surprice.days.indexOf(day)];
 				line += formatter.format(utility) + "\t";			
 				avgUtility += utility / Surprice.days.size();
 			}	
