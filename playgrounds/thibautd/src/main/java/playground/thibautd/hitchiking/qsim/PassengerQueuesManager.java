@@ -148,8 +148,9 @@ public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
 
 	@Override
 	public void afterSim() {
-		log.info( "state of passengers at the end of the iteration:" );
-		queues.logStatus();
+		queues.endIteration(
+			internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+			events);
 	}
 
 	@Override

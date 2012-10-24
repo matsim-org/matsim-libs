@@ -29,7 +29,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+
+import playground.thibautd.hitchiking.HitchHikingConstants;
 
 /**
  * @author thibautd
@@ -51,17 +54,27 @@ public class PassengerQueuesPerLink {
 		return qs;
 	}
 
-	public void logStatus() {
+	public void endIteration(final double endTime, final EventsManager events) {
 		int nLocationsWithWaitingAgents = 0;
 		int nWaitingAgents = 0;
 
-		for (QueuesPerDestination queues : queuesPerLink.values()) {
+		for (Map.Entry<Id, QueuesPerDestination> queues : queuesPerLink.entrySet()) {
 			boolean thereWereAgents = false;
-			for (Queue queue : queues.queues.values()) {
+			Id linkId = queues.getKey();
+			for (Queue queue : queues.getValue().queues.values()) {
 				int size = queue.size();
 				if (size > 0) {
 					nWaitingAgents += size;
 					thereWereAgents = true;
+
+					for (MobsimAgent agent : queue.queue) {
+						events.processEvent(
+								events.getFactory().createAgentStuckEvent(
+									endTime,
+									agent.getId(),
+									linkId,
+									HitchHikingConstants.PASSENGER_MODE) );
+					}
 				}
 			}
 			if (thereWereAgents) {
@@ -69,7 +82,8 @@ public class PassengerQueuesPerLink {
 			}
 		}
 
-		log.info( nWaitingAgents+" agents waiting at "+nLocationsWithWaitingAgents );
+		log.info( nWaitingAgents+" agents waiting at "+nLocationsWithWaitingAgents+" locations" );
+		log.info( "they were notified as stuck" );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
