@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -61,7 +62,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 
 	public EventsReaderXMLv1(final EventsManager events) {
 		this.events = events;
-		this.builder = (EventsFactory) events.getFactory();
+		this.builder = events.getFactory();
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate
 	}
 
@@ -205,7 +206,13 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			double value = Double.valueOf(atts.getValue(LinkChangeLanesEvent.CHANGEVALUE));
 			NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(changeType, value);
 			this.events.processEvent(this.builder.createLinkChangeLanesEvent(time, new IdImpl(atts.getValue(LinkChangeLanesEvent.ATTRIBUTE_LINK)), changeValue));
-		} else {
+		} 
+		else if (BoardingDeniedEvent.EVENT_TYPE.equals(eventType)){
+			Id personId = new IdImpl(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_PERSON_ID));
+			Id vehicleId = new  IdImpl(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_VEHICLE_ID));
+			this.events.processEvent(new BoardingDeniedEvent(time, personId, vehicleId));
+		}
+		else {
 			Event event = this.builder.createGenericEvent( eventType, time );
 			for ( int ii=0 ; ii<atts.getLength() ; ii++ ) {
 				String key = atts.getLocalName(ii) ;
