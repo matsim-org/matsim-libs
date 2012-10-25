@@ -268,19 +268,14 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		for ( VspExperimentalConfigKey keyTmp : VspExperimentalConfigKey.values() ) {
-			switch(keyTmp) {
-			case isGeneratingBoardingDeniedEvent:
-			case logitScaleParamForPlansRemoval:
-			case scoreMSAStartsAtIteration:
-			case vspDefaultsCheckingLevel:
-				if ( keyTmp.toString().equals(key) ) {
-					this.addParam(keyTmp, value ) ;
-				}
+			if ( keyTmp.toString().equals(key) ) {
+				this.addParam(keyTmp, value ) ;
 				return ;
 			}
 			// the above feels really odd.  Problem is that we can convert keys to strings, but not the other way round.
 			// alternative might be some lookup table.  kai, oct'12
 		}
+		
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
 			//			this.setUseActivityDurations(Boolean.parseBoolean(value));
 			if ( Boolean.parseBoolean(value) ) {
