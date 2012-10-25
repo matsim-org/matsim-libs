@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import java.util.List;
 
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -57,6 +58,6 @@ public interface TransitStopHandler {
 	 */
 	public double handleTransitStop(final TransitStopFacility stop, final double now,
 			final List<PTPassengerAgent> leavingPassengers, final List<PTPassengerAgent> enteringPassengers,
-			final PassengerAccessEgress handler);
+			final PassengerAccessEgress handler, MobsimVehicle vehicle);
 
 }

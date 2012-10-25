@@ -20,6 +20,9 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+
 /**
  * @author mrieser
  */
@@ -30,18 +33,14 @@ public interface PassengerAccessEgress {
 	 * @param time time the agent should be handled
 	 * @return true, if handled correctly, otherwise false, e.g. vehicle has no capacity left
 	 */
-	public boolean handlePassengerEntering(final PTPassengerAgent agent, final double time);
+	public boolean handlePassengerEntering(final PTPassengerAgent agent, MobsimVehicle vehicle, Id fromStopFacilityId, final double time);
 
 	/** 
 	 * @param agent agent to be handled
 	 * @param time time the agent should be handled
 	 * @return true, if handled correctly, otherwise false
 	 */
-	public boolean handlePassengerLeaving(final PTPassengerAgent agent, final double time);
+	public boolean handlePassengerLeaving(final PTPassengerAgent agent, MobsimVehicle vehicle, Id toLinkId, final double time);
 
-	/**
-	 * @return the number of passengers currently still in the vehicle, including those about to leave the vehicle.
-	 */
-	public int getNumberOfPassengers();
-	
+
 }

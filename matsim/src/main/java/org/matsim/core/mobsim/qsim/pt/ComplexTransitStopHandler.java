@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.pt;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -56,19 +57,20 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
-			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler) {
+			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
 		
 		if(this.doorOperationMode == VehicleType.DoorOperationMode.parallel){			
-			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler);			
+			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);			
 		} else if (this.doorOperationMode == VehicleType.DoorOperationMode.serial){
-			return handleSerialStop(stop, now, leavingPassengers, enteringPassengers, handler);
+			return handleSerialStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
 		} else {
 			log.info("Unimplemented door operation mode " + this.doorOperationMode + " set. Using parralel mode as default.");
-			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler);
+			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
 		}		
 	}
 	
-	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler){
+	private double handleSerialStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, 
+			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle){
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -103,7 +105,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 								break;
 							}
 
-							if(handler.handlePassengerLeaving(leavingPassengers.get(0), now)){
+							if(handler.handlePassengerLeaving(leavingPassengers.get(0), vehicle, stop.getLinkId(), now)){
 								leavingPassengers.remove(0);
 								this.passengersLeavingTimeFraction += personLeavesTime;
 							} else {
@@ -136,7 +138,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 									break;
 								}
 
-								if(handler.handlePassengerEntering(enteringPassengers.get(0), now)){
+								if(handler.handlePassengerEntering(enteringPassengers.get(0), vehicle, stop.getId(), now)){
 									enteringPassengers.remove(0);
 									this.passengersEnteringTimeFraction += personEntersTime;
 								} else {
@@ -193,7 +195,8 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 		return stopTime;
 	}
 	
-	private double handleParallelStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers, List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler){
+	private double handleParallelStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
+			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle){
 		double stopTime = 0.0;
 
 		int cntEgress = leavingPassengers.size();
@@ -229,7 +232,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 								break;
 							}
 
-							if(handler.handlePassengerEntering(enteringPassengers.get(0), now)){
+							if(handler.handlePassengerEntering(enteringPassengers.get(0), vehicle, stop.getId(), now)){
 								enteringPassengers.remove(0);
 								this.passengersEnteringTimeFraction += personEntersTime;
 							} else {
@@ -262,7 +265,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 								break;
 							}
 
-							if(handler.handlePassengerLeaving(leavingPassengers.get(0), now)){
+							if(handler.handlePassengerLeaving(leavingPassengers.get(0), vehicle, stop.getLinkId(), now)){
 								leavingPassengers.remove(0);
 								this.passengersLeavingTimeFraction += personLeavesTime;
 							} else {
