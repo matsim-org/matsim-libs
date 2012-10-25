@@ -51,10 +51,10 @@ public class AasRunner {
 	private final String baseFolder;
 	private final String iterationOutputDir;
 	private final String eventsFile;
-	private ScenarioImpl scenario;
-	private Set<Feature> shapeFile;
+	private final ScenarioImpl scenario;
+	private final Set<Feature> shapeFile;
 	
-	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 
 	
 
@@ -79,7 +79,7 @@ public class AasRunner {
 		this.anaModules.add(ptAna);
 		
 		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
-		distAna.init(this.scenario, 15);
+		distAna.init(this.scenario);
 		this.anaModules.add(distAna);
 		
 		MultiAnalyzer mA = new MultiAnalyzer(ptDriverPrefix);
@@ -108,6 +108,7 @@ public class AasRunner {
 			}
 		}
 		
+		// TODO: what if there are no events in the directory? bk oct'12
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 		reader.parse(this.eventsFile);
 	}
@@ -119,7 +120,7 @@ public class AasRunner {
 	}
 	
 	public void writeResults(){
-		String outputDir = this.iterationOutputDir + "/" + "aasRunner" + "/";
+		String outputDir = this.iterationOutputDir + "aasRunner" + "/";
 		log.info("Generating output directory " + outputDir);
 		new File(outputDir).mkdir();
 		

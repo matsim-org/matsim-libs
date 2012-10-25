@@ -47,7 +47,11 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.andreas.aas.modules.AbstractAnalyisModule;
 
 /**
- * Beware! This one depends on plans only. No events are processed. Thus, the actual distance may differ significantly. 
+ * This tool calculates modal split over predefined distance classes.
+ * 
+ * WARNING: The tool depends on plans only, no events are processed!
+ * Trip distances are beeline distances between activity locations.
+ * The actual (driven, teleported, ...) distances may differ significantly. 
  * 
  * @author aneumann, benjamin
  *
@@ -57,37 +61,25 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 
 	private ScenarioImpl scenario;
 	private final List<Integer> distanceClasses;
-
-	//	private final UserGroup group2analyze = UserGroup.MID;
-	private final UserGroup group2analyze = null;
-
-	private boolean considerUserGroupOnly;
 	private final SortedSet<String> usedModes;
 
 	private SortedMap<String, Map<Integer, Integer>> mode2DistanceClass2LegCount;
-
 	private SortedMap<String, Integer> mode2LegCount;
-
 	private SortedMap<String, Double> mode2Share;
 
 	public LegModeDistanceDistribution(String ptDriverPrefix){
+		// why are the following two lines necessary? bk oct'12
 		super(LegModeDistanceDistribution.class.getSimpleName(), ptDriverPrefix);
 		log.info("enabled");
 
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
-
-		if(group2analyze == null){
-			this.considerUserGroupOnly = false;
-		} else {
-			this.considerUserGroupOnly = true;
-		}
 	}
 
-	public void init(ScenarioImpl scenario, int noOfDistanceClasses){
-		this.scenario = scenario;
+	public void init(ScenarioImpl sc){
+		this.scenario = sc;
 
-		initializeDistanceClasse(noOfDistanceClasses);
+		initializeDistanceClasses(this.scenario.getPopulation());
 		initializeUsedModes(this.scenario.getPopulation());
 	}
 
@@ -104,17 +96,8 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		if(this.considerUserGroupOnly){
-			log.warn("Values are calculated for " + group2analyze + " ...");
-			Population relevantPop = new PersonFilter().getPopulation(this.scenario.getPopulation(), group2analyze);
-			this.mode2DistanceClass2LegCount = calculateMode2DistanceClass2LegCount(relevantPop);
-			this.mode2LegCount = calculateMode2LegCount(relevantPop);
-		} else {
-			log.warn("Values are calculated for the whole population ...");
-			this.mode2DistanceClass2LegCount = calculateMode2DistanceClass2LegCount(this.scenario.getPopulation());
-			this.mode2LegCount = calculateMode2LegCount(this.scenario.getPopulation());
-		}
-
+		this.mode2DistanceClass2LegCount = calculateMode2DistanceClass2LegCount(this.scenario.getPopulation());
+		this.mode2LegCount = calculateMode2LegCount(this.scenario.getPopulation());
 		this.mode2Share = calculateModeShare(this.mode2LegCount);
 	}
 
@@ -123,37 +106,36 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 		String outFile = outputFolder + "legModeDistanceDistribution.txt";
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
-			BufferedWriter out = new BufferedWriter(fstream);
-			out.write("#");
+			BufferedWriter writer1 = new BufferedWriter(fstream);
+			writer1.write("#");
 			for(String mode : this.usedModes){
-				out.write("\t" + mode);
+				writer1.write("\t" + mode);
 			}
-			out.write("\t" + "sum");
-			out.write("\n");
+			writer1.write("\t" + "sum");
+			writer1.write("\n");
 			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
 				//	Integer middleOfDistanceClass = ((this.distanceClasses.get(i) + this.distanceClasses.get(i + 1)) / 2);
 				//	out.write(middleOfDistanceClass + "\t");
-				out.write(this.distanceClasses.get(i+1) + "\t");
+				writer1.write(this.distanceClasses.get(i+1) + "\t");
 				Integer totalLegsInDistanceClass = 0;
 				for(String mode : this.usedModes){
 					Integer modeLegs = null;
 					modeLegs = this.mode2DistanceClass2LegCount.get(mode).get(this.distanceClasses.get(i + 1));
 					totalLegsInDistanceClass = totalLegsInDistanceClass + modeLegs;
-					out.write(modeLegs.toString() + "\t");
+					writer1.write(modeLegs.toString() + "\t");
 				}
-				out.write(totalLegsInDistanceClass.toString());
-				out.write("\n");
+				writer1.write(totalLegsInDistanceClass.toString());
+				writer1.write("\n");
 			}
-			//Close the output stream
-			out.close();
+			writer1.close(); //Close the output stream
 
-			BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder + "modeShares.txt");
-			writer.write("# mode\tshare"); writer.newLine();
+			BufferedWriter writer2 = IOUtils.getBufferedWriter(outputFolder + "modeShares.txt");
+			writer2.write("# mode\tshare"); writer2.newLine();
 			for (Entry<String, Double> modeShareEntry : this.mode2Share.entrySet()) {
-				writer.write(modeShareEntry.getKey() + "\t" + modeShareEntry.getValue()); writer.newLine();
+				writer2.write(modeShareEntry.getKey() + "\t" + modeShareEntry.getValue()); writer2.newLine();
 			}
-			writer.flush();
-			writer.close();
+			writer2.flush();
+			writer2.close(); //Close the output stream
 
 			log.info("Finished writing output to " + outFile);
 		}catch (Exception e){
@@ -162,7 +144,7 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 	}
 
 	private SortedMap<String, Double> calculateModeShare(SortedMap<String, Integer> mode2NoOfLegs) {
-		SortedMap<String, Double> mode2Share = new TreeMap<String, Double>();
+		SortedMap<String, Double> mode2Pct = new TreeMap<String, Double>();
 		int totalNoOfLegs = 0;
 		for(String mode : mode2NoOfLegs.keySet()){
 			int modeLegs = mode2NoOfLegs.get(mode);
@@ -170,9 +152,9 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 		}
 		for(String mode : mode2NoOfLegs.keySet()){
 			double share = 100. * (double) mode2NoOfLegs.get(mode) / totalNoOfLegs;
-			mode2Share.put(mode, share);
+			mode2Pct.put(mode, share);
 		}
-		return mode2Share;
+		return mode2Pct;
 	}
 
 	private SortedMap<String, Integer> calculateMode2LegCount(Population population) {
@@ -197,14 +179,14 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 		return mode2NoOfLegs;
 	}
 
-	private SortedMap<String, Map<Integer, Integer>> calculateMode2DistanceClass2LegCount(Population population) {
+	private SortedMap<String, Map<Integer, Integer>> calculateMode2DistanceClass2LegCount(Population pop) {
 		SortedMap<String, Map<Integer, Integer>> mode2DistanceClassNoOfLegs = new TreeMap<String, Map<Integer, Integer>>();
 
 		for(String mode : this.usedModes){
 			SortedMap<Integer, Integer> distanceClass2NoOfLegs = new TreeMap<Integer, Integer>();
 			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
 				Integer noOfLegs = 0;
-				for(Person person : population.getPersons().values()){
+				for(Person person : pop.getPersons().values()){
 					PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 					List<PlanElement> planElements = plan.getPlanElements();
 					for(PlanElement pe : planElements){
@@ -213,11 +195,13 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 							String legMode = leg.getMode();
 							Coord from = plan.getPreviousActivity(leg).getCoord();
 							Coord to = plan.getNextActivity(leg).getCoord();
-							Double legDist = CoordUtils.calcDistance(from, to);
+							Double legBeelineDist = CoordUtils.calcDistance(from, to);
 
 							if(legMode.equals(mode)){
-								if(legDist > this.distanceClasses.get(i) && legDist <= this.distanceClasses.get(i + 1)){
+								if(legBeelineDist > this.distanceClasses.get(i) && legBeelineDist <= this.distanceClasses.get(i + 1)){
 									noOfLegs++;
+								} else {
+									// TODO: counter for legs that are longer than the highest distance class
 								}
 							}
 						}
@@ -230,15 +214,42 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 		return mode2DistanceClassNoOfLegs;
 	}
 
-	private void initializeDistanceClasse(int noOfDistanceClasses) {
-		this.distanceClasses.add(0);
-		for(int noOfClasses = 0; noOfClasses < noOfDistanceClasses; noOfClasses++){
-			int distanceClass = 100 * (int) Math.pow(2, noOfClasses);
-			this.distanceClasses.add(distanceClass);
+	private void initializeDistanceClasses(Population pop) {
+		double longestBeelineDistance = getLongestBeelineDistance(pop);
+		int endOfDistanceClass = 0;
+		int classCounter = 0;
+		this.distanceClasses.add(endOfDistanceClass);
+		
+		while(endOfDistanceClass <= longestBeelineDistance){
+			endOfDistanceClass = 100 * (int) Math.pow(2, classCounter);
+			classCounter++;
+			this.distanceClasses.add(endOfDistanceClass);
 		}
 		log.info("The following distance classes were defined: " + this.distanceClasses);
 	}
 
+	private double getLongestBeelineDistance(Population pop){
+		double longestBeelineDistance = 0.0;
+		for(Person person : pop.getPersons().values()){
+			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			List<PlanElement> planElements = plan.getPlanElements();
+			for(PlanElement pe : planElements){
+				if(pe instanceof Leg){
+					Leg leg = (Leg) pe;
+					Coord from = plan.getPreviousActivity(leg).getCoord();
+					Coord to = plan.getNextActivity(leg).getCoord();
+					Double legBeelineDist = CoordUtils.calcDistance(from, to);
+					
+					if(legBeelineDist > longestBeelineDistance){
+						longestBeelineDistance = legBeelineDist;
+					}
+				}
+			}
+		}
+		log.info("The longest beeline distance between two activity locations is found to be: " + longestBeelineDistance);
+		return longestBeelineDistance;
+	}
+	
 	private void initializeUsedModes(Population pop) {
 		for(Person person : pop.getPersons().values()){
 			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
@@ -248,5 +259,6 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 				}
 			}
 		}
+		log.info("The following transport modes are considered: " + this.usedModes);
 	}
 }
