@@ -24,13 +24,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.UmlaufStueckI;
@@ -229,7 +229,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 			freeCapacity += a.getWeight();
 		}
 		List<PTPassengerAgent> passengersEntering = findPassengersEntering(stopFac, freeCapacity);
-		double stopTime = this.vehicle.getStopHandler().handleTransitStop(stopFac, time, passengersLeaving, passengersEntering, this);
+		double stopTime = this.vehicle.getStopHandler().handleTransitStop(stopFac, time, passengersLeaving, passengersEntering, this, null);
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(time, stopTime);
 		}
@@ -240,19 +240,19 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerEntering(final PTPassengerAgent agent, final double time) {
+	public boolean handlePassengerEntering(final PTPassengerAgent agent, MobsimVehicle vehicle, Id fromStopFacilityId, final double time) {
 		boolean handled = this.vehicle.addPassenger(agent);
 		if (handled) {
 			this.ptFeature.getAgentTracker().removeAgentFromStop(agent, this.currentStop.getStopFacility().getId());
 			EventsManager events = this.simEngine.getEventsManager();
-			events.processEvent(((EventsFactory) events.getFactory()).createPersonEntersVehicleEvent(time,
+			events.processEvent(events.getFactory().createPersonEntersVehicleEvent(time,
 					agent.getId(), this.vehicle.getId()));
 		}
 		return handled;
 	}
 
 	@Override
-	public boolean handlePassengerLeaving(final PTPassengerAgent agent, final double time) {
+	public boolean handlePassengerLeaving(final PTPassengerAgent agent,  MobsimVehicle vehicle, Id toLinkId, final double time) {
 		boolean handled = this.vehicle.removePassenger(agent);
 		if (handled) {
 			EventsManager events = this.simEngine.getEventsManager();
@@ -261,11 +261,6 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 //			agent.endLegAndAssumeControl(time);
 		}
 		return handled;
-	}
-
-	@Override
-	public int getNumberOfPassengers() {
-		return this.vehicle.getPassengers().size();
 	}
 	
 }
