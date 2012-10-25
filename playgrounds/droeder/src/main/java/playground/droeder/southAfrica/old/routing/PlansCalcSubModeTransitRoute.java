@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.routing;
+package playground.droeder.southAfrica.old.routing;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -51,7 +51,7 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemover;
+import playground.droeder.southAfrica.old.replanning.modules.PtSubModePtInteractionRemover;
 
 /**
  * @author droeder based on mrieser

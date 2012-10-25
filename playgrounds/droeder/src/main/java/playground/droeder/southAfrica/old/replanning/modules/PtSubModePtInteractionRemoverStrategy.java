@@ -16,37 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning.modules;
+package playground.droeder.southAfrica.old.replanning.modules;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.droeder.southAfrica.PtSubModeControler;
-
 /**
  * @author droeder
  *
  */
-public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
-	private Controler c;
+public class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule {
 	
 	/**
-	 * <code>PlanStrategyModule</code> which reroutes pt-legs and stores pt-submodes.
-	 * Aborts if the controler is not an instance of instance of <code>PtSubModeControler</code>
+	 * This class provides a strategy to remove pt-interactions from a plan, but changes the 
+	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>. Instead it keeps the 
+	 * original mode
+	 * 
 	 * @param c
 	 */
-	public ReRoutePtSubModeStrategy(Controler c) {
+	public PtSubModePtInteractionRemoverStrategy(Controler c){
 		super(c.getConfig().global());
-		if(!(c instanceof PtSubModeControler)){
-			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler...");
-		}
-		this.c = c;
 	}
-
+//
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return this.c.createRoutingAlgorithm();
+		return new PtSubModePtInteractionRemover();
 	}
 
 //	@Override
@@ -56,7 +51,8 @@ public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 //
 //	@Override
 //	public void handlePlan(Plan plan) {
-//		this.c.createRoutingAlgorithm().run(plan);
+//		new FixedPtSubModePtInteractionRemover().run(plan);
+//		
 //	}
 //
 //	@Override

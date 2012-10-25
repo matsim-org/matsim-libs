@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.southAfrica.scenarios;
+package playground.droeder.southAfrica.old.run;
 
 import java.io.File;
 
@@ -34,7 +34,6 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PHook;
 import playground.andreas.P2.hook.PTransitRouterFactory;
-import playground.droeder.southAfrica.PtSubModeControler;
 import playground.droeder.southAfrica.helper.Mode2LineSetterRSA;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
 
@@ -43,10 +42,10 @@ import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
  * @author droeder
  *
  */
-public class RsaRunner {
+public class RsaRunnerOld {
 	
 	
-	private final static Logger log = Logger.getLogger(RsaRunner.class);
+	private final static Logger log = Logger.getLogger(RsaRunnerOld.class);
 	private static String CONFIGFILE = 
 			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
 //			"E:/rsa/server/configDebug0.01.xml";
@@ -87,7 +86,7 @@ public class RsaRunner {
 		
 //		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(conf));
 	
-		Controler controler = new PtSubModeControler(scenario, fixedSubMode);
+		Controler controler = new PtSubModeControlerOld(scenario, fixedSubMode);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		
@@ -104,6 +103,7 @@ public class RsaRunner {
 		controler.setMobsimFactory(new TransitSubModeQSimFactory(fixedSubMode));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.setUseTripRouting(false);
 
 		controler.run();
 		

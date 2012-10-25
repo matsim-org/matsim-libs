@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.southAfrica;
+package playground.droeder.southAfrica.old.run;
 
 
 import org.apache.log4j.Logger;
@@ -31,24 +31,24 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
+import playground.droeder.southAfrica.old.routing.PlansCalcSubModeTransitRoute;
+import playground.droeder.southAfrica.old.routing.PtSubModeRouterFactory;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
-import playground.droeder.southAfrica.routing.PlansCalcSubModeTransitRoute;
-import playground.droeder.southAfrica.routing.PtSubModeRouterFactory;
 
 /**
  * @author droeder
  *
  */
-public class PtSubModeControler extends Controler {
+public class PtSubModeControlerOld extends Controler {
 	private static final Logger log = Logger
-			.getLogger(PtSubModeControler.class);
+			.getLogger(PtSubModeControlerOld.class);
 	
 	/**
 	 * This class is a extension of the original MATSim-Controler. It will only work with an enabled pt-simulation.
 	 * It uses an own implementation of the TransitRouter and will work with the strategy-module <code>ReRouteFixedPtSubMode</code>. 
 	 * @param configFile
 	 */
-	public PtSubModeControler(String configFile, boolean routeOnSameMode) {
+	public PtSubModeControlerOld(String configFile, boolean routeOnSameMode) {
 		super(configFile);
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
@@ -69,7 +69,7 @@ public class PtSubModeControler extends Controler {
 	 * It uses an own implementation of the TransitRouter and will work with the strategy-module <code>ReRouteFixedPtSubMode</code>. 
 	 * @param configFile
 	 */
-	public PtSubModeControler(Scenario sc, boolean routeOnSameMode) {
+	public PtSubModeControlerOld(Scenario sc, boolean routeOnSameMode) {
 		super(sc);
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
@@ -93,7 +93,7 @@ public class PtSubModeControler extends Controler {
 		if(!(super.getMobsimFactory() instanceof TransitSubModeQSimFactory)){
 			throw new IllegalArgumentException("QSIMFactory needs to be instance of TransitSubModeQsimFactory...");
 		}
-		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is defintiv called last, after all changes in schedule are done...
+		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is explicitly called last, after all changes in schedule are done...
 		super.addControlerListener((PtSubModeRouterFactory)super.getTransitRouterFactory());
 		super.run();
 	}
