@@ -51,7 +51,8 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.droeder.southAfrica.old.replanning.modules.PtSubModePtInteractionRemover;
+import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemover;
+import playground.droeder.southAfrica.routing.PtSubModeRouter;
 
 /**
  * @author droeder based on mrieser

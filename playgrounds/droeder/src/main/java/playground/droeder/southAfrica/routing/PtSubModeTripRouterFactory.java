@@ -65,7 +65,11 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	private final TransitRouterFactory transitRouterFactory;
 	private final TransitSchedule transitSchedule;
 
-	public PtSubModeTripRouterFactory(final Controler controler, boolean routeOnSameSubMode) {
+	/**
+	 * based on {@link TripRouterFactoryImpl}. Own Implementation is just necessary to add pt-submodes.
+	 * @param controler
+	 */
+	public PtSubModeTripRouterFactory(final Controler controler) {
 		
 		this.config = controler.getScenario().getConfig();
 		this.network = controler.getScenario().getNetwork();
@@ -140,13 +144,14 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 							modeRouteFactory)));
 		}
 
+		// add a Routing-Module for each Transit(sub)mode.
 		for(String mode: config.transit().getTransitModes()) {
 			tripRouter.setRoutingModule(
 					mode,
 					new TransitRouterWrapper(
 							transitRouterFactory.createTransitRouter(),
 							transitSchedule,
-							// use a walk router in case no PT path is found
+							// use a walk router in case no path is found
 							new LegRouterWrapper(
 									TransportMode.transit_walk,
 									populationFactory,
@@ -155,6 +160,21 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 											routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk),
 											routeConfigGroup.getBeelineDistanceFactor()))));
 		}
+		// add pt as fallback-solution
+		tripRouter.setRoutingModule(
+				TransportMode.pt,
+				new TransitRouterWrapper(
+						transitRouterFactory.createTransitRouter(),
+						transitSchedule,
+						// use a walk router in case no PT path is found
+						new LegRouterWrapper(
+								TransportMode.transit_walk,
+								populationFactory,
+								new TeleportationLegRouter(
+										modeRouteFactory,
+										routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk),
+										routeConfigGroup.getBeelineDistanceFactor()))));
+		
 
 		return tripRouter;
 		

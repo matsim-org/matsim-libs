@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.old.routing;
+package playground.droeder.southAfrica.routing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 	/**
 	 * Factory to create the <code>PtSubModeDependendRouter</code>
 	 * @param sc
-	 * @param routeOnSameMode
+	 * @param routeOnSameMode, for performance-reasons. Create subModeRouters only if necessary
 	 */
 	public PtSubModeRouterFactory(Controler c, boolean routeOnSameMode) {
 		super(((PConfigGroup)c.getConfig().getModule(PConfigGroup.GROUP_NAME)).getPtEnabler());

@@ -16,32 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.old.replanning.modules;
+package playground.droeder.southAfrica.replanning.modules;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.droeder.southAfrica.old.run.PtSubModeControlerOld;
+
 /**
  * @author droeder
  *
  */
-public class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule {
+public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
+	private Controler c;
 	
 	/**
-	 * This class provides a strategy to remove pt-interactions from a plan, but changes the 
-	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>. Instead it keeps the 
-	 * original mode
-	 * 
+	 * <code>PlanStrategyModule</code> which reroutes pt-legs and stores pt-submodes.
+	 * Aborts if the controler is not an instance of instance of <code>PtSubModeControler</code>
 	 * @param c
 	 */
-	public PtSubModePtInteractionRemoverStrategy(Controler c){
+	public ReRoutePtSubModeStrategy(Controler c) {
 		super(c.getConfig().global());
+		if(!(c instanceof PtSubModeControlerOld)){
+			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler...");
+		}
+		this.c = c;
 	}
-//
+
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PtSubModePtInteractionRemover();
+		return this.c.createRoutingAlgorithm();
 	}
 
 //	@Override
@@ -51,8 +56,7 @@ public class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreaded
 //
 //	@Override
 //	public void handlePlan(Plan plan) {
-//		new FixedPtSubModePtInteractionRemover().run(plan);
-//		
+//		this.c.createRoutingAlgorithm().run(plan);
 //	}
 //
 //	@Override

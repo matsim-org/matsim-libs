@@ -18,7 +18,12 @@
  * *********************************************************************** */
 package playground.droeder.southAfrica.routing;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.TripRouter;
 
 /**
@@ -30,9 +35,12 @@ public class PtSubModeTripRouter extends TripRouter{
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(PtSubModeTripRouter.class);
+	private boolean routeOnSubMode;
 
 	public PtSubModeTripRouter() {
+		this.routeOnSubMode = routeOnSubMode;
 		// TODO[dr] Auto-generated constructor stub
 	}
+	
 }
 

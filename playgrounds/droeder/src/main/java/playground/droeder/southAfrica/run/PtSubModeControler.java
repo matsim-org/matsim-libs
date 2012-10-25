@@ -35,8 +35,8 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import com.sun.xml.bind.v2.TODO;
 
 import playground.droeder.southAfrica.old.routing.PlansCalcSubModeTransitRoute;
-import playground.droeder.southAfrica.old.routing.PtSubModeRouterFactory;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
+import playground.droeder.southAfrica.routing.PtSubModeRouterFactory;
 import playground.droeder.southAfrica.routing.PtSubModeTripRouterFactory;
 
 /**
@@ -55,9 +55,10 @@ public class PtSubModeControler extends Controler {
 	public PtSubModeControler(String configFile, boolean routeOnSameMode) {
 		super(configFile);
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
+		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
-		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this, routeOnSameMode));
+		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
 	}
 	
 	/**
@@ -68,9 +69,10 @@ public class PtSubModeControler extends Controler {
 	public PtSubModeControler(Scenario sc, boolean routeOnSameMode) {
 		super(sc);
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
+		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
-		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this, routeOnSameMode));
+		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
 	}
 	
 	@Override
@@ -82,7 +84,7 @@ public class PtSubModeControler extends Controler {
 			throw new IllegalArgumentException("QSIMFactory needs to be instance of TransitSubModeQsimFactory...");
 		}
 		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is explicitly called last, after all changes in schedule are done...
-		//TODO[dr] the TransitRouter needs to be updated somewhere
+		super.addControlerListener((PtSubModeRouterFactory)super.getTransitRouterFactory());
 		super.run();
 	}
 	
