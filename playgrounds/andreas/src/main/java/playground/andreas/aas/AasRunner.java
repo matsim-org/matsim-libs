@@ -34,7 +34,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
-import playground.andreas.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 import playground.andreas.aas.modules.multiAnalyzer.MultiAnalyzer;
 import playground.andreas.aas.modules.ptTripAnalysis.BvgTripAnalysisRunnerV4;
 import playground.andreas.aas.modules.spatialAveragingLinkDemand.SpatialAveragingForLinkDemand;
@@ -77,10 +76,6 @@ public class AasRunner {
 		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
 		ptAna.init(this.scenario, this.shapeFile);
 		this.anaModules.add(ptAna);
-		
-		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
-		distAna.init(this.scenario);
-		this.anaModules.add(distAna);
 		
 		MultiAnalyzer mA = new MultiAnalyzer(ptDriverPrefix);
 		mA.init(this.scenario);
