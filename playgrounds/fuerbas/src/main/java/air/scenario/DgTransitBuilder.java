@@ -87,7 +87,7 @@ public class DgTransitBuilder {
 			TransitStopFacility fromFacility = schedule.getFacilities().get(fromId);
 			TransitStopFacility toFacility = schedule.getFacilities().get(toId);
 			TransitRouteStop fromStop = sf.createTransitRouteStop(fromFacility, 0.0, 0.0);
-			TransitRouteStop toStop = sf.createTransitRouteStop(toFacility, 0.0, 0.0);
+			TransitRouteStop toStop = sf.createTransitRouteStop(toFacility, flight.getScheduledDuration(), flight.getScheduledDuration());
 			List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();
 			stopList.add(fromStop);
 			stopList.add(toStop);
