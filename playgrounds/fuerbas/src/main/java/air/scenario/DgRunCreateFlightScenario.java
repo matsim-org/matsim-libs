@@ -27,7 +27,7 @@ package air.scenario;
 public class DgRunCreateFlightScenario {
 
 	/**
-	 * @param args
+	 * Separate main due to eclipse compile problems
 	 */
 	public static void main(String[] args) throws Exception {
 		//WORLD WIDE AIR TRAFFIC
