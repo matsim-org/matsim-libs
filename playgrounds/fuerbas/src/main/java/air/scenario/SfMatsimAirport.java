@@ -191,7 +191,7 @@ public class SfMatsimAirport {
 		linkRunwayInbound = network.getFactory().createLink(idRunwayIn, nodeRunwayInboundStart,
 				nodeTaxiInboundStart);
 		linkRunwayInbound.setAllowedModes(allowedModes);
-		linkRunwayInbound.setFreespeed(runwayFreespeed);
+		linkRunwayInbound.setFreespeed(this.capacityData.getInboundRunwayFreespeedForStorageRestriction(runwayLength));
 		linkRunwayInbound.setLength(runwayLength);
 		linkRunwayInbound.setCapacity(this.capacityData.getRunwayInboundFlowCapacityCarEquivPerHour());
 		// c_s = link_length * nr_lanes / 7.5 -> nr_lanes = c_s /link_length * 7.5, using c_s = 1
@@ -201,7 +201,7 @@ public class SfMatsimAirport {
 				nodeRunwayOutboundEnd);
 		linkRunwayOutbound.setAllowedModes(allowedModes);
 		linkRunwayOutbound.setLength(runwayLength);
-		linkRunwayOutbound.setFreespeed(runwayFreespeed);
+		linkRunwayOutbound.setFreespeed(this.capacityData.getOutboundRunwayFreespeedForStorageRestriction(runwayLength));
 		linkRunwayOutbound.setCapacity(this.capacityData.getRunwayOutboundFlowCapacity_CarEquivPerHour());
 		// c_s = link_length * nr_lanes / 7.5 -> nr_lanes = c_s /link_length * 7.5, using c_s = 1
 		linkRunwayOutbound.setNumberOfLanes(1.0 / runwayLength * 7.5);

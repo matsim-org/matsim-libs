@@ -58,12 +58,13 @@ public class DgCreateDgFlightScenario {
 	private static String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
 	public static String inputAirportsCoordinatesFilename = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/worldwide_airports_with_coords.csv";
 	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
-	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_3600vph/";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
+	
+	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_60vph_storage_restriction/";
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
 	private boolean useAirportCapacities = false;
-	public static final boolean useSingleDayOfOperation = false;
+	public static final boolean useSingleDayOfOperation = true;
 	private String airportCapacityFile = dataBaseDirectory + "shared-svn/projects/throughFlightData/airportCapacityData/2012-08-14_airport_capacity_from_www.csv";
 	
 	private ScenarioImpl initScenario(){
