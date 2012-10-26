@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.legModeDistanceDistribution;
+package playground.vsp.aas.modules.legModeDistanceDistribution;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.andreas.aas.modules.AbstractAnalyisModule;
+import playground.vsp.aas.modules.AbstractAnalyisModule;
 
 /**
  * This tool calculates modal split over predefined distance classes.
