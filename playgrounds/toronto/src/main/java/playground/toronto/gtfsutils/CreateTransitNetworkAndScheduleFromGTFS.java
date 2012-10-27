@@ -1,0 +1,238 @@
+package playground.toronto.gtfsutils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import GTFS2PTSchedule.Frequency;
+import GTFS2PTSchedule.GTFSDefinitions.RouteTypes;
+import GTFS2PTSchedule.Route;
+import GTFS2PTSchedule.Service;
+import GTFS2PTSchedule.Stop;
+import GTFS2PTSchedule.StopTime;
+import GTFS2PTSchedule.Trip;
+
+/**
+ * Creates a simple transit network + schedule from GTFS data. This network, in general, should run <em> as-scheduled </em>!
+ * This is useful for comparing with simpler assignment algorithms (e.g. Emme)
+ * 
+ * @author pkucirek
+ */
+public class CreateTransitNetworkAndScheduleFromGTFS {
+	
+	private NetworkImpl network;
+	private TransitSchedule schedule;
+	private GTFSSystem gtfs;
+	
+	private final CoordinateTransformation converter;
+
+	public CreateTransitNetworkAndScheduleFromGTFS(CoordinateTransformation converter){
+		this.converter = converter; //Need to have a coordinate converter to allow for euclidean distance.
+	}
+	
+	private void loadGTFSdata(String foldername) throws IOException{
+		this.gtfs = new GTFSSystem();
+		this.gtfs.loadGTFSfiles(foldername);
+	}
+	
+	private void processStops(){
+		this.network = NetworkImpl.createNetwork();
+		NetworkFactoryImpl netFact = this.network.getFactory();
+		TransitScheduleFactory schedFact = new TransitScheduleFactoryImpl();
+		this.schedule = schedFact.createTransitSchedule();
+		
+		for (Entry<Id, Stop> e : this.gtfs.getStops().entrySet()){
+			Id stopId = e.getKey();
+			Stop stop = e.getValue();
+			
+			//Create node
+			Coord coord = this.converter.transform(stop.getPoint());
+			Node n = netFact.createNode(stopId, coord);
+			this.network.addNode(n);
+			
+			//Create loop link at node
+			LinkImpl loopLink = (LinkImpl) netFact.createLink(new IdImpl(stopId +"_LOOP"), n, n, network, 0.0, 9999, 9999, 1.0);
+			loopLink.setType("LOOP");
+			
+			//Create TransitStop, link it to the loop link
+			TransitStopFacility tStop = schedFact.createTransitStopFacility(stopId, coord, true);
+			tStop.setLinkId(loopLink.getId());
+			tStop.setName(stop.getName());
+			this.schedule.addStopFacility(tStop);
+		}
+	}
+	
+	private void processRoutes(Set<Service> services, boolean copyLinks){
+		NetworkFactoryImpl netFact = this.network.getFactory();
+		TransitScheduleFactory schedFact = this.schedule.getFactory();
+		
+		//Each GTFS route becomes one MATSim line
+		for (Entry<Id, Route> e : this.gtfs.getRoutes().entrySet()){
+			Id routeId = e.getKey();
+			Route route = e.getValue();
+			
+			RouteTypes mode = route.getRouteType();
+			
+			TransitLine line = schedFact.createTransitLine(routeId);
+			
+			//Each GTFS trip becomes one MATSim route
+			for (Entry<String, Trip> tpEntry : route.getTrips().entrySet()){
+				Trip trip = tpEntry.getValue();
+				if (services.contains(trip.getService())){ //filter by specified service period
+					
+					ArrayList<TransitRouteStop> routeStops = new ArrayList<TransitRouteStop>();
+					ArrayList<Id> itinerary = new ArrayList<Id>();
+					
+					//Prepare first stop in trip
+					StopTime previousST = trip.getStopTimes().get(1);
+					double departure = (int)(previousST.getDepartureTime().getTime() / 1000);
+					TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(previousST.getStopId()));
+					itinerary.add(stop.getLinkId());
+					Node fromNode = this.network.getNodes().get(stop.getId());
+					
+					TransitRouteStop routeStop = schedFact.createTransitRouteStop(stop, 0, 0);
+					long firstDepartureTime = previousST.getDepartureTime().getTime();
+					routeStops.add(routeStop);
+										
+					for (int i = 2, q = 0; i <= trip.getStopTimes().size(); i++){
+						StopTime st = trip.getStopTimes().get(i + q);
+						while (st == null){
+							//GTFS specifies that stop indices are in increasing order, but not necessarily with a step size of 1.
+							q++;
+							st = trip.getStopTimes().get(i + q);
+						}						
+						stop = this.schedule.getFacilities().get(new IdImpl(st.getStopId()));
+						itinerary.add(stop.getLinkId());
+						Node toNode = this.network.getNodes().get(stop.getId());
+						
+						//Create TransitRouteStop
+						double departureOffset = (int)((st.getDepartureTime().getTime() - firstDepartureTime) / 1000);
+						double arrivalOffset = (int)((st.getArrivalTime().getTime() - firstDepartureTime) / 1000);
+						routeStop = schedFact.createTransitRouteStop(stop, arrivalOffset, departureOffset);
+						
+						//Get the stop-to-stop speed
+						double stopToStopTime = (int) ((st.getArrivalTime().getTime() - previousST.getDepartureTime().getTime()) / 1000); // in seconds
+						double dist = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()); //should be in meters
+						double freespeed = dist / stopToStopTime;
+						
+						//Check for existing links - there is no need to have duplicate links for the same stop-to-stop path for the same mode.
+						//TODO: Implement the copyLinks ability (if true, kepp duplicate links for each stop-stop pair.
+						Id linkId = new IdImpl(fromNode.getId().toString() + ">" + toNode.getId().toString() + "_" + mode.toString());
+						Link l = this.network.getLinks().get(linkId);
+						
+						if (l == null){
+							//Need a new link
+							l = netFact.createLink(linkId, fromNode, toNode, network, dist, freespeed, 9999, 1.0);
+							l.setAllowedModes(Collections.singleton(mode.toString()));
+							this.network.addLink(l);
+						}else{
+							//Update the speed on the old link if necessary.
+							if (freespeed > l.getFreespeed())
+								l.setFreespeed(freespeed);
+						}
+						itinerary.add(l.getId());
+						
+						//Set previous stop and node to current stop and node for next iteration
+						previousST = st;
+						fromNode = toNode;
+					}
+					
+					int lastIndex = itinerary.size() - 1;
+					NetworkRoute netRoute = new LinkNetworkRouteImpl(itinerary.get(0), itinerary.get(lastIndex));
+					if (itinerary.size() > 2)
+						netRoute.setLinkIds(itinerary.get(0), itinerary.subList(1, lastIndex - 1), itinerary.get(lastIndex));
+						
+					TransitRoute tRoute = schedFact.createTransitRoute(new IdImpl(tpEntry.getKey()), netRoute,routeStops,mode.toString());
+					tRoute.setDescription(trip.getName());
+					
+					//Check for departures
+					TreeMap<Id, Frequency> frequencies = gtfs.getFrequencies();
+					if (frequencies != null){
+						//TODO: Create a series of departures from frequency information.
+					}else{
+						tRoute.addDeparture(schedFact.createDeparture(new IdImpl(0), departure));
+					}
+					
+					line.addRoute(tRoute);
+				}
+			}
+			
+			//Add line to schedule
+			this.schedule.addTransitLine(line);
+		}
+	}
+
+	//PUBLIC METHODS---------------------------------------------------------------------------------------------------------------------------
+	
+	/**
+	 * Runs the conversion process.
+	 * 
+	 * @param folderName The folder of the GTFS files
+	 * @param serviceId A string of the desired service id
+	 * @param copyLinks True if you want each transit route to create its own network links, false if you don't want duplicates of links
+	 */
+	public void run(String folderName, String serviceId, boolean copyLinks) throws IOException{
+		
+		loadGTFSdata(folderName);
+		
+		processStops();
+		
+		processRoutes(Collections.singleton(this.gtfs.getService(serviceId)), copyLinks);
+	}
+	
+	public Network getNetwork(){
+		return this.network;
+	}
+	
+	public TransitSchedule getSchedule(){
+		return this.schedule;
+	}
+	
+	
+	//MAIN METHOD---------------------------------------------------------------------------------------------------------------------------
+	public static void main(String[] args) throws IOException {
+		String folder = args[0];
+		String projection = args[1];
+		String service = args[2];
+		boolean copyLinks = Boolean.parseBoolean(args[3]);
+		String networkFile = args[4];
+		String scheduleFile = args[5];
+		
+		GeotoolsTransformation converter = new GeotoolsTransformation(TransformationFactory.WGS84, projection);
+		
+		CreateTransitNetworkAndScheduleFromGTFS bob = new CreateTransitNetworkAndScheduleFromGTFS(converter);
+		bob.run(folder, service, copyLinks);
+		
+		new NetworkWriter(bob.getNetwork()).write(networkFile);
+		new TransitScheduleWriter(bob.getSchedule()).writeFile(scheduleFile);
+	}
+	
+}
