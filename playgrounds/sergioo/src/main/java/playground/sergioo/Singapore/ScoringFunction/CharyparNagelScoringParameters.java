@@ -65,7 +65,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final boolean scoreActs;
 
 	public CharyparNagelScoringParameters(final PlanCalcScoreConfigGroup config) {
-		marginalUtilityOfWaiting_s = config.getWaiting_utils_hr() / 3600.0;
+		marginalUtilityOfWaiting_s = config.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
 		marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
 		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
 		marginalUtilityOfTraveling_s = config.getTraveling_utils_hr() / 3600.0;

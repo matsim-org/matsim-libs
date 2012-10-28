@@ -98,7 +98,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		scoring.setMonetaryDistanceCostRateCar(0.0) ;
 		scoring.setMarginalUtilityOfMoney(1.) ;
 
-		scoring.setWaiting_utils_hr(0.0);
+		scoring.setMarginalUtlOfWaiting_utils_hr(0.0);
 
 		config.planomat().setDoLogging(false);
 

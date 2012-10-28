@@ -99,7 +99,7 @@ class RandomizedTransitRouterNetworkTravelTimeAndDisutility extends TransitRoute
 			double walktime = transfertime - waittime;
 			
 			disutl = -walktime * localConfig.getMarginalUtilityOfTravelTimeWalk_utl_s()
-			       -waittime * localConfig.getMarginalUtiltityOfWaiting_utl_s()
+			       -waittime * localConfig.getMarginalUtiltityOfWaitingPt_utl_s()
 			       - localConfig.getUtilityOfLineSwitch_utl();
 			
 		} else {

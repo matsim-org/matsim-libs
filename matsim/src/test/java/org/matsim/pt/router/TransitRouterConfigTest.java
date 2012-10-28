@@ -41,7 +41,11 @@ public class TransitRouterConfigTest {
 		
 		planScoring.setTravelingPt_utils_hr(-9.0);
 		planScoring.setTravelingWalk_utils_hr(-11.0);
-		planScoring.setWaiting_utils_hr(-13.0);
+
+//		planScoring.setMarginalUtlOfWaiting_utils_hr(-13.0);
+		planScoring.setMarginalUtlOfWaitingPt_utils_hr(-13.0);
+		// naturally, this failed after the functionality was moved to a separate planCalcScore parameter.  kai, oct'12
+
 		planScoring.setPerforming_utils_hr(+6.0);
 		
 		planScoring.setUtilityOfLineSwitch(-2.34);
@@ -66,7 +70,7 @@ public class TransitRouterConfigTest {
 		// test needs to be adapted; this seems the better place. kai/benjamin, oct'12
 		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
 		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaiting_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaitingPt_utl_s(), 1e-8);
 
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
@@ -84,7 +88,7 @@ public class TransitRouterConfigTest {
 		
 		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
 		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaiting_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaitingPt_utl_s(), 1e-8);
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		

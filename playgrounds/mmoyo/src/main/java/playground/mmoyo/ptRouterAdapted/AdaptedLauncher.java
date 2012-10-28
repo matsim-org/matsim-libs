@@ -85,7 +85,7 @@ public class AdaptedLauncher {
 		myTransitRouterConfig.setMarginalUtilityOfTravelTimePt_utl_s( -this.betaTime / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelTimeWalk_utl_s(-this.betaWalk     / 3600.0);
 		myTransitRouterConfig.setMarginalUtilityOfTravelDistancePt_utl_m(-this.betaDistance / 1000.0);
-		myTransitRouterConfig.setMarginalUtiltityOfWaiting_utl_s(-this.betaWait / 3600.0);
+		myTransitRouterConfig.setMarginalUtiltityOfWaitingPt_utl_s(-this.betaWait / 3600.0);
 		
 		//		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * -myTransitRouterConfig.getEffectiveMarginalUtilityOfTravelTimePt_utl_s());
 		myTransitRouterConfig.setUtilityOfLineSwitch_utl(this.betaTransfer * myTransitRouterConfig.getMarginalUtilityOfTravelTimePt_utl_s());

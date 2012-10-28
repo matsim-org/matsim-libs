@@ -114,7 +114,7 @@ public class InternalControler {
 
 		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
 		planCalcScoreConfigGroup.setEarlyDeparture_utils_hr(EARLY_DEPARTURE);
-		planCalcScoreConfigGroup.setWaiting_utils_hr(WAITING);
+		planCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(WAITING);
 		
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
 		controler.setScoringFunctionFactory(scoringfactory);

@@ -142,7 +142,7 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 		if (initialized) return;
 
 		utilParams.clear();
-		marginalUtilityOfWaiting = configGroup.getWaiting_utils_hr() / 3600.0;
+		marginalUtilityOfWaiting = configGroup.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
 		marginalUtilityOfLateArrival = configGroup.getLateArrival_utils_hr() / 3600.0;
 		marginalUtilityOfEarlyDeparture = configGroup.getEarlyDeparture_utils_hr() / 3600.0;
 		marginalUtilityOfTraveling = configGroup.getTraveling_utils_hr() / 3600.0;

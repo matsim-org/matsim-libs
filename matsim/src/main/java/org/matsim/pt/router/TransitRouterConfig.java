@@ -86,7 +86,7 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private double marginalUtilityOfTravelTimeTransit_utl_s;
 
-	private double marginalUtiltityOfWaiting_utl_s;
+	private double marginalUtiltityOfWaitingPt_utl_s;
 
 	private double marginalUtilityOfTravelDistanceTransit_utl_m;
 
@@ -120,9 +120,9 @@ public class TransitRouterConfig implements MatsimParameters {
 
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceCostRatePt();
 
-		this.marginalUtiltityOfWaiting_utl_s = pcsConfig.getWaiting_utils_hr() / 3600.0;
+		this.marginalUtiltityOfWaitingPt_utl_s = pcsConfig.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0;
 		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
-			this.marginalUtiltityOfWaiting_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ;
+			this.marginalUtiltityOfWaitingPt_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ;
 		}
 
 		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
@@ -170,12 +170,12 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = marginalUtilityOfTravelDistanceTransit_utl_m;
 	}
 
-	public double getMarginalUtiltityOfWaiting_utl_s() {
-		return this.marginalUtiltityOfWaiting_utl_s;
+	public double getMarginalUtiltityOfWaitingPt_utl_s() {
+		return this.marginalUtiltityOfWaitingPt_utl_s;
 	}
 
-	public void setMarginalUtiltityOfWaiting_utl_s(final double effectiveMarginalUtiltityOfWaiting_utl_s) {
-		this.marginalUtiltityOfWaiting_utl_s = effectiveMarginalUtiltityOfWaiting_utl_s;
+	public void setMarginalUtiltityOfWaitingPt_utl_s(final double effectiveMarginalUtiltityOfWaiting_utl_s) {
+		this.marginalUtiltityOfWaitingPt_utl_s = effectiveMarginalUtiltityOfWaiting_utl_s;
 	}
 
 	/**

@@ -22,14 +22,11 @@ package playground.mmoyo.ptRouterAdapted;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.DepartureTimeCache;
-import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.vehicles.Vehicle;
 
 /**
  *  This version of TransitRouterNetworkTravelTimeCost reads values from a MyTransitRouterConfig object
@@ -40,50 +37,43 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	
 	private final DepartureTimeCache data = new DepartureTimeCache();
 
-	private MyTransitRouterConfig myConfig;	
+//	private MyTransitRouterConfig config;	
 	public AdaptedTransitRouterNetworkTravelTimeCost(MyTransitRouterConfig config ) {
 		super( config ) ;
 		log.error("a problem at this point is that the walk speed comes from the config" );
-		myConfig= (MyTransitRouterConfig) this.config; 
+		config= (MyTransitRouterConfig) this.config; 
 	}
 
+//	@Override
+//	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
+//		double cost;
+//		if (((TransitRouterNetworkLink) link).getRoute() == null) {
+//			// "route" here means "pt route".  If no pt route is attached, it means that it is a transfer link.
+//
+//			cost = defaultTransferCost(link, time, person, vehicle);
+//			
+//		} else {
+//
+//			double offVehWaitTime = offVehicleWaitTime(link, time);
+//			
+//			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;
+//			
+//			cost = - inVehTime                   * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+//					-offVehWaitTime				 * this.config.getMarginalUtiltityOfWaitingPt_utl_s()
+//					-link.getLength() 			 * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+//		}
+//		return cost;
+//	}
+
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
-		double cost;
-		if (((TransitRouterNetworkLink) link).getRoute() == null) {
-			// "route" here means "pt route".  If no pt route is attached, it means that it is a transfer link.
-
-			double transfertime = getLinkTravelTime(link, time, person, vehicle);
-			
-			// one can configure an "additionalTransferTime" which leaves a bit more time between transfers.  That time
-			// is probably spent waiting, so we will weigh it with the waiting disutility.
-			double waittime = this.myConfig.additionalTransferTime;
-			double walktime = transfertime - waittime; // say that the effective walk time is the transfer time minus some "buffer"
-			
-			cost = 	-walktime * this.myConfig.getMarginalUtilityOfTravelTimeWalk_utl_s()
-		       		-waittime * this.myConfig.getMarginalUtiltityOfWaiting_utl_s()
-		       		- this.myConfig.getUtilityOfLineSwitch_utl();
-			
-		} else {
-			//pt link
-			//original
-			//cost = -getLinkTravelTime(link, time) * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
-			//- link.getLength() * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
-
-			//calculate off vehicle waiting time as new router parameter
-			double offVehWaitTime=0;
-			double nextVehArrivalTime = getVehArrivalTime(link, time);
-			if (time < nextVehArrivalTime){ // it means the agent waits outside the veh				
-				offVehWaitTime = nextVehArrivalTime-time;
-			}
-			
-			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;
-			
-			cost = - inVehTime                   * this.myConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
-					-offVehWaitTime				 * this.myConfig.getMarginalUtiltityOfWaiting_utl_s()
-					-link.getLength() 			 * this.myConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+	protected double offVehicleWaitTime(final Link link, final double time) {
+		//calculate off vehicle waiting time as new router parameter
+		double offVehWaitTime=0;
+		double nextVehArrivalTime = getVehArrivalTime(link, time);
+		if (time < nextVehArrivalTime){ // it means the agent waits outside the veh				
+			offVehWaitTime = nextVehArrivalTime-time;
 		}
-		return cost;
+		return offVehWaitTime;
 	}
 
 	
@@ -93,7 +83,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCost extends TransitRouterNetw
 	double previousWaitTime;
 	double cachedVehArrivalTime;
 	
-	double getVehArrivalTime(final Link link, final double now){
+	/* package (for a test) */ double getVehArrivalTime(final Link link, final double now){
 		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
 			return this.cachedVehArrivalTime;
 		}

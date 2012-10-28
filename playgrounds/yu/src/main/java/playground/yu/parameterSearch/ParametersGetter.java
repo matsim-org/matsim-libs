@@ -48,7 +48,7 @@ public class ParametersGetter {
 					Math.min(scoring.getLateArrival_utils_hr(),
 							scoring.getEarlyDeparture_utils_hr()),
 					Math.min(scoring.getTraveling_utils_hr(),
-							scoring.getWaiting_utils_hr()));
+							scoring.getMarginalUtlOfWaiting_utils_hr()));
 		} else if (value == null) {
 			value = cfg.findParam(CalibrationConfig.BSE_CONFIG_MODULE_NAME,
 					name);

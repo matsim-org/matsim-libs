@@ -54,30 +54,59 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
 		double cost;
-		if (((TransitRouterNetworkLink) link).route == null) {
-			// it's a transfer link (walk)
+		if (((TransitRouterNetworkLink) link).getRoute() == null) {
+			// "route" here means "pt route".  If no pt route is attached, it means that it is a transfer link.
 
-			//			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
-			// (old specification)
-			
-			double transfertime = getLinkTravelTime(link, time, person, vehicle);
-			double waittime = this.config.additionalTransferTime;
-			
-			// say that the effective walk time is the transfer time minus some "buffer"
-			double walktime = transfertime - waittime;
-			
-			// weigh the "buffer" not with the walk time disutility, but with the wait time disutility:
-			// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
-			// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
-			// be the same as the marginal opprotunity cost of time).  kai, nov'11
-			cost = -walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
-			       -waittime * this.config.getMarginalUtiltityOfWaiting_utl_s()
-			       - this.config.getUtilityOfLineSwitch_utl();
+			cost = defaultTransferCost(link, time, person, vehicle);
 			
 		} else {
-			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-			       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+//			final double inVehTime = getLinkTravelTime(link, time, person, vehicle);
+//			cost = - inVehTime * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+//			       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+
+			double offVehWaitTime = offVehicleWaitTime(link, time);
+			
+			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;
+			
+			cost = - inVehTime                   * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+					-offVehWaitTime				 * this.config.getMarginalUtiltityOfWaitingPt_utl_s()
+					-link.getLength() 			 * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+
 		}
+		return cost;
+	}
+	
+	/**
+	 * method to allow inclusion of offVehicleWaitTime without code replication.  kai, oct'12
+	 * 
+	 * @param link
+	 * @param time
+	 * @return
+	 */
+	protected double offVehicleWaitTime(final Link link, final double time) {
+		return 0. ;
+	}
+
+	/**
+	 * convenience method for derived classes in order to bring Manuel's version closer to this one here.
+	 * kai, oct'12
+	 */
+	protected final double defaultTransferCost(final Link link, final double time,
+			final Person person, final Vehicle vehicle) {
+		double cost;
+		double transfertime = getLinkTravelTime(link, time, person, vehicle);
+		double waittime = this.config.additionalTransferTime;
+		
+		// say that the effective walk time is the transfer time minus some "buffer"
+		double walktime = transfertime - waittime;
+		
+		// weigh the "buffer" not with the walk time disutility, but with the wait time disutility:
+		// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
+		// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
+		// be the same as the marginal opprotunity cost of time).  kai, nov'11
+		cost = -walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
+		       -waittime * this.config.getMarginalUtiltityOfWaitingPt_utl_s()
+		       - this.config.getUtilityOfLineSwitch_utl();
 		return cost;
 	}
 	

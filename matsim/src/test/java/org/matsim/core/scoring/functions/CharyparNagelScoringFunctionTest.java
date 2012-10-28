@@ -328,7 +328,7 @@ public class CharyparNagelScoringFunctionTest {
 	public void testWaitingTime() {
 		Fixture f = new Fixture();
 		double waiting = -10.0;
-		f.config.planCalcScore().setWaiting_utils_hr(waiting);
+		f.config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(waiting);
 
 		ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
 		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
@@ -539,7 +539,7 @@ public class CharyparNagelScoringFunctionTest {
 		scoring.setMonetaryDistanceCostRateCar(0.0) ;
 		scoring.setMarginalUtilityOfMoney(1.);
 
-		scoring.setWaiting_utils_hr(0.0);
+		scoring.setMarginalUtlOfWaiting_utils_hr(0.0);
 
 		// setup activity types h and w for scoring
 		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("home");
@@ -631,7 +631,7 @@ public class CharyparNagelScoringFunctionTest {
 
 			scoring.setEarlyDeparture_utils_hr(0.0);
 			scoring.setLateArrival_utils_hr(0.0);
-			scoring.setWaiting_utils_hr(0.0);
+			scoring.setMarginalUtlOfWaiting_utils_hr(0.0);
 			scoring.setPerforming_utils_hr(0.0);
 			scoring.setTraveling_utils_hr(0.0);
 			scoring.setTravelingPt_utils_hr(0.0);

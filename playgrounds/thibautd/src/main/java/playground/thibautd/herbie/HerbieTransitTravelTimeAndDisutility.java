@@ -90,7 +90,7 @@ public class HerbieTransitTravelTimeAndDisutility implements TravelTime, Transit
 						config,
 						link.getLength(),
 						CONSIDER_NEGATIVE_WALK_TIMES || (walktime > 0) ? walktime : 0 )
-			    -waittime * config.getMarginalUtiltityOfWaiting_utl_s()
+			    -waittime * config.getMarginalUtiltityOfWaitingPt_utl_s()
 			    - config.getUtilityOfLineSwitch_utl();
 
 			if (!CONSIDER_NEGATIVE_WALK_TIMES && cost < 0) {

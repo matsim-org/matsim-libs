@@ -60,6 +60,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String TRAVELING_WALK = "travelingWalk";
 	private static final String TRAVELING_OTHER = "travelingOther";
 	private static final String WAITING  = "waiting";
+	private static final String WAITING_PT  = "waitingPt";
 	
 	private static final String CONSTANT_CAR = "constantCar" ;
 	private static final String CONSTANT_BIKE = "constantBike" ;
@@ -116,6 +117,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private double marginalUtlOfDistanceWalk = 0.0;
 
 	private double waiting = -0.0;
+	private double waitingPt = -0.0 ; // yyyy because of backwards compability reasons. 
+	// would make a lot more sense to set this to travelingPt.  kai, oct'12
 
 	private double marginalUtilityOfMoney = 1.0 ;
 	private double monetaryDistanceCostRateCar = 0.0 ;
@@ -204,7 +207,9 @@ public class PlanCalcScoreConfigGroup extends Module {
 		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
 			setMonetaryDistanceCostRatePt( Double.parseDouble(value) ) ;
 		} else if (WAITING.equals(key)) {
-			setWaiting_utils_hr(Double.parseDouble(value));
+			setMarginalUtlOfWaiting_utils_hr(Double.parseDouble(value));
+		} else if (WAITING_PT.equals(key)) {
+			setMarginalUtlOfWaitingPt_utils_hr(Double.parseDouble(value));
 		} else if (UTL_OF_LINE_SWITCH.equals(key)) {
 			setUtilityOfLineSwitch(Double.parseDouble(value)) ;
 		} else if ( CONSTANT_CAR.equals(key)) {
@@ -265,7 +270,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(TRAVELING_WALK, Double.toString(this.getTravelingWalk_utils_hr()));
 		map.put(TRAVELING_OTHER, Double.toString(this.getTravelingOther_utils_hr()));
 		map.put(TRAVELING_BIKE, Double.toString(this.getTravelingBike_utils_hr()));
-		map.put(WAITING, Double.toString(this.getWaiting_utils_hr()));
+		map.put(WAITING, Double.toString(this.getMarginalUtlOfWaiting_utils_hr()));
+		map.put(WAITING_PT, Double.toString(this.getMarginalUtlOfWaitingPt_utils_hr()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_WALK, Double.toString(this.getMarginalUtlOfDistanceWalk()));
 		map.put(MARGINAL_UTL_OF_DISTANCE_OTHER, Double.toString(this.getMarginalUtlOfDistanceOther()));
 		map.put(MARGINAL_UTL_OF_MONEY, Double.toString( this.getMarginalUtilityOfMoney() ) ) ;
@@ -309,7 +315,9 @@ public class PlanCalcScoreConfigGroup extends Module {
 		map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Probably " +
 				"implemented correctly, but not tested." );
 		map.put(WAITING, "[utils/hr] utility offset for waiting.  this comes on top of the opportunity cost of time.  Probably " +
-				"implemented correctly, but not tested.") ;
+		"implemented correctly, but not tested.") ;
+		map.put(WAITING_PT, "[utils/hr] utility offset for waiting for a pt vehicle.  this comes on top of the opportunity cost " +
+				"of time." ) ;
 		map.put(BRAIN_EXP_BETA, "logit model scale parameter. default: 2.  Has name and default value for historical reasons " +
 				"(see Bryan Raney's phd thesis).  Should be in strategyConfigGroup.") ;
 		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
@@ -380,6 +388,11 @@ public class PlanCalcScoreConfigGroup extends Module {
 					+"number of hours without having an effect on the score of the plans, and thus\n"
 					+"resulting in wrong results / traffic patterns.\n"
 					+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n\n");
+		}
+		if ( this.getMarginalUtlOfWaiting_utils_hr() != 0.0 ) {
+			log.warn( "marginal utl of wait set to: " + this.getMarginalUtlOfWaiting_utils_hr() + ". Setting this different from zero is " +
+					"discouraged. The parameter was also abused for pt routing; if you did that, consider setting the new " +
+					"parameter waitingPt instead.");
 		}
 	}
 
@@ -495,13 +508,20 @@ public class PlanCalcScoreConfigGroup extends Module {
 		}
 	}
 
-	public double getWaiting_utils_hr() {
+	public double getMarginalUtlOfWaiting_utils_hr() {
 		return this.waiting;
 	}
+	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
+		this.waitingPt = val ;
+	}
 	
+	public double getMarginalUtlOfWaitingPt_utils_hr() {
+		return this.waitingPt ;
+	}
+
 	private static int setWaitingCnt=0 ;
 	
-	public void setWaiting_utils_hr(final double waiting) {
+	public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
 		if ( (this.earlyDeparture != 0.) && (setWaitingCnt<1) ) {
 			setWaitingCnt++ ;
 			log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
