@@ -1,3 +1,5 @@
+package org.matsim.contrib.cadyts.pt;
+
 /**
  * Integrates automatic calibration upon public transport line occupancies using Cadyts into MATSim.
  *
@@ -10,7 +12,7 @@
  *   &lt;!-- The first hour of the day to be used for calibration (start counting hours with 1, not 0) --&gt;
  *   &lt;param name="startHour" value="5" /&gt;
  *
- *   %lt;!-- The last hour of the day to be used for calibration (start counting hours with 1, not 0) --&gt;
+ *   &lt;!-- The last hour of the day to be used for calibration (start counting hours with 1, not 0) --&gt;
  *   &lt;param name="endHour" value="20" /&gt;
  *
  *   &lt;!-- Comma-separated list of transit lines to be calibrated. -&gt;
@@ -38,5 +40,6 @@
  * </ul>
  *
  */
-package org.matsim.contrib.cadyts.pt;
-
+class PackageInfo {
+	// class just here to use javadoc formatter in eclipse.  May destroy automatic javadoc extraction, need to check.
+}
