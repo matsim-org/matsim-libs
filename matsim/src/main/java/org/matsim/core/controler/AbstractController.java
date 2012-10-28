@@ -85,6 +85,7 @@ public abstract class AbstractController {
 	protected final void run(Config config) {
 		loadCoreListeners();
 		this.controlerListenerManager.fireControlerStartupEvent();
+		this.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
 		// make sure all routes are calculated.
 		prepareForSim();
 		doIterations(config.controler().getFirstIteration(), config.controler().getLastIteration(), config.global().getRandomSeed());
