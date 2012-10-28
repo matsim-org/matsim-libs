@@ -122,8 +122,8 @@ public class DreieckStreckeSzenario {
 			return delegate.getState();
 		}
 
-		public final void notifyTeleportToLink(Id linkId) {
-			delegate.notifyTeleportToLink(linkId);
+		public final void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 		}
 
 		@Override
