@@ -6,8 +6,8 @@ package org.matsim.contrib.cadyts.pt;
  * <h2>Entry point / How to use</h2>
  * <ul>
  * <li>Use <code>org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy</code> as a replanning strategy.</li>
- * <li>Add the following configuration parameters (very approximately; this has changed since inception; 
- * check auto-generated config comments):
+ * <li>Add the following configuration parameters (approximately; <i>this has changed since inception;</i> 
+ * check auto-generated config comments; use <i>second</i> config dump for that):
  *     <pre>
  * &lt;module name="cadytsPt"&gt;
  *   &lt;!-- The first hour of the day to be used for calibration (start counting hours with 1, not 0) --&gt;
