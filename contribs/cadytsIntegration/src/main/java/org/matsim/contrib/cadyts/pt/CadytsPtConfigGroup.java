@@ -107,8 +107,8 @@ public class CadytsPtConfigGroup extends Module {
 		Map<String, String> comments = super.getComments();
 
 		comments.put(CALIBRATED_LINES, "Comma-separated list of transit lines to be calibrated.");
-		comments.put(START_TIME, "The first second of the day to be used for calibration (start counting hours with 1, not 0)");
-		comments.put(END_TIME, "The last second of the day to be used for calibration (start counting hours with 1, not 0)");
+		comments.put(START_TIME, "The first second of the day to be used for calibration.  hh:mm:ss format");
+		comments.put(END_TIME, "The last second of the day to be used for calibration.  hh:mm:ss format");
 		comments.put(TIME_BIN_SIZE, "Length of time bin for which counts are aggregated.  IN SECONDS!!!!  Default is 3600.") ;
 
 		return comments;
