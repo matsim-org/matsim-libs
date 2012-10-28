@@ -36,7 +36,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.PtBseLinkCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.pt.CadytsPtLinkCostOffsetsXMLFileIO;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.TransitRouteUtil;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.LinkCostOffsets2QGISWithArrowhead;
@@ -146,7 +146,7 @@ public class LinkCostOffsets2QGIS {
 		Network net =dLoader.readNetwork(netFilePath);
 		Counts counts = dLoader.readCounts(countsFilePath);
 		TransitSchedule schedule = dLoader.readTransitSchedule(transitScheduleFilePath);
-		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);
+		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 		TransitRoute trRoute = dLoader.getTransitRoute(strRouteId, schedule);
 		

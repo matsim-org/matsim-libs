@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.PtBseLinkCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.pt.CadytsPtLinkCostOffsetsXMLFileIO;
 import utilities.misc.DynamicData;
 
 public class LinkOffsetScaler {
@@ -21,7 +21,7 @@ public class LinkOffsetScaler {
 		DataLoader dLoader = new DataLoader();
 		TransitSchedule schedule = dLoader.readTransitSchedule(transitScheduleFilePath);
 
-		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);
+		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 
 		for (TransitStopFacility stopFacility : stopOffsets.keySet()){
@@ -35,9 +35,9 @@ public class LinkOffsetScaler {
 		File file = new File(linkCostOffsetFilePath);
 		String filename = file.getParent() + "/" + file.getName() + "scaled.xml";
 		try {
-			PtBseLinkCostOffsetsXMLFileIO ptBseLinkCostOffsetsXMLFileIO = new PtBseLinkCostOffsetsXMLFileIO( schedule );
-			ptBseLinkCostOffsetsXMLFileIO.write( filename , stopOffsets);
-			ptBseLinkCostOffsetsXMLFileIO = null;
+			CadytsPtLinkCostOffsetsXMLFileIO cadytsPtLinkCostOffsetsXMLFileIO = new CadytsPtLinkCostOffsetsXMLFileIO( schedule );
+			cadytsPtLinkCostOffsetsXMLFileIO.write( filename , stopOffsets);
+			cadytsPtLinkCostOffsetsXMLFileIO = null;
 		}catch(IOException e) {
 			e.printStackTrace();
 		}

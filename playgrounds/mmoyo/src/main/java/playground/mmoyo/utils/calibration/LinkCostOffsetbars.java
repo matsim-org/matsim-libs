@@ -33,9 +33,9 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.PtBseLinkCostOffsetsXMLFileIO;
 import playground.mmoyo.utils.DataLoader;
 import utilities.misc.DynamicData;
+import org.matsim.contrib.cadyts.pt.CadytsPtLinkCostOffsetsXMLFileIO;
 
 /**Produces offset bar plots */
 public class LinkCostOffsetbars {
@@ -174,7 +174,7 @@ public class LinkCostOffsetbars {
 		DataLoader dLoader = new DataLoader();
 		Counts counts = dLoader.readCounts(countsFilePath);
 		TransitSchedule schedule = dLoader.readTransitSchedule(transitScheduleFilePath);
-		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);
+		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 		TransitRoute trRoute = dLoader.getTransitRoute(strRouteId, schedule);
 

@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 
@@ -35,7 +36,7 @@ import org.matsim.core.controler.Controler;
  */
 public class Controler_launcher {
 	
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) {
 		String configFile; 
 		if (args.length==1){
 			configFile = args[0];
@@ -43,18 +44,11 @@ public class Controler_launcher {
 			configFile = "../shared-svn/studies/countries/de/berlin-bvg09/ptManuel/calibration/100plans_bestValues_config.xml";
 		}
 
-		if (!new File(configFile).exists()) {
-			throw new FileNotFoundException(configFile);
-		}
+		Config config = null;
+		config = ConfigUtils.loadConfig(configFile);
 
-		
-		Config config = new Config();
-		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(configFile);
-
-		Controler controler = new Controler( config ) ;
-		controler.setCreateGraphs(true);
-		controler.setWriteEventsInterval(5); 
+		final Controler controler = new Controler(config);
+		controler.setOverwriteFiles(true);
 		
 		controler.run();
 	} 
