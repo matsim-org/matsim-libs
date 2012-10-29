@@ -26,6 +26,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 
@@ -158,6 +159,14 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 		}
 	}	// run()
 
+	private final Callable<Object> moveNodesC = new Callable<Object>() {
+		@Override
+		public Object call() throws Exception {
+			moveNodes();
+			return null;
+		}
+	};
+
 	private void moveNodes() {
 		/*
 		 * Move Nodes
@@ -183,6 +192,18 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 		}
 	}
 
+	public Callable<Object> getMoveNodesCallable() {
+		return moveNodesC;
+	}
+
+	final Callable<Object> moveLinksC = new Callable<Object>() {
+		@Override
+		public Object call() throws Exception {
+			moveLinks();
+			return null;
+		}
+	};
+
 	private void moveLinks() {
 		/*
 		 * Move Links
@@ -199,6 +220,10 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 			if (!isActive && !simulateAllLinks)
 				simLinks.remove();
 		}
+	}
+
+	public Callable<Object> getMoveLinksCallable() {
+		return moveLinksC;
 	}
 
 	@Override
