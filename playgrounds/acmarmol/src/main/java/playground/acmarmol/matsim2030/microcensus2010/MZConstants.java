@@ -105,7 +105,7 @@ public class MZConstants{
 		//created during cross border handling
 		public static final String AIRPORT = "aiport";
 		public static final String BORDER = "border";
-		public static final String ABROAD_TELEPORT = "abroad: teleport";
+		public static final String ABROAD_TELEPORT = "abroad_teleport";
 		
 	//transport modes
 		public static final String PLANE = "plane";
