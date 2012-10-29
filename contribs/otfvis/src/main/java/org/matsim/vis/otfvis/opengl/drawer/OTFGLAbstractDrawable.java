@@ -20,7 +20,7 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 
 import org.matsim.vis.otfvis.data.OTFDrawable;
@@ -56,7 +56,7 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 
     @Override
 	public final void draw() {
-		onDraw(gl.getGL());
+		onDraw(gl.getGL().getGL2());
 	}
 	
 	/**
@@ -72,21 +72,21 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 	 * 
 	 */
 	public final void glInit() {
-		onInit(gl.getGL());
+		onInit(gl.getGL().getGL2());
 	}
 	
-	protected void onInit(GL gl) {
+	protected void onInit(GL2 gl) {
 		// To override.
 	}
 	
-	abstract protected void onDraw( GL gl ) ;
+	abstract protected void onDraw( GL2 gl ) ;
 
 	static void setGl(GLAutoDrawable gl) {
 		OTFGLAbstractDrawable.gl = gl;
 	}
 	
-	public final static GL getGl() {
-		return gl.getGL();
+	public final static GL2 getGl() {
+		return gl.getGL().getGL2();
 	}
 
 }

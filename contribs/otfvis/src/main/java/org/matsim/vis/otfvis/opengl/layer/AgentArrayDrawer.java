@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
@@ -40,8 +41,8 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
-import com.sun.opengl.util.BufferUtil;
-import com.sun.opengl.util.texture.Texture;
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.util.texture.Texture;
 
 /**
  * 
@@ -69,12 +70,12 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 	private static final Logger log = Logger.getLogger(AgentArrayDrawer.class);
 
 	@Override
-	protected void onInit(GL gl) {
-		texture = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("icon18.png"));
+	protected void onInit(GL2 gl) {
+		texture = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream("icon18.png"));
 	}
 
 	private static int infocnt = 0 ;
-	private void drawArray(GL gl) {
+	private void drawArray(GL2 gl) {
 
 		// testing if the point sprite is available.  Would be good to not do this in every time step ...
 		// ... move to some earlier place in the calling hierarchy.  kai, feb'11
@@ -104,15 +105,15 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 		}
 	}
 
-	private static void setAgentSize(GL gl) {
+	private static void setAgentSize(GL2 gl) {
 		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize() / 10.f;
 		gl.glPointSize(agentSize);
 	}
 
 	void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){
 		if (this.count % OGLAgentPointLayer.BUFFERSIZE == 0) {
-			this.vertexIN = BufferUtil.newFloatBuffer(OGLAgentPointLayer.BUFFERSIZE*2);
-			this.colorsIN = BufferUtil.newByteBuffer(OGLAgentPointLayer.BUFFERSIZE*4);
+			this.vertexIN = Buffers.newDirectFloatBuffer(OGLAgentPointLayer.BUFFERSIZE*2);
+			this.colorsIN = Buffers.newDirectByteBuffer(OGLAgentPointLayer.BUFFERSIZE*4);
 			this.colBuffers.add(this.colorsIN);
 			this.getPosBuffers().add(this.vertexIN);
 		}
@@ -137,13 +138,13 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 	}
 
 	@Override
-	public void onDraw(GL gl) {
-		gl.glEnable(GL.GL_POINT_SPRITE);
+	public void onDraw(GL2 gl) {
+		gl.glEnable(GL2.GL_POINT_SPRITE);
 
 		setAgentSize(gl);
 
-		gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-		gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+		gl.glEnableClientState (GL2.GL_COLOR_ARRAY);
+		gl.glEnableClientState (GL2.GL_VERTEX_ARRAY);
 
 		//texture = null;
 		// setting the texture to null means that agents are painted using (software-rendered?) squares.  I have made speed
@@ -151,23 +152,23 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 		// and a jpg.  But it looks weird w/o some reasonable icon.  kai, jan'11
 
 		if (texture != null) {
-			texture.enable();
-			gl.glEnable(GL.GL_TEXTURE_2D);
-			gl.glTexEnvf(GL.GL_POINT_SPRITE, GL.GL_COORD_REPLACE, GL.GL_TRUE);
-			texture.bind();
+			texture.enable(gl);
+			gl.glEnable(GL2.GL_TEXTURE_2D);
+			gl.glTexEnvf(GL2.GL_POINT_SPRITE, GL2.GL_COORD_REPLACE, GL2.GL_TRUE);
+			texture.bind(gl);
 		}
 
 		gl.glDepthMask(false);
 
 		this.drawArray(gl);
 
-		gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-		gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
+		gl.glDisableClientState (GL2.GL_COLOR_ARRAY);
+		gl.glDisableClientState (GL2.GL_VERTEX_ARRAY);
 		if (texture != null ) {
-			texture.disable();
+			texture.disable(gl);
 		}
 
-		gl.glDisable(GL.GL_POINT_SPRITE);
+		gl.glDisable(GL2.GL_POINT_SPRITE);
 	}
 
 	@Override

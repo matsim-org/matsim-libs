@@ -6,7 +6,7 @@ package org.matsim.vis.otfvis.opengl.layer;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -15,7 +15,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import com.sun.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.TextureCoords;
 
 /**
  * This sounds like "quad tree", but I think it is in the sense of "polygon with 4 corners".  kai, feb'11  
@@ -29,7 +29,7 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 	private SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 
 	@Override
-	public void onDraw( GL gl) {
+	public void onDraw( GL2 gl) {
 		linkWidthCalculator.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
 		linkWidthCalculator.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 		float width = (float) linkWidthCalculator.calculateLinkWidth(this.nrLanes);
@@ -41,7 +41,7 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 		this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
 		//Draw quad
 		TextureCoords co = new TextureCoords(0,0,1,1);
-		gl.glBegin(GL.GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
 		gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
 		gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);

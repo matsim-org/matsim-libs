@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -45,7 +46,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 /**
  * QueryAgentPTBus draws certain public transport related informations.
@@ -78,21 +79,21 @@ public class QueryAgentPTBus extends AbstractQuery {
 					this.vertex[i] -=east;
 					this.vertex[i+1] -= north;
 				}
-				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 
 			}
 
-			GL gl = OTFGLAbstractDrawable.getGl();
+			GL2 gl = OTFGLAbstractDrawable.getGl().getGL2();
 			gl.glEnable(GL.GL_BLEND);
 			gl.glColor4d(0.6, 0.0,0.2,.2);
 
 			gl.glEnable(GL.GL_LINE_SMOOTH);
-			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+			gl.glEnableClientState (GL2.GL_VERTEX_ARRAY);
 			gl.glLineWidth(1.f*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 			gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
-			gl.glDrawArrays (GL.GL_LINE_STRIP, 0, this.vertex.length/2);
-			gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-			gl.glDisable(GL.GL_LINE_SMOOTH);
+			gl.glDrawArrays (GL2.GL_LINE_STRIP, 0, this.vertex.length/2);
+			gl.glDisableClientState (GL2.GL_VERTEX_ARRAY);
+			gl.glDisable(GL2.GL_LINE_SMOOTH);
 
 			for(String id : allIds) {
 				Point2D.Double pos = layer.getAgentCoords(id.toCharArray());
@@ -185,12 +186,12 @@ public class QueryAgentPTBus extends AbstractQuery {
 	}
 
 
-	public static void drawCircle(GL gl, float x, float y, float size) {
+	public static void drawCircle(GL2 gl, float x, float y, float size) {
 		float w = 40;
 
 		gl.glLineWidth(2);
-		gl.glEnable(GL.GL_LINE_SMOOTH);
-		gl.glBegin(GL.GL_LINE_STRIP);
+		gl.glEnable(GL2.GL_LINE_SMOOTH);
+		gl.glBegin(GL2.GL_LINE_STRIP);
 		for (float f = 0; f < w;) {
 			gl.glVertex3d(Math.cos(f)*size + x, Math.sin(f)*size + y,0);
 			f += (2*Math.PI/w);

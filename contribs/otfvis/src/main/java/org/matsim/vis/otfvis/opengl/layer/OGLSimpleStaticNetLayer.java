@@ -24,7 +24,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneLayer;
@@ -69,7 +69,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 
 	@Override
 	public void draw() {
-		GL gl = OTFGLAbstractDrawable.getGl();
+		GL2 gl = OTFGLAbstractDrawable.getGl().getGL2();
 		checkNetList(gl);
 		Color netColor = OTFClientControl.getInstance().getOTFVisConfig().getNetworkColor();
 		float[] components = netColor.getColorComponents(new float[4]);
@@ -83,8 +83,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	
 	@Override
 	public void glInit() {
-//		netDisplList = -1;
-		GL gl = OTFGLAbstractDrawable.getGl();
+		GL2 gl = OTFGLAbstractDrawable.getGl().getGL2();
 		checkNetList(gl);
 	}
 
@@ -109,7 +108,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 		}
 	}
 
-	private void checkNetList(GL gl) {
+	private void checkNetList(GL2 gl) {
 		float currentLinkWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 		if (cachedLinkWidth != currentLinkWidth || items.size() > nItems) {
 			// If the line width has changed (reason for redrawing)
@@ -122,7 +121,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 		if (netDisplList < 0) {
 			cachedLinkWidth = currentLinkWidth;
 			netDisplList = gl.glGenLists(1);
-			gl.glNewList(netDisplList, GL.GL_COMPILE);
+			gl.glNewList(netDisplList, GL2.GL_COMPILE);
 			for (OTFDrawable item : items) {
 				item.draw();
 			}

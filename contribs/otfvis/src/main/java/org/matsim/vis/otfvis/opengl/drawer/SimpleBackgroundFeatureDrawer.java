@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
@@ -73,16 +74,16 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer impl
 		final int glType;
 		if (geo instanceof Polygon) {
 			ls = ((Polygon) geo).getExteriorRing();
-			glType = GL.GL_POLYGON;
+			glType = GL2.GL_POLYGON;
 		}else if (geo instanceof MultiPolygon) {
 			ls = ((Polygon)((MultiPolygon)geo).getGeometryN(0)).getExteriorRing();
-			glType = GL.GL_POLYGON;
+			glType = GL2.GL_POLYGON;
 		} else if (geo instanceof LineString) {
 				ls = (LineString) geo;
-				glType = GL.GL_LINE_STRIP;
+				glType = GL2.GL_LINE_STRIP;
 		} else if (geo instanceof MultiLineString) {
 			ls = (LineString)((MultiLineString) geo).getGeometryN(0);
-			glType = GL.GL_LINE_STRIP;
+			glType = GL2.GL_LINE_STRIP;
 		}else if (geo instanceof Point) {
 				final GeometryFactory geofac  = new GeometryFactory();
 				ls = geofac.createLineString(new Coordinate [] {geo.getCoordinate()});
@@ -104,7 +105,7 @@ public class SimpleBackgroundFeatureDrawer extends AbstractBackgroundDrawer impl
 
 
 	@Override
-	public void onDraw(final GL gl) {
+	public void onDraw(final GL2 gl) {
 		
 		for(OTFFeature feature : featureList) {
 			if (!feature.converted) {

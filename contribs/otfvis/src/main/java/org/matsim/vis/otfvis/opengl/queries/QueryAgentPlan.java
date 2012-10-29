@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -58,7 +59,7 @@ import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 /**
  * For a given agentID this QueryAgentPlan draws a visual representation of the
@@ -183,7 +184,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		protected void drawWithGLDrawer(OTFOGLDrawer drawer) {
-			GL gl = OTFGLAbstractDrawable.getGl();
+			GL2 gl = OTFGLAbstractDrawable.getGl();
 			if (hasPlan) {
 				calcOffsetIfNecessary(drawer);
 				rewindGLBuffers();
@@ -208,25 +209,25 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			return pos;
 		}
 
-		private void prepare(GL gl) {
+		private void prepare(GL2 gl) {
 			Color color = Color.ORANGE;
 			gl.glColor4d(color.getRed() / 255., color.getGreen() / 255., color
 					.getBlue() / 255., .5);
-			gl.glEnable(GL.GL_BLEND);
-			gl.glEnable(GL.GL_LINE_SMOOTH);
-			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
-			gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+			gl.glEnable(GL2.GL_BLEND);
+			gl.glEnable(GL2.GL_LINE_SMOOTH);
+			gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
+			gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
 			gl.glLineWidth(1.f * getLineWidth());
-			gl.glColorPointer(4, GL.GL_UNSIGNED_BYTE, 0, cols);
-			gl.glVertexPointer(2, GL.GL_FLOAT, 0, this.vert);
-			gl.glDrawArrays(GL.GL_LINE_STRIP, 0, this.vertex.length / 2);
-			gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
-			gl.glDisableClientState(GL.GL_COLOR_ARRAY);
-			gl.glDisable(GL.GL_LINE_SMOOTH);
+			gl.glColorPointer(4, GL2.GL_UNSIGNED_BYTE, 0, cols);
+			gl.glVertexPointer(2, GL2.GL_FLOAT, 0, this.vert);
+			gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, this.vertex.length / 2);
+			gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
+			gl.glDisable(GL2.GL_LINE_SMOOTH);
 		}
 
-		private void unPrepare(GL gl) {
-			gl.glDisable(GL.GL_BLEND);
+		private void unPrepare(GL2 gl) {
+			gl.glDisable(GL2.GL_BLEND);
 		}
 
 		private void rewindGLBuffers() {
@@ -239,7 +240,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					.getLinkWidth();
 		}
 
-		private void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL gl) {
+		private void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL2 gl) {
 			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);// Blue
 			gl.glLineWidth(2);
 			gl.glBegin(GL.GL_LINE_STRIP);
@@ -248,7 +249,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			gl.glEnd();
 		}
 
-		private void drawCircleAroundAgent(Point2D.Double pos, GL gl) {
+		private void drawCircleAroundAgent(Point2D.Double pos, GL2 gl) {
 			DrawingUtils.drawCircle(gl, (float) pos.x, (float) pos.y, 200.f);
 		}
 
@@ -260,14 +261,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private void calcOffsetIfNecessary(OTFOGLDrawer drawer) {
 			if (this.calcOffset == true) {
 				this.calcOffset = false;
-//				for (int i = 0; i < this.vertex.length; i += 2) {
-//					this.vertex[i] -= (float) drawer.getQuad().offsetEast;
-//					this.vertex[i + 1] -= (float) drawer.getQuad().offsetNorth;
-//				}
-				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer
-						.wrap(this.vertex));
-				this.cols = BufferUtil.copyByteBuffer(ByteBuffer
-						.wrap(this.colors));
+				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+				this.cols = Buffers.copyByteBuffer(ByteBuffer.wrap(this.colors));
 			}
 		}
 

@@ -20,16 +20,14 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import static javax.media.opengl.GL.GL_QUADS;
-
 import java.awt.geom.Rectangle2D;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
 
 /**
  * SimpleBackgroundDrawer can draw a picture behind the network at a given coord.
@@ -48,8 +46,8 @@ public class SimpleBackgroundDrawer extends AbstractBackgroundDrawer {
 	}
 
 	@Override
-	public void onDraw(final GL gl) {
-		if (this.picture == null) this.picture = OTFOGLDrawer.createTexture(this.name);
+	public void onDraw(final GL2 gl) {
+		if (this.picture == null) this.picture = OTFOGLDrawer.createTexture(gl, this.name);
 		if (this.picture == null) return;
         final TextureCoords tc = this.picture.getImageTexCoords();
         final float tx1 = tc.left();
@@ -59,21 +57,21 @@ public class SimpleBackgroundDrawer extends AbstractBackgroundDrawer {
 
 
         final float z = 0.0f;
-        this.picture.enable();
-        this.picture.bind();
+        this.picture.enable(gl);
+        this.picture.bind(gl);
 
         gl.glColor4f(1,1,1,1);
 
 		final Rectangle2D.Float koords = new Rectangle2D.Float((float)(this.abskoords.x - this.offsetEast), (float)(this.abskoords.y- this.offsetNorth), this.abskoords.width, this.abskoords.height);
 		
-        gl.glBegin(GL_QUADS);
+        gl.glBegin(GL2.GL_QUADS);
         gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(koords.x, koords.y, z);
         gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(koords.x, koords.y + koords.height, z);
         gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(koords.x + koords.width, koords.y + koords.height, z);
         gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(koords.x + koords.width, koords.y, z);
         gl.glEnd();
         
-        this.picture.disable();
+        this.picture.disable(gl);
 	}
 
 	@Override

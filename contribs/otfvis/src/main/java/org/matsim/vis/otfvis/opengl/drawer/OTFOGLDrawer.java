@@ -20,20 +20,6 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import static javax.media.opengl.GL.GL_BLEND;
-import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
-import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
-import static javax.media.opengl.GL.GL_LINEAR;
-import static javax.media.opengl.GL.GL_MODELVIEW;
-import static javax.media.opengl.GL.GL_MODELVIEW_MATRIX;
-import static javax.media.opengl.GL.GL_PROJECTION;
-import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
-import static javax.media.opengl.GL.GL_QUADS;
-import static javax.media.opengl.GL.GL_SRC_ALPHA;
-import static javax.media.opengl.GL.GL_TEXTURE_MAG_FILTER;
-import static javax.media.opengl.GL.GL_TEXTURE_MIN_FILTER;
-import static javax.media.opengl.GL.GL_VIEWPORT;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -60,12 +46,14 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
-import javax.media.opengl.GLJPanel;
+import javax.media.opengl.GLProfile;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -100,12 +88,12 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
-import com.sun.opengl.util.ImageUtil;
-import com.sun.opengl.util.Screenshot;
-import com.sun.opengl.util.j2d.TextRenderer;
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureCoords;
-import com.sun.opengl.util.texture.TextureIO;
+import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.awt.Screenshot;
+import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.texture.TextureIO;
 
 public class OTFOGLDrawer implements GLEventListener {
 
@@ -266,12 +254,12 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	}
 
-	static public Texture createTexture(final InputStream data) {
+	static public Texture createTexture(GL2 gl, final InputStream data) {
 		Texture t = null;
 		try {
 			t = TextureIO.newTexture(data, true, null);
-			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			t.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+			t.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 		} catch (IOException e) {
 			log.error("Error loading Texture from stream.", e);
 		}
@@ -283,7 +271,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		return t;
 	}
 
-	static public Texture createTexture(String filename) {
+	static public Texture createTexture(GL gl, String filename) {
 		Texture t = null;
 		if (filename.startsWith("./res/")){
 			filename = filename.substring(6);
@@ -291,8 +279,8 @@ public class OTFOGLDrawer implements GLEventListener {
 		try {
 			t = TextureIO.newTexture(MatsimResource.getAsInputStream(filename),
 					true, null);
-			t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			t.setTexParameteri(gl, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+			t.setTexParameteri(gl, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
 		} catch (IOException e) {
 			log.error("Error loading " + filename, e);
 		}
@@ -373,7 +361,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.clientQ = clientQ;
 		this.hostControlBar = hostControlBar;
 		this.otfVisConfig = otfVisConfig;
-		GLCapabilities caps = new GLCapabilities();
+		GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
 		this.canvas = createGLCanvas(this, caps);
 		this.mouseMan = new VisGUIMouseHandler();
 		this.canvas.addMouseListener(this.mouseMan);
@@ -417,14 +405,14 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		OTFGLAbstractDrawable.setGl(drawable);
 		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
 		gl.glClearColor(components[0], components[1], components[2], components[3]);
-		gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL);
+		gl.glClear( GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_FILL);
 		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 		this.setFrustrum(gl);
 		components = otfVisConfig.getNetworkColor().getColorComponents(components);
 		gl.glColor4d(components[0], components[1], components[2], components[3]);
@@ -445,10 +433,10 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 
 		if((this.currentRect != null) && (this.alpha >= 0.f)){
-			gl.glEnable(GL_BLEND);
-			gl.glBlendFunc(GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			gl.glEnable(GL2.GL_BLEND);
+			gl.glBlendFunc(GL2.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 			this.renderFace(gl, this.marker);
-			gl.glDisable(GL_BLEND);
+			gl.glDisable(GL2.GL_BLEND);
 		} else {
 			this.currentRect = null;
 			this.alpha = 1.0f;
@@ -483,11 +471,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		gl.glDisable(GL.GL_BLEND);
 	}
 
-	@Override
-	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
-		// Do nothing.
-	}
-
 	private void displayLinkIds(Map<Coord, String> linkIds, GLAutoDrawable glAutoDrawable) {
 		String testText = "0000000";
 		Rectangle2D test = textRenderer.getBounds(testText);
@@ -510,10 +493,10 @@ public class OTFOGLDrawer implements GLEventListener {
 				i++;
 			}
 			xymap.put(text, Boolean.TRUE);
-            GL gl = glAutoDrawable.getGL();
+            GL2 gl = glAutoDrawable.getGL().getGL2();
 			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
 			gl.glLineWidth(2);
-			gl.glBegin(GL.GL_LINE_STRIP);
+			gl.glBegin(GL2.GL_LINE_STRIP);
 			gl.glVertex3d(east, north, 0);
 			gl.glVertex3d((float) text.getX(), (float) text.getY(), 0);
 			gl.glEnd();
@@ -669,12 +652,12 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		OTFGLAbstractDrawable.setGl(drawable);
 		gl.setSwapInterval(0);
 		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
 		gl.glClearColor(components[0], components[1], components[2], components[3]);
-		gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		gl.glClear( GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
 		if (!glInited) {
 			float minEasting = (float)clientQ.getMinEasting();
@@ -686,7 +669,7 @@ public class OTFOGLDrawer implements GLEventListener {
 			this.viewBounds =  new QuadTree.Rect(minEasting, minNorthing, minEasting + (maxNorthing - minNorthing) * aspectRatio, maxNorthing);
 			setZoomToNearestInteger();
 		}
-		marker = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream("otfvis/marker.png"));
+		marker = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream("otfvis/marker.png"));
 		setFrustrum(gl);
 
 
@@ -749,25 +732,25 @@ public class OTFOGLDrawer implements GLEventListener {
 		++nRedrawn;
 	}
 
-	private void renderFace(GL gl, Texture t) {
+	private void renderFace(GL2 gl, Texture t) {
 		TextureCoords tc = t.getImageTexCoords();
 		float tx1 = tc.left();
 		float ty1 = tc.top();
 		float tx2 = tc.right();
 		float ty2 = tc.bottom();
-		t.enable();
-		t.bind();
+		t.enable(gl);
+		t.bind(gl);
 
 		if (button==4) gl.glColor4f(0.8f, 0.2f, 0.2f, alpha);
 		else gl.glColor4f(alpha, alpha, alpha, alpha);
 
-		gl.glBegin(GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex2f(currentRect.x, currentRect.y);
 		gl.glTexCoord2f(tx2, ty1); gl.glVertex2f(currentRect.x, currentRect.y + currentRect.height);
 		gl.glTexCoord2f(tx2, ty2); gl.glVertex2f(currentRect.x + currentRect.width, currentRect.y + currentRect.height);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex2f(currentRect.x + currentRect.width, currentRect.y);
 		gl.glEnd();
-		t.disable();
+		t.disable(gl);
 	}
 
 	@Override
@@ -794,17 +777,17 @@ public class OTFOGLDrawer implements GLEventListener {
 		redraw();
 	}
 
-	private void setFrustrum(GL gl) {
+	private void setFrustrum(GL2 gl) {
 		GLU glu = new GLU();
-		gl.glMatrixMode(GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glLoadIdentity();
 		glu.gluOrtho2D(viewBounds.minX, viewBounds.maxX, viewBounds.minY, viewBounds.maxY);
-		gl.glMatrixMode(GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		// update matrices for mouse position calculation
-		gl.glGetDoublev( GL_MODELVIEW_MATRIX, modelview,0);
-		gl.glGetDoublev( GL_PROJECTION_MATRIX, projection,0);
-		gl.glGetIntegerv( GL_VIEWPORT, viewport,0 );
+		gl.glGetDoublev( GL2.GL_MODELVIEW_MATRIX, modelview,0);
+		gl.glGetDoublev( GL2.GL_PROJECTION_MATRIX, projection,0);
+		gl.glGetIntegerv( GL2.GL_VIEWPORT, viewport,0 );
 	}
 
 	public void setQueryHandler(OTFQueryHandler queryHandler) {
@@ -894,6 +877,12 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.canvas.repaint();
 		BufferedImage image = ImageUtil.createThumbnail(this.current, 300);
 		otfVisConfig.addZoom(new ZoomEntry(image,zoomstore, name));
+	}
+
+	@Override
+	public void dispose(GLAutoDrawable arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

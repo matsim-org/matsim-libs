@@ -1,21 +1,17 @@
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import static javax.media.opengl.GL.GL_MODELVIEW_MATRIX;
-import static javax.media.opengl.GL.GL_PROJECTION_MATRIX;
-import static javax.media.opengl.GL.GL_QUADS;
-import static javax.media.opengl.GL.GL_VIEWPORT;
-
 import java.awt.Font;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
-import com.sun.opengl.util.j2d.TextRenderer;
-import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureCoords;
+import com.jogamp.opengl.util.awt.TextRenderer;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
 
 /**
  * OTFScaleBarDrawer draws a scale bar as an overlay.
@@ -46,10 +42,10 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 	}
 
 	@Override
-	public void onDraw(GL gl) {
+	public void onDraw(GL2 gl) {
 		if (this.back == null){
-			this.back = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream(this.bg));
-			this.sc = OTFOGLDrawer.createTexture(MatsimResource.getAsInputStream(this.sb));
+			this.back = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream(this.bg));
+			this.sc = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream(this.sb));
 		}
 		
 		updateMatrices(gl);
@@ -67,32 +63,32 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 		
 		gl.glEnable(GL.GL_BLEND);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		this.back.enable();
-		this.back.bind();
+		this.back.enable(gl);
+		this.back.bind(gl);
 		gl.glColor4f(1,1,1,1);
 
-		gl.glBegin(GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(fl[4], fl[5], z);
 		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(fl[4], fl[7], z);
 		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(fl[2]+width2 + width2/3.f, fl[7], z);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(fl[2]+width2 + width2/3.f, fl[5], z);
 		gl.glEnd();
-		this.back.disable();
+		this.back.disable(gl);
 
 		gl.glDisable(GL.GL_BLEND);
 
-		this.sc.enable();
-		this.sc.bind();
+		this.sc.enable(gl);
+		this.sc.bind(gl);
 		
 		gl.glColor4f(1,1,1,1);
 		
-		gl.glBegin(GL_QUADS);
+		gl.glBegin(GL2.GL_QUADS);
 		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(fl[0], fl[1], z);
 		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(fl[0], fl[3], z);
 		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(fl[2], fl[3], z);
 		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(fl[2], fl[1], z);
 		gl.glEnd();
-		this.sc.disable();
+		this.sc.disable(gl);
 		
 		this.textRenderer.begin3DRendering();
 		float c = 0.f;
@@ -182,11 +178,11 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 		
 	}
 
-	public void updateMatrices(GL gl) {
+	public void updateMatrices(GL2 gl) {
 		// update matrices for mouse position calculation
-		gl.glGetDoublev( GL_MODELVIEW_MATRIX, this.modelview,0);
-		gl.glGetDoublev( GL_PROJECTION_MATRIX, this.projection,0);
-		gl.glGetIntegerv( GL_VIEWPORT, this.viewport,0 );
+		gl.glGetDoublev( GL2.GL_MODELVIEW_MATRIX, this.modelview,0);
+		gl.glGetDoublev( GL2.GL_PROJECTION_MATRIX, this.projection,0);
+		gl.glGetIntegerv( GL2.GL_VIEWPORT, this.viewport,0 );
 	}
 
 	private float [] getOGLPos(int x, int y) {

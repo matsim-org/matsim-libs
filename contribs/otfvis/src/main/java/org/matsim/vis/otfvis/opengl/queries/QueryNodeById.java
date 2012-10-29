@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -107,7 +108,7 @@ public class QueryNodeById extends AbstractQuery implements OTFQuery {
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
-			GL gl = OTFGLAbstractDrawable.getGl();
+			GL2 gl = OTFGLAbstractDrawable.getGl();
 			gl.glColor3d(1.0, 0.0, 0.0);
 			gl.glEnable(GL.GL_BLEND);
 			gl.glEnable(GL.GL_LINE_SMOOTH);

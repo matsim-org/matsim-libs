@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -148,7 +148,7 @@ public class FacilityDrawer {
 		/*package*/ final List<VisBusStop> stops = new LinkedList<VisBusStop>();
 
 		@Override
-		public void onDraw(GL gl) {
+		public void onDraw(GL2 gl) {
 			if (OTFClientControl.getInstance().getOTFVisConfig().isDrawTransitFacilities()) {
 				for (VisBusStop stop : this.stops) {
 					DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);

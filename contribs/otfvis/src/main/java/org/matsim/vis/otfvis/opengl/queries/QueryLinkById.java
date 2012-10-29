@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -40,7 +41,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 
 /**
@@ -137,30 +138,27 @@ public class QueryLinkById extends AbstractQuery implements OTFQuery {
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
 			if(this.vertex == null) return;
-			GL gl = OTFGLAbstractDrawable.getGl();
-			this.vert = BufferUtil.copyFloatBuffer(FloatBuffer
-					.wrap(this.vertex));
-			this.cols = BufferUtil.copyByteBuffer(ByteBuffer
-					.wrap(this.colors));
-
+			GL2 gl = OTFGLAbstractDrawable.getGl();
+			this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+			this.cols = Buffers.copyByteBuffer(ByteBuffer.wrap(this.colors));
 			rewindGLBuffers();
 			prepare(gl);
 			unPrepare(gl);
 
 		}
 
-		private void prepare(GL gl) {
-			gl.glEnable(GL.GL_BLEND);
-			gl.glEnable(GL.GL_LINE_SMOOTH);
-			gl.glEnableClientState(GL.GL_COLOR_ARRAY);
-			gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+		private void prepare(GL2 gl) {
+			gl.glEnable(GL2.GL_BLEND);
+			gl.glEnable(GL2.GL_LINE_SMOOTH);
+			gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
+			gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
 			gl.glLineWidth(1.f * getLineWidth());
-			gl.glColorPointer(4, GL.GL_UNSIGNED_BYTE, 0, this.cols);
-			gl.glVertexPointer(2, GL.GL_FLOAT, 0, this.vert);
-			gl.glDrawArrays(GL.GL_LINES, 0, this.vertex.length);
-			gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
-			gl.glDisableClientState(GL.GL_COLOR_ARRAY);
-			gl.glDisable(GL.GL_LINE_SMOOTH);
+			gl.glColorPointer(4, GL2.GL_UNSIGNED_BYTE, 0, this.cols);
+			gl.glVertexPointer(2, GL2.GL_FLOAT, 0, this.vert);
+			gl.glDrawArrays(GL2.GL_LINES, 0, this.vertex.length);
+			gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
+			gl.glDisable(GL2.GL_LINE_SMOOTH);
 		}
 
 		private void unPrepare(GL gl) {

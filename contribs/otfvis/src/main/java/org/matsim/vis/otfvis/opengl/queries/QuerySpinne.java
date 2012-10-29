@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GL2;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -62,7 +62,7 @@ import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 /**
  * QuerySpinne shows a relationship network for a given link based on several options.
@@ -119,7 +119,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 					this.colors.put((byte)120);
 				}
 
-				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
+				this.vert = Buffers.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 				this.agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
 				this.agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			}
@@ -127,30 +127,30 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			this.vert.position(0);
 			this.colors.position(0);
 
-			GL gl = OTFGLAbstractDrawable.getGl();
+			GL2 gl = OTFGLAbstractDrawable.getGl();
 			Color color = Color.ORANGE;
 			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,.3);
 			gl.glColor4d(1., 1.,1.,.3);
-			gl.glEnable(GL.GL_BLEND);
-			gl.glEnable(GL.GL_LINE_SMOOTH);
-			gl.glEnableClientState (GL.GL_COLOR_ARRAY);
-			gl.glEnableClientState (GL.GL_VERTEX_ARRAY);
+			gl.glEnable(GL2.GL_BLEND);
+			gl.glEnable(GL2.GL_LINE_SMOOTH);
+			gl.glEnableClientState (GL2.GL_COLOR_ARRAY);
+			gl.glEnableClientState (GL2.GL_VERTEX_ARRAY);
 			gl.glLineWidth(2.f*OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
-			gl.glVertexPointer (2, GL.GL_FLOAT, 0, this.vert);
-			gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, this.colors);
-			gl.glDrawArrays (GL.GL_LINES, 0, this.vertex.length/2);
-			gl.glDisableClientState (GL.GL_VERTEX_ARRAY);
-			gl.glDisableClientState (GL.GL_COLOR_ARRAY);
-			gl.glDisable(GL.GL_LINE_SMOOTH);
-			gl.glDisable(GL.GL_BLEND);
+			gl.glVertexPointer (2, GL2.GL_FLOAT, 0, this.vert);
+			gl.glColorPointer (4, GL2.GL_UNSIGNED_BYTE, 0, this.colors);
+			gl.glDrawArrays (GL2.GL_LINES, 0, this.vertex.length/2);
+			gl.glDisableClientState (GL2.GL_VERTEX_ARRAY);
+			gl.glDisableClientState (GL2.GL_COLOR_ARRAY);
+			gl.glDisable(GL2.GL_LINE_SMOOTH);
+			gl.glDisable(GL2.GL_BLEND);
 
 			drawCaption(drawer);
 		}
 
-		private void drawQuad(GL gl, double xs, double xe, double ys, double ye, Color color) {
+		private void drawQuad(GL2 gl, double xs, double xe, double ys, double ye, Color color) {
 			gl.glColor4d(color.getRed()/255., color.getGreen()/255.,color.getBlue()/255.,color.getAlpha()/255.);
 			double z = 0;
-			gl.glBegin(GL.GL_QUADS);
+			gl.glBegin(GL2.GL_QUADS);
 			gl.glVertex3d(xs, ys, z);
 			gl.glVertex3d(xe, ys, z);
 			gl.glVertex3d(xe, ye, z);
@@ -165,10 +165,10 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
 			double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
 			double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
-			GLAutoDrawable gl = OTFGLAbstractDrawable.getDrawable();
+			GL2 gl = OTFGLAbstractDrawable.getDrawable().getGL().getGL2();
 			Color color = new Color(255,255,255,200);
-			gl.getGL().glEnable(GL.GL_BLEND);
-			drawQuad(gl.getGL(), minX, maxX, minY, maxY, color);
+			gl.glEnable(GL.GL_BLEND);
+			drawQuad(gl, minX, maxX, minY, maxY, color);
 			double horOf = (maxY-minY)/12;
 			double verOf = (maxX-minX)/12;
 
@@ -180,17 +180,17 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			Color c3 = colorizer3.getColor(maxCount);
 
 			double a=1,b=4,c=1,d=3;
-			drawQuad(gl.getGL(), minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
+			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
 			InfoText text1 = new InfoText("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text1.draw(drawer.getTextRenderer(), gl, drawer.getViewBoundsAsQuadTreeRect());
+			text1.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=5;d=7;
-			drawQuad(gl.getGL(), minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
+			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
 			InfoText text2 = new InfoText("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text2.draw(drawer.getTextRenderer(),gl, drawer.getViewBoundsAsQuadTreeRect());
+			text2.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=9;d=11;
-			drawQuad(gl.getGL(), minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
+			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
 			InfoText text3 = new InfoText("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
-			text3.draw(drawer.getTextRenderer(),gl, drawer.getViewBoundsAsQuadTreeRect());
+			text3.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override

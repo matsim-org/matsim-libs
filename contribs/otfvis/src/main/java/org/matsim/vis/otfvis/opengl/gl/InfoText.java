@@ -27,7 +27,7 @@ import javax.media.opengl.GLAutoDrawable;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
 
-import com.sun.opengl.util.j2d.TextRenderer;
+import com.jogamp.opengl.util.awt.TextRenderer;
 
 /**
  * InfoText is the class behind all text displayed in the OPenGL context.
