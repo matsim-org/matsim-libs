@@ -19,7 +19,11 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 	final private static Logger log = Logger.getLogger(MyParallelQNetsimEngine.class);
 
-	private int numOfThreads;
+	private static final int TASKS_PER_THREAD = 20;
+
+	private final int numOfThreads;
+	private final int numOfTasks;
+
 	private MyQSimEngineRunner[] engines;
 	private ArrayList<Callable<Object>> moveNodesCallables, moveLinksCallables;
 
@@ -31,7 +35,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 	private NodeReActivator nodeReActivator;
 
-	private ExecutorService es;
+	private final ExecutorService es;
 
 
 	MyParallelQNetsimEngine(final QSim sim, final Random random) {
@@ -39,6 +43,9 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
 
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfTasks = this.numOfThreads * TASKS_PER_THREAD;
+
+		es = Executors.newFixedThreadPool(numOfThreads, new QSimEngineThreadFactory());
 	}
 
 	@Override
@@ -133,9 +140,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	}
 
 	private void initQSimEngineThreads() {
-		es = Executors.newFixedThreadPool(numOfThreads, new QSimEngineThreadFactory());
-		final int numOfTasks = numOfThreads * 20;
-
 		createNodesLists();
 		createLinkLists();
 
@@ -181,15 +185,15 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	 * Create equal sized Nodes Lists.
 	 */
 	private void createNodesLists() {
-		parallelNodesLists = new ArrayList<List<QNode>>();
-		for (int i = 0; i < this.numOfThreads; i++) {
+		parallelNodesLists = new ArrayList<List<QNode>>(numOfTasks);
+		for (int i = 0; i < this.numOfTasks; i++) {
 			parallelNodesLists.add(new ArrayList<QNode>());
 		}
 
 		int roundRobin = 0;
 		for (QNode node : allNodes) {
 			node.getCustomAttributes().put(Random.class.getName(), MatsimRandom.getLocalInstance());
-			parallelNodesLists.get(roundRobin % this.numOfThreads).add(node);
+			parallelNodesLists.get(roundRobin % this.numOfTasks).add(node);
 			roundRobin++;
 		}
 	}
@@ -202,7 +206,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		 * Now we create Arrays out of our Lists because iterating over them
 		 * is much faster.
 		 */
-		this.parallelNodesArrays = new QNode[this.numOfThreads][];
+		this.parallelNodesArrays = new QNode[this.numOfTasks][];
 		for (int i = 0; i < parallelNodesLists.size(); i++) {
 			List<QNode> list = parallelNodesLists.get(i);
 
@@ -216,9 +220,9 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	 * Create the Lists of QueueLinks that are handled on parallel Threads.
 	 */
 	private void createLinkLists() {
-		this.parallelSimLinksLists = new ArrayList<List<QLinkInternalI>>();
+		this.parallelSimLinksLists = new ArrayList<List<QLinkInternalI>>(numOfTasks);
 
-		for (int i = 0; i < this.numOfThreads; i++) {
+		for (int i = 0; i < this.numOfTasks; i++) {
 			this.parallelSimLinksLists.add(new ArrayList<QLinkInternalI>());
 		}
 
@@ -228,7 +232,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		if (simulateAllLinks) {
 			int roundRobin = 0;
 			for(QLinkInternalI link : allLinks) {
-				this.parallelSimLinksLists.get(roundRobin % this.numOfThreads).add(link);
+				this.parallelSimLinksLists.get(roundRobin % this.numOfTasks).add(link);
 				roundRobin++;
 			}
 		}
