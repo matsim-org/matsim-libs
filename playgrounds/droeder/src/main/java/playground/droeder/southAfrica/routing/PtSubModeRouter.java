@@ -105,13 +105,35 @@ public class PtSubModeRouter implements TransitRouter{
 			this.modeRouter.put(e.getKey(), new TransitRouterImpl(config2, e.getValue(), timeAndDisutility, timeAndDisutility));
 		}
 	}
+	
+	private boolean warn = true;
+	/**
+	 * 
+	 * @param mode
+	 * @return
+	 */
+	public TransitRouter getModeRouter(String mode){
+		if(this.modeRouter.containsKey(mode)){
+			return this.modeRouter.get(mode);
+		}
+		if(warn){
+			log.warn("Can not find router for single mode " + mode + ". Returning default pt-router..." +
+					" Message thrown only once...");
+			warn = false;
+		}
+		return this.modeRouter.get(TransportMode.pt);
+	}
 
+	
+
+
+	// ################# this is used for the old implementation ###########################
+	
 	@Override
 	public List<Leg> calcRoute(Coord fromCoord, Coord toCoord, double departureTime, Person person) {
 		throw new UnsupportedOperationException("use class own's calcRoute(Leg)! This class probably only works with PlansCalcSubModeDependendTransitRoute...");
 	}
-
-
+	
 	/**
 	 * @param person
 	 * @param leg
@@ -128,7 +150,6 @@ public class PtSubModeRouter implements TransitRouter{
 		}
 	}
 
-
 	/**
 	 * @param mode
 	 * @return
@@ -136,61 +157,8 @@ public class PtSubModeRouter implements TransitRouter{
 	public boolean calculatedRouteForMode(String mode) {
 		return this.modeRouter.containsKey(mode);
 	}
+	
+	// #####################################################################################
 
-//	/**
-//	 * @param sc
-//	 * @param routeOnSameSubMode
-//	 */
-//	private void initTransitRouter(Scenario sc, boolean routeOnSameSubMode) {
-//		
-//		
-//		if(!routeOnSameSubMode) return; //create additional router only if necessary
-//		log.info("separating lines by mode from transitSchedule...");
-//		// create an empty schedule per mode
-//		Map<String, TransitSchedule> temp = new HashMap<String, TransitSchedule>();
-//		for(String s: sc.getConfig().transit().getTransitModes()){
-//			temp.put(s, new TransitScheduleFactoryImpl().createTransitSchedule());
-//		}
-//		
-//		String mode = null;
-//		//parse all lines
-//		for(TransitLine line : sc.getTransitSchedule().getTransitLines().values()){
-//			// check mode of routes (in my opinion mode should be pushed up to line!)
-//			for(TransitRoute route: line.getRoutes().values()){
-//				if(mode == null){
-//					mode = route.getTransportMode();
-//				}else{
-//					// abort if a route line contains a route of different modes. In my opinion this really makes no sense [dr]
-//					if(mode != route.getTransportMode()){
-//						throw new IllegalArgumentException("one line must not operate on different transport-modes. ABORT...");
-//					}
-//				}
-//			}
-//			// check if transitMode is specified in pt-module
-//			if(temp.containsKey(mode)){
-//				// add routes
-//				temp.get(mode).addTransitLine(line);
-//				// and TransitStopFacilities
-//				for(TransitRoute route: line.getRoutes().values()){
-//					for(TransitRouteStop stop: route.getStops()){
-//						if(!temp.get(mode).getFacilities().containsKey(stop.getStopFacility().getId())){
-//							temp.get(mode).addStopFacility(stop.getStopFacility());
-//						}
-//					}
-//				}
-//			}else{
-//				//the mode of a line/route should be available to the agents
-//				log.warn("mode " + mode + " of transitline " + line.getId() + " not specified in pt-module. ABORT!");
-//			}
-//			mode = null;
-//		}
-//		log.info("finished...");
-//		log.info("creating mode-dependend transitRouter for: " + temp.keySet().toString());
-//		//create ModeDependendRouter
-//		for(Entry<String, TransitSchedule> e: temp.entrySet()){
-//			this.modeRouter.put(e.getKey(), new TransitRouterImpl(this.config, e.getValue()));
-//		}
-//		log.info("finished");
-//	}
 }
 

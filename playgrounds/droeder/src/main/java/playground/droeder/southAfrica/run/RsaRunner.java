@@ -36,19 +36,20 @@ import playground.andreas.P2.hook.PHook;
 import playground.andreas.P2.hook.PTransitRouterFactory;
 import playground.droeder.southAfrica.helper.Mode2LineSetterRSA;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
+import playground.droeder.southAfrica.routing.PtSubModeTripRouterFactory;
 
 
 /**
  * @author droeder
  *
  */
-public class RsaRunnerOld {
+public class RsaRunner {
 	
 	
-	private final static Logger log = Logger.getLogger(RsaRunnerOld.class);
+	private final static Logger log = Logger.getLogger(RsaRunner.class);
 	private static String CONFIGFILE = 
 			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
-//			"E:/rsa/server/configDebug0.01.xml";
+//			"E:/rsa/test/configRSAtest.xml";
 	
 
 	public static void main(final String[] args) {
@@ -76,7 +77,7 @@ public class RsaRunnerOld {
 	
 	private static void sim(String conf) {
 		
-		boolean fixedSubMode = false;
+		boolean fixedSubMode = true;
 		Config config = new Config();
 		config.addModule(PConfigGroup.GROUP_NAME, new PConfigGroup());
 		ConfigUtils.loadConfig(config, conf);
@@ -96,7 +97,7 @@ public class RsaRunnerOld {
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
-		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory(), null);
+		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory(), null, PtSubModeTripRouterFactory.class);
 		controler.addControlerListener(pFact);		
 		
 		//necessary because PHook overwrites setting, made in PtSubModeControler-c'tor

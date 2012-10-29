@@ -28,7 +28,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -91,10 +93,17 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 		return new PtSubModeRouter(this.tC, this.routerNetworks, new TransitRouterNetworkTravelTimeAndDisutility(this.tC));
 	}
 	
+//	@Override
+//	public void notifyStartup(StartupEvent event) {
+//		event.getControler().setTripRouterFactory(new PtSubModeTripRouterFactory(event.getControler()));
+//	}
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.updateRouter = true;
+		// not a nice way, but has to be done because otherwise PHook overwrites the Factory. This 
+//		// again happens because the TransitSchedule changes after every iteration.
+//		event.getControler().setTripRouterFactory(new PtSubModeTripRouterFactory(event.getControler()));
 	}
 	
 	private void updateRouterNetworks(){

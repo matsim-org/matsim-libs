@@ -145,11 +145,12 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		}
 
 		// add a Routing-Module for each Transit(sub)mode.
+		System.out.println(config.transit().getTransitModes());
 		for(String mode: config.transit().getTransitModes()) {
 			tripRouter.setRoutingModule(
 					mode,
 					new TransitRouterWrapper(
-							transitRouterFactory.createTransitRouter(),
+							((PtSubModeRouter) transitRouterFactory.createTransitRouter()).getModeRouter(mode),
 							transitSchedule,
 							// use a walk router in case no path is found
 							new LegRouterWrapper(
@@ -164,7 +165,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		tripRouter.setRoutingModule(
 				TransportMode.pt,
 				new TransitRouterWrapper(
-						transitRouterFactory.createTransitRouter(),
+						((PtSubModeRouter) transitRouterFactory.createTransitRouter()).getModeRouter(TransportMode.pt),
 						transitSchedule,
 						// use a walk router in case no PT path is found
 						new LegRouterWrapper(
@@ -174,8 +175,6 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 										modeRouteFactory,
 										routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk),
 										routeConfigGroup.getBeelineDistanceFactor()))));
-		
-
 		return tripRouter;
 		
 	}

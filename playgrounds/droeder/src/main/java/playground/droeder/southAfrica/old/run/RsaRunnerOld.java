@@ -47,8 +47,8 @@ public class RsaRunnerOld {
 	
 	private final static Logger log = Logger.getLogger(RsaRunnerOld.class);
 	private static String CONFIGFILE = 
-			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
-//			"E:/rsa/server/configDebug0.01.xml";
+//			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
+			"E:/rsa/server/configRSAtest.xml";
 	
 
 	public static void main(final String[] args) {
@@ -76,7 +76,7 @@ public class RsaRunnerOld {
 	
 	private static void sim(String conf) {
 		
-		boolean fixedSubMode = false;
+		boolean fixedSubMode = true;
 		Config config = new Config();
 		config.addModule(PConfigGroup.GROUP_NAME, new PConfigGroup());
 		ConfigUtils.loadConfig(config, conf);
@@ -96,7 +96,7 @@ public class RsaRunnerOld {
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
-		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory(), null);
+		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory(), null, null);
 		controler.addControlerListener(pFact);		
 		
 		//necessary because PHook overwrites setting, made in PtSubModeControler-c'tor

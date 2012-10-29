@@ -19,14 +19,19 @@
 
 package playground.andreas.P2.hook;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -70,11 +75,13 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 
 	private PersonReRouteStuckFactory stuckFactory;
 
+	private Class<? extends TripRouterFactory> tripRouterFactory;
+
 	public PHook(Controler controler) {
-		this(controler, null, null, null);
+		this(controler, null, null, null, null);
 	}
 	
-	public PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory){
+	public PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, Class<? extends TripRouterFactory> tripRouterFactory){
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
 		this.pTransitRouterFactory = pTransitRouterFactory;
@@ -94,9 +101,42 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			}
 		}
 		
+		if(tripRouterFactory == null){
+			this.tripRouterFactory = TripRouterFactoryImpl.class;
+		}else{
+			this.tripRouterFactory = tripRouterFactory;
+		}
+		
 		this.statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter); 
 	}
 
+	private TripRouterFactory getTripRouterInstance(ControlerEvent event) throws ClassNotFoundException{
+		TripRouterFactory factory;
+		try {
+			Class<?>[] args = new Class[1];
+			args[0] = Controler.class;
+			Constructor<? extends TripRouterFactory> c = null;
+			try{
+				c = this.tripRouterFactory.getConstructor(args);
+				factory = c.newInstance(event.getControler());
+			} catch(NoSuchMethodException e){
+				throw new NoSuchMethodException("Cannot find Constructor in TripRouterFactory " + this.tripRouterFactory.getSimpleName() + " with single argument of type Controler. " +
+						"ABORT!\n" );
+			}
+			log.info("Loaded TripRouterFactory " + this.tripRouterFactory.getSimpleName() + "...");
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return factory;
+	}
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.statsManager.notifyStartup(event);
@@ -111,7 +151,12 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		this.pTransitRouterFactory.createTransitRouterConfig(event.getControler().getConfig());
 		this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
 		
-		event.getControler().setTripRouterFactory(new TripRouterFactoryImpl(event.getControler()));
+		// don't wont to introduce a factory to create a factory...
+		try {
+			event.getControler().setTripRouterFactory(this.getTripRouterInstance(event));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		if(this.agentsStuckHandler != null){
 			event.getControler().getEvents().addHandler(this.agentsStuckHandler);
@@ -133,7 +178,12 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			
 			this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
 			
-			event.getControler().setTripRouterFactory(new TripRouterFactoryImpl(event.getControler()));
+			// don't wont to introduce a factory to create a factory...
+			try {
+				event.getControler().setTripRouterFactory(this.getTripRouterInstance(event));
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 			
 			if(this.agentsStuckHandler != null){
 				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {

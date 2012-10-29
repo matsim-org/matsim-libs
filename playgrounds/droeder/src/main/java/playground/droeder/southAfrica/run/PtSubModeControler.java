@@ -72,7 +72,9 @@ public class PtSubModeControler extends Controler {
 		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
+		//TODO[dr] add TripRouterFactory at right place...
 		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
+
 	}
 	
 	@Override
