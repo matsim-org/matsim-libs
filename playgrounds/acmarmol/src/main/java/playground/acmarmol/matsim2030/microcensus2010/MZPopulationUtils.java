@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -830,6 +831,26 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 			log.warn("Unhandled modes: "
 					+ unknownModes.toString());
 		}
+	}
+
+
+
+	public static void removePersonsWithoutPlan(Population population) {
+		final Map<Id, ? extends Person> persons = population.getPersons();
+		ArrayList<Id> toRemove = new ArrayList<Id>(persons.size());
+		
+		for (Id id : persons.keySet()) {
+			Person person = persons.get(id);
+			Plan plan = person.getSelectedPlan();
+
+			if(plan == null)
+				toRemove.add(id);
+		}
+
+		for (Id id : toRemove)
+			persons.remove(id);
+		
+		log.info("Removed " + toRemove.size() + " persons without plan.");
 	}
 	
 //////////////////////////////////////////////////////////////////////

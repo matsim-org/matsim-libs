@@ -377,6 +377,17 @@ public class MZ2010ToXmlFiles {
 
 
 //////////////////////////////////////////////////////////////////////
+
+
+		System.out.println("-----------------------------------------------------------------------------------------------------------");
+		log.info("filtering persions without plan...");
+		MZPopulationUtils.removePersonsWithoutPlan(population);
+		new PopulationWriter(population, null).write(outputBase+"population.14.xml");
+		System.out.println("  done.");
+
+
+
+//////////////////////////////////////////////////////////////////////
 		
 		
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
