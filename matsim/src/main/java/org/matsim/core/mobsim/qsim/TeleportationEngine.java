@@ -20,7 +20,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
-import org.matsim.vis.snapshotwriters.TeleportationVisData.Cache;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
@@ -34,12 +33,6 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine {
 	private InternalInterface internalInterface;
 	private final Set<Id> trackedAgents = new HashSet<Id>();
 	private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
-	
-	/**
-	 * I need a cache in TeleportationVisData that is not per Object, but for the run, and I don't want to use a 
-	 * static variable.  Thus this cache.  kai, jul'12
-	 */
-	private Cache cache = null ;
 	private boolean doVisualizeTeleportedAgents;
 	private Collection<AgentSnapshotInfo> snapshots = new ArrayList<AgentSnapshotInfo>();
 	
@@ -60,7 +53,7 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine {
 		Link currLink = this.internalInterface.getMobsim().getScenario().getNetwork().getLinks().get(linkId);
 		Link destLink = this.internalInterface.getMobsim().getScenario().getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
 		double travTime = agent.getExpectedTravelTime();
-		TeleportationVisData agentInfo = new TeleportationVisData( now, agentId, currLink, destLink, travTime, this.cache  );
+		TeleportationVisData agentInfo = new TeleportationVisData( now, agentId, currLink, destLink, travTime  );
 		this.teleportationData.put( agentId , agentInfo );
 		return true;
 	}

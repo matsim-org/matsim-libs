@@ -28,10 +28,6 @@ import org.matsim.api.core.v01.network.Link;
  *
  */
 public class TeleportationVisData implements AgentSnapshotInfo {
-	
-	public static class Cache {
-		public double euclideanUnitsPerMeter ;
-	}
 
 	private double stepsize;
 	private double startX;
@@ -46,12 +42,11 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private int type;
 	private double colorval;
 	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE ;
-	Cache cache ;
 	private int intX;
 	private int intY;
 	private static int offset = 100 ;
 
-	public TeleportationVisData(double now, Id personId, Link fromLink, Link toLink, double travelTime, Cache cache ) {
+	public TeleportationVisData(double now, Id personId, Link fromLink, Link toLink, double travelTime ) {
 		this.starttime = now;
 		this.agentId = personId ;
 		this.startX = fromLink.getToNode().getCoord().getX();
@@ -66,25 +61,6 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		this.normalY = dY / euclideanLength;
 		this.currentX = startX;
 		this.currentY = startY;
-		
-		this.cache = cache ;
-		if ( this.cache == null ) {
-			this.cache = new Cache() ;
-			Link link = toLink ;
-			if ( fromLink.getLength() > toLink.getLength() ) {
-				link = fromLink ;
-			}
-			double fromX = link.getFromNode().getCoord().getX();
-			double fromY = link.getFromNode().getCoord().getY();
-			double toX   = link.getToNode().getCoord().getX() ;
-			double toY   = link.getToNode().getCoord().getY() ;
-			
-			double dx2 = fromX - toX ;
-			double dy2 = fromY - toY ;
-			
-			this.cache.euclideanUnitsPerMeter = Math.sqrt( Math.pow(dx2, 2) + Math.pow(dy2 , 2) ) / link.getLength() ;
-		}
-		
 		String idstr = personId.toString() ;
 		int hashCode = idstr.hashCode() ;
 		intX = hashCode%offset ;
