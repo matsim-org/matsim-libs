@@ -20,7 +20,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 	private int numOfThreads;
 	private Thread[] threads;
-	private QSimEngineRunner[] engines;
+	private MyQSimEngineRunner[] engines;
 
 	private QNode[][] parallelNodesArrays;
 	private List<List<QNode>> parallelNodesLists;
@@ -62,7 +62,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		 * Calling the afterSim Method of the QSimEngineThreads
 		 * will set their simulationRunning flag to false.
 		 */
-		for (QSimEngineRunner engine : this.engines) {
+		for (MyQSimEngineRunner engine : this.engines) {
 			engine.afterSim();
 		}
 
@@ -96,7 +96,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 		try {
 			// set current Time
-			for (QSimEngineRunner engine : this.engines) {
+			for (MyQSimEngineRunner engine : this.engines) {
 				engine.setTime(time);
 			}
 
@@ -136,7 +136,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 		int numLinks = 0;
 
-		for (QSimEngineRunner engine : this.engines) {
+		for (MyQSimEngineRunner engine : this.engines) {
 			numLinks = numLinks + engine.getNumberOfSimulatedLinks();
 		}
 
@@ -148,7 +148,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 		int numNodes = 0;
 
-		for (QSimEngineRunner engine : this.engines) {
+		for (MyQSimEngineRunner engine : this.engines) {
 			numNodes = numNodes + engine.getNumberOfSimulatedNodes();
 		}
 
@@ -168,7 +168,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		}
 
 		this.threads = new Thread[numOfThreads];
-		this.engines = new QSimEngineRunner[numOfThreads] ;
+		this.engines = new MyQSimEngineRunner[numOfThreads] ;
 		LinkReActivator linkReActivator = new LinkReActivator(this.engines);
 		NodeReActivator nodeReActivator = new NodeReActivator(this.engines);
 
@@ -179,7 +179,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
-			QSimEngineRunner engine = new QSimEngineRunner(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
+			MyQSimEngineRunner engine = new MyQSimEngineRunner(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
 					this.endBarrier);
 
 			if (useNodeArray) {
@@ -322,10 +322,10 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	 * be to significant.
 	 */
 	/*package*/ static class LinkReActivator implements Runnable {
-		private final QSimEngineRunner[] runners;
+		private final MyQSimEngineRunner[] runners;
 
-		public LinkReActivator(QSimEngineRunner[] threads) {
-			this.runners = threads;
+		public LinkReActivator(MyQSimEngineRunner[] engines) {
+			this.runners = engines;
 		}
 
 		@Override
@@ -333,7 +333,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 			/*
 			 * Each Thread contains a List of Links to activate.
 			 */
-			for (QSimEngineRunner runner : this.runners) {
+			for (MyQSimEngineRunner runner : this.runners) {
 				/*
 				 * We do not redistribute the Links - they will be processed
 				 * by the same thread during the whole simulation.
@@ -344,10 +344,10 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	}
 
 	/*package*/ static class NodeReActivator implements Runnable {
-		private final QSimEngineRunner[] runners;
+		private final MyQSimEngineRunner[] runners;
 
-		public NodeReActivator(QSimEngineRunner[] runners) {
-			this.runners = runners;
+		public NodeReActivator(MyQSimEngineRunner[] engines) {
+			this.runners = engines;
 		}
 
 		@Override
@@ -355,7 +355,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 			/*
 			 * Each Thread contains a List of Links to activate.
 			 */
-			for (QSimEngineRunner runner : this.runners) {
+			for (MyQSimEngineRunner runner : this.runners) {
 				/*
 				 * We do not redistribute the Nodes - they will be processed
 				 * by the same thread during the whole simulation.
