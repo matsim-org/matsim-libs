@@ -3,8 +3,9 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -20,14 +21,17 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 	private int numOfThreads;
 	private MyQSimEngineRunner[] engines;
+	private ArrayList<Callable<Object>> moveNodesCallables, moveLinksCallables;
 
 	private QNode[][] parallelNodesArrays;
 	private List<List<QNode>> parallelNodesLists;
 	private List<List<QLinkInternalI>> parallelSimLinksLists;
 
-	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
-	private CyclicBarrier startBarrier;
-	private CyclicBarrier endBarrier;
+	private LinkReActivator linkReActivator;
+
+	private NodeReActivator nodeReActivator;
+
+	private ExecutorService es;
 
 
 	MyParallelQNetsimEngine(final QSim sim, final Random random) {
@@ -50,35 +54,8 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	@Override
 	public void doSimStep(final double time) {
 		run(time);
-		
+
 		this.printSimLog(time);
-	}
-
-	@Override
-	public void afterSim() {
-
-		/*
-		 * Calling the afterSim Method of the QSimEngineThreads
-		 * will set their simulationRunning flag to false.
-		 */
-		for (MyQSimEngineRunner engine : this.engines) {
-			engine.afterSim();
-		}
-
-		/*
-		 * Triggering the startBarrier of the QSimEngineThreads.
-		 * They will check whether the Simulation is still running.
-		 * It is not, so the Threads will stop running.
-		 */
-		try {
-			this.startBarrier.await();
-		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
-		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
-		}
-
-		super.afterSim();
 	}
 
 	/*
@@ -92,19 +69,20 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	 * this Method does, it should work anyway.
 	 */
 	private void run(double time) {
-
 		try {
 			// set current Time
 			for (MyQSimEngineRunner engine : this.engines) {
 				engine.setTime(time);
 			}
 
-			this.startBarrier.await();
+			es.invokeAll(moveNodesCallables);
 
-			this.endBarrier.await();
+			linkReActivator.run();
+
+			es.invokeAll(moveLinksCallables);
+
+			nodeReActivator.run();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
-		} catch (BrokenBarrierException e) {
 			Gbl.errorMsg(e);
 		}
 	}
@@ -155,7 +133,8 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	}
 
 	private void initQSimEngineThreads() {
-		final int numOfThreads = this.numOfThreads;
+		es = Executors.newFixedThreadPool(numOfThreads, new QSimEngineThreadFactory());
+		final int numOfTasks = numOfThreads * 20;
 
 		createNodesLists();
 		createLinkLists();
@@ -166,19 +145,15 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 			this.parallelNodesLists = null;
 		}
 
-		this.engines = new MyQSimEngineRunner[numOfThreads] ;
-		LinkReActivator linkReActivator = new LinkReActivator(this.engines);
-		NodeReActivator nodeReActivator = new NodeReActivator(this.engines);
-
-		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
-		this.separationBarrier = new CyclicBarrier(numOfThreads, linkReActivator);
-		//		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
-		this.endBarrier = new CyclicBarrier(numOfThreads + 1, nodeReActivator);
+		this.engines = new MyQSimEngineRunner[numOfTasks] ;
+		this.moveNodesCallables = new ArrayList<Callable<Object>>(numOfTasks);
+		this.moveLinksCallables = new ArrayList<Callable<Object>>(numOfTasks);
+		this.linkReActivator = new LinkReActivator(this.engines);
+		this.nodeReActivator = new NodeReActivator(this.engines);
 
 		// setup threads
-		for (int i = 0; i < numOfThreads; i++) {
-			MyQSimEngineRunner engine = new MyQSimEngineRunner(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
-					this.endBarrier);
+		for (int i = 0; i < numOfTasks; i++) {
+			MyQSimEngineRunner engine = new MyQSimEngineRunner(simulateAllNodes, simulateAllLinks);
 
 			if (useNodeArray) {
 				engine.setQNodeArray(this.parallelNodesArrays[i]);
@@ -187,13 +162,10 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 			}
 
 			engine.setLinks(this.parallelSimLinksLists.get(i));
-			Thread thread = new Thread(engine);
-			thread.setName("QSimEngineThread" + i);
 
-			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			this.engines[i] = engine;
-
-			thread.start();
+			this.moveNodesCallables.add(engine.getMoveNodesCallable());
+			this.moveLinksCallables.add(engine.getMoveLinksCallable());
 		}
 
 		/*
@@ -273,12 +245,12 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 			for (QNode[] array : parallelNodesArrays) {
 				for (QNode node : array) {
 					node.setNetElementActivator(this.engines[thread]);
-					
+
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
 						AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
 						// (must be of this type to work.  kai, feb'12)
-						
+
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 						qLink.setNetElementActivator(this.engines[thread]);
 					}
@@ -292,12 +264,12 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 					node.setNetElementActivator(this.engines[thread]);
 					// If we simulate all Nodes, we have to add them initially to the Lists.
 					if (simulateAllNodes) this.engines[thread].activateNode(node);
-					
+
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
 						AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
 						// (must be of this type to work.  kai, feb'12)
-						
+
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 						qLink.setNetElementActivator(this.engines[thread]);
 					}

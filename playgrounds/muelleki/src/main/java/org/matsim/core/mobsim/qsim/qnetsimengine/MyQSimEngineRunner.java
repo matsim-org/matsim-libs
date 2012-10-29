@@ -25,28 +25,19 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
 
-public class MyQSimEngineRunner extends NetElementActivator implements Runnable {
+public class MyQSimEngineRunner extends NetElementActivator {
 	final Logger log = Logger.getLogger(MyQSimEngineRunner.class);
 
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
 	private boolean simulateAllLinks = false;
 	private boolean useNodeArray = QNetsimEngine.useNodeArray;
-
-	private volatile boolean simulationRunning = true;
-
-	private final CyclicBarrier startBarrier;
-	private final CyclicBarrier separationBarrier;
-	private final CyclicBarrier endBarrier;
 
 	private QNode[] nodesArray = null;
 	private List<QNode> nodesList = null;
@@ -67,12 +58,9 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
 
-	/*package*/ MyQSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier) {
+	/*package*/ MyQSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks) {
 		this.simulateAllNodes = simulateAllNodes;
 		this.simulateAllLinks = simulateAllLinks;
-		this.startBarrier = startBarrier;
-		this.separationBarrier = separationBarrier;
-		this.endBarrier = endBarrier;
 	}
 
 	/*package*/ void setQNodeArray(QNode[] nodes) {
@@ -90,74 +78,6 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 	/*package*/ void setTime(final double t) {
 		time = t;
 	}
-
-	public void afterSim() {
-		this.simulationRunning = false;
-	}
-
-	@Override
-	public void run() {
-		/*
-		 * The method is ended when the simulationRunning Flag is
-		 * set to false.
-		 */
-		ArrayList<Long> adt1 = new ArrayList<Long>();
-		ArrayList<Long> adt2 = new ArrayList<Long>();
-
-		while(true) {
-			try {
-				/*
-				 * The Threads wait at the startBarrier until they are
-				 * triggered in the next TimeStep by the run() method in
-				 * the ParallelQNetsimEngine.
-				 */
-				startBarrier.await();
-
-				long t1 = System.nanoTime();
-
-				/*
-				 * Check if Simulation is still running.
-				 * Otherwise print CPU usage and end Thread.
-				 */
-				if (!simulationRunning) {
-					Gbl.printCurrentThreadCpuTime();
-					log.info(adt1.toString());
-					log.info(adt2.toString());
-					return;
-				}
-
-				moveNodes();
-
-				long dt1 = System.nanoTime() - t1;
-				adt1.add(dt1);
-
-				/*
-				 * After moving the Nodes all we use a CyclicBarrier to synchronize
-				 * the Threads. By using a Runnable within the Barrier we activate
-				 * some Links.
-				 */
-				this.separationBarrier.await();
-
-				long t2 = System.nanoTime();
-
-				moveLinks();
-
-				long dt2 = System.nanoTime() - t2;
-				adt2.add(dt2);
-
-				/*
-				 * The End of the Moving is synchronized with
-				 * the endBarrier. If all Threads reach this Barrier
-				 * the main Thread can go on.
-				 */
-				endBarrier.await();
-			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
-			} catch (BrokenBarrierException e) {
-				Gbl.errorMsg(e);
-			}
-		}
-	}	// run()
 
 	private final Callable<Object> moveNodesC = new Callable<Object>() {
 		@Override
