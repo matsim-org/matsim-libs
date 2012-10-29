@@ -41,7 +41,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	@Override
 	public void onPrepareSim() {
 		super.onPrepareSim();
-		initQSimEngineThreads(this.numOfThreads);
+		initQSimEngineThreads();
 	}
 
 	/**
@@ -155,8 +155,8 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		return numNodes;
 	}
 
-	private void initQSimEngineThreads(int numOfThreads) {
-		this.numOfThreads = numOfThreads;
+	private void initQSimEngineThreads() {
+		final int numOfThreads = this.numOfThreads;
 
 		createNodesLists();
 		createLinkLists();
