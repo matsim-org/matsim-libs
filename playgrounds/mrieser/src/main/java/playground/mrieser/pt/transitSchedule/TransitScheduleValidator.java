@@ -71,7 +71,10 @@ public abstract class TransitScheduleValidator {
 					Link prevLink = network.getLinks().get(netRoute.getStartLinkId());
 					for (Id linkId : netRoute.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
-						if (!prevLink.getToNode().equals(link.getFromNode())) {
+						if (link == null) {
+							result.addError("Transit line " + line.getId() + ", route " + route.getId() +
+									" contains a link that is not part of the network: " + linkId);
+						} else if (prevLink != null && !prevLink.getToNode().equals(link.getFromNode())) {
 							result.addError("Transit line " + line.getId() + ", route " + route.getId() +
 									" has inconsistent network route, e.g. between link " + prevLink.getId() + " and " + linkId);
 						}
