@@ -152,6 +152,9 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 		else if (VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase(name)){
 			Id typeId = new IdImpl(atts.getValue(VehicleSchemaV1Names.TYPE));
 			VehicleType type = this.vehicles.getVehicleTypes().get(typeId);
+			if (type == null) {
+				log.error("VehicleType " + typeId + " does not exist.");
+			}
 			String idString = atts.getValue(VehicleSchemaV1Names.ID);
 			Id id = new IdImpl(idString);
 			Vehicle v = this.builder.createVehicle(id, type);
