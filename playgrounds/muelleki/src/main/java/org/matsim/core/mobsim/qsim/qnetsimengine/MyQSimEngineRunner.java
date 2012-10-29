@@ -130,8 +130,8 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 				 */
 				if (useNodeArray) {
 					for (QNode node : nodesArray) {
-						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-						if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
+						if (simulateAllNodes || node.isActive() /*|| node.isSignalized()*/) {
+							Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
 							node.doSimStep(time, random);
 						}
 					}
@@ -172,9 +172,8 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 
 					isActive = link.doSimStep(time);
 
-					if (!isActive && !simulateAllLinks) {
+					if (!isActive && !simulateAllLinks)
 						simLinks.remove();
-					}
 				}
 
 				long dt2 = System.nanoTime() - t2;
