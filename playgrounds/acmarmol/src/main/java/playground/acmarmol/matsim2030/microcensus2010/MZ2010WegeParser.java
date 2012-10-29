@@ -25,23 +25,24 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import com.google.common.base.Supplier;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * 
@@ -53,7 +54,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class MZ2010WegeParser {
 
-//////////////////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////////////////
 //member variables
 //////////////////////////////////////////////////////////////////////
 
@@ -86,7 +88,7 @@ public class MZ2010WegeParser {
 		BufferedReader br = new BufferedReader(fr);
 		String curr_line = br.readLine(); // Skip header
 		int weg_counter = 0;
-			
+		
 		while ((curr_line = br.readLine()) != null) {
 			
 			weg_counter++;
@@ -215,6 +217,7 @@ public class MZ2010WegeParser {
 				
 				LegImpl previous_leg = (LegImpl)plan.getPlanElements().get(plan.getPlanElements().size()-2);
 				from_act.setEndTime(departure);
+				
 				LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
 				leg.setDepartureTime(departure);
 				leg.setTravelTime(arrival-departure);
@@ -228,15 +231,14 @@ public class MZ2010WegeParser {
 			
 				// coordinate consistency check
 				if ((from_act.getCoord().getX() != start_coord.getX()) || (from_act.getCoord().getY() != start_coord.getY())) {
-					 //Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + ((CoordImpl) from_act.getCoord()).calcDistance(start_coord) + ")");
+					Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + ((CoordImpl) from_act.getCoord()).calcDistance(start_coord) + ")");
 						coord_err_pids.add(pid);
 				}
 				
 				// time consistency check N°2
 				if (previous_leg.getArrivalTime() > leg.getDepartureTime()) {
 					if(!time_err_pids.contains(pid)){time_err_pids.add(pid);}
-					//Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": activity end time "+ leg.getDepartureTime() + " greater than start time " + previous_leg.getArrivalTime());
-						
+					Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": activity end time "+ leg.getDepartureTime() + " greater than start time " + previous_leg.getArrivalTime());
 				}
 			
 				
@@ -250,6 +252,7 @@ public class MZ2010WegeParser {
 				}else firstAct = ((PlanImpl) plan).createAndAddActivity(MZConstants.OVERNIGHT,start_coord);
 								
 				firstAct.setEndTime(departure);
+				
 				LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);				
 				leg.setDepartureTime(departure);
 				leg.setTravelTime(arrival-departure);

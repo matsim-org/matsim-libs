@@ -26,7 +26,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +47,13 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import com.google.common.base.Supplier;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
 * 
@@ -851,6 +860,58 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 			persons.remove(id);
 		
 		log.info("Removed " + toRemove.size() + " persons without plan.");
+	}
+
+
+
+	public static void analyzeActivityTypesAndLengths(Population population) throws ExecutionException {
+		LoadingCache<String, SummaryStatistics> activityDuration =
+				CacheBuilder.newBuilder().build(CacheLoader.from(
+						new Supplier<SummaryStatistics>() {
+								@Override
+								public SummaryStatistics get() {
+									return new SummaryStatistics(); }
+				}));
+		
+		for (Person p : population.getPersons().values()) {
+			if (p.getPlans().size() == 0)
+				continue;
+				
+			Plan plan = p.getPlans().get(0);
+			
+			List<PlanElement> planElements = plan.getPlanElements();
+			for (PlanElement pe : planElements) {
+				if (!(pe instanceof Activity))
+					continue;
+				Activity activity = (Activity)pe;
+				
+				double startTime = activity.getStartTime();
+				double endTime = activity.getEndTime();
+				
+				SummaryStatistics typeStats = activityDuration.get(activity.getType());
+				if (endTime != Time.UNDEFINED_TIME) {
+					if (startTime == Time.UNDEFINED_TIME)
+						startTime = 0;
+					typeStats.addValue(endTime - startTime);
+				}
+			}
+		}
+		
+		ConcurrentMap<String, SummaryStatistics> activityDurationMap = activityDuration.asMap();
+		{
+			int i = 0;
+			final StringBuffer s = new StringBuffer();
+			for (final String actType : activityDurationMap.keySet()) {
+				final SummaryStatistics stats = activityDurationMap.get(actType);
+
+				s.append(String.format("<param name=\"activityType_%d\" value=\"%s\" />\n", i, actType));
+				s.append(String.format("<param name=\"activityPriority_%d\" value=\"1\" />\n", i));
+				s.append(String.format("<param name=\"activityTypicalDuration_%d\" value=\"%s\" />\n", i, Time.writeTime(stats.getMean())));
+				s.append("\n");
+				i++;
+			}
+			log.info("All activities:\n" + s.toString());
+		}
 	}
 	
 //////////////////////////////////////////////////////////////////////

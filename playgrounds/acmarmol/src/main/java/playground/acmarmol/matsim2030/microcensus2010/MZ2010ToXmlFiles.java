@@ -333,19 +333,9 @@ public class MZ2010ToXmlFiles {
 
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("removing persons with undefined coords...");
-		Set<Id> undef_neg_pids = MZPopulationUtils.identifyPlansWithUndefinedNegCoords(population);
-		if(undef_neg_pids.size()>0){
-		MZPopulationUtils.removePlans(population, undef_neg_pids);
+		log.info("Analyzing activity types and lengths...");
+		MZPopulationUtils.analyzeActivityTypesAndLengths(population);
 		System.out.println("      done.");
-		System.out.println("      Total persons removed: " + undef_neg_pids.size());
-		System.out.println("      Remaining population size: " + population.getPersons().size() +" (" + (double)population.getPersons().size()/(double)original_pop_size*100 + "%)");
-		System.out.println("      Writing population without undefined coords xml file \n");	
-		new PopulationWriter(population, null).write(outputBase+"population.11.xml");
-		System.out.println("NUMBER OF UNDEFINED  COORDS "+undef_neg_pids.size());
-		System.out.println("  done.");
-	
-		}else{System.out.println("      NO PEOPLE WITH UNDEFINED COORDS \n");}
 
 //////////////////////////////////////////////////////////////////////
 
