@@ -140,11 +140,7 @@ public class AsyncWriter extends Writer {
 	 * @see java.io.Writer#flush()
 	 */
 	@Override
-	synchronized public void flush() throws IOException {
-		// Ask for termination and restart
-		Writer out = finishWorker();
-		out.flush();
-		startWorker(out);
+	public void flush() throws IOException {
 	}
 
 	/* (non-Javadoc)
