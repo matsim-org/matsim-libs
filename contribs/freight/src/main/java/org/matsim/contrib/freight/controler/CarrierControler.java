@@ -41,7 +41,7 @@ import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManager;
+import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -99,8 +99,7 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 		return carrierPlanStrategyManagerFactory;
 	}
 
-	public void setCarrierPlanStrategyManagerFactory(
-			CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory) {
+	public void setCarrierPlanStrategyManagerFactory(CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory) {
 		this.carrierPlanStrategyManagerFactory = carrierPlanStrategyManagerFactory;
 	}
 
@@ -109,7 +108,7 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 		carriers = new Carriers();
 		new CarrierPlanReader(carriers).read(carrierFilename);
 		assert carrierScoringFunctionFactory != null : "carrierScoringFunctionFactory must be set";
-		assert carrierPlanStrategyManagerFactory != null : "strategyManagerFactory must be set";
+//		assert carrierPlanStrategyManagerFactory != null : "strategyManagerFactory must be set";
 	}
 
 	@Override
@@ -136,7 +135,10 @@ public class CarrierControler implements StartupListener, ShutdownListener,
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		CarrierPlanStrategyManager strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
+		if(carrierPlanStrategyManagerFactory == null){
+			return;
+		}
+		CarrierReplanningStrategyManager strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			if (carrier.getSelectedPlan() == null) {

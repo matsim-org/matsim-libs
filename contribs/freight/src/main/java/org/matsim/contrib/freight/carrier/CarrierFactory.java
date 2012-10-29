@@ -95,4 +95,8 @@ public class CarrierFactory {
 		return new ArrayList<CarrierVehicle>(carrierCapabilities.getCarrierVehicles());
 	}
 
+	public CarrierVehicleType createDefaultVehicleType() {
+		return createVehicleType("default", 0, 0.0, 1.0);
+	}
+
 }

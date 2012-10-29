@@ -300,7 +300,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 			return;
 		}
 		if (initialSolutionFactory == null)
-			throw new IllegalStateException("no initialsolutionFactory set");
+			throw new IllegalStateException("no initialSolutionFactory set");
 	}
 
 	private void init() {

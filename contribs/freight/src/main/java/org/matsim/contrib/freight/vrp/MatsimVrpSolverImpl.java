@@ -77,7 +77,13 @@ class MatsimVrpSolverImpl implements MatsimVrpSolver {
 		logger.debug("");
 		logger.debug(printTours(solution.getRoutes()));
 		Collection<ScheduledTour> tours = makeScheduledVehicleTours(solution.getRoutes());
+		route(tours);
 		return tours;
+	}
+
+	private void route(Collection<ScheduledTour> tours) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private VehicleRoutingProblemSolution getInitialSolution() {

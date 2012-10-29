@@ -12,20 +12,20 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.replanning.selectors.CarrierPlanSelector;
 
-public class CarrierPlanStrategy {
+public class CarrierReplanningStrategy {
 
-	private static Logger logger = Logger.getLogger(CarrierPlanStrategy.class);
+	private static Logger logger = Logger.getLogger(CarrierReplanningStrategy.class);
 
-	private List<CarrierPlanStrategyModule> strategyModules = new ArrayList<CarrierPlanStrategyModule>();
+	private List<CarrierReplanningStrategyModule> strategyModules = new ArrayList<CarrierReplanningStrategyModule>();
 
 	private CarrierPlanSelector carrierPlanSelector;
 	
-	public CarrierPlanStrategy(CarrierPlanSelector carrierPlanSelector) {
+	public CarrierReplanningStrategy(CarrierPlanSelector carrierPlanSelector) {
 		super();
 		this.carrierPlanSelector = carrierPlanSelector;
 	}
 
-	public void addModule(CarrierPlanStrategyModule module) {
+	public void addModule(CarrierReplanningStrategyModule module) {
 		strategyModules.add(module);
 	}
 
@@ -33,7 +33,7 @@ public class CarrierPlanStrategy {
 		CarrierPlan plan = carrierPlanSelector.selectPlan(carrier);
 		CarrierPlan copiedPlan = copyPlan(plan);
 		
-		for (CarrierPlanStrategyModule module : strategyModules) {
+		for (CarrierReplanningStrategyModule module : strategyModules) {
 			logger.info("run " + module.getClass().toString());
 			module.handlePlan(copiedPlan);
 		}

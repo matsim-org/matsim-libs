@@ -14,9 +14,9 @@ public class CarrierVehicle {
 
 	private boolean active = true;
 
-	private double earliestStartTime;
+	private double earliestStartTime = 0.0;
 
-	private double latestEndTime;
+	private double latestEndTime = 48*3600.0;
 
 	public CarrierVehicle(final Id vehicleId, final Id location) {
 		this.vehicleId = vehicleId;

@@ -56,7 +56,6 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 
 	@Override
 	public final RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp) {
-
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp);
 		InitialSolutionFactory iniSolutionFactory = new InitialSolutionBestInsertion(serviceProviderFactory);
 		ruinAndRecreateAlgo.setInitialSolutionFactory(iniSolutionFactory);
@@ -101,7 +100,9 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 
 	@Override
 	public VehicleRoutingProblemSolver createSolver(VehicleRoutingProblem vrp,VehicleRoutingProblemSolution initialSolution) {
-
+		if(initialSolution == null){
+			return createAlgorithm(vrp);
+		}
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp);
 		ruinAndRecreateAlgo.setCurrentSolution(initialSolution);
 		

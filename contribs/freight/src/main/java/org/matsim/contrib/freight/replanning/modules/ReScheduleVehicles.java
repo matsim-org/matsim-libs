@@ -6,13 +6,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyModule;
+import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolver;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolverFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
-public class ReScheduleVehicles implements CarrierPlanStrategyModule {
+public class ReScheduleVehicles implements CarrierReplanningStrategyModule {
 
 	private Network network;
 
