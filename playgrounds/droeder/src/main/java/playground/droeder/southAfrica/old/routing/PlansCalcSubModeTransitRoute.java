@@ -52,7 +52,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemover;
-import playground.droeder.southAfrica.routing.PtSubModeRouter;
 
 /**
  * @author droeder based on mrieser
@@ -75,7 +74,7 @@ public class PlansCalcSubModeTransitRoute extends PlansCalcRoute{
 			.getLogger(PlansCalcSubModeTransitRoute.class);
 	
 	private PtSubModePtInteractionRemover remover = new PtSubModePtInteractionRemover();
-	private PtSubModeRouter router;
+	private PtSubModeRouterOld router;
 	private Plan currentPlan = null;
 	private final List<Tuple<Leg, List<Leg>>> legReplacements = new LinkedList<Tuple<Leg, List<Leg>>>();
 
@@ -104,10 +103,10 @@ public class PlansCalcSubModeTransitRoute extends PlansCalcRoute{
 			ModeRouteFactory routeFactory, TransitConfigGroup transitConfig,
 			TransitRouter transitRouter, TransitSchedule transitSchedule) {
 		super(config, network, costCalculator, travelTimes, factory, routeFactory);
-		if(!(transitRouter instanceof PtSubModeRouter)){
-			throw new IllegalArgumentException("the transitRouter needs to be an instance of " + PtSubModeRouter.class.getSimpleName() +". ABORT!");
+		if(!(transitRouter instanceof PtSubModeRouterOld)){
+			throw new IllegalArgumentException("the transitRouter needs to be an instance of " + PtSubModeRouterOld.class.getSimpleName() +". ABORT!");
 		}
-		this.router = (PtSubModeRouter) transitRouter;
+		this.router = (PtSubModeRouterOld) transitRouter;
 		this.schedule = transitSchedule;
 
 		//////

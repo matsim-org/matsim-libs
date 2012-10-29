@@ -22,19 +22,9 @@ package playground.droeder.southAfrica.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
-import com.sun.xml.bind.v2.TODO;
-
-import playground.droeder.southAfrica.old.routing.PlansCalcSubModeTransitRoute;
+import playground.droeder.southAfrica.old.routing.PtSubModeRouterFactoryOld;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
 import playground.droeder.southAfrica.routing.PtSubModeRouterFactory;
 import playground.droeder.southAfrica.routing.PtSubModeTripRouterFactory;

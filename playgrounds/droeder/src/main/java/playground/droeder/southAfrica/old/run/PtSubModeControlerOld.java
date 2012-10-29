@@ -32,8 +32,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 
 import playground.droeder.southAfrica.old.routing.PlansCalcSubModeTransitRoute;
+import playground.droeder.southAfrica.old.routing.PtSubModeRouterFactoryOld;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
-import playground.droeder.southAfrica.routing.PtSubModeRouterFactory;
 
 /**
  * @author droeder
@@ -53,7 +53,7 @@ public class PtSubModeControlerOld extends Controler {
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
-		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
+		super.setTransitRouterFactory(new PtSubModeRouterFactoryOld(this, routeOnSameMode));
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-transitWalk"-legs
 		((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 				setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
@@ -74,7 +74,7 @@ public class PtSubModeControlerOld extends Controler {
 		//necessary for departure-handling
 		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
 		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
-		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
+		super.setTransitRouterFactory(new PtSubModeRouterFactoryOld(this, routeOnSameMode));
 		//remove default pt-RouteFactory. This just because it is unclear what should happen to "only-tansitWalk"-legs
 		((PopulationFactoryImpl)super.getScenario().getPopulation().getFactory()).
 				setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
@@ -87,14 +87,14 @@ public class PtSubModeControlerOld extends Controler {
 	
 	@Override
 	public void run(){
-		if(!(super.getTransitRouterFactory() instanceof PtSubModeRouterFactory)){
+		if(!(super.getTransitRouterFactory() instanceof PtSubModeRouterFactoryOld)){
 			throw new IllegalArgumentException("TransitRouterFactory needs to be instance of PtSubModeDependRouterFactory..."); 
 		}
 		if(!(super.getMobsimFactory() instanceof TransitSubModeQSimFactory)){
 			throw new IllegalArgumentException("QSIMFactory needs to be instance of TransitSubModeQsimFactory...");
 		}
 		// need to add the PtSubmodeDependRouterFactory as last to controlerlistener, so it is explicitly called last, after all changes in schedule are done...
-		super.addControlerListener((PtSubModeRouterFactory)super.getTransitRouterFactory());
+		super.addControlerListener((PtSubModeRouterFactoryOld)super.getTransitRouterFactory());
 		super.run();
 	}
 

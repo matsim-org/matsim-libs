@@ -31,6 +31,7 @@ import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -150,7 +151,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 			tripRouter.setRoutingModule(
 					mode,
 					new TransitRouterWrapper(
-							((PtSubModeRouter) transitRouterFactory.createTransitRouter()).getModeRouter(mode),
+							((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(mode),
 							transitSchedule,
 							// use a walk router in case no path is found
 							new LegRouterWrapper(
@@ -165,7 +166,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		tripRouter.setRoutingModule(
 				TransportMode.pt,
 				new TransitRouterWrapper(
-						((PtSubModeRouter) transitRouterFactory.createTransitRouter()).getModeRouter(TransportMode.pt),
+						((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(TransportMode.pt),
 						transitSchedule,
 						// use a walk router in case no PT path is found
 						new LegRouterWrapper(

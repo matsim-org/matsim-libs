@@ -47,8 +47,8 @@ public class RsaRunnerOld {
 	
 	private final static Logger log = Logger.getLogger(RsaRunnerOld.class);
 	private static String CONFIGFILE = 
-//			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
-			"E:/rsa/server/configRSAtest.xml";
+			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
+//			"E:/rsa/test/configRSAtest.xml";
 	
 
 	public static void main(final String[] args) {

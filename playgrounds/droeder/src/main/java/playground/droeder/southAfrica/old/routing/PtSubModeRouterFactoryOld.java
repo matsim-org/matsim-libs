@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.routing;
+package playground.droeder.southAfrica.old.routing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,9 +50,9 @@ import playground.andreas.P2.hook.PTransitRouterFactory;
  * @author droeder
  *
  */
-public class PtSubModeRouterFactory extends PTransitRouterFactory implements IterationStartsListener{
+public class PtSubModeRouterFactoryOld extends PTransitRouterFactory implements IterationStartsListener{
 	private static final Logger log = Logger
-			.getLogger(PtSubModeRouterFactory.class);
+			.getLogger(PtSubModeRouterFactoryOld.class);
 	
 	private boolean routeOnSameMode;
 	private Scenario sc;
@@ -65,7 +65,7 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 	 * @param sc
 	 * @param routeOnSameMode, for performance-reasons. Create subModeRouters only if necessary
 	 */
-	public PtSubModeRouterFactory(Controler c, boolean routeOnSameMode) {
+	public PtSubModeRouterFactoryOld(Controler c, boolean routeOnSameMode) {
 		super(((PConfigGroup)c.getConfig().getModule(PConfigGroup.GROUP_NAME)).getPtEnabler());
 		this.sc = c.getScenario();
 		this.routeOnSameMode = routeOnSameMode;
@@ -90,7 +90,7 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 			this.updateRouterNetworks();
 			this.updateRouter = false;
 		}
-		return new PtSubModeRouterSet(this.tC, this.routerNetworks, new TransitRouterNetworkTravelTimeAndDisutility(this.tC), this.routeOnSameMode);
+		return new PtSubModeRouterOld(this.tC, this.routerNetworks, new TransitRouterNetworkTravelTimeAndDisutility(this.tC));
 	}
 	
 //	@Override
