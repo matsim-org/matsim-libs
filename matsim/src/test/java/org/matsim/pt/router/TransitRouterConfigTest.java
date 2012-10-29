@@ -70,7 +70,7 @@ public class TransitRouterConfigTest {
 		// test needs to be adapted; this seems the better place. kai/benjamin, oct'12
 		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
 		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaitingPt_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
 
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
@@ -88,7 +88,7 @@ public class TransitRouterConfigTest {
 		
 		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
 		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtiltityOfWaitingPt_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		

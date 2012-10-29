@@ -201,9 +201,9 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
 		myTRConfig.additionalTransferTime = 120.0;
 		double cost3 = timecost.getLinkTravelDisutility(testLink, 5.0*3600, null, null, null);
-		assertEquals(-120.0 * myTRConfig.getMarginalUtiltityOfWaitingPt_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
+		assertEquals(-120.0 * myTRConfig.getMarginalUtilityOfWaitingPt_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
 		// test with custom value for utility of waiting, just in case too many of the default marginal utilities are 0.0
-		myTRConfig.setMarginalUtiltityOfWaitingPt_utl_s(-12.0 / 3600.0);
+		myTRConfig.setMarginalUtilityOfWaitingPt_utl_s(-12.0 / 3600.0);
 		double cost4 = timecost.getLinkTravelDisutility(testLink, 7.0*3600, null, null, null);
 		assertEquals(120.0 * 12.0 / 3600.0, cost4 - cost2, MatsimTestCase.EPSILON);
 	}

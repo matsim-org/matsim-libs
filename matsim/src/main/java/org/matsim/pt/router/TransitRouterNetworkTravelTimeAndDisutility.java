@@ -69,7 +69,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime ;
 			
 			cost = - inVehTime                   * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-					-offVehWaitTime				 * this.config.getMarginalUtiltityOfWaitingPt_utl_s()
+					-offVehWaitTime				 * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					-link.getLength() 			 * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 
 		}
@@ -105,7 +105,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
 		// be the same as the marginal opprotunity cost of time).  kai, nov'11
 		cost = -walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
-		       -waittime * this.config.getMarginalUtiltityOfWaitingPt_utl_s()
+		       -waittime * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 		       - this.config.getUtilityOfLineSwitch_utl();
 		return cost;
 	}

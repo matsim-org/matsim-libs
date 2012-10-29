@@ -99,7 +99,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityVariableWW extends Trans
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.fromNode.route==null)
 			// it's a wait link
-			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtiltityOfWaitingPt_utl_s();
+			cost = - getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfWaitingPt_utl_s();
 		else if(wrapped.toNode.route==null)
 			// it's a transfer link (walk)
 			cost = -getLinkTravelTime(link, time, person, vehicle) * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
