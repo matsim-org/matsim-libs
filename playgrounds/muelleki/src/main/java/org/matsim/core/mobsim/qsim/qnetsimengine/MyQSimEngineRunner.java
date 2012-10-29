@@ -125,28 +125,7 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 					return;
 				}
 
-				/*
-				 * Move Nodes
-				 */
-				if (useNodeArray) {
-					for (QNode node : nodesArray) {
-						if (simulateAllNodes || node.isActive() /*|| node.isSignalized()*/) {
-							Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-							node.doSimStep(time, random);
-						}
-					}
-				} else {
-					ListIterator<QNode> simNodes = this.nodesList.listIterator();
-					QNode node;
-
-					while (simNodes.hasNext()) {
-						node = simNodes.next();
-						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-						node.doSimStep(time, random);
-
-						if (!node.isActive()) simNodes.remove();
-					}
-				}
+				moveNodes();
 
 				long dt1 = System.nanoTime() - t1;
 				adt1.add(dt1);
@@ -160,21 +139,7 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 
 				long t2 = System.nanoTime();
 
-				/*
-				 * Move Links
-				 */
-				ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
-				QLinkInternalI link;
-				boolean isActive;
-
-				while (simLinks.hasNext()) {
-					link = simLinks.next();
-
-					isActive = link.doSimStep(time);
-
-					if (!isActive && !simulateAllLinks)
-						simLinks.remove();
-				}
+				moveLinks();
 
 				long dt2 = System.nanoTime() - t2;
 				adt2.add(dt2);
@@ -192,6 +157,49 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 			}
 		}
 	}	// run()
+
+	private void moveNodes() {
+		/*
+		 * Move Nodes
+		 */
+		if (useNodeArray) {
+			for (QNode node : nodesArray) {
+				if (simulateAllNodes || node.isActive() /*|| node.isSignalized()*/) {
+					Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
+					node.doSimStep(time, random);
+				}
+			}
+		} else {
+			ListIterator<QNode> simNodes = this.nodesList.listIterator();
+			QNode node;
+
+			while (simNodes.hasNext()) {
+				node = simNodes.next();
+				Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
+				node.doSimStep(time, random);
+
+				if (!node.isActive()) simNodes.remove();
+			}
+		}
+	}
+
+	private void moveLinks() {
+		/*
+		 * Move Links
+		 */
+		ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+		QLinkInternalI link;
+		boolean isActive;
+
+		while (simLinks.hasNext()) {
+			link = simLinks.next();
+
+			isActive = link.doSimStep(time);
+
+			if (!isActive && !simulateAllLinks)
+				simLinks.remove();
+		}
+	}
 
 	@Override
 	protected void activateLink(QLinkInternalI link) {
