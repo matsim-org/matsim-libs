@@ -19,7 +19,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	final private static Logger log = Logger.getLogger(MyParallelQNetsimEngine.class);
 
 	private int numOfThreads;
-	private Thread[] threads;
 	private MyQSimEngineRunner[] engines;
 
 	private QNode[][] parallelNodesArrays;
@@ -167,7 +166,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 			this.parallelNodesLists = null;
 		}
 
-		this.threads = new Thread[numOfThreads];
 		this.engines = new MyQSimEngineRunner[numOfThreads] ;
 		LinkReActivator linkReActivator = new LinkReActivator(this.engines);
 		NodeReActivator nodeReActivator = new NodeReActivator(this.engines);
@@ -193,7 +191,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 			thread.setName("QSimEngineThread" + i);
 
 			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
-			this.threads[i] = thread;
 			this.engines[i] = engine;
 
 			thread.start();
