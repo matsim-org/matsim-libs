@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -59,6 +60,7 @@ public class MZPopulationUtils {
 //member variables
 //////////////////////////////////////////////////////////////////////
 	
+	private final static Logger log = Logger.getLogger(MZPopulationUtils.class);
 
 //////////////////////////////////////////////////////////////////////
 //public methods
@@ -776,15 +778,16 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	
 //////////////////////////////////////////////////////////////////////	
 	
- public static void changeToMatsimModes(Population population){
-	 
-	 for(Person person: population.getPersons().values()){
-		 
-		 Plan plan = person.getSelectedPlan();
-			
+	public static void changeToMatsimModes(Population population) {
+		Set<String> unknownModes = new HashSet<String>();
+
+		for (Person person : population.getPersons().values()) {
+
+			Plan plan = person.getSelectedPlan();
+
 			if(plan!=null){
 				for(PlanElement pe: plan.getPlanElements()){
-					
+
 					if(pe instanceof Leg){
 						Leg leg = (Leg) pe;
 						
@@ -798,36 +801,35 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 								|| mode.equals(MZConstants.SONSTINGER_OEV)
 								|| mode.equals(MZConstants.POSTAUTO)
 								|| mode.equals(MZConstants.REISECAR)
-								|| mode.equals(MZConstants.TRAIN)
-						){
+								|| mode.equals(MZConstants.TRAIN)) {
 							leg.setMode(TransportMode.pt);   //PUBLIC TRANSPORT
 						} else if (mode.equals(MZConstants.WALK)) {
 							leg.setMode(TransportMode.walk);  //WALK
-							
+
 						} else if (mode.equals(MZConstants.BYCICLE)
 								|| mode.equals(MZConstants.SKATEBOARD)
 								|| mode.equals(MZConstants.MOFA)) {
 							leg.setMode(TransportMode.bike);  //BICYCLE
-							
-						}else if(mode.equals(MZConstants.CAR)
+
+						} else if(mode.equals(MZConstants.CAR)
 								|| mode.equals(MZConstants.MOTORCYCLE)
 								|| mode.equals(MZConstants.TRUCK)
 								){
 							leg.setMode(TransportMode.car);  //CAR
-							
+
+						} else {
+							unknownModes.add(mode);
 						}
-						
-						
-					}		
+					}
 				}
 			}
-		 
-		 
-	 }
-	 
-	 
-	 
- }
+		}
+
+		if (!unknownModes.isEmpty()) {
+			log.warn("Unhandled modes: "
+					+ unknownModes.toString());
+		}
+	}
 	
 //////////////////////////////////////////////////////////////////////
 }
