@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+
+ [
+		<!ENTITY INBASE  ".">
+		<!ENTITY OUTBASE  "./output">
+ ]
+
+>
 <config>
 
 <!-- ====================================================================== -->
@@ -12,20 +19,26 @@
 
 <!-- ====================================================================== -->
 
+	<module name="changeLegMode" >
+		<param name="modes" value="car,pt,bike,walk" />
+	</module>
+
+<!-- ====================================================================== -->
+
 	<module name="controler" >
 		<param name="enableLinkToLinkRouting" value="false" />
 
 		<!-- Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (','). -->
 		<param name="eventsFileFormat" value="xml" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="1000" />
+		<param name="lastIteration" value="30" />
 
 		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation qsim JDEQSim multimodalQSim  -->
-		<param name="mobsim" value="null" />
-		<param name="outputDirectory" value="./output" />
+		<param name="mobsim" value="qsim" />
+		<param name="outputDirectory" value="&OUTBASE;" />
 
 		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
-		<param name="routingAlgorithmType" value="Dijkstra" />
+		<param name="routingAlgorithmType" value="FastAStarLandmarks" />
 
 		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
 		<param name="runId" value="null" />
@@ -72,14 +85,14 @@
 <!-- ====================================================================== -->
 
 	<module name="facilities" >
-		<param name="inputFacilitiesFile" value="null" />
+		<param name="inputFacilitiesFile" value="facilities.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->
 
 	<module name="global" >
-		<param name="coordinateSystem" value="Atlantis" />
-		<param name="numberOfThreads" value="2" />
+		<param name="coordinateSystem" value="CH1903_LV03" />
+		<param name="numberOfThreads" value="16" />
 		<param name="randomSeed" value="4711" />
 	</module>
 
@@ -151,7 +164,7 @@
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="null" />
+		<param name="inputNetworkFile" value="network.xml.gz" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
@@ -187,11 +200,11 @@
 
 	<module name="parallelEventHandling" >
 
-		<!-- estimated number of events during mobsim run, useful for configuration -->
-		<param name="estimatedNumberOfEvents" value="null" />
-
 		<!-- number of threads for parallel events handler.  0 or null means parallel events handler is disabled -->
-		<param name="numberOfThreads" value="null" />
+		<param name="numberOfThreads" value="8" />
+
+		<!-- Use SimSteps parallel events handler.  true/false -->
+		<param name="synchronizeOnSimSteps" value="true" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -259,6 +272,79 @@
 
 		<!-- write a plans file in each iteration directory which contains what each agent actually did, and the score it received. -->
 		<param name="writeExperiencedPlans" value="false" />
+
+		<param name="activityType_0"            value="home" />
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="00:30:00" />
+
+		<param name="activityType_1"            value="work_sector2" />
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="05:00:00" />
+		<param name="activityClosingTime_1"     value="22:00:00" />
+
+		<param name="activityType_2"            value="work_sector3" />
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="06:00:00" />
+		<param name="activityOpeningTime_2"     value="08:00:00" />
+		<param name="activityClosingTime_2"     value="20:00:00" />
+
+
+		<param name="activityType_3"            value="education_higher" />
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="06:00:00" />
+		<param name="activityOpeningTime_3"     value="08:00:00" />
+		<param name="activityClosingTime_3"     value="20:00:00" />
+
+
+		<param name="activityType_4"            value="education_kindergarten" />
+		<param name="activityPriority_4"        value="1" />
+		<param name="activityTypicalDuration_4" value="06:00:00" />
+		<param name="activityOpeningTime_4"     value="08:00:00" />
+		<param name="activityClosingTime_4"     value="20:00:00" />
+
+
+		<param name="activityType_5"            value="education_other" />
+		<param name="activityPriority_5"        value="1" />
+		<param name="activityTypicalDuration_5" value="06:00:00" />
+		<param name="activityOpeningTime_5"     value="08:00:00" />
+		<param name="activityClosingTime_5"     value="20:00:00" />
+
+
+		<param name="activityType_6"            value="education_primary" />
+		<param name="activityPriority_6"        value="1" />
+		<param name="activityTypicalDuration_6" value="06:00:00" />
+		<param name="activityOpeningTime_6"     value="08:00:00" />
+		<param name="activityClosingTime_6"     value="20:00:00" />
+
+
+		<param name="activityType_7"            value="education_secondary" />
+		<param name="activityPriority_7"        value="1" />
+		<param name="activityTypicalDuration_7" value="06:00:00" />
+		<param name="activityOpeningTime_7"     value="08:00:00" />
+		<param name="activityClosingTime_7"     value="20:00:00" />
+
+
+		<param name="activityType_8"            value="leisure" />
+		<param name="activityPriority_8"        value="1" />
+		<param name="activityTypicalDuration_8" value="02:00:00" />
+		<param name="activityOpeningTime_8"     value="20:00:00" />
+		<param name="activityClosingTime_8"     value="23:00:00" />
+
+
+		<param name="activityType_9"            value="shop" />
+		<param name="activityPriority_9"        value="1" />
+		<param name="activityTypicalDuration_9" value="06:00:00" />
+		<param name="activityOpeningTime_9"     value="08:00:00" />
+		<param name="activityClosingTime_9"     value="20:00:00" />
+
+
+		<param name="activityType_10"            value="tta" />
+		<param name="activityPriority_10"        value="1" />
+		<param name="activityTypicalDuration_10" value="06:00:00" />
+		<param name="activityOpeningTime_10"     value="08:00:00" />
+		<param name="activityClosingTime_10"     value="20:00:00" />
+
 	</module>
 
 <!-- ====================================================================== -->
@@ -277,7 +363,7 @@
 <!-- ====================================================================== -->
 
 	<module name="plans" >
-		<param name="inputPlansFile" value="null" />
+		<param name="inputPlansFile" value="plans.xml.gz" />
 
 		<!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
 		<param name="networkRouteType" value="LinkNetworkRoute" />
@@ -337,6 +423,18 @@
 
 <!-- ====================================================================== -->
 
+	<module name="qsim" >
+		<param name="flowCapacityFactor" value="0.10" />
+		<param name="storageCapacityFactor" value="0.20" />
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="96:00:00" />
+		<param name="numberOfThreads" value="8" />
+		<param name="stuckTime" value="60" />
+		<param name="removeStuckVehicles" value="false" />
+	</module>
+
+<!-- ====================================================================== -->
+
 	<module name="roadpricing" >
 	</module>
 
@@ -381,12 +479,18 @@
 <!-- ====================================================================== -->
 
 	<module name="strategy" >
-		<param name="ExternalExeConfigTemplate" value="null" />
-		<param name="ExternalExeTimeOut" value="3600" />
-		<param name="ExternalExeTmpFileRootDir" value="null" />
+		<param name="ModuleProbability_1" value="0.7" />
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="ModuleProbability_4" value="0.1" />
+		
+		<param name="Module_1" value="SelectExpBeta" />
+		<param name="Module_2" value="ReRoute" />
+		<param name="Module_3" value="ChangeLegMode" />
+		<param name="Module_4" value="TimeAllocationMutator" />
 
 		<!-- maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number -->
-		<param name="maxAgentPlanMemorySize" value="0" />
+		<param name="maxAgentPlanMemorySize" value="5" />
 
 		<!-- name of PlanSelector for plans removal.  If not full class name, resolved in StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically tested. kai, feb'12 -->
 		<param name="planSelectorForRemoval" value="null" />
