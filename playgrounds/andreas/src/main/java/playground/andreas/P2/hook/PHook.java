@@ -151,7 +151,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		this.pTransitRouterFactory.createTransitRouterConfig(event.getControler().getConfig());
 		this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
 		
-		// don't wont to introduce a factory to create a factory...
+		// don't wont to introduce a factory to create a factory... /dr
 		try {
 			event.getControler().setTripRouterFactory(this.getTripRouterInstance(event));
 		} catch (ClassNotFoundException e) {
@@ -178,7 +178,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			
 			this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
 			
-			// don't wont to introduce a factory to create a factory...
+			// don't wont to introduce a factory to create a factory... /dr
 			try {
 				event.getControler().setTripRouterFactory(this.getTripRouterInstance(event));
 			} catch (ClassNotFoundException e) {
