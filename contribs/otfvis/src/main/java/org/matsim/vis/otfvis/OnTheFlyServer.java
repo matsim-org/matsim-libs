@@ -54,6 +54,7 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -108,12 +109,11 @@ public class OnTheFlyServer implements OTFLiveServer {
 		}
 		
 		@Override
-		public
-		Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots() {
+		public VisData getNonNetwokAgentSnapshots() {
 			if (visMobsim != null) {
 				return visMobsim.getNonNetwokAgentSnapshots();
 			} else {
-				return visData.values();
+				return visData;
 			}
 		}
 
@@ -149,7 +149,16 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private VisMobsim visMobsim;
 	
-	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
+	private Map<Id, AgentSnapshotInfo> snapshots = new LinkedHashMap<Id, AgentSnapshotInfo>();
+	
+	private final VisData visData = new VisData() {
+
+		@Override
+		public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> positions) {
+			return snapshots.values();
+		}
+
+	};
 
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
 
@@ -303,7 +312,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 				quad = new SnapshotWriterQuadTree(this.scenario.getNetwork());
 				OTFAgentsListHandler.Writer teleportationWriter;
 				teleportationWriter = new OTFAgentsListHandler.Writer();
-				teleportationWriter.setSrc(visData.values());
+				teleportationWriter.setSrc(visData);
 				quad.addAdditionalElement(teleportationWriter);
 			}
 			quad.initQuadTree(connect);
@@ -425,7 +434,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 			@Override
 			public void beginSnapshot(double time) {
-				visData.clear();
+				snapshots.clear();
 				localTime = (int) time;
 			}
 
@@ -436,7 +445,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 			@Override
 			public void addAgent(AgentSnapshotInfo position) {
-				visData.put(position.getId(), position);
+				snapshots.put(position.getId(), position);
 			}
 
 			@Override

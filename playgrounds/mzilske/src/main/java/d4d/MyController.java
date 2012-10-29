@@ -17,14 +17,9 @@ import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -75,29 +70,14 @@ public class MyController extends AbstractController {
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim,
-				MatsimRandom.getRandom());
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim.addMobsimEngine(teleportationEngine);
+		BushwhackingEngine bushwhackingEngine = new BushwhackingEngine();
+		qSim.addMobsimEngine(bushwhackingEngine);
+		qSim.addDepartureHandler(bushwhackingEngine);
 
-		AgentFactory agentFactory;
-		if (scenario.getConfig().scenario().isUseTransit()) {
-			agentFactory = new TransitAgentFactory(qSim);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setUseUmlaeufe(true);
-			transitEngine
-					.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
-		} else {
-			agentFactory = new DefaultAgentFactory(qSim);
-		}
-		if (scenario.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
-		}
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		
@@ -131,6 +111,7 @@ public class MyController extends AbstractController {
 		config.controler().setLastIteration(0);
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.otfVis().setShowTeleportedAgents(true);
+		config.controler().setWriteEventsInterval(0);
 		setupOutputDirectory(config.controler().getOutputDirectory(), config
 				.controler().getRunId(), true);
 		this.eventsManager = EventsUtils.createEventsManager(config); 

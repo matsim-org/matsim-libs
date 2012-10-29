@@ -52,6 +52,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -511,8 +512,21 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots() {
-		return teleportationEngine.getTrackedAndTeleportedAgentsView();
+	public VisData getNonNetwokAgentSnapshots() {
+		return new VisData() {
+
+			@Override
+			public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> positions) {
+				for (MobsimEngine mobsimEngine : mobsimEngines) {
+					if (mobsimEngine instanceof VisData) {
+						VisData visData = (VisData) mobsimEngine;
+						positions = visData.getVehiclePositions(positions);
+					}
+				}
+				return positions;
+			}
+			
+		};
 	}
 
 }

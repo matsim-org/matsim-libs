@@ -58,6 +58,7 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -442,10 +443,17 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots() {
+	public VisData getNonNetwokAgentSnapshots() {
 		// This simulation simulates only agents on the network.
 		// We do not keep physical positions for teleporting agents, and other modes do not exist.
-		return Collections.emptyList();
+		return new VisData() {
+
+			@Override
+			public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> positions) {
+				return Collections.emptyList();
+			}
+			
+		};
 	}
 
 }

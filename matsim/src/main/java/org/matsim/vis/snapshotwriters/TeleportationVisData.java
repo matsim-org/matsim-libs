@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.vis.snapshotwriters;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -46,13 +47,13 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private int intY;
 	private static int offset = 100 ;
 
-	public TeleportationVisData(double now, Id personId, Link fromLink, Link toLink, double travelTime ) {
+	public TeleportationVisData(double now, Id personId, Coord fromCoord, Coord toCoord, double travelTime ) {
 		this.starttime = now;
 		this.agentId = personId ;
-		this.startX = fromLink.getToNode().getCoord().getX();
-		this.startY = fromLink.getToNode().getCoord().getY();
-		double endX = toLink.getToNode().getCoord().getX();
-		double endY = toLink.getToNode().getCoord().getY();
+		this.startX = fromCoord.getX();
+		this.startY = fromCoord.getY();
+		double endX = toCoord.getX();
+		double endY = toCoord.getY();
 		double dX = endX - startX;
 		double dY = endY - startY;
 		double euclideanLength = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));

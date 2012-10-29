@@ -28,8 +28,8 @@ public interface VisMobsim {
 	 * For that reason, it is just a Collection.</li>
 	 * </ul>  kai, aug'10
 	 */
-	Collection<MobsimAgent> getAgents() ;
+	Collection<MobsimAgent> getAgents();
 
-	Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots();
+	VisData getNonNetwokAgentSnapshots();
 
 }

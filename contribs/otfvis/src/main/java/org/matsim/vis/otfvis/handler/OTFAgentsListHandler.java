@@ -23,6 +23,7 @@ package org.matsim.vis.otfvis.handler;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.core.basic.v01.IdImpl;
@@ -37,6 +38,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisData;
 
 /**
  * OTFAgentsListHandler is responsible for the IO of the
@@ -47,7 +49,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  */
 public class OTFAgentsListHandler extends OTFDataReader {
 
-	static public class Writer extends OTFDataWriter<Collection<? extends AgentSnapshotInfo>> {
+	static public class Writer extends OTFDataWriter<VisData> {
 
 		private static final long serialVersionUID = -6368752578878835954L;
 
@@ -58,8 +60,10 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 		@Override
 		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putInt(src.size());
-			for (AgentSnapshotInfo pos : this.src) {
+			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+			src.getVehiclePositions(positions);
+			out.putInt(positions.size());
+			for (AgentSnapshotInfo pos : positions) {
 				writeAgent(pos, out);
 			}
 		}

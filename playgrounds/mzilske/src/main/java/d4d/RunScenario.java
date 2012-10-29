@@ -1,23 +1,38 @@
 package d4d;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+import org.geotools.data.shapefile.Lock;
+import org.geotools.data.shapefile.shp.ShapeType;
+import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -28,6 +43,21 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
+import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
+import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
+import org.openstreetmap.osmosis.core.task.v0_6.Sink;
+import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
+
+import playground.mzilske.osm.NetworkSink;
+import playground.mzilske.osm.SimplifyTask;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 public class RunScenario {
 	
@@ -43,6 +73,7 @@ public class RunScenario {
 
 	public Scenario readScenario(Config config)  {
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		readNetwork();
 		readPosts();
 		try {
 			readSample();
@@ -58,6 +89,7 @@ public class RunScenario {
 
 	Coord min = ct.transform(new CoordImpl(minLong, minLat));
 	Coord max = ct.transform(new CoordImpl(minLat, maxLat));
+	private Map<Coordinate, Polygon> siteToCell;
 	
 	private void readPosts() {
 		TabularFileParser tfp = new TabularFileParser();
@@ -73,21 +105,63 @@ public class RunScenario {
 				if (Double.isNaN(coord.getX()) || Double.isNaN(coord.getY())) {
 					throw new RuntimeException("Bad latlong: " + coord);
 				}
-				IdImpl linkId = new IdImpl(row[0]);
-				IdImpl nodeId = linkId;
-				IdImpl facilityId = linkId;
-				Node node = scenario.getNetwork().getFactory().createNode(nodeId, coord);
-				scenario.getNetwork().addNode(node);
-				scenario.getNetwork().addLink(scenario.getNetwork().getFactory().createLink(linkId, node, node));
-				ActivityFacilityImpl facility = scenario.getActivityFacilities().createFacility(facilityId, coord);
-				facility.setLinkId(linkId);
+				IdImpl facilityId = new IdImpl(row[0]);
+				scenario.getActivityFacilities().createFacility(facilityId, coord);
 			}
 		});
+		buildCells();
 	}
 	
+	private void buildCells() {
+		GeometryFactory gf = new GeometryFactory();
+		VoronoiDiagramBuilder vdb = new VoronoiDiagramBuilder();
+		Collection<Coordinate> coords = new ArrayList<Coordinate>();
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			coords.add(coordinate(facility));
+		}
+		vdb.setSites(coords);
+		GeometryCollection diagram = (GeometryCollection) vdb.getDiagram(gf);
+		siteToCell = new HashMap<Coordinate, Polygon>();
+		for (int i=0; i<diagram.getNumGeometries(); i++) {
+			Polygon cell = (Polygon) diagram.getGeometryN(i);
+			siteToCell.put((Coordinate) cell.getUserData(), cell); // user data of the cell is set to the Coordinate of the site by VoronoiDiagramBuilder
+		}
+		FileOutputStream shp = null;
+		FileOutputStream shx = null;
+		try {
+			shp = new FileOutputStream("/Users/zilske/d4d/output/myshape.shp");
+			shx = new FileOutputStream("/Users/zilske/d4d/output/myshape.shx");
+			ShapefileWriter writer = new ShapefileWriter( shp.getChannel(),shx.getChannel(), new Lock());
+			writer.write(diagram, ShapeType.POLYGON);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				shp.close();
+				shx.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
+		voronoiStatistics();
+	}
+
+	private Coordinate coordinate(ActivityFacility facility) {
+		return new Coordinate(facility.getCoord().getX(), facility.getCoord().getY());
+	}
+	
+	private void readNetwork() {
+		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
+	}
+
+	
 	private void readSample() throws FileNotFoundException {
-
 		final DateTimeFormatter dateTimeFormat = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 		final DateTime beginning = dateTimeFormat.parseDateTime("2011-12-06 00:00:00");
 		TabularFileParser tfp = new TabularFileParser();
@@ -103,7 +177,7 @@ public class RunScenario {
 					Facility facility = scenario.getActivityFacilities().getFacilities().get(new IdImpl(cellTowerId));
 					Coord coord = facility.getCoord();
 					Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("sighting", coord);
-					((ActivityImpl) activity).setLinkId(facility.getLinkId());
+					((ActivityImpl) activity).setFacilityId(facility.getId());
 					DateTime sighting = dateTimeFormat.parseDateTime(row[1]);
 					activity.setEndTime((sighting.getMillis() - beginning.getMillis()) / 1000);
 					IdImpl personId = new IdImpl(row[0]);
@@ -125,6 +199,14 @@ public class RunScenario {
 		});
 
 		// runStatistics();
+	}
+	
+	private void voronoiStatistics() {
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			Polygon cell = siteToCell.get(coordinate(facility));
+			System.out.println(cell.getArea());
+		}
+
 	}
 
 
@@ -162,6 +244,12 @@ public class RunScenario {
 			}
 		}
 		return false;
+	}
+	
+	public static void main(String[] args) {
+		Config config = ConfigUtils.createConfig();
+		RunScenario scenarioReader = new RunScenario();
+		Scenario scenario = scenarioReader.readScenario(config);
 	}
 
 }

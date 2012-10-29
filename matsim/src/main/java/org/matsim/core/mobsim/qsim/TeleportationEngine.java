@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -20,10 +21,11 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
+import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
-public class TeleportationEngine implements DepartureHandler, MobsimEngine {
+public class TeleportationEngine implements DepartureHandler, MobsimEngine, VisData {
 	/**
 	 * Includes all agents that have transportation modes unknown to the
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
@@ -53,13 +55,17 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine {
 		Link currLink = this.internalInterface.getMobsim().getScenario().getNetwork().getLinks().get(linkId);
 		Link destLink = this.internalInterface.getMobsim().getScenario().getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
 		double travTime = agent.getExpectedTravelTime();
-		TeleportationVisData agentInfo = new TeleportationVisData( now, agentId, currLink, destLink, travTime  );
+		Coord fromCoord = currLink.getToNode().getCoord();
+		Coord toCoord = destLink.getToNode().getCoord();
+		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travTime);
 		this.teleportationData.put( agentId , agentInfo );
 		return true;
 	}
 	
-	public Collection<AgentSnapshotInfo> getTrackedAndTeleportedAgentsView() {
-		return snapshots;
+	@Override
+	public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> snapshotList) {
+		snapshotList.addAll(this.snapshots);
+		return snapshotList;
 	}
 
 	private void updateSnapshots() {

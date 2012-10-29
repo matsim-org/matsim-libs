@@ -38,6 +38,7 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
+import org.matsim.vis.snapshotwriters.VisData;
 /**
  * The OTF has a file Reader and a file Writer part.
  * The writer is in charge of writing mvi data into a file.
@@ -69,7 +70,15 @@ public final class OTFFileWriter implements SnapshotWriter {
 		this.quad = new SnapshotWriterQuadTree(scenario.getNetwork());
 		this.quad.initQuadTree(connect);
 		this.writer = new OTFAgentsListHandler.Writer();
-		this.writer.setSrc(this.positions);
+		this.writer.setSrc(new VisData() {
+
+			@Override
+			public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> inPositions) {
+				inPositions.addAll(positions);
+				return inPositions;
+			}
+			
+		});
 		if (scenario.getConfig().otfVis() != null) {
 			scenario.getConfig().otfVis().setEffectiveLaneWidth(scenario.getNetwork().getEffectiveLaneWidth());
 		}

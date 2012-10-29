@@ -1,6 +1,5 @@
 package org.matsim.vis.otfvis;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -8,7 +7,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
@@ -34,6 +33,6 @@ public interface SimulationViewForQueries {
 
 	OTFServerQuadTree getNetworkQuadTree();
 	
-	Collection<? extends AgentSnapshotInfo> getNonNetwokAgentSnapshots();
+	VisData getNonNetwokAgentSnapshots();
 
 }

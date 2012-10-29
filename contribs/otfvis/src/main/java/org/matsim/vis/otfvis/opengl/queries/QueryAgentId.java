@@ -22,6 +22,7 @@ package org.matsim.vis.otfvis.opengl.queries;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -72,11 +73,11 @@ public class QueryAgentId extends AbstractQuery {
 		this.result = new Result();
 		double minDist = Double.POSITIVE_INFINITY;
 		double dist = 0;
-		List<AgentSnapshotInfo> positions = new LinkedList<AgentSnapshotInfo>();
+		Collection<AgentSnapshotInfo> positions = new LinkedList<AgentSnapshotInfo>();
 		for(VisLink qlink : simulationView.getVisNetwork().getVisLinks().values()) {
 			qlink.getVisData().getVehiclePositions(positions);
 		}
-		positions.addAll(simulationView.getNonNetwokAgentSnapshots());
+		positions = simulationView.getNonNetwokAgentSnapshots().getVehiclePositions(positions);
 		for(AgentSnapshotInfo info : positions) {
 			if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
 			java.awt.geom.Point2D.Double xy = OTFServerQuadTree.transform(new CoordImpl(info.getEasting(), info.getNorthing()));

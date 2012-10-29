@@ -1,6 +1,7 @@
 package playground.gregor.pedvis;
 
 import java.awt.BorderLayout;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import javax.swing.SwingUtilities;
@@ -35,6 +36,7 @@ import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEvent;
@@ -63,7 +65,15 @@ AgentArrivalEventHandler {
 
 
 		this.walk2dWriter = new OTFAgentsListHandler.Writer();
-		this.walk2dWriter.setSrc(this.visData.values());
+		this.walk2dWriter.setSrc(new VisData() {
+
+			@Override
+			public Collection<AgentSnapshotInfo> getVehiclePositions(
+					Collection<AgentSnapshotInfo> positions) {
+				return visData.values();
+			}
+			
+		});
 		this.server.addAdditionalElement(this.walk2dWriter);
 
 		final OTFConnectionManager connectionManager = new OTFConnectionManager();
