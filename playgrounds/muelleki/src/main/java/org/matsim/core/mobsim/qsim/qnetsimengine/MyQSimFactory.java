@@ -66,7 +66,7 @@ public class MyQSimFactory implements MobsimFactory {
 		QNetsimEngineFactory netsimEngFactory;
 		if (numOfThreads > 1) {
 			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-			netsimEngFactory = new ParallelQNetsimEngineFactory();
+			netsimEngFactory = new MyParallelQNetsimEngineFactory();
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 		} else {
 			netsimEngFactory = new DefaultQSimEngineFactory();
