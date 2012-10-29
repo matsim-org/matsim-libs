@@ -633,6 +633,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 				int legCounter = 0;
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Leg) {
+						@SuppressWarnings("unused")
 						Leg leg = (Leg) pe;
 						legCounter++;
 						String wid = person.getId().toString().concat("-").concat(String.valueOf(legCounter));
