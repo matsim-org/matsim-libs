@@ -62,10 +62,10 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 	 * 		However, still multiple "put" operations will be performed for the same node.
 	 */
 	private final Map<Id, QNode> nodesToActivate = new ConcurrentHashMap<Id, QNode>();
-	
+
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
-	
+
 	/*package*/ MyQSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier) {
 		this.simulateAllNodes = simulateAllNodes;
 		this.simulateAllLinks = simulateAllLinks;
@@ -102,7 +102,7 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 		 */
 		ArrayList<Long> adt1 = new ArrayList<Long>();
 		ArrayList<Long> adt2 = new ArrayList<Long>();
-		
+
 		while(true) {
 			try {
 				/*
@@ -111,7 +111,7 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 				 * the ParallelQNetsimEngine.
 				 */
 				startBarrier.await();
-				
+
 				long t1 = System.nanoTime();
 
 				/*
@@ -147,7 +147,7 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 						if (!node.isActive()) simNodes.remove();
 					}
 				}
-				
+
 				long dt1 = System.nanoTime() - t1;
 				adt1.add(dt1);
 
@@ -157,7 +157,7 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 				 * some Links.
 				 */
 				this.separationBarrier.await();
-				
+
 				long t2 = System.nanoTime();
 
 				/*
@@ -176,7 +176,7 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 						simLinks.remove();
 					}
 				}
-				
+
 				long dt2 = System.nanoTime() - t2;
 				adt2.add(dt2);
 
@@ -189,8 +189,8 @@ public class MyQSimEngineRunner extends NetElementActivator implements Runnable 
 			} catch (InterruptedException e) {
 				Gbl.errorMsg(e);
 			} catch (BrokenBarrierException e) {
-            	Gbl.errorMsg(e);
-            }
+				Gbl.errorMsg(e);
+			}
 		}
 	}	// run()
 
