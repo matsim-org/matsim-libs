@@ -71,11 +71,11 @@ public class PreProcessor {
 	private final static double SAMPLESIZE = 0.20;
 	
 	private final static String INPUTDIR = "E:/rsa/Data-nmbm/";
-		private final static String POPULATIONINPUTDIR = INPUTDIR + "population/20120831_100pct/"; 
+		private final static String POPULATIONINPUTDIR = INPUTDIR + "population/20121010_100pct/"; 
 		private final static String INPUTNETWORK =  INPUTDIR + "transit/bus/NMBM_Bus_V1.xml.gz";
 		private final static String INPUTSCHEDULE = INPUTDIR + "transit/bus/Transitschedule_Bus_V1_WithVehicles.xml.gz";
 		private final static String INPUTVEHICLES = INPUTDIR + "transit/bus/transitVehicles_Bus_V1.xml.gz";
-	private final static String OUTDIR = "E:/rsa/server/sampleActivityTime_" + String.valueOf(SAMPLESIZE) + "/";
+	private final static String OUTDIR = "E:/rsa/server/activityTime15min_sample" + String.valueOf(SAMPLESIZE) + "/";
 
 	
 	public static void main(String[] args) {
@@ -84,16 +84,16 @@ public class PreProcessor {
 		}
 		String outputNetwork = INPUTNETWORK;
 		
-		outputNetwork = transformNetwork(outputNetwork, OUTDIR);
+//		outputNetwork = transformNetwork(outputNetwork, OUTDIR);
 		outputNetwork = removeCarFromRailLinks(outputNetwork, OUTDIR);
 		outputNetwork = cleanNetwork(outputNetwork, OUTDIR);
 		outputNetwork = simplifyNetwork(outputNetwork, INPUTSCHEDULE, OUTDIR);
-		sampleHousholds(POPULATIONINPUTDIR, 
-						OUTDIR, 
-						SAMPLESIZE, 
-						outputNetwork);
-		changeLegModes(OUTDIR + "population.xml.gz", OUTDIR + "population.changedLegModes.xml.gz");
-		IOUtils.copyFile(new File(INPUTVEHICLES), new File(OUTDIR + "vehicles.xml.gz"));
+//		sampleHousholds(POPULATIONINPUTDIR, 
+//						OUTDIR, 
+//						SAMPLESIZE, 
+//						outputNetwork);
+//		changeLegModes(OUTDIR + "population.xml.gz", OUTDIR + "population.changedLegModes.xml.gz");
+//		IOUtils.copyFile(new File(INPUTVEHICLES), new File(OUTDIR + "vehicles.xml.gz"));
 	}
 	
 
@@ -225,7 +225,7 @@ public class PreProcessor {
 							}
 						}
 						if(pe instanceof Activity){
-							Double blur = (5*60) * (2 * (0.5 - MatsimRandom.getRandom().nextDouble())); //+- 5 min
+							Double blur = (15*60) * (2 * (0.5 - MatsimRandom.getRandom().nextDouble())); //+- 15 min
 							if(!(((Activity) pe).getEndTime() == Double.NaN)){
 								((Activity) pe).setEndTime(((Activity) pe).getEndTime() + blur);
 							}

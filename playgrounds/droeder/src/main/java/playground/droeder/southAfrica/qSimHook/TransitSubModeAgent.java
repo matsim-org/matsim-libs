@@ -72,12 +72,23 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 		Leg leg = getCurrentLeg();
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 		
-		if(containsId(stopsToCome, route.getEgressStopId()) && enterThisMode(leg, transitRoute)){
+		if(containsId(stopsToCome, route.getEgressStopId()) && enterThisMode(leg, transitRoute) && lessThanEqualTime(leg, transitRoute)){
 			return true;
 		}
 		return false;
 	}
 	
+	/**
+	 * @param leg
+	 * @param transitRoute
+	 * @return
+	 */
+	private boolean lessThanEqualTime(Leg leg, TransitRoute transitRoute) {
+		// TODO[dr] how to get the planned and the offered transportTime here?
+		return false;
+	}
+
+
 	private boolean containsId(List<TransitRouteStop> stopsToCome,
 			Id egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {

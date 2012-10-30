@@ -94,7 +94,7 @@ public class TransitSubModeQSimFactory implements MobsimFactory {
 		
 		if (sc.getConfig().scenario().isUseTransit()) {
 			//##### changes here ############
-			// TODO[dr] replace with own Factory/Agent (agents board only when better time and when correct mode)
+
 			agentFactory = new TransitSubModeAgentFactory(qSim, this.routeOnSameMode);
 			TransitQSimEngine transitEngine = new TransitSubModeQSimEngine(qSim);
 			//###############################

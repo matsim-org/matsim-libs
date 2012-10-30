@@ -51,7 +51,7 @@ public class PtSubModePtInteractionRemover implements PlanAlgorithm {
 		newPlanElements.add( plan.getPlanElements().get(0));
 		List<PlanElement> temp = new ArrayList<PlanElement>();
 		PlanElement e;
-		// TODO[dr] very complex. easier way?
+		// very complex. easier way?
 		for(int i = 1; i < plan.getPlanElements().size(); i++){
 			e = plan.getPlanElements().get(i);
 			temp.add(e);
