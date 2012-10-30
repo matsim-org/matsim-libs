@@ -62,7 +62,7 @@ public class MultiDayControler {
 //		analyzer.analyze(config, outPath, sideLength);
 		
 		Analyzer analyzer = new Analyzer();
-		analyzer.init(config);
+		analyzer.init(configFile);
 		analyzer.run();
 		
 		log.info("Week simulated, yep, .................................................................");

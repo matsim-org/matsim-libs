@@ -70,13 +70,9 @@ public class Analyzer {
 	
 	public void init(String configFile) {
 		this.config = ConfigUtils.loadConfig(configFile);
-		this.init(config);
-	}
-	
-	public void init(Config config) {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 	}
-	
+		
 	public void run() {
 		String outPath = config.controler().getOutputDirectory();
 		this.analyze(outPath);
