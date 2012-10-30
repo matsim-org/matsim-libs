@@ -19,6 +19,7 @@ Changes:
 - Feature Improvements:
   - Loading Plans is now faster thanks to multithreading (r18639)
   - Preprocessing for AStarLandmarks router is now faster thanks to multithreading (r18734)
+  - OTFVis now uses OpenGL2
 
 - BugFix:
   - Fixed a bug during preprocessing for routing algorithms, removing the (wrong) warning "All incident nodes of X are dead ends" in the logfile. (mrieser, r20547)
