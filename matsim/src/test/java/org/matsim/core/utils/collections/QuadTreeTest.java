@@ -20,6 +20,12 @@
 
 package org.matsim.core.utils.collections;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,9 +36,11 @@ import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
-import junit.framework.TestCase;
+import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -40,7 +48,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  *
  * @author mrieser
  */
-public class QuadTreeTest extends TestCase {
+public class QuadTreeTest {
 
 	private final static Logger log = Logger.getLogger(QuadTreeTest.class);
 
@@ -63,6 +71,7 @@ public class QuadTreeTest extends TestCase {
 	/**
 	 * Test {@link QuadTree#QuadTree(double, double, double, double)}.
 	 */
+	@Test
 	public void testConstructor() {
 		QuadTree<String> qt = new QuadTree<String>(-50.0, -40.0, +30.0, +20.0);
 		assertEquals(-50.0, qt.getMinEasting(), 0.0);
@@ -74,6 +83,7 @@ public class QuadTreeTest extends TestCase {
 	/**
 	 * Test putting values into a QuadTree using {@link QuadTree#put(double, double, Object)}.
 	 */
+	@Test
 	public void testPut() {
 		QuadTree<String> qt = new QuadTree<String>(-50.0, -50.0, +150.0, +150.0);
 		assertEquals(0, qt.size());
@@ -97,6 +107,7 @@ public class QuadTreeTest extends TestCase {
 	 * Test getting values from a QuadTree using {@link QuadTree#get(double, double)}
 	 * and {@link QuadTree#get(double, double, double)}.
 	 */
+	@Test
 	public void testGet() {
 		QuadTree<String> qt = getTestTree();
 
@@ -160,13 +171,14 @@ public class QuadTreeTest extends TestCase {
 
 		values.clear();
 		qt.get(0.0, 0.0, 20.0, 20.0, values); // test with an object exactly on the boundary
-		assertEquals(3, values.size());
+		assertEquals(4, values.size());
 
 		values.clear();
 		qt.get(0.0, 0.0, 19.9, 19.9, values); // test with no object on the boundary
 		assertEquals(3, values.size());
 	}
 
+	@Test
 	public void testGetXY_EntryOnDividingBorder() {
 		QuadTree<String> qt = new QuadTree<String>(0, 0, 40, 60);
 		qt.put(10.0, 10.0, "10.0, 10.0");
@@ -179,6 +191,7 @@ public class QuadTreeTest extends TestCase {
 		assertEquals("30.0, 30.0", qt.get(30.0, 30.0));
 	}
 
+	@Test
 	public void testGetXY_EntryOnOutsideBorder() {
 		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
 		// the 4 corners
@@ -202,6 +215,7 @@ public class QuadTreeTest extends TestCase {
 		assertEquals("W", qt.get(0.0, 10.0));
 	}
 
+	@Test
 	public void testGetXY_EntryOutsideExtend() {
 		QuadTree<String> qt = new QuadTree<String>(5.0, 5.0, 35.0, 55.0);
 		// outside the 4 corners
@@ -225,6 +239,7 @@ public class QuadTreeTest extends TestCase {
 		assertEquals("W", qt.get(0.0, 10.0));
 	}
 
+	@Test
 	public void testGetDistance_fromOutsideExtent() {
 		QuadTree<String> qt = getTestTree();
 		assertContains(new String[] {"100.0, 0.0"}, qt.get(160.0, 0, 60.1)); // E
@@ -233,6 +248,7 @@ public class QuadTreeTest extends TestCase {
 		assertContains(new String[] {"100.0, 0.0"}, qt.get(100.0, -60, 60.1)); // S
 	}
 
+	@Test
 	public void testGetDistance_EntryOnDividingBorder() {
 		QuadTree<String> qt = new QuadTree<String>(0, 0, 40, 60);
 		qt.put(10.0, 10.0, "10.0, 10.0");
@@ -254,6 +270,7 @@ public class QuadTreeTest extends TestCase {
 		assertContains(new String[] {"10.0, 25.0"}, qt.get(10.0, 28.0, 3.0));
 	}
 
+	@Test
 	public void testGetDistance_EntryOnOutsideBorder() {
 		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
 		// the 4 corners
@@ -278,6 +295,7 @@ public class QuadTreeTest extends TestCase {
 		assertContains(new String[] {"W"}, qt.get(3.0, 10.0, 3.0));
 	}
 
+	@Test
 	public void testGetDistance_EntryOutsideExtent() {
 		QuadTree<String> qt = new QuadTree<String>(5.0, 5.0, 35.0, 55.0);
 		// outside the 4 corners
@@ -304,6 +322,7 @@ public class QuadTreeTest extends TestCase {
 	/**
 	 * Test removing values from a QuadTree using {@link QuadTree#remove(double, double, Object)}.
 	 */
+	@Test
 	public void testRemove() {
 		QuadTree<String> qt = getTestTree();
 		int size = qt.size();
@@ -337,6 +356,7 @@ public class QuadTreeTest extends TestCase {
 	/**
 	 * Test {@link QuadTree#clear()}.
 	 */
+	@Test
 	public void testClear() {
 		QuadTree<String> qt = getTestTree();
 		int size = qt.size();
@@ -349,6 +369,7 @@ public class QuadTreeTest extends TestCase {
 	/**
 	 * Test {@link QuadTree#values()} that it returns the correct content.
 	 */
+	@Test
 	public void testValues() {
 		QuadTree<String> qt = getTestTree();
 		int size = qt.size();
@@ -381,6 +402,7 @@ public class QuadTreeTest extends TestCase {
 		} catch (UnsupportedOperationException expected) {}
 	}
 
+	@Test
 	public void testValues_EntryOnDividingBorder() {
 		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
 		qt.put(10.0, 10.0, "10.0, 10.0");
@@ -400,6 +422,7 @@ public class QuadTreeTest extends TestCase {
 		assertFalse(iter.hasNext());
 	}
 
+	@Test
 	public void testValues_EntryOnOutsideBorder() {
 		QuadTree<String> qt = new QuadTree<String>(0.0, 0.0, 40.0, 60.0);
 		// the 4 corners
@@ -435,6 +458,7 @@ public class QuadTreeTest extends TestCase {
 		assertFalse(iter.hasNext());
 	}
 
+	@Test
 	public void testValues_EntryOutsideExtend() {
 		QuadTree<String> qt = new QuadTree<String>(5.0, 5.0, 35.0, 55.0);
 		// outside the 4 corners
@@ -465,6 +489,7 @@ public class QuadTreeTest extends TestCase {
 	 * on the QuadTree, so when the QuadTree changes, the view is updated
 	 * as well.
 	 */
+	@Test
 	public void testValues_isView() {
 		QuadTree<String> qt = getTestTree();
 		int size = qt.size();
@@ -484,6 +509,7 @@ public class QuadTreeTest extends TestCase {
 		valuesTester(size + 1, values);
 	}
 
+	@Test
 	public void testValuesIterator_ConcurrentModification() {
 		QuadTree<String> qt = getTestTree();
 		Iterator<String> iter = qt.values().iterator();
@@ -503,6 +529,7 @@ public class QuadTreeTest extends TestCase {
 	/**
 	 * Test {@link QuadTree#execute(double, double, double, double, QuadTree.Executor)}.
 	 */
+	@Test
 	public void testExecute() {
 		QuadTree<String> qt = getTestTree();
 		TestExecutor executor = new TestExecutor();
@@ -532,6 +559,7 @@ public class QuadTreeTest extends TestCase {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
+	@Test
 	public void testSerialization() throws IOException, ClassNotFoundException {
 		QuadTree<String> qt = getTestTree();
 
