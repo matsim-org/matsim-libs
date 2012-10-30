@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
@@ -256,8 +255,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	@Override
-	public TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+	public Map<String, String> getParams() {
+		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
 		map.put(LEARNING_RATE, Double.toString(this.getLearningRate()) );
 		map.put(BRAIN_EXP_BETA, Double.toString(this.getBrainExpBeta()) );
@@ -344,7 +343,12 @@ public class PlanCalcScoreConfigGroup extends Module {
 		"default=0 to be backwards compatible for the time being" ) ;
 		map.put(WRITE_EXPERIENCED_PLANS, "write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
 		
-		return map ;
+		for (int index = 0; index < this.activityTypes.size(); index++) {
+			String key = Integer.toString(index);
+			map.put(ACTIVITY_TYPE + key, " ============================ " );
+		}
+		
+		return map;
 	}
 
 	private ActivityParams getActivityTypeByNumber(final String number, final boolean createIfMissing) {
