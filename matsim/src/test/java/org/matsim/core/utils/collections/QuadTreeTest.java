@@ -319,6 +319,42 @@ public class QuadTreeTest {
 		assertContains(new String[] {"W"}, qt.get(6.0, 21.0, 7.0));
 	}
 
+	@Test
+	public void testGetRect() {
+		QuadTree<String> qt = new QuadTree<String>(0, 0, 1000, 1000);
+		qt.put(100, 200, "node1");
+		qt.put(400, 900, "node2");
+		qt.put(700, 300, "node3");
+		qt.put(900, 400, "node4");
+		
+		Collection<String> values = new ArrayList<String>();
+		qt.get(new Rect(400, 300, 700, 900), values);
+		Assert.assertEquals(2, values.size());
+		Assert.assertTrue(values.contains("node2"));
+		Assert.assertTrue(values.contains("node3"));
+	}
+
+	@Test
+	public void testGetRect_flatNetwork() {
+		QuadTree<String> qt = new QuadTree<String>(0, 0, 1000, 0);
+		qt.put(0, 0, "node1");
+		qt.put(100, 0, "node2");
+		qt.put(500, 0, "node3");
+		qt.put(900, 0, "node4");
+
+		Collection<String> values = new ArrayList<String>();
+		qt.get(new Rect(90, -10, 600, +10), values);
+		Assert.assertEquals(2, values.size());
+		Assert.assertTrue(values.contains("node2"));
+		Assert.assertTrue(values.contains("node3"));
+
+		Collection<String> values2 = new ArrayList<String>();
+		qt.get(new Rect(90, 0, 600, 0), values2);
+		Assert.assertEquals(2, values2.size());
+		Assert.assertTrue(values2.contains("node2"));
+		Assert.assertTrue(values2.contains("node3"));
+	}
+
 	/**
 	 * Test removing values from a QuadTree using {@link QuadTree#remove(double, double, Object)}.
 	 */

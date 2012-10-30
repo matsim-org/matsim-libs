@@ -408,6 +408,13 @@ public class QuadTree<T> implements Serializable {
 					y < this.maxY);
 		}
 
+		public boolean containsOrEquals(final double x, final double y) {
+			return (x >= this.minX &&
+					y >= this.minY &&
+					x <= this.maxX &&
+					y <= this.maxY);
+		}
+
 		/**
 		 * Tests if a specified rect is inside or on the boundary of this <code>Rect</code>.
 		 * @param rect the rect to test
@@ -423,20 +430,20 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		/**
-		 * Tests if the interior of this <code>Rect</code>
-		 * intersects the interior of another <code>Rect</code>.
+		 * Tests if this <code>Rect</code> intersects another <code>Rect</code>.
+		 * Intersection is either interior or border of rect.
 		 * @param other The rectangle that should be tested for intersection.
 		 * @return <code>true</code> if this <code>Rect</code>
 		 * intersects the interior of the other <code>Rect</code>; <code>false</code> otherwise.
 		 */
 		public boolean intersects(final Rect other) {
-			if ((this.maxX-this.minX) <= 0 || (this.maxY-this.minY) <= 0) {
+			if ((this.maxX-this.minX) < 0 || (this.maxY-this.minY) < 0) {
 				return false;
 			}
-			return (other.maxX > this.minX &&
-					other.maxY > this.minY &&
-					other.minX < this.maxX &&
-					other.minY < this.maxY);
+			return (other.maxX >= this.minX &&
+					other.maxY >= this.minY &&
+					other.minX <= this.maxX &&
+					other.minY <= this.maxY);
 		}
 
 		/**
@@ -674,7 +681,7 @@ public class QuadTree<T> implements Serializable {
 				return values;
 			}
 			// no more childs, so we must contain the closest object
-			if (this.leaf != null && this.leaf.values.size() > 0 && bounds.contains(this.leaf.x, this.leaf.y)) {
+			if (this.leaf != null && this.leaf.values.size() > 0 && bounds.containsOrEquals(this.leaf.x, this.leaf.y)) {
 				values.addAll(this.leaf.values);
 			}
 			return values;
