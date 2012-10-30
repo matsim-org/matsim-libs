@@ -76,6 +76,50 @@ public class LinkQuadTreeTest {
 		Assert.assertEquals(a, qt.getNearest(400, 210)); // distance to (1) is smaller than to (3)-(4) 
 	}
 	
+	@Test
+	public void testPut_zeroLengthLink() {
+		/*
+		 * Test the following constellation:
+		 * 
+		 * (1)         (2)
+		 *    \       /
+		 *     \     /
+		 *      \   /
+		 *      <(3,4)>
+		 *      /   \
+		 *     /     \
+		 *    /       \
+		 * (5)         (6)
+		 * 
+		 * 
+		 * node 1: 0/1000
+		 * node 2: 1000/1000
+		 * node 3, 4: 400, 400
+		 * node 5: 0/0
+		 * node 6: 1000/0
+		 * 
+		 * with links in between nodes 3 and 4 as well
+		 */
+		
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		LinkQuadTree qt = new LinkQuadTree(0, 0, 1000, 1000);
+		Link l13 = createLink(s, 0, 1000, 400, 400);
+		Link l23 = createLink(s, 1000, 1000, 400, 400);
+		Link l53 = createLink(s, 0, 0, 400, 400);
+		Link l63 = createLink(s, 1000, 0, 400, 400);
+		Link l43 = createLink(s, 400, 400, 400, 400);
+		Link l34 = createLink(s, 400, 400, 400, 400);
+		qt.put(l13);
+		qt.put(l23);
+		qt.put(l53);
+		qt.put(l63);
+		qt.put(l43);
+		qt.put(l34);
+		
+		// mostly check that there is no exception like StackOverflowError
+		Assert.assertEquals(l13, qt.getNearest(100, 800));
+	}
 
 	private Link createLink(Scenario s, double fromX, double fromY, double toX, double toY) {
 		NetworkFactory nf = s.getNetwork().getFactory();
@@ -87,6 +131,5 @@ public class LinkQuadTreeTest {
 				nf.createNode(s.createId(tc.toString()), tc) 
 				);
 	}
-	
 
 }

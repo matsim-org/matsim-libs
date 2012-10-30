@@ -269,10 +269,21 @@ public class LinkQuadTree {
 			double tx = link.getToNode().getCoord().getX();
 			double ty = link.getToNode().getCoord().getY();
 
-			this.minX = Math.min(fx, tx);
-			this.minY = Math.min(fy, ty);
-			this.maxX = Math.max(fx, tx);
-			this.maxY = Math.max(fy, ty);
+			if (fx == tx) {
+				// enforce minimal extent
+				this.minX = fx - fx*1e-8; // make it adaptive within the number of significant digits
+				this.maxX = fx + fx*1e-8; // make it adaptive within the number of significant digits
+			} else {
+				this.minX = Math.min(fx, tx);
+				this.maxX = Math.max(fx, tx);
+			}
+			if (fy == ty) {
+				this.minY = fy - fy*1e-8; // make it adaptive within the number of significant digits
+				this.maxY = fy + fy*1e-8; // make it adaptive within the number of significant digits
+			} else {
+				this.minY = Math.min(fy, ty);
+				this.maxY = Math.max(fy, ty);
+			}
 
 			this.link = link;
 		}
