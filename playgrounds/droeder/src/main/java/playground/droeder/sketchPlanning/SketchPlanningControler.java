@@ -30,7 +30,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.droeder.DRPaths;
-import playground.droeder.Analysis.handler.NetworkAnalysisHandler;
 
 /**
  * @author droeder
