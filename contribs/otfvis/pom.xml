@@ -1,12 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>contrib</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
-  </parent>
-  <build>
-  <plugins>
-  <plugin>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>contrib</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+	<build>
+		<plugins>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
@@ -16,27 +17,26 @@
 					</excludes>
 					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.endorsed.dirs="${basedir}/libs/endorsed" -Djava.awt.headless=true</argLine>
-					<enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
+					<argLine>-Xmx700m -Djava.endorsed.dirs="${basedir}/libs/endorsed"
+						-Djava.awt.headless=true</argLine>
+					<enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't 
+						work otherwise... -->
 				</configuration>
 			</plugin>
-  </plugins>
-  </build>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
-  <artifactId>otfvis</artifactId>
-  <name>otfvis</name>
-  
-  
-  
-  <repositories>
-  <repository>
-           <id>jogamp-remote</id>
-           <name>jogamp test mirror</name>
-           <url>http://www.jogamp.org/deployment/maven/</url>
-           <layout>default</layout>
-         </repository>
-  </repositories>
+		</plugins>
+	</build>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim.contrib</groupId>
+	<artifactId>otfvis</artifactId>
+	<name>otfvis</name>
+	<repositories>
+		<repository>
+			<id>jogamp-remote</id>
+			<name>jogamp test mirror</name>
+			<url>http://www.jogamp.org/deployment/maven/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>net.java.dev.timingframework</groupId>
