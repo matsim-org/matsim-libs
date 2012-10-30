@@ -107,6 +107,8 @@ public class InterZoneDistanceCalculator
             bw.write(j.zoneId + "\t");
         }
 
+        bw.newLine();
+
         // normal lines
         for (ZoneCentroid i : zoneCentroids) {
             System.out.println(i.zoneId + "...");
