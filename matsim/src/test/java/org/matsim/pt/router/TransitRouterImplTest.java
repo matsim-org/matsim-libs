@@ -48,7 +48,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 
-
+/**
+ * @author mrieser
+ */
 public class TransitRouterImplTest {
 
 	@Test
