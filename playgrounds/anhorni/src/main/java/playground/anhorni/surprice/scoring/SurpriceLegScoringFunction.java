@@ -140,12 +140,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			this.alpha = 1.0;
 			this.gamma = 1.0;
 			this.alphaTrip = 0.0;
-		}
-		
-		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useAlphaTrip"))) {
-			this.alphaTrip = 0.0;
-		}
-		
+		}		
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
 		

@@ -31,6 +31,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.AgentMemories;
+import playground.anhorni.surprice.Surprice;
 
 public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory{
 	
@@ -57,10 +58,9 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		for (int i = 0; i < 100; i++) {
 			this.random.nextDouble();
 		}
-		// 1.0 - rn
-		// to make it symmetric
-		double alphaTrip = 0.5 * (1.0 - this.random.nextDouble());		
-		
+		double alphaTrip = 0.0;	
+		double alphaTripRange = Double.parseDouble(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "alphaTripRange"));
+		alphaTrip = 0.5 * alphaTripRange * (1.0 - this.random.nextDouble());		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				
 		SurpriceActivityScoringFunction scoringFunction = new SurpriceActivityScoringFunction(
