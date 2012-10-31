@@ -67,6 +67,10 @@ public class ControlerTest {
 		}
 		TransitRouterFactory f = controler.getTransitRouterFactory();
 
+		assertNotNull(
+				"transit router factory is null!?",
+				f);
+
 		assertTrue(
 				"wrong transit router factory type "+f.getClass(),
 				f instanceof HerbieTransitRouterFactory);

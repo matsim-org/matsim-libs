@@ -96,10 +96,10 @@
 		<!--
 		<param name="Module_3" value="TransitChangeLegMode" />
 		-->
-		<param name="Module_3" value="playground.thibautd.parknride.ParkAndRideModeStrategy" />
+		<param name="Module_3" value="playground.thibautd.parknride.replanning.ParkAndRideModeStrategy" />
 
 		<param name="ModuleProbability_4" value="0.1" />
-		<param name="Module_4" value="playground.thibautd.parknride.ParkAndRideTimeAllocationMutator" />
+		<param name="Module_4" value="playground.thibautd.parknride.replanning.ParkAndRideTimeAllocationMutator" />
 	</module>
 
 	<module name="transit">
