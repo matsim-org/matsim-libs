@@ -12,15 +12,54 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
-public interface VehicleRoutingProblem {
+import org.apache.log4j.Logger;
 
-	public Collection<Vehicle> getVehicles();
+public class VehicleRoutingProblem {
 
-	public Map<String, Job> getJobs();
+	public static int SOLUTION_MEMORY = 5;
+	
+	private static Logger logger = Logger.getLogger(VehicleRoutingProblem.class);
 
-	public VehicleRoutingCosts getCosts();
+	private VehicleRoutingCosts costs;
+
+	private Map<String, Job> jobs;
+
+	private Collection<Vehicle> vehicles;
+	
+	private Collection<VehicleRoutingProblemSolution> solutions = new ArrayList<VehicleRoutingProblemSolution>();
+
+	public VehicleRoutingProblem(Collection<? extends Job> jobs,Collection<Vehicle> vehicles, VehicleRoutingCosts costs) {
+		this.jobs = new HashMap<String, Job>();
+		mapJobs(jobs);
+		this.vehicles = vehicles;
+		this.costs = costs;
+	}
+
+	private void mapJobs(Collection<? extends Job> jobs) {
+		for (Job j : jobs) {
+			this.jobs.put(j.getId(), j);
+		}
+	}
+
+	public Map<String, Job> getJobs() {
+		return jobs;
+	}
+
+	public Collection<Vehicle> getVehicles() {
+		return vehicles;
+	}
+
+	public VehicleRoutingCosts getCosts() {
+		return costs;
+	}
+
+	public Collection<VehicleRoutingProblemSolution> getSolutions() {
+		return solutions;
+	}
 
 }

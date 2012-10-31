@@ -3,6 +3,8 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
+
 public class InsertionData {
 	
 	public static class NoInsertionFound extends InsertionData{
@@ -16,6 +18,8 @@ public class InsertionData {
 	private final double insertionCost;
 	
 	private final int[] insertionIndeces;
+	
+	private Vehicle selectedVehicle;
 	
 	private Map<String,Object> additionalInformation = new HashMap<String, Object>();
 	
@@ -39,5 +43,15 @@ public class InsertionData {
 	public double getInsertionCost() {
 		return insertionCost;
 	}
+
+	public void setVehicle(Vehicle bestVehicle) {
+		selectedVehicle = bestVehicle;
+	}
+
+	public Vehicle getSelectedVehicle() {
+		return selectedVehicle;
+	}
+	
+	
 	
 }

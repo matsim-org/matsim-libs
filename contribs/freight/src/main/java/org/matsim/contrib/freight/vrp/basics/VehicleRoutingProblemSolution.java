@@ -1,12 +1,33 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 import java.util.Collection;
-import java.util.Collections;
 
-public interface VehicleRoutingProblemSolution {
+public class VehicleRoutingProblemSolution {
 	
-	public Collection<VehicleRoute> getRoutes();
+	private Collection<VehicleRoute> routes;
 
-	public double getTotalCost();
+	private double totalCost;
+
+	public VehicleRoutingProblemSolution(Collection<VehicleRoute> routes, double totalCost) {
+		super();
+		this.routes = routes;
+		this.totalCost = totalCost;
+	}
+
+	
+	public Collection<VehicleRoute> getRoutes() {
+		return routes;
+	}
+
+
+	public double getTotalCost() {
+		return totalCost;
+	}
+
+
+	public void setCosts(double totalCost) {
+		this.totalCost = totalCost;
+		
+	}
 
 }

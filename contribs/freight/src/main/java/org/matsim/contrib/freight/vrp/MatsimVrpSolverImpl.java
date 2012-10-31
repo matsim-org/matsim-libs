@@ -22,7 +22,6 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolutionImpl;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolverFactory;
 
@@ -91,7 +90,7 @@ class MatsimVrpSolverImpl implements MatsimVrpSolver {
 			return null;
 		}
 		Collection<VehicleRoute> routes = Matsim2VrpUtils.createVehicleRoutes(carrier.getSelectedPlan().getScheduledTours(), matsim2vrp);
-		return new VehicleRoutingProblemSolutionImpl(routes, (-1)*carrier.getSelectedPlan().getScore());
+		return new VehicleRoutingProblemSolution(routes, (-1)*carrier.getSelectedPlan().getScore());
 	}
 
 	private String printTours(Collection<VehicleRoute> solution) {

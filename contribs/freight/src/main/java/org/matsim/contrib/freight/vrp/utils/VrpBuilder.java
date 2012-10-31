@@ -16,9 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.basics.Job;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 public class VrpBuilder {
@@ -46,8 +45,7 @@ public class VrpBuilder {
 
 	public VehicleRoutingProblem build() {
 		verify();
-		VehicleRoutingProblemImpl vrp = new VehicleRoutingProblemImpl(jobs,
-				vehicles, costs);
+		VehicleRoutingProblem vrp = new VehicleRoutingProblem(jobs,vehicles, costs);
 		return vrp;
 	}
 

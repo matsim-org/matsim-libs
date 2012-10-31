@@ -77,5 +77,9 @@ public class TourImpl implements Tour {
 				+ "][transportCosts=" + tourData.transportCosts + "]";
 		return tour;
 	}
+	
+	public TourImpl duplicate(){
+		return new TourImpl(this);
+	}
 
 }

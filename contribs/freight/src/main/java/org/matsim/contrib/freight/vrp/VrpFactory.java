@@ -9,7 +9,6 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl.Type;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemImpl;
 
 class VrpFactory {
 
@@ -33,7 +32,7 @@ class VrpFactory {
 	public VehicleRoutingProblem createVrp() {
 		verify();
 		logProblem();
-		VehicleRoutingProblemImpl vrp = new VehicleRoutingProblemImpl(
+		VehicleRoutingProblem vrp = new VehicleRoutingProblem(
 				matsim2vrpMap.getShipments(), matsim2vrpMap.getVehicles(),
 				costs);
 		return vrp;

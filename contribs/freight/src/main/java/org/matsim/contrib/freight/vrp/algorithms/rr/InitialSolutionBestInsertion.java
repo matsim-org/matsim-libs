@@ -50,15 +50,14 @@ public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 
 	private ServiceProviderAgentFactory serviceProviderFactory;
 
-	public InitialSolutionBestInsertion(
-			ServiceProviderAgentFactory serviceProviderFactory) {
+	public InitialSolutionBestInsertion(ServiceProviderAgentFactory serviceProviderFactory) {
 		super();
 		this.serviceProviderFactory = serviceProviderFactory;
 	}
 
 	@Override
 	public RuinAndRecreateSolution createInitialSolution(VehicleRoutingProblem vrp) {
-		// logger.info("create initial solution.");
+		logger.info("create initial solution.");
 		List<ServiceProviderAgent> serviceProviders = createEmptyServiceProviders(vrp);
 		RecreationBestInsertion bestInsertion = new RecreationBestInsertion();
 		bestInsertion.recreate(serviceProviders, getUnassignedJobs(vrp),Double.MAX_VALUE);
@@ -79,8 +78,7 @@ public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 		return jobs;
 	}
 
-	private List<ServiceProviderAgent> createEmptyServiceProviders(
-			VehicleRoutingProblem vrp) {
+	private List<ServiceProviderAgent> createEmptyServiceProviders(VehicleRoutingProblem vrp) {
 		List<ServiceProviderAgent> emptyTours = new ArrayList<ServiceProviderAgent>();
 		for (Vehicle v : vrp.getVehicles()) {
 			DriverImpl driver = new DriverImpl("driver");

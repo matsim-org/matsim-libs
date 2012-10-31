@@ -14,7 +14,9 @@ package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 import org.apache.log4j.Logger;
@@ -31,7 +33,9 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinStartsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.WarmupStartsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
+import org.matsim.contrib.freight.vrp.basics.DriverImpl;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
@@ -129,19 +133,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 			if (spa.isActive())
 				routes.add(new VehicleRoute(spa.getTour(), spa.getVehicle()));
 		}
-
-		return new VehicleRoutingProblemSolution() {
-
-			@Override
-			public Collection<VehicleRoute> getRoutes() {
-				return routes;
-			}
-
-			@Override
-			public double getTotalCost() {
-				return currentSolution.getResult();
-			}
-		};
+		return new VehicleRoutingProblemSolution(routes,currentSolution.getResult());
 	}
 
 	public void run() {
@@ -268,8 +260,19 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 
 	private RuinAndRecreateSolution makeSolution(VehicleRoutingProblemSolution solution) {
 		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
+		Set<Vehicle> usedVehicles = new HashSet<Vehicle>();
 		for(VehicleRoute route : solution.getRoutes()){
 			agents.add(tourAgentFactory.createAgent(route.getVehicle(), route.getDriver(), route.getTour()));
+			usedVehicles.add(route.getVehicle());
+		}
+		for(Vehicle v : vrp.getVehicles()){
+			if(!usedVehicles.contains(v)){
+				DriverImpl driver = new DriverImpl("driver");
+				driver.setEarliestStart(v.getEarliestDeparture());
+				driver.setLatestEnd(v.getLatestArrival());
+				driver.setHomeLocation(v.getLocationId());
+				agents.add(tourAgentFactory.createAgent(v, driver));
+			}
 		}
 		RuinAndRecreateSolution sol = new RuinAndRecreateSolution(agents, solution.getTotalCost());
 		return sol;
