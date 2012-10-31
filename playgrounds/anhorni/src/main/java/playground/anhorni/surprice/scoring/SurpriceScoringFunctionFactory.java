@@ -60,7 +60,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		}
 		double alphaTrip = 0.0;	
 		double alphaTripRange = Double.parseDouble(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "alphaTripRange"));
-		alphaTrip = 0.5 * alphaTripRange * (1.0 - this.random.nextDouble());		
+		alphaTrip = alphaTripRange * (0.5 - this.random.nextDouble());		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				
 		SurpriceActivityScoringFunction scoringFunction = new SurpriceActivityScoringFunction(
