@@ -33,16 +33,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
 import playground.thibautd.parknride.ParkAndRideConfigGroup;
 import playground.thibautd.parknride.ParkAndRideConstants;
@@ -55,6 +50,7 @@ import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
  */
 public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreadedModule {
 	private final Controler controler;
+	private static final boolean CHECK_CAR_AVAIL = false;
 
 	public ParkAndRideChooseModeForSubtourModule(final Controler controler) {
 		super( controler.getConfig().global() );
@@ -107,7 +103,8 @@ public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreaded
 			List<String> available = new ArrayList<String>( modes );
 
 			Person person = plan.getPerson();
-			if (person instanceof PersonImpl &&
+			if (CHECK_CAR_AVAIL &&
+					person instanceof PersonImpl &&
 					"never".equals( ((PersonImpl) person).getCarAvail() )) {
 				available.remove( TransportMode.car );
 				available.remove( ParkAndRideConstants.PARK_N_RIDE_LINK_MODE );
