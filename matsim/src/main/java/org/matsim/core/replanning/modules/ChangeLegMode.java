@@ -81,6 +81,12 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 		}
 
 	}
+	
+	public ChangeLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
+		super(nOfThreads);
+		this.availableModes = modes.clone();
+		this.ignoreCarAvailability = ignoreCarAvailabilty;
+	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {

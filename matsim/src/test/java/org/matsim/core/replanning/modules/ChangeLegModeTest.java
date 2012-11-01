@@ -23,25 +23,25 @@ package org.matsim.core.replanning.modules;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author mrieser
  */
-public class ChangeLegModeTest extends MatsimTestCase {
+public class ChangeLegModeTest {
 
-	private final static Logger log = Logger.getLogger(ChangeLegModeTest.class);
-
+	@Test
 	public void testDefaultModes() {
-		Config config = loadConfig(null);
+		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 
 		final ChangeLegMode module = new ChangeLegMode(config);
@@ -49,8 +49,9 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		runTest(module, modes);
 	}
 
+	@Test
 	public void testWithConfig() {
-		Config config = loadConfig(null);
+		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
 
@@ -58,9 +59,17 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
+	
+	@Test
+	public void testWithConstructor() {
+		final ChangeLegMode module = new ChangeLegMode(0, new String[] {"car", "pt", "bike", "walk"}, true);
+		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
+		runTest(module, modes);
+	}
 
+	@Test
 	public void testWithConfig_withoutIgnoreCarAvailability() {
-		Config config = loadConfig(null);
+		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, "car,pt,walk");
 		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
@@ -86,7 +95,7 @@ public class ChangeLegModeTest extends MatsimTestCase {
 			Integer count = counter.get(leg.getMode());
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
-		assertEquals(0, counter.get("car").intValue());
+		Assert.assertEquals(0, counter.get("car").intValue());
 	}
 
 	private void runTest(final ChangeLegMode module, final String[] possibleModes) {
@@ -105,13 +114,13 @@ public class ChangeLegModeTest extends MatsimTestCase {
 		for (int i = 0; i < 10; i++) {
 			module.handlePlan(plan);
 			Integer count = counter.get(leg.getMode());
-			assertNotNull("unexpected mode: " + leg.getMode(), count);
+			Assert.assertNotNull("unexpected mode: " + leg.getMode(), count);
 			counter.put(leg.getMode(), Integer.valueOf(count.intValue() + 1));
 		}
 
 		for (Map.Entry<String, Integer> entry : counter.entrySet()) {
 			int count = entry.getValue().intValue();
-			assertTrue("mode " + entry.getKey() + " was never chosen.", count > 0);
+			Assert.assertTrue("mode " + entry.getKey() + " was never chosen.", count > 0);
 		}
 	}
 }

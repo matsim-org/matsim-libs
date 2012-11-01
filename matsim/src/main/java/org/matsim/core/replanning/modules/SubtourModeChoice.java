@@ -91,6 +91,13 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 		this.permissibleModesCalculator = new AllowTheseModesForEveryone(this.modes);
 	}
 
+	public SubtourModeChoice(final int numberOfThreads, final String[] modes, final String[] chainBasedModes) {
+		super(numberOfThreads);
+		this.modes = modes.clone();
+		this.chainBasedModes = chainBasedModes.clone();
+		this.permissibleModesCalculator = new AllowTheseModesForEveryone(this.modes);
+	}
+
 	private String[] explodeModesWithDefaults(String modes, String[] defaults) {
 		String[] availableModes;
 		if (modes != null) {
