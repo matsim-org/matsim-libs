@@ -195,7 +195,7 @@ public class CreateTestScenario {
 		
 		Link l = factory.createLink(new IdImpl(id), from, to);
 		l.setAllowedModes(mode);
-		l.setCapacity(2000);
+		l.setCapacity(4000);
 		if(mode.contains("train")){
 			l.setFreespeed(100/3.6);
 		}else{

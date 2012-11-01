@@ -51,33 +51,37 @@ public class RsaRunner {
 			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
 //			"E:/rsa/test/configRSAtest.xml";
 	
-
+	private static boolean FIXEDSUBMODE = true;
+	
 	public static void main(final String[] args) {
 		String configFile = null;
+		Boolean fixedSubMode = null;
 		
 		if(args.length == 0){
 			if(new File(CONFIGFILE).exists()){
 				configFile = CONFIGFILE;
+				fixedSubMode = FIXEDSUBMODE;
 			}else{
 				log.error("no config Found...");
 				System.exit(1);
 			}
 		}else if(args.length == 1){
 			configFile = args[0];
+			fixedSubMode = Boolean.parseBoolean(args[1]);
 		}else{
 			log.error("no config Found...");
 			System.exit(1);
 		}
 		
 				
-		sim(configFile);
+		sim(configFile, fixedSubMode);
 		
 	}
 
 	
-	private static void sim(String conf) {
+	private static void sim(String conf, boolean fixedSubMode) {
 		
-		boolean fixedSubMode = true;
+		
 		Config config = new Config();
 		config.addModule(PConfigGroup.GROUP_NAME, new PConfigGroup());
 		ConfigUtils.loadConfig(config, conf);

@@ -39,7 +39,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author droeder
- * except of getEnterTransitRoute(...) c&p from TransitAgent
+ * except of getEnterTransitRoute(...) c&p from {@link TransitAgent} and {@link PTransitAgent} 
  *
  */
 public class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent{
@@ -48,7 +48,9 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 	private static final Logger log = Logger
 			.getLogger(TransitSubModeAgent.class);
 
-	private boolean fixedMode;
+	private boolean fixedSubMode;
+
+	private TransitSchedule transitSchedule;
 	
 	public static TransitSubModeAgent createAgent(Person p, Netsim sim, boolean fixedMode){
 		return new TransitSubModeAgent(p, sim, fixedMode);
@@ -57,8 +59,8 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 
 	private TransitSubModeAgent(Person p, Netsim sim, boolean fixedMode) {
 		super(p, p.getSelectedPlan(), sim);
-		this.fixedMode = fixedMode;
-		
+		this.fixedSubMode = fixedMode;
+		this.transitSchedule = sim.getScenario().getTransitSchedule();
 	}
 
 	@Override
@@ -72,22 +74,68 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 		Leg leg = getCurrentLeg();
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
 		
-		if(containsId(stopsToCome, route.getEgressStopId()) && enterThisMode(leg, transitRoute) && lessThanEqualTime(leg, transitRoute)){
+		if(containsId(stopsToCome, route.getEgressStopId()) && enterThisMode(leg, transitRoute) && lessThanEqualTime(line, leg, transitRoute)){
 			return true;
 		}
 		return false;
 	}
 	
 	/**
+	 * adapted from {@linkPTransitAgent}
+	 * 
+	 * @param line 
 	 * @param leg
 	 * @param transitRoute
 	 * @return
 	 */
-	private boolean lessThanEqualTime(Leg leg, TransitRoute transitRoute) {
-		// TODO[dr] how to get the planned and the offered transportTime here?
+	private boolean lessThanEqualTime(TransitLine line, Leg leg, TransitRoute transitRoute) {
+		
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		
+		TransitRoute transitRoutePlanned = this.transitSchedule.getTransitLines().get(route.getLineId()).getRoutes().get(route.getRouteId());
+		if (transitRoutePlanned == null) {
+			// This route doesn't exist anymore. In terms of time enter, other conditions checked somewhere else
+			return true;
+		}
+		
+		TransitRoute transitRouteOffered = this.transitSchedule.getTransitLines().get(line.getId()).getRoutes().get(transitRoute.getId());
+
+		double travelTimePlanned = getArrivalOffsetFromRoute(transitRoutePlanned, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRoutePlanned, route.getAccessStopId());
+		double travelTimeOffered = getArrivalOffsetFromRoute(transitRouteOffered, route.getEgressStopId()) - getDepartureOffsetFromRoute(transitRouteOffered, route.getAccessStopId());
+		
+		if (travelTimeOffered <= travelTimePlanned) {
+			// this is a faster or at least an equal solution, enter
+			return true;
+		}
 		return false;
 	}
+	
+	
+	// ################ c&p from PTransitAgent ########################################
+	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id egressStopId) {
+		for (TransitRouteStop routeStop : transitRoute.getStops()) {
+			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
+				return routeStop.getArrivalOffset();
+			}
+		}
 
+		log.error("Stop " + egressStopId + " not found in route " + transitRoute.getId());
+		// returning what???
+		return -1.0;
+	}
+	
+	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id accessStopId) {
+		for (TransitRouteStop routeStop : transitRoute.getStops()) {
+			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
+				return routeStop.getDepartureOffset();
+			}
+		}
+
+		log.error("Stop " + accessStopId + " not found in route " + transitRoute.getId());
+		// returning what???
+		return -1.0;
+	}
+	// ################# end c&p #######################################################
 
 	private boolean containsId(List<TransitRouteStop> stopsToCome,
 			Id egressStopId) {
@@ -98,8 +146,7 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 		}
 		return false;
 	}
-
-
+	
 	/**
 	 * @param leg
 	 * @param transitRoute
@@ -110,8 +157,8 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 			// agent should definitely enter
 			return true;
 		}else{
-			if(!this.fixedMode){
-				// mode is not fixed, so enter anyway
+			if(!this.fixedSubMode){
+				// subMode is not fixed, so enter anyway
 				return true;
 			}
 		}
