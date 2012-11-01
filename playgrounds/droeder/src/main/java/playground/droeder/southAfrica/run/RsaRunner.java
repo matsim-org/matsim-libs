@@ -65,7 +65,7 @@ public class RsaRunner {
 				log.error("no config Found...");
 				System.exit(1);
 			}
-		}else if(args.length == 1){
+		}else if(args.length == 2){
 			configFile = args[0];
 			fixedSubMode = Boolean.parseBoolean(args[1]);
 		}else{
