@@ -45,17 +45,13 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-
 /**
+ * Converting the TransitRouterNetwork into a {@link org.matsim.core.router.util.RoutingNetwork} might
+ * speed up the routing and additionally reduce the memory consumption (e.g. by using array for a nodes 
+ * in- and outgoing links). cdobler, nov'12
+ * 
  * @author mrieser
- */
-/**
  * @author nagel
- *
- */
-/**
- * @author nagel
- *
  */
 public final class TransitRouterNetwork implements Network {
 
@@ -141,13 +137,17 @@ public final class TransitRouterNetwork implements Network {
 		final Id id;
 		private final double length;
 
-		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
+		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line, double length) {
 			this.id = id;
 			this.fromNode = fromNode;
 			this.toNode = toNode;
 			this.route = route;
 			this.line = line;
-			this.length = CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
+			this.length = length;
+		}
+		
+		public TransitRouterNetworkLink(final Id id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
+			this(id, fromNode, toNode, route, line, CoordUtils.calcDistance(toNode.stop.getStopFacility().getCoord(), fromNode.stop.getStopFacility().getCoord()));
 		}
 
 		@Override
