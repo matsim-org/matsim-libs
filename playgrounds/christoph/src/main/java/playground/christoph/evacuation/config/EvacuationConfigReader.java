@@ -52,6 +52,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 	public static String INFORMAGENTS = "informagents";
 	public static String ROADCONDITIONS = "roadconditions";
 	public static String EVACUATIONDECISION = "evacuationdecision";
+	public static String TRANSITROUTER = "transitrouter";
 	
 	public static String TIME = "time";
 	public static String DELAY = "delay";
@@ -193,6 +194,9 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 			} else {
 				throw new RuntimeException("Unknown value for evacuation decision behaviour found: " + behaviour);
 			}
+		} else if (TRANSITROUTER.equalsIgnoreCase(name)) {
+			EvacuationConfig.transitRouterFile = atts.getValue(FILENAME);
+			EvacuationConfig.useTransitRouter = Boolean.valueOf(atts.getValue(ENABLED));
 		} else {
 			log.warn("Ignoring startTag: " + name);
 		}
@@ -223,6 +227,7 @@ public class EvacuationConfigReader extends MatsimXmlParser {
 		} else if(INFORMAGENTS.equalsIgnoreCase(name)) {
 		} else if(ROADCONDITIONS.equalsIgnoreCase(name)) {
 		} else if(EVACUATIONDECISION.equalsIgnoreCase(name)) {
+		} else if(TRANSITROUTER.equalsIgnoreCase(name)) {
 		} else log.warn("Ignoring endTag: " + name);
 	}
 	

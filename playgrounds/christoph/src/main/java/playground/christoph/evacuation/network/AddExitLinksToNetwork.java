@@ -22,6 +22,7 @@ package playground.christoph.evacuation.network;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,8 @@ public class AddExitLinksToNetwork {
 	private Scenario scenario;
 	private Network network;
 	
+	private final Map<Id, Node> exitNodes;
+	
 	private double innerRadius = EvacuationConfig.innerRadius;
 	private double outerRadius = EvacuationConfig.outerRadius;
 	private Coord center;
@@ -92,7 +95,8 @@ public class AddExitLinksToNetwork {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		AddExitLinksToNetwork addExitLinksToNetwork = new AddExitLinksToNetwork(scenario);
-		Map<Id, Node> exitNodes = addExitLinksToNetwork.getExitNodes();
+		addExitLinksToNetwork.identifyExitNodes();
+		Map<Id, Node> exitNodes = addExitLinksToNetwork.getExitNodes(); 
 		
 		Network network = scenario.getNetwork();
 		List<Node> nonExitNodes = new ArrayList<Node>();
@@ -142,13 +146,18 @@ public class AddExitLinksToNetwork {
 	public AddExitLinksToNetwork(Scenario scenario) {
 		this.scenario = scenario;
 		this.network = this.scenario.getNetwork();
+				
+		this.center = EvacuationConfig.centerCoord;
+		this.exitNodes = new TreeMap<Id, Node>();
 		
-		this.center = EvacuationConfig.centerCoord;	// Bellevue Coordinates
+		identifyExitNodes();
 	}
 	
-	private Map<Id, Node> getExitNodes() {
-		Map<Id, Node> exitNodes = new TreeMap<Id, Node>();
-		
+	public Map<Id, Node> getExitNodes() {
+		return Collections.unmodifiableMap(this.exitNodes);
+	}
+	
+	private void identifyExitNodes() {		
 		for (Node node : network.getNodes().values()) {
 			double distance = CoordUtils.calcDistance(center, node.getCoord());
 			
@@ -156,8 +165,6 @@ public class AddExitLinksToNetwork {
 		}
 		
 		log.info("Found " + exitNodes.size() + " exit nodes.");
-		
-		return exitNodes;
 	}
 	
 	public void createExitLinks() {
@@ -172,7 +179,7 @@ public class AddExitLinksToNetwork {
 		network.addNode(rescueNode);
 		
 		int counter = 0;
-		for (Node node : getExitNodes().values()) {
+		for (Node node : exitNodes.values()) {
 			counter++;
 			Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink" + counter), node, rescueNode);
 			rescueLink.setLength(10);	// use short links for non-vehicular traffic

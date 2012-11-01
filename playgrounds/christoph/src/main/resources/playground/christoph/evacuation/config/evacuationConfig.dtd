@@ -4,7 +4,7 @@
 
 <!-- Author: Christoph Dobler -->
 
-<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes, informAgents, roadConditions, evacuationDecision)>
+<!ELEMENT evacuationConfig     (evacuationTime, centerCoord, heightInformation, evacuationArea, vehicleFleet, householdObjectAttributes, analysis, pt, panic, participation, duringLegRerouting, pickupAgents, fuzzyTravelTimes, informAgents, roadConditions, evacuationDecision, transitRouter)>
 
 <!ELEMENT evacuationTime	EMPTY>
 <!ATTLIST evacuationTime
@@ -84,3 +84,8 @@
 <!ELEMENT evacuationDecision	EMPTY>
 <!ATTLIST evacuationDecision
 			behaviour			CDATA	#REQUIRED>
+			
+<!ELEMENT transitRouter	EMPTY>
+<!ATTLIST transitRouter
+			enabled				CDATA	#REQUIRED
+			fileName			CDATA	#REQUIRED>

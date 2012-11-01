@@ -26,16 +26,16 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 
 public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private Scenario scenario;
-	private PTTravelTimeKTI ptTravelTime;
+	private SwissPTTravelTime ptTravelTime;
 	
 	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
 			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
-			PTTravelTimeKTI ptTravelTime) {
+			SwissPTTravelTime ptTravelTime) {
 		super(replanningManager, abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.ptTravelTime = ptTravelTime;

@@ -24,12 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balmermi.world.Layer;
@@ -38,7 +40,7 @@ import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
 
-public class PTTravelTimeKTI implements TravelTime {
+public class PTTravelTimeKTI implements SwissPTTravelTime {
 
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo;
 	private final PlansCalcRouteConfigGroup configGroup;
@@ -74,25 +76,10 @@ public class PTTravelTimeKTI implements TravelTime {
 		 * is done when personSpeed contains a null value.
 		 */
 		Double personSpeed = agentSpeedMap.get(person.getId());
-		this.personSpeed.set(personSpeed);
-		/*
-		 * After removing PersonalizeTravelTime this should not be 
-		 * necessary anymore.
-		 */
-//		if (personSpeed != null) {
-//			this.personSpeed.set(agentSpeedMap.get(person.getId()));			
-//		} else {
-//			/*
-//			 * If no speed value for the person is set, the agent performs
-//			 * the PT trip before the evacuation starts. Therefore use
-//			 * the simple PT travel time calculator.
-//			 */
-//			if (this.personSpeed == null) {
-//				this.ptTravelTime.setPerson(person);			
-//			}			
-//		}	
+		this.personSpeed.set(personSpeed);	
 	}
 
+	@Override
 	public void setPersonSpeed(Id personId, double speed) {
 		this.agentSpeedMap.put(personId, speed);
 	}
@@ -109,7 +96,8 @@ public class PTTravelTimeKTI implements TravelTime {
 	 * @param depTime
 	 * @return travel time
 	 */
-	public double calcSwissPtTravelTime(final Activity fromAct, final Activity toAct, final double depTime) {
+	@Override
+	public Tuple<Double, Coord> calcSwissPtTravelTime(final Activity fromAct, final Activity toAct, final double depTime, Person person) {
 
 		double travelTime = 0.0;
 
@@ -136,49 +124,9 @@ public class PTTravelTimeKTI implements TravelTime {
 
 		travelTime = walkAccessEgressTime + timeInVehicle;
 
-		return travelTime;
+		return new Tuple<Double, Coord>(travelTime, null);
 	}
 
-//	/*
-//	 * The underlying travel time matrix is not time dependent. Therefore
-//	 * we have to add some kind of time dependent filter. We assume that there
-//	 * is almost no PT available between 1:00 and 5:00.
-//	 * 
-//	 * We use the following penalty factors, which are linear interpolated
-//	 * 0:00-1:00: 1.0-3.0
-//	 * 1:00-2:00: 3.0-15.0
-//	 * 2:00-4:00: 25.0
-//	 * 4:00-5:00: 15.0-3.0
-//	 * 5:00-6:00: 3.0-1.0
-//	 */
-//	private double addTimePenalty(double timeInVehicle, double depTime) {
-//		
-//		double penaltyFactor;
-//		if (depTime > 6*3600) {
-//			penaltyFactor = 1.0;
-//		}
-//		else if (depTime > 5*3600) {
-//			double dt = (depTime - 5*3600);
-//			penaltyFactor = 1.0 + 2.0*(3600.0-dt)/3600.0; 
-//		}
-//		else if (depTime > 4*3600) {
-//			double dt = (depTime - 4*3600);
-//			penaltyFactor = 3.0 + 52.0*(3600.0-dt)/3600.0;
-//		}
-//		else if (depTime > 2*3600) {
-//			penaltyFactor = 55.0;
-//		}
-//		else if (depTime > 1*3600) {
-//			double dt = (depTime - 1*3600);
-//			penaltyFactor = 55.0 - 52.0*(3600.0-dt)/3600.0;
-//		}
-//		else {
-//			penaltyFactor =  1.0 + 2.0 * (depTime / 3600.0);
-//		}
-//
-//		return penaltyFactor * timeInVehicle;
-//	}
-	
 	/*
 	 * New approach for penalty time: if the person tries to depart to early, we add time
 	 * between the scheduled departure and the assumed first PT connection to the travel

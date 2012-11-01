@@ -21,6 +21,7 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,6 +39,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
@@ -45,7 +47,7 @@ import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
 public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActivityReplanner {
@@ -56,11 +58,11 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	
 	protected final DecisionDataProvider decisionDataProvider;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
-	protected final PTTravelTimeKTI ptTravelTime;
+	protected final SwissPTTravelTime ptTravelTime;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
-			ModeAvailabilityChecker modeAvailabilityChecker, PTTravelTimeKTI ptTravelTime) {
+			ModeAvailabilityChecker modeAvailabilityChecker, SwissPTTravelTime ptTravelTime) {
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
@@ -154,7 +156,8 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			
 			// if the person has to walk, we additionally try pt
 			if (transportMode.equals(TransportMode.walk)) {
-				double travelTimePT = ptTravelTime.calcSwissPtTravelTime(currentActivity, meetingActivity, this.time);
+				Tuple<Double, Coord> tuple = ptTravelTime.calcSwissPtTravelTime(currentActivity, meetingActivity, this.time, executedPlan.getPerson()); 
+				double travelTimePT = tuple.getFirst();
 				double travelTimeWalk = legToMeeting.getTravelTime();
 				
 				// If using pt is faster than walking switch to pt.

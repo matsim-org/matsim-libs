@@ -108,8 +108,8 @@ import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIEvacuationFactory;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AffectedAgentsFilterFactory;
@@ -775,7 +775,7 @@ public class MarathonController extends WithinDayController implements StartupLi
 		 * During Activity Replanners
 		 */
 		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, 
-				(PTTravelTimeKTI) this.ptTravelTime);
+				(SwissPTTravelTime) this.ptTravelTime);
 		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, 
 				endActivityAndEvacuateReplannerFactory);
 		this.marathonEndActivityAndEvacuateReplannerFactory.addIdentifier(this.affectedActivityPerformingIdentifier);

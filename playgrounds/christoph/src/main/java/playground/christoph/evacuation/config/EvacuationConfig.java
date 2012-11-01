@@ -35,7 +35,7 @@ public class EvacuationConfig {
 	
 	public static double evacuationTime = 3600 * 8.0;	// time when the incident takes place
 	public static double evacuationDelayTime = 3600 * 8.0;	// time until the area should be cleared
-		
+	
 	/*
 	 * Even if meet at home and evacuate afterwards might be more time consuming than
 	 * evacuating directly (but not joined), a household might still prefer the first option.
@@ -47,11 +47,19 @@ public class EvacuationConfig {
 	public static double innerRadius = 30000.0;
 	public static double outerRadius = 30500.0;
 	
+	/*
+	 * If true, pt travel times are estimated using the transit router.
+	 * Otherwise, they are estimated based on the matrix used for the
+	 * KTI runs.
+	 */
+	public static boolean useTransitRouter = true;
+	public static String transitRouterFile = "";
+	
 //	public static Coord centerCoord = new CoordImpl("683518.0","246836.0");	// Bellevue Coord
 	public static Coord centerCoord = new CoordImpl("640050.0", "246256.0");	// Coordinates of KKW Goesgen
 	
-	public static String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
-	public static String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
+	public static String dhm25File = "";
+	public static String srtmFile = "";
 	
 	public static String householdObjectAttributesFile = "";
 	

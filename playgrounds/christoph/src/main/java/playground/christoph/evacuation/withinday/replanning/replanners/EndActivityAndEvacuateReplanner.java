@@ -38,20 +38,21 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTI;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
 	
 	private static final Logger log = Logger.getLogger(EndActivityAndEvacuateReplanner.class);
 	
-	private final PTTravelTimeKTI ptTravelTime;
+	private final SwissPTTravelTime ptTravelTime;
 	
 	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
-			PTTravelTimeKTI ptTravelTime) {
+			SwissPTTravelTime ptTravelTime) {
 		super(id, scenario, internalInterface);
 		this.ptTravelTime = ptTravelTime;
 	}
@@ -141,7 +142,8 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		
 		// if the person has to walk, we additionally try pt
 		if (transportMode.equals(TransportMode.walk)) {
-			double travelTimePT = ptTravelTime.calcSwissPtTravelTime(currentActivity, rescueActivity, this.time);
+			Tuple<Double, Coord> tuple = ptTravelTime.calcSwissPtTravelTime(currentActivity, rescueActivity, this.time, executedPlan.getPerson());
+			double travelTimePT = tuple.getFirst();
 			double travelTimeWalk = legToRescue.getTravelTime();
 			
 			// If using pt is faster than walking switch to pt.

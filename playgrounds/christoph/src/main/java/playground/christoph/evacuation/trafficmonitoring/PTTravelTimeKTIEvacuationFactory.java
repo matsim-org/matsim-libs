@@ -68,10 +68,6 @@ public class PTTravelTimeKTIEvacuationFactory extends PTTravelTimeKTIFactory {
 	public PTTravelTimeKTIEvacuationFactory(Scenario scenario, TravelTime ptTravelTime) {
 		super(scenario, ptTravelTime);
 	}
-
-	public void prepareMatrixForEvacuation(CoordAnalyzer coordAnalyzer) {
-		this.prepareMatrixForEvacuation(coordAnalyzer, null, null);
-	}
 	
 	public void prepareMatrixForEvacuation(CoordAnalyzer coordAnalyzer, String stopsFile, String travelTimesFile) {
 		PlansCalcRouteKtiInfo pcrKTIi = this.getPlansCalcRouteKtiInfo();
