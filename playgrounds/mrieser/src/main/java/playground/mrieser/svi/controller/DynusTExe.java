@@ -20,6 +20,11 @@
 package playground.mrieser.svi.controller;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
@@ -44,17 +49,6 @@ public class DynusTExe {
 	}
 
 	public void runDynusT(final boolean cleanUp) {
-		final String[] exeFiles = new String[] {
-				"DynusT.exe",
-				"DLL_ramp.dll",
-				"Ramp_Meter_Fixed_CDLL.dll",
-				"Ramp_Meter_Feedback_CDLL.dll",
-				"Ramp_Meter_Feedback_FDLL.dll",
-				"libifcoremd.dll",
-				"libmmd.dll",
-				"Ramp_Meter_Fixed_FDLL.dll",
-				"libiomp5md.dll"
-		};
 		final String[] modelFiles = new String[] {
 				"network.dat",
 				"scenario.dat",
@@ -87,11 +81,30 @@ public class DynusTExe {
 			iterDir.mkdir();
 		}
 		log.info("Copying application files to iteration-directory...");
-		for (String filename : exeFiles) {
-			log.info("  Copying " + filename);
-			IOUtils.copyFile(new File(this.dynusTDir + "/" + filename), new File(this.tmpDir + "/" + filename));
+		String exeName = null;
+		List<String> exeFiles = new ArrayList<String>();
+		for (File f : new File(this.dynusTDir).listFiles()) {
+			if (f.isFile()) {
+				log.info("  Copying " + f.getName());
+				exeFiles.add(f.getName());
+				IOUtils.copyFile(f, new File(this.tmpDir + "/" + f.getName()));
+				String lcName = f.getName().toLowerCase(Locale.ROOT);
+				if (lcName.endsWith(".exe") && lcName.contains("dynust")) {
+					log.info("    Found DynusT executable");
+					exeName = f.getName();
+				}
+			}
 		}
 		log.info("Copying model files to iteration-directory...");
+//		List<String> modelFiles = new ArrayList<String>();
+//		for (File f : new File(this.modelDir).listFiles()) {
+//			if (!(f.getName().toLowerCase(Locale.ROOT).matches("demand.dat"))) {
+//				String filename = f.getName();
+//				modelFiles.add(filename);
+//				log.info("  Copying " + filename);
+//				IOUtils.copyFile(f, new File(this.tmpDir + "/" + filename));
+//			}
+//		}
 		for (String filename : modelFiles) {
 			log.info("  Copying " + filename);
 			IOUtils.copyFile(new File(this.modelDir + "/" + filename), new File(this.tmpDir + "/" + filename));
@@ -103,11 +116,23 @@ public class DynusTExe {
 			}
 		}
 
+		// adapt workingdir.ini
+		File file = new File(this.tmpDir + "/workingdir.ini");
+		try {
+			FileWriter write = new FileWriter(file, false);
+			PrintWriter prntln = new PrintWriter(write);
+			prntln.print(this.tmpDir);
+			prntln.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
 		String logfileName = this.tmpDir + "/dynus-t.log";
 
-		String cmd = this.tmpDir + "/DynusT.exe";
+		String cmd = this.tmpDir + "/" + exeName;
 		log.info("running command: " + cmd + " in directory " + this.tmpDir);
-		int timeout = 7200; // 2 hours should hopefully be enough
+		int timeout = 3600; // 1 hour should hopefully be enough
 		int exitcode = ExeRunner.run(cmd, logfileName, timeout, this.tmpDir);
 		if (exitcode != 0) {
 			throw new RuntimeException("There was a problem running Dynus-T. exit code: " + exitcode);
