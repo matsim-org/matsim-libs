@@ -23,6 +23,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.droeder.southAfrica.old.run.PtSubModeControlerOld;
+import playground.droeder.southAfrica.run.PtSubModeControler;
 
 /**
  * @author droeder
@@ -38,8 +39,8 @@ public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	 */
 	public ReRoutePtSubModeStrategy(Controler c) {
 		super(c.getConfig().global());
-		if(!(c instanceof PtSubModeControlerOld)){
-			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler...");
+		if(!(c instanceof PtSubModeControler) || !(c instanceof PtSubModeControlerOld)){
+			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler(Old)...");
 		}
 		this.c = c;
 	}
@@ -48,20 +49,4 @@ public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	public PlanAlgorithm getPlanAlgoInstance() {
 		return this.c.createRoutingAlgorithm();
 	}
-
-//	@Override
-//	public void prepareReplanning() {
-//		
-//	}
-//
-//	@Override
-//	public void handlePlan(Plan plan) {
-//		this.c.createRoutingAlgorithm().run(plan);
-//	}
-//
-//	@Override
-//	public void finishReplanning() {
-//		
-//	}
-
 }
