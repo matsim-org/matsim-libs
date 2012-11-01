@@ -176,14 +176,14 @@ public class CreateTestScenario {
 		// create LoopLinks for Home/Work-Locations
 		l = createLink(net, factory, "A-A", busCarTaxi);
 		l.setCapacity(9999);
-		l.setFreespeed(100);
-		l.setLength(100);
+		l.setFreespeed(10000);
+		l.setLength(1000);
 		net.addLink(l);
 		
 		l = createLink(net, factory, "C-C", busCarTaxi);
 		l.setCapacity(9999);
-		l.setFreespeed(100);
-		l.setLength(100);
+		l.setFreespeed(10000);
+		l.setLength(1000);
 		net.addLink(l);
 		
 	}

@@ -39,7 +39,7 @@ public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	 */
 	public ReRoutePtSubModeStrategy(Controler c) {
 		super(c.getConfig().global());
-		if(!(c instanceof PtSubModeControler) || !(c instanceof PtSubModeControlerOld)){
+		if(!(c instanceof PtSubModeControler || c instanceof PtSubModeControlerOld)){
 			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler(Old)...");
 		}
 		this.c = c;

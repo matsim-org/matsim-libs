@@ -78,7 +78,7 @@ public class PtSubModeRouterSet implements TransitRouter{
 			TransitRouterNetworkTravelTimeAndDisutility timeAndDisutility) {
 		
 		for(Entry<String, TransitRouterNetwork> e :networks.entrySet()){
-			this.modeRouter.put(e.getKey(), new TransitRouterImpl(config2, e.getValue(), timeAndDisutility, timeAndDisutility));
+			this.modeRouter.put(e.getKey(), new PtSubModeRouter(config2, e.getValue(), timeAndDisutility, timeAndDisutility));
 		}
 	}
 	
