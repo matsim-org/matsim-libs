@@ -20,6 +20,7 @@
 package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
@@ -62,6 +63,10 @@ public class TTtripAnalysisV4{
 	}
 	
 	public void writeResults(String outputFolder) {
+		if(!new File(outputFolder).exists()){
+			new File(outputFolder).mkdirs();
+		}
+		
 		BufferedWriter writer;
 		try {
 			// write analysis

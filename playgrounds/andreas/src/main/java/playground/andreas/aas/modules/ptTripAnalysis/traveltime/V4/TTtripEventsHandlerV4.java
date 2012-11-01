@@ -57,6 +57,7 @@ public class TTtripEventsHandlerV4 extends AbstractTTtripEventsHandler implement
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent e) {
+		//drivers have no plans
 		if(super.id2Trips.containsKey(e.getPersonId())){
 			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
 				this.addTrip2TripSet(e.getPersonId());

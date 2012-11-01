@@ -72,7 +72,7 @@ public class AasRunner {
 		
 		// END of configuration file
 		
-		
+		// TOOD BvgAnalysis is a SpecialCase. Use TTtripAnalysis here... /dr Nov '12
 		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
 		ptAna.init(this.scenario, this.shapeFile);
 		this.anaModules.add(ptAna);
