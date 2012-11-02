@@ -113,11 +113,10 @@ public class CreateScenario {
 		ObjectAttributes preferences = new ObjectAttributes();
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
 			
-				// incomes 1..8
-				// alpha [min ... 2.0]:
-				double mintt = 0.001;
-				double incomeNzd = (personWeeks.getIncome() - 1) / 8.0; // income [0..1] 
-				double alpha = Math.max(mintt, 2 * incomeNzd);
+				// incomes 0..8
+				// alpha [0.5 ... 1.5]:
+				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] 
+				double alpha = 0.5 + incomeNzd;
 				
 				// gamma [0.0 ... 2.0]:
 				double k = 4.0 / (incomeNzd + 1.0); // [2.0 .. 4.0]
