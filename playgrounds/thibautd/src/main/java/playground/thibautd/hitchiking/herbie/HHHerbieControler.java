@@ -74,11 +74,19 @@ public class HHHerbieControler extends HitchHikingControler {
 
 	@Override
 	protected void setUp() {
+		FacilityPenalties facPenalties = getScenario().getScenarioElement(FacilityPenalties.class);
+
+		if (facPenalties == null) {
+			// I'm pretty sure it's not used anywhere...
+			facPenalties = new FacilityPenalties();
+			getScenario().addScenarioElement( facPenalties );
+		}
+
 		HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
 			new HerbiePlanBasedScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
-				this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(),
+				facPenalties.getFacilityPenalties(),
 				this.getFacilities(),
 				this.getNetwork());
 
