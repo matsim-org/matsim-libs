@@ -52,7 +52,7 @@ public class PassengerDepartsWithDriverEvent extends WaitingEvent {
 	public Map<String, String> getAttributes() {
 		Map<String, String> atts = super.getAttributes();
 
-		atts.put( ATTRIBUTE_DRIVER  , "driverId"+driverId );
+		atts.put( ATTRIBUTE_DRIVER  , ""+driverId );
 
 		return atts;
 	}
