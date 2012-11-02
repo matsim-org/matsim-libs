@@ -293,8 +293,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		Coord c = link.getCoord();
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
 		
+//		this.cellTree.get
+		
 		//update cell link enter time
-		cell.addLinkEnterTime(event.getTime());
+		cell.addLinkEnterTime(personId, event.getTime());
 		
 		//check for highest global utilization of a single link
 		int enterCount = cell.getLinkEnterTimes().size();
@@ -327,7 +329,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		Cell<List<Event>> cell = this.cellTree.get(c.getX(), c.getY());
 		
 		//update cell link leave time
-		cell.addLinkLeaveTime(event.getTime());
+		cell.addLinkLeaveTime(personId, event.getTime());
 		
 		//update global link leave times
 		List<Tuple<Id,Double>> times;
