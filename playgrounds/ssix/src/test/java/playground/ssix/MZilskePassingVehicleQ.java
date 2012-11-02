@@ -9,7 +9,7 @@ import java.util.Queue;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
 
-final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
+public class MZilskePassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 
 
 	private final Queue<QVehicle> delegate = new PriorityQueue<QVehicle>(11, new Comparator<QVehicle>() {
