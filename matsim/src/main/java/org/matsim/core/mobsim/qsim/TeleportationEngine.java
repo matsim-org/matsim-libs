@@ -25,19 +25,21 @@ import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
-public class TeleportationEngine implements DepartureHandler, MobsimEngine, VisData {
+public class TeleportationEngine implements DepartureHandler, MobsimEngine,
+		VisData {
 	/**
 	 * Includes all agents that have transportation modes unknown to the
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TeleportationArrivalTimeComparator());
+	private Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(
+			30, new TeleportationArrivalTimeComparator());
 	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 	private InternalInterface internalInterface;
 	private final Set<Id> trackedAgents = new HashSet<Id>();
 	private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
 	private boolean doVisualizeTeleportedAgents;
 	private Collection<AgentSnapshotInfo> snapshots = new ArrayList<AgentSnapshotInfo>();
-	
+
 	public void removeTrackedAgent(Id id) {
 		trackedAgents.remove(id);
 	}
@@ -46,59 +48,61 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine, VisD
 		trackedAgents.add(agentId);
 	}
 
-
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
 		double arrivalTime = now + agent.getExpectedTravelTime();
-		this.teleportationList.add(new Tuple<Double, MobsimAgent>(arrivalTime, agent));
+		this.teleportationList.add(new Tuple<Double, MobsimAgent>(arrivalTime,
+				agent));
 		Id agentId = agent.getId();
-		Link currLink = this.internalInterface.getMobsim().getScenario().getNetwork().getLinks().get(linkId);
-		Link destLink = this.internalInterface.getMobsim().getScenario().getNetwork().getLinks().get(agent.getDestinationLinkId()) ;
+		Link currLink = this.internalInterface.getMobsim().getScenario()
+				.getNetwork().getLinks().get(linkId);
+		Link destLink = this.internalInterface.getMobsim().getScenario()
+				.getNetwork().getLinks().get(agent.getDestinationLinkId());
 		double travTime = agent.getExpectedTravelTime();
 		Coord fromCoord = currLink.getToNode().getCoord();
 		Coord toCoord = destLink.getToNode().getCoord();
-		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travTime);
-		this.teleportationData.put( agentId , agentInfo );
+		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId,
+				fromCoord, toCoord, travTime);
+		this.teleportationData.put(agentId, agentInfo);
 		return true;
 	}
-	
+
 	@Override
-	public Collection<AgentSnapshotInfo> getVehiclePositions(Collection<AgentSnapshotInfo> snapshotList) {
+	public Collection<AgentSnapshotInfo> getVehiclePositions(
+			Collection<AgentSnapshotInfo> snapshotList) {
 		snapshotList.addAll(this.snapshots);
 		return snapshotList;
 	}
 
-	private void updateSnapshots() {
+	@Override
+	public void doSimStep(double time) {
+		this.updateSnapshots(time);
+		handleTeleportationArrivals();
+	}
+
+	private void updateSnapshots(double time) {
 		snapshots.clear();
-		for (TeleportationVisData agentInfo : teleportationData.values()) {
-			if (this.doVisualizeTeleportedAgents || trackedAgents.contains(agentInfo.getId())) {
-				snapshots.add(agentInfo);
+		if (this.doVisualizeTeleportedAgents) {
+			for (TeleportationVisData teleportationVisData : teleportationData.values()) {
+				teleportationVisData.calculatePosition(time);
+				snapshots.add(teleportationVisData);
 			}
 		}
 		for (Id personId : trackedAgents) {
-			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			MobsimAgent agent = agents.get(personId);
-			VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
-			visLink.getVisData().getVehiclePositions(positions);
-			for (AgentSnapshotInfo position : positions) {
-				if (position.getId().equals(personId)) {
-					snapshots.add(position);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		this.updateTeleportedAgents(time);
-		updateSnapshots();
-		handleTeleportationArrivals();
-	}
-	
-	private void updateTeleportedAgents(double time) {
-		for (TeleportationVisData teleportationVisData : teleportationData.values()) {
-			if (this.doVisualizeTeleportedAgents || trackedAgents.contains(teleportationVisData.getId())) {
+			TeleportationVisData teleportationVisData = teleportationData.get(personId);
+			if (teleportationVisData != null) {
 				teleportationVisData.calculatePosition(time);
+				snapshots.add(teleportationVisData);
+			} else {
+				Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+				MobsimAgent agent = agents.get(personId);
+				VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
+				visLink.getVisData().getVehiclePositions(positions);
+				for (AgentSnapshotInfo position : positions) {
+					if (position.getId().equals(personId)) {
+						snapshots.add(position);
+					}
+				}
 			}
 		}
 	}
@@ -110,10 +114,11 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine, VisD
 			if (entry.getFirst().doubleValue() <= now) {
 				teleportationList.poll();
 				MobsimAgent personAgent = entry.getSecond();
-				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
+				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent
+						.getDestinationLinkId());
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
-				internalInterface.arrangeNextAgentState(personAgent) ;
+				internalInterface.arrangeNextAgentState(personAgent);
 			} else {
 				break;
 			}
@@ -122,8 +127,10 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine, VisD
 
 	@Override
 	public void onPrepareSim() {
-		this.doVisualizeTeleportedAgents = internalInterface.getMobsim().getScenario().getConfig().otfVis().isShowTeleportedAgents();
-		for (MobsimAgent agent : ((VisMobsim) internalInterface.getMobsim()).getAgents()) {
+		this.doVisualizeTeleportedAgents = internalInterface.getMobsim()
+				.getScenario().getConfig().otfVis().isShowTeleportedAgents();
+		for (MobsimAgent agent : ((VisMobsim) internalInterface.getMobsim())
+				.getAgents()) {
 			agents.put(agent.getId(), agent);
 		}
 	}
@@ -133,8 +140,11 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine, VisD
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (Tuple<Double, MobsimAgent> entry : teleportationList) {
 			MobsimAgent agent = entry.getSecond();
-			EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
-			eventsManager.processEvent(eventsManager.getFactory().createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
+			EventsManager eventsManager = internalInterface.getMobsim()
+					.getEventsManager();
+			eventsManager.processEvent(eventsManager.getFactory()
+					.createAgentStuckEvent(now, agent.getId(),
+							agent.getDestinationLinkId(), agent.getMode()));
 		}
 		teleportationList.clear();
 	}
