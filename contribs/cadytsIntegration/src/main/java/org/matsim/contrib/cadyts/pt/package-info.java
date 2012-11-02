@@ -1,5 +1,3 @@
-package org.matsim.contrib.cadyts.pt;
-
 /**
  * Integrates automatic calibration upon public transport line occupancies using Cadyts into MATSim.
  *
@@ -57,6 +55,4 @@ package org.matsim.contrib.cadyts.pt;
  * </ul>
  *
  */
-class PackageInfo {
-	// class just here to use javadoc formatter in eclipse.  yyyy May destroy automatic javadoc extraction, need to check.
-}
+package org.matsim.contrib.cadyts.pt;
