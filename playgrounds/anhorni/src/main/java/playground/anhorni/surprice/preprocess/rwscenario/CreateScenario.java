@@ -113,10 +113,17 @@ public class CreateScenario {
 		ObjectAttributes preferences = new ObjectAttributes();
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
 			
-				double alpha = personWeeks.getIncome() + this.random.nextDouble();
-				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "alpha", alpha);
+				// incomes 1..8
+				// alpha [min ... 2.0]:
+				double mintt = 0.001;
+				double incomeNzd = (personWeeks.getIncome() - 1) / 8.0; // income [0..1] 
+				double alpha = Math.max(mintt, 2 * incomeNzd);
 				
-				double gamma = 1.0 / (personWeeks.getIncome() + 1.0) + 0.1 * this.random.nextDouble();
+				// gamma [0.0 ... 2.0]:
+				double k = 4.0 / (incomeNzd + 1.0); // [2.0 .. 4.0]
+				double gamma = k - 2; // [0 .. 2]
+				
+				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "alpha", alpha);
 				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "gamma", gamma);
 		}
 		this.writePreferences(path, preferences);

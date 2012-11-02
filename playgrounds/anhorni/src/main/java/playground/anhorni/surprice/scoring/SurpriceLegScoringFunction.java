@@ -20,7 +20,7 @@
 
 package playground.anhorni.surprice.scoring;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,7 +34,6 @@ import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.anhorni.surprice.AgentMemory;
 import playground.anhorni.surprice.Surprice;
-import playground.anhorni.surprice.analysis.Analyzer;
 
 public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
@@ -62,7 +61,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private double constantBike;
     private double constantWalk;  
     
-    private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
+//    private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
 
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
     		String day, double alpha, double gamma, double alphaTrip) {

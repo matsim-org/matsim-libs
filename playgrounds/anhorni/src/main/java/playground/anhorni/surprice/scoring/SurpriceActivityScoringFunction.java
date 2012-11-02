@@ -22,7 +22,7 @@ package playground.anhorni.surprice.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -48,7 +48,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	private final ActivityFacilities facilities;
 	private DayType day;
 	private Plan plan;
-	private final static Logger log = Logger.getLogger(SurpriceActivityScoringFunction.class);
+//	private final static Logger log = Logger.getLogger(SurpriceActivityScoringFunction.class);
 		
 	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
 			ActivityFacilities facilities, double alpha, String day) {
