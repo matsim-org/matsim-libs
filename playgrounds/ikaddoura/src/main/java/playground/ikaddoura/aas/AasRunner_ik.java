@@ -33,11 +33,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.vsp.aas.modules.AbstractAnalyisModule;
+import playground.vsp.aas.modules.carDistance.CarDistanceAnalyzer;
 import playground.vsp.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
+import playground.vsp.aas.modules.transferPayments.MonetaryPaymentsAnalyzer;
+import playground.vsp.aas.modules.travelTime.TravelTimeAnalyzer;
+import playground.vsp.aas.modules.userBenefits.UserBenefitsAnalyzer;
 
 /**
  * 
- * @author aneumann, ikaddoura
+ * @author ikaddoura, aneumann
  *
  */
 public class AasRunner_ik {
@@ -58,15 +62,32 @@ public class AasRunner_ik {
 
 	public void init(String aasRunnerConfigFile){
 		log.info("This is currently not implemented. Initializing all modules with defaults...");
-		String ptDriverPrefix = "pt_";
+		String ptDriverPrefix = "pt_"; // personId must not have the same prefix!
 		
 		// END of configuration file
 		
-		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
-		distAna.init(this.scenario);
-		this.anaModules.add(distAna);
+//		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
+//		distAna.init(this.scenario);
+//		this.anaModules.add(distAna);
+//		
+//		UserBenefitsAnalyzer userBenefitsAna = new UserBenefitsAnalyzer(ptDriverPrefix);
+//		userBenefitsAna.init(this.scenario);
+//		this.anaModules.add(userBenefitsAna);
+		
+		MonetaryPaymentsAnalyzer moneyAna = new MonetaryPaymentsAnalyzer(ptDriverPrefix);
+		moneyAna.init(this.scenario);
+		this.anaModules.add(moneyAna);
+		
+		CarDistanceAnalyzer carDistAna = new CarDistanceAnalyzer(ptDriverPrefix);
+		carDistAna.init(scenario);
+		this.anaModules.add(carDistAna);
+		
+		TravelTimeAnalyzer ttAna = new TravelTimeAnalyzer(ptDriverPrefix);
+		ttAna.init(scenario);
+		this.anaModules.add(ttAna);
 		
 		// END ugly code - Initialization needs to be configurable
+		
 		log.info("Initializing all modules with defaults... done.");
 	}
 
@@ -116,7 +137,7 @@ public class AasRunner_ik {
 			log.info("Writing results of module " + module.getName() + " to " + moduleOutputDir + "... done.");
 		}
 		log.info("Writing results for all modules... done.");
-		
+
 		Gbl.printElapsedTime();
 		Gbl.printMemoryUsage();
 	}

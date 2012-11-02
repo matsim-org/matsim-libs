@@ -28,7 +28,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * 
- * @author aneumann, ikaddoura
+ * @author ikaddoura, aneumann
  *
  */
 public class AasMain_ik {
@@ -47,8 +47,8 @@ public class AasMain_ik {
 	 */
 	public static void main(String[] args) {
 		
-		final String iteration = "1";
-		final String CONFIGFILE = "/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/test/test_config.xml";
+		final String iteration = "300";
+		final String CONFIGFILE = "/Users/Ihab/Desktop/extIt0.0/internalIterations/output_config.xml";
 		final String AASRUNNERCONFIGFILE = null;
 		
 		AasMain_ik aM = new AasMain_ik(CONFIGFILE, iteration);
@@ -71,15 +71,21 @@ public class AasMain_ik {
 		
 		this.config = ConfigUtils.loadConfig(configFile);
 		
-		// assuming a runID to be set in the controler
+		String runId;
+		if (this.config.controler().getRunId() == null){
+			runId ="";
+		} else {
+			runId = this.config.controler().getRunId() + ".";
+		}
+		
 		this.iterationOutputDir = this.config.controler().getOutputDirectory() + "/ITERS/it." + iteration + "/";
-		this.eventsFile = this.iterationOutputDir + this.config.controler().getRunId() + "." + iteration + ".events.xml.gz";
+		this.eventsFile = this.iterationOutputDir + runId + iteration + ".events.xml.gz";
 		
 		String networkFile = this.config.network().getInputFile();
 		log.info("Setting network to " + networkFile);
 		this.config.network().setInputFile(networkFile);
 		
-		String popFile = this.iterationOutputDir + this.config.controler().getRunId() + "." + iteration + ".plans.xml.gz";
+		String popFile = this.iterationOutputDir + runId + iteration + ".plans.xml.gz";
 		log.info("Setting population to " + popFile);
 		this.config.plans().setInputFile(popFile);
 		

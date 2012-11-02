@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
 /**
- * @author Ihab
+ * @author ikaddoura
  *
  */
 public class IKControler {
