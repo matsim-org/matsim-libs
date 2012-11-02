@@ -63,7 +63,11 @@ public class DistanceCalculations {
 		if(!dist.isNaN()) return route.getDistance();
 		
 		String routeDescription = route.getRouteDescription();
-		String nodeIDs[] = routeDescription.split(" ");
+		// events to legs generates a genericRoute with no description
+		// for car legs from link i to link i (td, oct. 2012)
+		String[] nodeIDs = routeDescription != null ?
+			routeDescription.split(" ") :
+			new String[0];
 		
 		for (int i = 0; i < (nodeIDs.length - 1); i++) {
 			
