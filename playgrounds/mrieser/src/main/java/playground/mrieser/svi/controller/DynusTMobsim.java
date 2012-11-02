@@ -25,14 +25,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.mrieser.svi.data.DynamicODMatrix;
 import playground.mrieser.svi.data.DynusTDynamicODDemandWriter;
+import playground.mrieser.svi.data.vehtrajectories.CalculateLinkStatsFromVehTrajectories;
 import playground.mrieser.svi.data.vehtrajectories.CalculateLinkTravelTimesFromVehTrajectories;
 import playground.mrieser.svi.data.vehtrajectories.CalculateTravelTimeMatrixFromVehTrajectories;
 import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.data.vehtrajectories.MultipleVehicleTrajectoryHandler;
 import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoriesReader;
 import playground.mrieser.svi.replanning.DynamicODDemandCollector;
 
@@ -47,13 +50,15 @@ public class DynusTMobsim implements Mobsim {
 	private final Scenario scenario;
 	private final DynamicTravelTimeMatrix ttMatrix;
 	private final Network dynusTnet;
+	private final Controler controler;
 
 	public DynusTMobsim(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final Scenario sc, final EventsManager eventsManager,
-			final Network dynusTnet) {
+			final Network dynusTnet, final Controler controler) {
 		this.dc = dc;
 		this.scenario = sc;
 		this.ttMatrix = ttMatrix;
 		this.dynusTnet = dynusTnet;
+		this.controler = controler;
 	}
 
 	@Override
@@ -82,13 +87,22 @@ public class DynusTMobsim implements Mobsim {
 		// read in data, convert it somehow to score the plans
 		log.info("read in Vehicle Trajectories from DynusT");
 		String vehTrajFilename = this.dc.getOutputDirectory() + "/VehTrajectory.dat";
+		
+		MultipleVehicleTrajectoryHandler multiHandler = new MultipleVehicleTrajectoryHandler();
 		CalculateTravelTimeMatrixFromVehTrajectories ttmCalc = new CalculateTravelTimeMatrixFromVehTrajectories(this.ttMatrix);
-		new VehicleTrajectoriesReader(ttmCalc, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
-
+		multiHandler.addTrajectoryHandler(ttmCalc);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(this.dynusTnet, this.scenario.getConfig().travelTimeCalculator());
 		CalculateLinkTravelTimesFromVehTrajectories lttCalc = new CalculateLinkTravelTimesFromVehTrajectories(ttc, this.dynusTnet);
-		new VehicleTrajectoriesReader(lttCalc, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
+		multiHandler.addTrajectoryHandler(lttCalc);
+		CalculateLinkStatsFromVehTrajectories linkStats = new CalculateLinkStatsFromVehTrajectories(this.dynusTnet);
+		multiHandler.addTrajectoryHandler(linkStats);
+		
+		new VehicleTrajectoriesReader(multiHandler, this.dc.getZoneIdToIndexMapping()).readFile(vehTrajFilename);
+
 		this.dc.setTravelTimeCalculator(ttc);
+		linkStats.writeLinkVolumesToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkVolumes.txt"));
+		linkStats.writeLinkTravelTimesToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelTimes.txt"));
+		linkStats.writeLinkTravelSpeedsToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelSpeeds.txt"));
 	}
 
 }

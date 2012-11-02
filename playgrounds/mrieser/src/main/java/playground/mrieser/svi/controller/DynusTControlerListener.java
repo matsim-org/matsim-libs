@@ -114,7 +114,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		if (!this.useOnlyDynusT) {
 			// run DynusT now
-			new DynusTMobsim(this.dc, this.ttMatrix, event.getControler().getScenario(), event.getControler().getEvents(), this.dynusTNetwork).run();
+			new DynusTMobsim(this.dc, this.ttMatrix, event.getControler().getScenario(), event.getControler().getEvents(), this.dynusTNetwork, event.getControler()).run();
 			new ScoreAdaptor().run();
 		}
 	}

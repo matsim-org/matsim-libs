@@ -63,7 +63,7 @@ public abstract class DynusTUtils {
 
 		boolean useOnlyDynusT = Boolean.parseBoolean(controler.getConfig().getParam("dynus-t", "useOnlyDynusT"));
 		if (useOnlyDynusT) {
-			controler.setMobsimFactory(new DynusTMobsimFactory(dc, ttMatrix, dynusTNetwork));
+			controler.setMobsimFactory(new DynusTMobsimFactory(dc, ttMatrix, dynusTNetwork, controler));
 			log.info("DynusT will be used as exclusive mobility simulation. Make sure that re-routing is *not* enabled as replanning strategy, as it will have no effect.");
 			controler.setScoringFunctionFactory(new DynusTScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), new CharyparNagelScoringParameters(config.planCalcScore())));
 		} else {

@@ -35,5 +35,4 @@ public class CalculateTravelTimeMatrixFromVehTrajectories implements VehicleTraj
 		this.matrix.addTravelTime(trajectory.getStartTime(), trajectory.getTravelTime(), trajectory.getOrigZone(), trajectory.getDestZone());
 	}
 
-
 }
