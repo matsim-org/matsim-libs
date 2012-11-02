@@ -74,7 +74,12 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 			double dist = 0.0;
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
-				dist = DistanceCalculations.getLegDistance(route, network);
+				try {
+					dist = DistanceCalculations.getLegDistance(route, network);
+				}
+				catch (Exception e) {
+					throw new RuntimeException( "mode="+leg.getMode()+", route="+route, e );
+				}
 			}
 			tmpScore += travelScoring.getCarScore(dist, travelTime);
 		}
