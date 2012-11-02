@@ -198,7 +198,7 @@ public class DreieckStreckeSzenario {
 	}
 	
 	public static void main(String[] args) {
-		new DreieckStreckeSzenario(500.0,500).run();
+		new DreieckStreckeSzenario(500.0,2000).run();
 	}
 	
 	public void run(){
