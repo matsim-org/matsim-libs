@@ -32,7 +32,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 
 /**
- * @author ikaddoura, aneumann, benjamin
+ * @author ikaddoura, benjamin
  *
  */
 public class UserBenefitsCalculator {

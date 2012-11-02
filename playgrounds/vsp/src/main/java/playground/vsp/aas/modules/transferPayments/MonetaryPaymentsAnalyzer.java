@@ -17,12 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- * @author ikaddoura
- * 
- */
-package playground.vsp.aas.modules.userBenefits;
+package playground.vsp.aas.modules.transferPayments;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,6 +26,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,66 +36,70 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.aas.modules.AbstractAnalyisModule;
 
 /**
+ * A transfer payment can be a toll, a fare or any other {@link AgentMoneyEvent}. Normally this is the operator revenue.
+ * 
  * @author ikaddoura
  *
  */
-public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
+public class MonetaryPaymentsAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(MonetaryPaymentsAnalyzer.class);
 	private ScenarioImpl scenario;
-	private UserBenefitsCalculator userWelfareCalculator;
-	
-	private double allUsersLogSum;
-	private int personWithNoValidPlanCnt;
-	private Map<Id, Double> personId2Logsum;
 
-	public UserBenefitsAnalyzer(String ptDriverPrefix) {
-		super(UserBenefitsAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	private MoneyEventHandler moneyEventHandler;
+	private Map<Id, Double> personId2amount;
+	private double allUsersAmount;
+	
+	public MonetaryPaymentsAnalyzer(String ptDriverPrefix) {
+		super(MonetaryPaymentsAnalyzer.class.getSimpleName(), ptDriverPrefix);
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		
-		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig());
-		this.userWelfareCalculator.reset();
+		this.moneyEventHandler = new MoneyEventHandler();
+		this.personId2amount = new TreeMap<Id, Double>();
+		this.allUsersAmount = 0.;
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		// nothing to return
-		return new LinkedList<EventHandler>();
+		List<EventHandler> handler = new LinkedList<EventHandler>();
+		handler.add(this.moneyEventHandler);		
+		return handler;
 	}
 
 	@Override
 	public void preProcessData() {
-		this.allUsersLogSum = this.userWelfareCalculator.calculateLogsum(this.scenario.getPopulation());
-		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getNoValidPlanCnt();
-		log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + personWithNoValidPlanCnt);
-		this.personId2Logsum = this.userWelfareCalculator.getPersonId2Logsum();
-	}
-
-	@Override
-	public void postProcessData() {
 		// nothing to do
 	}
 
 	@Override
+	public void postProcessData() {
+		this.personId2amount = moneyEventHandler.getPersonId2amount();
+		
+		for (Double amount : personId2amount.values()){
+			this.allUsersAmount += amount;
+		}
+	}
+
+	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder + "userBenefits.txt";
+		String fileName = outputFolder + "transferPayments.txt";
 		File file = new File(fileName);
-				
+			
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("monetary user benefits (all users logsum): " + this.allUsersLogSum);
+			bw.write("Note: From users' perspective a positive amount means a gain, a negative amount a payment!");
 			bw.newLine();
-			bw.write("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + this.personWithNoValidPlanCnt);
+			bw.newLine();
+			bw.write("total transfer payments (from users' perspective): " + this.allUsersAmount);
+			bw.newLine();
+			bw.newLine();
+			bw.write("userID \t transfer payment from user's perspective");
 			bw.newLine();
 			
-			bw.newLine();
-			bw.write("userID \t monetary user logsum");
-			bw.newLine();
-			
-			for (Id id : this.personId2Logsum.keySet()){
-				String row = id + "\t" + this.personId2Logsum.get(id);
+			for (Id id : this.personId2amount.keySet()){
+				String row = id + "\t" + this.personId2amount.get(id);
 				bw.write(row);
 				bw.newLine();
 			}

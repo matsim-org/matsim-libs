@@ -22,7 +22,7 @@
  * @author ikaddoura
  * 
  */
-package playground.vsp.aas.modules.userBenefits;
+package playground.vsp.aas.modules.carDistance;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,74 +43,85 @@ import playground.vsp.aas.modules.AbstractAnalyisModule;
  * @author ikaddoura
  *
  */
-public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
+public class CarDistanceAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(CarDistanceAnalyzer.class);
 	private ScenarioImpl scenario;
-	private UserBenefitsCalculator userWelfareCalculator;
 	
-	private double allUsersLogSum;
-	private int personWithNoValidPlanCnt;
-	private Map<Id, Double> personId2Logsum;
-
-	public UserBenefitsAnalyzer(String ptDriverPrefix) {
-		super(UserBenefitsAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	private CarDistanceEventHandler carDistanceEventHandler;
+	private Map<Id, Double> personId2carDistance;
+	private int carTrips;
+	private double avgCarDistancePerCarUser_km;
+	private double avgCarDistancePerTrip_km;
+	
+	public CarDistanceAnalyzer(String ptDriverPrefix) {
+		super(CarDistanceAnalyzer.class.getSimpleName(), ptDriverPrefix);
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		
-		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig());
-		this.userWelfareCalculator.reset();
+		this.carDistanceEventHandler = new CarDistanceEventHandler(scenario.getNetwork(), this.ptDriverPrefix);
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		// nothing to return
-		return new LinkedList<EventHandler>();
+		List<EventHandler> handler = new LinkedList<EventHandler>();
+		handler.add(this.carDistanceEventHandler);		
+		return handler;
 	}
 
 	@Override
 	public void preProcessData() {
-		this.allUsersLogSum = this.userWelfareCalculator.calculateLogsum(this.scenario.getPopulation());
-		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getNoValidPlanCnt();
-		log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + personWithNoValidPlanCnt);
-		this.personId2Logsum = this.userWelfareCalculator.getPersonId2Logsum();
-	}
-
-	@Override
-	public void postProcessData() {
 		// nothing to do
 	}
 
 	@Override
+	public void postProcessData() {
+		double totalCarDistance_km = 0.0;
+		int numberOfPersons = 0;
+		this.personId2carDistance = this.carDistanceEventHandler.getPersonId2CarDistance();
+		this.carTrips = this.carDistanceEventHandler.getCarTrips();
+		
+		for(Id personId : this.personId2carDistance.keySet()){
+			totalCarDistance_km += this.personId2carDistance.get(personId) / 1000.;
+			numberOfPersons++;
+		}
+		
+		this.avgCarDistancePerCarUser_km = totalCarDistance_km / numberOfPersons;
+		this.avgCarDistancePerTrip_km = totalCarDistance_km / this.carTrips;
+		
+		
+	}
+
+	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder + "userBenefits.txt";
+		String fileName = outputFolder + "carDistances.txt";
 		File file = new File(fileName);
 				
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("monetary user benefits (all users logsum): " + this.allUsersLogSum);
+			bw.write("average car distance [km] per car user : " + this.avgCarDistancePerCarUser_km);
 			bw.newLine();
-			bw.write("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + this.personWithNoValidPlanCnt);
-			bw.newLine();
-			
-			bw.newLine();
-			bw.write("userID \t monetary user logsum");
+			bw.write("average car distance [km] per trip  " + this.avgCarDistancePerTrip_km);
 			bw.newLine();
 			
-			for (Id id : this.personId2Logsum.keySet()){
-				String row = id + "\t" + this.personId2Logsum.get(id);
-				bw.write(row);
+			bw.write("person id \t total car distance [km]");
+			bw.newLine();
+			
+			for(Id personId : this.personId2carDistance.keySet()){
+				Double individualCarDistance_km = this.personId2carDistance.get(personId) / 1000.;
+				bw.write(personId.toString() + "\t");
+				bw.write(individualCarDistance_km.toString());
 				bw.newLine();
 			}
 			
 			bw.close();
+
 			log.info("Output written to " + fileName);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
-
+	
 }
