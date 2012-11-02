@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import javax.management.timer.Timer;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -49,9 +50,10 @@ public class InputDataCollection implements Serializable {
 	HashMap<String, String> landUseToHITSTypeLookup = new HashMap<String, String>();
 	HashMap<String, HashMap<String, Double>> workLandUseSecondaryActCapacities = new HashMap<String, HashMap<String, Double>>();
 	HashMap<Integer, HouseholdSG> households;
-	HashMap<String, HashMap<String, Double>> landUseGivenOccupation = new HashMap<String, HashMap<String, Double>>();
+//	HashMap<String, HashMap<String, Double>> landUseGivenOccupation = new HashMap<String, HashMap<String, Double>>();
 	HashSet<String> landUseTypes = new HashSet<String>();
 	HashMap<String, LocationSampler> locationSamplers = new HashMap<String, LocationSampler>();
+	HashMap<Integer, LocationSampler> subdgpWorkFlowSamplers = new HashMap<Integer, LocationSampler>();
 	HashSet<String> mainActivityTypes = new HashSet<String>();
 	HashMap<String, ArrayList<PaxSG>> mainActPaxCollection = new HashMap<String, ArrayList<PaxSG>>();
 	HashSet<String> occupationTypes = new HashSet<String>();
@@ -62,6 +64,8 @@ public class InputDataCollection implements Serializable {
 
 	transient ScenarioImpl scenario;
 	transient Logger inputLog;
+	HashMap<Integer, HashMap<String, LocationSampler>> subDGPActivityLocationSamplers;
+	HashMap<String, Integer> facilityToSubDGP;
 
 	public InputDataCollection(DataBaseAdmin dba,
 			Properties diverseScriptProperties, ScenarioImpl scenario,
@@ -77,8 +81,10 @@ public class InputDataCollection implements Serializable {
 		loadWorkLandUseSecondaryActCapacities();
 		loadData(facilitiesAllInOneXML);
 		getMainActivityTypes();
-		getOccupationAndLandUseTypes();
+//		getOccupationAndLandUseTypes();
 		createLocationSamplers();
+		loadSubDGPWorkTripFlows();
+		loadSubDGPLocationSamplers();
 		createMainActPaxCollections();
 		createFacilityIdtoDescriptionLookup();
 	}
@@ -188,7 +194,141 @@ public class InputDataCollection implements Serializable {
 		}
 		inputLog.info("DONE: Loading masterplan land use types to HITS activity type frequencies.");
 	}
-
+	
+	private void loadSubDGPWorkTripFlows() {
+		inputLog.info("Loading work trip flows for weighted assignment");
+		String workTripFlowTable = diverseScriptProperties
+				.getProperty("workTripFlows");
+		
+		this.subdgpWorkFlowSamplers = new HashMap<Integer, LocationSampler>();
+		try {
+			ResultSet rs = dba.executeQuery(String.format(
+					"select distinct origsubdgp from %s order by origsubdgp",
+					workTripFlowTable));
+			while (rs.next()) {
+				int origsubdgp = rs.getInt("origsubdgp");
+				
+				ResultSet rs2 = dba.executeQuery(String.format(
+						"select destsubdgp,predict from %s where origsubdgp = %d",
+						workTripFlowTable, origsubdgp));
+				HashMap<Integer,Double> tripflows = new HashMap<Integer, Double>();
+				while (rs2.next()) {
+					tripflows.put(rs2.getInt("destsubdgp"),
+							rs2.getDouble("predict"));
+				}
+//				write it to arrays
+				Iterator<Entry<Integer,Double>> fi = tripflows.entrySet()
+						.iterator();
+				String[] ids = new String[tripflows.entrySet().size()];
+				double[] caps = new double[tripflows.entrySet().size()];
+				int i = 0;
+				while (fi.hasNext()) {
+					Entry<Integer, Double> e = fi.next();
+					ids[i] = e.getKey().toString();
+					caps[i] = e.getValue();
+					i++;
+				}
+				LocationSampler ls = new LocationSampler(Integer.toString(origsubdgp), ids, caps);
+				this.subdgpWorkFlowSamplers.put(origsubdgp, ls);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+		inputLog.info("DONE: Loading work trip flows for weighted assignment");
+	}
+	
+	private void loadSubDGPLocationSamplers() {
+		inputLog.info("Loading locationsamplers for each subdgp and work activity type");
+		String facilityToSubDGPTable = diverseScriptProperties
+				.getProperty("workFacilitiesToSubDGP");
+		HashMap<String, Integer> facilityToSubDGP = new HashMap<String, Integer>();
+		HashMap<Integer, HashMap<String,Tuple<ArrayList<String>,ArrayList<Double>>>> subDGPActivityMapping = 
+				new HashMap<Integer, HashMap<String,Tuple<ArrayList<String>,ArrayList<Double>>>>();
+		HashMap<Integer, HashMap<String,LocationSampler>> subDGPActivityLocationSamplers = 
+				new HashMap<Integer, HashMap<String,LocationSampler>>();
+		try {
+//		start by mapping facilities to subdgps
+			inputLog.info("\tMapping facilities to subdgps");
+			ResultSet rs = dba.executeQuery(String.format(
+					"select * from %s", facilityToSubDGPTable));
+			while (rs.next()) {
+				facilityToSubDGP.put(rs.getString("id"), rs.getInt("subdgp"));
+			}
+//			initialize the hashmaps
+			inputLog.info("\tInitializing hashmaps");
+			rs = dba.executeQuery(String.format(
+					"select distinct subdgp  from %s order by subdgp", facilityToSubDGPTable));
+			while (rs.next()) {
+				subDGPActivityMapping.put(rs.getInt("subdgp"), 
+						new HashMap<String,Tuple<ArrayList<String>,ArrayList<Double>>>());
+				subDGPActivityLocationSamplers.put(rs.getInt("subdgp"),
+						new HashMap<String,LocationSampler>());
+			}
+//			further initialization of the hashmaps
+			for (String activityType : this.mainActivityTypes) {
+				if(!activityType.startsWith("w_"))
+					continue;
+				rs.beforeFirst();
+				while(rs.next()){
+					subDGPActivityMapping.get(rs.getInt("subdgp")).put(activityType, 
+							new Tuple<ArrayList<String>, ArrayList<Double>>(
+									new ArrayList<String>(), new ArrayList<Double>()));
+					
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NoConnectionException e) {
+			e.printStackTrace();
+		}
+//		then, go through the facilities for each work activity, find the subdgp theyre in
+//		put a reference to them in that subdgp's activity type map
+		inputLog.info("\tFilling capacities");
+		for (String activityType : this.mainActivityTypes) {
+//			only look at work activities
+			if(!activityType.startsWith("w_"))
+				continue;
+			TreeMap<Id, ActivityFacility> facilities = this.scenario
+					.getActivityFacilities().getFacilitiesForActivityType(
+							activityType);
+			Iterator<Entry<Id, ActivityFacility>> fi = facilities.entrySet()
+					.iterator();
+			while (fi.hasNext()) {
+				Entry<Id, ActivityFacility> e = fi.next();
+				String currid = e.getKey().toString();
+				double currcap = e.getValue().getActivityOptions().get(activityType)
+						.getCapacity();
+//				TODO: check spatial join of facilities to subdgps
+//				there are a few facilities that  havent spatially joined properly, skip over them
+				try{
+					int subDGP = facilityToSubDGP.get(currid);
+					subDGPActivityMapping.get(subDGP).get(activityType).getFirst().add(currid);
+					subDGPActivityMapping.get(subDGP).get(activityType).getSecond().add(currcap);
+					
+				}catch(NullPointerException ne){
+					continue;
+				}
+			}
+		}
+//		now, convert all the arraylists to arrays, and create location samplers
+		inputLog.info("\tConverting to arrays");
+		for(int subdgp:subDGPActivityMapping.keySet()){
+			for(String acttype:subDGPActivityMapping.get(subdgp).keySet()){
+				ArrayList ids = subDGPActivityMapping.get(subdgp).get(acttype).getFirst();
+				ArrayList caps = subDGPActivityMapping.get(subdgp).get(acttype).getSecond();
+				String[] idsA = (String[]) ids.toArray(new String[ids.size()]);
+				double[] capsA = ArrayUtils.toPrimitive((Double[])caps.toArray(new Double[caps.size()]));
+				subDGPActivityLocationSamplers.get(subdgp).put(acttype, new LocationSampler(acttype, idsA, capsA));
+			}
+		}
+		this.subDGPActivityLocationSamplers = subDGPActivityLocationSamplers;
+		this.facilityToSubDGP = facilityToSubDGP;
+		inputLog.info("DONE: Loading locationsamplers for each subdgp and work activity type");
+	}
+	
+	
 	private void addSecondaryActivityTypes() {
 		for (Entry<Id, ActivityFacility> facilityset : this.scenario
 				.getActivityFacilities().getFacilities().entrySet()) {
@@ -308,11 +448,11 @@ public class InputDataCollection implements Serializable {
 		}
 	}
 
-	private void getOccupationAndLandUseTypes() {
-		this.landUseTypes.addAll(this.landUseGivenOccupation.keySet());
-		this.occupationTypes.addAll(this.landUseGivenOccupation.values()
-				.iterator().next().keySet());
-	}
+//	private void getOccupationAndLandUseTypes() {
+//		this.landUseTypes.addAll(this.landUseGivenOccupation.keySet());
+//		this.occupationTypes.addAll(this.landUseGivenOccupation.values()
+//				.iterator().next().keySet());
+//	}
 
 	public HashMap<Integer, PaxSG> getPersons() {
 		return persons;
@@ -323,7 +463,7 @@ public class InputDataCollection implements Serializable {
 		loadHouseholdsAndPersons();
 		loadFacilities(facilitiesAllInOneXML);
 		// dumpFacilitiesToSQL();
-		loadOccupationLandUseProbabilities();
+//		loadOccupationLandUseProbabilities();
 	}
 
 	private void loadFacilitiesFromSQL() {
@@ -564,7 +704,9 @@ public class InputDataCollection implements Serializable {
 		}
 		return new Tuple<String[], double[]>(activityTypes, activityFrequencies);
 	}
+	
 
+	
 	private void loadLandUsetoHITSType() {
 		inputLog.info("Loading masterplan land use to HITS place type lookup.");
 		String masterplan2hitstypefield = diverseScriptProperties
@@ -584,34 +726,34 @@ public class InputDataCollection implements Serializable {
 		inputLog.info("DONE: Loading masterplan land use to HITS place type lookup.");
 	}
 
-	private void loadOccupationLandUseProbabilities() {
-		inputLog.info("Loading occupation vs masterplan landuse type frequencies");
-		String occupXlandUseTable = this.diverseScriptProperties
-				.getProperty("occupXlandUseTable");
-		try {
-			ResultSet rs = dba.executeQuery(String.format(
-					"SELECT DISTINCT occup FROM %s", occupXlandUseTable));
-			// initialize and populate the hashmaps
-			while (rs.next()) {
-				String currentOccupation = rs.getString("occup");
-				HashMap<String, Double> occupMap = new HashMap<String, Double>();
-				this.landUseGivenOccupation.put(currentOccupation, occupMap);
-				ResultSet rs2 = dba.executeQuery(String.format(
-						"SELECT * FROM %s WHERE occup = \'%s\'",
-						occupXlandUseTable, currentOccupation));
-				while (rs2.next()) {
-					occupMap.put(rs2.getString("lu_type"),
-							rs2.getDouble("problandusegivenoccup"));
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
-			e.printStackTrace();
-		}
-		inputLog.info("DONE: Loading occupation vs masterplan landuse type frequencies");
-	}
+//	private void loadOccupationLandUseProbabilities() {
+//		inputLog.info("Loading occupation vs masterplan landuse type frequencies");
+//		String occupXlandUseTable = this.diverseScriptProperties
+//				.getProperty("occupXlandUseTable");
+//		try {
+//			ResultSet rs = dba.executeQuery(String.format(
+//					"SELECT DISTINCT occup FROM %s", occupXlandUseTable));
+//			// initialize and populate the hashmaps
+//			while (rs.next()) {
+//				String currentOccupation = rs.getString("occup");
+//				HashMap<String, Double> occupMap = new HashMap<String, Double>();
+//				this.landUseGivenOccupation.put(currentOccupation, occupMap);
+//				ResultSet rs2 = dba.executeQuery(String.format(
+//						"SELECT * FROM %s WHERE occup = \'%s\'",
+//						occupXlandUseTable, currentOccupation));
+//				while (rs2.next()) {
+//					occupMap.put(rs2.getString("lu_type"),
+//							rs2.getDouble("problandusegivenoccup"));
+//				}
+//			}
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} catch (NoConnectionException e) {
+//			e.printStackTrace();
+//		}
+//		inputLog.info("DONE: Loading occupation vs masterplan landuse type frequencies");
+//	}
 
 	public void restoreIfDeserialized(ScenarioImpl scenario, DataBaseAdmin dba,
 			Properties p) {

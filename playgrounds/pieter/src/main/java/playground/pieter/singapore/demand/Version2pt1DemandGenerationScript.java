@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.Time;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 
-public class Version2DemandGenerationScript {
+public class Version2pt1DemandGenerationScript {
 	private static final double DEFAULT_LEISURE_TIME = Time
 			.parseTime("01:00:00");
 	private static final double DEFAULT_LEISURE_HOME_DEPARTTIME = Time
@@ -47,7 +47,7 @@ public class Version2DemandGenerationScript {
 	Properties diverseScriptProperties;
 	Logger scriptLog;
 
-	public Version2DemandGenerationScript(String dbaProperties,
+	public Version2pt1DemandGenerationScript(String dbaProperties,
 			String otherProperties, boolean deserialize,
 			boolean facilitiesAllInOneXML) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException,
@@ -121,8 +121,18 @@ public class Version2DemandGenerationScript {
 		popWriter.startStreaming(plansFile);
 		// popWriter.write(plansFile);
 		PopulationFactory popFactory = pop.getFactory();
+		int planCounter = 0;
+		int carTripCounter = 0;
+		int ptTripCounter = 0;
 		for (PaxSG pax : this.inputData.persons.values()) {
-
+			// skip over non-travelers:
+			if (pax.modeSuggestion.equals("notravel"))
+				continue;
+			// only realise half the ptmix plans
+			if (pax.modeSuggestion.equals("ptmix")) {
+				if (Math.random() > 0.5)
+					continue;
+			}
 			PersonImpl person = (PersonImpl) popFactory
 					.createPerson(new IdImpl((long) pax.paxId));
 			person.setAge(pax.age);
@@ -225,10 +235,15 @@ public class Version2DemandGenerationScript {
 				plan.addActivity(act);
 				if (st.hasMoreTokens()) {
 					Leg currLeg;
-					if (person.hasLicense())
+					if (person.hasLicense()){
 						currLeg = popFactory.createLeg("car");
-					else
+						carTripCounter++;
+					}
+					
+					else{
+						ptTripCounter++;
 						currLeg = popFactory.createLeg("pt");
+					}
 					plan.addLeg(currLeg);
 
 				}
@@ -236,10 +251,11 @@ public class Version2DemandGenerationScript {
 			person.addPlan(plan);
 			// pop.addPerson(person);
 			popWriter.writePerson(person);
+			planCounter++;
 		}
+		scriptLog.info("Wrote a total of "+planCounter+" plans.");
 		popWriter.closeStreaming();
 	}
-
 
 	private double getDayEndTime(PaxSG pax, int chainLength) {
 		if (pax.chainType.equals("workOnly")
@@ -403,54 +419,89 @@ public class Version2DemandGenerationScript {
 			primeActors[actcounter] = inputData.mainActPaxCollection.get(
 					actType).size();
 			for (PaxSG p : inputData.mainActPaxCollection.get(actType)) {
-				LocationSampler ls = inputData.locationSamplers.get(actType);
-				int sampleSize = Integer.parseInt(this.diverseScriptProperties
-						.getProperty("locationSampleSize"));
-				Tuple<String[], double[]> locations = ls
-						.sampleLocationsNoWeight(sampleSize);
-//				HashMap<String, Double> landUseScaler = null;
-				// only apply the scaling of attraction by land use given
-				// occupation if this is work act
-//				if (actType.startsWith("w"))
-//					landUseScaler = inputData.landUseGivenOccupation
-//							.get(p.occup);
-				String[] ids = locations.getFirst();
-				double[] samplingWeight = locations.getSecond();
-				Tuple<Double,Double> gravityOutput = new Tuple<Double, Double>(1.0, 0.0);
-				// scale capacities of the set
-				for (int i = 0; i < ids.length; i++) {
-					String facilityLandUseType = inputData.facilityIdDescLookup
-							.get(ids[i]);
+				// skip over non-travelers
+				if (p.modeSuggestion.equals("notravel"))
+					continue;
+				// split the demand assignment method in two here, using the
+				// subdgp-based version for work acts,
+				// and the usual method for others
+				boolean assigned = false;
+				double distanceToWork = -100000.0;
+				if (actType.startsWith("w_")) {
 					try {
-						double scale = 1;
-
-//						if (landUseScaler != null)
-//							scale = landUseScaler.get(facilityLandUseType);
-						double attenuatedCap = scale * samplingWeight[i];
-						gravityOutput= getGravityFactor(p,
-								p.household.homeFacilityId, ids[i], actType,
-								attenuatedCap);
-						samplingWeight[i] =gravityOutput.getFirst();
-					} catch (NullPointerException e) {
-						// String errMsg = String.format(
-						// "No frequency for occup %s x land use %s.",
-						// p.occup, facilityLandUseType);
-						// scriptLog.error(errMsg);
-						gravityOutput = getGravityFactor(p,
-								p.household.homeFacilityId, ids[i], actType,
-								0.001 * samplingWeight[i]);
-						samplingWeight[i] =gravityOutput.getFirst();
+						int homeSubDGP = inputData.facilityToSubDGP
+								.get(p.household.homeFacilityId);
+						// get a work subdgp
+						LocationSampler ls = inputData.subdgpWorkFlowSamplers
+								.get(homeSubDGP);
+						int workSubDGP = Integer.parseInt(ls.sampleLocations(1)
+								.getFirst()[0]);
+						// now, sample a location for this work activity in the
+						// work subdgp
+						LocationSampler workFacilitySampler = inputData.subDGPActivityLocationSamplers
+								.get(workSubDGP).get(actType);
+						String workFacilityId = workFacilitySampler.sampleLocations(1).getFirst()[0];
+						p.mainActFacility = workFacilityId;
+						assigned = true;
+					} catch (NullPointerException ne) {
+						// something went wrong, either the home or the work was
+						// null
+						scriptLog.error("Passing a person to the usual method");
 					}
-
+					// if we came this far, the assignment was successful, go to
+					// the end of the assignment method
 				}
-
-				// do a weighted sampling for a single location
-				p.mainActFacility = new LocationSampler(actType, ids,
-						samplingWeight).sampleLocations(1).getFirst()[0];
+				if(!assigned){	
+					LocationSampler ls = inputData.locationSamplers.get(actType);
+					int sampleSize = Integer.parseInt(this.diverseScriptProperties
+							.getProperty("locationSampleSize"));
+					Tuple<String[], double[]> locations = ls
+							.sampleLocationsNoWeight(sampleSize);
+					// HashMap<String, Double> landUseScaler = null;
+					// only apply the scaling of attraction by land use given
+					// occupation if this is work act
+					// if (actType.startsWith("w"))
+					// landUseScaler = inputData.landUseGivenOccupation
+					// .get(p.occup);
+					String[] ids = locations.getFirst();
+					double[] samplingWeight = locations.getSecond();
+					double[] distances = new double[samplingWeight.length];
+					double gravityOutput = 1.0;
+					// scale capacities of the set
+					for (int i = 0; i < ids.length; i++) {
+						// String facilityLandUseType =
+						// inputData.facilityIdDescLookup
+						// .get(ids[i]);
+						try {
+							double scale = 1;
+							// if (landUseScaler != null)
+							// scale = landUseScaler.get(facilityLandUseType);
+							double attenuatedCap = scale * samplingWeight[i];
+							samplingWeight[i] = getGravityFactor(p,
+									p.household.homeFacilityId, ids[i], actType,
+									attenuatedCap);
+						} catch (NullPointerException e) {
+							// String errMsg = String.format(
+							// "No frequency for occup %s x land use %s.",
+							// p.occup, facilityLandUseType);
+							// scriptLog.error(errMsg);
+							samplingWeight[i] = getGravityFactor(p,
+									p.household.homeFacilityId, ids[i], actType,
+									0.001 * samplingWeight[i]);
+						}
+						
+					}
+					
+					// do a weighted sampling for a single location
+					p.mainActFacility = new LocationSampler(actType, ids,
+							samplingWeight).sampleLocations(1).getFirst()[0];
+				}
 				try {
+					distanceToWork = interFacilityDistance(p.household.homeFacilityId, p.mainActFacility);
 					dba.executeStatement(String
 							.format("INSERT INTO matsim2.main_act_locations VALUES(%d,\'%s\',%f)",
-									p.paxId, p.mainActFacility,gravityOutput.getSecond()));
+									p.paxId, p.mainActFacility,distanceToWork
+									));
 				} catch (SQLException e) {
 					e.printStackTrace();
 				} catch (NoConnectionException e) {
@@ -478,18 +529,23 @@ public class Version2DemandGenerationScript {
 							.format("%6d of %8d persons done in %.3f seconds at %.3f agents/sec, %s sec to go.",
 									totalCounter, totalCount, timePastSec,
 									agentsPerSecond, timeToGo));
-
 		}
 	}
 
-	private Tuple<Double, Double> getGravityFactor(PaxSG p, String originFacilityId,
-			String destinationFacilityId, String actType, double capacity) {
+	private double interFacilityDistance(String originFacilityId,
+			String destinationFacilityId) {
 		ActivityFacilityImpl origin = (ActivityFacilityImpl) this.scenario
 				.getActivityFacilities().getLocation(
 						new IdImpl(originFacilityId));
 		BasicLocation destination = this.scenario.getActivityFacilities()
 				.getLocation(new IdImpl(destinationFacilityId));
 		double distance = origin.calcDistance(destination.getCoord());
+		return distance;
+	}
+	private double getGravityFactor(PaxSG p,
+			String originFacilityId, String destinationFacilityId,
+			String actType, double capacity) {
+		double distance = interFacilityDistance(originFacilityId, destinationFacilityId);
 		// double distance =
 		// HITSAnalyser.getShortestPathDistance(home.getCoord(),
 		// away.getCoord());
@@ -514,10 +570,11 @@ public class Version2DemandGenerationScript {
 					.getProperty("otherTripsBeta"));
 		}
 		if (feta > 0 && beta > 0) {
-			return new Tuple<Double, Double>(((feta * capacity) / Math.pow(distance, beta)),distance);
+			return ((feta * capacity) / Math.pow(
+					distance, beta));
 		}
 		// default is to do no scaling
-		return new Tuple<Double, Double>(1.0, distance);
+		return 1.0;
 	}
 
 	private String assignSecondaryActivityLocation(String activityType,
@@ -533,7 +590,7 @@ public class Version2DemandGenerationScript {
 		for (int i = 0; i < ids.length; i++) {
 
 			samplingWeight[i] = getGravityFactor(p, lastFacilityId.toString(),
-					ids[i], activityType, samplingWeight[i]).getFirst();
+					ids[i], activityType, samplingWeight[i]);
 
 		}
 
@@ -599,7 +656,7 @@ public class Version2DemandGenerationScript {
 				double attenuatedCap = scale * samplingWeight[i];
 				samplingWeight[i] = getGravityFactor(p,
 						p.household.homeFacilityId, ids[i], actType,
-						attenuatedCap).getFirst();
+						attenuatedCap);
 			} catch (NullPointerException e) {
 				String errMsg = String.format(
 						"No frequency for occup %s x land use %s.", p.occup,
@@ -607,7 +664,7 @@ public class Version2DemandGenerationScript {
 				scriptLog.error(errMsg);
 				samplingWeight[i] = getGravityFactor(p,
 						p.household.homeFacilityId, ids[i], actType,
-						0.0000001 * samplingWeight[i]).getFirst();
+						0.0000001 * samplingWeight[i]);
 			}
 		}
 		// do a weighted sampling for a single location
@@ -641,7 +698,7 @@ public class Version2DemandGenerationScript {
 		}
 		System.out
 				.println("First arg is deserialize, second is whether all facilities are to be loaded from single xml file");
-		Version2DemandGenerationScript script = new Version2DemandGenerationScript(
+		Version2pt1DemandGenerationScript script = new Version2pt1DemandGenerationScript(
 				dbaProperties, otherProperties, deserialize,
 				facilitiesAllInOneXML);
 		script.run();

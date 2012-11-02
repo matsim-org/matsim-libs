@@ -138,7 +138,7 @@ public class LocationSampler implements Serializable {
 
 	public static void main(String args[]) {
 		String[] ids = { "0", "1", "2", "3", "4" };
-		double weights[] = { 0, 1e-322, 2e-320, 3e-320, 4e-320 };
+		double weights[] = { 0.001, 0.001, 2, 0.001, 0.001 };
 		LocationSampler ls = new LocationSampler("test", ids, weights);
 		int[] sampleCountsSet = { 0, 0, 0, 0, 0 };
 		int[] sampleCountsNormal = { 0, 0, 0, 0, 0 };
