@@ -182,7 +182,7 @@ public class DreieckStreckeSzenario {
 	
 	private int networkCapacity;//the capacity all links of the network will have
 	
-	public DreieckStreckeSzenario(double length, int networkCapacity){
+	public DreieckStreckeSzenario(int networkCapacity){
 		this.networkCapacity = networkCapacity;
 
 		Config config = ConfigUtils.createConfig();
@@ -198,7 +198,7 @@ public class DreieckStreckeSzenario {
 	}
 	
 	public static void main(String[] args) {
-		new DreieckStreckeSzenario(500.0,2000).run();
+		new DreieckStreckeSzenario(2000).run();
 	}
 	
 	public void run(){
