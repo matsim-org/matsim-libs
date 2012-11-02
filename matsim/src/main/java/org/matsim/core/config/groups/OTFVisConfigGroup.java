@@ -47,9 +47,6 @@ public class OTFVisConfigGroup extends Module {
 
 	public static final String SHOW_TELEPORTATION = "showTeleportation";
 	public static final String LINK_WIDTH = "linkWidth";
-	
-//	public static final String SHOW_PARKING = "showNonMovingItems" ;
-	// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 
 	private  float agentSize = 120.f;
 	private  String middleMouseFunc = "Pan";
@@ -174,16 +171,6 @@ public class OTFVisConfigGroup extends Module {
 		}  else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			return this.rightMouseFunc;
 		}
-//		else if (AGENT_SIZE.equals(key)) {
-//			return Float.toString(getAgentSize());
-//		} else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
-//			return Boolean.toString(this.showTeleportedAgents);
-//		}
-//		else if (LINK_WIDTH.equalsIgnoreCase(key)){
-//			return Float.toString(this.getLinkWidth());
-//		}
-//		else if ( COLORING.equalsIgnoreCase(key) )
-//			return this.coloring ;
 		else {
 			throw new IllegalArgumentException(key + ".  There may exist a direct getter.");
 		}
@@ -223,10 +210,6 @@ public class OTFVisConfigGroup extends Module {
 		else if (NODE_OFFSET.equalsIgnoreCase(key)){
 			this.nodeOffset = Double.parseDouble(value);
 		}
-//		else if ( SHOW_PARKING.equalsIgnoreCase(key) ) {
-//			this.setShowParking( Boolean.parseBoolean(value) ) ;
-//			// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
-//		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -247,9 +230,6 @@ public class OTFVisConfigGroup extends Module {
 		map.put(COLORING, this.getColoringScheme().toString() );
 		map.put(MAP_OVERLAY_MODE, Boolean.toString(this.isMapOverlayMode()));
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
-//		map.put(SHOW_PARKING, Boolean.toString( this.isShowParking() ) ) ;
-		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
-
 		return map;
 	}
 
@@ -313,46 +293,29 @@ public class OTFVisConfigGroup extends Module {
 		this.rightMouseFunc = rightMouseFunc;
 	}
 
-	/**
-	 * @return the bigTimeStep
-	 */
 	public int getBigTimeStep() {
 		return this.bigTimeStep;
 	}
 
-	/**
-	 * @param bigTimeStep the bigTimeStep to set
-	 */
 	public void setBigTimeStep(final int bigTimeStep) {
 		if(this.bigTimeStep != bigTimeStep) setModified();
 		this.bigTimeStep = bigTimeStep;
 	}
 
-	/**
-	 * @return the queryType
-	 */
 	public String getQueryType() {
 		return this.queryType;
 	}
-
-	/**
-	 * @param queryType the queryType to set
-	 */
+	
 	public void setQueryType(final String queryType) {
 		setModified() ;
 		this.queryType = queryType;
 	}
 
-	/**
-	 * @return the multipleSelect
-	 */
 	public boolean isMultipleSelect() {
 		return this.multipleSelect;
 	}
 
-	/**
-	 * @param multipleSelect the multipleSelect to set
-	 */
+
 	public void setMultipleSelect(final boolean multipleSelect) {
 		setModified() ;
 		this.multipleSelect = multipleSelect;
@@ -385,31 +348,19 @@ public class OTFVisConfigGroup extends Module {
 		this.linkWidth = linkWidth;
 	}
 
-	/**
-	 * @return the showParking
-	 */
 	public boolean isShowParking() {
 		return this.showParking;
 	}
 
-	/**
-	 * @param showParking the showParking to set
-	 */
 	public void setShowParking(final boolean showParking) {
 		setModified();
 		this.showParking = showParking;
 	}
 
-	/**
-	 * @return the drawLinkIds
-	 */
 	public boolean isDrawingLinkIds() {
 		return this.drawLinkIds;
 	}
 
-	/**
-	 * @param drawLinkIds the drawLinkIds to set
-	 */
 	public void setDrawLinkIds(final boolean drawLinkIds) {
 		setModified();
 		this.drawLinkIds = drawLinkIds;

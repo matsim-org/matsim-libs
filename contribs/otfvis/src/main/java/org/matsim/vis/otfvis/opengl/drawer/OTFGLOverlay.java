@@ -16,10 +16,9 @@ import javax.imageio.ImageIO;
 import javax.media.opengl.GL2;
 
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.vis.otfvis.caching.SceneGraph;
 
 
-class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
+class OTFGLOverlay extends OTFGLAbstractDrawable {
 	private final float relX;
 	private final float relY;
 	private final boolean opaque;
@@ -141,10 +140,6 @@ class OTFGLOverlay extends OTFGLAbstractDrawableReceiver {
 		gl.glPopMatrix();
 		gl.glMatrixMode( GL2.GL_PROJECTION);
 		gl.glPopMatrix();
-	}
-
-	@Override
-	public void addToSceneGraph(SceneGraph graph) {
 	}
 
 }

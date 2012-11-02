@@ -26,10 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDrawable;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
@@ -71,30 +68,15 @@ public class SceneGraph {
 	private OGLAgentPointLayer agentLayer = new OGLAgentPointLayer();
 	private OGLSimpleStaticNetLayer networkLayer = new OGLSimpleStaticNetLayer();
 	private SimpleSceneLayer miscellaneousLayer = new SimpleSceneLayer();
-	
-	private final OTFOGLDrawer drawer;
-	private final double time;
 
 	private ArrayList<SceneLayer> drawingLayers;
 
-	/**
-	 * @return the time
-	 */
-	public double getTime() {
-		return time;
-	}
-
-	public SceneGraph(Rect rect, double time, OTFConnectionManager connect, OTFOGLDrawer drawer) {
+	public SceneGraph(Rect rect) {
 		this.rect = rect;
-		this.drawer = drawer;
-		this.time = time;
 		this.drawingLayers = new ArrayList<SceneLayer>();
 		this.drawingLayers.add(miscellaneousLayer);
 		this.drawingLayers.add(networkLayer);
 		this.drawingLayers.add(agentLayer);	
-		for (SceneLayer layer : drawingLayers) {
-			layer.init(time == -1 ? true : false);
-		}
 	}
 
 	public Rect getRect() {
@@ -105,23 +87,16 @@ public class SceneGraph {
 		this.rect = rec;
 	}
 
-	public OTFOGLDrawer getDrawer() {
-		return drawer;
-	}
-
-	public void addItem(OTFDrawable item) {
+	public void addItem(OTFGLAbstractDrawable item) {
 		miscellaneousLayer.addItem(item);
 	}
 
-	public void addStaticItem(OTFDrawable item) {
+	public void addStaticItem(OTFGLAbstractDrawable item) {
 		networkLayer.addItem(item);
 	}
 	
 	public void finish() {
 		Collections.sort(drawingLayers, new LayerDrawingOrderComparator());
-		for (SceneLayer layer : drawingLayers) {
-			layer.finish();
-		}
 	}
 	
 	public OGLAgentPointLayer getAgentPointLayer() {
@@ -138,10 +113,6 @@ public class SceneGraph {
 		for (SceneLayer layer : drawingLayers) {
 			layer.glInit();
 		}
-	}
-
-	public AgentPointDrawer getAgentPointDrawer() {
-		return (AgentPointDrawer) agentLayer.newInstanceOf(AgentPointDrawer.class);
 	}
 
 }

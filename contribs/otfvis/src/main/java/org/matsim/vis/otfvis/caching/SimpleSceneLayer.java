@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.caching;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.vis.otfvis.data.OTFDrawable;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 
 
 /**
@@ -35,10 +35,9 @@ import org.matsim.vis.otfvis.data.OTFDrawable;
  */
 public class SimpleSceneLayer implements SceneLayer {
 	
-	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
+	private final List<OTFGLAbstractDrawable> items = new ArrayList<OTFGLAbstractDrawable>();
 
-	@Override
-	public void addItem(OTFDrawable item) {
+	public void addItem(OTFGLAbstractDrawable item) {
 		items.add(item);
 	}
 	
@@ -49,35 +48,14 @@ public class SimpleSceneLayer implements SceneLayer {
 
 	@Override
 	public void draw() {
-		for(OTFDrawable item : items) {
+		for(OTFGLAbstractDrawable item : items) {
 			item.draw();
 		}
 	}
 	
 	@Override
-	public void finish() {
-	}
-
-	@Override
-	public void init(boolean initConstData) {
-	}
-
-	@Override
 	public int getDrawOrder() {
 		return 100;
 	}
-
-	@Override
-	public OTFDrawable newInstanceOf(Class clazz) {
-		try {
-			return (OTFDrawable) clazz.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	
 	
 }

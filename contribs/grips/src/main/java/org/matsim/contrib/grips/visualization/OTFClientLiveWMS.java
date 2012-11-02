@@ -47,8 +47,6 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
@@ -68,10 +66,7 @@ public class OTFClientLiveWMS {
 				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 				connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
-				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, AgentPointDrawer.class);
-				connectionManager.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
 				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-				connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
 				
 				
 				if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
@@ -93,14 +88,13 @@ public class OTFClientLiveWMS {
 				OTFClientControl.getInstance().setOTFVisConfig(visconf); // has to be set before OTFClientQuadTree.getConstData() is invoked!
 				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
-				clientQuadTree.setConnectionManager(connectionManager);
 				clientQuadTree.getConstData();
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, config.otfVis());
 				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
-				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+				otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				otfClient.addDrawerAndInitialize(mainDrawer, saver);
 				otfClient.addMapViewer(TileFactoryBuilder.getWMSTileFactory(baseURL, layer));

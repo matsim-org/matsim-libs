@@ -24,8 +24,6 @@ import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
@@ -105,10 +103,7 @@ public class OTFDemo {
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
-		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class,  AgentPointDrawer.class);
 		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class,  OTFAgentsListHandler.class);
-		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		connect.connectReaderToReceiver(OTFAgentsListHandler.class,  AgentPointDrawer.class);
 
 		connect.connectWriterToReader(FacilityDrawer.Writer.class, FacilityDrawer.Reader.class);
 		connect.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);

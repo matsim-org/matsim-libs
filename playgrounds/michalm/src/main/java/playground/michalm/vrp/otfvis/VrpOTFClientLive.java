@@ -27,18 +27,27 @@ import javax.swing.SwingUtilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.lanes.otfvis.io.*;
+import org.matsim.lanes.otfvis.io.OTFLaneReader;
+import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.signalsystems.otfvis.io.*;
-import org.matsim.vis.otfvis.*;
+import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
+import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
+import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
-import org.matsim.vis.otfvis.data.*;
+import org.matsim.vis.otfvis.data.OTFClientQuadTree;
+import org.matsim.vis.otfvis.data.OTFConnectionManager;
+import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
-import org.matsim.vis.otfvis.gui.*;
-import org.matsim.vis.otfvis.handler.*;
+import org.matsim.vis.otfvis.gui.OTFHostControlBar;
+import org.matsim.vis.otfvis.gui.OTFQueryControl;
+import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
+import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.*;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 
 public class VrpOTFClientLive
@@ -61,14 +70,8 @@ public class VrpOTFClientLive
                         OGLSimpleQuadDrawer.class);
                 connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class,
                         OGLSimpleStaticNetLayer.class);
-                connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class,
-                        AgentPointDrawer.class);
-                connectionManager.connectReceiverToLayer(AgentPointDrawer.class,
-                        OGLAgentPointLayer.class);
                 connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class,
                         OTFAgentsListHandler.class);
-                connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class,
-                        AgentPointDrawer.class);
 
                 if (config.scenario().isUseTransit()) {
                     connectionManager.connectWriterToReader(FacilityDrawer.Writer.class,
@@ -107,7 +110,6 @@ public class VrpOTFClientLive
                 OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
                 OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server,
                         connectionManager);
-                clientQuadTree.setConnectionManager(connectionManager);
                 clientQuadTree.getConstData();
                 OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
                 OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, config
@@ -116,7 +118,7 @@ public class VrpOTFClientLive
                 OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl,
                         visconf);
                 queryControl.setQueryTextField(queryControlBar.getTextField());
-                otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+                otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
                 mainDrawer.setQueryHandler(queryControl);
                 otfClient.addDrawerAndInitialize(mainDrawer, saver);
                 otfClient.show();

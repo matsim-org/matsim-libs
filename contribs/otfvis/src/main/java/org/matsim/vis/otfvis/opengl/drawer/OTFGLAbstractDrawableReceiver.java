@@ -34,10 +34,8 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
  * </p>
  *
  */
-public abstract class OTFGLAbstractDrawableReceiver extends OTFGLAbstractDrawable
-{
+public abstract class OTFGLAbstractDrawableReceiver extends OTFGLAbstractDrawable {
 
-	@Override
 	public abstract void addToSceneGraph(SceneGraph graph);
 
 }

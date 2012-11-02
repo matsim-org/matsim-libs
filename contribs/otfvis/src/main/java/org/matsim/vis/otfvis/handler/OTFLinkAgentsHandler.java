@@ -37,7 +37,6 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
@@ -152,8 +151,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 		agInfo.setColorValueBetweenZeroAndOne(colorValue);
 		agInfo.setUserDefined(userdefined);
 		agInfo.setAgentState(AgentState.values()[state]);
-		AgentPointDrawer agentPointDrawer = sceneGraph.getAgentPointDrawer();
-		agentPointDrawer.setAgent(agInfo);
+		sceneGraph.getAgentPointLayer().addAgent(agInfo);
 	}
 
 	@Override

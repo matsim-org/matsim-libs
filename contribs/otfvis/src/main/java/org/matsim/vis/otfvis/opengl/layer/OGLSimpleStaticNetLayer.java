@@ -28,7 +28,6 @@ import javax.media.opengl.GL2;
 
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneLayer;
-import org.matsim.vis.otfvis.data.OTFDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 
 
@@ -50,7 +49,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
  */
 public class OGLSimpleStaticNetLayer implements SceneLayer {
 
-	private final List<OTFDrawable> items = new ArrayList<OTFDrawable>();
+	private final List<OTFGLAbstractDrawable> items = new ArrayList<OTFGLAbstractDrawable>();
 	
 	private static int netDisplList = -1;
 	
@@ -58,8 +57,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	
 	private static float cachedLinkWidth = 30.f;
 
-	@Override
-	public void addItem(OTFDrawable item) {
+	public void addItem(OTFGLAbstractDrawable item) {
 		items.add(item);
 	}
 
@@ -78,10 +76,6 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	}
 
 	@Override
-	public void init(boolean initConstData) {
-	}
-	
-	@Override
 	public void glInit() {
 		GL2 gl = OTFGLAbstractDrawable.getGl().getGL2();
 		checkNetList(gl);
@@ -92,21 +86,6 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 		return 1;
 	}
 
-	@Override
-	public void finish() {
-		
-	}
-
-	@Override
-	public OTFDrawable newInstanceOf(Class clazz) {
-		try {
-			return (OTFDrawable) clazz.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	private void checkNetList(GL2 gl) {
 		float currentLinkWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
@@ -122,7 +101,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 			cachedLinkWidth = currentLinkWidth;
 			netDisplList = gl.glGenLists(1);
 			gl.glNewList(netDisplList, GL2.GL_COMPILE);
-			for (OTFDrawable item : items) {
+			for (OTFGLAbstractDrawable item : items) {
 				item.draw();
 			}
 			nItems = items.size();

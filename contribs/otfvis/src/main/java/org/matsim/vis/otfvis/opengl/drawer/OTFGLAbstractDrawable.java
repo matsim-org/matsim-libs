@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis.opengl.drawer;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 
-import org.matsim.vis.otfvis.data.OTFDrawable;
 
 
 /**
@@ -40,7 +39,7 @@ import org.matsim.vis.otfvis.data.OTFDrawable;
  * @author dstrippgen
  *
  */
-public abstract class OTFGLAbstractDrawable implements OTFDrawable {
+public abstract class OTFGLAbstractDrawable {
 
 	// We need to statically cache the GL context here. The reason is that OTFDrawable tries to 
 	// be a common interface for things which are drawable by Swing and things which are drawable by OpenGL.
@@ -54,7 +53,6 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
         return gl;
     }
 
-    @Override
 	public final void draw() {
 		onDraw(gl.getGL().getGL2());
 	}
@@ -65,11 +63,6 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 	 * displays, re-creating buffers etc., so layers need to be notified of this.
 	 * Particularly, the OGLSimpleStaticNetLayer needs this message to recreate its OpenGL display lists
 	 * when the OpenGL context changes.
-	 *
-	 * Swing implementations don't need this, and OpenGL implementations need to get the OpenGL context
-	 * from a static variable somewhere. Sorry. I think it is not really possible to put drawables for
-	 * two graphics frameworks with completely different protocols behind a common interface.
-	 * 
 	 */
 	public final void glInit() {
 		onInit(gl.getGL().getGL2());

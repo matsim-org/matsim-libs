@@ -33,6 +33,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -71,7 +72,7 @@ public class PreferencesDialog extends javax.swing.JDialog implements ChangeList
 
 	private JSpinner delaySpinner = null;
 
-	public PreferencesDialog(final OTFServer server, final OTFFrame frame, final OTFHostControlBar mother) {
+	public PreferencesDialog(final OTFServer server, final JFrame frame, final OTFHostControlBar mother) {
 		super(frame);
 		this.server = server;
 		this.host = mother;

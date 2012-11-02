@@ -36,8 +36,6 @@ import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
@@ -75,17 +73,14 @@ public class OTFClientFile implements Runnable {
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-		connect.connectReaderToReceiver(OTFAgentsListHandler.class, AgentPointDrawer.class);
 		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
-		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
-		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
+		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);	
 		OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 		OTFHostControl otfHostControl = hostControlBar.getOTFHostControl();
 		OTFTimeLine timeLine = new OTFTimeLine("time", otfHostControl);
-		otfClient.getFrame().getContentPane().add(timeLine, BorderLayout.SOUTH);
+		otfClient.getContentPane().add(timeLine, BorderLayout.SOUTH);
 		OTFServerQuadTree servQ = otfServer.getQuad(connect);
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
-		clientQ.setConnectionManager(connect);
 		clientQ.getConstData();
 		OTFClientQuadTree clientQuadTree = clientQ;
 		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);

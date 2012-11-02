@@ -23,13 +23,17 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.OverlayLayout;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
@@ -45,7 +49,6 @@ import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
-import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.PreferencesDialog;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
@@ -57,11 +60,11 @@ import org.matsim.vis.otfvis.utils.WGS84ToMercator;
  * @author dgrether
  *
  */
-public final class OTFClient {
+public final class OTFClient extends JFrame {
+
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger log = Logger.getLogger(OTFClient.class);
-	
-	private OTFFrame frame;
 
 	private OTFHostControlBar hostControlBar;
 
@@ -99,9 +102,18 @@ public final class OTFClient {
 	}
 	
 	public OTFClient() {
-		this.frame = new OTFFrame("MATSim OTFVis");
+		super("MATSim OTFVis");
+		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		boolean isMac = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("mac os x");
+		if (isMac){
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			this.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
+		}
+		//Make sure menus appear above JOGL Layer
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		this.frame.setSize(screenSize.width/2,screenSize.height/2);
+		setSize(screenSize.width/2,screenSize.height/2);
 		log.info("created MainFrame");
 	}
 
@@ -111,7 +123,7 @@ public final class OTFClient {
 	}
 
 	@SuppressWarnings("serial")
-	private static void buildMenu(final OTFFrame frame, final OTFHostControlBar hostControlBar, final SettingsSaver save, final OTFServer server) {
+	private void buildMenu(final OTFHostControlBar hostControlBar, final SettingsSaver save, final OTFServer server) {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -123,7 +135,7 @@ public final class OTFClient {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				PreferencesDialog preferencesDialog = new PreferencesDialog(server, frame, hostControlBar);
+				PreferencesDialog preferencesDialog = new PreferencesDialog(server, OTFClient.this, hostControlBar);
 				preferencesDialog.setVisConfig(OTFClientControl.getInstance().getOTFVisConfig());
 				preferencesDialog.setVisible(true);
 			}
@@ -160,19 +172,19 @@ public final class OTFClient {
 		Action exitAction = new AbstractAction("Quit") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				frame.endProgram(0);
+				endProgram(0);
 			}
 		};
 		fileMenu.add(exitAction);
-		frame.setJMenuBar(menuBar);
-		SwingUtilities.updateComponentTreeUI(frame);
+		setJMenuBar(menuBar);
+		SwingUtilities.updateComponentTreeUI(this);
 	}
 
 	public void addDrawerAndInitialize(final OTFOGLDrawer mainDrawer, SettingsSaver saver) {
 		this.mainDrawer = mainDrawer;
 		log.info("got OTFVis config");
-		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
-		buildMenu(frame, hostControlBar, saver, server);
+		getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
+		buildMenu(hostControlBar, saver, server);
 		log.info("created HostControlBar");
 		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");
@@ -181,7 +193,7 @@ public final class OTFClient {
 		compositePanel.add(mainDrawer.getComponent());	
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(compositePanel, BorderLayout.CENTER);
-		this.frame.getContentPane().add(panel);
+		getContentPane().add(panel);
 		hostControlBar.setDrawer(mainDrawer);
 	}
 	
@@ -211,17 +223,27 @@ public final class OTFClient {
 		});
 	}
 
+	@Override
 	public void show() {
 		mainDrawer.redraw();
-		frame.setVisible(true);
+		super.show();
 	}
 
 	public OTFHostControlBar getHostControlBar() {
 		return hostControlBar;
 	}
 
-	public OTFFrame getFrame() {
-		return frame;
+	@Override
+	protected void processWindowEvent(WindowEvent e) {
+		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+			this.endProgram(0);
+		} else {
+			super.processWindowEvent(e);
+		}
 	}
 
+	public void endProgram(int code) {
+		System.exit(code);
+	}
+	
 }

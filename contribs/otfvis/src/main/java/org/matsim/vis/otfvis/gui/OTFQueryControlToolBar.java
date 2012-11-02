@@ -51,6 +51,8 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
  */
 public class OTFQueryControlToolBar extends JToolBar implements ActionListener, ItemListener {
 
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger log = Logger.getLogger(OTFQueryControlToolBar.class);
 
 	private JTextField textField;

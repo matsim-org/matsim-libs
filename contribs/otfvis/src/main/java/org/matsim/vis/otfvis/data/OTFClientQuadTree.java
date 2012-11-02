@@ -33,7 +33,6 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 
 /**
@@ -60,7 +59,6 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 	public double offsetNorth;
 
 	private final OTFServer host;
-	private OTFConnectionManager connect;
 
 	private final List<OTFDataReader> additionalElements = new LinkedList<OTFDataReader>();
 
@@ -125,10 +123,6 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 		}
 	}
 
-	public void setConnectionManager(final OTFConnectionManager c) {
-		this.connect = c;
-	}
-
 	public synchronized void getConstData() {
 		byte[] bbyte = this.host.getQuadConstStateBuffer();
 		ByteBuffer in = ByteBuffer.wrap(bbyte);
@@ -157,9 +151,8 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 
 	/**
 	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
-	 * 	 * "drawer" is the backpointer to the calling method; don't know why it is done in this way.  kai, feb'11
 	 */
-	private SceneGraph createSceneGraph(final int time, Rect rect, final OTFOGLDrawer drawer) {
+	private SceneGraph createSceneGraph(final int time, Rect rect) {
 		List<Rect> rects = new LinkedList<Rect>();
 		/*
 		 * This hack ensures that vehicles on links are drawn even if their center is not visible
@@ -211,7 +204,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 
 		SceneGraph result;
 		if ( cachedResult == null) {
-			SceneGraph result1 = new SceneGraph(rect, time, this.connect, drawer);
+			result = new SceneGraph(rect);
 			// (sets up the layers but does not put content)
 
 			QuadTree.Rect bound2 = this.host.isLive() ? rect : this.top.getBounds();
@@ -222,13 +215,13 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 			ByteBuffer in = ByteBuffer.wrap(bbyte);
 			// (converts the byte buffer into an object)
 
-			this.execute(bound2, new ReadDataExecutor(in, false, result1));
+			this.execute(bound2, new ReadDataExecutor(in, false, result));
 			// (this is pretty normal, but I still keep forgetting it: The leaves of the QuadTree contain objects of type
 			// OTFDataReader.  The ReadDataExecutor (defined above) uses them to read the data.
 
 			for(OTFDataReader element : this.additionalElements) {
 				try {
-					element.readDynData(in,result1);
+					element.readDynData(in,result);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -236,9 +229,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 			// fill with elements
 			//
 			// I don't understand the wording.  Why does "invalidate" do a "fill with elements"?
-			invalidate(rect, result1);
-
-			result = result1;
+			invalidate(rect, result);
 		} else {
 			result = cachedResult;
 			result.setRect(rect);
@@ -263,13 +254,12 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 
 	/**
 	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
-	 * "drawer" is the backpointer to the calling method; don't know why it is done in this way.  kai, feb'11
 	 */
-	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect, final OTFOGLDrawer drawer) {
+	public synchronized SceneGraph getSceneGraph(final int time, final Rect rect) {
 		if ((time == -1) && (this.lastGraph != null)) {
 			return this.lastGraph;
 		} else {
-			this.lastGraph = createSceneGraph(time, rect, drawer);
+			this.lastGraph = createSceneGraph(time, rect);
 			return this.lastGraph;
 		}
 	}

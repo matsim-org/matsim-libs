@@ -20,7 +20,6 @@
 
 package org.matsim.vis.otfvis.caching;
 
-import org.matsim.vis.otfvis.data.OTFDrawable;
 
 /**
  * The interface SceneLayer has to be implemented from each class the will be added to the SceneGraph as a Layer.
@@ -31,7 +30,6 @@ import org.matsim.vis.otfvis.data.OTFDrawable;
  */
 public interface SceneLayer {
 	
-	public void init(boolean initConstData);
 	
 	/**
 	 * 
@@ -46,14 +44,8 @@ public interface SceneLayer {
 	 * 
 	 */
 	public void glInit();
-	
-	public void finish();
-	
-	public void addItem(OTFDrawable item);
-	
+
 	public void draw();
-	
-	public Object newInstanceOf(Class clazz);
 	
 	public int getDrawOrder();
 	

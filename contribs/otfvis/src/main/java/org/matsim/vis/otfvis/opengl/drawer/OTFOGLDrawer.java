@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -134,20 +133,6 @@ public class OTFOGLDrawer implements GLEventListener {
 			return this.fastValues[(int)(value*this.grain)] ;
 		}
 
-	}
-
-	public static class RandomColorizer {
-		Color [] fastValues;
-		private static final Random rand = new Random();
-
-		public RandomColorizer(int size) {
-			this.fastValues = new Color[size];
-			for (int i = 0; i < size; i++) this.fastValues[i] = new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255));
-		}
-
-		public Color getColor(int value) {
-			return this.fastValues[value];
-		}
 	}
 
 	private class VisGUIMouseHandler extends MouseInputAdapter {
@@ -313,7 +298,7 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private int nRedrawn = 0;
 
-	private VisGUIMouseHandler mouseMan = null;
+	private final VisGUIMouseHandler mouseMan;
 
 	private final OTFClientQuadTree clientQ;
 
@@ -720,7 +705,7 @@ public class OTFOGLDrawer implements GLEventListener {
 			rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
 			this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
 		}
-		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect, this);
+		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect);
 		if (this.queryHandler != null) {
 			this.queryHandler.updateQueries();
 		}
