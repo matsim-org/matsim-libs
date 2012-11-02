@@ -111,9 +111,11 @@ public class HitchHikingQsimFactory implements MobsimFactory {
         AgentFactory agentFactory =
 			new HitchHikerAgentFactory(
 					new TransitAgentFactory(qSim),
+					controler.getNetwork(),
 					controler.getTripRouterFactory().createTripRouter(),
 					queuesManager,
-					eventsManager);
+					eventsManager,
+					controler.getConfig().planCalcScore().getMonetaryDistanceCostRateCar());
 
         if (sc.getConfig().scenario().isUseTransit()) {
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);

@@ -24,8 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,6 +39,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
@@ -47,6 +51,9 @@ import playground.thibautd.hitchiking.qsim.events.PassengerDepartsWithDriverEven
  * @author thibautd
  */
 public class DriverRouteHandler implements HitchHikingHandler {
+	private static final Logger log =
+		Logger.getLogger(DriverRouteHandler.class);
+
 	/**
 	 * Maximum number of passengers per driver. 
 	 */
@@ -56,6 +63,8 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	private final TripRouter router;
 	private final HitchHikerAgent agent;
 	private final EventsManager events;
+	private final Network network;
+	private final double costOfDistance;
 
 	private Stage stage = Stage.ACCESS;
 	private double now;
@@ -67,11 +76,13 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	private Id nextIdInRoute;
 
 	public DriverRouteHandler(
+			final Network network,
 			final HitchHikerAgent agent,
 			final TripRouter router,
 			final PassengerQueuesManager manager,
 			final EventsManager events,
 			final HitchHikingDriverRoute route,
+			final double costOfDistance,
 			final double now) {
 		this.agent = agent;
 		this.router = router;
@@ -79,6 +90,8 @@ public class DriverRouteHandler implements HitchHikingHandler {
 		this.route = route;
 		this.now = now;
 		this.events = events;
+		this.costOfDistance = costOfDistance;
+		this.network = network;
 
 		performAccess();
 	}
@@ -86,7 +99,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	private void performAccess() {
 		currentDestination = route.getPickUpLinkId();
 		currentIdInRoute = route.getStartLinkId();
-		routeToNextDest = route( currentIdInRoute , currentDestination );
+		routeToNextDest = route( currentIdInRoute , currentDestination ).getLinkIds().iterator();
 		nextIdInRoute = nextIdInRoute();
 	}
 
@@ -179,7 +192,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 
 	private boolean performEgress() {
 		currentDestination = route.getEndLinkId();
-		routeToNextDest = route( currentIdInRoute , currentDestination );
+		routeToNextDest = route( currentIdInRoute , currentDestination ).getLinkIds().iterator();
 		nextIdInRoute = nextIdInRoute();
 		return true;
 	}
@@ -200,10 +213,15 @@ public class DriverRouteHandler implements HitchHikingHandler {
 		if (destAndPassengers != null) {
 			passengers = destAndPassengers.getSecond();
 			currentDestination = destAndPassengers.getFirst();		
-			routeToNextDest =
-				route(
+			NetworkRoute r = route(
 					route.getPickUpLinkId(),
 					currentDestination);
+			routeToNextDest = r.getLinkIds().iterator();
+
+			// XXX: this assumes cost of distance for hitch hiking in scoring f.
+			double dist = RouteUtils.calcDistance( r , network );
+			double bonusPerPerson = -passengers.size() * (dist * costOfDistance) /
+									(passengers.size() + 1d);
 
 			for (MobsimAgent p : passengers) {
 				// fire event for each passenger
@@ -213,7 +231,19 @@ public class DriverRouteHandler implements HitchHikingHandler {
 							p.getId(),
 							agent.getId(),
 							pickUpLink));
+				log.info( "passenger "+p.getId()+" gets bonus "+bonusPerPerson );
+				events.processEvent(
+						events.getFactory().createAgentMoneyEvent(
+							now,
+							p.getId(),
+							bonusPerPerson));
 			}
+			log.info( "driver "+agent.getId()+" gets bonus "+bonusPerPerson );
+			events.processEvent(
+					events.getFactory().createAgentMoneyEvent(
+						now,
+						agent.getId(),
+						bonusPerPerson));
 		}
 		else {
 			passengers = null;
@@ -221,7 +251,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 			routeToNextDest =
 				route(
 					route.getPickUpLinkId(),
-					currentDestination);
+					currentDestination).getLinkIds().iterator();
 		}
 		currentIdInRoute = route.getPickUpLinkId();
 		nextIdInRoute = nextIdInRoute();
@@ -229,7 +259,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 		return true;
 	}
 
-	private Iterator<Id> route(final Id o , final Id d) {
+	private NetworkRoute route(final Id o , final Id d) {
 		List<? extends PlanElement> trip = 
 			router.calcRoute(
 					TransportMode.car,
@@ -239,8 +269,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 					agent.getPerson());
 
 		Leg l = (Leg) trip.get( 0 );
-		NetworkRoute r = (NetworkRoute) l.getRoute();
-		return r.getLinkIds().iterator();
+		return (NetworkRoute) l.getRoute();
 	}
 
 	@Override

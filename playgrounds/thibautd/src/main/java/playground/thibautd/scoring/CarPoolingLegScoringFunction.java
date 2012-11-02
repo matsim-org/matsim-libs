@@ -20,6 +20,7 @@
 package playground.thibautd.scoring;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -141,7 +142,7 @@ public class CarPoolingLegScoringFunction extends CharyparNagelLegScoring {
 		}
 		else {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				dist = leg.getRoute().getDistance();
+				dist = getDistance( leg.getRoute() );
 			}
 			// use the same values as for "car"
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
@@ -150,6 +151,16 @@ public class CarPoolingLegScoringFunction extends CharyparNagelLegScoring {
 
 		return tmpScore;
 
+	}
+
+	private double getDistance(final Route r) {
+		if (r instanceof NetworkRoute) {
+			NetworkRoute nr = (NetworkRoute) r;
+			return nr.getDistance() > 0 ?
+				nr.getDistance() :
+				RouteUtils.calcDistance( nr , network );
+		}
+		return r.getDistance() > 0 ? r.getDistance() : 0;
 	}
 
 	private static class LogListener implements IterationEndsListener {

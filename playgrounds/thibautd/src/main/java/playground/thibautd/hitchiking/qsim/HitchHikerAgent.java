@@ -22,6 +22,7 @@ package playground.thibautd.hitchiking.qsim;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
@@ -54,6 +55,9 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	private final TripRouter router;
 	private final PassengerQueuesManager manager;
 	private final EventsManager events;
+	private final Network network;
+	// XXX this should not be here but in the scoring function
+	private final double costOfDistance;
 
 	/**
 	 * hitch-hiking-specific delegate.
@@ -67,13 +71,17 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	// /////////////////////////////////////////////////////////////////////////
 	public HitchHikerAgent(
 			final MobsimDriverPassengerAgent delegate,
+			final Network network,
 			final TripRouter router,
 			final PassengerQueuesManager manager,
-			final EventsManager events) {
+			final EventsManager events,
+			final double costOfDistance) {
 		this.delegate = delegate;
 		this.router = router;
 		this.manager = manager;
 		this.events = events;
+		this.costOfDistance = costOfDistance;
+		this.network = network;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -156,11 +164,13 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 
 		if (leg.getMode().equals( HitchHikingConstants.DRIVER_MODE )) {
 			hitchHiker = new DriverRouteHandler(
+					network,
 					this,
 					router,
 					manager,
 					events,
 					(HitchHikingDriverRoute) route,
+					costOfDistance,
 					now);
 		}
 		else if (leg.getMode().equals( HitchHikingConstants.PASSENGER_MODE )) {
