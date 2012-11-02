@@ -221,8 +221,12 @@ public class DreieckStreckeSzenarioTest {
 		createPopulation((long)89,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
+		/*
 		FunDiagramsDreieck fundi2 = new FunDiagramsDreieck(this.scenario);
 		events.addHandler(fundi2);
+		*/
+		FunDiagramsWithPassing fundi3 = new FunDiagramsWithPassing(this.scenario);
+		events.addHandler(fundi3);
 		
 		runqsim(events);
 	}
@@ -321,6 +325,8 @@ public class DreieckStreckeSzenarioTest {
 		for (long i = 0; i<numberOfPeople; i++){
 			
 			Person person = population.getFactory().createPerson(createId(i+1));
+			Map<String, Object> customMap = person.getCustomAttributes();
+			
 			Plan plan = population.getFactory().createPlan();
 			plan.addActivity(createHome(sekundenFrequenz, i+1));
 			//Assigning this person to a randomly chosen transport mode
@@ -336,6 +342,7 @@ public class DreieckStreckeSzenarioTest {
 			} else {
 				transportMode = "fast";
 			}
+			customMap.put("transportMode", transportMode);
 			Leg leg = population.getFactory().createLeg(transportMode);
 			
 			//following modification goes with the modification in the prepareForSim method
