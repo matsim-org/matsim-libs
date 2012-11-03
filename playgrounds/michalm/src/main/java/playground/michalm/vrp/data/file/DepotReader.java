@@ -28,7 +28,6 @@ import org.xml.sax.Attributes;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.model.DynAgentVehicle;
 import playground.michalm.vrp.data.network.MatsimVrpGraph;
 
@@ -40,7 +39,7 @@ public class DepotReader
     private final static String VEHICLE = "vehicle";
 
     private Scenario scenario;
-    private MatsimVrpData data;
+    private VrpData data;
     private MatsimVrpGraph graph;
 
     private List<Depot> depots = new ArrayList<Depot>();
@@ -49,12 +48,12 @@ public class DepotReader
     private Depot currentDepot;
 
 
-    public DepotReader(Scenario scenario, MatsimVrpData data)
+    public DepotReader(Scenario scenario, VrpData data)
     {
         this.scenario = scenario;
         this.data = data;
 
-        graph = data.getMatsimVrpGraph();
+        graph = (MatsimVrpGraph)data.getVrpGraph();
     }
 
 
@@ -62,9 +61,8 @@ public class DepotReader
     {
         parse(filename);
 
-        VrpData vrpData = data.getVrpData();
-        vrpData.setDepots(depots);
-        vrpData.setVehicles(vehicles);
+        data.setDepots(depots);
+        data.setVehicles(vehicles);
     }
 
 
