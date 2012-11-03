@@ -58,7 +58,7 @@ public class DepotGenerator
 
             pw.println("\t\t<vehicles>");
 
-            pw.printf("\t\t\t<vehicle name=\"%d\" t0=\"0\" t1=\"%d\"/>", i, t1);
+            pw.printf("\t\t\t<vehicle name=\"taxi_%d\" t0=\"0\" t1=\"%d\"/>", i, t1);
             pw.println();
 
             pw.println("\t\t</vehicles>");
