@@ -181,20 +181,18 @@ public class SingleIterOfflineDvrpLauncher
     private void initMatsimVrpData()
         throws IOException
     {
-        data = MatsimVrpDataCreator.create(scenario);
-        new DepotReader(scenario, data).readFile(depotsFileName);
-
-        handleTaxiModeDepartures();// creates Requests
-
-        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
-        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
-                ttimeCalc, tcostCalc);
         TimeDiscretizer timeDiscretizer = TimeDiscretizer.TD_24H_BY_15MIN;
-        MatsimVrpGraph graph = data.getMatsimVrpGraph();
+        MatsimVrpGraph graph = MatsimVrpGraphCreator.create(scenario, ttimeCalc, tcostCalc,
+                timeDiscretizer, true);
 
-        ArcFactory arcFactory = new SparseDiscreteMatsimArc.SparseDiscreteMatsimArcFactory(shortestPathCalculator,
-                timeDiscretizer);
-        ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
+        VrpData vrpData = new VrpData();
+        vrpData.setVrpGraph(graph);
+        vrpData.setCustomers(new ArrayList<Customer>());
+        vrpData.setRequests(new ArrayList<Request>());
+        new DepotReader(scenario, vrpData).readFile(depotsFileName);
+        handleTaxiModeDepartures();// creates Requests
+        
+        data = new MatsimVrpData(vrpData, scenario);
     }
 
 

@@ -17,45 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.data;
+package playground.michalm.vrp.data.network;
 
 import java.io.IOException;
-import java.util.*;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.*;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
+import pl.poznan.put.util.lang.TimeDiscretizer;
+import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
 
 
-public class MatsimVrpDataCreator
+public class MatsimVrpGraphCreator
 {
-    public static MatsimVrpData create(Scenario scenario)
+    public static MatsimVrpGraph create(Scenario scenario, TravelTime ttimeCalc,
+            TravelDisutility tcostCalc, TimeDiscretizer timeDiscretizer, boolean fixedSizeVrpGraph)
         throws IOException
     {
-        VrpData vrpData = new VrpData();
+        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
+        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
+                ttimeCalc, tcostCalc);
 
-        List<Customer> customers = new ArrayList<Customer>();
-        List<Request> requests = new ArrayList<Request>();
+        ArcFactory arcFactory = new SparseDiscreteMatsimArc.SparseDiscreteMatsimArcFactory(
+                shortestPathCalculator, timeDiscretizer);
 
-        vrpData.setCustomers(customers);
-        vrpData.setRequests(requests);
+        MatsimVrpGraph graph;
 
-        int vertexCount = scenario.getNetwork().getLinks().size();
+        if (fixedSizeVrpGraph) {
+            int vertexCount = scenario.getNetwork().getLinks().size();
+            graph = new FixedSizeMatsimVrpGraph(vertexCount);
+            ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
+        }
+        else {
+            graph = new GrowingMatsimVrpGraph(arcFactory);
+        }
 
+        // build vertices for all links...
         MatsimVertexBuilder vertexBuilder = MatsimVertexImpl.createFromLinkIdBuilder(scenario
                 .getNetwork());
 
-        VrpGraph graph = new FixedSizeMatsimVrpGraph(vertexCount);
-        vrpData.setVrpGraph(graph);
-
-        // build vertices for all links...
         for (Id id : scenario.getNetwork().getLinks().keySet()) {
             graph.addVertex(vertexBuilder.setLinkId(id).build());
         }
 
-        return new MatsimVrpData(vrpData, scenario);
+        return graph;
     }
 }

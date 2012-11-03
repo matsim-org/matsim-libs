@@ -36,7 +36,6 @@ import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
@@ -50,16 +49,14 @@ import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.ChartFileOptimizerListener;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.file.DepotReader;
-import playground.michalm.vrp.data.network.MatsimVrpGraph;
+import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.*;
-import playground.michalm.vrp.data.network.shortestpath.*;
 import playground.michalm.vrp.otfvis.VrpOTFClientLive;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.TaxiAgentSource;
@@ -229,18 +226,17 @@ public class SingleIterOnlineDvrpLauncher
                 throw new IllegalArgumentException();
         }
 
-        data = MatsimVrpDataCreator.create(scenario);
-        new DepotReader(scenario, data).readFile(depotsFileName);
-
-        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
-        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
-                ttimeCalc, tcostCalc);
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
-        MatsimVrpGraph graph = data.getMatsimVrpGraph();
+        MatsimVrpGraph graph = MatsimVrpGraphCreator.create(scenario, ttimeCalc, tcostCalc,
+                timeDiscretizer, false);
 
-        ArcFactory arcFactory = new SparseDiscreteMatsimArc.SparseDiscreteMatsimArcFactory(shortestPathCalculator,
-                timeDiscretizer);
-        ((FixedSizeVrpGraph)graph).initArcs(arcFactory);
+        VrpData vrpData = new VrpData();
+        vrpData.setVrpGraph(graph);
+        vrpData.setCustomers(new ArrayList<Customer>());
+        vrpData.setRequests(new ArrayList<Request>());
+        new DepotReader(scenario, vrpData).readFile(depotsFileName);
+
+        data = new MatsimVrpData(vrpData, scenario);
     }
 
 
