@@ -75,7 +75,7 @@ public class InterZoneDistanceCalculator
             double x = scanner.nextDouble();
             double y = scanner.nextDouble();
             zc.node = network.getNearestNode(scenario.createCoord(x, y));
-            
+
             zoneCentroidList.add(zc);
         }
 
@@ -83,11 +83,10 @@ public class InterZoneDistanceCalculator
     }
 
 
-    private void initDijkstra()
+    private void initDijkstra(boolean distanceMode) // modes: distance or freeflow-speed time
     {
         TravelTime ttimeCalc = new FreeSpeedTravelTimeCalculator();
 
-        boolean distanceMode = true; // distance or freeflow speed
         TravelDisutility tcostCalc = distanceMode ? new DistanceAsTravelDisutility()
                 : new TimeAsTravelDisutility(ttimeCalc);
 
@@ -112,7 +111,7 @@ public class InterZoneDistanceCalculator
         // normal lines
         for (ZoneCentroid i : zoneCentroids) {
             System.out.println(i.zoneId + "...");
-            
+
             bw.write(i.zoneId + "\t");
             for (ZoneCentroid j : zoneCentroids) {
                 Path path = router.calcLeastCostPath(i.node, j.node, 0, null, null);
@@ -121,27 +120,34 @@ public class InterZoneDistanceCalculator
 
             bw.newLine();
         }
-        
+
         bw.close();
     }
 
 
-    public void go(String networkFilename, String centroidsFilename, String distancesFilename)
+    public void go(String networkFilename, String centroidsFilename, String distancesFilename,
+            boolean distanceMode)
         throws IOException
     {
         readNetwork(networkFilename);
         readZoneCentroids(centroidsFilename);
-        initDijkstra();
+        initDijkstra(distanceMode);
         writeDistances(distancesFilename);
     }
-    
-    
-    public static void main(String[] args) throws IOException
+
+
+    public static void main(String[] args)
+        throws IOException
     {
         String networkFilename = "d:\\PP-rad\\poznan\\network.xml";
         String centroidsFilename = "d:\\PP-rad\\poznan\\wspol_centr.txt";
-        String distancesFilename = "d:\\PP-rad\\poznan\\inter_zone_distances.txt";
-        
-        new InterZoneDistanceCalculator().go(networkFilename, centroidsFilename, distancesFilename);
+
+        boolean distanceMode = !true;
+
+        String distancesFilename = "d:\\PP-rad\\poznan\\inter_zone_"
+                + (distanceMode ? "distances.txt" : "times.txt");
+
+        new InterZoneDistanceCalculator().go(networkFilename, centroidsFilename, distancesFilename,
+                distanceMode);
     }
 }
