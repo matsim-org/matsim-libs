@@ -64,7 +64,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
 	// yy not so great: implicit instantiation at activity.  kai, nov'11
 	@Override
-	public MobsimAgent.State getState() {
+	public final MobsimAgent.State getState() {
 		return this.state ;
 	}
 
@@ -83,7 +83,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2);
 	}
 
-	protected void init() {
+	protected final void init() {
 		if (getTransitRoute() != null) {
 			this.stopIterator = getTransitRoute().getStops().listIterator();
 			this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
@@ -93,12 +93,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		this.nextLinkIndex = 0;
 	}
 
-	protected void setDriver(Person personImpl) {
+	protected final void setDriver(Person personImpl) {
 		this.dummyPerson = personImpl;
 	}
 
 	@Override
-	public Id chooseNextLinkId() {
+	public final Id chooseNextLinkId() {
 		NetworkRoute netR = getCarRoute();
 		List<Id> linkIds = netR.getLinkIds();
 		if (this.nextLinkIndex < linkIds.size()) {
@@ -111,12 +111,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 	
 	@Override
-	public void abort( final double now ) {
+	public final void abort( final double now ) {
 		this.state = MobsimAgent.State.ABORT ;
 	}
 
 	@Override
-	public Id getCurrentLinkId() {
+	public final Id getCurrentLinkId() {
 		int currentLinkIndex = this.nextLinkIndex - 1;
 		if (currentLinkIndex < 0) {
 			return getCarRoute().getStartLinkId();
@@ -128,12 +128,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 	@Override
-	public void notifyMoveOverNode(Id nextLinkId) {
+	public final void notifyMoveOverNode(Id nextLinkId) {
 		this.nextLinkIndex++;
 	}
 
 	@Override
-	public TransitStopFacility getNextTransitStop() {
+	public final TransitStopFacility getNextTransitStop() {
 		if (this.nextStop == null) {
 			return null;
 		}
@@ -142,6 +142,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 
 	@Override
 	public double handleTransitStop(final TransitStopFacility stop, final double now) {
+		// yy can't make this final because of tests.  kai, oct'12
+		
 		assertExpectedStop(stop);
 		processEventVehicleArrives(stop, now);
 		
@@ -177,7 +179,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
 	}
 
-	Netsim getSimulation(){
+	final Netsim getSimulation(){
 		return this.internalInterface.getMobsim();
 	}
 
@@ -188,17 +190,17 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	 * it public again as long as it is not part of the PlanDriverAgent interface.  kai, jun'11
 	 * </ul>
 	 */
-	Person getPerson() {
+	final Person getPerson() {
 		return this.dummyPerson;
 	}
 
 	@Override
-	public TransitVehicle getVehicle() {
+	public final TransitVehicle getVehicle() {
 		return this.vehicle;
 	}
 
 	@Override
-	public void setVehicle(final MobsimVehicle vehicle) {
+	public final void setVehicle(final MobsimVehicle vehicle) {
 		// MobsimVehicle to fulfill the interface; should be a TransitVehicle at runtime!
 		this.vehicle = (TransitVehicle) vehicle;
 	}
@@ -287,7 +289,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 
-	protected NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
+	protected final NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
 		return new NetworkRouteWrapper(carRoute);
 	}
 
@@ -310,7 +312,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	 *
 	 * @author mrieser
 	 */
-	protected class NetworkRouteWrapper implements NetworkRoute, Cloneable {
+	protected final class NetworkRouteWrapper implements NetworkRoute, Cloneable {
 
 		private final NetworkRoute delegate;
 
