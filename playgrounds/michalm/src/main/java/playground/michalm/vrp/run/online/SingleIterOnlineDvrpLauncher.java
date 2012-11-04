@@ -29,7 +29,9 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.*;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.*;
@@ -291,6 +293,9 @@ public class SingleIterOnlineDvrpLauncher
         }
 
         EventsManager events = EventsUtils.createEventsManager();
+        EventWriter writer = new EventWriterXML(dirName + "events.xml.gz");
+        events.addHandler(writer);
+        
         QSim qSim = new QSim(scenario, events);
         ActivityEngine activityEngine = new ActivityEngine();
         qSim.addMobsimEngine(activityEngine);
@@ -337,6 +342,9 @@ public class SingleIterOnlineDvrpLauncher
         // events.addHandler(runningVehicleRegister = new RunningVehicleRegister());
 
         qSim.run();
+        
+        events.finishProcessing();
+        writer.closeFile();
     }
 
 
