@@ -43,29 +43,40 @@ class RandomizedTransitRouterNetworkTravelTimeAndDisutility extends TransitRoute
 	
 	Id cachedPersonId = null ;
 	final TransitRouterConfig originalTransitRouterConfig ;
-	TransitRouterConfig localConfig ;
+//	TransitRouterConfig localConfig ;
+	private double localMarginalUtilityOfTravelTimeWalk_utl_s = Double.NaN ;
+	private double localMarginalUtilityOfWaitingPt_utl_s = Double.NaN ;
+	private double localUtilityOfLineSwitch_utl = Double.NaN ;
+	private double localMarginalUtilityOfTravelTimePt_utl_s = Double.NaN ;
+	private double localMarginalUtilityOfTravelDistancePt_utl_m = Double.NaN ;
 	
-	public RandomizedTransitRouterNetworkTravelTimeAndDisutility(TransitRouterConfig config) {
-		super(config);
+	public RandomizedTransitRouterNetworkTravelTimeAndDisutility(TransitRouterConfig routerConfig) {
+		super(routerConfig);
 		
 		// make sure that some parameters are not zero since otherwise the randomization will not work:
 
 		// marg utl time wlk should be around -3/h or -(3/3600)/sec.  Give warning if not at least 1/3600:
-		if ( -config.getMarginalUtilityOfTravelTimeWalk_utl_s() < 1./3600. ) {
+		if ( -routerConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() < 1./3600. ) {
 			Logger.getLogger(this.getClass()).warn( "marg utl of walk rather close to zero; randomization may not work") ;
 		}
 		// utl of line switch should be around -300sec or -0.5u.  Give warning if not at least 0.1u:
-		if ( -config.getUtilityOfLineSwitch_utl() < 0.1 ) {
+		if ( -routerConfig.getUtilityOfLineSwitch_utl() < 0.1 ) {
 			Logger.getLogger(this.getClass()).warn( "utl of line switch rather close to zero; randomization may not work") ;
 		}
 
 			
-			this.originalTransitRouterConfig = config ;
-			this.localConfig = config ;
+			this.originalTransitRouterConfig = routerConfig ;
+//			this.localConfig = config ;
+			this.localMarginalUtilityOfTravelDistancePt_utl_m = routerConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+			this.localMarginalUtilityOfTravelTimePt_utl_s = routerConfig.getMarginalUtilityOfTravelTimePt_utl_s() ;
+			this.localMarginalUtilityOfTravelTimeWalk_utl_s = routerConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
+			this.localMarginalUtilityOfWaitingPt_utl_s = routerConfig.getMarginalUtilityOfTravelTimePt_utl_s() ;
+			this.localUtilityOfLineSwitch_utl = routerConfig.getUtilityOfLineSwitch_utl() ;
 	}
 	
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, final CustomDataManager dataManager) {
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle, 
+			final CustomDataManager dataManager) {
 		
 		if ( !person.getId().equals(this.cachedPersonId)) {
 			// person has changed, so ...
@@ -73,16 +84,23 @@ class RandomizedTransitRouterNetworkTravelTimeAndDisutility extends TransitRoute
 			// ... memorize new person id:
 			this.cachedPersonId = person.getId() ;
 			
-			// ... generate new random parameters
-			{
-				double tmp = this.originalTransitRouterConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
-				tmp *= 5. * MatsimRandom.getRandom().nextDouble() ;
-				localConfig.setMarginalUtilityOfTravelTimeWalk_utl_s(tmp) ;
-			}
+			// ... generate new random parameters.  One param can remain fixed.
+			// Since the marginal utility of walk time is used in the
+			// multimodal dijkstra outside travel disutility, we keep that one fixed and vary the other ones. 
+//			{
+//				double tmp = this.originalTransitRouterConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
+//				tmp *= 5. * MatsimRandom.getRandom().nextDouble() ;
+//				localMarginalUtilityOfTravelTimeWalk_utl_s = tmp ;
+//			}
 			{
 				double tmp = this.originalTransitRouterConfig.getUtilityOfLineSwitch_utl() ;
 				tmp *= 5. * MatsimRandom.getRandom().nextDouble() ;
-				localConfig.setUtilityOfLineSwitch_utl(tmp) ;
+				localUtilityOfLineSwitch_utl = tmp ;
+			}
+			{
+				double tmp = this.originalTransitRouterConfig.getMarginalUtilityOfTravelTimePt_utl_s() ;
+				tmp *= 5. * MatsimRandom.getRandom().nextDouble() ;
+				localMarginalUtilityOfTravelTimePt_utl_s = tmp ;
 			}
 			
 		}
@@ -93,22 +111,22 @@ class RandomizedTransitRouterNetworkTravelTimeAndDisutility extends TransitRoute
 			// this means that it is a transfer link (walk)
 
 			double transfertime = getLinkTravelTime(link, time, person, vehicle);
-			double waittime = localConfig.additionalTransferTime;
+			double waittime = this.originalTransitRouterConfig.additionalTransferTime;
 			
 			// say that the effective walk time is the transfer time minus some "buffer"
 			double walktime = transfertime - waittime;
 			
-			disutl = -walktime * localConfig.getMarginalUtilityOfTravelTimeWalk_utl_s()
-			       -waittime * localConfig.getMarginalUtilityOfWaitingPt_utl_s()
-			       - localConfig.getUtilityOfLineSwitch_utl();
+			disutl = -walktime * localMarginalUtilityOfTravelTimeWalk_utl_s
+			       -waittime * localMarginalUtilityOfWaitingPt_utl_s
+			       - localUtilityOfLineSwitch_utl;
 			
 		} else {
-			// this means that the time it is a travel link.  With this version, we cannot differentiate between in-vehicle
+			// this means that it is a travel link.  With this version, we cannot differentiate between in-vehicle
 			// wait and out-of-vehicle wait, but my current intuition is that this will not matter that much (despite what is
 			// said in the literature).  kai, sep'12
 			
-			disutl = - getLinkTravelTime(link, time, person, vehicle) * localConfig.getMarginalUtilityOfTravelTimePt_utl_s() 
-			       - link.getLength() * localConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
+			disutl = - getLinkTravelTime(link, time, person, vehicle) * localMarginalUtilityOfTravelTimePt_utl_s
+			       - link.getLength() * localMarginalUtilityOfTravelDistancePt_utl_m;
 		}
 		return disutl;
 	}
