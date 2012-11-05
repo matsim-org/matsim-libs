@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -40,6 +41,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.anhorni.surprice.Surprice;
 
@@ -51,26 +54,43 @@ public class Analyzer {
 	private double tdAvg[] = new double[8]; 
 	private double tolltdAvg[] = new double[8];
 	private double utilitiesAvg[] = new double[8];
+	private Bins utilityBins;
+	private Bins ttBins;
+	private Bins tdBins;
+	private Bins tolltdBins;
+	
+	private ObjectAttributes incomes;
 	
 	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
 	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
 	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt");
 	private SupriceBoxPlot boxPlotTravelDistancesCar = new SupriceBoxPlot("Travel Distances Car", "Day", "td");
 	
+	
 	public static void main (final String[] args) {		
-		if (args.length != 1) {
+		if (args.length != 2) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
 		}
-		Analyzer analyzer = new Analyzer();
 		String configFile = args[0];
-		analyzer.init(configFile);
+		String incomesFile = args[1];
+		Analyzer analyzer = new Analyzer();
+		analyzer.init(configFile, incomesFile);
 		analyzer.run();	
 	}
-	
-	public void init(String configFile) {
+		
+	public void init(String configFile, String incomesFile) {
+		this.incomes = new ObjectAttributes();
+		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(this.incomes);
+		preferencesReader.parse(incomesFile);
+		
 		this.config = ConfigUtils.loadConfig(configFile);
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		
+		this.utilityBins = new Bins(1, 9, "utilities");
+		this.ttBins = new Bins(1, 9, "tt");
+		this.tdBins = new Bins(1, 9, "td");
+		this.tolltdBins = new Bins(1, 9, "tolltd");
 	}
 		
 	public void run() {
@@ -92,8 +112,10 @@ public class Analyzer {
 			MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 			populationReader.readFile(plansFilePath);						
 			
-			String eventsfile = outPath + "/" + day + "/ITERS/it." + this.config.controler().getLastIteration() + "/" + day + "." + this.config.controler().getLastIteration() + ".events.xml.gz";
-			this.analyzeDay(eventsfile, day, config, utilitiesRelative,utilitiesAbsolute);
+			String eventsfile = outPath + "/" + day + "/ITERS/it." + this.config.controler().getLastIteration() +
+					"/" + day + "." + this.config.controler().getLastIteration() + ".events.xml.gz";
+			
+			this.analyzeDay(eventsfile, day, config, utilitiesRelative, utilitiesAbsolute);
 		
 			this.scenario.getPopulation().getPersons().clear();
 		}	
@@ -140,7 +162,7 @@ public class Analyzer {
 		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");
 	}
 	
-	public void writeBoxPlots(String outPath) {			
+	public void writePlots(String outPath) {			
 		this.boxPlotRelative.createChart();
 		this.boxPlotRelative.saveAsPng(outPath + "/utilitiesRelative.png", 800, 600);
 		
@@ -152,6 +174,8 @@ public class Analyzer {
 		
 		this.boxPlotTravelDistancesCar.createChart();
 		this.boxPlotTravelDistancesCar.saveAsPng(outPath + "/traveldistances.png", 800, 600);
+		
+		this.utilityBins.plotBinnedDistribution(outPath + "/utilitiesPerIncome.png", "income", "");
 	}
 			
 	private double computeUtilities(ArrayList<Double> utilities, String day, String type) {		
@@ -168,6 +192,9 @@ public class Analyzer {
 				utilities.add(person.getSelectedPlan().getScore() / avgUtility);
 			} else {
 				utilities.add(person.getSelectedPlan().getScore());
+				
+				double income = Double.parseDouble((String)this.incomes.getAttribute(person.getId().toString(), "income"));
+				this.utilityBins.addVal(income, person.getSelectedPlan().getScore());
 			}
 		}
 		return avgUtility;
@@ -175,7 +202,7 @@ public class Analyzer {
 			
 	private void write(String outPath) {
 		
-		this.writeBoxPlots(outPath);
+		this.writePlots(outPath);
 		
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {

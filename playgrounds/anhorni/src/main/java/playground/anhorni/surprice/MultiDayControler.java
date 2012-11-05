@@ -32,12 +32,13 @@ public class MultiDayControler {
 	private final static Logger log = Logger.getLogger(MultiDayControler.class);
 			
 	public static void main (final String[] args) {		
-		if (args.length != 1) {
+		if (args.length != 2) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
 		}		
 		String configFile = args[0];
 		Config config = ConfigUtils.loadConfig(configFile);
+		String incomesFile = args[1];
 		String path = config.plans().getInputFile();
 		String outPath = config.controler().getOutputDirectory();
 						
@@ -62,7 +63,7 @@ public class MultiDayControler {
 //		analyzer.analyze(config, outPath, sideLength);
 		
 		Analyzer analyzer = new Analyzer();
-		analyzer.init(configFile);
+		analyzer.init(configFile, incomesFile);
 		analyzer.run();
 		
 		log.info("Week simulated, yep, .................................................................");
