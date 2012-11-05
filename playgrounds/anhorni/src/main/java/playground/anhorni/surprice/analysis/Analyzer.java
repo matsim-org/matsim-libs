@@ -79,6 +79,8 @@ public class Analyzer {
 	}
 		
 	public void init(String configFile, String incomesFile) {
+		log.info("config file: " + configFile);
+		log.info("incomes file: " + incomesFile);
 		this.incomes = new ObjectAttributes();
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(this.incomes);
 		preferencesReader.parse(incomesFile);
