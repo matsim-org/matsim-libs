@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -30,6 +31,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler, 
 	ActivityStartEventHandler {
@@ -39,6 +41,14 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	private final ArrayList<Double> travelTimes = new ArrayList<Double>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
+	
+	private Bins ttBins;
+	private ObjectAttributes incomes;
+	
+	public TravelTimeCalculator(Bins ttBins, ObjectAttributes incomes) {
+		this.ttBins = ttBins;
+		this.incomes = incomes;
+	}
 	
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
@@ -60,6 +70,9 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 			this.sumTrips++;
 			
 			this.travelTimes.add(travTime);
+			
+			double income = Double.parseDouble((String)this.incomes.getAttribute(event.getPersonId().toString(), "income"));
+			this.ttBins.addVal(income, travTime);
 		}
 	}
 	
@@ -70,6 +83,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 		this.travelTimes.clear();
 		this.sumTripDurations = 0;
 		this.sumTrips = 0;	
+		this.ttBins.clear();
 	}
 	
 	public ArrayList<Double> getTravelTimes() {

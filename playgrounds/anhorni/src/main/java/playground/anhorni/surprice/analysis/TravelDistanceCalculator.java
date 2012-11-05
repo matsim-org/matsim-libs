@@ -21,6 +21,7 @@ package playground.anhorni.surprice.analysis;
 
 import java.util.ArrayList;
 
+import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -31,6 +32,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -38,9 +40,13 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 	private int cntTrips = 0;
 	private final Network network;
 	private final ArrayList<Double> travelDistances = new ArrayList<Double>();
+	private Bins tdBins;
+	private ObjectAttributes incomes;
 
-	public TravelDistanceCalculator(final Network network) {
+	public TravelDistanceCalculator(final Network network, Bins tdBins, ObjectAttributes incomes) {
 		this.network = network;
+		this.tdBins = tdBins;
+		this.incomes = incomes;
 	}
 
 	@Override
@@ -64,6 +70,9 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 					}
 					this.sumLength += dist;
 					this.cntTrips++;
+					
+					double income = Double.parseDouble((String)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"));
+					this.tdBins.addVal(income, dist);
 				}
 			}
 		}

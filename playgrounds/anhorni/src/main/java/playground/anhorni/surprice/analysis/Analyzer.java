@@ -125,7 +125,7 @@ public class Analyzer {
 	private void analyzeDay(String eventsfile, String day, Config config, 
 			ArrayList<Double> utilitiesRelative, ArrayList<Double> utilitiesAbsolute) {
 		
-		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork());			
+		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork(), this.tdBins, this.incomes);			
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			tdCalculator.run(person.getSelectedPlan());
 		}
@@ -141,7 +141,7 @@ public class Analyzer {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		TravelTimeCalculator ttCalculator = new TravelTimeCalculator();
+		TravelTimeCalculator ttCalculator = new TravelTimeCalculator(this.ttBins, this.incomes);
 		events.addHandler(ttCalculator);
 
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl(); //(RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
@@ -176,6 +176,8 @@ public class Analyzer {
 		this.boxPlotTravelDistancesCar.saveAsPng(outPath + "/traveldistances.png", 800, 600);
 		
 		this.utilityBins.plotBinnedDistribution(outPath + "/utilitiesPerIncome.png", "income", "");
+		this.ttBins.plotBinnedDistribution(outPath + "/ttPerIncome.png", "income", "");
+		this.tdBins.plotBinnedDistribution(outPath + "/tdPerIncome.png", "income", "");
 	}
 			
 	private double computeUtilities(ArrayList<Double> utilities, String day, String type) {		
