@@ -93,6 +93,7 @@ public class Analyzer {
 	}
 		
 	public void run() {
+		log.info("Starting analysis .... ");
 		String outPath = config.controler().getOutputDirectory();
 		this.analyze(outPath);
 		log.info("=================== Finished analyses ====================");
@@ -124,6 +125,7 @@ public class Analyzer {
 	private void analyzeDay(String eventsfile, String day, Config config, 
 			ArrayList<Double> utilitiesRelative, ArrayList<Double> utilitiesAbsolute) {
 		
+		log.info("	analyzing travel distances ...");
 		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork(), this.tdBins, this.incomes);			
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			tdCalculator.run(person.getSelectedPlan());
@@ -131,18 +133,19 @@ public class Analyzer {
 		this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();
 		this.boxPlotTravelDistancesCar.addValuesPerDay(tdCalculator.getTravelDistances(), day, "Travel Distances Car");
 		
+		log.info("	analyzing utilities ...");
 		this.computeUtilities(utilitiesRelative, day, "rel");
 		boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
 		
 		this.utilitiesAvg[Surprice.days.indexOf(day)] = this.computeUtilities(utilitiesAbsolute, day, "abs");
 		boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");	
 		
-		
+		log.info("	analyzing travel times ...");
 		EventsManager events = EventsUtils.createEventsManager();
-		
 		TravelTimeCalculator ttCalculator = new TravelTimeCalculator(this.ttBins, this.incomes);
 		events.addHandler(ttCalculator);
 
+		log.info("	analyzing toll travel distances ...");
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl(); //(RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);		
 		try {
@@ -154,8 +157,7 @@ public class Analyzer {
 		TolledTripLengthCalculator tollCalculator = new TolledTripLengthCalculator(this.scenario.getNetwork(), scheme, this.tolltdBins, this.incomes);
 		events.addHandler(tollCalculator);
 		
-		new MatsimEventsReader(events).readFile(eventsfile);
-				
+		new MatsimEventsReader(events).readFile(eventsfile);				
 		this.ttAvg[Surprice.days.indexOf(day)] = ttCalculator.getAverageTripDuration();
 		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();	
 		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");
