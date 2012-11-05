@@ -96,7 +96,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 			// if this is not zero, accumulate it into some global accumulated length ...
 			this.sumLength += length.doubleValue();
 			
-			double income = Double.parseDouble((String)this.incomes.getAttribute(event.getPersonId().toString(), "income"));
+			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income");
 			this.tolltdBins.addVal(income, length.doubleValue());
 			
 			// ... and reset the agent-individual accumlated length to zero:

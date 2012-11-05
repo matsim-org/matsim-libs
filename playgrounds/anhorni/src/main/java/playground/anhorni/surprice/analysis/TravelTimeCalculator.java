@@ -71,7 +71,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 			
 			this.travelTimes.add(travTime);
 			
-			double income = Double.parseDouble((String)this.incomes.getAttribute(event.getPersonId().toString(), "income"));
+			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income");
 			this.ttBins.addVal(income, travTime);
 		}
 	}

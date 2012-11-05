@@ -199,7 +199,7 @@ public class Analyzer {
 			} else {
 				utilities.add(person.getSelectedPlan().getScore());
 				
-				double income = Double.parseDouble((String)this.incomes.getAttribute(person.getId().toString(), "income"));
+				double income = (Double)this.incomes.getAttribute(person.getId().toString(), "income");
 				this.utilityBins.addVal(income, person.getSelectedPlan().getScore());
 			}
 		}
