@@ -194,5 +194,7 @@ public class EvacuationConfig {
 		log.info("Network capacity factor:\t" + capacityFactor);
 		log.info("Network speed factor:\t" + speedFactor);
 		log.info("Evacuation decision:\t" + evacuationDecisionBehaviour.toString());
+		log.info("use transit router:\t" + useTransitRouter);
+		log.info("transit router network file:\t" + transitRouterFile);
 	}
 }
