@@ -10,7 +10,7 @@ import org.matsim.contrib.freight.vrp.DTWSolverFactory;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolver;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolverFactory;
 import org.matsim.contrib.freight.vrp.TransportCostCalculator;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;

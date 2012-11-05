@@ -4,27 +4,30 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolutionBestInsertion;
-import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolutionFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.JobDistanceAvgCosts;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RecreationBestInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinRadial;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinRandom;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinStrategyManager;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ThresholdFunctionSchrimpf;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionBestInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.SingleDepotDistribTWSPFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.recreate.RecreationBestInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.JobDistanceAvgCosts;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinRadial;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinRandom;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
 public class CVRPTWSolver implements VehicleRoutingProblemSolver {
@@ -93,7 +96,7 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver {
 		return ruinAndRecreateAlgo.solve();
 	}
 
-	private ServiceProviderAgentFactory getSPFactory() {
+	private RouteAgentFactory getSPFactory() {
 		TourCost tourCost = new TourCost() {
 
 			@Override
@@ -103,7 +106,9 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver {
 						+ tour.tourData.transportCosts;
 			}
 		};
-		return new SingleDepotDistribTWSPFactory(tourCost, vrp.getCosts());
+		RouteAgentFactoryImpl factory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(vrp.getCosts(),new CalculatesLocalActInsertion(vrp.getCosts())), 
+				new CalculatesCostAndTWs(vrp.getCosts()));
+		return factory;
 	}
 
 	private void checkWhetherProblemIsOfCorrectType() {

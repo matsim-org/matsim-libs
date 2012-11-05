@@ -13,15 +13,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierFactory;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Driver;
@@ -45,9 +47,8 @@ public class RRVRPSolverTest extends TestCase {
 				Carrier carrier,
 				Network network, TourCost tourCost,
 				VehicleRoutingCosts costs) {
-			ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(
-					tourCost, costs)
-					.getFactory(VehicleRoutingProblemType.CVRPTW);
+			RouteAgentFactory spFactory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
+					new CalculatesCostAndTWs(costs));
 			MatsimVrpSolverImpl solver = new MatsimVrpSolverImpl(carrier,costs);
 			RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(
 					spFactory);

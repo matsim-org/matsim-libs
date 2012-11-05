@@ -20,6 +20,9 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.AlgorithmEndsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.AlgorithmStartsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.IterationEndsListener;
@@ -31,8 +34,8 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateList
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinEndsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinStartsListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.WarmupStartsListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.recreate.RecreationStrategy;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
 import org.matsim.contrib.freight.vrp.basics.DriverImpl;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -74,7 +77,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 
 	private Double initialThreshold = 0.0;
 
-	private ServiceProviderAgentFactory tourAgentFactory;
+	private RouteAgentFactory tourAgentFactory;
 
 	private InitialSolutionFactory initialSolutionFactory;
 
@@ -101,7 +104,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		this.recreationStrategy = recreationStrategy;
 	}
 
-	public void setTourAgentFactory(ServiceProviderAgentFactory tourAgentFactory) {
+	public void setTourAgentFactory(RouteAgentFactory tourAgentFactory) {
 		this.tourAgentFactory = tourAgentFactory;
 	}
 
@@ -129,9 +132,8 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 
 	private VehicleRoutingProblemSolution createSolution() {
 		final Collection<VehicleRoute> routes = new ArrayList<VehicleRoute>();
-		for (ServiceProviderAgent spa : currentSolution.getTourAgents()) {
-			if (spa.isActive())
-				routes.add(new VehicleRoute(spa.getTour(), spa.getVehicle()));
+		for (RouteAgent spa : currentSolution.getTourAgents()) {
+			routes.add(spa.getRoute());
 		}
 		return new VehicleRoutingProblemSolution(routes,currentSolution.getResult());
 	}
@@ -156,7 +158,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		informMainRunStarts();
 		while (currentIteration < nOfIterations) {
 			informIterationStarts(currentIteration, currentSolution);
-			Collection<ServiceProviderAgent> agents = copySolution(currentSolution.getTourAgents());
+			Collection<RouteAgent> agents = copySolution(currentSolution.getTourAgents());
 			double result2beat = currentSolution.getResult() + thresholdFunction.getThreshold(currentIteration);
 			ruinAndRecreate(agents, result2beat);
 			double tentativeResult = getResult(agents);
@@ -173,10 +175,10 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 	}
 
 
-	private double getResult(Collection<ServiceProviderAgent> agents) {
+	private double getResult(Collection<RouteAgent> agents) {
 		double cost = 0.0;
-		for(ServiceProviderAgent a : agents){
-			cost += a.getTourCost();
+		for(RouteAgent a : agents){
+			cost += a.getCost();
 		}
 		return cost;
 	}
@@ -259,7 +261,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 	}
 
 	private RuinAndRecreateSolution makeSolution(VehicleRoutingProblemSolution solution) {
-		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
+		List<RouteAgent> agents = new ArrayList<RouteAgent>();
 		Set<Vehicle> usedVehicles = new HashSet<Vehicle>();
 		for(VehicleRoute route : solution.getRoutes()){
 			agents.add(tourAgentFactory.createAgent(route.getVehicle(), route.getDriver(), route.getTour()));
@@ -286,10 +288,10 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		}
 	}
 
-	private Collection<ServiceProviderAgent> copySolution(Collection<ServiceProviderAgent> agents2copy) {
-		List<ServiceProviderAgent> agents = new ArrayList<ServiceProviderAgent>();
-		for (ServiceProviderAgent agent : agents2copy) {
-			ServiceProviderAgent newTourAgent = tourAgentFactory.createAgent(agent);
+	private Collection<RouteAgent> copySolution(Collection<RouteAgent> agents2copy) {
+		List<RouteAgent> agents = new ArrayList<RouteAgent>();
+		for (RouteAgent agent : agents2copy) {
+			RouteAgent newTourAgent = tourAgentFactory.createAgent(agent);
 			agents.add(newTourAgent);
 		}
 		return agents;
@@ -311,7 +313,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		thresholdFunction.setInitialThreshold(initialThreshold);
 	}
 
-	private void ruinAndRecreate(Collection<ServiceProviderAgent> tourAgents, double result2beat) {
+	private void ruinAndRecreate(Collection<RouteAgent> tourAgents, double result2beat) {
 		RuinStrategy ruinStrategy = ruinStrategyManager.getRandomStrategy();
 		informRuinStarts(ruinStrategy, new RuinAndRecreateSolution(tourAgents, currentSolution.getResult()));
 		Collection<Job> unassignedJobs = ruinStrategy.ruin(tourAgents);
@@ -321,7 +323,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		informRecreationEnds(tourAgents);
 	}
 
-	private void informRecreationEnds(Collection<ServiceProviderAgent> tourAgents) {
+	private void informRecreationEnds(Collection<RouteAgent> tourAgents) {
 		for (RuinAndRecreateListener l : controlerListeners) {
 			if (l instanceof RecreationEndsListener) {
 				((RecreationEndsListener) l).informRecreationEnds(tourAgents);
@@ -329,7 +331,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		}
 	}
 
-	private void informRecreationStarts(Collection<ServiceProviderAgent> tourAgents,
+	private void informRecreationStarts(Collection<RouteAgent> tourAgents,
 			Collection<Job> unassignedJobs) {
 		for (RuinAndRecreateListener l : controlerListeners) {
 			if (l instanceof RecreationStartsListener) {
@@ -338,7 +340,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		}
 	}
 
-	private void informRuinEnds(Collection<ServiceProviderAgent> tourAgents) {
+	private void informRuinEnds(Collection<RouteAgent> tourAgents) {
 		for (RuinAndRecreateListener l : controlerListeners) {
 			if (l instanceof RuinEndsListener) {
 				((RuinEndsListener) l).informRuinEnds(tourAgents);
@@ -363,7 +365,7 @@ public final class RuinAndRecreate implements VehicleRoutingProblemSolver {
 		double[] results = new double[nOfIterations];
 		for (int i = 0; i < nOfIterations; i++) {
 			printNoIteration(i);
-			Collection<ServiceProviderAgent> agents = copySolution(lastSolution.getTourAgents());
+			Collection<RouteAgent> agents = copySolution(lastSolution.getTourAgents());
 			ruinAndRecreate(agents, Double.MAX_VALUE);
 			double result = getResult(agents);
 			results[i] = result;

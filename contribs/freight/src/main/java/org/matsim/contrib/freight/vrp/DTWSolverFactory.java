@@ -13,9 +13,12 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
 import org.matsim.core.gbl.MatsimRandom;
@@ -31,7 +34,8 @@ public class DTWSolverFactory implements MatsimVrpSolverFactory {
 	@Override
 	public MatsimVrpSolver createSolver(Carrier carrier, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
 		verifyDistributionProblem(carrier.getShipments(), carrier.getCarrierCapabilities().getCarrierVehicles());
-		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(tourCost, costs).getFactory(VehicleRoutingProblemType.CVRPTW);
+		RouteAgentFactory spFactory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
+				new CalculatesCostAndTWs(costs)); 
 		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(carrier,costs);
 		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
 		rrSolver.setVrpSolverFactory(ruinAndRecreateFactory);

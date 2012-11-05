@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.listener.RuinAndRecreateListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.recreate.RecreationStrategy;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
@@ -36,7 +39,7 @@ public class RuinAndRecreateAlgorithmBuilder {
 		this.thresholdFunction = thresholdFunction;
 	}
 
-	private ServiceProviderAgentFactory serviceProviderAgentFactory;
+	private RouteAgentFactory serviceProviderAgentFactory;
 
 	private VehicleRoutingProblemSolution iniSolution;
 
@@ -54,8 +57,8 @@ public class RuinAndRecreateAlgorithmBuilder {
 		this.contolerListeners.add(l);
 	}
 
-	public void setServiceProviderAgentFactory(
-			ServiceProviderAgentFactory serviceProviderAgentFactory) {
+	public void setRouteAgentFactory(
+			RouteAgentFactory serviceProviderAgentFactory) {
 		this.serviceProviderAgentFactory = serviceProviderAgentFactory;
 	}
 

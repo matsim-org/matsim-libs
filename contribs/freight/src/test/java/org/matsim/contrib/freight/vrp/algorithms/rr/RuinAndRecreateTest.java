@@ -27,10 +27,14 @@ import junit.framework.TestCase;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesOnlyCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -64,7 +68,7 @@ public class RuinAndRecreateTest extends TestCase {
 
 	VrpBuilder vrpBuilder;
 
-	ServiceProviderAgentFactory spFactory;
+	RouteAgentFactory spFactory;
 
 	@Override
 	public void setUp() {
@@ -150,8 +154,8 @@ public class RuinAndRecreateTest extends TestCase {
 
 		};
 
-		spFactory = new ServiceProviderAgentFactoryFinder(tourCost, costs)
-				.getFactory(VehicleRoutingProblemType.CVRP);
+		spFactory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
+				new CalculatesOnlyCost(costs));
 
 		// RuinAndRecreateConfig.RadialRuinConfig.jobDistance =
 		// RuinAndRecreateConfig.RadialRuinConfig.VRPCOST;
@@ -177,8 +181,8 @@ public class RuinAndRecreateTest extends TestCase {
 
 	private Collection<TourImpl> getTours(RuinAndRecreateSolution solution) {
 		List<TourImpl> tours = new ArrayList<TourImpl>();
-		for (ServiceProviderAgent a : solution.getTourAgents()) {
-			tours.add(a.getTour());
+		for (RouteAgent a : solution.getTourAgents()) {
+			tours.add(a.getRoute().getTour());
 		}
 		return tours;
 	}

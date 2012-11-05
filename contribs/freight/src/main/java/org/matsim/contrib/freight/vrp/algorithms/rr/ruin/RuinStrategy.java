@@ -10,11 +10,12 @@
  * Contributors:
  *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
-package org.matsim.contrib.freight.vrp.algorithms.rr;
+package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.basics.Job;
 
 /**
  * 
@@ -22,29 +23,15 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
  * 
  */
 
-public class RuinAndRecreateSolution {
+public interface RuinStrategy {
 
-	private Collection<RouteAgent> tourAgents;
-
-	private double totalCosts;
-
-	public RuinAndRecreateSolution(Collection<RouteAgent> tourAgents, double totalCosts) {
-		super();
-		this.tourAgents = tourAgents;
-		this.totalCosts = totalCosts;
-	}
-
-	public double getResult() {
-		return totalCosts;
-	}
-
-	public Collection<RouteAgent> getTourAgents() {
-		return tourAgents;
-	}
-
-	@Override
-	public String toString() {
-		return "totalResult=" + getResult();
-	}
+	/**
+	 * Ruins a current solution, i.e. removes jobs from service providers and
+	 * returns a collection of these removed, and thus unassigned, jobs.
+	 * 
+	 * @param serviceProviders
+	 * @return
+	 */
+	public Collection<Job> ruin(Collection<? extends RouteAgent> serviceProviders);
 
 }

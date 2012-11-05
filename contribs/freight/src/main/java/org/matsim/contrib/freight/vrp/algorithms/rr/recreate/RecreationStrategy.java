@@ -10,11 +10,12 @@
  * Contributors:
  *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
-package org.matsim.contrib.freight.vrp.algorithms.rr;
+package org.matsim.contrib.freight.vrp.algorithms.rr.recreate;
 
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.basics.Job;
 
 /**
  * 
@@ -22,29 +23,15 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
  * 
  */
 
-public class RuinAndRecreateSolution {
+public interface RecreationStrategy {
 
-	private Collection<RouteAgent> tourAgents;
-
-	private double totalCosts;
-
-	public RuinAndRecreateSolution(Collection<RouteAgent> tourAgents, double totalCosts) {
-		super();
-		this.tourAgents = tourAgents;
-		this.totalCosts = totalCosts;
-	}
-
-	public double getResult() {
-		return totalCosts;
-	}
-
-	public Collection<RouteAgent> getTourAgents() {
-		return tourAgents;
-	}
-
-	@Override
-	public String toString() {
-		return "totalResult=" + getResult();
-	}
+	/**
+	 * Assigns the unassigned jobs to service-providers
+	 * 
+	 * @param serviceProviders
+	 * @param unassignedJobs
+	 * @param result2beat
+	 */
+	public void recreate(Collection<? extends RouteAgent> serviceProviders,Collection<Job> unassignedJobs, double result2beat);
 
 }

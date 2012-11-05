@@ -23,10 +23,14 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionBestInsertion;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Locations;
@@ -130,12 +134,12 @@ public class VRPTestCase extends TestCase {
 
 		};
 		return new InitialSolutionBestInsertion(
-				new ServiceProviderAgentFactoryFinder(tourCost, vrp.getCosts())
-						.getFactory(VehicleRoutingProblemType.CVRPTW))
+				new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
+						new CalculatesCostAndTWs(costs)))
 				.createInitialSolution(vrp);
 	}
 
-	protected ServiceProviderAgent getTourAgent(VehicleRoutingProblem vrp,
+	protected RouteAgent getTourAgent(VehicleRoutingProblem vrp,
 			TourImpl tour1, Vehicle vehicle) {
 		TourCost tourCost = new TourCost() {
 
@@ -146,9 +150,8 @@ public class VRPTestCase extends TestCase {
 			}
 
 		};
-		ServiceProviderAgentFactory spFactory = new ServiceProviderAgentFactoryFinder(
-				tourCost, vrp.getCosts())
-				.getFactory(VehicleRoutingProblemType.CVRPTW);
+		RouteAgentFactory spFactory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
+				new CalculatesCostAndTWs(costs));;
 		return spFactory.createAgent(vehicle, new Driver() {
 		}, tour1);
 	}

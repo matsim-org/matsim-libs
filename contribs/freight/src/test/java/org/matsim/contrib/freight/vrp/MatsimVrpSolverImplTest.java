@@ -7,8 +7,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierPlanReader;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgorithmFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactoryFinder;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
@@ -78,7 +81,9 @@ public class MatsimVrpSolverImplTest extends MatsimTestCase{
 				return tour.tourData.totalCost;
 			}
 		};
-		solver.setVrpSolverFactory(new RuinAndRecreateStandardAlgorithmFactory(new ServiceProviderAgentFactoryFinder(tourCost, tcc).getFactory(VehicleRoutingProblemType.CVRPTW)));
+		solver.setVrpSolverFactory(new RuinAndRecreateStandardAlgorithmFactory(
+				new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(tcc, new CalculatesLocalActInsertion(tcc)), 
+						new CalculatesCostAndTWs(tcc))));
 		solver.useSelectedPlanAsInitialSolution(true);
 		solver.solve();
 		

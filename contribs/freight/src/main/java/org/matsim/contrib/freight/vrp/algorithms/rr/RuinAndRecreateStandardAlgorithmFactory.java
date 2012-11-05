@@ -12,19 +12,17 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.ServiceProviderAgentFactory;
-import org.matsim.contrib.freight.vrp.basics.Driver;
-import org.matsim.contrib.freight.vrp.basics.DriverImpl;
-import org.matsim.contrib.freight.vrp.basics.TourPlan;
-import org.matsim.contrib.freight.vrp.basics.Vehicle;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionBestInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.recreate.RecreationBestInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.JobDistance;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.JobDistanceAvgCosts;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinRadial;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinRandom;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolver;
@@ -37,7 +35,7 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 
 	private Random random = RandomNumberGeneration.getRandom();
 
-	private final ServiceProviderAgentFactory serviceProviderFactory;
+	private final RouteAgentFactory serviceProviderFactory;
 
 	public int warmup = 50;
 
@@ -45,7 +43,7 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 
 	public String jobDistance = "vrpCost";
 
-	public RuinAndRecreateStandardAlgorithmFactory(ServiceProviderAgentFactory serviceProviderFactory) {
+	public RuinAndRecreateStandardAlgorithmFactory(RouteAgentFactory serviceProviderFactory) {
 		super();
 		this.serviceProviderFactory = serviceProviderFactory;
 	}

@@ -9,7 +9,7 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolver;
 import org.matsim.contrib.freight.vrp.MatsimVrpSolverFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.serviceProvider.TourCost;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
 public class ReScheduleVehicles implements CarrierReplanningStrategyModule {
