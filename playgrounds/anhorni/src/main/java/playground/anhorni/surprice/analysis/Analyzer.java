@@ -38,7 +38,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -152,7 +151,7 @@ public class Analyzer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}		
-		CalcAverageTolledTripLength tollCalculator = new CalcAverageTolledTripLength(this.scenario.getNetwork(), scheme);
+		TolledTripLengthCalculator tollCalculator = new TolledTripLengthCalculator(this.scenario.getNetwork(), scheme, this.tolltdBins, this.incomes);
 		events.addHandler(tollCalculator);
 		
 		new MatsimEventsReader(events).readFile(eventsfile);
