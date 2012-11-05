@@ -104,6 +104,7 @@ public class CarDistanceAnalyzer extends AbstractAnalyisModule{
 			bw.newLine();
 			bw.write("average car distance [km] per trip  " + this.avgCarDistancePerTrip_km);
 			bw.newLine();
+			bw.newLine();
 			
 			bw.write("person id \t total car distance [km]");
 			bw.newLine();

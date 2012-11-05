@@ -125,7 +125,7 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule{
 			bw.newLine();
 
 			for(String mode : mode2personId2TravelTime.keySet()){
-				String modeInfo = mode + "\t" + this.mode2numberOfPersons + "\t" + this.mode2noOfTrips + "\t" + this.mode2sumOfTravelTimes_min + "\t" + this.mode2avgTravelTimeOfModePerUser_mins + "\t" + this.mode2avgTravelTimeOfModePerTrip_mins;
+				String modeInfo = mode + "\t" + this.mode2numberOfPersons.get(mode) + "\t" + this.mode2noOfTrips.get(mode) + "\t" + this.mode2sumOfTravelTimes_min.get(mode) + "\t" + this.mode2avgTravelTimeOfModePerUser_mins.get(mode) + "\t" + this.mode2avgTravelTimeOfModePerTrip_mins.get(mode);
 				bw.write(modeInfo);
 				bw.newLine();
 			}
