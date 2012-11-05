@@ -128,8 +128,9 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	public void handleEvent(LinkEnterEvent event){
 		Id personId = event.getPersonId();
 		
+		//Disaggregated data updating methods
 		String transportMode = (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode");
-		System.out.println("transportMode: "+transportMode);
+		//System.out.println("transportMode: "+transportMode);
 		if (transportMode.equals("truck")){
 			handleEvent_truck(event);
 		} else if (transportMode.equals("med")) {
@@ -142,59 +143,12 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			}
 		}
 		
-		//Still performing aggregated data collecting
+		//Still performing some aggregated data collecting
 		int tourNumber;
 		double nowTime = event.getTime();
 		double networkLength = DreieckStreckeSzenarioTest.length * 3;
 		
-		if (event.getLinkId().equals(studiedMeasuringPointLinkId)){
-			if (this.personTour.containsKey(personId)){
-				tourNumber = personTour.get(personId);
-				//Saving the speed by updating the previous average speed
-				double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
-				double speed = networkLength / (nowTime-lastSeenTime);//in m/s!!
-				Tuple<Integer,Double> NumberSpeed = this.tourNumberSpeed.get(tourNumber);
-				int n = NumberSpeed.getFirst();
-				double sn = NumberSpeed.getSecond();//average speed for n people
-				//encountered a few calculatory problems here for still mysterious reasons, 
-				//hence the normally very unnecessary detailed programming
-				double first = n*sn/(n+1);
-				double second = speed/(n+1);
-				Tuple<Integer,Double> newNumberSpeed = new Tuple<Integer,Double>(n+1,first + second/*average speed with n+1 people*/);
-				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
-				//Checking for permanentRegime
-				if (tourNumber>2){
-					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
-					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
-						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
-						if ((permanentRegime_truck) && (permanentRegime_med) && (permanentRegime_fast)){//just checking that the modes are effectively stable
-							if (!(permanentRegime)){
-								this.permanentRegimeTour=tourNumber;
-								this.permanentRegime=true;
-							}
-						}	
-					}
-				}
-				
-				//Updating other data sources
-				tourNumber++;
-				this.personTour.put(personId,tourNumber);
-				this.lastSeenOnStudiedLinkEnter.put(personId,nowTime);
-				
-				//Initializing new Map for next Tour
-				if (!(this.tourNumberSpeed.containsKey(tourNumber)))
-					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
-			} else {
-				//First tour handling
-				tourNumber = 1;
-				this.personTour.put(personId, tourNumber);
-				this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
-				if (!(this.tourNumberSpeed.containsKey(tourNumber))){
-					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
-					this.flowTime = new Double(nowTime);
-				}
-			}
+		if (event.getLinkId().equals(studiedMeasuringPointLinkId)){	
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
 			if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
@@ -219,33 +173,21 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				this.flowTime = new Double(nowTime);
 			}
 			
-		
+			//Permanent Regime handling
 			if (permanentRegime){
 				tourNumber = this.personTour.get(personId);
 				
-				this.permanentFlow = getActualFlow();//veh/h
-				this.permanentFlow_truck = getActualFlow_truck();
-				this.permanentFlow_med = getActualFlow_med();
-				this.permanentFlow_fast = getActualFlow_fast();				
+				handlePermanentGroupDependentVariables(tourNumber);
+				
+				this.permanentFlow = getActualFlow();//veh/h				
 				
 				if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
 					
 					int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
-					int N_truck = this.tourNumberSpeed_truck.get(this.permanentRegimeTour).getFirst();
-					int N_med = this.tourNumberSpeed_med.get(this.permanentRegimeTour).getFirst();
-					int N_fast = this.tourNumberSpeed_fast.get(this.permanentRegimeTour).getFirst();
 					
 					this.permanentDensity = numberOfDrivingAgents/networkLength*1000;//veh/km
-					//as stated in the class attribute section, the following densities are PARTIAL densities, which means
-					//the saturation density will depend on the chosen probabilities (and hence will not be the usual 148.33 veh/km for all modes)
-					this.permanentDensity_truck = N_truck/networkLength*1000;
-					this.permanentDensity_med = N_med/networkLength*1000;
-					this.permanentDensity_fast = N_fast/networkLength*1000;
-					
+				
 					this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
-					this.permanentAverageVelocity_truck = this.tourNumberSpeed_truck.get(this.permanentRegimeTour).getSecond();//m/s
-					this.permanentAverageVelocity_med = this.tourNumberSpeed_med.get(this.permanentRegimeTour).getSecond();//m/s
-					this.permanentAverageVelocity_fast = this.tourNumberSpeed_fast.get(this.permanentRegimeTour).getSecond();//m/s
 					
 					//Setting all agents to abort:
 					//TODO: An abort condition/a selection condition for avoiding console spamming is now needed.
@@ -273,33 +215,54 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				//Saving the speed by updating the previous average speed
 				double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
 				double speed = networkLength / (nowTime-lastSeenTime);//in m/s!!
-				Tuple<Integer,Double> NumberSpeed = this.tourNumberSpeed_truck.get(tourNumber);
-				int n = NumberSpeed.getFirst();
-				double sn = NumberSpeed.getSecond();//average speed for n people
+				Tuple<Integer,Double> NumberSpeed = this.tourNumberSpeed.get(tourNumber);
+				Tuple<Integer,Double> NumberSpeed_truck = this.tourNumberSpeed_truck.get(tourNumber);
+				int n = NumberSpeed.getFirst(); int n_truck = NumberSpeed_truck.getFirst(); 
+				double sn = NumberSpeed.getSecond(); double sn_truck = NumberSpeed_truck.getSecond();//average speed for n people
 				//encountered a few calculatory problems here for still mysterious reasons, 
 				//hence the normally very unnecessary detailed programming
-				double first = n*sn/(n+1);
-				double second = speed/(n+1);
+				double  first = n*sn/(n+1); double first_truck = n_truck*sn_truck/(n_truck+1);
+				double second = speed/(n+1); double second_truck = speed/(n_truck+1);
 				Tuple<Integer,Double> newNumberSpeed = new Tuple<Integer,Double>(n+1,first + second/*average speed with n+1 people*/);
-				this.tourNumberSpeed_truck.put(tourNumber, newNumberSpeed);
-				//Checking for permanentRegime
+				Tuple<Integer,Double> newNumberSpeed_truck = new Tuple<Integer,Double>(n_truck+1,first_truck + second_truck/*truck average speed with n+1 people*/);
+				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
+				this.tourNumberSpeed_truck.put(tourNumber, newNumberSpeed_truck);
+				
+				
+				//Checking for permanentRegime, in the mode and globally
 				if (tourNumber>2){
-					double previousLapSpeed = this.tourNumberSpeed_truck.get(tourNumber-1).getSecond();
-					double theOneBefore = this.tourNumberSpeed_truck.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+					//In the mode
+					double previousLapSpeed_truck = this.tourNumberSpeed_truck.get(tourNumber-1).getSecond();
+					double theOneBefore_truck = this.tourNumberSpeed_truck.get(tourNumber-2).getSecond();
+					if ((almostEqualDoubles(speed, previousLapSpeed_truck, 0.02)) && (almostEqualDoubles(previousLapSpeed_truck, theOneBefore_truck, 0.02))){
 						if (!(permanentRegime_truck)){
 							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
 							this.permanentRegime_truck=true;
+							System.out.println("Truck permanent regime attained.");
 						}
+					}
+					//globally
+					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
+					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
+					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
+						//if ((permanentRegime_truck) && (permanentRegime_med) && (permanentRegime_fast)){//just checking that the modes are effectively stable
+							if (!(permanentRegime)){
+								this.permanentRegimeTour=tourNumber;
+								this.permanentRegime=true;
+							}
+						//}	
 					}
 				}
 				
-				//Updating other data sources
+				//Updating aggregated data sources
 				tourNumber++;
 				this.personTour.put(personId,tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId,nowTime);
 				
-				//Initializing new Map for next Tour
+				//Initializing new Maps for next Tour if not already done
+				if (!(this.tourNumberSpeed.containsKey(tourNumber)))
+					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 				if (!(this.tourNumberSpeed_truck.containsKey(tourNumber)))
 					this.tourNumberSpeed_truck.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 			} else {
@@ -307,11 +270,17 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				tourNumber = 1;
 				this.personTour.put(personId, tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
+				if (!(this.tourNumberSpeed.containsKey(tourNumber))){
+					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
+					this.flowTime = new Double(nowTime);
+				}				
 				if (!(this.tourNumberSpeed_truck.containsKey(tourNumber))){
 					this.tourNumberSpeed_truck.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_truck = new Double(nowTime);
 				}
 			}
+			
+			
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
 			if (nowTime == this.flowTime_truck.doubleValue()){//Still measuring the flow of the same second
@@ -350,33 +319,54 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				//Saving the speed by updating the previous average speed
 				double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
 				double speed = networkLength / (nowTime-lastSeenTime);//in m/s!!
-				Tuple<Integer,Double> NumberSpeed = this.tourNumberSpeed_med.get(tourNumber);
-				int n = NumberSpeed.getFirst();
-				double sn = NumberSpeed.getSecond();//average speed for n people
+				Tuple<Integer,Double> NumberSpeed = this.tourNumberSpeed.get(tourNumber);
+				Tuple<Integer,Double> NumberSpeed_med = this.tourNumberSpeed_med.get(tourNumber);
+				int n = NumberSpeed.getFirst(); int n_med = NumberSpeed_med.getFirst(); 
+				double sn = NumberSpeed.getSecond(); double sn_med = NumberSpeed_med.getSecond();//average speed for n people
 				//encountered a few calculatory problems here for still mysterious reasons, 
 				//hence the normally very unnecessary detailed programming
-				double first = n*sn/(n+1);
-				double second = speed/(n+1);
+				double  first = n*sn/(n+1); double first_med = n_med*sn_med/(n_med+1);
+				double second = speed/(n+1); double second_med = speed/(n_med+1);
 				Tuple<Integer,Double> newNumberSpeed = new Tuple<Integer,Double>(n+1,first + second/*average speed with n+1 people*/);
-				this.tourNumberSpeed_med.put(tourNumber, newNumberSpeed);
-				//Checking for permanentRegime
+				Tuple<Integer,Double> newNumberSpeed_med = new Tuple<Integer,Double>(n_med+1,first_med + second_med/*truck average speed with n+1 people*/);
+				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
+				this.tourNumberSpeed_truck.put(tourNumber, newNumberSpeed_med);
+				
+				
+				//Checking for permanentRegime, in the mode and globally
 				if (tourNumber>2){
-					double previousLapSpeed = this.tourNumberSpeed_med.get(tourNumber-1).getSecond();
-					double theOneBefore = this.tourNumberSpeed_med.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+					//In the mode
+					double previousLapSpeed_med = this.tourNumberSpeed_med.get(tourNumber-1).getSecond();
+					double theOneBefore_med = this.tourNumberSpeed_med.get(tourNumber-2).getSecond();
+					if ((almostEqualDoubles(speed, previousLapSpeed_med, 0.02)) && (almostEqualDoubles(previousLapSpeed_med, theOneBefore_med, 0.02))){
 						if (!(permanentRegime_med)){
 							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
 							this.permanentRegime_med=true;
+							System.out.println("Med permanent regime attained.");
 						}
+					}
+					//globally
+					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
+					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
+					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
+						if ((permanentRegime_truck) && (permanentRegime_med) && (permanentRegime_fast)){//just checking that the modes are effectively stable
+							if (!(permanentRegime)){
+								this.permanentRegimeTour=tourNumber;
+								this.permanentRegime=true;
+							}
+						}	
 					}
 				}
 				
-				//Updating other data sources
+				//Updating aggregated data sources
 				tourNumber++;
 				this.personTour.put(personId,tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId,nowTime);
 				
-				//Initializing new Map for next Tour
+				//Initializing new Maps for next Tour if not already done
+				if (!(this.tourNumberSpeed.containsKey(tourNumber)))
+					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 				if (!(this.tourNumberSpeed_med.containsKey(tourNumber)))
 					this.tourNumberSpeed_med.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 			} else {
@@ -384,11 +374,17 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				tourNumber = 1;
 				this.personTour.put(personId, tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
+				if (!(this.tourNumberSpeed.containsKey(tourNumber))){
+					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
+					this.flowTime = new Double(nowTime);
+				}				
 				if (!(this.tourNumberSpeed_med.containsKey(tourNumber))){
 					this.tourNumberSpeed_med.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_med = new Double(nowTime);
 				}
 			}
+			
+			
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
 			if (nowTime == this.flowTime_med.doubleValue()){//Still measuring the flow of the same second
@@ -427,33 +423,54 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				//Saving the speed by updating the previous average speed
 				double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
 				double speed = networkLength / (nowTime-lastSeenTime);//in m/s!!
-				Tuple<Integer,Double> NumberSpeed = this.tourNumberSpeed_fast.get(tourNumber);
-				int n = NumberSpeed.getFirst();
-				double sn = NumberSpeed.getSecond();//average speed for n people
+				Tuple<Integer,Double> NumberSpeed = this.tourNumberSpeed.get(tourNumber);
+				Tuple<Integer,Double> NumberSpeed_fast = this.tourNumberSpeed_fast.get(tourNumber);
+				int n = NumberSpeed.getFirst(); int n_fast = NumberSpeed_fast.getFirst(); 
+				double sn = NumberSpeed.getSecond(); double sn_fast = NumberSpeed_fast.getSecond();//average speed for n people
 				//encountered a few calculatory problems here for still mysterious reasons, 
 				//hence the normally very unnecessary detailed programming
-				double first = n*sn/(n+1);
-				double second = speed/(n+1);
+				double  first = n*sn/(n+1); double first_fast = n_fast*sn_fast/(n_fast+1);
+				double second = speed/(n+1); double second_fast = speed/(n_fast+1);
 				Tuple<Integer,Double> newNumberSpeed = new Tuple<Integer,Double>(n+1,first + second/*average speed with n+1 people*/);
-				this.tourNumberSpeed_fast.put(tourNumber, newNumberSpeed);
-				//Checking for permanentRegime
+				Tuple<Integer,Double> newNumberSpeed_fast = new Tuple<Integer,Double>(n_fast+1,first_fast + second_fast/*truck average speed with n+1 people*/);
+				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
+				this.tourNumberSpeed_truck.put(tourNumber, newNumberSpeed_fast);
+				
+				
+				//Checking for permanentRegime, in the mode and globally
 				if (tourNumber>2){
-					double previousLapSpeed = this.tourNumberSpeed_fast.get(tourNumber-1).getSecond();
-					double theOneBefore = this.tourNumberSpeed_fast.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+					//In the mode
+					double previousLapSpeed_fast = this.tourNumberSpeed_fast.get(tourNumber-1).getSecond();
+					double theOneBefore_fast = this.tourNumberSpeed_fast.get(tourNumber-2).getSecond();
+					if ((almostEqualDoubles(speed, previousLapSpeed_fast, 0.02)) && (almostEqualDoubles(previousLapSpeed_fast, theOneBefore_fast, 0.02))){
 						if (!(permanentRegime_fast)){
 							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
 							this.permanentRegime_fast=true;
+							System.out.println("Fast permanent regime attained.");
 						}
+					}
+					//globally
+					double previousLapSpeed = this.tourNumberSpeed.get(tourNumber-1).getSecond();
+					double theOneBefore = this.tourNumberSpeed.get(tourNumber-2).getSecond();
+					if ((almostEqualDoubles(speed, previousLapSpeed, 0.02)) && (almostEqualDoubles(previousLapSpeed, theOneBefore, 0.02))){
+						//then the average speeds of all vehicles (all modes included) has stabilized in these turns=>permanent Regime indicator
+						if ((permanentRegime_truck) && (permanentRegime_med) && (permanentRegime_fast)){//just checking that the modes are effectively stable
+							if (!(permanentRegime)){
+								this.permanentRegimeTour=tourNumber;
+								this.permanentRegime=true;
+							}
+						}	
 					}
 				}
 				
-				//Updating other data sources
+				//Updating aggregated data sources
 				tourNumber++;
 				this.personTour.put(personId,tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId,nowTime);
 				
-				//Initializing new Map for next Tour
+				//Initializing new Maps for next Tour if not already done
+				if (!(this.tourNumberSpeed.containsKey(tourNumber)))
+					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 				if (!(this.tourNumberSpeed_fast.containsKey(tourNumber)))
 					this.tourNumberSpeed_fast.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 			} else {
@@ -461,11 +478,17 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				tourNumber = 1;
 				this.personTour.put(personId, tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
+				if (!(this.tourNumberSpeed.containsKey(tourNumber))){
+					this.tourNumberSpeed.put(tourNumber,new Tuple<Integer,Double>(0,0.));
+					this.flowTime = new Double(nowTime);
+				}				
 				if (!(this.tourNumberSpeed_fast.containsKey(tourNumber))){
 					this.tourNumberSpeed_fast.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_fast = new Double(nowTime);
 				}
 			}
+			
+			
 			
 			//Updating Flow. NB: Flow is also measured on studiedMeasuringPointLinkId
 			if (nowTime == this.flowTime_fast.doubleValue()){//Still measuring the flow of the same second
@@ -500,8 +523,6 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		}
 		return flowOverLast3600s;//extrapolated hour flow in veh/h
 	}
- 	
- 	
  	
 	private double getActualFlow_truck(){
 		double flowOverLast3600s = 0;
@@ -552,6 +573,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		}
 	}
 	
+	
 	private boolean almostEqualDoubles(double d1, double d2, double relativeMaximumAcceptedDeviance){
 		if (((d1-d2)/d2)<relativeMaximumAcceptedDeviance)
 			return true;
@@ -593,7 +615,6 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.flowTime_med = new Double(0.);
 		this.flowTime_fast = new Double(0.);
 	}
-	
 
 	private void resetGroupDependentVariables(){
 		this.permanentRegime_truck = false;
@@ -623,5 +644,50 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.flowTime_truck = new Double(0.);
 		this.flowTime_med = new Double(0.);
 		this.flowTime_fast = new Double(0.);
+	}
+	
+	private void handlePermanentGroupDependentVariables(int tourNumber){
+		double networkLength = 3*DreieckStreckeSzenarioTest.length;
+		
+		this.permanentFlow_truck = getActualFlow_truck();
+		this.permanentFlow_med = getActualFlow_med();
+		this.permanentFlow_fast = getActualFlow_fast();				
+		
+		if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
+			int N_truck = 0; int N_med = 0; int N_fast = 0;
+			
+			if (this.tourNumberSpeed_truck.size() != 0){
+				 N_truck = this.tourNumberSpeed_truck.get(this.permanentRegimeTour).getFirst();
+			}
+			if (this.tourNumberSpeed_med.size() != 0){
+				 N_med = this.tourNumberSpeed_med.get(this.permanentRegimeTour).getFirst();
+			}
+			if (this.tourNumberSpeed_fast.size() != 0){
+				 N_fast = this.tourNumberSpeed_fast.get(this.permanentRegimeTour).getFirst();
+			}
+
+			//as stated in the class attribute section, the following densities are PARTIAL densities, which means
+			//the saturation density will DEPEND on the chosen probabilities (and hence will not be the usual 148.33 veh/km for all modes)
+			this.permanentDensity_truck = N_truck/networkLength*1000;
+			this.permanentDensity_med = N_med/networkLength*1000;
+			this.permanentDensity_fast = N_fast/networkLength*1000;
+			
+			if (this.tourNumberSpeed_truck.size() != 0){
+				this.permanentAverageVelocity_truck = this.tourNumberSpeed_truck.get(this.permanentRegimeTour).getSecond();//m/s
+			} else {
+				this.permanentAverageVelocity_truck = 0.;
+			}
+			if (this.tourNumberSpeed_med.size() != 0){
+				this.permanentAverageVelocity_med = this.tourNumberSpeed_med.get(this.permanentRegimeTour).getSecond();//m/s
+			} else {
+				this.permanentAverageVelocity_med = 0.;
+			}
+			if (this.tourNumberSpeed_fast.size() != 0){
+				this.permanentAverageVelocity_fast = this.tourNumberSpeed_fast.get(this.permanentRegimeTour).getSecond();//m/s
+			} else {
+				this.permanentAverageVelocity_fast = 0.;
+			}
+			
+		}	
 	}
 }

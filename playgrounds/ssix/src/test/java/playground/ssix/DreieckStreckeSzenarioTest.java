@@ -30,7 +30,6 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -70,7 +69,6 @@ import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playgrounds.ssix.FunDiagramsDreieck;
 import playgrounds.ssix.MyPersonDriverAgentImpl;
 
 public class DreieckStreckeSzenarioTest {
@@ -188,9 +186,9 @@ public class DreieckStreckeSzenarioTest {
 	public static double length = 200.;//in m
 	
 	private static double FREESPEED = 50.;//in km/h
-	private static double P_TRUCK = 0.1;
-	private static double P_MED = 0.5;
-	private static double P_FAST = 0.4;
+	private static double P_TRUCK = 2.;//no need to worry much about those, are normalized when choosing effective transport mode
+	private static double P_MED = 2.;
+	private static double P_FAST = 2.;
 	
 	private Scenario scenario;
 	
@@ -218,7 +216,7 @@ public class DreieckStreckeSzenarioTest {
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)89,2);
+		createPopulation((long)2,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		/*
@@ -337,10 +335,13 @@ public class DreieckStreckeSzenarioTest {
 			double p_truck = DreieckStreckeSzenarioTest.P_TRUCK/psum;
 			if (p<p_truck){
 				transportMode = "truck";
+				System.out.println("A truck was made.");
 			} else if (p<(p_truck+p_med)) {
 				transportMode = "med";
+				System.out.println("A med was made.");
 			} else {
 				transportMode = "fast";
+				System.out.println("A fast was made.");
 			}
 			customMap.put("transportMode", transportMode);
 			Leg leg = population.getFactory().createLeg(transportMode);
