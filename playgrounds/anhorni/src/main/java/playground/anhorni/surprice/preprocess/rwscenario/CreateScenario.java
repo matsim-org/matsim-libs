@@ -99,7 +99,8 @@ public class CreateScenario {
 		// merge ................................................................
 		this.merge();
 		
-		this.createToll(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+		this.createToll(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"),
+				Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "tollRadius")));
 				
 		this.writeWeek(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 		
@@ -199,7 +200,7 @@ public class CreateScenario {
 		}
 	}
 		
-	private void createToll(String outPath) {	
+	private void createToll(String outPath, double radius) {	
 		
 		NetworkImpl network = (NetworkImpl)this.scenario.getNetwork();
 		
@@ -212,7 +213,6 @@ public class CreateScenario {
 		// dummy zone
 		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
 		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
-		double radius = 5000.0;
 
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
 			if (bellevue.calcDistance(facility.getCoord()) < radius) {
