@@ -19,68 +19,54 @@
  * *********************************************************************** */
 package playground.andreas.aas.modules.ptTripAnalysis;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.geotools.feature.Feature;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
-
-import playground.andreas.aas.modules.AbstractAnalyisModule;
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4.TTtripAnalysisV4;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author aneumann, droeder
  *
  */
-public class BvgTripAnalysisRunnerV4 extends AbstractAnalyisModule{
-	
-	private final static Logger log = Logger.getLogger(BvgTripAnalysisRunnerV4.class);
-
-	private ScenarioImpl scenario;
-	private TTtripAnalysisV4 ana;
-	
-	public BvgTripAnalysisRunnerV4(String ptDriverPrefix){
-		super(BvgTripAnalysisRunnerV4.class.getSimpleName(), ptDriverPrefix);
-		log.info("enabled");
-	}
-	
-	public void init(ScenarioImpl scenario, Set<Feature> shapeFile) {
-		this.scenario = scenario;
-		this.ana = new TTtripAnalysisV4();
-
-		Geometry g =  (Geometry) shapeFile.iterator().next().getAttribute(0);
-		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
-		zones.put("Berlin", g);
-		this.ana.addZones(zones);
-	}
-
-	@Override
-	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.ana.getEventHandler());
-		return handler;
-	}
-
-	@Override
-	public void preProcessData() {
-		this.ana.preProcessData(this.scenario.getPopulation());
-	}
-
-	@Override
-	public void postProcessData() {
-		// nothing to do here
-	}
-
-	@Override
-	public void writeResults(String outputFolder) {
-		this.ana.writeResults(outputFolder);
-	}
+public class BvgTripAnalysisRunnerV4 {
+//			extends AbstractAnalyisModule{
+//	
+//	private final static Logger log = Logger.getLogger(BvgTripAnalysisRunnerV4.class);
+//
+//	private ScenarioImpl scenario;
+//	private TTtripAnalysisV4 ana;
+//	
+//	public BvgTripAnalysisRunnerV4(String ptDriverPrefix){
+//		super(BvgTripAnalysisRunnerV4.class.getSimpleName(), ptDriverPrefix);
+//		log.info("enabled");
+//	}
+//	
+//	public void init(ScenarioImpl scenario, Set<Feature> shapeFile) {
+//		this.scenario = scenario;
+//		this.ana = new TTtripAnalysisV4(scenario.getConfig().transit().getTransitModes(), scenario.getConfig().plansCalcRoute().getNetworkModes());
+//
+//		Geometry g =  (Geometry) shapeFile.iterator().next().getAttribute(0);
+//		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
+//		zones.put("Berlin", g);
+//		this.ana.addZones(zones);
+//	}
+//
+//	@Override
+//	public List<EventHandler> getEventHandler() {
+//		List<EventHandler> handler = new LinkedList<EventHandler>();
+//		handler.add(this.ana.getEventHandler());
+//		return handler;
+//	}
+//
+//	@Override
+//	public void preProcessData() {
+//		this.ana.preProcessData(this.scenario.getPopulation());
+//	}
+//
+//	@Override
+//	public void postProcessData() {
+//		// nothing to do here
+//	}
+//
+//	@Override
+//	public void writeResults(String outputFolder) {
+//		this.ana.writeResults(outputFolder);
+//	}
 
 }

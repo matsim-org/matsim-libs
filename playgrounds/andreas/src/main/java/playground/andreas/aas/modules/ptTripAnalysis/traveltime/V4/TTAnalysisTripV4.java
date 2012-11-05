@@ -20,6 +20,8 @@
 package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,17 +36,19 @@ import playground.andreas.aas.modules.ptTripAnalysis.traveltime.AbstractTTAnalys
  */
 public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 	
-//	private static final Logger log = Logger.getLogger(AnalysisTripV3.class);
 	
 	private Integer nrOfExpEvents = null;
 	private Integer nrOfElements = 0;
 	private PtTimeHandler handler;
 	
-	public TTAnalysisTripV4(){
-		
+	private Collection<String> networkModes;
+	private Collection<String> ptModes;
+	
+	public TTAnalysisTripV4(Collection<String> ptModes, Collection<String> networkModes){
+		this.ptModes = ptModes;
+		this.networkModes = networkModes;
 	}
 	
-	// TODO[dr] this need to be the elements of the executed plan, I think...
 	@Override
 	public void addElements(ArrayList<PlanElement> elements){
 		this.nrOfElements = elements.size();
@@ -52,7 +56,7 @@ public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 		super.addElements(elements);
 		
 		//handler is only needed for pt
-		if(super.getMode().equals(TransportMode.pt)){
+		if(this.ptModes.contains(super.getMode())){
 			this.handler = new PtTimeHandler();
 		}
 	}
@@ -61,19 +65,21 @@ public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 		return this.nrOfElements;
 	}
 	
-	// TODO[dr] adapt changes in MATSim-core. There are a lot more thrown than in the past
 	private int findExpectedNumberOfEvents(ArrayList<PlanElement> elements){
 		int temp = 0;
 		for(PlanElement pe: elements){
 			if( pe instanceof Leg){
-				// +4 for every pt-leg
 			
-				if(((Leg) pe).getMode().equals(TransportMode.pt)){
-					temp +=4;
+				if(this.ptModes.contains(((Leg) pe).getMode())){
+					// +4 for every pt-leg (end, enter, leave, start)
+					temp +=6;
 				}
-				// +2 for every other leg
+				else if(this.networkModes.contains(((Leg) pe).getMode()))
+					// +4 for every simulated-network-mode-leg (end, enter, leave, start)
+					temp +=6;
 				else{
-					temp +=2;
+					// +2 for teleported modes (end, start)
+					temp +=4;
 				}
 			}
 		}
@@ -90,8 +96,7 @@ public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 	 */
 	public boolean handleEvent(Event e){
 		this.handledEvents++;
-		// TODO[dr] do this for all modes in pt
-		if(super.getMode().equals(TransportMode.pt)){
+		if(this.ptModes.contains(super.getMode())){
 			handler.handleEvent(e);
 			if(this.handledEvents == this.nrOfExpEvents){
 				handler.finish(this);
@@ -100,7 +105,6 @@ public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 				return false;
 			}
 		}else{
-			// TODO[dr] should still work, but check...
 			if(first == null){
 				first = e.getTime();
 			}else{

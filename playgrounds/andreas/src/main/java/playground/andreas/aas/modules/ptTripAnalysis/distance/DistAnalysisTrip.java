@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
-import playground.andreas.aas.modules.ptTripAnalysis.GeoCalculator;
+import playground.andreas.aas.modules.ptTripAnalysis.utils.GeoCalculator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

@@ -20,6 +20,7 @@
 package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,17 +66,24 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 	protected Map<Id, int[]> nrOfTrips = null;
 	private int possibleTrips = 0;
 	private boolean stuck = false;
+
+	private Collection<String> ptModes;
 	
-	public AbstractTTtripEventsHandler(){
+	public AbstractTTtripEventsHandler(Collection<String> ptModes){
 		this.id2Events = new HashMap<Id, ArrayList<Event>>();
 		this.zone2tripSet = new HashMap<String, AnalysisTripSetStorage>();
-		this.zone2tripSet.put("noZone", new AnalysisTripSetStorage(false, null));
+		this.zone2tripSet.put("noZone", new AnalysisTripSetStorage(false, null, ptModes));
 		this.stuckAgents = new ArrayList<Id>();
+		this.ptModes = ptModes;
 	}
 
 	@Override
 	public void reset(int iteration) {
 		
+	}
+	
+	protected Collection<String> getPtModes(){
+		return this.ptModes;
 	}
 
 	@Override
@@ -120,7 +128,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 	public void addZones(Map<String, Geometry> zones){
 		this.zone2tripSet = new HashMap<String, AnalysisTripSetStorage>();
 		for(Entry<String, Geometry> e : zones.entrySet()){
-			this.zone2tripSet.put(e.getKey(), new AnalysisTripSetStorage(false, e.getValue()));
+			this.zone2tripSet.put(e.getKey(), new AnalysisTripSetStorage(false, e.getValue(), this.ptModes));
 		}
 	}
 	

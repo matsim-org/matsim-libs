@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis;
+package playground.andreas.aas.modules.ptTripAnalysis.utils;
 
 import org.apache.commons.math.geometry.Vector3D;
 import org.matsim.api.core.v01.Coord;

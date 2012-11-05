@@ -75,7 +75,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		this.routes = new HashMap<Id, DistAnalysisTransitRoute>();
 		this.vehicles = new HashMap<Id, DistAnalysisVehicle>();
 		this.tripSets = new HashMap<String, AnalysisTripSetStorage>();
-		this.tripSets.put("noZone", new AnalysisTripSetStorage(false, null));
+		this.tripSets.put("noZone", new AnalysisTripSetStorage(false, null, null));
 		this.stuckAgents = new ArrayList<Id>();
 	}
 	
@@ -85,7 +85,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	public void addZones(Map<String, Geometry> zones){
 		this.tripSets = new HashMap<String, AnalysisTripSetStorage>();
 		for(Entry<String, Geometry> e : zones.entrySet()){
-			this.tripSets.put(e.getKey(), new AnalysisTripSetStorage(false, e.getValue()));
+			this.tripSets.put(e.getKey(), new AnalysisTripSetStorage(false, e.getValue(), null));
 		}
 	}
 	

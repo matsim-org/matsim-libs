@@ -26,16 +26,21 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
 import playground.andreas.aas.modules.multiAnalyzer.MultiAnalyzer;
-import playground.andreas.aas.modules.ptTripAnalysis.BvgTripAnalysisRunnerV4;
+import playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4.TTtripAnalysisV4;
 import playground.andreas.aas.modules.spatialAveragingLinkDemand.SpatialAveragingForLinkDemand;
 
 /**
@@ -73,9 +78,22 @@ public class AasRunner {
 		// END of configuration file
 		
 		// TOOD BvgAnalysis is a SpecialCase. Use TTtripAnalysis here... /dr Nov '12
-		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
-		ptAna.init(this.scenario, this.shapeFile);
-		this.anaModules.add(ptAna);
+//		BvgTripAnalysisRunnerV4 ptAna = new BvgTripAnalysisRunnerV4(ptDriverPrefix);
+//		ptAna.init(this.scenario, this.shapeFile);
+//		this.anaModules.add(ptAna);
+
+		TTtripAnalysisV4 tripAna = new TTtripAnalysisV4(this.scenario.getConfig().transit().getTransitModes(), 
+													this.scenario.getConfig().plansCalcRoute().getNetworkModes(), 
+													ptDriverPrefix, 
+													scenario.getPopulation());
+		// normally we should add the zones here, but with the given Set<Feature> we have to 
+		// assume which entry of the feature is the name, which is the Geometry and so on...
+		// without adding any zones, we analyze just the all trips as if they are starting and ending in the same zone 
+		// what should be the default.
+		// changing the input is not that easy, because it is used by other modules...
+//		tripAna.addZones(zones);
+		this.anaModules.add(tripAna);
+		// finished TTtripAnalysisV4
 		
 		MultiAnalyzer mA = new MultiAnalyzer(ptDriverPrefix);
 		mA.init(this.scenario);

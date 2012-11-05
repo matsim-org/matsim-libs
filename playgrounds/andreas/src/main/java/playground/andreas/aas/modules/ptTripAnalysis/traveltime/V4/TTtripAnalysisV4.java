@@ -23,14 +23,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.andreas.aas.modules.AbstractAnalyisModule;
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTripSet;
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 import playground.andreas.aas.modules.ptTripAnalysis.AnalysisTripSetStorage;
@@ -41,27 +47,36 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author aneumann, droeder
  *
  */
-public class TTtripAnalysisV4{
+public class TTtripAnalysisV4 extends AbstractAnalyisModule{
 	private static final Logger log = Logger.getLogger(TTtripAnalysisV4.class);
 	private TTtripEventsHandlerV4 eventsHandler;
 	private String unProcessedAgents;
+	private Collection<String> networkmodes;
+	private Collection<String> ptModes;
+	private Population population;
 	
-	public TTtripAnalysisV4 (){
-		 this.eventsHandler = new TTtripEventsHandlerV4();
+	public TTtripAnalysisV4 (Collection<String> ptModes, Collection<String> networkModes, String ptDriverPrefix, Population population){
+		super(TTtripAnalysisV4.class.getSimpleName(), ptDriverPrefix);
+		this.eventsHandler = new TTtripEventsHandlerV4(ptModes);
+		this.ptModes = ptModes;
+		// not sure if this is necessary, but pt should be the default...
+		this.networkmodes = networkModes;
+		this.population = population;
 	}
 	
 	public void addZones(Map<String, Geometry> zones){
 		this.eventsHandler.addZones(zones);
 	}
 	
-	public void preProcessData(Population population) {
-		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilterV4();
-		planFilter.run(population);
-		this.unProcessedAgents = planFilter.getUnprocessedAgents();
-		this.eventsHandler.addTrips( planFilter.getTrips());
-		log.info("Processed all plans.");
-	}
+//	public void preProcessData(Population population) {
+//		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilterV4(this.ptModes, this.networkmodes);
+//		planFilter.run(population);
+//		this.unProcessedAgents = planFilter.getUnprocessedAgents();
+//		this.eventsHandler.addTrips( planFilter.getTrips());
+//		log.info("Processed all plans.");
+//	}
 	
+	@Override
 	public void writeResults(String outputFolder) {
 		if(!new File(outputFolder).exists()){
 			new File(outputFolder).mkdirs();
@@ -106,7 +121,25 @@ public class TTtripAnalysisV4{
 		log.info("Output successfully written.");
 	}
 	
-	public EventHandler getEventHandler() {
-		return this.eventsHandler;
+	@Override
+	public List<EventHandler> getEventHandler() {
+		List<EventHandler> handler = new LinkedList<EventHandler>();
+		handler.add(this.eventsHandler);
+		return handler;
+	}
+
+	@Override
+	public void preProcessData() {
+		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilterV4(this.ptModes, this.networkmodes);
+		planFilter.run(this.population);
+		this.unProcessedAgents = planFilter.getUnprocessedAgents();
+		this.eventsHandler.addTrips( planFilter.getTrips());
+		log.info("Processed all plans.");
+	}
+
+	@Override
+	public void postProcessData() {
+		// TODO[dr] Auto-generated method stub
+		
 	}
 }

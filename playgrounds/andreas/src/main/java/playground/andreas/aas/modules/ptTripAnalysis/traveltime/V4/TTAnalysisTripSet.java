@@ -19,12 +19,14 @@
  * *********************************************************************** */
 package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTripSet;
@@ -75,17 +77,20 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	private Integer[] line10cnt;
 	private Integer[] lineGt10cnt;
 
-	public TTAnalysisTripSet(String mode, Geometry zone, boolean storeTrips) {
+	private Collection<String> ptModes;
+
+	public TTAnalysisTripSet(String mode, Geometry zone, boolean storeTrips, Collection<String> ptModes) {
 		super(mode, zone);
 		this.storeTrips = storeTrips;
 		if(storeTrips){
 			this.trips = new LinkedList<AbstractTTAnalysisTrip>();
 		}
+		this.ptModes = ptModes;
 		this.init();
 	}
 	
 	private void init() {
-		if(super.getMode().equals(TransportMode.pt)){
+		if(this.ptModes.contains(super.getMode())){
 			accesWalkCnt = new Integer[4];
 			accesWaitCnt = new Integer[4];
 			egressWalkCnt = new Integer[4];
@@ -117,7 +122,7 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 			sumTTime[i] = 0.0;
 			tripCnt[i] = 0;
 			
-			if(super.getMode().equals(TransportMode.pt)){
+			if(this.ptModes.contains(super.getMode())){
 				accesWalkCnt[i] = 0;
 				accesWaitCnt[i] = 0;
 				egressWalkCnt[i] = 0;
@@ -149,11 +154,11 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	}
 
 	public TTAnalysisTripSet(String mode, Geometry zone){
-		this(mode, zone, false);
+		this(mode, zone, false, CollectionUtils.stringToSet(TransportMode.pt));
 	}
 	
 	public TTAnalysisTripSet(String mode){
-		this(mode, null, false);
+		this(mode, null, false, CollectionUtils.stringToSet(TransportMode.pt));
 	}
 
 //	public void addTrip(AbstractTTAnalysisTrip trip) {
@@ -174,7 +179,7 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	protected void addTripValues(AbstractAnalysisTrip trip) {
 		Integer zone = super.getTripLocation(trip);
 		this.addAllModeValues((AbstractTTAnalysisTrip) trip, zone);
-		if(trip.getMode().equals(TransportMode.pt)){
+		if(this.ptModes.contains(trip.getMode())){
 			this.addPtValues((AbstractTTAnalysisTrip) trip, zone);
 		}
 	}
@@ -251,7 +256,7 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 		b.append("tripCnt;"); super.println(this.tripCnt, b);
 		
 		//values for pt
-		if(super.getMode().equals(TransportMode.pt)){
+		if(this.ptModes.contains(super.getMode())){
 			b.append("accesWalkCnt;"); super.println(this.accesWalkCnt, b);
 			b.append("accesWaitCnt;"); super.println(this.accesWaitCnt, b);
 			b.append("egressWalkCnt;"); super.println(this.egressWalkCnt, b);

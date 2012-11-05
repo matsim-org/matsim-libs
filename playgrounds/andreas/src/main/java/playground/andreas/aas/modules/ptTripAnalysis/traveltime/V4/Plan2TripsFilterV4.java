@@ -20,6 +20,7 @@
 package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.matsim.api.core.v01.population.PlanElement;
 
@@ -31,10 +32,18 @@ import playground.andreas.aas.modules.ptTripAnalysis.traveltime.AbstractTTAnalys
  *
  */
 public class Plan2TripsFilterV4 extends AbstractPlan2TripsFilter{
+	
+	private Collection<String> networkmodes;
+	private Collection<String> ptModes;
+	
+	public Plan2TripsFilterV4(Collection<String> ptModes, Collection<String> networkModes) {
+		this.ptModes = ptModes;
+		this.networkmodes = networkModes;
+	}
 
 	@Override
 	protected AbstractTTAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
-		AbstractTTAnalysisTrip trip = new TTAnalysisTripV4();
+		AbstractTTAnalysisTrip trip = new TTAnalysisTripV4(this.ptModes, this.networkmodes);
 		trip.addElements(elements);
 		return trip;
 	}

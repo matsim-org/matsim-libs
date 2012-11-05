@@ -253,7 +253,8 @@ class SwitchWalk extends SomePtTime {
 
 	// the last SwitchWalk is the EgressWalk
 	public double getEgressWalkTime() {
-		return (this.times.get(this.times.size() - 1).getSecond() - this.times
-				.get(this.times.size() - 1).getFirst());
+		if(times.size() < 1) return 0;
+		return (this.times.get(this.times.size() - 1).getSecond() - 
+				this.times.get(this.times.size() - 1).getFirst());
 	}
 }

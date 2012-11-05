@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.andreas.aas.modules.ptTripAnalysis;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,10 +43,13 @@ public class AnalysisTripSetStorage {
 	private Map<String, AbstractAnalysisTripSet> mode2TripSet = new HashMap<String, AbstractAnalysisTripSet>();
 	private boolean storeTrips;
 	private Geometry zone;
+
+	private Collection<String> ptModes;
 	
-	public AnalysisTripSetStorage(boolean storeTrips, Geometry zone){
+	public AnalysisTripSetStorage(boolean storeTrips, Geometry zone, Collection<String> ptModes){
 		this.storeTrips = storeTrips;
 		this.zone = zone;
+		this.ptModes = ptModes;
 	}
 	
 	public void addTrip(AbstractAnalysisTrip trip){
@@ -59,7 +63,7 @@ public class AnalysisTripSetStorage {
 			if(trip instanceof DistAnalysisTripI){
 				temp = new DistanceAnalysisTripSet(mode, this.zone);
 			}else if(trip instanceof TTAnalysisTripI){
-				temp = new TTAnalysisTripSet(mode, this.zone, this.storeTrips);
+				temp = new TTAnalysisTripSet(mode, this.zone, this.storeTrips, this.ptModes);
 //				temp=null;
 			}else{
 				log.error("could not define a tripSet");

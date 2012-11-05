@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
@@ -43,21 +46,52 @@ public class TTtripEventsHandlerV4 extends AbstractTTtripEventsHandler implement
 										PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	
-	
-	
+	/**
+	 * @param ptModes
+	 */
+	public TTtripEventsHandlerV4(Collection<String> ptModes) {
+		super(ptModes);
+	}
+
 	@Override
-	public void handleEvent(ActivityStartEvent e){
-		// do nothing
+	public void handleEvent(ActivityStartEvent e) {
+		if(super.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent e) {
+		if(super.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(AgentArrivalEvent e) {
+		if(super.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent e) {
+		if(super.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
 	}
 	
-	@Override
-	public void handleEvent(ActivityEndEvent e){
-		//do nothing
-	}
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent e) {
-		//drivers have no plans
 		if(super.id2Trips.containsKey(e.getPersonId())){
 			if(((TTAnalysisTripV4) super.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
 				this.addTrip2TripSet(e.getPersonId());
@@ -98,8 +132,7 @@ public class TTtripEventsHandlerV4 extends AbstractTTtripEventsHandler implement
 
 	@Override
 	protected void processEvent(Event e) {
-		// TODO Auto-generated method stub
-		
+		// do nothing
 	}
 }
 
