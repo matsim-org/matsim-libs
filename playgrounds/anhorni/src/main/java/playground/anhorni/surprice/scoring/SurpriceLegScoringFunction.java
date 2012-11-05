@@ -20,7 +20,7 @@
 
 package playground.anhorni.surprice.scoring;
 
-//import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -61,7 +61,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private double constantBike;
     private double constantWalk;  
     
-//    private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
+    private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
 
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
     		String day, double alpha, double gamma, double alphaTrip) {
@@ -145,27 +145,24 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		
 		// ============= CAR =======================================================
 		// apply alpha_trip to car:
-		if (TransportMode.car.equals(leg.getMode())) {
+		if (TransportMode.car.equals(leg.getMode())) {			
+			Route route = leg.getRoute();
 			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
-			}
+			dist = getDistance(route);
 						
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * Math.max(alpha + alphaTrip, 0.0) + 
-					this.gamma * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfDistanceCar_m * dist;
+					this.gamma * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantCar;
-			
+						
 		// ============= CAR =======================================================
-		} else if (TransportMode.pt.equals(leg.getMode())) {
+		} else if (TransportMode.pt.equals(leg.getMode())) {			
+			Route route = leg.getRoute();
 			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
-			}
+			dist = getDistance(route);
+			
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s * alpha + 
-					this.gamma * this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfDistancePt_m * dist;
-			tmpScore += this.constantPt;
+					this.gamma * this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
+			tmpScore += this.constantPt;			
 		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
 			tmpScore +=  this.constantWalk;
@@ -174,10 +171,8 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += this.constantBike;
 		} else {
 			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
-			}
+			Route route = leg.getRoute();
+			dist = getDistance(route);
 			// use the same values as for "car"
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * alpha + 
 					this.gamma * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfDistanceCar_m * dist;
