@@ -177,6 +177,7 @@ public class Analyzer {
 		this.utilityBins.plotBinnedDistribution(outPath + "/utilitiesPerIncome.png", "income", "");
 		this.ttBins.plotBinnedDistribution(outPath + "/ttPerIncome.png", "income", "");
 		this.tdBins.plotBinnedDistribution(outPath + "/tdPerIncome.png", "income", "");
+		this.tolltdBins.plotBinnedDistribution(outPath + "/tolltdPerIncome.png", "income", "");
 	}
 			
 	private double computeUtilities(ArrayList<Double> utilities, String day, String type) {		
