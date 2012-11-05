@@ -34,8 +34,8 @@ public class Cell<T>
 	private int count;
 	private T data;
 	private List<Double> arrivalTimes;
-	private List<Tuple<Id, Double>> linkLeaveTimes;
-	private List<Tuple<Id, Double>> linkEnterTimes;
+	private List<Tuple<Tuple<Id,Id>, Double>> linkLeaveTimes;
+	private List<Tuple<Tuple<Id,Id>, Double>> linkEnterTimes;
 	private CoordImpl coord;
 	
 	public static String CELLSIZE = "cellsize";
@@ -43,8 +43,8 @@ public class Cell<T>
 	public Cell(T data)
 	{
 		this.data = data;
-		this.linkLeaveTimes = new ArrayList<Tuple<Id, Double>>();
-		this.linkEnterTimes = new ArrayList<Tuple<Id, Double>>();
+		this.linkLeaveTimes = new ArrayList<Tuple<Tuple<Id,Id>, Double>>();
+		this.linkEnterTimes = new ArrayList<Tuple<Tuple<Id,Id>, Double>>();
 		this.arrivalTimes = new ArrayList<Double>();
 	}
 	
@@ -86,35 +86,36 @@ public class Cell<T>
 		return arrivalTimes;
 	}
 	
-	public List<Tuple<Id, Double>> getLinkEnterTimes() {
+	public List<Tuple<Tuple<Id,Id>, Double>> getLinkEnterTimes() {
 		return linkEnterTimes;
 	}
 	
-	public List<Tuple<Id, Double>> getLinkLeaveTimes() {
+	public List<Tuple<Tuple<Id,Id>, Double>> getLinkLeaveTimes() {
 		return linkLeaveTimes;
 	}
 	
-	public void setLinkEnterTimes(List<Tuple<Id, Double>> linkEnterTimes) {
+	public void setLinkEnterTimes(List<Tuple<Tuple<Id,Id>, Double>> linkEnterTimes) {
 		this.linkEnterTimes = linkEnterTimes;
 	}
 	
-	public void setLinkLeaveTimes(List<Tuple<Id, Double>> linkLeaveTimes) {
+	public void setLinkLeaveTimes(List<Tuple<Tuple<Id,Id>, Double>> linkLeaveTimes) {
 		this.linkLeaveTimes = linkLeaveTimes;
 	}
 	
-	public void addLinkEnterTime(Id personId, Double time)
+	public void addLinkEnterTime(Id linkId, Id personId, Double time)
 	{
 		if (this.linkEnterTimes==null)
-			this.linkEnterTimes = new ArrayList<Tuple<Id, Double>>();
+			this.linkEnterTimes = new ArrayList<Tuple<Tuple<Id,Id>, Double>>();
 		
-		this.linkEnterTimes.add(new Tuple<Id, Double>(personId, time));
+		this.linkEnterTimes.add(new Tuple<Tuple<Id,Id>, Double>(new Tuple<Id,Id>(linkId,personId), time));
 	}
 	
-	public void addLinkLeaveTime(Id personId, Double time)
+	public void addLinkLeaveTime(Id linkId, Id personId, Double time)
 	{
 		if (this.linkLeaveTimes==null)
-			this.linkLeaveTimes = new ArrayList<Tuple<Id, Double>>();
-		this.linkLeaveTimes.add(new Tuple<Id, Double>(personId, time));
+			this.linkLeaveTimes = new ArrayList<Tuple<Tuple<Id,Id>, Double>>();
+		
+		this.linkLeaveTimes.add(new Tuple<Tuple<Id,Id>, Double>(new Tuple<Id,Id>(linkId,personId), time));
 	}
 	
 	public void setCoord(CoordImpl centroid) {
