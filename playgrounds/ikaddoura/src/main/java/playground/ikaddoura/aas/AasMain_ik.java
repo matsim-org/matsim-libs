@@ -47,8 +47,8 @@ public class AasMain_ik {
 	 */
 	public static void main(String[] args) {
 		
-		final String iteration = "300";
-		final String CONFIGFILE = "/Users/Ihab/Desktop/extIt0.0/internalIterations/output_config.xml";
+		final String iteration = "0";
+		final String CONFIGFILE = "/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/test/test_config.xml";
 		final String AASRUNNERCONFIGFILE = null;
 		
 		AasMain_ik aM = new AasMain_ik(CONFIGFILE, iteration);
