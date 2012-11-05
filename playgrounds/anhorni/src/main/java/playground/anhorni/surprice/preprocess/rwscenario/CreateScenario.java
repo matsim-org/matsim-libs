@@ -234,7 +234,7 @@ public class CreateScenario {
 	
 	private void writeWeek(String outPath) {
 		new Analyzer().writeHeader(outPath);
-		for (int dow = 0; dow < 7; dow++) {
+		for (int dow = 0; dow < Surprice.days.size(); dow++) {
 			int counter = 0;
 			int nextMsg = 1;
 			for (Person person : this.scenario.getPopulation().getPersons().values()) {			
