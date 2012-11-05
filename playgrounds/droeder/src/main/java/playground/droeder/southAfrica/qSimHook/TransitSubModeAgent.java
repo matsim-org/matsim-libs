@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.population.routes.GenericRoute;
@@ -36,6 +36,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.andreas.P2.hook.PTransitAgent;
 
 /**
  * @author droeder
@@ -92,7 +94,13 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 		
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		
-		TransitRoute transitRoutePlanned = this.transitSchedule.getTransitLines().get(route.getLineId()).getRoutes().get(route.getRouteId());
+		TransitLine transitLinePlanned = this.transitSchedule.getTransitLines().get(route.getLineId());
+		if(transitLinePlanned == null){
+			// line doesn't exist anymore
+			return true;
+		}
+		
+		TransitRoute transitRoutePlanned = transitLinePlanned.getRoutes().get(route.getRouteId());
 		if (transitRoutePlanned == null) {
 			// This route doesn't exist anymore. In terms of time enter, other conditions checked somewhere else
 			return true;

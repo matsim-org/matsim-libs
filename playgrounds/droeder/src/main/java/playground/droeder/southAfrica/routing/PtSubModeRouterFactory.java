@@ -50,7 +50,7 @@ import playground.andreas.P2.hook.PTransitRouterFactory;
  * @author droeder
  *
  */
-public class PtSubModeRouterFactory extends PTransitRouterFactory implements IterationStartsListener{
+public class PtSubModeRouterFactory extends PTransitRouterFactory implements IterationStartsListener, StartupListener{
 	private static final Logger log = Logger
 			.getLogger(PtSubModeRouterFactory.class);
 	
@@ -58,7 +58,7 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 	private Scenario sc;
 	private TransitRouterConfig tC;
 	private Map<String, TransitRouterNetwork> routerNetworks;
-	private boolean updateRouter;
+	private boolean updateRouter = true;
 
 	/**
 	 * Factory to create the <code>PtSubModeDependendRouter</code>
@@ -84,26 +84,25 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 		//do nothing
 	}
 	
+	private PtSubModeRouterSet set;
 	@Override
 	public TransitRouter createTransitRouter() {
 		if(this.updateRouter){
 			this.updateRouterNetworks();
 			this.updateRouter = false;
+//			this.set = new PtSubModeRouterSet(this.tC, this.routerNetworks, new TransitRouterNetworkTravelTimeAndDisutility(this.tC), this.routeOnSameMode);
 		}
 		return new PtSubModeRouterSet(this.tC, this.routerNetworks, new TransitRouterNetworkTravelTimeAndDisutility(this.tC), this.routeOnSameMode);
 	}
 	
-//	@Override
-//	public void notifyStartup(StartupEvent event) {
-//		event.getControler().setTripRouterFactory(new PtSubModeTripRouterFactory(event.getControler()));
-//	}
-	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.updateRouter = true;
-		// not a nice way, but has to be done because otherwise PHook overwrites the Factory. This 
-//		// again happens because the TransitSchedule changes after every iteration.
-//		event.getControler().setTripRouterFactory(new PtSubModeTripRouterFactory(event.getControler()));
+	}
+	
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		this.updateRouter = true;
 	}
 	
 	private void updateRouterNetworks(){
@@ -162,8 +161,6 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 		}
 		log.info("finished");
 	}
-
-
 }
 
 	

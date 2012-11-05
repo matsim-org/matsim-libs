@@ -177,13 +177,13 @@ public class CreateTestScenario {
 		l = createLink(net, factory, "A-A", busCarTaxi);
 		l.setCapacity(9999);
 		l.setFreespeed(10000);
-		l.setLength(1000);
+		l.setLength(10000);
 		net.addLink(l);
 		
 		l = createLink(net, factory, "C-C", busCarTaxi);
 		l.setCapacity(9999);
 		l.setFreespeed(10000);
-		l.setLength(1000);
+		l.setLength(10000);
 		net.addLink(l);
 		
 	}
@@ -449,13 +449,13 @@ public class CreateTestScenario {
 			}
 			l = pFac.createLeg(mode);
 			
-			h1 = pFac.createActivityFromLinkId("h", sc.createId("A-A"));
+			h1 = pFac.createActivityFromLinkId("h", sc.createId("B3-A"));
 			((ActivityImpl) h1).setCoord(sc.getNetwork().getLinks().get(h1.getLinkId()).getToNode().getCoord());
 			h1.setEndTime(end1);
-			w = pFac.createActivityFromLinkId("w", sc.createId("C-C"));
+			w = pFac.createActivityFromLinkId("w", sc.createId("B3-C"));
 			((ActivityImpl) w).setCoord(sc.getNetwork().getLinks().get(w.getLinkId()).getToNode().getCoord());
 			w.setEndTime(end2);
-			h2 = pFac.createActivityFromLinkId("h", sc.createId("A-A"));
+			h2 = pFac.createActivityFromLinkId("h", sc.createId("B3-A"));
 			((ActivityImpl) h2).setCoord(sc.getNetwork().getLinks().get(h2.getLinkId()).getToNode().getCoord());
 			
 			Plan plan = pFac.createPlan();

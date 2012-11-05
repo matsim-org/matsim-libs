@@ -100,7 +100,13 @@ public class PtSubModeRouter implements TransitRouter {
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(fromCoord);
-			double distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+			double distance;
+			if(nearestNode == null){
+				// there is no nearest node...
+				distance = this.config.searchRadius + this.config.extensionRadius;
+			}else{
+				distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+			}
 			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, distance + this.config.extensionRadius);
 		}
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
@@ -116,7 +122,13 @@ public class PtSubModeRouter implements TransitRouter {
 		if (toNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toCoord);
-			double distance = CoordUtils.calcDistance(toCoord, nearestNode.stop.getStopFacility().getCoord());
+			double distance;
+			if(nearestNode == null){
+				// there is no nearest node...
+				distance = this.config.searchRadius + this.config.extensionRadius;
+			}else{
+				distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+			}
 			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.extensionRadius);
 		}
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
