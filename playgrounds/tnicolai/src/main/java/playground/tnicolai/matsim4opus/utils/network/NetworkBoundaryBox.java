@@ -28,7 +28,7 @@ public class NetworkBoundaryBox {
 		if(boundingBox != null)
 			log.warn("Bounding box is already initialized and will not be overwritten!");
 		else{
-			log.warn("Setting bounding box from network! This may lead to memory issues depending on available memory and/or grid resolution. In this case define a custom bounding box.");
+			log.warn("Setting bounding box from network! For large networks this may lead to memory issues depending on available memory and/or grid resolution. In this case define a custom bounding box.");
 			// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
 			boundingBox = NetworkUtils.getBoundingBox(network.getNodes().values());
 			log.info("... done!");
