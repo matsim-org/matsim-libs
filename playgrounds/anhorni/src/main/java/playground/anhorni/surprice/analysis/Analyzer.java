@@ -88,10 +88,10 @@ public class Analyzer {
 		this.config = ConfigUtils.loadConfig(configFile);
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		
-		this.utilityBins = new Bins(1, 9, "utilities");
-		this.ttBins = new Bins(1, 9, "tt");
-		this.tdBins = new Bins(1, 9, "td");
-		this.tolltdBins = new Bins(1, 9, "tolltd");
+		this.utilityBins = new Bins(1, 9, "utilitiesPerIncome");
+		this.ttBins = new Bins(1, 9, "ttPerIncome");
+		this.tdBins = new Bins(1, 9, "tdPerIncome");
+		this.tolltdBins = new Bins(1, 9, "tolltdPerIncome");
 	}
 		
 	public void run() {
@@ -178,10 +178,10 @@ public class Analyzer {
 		this.boxPlotTravelDistancesCar.createChart();
 		this.boxPlotTravelDistancesCar.saveAsPng(outPath + "/traveldistances.png", 800, 600);
 		
-		this.utilityBins.plotBinnedDistribution(outPath + "/utilitiesPerIncome.png", "income", "");
-		this.ttBins.plotBinnedDistribution(outPath + "/ttPerIncome.png", "income", "");
-		this.tdBins.plotBinnedDistribution(outPath + "/tdPerIncome.png", "income", "");
-		this.tolltdBins.plotBinnedDistribution(outPath + "/tolltdPerIncome.png", "income", "");
+		this.utilityBins.plotBinnedDistribution(outPath, "income", "");
+		this.ttBins.plotBinnedDistribution(outPath, "income", "");
+		this.tdBins.plotBinnedDistribution(outPath, "income", "");
+		this.tolltdBins.plotBinnedDistribution(outPath, "income", "");
 	}
 			
 	private double computeUtilities(ArrayList<Double> utilities, String day, String type) {		
