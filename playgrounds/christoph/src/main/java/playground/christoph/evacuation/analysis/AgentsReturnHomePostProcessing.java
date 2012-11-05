@@ -92,6 +92,10 @@ public class AgentsReturnHomePostProcessing {
 	public AgentsReturnHomePostProcessing(String configFile, String evacuationConfigFile, String outputPath) throws IOException {
 		
 		Config config = ConfigUtils.loadConfig(configFile);
+		
+		// ensure vehicles are not loaded (in an output config file, "useVehicles" is set to true, but we do not need them)
+		config.scenario().setUseVehicles(false);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		
