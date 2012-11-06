@@ -107,7 +107,7 @@ public class DefaultAnalysis {
 	}
 	
 	public void writeResults(){
-		String outputDir = this.iterationOutputDir + "aasRunner" + "/";
+		String outputDir = this.iterationOutputDir + "defaultAnalysis" + "/";
 		log.info("Generating output directory " + outputDir);
 		new File(outputDir).mkdir();
 		
