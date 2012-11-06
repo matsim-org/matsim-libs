@@ -196,7 +196,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 
 	public void printInfo(final int iteration) {
 		Map<String, Double> currentModeXYs = getModeXYs();
-		long nLegs = this.getNumberOfLegs();
+//		long nLegs = this.getNumberOfLegs();
 		double totalXY = currentModeXYs.remove(ALL_MODES);
 
 		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
@@ -207,11 +207,12 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 				log.info("Share of " + mode.getKey() + ":\t" + "distance [km]: " + (100d*mode.getValue() / totalXY) +"%");
 			}
 		}
-		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
-			if (this.xy.equals("times")) {
-				log.info("Share of " + mode.getKey() + ":\t" + "number of legs: "+ (100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
-			}
-		}
+// not needed anymore
+//		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
+//			if (this.xy.equals("times")) {
+//				log.info("Share of " + mode.getKey() + ":\t" + "number of legs: "+ (100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
+//			}
+//		}
 	}
 
 	/**
