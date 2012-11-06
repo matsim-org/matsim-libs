@@ -26,36 +26,37 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
 
-//import playground.andreas.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 import playground.vsp.aas.modules.AbstractAnalyisModule;
+import playground.vsp.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
+//import playground.andreas.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**
  * 
  * @author aneumann
  *
  */
-public class AasRunner {
+public class DefaultAnalysis {
 	
-	private final static Logger log = Logger.getLogger(AasRunner.class);
+	private final static Logger log = Logger.getLogger(DefaultAnalysis.class);
 	
 	private final String baseFolder;
 	private final String iterationOutputDir;
 	private final String eventsFile;
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 	private final Set<Feature> shapeFile;
 	
 	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 
 	
 
-	public AasRunner(ScenarioImpl scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<Feature> shapeFile) {
+	public DefaultAnalysis(Scenario scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<Feature> shapeFile) {
 		this.baseFolder = baseFolder;
 		this.iterationOutputDir = iterationOutputDir;
 		this.eventsFile = eventsFile;
@@ -64,15 +65,14 @@ public class AasRunner {
 	}
 
 	public void init(String aasRunnerConfigFile){
-		log.info("This is currently not implemented. Initializing all modules with defaults.");
+		log.info("Configuration through config file is currently not implemented. Initializing all modules with defaults.");
 		String ptDriverPrefix = "pt_";
-		
 		
 		// END of configuration file
 		
-//		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
-//		distAna.init(this.scenario);
-//		this.anaModules.add(distAna);
+		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
+		distAna.init(this.scenario);
+		this.anaModules.add(distAna);
 		
 		// END ugly code - Initialization needs to be configurable
 	}
@@ -92,8 +92,14 @@ public class AasRunner {
 		}
 		
 		// TODO: what if there are no events in the directory? bk oct'12
-		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
-		reader.parse(this.eventsFile);
+		if(this.eventsFile == null){
+			log.warn("You did not provide any events file for analyis.");
+			log.warn("Make sure if this is what you want. Analysis modules " +
+					"that are based on events will not produce any results!");
+		} else {
+			EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
+			reader.parse(this.eventsFile);
+		}
 	}
 	
 	public void postProcess(){

@@ -33,6 +33,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,7 +41,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -59,7 +59,7 @@ import playground.vsp.aas.modules.AbstractAnalyisModule;
 public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(LegModeDistanceDistribution.class);
 
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 	private final List<Integer> distanceClasses;
 	private final SortedSet<String> usedModes;
 
@@ -76,9 +76,8 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 		this.usedModes = new TreeSet<String>();
 	}
 
-	public void init(ScenarioImpl sc){
-		this.scenario = sc;
-
+	public void init(Scenario scenario){
+		this.scenario = scenario;
 		initializeDistanceClasses(this.scenario.getPopulation());
 		initializeUsedModes(this.scenario.getPopulation());
 	}
@@ -129,7 +128,7 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 			}
 			writer1.close(); //Close the output stream
 
-			BufferedWriter writer2 = IOUtils.getBufferedWriter(outputFolder + "modeShares.txt");
+			BufferedWriter writer2 = IOUtils.getBufferedWriter(outputFolder + "legModeShare.txt");
 			writer2.write("# mode\tshare"); writer2.newLine();
 			for (Entry<String, Double> modeShareEntry : this.mode2Share.entrySet()) {
 				writer2.write(modeShareEntry.getKey() + "\t" + modeShareEntry.getValue()); writer2.newLine();
