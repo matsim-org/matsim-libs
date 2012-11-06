@@ -40,6 +40,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	private final Map<Id, Double> agentArrivals = new HashMap<Id, Double>();
 	private final ArrayList<Double> travelTimes = new ArrayList<Double>();
 	private double sumTripDurations = 0;
+	private double sumTripDurationsIncomeWeighted = 0;
 	private int sumTrips = 0;
 	
 	private Bins ttBins;
@@ -73,6 +74,8 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 			
 			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income");
 			this.ttBins.addVal(income, travTime);
+			
+			this.sumTripDurationsIncomeWeighted += travTime * income;
 		}
 	}
 	
@@ -92,5 +95,9 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 
 	public double getAverageTripDuration() {
 		return (this.sumTripDurations / this.sumTrips);
+	}
+
+	public double getSumTripDurationsIncomeWeighted() {
+		return sumTripDurationsIncomeWeighted;
 	}
 }

@@ -37,6 +37,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private double sumLength = 0.0;
+	private double sumLenghtIncomeWeighted = 0.0;
 	private int cntTrips = 0;
 	private final Network network;
 	private final ArrayList<Double> travelDistances = new ArrayList<Double>();
@@ -73,6 +74,8 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 					
 					double income = (Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income");
 					this.tdBins.addVal(income, dist);
+					
+					this.sumLenghtIncomeWeighted += dist * income;
 				}
 			}
 		}
@@ -87,6 +90,10 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 
 	public ArrayList<Double> getTravelDistances() {
 		return travelDistances;
+	}
+
+	public double getSumLenghtIncomeWeighted() {
+		return sumLenghtIncomeWeighted;
 	}
 }
 
