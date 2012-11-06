@@ -17,9 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
+package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.jfree.util.Log;
@@ -69,7 +70,7 @@ public abstract class SomePtTime {
 	private void addTime(Event e) {
 		if (temp == null) {
 			temp = e.getTime();
-		} else if (temp < e.getTime()) {
+		} else if (temp <= e.getTime()) {
 			times.add(new Tuple<Double, Double>(temp, e.getTime()));
 			temp = null;
 		} else {
@@ -159,51 +160,25 @@ class LineTT extends SomePtTime {
 
 class SwitchWait extends SomePtTime {
 
-	private String nextExp;
-
 	public SwitchWait() {
 		super();
-		nextExp = PersonLeavesVehicleEvent.class.toString();
 	}
 
+	private boolean first = true;
 	@Override
 	protected boolean handle(Event e) {
-		// handle only if the given event is an instance of the next expected
-		// event
-		if (nextExp.equals(e.getClass().toString())) {
-			if (e instanceof PersonLeavesVehicleEvent) {
-				nextExp = AgentDepartureEvent.class.toString();
-				return true;
-			} else if (e instanceof AgentDepartureEvent) {
-				/*
-				 * after an AgentDepartureEvent a PersonEntersVehicleEvent is
-				 * thrown only if the LegMode is ptthe time in the pt-vehicle
-				 * starts as recently as the agent enters the vehicle
-				 */
-				if (((AgentDepartureEvent) e).getLegMode().equals(
-						TransportMode.pt)) {
-					nextExp = PersonEntersVehicleEvent.class.toString();
-					return false;
-				} else if (((AgentDepartureEvent) e).getLegMode().equals(
-						TransportMode.transit_walk)) {
-					nextExp = AgentArrivalEvent.class.toString();
-					return true;
-				} else {
-					return false;
-				}
-			} else if (e instanceof AgentArrivalEvent) {
-				nextExp = PersonEntersVehicleEvent.class.toString();
-				return true;
-			} else if (e instanceof PersonEntersVehicleEvent) {
-				nextExp = PersonLeavesVehicleEvent.class.toString();
-				return true;
-			} else {
+		
+		if(e instanceof PersonLeavesVehicleEvent){
+			return true;
+		}
+		else if(e instanceof PersonEntersVehicleEvent){
+			if(this.first){
+				first = false;
 				return false;
 			}
-
-		} else {
-			return false;
+			return true;
 		}
+		return false;
 	}
 }
 

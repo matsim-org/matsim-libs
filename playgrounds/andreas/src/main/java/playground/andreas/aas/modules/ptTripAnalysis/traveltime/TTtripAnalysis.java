@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
+package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,17 +47,17 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author aneumann, droeder
  *
  */
-public class TTtripAnalysisV4 extends AbstractAnalyisModule{
-	private static final Logger log = Logger.getLogger(TTtripAnalysisV4.class);
-	private TTtripEventsHandlerV4 eventsHandler;
+public class TTtripAnalysis extends AbstractAnalyisModule{
+	private static final Logger log = Logger.getLogger(TTtripAnalysis.class);
+	private TTtripEventsHandler eventsHandler;
 	private String unProcessedAgents;
 	private Collection<String> networkmodes;
 	private Collection<String> ptModes;
 	private Population population;
 	
-	public TTtripAnalysisV4 (Collection<String> ptModes, Collection<String> networkModes, String ptDriverPrefix, Population population){
-		super(TTtripAnalysisV4.class.getSimpleName(), ptDriverPrefix);
-		this.eventsHandler = new TTtripEventsHandlerV4(ptModes);
+	public TTtripAnalysis (Collection<String> ptModes, Collection<String> networkModes, String ptDriverPrefix, Population population){
+		super(TTtripAnalysis.class.getSimpleName(), ptDriverPrefix);
+		this.eventsHandler = new TTtripEventsHandler(ptModes);
 		this.ptModes = ptModes;
 		// not sure if this is necessary, but pt should be the default...
 		this.networkmodes = networkModes;
@@ -130,7 +130,7 @@ public class TTtripAnalysisV4 extends AbstractAnalyisModule{
 
 	@Override
 	public void preProcessData() {
-		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilterV4(this.ptModes, this.networkmodes);
+		AbstractPlan2TripsFilter planFilter = new Plan2TripsFilter(this.ptModes, this.networkmodes);
 		planFilter.run(this.population);
 		this.unProcessedAgents = planFilter.getUnprocessedAgents();
 		this.eventsHandler.addTrips( planFilter.getTrips());

@@ -17,24 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
+package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.AbstractTTAnalysisTrip;
+import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author droeder
  *
  */
-public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
+public class TTAnalysisTrip  extends AbstractAnalysisTrip implements TTAnalysisTripI {
+	
+	//all modes
+	public double tripTTime = 0.0;
+	
+	// pt only
+	public int accesWalkCnt = 0;
+	public int accesWaitCnt = 0;
+	public int egressWalkCnt = 0;
+	public int switchWalkCnt= 0;
+	public int switchWaitCnt = 0;
+	public int lineCnt = 0;
+	
+	public double accesWalkTTime = 0.0;
+	public double accesWaitTime = 0.0;
+	public double egressWalkTTime = 0.0;
+	public double switchWalkTTime = 0.0;
+	public double switchWaitTime = 0.0;
+	public double lineTTime = 0.0;
 	
 	
 	private Integer nrOfExpEvents = null;
@@ -44,20 +64,45 @@ public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 	private Collection<String> networkModes;
 	private Collection<String> ptModes;
 	
-	public TTAnalysisTripV4(Collection<String> ptModes, Collection<String> networkModes){
+	public TTAnalysisTrip(Collection<String> ptModes, Collection<String> networkModes){
 		this.ptModes = ptModes;
 		this.networkModes = networkModes;
 	}
 	
-	@Override
 	public void addElements(ArrayList<PlanElement> elements){
 		this.nrOfElements = elements.size();
 		this.nrOfExpEvents = this.findExpectedNumberOfEvents(elements);
-		super.addElements(elements);
+		this.analyzeElements(elements);
 		
 		//handler is only needed for pt
 		if(this.ptModes.contains(super.getMode())){
 			this.handler = new PtTimeHandler();
+		}
+	}
+	
+	
+	private void analyzeElements(ArrayList<PlanElement> elements) {
+		this.findMode(elements);
+		//if no zones in TripSet are defined, coords not necessary
+		if(!(((Activity) elements.get(0)).getCoord() == null) && !(((Activity) elements.get(elements.size() - 1)).getCoord() == null)){
+			super.setStart(new Coordinate(((Activity) elements.get(0)).getCoord().getX(), 
+					((Activity) elements.get(0)).getCoord().getY()));
+			super.setEnd(new Coordinate(((Activity) elements.get(elements.size() - 1)).getCoord().getX(), 
+					((Activity) elements.get(elements.size() - 1)).getCoord().getY()));
+		}
+	}
+	
+	// not essential but good to prevent mixing up different modes
+	private void findMode(ArrayList<PlanElement> elements) {
+		for(PlanElement p : elements){
+			if(p instanceof Leg){
+				if(((Leg) p).getMode().equals(TransportMode.transit_walk)){
+					super.setMode(TransportMode.transit_walk);
+				}else{
+					super.setMode(((Leg) p).getMode());
+					return;
+				}
+			}
 		}
 	}
 	
@@ -121,4 +166,94 @@ public class TTAnalysisTripV4 extends AbstractTTAnalysisTrip {
 		
 	}
 	
+	/**
+	 * @return the tripTTime
+	 */
+	public Double getTripTTime() {
+		return tripTTime;
+	}
+
+	/**
+	 * @return the accesWalkCnt
+	 */
+	public int getAccesWalkCnt() {
+		return accesWalkCnt;
+	}
+
+	/**
+	 * @return the accesWaitCnt
+	 */
+	public int getAccesWaitCnt() {
+		return accesWaitCnt;
+	}
+
+	/**
+	 * @return the egressWalkCnt
+	 */
+	public int getEgressWalkCnt() {
+		return egressWalkCnt;
+	}
+
+	/**
+	 * @return the switchWalkCnt
+	 */
+	public int getSwitchWalkCnt() {
+		return switchWalkCnt;
+	}
+
+	/**
+	 * @return the switchWaitCnt
+	 */
+	public int getSwitchWaitCnt() {
+		return switchWaitCnt;
+	}
+
+	/**
+	 * @return the lineCnt
+	 */
+	public int getLineCnt() {
+		return lineCnt;
+	}
+
+	/**
+	 * @return the accesWalkTTime
+	 */
+	public double getAccesWalkTTime() {
+		return accesWalkTTime;
+	}
+
+	/**
+	 * @return the accesWaitTime
+	 */
+	public double getAccesWaitTime() {
+		return accesWaitTime;
+	}
+
+	/**
+	 * @return the egressWalkTTime
+	 */
+	public double getEgressWalkTTime() {
+		return egressWalkTTime;
+	}
+
+	/**
+	 * @return the switchWalkTTime
+	 */
+	public double getSwitchWalkTTime() {
+		return switchWalkTTime;
+	}
+
+	/**
+	 * @return the switchWaitTime
+	 */
+	public double getSwitchWaitTime() {
+		return switchWaitTime;
+	}
+
+	/**
+	 * @return the lineTTime
+	 */
+	public double getLineTTime() {
+		return lineTTime;
+	}
 }

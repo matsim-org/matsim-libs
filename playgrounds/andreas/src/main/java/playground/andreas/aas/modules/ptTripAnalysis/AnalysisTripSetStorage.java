@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import playground.andreas.aas.modules.ptTripAnalysis.distance.DistAnalysisTripI;
 import playground.andreas.aas.modules.ptTripAnalysis.distance.DistanceAnalysisTripSet;
 import playground.andreas.aas.modules.ptTripAnalysis.traveltime.TTAnalysisTripI;
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4.TTAnalysisTripSet;
+import playground.andreas.aas.modules.ptTripAnalysis.traveltime.TTAnalysisTripSet;
 
 import com.vividsolutions.jts.geom.Geometry;
 

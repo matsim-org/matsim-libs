@@ -17,9 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
+package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.Event;
@@ -61,7 +62,7 @@ public class PtTimeHandler {
 	 * updates all values of the given trip
 	 * @param trip
 	 */
-	public void finish(TTAnalysisTripV4 trip){
+	public void finish(TTAnalysisTrip trip){
 		trip.tripTTime = last - first;
 		for(SomePtTime t: this.times){
 			if ( t instanceof AccesWait){

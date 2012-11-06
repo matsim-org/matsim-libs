@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4;
+package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -30,7 +30,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTripSet;
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.AbstractTTAnalysisTrip;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -42,7 +41,7 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	
 	private static final Logger log = Logger.getLogger(TTAnalysisTripSet.class);
 	
-	private List<AbstractTTAnalysisTrip> trips;
+	private List<TTAnalysisTrip > trips;
 	private boolean storeTrips;
 	
 	//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
@@ -83,7 +82,7 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 		super(mode, zone);
 		this.storeTrips = storeTrips;
 		if(storeTrips){
-			this.trips = new LinkedList<AbstractTTAnalysisTrip>();
+			this.trips = new LinkedList<TTAnalysisTrip >();
 		}
 		this.ptModes = ptModes;
 		this.init();
@@ -178,18 +177,18 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 	@Override
 	protected void addTripValues(AbstractAnalysisTrip trip) {
 		Integer zone = super.getTripLocation(trip);
-		this.addAllModeValues((AbstractTTAnalysisTrip) trip, zone);
+		this.addAllModeValues((TTAnalysisTrip ) trip, zone);
 		if(this.ptModes.contains(trip.getMode())){
-			this.addPtValues((AbstractTTAnalysisTrip) trip, zone);
+			this.addPtValues((TTAnalysisTrip ) trip, zone);
 		}
 	}
 
-	private void addAllModeValues(AbstractTTAnalysisTrip trip, Integer zone) {
+	private void addAllModeValues(TTAnalysisTrip trip, Integer zone) {
 		tripCnt[zone]++;
 		sumTTime[zone] += trip.getTripTTime();
 	}
 
-	private void addPtValues(AbstractTTAnalysisTrip trip, Integer zone) {
+	private void addPtValues(TTAnalysisTrip trip, Integer zone) {
 		accesWalkCnt[zone] += trip.getAccesWalkCnt(); 
 		accesWalkTTime[zone] += trip.getAccesWalkTTime();
 		
@@ -236,7 +235,7 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 		}
 	}
 	
-	public List<AbstractTTAnalysisTrip> getTrips(){
+	public List<TTAnalysisTrip > getTrips(){
 		if(!storeTrips){
 			log.error("Trips not stored. Check constructor!");
 		}

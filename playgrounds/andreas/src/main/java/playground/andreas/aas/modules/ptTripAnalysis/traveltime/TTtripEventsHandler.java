@@ -35,11 +35,15 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
 import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.andreas.aas.modules.ptTripAnalysis.AnalysisTripSetStorage;
@@ -50,12 +54,13 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public abstract class AbstractTTtripEventsHandler implements AgentDepartureEventHandler, 
+public class TTtripEventsHandler  implements AgentDepartureEventHandler, 
 										AgentArrivalEventHandler, ActivityEndEventHandler, 
-										ActivityStartEventHandler, AgentStuckEventHandler{
+										ActivityStartEventHandler, AgentStuckEventHandler, 
+										PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private static final Logger log = Logger
-			.getLogger(AbstractTTtripEventsHandler.class);
+			.getLogger(TTtripEventsHandler.class);
 	
 	protected Map<Id, LinkedList<AbstractAnalysisTrip>> id2Trips = null;
 	protected Map<Id, ArrayList<Event>> id2Events = null;
@@ -69,23 +74,22 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 
 	private Collection<String> ptModes;
 	
-	public AbstractTTtripEventsHandler(Collection<String> ptModes){
+	/**
+	 * @param ptModes
+	 */
+	public TTtripEventsHandler(Collection<String> ptModes) {
 		this.id2Events = new HashMap<Id, ArrayList<Event>>();
 		this.zone2tripSet = new HashMap<String, AnalysisTripSetStorage>();
 		this.zone2tripSet.put("noZone", new AnalysisTripSetStorage(false, null, ptModes));
 		this.stuckAgents = new ArrayList<Id>();
 		this.ptModes = ptModes;
 	}
-
+	
 	@Override
 	public void reset(int iteration) {
 		
 	}
 	
-	protected Collection<String> getPtModes(){
-		return this.ptModes;
-	}
-
 	@Override
 	public void handleEvent(AgentStuckEvent e) {
 		if(!stuck){
@@ -94,36 +98,84 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 		}
 		this.stuckAgents.add(e.getPersonId());
 	}
-	
+
 	@Override
 	public void handleEvent(ActivityStartEvent e) {
-		this.processEvent(e);
+		if(this.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent e) {
-		this.processEvent(e);
+		if(this.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent e) {
-		this.processEvent(e);
+		if(this.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent e) {
-		this.processEvent(e);
+		if(this.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
 	}
 	
-	protected abstract void processEvent(Event e);
 	
-	/**
-	 * @param map
-	 */
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent e) {
+		if(this.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
+	}
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent e) {
+		if(this.id2Trips.containsKey(e.getPersonId())){
+			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
+				this.addTrip2TripSet(e.getPersonId());
+			}
+		}
+	}
+	
+	private void addTrip2TripSet(Id id){
+		// store number of processed Trips
+		this.nrOfprocessedTrips++;
+		
+		// store this for getUncompletedPlans()
+		this.nrOfTrips.get(id)[1]++;
+		
+		//get and remove the first Trip of this agent
+		TTAnalysisTrip trip = (TTAnalysisTrip ) this.id2Trips.get(id).removeFirst();
+		
+		//add for all zones
+		for(String s : this.zone2tripSet.keySet()){
+			this.zone2tripSet.get(s).addTrip(trip);
+		}
+	}
+	
 	public void addTrips(Map<Id, LinkedList<AbstractAnalysisTrip>> map) {
 		this.id2Trips = map;
 		this.init();
+		this.id2Events = null;
 	}
+
 	
 	public void addZones(Map<String, Geometry> zones){
 		this.zone2tripSet = new HashMap<String, AnalysisTripSetStorage>();
@@ -181,4 +233,7 @@ public abstract class AbstractTTtripEventsHandler implements AgentDepartureEvent
 		log.info(this.nrOfprocessedTrips + " of " + this.possibleTrips + " trips from plansfile are processed");
 		return this.zone2tripSet;
 	}
+	
 }
+
+

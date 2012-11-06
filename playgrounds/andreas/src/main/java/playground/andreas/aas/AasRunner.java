@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
 import playground.andreas.aas.modules.multiAnalyzer.MultiAnalyzer;
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.V4.TTtripAnalysisV4;
+import playground.andreas.aas.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
 import playground.andreas.aas.modules.spatialAveragingLinkDemand.SpatialAveragingForLinkDemand;
 
 /**
@@ -82,7 +82,7 @@ public class AasRunner {
 //		ptAna.init(this.scenario, this.shapeFile);
 //		this.anaModules.add(ptAna);
 
-		TTtripAnalysisV4 tripAna = new TTtripAnalysisV4(this.scenario.getConfig().transit().getTransitModes(), 
+		TTtripAnalysis tripAna = new TTtripAnalysis(this.scenario.getConfig().transit().getTransitModes(), 
 													this.scenario.getConfig().plansCalcRoute().getNetworkModes(), 
 													ptDriverPrefix, 
 													scenario.getPopulation());
