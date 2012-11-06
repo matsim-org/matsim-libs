@@ -203,7 +203,8 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		log.info("mode shares: ---------------------------");
 		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
 			if (this.xy.equals("times")) {
-				
+				log.info("Share of " + mode.getKey() + ":\t" + "time [s]: "+ (100d*mode.getValue() / totalXY) +"%"+ "\tnumber of legs: "+
+						(100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
 			}
 			else {
 				log.info("Share of " + mode.getKey() + ":\t" + "distance [km]: "+ (100d*mode.getValue() / totalXY) +"%"+ "\tnumber of legs: "+
