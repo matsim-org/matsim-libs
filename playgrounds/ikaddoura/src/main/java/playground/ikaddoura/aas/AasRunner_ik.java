@@ -34,14 +34,14 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.vsp.aas.modules.AbstractAnalyisModule;
-import playground.vsp.aas.modules.carDistance.CarDistanceAnalyzer;
-import playground.vsp.aas.modules.emissionsAnalyzer.EmissionsAnalyzer;
-import playground.vsp.aas.modules.emissionsWriter.EmissionEventsWriter;
-import playground.vsp.aas.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
-import playground.vsp.aas.modules.transferPayments.MonetaryPaymentsAnalyzer;
-import playground.vsp.aas.modules.travelTime.TravelTimeAnalyzer;
-import playground.vsp.aas.modules.userBenefits.UserBenefitsAnalyzer;
+import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.carDistance.CarDistanceAnalyzer;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
+import playground.vsp.analysis.modules.emissionsWriter.EmissionEventsWriter;
+import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
+import playground.vsp.analysis.modules.transferPayments.MonetaryPaymentsAnalyzer;
+import playground.vsp.analysis.modules.travelTime.TravelTimeAnalyzer;
+import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
 
 /**
  * 
