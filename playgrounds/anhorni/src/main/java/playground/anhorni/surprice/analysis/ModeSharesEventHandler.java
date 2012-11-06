@@ -75,6 +75,10 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	public ModeSharesEventHandler(final Controler controler, String xy) {
 		this.network = controler.getNetwork();
 		this.xy = xy;
+		
+		if (this.xy.equals("times")) {
+			maxXYForPlotting = 3600.0;
+		}
 	}
 	
 	@Override
@@ -153,12 +157,11 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		// remember data
 		frequency.addValue(xyVal);
 		rawDataElement.addElement(xyVal);
-		this.maxXYForPlotting = Math.max(xyVal, this.maxXYForPlotting);
 	}
 		
 	private double computeTimes(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent,
 			ResizableDoubleArray rawDataElement, Frequency frequency) {
-		double time = departureEvent.getTime() - arrivalEvent.getTime();
+		double time = arrivalEvent.getTime() - departureEvent.getTime();
 		return time;
 	}
 	
@@ -284,7 +287,6 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 
 		JFreeChart chart = ChartFactory.createHistogram(title, xLabel, yLabel, data,
 				PlotOrientation.VERTICAL, legend, tooltips, urls);
-		chart.getXYPlot().setForegroundAlpha(0.0F);
 		return chart;
 	}
 
