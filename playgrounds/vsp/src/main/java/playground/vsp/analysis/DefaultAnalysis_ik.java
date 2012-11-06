@@ -39,9 +39,11 @@ import playground.vsp.analysis.modules.carDistance.CarDistanceAnalyzer;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 import playground.vsp.analysis.modules.emissionsWriter.EmissionEventsWriter;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
+import playground.vsp.analysis.modules.ptOperator.PtOperatorAnalyzer;
 import playground.vsp.analysis.modules.transferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.travelTime.TravelTimeAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
+import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
 
 /**
  * 
@@ -90,7 +92,6 @@ public class DefaultAnalysis_ik {
 //		TravelTimeAnalyzer ttAna = new TravelTimeAnalyzer(ptDriverPrefix);
 //		ttAna.init(scenario);
 //		this.anaModules.add(ttAna);
-//		
 		
 //		EmissionEventsWriter emiWriter = new EmissionEventsWriter(ptDriverPrefix, this.outputDir);
 //		// additional files, required for this analysis module:
@@ -113,11 +114,19 @@ public class DefaultAnalysis_ik {
 //		emiWriter.init(scenario);
 //		this.anaModules.add(emiWriter);
 		
-		// emission events file required for this analysis module:
-		String emissionsEventsFile = "/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/test/output/test_fakePt/ITERS/it.0/analysis/EmissionEventsWriter/emission.events.xml";
-		EmissionsAnalyzer emiAna = new EmissionsAnalyzer(ptDriverPrefix, emissionsEventsFile);
-		emiAna.init(scenario);
-		this.anaModules.add(emiAna);
+//		// emission events file required for this analysis module:
+//		String emissionsEventsFile = "/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/test/output/test_fakePt/ITERS/it.0/analysis/EmissionEventsWriter/emission.events.xml";
+//		EmissionsAnalyzer emiAna = new EmissionsAnalyzer(ptDriverPrefix, emissionsEventsFile);
+//		emiAna.init(scenario);
+//		this.anaModules.add(emiAna);
+		
+//		PtOperatorAnalyzer ptOperatorAna = new PtOperatorAnalyzer(ptDriverPrefix);
+//		ptOperatorAna.init(scenario);
+//		this.anaModules.add(ptOperatorAna);
+//		
+//		WaitingTimesAnalyzer waitAna = new WaitingTimesAnalyzer(ptDriverPrefix);
+//		waitAna.init(scenario);
+//		this.anaModules.add(waitAna);
 		
 		// END ugly code - Initialization needs to be configurable
 		
