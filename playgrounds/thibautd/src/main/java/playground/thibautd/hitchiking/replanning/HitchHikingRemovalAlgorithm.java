@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
-import playground.thibautd.utils.SubtourStructure;
-import playground.thibautd.utils.SubtourStructure.Subtour;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours;
+import org.matsim.population.algorithms.PlanAnalyzeSubtours.Subtour;
 
 /**
  * Algorithm which removes a random hitch hiking trip and replaces it by a leg
@@ -49,7 +49,7 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		SubtourStructure structure = new SubtourStructure( plan );
+		PlanAnalyzeSubtours structure = new PlanAnalyzeSubtours( plan );
 
 		Subtour toActOn = getRandomHhSubtour( structure );
 
@@ -92,7 +92,7 @@ public class HitchHikingRemovalAlgorithm implements PlanAlgorithm {
 		return getNonHhMode( s.getParent() );
 	}
 
-	private Subtour getRandomHhSubtour(final SubtourStructure structure) {
+	private Subtour getRandomHhSubtour(final PlanAnalyzeSubtours structure) {
 		List<Subtour> eligibleSubtours = new ArrayList<Subtour>();
 
 		for (Subtour s : structure.getSubtours()) {
