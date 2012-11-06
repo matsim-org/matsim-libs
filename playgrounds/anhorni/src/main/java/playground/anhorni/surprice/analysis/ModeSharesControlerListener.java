@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointReplanningControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -27,11 +26,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-/**
- * A controler listener to load any necessary EventsListener in the
- * controler.
- * @author thibautd
- */
+
 public class ModeSharesControlerListener implements StartupListener, IterationEndsListener {
 	private ModeSharesEventHandler handler;
 
@@ -44,11 +39,10 @@ public class ModeSharesControlerListener implements StartupListener, IterationEn
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		// TODO Auto-generated method stub
 		String path = event.getControler().getControlerIO()
 			.getIterationPath(event.getIteration());
 		handler.printInfo(event.getIteration());
-		handler.writeTraveledDistancesGraphic(path+"/graphicTest.png", 20);
+		handler.writeTraveledDistancesGraphic(path+"/tdByMode.png", 20);
 	}
 }
 

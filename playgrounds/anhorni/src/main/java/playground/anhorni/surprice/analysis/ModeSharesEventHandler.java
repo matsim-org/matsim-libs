@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ModeDistanceSharesEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,10 +21,8 @@ package playground.anhorni.surprice.analysis;
 import java.io.File;
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math.stat.Frequency;
@@ -39,7 +36,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,8 +46,6 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
@@ -62,11 +56,9 @@ import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
  * Can also produce statistics on the mode shares based on the number of
  * legs.
  *
- * @author thibautd
+ * @author thibautd adapted by anhorni
  */
-public class ModeSharesEventHandler
-		extends AbstractClassifiedFrequencyAnalysis
-		implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 	private static final Logger log =
 		Logger.getLogger(ModeSharesEventHandler.class);
 
@@ -74,32 +66,16 @@ public class ModeSharesEventHandler
 	// are not generated for non-car modes.
 	private static final String ALL_MODES = "allAvailableModes";
 
-	private final Map<Id, AgentDepartureEvent> pendantDepartures =
-			new HashMap<Id, AgentDepartureEvent>();
+	private final Map<Id, AgentDepartureEvent> pendantDepartures = new HashMap<Id, AgentDepartureEvent>();
 	private final Network network;
-
-	private final List<Map<String, Double>> modeShares;
 	private boolean toReset = false;
-	private double maxDistance = 0d;
+	private double maxDistanceForPlotting = 100000; // [m]
 		
-	/*
-	 * =========================================================================
-	 * constructors
-	 * =========================================================================
-	 */
-	/**
-	 * @param controler the controler, used to get the network
-	 */
+
 	public ModeSharesEventHandler(final Controler controler) {
 		this.network = controler.getNetwork();
-		this.modeShares = new ArrayList<Map<String, Double>>(controler.getLastIteration());
 	}
 	
-	/*
-	 * =========================================================================
-	 * Handling methods
-	 * =========================================================================
-	 */
 	@Override
 	public void reset(final int iteration) {
 		// only reset at the first fired event, so that the order in which
@@ -118,7 +94,7 @@ public class ModeSharesEventHandler
 				log.warn("Some arrivals were not handled!");
 				this.pendantDepartures.clear();
 			}
-			this.maxDistance = 0d;
+			this.maxDistanceForPlotting = 100000; // [m]
 		}
 	}
 
@@ -182,20 +158,7 @@ public class ModeSharesEventHandler
 		// remember data
 		frequency.addValue(distance);
 		rawDataElement.addElement(distance);
-		this.maxDistance = Math.max(distance, this.maxDistance);
-	}
-
-	/*
-	 * =========================================================================
-	 * processing methods
-	 * =========================================================================
-	 */
-	/**
-	 * Helper method to perform any necessary data processing before clearing
-	 * data structures.
-	 */
-	private void processEndOfIteration(final int iteration) {
-		//this.modeShares.add(iteration, getModeShares());
+		this.maxDistanceForPlotting = Math.max(distance, this.maxDistanceForPlotting);
 	}
 
 	private Map<String, Double> getModeDistances() {
@@ -211,15 +174,10 @@ public class ModeSharesEventHandler
 			totalDistance += currentDistance;
 			modeDistances.put(mode, currentDistance);
 		}
-
 		modeDistances.put(ALL_MODES, totalDistance);
-
 		return modeDistances;
 	}
 
-	/**
-	 * Logs some statistics on mode shares.
-	 */
 	public void printInfo(final int iteration) {
 		//this.processEndOfIteration(iteration);
 		//Map<String, Double> currentModeShares = this.modeShares.get(iteration);
@@ -279,25 +237,19 @@ public class ModeSharesEventHandler
 		}
 		//add the last count
 		output.add(currentUpperBound - step, count);
-		//output.add(currentUpperBound, count);
 		output.add(currentUpperBound, 0);
-
 		return output;
 	}
 
 	public HistogramDataset getHistogramDataset(final int nBins) {
 		HistogramDataset output = new HistogramDataset();
 		output.setType(HistogramType.RELATIVE_FREQUENCY);
-
 		for (String mode : this.rawData.keySet()) {
 			output.addSeries(mode, this.rawData.get(mode).getElements(), nBins);
 		}
-
 		return output;
 	}
 
-	// would be more readable with a "real" histogramm.
-	// TODO: use matsim chartUtils
 	public JFreeChart getTraveledDistancesHistogram(final int numberOfBins) {
 		String title = "Traveled distances distribution by mode";
 		String xLabel = "Distance (m)";
@@ -305,25 +257,17 @@ public class ModeSharesEventHandler
 		boolean legend = true;
 		boolean tooltips = false;
 		boolean urls = false;
-		//XYSeriesCollection data = new XYSeriesCollection();
-		HistogramDataset data = getHistogramDataset(numberOfBins);
-		double step = this.maxDistance / numberOfBins;
-
-		//for (String mode : this.rawData.keySet()) {
-		//	data.addSeries(getTraveledDistancesHistogram(mode, step));
-		//}
+		HistogramDataset data = this.getHistogramDataset(numberOfBins);
 
 		JFreeChart chart = ChartFactory.createHistogram(title, xLabel, yLabel, data,
 				PlotOrientation.VERTICAL, legend, tooltips, urls);
-		chart.getXYPlot().setForegroundAlpha(0.5F);
+		chart.getXYPlot().setForegroundAlpha(0.0F);
 
 		return chart;
 	}
 
-	public void writeTraveledDistancesGraphic(
-			final String fileName,
-			final int numberOfBins) {
-		JFreeChart chart = getTraveledDistancesHistogram(numberOfBins);
+	public void writeTraveledDistancesGraphic(final String fileName, final int numberOfBins) {
+		JFreeChart chart = this.getTraveledDistancesHistogram(numberOfBins);
 		try {
 			ChartUtilities.saveChartAsPNG(new File(fileName), chart, 1024, 768);
 		} catch (IOException e) {
@@ -333,11 +277,6 @@ public class ModeSharesEventHandler
 		}
 	}
 
-	/*
-	 * =========================================================================
-	 * Miscelaneous
-	 * =========================================================================
-	 */
 	@Override
 	public void run(final Person person) { /*do nothing*/ }
 }
