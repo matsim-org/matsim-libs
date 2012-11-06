@@ -98,6 +98,6 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	}
 
 	public double getSumTripDurationsIncomeWeighted() {
-		return sumTripDurationsIncomeWeighted;
+		return this.sumTripDurationsIncomeWeighted / this.getAverageTripDuration();
 	}
 }

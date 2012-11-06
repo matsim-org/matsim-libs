@@ -125,6 +125,6 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	}
 
 	public double getSumLengthIncomeWeighted() {
-		return sumLengthIncomeWeighted;
+		return this.sumLengthIncomeWeighted / this.getAverageTripLength();
 	}
 }
