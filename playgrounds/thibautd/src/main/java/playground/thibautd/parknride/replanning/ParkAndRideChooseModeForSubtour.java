@@ -72,14 +72,14 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 	private final Collection<String> modes;
 	private final Collection<String> chainBasedModes;
 	private final Random rng;
-	private final PlanAnalyzeSubtours planAnalyzeSubtours;
+	private PlanAnalyzeSubtours planAnalyzeSubtours;
 	private final TripRouter tripRouter;
 	private final ParkAndRideIncluder includer;
 	private final double facilityChangeProbability;
 	private final FacilityChanger changer;
+	private final boolean anchorAtFacilities = false;
 
 	private PermissibleModesCalculator permissibleModesCalculator;
-	private TripStructureAnalysisLayerOption tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.link;
 	
 	/**
 	 * @param includer
@@ -105,7 +105,6 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		this.modes = Arrays.asList(modes);
 		this.chainBasedModes = Arrays.asList(chainBasedModes);
 		this.rng = rng;
-		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		this.facilityChangeProbability = facilityChangeProbability;
 		log.info("Chain based modes: " + this.chainBasedModes.toString());
 	}
@@ -129,13 +128,12 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 					ParkAndRideConstants.PARKING_ACT_TYPE,
 					plan );
 		checkSequence( planStructure );
-		planAnalyzeSubtours.setTripStructureAnalysisLayer( tripStructureAnalysisLayer );
-		planAnalyzeSubtours.run( wrapPlanStructure( planStructure ) );
+		planAnalyzeSubtours = new PlanAnalyzeSubtours( planStructure , anchorAtFacilities );
 
 		List< List<PlanElement> > pnrSubtours = new ArrayList< List<PlanElement> >();
 
 		int sub = 0;
-		for ( List<PlanElement> subtour : planAnalyzeSubtours.getSubtours() ) {
+		for ( List<PlanElement> subtour : planAnalyzeSubtours.getSubtourElements() ) {
 			List<PlanElement> cleanSubtour =
 				getSubtourWithoutSubsubtours(
 						sub,
@@ -192,16 +190,12 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		Id homeLocation = null;
 
 		if (plan.getPlanElements().size() > 1) {
-			if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-				homeLocation = ((Activity) plan.getPlanElements().get(0)).getLinkId();
-			}
-			else if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.facility) {
-				homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId();
-			}
+				homeLocation = anchorAtFacilities ?
+					((Activity) plan.getPlanElements().get(0)).getFacilityId() :
+					((Activity) plan.getPlanElements().get(0)).getLinkId();
 			Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
 
-			planAnalyzeSubtours.setTripStructureAnalysisLayer( tripStructureAnalysisLayer );
-			planAnalyzeSubtours.run( wrapPlanStructure( planStructure ) );
+			planAnalyzeSubtours = new PlanAnalyzeSubtours( planStructure , anchorAtFacilities );
 
 			List<Candidate> choiceSet =
 				determineChoiceSet(
@@ -211,7 +205,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 
 			if (!choiceSet.isEmpty()) {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
-				List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
+				List<PlanElement> subTour = planAnalyzeSubtours.getSubtourElements().get(whatToDo.subTourIndex);
 				//List<PlanElement> subTour =
 				//	getSubtourWithoutSubsubtours(
 				//			whatToDo.subTourIndex,
@@ -267,12 +261,6 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 		return false;
 	}
 
-	private static Plan wrapPlanStructure(final List<PlanElement> planStructure) {
-		Plan plan = new PlanImpl();
-		plan.getPlanElements().addAll( planStructure );
-		return plan;
-	}
-
 	private List<Candidate> determineChoiceSet(
 			final Id homeLocation,
 			final List<PlanElement> planStructure,
@@ -282,21 +270,14 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 			if (subTourIndex < 0) {
 				continue;
 			}
-			List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(subTourIndex);
+			List<PlanElement> subTour = planAnalyzeSubtours.getSubtourElements().get(subTourIndex);
 			if (containsUnknownMode(subTour)) {
 				continue;
 			}
 			Set<String> usableChainBasedModes = new HashSet<String>();
-			Id subtourStartLocation;
-			if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-				subtourStartLocation = ((Activity) subTour.get(0)).getLinkId();
-			}
-			else if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.facility) {
-				subtourStartLocation = ((Activity) subTour.get(0)).getFacilityId();
-			}
-			else {
-				throw new RuntimeException( "unknow trip structure analysis layer value "+tripStructureAnalysisLayer);
-			}
+			Id subtourStartLocation = anchorAtFacilities ?
+				((Activity) subTour.get(0)).getFacilityId() :
+				((Activity) subTour.get(0)).getLinkId();
 			
 			for (String mode : chainBasedModes) {
 				Id vehicleLocation = homeLocation;
@@ -383,21 +364,17 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 	}
 
 	private Id getLocationId(final Activity activity) {
-		if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-			return activity.getLinkId();
-		} else {
-			return activity.getFacilityId();
-		}
+			return anchorAtFacilities ?
+				activity.getFacilityId() :
+				activity.getLinkId();
 	}
 	
 	private boolean atSameLocation(
 			final Activity firstLegUsingMode,
 			final Activity lastLegUsingMode) {
-		if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-			return firstLegUsingMode.getLinkId().equals(lastLegUsingMode.getLinkId());
-		} else {
-			return firstLegUsingMode.getFacilityId().equals(lastLegUsingMode.getFacilityId());
-		}
+			return anchorAtFacilities ?
+				firstLegUsingMode.getFacilityId().equals(lastLegUsingMode.getFacilityId()) :
+				firstLegUsingMode.getLinkId().equals(lastLegUsingMode.getLinkId());
 	}
 
 	private Activity findLastLegUsing(
@@ -508,12 +485,6 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 				origin = destination;
 			}
 		}
-	}
-
-	public void setTripStructureAnalysisLayer(
-			final TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		planAnalyzeSubtours.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		this.tripStructureAnalysisLayer = tripStructureAnalysisLayer;
 	}
 
 	/*private*/ static double getEndTime(

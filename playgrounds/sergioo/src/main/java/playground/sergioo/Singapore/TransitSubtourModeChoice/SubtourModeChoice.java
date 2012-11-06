@@ -134,7 +134,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		ChooseRandomLegModeForSubtour chooseRandomLegMode = new ChooseRandomLegModeForSubtour(this.permissibleModesCalculator, this.modes, this.chainBasedModes, MatsimRandom.getLocalInstance());
-		chooseRandomLegMode.setTripStructureAnalysisLayer(TripStructureAnalysisLayerOption.link);
+		chooseRandomLegMode.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		return chooseRandomLegMode;
 	}
 

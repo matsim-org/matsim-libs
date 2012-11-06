@@ -126,11 +126,9 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	private void doTest(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup,
 			String facString, String expectedSubtourIndexationString,
 			int expectedNumSubtoursForThis, Map<Integer, Integer> childToParent) {
-		TripStructureAnalysisLayerOption linksOrFacilities = planomatConfigGroup.getTripStructureAnalysisLayer();
-		PlanImpl plan = createPlan(layer, facString, linksOrFacilities);
-		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours();
-		testee.setTripStructureAnalysisLayer(linksOrFacilities);
-		testee.run(plan);
+		boolean useFacilities = planomatConfigGroup.getTripStructureAnalysisLayer().equals( PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility );
+		PlanImpl plan = createPlan(layer, facString, useFacilities);
+		PlanAnalyzeSubtours testee = new PlanAnalyzeSubtours( plan , useFacilities);
 		StringBuilder builder = new StringBuilder();
 		List<Integer> actualSubtourIndexation = toList(testee.getSubtourIndexation());
 		for (int value : actualSubtourIndexation) {
@@ -145,7 +143,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 			int leftPlanIndex = 2 * actualSubtourIndexation.indexOf(i);
 			int rightPlanIndex = 2 * (1 + actualSubtourIndexation.lastIndexOf(i)) + 1;
 			List<? extends PlanElement> expectedSubTour = plan.getPlanElements().subList(leftPlanIndex, rightPlanIndex);
-			List<? extends PlanElement> actualSubTour = testee.getSubtours().get(i);
+			List<? extends PlanElement> actualSubTour = testee.getSubtourElements().get(i);
 			assertEquals(expectedSubTour, actualSubTour);
 			for (Entry<Integer, Integer> entry : childToParent.entrySet()) {
 				assertEquals(entry.getValue(), testee.getParentTours().get(entry.getKey()));
@@ -154,17 +152,14 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	private PlanImpl createPlan(BasicLocations layer, String facString,
-			TripStructureAnalysisLayerOption linksOrFacilities) {
+			boolean useFacilities) {
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
-		PlanImpl plan;
-		if (linksOrFacilities.equals(TripStructureAnalysisLayerOption.facility)) {
-			plan = TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) layer, person, TransportMode.car, facString);
-		} else if (linksOrFacilities.equals(TripStructureAnalysisLayerOption.link)) {
-			plan = TestsUtil.createPlanFromLinks((NetworkImpl) layer, person, TransportMode.car, facString);
-		} else {
-			throw new RuntimeException("Unknown option.");
+
+		if ( useFacilities ) {
+			return TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) layer, person, TransportMode.car, facString);
 		}
-		return plan;
+
+		return TestsUtil.createPlanFromLinks((NetworkImpl) layer, person, TransportMode.car, facString);
 	}
 
 

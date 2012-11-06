@@ -151,7 +151,7 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		String[] modes = new String[] {"car", "pt", "walk"};
 		
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, new Random(15102011));
-		testee.setTripStructureAnalysisLayer(TripStructureAnalysisLayerOption.link);
+		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
 		Person person = new PersonImpl(new IdImpl("1000"));
 		Plan plan = new PlanImpl();
 		person.addPlan(plan);
@@ -215,7 +215,8 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		String originalMode = TransportMode.pt;
 		String[] modes = new String[] {expectedMode, originalMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
-		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
+		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(
+				tripStructureAnalysisLayer.equals( TripStructureAnalysisLayerOption.facility ));
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
@@ -232,7 +233,8 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		String originalMode = TransportMode.walk;
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
-		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
+		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(
+				tripStructureAnalysisLayer.equals( TripStructureAnalysisLayerOption.facility ));
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
@@ -250,7 +252,8 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 		String originalMode = TransportMode.car;
 		String[] modes = new String[] {expectedMode, originalMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
-		testee.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
+		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(
+				tripStructureAnalysisLayer.equals( TripStructureAnalysisLayerOption.facility ));
 		PersonImpl person = new PersonImpl(new IdImpl("1000"));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(layer, activityChainString, tripStructureAnalysisLayer, originalMode);
@@ -266,7 +269,8 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 	private void testCarDoesntTeleport(BasicLocations layer, PlanomatConfigGroup planomatConfigGroup, String originalMode, String otherMode) {
 		String[] modes = new String[] {originalMode, otherMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour(new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
-		testee.setTripStructureAnalysisLayer(planomatConfigGroup.getTripStructureAnalysisLayer());
+		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(
+				planomatConfigGroup.getTripStructureAnalysisLayer().equals( TripStructureAnalysisLayerOption.facility ));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(layer, activityChainString, planomatConfigGroup.getTripStructureAnalysisLayer(), originalMode);
 			testee.run(plan);
@@ -291,9 +295,10 @@ public class ChooseRandomLegModeForSubtourTest extends MatsimTestCase {
 
 	private void assertSubTourMutated(Plan plan, Plan originalPlan,
 			String expectedMode, TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-		planAnalyzeSubtours.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		planAnalyzeSubtours.run(plan);
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(
+						plan,
+						tripStructureAnalysisLayer.equals(
+							PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility ));
 		Integer mutatedSubTourIndex = null;
 		int numSubtours = planAnalyzeSubtours.getNumSubtours();
 		if (numSubtours == 0) {

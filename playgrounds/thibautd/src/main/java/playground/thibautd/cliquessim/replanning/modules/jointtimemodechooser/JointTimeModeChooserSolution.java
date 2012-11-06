@@ -468,13 +468,7 @@ public class JointTimeModeChooserSolution implements Solution {
 	private static List<Subtour> analyseSubtours(
 			final boolean isCarAvailable,
 			final List<PlanElement> planStructure) {
-		PlanAnalyzeSubtours analyzer = new PlanAnalyzeSubtours();
-		analyzer.setTripStructureAnalysisLayer( TripStructureAnalysisLayerOption.link );
-
-		// XXX: quick workaround: change that
-		Plan fakePlan = new PlanImpl();
-		fakePlan.getPlanElements().addAll( planStructure );
-		analyzer.run( fakePlan );
+		PlanAnalyzeSubtours analyzer = new PlanAnalyzeSubtours( planStructure );
 
 		Map<Integer, List<Leg>> subtours = new HashMap<Integer, List<Leg>>();
 

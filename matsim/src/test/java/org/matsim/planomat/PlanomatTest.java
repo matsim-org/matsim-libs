@@ -247,8 +247,7 @@ public class PlanomatTest extends MatsimTestCase {
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.size() > 0) {
-			planAnalyzeSubtours = new PlanAnalyzeSubtours();
-			planAnalyzeSubtours.run(testPlan);
+			planAnalyzeSubtours = new PlanAnalyzeSubtours( testPlan , true );
 		}
 
 		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(
@@ -282,9 +281,10 @@ public class PlanomatTest extends MatsimTestCase {
 		testPlan = testPerson.getPlans().get(TEST_PLAN_NR);
 
 		// init IChromosome (from JGAP)
-		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours();
-		planAnalyzeSubtours.setTripStructureAnalysisLayer(scenario.getConfig().planomat().getTripStructureAnalysisLayer());
-		planAnalyzeSubtours.run(testPlan);
+		PlanAnalyzeSubtours planAnalyzeSubtours = new PlanAnalyzeSubtours(
+					testPlan,
+					scenario.getConfig().planomat().getTripStructureAnalysisLayer().equals(
+						PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility ));
 		int numActs = planAnalyzeSubtours.getSubtourIndexation().length;
 
 		Configuration jgapConfiguration = new Configuration();

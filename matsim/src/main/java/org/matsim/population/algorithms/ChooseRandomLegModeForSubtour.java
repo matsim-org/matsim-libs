@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 
 /**
@@ -65,7 +64,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 
 	private PermissibleModesCalculator permissibleModesCalculator;
 
-	private TripStructureAnalysisLayerOption tripStructureAnalysisLayer;
+	private boolean anchorAtFacilities = false;
 	
 	private Id homeLocation;
 	
@@ -78,7 +77,6 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		this.singleTripSubtourModes = this.chainBasedModes;
 		
 		this.rng = rng;
-		this.planAnalyzeSubtours = new PlanAnalyzeSubtours();
 		logger.info("Chain based modes: " + this.chainBasedModes.toString());
 	}
 
@@ -100,17 +98,15 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		this.plan = plan;
 		
 		if (plan.getPlanElements().size() > 1) {
-			if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-				homeLocation = ((Activity) plan.getPlanElements().get(0)).getLinkId();
-			} else if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.facility) {
-				homeLocation = ((Activity) plan.getPlanElements().get(0)).getFacilityId();
-			}
+			homeLocation = anchorAtFacilities ?
+				((Activity) plan.getPlanElements().get(0)).getFacilityId() :
+				((Activity) plan.getPlanElements().get(0)).getLinkId();
 			Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
-			planAnalyzeSubtours.run(plan);
+			planAnalyzeSubtours = new PlanAnalyzeSubtours( plan , anchorAtFacilities );
 			List<Candidate> choiceSet = determineChoiceSet(permissibleModesForThisPlan);
 			if (!choiceSet.isEmpty()) {
 				Candidate whatToDo = choiceSet.get(rng.nextInt(choiceSet.size()));
-				List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(whatToDo.subTourIndex);
+				List<PlanElement> subTour = planAnalyzeSubtours.getSubtourElements().get(whatToDo.subTourIndex);
 				changeLegModeTo(subTour, whatToDo.newTransportMode);
 			}
 		}
@@ -122,18 +118,17 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			if (subTourIndex < 0) {
 				continue;
 			}
-			List<PlanElement> subTour = planAnalyzeSubtours.getSubtours().get(subTourIndex);
+			List<PlanElement> subTour = planAnalyzeSubtours.getSubtourElements().get(subTourIndex);
 			if (containsUnknownMode(subTour)) {
 				continue;
 			}
 			Set<String> usableChainBasedModes = new HashSet<String>();
 			Id subtourStartLocation;
-			if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-				subtourStartLocation = ((Activity) subTour.get(0)).getLinkId();
-			} else if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.facility) {
+			if ( anchorAtFacilities) {
 				subtourStartLocation = ((Activity) subTour.get(0)).getFacilityId();
-			} else {
-				throw new RuntimeException();
+			}
+			else {
+				subtourStartLocation = ((Activity) subTour.get(0)).getLinkId();
 			}
 			
 			Collection<String> testingModes = chainBasedModes;
@@ -210,20 +205,18 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	}
 
 	private Id getLocationId(Activity activity) {
-		if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-			return activity.getLinkId();
-		} else {
-			return activity.getFacilityId();
-		}
+		return anchorAtFacilities ?
+			activity.getFacilityId() :
+			activity.getLinkId();
 	}
 	
 	private boolean atSameLocation(Activity firstLegUsingMode,
 			Activity lastLegUsingMode) {
-		if (tripStructureAnalysisLayer == TripStructureAnalysisLayerOption.link) {
-			return firstLegUsingMode.getLinkId().equals(lastLegUsingMode.getLinkId());
-		} else {
-			return firstLegUsingMode.getFacilityId().equals(lastLegUsingMode.getFacilityId());
-		}
+		return anchorAtFacilities ?
+			firstLegUsingMode.getFacilityId().equals(
+					lastLegUsingMode.getFacilityId() ) :
+			firstLegUsingMode.getLinkId().equals(
+					lastLegUsingMode.getLinkId() );
 	}
 
 	private Activity findLastLegUsing(List<PlanElement> subTour, String mode) {
@@ -256,10 +249,9 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		}
 	}
 
-	public void setTripStructureAnalysisLayer(
-			TripStructureAnalysisLayerOption tripStructureAnalysisLayer) {
-		planAnalyzeSubtours.setTripStructureAnalysisLayer(tripStructureAnalysisLayer);
-		this.tripStructureAnalysisLayer = tripStructureAnalysisLayer;
+	public void setAnchorSubtoursAtFacilitiesInsteadOfLinks(
+			final boolean anchorAtFacilities) {
+		this.anchorAtFacilities = anchorAtFacilities;
 	}
 
 }

@@ -99,9 +99,10 @@ public class PlanomatJGAPConfigurationTest extends MatsimTestCase {
 
 		PlanAnalyzeSubtours planAnalyzeSubtours = null;
 		if (possibleModes.size() > 0) {
-			planAnalyzeSubtours = new PlanAnalyzeSubtours();
-			planAnalyzeSubtours.setTripStructureAnalysisLayer(scenario.getConfig().planomat().getTripStructureAnalysisLayer());
-			planAnalyzeSubtours.run(testPlan);
+			planAnalyzeSubtours = new PlanAnalyzeSubtours(
+					testPlan,
+					planomatConfigGroup.getTripStructureAnalysisLayer().equals(
+						PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility ));
 		}
 
 		// run testee

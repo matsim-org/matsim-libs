@@ -127,9 +127,10 @@ public class Planomat implements PlanAlgorithm {
 			if (this.doLogging) {
 				logger.info("Running subtour analysis...");
 			}
-			planAnalyzeSubtours = new PlanAnalyzeSubtours();
-			planAnalyzeSubtours.setTripStructureAnalysisLayer(this.planomatConfigGroup.getTripStructureAnalysisLayer());
-			planAnalyzeSubtours.run(plan);
+			planAnalyzeSubtours = new PlanAnalyzeSubtours(
+					plan,
+					this.planomatConfigGroup.getTripStructureAnalysisLayer().equals(
+						PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility ));
 		}
 		if (this.doLogging) {
 			logger.info("Running subtour analysis...done.");

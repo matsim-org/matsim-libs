@@ -41,7 +41,7 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
  */
 public class ComprehensiveChoiceModel {
 	private ChoiceModel tripLevelModel = null;
-	private final PlanAnalyzeSubtours subtoursAnalyser = new PlanAnalyzeSubtours();
+	private PlanAnalyzeSubtours subtoursAnalyser;
 
 	private static final double EPSILON = 1E-7;
 	private static final int NO_FATHER_SUBTOUR = Integer.MIN_VALUE;
@@ -71,10 +71,6 @@ public class ComprehensiveChoiceModel {
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
 	// /////////////////////////////////////////////////////////////////////////
-	public ComprehensiveChoiceModel() {
-		subtoursAnalyser.setTripStructureAnalysisLayer(
-				PlanomatConfigGroup.TripStructureAnalysisLayerOption.link );
-	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// getters / setters
@@ -125,7 +121,7 @@ public class ComprehensiveChoiceModel {
 			final DecisionMaker decisionMaker,
 			final Plan plan) {
 		// init internal information
-		subtoursAnalyser.run( plan );
+		subtoursAnalyser = new PlanAnalyzeSubtours( plan );
 		subtourIndices = subtoursAnalyser.getSubtourIndexation();
 		subtourFatherTable = getFatherTable();
 

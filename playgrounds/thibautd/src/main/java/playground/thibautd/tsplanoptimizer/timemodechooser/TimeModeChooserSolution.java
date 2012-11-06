@@ -247,15 +247,8 @@ public class TimeModeChooserSolution implements Solution {
 
 	private static List<List<PlanElement>> analyseSubtours(
 			final List<PlanElement> planStructure) {
-		PlanAnalyzeSubtours analyzer = new PlanAnalyzeSubtours();
-		analyzer.setTripStructureAnalysisLayer( TripStructureAnalysisLayerOption.link );
-
-		// XXX: quick workaround: change that
-		Plan fakePlan = new PlanImpl();
-		fakePlan.getPlanElements().addAll( planStructure );
-		analyzer.run( fakePlan );
-
-		return analyzer.getSubtours();
+		PlanAnalyzeSubtours analyzer = new PlanAnalyzeSubtours( planStructure , false );
+		return analyzer.getSubtourElements();
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
