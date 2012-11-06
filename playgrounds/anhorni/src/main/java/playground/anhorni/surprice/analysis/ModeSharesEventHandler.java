@@ -69,11 +69,13 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	private final Map<Id, AgentDepartureEvent> pendantDepartures = new HashMap<Id, AgentDepartureEvent>();
 	private final Network network;
 	private boolean toReset = false;
-	private double maxDistanceForPlotting = 100000; // [m]
+	private double maxXYForPlotting = 100000; // [m]
+	private String xy;
 		
 
-	public ModeSharesEventHandler(final Controler controler) {
+	public ModeSharesEventHandler(final Controler controler, String xy) {
 		this.network = controler.getNetwork();
+		this.xy = xy;
 	}
 	
 	@Override
@@ -94,7 +96,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 				log.warn("Some arrivals were not handled!");
 				this.pendantDepartures.clear();
 			}
-			this.maxDistanceForPlotting = 100000; // [m]
+			this.maxXYForPlotting = 100000; // [m]
 		}
 	}
 
@@ -114,15 +116,11 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	@Override
 	public void handleEvent(final AgentArrivalEvent arrivalEvent) {
 		this.doReset();
-		AgentDepartureEvent departureEvent =
-			this.pendantDepartures.remove(arrivalEvent.getPersonId());
+		AgentDepartureEvent departureEvent = this.pendantDepartures.remove(arrivalEvent.getPersonId());
 		String mode = arrivalEvent.getLegMode();
 		Frequency frequency;
 		ResizableDoubleArray rawDataElement;
-		Link departureLink;
-		Link arrivalLink;
-		double distance;
-
+		
 		// Consistency check...
 		if (departureEvent == null) {
 			log.warn("One arrival do not correspond to any departure for agent "+
@@ -146,8 +144,30 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 			this.frequencies.put(mode, frequency);
 			this.rawData.put(mode, rawDataElement);
 		}
-
-		// compute data
+		double xyVal = 0.0;
+		if (this.xy.equals("time")) {
+			xyVal = this.computeTimes(arrivalEvent, departureEvent, rawDataElement, frequency);
+		}
+		else {
+			xyVal = this.computeDistances(arrivalEvent, departureEvent, rawDataElement, frequency);
+		}
+		// remember data
+		frequency.addValue(xyVal);
+		rawDataElement.addElement(xyVal);
+		this.maxXYForPlotting = Math.max(xyVal, this.maxXYForPlotting);
+	}
+		
+	private double computeTimes(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent,
+			ResizableDoubleArray rawDataElement, Frequency frequency) {
+		double time = departureEvent.getTime() - arrivalEvent.getTime();
+		return time;
+	}
+	
+	private double computeDistances(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent,
+			ResizableDoubleArray rawDataElement, Frequency frequency) {
+		Link departureLink;
+		Link arrivalLink;
+		double distance;
 		departureLink = this.network.getLinks().get(departureEvent.getLinkId());
 		arrivalLink = this.network.getLinks().get(arrivalEvent.getLinkId());
 
@@ -155,43 +175,40 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 				departureLink.getCoord(),
 				arrivalLink.getCoord());
 
-		// remember data
-		frequency.addValue(distance);
-		rawDataElement.addElement(distance);
-		this.maxDistanceForPlotting = Math.max(distance, this.maxDistanceForPlotting);
+		return distance;
 	}
 
-	private Map<String, Double> getModeDistances() {
-		Map<String, Double> modeDistances = new HashMap<String, Double>();
-		double totalDistance = 0d;
-		double currentDistance;
+	private Map<String, Double> getModeXYs() {
+		Map<String, Double> modeXYs = new HashMap<String, Double>();
+		double totalXY = 0d;
+		double currentXY;
 
 		for (String mode : this.rawData.keySet()) {
-			currentDistance = 0d;
+			currentXY = 0d;
 			for (double d : this.rawData.get(mode).getElements()) {
-				currentDistance += d;
+				currentXY += d;
 			}
-			totalDistance += currentDistance;
-			modeDistances.put(mode, currentDistance);
+			totalXY += currentXY;
+			modeXYs.put(mode, currentXY);
 		}
-		modeDistances.put(ALL_MODES, totalDistance);
-		return modeDistances;
+		modeXYs.put(ALL_MODES, totalXY);
+		return modeXYs;
 	}
 
 	public void printInfo(final int iteration) {
-		//this.processEndOfIteration(iteration);
-		//Map<String, Double> currentModeShares = this.modeShares.get(iteration);
-		Map<String, Double> currentModeDistances = getModeDistances();
+		Map<String, Double> currentModeXYs = getModeXYs();
 		long nLegs = this.getNumberOfLegs();
-		double totalDist = currentModeDistances.remove(ALL_MODES);
+		double totalXY = currentModeXYs.remove(ALL_MODES);
 
-		log.info("Mode shares:");
-		log.info("Cumulated traveled distance: "+(totalDist/1000d)+"km");
-		for (Map.Entry<String, Double> mode : currentModeDistances.entrySet()) {
-			log.info("Share of "+mode.getKey()+":\t"+
-					"distance: "+(100d*mode.getValue() / totalDist)+"%"+
-					"\tnumber of legs: "+
+		log.info("mode shares: ---------------------------");
+		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
+			if (this.xy.equals("time")) {
+				
+			}
+			else {
+				log.info("Share of " + mode.getKey() + ":\t" + "distance [km]: "+ (100d*mode.getValue() / totalXY) +"%"+ "\tnumber of legs: "+
 					(100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
+			}
 		}
 	}
 
@@ -204,7 +221,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	 * @param step the width of the bins, in meters
 	 * @param mode the mode to get the data for
 	 */
-	public XYSeries getTraveledDistancesHistogram(final String mode, final double step) {
+	public XYSeries getTraveledXYsHistogram(final String mode, final double step) {
 		boolean autoSort = false;
 		boolean allowDuplicateXValues = true;
 		XYSeries output = new XYSeries(mode, autoSort, allowDuplicateXValues);
@@ -218,8 +235,8 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		double currentUpperBound = step;
 		int count = 0;
 
-		for (double distValue : modeRawData) {
-			if (distValue < currentUpperBound) {
+		for (double xyValue : modeRawData) {
+			if (xyValue < currentUpperBound) {
 				count++;
 			}
 			else {
@@ -228,7 +245,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 				//output.add(currentUpperBound, count);
 
 				currentUpperBound += step;
-				while (distValue > currentUpperBound) {
+				while (xyValue > currentUpperBound) {
 					output.add(currentUpperBound, 0d);
 					currentUpperBound += step;
 				}
@@ -250,10 +267,13 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		return output;
 	}
 
-	public JFreeChart getTraveledDistancesHistogram(final int numberOfBins) {
-		String title = "Traveled distances distribution by mode";
-		String xLabel = "Distance (m)";
-		String yLabel = "Number of trips";
+	private JFreeChart getTraveledXYsHistogram(final int numberOfBins) {
+		String title = this.xy + " distribution by mode";
+		String xLabel = "distance (m)";
+		if (this.xy.equals("time")) {
+			xLabel = "time (s)";
+		}		
+		String yLabel = "number of trips";
 		boolean legend = true;
 		boolean tooltips = false;
 		boolean urls = false;
@@ -262,12 +282,11 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		JFreeChart chart = ChartFactory.createHistogram(title, xLabel, yLabel, data,
 				PlotOrientation.VERTICAL, legend, tooltips, urls);
 		chart.getXYPlot().setForegroundAlpha(0.0F);
-
 		return chart;
 	}
 
-	public void writeTraveledDistancesGraphic(final String fileName, final int numberOfBins) {
-		JFreeChart chart = this.getTraveledDistancesHistogram(numberOfBins);
+	public void writeXYsGraphic(final String fileName, final int numberOfBins) {
+		JFreeChart chart = this.getTraveledXYsHistogram(numberOfBins);
 		try {
 			ChartUtilities.saveChartAsPNG(new File(fileName), chart, 1024, 768);
 		} catch (IOException e) {

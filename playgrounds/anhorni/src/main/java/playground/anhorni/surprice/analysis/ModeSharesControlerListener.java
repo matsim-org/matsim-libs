@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.anhorni.surprice.analysis;
 
-import herbie.running.analysis.ModeSharesEventHandler;
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -29,11 +27,16 @@ import org.matsim.core.controler.listener.StartupListener;
 
 public class ModeSharesControlerListener implements StartupListener, IterationEndsListener {
 	private ModeSharesEventHandler handler;
+	private String xy;
+	
+	public ModeSharesControlerListener(String xy) {
+		this.xy = xy;
+	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();
-		handler = new ModeSharesEventHandler(controler);
+		handler = new ModeSharesEventHandler(controler, this.xy);
 		controler.getEvents().addHandler(handler);
 	}
 
@@ -42,7 +45,7 @@ public class ModeSharesControlerListener implements StartupListener, IterationEn
 		String path = event.getControler().getControlerIO()
 			.getIterationPath(event.getIteration());
 		handler.printInfo(event.getIteration());
-		handler.writeTraveledDistancesGraphic(path+"/tdByMode.png", 20);
+		handler.writeXYsGraphic(path+"/" + this.xy + "ByMode.png", 20);
 	}
 }
 
