@@ -21,6 +21,7 @@ package playground.anhorni.surprice.analysis;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,8 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import utils.Utils;
 
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 
@@ -264,8 +267,15 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	public HistogramDataset getHistogramDataset(final int nBins) {
 		HistogramDataset output = new HistogramDataset();
 		output.setType(HistogramType.RELATIVE_FREQUENCY);
+		ArrayList<Double> croppedData = new ArrayList<Double>();
+		
 		for (String mode : this.rawData.keySet()) {
-			output.addSeries(mode, this.rawData.get(mode).getElements(), nBins);
+			for (double d : this.rawData.get(mode).getElements()) {
+				if (d < this.maxXYForPlotting) {
+					croppedData.add(d);
+				}
+			}
+			output.addSeries(mode, Utils.convert(croppedData), nBins);
 		}
 		return output;
 	}
