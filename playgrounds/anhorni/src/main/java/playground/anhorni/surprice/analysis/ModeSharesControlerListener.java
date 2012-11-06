@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.anhorni.surprice.analysis;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -28,6 +29,7 @@ import org.matsim.core.controler.listener.StartupListener;
 public class ModeSharesControlerListener implements StartupListener, IterationEndsListener {
 	private ModeSharesEventHandler handler;
 	private String xy;
+	private static final Logger log = Logger.getLogger(ModeSharesControlerListener.class);
 	
 	public ModeSharesControlerListener(String xy) {
 		this.xy = xy;
@@ -46,6 +48,7 @@ public class ModeSharesControlerListener implements StartupListener, IterationEn
 			.getIterationPath(event.getIteration());
 		handler.printInfo(event.getIteration());
 		handler.writeXYsGraphic(path+"/" + this.xy + "ByMode.png", 20);
+		log.info("--------------------------------------");
 	}
 }
 

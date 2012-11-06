@@ -59,8 +59,7 @@ import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
  * @author thibautd adapted by anhorni
  */
 public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler {
-	private static final Logger log =
-		Logger.getLogger(ModeSharesEventHandler.class);
+	private static final Logger log = Logger.getLogger(ModeSharesEventHandler.class);
 
 	// use euclidean distance rather than network distance, as linkEvents
 	// are not generated for non-car modes.
@@ -200,18 +199,17 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		long nLegs = this.getNumberOfLegs();
 		double totalXY = currentModeXYs.remove(ALL_MODES);
 
-		log.info("mode shares: ---------------------------");
 		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
 			if (this.xy.equals("times")) {
 				log.info("Share of " + mode.getKey() + ":\t" + "time [s]: "+ (100d*mode.getValue() / totalXY) +"%");
 			}
 			else {
-				log.info("Share of " + mode.getKey() + ":\t" + "distance [km]: "+ (100d*mode.getValue() / totalXY) +"%");
+				log.info("Share of " + mode.getKey() + ":\t" + "distance [km]: " + (100d*mode.getValue() / totalXY) +"%");
 			}
 		}
 		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
 			if (this.xy.equals("times")) {
-				log.info("number of legs: "+ (100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
+				log.info("Share of " + mode.getKey() + ":\t" + "number of legs: "+ (100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
 			}
 		}
 	}
