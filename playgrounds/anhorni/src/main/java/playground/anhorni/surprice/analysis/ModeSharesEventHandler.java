@@ -149,24 +149,21 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		}
 		double xyVal = 0.0;
 		if (this.xy.equals("times")) {
-			xyVal = this.computeTimes(arrivalEvent, departureEvent, rawDataElement, frequency);
+			xyVal = this.computeTimes(arrivalEvent, departureEvent);
 		}
 		else {
-			xyVal = this.computeDistances(arrivalEvent, departureEvent, rawDataElement, frequency);
+			xyVal = this.computeDistances(arrivalEvent, departureEvent);
 		}
 		// remember data
 		frequency.addValue(xyVal);
 		rawDataElement.addElement(xyVal);
 	}
 		
-	private double computeTimes(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent,
-			ResizableDoubleArray rawDataElement, Frequency frequency) {
-		double time = arrivalEvent.getTime() - departureEvent.getTime();
-		return time;
+	private double computeTimes(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent) {
+		return (arrivalEvent.getTime() - departureEvent.getTime());
 	}
 	
-	private double computeDistances(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent,
-			ResizableDoubleArray rawDataElement, Frequency frequency) {
+	private double computeDistances(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent) {
 		Link departureLink;
 		Link arrivalLink;
 		double distance;
