@@ -19,6 +19,10 @@
 
 package playground.anhorni.surprice;
 
+import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
+import herbie.running.controler.listeners.LegDistanceDistributionWriter;
+import herbie.running.controler.listeners.ScoreElements;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -28,8 +32,12 @@ public class DayControler extends Controler {
 	
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
-	ObjectAttributes incomes;
-	ObjectAttributes preferences;
+	private ObjectAttributes preferences;
+	
+	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
+	protected static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
+	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
+	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 	
 	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(config);	
@@ -48,5 +56,8 @@ public class DayControler extends Controler {
 	  	
 	  	//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!
 	  	this.addControlerListener(new Memorizer(this.memories, this.day));
+	  	this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
+		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
+		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.scenarioData.getNetwork()));
 	}
 }
