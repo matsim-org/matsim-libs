@@ -56,9 +56,10 @@ public class LegModeDistanceDistribution {
 
 //	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase_ctd/";
 //	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_pricing_x10/";
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
+//	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_policyCase_zone30/";
+	private static String runDirectory = "../../runs-svn/detEval/mobilTUM/run20/";
 	
-	private static String initialIterationNo = "1000";
+	private static String initialIterationNo = "0";
 	private static String finalIterationNo = null;
 	
 	private static String initialPlansFile = runDirectory + "ITERS/it." + initialIterationNo + "/" + initialIterationNo + ".plans.xml.gz";
@@ -211,6 +212,7 @@ public class LegModeDistanceDistribution {
 		return modeDifference2DistanceClassNoOfLegs;
 	}
 
+	// TODO: needed!
 	private SortedMap<String, Double> calculateModeShareDifference(SortedMap<String, Double> initialMode2Share,	SortedMap<String, Double> finalMode2Share) {
 		SortedMap<String, Double> mode2ShareDiff = new TreeMap<String, Double>();
 		
