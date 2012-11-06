@@ -72,7 +72,7 @@ public class IdentifySpotsAtPtRough {
 		log.info( "search for links nearby stops" );
 		Counter linkCounter = new Counter( "hitch-hiking link # " );
 		List<Link> hhLinks = new ArrayList<Link>();
-		for (Coord coord : ptStopsCoordParser.coords.getCoords()) {
+		for (Coord coord : ptStopsCoordParser.coords.coords) {
 			linkCounter.incCounter();
 			hhLinks.add( carNetwork.getNearestLink( coord ) );
 		}
@@ -99,7 +99,7 @@ public class IdentifySpotsAtPtRough {
 	}
 
 	private static class Parser extends MatsimXmlParser {
-		public final CoordTree coords = new CoordTree();
+		public final Coords coords = new Coords();
 		private final Counter accCount = new Counter( "ACCEPTED Stop coord # " );
 		private final Counter rejCount = new Counter( "REJECTED Stop coord # " );
 
@@ -130,50 +130,16 @@ public class IdentifySpotsAtPtRough {
 		}
 	}
 
-	/**
-	 * A simple binary tree which only adds coords at more
-	 * than MIN_DIST of an already known coord.
-	 */
-	private static class CoordTree {
-		public Coord c = null;
-		public CoordTree left = null;
-		public CoordTree right = null;
+	private static class Coords {
+		private final List<Coord> coords = new ArrayList<Coord>();
 
 		public boolean add(final Coord toAdd) {
-			if ( c == null ) {
-				c = toAdd;
-				return true;
+			for (Coord c : coords) {
+				if ( CoordUtils.calcDistance( c , toAdd ) < MIN_DIST ) {
+					return false;
+				}
 			}
-
-			if ( !allow( toAdd ) ) return false;
-
-			if ( toAdd.getX() < c.getX() ) {
-				if ( left == null ) left = new CoordTree();
-				return left.add( toAdd );
-			}
-
-			if ( right == null ) right = new CoordTree();
-			return right.add( toAdd );
-		}
-
-		private boolean allow(final Coord coord) {
-			return CoordUtils.calcDistance( coord, c ) > MIN_DIST &&
-				// if the "dangerous area" for the coord intersects the left or right
-				// side, go down to check for a chalenger.
-				(left == null || coord.getX() - MIN_DIST > c.getX() || left.allow( coord )) &&
-				(right == null || coord.getX() + MIN_DIST < c.getX() || right.allow( coord ));
-		}
-
-		public Collection<Coord> getCoords() {
-			List<Coord> coords = new ArrayList<Coord>();
-			fill( coords );
-			return coords;
-		}
-
-		private void fill(final List<Coord> coords) {
-			if ( c != null) coords.add( c );
-			if ( left != null ) left.fill( coords );
-			if ( right != null ) right.fill( coords );
+			return coords.add( toAdd );
 		}
 	}
 }
