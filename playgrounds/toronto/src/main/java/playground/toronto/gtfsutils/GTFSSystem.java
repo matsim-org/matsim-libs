@@ -105,12 +105,11 @@ public class GTFSSystem {
 			"shape_pt_sequence",
 			"shape_dist_traveled"});
 
-	
-	
 	private TreeMap<Id, Stop> stops;
 	private TreeMap<Id, Route> routes;
 	private TreeMap<Id, Service> services;
 	private TreeMap<Id, Shape> shapes;
+	private TreeMap<Id, Frequency> frequencies;
 	private HashMap<String, Route> tripToRoute; //tripId -> routeId
 	
 	//CONSTRUCTOR--------------------------------------------------------------------------------------------------------------------------
@@ -181,7 +180,7 @@ public class GTFSSystem {
 			this.routes.clear();
 			while (tr.next()){
 				Id routeId = new IdImpl(tr.current().get("route_id"));
-				Route r = new Route(tr.current().get("route_short_name"), getWayType(Integer.parseInt(tr.current().get("route_type")))); //TODO: check that this works.
+				Route r = new Route(tr.current().get("route_short_name"), getWayType(Integer.parseInt(tr.current().get("route_type")))); 
 				this.routes.put(routeId, r);
 			}
 			tr.close();
@@ -240,15 +239,33 @@ public class GTFSSystem {
 				t.putStopTime(seq, st);				
 			}
 			tr.close();
-			this.tripToRoute.clear(); //No longer needed. Clear to free up memory.
+			//this.tripToRoute.clear(); //No longer needed. Clear to free up memory.
 		}
 		
 		private void loadShapes(String filename){
 			//TODO implement shapes file loading.
 		}
 		
-		private void loadFrequencies(String filename){
-			//TODO implement frequencies file loading.
+		private void loadFrequencies(String filename) throws FileNotFoundException, IOException{
+			TableReader tr = new TableReader(filename);
+			tr.open();
+			if (!tr.checkHeaders(frequenciesFileHeaders)) throw new IOException("Frequencies file is incorrectly formatted!");
+			
+			while (tr.next()){
+				int headway = Integer.parseInt(tr.current().get("headway_secs"));
+				Date startTime = new Date();
+				startTime.setTime((int)(Time.parseTime(tr.current().get("start_time")) * 1000));
+				Date endTime = new Date();
+				endTime.setTime((int)(Time.parseTime(tr.current().get("end_time")) * 1000));
+				
+				Frequency f = new Frequency(startTime, endTime, headway);
+				
+				Route route = this.tripToRoute.get(tr.current().get("trip_id"));
+				Trip trip = route.getTrips().get(tr.current().get("trip_id"));
+				trip.addFrequency(f);
+			}
+			
+			tr.close();
 		}
 
 		//PUBLIC METHODS-----------------------------------------------------------------------------------------------------------------------
@@ -320,8 +337,7 @@ public class GTFSSystem {
 		}
 		
 		public TreeMap<Id, Frequency> getFrequencies(){
-			//TODO: Get the frequencies map.
-			return null;
+			return this.frequencies;
 		}
 		
 		public Service getService(String id){

@@ -57,30 +57,6 @@ public class RunToronto {
 		Controler controller = new Controler(scenario);
 		controller.setOverwriteFiles(true);
 		
-		/*
-		//Determine start time of simulation
-		double startTime = Double.MAX_VALUE;
-		//Check transit schedule
-		if (config.scenario().isUseTransit()){
-			TransitSchedule schedule = scenario.getTransitSchedule();
-			for (TransitLine l : schedule.getTransitLines().values()){
-				for (TransitRoute r : l.getRoutes().values()){
-					for (Departure d : r.getDepartures().values()){
-						if (d.getDepartureTime() < startTime) startTime = d.getDepartureTime();
-					}
-				}
-			}
-		}
-		//Check plans
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			PlanImpl P = (PlanImpl) p.getSelectedPlan();
-			if (P.getFirstActivity().getEndTime() < startTime) startTime = P.getFirstActivity().getEndTime();
-		}
-		
-		log.info("Start time of simulation = " + Time.writeTime(startTime));		
-		config.getQSimConfigGroup().setStartTime(startTime);
-		*/
-		
 		controller.run();
 				
 	}

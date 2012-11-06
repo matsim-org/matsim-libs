@@ -25,19 +25,16 @@ package playground.toronto.router;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Cost calculator with mode-based differential boarding penalties.
- * 
- * CURRENTLY NEEDS WORK
+ * Cost calculator with mode-based differential boarding penalties. These boarding penalties are standard
+ * as required by GTAModel V2 and up.
  * 
  * @author pkucirek
  */
-@Deprecated
 public class TorontoTransitRouterNetworkTravelTimeAndDisutility extends UpgradedTransitNetworkTravelTimeAndDisutility {
 
 	private final double busWeight;
@@ -57,7 +54,7 @@ public class TorontoTransitRouterNetworkTravelTimeAndDisutility extends Upgraded
 
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		
-		double cost = super.getLinkTravelDisutility(link, time, person, vehicle, /* dataManager */ null); //TODO: figure out this data manager thing
+		double cost = super.getLinkTravelDisutility(link, time, person, vehicle, /* dataManager */ null); 
 			
 		if (link instanceof TransitRouterNetworkLink){			
 			if (((TransitRouterNetworkLink) link).getRoute() == null){

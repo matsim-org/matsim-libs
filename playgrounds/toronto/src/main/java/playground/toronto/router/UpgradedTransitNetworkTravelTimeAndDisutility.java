@@ -69,6 +69,8 @@ public class UpgradedTransitNetworkTravelTimeAndDisutility implements TravelTime
 			double walkTime = getWalkTime((TransitRouterNetworkLink)link, time) + this.config.additionalTransferTime;
 			double fareCost = this.fareCalc.getDisutilityOfTransferFare(person, vehicle, (TransitRouterNetworkLink)link, time);
 			
+			//TODO: Figure out how to use the CustomDataManager to store transit fares.
+			
 			cost = -walkTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
 				       - waitTime * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 				       - this.config.getUtilityOfLineSwitch_utl()
