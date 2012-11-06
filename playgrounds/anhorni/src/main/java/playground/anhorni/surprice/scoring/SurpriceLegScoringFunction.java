@@ -75,6 +75,11 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
         this.gamma = gamma;
         this.alphaTrip = alphaTrip;
         
+        this.constantCar = this.params.constantCar;
+    	this.constantPt = this.params.constantPt;
+    	this.constantBike = this.params.constantBike;
+    	this.constantWalk = this.params.constantWalk; 
+        
 		this.reset();		
 				
 		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
@@ -82,12 +87,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		}
 	}
         
-    private void adaptCoefficientsLagged() {
-    	this.constantCar = this.params.constantCar;
-    	this.constantPt = this.params.constantPt;
-    	this.constantBike = this.params.constantBike;
-    	this.constantWalk = this.params.constantWalk;  
-    	
+    private void adaptCoefficientsLagged() {    	
     	double f_lagged = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "f_lagged"));
     	
 		// adapt for tue - sun: 
