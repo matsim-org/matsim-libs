@@ -90,7 +90,6 @@ public class DefaultAnalysis {
 			}
 		}
 		
-		// TODO: what if there are no events in the directory? bk oct'12
 		if(this.eventsFile == null){
 			log.warn("You did not provide any events file for analyis.");
 			log.warn("Make sure if this is what you want. Analysis modules " +
