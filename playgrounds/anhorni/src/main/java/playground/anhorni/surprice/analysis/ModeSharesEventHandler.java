@@ -145,7 +145,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 			this.rawData.put(mode, rawDataElement);
 		}
 		double xyVal = 0.0;
-		if (this.xy.equals("time")) {
+		if (this.xy.equals("times")) {
 			xyVal = this.computeTimes(arrivalEvent, departureEvent, rawDataElement, frequency);
 		}
 		else {
@@ -202,7 +202,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 
 		log.info("mode shares: ---------------------------");
 		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
-			if (this.xy.equals("time")) {
+			if (this.xy.equals("times")) {
 				
 			}
 			else {
@@ -270,7 +270,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	private JFreeChart getTraveledXYsHistogram(final int numberOfBins) {
 		String title = this.xy + " distribution by mode";
 		String xLabel = "distance (m)";
-		if (this.xy.equals("time")) {
+		if (this.xy.equals("times")) {
 			xLabel = "time (s)";
 		}		
 		String yLabel = "number of trips";
