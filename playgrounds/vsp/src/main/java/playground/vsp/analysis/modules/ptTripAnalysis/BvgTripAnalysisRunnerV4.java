@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis;
+package playground.vsp.analysis.modules.ptTripAnalysis;
 
 
 /**

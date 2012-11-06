@@ -17,13 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.distance;
+package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTripSet;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTripSet;
 
 import com.vividsolutions.jts.geom.Geometry;
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis;
+package playground.vsp.analysis.modules.ptTripAnalysis;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,10 +25,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import playground.andreas.aas.modules.ptTripAnalysis.distance.DistAnalysisTripI;
-import playground.andreas.aas.modules.ptTripAnalysis.distance.DistanceAnalysisTripSet;
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.TTAnalysisTripI;
-import playground.andreas.aas.modules.ptTripAnalysis.traveltime.TTAnalysisTripSet;
+import playground.vsp.analysis.modules.ptTripAnalysis.distance.DistAnalysisTripI;
+import playground.vsp.analysis.modules.ptTripAnalysis.distance.DistanceAnalysisTripSet;
+import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTAnalysisTripI;
+import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTAnalysisTripSet;
 
 import com.vividsolutions.jts.geom.Geometry;
 

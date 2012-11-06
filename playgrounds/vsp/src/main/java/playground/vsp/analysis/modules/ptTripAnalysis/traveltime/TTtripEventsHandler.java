@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
+package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,8 +45,8 @@ import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
-import playground.andreas.aas.modules.ptTripAnalysis.AnalysisTripSetStorage;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
+import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
 
 import com.vividsolutions.jts.geom.Geometry;
 

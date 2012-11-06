@@ -17,12 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
+package playground.vsp.analysis.modules.ptTripAnalysis;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder
  *
  */
-public interface TTAnalysisTripI {
+public abstract class AbstractAnalysisTrip {
+	private Coordinate start;
+	private Coordinate end;
+	private String mode = null;
+	
+	
+	public String getMode(){
+		return this.mode;
+	}
+	
+	public void setMode(String mode){
+		this.mode = mode;
+	}
 
+	public Point getStart() {
+		return new GeometryFactory().createPoint(start);
+	}
+
+	public void setStart(Coordinate start) {
+		this.start = start;
+	}
+
+	public Point getEnd() {
+		return new GeometryFactory().createPoint(end);
+	}
+
+	public void setEnd(Coordinate end) {
+		this.end = end;
+	}
+	
+	
 }

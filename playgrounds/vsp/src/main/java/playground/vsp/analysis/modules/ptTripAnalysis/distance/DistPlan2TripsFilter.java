@@ -17,14 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.distance;
+package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.population.PlanElement;
 
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 
 /**
  * @author droeder

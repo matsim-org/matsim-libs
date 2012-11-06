@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.distance;
+package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -38,20 +39,21 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTripSet;
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
-import playground.andreas.aas.modules.ptTripAnalysis.AnalysisTripSetStorage;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTripSet;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
+import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
- *
+ * actually this class is compiling, but not running
  */
+@Deprecated
 public class DistanceAnalysis {
+	//TODO[dr] debugging
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
 	
 	private DistAnalysisHandler eventsHandler;
@@ -66,6 +68,7 @@ public class DistanceAnalysis {
 		this.eventsHandler.addZones(zones);
 	}
 	
+
 	public void run(String plans, String network, String events, String outDir){
 		this.readPlansAndNetwork(plans, network);
 		log.info("streaming plans finished!");

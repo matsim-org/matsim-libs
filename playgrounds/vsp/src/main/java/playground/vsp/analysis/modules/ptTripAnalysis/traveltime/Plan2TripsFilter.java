@@ -17,69 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.distance;
+package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.population.PlanElement;
 
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 
 /**
  * @author droeder
  *
  */
-public class DistAnalysisAgent {
+public class Plan2TripsFilter extends AbstractPlan2TripsFilter{
 	
-	private LinkedList<AbstractAnalysisTrip> trips;
-	private Id id;
+	private Collection<String> networkmodes;
+	private Collection<String> ptModes;
 	
-	public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id id){
-		this.trips = linkedList;
-		this.id = id;
-	}
-	
-	/**
-	 * returns true true if the trip is finished
-	 * @param e
-	 * @return
-	 */
-	public boolean processAgentEvent(Event e) {
-		((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
-		return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();
+	public Plan2TripsFilter(Collection<String> ptModes, Collection<String> networkModes) {
+		this.ptModes = ptModes;
+		this.networkmodes = networkModes;
 	}
 
-	public void processLinkEnterEvent(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).processLinkEnterEvent(length);
-	}
-	
-	public void passedLinkInPt(double length) {
-		((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
-	}
-
-	public Id getId(){
-		return this.id;
-	}
-	
 	@Override
-	public boolean equals(final Object other){
-		if(!(other instanceof DistAnalysisAgent)){
-			return false;
-		}else{
-			if(((DistAnalysisAgent) other).getId().equals(this.id)){
-				return true;
-			}else{
-				return false;
-			}
-		}
+	protected TTAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
+		TTAnalysisTrip trip = new TTAnalysisTrip(this.ptModes, this.networkmodes);
+		trip.addElements(elements);
+		return trip;
 	}
-
-	/**
-	 * @return
-	 */
-	public AbstractAnalysisTrip removeFinishedTrip() {
-		return this.trips.removeFirst();
-	}
+	
 
 }

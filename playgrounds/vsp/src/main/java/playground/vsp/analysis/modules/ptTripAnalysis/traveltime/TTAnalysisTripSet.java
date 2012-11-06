@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
+package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -28,8 +28,8 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTrip;
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTripSet;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTripSet;
 
 import com.vividsolutions.jts.geom.Geometry;
 

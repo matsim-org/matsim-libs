@@ -17,80 +17,69 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.distance;
+package playground.vsp.analysis.modules.ptTripAnalysis.distance;
+
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
+
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 
 /**
  * @author droeder
  *
  */
-public class DistAnalysisTransitRoute {
+public class DistAnalysisAgent {
 	
+	private LinkedList<AbstractAnalysisTrip> trips;
 	private Id id;
-	private double travelDistance = 0;
-	private double trafficPerformance = 0;
-	private int transportedPersons = 0;
-
-	/**
-	 * @param transitRouteId
-	 */
-	public DistAnalysisTransitRoute(Id transitRouteId) {
-		this.id = transitRouteId;
-	}
 	
-	public void countPassenger(){
-		this.transportedPersons++;
+	public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id id){
+		this.trips = linkedList;
+		this.id = id;
 	}
 	
 	/**
-	 * @param linkLength
-	 * @param nrOfDrivingPassengers
+	 * returns true true if the trip is finished
+	 * @param e
+	 * @return
 	 */
-	public void passedLink(double linkLength, int nrOfDrivingPassengers) {
-		this.travelDistance += linkLength;
-		this.trafficPerformance += (linkLength * nrOfDrivingPassengers);
+	public boolean processAgentEvent(Event e) {
+		((DistAnalysisTrip) this.trips.getFirst()).processAgentEvent(e);
+		return ((DistAnalysisTrip) this.trips.getFirst()).isFinished();
 	}
 
-	/**
-	 * @return the travelDistance
-	 */
-	public double getTravelDistance() {
-		return travelDistance;
+	public void processLinkEnterEvent(double length) {
+		((DistAnalysisTrip) this.trips.getFirst()).processLinkEnterEvent(length);
+	}
+	
+	public void passedLinkInPt(double length) {
+		((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
 	}
 
-	/**
-	 * @return the trafficPerformance
-	 */
-	public double getTrafficPerformance() {
-		return trafficPerformance;
-	}
-
-	/**
-	 * @return the transportedPersons
-	 */
-	public int getTransportedPersons() {
-		return transportedPersons;
-	}
-
-	/**
-	 * @return the id
-	 */
-	public Id getId() {
-		return id;
-	}
-
-	public String toString(boolean header){
-		StringBuffer b =  new StringBuffer();
-		if(header){
-			b.append("RouteId;Distance [m];nr of Pers. * meters ; transported Persons\n");
-		}
-		b.append(this.id.toString() + ";" + this.travelDistance + ";" + this.trafficPerformance + ";" + this.transportedPersons + "\n");
-		return b.toString();
+	public Id getId(){
+		return this.id;
 	}
 	
 	@Override
-	public String toString(){
-		return this.toString(true);
+	public boolean equals(final Object other){
+		if(!(other instanceof DistAnalysisAgent)){
+			return false;
+		}else{
+			if(((DistAnalysisAgent) other).getId().equals(this.id)){
+				return true;
+			}else{
+				return false;
+			}
+		}
 	}
+
+	/**
+	 * @return
+	 */
+	public AbstractAnalysisTrip removeFinishedTrip() {
+		return this.trips.removeFirst();
+	}
+
 }

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.distance;
+package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
 import org.matsim.api.core.v01.Id;
 
@@ -25,36 +25,72 @@ import org.matsim.api.core.v01.Id;
  * @author droeder
  *
  */
-public class DistAnalysisPtDriver {
+public class DistAnalysisTransitRoute {
 	
 	private Id id;
-	private DistAnalysisVehicle vehicle = null;
-	private double distance = 0;
+	private double travelDistance = 0;
+	private double trafficPerformance = 0;
+	private int transportedPersons = 0;
 
 	/**
-	 * @param driverId
-	 * @param id 
+	 * @param transitRouteId
 	 */
-	public DistAnalysisPtDriver(Id driverId) {
-		this.id  = driverId;
-	}
-
-	/**
-	 * @param v
-	 */
-	public void registerVehicle(DistAnalysisVehicle v) {
-		this.vehicle = v;
-	}
-
-	/**
-	 * @param length
-	 */
-	public void processLinkEnterEvent(double length) {
-		this.vehicle.processLinkEnterEvent(length);		
-		this.distance += length;
+	public DistAnalysisTransitRoute(Id transitRouteId) {
+		this.id = transitRouteId;
 	}
 	
-	public Id getId(){
-		return this.id;
+	public void countPassenger(){
+		this.transportedPersons++;
+	}
+	
+	/**
+	 * @param linkLength
+	 * @param nrOfDrivingPassengers
+	 */
+	public void passedLink(double linkLength, int nrOfDrivingPassengers) {
+		this.travelDistance += linkLength;
+		this.trafficPerformance += (linkLength * nrOfDrivingPassengers);
+	}
+
+	/**
+	 * @return the travelDistance
+	 */
+	public double getTravelDistance() {
+		return travelDistance;
+	}
+
+	/**
+	 * @return the trafficPerformance
+	 */
+	public double getTrafficPerformance() {
+		return trafficPerformance;
+	}
+
+	/**
+	 * @return the transportedPersons
+	 */
+	public int getTransportedPersons() {
+		return transportedPersons;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Id getId() {
+		return id;
+	}
+
+	public String toString(boolean header){
+		StringBuffer b =  new StringBuffer();
+		if(header){
+			b.append("RouteId;Distance [m];nr of Pers. * meters ; transported Persons\n");
+		}
+		b.append(this.id.toString() + ";" + this.travelDistance + ";" + this.trafficPerformance + ";" + this.transportedPersons + "\n");
+		return b.toString();
+	}
+	
+	@Override
+	public String toString(){
+		return this.toString(true);
 	}
 }

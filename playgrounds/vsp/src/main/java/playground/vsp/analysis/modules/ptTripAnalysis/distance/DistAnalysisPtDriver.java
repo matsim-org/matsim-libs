@@ -17,35 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
+package playground.vsp.analysis.modules.ptTripAnalysis.distance;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.matsim.api.core.v01.population.PlanElement;
-
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author droeder
  *
  */
-public class Plan2TripsFilter extends AbstractPlan2TripsFilter{
+public class DistAnalysisPtDriver {
 	
-	private Collection<String> networkmodes;
-	private Collection<String> ptModes;
-	
-	public Plan2TripsFilter(Collection<String> ptModes, Collection<String> networkModes) {
-		this.ptModes = ptModes;
-		this.networkmodes = networkModes;
+	private Id id;
+	private DistAnalysisVehicle vehicle = null;
+	private double distance = 0;
+
+	/**
+	 * @param driverId
+	 * @param id 
+	 */
+	public DistAnalysisPtDriver(Id driverId) {
+		this.id  = driverId;
 	}
 
-	@Override
-	protected TTAnalysisTrip generateTrip(ArrayList<PlanElement> elements) {
-		TTAnalysisTrip trip = new TTAnalysisTrip(this.ptModes, this.networkmodes);
-		trip.addElements(elements);
-		return trip;
+	/**
+	 * @param v
+	 */
+	public void registerVehicle(DistAnalysisVehicle v) {
+		this.vehicle = v;
+	}
+
+	/**
+	 * @param length
+	 */
+	public void processLinkEnterEvent(double length) {
+		this.vehicle.processLinkEnterEvent(length);		
+		this.distance += length;
 	}
 	
-
+	public Id getId(){
+		return this.id;
+	}
 }

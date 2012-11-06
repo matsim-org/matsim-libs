@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.andreas.aas.modules.ptTripAnalysis.traveltime;
+package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,15 +34,17 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.andreas.aas.modules.AbstractAnalyisModule;
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractAnalysisTripSet;
-import playground.andreas.aas.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
-import playground.andreas.aas.modules.ptTripAnalysis.AnalysisTripSetStorage;
+import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTripSet;
+import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
+import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author aneumann, droeder
+ * 
+ * This class analyzes the trip-dependent traveltime per mode 
  *
  */
 public class TTtripAnalysis extends AbstractAnalyisModule{
@@ -53,6 +55,15 @@ public class TTtripAnalysis extends AbstractAnalyisModule{
 	private Collection<String> ptModes;
 	private Population population;
 	
+	
+	/**
+	 * 
+	 * @param ptModes, the modes specified in the {@link TransitConfigGroup}
+	 * @param networkModes, the modes specified in the {@link PlansCalcRouteConfigGroup}
+	 * @param ptDriverPrefix
+	 * @param population, the population corresponding to the analyzed eventsfile (i.e. analyze runId.iteration.events.xml.gz, use 
+	 * runId.iteration.plans.xml.gz!) 
+	 */
 	public TTtripAnalysis (Collection<String> ptModes, Collection<String> networkModes, String ptDriverPrefix, Population population){
 		super(TTtripAnalysis.class.getSimpleName(), ptDriverPrefix);
 		this.eventsHandler = new TTtripEventsHandler(ptModes);
@@ -137,7 +148,6 @@ public class TTtripAnalysis extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		// TODO[dr] Auto-generated method stub
 		
 	}
 }
