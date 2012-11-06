@@ -138,10 +138,10 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		 * End agent's current leg at the current link.
 		 * Check whether the agent is already on the routes last link.
 		 */
+		subRoute = new ArrayList<Id>();
 		if (currentLinkId.equals(currentRoute.getEndLinkId())) {
-			subRoute = currentRoute.getLinkIds();	
+			subRoute.addAll(currentRoute.getLinkIds());	
 		} else {
-			subRoute = new ArrayList<Id>();
 			subRoute.addAll(currentRoute.getLinkIds().subList(0, currentLinkIndex));
 		}
 		currentRoute.setLinkIds(currentRoute.getStartLinkId(), subRoute, currentLinkId);
