@@ -21,6 +21,7 @@ package playground.anhorni.surprice;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.roadpricing.RoadPricing;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
@@ -51,5 +52,6 @@ public class DayControler extends Controler {
 	  	this.addControlerListener(new Memorizer(this.memories, this.day));
 	  	this.addControlerListener(new ModeSharesControlerListener("times"));
 	  	this.addControlerListener(new ModeSharesControlerListener("distances"));
+	  	this.addControlerListener(new RoadPricing());
 	}
 }
