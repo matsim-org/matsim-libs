@@ -133,8 +133,16 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 			 */
 			if (toAct.getFacilityId().toString().equals("rescueFacility")) {
 				Path exitPath = evacuationRouter.calcExitPath(fromAct.getCoord(), depTime, person);
-				travelTime = exitPath.travelTime;
-				exitCoord = exitPath.nodes.get(exitPath.nodes.size() - 1).getCoord();
+				if (exitPath != null) {
+					travelTime = exitPath.travelTime;
+					exitCoord = exitPath.nodes.get(exitPath.nodes.size() - 1).getCoord();
+					
+					if (travelTime < Double.MAX_VALUE) {
+						// the person has been informed, therefore also the evacuation has already started
+						double penaltyFactor = EvacuationConfig.ptTravelTimePenaltyFactor;
+						travelTime *= penaltyFactor;
+					}
+				}
 			}
 			/*
 			 * other route
