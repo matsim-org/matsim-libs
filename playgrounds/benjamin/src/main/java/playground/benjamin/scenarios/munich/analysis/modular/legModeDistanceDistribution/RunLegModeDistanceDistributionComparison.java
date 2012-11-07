@@ -67,7 +67,7 @@ public class RunLegModeDistanceDistributionComparison {
 		SortedMap<String, Double> finalLegMode2Share = getMode2Share(rlmdd2);
 		SortedMap<String, Double> mode2ShareDifference = calculateLegModeShareDifference(initialLegMode2Share, finalLegMode2Share);
 	
-		// ugly code...
+		// begin ugly code...
 		List<AbstractAnalyisModule> anaModules = rlmdd1.getAnalysis().getAnaModules();
 		for(AbstractAnalyisModule anaModule : anaModules){
 			if(anaModule instanceof LegModeDistanceDistribution){
@@ -78,6 +78,7 @@ public class RunLegModeDistanceDistributionComparison {
 						+ iteration1 + "-" + iteration2 + "_");
 			}	
 		}
+		// end ugly code...
 	}
 	
 	private static SortedMap<String, Double> getMode2Share(RunLegModeDistanceDistribution rlmdd) {
