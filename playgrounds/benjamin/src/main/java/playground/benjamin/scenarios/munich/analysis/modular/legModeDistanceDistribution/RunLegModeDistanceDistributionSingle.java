@@ -36,6 +36,7 @@ public class RunLegModeDistanceDistributionSingle {
 	static String iteration = "0";
 	
 	static UserGroup userGroup = null;
+//	static UserGroup userGroup = UserGroup.URBAN;
 
 	public static void main(String[] args) {
 		Gbl.startMeasurement();

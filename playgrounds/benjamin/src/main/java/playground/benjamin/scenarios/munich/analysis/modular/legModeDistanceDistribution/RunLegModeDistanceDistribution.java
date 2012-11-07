@@ -46,6 +46,8 @@ public class RunLegModeDistanceDistribution {
 	String iteration;
 
 	UserGroup userGroup = null;
+
+	DefaultAnalysis analysis;
 	
 	public RunLegModeDistanceDistribution(String baseFolder, String configFile, String iteration, UserGroup userGroup){
 		this.baseFolder = baseFolder;
@@ -56,12 +58,12 @@ public class RunLegModeDistanceDistribution {
 	
 	void run() {
 		Scenario scenario = loadScenario();
-		DefaultAnalysis analysis = new DefaultAnalysis(scenario, baseFolder, this.iterationOutputDir, null, null);
-		analysis.init(null);
-		analysis.preProcess();
-		analysis.run();
-		analysis.postProcess();
-		analysis.writeResults();
+		this.analysis = new DefaultAnalysis(scenario, baseFolder, this.iterationOutputDir, null, null);
+		this.analysis.init(null);
+		this.analysis.preProcess();
+		this.analysis.run();
+		this.analysis.postProcess();
+		this.analysis.writeResults();
 	}
 
 	private Scenario loadScenario() {
@@ -87,19 +89,25 @@ public class RunLegModeDistanceDistribution {
 		new MatsimPopulationReader(scenario).readFile(popFile);
 		logger.info("Setting population to " + popFile);
 		
+		Scenario relevantScenario;
+		
 		if(this.userGroup == null){
 			logger.warn("Values are calculated for the whole population ...");
+			relevantScenario = scenario;
 		} else {
-			logger.warn("Values are calculated for " + this.userGroup + " ...");
+			logger.warn("Values are calculated for user group " + this.userGroup + " ...");
 			PersonFilter personFilter = new PersonFilter();
 			Population pop = scenario.getPopulation();
 			Population relevantPop = personFilter.getPopulation(pop, userGroup);
 
 			ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario((ConfigUtils.createConfig()));
 			sc.setPopulation(relevantPop);
-			ScenarioUtils.loadScenario(sc);
+			relevantScenario = sc;
 		}
-		
-		return scenario;
+		return relevantScenario;
+	}
+
+	protected DefaultAnalysis getAnalysis() {
+		return this.analysis;
 	}
 }

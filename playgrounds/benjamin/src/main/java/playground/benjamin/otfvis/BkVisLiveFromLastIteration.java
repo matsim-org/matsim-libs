@@ -60,9 +60,12 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 public class BkVisLiveFromLastIteration {
 	private static final Logger log = Logger.getLogger(BkVisLiveFromLastIteration.class);
 
-	private final static String runNumber = "981";
-	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
-	private final static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+//	private final static String runNumber = "981";
+//	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+//	private final static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+	
+	private final static String runDirectory = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+	private final static String configFile = runDirectory + "output_config.xml.gz";
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		args = new String[1];
@@ -99,7 +102,7 @@ public class BkVisLiveFromLastIteration {
 			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, config.controler().getRunId(), false);
 		}
 		else {
-			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, false);
+			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, true);
 		}
 		config.network().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		config.plans()
