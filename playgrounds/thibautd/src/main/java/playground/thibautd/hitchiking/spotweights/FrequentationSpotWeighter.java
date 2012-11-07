@@ -22,9 +22,10 @@ package playground.thibautd.hitchiking.spotweights;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
-import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -53,6 +54,9 @@ import playground.thibautd.hitchiking.HitchHikingConstants;
  * @author thibautd
  */
 public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEventHandler, StartupListener {
+	private static final Logger log =
+		Logger.getLogger(FrequentationSpotWeighter.class);
+
 	public static final String CONFIG_GROUP_NAME = "frequentationSpotWeighter";
 	public static final String CONFIG_PARAM_RATE = "learningRate";
 	public static final String CONFIG_PARAM_BASE_WEIGHT = "baseWeight";
@@ -64,8 +68,8 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 
 	private StatsWriter statsWriter = null;
 
-	private final Map<Id, WeightsPerTimeBin> weightsForDrivers = new TreeMap<Id, WeightsPerTimeBin>();
-	private final Map<Id, WeightsPerTimeBin> weightsForPassengers = new TreeMap<Id, WeightsPerTimeBin>();
+	private final Map<Id, WeightsPerTimeBin> weightsForDrivers = new ConcurrentHashMap<Id, WeightsPerTimeBin>();
+	private final Map<Id, WeightsPerTimeBin> weightsForPassengers = new ConcurrentHashMap<Id, WeightsPerTimeBin>();
 
 	private int currentIter = -1;
 
@@ -133,16 +137,21 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	// ///////////////////////////////////////////////////////////////////////////
 	@Override
 	public void reset(final int iteration) {
+		log.debug( "reset called" );
 		if (iteration > currentIter) {
+			log.debug( "update iteration number from "+currentIter+" to "+iteration );
 			currentIter = iteration;
 
 			if (writeInterval > 0 && iteration % writeInterval == 0) {
+				log.debug( "call statistics print" );
 				statsWriter.writeStats( iteration );
 			}
 
+			log.debug( "update weights for drivers" );
 			for (WeightsPerTimeBin ws  : weightsForDrivers.values()) {
 				for (MyDouble v : ws.weights.values()) v.value *= learningRate;
 			}
+			log.debug( "update weights for passengers" );
 			for (WeightsPerTimeBin ws : weightsForPassengers.values()) {
 				for (MyDouble v : ws.weights.values()) v.value *= learningRate;
 			}
@@ -176,9 +185,9 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	}
 
 	private class WeightsPerTimeBin {
-		private final Map<Integer, MyDouble> weights = new HashMap<Integer, MyDouble>();
+		private final Map<Integer, MyDouble> weights = new ConcurrentHashMap<Integer, MyDouble>();
 
-		public MyDouble getValue(final double time) {
+		public synchronized MyDouble getValue(final double time) {
 			int bin = (int) (time / binSize);
 			MyDouble v = weights.get( bin );
 
@@ -195,14 +204,18 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 			final Id key,
 			final double time,
 			final Map<Id, WeightsPerTimeBin> map) {
-		WeightsPerTimeBin val = map.get( key );
+		synchronized (map) {
+			if (log.isTraceEnabled()) log.trace( "getting value at "+key );
+			WeightsPerTimeBin val = map.get( key );
 
-		if (val == null) {
-			val = new WeightsPerTimeBin();
-			map.put( key , val );
+			if (val == null) {
+				if (log.isTraceEnabled()) log.trace( "creating value at "+key );
+				val = new WeightsPerTimeBin();
+				map.put( key , val );
+			}
+
+			return val.getValue( time );
 		}
-
-		return val.getValue( time );
 	}
 
 	private class StatsWriter {
