@@ -134,15 +134,15 @@ public class Analyzer {
 	private void analyzeDay(String eventsfile, String day, Config config, 
 			ArrayList<Double> utilitiesRelative, ArrayList<Double> utilitiesAbsolute) {
 		
-		this.utilityBins = new Bins(1, 9, day + "utilitiesPerIncome");
-		this.ttBins = new Bins(1, 9, day + "ttPerIncome");
-		this.tdBins = new Bins(1, 9, day + "tdPerIncome");
-		this.tolltdBins = new Bins(1, 9, day + "tolltdPerIncome");	
+		this.utilityBins = new Bins(1, 9, day + ".utilitiesPerIncome");
+		this.ttBins = new Bins(1, 9, day + ".ttPerIncome");
+		this.tdBins = new Bins(1, 9, day + ".tdPerIncome");
+		this.tolltdBins = new Bins(1, 9, day + ".tolltdPerIncome");	
 		
-		this.modeBins.put("car", new Bins(1, 9, day + "carPerIncome"));
-		this.modeBins.put("pt", new Bins(1, 9, day + "ptPerIncome"));
-		this.modeBins.put("bike", new Bins(1, 9, day + "bikePerIncome"));
-		this.modeBins.put("walk", new Bins(1, 9, day + "walkPerIncome"));
+		this.modeBins.put("car", new Bins(1, 9, day + ".carPerIncome"));
+		this.modeBins.put("pt", new Bins(1, 9, day + ".ptPerIncome"));
+		this.modeBins.put("bike", new Bins(1, 9, day + ".bikePerIncome"));
+		this.modeBins.put("walk", new Bins(1, 9, day + ".walkPerIncome"));
 		
 		log.info("	analyzing travel distances ...");
 		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork(), this.tdBins, this.incomes);			
@@ -194,6 +194,7 @@ public class Analyzer {
 		this.ttBins.plotBinnedDistribution(outPath, "income", "");
 		this.tdBins.plotBinnedDistribution(outPath, "income", "");
 		this.tolltdBins.plotBinnedDistribution(outPath, "income", "");
+		
 		for (Bins bins : this.modeBins.values()) {
 			bins.plotBinnedDistribution(outPath, "income", "");
 		}
@@ -243,8 +244,7 @@ public class Analyzer {
 					Leg leg = (Leg) pe;
 					String mode = leg.getMode();
 					Bins bins = this.modeBins.get(mode);
-					double val = bins.getBins()[(int)income];
-					bins.addVal(income, val + 1.0);
+					bins.addVal(income, 1.0);
 				}
 			}
 		}
