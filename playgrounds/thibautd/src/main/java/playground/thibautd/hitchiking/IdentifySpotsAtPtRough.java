@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
@@ -43,7 +44,11 @@ import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 /**
- * chooses car links near PT stops
+ * chooses car links near PT stops.
+ * It chooses the shortest link ending on nodes near PT stops,
+ * as the QSim simulates the last link but not the first.
+ * The "shortest" part is here to (1) identify on single link
+ * (2) avoid big detours for drivers passing nearby.
  * @author thibautd
  */
 public class IdentifySpotsAtPtRough {
@@ -71,11 +76,21 @@ public class IdentifySpotsAtPtRough {
 
 		log.info( "search for links nearby stops" );
 		Counter linkCounter = new Counter( "hitch-hiking link # " );
-		List<Link> hhLinks = new ArrayList<Link>();
+		Collection<Link> hhLinks = new ArrayList<Link>();
 		for (Coord coord : ptStopsCoordParser.coords.coords) {
 			linkCounter.incCounter();
-			hhLinks.add( carNetwork.getNearestLink( coord ) );
+			Node n = carNetwork.getNearestNode( coord );
+
+			Link toAdd = null;
+			for ( Link l : n.getInLinks().values() ) {
+				if ( toAdd == null || toAdd.getLength() > l.getLength() ) toAdd = l;
+			}
+			if ( toAdd == null ) throw new RuntimeException( "TODO: search only for nodes with incoming links" );
+
+			hhLinks.add( toAdd );
 		}
+		linkCounter.printCounter();
+		logInfo( hhLinks );
 
 		log.info( "write link Ids to "+spotsOutFile );
 		HitchHikingUtils.writeFile(
@@ -83,6 +98,15 @@ public class IdentifySpotsAtPtRough {
 					carNetwork,
 					hhLinks),
 				spotsOutFile);
+	}
+
+	private static void logInfo(final Collection<Link> hhLinks) {
+		List<Link> known = new ArrayList<Link>();
+
+		for (Link l : hhLinks) {
+			if (known.contains( l )) log.info( l.getId()+" appears more than once" );
+			else known.add( l );
+		}
 	}
 
 	private static NetworkImpl getCarNetwork( final String netFile ) {
