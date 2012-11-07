@@ -218,9 +218,10 @@ public class DriverRouteHandler implements HitchHikingHandler {
 					currentDestination);
 			routeToNextDest = r.getLinkIds().iterator();
 
-			// XXX: this assumes cost of distance for hitch hiking in scoring f.
-			double dist = RouteUtils.calcDistance( r , network );
-			double bonusPerPerson = -passengers.size() * (dist * costOfDistance) /
+			// XXX: this assumes no cost of distance for hitch hiking in scoring f.
+			double dist = RouteUtils.calcDistance( r , network ) +
+				network.getLinks().get( r.getEndLinkId() ).getLength();
+			double malusPerPerson = (dist * costOfDistance) /
 									(passengers.size() + 1d);
 
 			for (MobsimAgent p : passengers) {
@@ -231,19 +232,19 @@ public class DriverRouteHandler implements HitchHikingHandler {
 							p.getId(),
 							agent.getId(),
 							pickUpLink));
-				log.info( "passenger "+p.getId()+" gets bonus "+bonusPerPerson );
+				if (log.isTraceEnabled()) log.trace( "passenger "+p.getId()+" gets bonus "+malusPerPerson );
 				events.processEvent(
 						events.getFactory().createAgentMoneyEvent(
 							now,
 							p.getId(),
-							bonusPerPerson));
+							malusPerPerson));
 			}
-			log.info( "driver "+agent.getId()+" gets bonus "+bonusPerPerson );
+			if (log.isTraceEnabled()) log.trace( "driver "+agent.getId()+" gets bonus "+malusPerPerson );
 			events.processEvent(
 					events.getFactory().createAgentMoneyEvent(
 						now,
 						agent.getId(),
-						bonusPerPerson));
+						malusPerPerson));
 		}
 		else {
 			passengers = null;

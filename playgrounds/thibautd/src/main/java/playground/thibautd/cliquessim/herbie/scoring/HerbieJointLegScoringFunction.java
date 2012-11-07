@@ -39,6 +39,7 @@ import herbie.running.pt.DistanceCalculations;
 import herbie.running.scoring.TravelScoringFunction;
 
 import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.hitchiking.HitchHikingConstants;
 
 /**
  * @author thibautd
@@ -133,6 +134,11 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 				* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			tmpScore += travelScoring.getBikeScore(distance, travelTime);
 			
+		}
+		else if (HitchHikingConstants.DRIVER_MODE.equals(leg.getMode()) ||
+				HitchHikingConstants.PASSENGER_MODE.equals( leg.getMode() ) ) {
+			// distance is handled by a money event in the QSim
+			tmpScore += travelScoring.getCarScore(0, travelTime);
 		}
 		else {
 			double dist = 0.0;
