@@ -63,11 +63,11 @@ public class TorontoTransitRouterNetworkTravelTimeAndDisutility extends Upgraded
 				TransitRouterNetworkNode toStop = (TransitRouterNetworkNode) link.getToNode();
 				String mode = toStop.route.getTransportMode();
 				
-				if (mode.equals("Bus") || mode.equals("bus")){
+				if (mode.equals("Bus") || mode.equals("bus") || mode.equals("BUS")){
 					return cost - this.busWeight;
-				}else if (mode.equals("Streetcar") || mode.equals("streetcar") || mode.equals("tram")){
+				}else if (mode.equals("Streetcar") || mode.equals("streetcar") || mode.equals("tram") || mode.equals("TRAM")){
 					return cost - this.streetcarWeight;
-				}else if (mode.equals("Subway") || mode.equals("subway")){
+				}else if (mode.equals("Subway") || mode.equals("subway") || mode.equals("SUBWAY")){
 					return cost - this.subwayWeight;
 				}else{
 					return cost;

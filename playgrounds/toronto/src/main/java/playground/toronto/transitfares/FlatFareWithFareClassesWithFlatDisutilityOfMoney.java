@@ -22,6 +22,12 @@ public class FlatFareWithFareClassesWithFlatDisutilityOfMoney implements FareCal
 	private final Map<String, Double> fares; //Fare class name -> Flat fare value 
 	private final FareClasser classifier;
 	
+	/**
+	 * @param disutilityOfMoney Disutility = disUtilityOfMoney * fare.
+	 * @param defaultFare A default fare to be used if the fare classer doesn't work.
+	 * @param fares A dictionary mapping personalized fare class (as a string) to the fare paid by that class.
+	 * @param classifier A {@link FareClasser} which converts a {@link Person} to a fare class string.
+	 */
 	public FlatFareWithFareClassesWithFlatDisutilityOfMoney(double disutilityOfMoney, double defaultFare,
 			Map<String, Double> fares, FareClasser classifier){
 		this.defaultFare = defaultFare;
