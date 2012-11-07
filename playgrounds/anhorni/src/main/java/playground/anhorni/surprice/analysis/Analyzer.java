@@ -24,10 +24,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -58,6 +61,8 @@ public class Analyzer {
 	private double tolltdSumIncomeWeighted[] = new double[8];
 	private double ttSumIncomeWeighted[] = new double[8];
 	
+	private TreeMap<String, Bins> modeBins = new TreeMap<String, Bins>();
+	
 	private Bins utilityBins;
 	private Bins ttBins;
 	private Bins tdBins;
@@ -69,6 +74,8 @@ public class Analyzer {
 	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
 	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt");
 	private SupriceBoxPlot boxPlotTravelDistancesCar = new SupriceBoxPlot("Travel Distances Car", "Day", "td");
+	
+	private String outPath;
 	
 	
 	public static void main (final String[] args) {		
@@ -92,21 +99,16 @@ public class Analyzer {
 		
 		this.config = ConfigUtils.loadConfig(configFile);
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		
-		this.utilityBins = new Bins(1, 9, "utilitiesPerIncome");
-		this.ttBins = new Bins(1, 9, "ttPerIncome");
-		this.tdBins = new Bins(1, 9, "tdPerIncome");
-		this.tolltdBins = new Bins(1, 9, "tolltdPerIncome");
 	}
 		
 	public void run() {
 		log.info("Starting analysis .... ");
-		String outPath = config.controler().getOutputDirectory();
-		this.analyze(outPath);
+		outPath = config.controler().getOutputDirectory();
+		this.analyze();
 		log.info("=================== Finished analyses ====================");
 	}
 		
-	public void analyze(String outPath) {		
+	public void analyze() {		
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());		
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
 		
@@ -126,11 +128,21 @@ public class Analyzer {
 		
 			this.scenario.getPopulation().getPersons().clear();
 		}	
-		this.write(outPath);
+		this.write();
 	}
 	
 	private void analyzeDay(String eventsfile, String day, Config config, 
 			ArrayList<Double> utilitiesRelative, ArrayList<Double> utilitiesAbsolute) {
+		
+		this.utilityBins = new Bins(1, 9, day + "utilitiesPerIncome");
+		this.ttBins = new Bins(1, 9, day + "ttPerIncome");
+		this.tdBins = new Bins(1, 9, day + "tdPerIncome");
+		this.tolltdBins = new Bins(1, 9, day + "tolltdPerIncome");	
+		
+		this.modeBins.put("car", new Bins(1, 9, day + "carPerIncome"));
+		this.modeBins.put("pt", new Bins(1, 9, day + "ptPerIncome"));
+		this.modeBins.put("bike", new Bins(1, 9, day + "bikePerIncome"));
+		this.modeBins.put("walk", new Bins(1, 9, day + "walkPerIncome"));
 		
 		log.info("	analyzing travel distances ...");
 		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork(), this.tdBins, this.incomes);			
@@ -171,9 +183,23 @@ public class Analyzer {
 		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();	
 		this.tolltdSumIncomeWeighted[Surprice.days.indexOf(day)] = tollCalculator.getSumLengthIncomeWeighted();
 		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");
+		
+		this.computeModesPerIncome();
+		
+		this.writeDailyPlots();
 	}
 	
-	public void writePlots(String outPath) {			
+	private void writeDailyPlots() {
+		this.utilityBins.plotBinnedDistribution(outPath, "income", "");
+		this.ttBins.plotBinnedDistribution(outPath, "income", "");
+		this.tdBins.plotBinnedDistribution(outPath, "income", "");
+		this.tolltdBins.plotBinnedDistribution(outPath, "income", "");
+		for (Bins bins : this.modeBins.values()) {
+			bins.plotBinnedDistribution(outPath, "income", "");
+		}
+	}
+	
+	private void writePlots() {			
 		this.boxPlotRelative.createChart();
 		this.boxPlotRelative.saveAsPng(outPath + "/utilitiesRelative.png", 800, 600);
 		
@@ -184,12 +210,7 @@ public class Analyzer {
 		this.boxPlotTravelTimes.saveAsPng(outPath + "/traveltimes.png", 800, 600);
 		
 		this.boxPlotTravelDistancesCar.createChart();
-		this.boxPlotTravelDistancesCar.saveAsPng(outPath + "/traveldistances.png", 800, 600);
-		
-		this.utilityBins.plotBinnedDistribution(outPath, "income", "");
-		this.ttBins.plotBinnedDistribution(outPath, "income", "");
-		this.tdBins.plotBinnedDistribution(outPath, "income", "");
-		this.tolltdBins.plotBinnedDistribution(outPath, "income", "");
+		this.boxPlotTravelDistancesCar.saveAsPng(outPath + "/traveldistances.png", 800, 600);	
 	}
 			
 	private double computeUtilities(ArrayList<Double> utilities, String day, String type) {		
@@ -213,10 +234,25 @@ public class Analyzer {
 		}
 		return avgUtility;
 	}
+	
+	private void computeModesPerIncome() {
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			double income = (Double)this.incomes.getAttribute(person.getId().toString(), "income");
+			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					String mode = leg.getMode();
+					Bins bins = this.modeBins.get(mode);
+					double val = bins.getBins()[(int)income];
+					bins.addVal(income, val + 1.0);
+				}
+			}
+		}
+	}
 			
-	private void write(String outPath) {
+	private void write() {
 		
-		this.writePlots(outPath);
+		this.writePlots();
 		
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
