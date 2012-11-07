@@ -47,6 +47,9 @@ import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 
 /**
+ * This module requires an emissions events file
+ * and calculates the total emissions.
+ * 
  * @author ikaddoura, benjamin
  *
  */

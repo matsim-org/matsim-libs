@@ -36,7 +36,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- * A transfer payment can be a toll, a fare or any other {@link AgentMoneyEvent}. Normally this is the operator revenue.
+ * This module calculates the transfer payments for each agent and the sum of all transfer payments.
+ * A transfer payment can be a toll, a fare or any other {@link AgentMoneyEvent}.
+ * The sum of all transfer payments normally can be interpreted as the operator revenue.
  * 
  * @author ikaddoura
  *

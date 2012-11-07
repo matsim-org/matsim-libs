@@ -40,7 +40,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- * @author ikaddoura
+ * This module calculates the logsum for each user and the sum of all user logsums in monetary units.
+ * Furthermore, it analyzes users with no valid plan, that are not considered for the logsum calculation.
+ * 
+ * @author ikaddoura, benjamin
  *
  */
 public class UserBenefitsAnalyzer extends AbstractAnalyisModule{

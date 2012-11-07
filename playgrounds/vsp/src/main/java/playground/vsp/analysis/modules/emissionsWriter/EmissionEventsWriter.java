@@ -39,6 +39,9 @@ import playground.vsp.emissions.EmissionModule;
 import playground.vsp.emissions.WarmEmissionHandler;
 
 /**
+ * This module requires a scenario with emission specific informations set in the VspExperimentalConfigGroup.
+ * Emission events are written based on a standard events file.
+ * 
  * @author ikaddoura, benjamin
  *
  */

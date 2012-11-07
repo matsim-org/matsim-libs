@@ -38,8 +38,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- *  Analyzes public transport parameters (such as vehicle-hours, vehicle-km, and number of public vehicles) which are relevant for operator cost calculations.
- * 
+ * This module calculates the public transport parameters vehicle-hours, vehicle-km, number of public vehicles.
+ * These parameters can be used for operator cost calculations.
+ *  
  * @author ikaddoura
  *
  */

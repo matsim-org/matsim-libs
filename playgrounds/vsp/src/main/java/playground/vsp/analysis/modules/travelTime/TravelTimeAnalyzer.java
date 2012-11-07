@@ -41,6 +41,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
+ * This module calculates for each mode the number of users, the number of departures, the total travel time,
+ * the avg. travel time per user and the avg. travel time per departure.
+ * 
  * @author ikaddoura, benjamin
  *
  */

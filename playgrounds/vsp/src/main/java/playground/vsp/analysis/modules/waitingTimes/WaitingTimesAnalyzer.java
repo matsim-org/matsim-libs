@@ -41,7 +41,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- * Analyzes the waiting times for public vehicles. (all waiting times, waiting times per person, waiting times per transitStop)
+ * This module analyzes the waiting times for public vehicles.
+ * It calculates the sum of all waiting times, the avg. waiting time, 
+ * the avg. waiting time for each transit stop, the avg. waiting time per transit stop,
+ * the avg. waiting time for each pt user and the avg. waiting time per pt user.
  * 
  * @author ikaddoura
  *

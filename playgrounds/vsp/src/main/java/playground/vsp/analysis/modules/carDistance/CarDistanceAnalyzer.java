@@ -40,6 +40,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
+ * This module calculates the total car distance for each person
+ * as well as the avg. distance per car user and the avg. distance per trip.
+ * 
  * @author ikaddoura
  *
  */
