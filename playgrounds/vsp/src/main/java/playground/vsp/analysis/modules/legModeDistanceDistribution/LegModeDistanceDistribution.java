@@ -76,8 +76,8 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 		this.usedModes = new TreeSet<String>();
 	}
 
-	public void init(Scenario scenario){
-		this.scenario = scenario;
+	public void init(Scenario sc){
+		this.scenario = sc;
 		initializeDistanceClasses(this.scenario.getPopulation());
 		initializeUsedModes(this.scenario.getPopulation());
 	}
@@ -259,5 +259,22 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 			}
 		}
 		log.info("The following transport modes are considered: " + this.usedModes);
+	}
+
+	public SortedMap<String, Map<Integer, Integer>> getMode2DistanceClass2LegCount() {
+		return this.mode2DistanceClass2LegCount;
+	}
+
+	public void setMode2DistanceClass2LegCount(
+			SortedMap<String, Map<Integer, Integer>> mode2DistanceClass2LegCount) {
+		this.mode2DistanceClass2LegCount = mode2DistanceClass2LegCount;
+	}
+
+	public SortedMap<String, Double> getMode2Share() {
+		return this.mode2Share;
+	}
+
+	public void setMode2Share(SortedMap<String, Double> mode2Share) {
+		this.mode2Share = mode2Share;
 	}
 }

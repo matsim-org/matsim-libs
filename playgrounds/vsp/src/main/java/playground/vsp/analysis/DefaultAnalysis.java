@@ -53,8 +53,6 @@ public class DefaultAnalysis {
 	
 	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 
-	
-
 	public DefaultAnalysis(Scenario scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<Feature> shapeFile) {
 		this.baseFolder = baseFolder;
 		this.iterationOutputDir = iterationOutputDir;
@@ -122,5 +120,9 @@ public class DefaultAnalysis {
 		log.info("All output written");
 		Gbl.printElapsedTime();
 		Gbl.printMemoryUsage();
+	}
+
+	public List<AbstractAnalyisModule> getAnaModules() {
+		return this.anaModules;
 	}
 }
