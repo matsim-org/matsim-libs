@@ -46,9 +46,12 @@ public class DayControler extends Controler {
 	    	    
 	  	SurpriceScoringFunctionFactory scoringFunctionFactory = new SurpriceScoringFunctionFactory(
 	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
-	  	this.setScoringFunctionFactory(scoringFunctionFactory);
-	  	
-	  	//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!
+	  	this.setScoringFunctionFactory(scoringFunctionFactory);  	
+	}
+	
+	protected void loadControlerListeners() {
+		super.loadControlerListeners();
+		//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!
 	  	this.addControlerListener(new Memorizer(this.memories, this.day));
 	  	this.addControlerListener(new ModeSharesControlerListener("times"));
 	  	this.addControlerListener(new ModeSharesControlerListener("distances"));
