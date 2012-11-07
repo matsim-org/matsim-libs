@@ -164,6 +164,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 						double departureOffset = (int)((st.getDepartureTime().getTime() - firstDepartureTime) / 1000);
 						double arrivalOffset = (int)((st.getArrivalTime().getTime() - firstDepartureTime) / 1000);
 						routeStop = schedFact.createTransitRouteStop(stop, arrivalOffset, departureOffset);
+						routeStops.add(routeStop);
 						
 						//Get the stop-to-stop speed
 						double stopToStopTime = (int) ((st.getArrivalTime().getTime() - previousST.getDepartureTime().getTime()) / 1000); // in seconds
