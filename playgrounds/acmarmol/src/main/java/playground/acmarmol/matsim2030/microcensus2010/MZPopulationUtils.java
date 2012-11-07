@@ -735,7 +735,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	
 //////////////////////////////////////////////////////////////////////
 
-	public static void classifyActivtyChains(Population population){
+	public static void classifyActivityChains(Population population){
 		
 		Set<String> actChains = new HashSet<String>();
 			
@@ -761,7 +761,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
 						|| type.contains(MZConstants.ERRANDS)
 						|| type.contains(MZConstants.OTHER)
-						|| type.contains(MZConstants.FOREING_PROPERTY)
+						|| type.contains(MZConstants.FOREIGN_PROPERTY)
 						|| type.contains(MZConstants.OVERNIGHT)
 						|| type.contains(MZConstants.PSEUDOETAPPE)) {actChain.append("L");}
 						

@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 
-package playground.acmarmol.matsim2030.microcensus2005;
+package playground.acmarmol.matsim2030.microcensus2000;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
  * 
  */
 
-public class MZ2005WegeParser {
+public class MZ2000WegeParser {
 
 //////////////////////////////////////////////////////////////////////
 //member variables
@@ -66,7 +66,7 @@ public class MZ2005WegeParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZ2005WegeParser(Population population, ObjectAttributes wegeAttributes) {
+	public MZ2000WegeParser(Population population, ObjectAttributes wegeAttributes) {
 		super();
 		this.wegeAttributes = wegeAttributes;
 		this.population = population;
@@ -96,7 +96,7 @@ public class MZ2005WegeParser {
 			String[] entries = curr_line.split("\t", -1);
 				
 			//household number
-			String hhnr = entries[0].trim();
+			String hhnr = entries[1].trim();
 						
 			//person number (zielpnr)
 			String zielpnr = entries[1].trim();

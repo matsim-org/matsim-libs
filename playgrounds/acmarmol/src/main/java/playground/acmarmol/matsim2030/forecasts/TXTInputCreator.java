@@ -1,4 +1,4 @@
-package playground.acmarmol.matsim2030.actChainsForecast;
+package playground.acmarmol.matsim2030.forecasts;
 
 import java.util.List;
 import java.util.TreeMap;

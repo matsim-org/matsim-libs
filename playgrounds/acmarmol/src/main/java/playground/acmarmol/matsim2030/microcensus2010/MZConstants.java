@@ -99,11 +99,11 @@ public class MZConstants{
 		public static final String LEISURE= "leisure";
 		public static final String ACCOMPANYING_CHILDREN = "accompanying (children)";
 		public static final String ACCOMPANYING_NOT_CHILDREN = "accompanying (not children)";
-		public static final String FOREING_PROPERTY = "foreign property";
+		public static final String FOREIGN_PROPERTY = "foreign property";
 		public static final String OVERNIGHT = "overnight away";
 		public static final String PSEUDOETAPPE = "pseudoetappe";
 		//created during cross border handling
-		public static final String AIRPORT = "aiport";
+		public static final String AIRPORT = "airport";
 		public static final String BORDER = "border";
 		public static final String ABROAD_TELEPORT = "abroad_teleport";
 		
@@ -124,6 +124,14 @@ public class MZConstants{
 		public static final String BYCICLE = "bycicle";
 		public static final String WALK = "walk";
 		public static final String SKATEBOARD = "skateboard";
+		
+		public static final String KLEINMOTORRAD = "small motorcycle";
+		public static final String MOTORRAD_FAHRER = "motorcycle-driver";
+		public static final String MOTORRAD_MITFAHRER = "motorcycle-not-driver";
+		public static final String CAR_FAHRER = "car-driver";
+		public static final String CAR_MITFAHRER = "car-not-driver";
+		public static final String CABLE_CAR = "cable car";
+		public static final String BORDER_CROSSING = "border crossing";
 		
 	//legs attributes
 		public static final String START_COUNTRY = "start country";

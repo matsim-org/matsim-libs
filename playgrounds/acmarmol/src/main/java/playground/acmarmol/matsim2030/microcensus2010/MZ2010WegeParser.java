@@ -24,8 +24,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,10 +37,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import com.google.common.base.Supplier;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 /**
  * 
@@ -192,7 +186,7 @@ public class MZ2010WegeParser {
 			else if(wzweck1.equals("8")){purpose =  MZConstants.LEISURE;}
 			else if(wzweck1.equals("9")){purpose =  MZConstants.ACCOMPANYING_CHILDREN;}
 			else if(wzweck1.equals("10")){purpose = MZConstants.ACCOMPANYING_NOT_CHILDREN;}
-			else if(wzweck1.equals("11")){purpose=  MZConstants.FOREING_PROPERTY;}
+			else if(wzweck1.equals("11")){purpose=  MZConstants.FOREIGN_PROPERTY;}
 			else if(wzweck1.equals("12")){purpose =  MZConstants.OTHER;}
 			//else if(wzweck1.equals("13")){purpose = "border crossing";}
 			else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;}
@@ -256,7 +250,7 @@ public class MZ2010WegeParser {
 				LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);				
 				leg.setDepartureTime(departure);
 				leg.setTravelTime(arrival-departure);
-				leg.setArrivalTime(arrival);
+				leg.setArrivalTime(arrival);				
 //				GenericRouteImpl route = new GenericRouteImpl(null, null);
 //				leg.setRoute(route);
 //				route.setDistance(distance);

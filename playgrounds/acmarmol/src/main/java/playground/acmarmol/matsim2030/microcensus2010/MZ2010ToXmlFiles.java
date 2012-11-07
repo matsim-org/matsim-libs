@@ -96,7 +96,7 @@ public class MZ2010ToXmlFiles {
 		String inputBase = args[0];
 		String outputBase = args[1];
 
-		String haushalteFile = inputBase+"haushalte.dat";
+		String haushalteFile = inputBase+"haushalte5imp.dat";
 		String haushaltspersonenFile = inputBase+"haushaltspersonen.dat";
 		String fahrzeugeFile = inputBase+"fahrzeuge.dat";
 		String zielpersonenFile = inputBase+"zielpersonen.dat";
@@ -370,7 +370,7 @@ public class MZ2010ToXmlFiles {
 
 
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
-		log.info("filtering persions without plan...");
+		log.info("filtering persons without plan...");
 		MZPopulationUtils.removePersonsWithoutPlan(population);
 		new PopulationWriter(population, null).write(outputBase+"population.14.xml");
 		System.out.println("  done.");
@@ -385,7 +385,7 @@ public class MZ2010ToXmlFiles {
 
 		Gbl.printElapsedTime();
 		
-		MZPopulationUtils.classifyActivtyChains(population);
+		MZPopulationUtils.classifyActivityChains(population);
 		
 
 	}//end main		

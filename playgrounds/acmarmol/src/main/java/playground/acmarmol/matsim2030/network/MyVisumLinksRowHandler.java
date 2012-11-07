@@ -49,6 +49,7 @@ public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 	private final String[] LENGTH = {"LENGTH", "LAENGE"};
 	private final String[] CAPACITY = {"CAPRT", "KAPIV"};
 	private final String[] FREESPEED = {"V0PRT", "V0IV"};
+	private final String[] NUMLANES = {"NUMLANES", "ANZFAHRSTREIFEN"};
 	
 	
 	public MyVisumLinksRowHandler(NetworkImpl network, MyVisumNetwork visumNetwork) {
@@ -81,6 +82,7 @@ public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 		IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
 
 		EdgeType edgeType = visumNetwork.edgeTypes.get(edgeTypeId);
+		
 		// double capacity = getCapacity(edgeTypeId);
 
 		String VSYSSET_String = row.get(TSYSSET[this.language]);
@@ -95,9 +97,13 @@ public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 		}
 
 		double capacity = Double.parseDouble(row.get(CAPACITY[this.language]));
+		if(capacity == 0){
+			capacity = Double.parseDouble(edgeType.kapIV);
+		}
+
 
 		
-		// edgeType.kapIV
+		// 
 				//);
 
 		// // kick out all irrelevant edge types
@@ -123,13 +129,22 @@ public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 		// if(isEdgeTypeRelevantForPeriphery(edgeTypeId)){
 		// freespeed = getFreespeedTravelTime(edgeTypeId);
 		
-		double freespeed = Double.parseDouble(row.get(FREESPEED[this.language]).substring(0, row.get(FREESPEED[this.language]).indexOf('k'))
-		// edgeType.v0IV
-				) / 3.6;
+		double freespeed = Double.parseDouble(row.get(FREESPEED[this.language]).substring(0, row.get(FREESPEED[this.language]).indexOf('k'))) / 3.6;
+		if(freespeed == 0){
+			freespeed =  Double.parseDouble(edgeType.v0IV.substring(0, row.get(FREESPEED[this.language]).indexOf('k'))) / 3.6;
+		}
+				
+		
+		double numOfLanes = Double.parseDouble(row.get(NUMLANES[this.language]));{
+			if(numOfLanes == 0){
+				numOfLanes = Double.parseDouble(edgeType.noOfLanes);
+			}
+		}
+		
 
 
 		network.createAndAddLink(id, fromNode, toNode, length, freespeed,
-				capacity, 1, null, edgeTypeIdString);
+				capacity, numOfLanes, null, edgeTypeIdString);
 		
 		//modes.clear();
 		modes.add(TransportMode.car);

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.acmarmol.matsim2030.microcensus2010;
+package playground.acmarmol.matsim2030.microcensus2000;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,9 +31,11 @@ import org.matsim.households.IncomeImpl;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
+
 /**
 * 
-* Parses the haushalte.dat file from MZ2010, creates matsim households, and
+* Parses the haushalte.dat file from MZ2005, creates matsim households, and
 * fills the households attributes with the microcensus information.
 * 
 * @see org.matsim.utils.objectattributes 
@@ -42,7 +44,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 * 
 */
 
-public class MZ2010HouseholdParser {
+public class MZ2000HouseholdParser {
 
 //////////////////////////////////////////////////////////////////////
 //member variables
@@ -57,7 +59,7 @@ public class MZ2010HouseholdParser {
 //constructors
 //////////////////////////////////////////////////////////////////////
 
-	public MZ2010HouseholdParser(Households households, ObjectAttributes householdAttributes) {
+	public MZ2000HouseholdParser(Households households, ObjectAttributes householdAttributes) {
 	super();
 	this.households = households;
 	this.householdAttributes = householdAttributes;
@@ -88,22 +90,22 @@ public class MZ2010HouseholdParser {
 		householdAttributes.putAttribute(hhnr, "weight", hh_weight);
 		
 		//household size
-		String size = entries[76].trim();
-		householdAttributes.putAttribute(hhnr, "size", size);
+		//String size = entries[76].trim();
+		//householdAttributes.putAttribute(hhnr, "size", size);
 		
 		//household income
-		String income = entries[100].trim();
-		householdAttributes.putAttribute(hhnr, "income", income);
+		//String income = entries[98].trim();
+		//householdAttributes.putAttribute(hhnr, "income", income);
 		
 		
 		// location coordinate (round to 1/10 of hectare) - WGS84 (5,6) & CH1903 (7,8)
-		Coord location = new CoordImpl(entries[7].trim(),entries[8].trim());
+		//Coord location = new CoordImpl(entries[7].trim(),entries[8].trim());
 		//location.setX(Math.round(location.getX()/10.0)*10);
 		//location.setY(Math.round(location.getY()/10.0)*10);
-		householdAttributes.putAttribute(hhnr, "coord", location);
+		//householdAttributes.putAttribute(hhnr, "coord", location);
 		
 		//Kanton
-		String kanton =  entries[17].trim();
+		String kanton =  entries[10].trim();
 		if(kanton.equals("1")){kanton = "zürich";}						else if(kanton.equals("2")){kanton = "bern";}
 		else if(kanton.equals("3")){kanton = "luzern";}					else if(kanton.equals("4")){kanton = "uri";}
 		else if(kanton.equals("5")){kanton = "schwyz";}					else if(kanton.equals("6")){kanton = "obwalden";}
@@ -121,47 +123,47 @@ public class MZ2010HouseholdParser {
 		householdAttributes.putAttribute(hhnr, "kanton", kanton);
 		
 		//municipality BFS number
-		String municipality =  entries[10].trim();
+		String municipality =  entries[5].trim();
 		householdAttributes.putAttribute(hhnr, "municipality", municipality);
 		
-		
-		//municipality BFS number
-		String region =  entries[16].trim();
-		householdAttributes.putAttribute(hhnr, "region", region);
-		
 		//number of cars
-		String nr_cars = entries[77];
-		if(nr_cars.equals("-98")){nr_cars = MZConstants.NO_ANSWER;}
-		else if(nr_cars.equals("-97")){nr_cars = MZConstants.NOT_KNOWN;}
+		String nr_cars = entries[27];
+		if(nr_cars.equals("-2")){nr_cars = MZConstants.NO_ANSWER;}
+		else if(nr_cars.equals("-1")){nr_cars = MZConstants.NOT_KNOWN;}
+		else if(nr_cars.equals("7")){nr_cars = "more than 6";}
 		householdAttributes.putAttribute(hhnr, "total cars ", nr_cars);
 		
 		//number of motorcycles
-		String nr_mcycles = entries[79];
-		if(nr_mcycles.equals("-98")){nr_mcycles = MZConstants.NO_ANSWER;}
-		else if(nr_mcycles.equals("-97")){nr_mcycles = MZConstants.NOT_KNOWN;}
+		String nr_mcycles = entries[28];
+		if(nr_mcycles.equals("-2")){nr_mcycles = MZConstants.NO_ANSWER;}
+		else if(nr_mcycles.equals("-1")){nr_mcycles = MZConstants.NOT_KNOWN;}
+		else if(nr_mcycles.equals("7")){nr_mcycles = "more than 6";}
 		householdAttributes.putAttribute(hhnr, "total motorcycles ", nr_mcycles);
 		
 		//number of small motorcycles
-		String nr_smcycles = entries[80];
-		if(nr_smcycles.equals("-98")){nr_smcycles = MZConstants.NO_ANSWER;}
-		else if(nr_smcycles.equals("-97")){nr_smcycles = MZConstants.NOT_KNOWN;}
+		String nr_smcycles = entries[29];
+		if(nr_smcycles.equals("-2")){nr_smcycles = MZConstants.NO_ANSWER;}
+		else if(nr_smcycles.equals("-1")){nr_smcycles = MZConstants.NOT_KNOWN;}
+		else if(nr_smcycles.equals("-1")){nr_smcycles = "more than 6";}
 		householdAttributes.putAttribute(hhnr, "total small motorcycles ", nr_smcycles);
 		
 		//number of mofa
-		String nr_mofas = entries[82];
-		if(nr_mofas.equals("-98")){nr_mofas = MZConstants.NO_ANSWER;}
-		else if(nr_mofas.equals("-97")){nr_mofas = MZConstants.NOT_KNOWN;}
+		String nr_mofas = entries[30];
+		if(nr_mofas.equals("-2")){nr_mofas = MZConstants.NO_ANSWER;}
+		else if(nr_mofas.equals("-1")){nr_mofas = MZConstants.NOT_KNOWN;}
+		else if(nr_mofas.equals("7")){nr_mofas = "more than 6";}
 		householdAttributes.putAttribute(hhnr, "total mofas ", nr_mofas);
 		
 		//number of bicycles
-		String nr_bikes = entries[83];
-		if(nr_bikes.equals("-98")){nr_bikes = MZConstants.NO_ANSWER;}
-		else if(nr_bikes.equals("-97")){nr_bikes = MZConstants.NOT_KNOWN;}
+		String nr_bikes = entries[31];
+		if(nr_bikes.equals("-2")){nr_bikes = MZConstants.NO_ANSWER;}
+		else if(nr_bikes.equals("-1")){nr_bikes = MZConstants.NOT_KNOWN;}
+		else if(nr_bikes.equals("7")){nr_bikes = "more than 6";}
 		householdAttributes.putAttribute(hhnr, "total bicycles", nr_bikes);
 		
 		// creating matsim household
 		Household hh = households.getFactory().createHousehold(new IdImpl(hhnr));
-		hh.setIncome(new IncomeImpl(Double.parseDouble(income), IncomePeriod.month));
+		//hh.setIncome(new IncomeImpl(Double.parseDouble(income), IncomePeriod.month));
 		households.getHouseholds().put(hh.getId(), hh);
 		}
 		

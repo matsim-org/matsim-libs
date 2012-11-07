@@ -377,7 +377,7 @@ public class MZ2005ToXmlFiles {
 
 		Gbl.printElapsedTime();
 		
-		MZPopulationUtils.classifyActivtyChains(population);
+		MZPopulationUtils.classifyActivityChains(population);
 		
 
 	}//end main		

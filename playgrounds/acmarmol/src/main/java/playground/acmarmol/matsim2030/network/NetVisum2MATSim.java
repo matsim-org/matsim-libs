@@ -3,13 +3,8 @@
  */
 package playground.acmarmol.matsim2030.network;
 
-import java.util.ArrayList;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -111,105 +106,6 @@ public class NetVisum2MATSim {
 	}
 	
 	
-	public void handleZeroFreeSpeedLinks(){
-		
-		ArrayList<Id> unresolved_links = new ArrayList<Id>();
-		
-		int counter = 0;
-		for(Link link : this.network.getLinks().values()){
-			
-			if(link.getFreespeed()==0.0){
-				counter++;
-				if(!link.getId().toString().contains("R")){
-					
-					IdImpl id = new IdImpl(link.getId().toString()+"R");
-					
-					if(network.getLinks().containsKey(id)){
-						if(network.getLinks().get(id).getFreespeed()==0.0){
-							unresolved_links.add(link.getId());
-						}
-						link.setFreespeed(network.getLinks().get(id).getFreespeed());
-					 }
-				}else{
-					IdImpl id = new IdImpl(link.getId().toString().substring(0,link.getId().toString().indexOf("R")));
-					link.setFreespeed(network.getLinks().get(id).getFreespeed());
-					if(network.getLinks().get(id).getFreespeed()==0.0){
-						unresolved_links.add(link.getId());
-					}
-				}
-			}
-		}
-		
-		System.out.println(counter + " links had no freespeed value, " + (counter-unresolved_links.size()) + " were handled by setting them to the same freespeed of the respective 'return link'");
-		System.out.println("unresolved links are: " + unresolved_links);
-	}
-	
-	
-	public void handleZeroCapacityLinks(){
-		
-		ArrayList<Id> unresolved_links = new ArrayList<Id>();
-		
-		int counter = 0;
-		for(Link link : this.network.getLinks().values()){
-			
-			if(link.getCapacity()==0.0){
-				counter++;
-				if(!link.getId().toString().contains("R")){
-					
-					IdImpl id = new IdImpl(link.getId().toString()+"R");
-					
-					if(network.getLinks().containsKey(id)){
-						if(network.getLinks().get(id).getCapacity()==0.0){
-							unresolved_links.add(link.getId());
-						}
-						link.setCapacity(network.getLinks().get(id).getCapacity());
-					 }
-				}else{
-					IdImpl id = new IdImpl(link.getId().toString().substring(0,link.getId().toString().indexOf("R")));
-					link.setCapacity(network.getLinks().get(id).getCapacity());
-					if(network.getLinks().get(id).getCapacity()==0.0){
-						unresolved_links.add(link.getId());
-					}
-				}
-			}
-		}
-		
-		System.out.println(counter + " links had capacity value = 0.0 , " + (counter-unresolved_links.size()) + " were handled by setting them to the same capacity of the respective 'return link'");
-		System.out.println("unresolved links are: " + unresolved_links);
-	}
-	
-	public void handleZeroLengthLinks(){
-		
-		ArrayList<Id> unresolved_links = new ArrayList<Id>();
-		
-		int counter = 0;
-		for(Link link : this.network.getLinks().values()){
-			
-			if(link.getLength()==0.0){
-				counter++;
-				if(!link.getId().toString().contains("R")){
-					
-					IdImpl id = new IdImpl(link.getId().toString()+"R");
-					
-					if(network.getLinks().containsKey(id)){
-						if(network.getLinks().get(id).getLength()==0.0){
-							unresolved_links.add(link.getId());
-						}
-						link.setLength(network.getLinks().get(id).getLength());
-					 }
-				}else{
-					IdImpl id = new IdImpl(link.getId().toString().substring(0,link.getId().toString().indexOf("R")));
-					link.setLength(network.getLinks().get(id).getLength());
-					if(network.getLinks().get(id).getLength()==0.0){
-						unresolved_links.add(link.getId());
-					}
-				}
-			}
-		}
-		
-		System.out.println(counter + " links had Length value = 0.0 , " + (counter-unresolved_links.size()) + " were handled by setting them to the same Length of the respective 'return link'");
-		System.out.println("unresolved links are: " + unresolved_links);
-	}
 	
 
 	/**
@@ -235,10 +131,10 @@ public class NetVisum2MATSim {
 		String inputVisumNetFile = inputBase + networks[index] + ".net";
 		n2m.readVisumNets(inputVisumNetFile);
 		n2m.convertNetwork(inputVisumNetFile, outputZoneFile);
+		
+		NetworkPostProcessor postProcessor = new NetworkPostProcessor(n2m.network);
+		postProcessor.Process();
 		n2m.cleanNetwork();
-		n2m.handleZeroFreeSpeedLinks();
-		n2m.handleZeroCapacityLinks();
-		n2m.handleZeroLengthLinks();
 		n2m.writeMATSimNetwork(outputMATSimNetworkFile);
 		
 		//OeV NETWORK
@@ -248,14 +144,14 @@ public class NetVisum2MATSim {
 		inputVisumNetFile = inputBase + networks[index] + ".net";
 		n2m_2.readVisumNets(inputVisumNetFile);
 		n2m_2.convertNetwork(inputVisumNetFile, outputZoneFile);
-		n2m_2.cleanNetwork();
-		//n2m_2.handleZeroFreeSpeedLinks();
-		n2m_2.handleZeroCapacityLinks();
-		n2m_2.handleZeroLengthLinks();
+		NetworkPostProcessor postProcessor2 = new NetworkPostProcessor(n2m_2.network);
+		postProcessor2.Process();
+		//n2m_2.cleanNetwork();
+
 		n2m_2.writeMATSimNetwork(outputMATSimNetworkFile);
 		String outputMATSimTransitScheduleFile = outputBase + networks[index] + "_TransitSchedule.xml";
 		String outputMATSimPTVehiclesFile = outputBase + networks[index] + "_PTVehicles.xml";
-		//n2m_2.writeTransitScheduleAndVehiclesFiles(outputMATSimTransitScheduleFile, outputMATSimPTVehiclesFile );
+		n2m_2.writeTransitScheduleAndVehiclesFiles(outputMATSimTransitScheduleFile, outputMATSimPTVehiclesFile );
 		
 
 		
