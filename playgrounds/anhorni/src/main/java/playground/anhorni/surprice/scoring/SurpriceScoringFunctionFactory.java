@@ -50,8 +50,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		this.preferences = preferences;	
 	}
 	
-	public ScoringFunction createNewScoringFunction(Plan plan) {	
-		
+	public ScoringFunction createNewScoringFunction(Plan plan) {			
 		// generate alpha_trip with id of agent
 		this.random = new Random(Integer.parseInt(plan.getPerson().getId().toString()));
 		
@@ -62,13 +61,11 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		double alphaTripRange = Double.parseDouble(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "alphaTripRange"));
 		alphaTrip = alphaTripRange * (0.5 - this.random.nextDouble());		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				
-		SurpriceActivityScoringFunction scoringFunction = new SurpriceActivityScoringFunction(
+						
+		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
 				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(), 
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "alpha"),
-				this.day);
-		
-		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
+				this.day));
 		
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
 				super.getParams(), controler.getNetwork(), controler.getConfig(),
@@ -77,6 +74,9 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "alpha"),
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma"),
 				alphaTrip));
+		
+		scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(
+				super.getParams(), (Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma")));
 		
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;
