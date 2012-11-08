@@ -75,8 +75,10 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma"),
 				alphaTrip));
 		
-		scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(
-				super.getParams(), (Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma")));
+		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
+			scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(
+					super.getParams(), (Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma")));
+		}
 		
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;

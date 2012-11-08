@@ -55,6 +55,9 @@ public class DayControler extends Controler {
 	  	this.addControlerListener(new Memorizer(this.memories, this.day));
 	  	this.addControlerListener(new ModeSharesControlerListener("times"));
 	  	this.addControlerListener(new ModeSharesControlerListener("distances"));
-	  	this.addControlerListener(new RoadPricing());
+	  	
+	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
+	  		this.addControlerListener(new RoadPricing());
+		}
 	}
 }
