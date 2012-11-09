@@ -22,16 +22,18 @@
  * @author ikaddoura
  * 
  */
-package playground.vsp.analysis.modules.level1.agentId2enterLeaveVehicle;
+package playground.vsp.analysis.modules.level1.stopId2personEnterLeaveVehicle;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -44,27 +46,26 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- * This module analyzes the entering and leaving event for each person.
- * Ignoring the pt driver and not differentiating between public and private vehicles.
+ * This module collects <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEventHandler</code> for each stop id.
  * 
  * @author ikaddoura
  *
  */
-public class AgentId2EnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(AgentId2EnterLeaveVehicleAnalyzer.class);
+public class StopId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(StopId2PersonEnterLeaveVehicleAnalyzer.class);
 	private ScenarioImpl scenario;
-	private AgentId2EnterLeaveVehicleEventHandler enterLeaveHandler;
+	private StopId2PersonEnterLeaveVehicleHandler enterLeaveHandler;
 	
-	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> agentId2EnterEvent;
-	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> agentId2LeaveEvent;
+	private Map<Id, List<PersonEntersVehicleEvent>> stopId2PersonEnterEventMap;
+	private Map<Id, List<PersonLeavesVehicleEvent>> stopId2PersonLeaveEventMap;
 			
-	public AgentId2EnterLeaveVehicleAnalyzer(String ptDriverPrefix) {
-		super(AgentId2EnterLeaveVehicleAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public StopId2PersonEnterLeaveVehicleAnalyzer(String ptDriverPrefix) {
+		super(StopId2PersonEnterLeaveVehicleAnalyzer.class.getSimpleName(), ptDriverPrefix);
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
-		this.enterLeaveHandler = new AgentId2EnterLeaveVehicleEventHandler(this.ptDriverPrefix);
+		this.enterLeaveHandler = new StopId2PersonEnterLeaveVehicleHandler(this.ptDriverPrefix);
 	}
 	
 	@Override
@@ -81,23 +82,14 @@ public class AgentId2EnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		
-		this.agentId2EnterEvent = this.enterLeaveHandler.getAgentId2EnterEventMap();
-		this.agentId2LeaveEvent = this.enterLeaveHandler.getAgentId2LeaveEventMap();
-		
+		this.stopId2PersonEnterEventMap = this.enterLeaveHandler.getStopId2PersonEnterEventMap();
+		this.stopId2PersonLeaveEventMap = this.enterLeaveHandler.getStopId2PersonLeaveEventMap();
+		// ...
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		// nothing to write so far
-	}
-	
-	public TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> getAgentId2EnterEvent() {
-		return agentId2EnterEvent;
-	}
-
-	public TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> getAgentId2LeaveEvent() {
-		return agentId2LeaveEvent;
+		// ...
 	}
 
 }

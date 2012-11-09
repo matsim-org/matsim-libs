@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.level1.agentId2enterLeaveVehicle;
+package playground.vsp.analysis.modules.level1.agentId2personEnterLeaveVehicle;
 
 import java.util.ArrayList;
 import java.util.Set;

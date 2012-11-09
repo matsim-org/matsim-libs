@@ -22,7 +22,7 @@
  * @author ikaddoura
  * 
  */
-package playground.vsp.analysis.modules.level1.stopId2lineId2pulk;
+package playground.vsp.analysis.modules.level1.delayAtStopHistogram;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -45,31 +46,39 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- * This module analyzes the headway between two vehicles following each other.
- * If they are considered to bunch a <code>StopId2LineId2PulkData</code> entry is stored at the corresponding stop and line.
+ * Evaluates the delay a vehicle reports at a stop when arriving or departing. Writes a histogram to file. A negative delay is counted as no delay (0s).
  * 
- * @author ikaddoura
+ * @author ikaddoura, aneumann
  *
  */
-public class StopId2LineId2PulkAnalyzer extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(StopId2LineId2PulkAnalyzer.class);
+public class VehDelayAtStopHistogramAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(VehDelayAtStopHistogramAnalyzer.class);
 	private ScenarioImpl scenario;
-	private StopId2LineId2PulkEventHandler pulkHandler;
-	private TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> stopId2LineId2PulkDataList;
-			
-	public StopId2LineId2PulkAnalyzer(String ptDriverPrefix) {
-		super(StopId2LineId2PulkAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	private VehDelayAtStopHistogramEventHandler delayHandler;
+	private int numberOfDetailedSlots;
+	
+	private int[] arrivalDelay;
+	private int[] departureDelay;
+	
+	/**
+	 * 
+	 * @param numberOfDetailedSlots Number of separate slots. Each slot aggregates the delay within that minute, e.g. slot 1 delay from 1s to 59s.
+	 * Delays <= 0s are counted in the first slot, delays >= <code>numberOfDetailedSlots</code> in the last slot.
+	 */
+	public VehDelayAtStopHistogramAnalyzer(String ptDriverPrefix, int numberOfDetailedSlots) {
+		super(VehDelayAtStopHistogramAnalyzer.class.getSimpleName(), ptDriverPrefix);
+		this.numberOfDetailedSlots = numberOfDetailedSlots;
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
-		this.pulkHandler = new StopId2LineId2PulkEventHandler();
+		this.delayHandler = new VehDelayAtStopHistogramEventHandler(this.numberOfDetailedSlots);
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.pulkHandler);		
+		handler.add(this.delayHandler);		
 		return handler;
 	}
 
@@ -80,13 +89,43 @@ public class StopId2LineId2PulkAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		this.stopId2LineId2PulkDataList = this.pulkHandler.getStopId2LineId2PulkDataList();
-		// ...
+		this.departureDelay = this.delayHandler.getDepartureDelay();
+		this.arrivalDelay = this.delayHandler.getArrivalDelay();
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		// ...
+		String fileName1 = outputFolder + "vehDelayAtStopHistogram.txt";
+		File file1 = new File(fileName1);
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file1));
+			writer.write("Dumping arrival delay histogram..."); writer.newLine();
+			writer.write("delay; count"); writer.newLine();
+			for (int i = 0; i < this.arrivalDelay.length; i++) {
+				writer.write(i + "; " + this.arrivalDelay[i]); writer.newLine();
+			}
+			
+			writer.write("Dumping departure delay histogram..."); writer.newLine();
+			writer.write("delay; count"); writer.newLine();
+			for (int i = 0; i < this.departureDelay.length; i++) {
+				writer.write(i + "; " + this.departureDelay[i]); writer.newLine();
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+
+	public int[] getArrivalDelay() {
+		return arrivalDelay;
+	}
+
+	public int[] getDepartureDelay() {
+		return departureDelay;
+	}
+	
+	
 
 }

@@ -22,7 +22,7 @@
  * @author ikaddoura
  * 
  */
-package playground.vsp.analysis.modules.level1.stopId2lineId2pulk;
+package playground.vsp.analysis.modules.level1.vehicleId2personEnterLeaveVehicle;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -45,31 +46,31 @@ import org.matsim.core.scenario.ScenarioImpl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- * This module analyzes the headway between two vehicles following each other.
- * If they are considered to bunch a <code>StopId2LineId2PulkData</code> entry is stored at the corresponding stop and line.
+ * This module collects <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEventHandler</code> for a each vehicle id.
  * 
  * @author ikaddoura
  *
  */
-public class StopId2LineId2PulkAnalyzer extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(StopId2LineId2PulkAnalyzer.class);
+public class VehId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(VehId2PersonEnterLeaveVehicleAnalyzer.class);
 	private ScenarioImpl scenario;
-	private StopId2LineId2PulkEventHandler pulkHandler;
-	private TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> stopId2LineId2PulkDataList;
+	private VehId2PersonEnterLeaveVehicleHandler delayHandler;
+	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> vehId2PersonEnterEvent;
+	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> vehId2PersonLeaveEvent;	
 			
-	public StopId2LineId2PulkAnalyzer(String ptDriverPrefix) {
-		super(StopId2LineId2PulkAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public VehId2PersonEnterLeaveVehicleAnalyzer(String ptDriverPrefix) {
+		super(VehId2PersonEnterLeaveVehicleAnalyzer.class.getSimpleName(), ptDriverPrefix);
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
-		this.pulkHandler = new StopId2LineId2PulkEventHandler();
+		this.delayHandler = new VehId2PersonEnterLeaveVehicleHandler();
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.pulkHandler);		
+		handler.add(this.delayHandler);		
 		return handler;
 	}
 
@@ -80,7 +81,8 @@ public class StopId2LineId2PulkAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		this.stopId2LineId2PulkDataList = this.pulkHandler.getStopId2LineId2PulkDataList();
+		this.vehId2PersonEnterEvent = this.delayHandler.getVehId2PersonEnterEventMap();
+		this.vehId2PersonLeaveEvent = this.delayHandler.getVehId2PersonLeaveEventMap();
 		// ...
 	}
 
@@ -89,4 +91,12 @@ public class StopId2LineId2PulkAnalyzer extends AbstractAnalyisModule{
 		// ...
 	}
 
+	public TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> getVehId2PersonEnterEvent() {
+		return vehId2PersonEnterEvent;
+	}
+
+	public TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> getVehId2PersonLeaveEvent() {
+		return vehId2PersonLeaveEvent;
+	}
+	
 }
