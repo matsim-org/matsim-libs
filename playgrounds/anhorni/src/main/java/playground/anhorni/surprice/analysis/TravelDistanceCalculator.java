@@ -20,6 +20,7 @@ package playground.anhorni.surprice.analysis;
  * *********************************************************************** */
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.network.Network;
@@ -43,6 +44,7 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 	private final ArrayList<Double> travelDistances = new ArrayList<Double>();
 	private Bins tdBins;
 	private ObjectAttributes incomes;
+	private TreeMap<Integer, ArrayList<Double>> carDistances = new TreeMap<Integer, ArrayList<Double>>();
 
 	public TravelDistanceCalculator(final Network network, Bins tdBins, ObjectAttributes incomes) {
 		this.network = network;
@@ -76,6 +78,11 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 					this.tdBins.addVal(income, dist);
 					
 					this.sumLenghtIncomeWeighted += dist * income;
+					
+					if (this.carDistances.get((int)income) == null) {
+						this.carDistances.put((int)income, new ArrayList<Double>());
+					}
+					this.carDistances.get((int)income).add(dist);
 				}
 			}
 		}
@@ -94,6 +101,9 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 
 	public double getSumLenghtIncomeWeighted() {
 		return this.sumLenghtIncomeWeighted / this.getAverageTripLength();
+	}
+	public TreeMap<Integer, ArrayList<Double>> getCar() {
+		return carDistances;
 	}
 }
 

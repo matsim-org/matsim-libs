@@ -22,6 +22,7 @@ package playground.anhorni.surprice.analysis;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
@@ -38,11 +39,13 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 
 	private final Map<Id, Double> agentDepartures = new HashMap<Id, Double>();
 	private final Map<Id, Double> agentArrivals = new HashMap<Id, Double>();
+	private final Map<Id, String> agentArrivalsMode = new HashMap<Id, String>();
 	private final ArrayList<Double> travelTimes = new ArrayList<Double>();
 	private double sumTripDurations = 0;
 	private double sumTripDurationsIncomeWeighted = 0;
 	private int sumTrips = 0;
-	
+	private TreeMap<Integer, ArrayList<Double>> carTimes = new TreeMap<Integer, ArrayList<Double>>();
+	private TreeMap<Integer, ArrayList<Double>> ptTimes = new TreeMap<Integer, ArrayList<Double>>();
 	private Bins ttBins;
 	private ObjectAttributes incomes;
 	
@@ -65,6 +68,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	public void handleEvent(ActivityStartEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Double arrTime = this.agentArrivals.remove(event.getPersonId());
+		String mode = this.agentArrivalsMode.remove(event.getPersonId());
 		if (depTime != null) {
 			double travTime = arrTime - depTime;
 			this.sumTripDurations += travTime;
@@ -76,6 +80,19 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 			this.ttBins.addVal(income, travTime);
 			
 			this.sumTripDurationsIncomeWeighted += travTime * income;
+			
+			if (mode.equals("car")) {
+				if (this.carTimes.get((int)income) == null) {
+					this.carTimes.put((int)income, new ArrayList<Double>());
+				}
+				this.carTimes.get((int)income).add(travTime);
+			}
+			else if (mode.equals("pt")) {
+				if (this.ptTimes.get((int)income) == null) {
+					this.ptTimes.put((int)income, new ArrayList<Double>());
+				}
+				this.ptTimes.get((int)income).add(travTime);
+			}
 		}
 	}
 	
@@ -87,6 +104,8 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 		this.sumTripDurations = 0;
 		this.sumTrips = 0;	
 		this.ttBins.clear();
+		this.carTimes.clear();
+		this.ptTimes.clear();
 	}
 	
 	public ArrayList<Double> getTravelTimes() {
@@ -99,5 +118,13 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 
 	public double getSumTripDurationsIncomeWeighted() {
 		return this.sumTripDurationsIncomeWeighted / this.getAverageTripDuration();
+	}
+
+	public TreeMap<Integer, ArrayList<Double>> getCar() {
+		return carTimes;
+	}
+
+	public TreeMap<Integer, ArrayList<Double>> getPt() {
+		return ptTimes;
 	}
 }

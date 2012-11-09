@@ -75,6 +75,11 @@ public class Analyzer {
 	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt");
 	private SupriceBoxPlot boxPlotTravelDistancesCar = new SupriceBoxPlot("Travel Distances Car", "Day", "td");
 	
+	private SupriceBoxPlot boxPlotTravelDistancesTolledPerIncome = new SupriceBoxPlot("Tolled Travel Distances", "Day", "tolltd");
+	private SupriceBoxPlot boxPlotTravelDistancesCarPerIncome = new SupriceBoxPlot("Travel Distances Car", "Day", "td");	
+	private SupriceBoxPlot boxPlotTravelTimesCarPerIncome = new SupriceBoxPlot("Travel Times Car", "Day", "tt");
+	private SupriceBoxPlot boxPlotTravelTimesPtPerIncome = new SupriceBoxPlot("Travel Times Pt", "Day", "tt");
+	
 	private String outPath;
 	
 	
@@ -151,14 +156,14 @@ public class Analyzer {
 		}
 		this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();
 		this.tdSumIncomeWeighted[Surprice.days.indexOf(day)] = tdCalculator.getSumLenghtIncomeWeighted();
-		this.boxPlotTravelDistancesCar.addValuesPerDay(tdCalculator.getTravelDistances(), day, "Travel Distances Car");
+		this.boxPlotTravelDistancesCar.addValuesPerCategory(tdCalculator.getTravelDistances(), day, "Travel Distances Car");
 		
 		log.info("	analyzing utilities ...");
 		this.computeUtilities(utilitiesRelative, day, "rel");
-		boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
+		boxPlotRelative.addValuesPerCategory(utilitiesRelative, day, "Utilities");
 		
 		this.utilitiesAvg[Surprice.days.indexOf(day)] = this.computeUtilities(utilitiesAbsolute, day, "abs");
-		boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");	
+		boxPlotAbsolute.addValuesPerCategory(utilitiesAbsolute, day, "Utilities");	
 		
 		log.info("	analyzing travel times ...");
 		EventsManager events = EventsUtils.createEventsManager();
@@ -182,10 +187,17 @@ public class Analyzer {
 		this.ttSumIncomeWeighted[Surprice.days.indexOf(day)] = ttCalculator.getSumTripDurationsIncomeWeighted();
 		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();	
 		this.tolltdSumIncomeWeighted[Surprice.days.indexOf(day)] = tollCalculator.getSumLengthIncomeWeighted();
-		this.boxPlotTravelTimes.addValuesPerDay(ttCalculator.getTravelTimes(), day, "Travel Times");
+		this.boxPlotTravelTimes.addValuesPerCategory(ttCalculator.getTravelTimes(), day, "Travel Times");
 		
 		this.computeModesPerIncome();
 		
+		
+		for (int i = 0; i < 9; i++) {
+			this.boxPlotTravelTimesCarPerIncome.addValuesPerCategory(ttCalculator.getCar().get(i), Integer.toString(i), "tt");
+			this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPt().get(i), Integer.toString(i), "tt");
+			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
+			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistances().get(i), Integer.toString(i), "tt");
+		}		
 		this.writeDailyPlots();
 	}
 	
@@ -198,6 +210,17 @@ public class Analyzer {
 		for (Bins bins : this.modeBins.values()) {
 			bins.plotBinnedDistribution(outPath, "income", "");
 		}
+		this.boxPlotTravelTimesCarPerIncome.createChart();
+		this.boxPlotTravelTimesCarPerIncome.saveAsPng(outPath + "/ttCarPerIncome.png", 800, 600);
+		
+		this.boxPlotTravelTimesPtPerIncome.createChart();
+		this.boxPlotTravelTimesPtPerIncome.saveAsPng(outPath + "/ttPtPerIncome.png", 800, 600);
+		
+		this.boxPlotTravelDistancesCarPerIncome.createChart();
+		this.boxPlotTravelDistancesCarPerIncome.saveAsPng(outPath + "/tdCarPerIncome.png", 800, 600);
+				
+		this.boxPlotTravelDistancesTolledPerIncome.createChart();
+		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/tolltdPerIncome.png", 800, 600);
 	}
 	
 	private void writePlots() {			

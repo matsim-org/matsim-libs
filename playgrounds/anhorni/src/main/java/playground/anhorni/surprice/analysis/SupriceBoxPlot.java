@@ -49,8 +49,8 @@ public class SupriceBoxPlot {
 		this.yAxisName = yAxisName;
 	}
 		
-	public void addValuesPerDay(ArrayList<Double> values, String day, String name) {
-		dataset.add(values, name, day);
+	public void addValuesPerCategory(ArrayList<Double> values, String category, String name) {
+		dataset.add(values, name, category);
 	}
 
 	public JFreeChart createChart() {	

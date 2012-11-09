@@ -20,6 +20,7 @@
 
 package playground.anhorni.surprice.analysis;
 
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.matsim.analysis.Bins;
@@ -49,6 +50,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	
 	private Bins tolltdBins;
 	private ObjectAttributes incomes;
+	private TreeMap<Integer, ArrayList<Double>> tollDistances = new TreeMap<Integer, ArrayList<Double>>();
 
 	public TolledTripLengthCalculator(final Network network, final RoadPricingScheme scheme, Bins tolltdBins, ObjectAttributes incomes) {
 		this.scheme = scheme;
@@ -102,6 +104,11 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 			
 			this.sumLengthIncomeWeighted += length.doubleValue() * income;
 			
+			if (this.tollDistances.get((int)income) == null) {
+				this.tollDistances.put((int)income, new ArrayList<Double>());
+			}
+			this.tollDistances.get((int)income).add(length.doubleValue());
+			
 			// ... and reset the agent-individual accumlated length to zero:
 			this.agentDistance.put(event.getPersonId(), zero);
 			this.cntTrips++;
@@ -126,5 +133,9 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 
 	public double getSumLengthIncomeWeighted() {
 		return this.sumLengthIncomeWeighted / this.getAverageTripLength();
+	}
+
+	public TreeMap<Integer, ArrayList<Double>> getTollDistances() {
+		return tollDistances;
 	}
 }
