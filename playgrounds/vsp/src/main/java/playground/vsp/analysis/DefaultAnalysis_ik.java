@@ -39,6 +39,11 @@ import playground.vsp.analysis.modules.carDistance.CarDistanceAnalyzer;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 import playground.vsp.analysis.modules.emissionsWriter.EmissionEventsWriter;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
+import playground.vsp.analysis.modules.level1.agentId2enterLeaveVehicle.AgentId2EnterLeaveVehicleAnalyzer;
+import playground.vsp.analysis.modules.level1.departureDelayAtStop.DepartureDelayAtStopAnalyzer;
+import playground.vsp.analysis.modules.level1.enterLeaveVehicle2Activity.EnterLeaveVehicle2ActivityAnalyzer;
+import playground.vsp.analysis.modules.level1.ptTripTravelTime.PtTripTravelTimeTransfersAnalyzer;
+import playground.vsp.analysis.modules.level1.stopId2lineId2pulk.StopId2LineId2PulkAnalyzer;
 import playground.vsp.analysis.modules.ptOperator.PtOperatorAnalyzer;
 import playground.vsp.analysis.modules.transferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.travelTime.TravelTimeAnalyzer;
@@ -128,11 +133,32 @@ public class DefaultAnalysis_ik {
 //		waitAna.init(scenario);
 //		this.anaModules.add(waitAna);
 		
+//		DepartureDelayAtStopAnalyzer delayAna = new DepartureDelayAtStopAnalyzer(ptDriverPrefix);
+//		delayAna.init(scenario);
+//		this.anaModules.add(delayAna);
+		
+//		AgentId2EnterLeaveVehicleAnalyzer agent2EnterLeaveAna = new AgentId2EnterLeaveVehicleAnalyzer(ptDriverPrefix);
+//		agent2EnterLeaveAna.init(scenario);
+//		this.anaModules.add(agent2EnterLeaveAna);
+		
+//		PtTripTravelTimeTransfersAnalyzer ptTTAna = new PtTripTravelTimeTransfersAnalyzer(ptDriverPrefix);
+//		ptTTAna.init(scenario);
+//		this.anaModules.add(ptTTAna);
+		
+//		EnterLeaveVehicle2ActivityAnalyzer enterLeaveActAna = new EnterLeaveVehicle2ActivityAnalyzer(ptDriverPrefix);
+//		enterLeaveActAna.init(scenario);
+//		this.anaModules.add(enterLeaveActAna);
+		
+		StopId2LineId2PulkAnalyzer pulkAna = new StopId2LineId2PulkAnalyzer(ptDriverPrefix);
+		pulkAna.init(scenario);
+		this.anaModules.add(pulkAna);
+		
+		
 		// END ugly code - Initialization needs to be configurable
 		
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			if (person.getId().toString().startsWith(ptDriverPrefix)){
-				throw new RuntimeException("Person Ids have the same prefix as the pt Driver: " + ptDriverPrefix + ". Aborting...");
+				throw new RuntimeException("Person " + person.getId() + " has the same prefix as the pt Driver: " + ptDriverPrefix + ". Aborting...");
 			}
 		}
 		
