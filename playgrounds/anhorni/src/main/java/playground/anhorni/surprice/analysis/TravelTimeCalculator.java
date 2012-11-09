@@ -62,6 +62,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		this.agentArrivals.put(event.getPersonId(), event.getTime());
+		this.agentArrivalsMode.put(event.getPersonId(), event.getLegMode());
 	}
 
 	@Override
