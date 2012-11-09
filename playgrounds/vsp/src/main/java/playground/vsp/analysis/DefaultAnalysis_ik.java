@@ -39,11 +39,17 @@ import playground.vsp.analysis.modules.carDistance.CarDistanceAnalyzer;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 import playground.vsp.analysis.modules.emissionsWriter.EmissionEventsWriter;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
-import playground.vsp.analysis.modules.level1.agentId2enterLeaveVehicle.AgentId2EnterLeaveVehicleAnalyzer;
+import playground.vsp.analysis.modules.level1.agentId2personEnterLeaveVehicle.AgentId2EnterLeaveVehicleAnalyzer;
+import playground.vsp.analysis.modules.level1.delayAtStop.VehDelayAtStopAnalyzer;
+import playground.vsp.analysis.modules.level1.delayAtStopHistogram.VehDelayAtStopHistogramAnalyzer;
 import playground.vsp.analysis.modules.level1.departureDelayAtStop.DepartureDelayAtStopAnalyzer;
 import playground.vsp.analysis.modules.level1.enterLeaveVehicle2Activity.EnterLeaveVehicle2ActivityAnalyzer;
 import playground.vsp.analysis.modules.level1.ptTripTravelTime.PtTripTravelTimeTransfersAnalyzer;
 import playground.vsp.analysis.modules.level1.stopId2lineId2pulk.StopId2LineId2PulkAnalyzer;
+import playground.vsp.analysis.modules.level1.stopId2personEnterLeaveVehicle.StopId2PersonEnterLeaveVehicleAnalyzer;
+import playground.vsp.analysis.modules.level1.stopId2personEnterLeaveVehicle.StopId2PersonEnterLeaveVehicleHandler;
+import playground.vsp.analysis.modules.level1.stopId2routeId2DelayAtStop.StopId2RouteId2DelayAtStopAnalyzer;
+import playground.vsp.analysis.modules.level1.vehicleId2personEnterLeaveVehicle.VehId2PersonEnterLeaveVehicleAnalyzer;
 import playground.vsp.analysis.modules.ptOperator.PtOperatorAnalyzer;
 import playground.vsp.analysis.modules.transferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.travelTime.TravelTimeAnalyzer;
@@ -148,11 +154,32 @@ public class DefaultAnalysis_ik {
 //		EnterLeaveVehicle2ActivityAnalyzer enterLeaveActAna = new EnterLeaveVehicle2ActivityAnalyzer(ptDriverPrefix);
 //		enterLeaveActAna.init(scenario);
 //		this.anaModules.add(enterLeaveActAna);
+//		
+//		StopId2LineId2PulkAnalyzer pulkAna = new StopId2LineId2PulkAnalyzer(ptDriverPrefix);
+//		pulkAna.init(scenario);
+//		this.anaModules.add(pulkAna);
 		
-		StopId2LineId2PulkAnalyzer pulkAna = new StopId2LineId2PulkAnalyzer(ptDriverPrefix);
-		pulkAna.init(scenario);
-		this.anaModules.add(pulkAna);
+//		StopId2PersonEnterLeaveVehicleAnalyzer stopAna = new StopId2PersonEnterLeaveVehicleAnalyzer(ptDriverPrefix);
+//		stopAna.init(scenario);
+//		this.anaModules.add(stopAna);
 		
+//		StopId2RouteId2DelayAtStopAnalyzer delayAna = new StopId2RouteId2DelayAtStopAnalyzer(ptDriverPrefix);
+//		delayAna.init(scenario);
+//		this.anaModules.add(delayAna);
+		
+//		// number of detailed slots required for this analysis module
+//		int numberOfDetailedSlots = 5;
+//		VehDelayAtStopHistogramAnalyzer delayHistogramAna = new VehDelayAtStopHistogramAnalyzer(ptDriverPrefix, numberOfDetailedSlots);
+//		delayHistogramAna.init(scenario);
+//		this.anaModules.add(delayHistogramAna);
+
+//		VehDelayAtStopAnalyzer vehDelayAna = new VehDelayAtStopAnalyzer(ptDriverPrefix);
+//		vehDelayAna.init(scenario);
+//		this.anaModules.add(vehDelayAna);
+//		
+		VehId2PersonEnterLeaveVehicleAnalyzer vehIdEnterLeaveAna = new VehId2PersonEnterLeaveVehicleAnalyzer(ptDriverPrefix);
+		vehIdEnterLeaveAna.init(scenario);
+		this.anaModules.add(vehIdEnterLeaveAna);
 		
 		// END ugly code - Initialization needs to be configurable
 		
