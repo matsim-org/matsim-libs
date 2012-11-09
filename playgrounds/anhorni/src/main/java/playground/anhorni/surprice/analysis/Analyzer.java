@@ -155,7 +155,7 @@ public class Analyzer {
 			tdCalculator.run(person.getSelectedPlan());
 		}
 		this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();
-		this.tdSumIncomeWeighted[Surprice.days.indexOf(day)] = tdCalculator.getSumLenghtIncomeWeighted();
+		this.tdSumIncomeWeighted[Surprice.days.indexOf(day)] = tdCalculator.getLenghtIncomeWeighted();
 		this.boxPlotTravelDistancesCar.addValuesPerCategory(tdCalculator.getTravelDistances(), day, "Travel Distances Car");
 		
 		log.info("	analyzing utilities ...");

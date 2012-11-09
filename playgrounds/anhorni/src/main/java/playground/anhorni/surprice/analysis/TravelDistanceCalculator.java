@@ -99,8 +99,8 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 		return this.travelDistances;
 	}
 
-	public double getSumLenghtIncomeWeighted() {
-		return this.sumLenghtIncomeWeighted / this.getAverageTripLength();
+	public double getLenghtIncomeWeighted() {
+		return this.sumLenghtIncomeWeighted / (this.getAverageTripLength() * this.cntTrips);
 	}
 	public TreeMap<Integer, ArrayList<Double>> getCar() {
 		return carDistances;

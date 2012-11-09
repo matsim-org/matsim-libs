@@ -132,7 +132,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	}
 
 	public double getSumLengthIncomeWeighted() {
-		return this.sumLengthIncomeWeighted / this.getAverageTripLength();
+		return this.sumLengthIncomeWeighted / (this.getAverageTripLength() * this.cntTrips);
 	}
 
 	public TreeMap<Integer, ArrayList<Double>> getTollDistances() {
