@@ -21,40 +21,33 @@
 package playground.telaviv.zones;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
 
 public class Emme2ZonesFileParser {
 
 	private String inFile;
 	private String separator = ",";
-	private Charset charset = Charset.forName("UTF-8");
 	
 	public Emme2ZonesFileParser(String inFile) {
 		this.inFile = inFile;
 	}
 	
-	public Map<Integer, Emme2Zone> readFile() {
+	public Map<Integer, Emme2Zone> readFile(boolean skipHeader) {
 		Map<Integer, Emme2Zone> zones = new TreeMap<Integer, Emme2Zone>();
 		
-		FileInputStream fis = null;
-		InputStreamReader isr = null;
 	    BufferedReader br = null;
 	       
     	try {
-    		fis = new FileInputStream(inFile);
-    		isr = new InputStreamReader(fis, charset);
-			br = new BufferedReader(isr);
+			br = IOUtils.getBufferedReader(inFile);
 			
 			// skip first Line
-//			br.readLine();
+			if (skipHeader) br.readLine();
 			 
 			String line;
 			while((line = br.readLine()) != null) {
@@ -122,14 +115,11 @@ public class Emme2ZonesFileParser {
 				zone.LSIZEINTS = parseDouble(cols[57]);
 				zone.LSUMSIZE0 = parseDouble(cols[58]);
 				zone.LSUMSIZES = parseDouble(cols[59]);
-				zone.SUPERZONE = parseInteger(cols[60]);
-				
+				zone.SUPERZONE = parseInteger(cols[60]);				
 				zones.put(zone.TAZ, zone);
 			}
 			
 			br.close();
-			isr.close();
-			fis.close();
     	} catch (FileNotFoundException e)  {
 			Gbl.errorMsg(e);
 		} catch (IOException e) {

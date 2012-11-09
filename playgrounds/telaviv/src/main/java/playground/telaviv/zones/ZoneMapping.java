@@ -51,6 +51,8 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
+import playground.telaviv.config.TelAvivConfig;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -86,10 +88,16 @@ public class ZoneMapping {
 
 	private static final Logger log = Logger.getLogger(ZoneMapping.class);
 	
-	private String networkFile = "../../matsim/mysimulations/telaviv/network/network_WGS84.xml";
-	private String shapeFile = "../../matsim/mysimulations/telaviv/zones/taz_new.shp";
-	private String zonesFile = "../../matsim/mysimulations/telaviv/zones/zonal2007.txt";
-
+//	private String networkFile = TelAvivConfig.basePath + "/network/network_WGS84.xml";
+//	private String shapeFile = TelAvivConfig.basePath + "/zones/taz_new.shp";
+//	private String zonesFile = TelAvivConfig.basePath + "/zones/zonal2007.txt";
+//	private boolean skipHeader = false;
+	
+	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
+	private String shapeFile = TelAvivConfig.basePath + "/zones/TAZ2010_WGS1984.shp";
+	private String zonesFile = TelAvivConfig.basePath + "/zones/zonal2010v24.CSV";
+	private boolean skipHeader = true;
+	
 	private GeometryFactory factory;
 	private Set<Feature> zones;
 	private Scenario scenario;
@@ -106,15 +114,13 @@ public class ZoneMapping {
 	 * @throws FactoryException
 	 * @throws TransformException
 	 */
-	public static void main(String[] args) 
-	{
+	public static void main(String[] args) {
 		new ZoneMapping();
 	}
 	
 	public ZoneMapping() {
 		
-		try
-		{
+		try {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			new MatsimNetworkReader(scenario).readFile(networkFile);
 			CoordinateTransformation coordinateTransformation = new IdentityTransformation();
@@ -133,15 +139,13 @@ public class ZoneMapping {
 	}
 	
 	/*
-	 * The Zones Shape file uses WGS84 Coordinates but the MATSim network uses ITM Coordinates.
+	 * The 2007 Zones Shape file uses WGS84 Coordinates but the MATSim network uses ITM Coordinates.
 	 * Therefore we have to transform the Coordinates.
 	 */
-	public ZoneMapping(Scenario scenario, CoordinateTransformation coordinateTransformation)
-	{
+	public ZoneMapping(Scenario scenario, CoordinateTransformation coordinateTransformation) {
 		this.scenario = scenario;
 		
-		try
-		{		
+		try {		
 			this.createMapping(coordinateTransformation);
 		} catch (IOException e) { 
 			e.printStackTrace();
@@ -172,8 +176,7 @@ public class ZoneMapping {
 		}
 	
 		zonesMap = new TreeMap<Integer, Feature>();
-		for (Feature zone : zones)
-		{
+		for (Feature zone : zones) {
 			zonesMap.put((Integer)zone.getAttribute(3), zone);
 		}
 		
@@ -213,8 +216,7 @@ public class ZoneMapping {
 //			Point centerPoint = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
 //			Point endPoint = factory.createPoint(new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()));
 
-			for (Feature zone : zones)
-			{
+			for (Feature zone : zones) {
 				Geometry polygon = zone.getDefaultGeometry();
 				if (polygon.contains(startPoint)) startZone = zone;
 				if (polygon.contains(centerPoint)) centerZone = zone;
@@ -229,8 +231,7 @@ public class ZoneMapping {
 			if (startZone == null) nullCounter++;
 			if (centerZone == null) nullCounter++;
 			if (endZone == null) nullCounter++;
-			if (nullCounter > 1)
-			{
+			if (nullCounter > 1) {
 				outsideLinks++;
 				continue;
 			}
@@ -248,16 +249,14 @@ public class ZoneMapping {
 		 * iterate over all nodes to find all external nodes
 		 */
 		externalNodes = new TreeSet<Id>();
-		for (Node node : network.getNodes().values())
-		{
+		for (Node node : network.getNodes().values()) {
 			Coord pointCoord = coordinateTransformation.transform(node.getCoord());
 			Point point = factory.createPoint(new Coordinate(pointCoord.getX(), pointCoord.getY()));
 			
 //			Point point = factory.createPoint(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
 			
 			Feature pointZone = null;
-			for (Feature zone : zones)
-			{
+			for (Feature zone : zones) {
 				Geometry polygon = zone.getDefaultGeometry();
 				if (polygon.contains(point)) pointZone = zone;
 			}
@@ -272,19 +271,15 @@ public class ZoneMapping {
 		 * 
 		 * Each Zone Connector Node has the same Id as the TAZ of its zone!
 		 */
-		for (Entry<Integer, Feature> entry : zonesMap.entrySet())
-		{
+		for (Entry<Integer, Feature> entry : zonesMap.entrySet()) {
 			
 			Node node = network.getNodes().get(scenario.createId(entry.getKey().toString()));
 			
-			if (node != null)
-			{
-				for (Link link : node.getInLinks().values())
-				{
+			if (node != null) {
+				for (Link link : node.getInLinks().values()) {
 					linkMapping.put(link.getId(), entry.getValue());
 				}
-				for (Link link : node.getOutLinks().values())
-				{
+				for (Link link : node.getOutLinks().values()) {
 					linkMapping.put(link.getId(), entry.getValue());
 				}
 			}
@@ -294,15 +289,14 @@ public class ZoneMapping {
 		 * Parse Zones file
 		 */
 		log.info("Parsing zones file...");
-		parsedZones = new Emme2ZonesFileParser(zonesFile).readFile();
+		parsedZones = new Emme2ZonesFileParser(zonesFile).readFile(skipHeader);
 		log.info("done.");
 		
 		/*
 		 *  Add found mappings to the zones (fill LinkId Lists)
 		 */
 		log.info("Adding Links to the zones...");
-		for (Entry <Id, Feature> entry : linkMapping.entrySet())
-		{
+		for (Entry <Id, Feature> entry : linkMapping.entrySet()) {
 			Feature zone = entry.getValue();
 			int TAZ = (Integer) zone.getAttribute(3);
 			
@@ -314,10 +308,8 @@ public class ZoneMapping {
 		/*
 		 * Searching for Zones without a mapped Link
 		 */
-		for (Emme2Zone emme2Zone : parsedZones.values())
-		{
-			if (emme2Zone.linkIds.size() == 0)
-			{
+		for (Emme2Zone emme2Zone : parsedZones.values()) {
+			if (emme2Zone.linkIds.size() == 0) {
 				String infoString = "Warning: found Zone without mapped Link! TAZ: " + emme2Zone.TAZ;
 				infoString = infoString + ", Population: " + emme2Zone.POPULATION;
 				infoString = infoString + ", Students: " + emme2Zone.STUDENTS;
@@ -330,15 +322,14 @@ public class ZoneMapping {
 		Set<Feature> zonesWithLinks = new HashSet<Feature>();
 		zonesWithLinks.addAll(zones);
 		Iterator<Feature> iter2 = zonesWithLinks.iterator();
-		while (iter2.hasNext())
-		{
+		while (iter2.hasNext()) {
 			Feature zone = iter2.next();
 			int TAZ = (Integer) zone.getAttribute(3);
 			
 			Emme2Zone emme2Zone = parsedZones.get(TAZ);
 			if (emme2Zone.linkIds.size() == 0) iter2.remove();
 		}
-		ShapeFileWriter.writeGeometries(zonesWithLinks, "../../matsim/mysimulations/telaviv/network/zonesWithLinks.shp");
+//		ShapeFileWriter.writeGeometries(zonesWithLinks, TelAvivConfig.basePath + "/network/zonesWithLinks.shp");
 	}
 		
 	/*
@@ -364,8 +355,7 @@ public class ZoneMapping {
 
 		Map<Feature, Integer> mapping = new TreeMap<Feature, Integer>(new FeatureComparator());
 
-		for (int i = 0; i <= sections; i++)
-		{
+		for (int i = 0; i <= sections; i++) {
 			double x = fromX + i * dXSection;
 			double y = fromY + i * dYSection;
 
@@ -374,18 +364,13 @@ public class ZoneMapping {
 			
 //			Point point = factory.createPoint(new Coordinate(x, y));
 
-			for (Feature zone : zones)
-			{
+			for (Feature zone : zones) {
 				Geometry polygon = zone.getDefaultGeometry();
-				if (polygon.contains(point))
-				{
-					if (mapping.containsKey(zone))
-					{
+				if (polygon.contains(point)) {
+					if (mapping.containsKey(zone)) {
 						int count = mapping.get(zone);
 						mapping.put(zone, count + 1);
-					} 
-					else
-					{
+					} else {
 						mapping.put(zone, 1);
 					}
 				}
@@ -395,10 +380,8 @@ public class ZoneMapping {
 		Feature mappedFeature = null;
 		int maxCount = 0;
 		boolean unclearMapping = false;
-		for (Entry<Feature, Integer> entry : mapping.entrySet())
-		{
-			if (entry.getValue() >= maxCount)
-			{
+		for (Entry<Feature, Integer> entry : mapping.entrySet()) {
+			if (entry.getValue() >= maxCount) {
 				if (entry.getValue() == maxCount) unclearMapping = true;
 				else unclearMapping = false;
 
@@ -413,49 +396,41 @@ public class ZoneMapping {
 		 * double the number of sections. This is done until a clear mapping is
 		 * found.
 		 */
-		if (unclearMapping)
-		{
+		if (unclearMapping) {
 			mappedFeature = getLinkMapping(link, 2 * sections, coordinateTransformation);
 		}
 
 		return mappedFeature;
 	}
 	
-	public boolean zoneExists(int TAZ)
-	{
+	public boolean zoneExists(int TAZ) {
 		return parsedZones.containsKey(TAZ);
 	}
 		
-	public Network getNetwork()
-	{
+	public Network getNetwork() {
 		return this.network;
 	}
 	
-	public Map<Id, Feature> getLinkMapping()
-	{
+	public Map<Id, Feature> getLinkMapping() {
 		return linkMapping;
 	}
 	
-	public int getLinkTAZ(Id linkId)
-	{
+	public int getLinkTAZ(Id linkId) {
 		Feature zone = linkMapping.get(linkId);
 		int TAZ = (Integer) zone.getAttribute(3);
 		
 		return TAZ;
 	}
 	
-	public Set<Id> getExternalNodes()
-	{
+	public Set<Id> getExternalNodes() {
 		return externalNodes;
 	}
 	
-	public Emme2Zone getParsedZone(int id)
-	{
+	public Emme2Zone getParsedZone(int id) {
 		return parsedZones.get(id);
 	}
 	
-	public Map<Integer, Emme2Zone> getParsedZones()
-	{
+	public Map<Integer, Emme2Zone> getParsedZones() {
 		return parsedZones;
 	}
 	

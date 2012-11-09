@@ -22,18 +22,20 @@ package playground.telaviv.population;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -41,12 +43,14 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.Desires;
 
+import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.facilities.Emme2FacilitiesCreator;
 import playground.telaviv.zones.ZoneMapping;
 
@@ -54,10 +58,11 @@ public class Emme2PopulationCreator {
 
 	private static final Logger log = Logger.getLogger(Emme2PopulationCreator.class);
 
-	private String populationFile = "../../matsim/mysimulations/telaviv/population/PB1000_10.txt";
-	private String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
-	private String facilitiesFile = "../../matsim/mysimulations/telaviv/facilities/facilities.xml";
-	private String outFile = "../../matsim/mysimulations/telaviv/population/internal_plans_10.xml.gz";
+//	private String populationFile = TelAvivConfig.basePath + "/population/PB1000_10.txt";
+	private String populationFile = TelAvivConfig.basePath + "/population/Pop_2010_Msim_a.CSV";
+	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
+	private String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
+	private String outFile = TelAvivConfig.basePath + "/population/internal_plans_10.xml.gz";
 
 	private Scenario scenario;
 	private ActivityFacilities activityFacilities;
@@ -65,6 +70,11 @@ public class Emme2PopulationCreator {
 	private Emme2FacilitiesCreator facilitiesCreator;
 	private Random random = new Random(123456);
 
+	/*
+	 * The +/- range within an activity's departure time is randomly shifted.
+	 */
+	private double timeMutationRange = 1800.0;
+	
 	/*
 	 * Opening Times:
 	 * home 0..24
@@ -99,12 +109,13 @@ public class Emme2PopulationCreator {
 		log.info("done.");
 
 		log.info("Parsing population file...");
-		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile).readFile();
+		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile, "," , true).readFile();
 		log.info("done.");
 
 		log.info("Creating MATSim population...");
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
+		Counter counter = new Counter ("People skipped because invalid plan information was found: #");
 		for (Entry<Integer, Emme2Person> entry : personMap.entrySet()) {
 			Id id = scenario.createId(String.valueOf(entry.getKey()));
 			Emme2Person emme2Person = entry.getValue();
@@ -113,12 +124,28 @@ public class Emme2PopulationCreator {
 
 			setBasicParameters(person, emme2Person);
 
-			createAndAddInitialPlan(person, emme2Person);
+			/*
+			 * Some entries in the input file might be wrong (e.g. persons which want to perform
+			 * an activity from type a in a zone which does not offer that type of activity).
+			 */
+			boolean vaildPerson = createAndAddInitialPlan(person, emme2Person);
 
-			scenario.getPopulation().addPerson(person);
+			if (vaildPerson) scenario.getPopulation().addPerson(person);
+			else counter.incCounter();
 		}
+		counter.printCounter();
 		log.info("done.");
 
+		log.info("mutating populations activity times");
+		scenario.getConfig().global().setNumberOfThreads(8);
+		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(scenario.getConfig(), timeMutationRange);
+		timeAllocationMutator.prepareReplanning();
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) timeAllocationMutator.handlePlan(plan);
+		}
+		timeAllocationMutator.finishReplanning();
+		log.info("done.");
+		
 		log.info("Writing MATSim population to file...");
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outFile);
 		log.info("done.");
@@ -155,7 +182,7 @@ public class Emme2PopulationCreator {
 	 * 3 - shopping
 	 * 4 - other (leisure)
 	 */
-	public void createAndAddInitialPlan(PersonImpl person, Emme2Person emme2Person) {
+	public boolean createAndAddInitialPlan(PersonImpl person, Emme2Person emme2Person) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 //		RouteFactory routeFactory = new GenericRouteFactory();
 
@@ -252,7 +279,7 @@ public class Emme2PopulationCreator {
 		plan.addActivity(activity);
 
 		// If we have no activity chains we have nothing left to do.
-		if (!hasPrimaryActivity && !hasSecondaryActivity) return;
+		if (!hasPrimaryActivity && !hasSecondaryActivity) return true;
 
 		previousActivityLinkId = homeLinkId;
 		transportMode = getPrimaryTransportMode(primaryMainModePreActivity);
@@ -275,6 +302,7 @@ public class Emme2PopulationCreator {
 //				leg.setRoute(route);
 				plan.addLeg(leg);
 
+				
 				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(getActivityTypeString(primaryPreStopActivityType, getActivityFacilityByLinkId(primaryPreLinkId)), primaryPreLinkId);
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_1_BEF);
@@ -423,7 +451,14 @@ public class Emme2PopulationCreator {
 //			leg.setRoute(route);
 			plan.addLeg(leg);
 
-			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(getActivityTypeString(secondaryMainActivityType, getActivityFacilityByLinkId(secondaryLinkId)), secondaryLinkId);
+			/*
+			 * If null is returned, the found activity type cannot be performed in the found
+			 * facility. Skip those persons.
+			 */
+			String activityType = getActivityTypeString(secondaryMainActivityType, getActivityFacilityByLinkId(secondaryLinkId));
+			if (activityType == null) return false;
+			
+			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, secondaryLinkId);
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_2_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_2_MAIN);
@@ -493,6 +528,9 @@ public class Emme2PopulationCreator {
 			}
 			if (otherDurations < 86400) desires.accumulateActivityDuration("home", 86400 - otherDurations);
 		}
+		
+		// no errors have been found, so return true
+		return true;
 	}
 
 	/*
@@ -586,8 +624,7 @@ public class Emme2PopulationCreator {
 			case 6: currentTransportMode = "undefined"; break; // to passenger
 
 			default:
-				log.warn("Unknown Transport Mode Change Code! " + code + ", use bus as TransportMode.");
-//				currentTransportMode = TransportMode.bus; break;
+				log.warn("Unknown Transport Mode Change Code! " + code + ", use pt as TransportMode.");
 				currentTransportMode = TransportMode.pt; break;
 		}
 
@@ -612,7 +649,7 @@ public class Emme2PopulationCreator {
 
 	private static int activityNotSupportedCounter = 0;
 	private String getActivityTypeString(int code, ActivityFacility activityFacility) {
-		String string;
+		String string = null;
 
 		switch (code) {
 //			case 0: string = "h"; break;	// no -> home
@@ -627,7 +664,7 @@ public class Emme2PopulationCreator {
 					break;
 				}
 				else {
-					log.warn("No home ActivityOption found!" + ++activityNotSupportedCounter);
+					log.warn("No home ActivityOption found! #" + ++activityNotSupportedCounter);
 					string = "home";
 					break;
 				}
@@ -638,8 +675,8 @@ public class Emme2PopulationCreator {
 					break;
 				}
 				else {
-					log.warn("No work ActivityOption found!" + ++activityNotSupportedCounter);
-					string = "work";
+					log.warn("No work ActivityOption found! #" + ++activityNotSupportedCounter);
+//					string = "work";
 					break;
 				}
 
@@ -657,8 +694,8 @@ public class Emme2PopulationCreator {
 					break;
 				}
 				else {
-					log.warn("No education ActivityOption found!" + ++activityNotSupportedCounter);
-					string = "education";
+					log.warn("No education ActivityOption found! #" + ++activityNotSupportedCounter);
+//					string = "education";
 					break;
 				}
 
@@ -668,8 +705,8 @@ public class Emme2PopulationCreator {
 					break;
 				}
 				else {
-					log.warn("No shopping ActivityOption found!" + ++activityNotSupportedCounter);
-					string = "shopping";
+					log.warn("No shopping ActivityOption found! #" + ++activityNotSupportedCounter);
+//					string = "shopping";
 					break;
 				}
 
@@ -679,8 +716,8 @@ public class Emme2PopulationCreator {
 					break;
 				}
 				else {
-					log.warn("No leisure ActivityOption found!" + ++activityNotSupportedCounter);
-					string = "leisure";
+					log.warn("No leisure ActivityOption found! #" + ++activityNotSupportedCounter);
+//					string = "leisure";
 					break;
 				}
 

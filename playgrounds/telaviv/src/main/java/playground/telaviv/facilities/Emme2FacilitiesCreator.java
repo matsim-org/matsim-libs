@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NetworkEmme2MATSim.java
+ * Emme2FacilitiesCreator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,10 +21,7 @@
 package playground.telaviv.facilities;
 
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,8 +47,11 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 
+import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.ZoneMapping;
 
@@ -59,11 +59,9 @@ public class Emme2FacilitiesCreator {
 
 	private static final Logger log = Logger.getLogger(Emme2FacilitiesCreator.class);
 
-	private static String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
-	private String facilitiesFile = "../../matsim/mysimulations/telaviv/facilities/facilities.xml";
-	private String f2lFile = "../../matsim/mysimulations/telaviv/facilities/f2l.txt";
-		
-	private Charset charset = Charset.forName("UTF-8");
+	private static String networkFile = TelAvivConfig.basePath + "/network/network.xml";
+	private String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
+	private String f2lFile = TelAvivConfig.basePath + "/facilities/f2l.txt";
 	
 	private Scenario scenario;
 	private ZoneMapping zoneMapping;
@@ -88,6 +86,9 @@ public class Emme2FacilitiesCreator {
 		this.scenario = scenario;
 		
 		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
+//		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:28193", "EPSG:2039");
+//		zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:28193", "WGS84"));
+//		zoneMapping = new ZoneMapping(scenario, new IdentityTransformation());
 	}
 	
 	public Emme2FacilitiesCreator(Scenario scenario, ZoneMapping zoneMapping) {
@@ -110,6 +111,9 @@ public class Emme2FacilitiesCreator {
 	
 		for (Entry<Id, Feature> entry : zoneMapping.getLinkMapping().entrySet()) {
 			Id id = entry.getKey();
+			
+			if (id.toString().equals("6078")) 
+				log.info("found it!");
 			
 			Link link = zoneMapping.getNetwork().getLinks().get(id);
 			
@@ -328,9 +332,7 @@ public class Emme2FacilitiesCreator {
 	public void createAndWriteF2LMapping() {
 		log.info("Creating f2l mapping and write it to a file...");
 		try {
-			FileOutputStream fos = new FileOutputStream(f2lFile);
-			OutputStreamWriter osw = new OutputStreamWriter(fos, charset);
-			BufferedWriter bw = new BufferedWriter(osw);
+			BufferedWriter bw = IOUtils.getBufferedWriter(f2lFile);
 			
 			// write Header
 			bw.write("fid" + "\t" + "lid" + "\n");
@@ -339,10 +341,8 @@ public class Emme2FacilitiesCreator {
 				bw.write(id.toString() + "\t" + id.toString() + "\n");
 			}
 			
-			bw.close();
-			osw.close();
-			fos.close();
-			
+			bw.flush();
+			bw.close();			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -21,38 +21,35 @@
 package playground.telaviv.population;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.matsim.core.utils.io.IOUtils;
 
 public class Emme2PersonFileParser {
 
 	private String inFile;
-	private String separator = ",";
-	private Charset charset = Charset.forName("UTF-8");
+	private String separator;
+	private boolean skipHeader;
 	
-	public Emme2PersonFileParser(String inFile) {
+	public Emme2PersonFileParser(String inFile, String separator, boolean skipHeader) {
 		this.inFile = inFile;
+		this.separator = separator;
+		this.skipHeader = skipHeader;
 	}
 	
 	public Map<Integer, Emme2Person> readFile() {
 		Map<Integer, Emme2Person> zones = new TreeMap<Integer, Emme2Person>();
 		
-		FileInputStream fis = null;
-		InputStreamReader isr = null;
 	    BufferedReader br = null;
 	       
     	try {
-    		fis = new FileInputStream(inFile);
-    		isr = new InputStreamReader(fis, charset);
-			br = new BufferedReader(isr);
+			br = IOUtils.getBufferedReader(inFile);
 			
 			// skip first Line
-//			br.readLine();
+			if (skipHeader) br.readLine();
 			 
 			String line;
 			while((line = br.readLine()) != null) {
@@ -113,8 +110,6 @@ public class Emme2PersonFileParser {
 			}
 			
 			br.close();
-			isr.close();
-			fis.close();
     	}
     	catch (FileNotFoundException e) {
 			e.printStackTrace();

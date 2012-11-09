@@ -71,7 +71,7 @@ public class LocationChoicePlanModule extends AbstractMultithreadedModule {
 		log.info("done.");
 		
 		log.info("Parsing population file...");
-		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile).readFile();
+		Map<Integer, Emme2Person> personMap = new Emme2PersonFileParser(populationFile, ",", true).readFile();
 		log.info("done.");
 		
 		log.info("Filter persons with shopping activities...");

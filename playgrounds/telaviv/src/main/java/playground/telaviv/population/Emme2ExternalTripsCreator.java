@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -43,17 +44,18 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.Desires;
+
+import playground.telaviv.config.TelAvivConfig;
 
 public class Emme2ExternalTripsCreator {
 
 	private static final Logger log = Logger.getLogger(Emme2ExternalTripsCreator.class);
 	
-	private String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
-	private String facilitiesFile = "../../matsim/mysimulations/telaviv/facilities/facilities.xml";
-	private String externalTripsFile = "../../matsim/mysimulations/telaviv/population/external_trips.csv";
-	private String outFile = "../../matsim/mysimulations/telaviv/population/external_plans_10.xml.gz";
+	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
+	private String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
+	private String externalTripsFile = TelAvivConfig.basePath + "/population/external_trips.csv";
+	private String outFile = TelAvivConfig.basePath + "/population/external_plans_10.xml.gz";
 	
 	private Scenario scenario;
 //	private ZoneMapping zoneMapping;

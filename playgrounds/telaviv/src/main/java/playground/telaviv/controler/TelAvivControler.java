@@ -21,10 +21,12 @@
 package playground.telaviv.controler;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.telaviv.replanning.TTAStrategyManager;
 
@@ -32,6 +34,8 @@ public class TelAvivControler extends Controler {
 
 	public TelAvivControler(final String[] args) {
 		super(args);
+				
+		
 	}
 	
 	/*
@@ -42,7 +46,15 @@ public class TelAvivControler extends Controler {
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		return new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
 	}
+	
+	@Override
+	protected void loadData() {
+		super.loadData();
 		
+		// connect facilities to links
+		new WorldConnectLocations(config).connectFacilitiesWithLinks(this.scenarioData.getActivityFacilities(), (NetworkImpl) network);
+	}
+	
 	/*
 	 * Use a TTAStrategyManager that ignores TTA Agents when doing
 	 * the replanning.

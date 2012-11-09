@@ -21,19 +21,32 @@
 package playground.telaviv.counts;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
+
+import playground.telaviv.config.TelAvivConfig;
+import playground.telaviv.network.NetworkEmme2MATSim2012;
 
 /*
  * Assigning the counts from a Emme2Model to a MATSim Network.
@@ -47,13 +60,20 @@ import org.matsim.counts.CountsWriter;
  */
 public class CountsCreator {
 
-	private String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
-//	private String countsFile = "../../matsim/mysimulations/telaviv/counts/linkflows1000.csv";
-	private String countsFile = "../../matsim/mysimulations/telaviv/counts/selected_flows.csv";
-	private String outFile = "../../matsim/mysimulations/telaviv/counts/counts.xml";
+	private static final Logger log = Logger.getLogger(CountsCreator.class);
+	
+	private String nodesFile = TelAvivConfig.basePath + "/network/nodes.csv";
+	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
+//	private String countsFile = TelAvivConfig.basePath + "/counts/linkflows1000.csv";
+//	private String countsFile = TelAvivConfig.basePath + "./counts/selected_flows.csv";
+	private String countsFile = TelAvivConfig.basePath + "/counts/Traffic_counts.csv";
+	private String outFile = TelAvivConfig.basePath + "/counts/counts.xml";
 
 	private Scenario scenario;
-
+	
+	private Map<Id, ? extends Node> originalNodes = new HashMap<Id, Node>();
+	private QuadTree<Node> nodeQuadTree;
+	
 	public static void main(String[] args) {
 		new CountsCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).createCounts();
 	}
@@ -67,10 +87,23 @@ public class CountsCreator {
 		Counts counts = new Counts();
 		counts.setName("Tel Aviv Model");
 		counts.setDescription("Tel Aviv Model");
-		counts.setYear(2000);
+		counts.setYear(2008);
+		
+		if (this.nodesFile != null) {
+			try {
+			Config config = ConfigUtils.createConfig();
+			Scenario scenario = ScenarioUtils.createScenario(config);
+				NetworkEmme2MATSim2012.readNodes((NetworkImpl) scenario.getNetwork(), scenario, false);
+				originalNodes = scenario.getNetwork().getNodes();
+				buildNodesQuadTree();
+			} catch (Exception e) {
+				Gbl.errorMsg(e);
+			}
+		}
 
 		List<Emme2Count> emme2Counts = new CountsFileParser(countsFile).readFile();
 
+		Counter counter = new Counter("Count stations mapped to MATSim network: #");
 		for (Emme2Count emme2Count : emme2Counts) {
 			Id fromNodeId = scenario.createId(String.valueOf(emme2Count.inode));
 			Id toNodeId = scenario.createId(String.valueOf(emme2Count.jnode));
@@ -79,19 +112,29 @@ public class CountsCreator {
 			Node toNode = scenario.getNetwork().getNodes().get(toNodeId);
 
 			Link link = null;
-			if (fromNode == null || toNode == null) link = searchTransformedLink(emme2Count, fromNode, toNode);
+			if (fromNode == null || toNode == null) {
+				// try searching using original nodes
+				if (this.nodesFile != null) link = searchUsingOriginalNodes(fromNodeId, toNodeId);
+				
+				// if link is still null try searching in transformed links
+				if (link == null) link = searchTransformedLink(emme2Count, fromNode, toNode);
+			}
 			else link = searchLink(emme2Count, fromNode, toNode);
 
 			if (link != null) {
-				Count count = counts.createCount(link.getId(), link.getId().toString());
+				Count count = counts.createCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
 
 				count.createVolume(6, emme2Count.volau);
 				count.createVolume(7, emme2Count.volau);
 				count.createVolume(8, emme2Count.volau);
 				count.createVolume(9, emme2Count.volau);
+				
+				counter.incCounter();
 			}
-			else System.out.println("Link not found! From Node " + fromNodeId + " to Node " + toNodeId);
+			else log.warn("Link from Node " + fromNodeId + " to Node " + toNodeId + " could not be found!");
 		}
+		counter.printCounter();
+		log.info("Input file contained count information for " + emme2Counts.size() + " links.");
 		new CountsWriter(counts).write(outFile);
 	}
 
@@ -101,10 +144,88 @@ public class CountsCreator {
 				return link;
 			}
 		}
-
 		return null;
 	}
 
+	private void buildNodesQuadTree() {
+
+		double startTime = System.currentTimeMillis();
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for (Node n : this.scenario.getNetwork().getNodes().values()) {
+			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
+			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
+			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
+			if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
+		for (Node n : this.scenario.getNetwork().getNodes().values()) {
+			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
+		}
+		/* assign the quadTree at the very end, when it is complete.
+		 * otherwise, other threads may already start working on an incomplete quadtree
+		 */
+		this.nodeQuadTree = quadTree;
+		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
+	}
+	
+	private Link searchUsingOriginalNodes(Id fromNodeId, Id toNodeId) {
+				
+		Collection<Node> potentialFromNodes = new ArrayList<Node>();
+		Collection<Node> potentialToNodes = new ArrayList<Node>();
+		
+		Node fromNode = scenario.getNetwork().getNodes().get(fromNodeId);
+		Node toNode = scenario.getNetwork().getNodes().get(toNodeId);
+		
+		if (fromNode == null) {
+			fromNode = this.originalNodes.get(fromNodeId);
+			if (fromNode == null) {
+				log.warn("fromNode is not contained in the original network!");
+				return null;
+			}
+			Coord fromCoord = fromNode.getCoord();
+			
+			potentialFromNodes = this.nodeQuadTree.get(fromCoord.getX(), fromCoord.getY(), 10.0);			
+			
+		} else potentialFromNodes.add(fromNode);
+		
+		if (toNode == null) {
+			toNode = this.originalNodes.get(toNodeId);
+			if (toNode == null) {
+				log.warn("toNode is not contained in the original network!");
+				return null;
+			}
+			Coord toCoord = toNode.getCoord();
+			
+			potentialToNodes = this.nodeQuadTree.get(toCoord.getX(), toCoord.getY(), 10.0);
+			
+		} else potentialToNodes.add(toNode);
+		
+		for (Node potentialFromNode : potentialFromNodes) {
+			if (!potentialFromNode.getId().toString().contains(fromNodeId.toString())) continue;
+				
+			for (Node potentialToNode : potentialToNodes) {
+				if (!potentialToNode.getId().toString().contains(toNodeId.toString())) continue;
+				
+				for (Link potentialLink : potentialFromNode.getOutLinks().values()) {
+					if (potentialLink.getToNode().equals(potentialToNode)) {
+						return potentialLink;
+					}
+				}
+			}
+		}
+		
+		log.warn("Link from Node " + fromNodeId + " to Node " + toNodeId + " could not be found using original node data!");
+		return null;
+	}
+	
 	/*
 	 * If the Link cannot be found it may have be transformed to
 	 * represent turning conditions. In that case we try to find
@@ -132,7 +253,7 @@ public class CountsCreator {
 		else possibleFromNodes.add(fromNode);
 
 		if (possibleFromNodes.size() == 0) {
-			System.out.println("No potential FromNode found!");
+			log.info("No potential FromNode found!");
 			return null;
 		}
 
@@ -153,7 +274,7 @@ public class CountsCreator {
 		else possibleToNodes.add(toNode);
 
 		if (possibleToNodes.size() == 0) {
-			System.out.println("No potential ToNode found!");
+			log.info("No potential ToNode found!");
 			return null;
 		}
 
@@ -177,7 +298,7 @@ public class CountsCreator {
 		for (Link link : possibleLinks) {
 			if (link.getLength() > longestLink.getLength()) longestLink = link;
 		}
-		if (longestLink.getLength() < 1.0) System.out.println("Link is very short...");
+		if (longestLink.getLength() < 1.0) log.info("Link is very short...");
 		return longestLink;
 	}
 }
