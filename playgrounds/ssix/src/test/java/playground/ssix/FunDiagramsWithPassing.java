@@ -46,6 +46,8 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	
 	private static final Logger log = Logger.getLogger(FundamentalDiagrams.class);
 	
+	private static final int NUMBER_OF_MEMORIZED_FLOWS = 20;
+	
 	private Scenario scenario;
 	
 	private Id studiedMeasuringPointLinkId = new IdImpl(0);
@@ -90,7 +92,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 	private Double flowTime_med;
 	private Double flowTime_fast;
 	
-	private List<Double> last5Flows;//for detecting permanent Flow more precisely
+	private List<Double> lastXFlows;//for detecting permanent Flow more precisely
 	
 	
 
@@ -108,9 +110,9 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 			this.flowTable.add(0);
 		}
 		this.flowTime = new Double(0.);
-		this.last5Flows = new LinkedList<Double>();
-		for (int i=0; i<5; i++){
-			this.last5Flows.add(0.);
+		this.lastXFlows = new LinkedList<Double>();
+		for (int i=0; i<FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS; i++){
+			this.lastXFlows.add(0.);
 		}
 		
 		this.initializeGroupDependentVariables();
@@ -126,7 +128,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.lastSeenOnStudiedLinkEnter.clear();
 		this.flowTable.clear();
 		this.flowTime = new Double(0.);
-		this.last5Flows.clear();
+		this.lastXFlows.clear();
 		
 		this.resetGroupDependentVariables();
 	}
@@ -187,10 +189,10 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				
 				this.permanentFlow = getActualFlow();//veh/h
 				//Updating last5Flows
-				for (int j=3; j>=0; j--){
-					this.last5Flows.set(j+1, this.last5Flows.get(j).doubleValue());
+				for (int j=FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-2; j>=0; j--){
+					this.lastXFlows.set(j+1, this.lastXFlows.get(j).doubleValue());
 				}
-				this.last5Flows.set(0, this.permanentFlow);
+				this.lastXFlows.set(0, this.permanentFlow);
 				
 				if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
 					
@@ -199,15 +201,16 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 					this.permanentDensity = numberOfDrivingAgents/networkLength*1000;//veh/km
 				
 					this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
-					
-					//Setting all agents to abort:
-					//TODO: An abort condition/a selection condition for avoiding console spamming is now needed.
-					
-					if (almostEqualDoubles(this.last5Flows.get(0),this.last5Flows.get(4),0.02)){
+
+					if (almostEqualDoubles(this.lastXFlows.get(0),this.lastXFlows.get(FunDiagramsWithPassing.NUMBER_OF_MEMORIZED_FLOWS-1),0.02)){
 						log.info("Simulation successful.\n" +
 							 "Densities: truck: "+this.permanentDensity_truck+" med: "+this.permanentDensity_med+" fast: "+this.permanentDensity_fast+" TOTAL: "+this.permanentDensity+"\n"+
 							 "Flows: truck: "+this.permanentFlow_truck+" med: "+this.permanentFlow_med+" fast: "+this.permanentFlow_fast+" TOTAL: "+this.permanentFlow+"\n"+
 							 "V: truck: "+this.permanentAverageVelocity_truck+" med: "+this.permanentAverageVelocity_med+" fast: "+this.permanentAverageVelocity_fast+" AVERAGE: "+this.permanentAverageVelocity+"\n");
+						
+						//TODO: set all agents to abort and terminate simulation.
+						
+						
 					}
 				}
 			}
@@ -248,14 +251,14 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 						int checkingForAgents_med = this.tourNumberSpeed_med.size();
 						if (checkingForAgents_med == 0){
 							this.permanentRegime_med = true;//no agents driving, so this variable should always be true
-							System.out.println("Med permanent regime attained.");
+							System.out.println("Med permanent regime attained because of empty mode.");
 						}
 					}
 					if (!(this.permanentRegime_fast)){
 						int checkingForAgents_fast = this.tourNumberSpeed_fast.size();
 						if (checkingForAgents_fast == 0){
 							this.permanentRegime_fast = true;//no agents driving, so this variable should always be true
-							System.out.println("Fast permanent regime attained.");
+							System.out.println("Fast permanent regime attained because of empty mode.");
 						}
 					}
 					
@@ -368,20 +371,23 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 						int checkingForAgents_truck = this.tourNumberSpeed_truck.size();
 						if (checkingForAgents_truck == 0){
 							this.permanentRegime_truck = true;//no agents driving, so this variable should always be true
-							System.out.println("Truck permanent regime attained.");
+							System.out.println("Truck permanent regime attained because of empty mode.");
 						}
 					}
 					if (!(this.permanentRegime_fast)){
 						int checkingForAgents_fast = this.tourNumberSpeed_fast.size();
 						if (checkingForAgents_fast == 0){
 							this.permanentRegime_fast = true;//no agents driving, so this variable should always be true
-							System.out.println("Fast permanent regime attained.");
+							System.out.println("Fast permanent regime attained because of empty mode.");
 						}
 					}
 					
 					//Permanent in the mode?
+					//System.out.println("speed_med: "+speed);
 					double previousLapSpeed_med = this.tourNumberSpeed_med.get(tourNumber-1).getSecond();
+					//System.out.println("previous_med: "+previousLapSpeed_med);
 					double theOneBefore_med = this.tourNumberSpeed_med.get(tourNumber-2).getSecond();
+					//System.out.println("before_med: "+theOneBefore_med);
 					if ((almostEqualDoubles(speed, previousLapSpeed_med, 0.02)) && (almostEqualDoubles(previousLapSpeed_med, theOneBefore_med, 0.02))){
 						if (!(permanentRegime_med)){
 							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
@@ -478,7 +484,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 				Tuple<Integer,Double> newNumberSpeed = new Tuple<Integer,Double>(n+1,first + second/*average speed with n+1 people*/);
 				Tuple<Integer,Double> newNumberSpeed_fast = new Tuple<Integer,Double>(n_fast+1,first_fast + second_fast/*truck average speed with n+1 people*/);
 				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
-				this.tourNumberSpeed_truck.put(tourNumber, newNumberSpeed_fast);
+				this.tourNumberSpeed_fast.put(tourNumber, newNumberSpeed_fast);
 				
 				
 				//Checking for permanentRegime, in the mode and globally
@@ -488,21 +494,24 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 						int checkingForAgents_truck = this.tourNumberSpeed_truck.size();
 						if (checkingForAgents_truck == 0){
 							this.permanentRegime_truck = true;//no agents driving, so this variable should always be true
-							System.out.println("Truck permanent regime attained.");
+							System.out.println("Truck permanent regime attained because of empty mode.");
 						}
 					}
 					if (!(this.permanentRegime_med)){
 						int checkingForAgents_med = this.tourNumberSpeed_med.size();
 						if (checkingForAgents_med == 0){
 							this.permanentRegime_med = true;//no agents driving, so this variable should always be true
-							System.out.println("Med permanent regime attained.");
+							System.out.println("Med permanent regime attained because of empty mode.");
 						}
 					}
 					
 					//Permanent in the mode?
+					//System.out.println("speed_fast: "+speed);
 					double previousLapSpeed_fast = this.tourNumberSpeed_fast.get(tourNumber-1).getSecond();
+					//System.out.println("previous_fast: "+previousLapSpeed_fast);
 					double theOneBefore_fast = this.tourNumberSpeed_fast.get(tourNumber-2).getSecond();
-					if ((almostEqualDoubles(speed, previousLapSpeed_fast, 0.02)) && (almostEqualDoubles(previousLapSpeed_fast, theOneBefore_fast, 0.02))){
+					//System.out.println("before_fast: "+theOneBefore_fast);
+					if ((almostEqualDoubles(speed, previousLapSpeed_fast, 0.05)) && (almostEqualDoubles(previousLapSpeed_fast, theOneBefore_fast, 0.05))){
 						if (!(permanentRegime_fast)){
 							//this.permanentRegimeTour=tourNumber; eventually detect the permanent regime as soon as ONE of the modes has reached it?
 							this.permanentRegime_fast=true;

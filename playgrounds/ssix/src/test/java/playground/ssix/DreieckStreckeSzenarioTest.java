@@ -216,7 +216,7 @@ public class DreieckStreckeSzenarioTest {
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)2,2);
+		createPopulation((long)60,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		/*
@@ -335,13 +335,13 @@ public class DreieckStreckeSzenarioTest {
 			double p_truck = DreieckStreckeSzenarioTest.P_TRUCK/psum;
 			if (p<p_truck){
 				transportMode = "truck";
-				System.out.println("A truck was made.");
+				//System.out.println("A truck was made.");
 			} else if (p<(p_truck+p_med)) {
 				transportMode = "med";
-				System.out.println("A med was made.");
+				//System.out.println("A med was made.");
 			} else {
 				transportMode = "fast";
-				System.out.println("A fast was made.");
+				//System.out.println("A fast was made.");
 			}
 			customMap.put("transportMode", transportMode);
 			Leg leg = population.getFactory().createLeg(transportMode);
