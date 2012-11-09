@@ -81,10 +81,6 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private boolean replanDriver(PlanBasedWithinDayAgent withinDayAgent) {
 		PlanImpl executedPlan = (PlanImpl) withinDayAgent.getSelectedPlan();
-
-		if (withinDayAgent.getId().toString().equals("5898402")) {
-			log.info("found agent...");
-		}
 		
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
