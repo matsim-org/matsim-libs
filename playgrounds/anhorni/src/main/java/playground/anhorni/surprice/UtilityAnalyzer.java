@@ -92,10 +92,10 @@ public class UtilityAnalyzer {
 
 			this.computeZoneUtilities(utilitiesPerZone, day);
 			this.computeUtilities(utilitiesRelative, day, "rel");
-			this.boxPlotRelative.addValuesPerDay(utilitiesRelative, day, "Utilities");
+			this.boxPlotRelative.addValuesPerCategory(utilitiesRelative, day, "Utilities");
 			
 			this.computeUtilities(utilitiesAbsolute, day, "abs");
-			this.boxPlotAbsolute.addValuesPerDay(utilitiesAbsolute, day, "Utilities");
+			this.boxPlotAbsolute.addValuesPerCategory(utilitiesAbsolute, day, "Utilities");
 						
 			this.scenario.getPopulation().getPersons().clear();
 		}	
