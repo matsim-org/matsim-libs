@@ -42,6 +42,7 @@ public class EventData {
 	private HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes;
 	private HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes;
 	private int maxUtilization;
+	private double maxClearingTime;
 	
 	public EventData(String eventName, QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Tuple<Double,Integer>> arrivalTimes, Rect boundingBox) {
 		this.eventName = eventName;
@@ -54,12 +55,10 @@ public class EventData {
 		this.boundingBox = boundingBox;
 	}
 	
-	
 	public EventData(String eventName)
 	{
 		this.eventName = eventName;
 	}
-
 
 	public double getCellSize() {
 		return cellSize;
@@ -146,6 +145,15 @@ public class EventData {
 	
 	public int getMaxUtilization() {
 		return maxUtilization;
+	}
+	
+	public void setMaxClearingTime(double maxClearingTime) {
+		this.maxClearingTime = maxClearingTime;
+	}
+
+	public double getMaxClearingTime() {
+		
+		return this.maxClearingTime;
 	}
 
 }

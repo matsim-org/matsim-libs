@@ -37,6 +37,10 @@ public class Cell<T>
 	private List<Tuple<Tuple<Id,Id>, Double>> linkLeaveTimes;
 	private List<Tuple<Tuple<Id,Id>, Double>> linkEnterTimes;
 	private CoordImpl coord;
+	private double clearingTime;
+	private int id;
+	
+	private static int currentId = 0;
 	
 	public static String CELLSIZE = "cellsize";
 	
@@ -46,6 +50,10 @@ public class Cell<T>
 		this.linkLeaveTimes = new ArrayList<Tuple<Tuple<Id,Id>, Double>>();
 		this.linkEnterTimes = new ArrayList<Tuple<Tuple<Id,Id>, Double>>();
 		this.arrivalTimes = new ArrayList<Double>();
+		this.clearingTime = 0d;
+		
+		currentId++;
+		this.id = currentId;
 	}
 	
 	
@@ -124,6 +132,22 @@ public class Cell<T>
 	
 	public CoordImpl getCoord() {
 		return coord;
+	}
+
+
+	public void updateClearanceTime(double latestTime)
+	{
+		if (latestTime>clearingTime)
+			clearingTime=latestTime;
+	}
+	
+	public double getClearingTime() {
+		return clearingTime;
+	}
+
+
+	public int getId() {
+		return this.id;
 	}
 
 }

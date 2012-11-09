@@ -43,6 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -119,6 +120,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private Cell selectedCell;
 
 	private Mode mode;
+
 
 
 	public MyMapViewer(EvacuationAnalysis evacAnalysis) {
@@ -411,180 +413,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				g.fillPolygon(x, y, areaPolygon.getExteriorRing().getNumPoints());
 			}
 
-//			if ((!this.freezeMode)&&(this.currentHoverLinks.size()>0))
-//				this.currentHoverLinks.clear();
-//
-//			GeoPosition wPoint = null;
-
-			/*
-			 * 
-			//get geo mouseposition
-			if (this.currentMousePosition!=null){
-				Point wldPoint = new Point(this.currentMousePosition.x+b.x,this.currentMousePosition.y+b.y);
-				wPoint = this.getTileFactory().pixelToGeo(wldPoint, this.getZoom());
-
-
-				Coord wCoord = new CoordImpl(wPoint.getLongitude(), wPoint.getLatitude());
-				wCoord = this.ct.transform(wCoord);
-
-				//			System.out.println(wCoord);
-				//go through all links, draw them and check if the mouse cursor is nearby (for highlighting)
-				//			Collection<Coord[]> collection = this.links.get(wCoord.getX(),wCoord.getY(), 1000);
-				Link l = this.links.getNearest(wCoord.getX(),wCoord.getY());
-
-				Coord from = this.ctInverse.transform(l.getFromNode().getCoord());
-				Coord to = this.ctInverse.transform(l.getToNode().getCoord());
-
-				Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(from.getY(),from.getX()), this.getZoom());
-				Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(to.getY(),to.getX()), this.getZoom());
-
-				int x1 = (int) (from2D.getX()-b.x);
-				int y1 = (int) (from2D.getY()-b.y);
-				int x2 = (int) (to2D.getX()-b.x);
-				int y2 = (int) (to2D.getY()-b.y);
-
-				g2D.setStroke(new BasicStroke(3F));
-
-				//				//if there is already data available for the current link (road)
-				//				if (this.evacSel.hasLink(fromToIds[2]))
-				//					g.setColor(Color.blue);
-				//				else
-
-				
-				g.setColor(ToolConfig.COLOR_ROAD_HOVER);
-
-				int x = (x2-x1);
-				int y = (y2-y1);
-
-				//check for nearby links (mouse cursor) 
-				if (wPoint!=null){
-					int mouseX = this.currentMousePosition.x;
-					int mouseY = this.currentMousePosition.y;
-
-					int maxX = Math.max(x2,x1);
-					int maxY = Math.max(y2,y1);
-
-					int minX = Math.min(x2,x1);
-					int minY = Math.min(y2,y1);
-
-
-					if ((mouseX <= maxX) && (mouseX >= minX) && (mouseY <= maxY) && (mouseY >= minY)){
-						float r1 = ((float)mouseX - (float)x1) / x;
-						float r2 = ((float)mouseY - (float)y1) / y;
-
-						//if cursor is nearby, draw roads in another color
-						if ((r1 - 3f < r2) && (r1 + 3f > r2))	{
-							if ((!this.freezeMode) && (this.currentHoverLinks.size()<2)) {
-								this.currentHoverLinks.add(l);
-								for (Link revL : l.getToNode().getOutLinks().values()) {
-									if (revL.getToNode() == l.getFromNode()) {
-										this.currentHoverLinks.add(revL);
-										break;
-									}
-								}
-
-							}
-							g2D.setStroke(new BasicStroke(8F));
-							g.setColor(ToolConfig.COLOR_ROAD_HOVER);
-						}
-
-					}
-
-				}
-
-				//draw link/road if its not a selected one 
-				if ((!this.freezeMode)||(!this.currentHoverLinks.contains(l))) {
-					g.drawLine(x1,y1,x2,y2);
-				}
-			}
-			*/
-
-			/*
-			//display selected roads (with arrows)
-			if ((this.freezeMode)&&(this.currentHoverLinks.size()>0))
-			{
-				g2D.setStroke(new BasicStroke(5F));
-
-				//for each hover link
-				for (int i = 0; i<this.currentHoverLinks.size();i++)				{
-					//get the from & to nodes
-					Link l = this.currentHoverLinks.get(i);
-
-					Coord from = l.getFromNode().getCoord();
-					Coord to = l.getToNode().getCoord();
-
-					double length = Math.hypot(from.getX()-to.getX(), from.getY()-to.getY());
-					double dx = to.getX() - from.getX();
-					double dy = to.getY() - from.getY();
-					double nX = dx/length;
-					double nY = dy/length;
-
-					//shift arrow 10% of the link length to the left
-					double rightShiftX = nY * .1 * length;
-					double rightShiftY = -nX * .1 * length;
-
-					//from-to arrow
-					double fXA = from.getX() + rightShiftX;
-					double fYA = from.getY() + rightShiftY;
-					double tXA = to.getX() + rightShiftX;
-					double tYA = to.getY() + rightShiftY;
-					//arrow peak is 10% of link length long;
-					double leftPeakEndX = tXA-.1*length*nX + -nY * .1 * length;
-					double leftPeakEndY = tYA-.1*length*nY + nX * .1 * length;
-					double rightPeakEndX = tXA-.1*length*nX - -nY * .1 * length;
-					double rightPeakEndY = tYA-.1*length*nY - nX * .1 * length;
-
-
-					Coord tmp = this.ctInverse.transform(from);
-					Point2D from2D = this.getTileFactory().geoToPixel(new GeoPosition(tmp.getY(),tmp.getX()), this.getZoom());
-
-					tmp = this.ctInverse.transform(to);
-					Point2D to2D = this.getTileFactory().geoToPixel(new GeoPosition(tmp.getY(),tmp.getX()), this.getZoom());
-					int x1 = (int) (from2D.getX()-b.x);
-					int y1 = (int) (from2D.getY()-b.y);
-					int x2 = (int) (to2D.getX()-b.x);
-					int y2 = (int) (to2D.getY()-b.y);
-
-
-					tmp = this.ctInverse.transform(new CoordImpl(fXA,fYA));
-					Point2D arrowFrom2D = this.getTileFactory().geoToPixel(new GeoPosition(tmp.getY(),tmp.getX()), this.getZoom());
-					int ax1 = (int) (arrowFrom2D.getX()-b.x);
-					int ay1 = (int) (arrowFrom2D.getY()-b.y);
-
-					tmp = this.ctInverse.transform(new CoordImpl(tXA,tYA));
-					Point2D arrowTo2D = this.getTileFactory().geoToPixel(new GeoPosition(tmp.getY(),tmp.getX()), this.getZoom());
-					int ax2 = (int) (arrowTo2D.getX()-b.x);
-					int ay2 = (int) (arrowTo2D.getY()-b.y);
-
-
-					tmp = this.ctInverse.transform(new CoordImpl(leftPeakEndX,leftPeakEndY));
-					Point2D arrowLeftPeakEnd = this.getTileFactory().geoToPixel(new GeoPosition(tmp.getY(),tmp.getX()), this.getZoom());
-					int alx = (int) (arrowLeftPeakEnd.getX()-b.x);
-					int aly = (int) (arrowLeftPeakEnd.getY()-b.y);
-
-					tmp = this.ctInverse.transform(new CoordImpl(rightPeakEndX,rightPeakEndY));
-					Point2D arrowRightPeakEnd = this.getTileFactory().geoToPixel(new GeoPosition(tmp.getY(),tmp.getX()), this.getZoom());
-					int arx = (int) (arrowRightPeakEnd.getX()-b.x);
-					int ary = (int) (arrowRightPeakEnd.getY()-b.y);
-
-
-					g.setColor(ToolConfig.COLOR_ROAD_SELECTED);
-					g.drawLine(x1,y1,x2,y2);
-
-					//give each arrow a different color
-					if (i ==0 ) {
-						g.setColor(ToolConfig.COLOR_ROAD_1);
-					} else {
-						g.setColor(ToolConfig.COLOR_ROAD_2);
-					}
-					g.drawLine(ax1, ay1, ax2, ay2);
-					g.drawLine(ax2,ay2,alx,aly);
-					g.drawLine(ax2,ay2,arx,ary);
-
-
-				}
-			}
-			*/
 			
 			//draw utilization
 			if (mode.equals(Mode.UTILIZATION))
@@ -628,6 +456,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				
 				//get max cell time sum from data
 				double maxCellTimeSum = data.getMaxCellTimeSum();
+				double maxClearingTime = data.getMaxClearingTime();
 				
 				//get all cells from celltree
 				LinkedList<Cell> cells = new LinkedList<Cell>();
@@ -636,17 +465,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				this.selectedCell = null;
 				for (Cell cell : cells)
 				{
-					g2D.setStroke(new BasicStroke(1F));
-					
-					//calculate travel time in relation to the overall maximum travel time per cell 
-					Double relTravelTime = (cell.getTimeSum()) / maxCellTimeSum;
-
-					//might be NAN or less than zero: make it a zero
-					if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
-						relTravelTime = 0d;
-
-					//colorize cell depending on the picked colorization, cell data and the relative travel time
-					setCellColor(g, cell, relTravelTime);					
 					
 					//get cell coordinate (+ gridsize) and transform into pixel coordinates
 					CoordImpl cellCoord = cell.getCoord();
@@ -675,8 +493,35 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						gridY1 = temp;
 					}
 					
-					//color grid (if mode equals evacuation)
+					g2D.setStroke(new BasicStroke(1F));
+					
+					//calculate travel time in relation to the overall maximum travel time per cell 
+					double relTravelTime = cell.getTimeSum() / maxCellTimeSum;
+					double relClearingTime = cell.getClearingTime() / maxClearingTime;
+
+					//might be NAN or less than zero: make it a zero
+					if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
+						relTravelTime = 0d;
+
+					
+					//colorize cell depending on the picked colorization, cell data and the relative travel or clearance time
+					g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); //default
 					if (mode.equals(Mode.EVACUATION))
+					{
+						if (cell.getCount()>0)
+							setCellColor(g, cell, relTravelTime);
+					}
+					else if (mode.equals(Mode.CLEARING))
+					{
+						if (cell.getClearingTime()>0)
+							setCellColor(g, cell, relClearingTime);
+						
+					}
+					
+
+					
+					//color grid (if mode equals evacuation)
+					if ( (mode.equals(Mode.CLEARING)) || (mode.equals(Mode.EVACUATION)) ) 
 						g.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
 					
 					//draw grid
@@ -695,13 +540,10 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							g2D.setStroke(new BasicStroke(3F));
 							g.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
 							
-							
 							this.selectedCell = cell; 
 						}
 						
 					}		
-					
-					
 					
 					
 				}
@@ -709,11 +551,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				if ((this.selectedCell!=null) && (this.currentMousePosition!=null))
 				{
 					g.setColor(Color.white);
-					g.fillRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 50);
+					g.fillRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 150);
 					g.setColor(Color.black);
-					g.drawRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 50);
+					g.drawRect(this.currentMousePosition.x-20, this.currentMousePosition.y+20, 120, 150);
 					
 					g.drawString("person count: " + selectedCell.getCount(), this.currentMousePosition.x-15, this.currentMousePosition.y+50);
+					g.drawString("clearing time: " + selectedCell.getClearingTime(), this.currentMousePosition.x-15, this.currentMousePosition.y+70);
+					g.drawString("id:" + this.selectedCell.getId(), this.currentMousePosition.x-15, this.currentMousePosition.y+90);
 					
 				}
 				g.setColor(Color.black);
@@ -730,36 +574,30 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	}
 
 
-	private void setCellColor(Graphics g, Cell cell, Double relTravelTime) {
-		//if is activity in the current cell (person count > 0)
-		if (cell.getCount()>0)
+	private void setCellColor(Graphics g, Cell cell, Double value) {
+		//depending on the selected colorization, set red, green and blue values
+		//RED <-> YELLOW <-> GREEN 
+		if (coloringMode.equals(ColoringMode.RYG))
 		{
-			//depending on the selected colorization, set red, green and blue values
-			//RED <-> YELLOW <-> GREEN 
-			if (coloringMode.equals(ColoringMode.RYG))
+			int red,green,blue;
+			
+			if (value>.5)
 			{
-				int red,green,blue;
-				
-				if (relTravelTime>.5)
-				{
-					red = 255;
-					green = (int)(255 - 255*(relTravelTime-.5)*2);
-					blue = 0;
-				}
-				else
-				{
-					red = (int)(255*relTravelTime*2);
-					green = 255;
-					blue = 0;
-					
-				}
-				g.setColor(new Color(red,green,blue,(int)(255*cellTransparency)));
+				red = 255;
+				green = (int)(255 - 255*(value-.5)*2);
+				blue = 0;
 			}
 			else
-				g.setColor(new Color(0,127,(int)(255*relTravelTime),100));
+			{
+				red = (int)(255*value*2);
+				green = 255;
+				blue = 0;
+				
+			}
+			g.setColor(new Color(red,green,blue,(int)(255*cellTransparency)));
 		}
 		else
-			g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT);
+			g.setColor(new Color(0,127,(int)(255*value),100));
 	}
 
 	public void updateEventData(EventData data)

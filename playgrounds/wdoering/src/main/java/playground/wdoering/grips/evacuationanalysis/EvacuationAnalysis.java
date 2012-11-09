@@ -108,7 +108,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class EvacuationAnalysis implements ActionListener{
 
-	public static enum Mode { EVACUATION, UTILIZATION };
+	public static enum Mode { EVACUATION, UTILIZATION, CLEARING };
 	
 	private static final Logger log = Logger.getLogger(EvacuationAnalysis.class);
 	private JFrame frame;
@@ -499,6 +499,10 @@ public class EvacuationAnalysis implements ActionListener{
 			else if (modeList.getSelectedItem().toString().contains("utilization"))
 			{
 				setMode(Mode.UTILIZATION);
+			}
+			else if (modeList.getSelectedItem().toString().contains("clearing"))
+			{
+				setMode(Mode.CLEARING);
 			}
 				
 		}

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
@@ -54,7 +55,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEvent;
@@ -107,6 +107,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes;
 	private HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes;
+	private double maxClearingTime;
 	
 	
 
@@ -125,6 +126,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.arrivals = 0;
 		this.timeSum = 0;
 		this.maxUtilization = 0;
+		this.maxClearingTime = Double.NEGATIVE_INFINITY;
 		this.maxCellTimeSum = Double.NEGATIVE_INFINITY;
 		this.linkEnterTimes = new HashMap<Id, List<Tuple<Id,Double>>>();
 		this.linkLeaveTimes = new HashMap<Id, List<Tuple<Id,Double>>>();
@@ -193,7 +195,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		
 		
 	}
-	
 
 	public LinkedList<Double> getTimeSteps()
 	{
@@ -205,7 +206,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			this.timeSteps.addLast(timeStepValue);
 
 		return this.timeSteps;
-
 		//return timeStepsAsDoubleValues;
 	}
 
@@ -242,6 +242,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		//get the cell data, store event to it 
 		List<Event> cellEvents = cell.getData();
 		cellEvents.add(event);
+
 	}
 	
 	@Override
@@ -275,6 +276,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		}
 		
 	}
+
 
 	@Override
 	public void run()
@@ -313,8 +315,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		
 		linkEnterTimes.put(linkId, times);
 		
-		
-
 	}
 
 	@Override
@@ -341,6 +341,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		times.add(new Tuple(personId,event.getTime()));
 		
 		linkLeaveTimes.put(linkId, times);
+		
 	}
 	
 	public QuadTree<Cell> getCellTree() {
@@ -349,9 +350,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
  
 	public EventData getData()
 	{
-//		calculateClearingTimes();
 		
-		
+		getClearingTimes();
 		
 		EventData eventData = new EventData(eventName);
 		
@@ -365,11 +365,50 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		eventData.setLinkEnterTimes(linkEnterTimes);
 		eventData.setLinkLeaveTimes(linkLeaveTimes);
 		eventData.setMaxUtilization(maxUtilization);
+		eventData.setMaxClearingTime(maxClearingTime);
 		
 		return eventData;
 	}
+	
+	private void getClearingTimes()
+	{
+				
+		for (Link link : this.links)
+		{
+			Coord fromNodeCoord = link.getFromNode().getCoord();
+			Coord toNodeCoord = link.getToNode().getCoord();
+			
+			double minX = Math.min(fromNodeCoord.getX(), toNodeCoord.getX()) - cellSize/2d;
+			double maxX = Math.max(fromNodeCoord.getX(), toNodeCoord.getX()) + cellSize/2d;
+			double minY = Math.min(fromNodeCoord.getY(), toNodeCoord.getY()) - cellSize/2d;
+			double maxY = Math.max(fromNodeCoord.getY(), toNodeCoord.getY()) + cellSize/2d;
+			
+			Rect boundary = new Rect(minX, minY, maxX, maxY);
 
-	private void calculateClearingTimes()
+			//get all cells that are within the boundary from celltree
+			LinkedList<Cell> cells = new LinkedList<Cell>();
+			List<Tuple<Id, Double>> currentLinkLeaveTimes = linkLeaveTimes.get(link.getId());
+			
+			if ((currentLinkLeaveTimes!=null) && (currentLinkLeaveTimes.size()>0))
+			{
+				//cut 5%
+				int confidentElementNo = Math.max(0, (int)(currentLinkLeaveTimes.size()*0.95d - 1));
+				
+				double latestTime = currentLinkLeaveTimes.get(confidentElementNo).getSecond();
+				maxClearingTime = Math.max(latestTime, maxClearingTime);
+				
+				cellTree.get(boundary, cells);
+				
+				
+				for (Cell cell : cells)
+					cell.updateClearanceTime(latestTime);
+			}
+			
+		}
+	}
+
+	@Deprecated
+	private void calculateClearanceTimes()
 	{
 		
 		//get all cells from celltree
