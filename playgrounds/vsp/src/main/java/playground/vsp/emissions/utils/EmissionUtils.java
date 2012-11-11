@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.analysis.modules.emissionsAnalyzer;
+package playground.vsp.emissions.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -150,30 +150,6 @@ public class EmissionUtils {
 		}
 		return linkId2Emissions;
 	}
-
-//	public SortedMap<UserGroup, SortedMap<String, Double>> getEmissionsPerGroup(Map<Id, SortedMap<String, Double>> person2TotalEmissions) {
-//		SortedMap<UserGroup, SortedMap<String, Double>> userGroup2Emissions = new TreeMap<UserGroup, SortedMap<String, Double>>();
-//
-//		for(UserGroup userGroup : UserGroup.values()){
-//			SortedMap<String, Double> totalEmissions = new TreeMap<String,Double>();
-//			for(Id personId : person2TotalEmissions.keySet()){
-//				SortedMap<String, Double> individualEmissions = person2TotalEmissions.get(personId);
-//				if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
-//					double sumOfPollutant;
-//					for(String pollutant : individualEmissions.keySet()){
-//						if(totalEmissions.containsKey(pollutant)){
-//							sumOfPollutant = totalEmissions.get(pollutant) + individualEmissions.get(pollutant);
-//						} else {
-//							sumOfPollutant = individualEmissions.get(pollutant);
-//						}
-//						totalEmissions.put(pollutant, sumOfPollutant);
-//					}
-//				}
-//			}
-//			userGroup2Emissions.put(userGroup, totalEmissions);
-//		}
-//		return userGroup2Emissions;
-//	}
 
 	public SortedMap<String, Double> getTotalEmissions(Map<Id, SortedMap<String, Double>> person2TotalEmissions) {
 		SortedMap<String, Double> totalEmissions = new TreeMap<String, Double>();

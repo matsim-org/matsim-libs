@@ -25,12 +25,11 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.LinkImpl;
 
-import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.vsp.emissions.events.WarmEmissionEvent;
 import playground.vsp.emissions.events.WarmEmissionEventHandler;
 import playground.vsp.emissions.types.WarmPollutant;
+import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
  * @author benjamin, friederike

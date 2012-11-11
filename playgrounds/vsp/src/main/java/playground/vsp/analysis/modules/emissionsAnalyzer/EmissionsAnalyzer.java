@@ -45,6 +45,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
+import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
  * This module requires an emissions events file
