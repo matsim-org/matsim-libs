@@ -143,7 +143,7 @@ public class BkVisLiveFromLastIteration {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario sc = loader.loadScenario();
 		EventsManager events = EventsUtils.createEventsManager();
-		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(sc.getConfig().controler().getOutputDirectory(), false);
+		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(sc.getConfig().controler().getOutputDirectory(), true);
 		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(sc, events);
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			SignalEngine engine = new QSimSignalEngine(

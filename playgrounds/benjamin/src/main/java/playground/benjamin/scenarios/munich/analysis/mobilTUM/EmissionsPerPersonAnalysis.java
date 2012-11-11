@@ -33,12 +33,13 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
-import playground.benjamin.scenarios.munich.analysis.EmissionWriter;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
-
+import playground.vsp.emissions.utils.EmissionUtils;
+import playground.vsp.emissions.utils.EmissionWriter;
 
 /**
  * @author benjamin

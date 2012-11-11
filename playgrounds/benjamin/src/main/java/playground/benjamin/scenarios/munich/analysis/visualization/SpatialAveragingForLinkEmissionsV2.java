@@ -59,19 +59,19 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-//import playground.julia.interpolation.EmissionUtils;
-import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
-import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkWarmEventHandler;
+import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
+import playground.vsp.emissions.utils.EmissionUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
+//import playground.julia.interpolation.EmissionUtils;
 
 /**
  * @author benjamin

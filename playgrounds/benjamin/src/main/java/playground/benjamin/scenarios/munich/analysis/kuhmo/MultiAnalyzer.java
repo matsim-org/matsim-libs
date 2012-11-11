@@ -36,14 +36,15 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.benjamin.scenarios.munich.analysis.EmissionUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonWarmEventHandler;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
+import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
  * @author benjamin
@@ -184,6 +185,7 @@ public class MultiAnalyzer {
 
 	private void calculateEmissionStatisticsByUserGroup(String emissionEventsFile, String runName) {
 		EmissionUtils summarizer = new EmissionUtils();
+		UserGroupUtils utils = new UserGroupUtils();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
@@ -198,7 +200,7 @@ public class MultiAnalyzer {
 		Map<Id, Map<WarmPollutant, Double>> person2warmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		Map<Id, Map<ColdPollutant, Double>> person2coldEmissions = coldHandler.getColdEmissionsPerPerson();
 		Map<Id, SortedMap<String, Double>> person2totalEmissions = summarizer.sumUpEmissionsPerId(person2warmEmissions, person2coldEmissions);
-		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = summarizer.getEmissionsPerGroup(person2totalEmissions);
+		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = utils.getEmissionsPerGroup(person2totalEmissions);
 
 		writer.setRunName(runName);
 		writer.writeEmissionInformation(group2totalEmissions);
