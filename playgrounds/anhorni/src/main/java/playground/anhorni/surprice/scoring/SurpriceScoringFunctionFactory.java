@@ -27,7 +27,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-//import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.AgentMemories;
@@ -58,8 +57,11 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 			this.random.nextDouble();
 		}
 		double alphaTrip = 0.0;	
+		double gammaTrip = 0.0;
 		double alphaTripRange = Double.parseDouble(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "alphaTripRange"));
-		alphaTrip = alphaTripRange * (0.5 - this.random.nextDouble());		
+		double r = this.random.nextDouble();
+		alphaTrip = alphaTripRange * (0.5 - r);	// tripRange * [-0.5 .. 0.5]
+		gammaTrip = -1.0 * alphaTrip;
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 						
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
@@ -73,7 +75,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 				this.day,
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "alpha"),
 				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma"),
-				alphaTrip));
+				alphaTrip, gammaTrip));
 		
 		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 			scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(

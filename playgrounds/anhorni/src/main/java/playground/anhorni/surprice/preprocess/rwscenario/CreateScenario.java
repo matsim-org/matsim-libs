@@ -23,9 +23,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -114,14 +114,12 @@ public class CreateScenario {
 		ObjectAttributes preferences = new ObjectAttributes();
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
 			
-				// incomes 0..8
-				// alpha [0.5 ... 1.5]:
-				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] 
-				double alpha = 0.5 + incomeNzd;
-				
-				// gamma [0.0 ... 2.0]:
-				double k = 4.0 / (incomeNzd + 1.0); // [2.0 .. 4.0]
-				double gamma = k - 2; // [0 .. 2]
+				// incomes 0..8				
+				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] [low .. high]
+				double alpha = 0.5 + incomeNzd; // alpha [0.5 ... 1.5]
+								
+				double k = (8.0 - personWeeks.getIncome()) / 8.0; // [0.0 .. 1.0] [high .. low]
+				double gamma = 0.5 + k; // gamma [0.5 ... 1.5]
 				
 				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "alpha", alpha);
 				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "gamma", gamma);
