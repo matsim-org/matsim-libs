@@ -224,8 +224,8 @@ public class CreateScenario {
 				tollZone,
 				8.0 * 3600.0,
 				18.0 * 3600.0,
-				10.0,
-				"area",
+				0.5,
+				"link",
 				"ZH scenario"); 
 		// TODO: different schemes for different days
 	}
