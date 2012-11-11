@@ -198,10 +198,10 @@ public class Analyzer {
 			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
 			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistances().get(i), Integer.toString(i), "tt");
 		}		
-		this.writeDailyPlots();
+		this.writeDailyPlots(day);
 	}
 	
-	private void writeDailyPlots() {
+	private void writeDailyPlots(String day) {
 		this.utilityBins.plotBinnedDistribution(outPath, "income", "");
 		this.ttBins.plotBinnedDistribution(outPath, "income", "");
 		this.tdBins.plotBinnedDistribution(outPath, "income", "");
@@ -211,16 +211,16 @@ public class Analyzer {
 			bins.plotBinnedDistribution(outPath, "income", "");
 		}
 		this.boxPlotTravelTimesCarPerIncome.createChart();
-		this.boxPlotTravelTimesCarPerIncome.saveAsPng(outPath + "/ttCarPerIncome.png", 800, 600);
+		this.boxPlotTravelTimesCarPerIncome.saveAsPng(outPath + "/" + day + ".ttCarPerIncome.png", 800, 600);
 		
 		this.boxPlotTravelTimesPtPerIncome.createChart();
-		this.boxPlotTravelTimesPtPerIncome.saveAsPng(outPath + "/ttPtPerIncome.png", 800, 600);
+		this.boxPlotTravelTimesPtPerIncome.saveAsPng(outPath + "/" + day + ".ttPtPerIncome.png", 800, 600);
 		
 		this.boxPlotTravelDistancesCarPerIncome.createChart();
-		this.boxPlotTravelDistancesCarPerIncome.saveAsPng(outPath + "/tdCarPerIncome.png", 800, 600);
+		this.boxPlotTravelDistancesCarPerIncome.saveAsPng(outPath + "/" + day + ".tdCarPerIncome.png", 800, 600);
 				
 		this.boxPlotTravelDistancesTolledPerIncome.createChart();
-		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/tolltdPerIncome.png", 800, 600);
+		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + ".tolltdPerIncome.png", 800, 600);
 	}
 	
 	private void writePlots() {			
