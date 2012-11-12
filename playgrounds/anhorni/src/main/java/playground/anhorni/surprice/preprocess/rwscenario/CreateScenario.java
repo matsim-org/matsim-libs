@@ -208,26 +208,35 @@ public class CreateScenario {
 					);
 		}
 		
-		// dummy zone
-		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
-		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
-
-		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
-			if (bellevue.calcDistance(facility.getCoord()) < radius) {
-				tollZone.addFacility(facility);
-			}
-		}
-		
 		CreateToll tollCreator = new CreateToll();
-		tollCreator.create(
+		tollCreator.createLinkTolling(
 				outPath, 
-				tollZone,
-				8.0 * 3600.0,
-				18.0 * 3600.0,
-				10.0,
-				"area",
+				network,
+				6.0 * 3600.0,
+				20.0 * 3600.0,
+				1.0,
+				"link",
 				"ZH scenario"); 
-		// TODO: different schemes for different days
+		
+//		// dummy zone
+//		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
+//		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
+
+//		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
+//			if (bellevue.calcDistance(facility.getCoord()) < radius) {
+//				tollZone.addFacility(facility);
+//			}
+//		}
+//		
+//		CreateToll tollCreator = new CreateToll();
+//		tollCreator.create(
+//				outPath, 
+//				tollZone,
+//				8.0 * 3600.0,
+//				18.0 * 3600.0,
+//				1.0,
+//				"link",
+//				"ZH scenario"); 
 	}
 	
 	private void writeWeek(String outPath) {

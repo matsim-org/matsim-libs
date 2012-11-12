@@ -22,6 +22,8 @@ package playground.anhorni.surprice.preprocess;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import playground.anhorni.surprice.preprocess.miniscenario.Zone;
@@ -41,6 +43,25 @@ public class CreateToll {
     	// add links of center area
     	for (Id linkId : tollZone.getlinksInZone()) {
     		scheme.addLink(linkId);
+    	} 
+    	log.info("Writing tolls to " + path + "/tolls.xml");
+    	RoadPricingWriterXMLv1 tollWriter = new RoadPricingWriterXMLv1(scheme);
+    	tollWriter.writeFile(path + "/tolls.xml");	
+    }
+    
+    public void createLinkTolling(String path, NetworkImpl network, double startTime, double endTime, double amount, String type, String desc) { 	    	
+    	RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
+    	scheme.setType(type);
+    	scheme.setName("surprice");
+    	scheme.setDescription(desc); 	
+    	
+    	scheme.addCost(startTime, endTime, amount);
+    	
+    	// add links of center area
+    	for (Link link : network.getLinks().values()) {
+    		if (link.getFreespeed() >= 60.0) {
+    			scheme.addLink(link.getId());
+    		}
     	} 
     	log.info("Writing tolls to " + path + "/tolls.xml");
     	RoadPricingWriterXMLv1 tollWriter = new RoadPricingWriterXMLv1(scheme);
