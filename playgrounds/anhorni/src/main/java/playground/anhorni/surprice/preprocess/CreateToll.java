@@ -59,7 +59,7 @@ public class CreateToll {
     	
     	// add links of center area
     	for (Link link : network.getLinks().values()) {
-    		if (link.getFreespeed() >= 60.0) {
+    		if (link.getFreespeed() >= 60.0 / 3.6) {
     			scheme.addLink(link.getId());
     		}
     	} 
