@@ -29,9 +29,12 @@ import java.util.SortedMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
@@ -58,7 +61,8 @@ public class MultiAnalyzerWriter {
 		String fileName = this.outputDir + "/welfareTollInformation_" + runName + ".txt";
 		File file = new File(fileName);
 		
-		UserWelfareCalculator userWelfareCalculator = new UserWelfareCalculator(configFile);
+		Config config = ConfigUtils.loadConfig(configFile);
+		UserBenefitsCalculator userBenefitsCalculator = new UserBenefitsCalculator(config);
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -71,8 +75,8 @@ public class MultiAnalyzerWriter {
 				
 				Population userGroupPop = personFilter.getPopulation(pop, userGroup);
 
-				double userWelfareOfGroup = userWelfareCalculator.calculateLogsum(userGroupPop);
-				int personWithNoValidPlanCnt = userWelfareCalculator.getNoValidPlanCnt();
+				double userWelfareOfGroup = userBenefitsCalculator.calculateLogsum(userGroupPop);
+				int personWithNoValidPlanCnt = userBenefitsCalculator.getNoValidPlanCnt();
 				logger.warn(runName + ": users with no valid plan (all scores ``== null'' or ``<= 0.0'') in group " + userGroup + " : " + personWithNoValidPlanCnt);
 				
 				double tollRevenueOfGroup = 0.0;
@@ -89,7 +93,7 @@ public class MultiAnalyzerWriter {
 				String row = "\t" + userGroupPop.getPersons().size() + "\t" + groupSize + "\t" + userWelfareOfGroup + "\t" + absoluteTollRevenueUserGroup;
 				bw.write(row);
 				bw.newLine();
-				userWelfareCalculator.reset();
+				userBenefitsCalculator.reset();
 			}
 			bw.close();
 			logger.info("Finished writing output to " + fileName);

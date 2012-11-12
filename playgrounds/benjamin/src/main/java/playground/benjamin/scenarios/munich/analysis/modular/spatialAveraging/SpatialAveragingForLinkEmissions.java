@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.visualization;
+package playground.benjamin.scenarios.munich.analysis.modular.spatialAveraging;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -39,7 +39,6 @@ import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -55,7 +54,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -77,8 +75,12 @@ import com.vividsolutions.jts.util.Assert;
  * @author benjamin
  *
  */
-public class SpatialAveragingForLinkEmissionsV2 {
-	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkEmissionsV2.class);
+public class SpatialAveragingForLinkEmissions {
+	
+	//TODO die r-ausgabe wieder herstellen
+	//TODO aufraeumen
+	
+	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkEmissions.class);
 
 	private final static String runNumber1 = "981";
 	private final static String runNumber2 = "983";
@@ -125,6 +127,7 @@ public class SpatialAveragingForLinkEmissionsV2 {
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean baseCaseOnly = true;
 	final boolean calculateRelativeChange = false;
+	final double sigma = 3.0; //besser: 2sigma = radius
 	
 	int counter1, counter2, counter3, counter4, counter5, counter6 =0;
 
@@ -178,11 +181,11 @@ public class SpatialAveragingForLinkEmissionsV2 {
 //		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + "." + pollutant + ".smoothed.txt");
 //		writer.append("xCentroid\tyCentroid\t" + pollutant + "\tTIME\n");
 
-		Collection<Feature> features = new ArrayList<Feature>();
+		Collection<Feature> features = new ArrayList<Feature>(); //TODO featerzeug geloescht, neu schreiebn
 
 		double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 		
-		logger.info("time mark 0");
+		logger.info("Start mapping emissions");
 		
 		for(double endOfTimeInterval : time2EmissionMapToAnalyze.keySet()){
 			Map<Id, Map<String, Double>> emissionMapToAnalyze = time2EmissionMapToAnalyze.get(endOfTimeInterval);
@@ -190,106 +193,83 @@ public class SpatialAveragingForLinkEmissionsV2 {
 			// eWriter.writeLinkLocation2Emissions(listOfPollutants, deltaEmissionsTotal, network, outFile);
 
 			int[][] noOfLinksInCell = new int[noOfXbins][noOfYbins];
-			double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
 			sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
+			double[][] sumOfOriginateValuesForCell = new double [noOfXbins][noOfYbins];
 
-			logger.info("time mark 1");
+			//1. in den jeweiligen Kaestchen entstehende Emissionen berechnen
+			//TODO grosse Links dabei aufteilen
+			//2. Emissionen auf die Nachbarn (und sich selbst) verteilen - abhaengig von Entfernung und gewaehlter Varianz
+			//- dabei eventuell skalieren
 			
-			
-			
-			
-			//calculate weighted values and weights for every link, every bin
-			for(Link link : network.getLinks().values()){
+			//1.
+			for(Link link: network.getLinks().values()){
 				Id linkId = link.getId();
 				Coord linkCoord = link.getCoord();
 				double xLink = linkCoord.getX();
 				double yLink = linkCoord.getY();
-
+				
 				Integer xbin = mapXCoordToBin(xLink);
 				Integer ybin = mapYCoordToBin(yLink);
 				if ( xbin != null && ybin != null ){
 
-					noOfLinksInCell[xbin][ybin] ++;
-
-					int xMin = Math.max(0, (xbin-radius)); 
-					int xMax = Math.min(noOfXbins, (xbin+radius));
-					int yMin =Math.max(0, (ybin-radius));
-					int yMax =Math.min(noOfYbins, (ybin+radius)); 
+					noOfLinksInCell[xbin][ybin] ++;					
+					//den Wert auslesen
+					double value = emissionMapToAnalyze.get(linkId).get(pollutant2analyze);
+					//den wert in das richtige kaestchen schreiben
+					sumOfOriginateValuesForCell[xbin][ybin]=sumOfOriginateValuesForCell[xbin][ybin]+value;
+					counter4++;
+					//counter5+=
+				}
+			
+			}	
+			double sumOverAll=0.0;
+			for(int i=0; i<sumOfOriginateValuesForCell.length;i++){
+				for(int j=0; j<sumOfOriginateValuesForCell[i].length;j++)
+					sumOverAll=sumOverAll+ sumOfOriginateValuesForCell[i][j];
+			}
+		
+			
+			logger.info("2. for");
+				//2. 
+			//jedes Kaestchen der sumOfOrigi durchgehen und aufteilen, in sumOfWeightedValues speichern
+			
+			for (int i= 0; i< sumOfOriginateValuesForCell.length; i++){
+				for (int j=0; j< sumOfOriginateValuesForCell[i].length; j++){
 					
-					for(int xIndex = xMin; xIndex < xMax; xIndex++){
-						for(int yIndex = yMin; yIndex < yMax; yIndex++){
-							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = emissionMapToAnalyze.get(linkId).get(pollutant2analyze);
-							//exponential function (distance)
-							//euklidischer abstand, quadratwurzel
-							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-							System.out.print(weightOfLinkForCell+" ");
-							//TODO weightOfLinkForCell mit gauss statt quadratisch machen?
-							//summe der abstaende
-							sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
-							//was : sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
-							if(weightOfLinkForCell>binsize && binsize>0.0)
-								{sumOfweightedValuesForCell[xIndex][yIndex] += value/weightOfLinkForCell;}
-							else{
-								sumOfweightedValuesForCell[xIndex][yIndex] += value;
-							} 
+					//alle nachbarn des aktuellen kaestchens i,j
+					int xlimitBottom= Math.max(i-radius, 0);
+					int xlimitTop= Math.min(i+radius, noOfXbins-1); //TODO -1 wegen Arraygroesse noetig??
+					int ylimitBottom= Math.max(i-radius, 0);
+					int ylimitTop= Math.min(i+radius, noOfYbins-1); //TODO -1 wegen Arraygroesse noetig?? 
+					for(int neighborX = xlimitBottom; neighborX < xlimitTop; neighborX++){
+						for (int neighborY = ylimitBottom; neighborY < ylimitTop; neighborY++){
+							//den effektiven belastungswert berechnen 
+							//der factor entspricht einer diskretisierten normalverteilung
+							//System.out.println(factor(neighborX, neighborY, radius)+"factor"+sumOfOriginateValuesForCell[i][j]);
+							//sumOfweightedValuesForCell[neighborX][neighborY]+=10000*factor(neighborX, neighborY, radius)*sumOfOriginateValuesForCell[i][j];
+							sumOfweightedValuesForCell[neighborX][neighborY]+=factor(neighborX, neighborY, radius)*sumOfOriginateValuesForCell[i][j];
 						}
-						System.out.println("");
+					}
+				}
+			} //Ende 2.
+			String outputPathForR = new String(outPathStub + ".Routput"+pollutant2analyze.toString()+"."+endOfTimeInterval+".txt");
+			
+			//TODO rauskriegen, was in der sumOfWeighted Valued drin steht
+			for(double[] eintragarray : sumOfOriginateValuesForCell){
+				for(double eintrag : eintragarray){
+					if (eintrag < 1.0) counter2++;
+					else{
+						if(eintrag > 10000)counter3++;
 					}
 				}
 			}
-			logger.info("sumOfweightedValues,"+sumOfweightedValuesForCell);
-			if(endOfTimeInterval <Time.MIDNIGHT){
-			//
-				counter4++;
-			//scaling
-			// time mark 2 bis time mark 3 brauchen bei mir 13 Sekunden und laufen 120*160 Mal durch
-				
-			double coefficient = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) * 1000. * 1000.;
-			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-					counter1++; //noOfXbins*noOfYbins*timebins 115200
-					if(isInMunichShape(cellCentroid)){
-					if(noOfLinksInCell[xIndex][yIndex] >= minimumNoOfLinksInCell){
-						//counter2++; //115200
-						
-							//counter3++; //64044
-							 // time manager in QGIS does not accept time beyond midnight...
-								//counter4++; //42696
-								// double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex]; // average of emissions per cell
-
-								// double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m); // sum of emissions per cell normalized to emissions per m²
-
-								double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / coefficient ; // sum of emissions per cell normalized to emissions per km²
-
-								String dateTimeString = convertSeconds2dateTimeFormat(endOfTimeInterval);
-								// String outString = cellCentroid.getX() + "\t" + cellCentroid.getY() + "\t" + averageValue + "\t" + dateTimeString + "\n";
-								// writer.append(outString);
-
-								Point point = MGC.xy2Point(cellCentroid.getX(), cellCentroid.getY());
-								try {
-									counter5++; //42696
-									Feature feature = featureType.create(new Object[] {
-											point, dateTimeString, averageValue
-									});
-									features.add(feature);
-								} catch (IllegalAttributeException e1) {
-									counter6++; //0
-									throw new RuntimeException(e1);
-								}
-							
-						}
-					}
-				}
-			}}	
-
-			//logger.info("time mark 3");
-			//das r-outputschreiben selbst dauert weniger als eine Sekunde
-			String outputPathForR = new String(outPathStub + ".Routput"+pollutant2analyze.toString()+"."+endOfTimeInterval+".txt");
+			
 			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
 			
-		}
+			logger.info("done with time bin "+endOfTimeInterval+" "+sumOfOriginateValuesForCell[60][70]);
+			logger.info(sumOverAll);
+			
+		}//Ende der Schleife Zeitintervall
 
 		//TODO momentan fuer jedes Zeitintervall, passende Ifabfrage o ae
 //		String outputPathForR = new String(outPathStub + ".Routput.txt");
@@ -297,13 +277,28 @@ public class SpatialAveragingForLinkEmissionsV2 {
 //		writer.close();
 //		logger.info("Finished writing output to " + outPathStub + "." + pollutant2analyze + ".smoothed.txt");
 
-		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant2analyze + "perKmSquare.movie.emissionsPerLinkSmoothed.shp");
-		logger.info("Finished writing output to " + outPathStub +  "." + pollutant2analyze + ".perKmSquare.movie.emissionsPerLinkSmoothed.shp");
+		//TODO beide folgezeilen wieder ausschalten
+//		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant2analyze + "perKmSquare.movie.emissionsPerLinkSmoothed.shp");
+//		logger.info("Finished writing output to " + outPathStub +  "." + pollutant2analyze + ".perKmSquare.movie.emissionsPerLinkSmoothed.shp");
 //		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant2analyze + ".movie.emissionsPerLinkSmoothed.shp");
 //		logger.info("Finished writing output to " + outPathStub +  "." + pollutant2analyze + ".movie.emissionsPerLinkSmoothed.shp");
 		logger.info("Conterstaende 1,2,3,4,5,6: "+counter1+","+counter2+","+counter3+","+counter4+","+counter5+","+counter6);
 
 		
+	}
+
+	private double factor(int neighborX, int neighborY, int radius2) {
+		// TODO ueberpruefen
+		//TODO und es muss nicht jedes mal berechnet werden
+		//1/ sigma * sqrt(2 pi)
+		//return 0.4; //TODO rausnehmen, funktioniert nur fuer radius 5, wenn ueberhaupt
+		double prefactor = (1/sigma)/(Math.sqrt(2*Math.PI));
+		//exponentialterm e^(-1/2*(Abstand/sigma)^2)
+		double abstand = Math.sqrt(neighborX*neighborX+neighborY*neighborY);
+		double expo = Math.pow(Math.E, Math.pow(-0.5*(abstand/sigma),2));
+		double fac = prefactor*expo;
+		//System.out.println("fac"+fac+"expo"+expo+"abstand"+abstand+"pre"+prefactor);
+		return fac;
 	}
 
 	private void writeRoutput(double[][] sumOfweightedValuesForCell,
@@ -322,7 +317,7 @@ public class SpatialAveragingForLinkEmissionsV2 {
 			
 			//first line containing coordinates
 			for(int i=0; i<sumOfweightedValuesForCell.length;i++){
-				valueString+=Double.toString(yMin+i*yDist)+"\t";
+				valueString= valueString+Double.toString(yMin+i*yDist)+"\t";
 			}
 			buffW.write(valueString);
 			buffW.newLine();
@@ -332,15 +327,19 @@ public class SpatialAveragingForLinkEmissionsV2 {
 			//outputdatei mit 160 zeilen
 			for(int i = 0; i< sumOfweightedValuesForCell[0].length; i++){
 				//coordinates as header
-				valueString+=Double.toString(xMin+i*xDist)+"\t";
+				valueString=valueString+Double.toString(xMin+i*xDist)+"\t";
 				
 				//table contents
 				for(int j=0; j<sumOfweightedValuesForCell.length; j++){ 
 					try {
-						valueString+=Double.toString(sumOfweightedValuesForCell[j][i])+"\t"; 
+						if (sumOfweightedValuesForCell[i][j]<1.0)counter1++;
+						String actString=Double.toString(sumOfweightedValuesForCell[i][j]);
+						if (actString.contains("E"))actString="1.9"; //TODO catch this exception
+						if (actString.contains("N"))actString="0.0";
+						valueString= valueString+actString+"\t"; 
 					} catch (Exception e) {
 						//if the array was not initialized at [i][j] use 0.0
-						valueString+="0.0"+"\t";
+						valueString=valueString+"0.0"+"\t";
 						//alternative, TODO check if R handles this correctly
 						//valueString+="NA"+"\t";
 					}
@@ -645,6 +644,6 @@ public class SpatialAveragingForLinkEmissionsV2 {
 	}
 
 	public static void main(String[] args) throws IOException{
-		new SpatialAveragingForLinkEmissionsV2().run();
+		new SpatialAveragingForLinkEmissions().run();
 	}
 }
