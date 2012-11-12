@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.router.DepartureTimeCache;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
@@ -47,6 +48,7 @@ public class EvacuationTransitRouterFactory {
 	private final TransitRouterConfig routerConfig;
 	private final TransitRouterNetwork routerNetwork;
 	private final EvacuationTransitRouterNetworkTravelTimeAndDisutility ttCalculator;
+	private final DepartureTimeCache departureTimeCache;
 	
 	private final Coord center = EvacuationConfig.centerCoord;
 	private final double innerRadius = EvacuationConfig.innerRadius;
@@ -60,7 +62,8 @@ public class EvacuationTransitRouterFactory {
 		this.routerConfig = routerConfig;
 		this.routerNetwork = routerNetwork;
 		
-		this.ttCalculator = new EvacuationTransitRouterNetworkTravelTimeAndDisutility(routerConfig);
+		this.departureTimeCache = new DepartureTimeCache();
+		this.ttCalculator = new EvacuationTransitRouterNetworkTravelTimeAndDisutility(this.routerConfig, this.departureTimeCache);
 		this.exitNodes = new ArrayList<TransitRouterNetworkNode>();
 		identifyExitNodes();
 	}

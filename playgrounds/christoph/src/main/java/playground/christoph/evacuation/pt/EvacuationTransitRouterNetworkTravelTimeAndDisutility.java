@@ -49,18 +49,20 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 
 	protected final TransitRouterConfig config;
 	
-	private final ThreadLocal<Link> previousLinks;
-	private final ThreadLocal<Double> previousTimes;
-	private final ThreadLocal<Double> cachedTravelTimes;
-	private final ThreadLocal<DepartureTimeCache> departureTimeCaches;
+//	private final ThreadLocal<Link> previousLinks;
+//	private final ThreadLocal<Double> previousTimes;
+//	private final ThreadLocal<Double> cachedTravelTimes;
+	private final ThreadLocal<BufferedData> bufferedData;
+	private final DepartureTimeCache departureTimeCache;
 
-	public EvacuationTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
+	public EvacuationTransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, final DepartureTimeCache departureTimeCache) {
 		this.config = config;
 		
-		this.previousLinks = new ThreadLocal<Link>();
-		this.previousTimes = new ThreadLocal<Double>();
-		this.cachedTravelTimes = new ThreadLocal<Double>();
-		this.departureTimeCaches = new ThreadLocal<DepartureTimeCache>();
+//		this.previousLinks = new ThreadLocal<Link>();
+//		this.previousTimes = new ThreadLocal<Double>();
+//		this.cachedTravelTimes = new ThreadLocal<Double>();
+		this.bufferedData = new ThreadLocal<BufferedData>();
+		this.departureTimeCache = departureTimeCache;
 	}
 
 	@Override
@@ -72,14 +74,25 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 	@Override
 	public double getLinkTravelTime(final Link link, final double time, Person person, Vehicle vehicle) {
 		
-		Link previousLink = this.previousLinks.get();
-		Double previousTime = this.previousTimes.get();	// has to be Double since get() might return null!
+//		Link previousLink = this.previousLinks.get();
+//		Double previousTime = this.previousTimes.get();	// has to be Double since get() might return null!
 		
-		if ((link == previousLink) && (time == previousTime)) {
-			return this.cachedTravelTimes.get();
+//		if ((link == previousLink) && (time == previousTime)) {
+//			return this.cachedTravelTimes.get();
+//		}
+//		this.previousLinks.set(link);
+//		this.previousTimes.set(time);
+		
+		BufferedData bd = bufferedData.get();
+		if (bd == null) {
+			bd = new BufferedData();
+			bufferedData.set(bd);
 		}
-		this.previousLinks.set(link);
-		this.previousTimes.set(time);
+		if ((link == bd.previousLink) && (time == bd.previousTime)) {
+			return bd.cachedTravelTime;
+		}
+		bd.previousLink = link;
+		bd.previousTime = time;
 
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
@@ -87,13 +100,7 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 		if (wrapped.getRoute() != null) {
 			// (agent stays on the same route, so use transit line travel time)
 			
-			// get the next departure time:
-			DepartureTimeCache data = this.departureTimeCaches.get();
-			if (data == null) {
-				data = new DepartureTimeCache();
-				departureTimeCaches.set(data);
-			}
-			double bestDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, time);
+			double bestDepartureTime = departureTimeCache.getNextDepartureTime(wrapped.getRoute(), fromStop, time);
 
 			// the travel time on the link is 
 			//   the time until the departure (``dpTime - now'')
@@ -105,14 +112,26 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 				// ( this can only happen, I think, when ``bestDepartureTime'' is after midnight but ``time'' was before )
 				time2 += MIDNIGHT;
 			}
-			this.cachedTravelTimes.set(time2);
+//			this.cachedTravelTimes.set(time2);
+			bd.cachedTravelTime = time2;
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
 		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
-		this.cachedTravelTimes.set(time2);
+//		this.cachedTravelTimes.set(time2);
+		bd.cachedTravelTime = time2;
 				
 		return time2;
+	}
+	
+	/*
+	 * Use one object to store all buffered data. By doing so, only a single
+	 * ThreadLocal object is required.
+	 */
+	private static class BufferedData {
+		Link previousLink = null;
+		double previousTime = Double.NaN;
+		double cachedTravelTime = Double.NaN;
 	}
 }
