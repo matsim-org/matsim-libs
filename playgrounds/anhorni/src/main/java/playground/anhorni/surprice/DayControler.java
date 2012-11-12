@@ -19,6 +19,9 @@
 
 package playground.anhorni.surprice;
 
+import java.util.ArrayList;
+
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -35,6 +38,7 @@ import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
+import playground.anhorni.surprice.analysis.SupriceBoxPlot;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
 
 public class DayControler extends Controler {
@@ -56,7 +60,25 @@ public class DayControler extends Controler {
 	    	    
 	  	SurpriceScoringFunctionFactory scoringFunctionFactory = new SurpriceScoringFunctionFactory(
 	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
-	  	this.setScoringFunctionFactory(scoringFunctionFactory);  	
+	  	this.setScoringFunctionFactory(scoringFunctionFactory);  
+	  	
+	  	this.printPrefs();
+	}
+	
+	private void printPrefs() {
+		SupriceBoxPlot boxPlotPrefs = new SupriceBoxPlot("Prefs", "pref", "prefs");
+		ArrayList<Double> alpha = new ArrayList<Double>();
+		ArrayList<Double> gamma = new ArrayList<Double>();
+		
+		for (Person p : this.population.getPersons().values()) {
+			SurpriceScoringFunctionFactory sf = (SurpriceScoringFunctionFactory) this.getScoringFunctionFactory().createNewScoringFunction(p.getSelectedPlan());
+			alpha.add(sf.getAlpha() + sf.getAlphaTrip());
+			gamma.add(sf.getGamma() + sf.getGammaTrip());
+		}
+		boxPlotPrefs.addValuesPerCategory(alpha, "alpha", "alpha");
+		boxPlotPrefs.addValuesPerCategory(gamma, "gamma", "gamma");
+		boxPlotPrefs.createChart();
+		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename("prefs.png"), 800, 600);	
 	}
 	
 	@Override

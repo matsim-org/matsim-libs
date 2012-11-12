@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -146,14 +147,18 @@ public class CreateScenario {
 	}
 	
 	private void writeIncomes(String outPath) {
+		Bins incomeBins = new Bins(1, 9, "incomes");
 		ObjectAttributes incomes = new ObjectAttributes();
 		
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
 			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", personWeeks.getIncome());
+			incomeBins.addVal(personWeeks.getIncome(), 1.0);
 		}		
 		log.info("Writing incomes to " + outPath + "/incomes.xml");
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(incomes);
 		attributesWriter.writeFile(outPath + "/incomes.xml");
+		
+		incomeBins.plotBinnedDistribution(outPath + "/", "income", "");	
 	}
 	
 	private void drawIncomes(TreeMap<Double, Integer> incomesNormalized) {
