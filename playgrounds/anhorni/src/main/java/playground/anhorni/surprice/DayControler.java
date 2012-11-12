@@ -23,6 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -30,6 +31,7 @@ import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricing;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
@@ -65,10 +67,15 @@ public class DayControler extends Controler {
 		if (scheme.getType().equals("area")) {		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 		return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts,
-				travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory, (RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
+				travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory, 
+				(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
 		}
 		else {
-			return super.createRoutingAlgorithm(travelCosts, travelTimes);
+			final TravelDisutilityFactory previousTravelCostCalculatorFactory = super.getTravelDisutilityFactory();
+			TravelDisutility costsIncludingTolls = new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(
+					travelTimes, this.config.planCalcScore()), 
+					(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
+			return super.createRoutingAlgorithm(costsIncludingTolls, travelTimes);
 		}
 	}
 	
