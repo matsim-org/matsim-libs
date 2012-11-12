@@ -76,9 +76,10 @@ public class MultiPlanCooperative extends AbstractCooperative{
 			}
 
 			double accumulatedWeight = 0.0;
+			double rndTreshold = MatsimRandom.getRandom().nextDouble() * numberOfVehicles;
 			for (PPlan pPlan : plansWithAtLeastTwoVehicles) {
 				accumulatedWeight += pPlan.getNVehicles();
-				if (MatsimRandom.getRandom().nextDouble() * numberOfVehicles <= accumulatedWeight) {
+				if (rndTreshold <= accumulatedWeight) {
 					this.bestPlan = pPlan;
 					return this.bestPlan;
 				}
