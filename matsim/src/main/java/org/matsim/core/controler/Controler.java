@@ -227,6 +227,18 @@ public class Controler extends AbstractController {
 
 	private boolean useTripRouting = true;
 
+	public static void main(final String[] args) {
+		if ((args == null) || (args.length == 0)) {
+			System.out.println("No argument given!");
+			System.out.println("Usage: Controler config-file [dtd-file]");
+			System.out.println();
+		} else {
+			final Controler controler = new Controler(args);
+			controler.run();
+		}
+		System.exit(0);
+	}
+
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
 	 *
@@ -277,228 +289,15 @@ public class Controler extends AbstractController {
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
-		
-		this.events = createEventsManager(this.config);
-		this.config.parallelEventHandling().makeLocked();
-	}
 
-	protected EventsManager createEventsManager(final Config config) {
-		return EventsUtils.createEventsManager(this.config);
+		this.events = EventsUtils.createEventsManager(this.config);
+		this.config.parallelEventHandling().makeLocked();
 	}
 
 	/**
 	 * Starts the simulation.
 	 */
 	public void run() {
-		loadConfig();
-		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
-		init();
-		run(config);
-	}
-
-	private void init() {
-		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			setupMultiModalSimulation();
-		}
-		if (this.config.scenario().isUseTransit()) {
-			setupTransitSimulation();
-		}
-		loadData();
-		setUp();
-	}
-
-	private final void setupMultiModalSimulation() {
-		log.info("setting up multi modal simulation");
-
-		// set Route Factories
-		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
-			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(mode, factory);
-		}
-	}
-
-	private final void setupTransitSimulation() {
-		log.info("setting up transit simulation");
-		if (!this.config.scenario().isUseVehicles()) {
-			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
-		}
-
-		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
-		formats.add(EventsFileFormat.xml);
-		this.config.controler().setEventsFileFormats(formats);
-
-		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		transitActivityParams.setTypicalDuration(120.0);
-		this.config.planCalcScore().addActivityParams(transitActivityParams);
-
-		// the QSim reads the config by itself, and configures itself as a
-		// transit-enabled mobsim. kai, nov'11
-	}
-
-
-
-	@Override
-	protected void prepareForSim() {
-		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
-			}
-		});
-	}
-
-	@Override
-	protected void runMobSim(int iteration) {
-		this.iteration = iteration;
-		runMobSim();
-	}
-
-	protected void runMobSim() {
-		Mobsim sim = getNewMobsim();
-		sim.run();
-	}
-
-	/**
-	 * Initializes the Controler with the parameters from the configuration.
-	 * This method is called after the configuration is loaded, and after the
-	 * scenario data (network, population) is read.
-	 */
-	protected void setUp() {
-
-		if (this.travelTimeCalculatorFactory != null) {
-			log.info("travelTimeCalculatorFactory already set, ignoring default");
-		} else {
-			if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-				this.travelTimeCalculatorFactory = new TravelTimeCalculatorWithBufferFactory();
-			} else {
-				this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-			}
-		}
-
-		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-
-		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			if (this.config.multiModal().isCreateMultiModalNetwork()) {
-				log.info("Creating multi modal network.");
-				new MultiModalNetworkCreator(this.config.multiModal()).run(this.scenarioData.getNetwork());
-			}
-
-			if (this.config.multiModal().isEnsureActivityReachability()) {
-				log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
-				new EnsureActivityReachability(this.scenarioData).run(this.scenarioData.getPopulation());
-			}
-
-			if (this.config.multiModal().isDropNonCarRoutes()) {
-				log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
-				new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
-			}
-
-
-			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
-			multiModalTravelTimes = new HashMap<String, TravelTime>();
-			multiModalTravelTimes.put(TransportMode.car, this.getTravelTimeCalculator());
-			multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
-			multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
-					new WalkTravelTime(configGroup)));
-			multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
-					new WalkTravelTime(configGroup)));
-			multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-					this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
-			
-		}
-
-		if (this.travelCostCalculator == null) {
-			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelDisutility(this.travelTimeCalculator, this.config.planCalcScore());
-		}
-		this.events.addHandler(this.travelTimeCalculator);
-
-		if (this.leastCostPathCalculatorFactory != null) {
-			log.info("leastCostPathCalculatorFactory already set, ignoring RoutingAlgorithmType specified in config");
-		} else {
-			if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {
-				this.leastCostPathCalculatorFactory = new DijkstraFactory();
-			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
-				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(
-						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()), this.config.global().getNumberOfThreads());
-			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastDijkstra)) {
-				this.leastCostPathCalculatorFactory = new FastDijkstraFactory();
-			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastAStarLandmarks)) {
-				this.leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(
-						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-			} else {
-				throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-			}
-		}
-
-		if ( config.scenario().isUseTransit() && getTransitRouterFactory() == null ) {
-			setTransitRouterFactory(
-					new TransitRouterImplFactory(
-						getScenario().getTransitSchedule(),
-						new TransitRouterConfig(
-							config.planCalcScore(),
-							config.plansCalcRoute(),
-							config.transitRouter(),
-							config.vspExperimental() )));
-		}
-
-		if ( getUseTripRouting() && tripRouterFactory == null ) {
-			tripRouterFactory = new TripRouterFactoryImpl( this );
-
-			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
-				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
-						network,
-						population.getFactory(),
-						getLeastCostPathCalculatorFactory(),
-						createTravelCostCalculator(),
-						multiModalTravelTimes,
-						config.multiModal(),
-						tripRouterFactory);
-			}
-
-			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
-				tripRouterFactory = new LinkToLinkTripRouterFactory(
-						getScenario(),
-						getLeastCostPathCalculatorFactory(),
-						getTravelDisutilityFactory(),
-						getTravelTimeCalculator(),
-						getPopulation().getFactory(),
-						tripRouterFactory);
-			}
-		}
-
-		/*
-		 * TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
-		 * 15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
-		 * traveltimes in linkStats are the avg. traveltimes between xx.00 and
-		 * xx.15, and not between xx.00 and xx.59
-		 */
-		this.linkStats = new CalcLinkStats(this.network);
-		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
-		this.events.addHandler(this.volumes);
-		this.legTimes = new CalcLegTimes();
-		this.events.addHandler(this.legTimes);
-
-		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = loadScoringFunctionFactory();
-		}
-
-		this.strategyManager = loadStrategyManager();
-	}
-
-
-
-	/*
-	 * ===================================================================
-	 * private methods
-	 * ===================================================================
-	 */
-
-	/**
-	 * Loads values from the configuration object to initialize the settings
-	 */
-	private void loadConfig() {
 		checkConfigConsistencyAndWriteToLog("Complete config dump directly after reading the config file.  " +
 				"See later for config dump after setup.");
 
@@ -512,6 +311,15 @@ public class Controler extends AbstractController {
 		if (this.writePlansInterval == -1) {
 			this.writePlansInterval = this.config.controler().getWritePlansInterval();
 		}
+		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
+		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
+			setupMultiModalSimulation();
+		}
+		if (this.config.scenario().isUseTransit()) {
+			setupTransitSimulation();
+		}
+		loadData();
+		run(config);
 	}
 
 	/**
@@ -539,10 +347,36 @@ public class Controler extends AbstractController {
 		log.info("Checking consistency of config done.");
 	}
 
+	private final void setupMultiModalSimulation() {
+		log.info("setting up multi modal simulation");
+	
+		// set Route Factories
+		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
+			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(mode, factory);
+		}
+	}
+
+	private final void setupTransitSimulation() {
+		log.info("setting up transit simulation");
+		if (!this.config.scenario().isUseVehicles()) {
+			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
+		}
+	
+		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
+		formats.add(EventsFileFormat.xml);
+		this.config.controler().setEventsFileFormats(formats);
+	
+		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+		this.config.planCalcScore().addActivityParams(transitActivityParams);
+	
+		// the QSim reads the config by itself, and configures itself as a
+		// transit-enabled mobsim. kai, nov'11
+	}
 
 	/**
-	 * Load all the required data. Currently, this only loads the Scenario if it
-	 * was not given in the Constructor.
+	 * Loads the Scenario if it was not given in the constructor.
 	 */
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
@@ -554,12 +388,63 @@ public class Controler extends AbstractController {
 	}
 
 	/**
-	 * @return A fully initialized StrategyManager for the plans replanning.
+	 * Loads a default set of {@link org.matsim.core.controler.listener
+	 * ControlerListener} to provide basic functionality. <b>Note:</b> Be very
+	 * careful if you overwrite this method! The order how the listeners are
+	 * added is very important. Check the comments in the source file before
+	 * overwriting this method!
 	 */
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, manager);
-		return manager;
+	@Override
+	protected void loadCoreListeners() {
+	
+		/*
+		 * The order how the listeners are added is very important! As
+		 * dependencies between different listeners exist or listeners may read
+		 * and write to common variables, the order is important. Example: The
+		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
+		 * turn is used by the PlansScoring-Listener.
+		 *
+		 * IMPORTANT: The execution order is reverse to the order the listeners
+		 * are added to the list.
+		 */
+	
+		if (this.dumpDataAtEnd) {
+			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, controlerIO));
+		}
+	
+	
+		if (this.scoringFunctionFactory == null) {
+			this.scoringFunctionFactory = loadScoringFunctionFactory();
+		}
+	
+		// the default handling of plans
+		this.plansScoring = new PlansScoring( this.scenarioData, this.events, controlerIO, this.scoringFunctionFactory );
+		this.addCoreControlerListener(this.plansScoring);
+		this.addCoreControlerListener(new PlansReplanning());
+		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
+				this.stopwatch, this.controlerIO ));
+	
+	
+		/*
+		 * TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
+		 * 15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
+		 * traveltimes in linkStats are the avg. traveltimes between xx.00 and
+		 * xx.15, and not between xx.00 and xx.59
+		 */
+		this.linkStats = new CalcLinkStats(this.network);
+		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
+		this.events.addHandler(this.volumes);
+	
+		this.legTimes = new CalcLegTimes();
+		this.events.addHandler(this.legTimes);
+		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
+	
+		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(),
+				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
+		// must be last being added (=first being executed)
+	
+	
+		loadControlerListeners();
 	}
 
 	/**
@@ -576,48 +461,6 @@ public class Controler extends AbstractController {
 	}
 
 	/**
-	 * Loads a default set of {@link org.matsim.core.controler.listener
-	 * ControlerListener} to provide basic functionality. <b>Note:</b> Be very
-	 * careful if you overwrite this method! The order how the listeners are
-	 * added is very important. Check the comments in the source file before
-	 * overwriting this method!
-	 */
-	@Override
-	protected void loadCoreListeners() {
-
-		/*
-		 * The order how the listeners are added is very important! As
-		 * dependencies between different listeners exist or listeners may read
-		 * and write to common variables, the order is important. Example: The
-		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
-		 * turn is used by the PlansScoring-Listener.
-		 *
-		 * IMPORTANT: The execution order is reverse to the order the listeners
-		 * are added to the list.
-		 */
-
-		if (this.dumpDataAtEnd) {
-			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, controlerIO));
-		}
-
-		// the default handling of plans
-		this.plansScoring = new PlansScoring( this.scenarioData, this.events, controlerIO, this.scoringFunctionFactory );
-		this.addCoreControlerListener(this.plansScoring);
-		this.addCoreControlerListener(new PlansReplanning( this.strategyManager, this.population ));
-		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.getWritePlansInterval(),
-				this.stopwatch, this.controlerIO ));
-
-
-		this.addCoreControlerListener(new LegTimesListener(legTimes, controlerIO));
-		this.addCoreControlerListener(new EventsHandling(this.events, this.getWriteEventsInterval(),
-				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
-		// must be last being added (=first being executed)
-
-
-		loadControlerListeners();
-	}
-
-	/**
 	 * Loads the default set of {@link org.matsim.core.controler.listener
 	 * ControlerListener} to provide some more basic functionality. Unlike the
 	 * core ControlerListeners the order in which the listeners of this method
@@ -626,44 +469,189 @@ public class Controler extends AbstractController {
 	protected void loadControlerListeners() {
 		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
-
+	
 		// optional: score stats
 		this.scoreStats = new ScoreStats(this.population,
 				this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 		this.addControlerListener(this.scoreStats);
-
+	
 		// optional: travel distance stats
 		this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
 				this.controlerIO .getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 		this.addControlerListener(this.travelDistanceStats);
-
+	
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
 			CountControlerListener ccl = new CountControlerListener(this.config.counts());
 			this.addControlerListener(ccl);
 			this.counts = ccl.getCounts();
 		}
-
+	
 		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
 			this.addControlerListener(new LinkStatsControlerListener(this.config.linkStats()));
 		}
-
+	
 		if (this.config.scenario().isUseTransit()) {
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined! kai, oct'10
 				addControlerListener(new PtCountControlerListener(this.config));
 			}
 		}
-
+	
 		if (this.config.scenario().isUseSignalSystems()) {
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
-
+	
 		if ( !this.config.vspExperimental().getActivityDurationInterpretation().equals(ActivityDurationInterpretation.minOfDurationAndEndTime)
 				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 			addControlerListener(new VspPlansCleaner());
 		}
+	
+	}
 
+	@Override
+	protected void prepareForSim() {
+
+		setUp();
+		
+		// make sure all routes are calculated.
+		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
+			public AbstractPersonAlgorithm getPersonAlgorithm() {
+				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
+			}
+		});
+	}
+
+	/**
+	 * Initializes the Controler with the parameters from the configuration.
+	 * This method is called after the configuration is loaded, after the
+	 * scenario data (network, population) is read, and after all ControlerListeners
+	 * have processed their startup event.
+	 */
+	protected void setUp() {
+		if (this.travelTimeCalculatorFactory != null) {
+			log.info("travelTimeCalculatorFactory already set, ignoring default");
+		} else {
+			if (this.config.multiModal().isMultiModalSimulationEnabled()) {
+				this.travelTimeCalculatorFactory = new TravelTimeCalculatorWithBufferFactory();
+			} else {
+				this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+			}
+		}
+		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+	
+		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
+			if (this.config.multiModal().isCreateMultiModalNetwork()) {
+				log.info("Creating multi modal network.");
+				new MultiModalNetworkCreator(this.config.multiModal()).run(this.scenarioData.getNetwork());
+			}
+	
+			if (this.config.multiModal().isEnsureActivityReachability()) {
+				log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
+				new EnsureActivityReachability(this.scenarioData).run(this.scenarioData.getPopulation());
+			}
+	
+			if (this.config.multiModal().isDropNonCarRoutes()) {
+				log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
+				new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
+			}
+	
+	
+			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
+			multiModalTravelTimes = new HashMap<String, TravelTime>();
+			multiModalTravelTimes.put(TransportMode.car, this.getTravelTimeCalculator());
+			multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
+			multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
+					new WalkTravelTime(configGroup)));
+			multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(this.getTravelTimeCalculator(), 
+					new WalkTravelTime(configGroup)));
+			multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
+					this.getTravelTimeCalculator(), new WalkTravelTime(configGroup)));
+	
+		}
+	
+		if (this.travelCostCalculator == null) {
+			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelDisutility(this.travelTimeCalculator, this.config.planCalcScore());
+		}
+		this.events.addHandler(this.travelTimeCalculator);
+	
+		if (this.leastCostPathCalculatorFactory != null) {
+			log.info("leastCostPathCalculatorFactory already set, ignoring RoutingAlgorithmType specified in config");
+		} else {
+			if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {
+				this.leastCostPathCalculatorFactory = new DijkstraFactory();
+			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
+				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(
+						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()), this.config.global().getNumberOfThreads());
+			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastDijkstra)) {
+				this.leastCostPathCalculatorFactory = new FastDijkstraFactory();
+			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastAStarLandmarks)) {
+				this.leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(
+						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+			} else {
+				throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+			}
+		}
+	
+		if ( config.scenario().isUseTransit() && getTransitRouterFactory() == null ) {
+			setTransitRouterFactory(
+					new TransitRouterImplFactory(
+							getScenario().getTransitSchedule(),
+							new TransitRouterConfig(
+									config.planCalcScore(),
+									config.plansCalcRoute(),
+									config.transitRouter(),
+									config.vspExperimental() )));
+		}
+	
+		if ( getUseTripRouting() && tripRouterFactory == null ) {
+			tripRouterFactory = new TripRouterFactoryImpl( this );
+	
+			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
+				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
+						network,
+						population.getFactory(),
+						getLeastCostPathCalculatorFactory(),
+						createTravelCostCalculator(),
+						multiModalTravelTimes,
+						config.multiModal(),
+						tripRouterFactory);
+			}
+	
+			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
+				tripRouterFactory = new LinkToLinkTripRouterFactory(
+						getScenario(),
+						getLeastCostPathCalculatorFactory(),
+						getTravelDisutilityFactory(),
+						getTravelTimeCalculator(),
+						getPopulation().getFactory(),
+						tripRouterFactory);
+			}
+		}
+	
+		this.strategyManager = loadStrategyManager();
+	}
+
+	/**
+	 * @return A fully initialized StrategyManager for the plans replanning.
+	 */
+	protected StrategyManager loadStrategyManager() {
+		StrategyManager manager = new StrategyManager();
+		StrategyManagerConfigLoader.load(this, manager);
+		return manager;
+	}
+
+	@Override
+	protected void runMobSim(int iteration) {
+		this.iteration = iteration;
+		runMobSim();
+	}
+
+	protected void runMobSim() {
+		Mobsim sim = getNewMobsim();
+		sim.run();
 	}
 
 	/* package */Mobsim getNewMobsim() {
@@ -738,21 +726,9 @@ public class Controler extends AbstractController {
 		}
 	}
 
-
-	/**
-	 * Removes a ControlerListener from the Controler instance
-	 *
-	 * @param l
-	 */
 	public final void removeControlerListener(final ControlerListener l) {
 		this.controlerListenerManager.removeControlerListener(l);
 	}
-
-	/*
-	 * ===================================================================
-	 * Options
-	 * ===================================================================
-	 */
 
 	/**
 	 * Sets whether the Controler is allowed to overwrite files in the output
@@ -821,12 +797,6 @@ public class Controler extends AbstractController {
 		this.dumpDataAtEnd = dumpData;
 	}
 
-	/*
-	 * ===================================================================
-	 * Optional setters that allow to overwrite some default algorithms used
-	 * ===================================================================
-	 */
-
 	public final TravelDisutility createTravelCostCalculator() {
 		return this.travelCostCalculatorFactory.createTravelDisutility(
 				this.travelTimeCalculator, this.config.planCalcScore());
@@ -875,12 +845,6 @@ public class Controler extends AbstractController {
 		this.leastCostPathCalculatorFactory = factory;
 	}
 
-	/*
-	 * ===================================================================
-	 * Factory methods
-	 * ===================================================================
-	 */
-
 	/**
 	 * @param travelCosts
 	 *            the travel costs to be used for the routing
@@ -900,7 +864,7 @@ public class Controler extends AbstractController {
 					getScenario().getActivityFacilities());
 		}
 	}	
-	
+
 	private PlanAlgorithm createOldRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
@@ -914,21 +878,21 @@ public class Controler extends AbstractController {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, multiModalTravelTimes.get(TransportMode.car),
 					this.getLeastCostPathCalculatorFactory(), routeFactory);
 
-			
+
 			// Define restrictions for the different modes.
 			/*
 			 * Car
 			 */	
 			Set<String> carModeRestrictions = new HashSet<String>();
 			carModeRestrictions.add(TransportMode.car);
-			
+
 			/*
 			 * Walk
 			 */	
 			Set<String> walkModeRestrictions = new HashSet<String>();
 			walkModeRestrictions.add(TransportMode.bike);
 			walkModeRestrictions.add(TransportMode.walk);
-					
+
 			/*
 			 * Bike
 			 * Besides bike mode we also allow walk mode - but then the
@@ -937,7 +901,7 @@ public class Controler extends AbstractController {
 			Set<String> bikeModeRestrictions = new HashSet<String>();
 			bikeModeRestrictions.add(TransportMode.walk);
 			bikeModeRestrictions.add(TransportMode.bike);
-			
+
 			/*
 			 * PT
 			 * We assume PT trips are possible on every road that can be used by cars.
@@ -952,7 +916,7 @@ public class Controler extends AbstractController {
 			ptModeRestrictions.add(TransportMode.car);
 			ptModeRestrictions.add(TransportMode.bike);
 			ptModeRestrictions.add(TransportMode.walk);
-			
+
 			/*
 			 * Ride
 			 * We assume ride trips are possible on every road that can be used by cars.
@@ -963,10 +927,10 @@ public class Controler extends AbstractController {
 			rideModeRestrictions.add(TransportMode.car);
 			rideModeRestrictions.add(TransportMode.bike);
 			rideModeRestrictions.add(TransportMode.walk);
-			
+
 			TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(this.network);
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
-				
+
 				Set<String> modeRestrictions;
 				if (mode.equals(TransportMode.car)) {
 					modeRestrictions = carModeRestrictions;
@@ -979,14 +943,14 @@ public class Controler extends AbstractController {
 				} else if (mode.equals(TransportMode.pt)) {
 					modeRestrictions = ptModeRestrictions;
 				} else continue;
-				
+
 				Network subNetwork = NetworkImpl.createNetwork();
 				networkFilter.filter(subNetwork, modeRestrictions);
-				
+
 				LeastCostPathCalculator routeAlgo = this.getLeastCostPathCalculatorFactory().createPathCalculator(subNetwork, travelCosts, multiModalTravelTimes.get(mode));
 				plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(network, routeAlgo, routeFactory));
 			}
-		
+
 		} else {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(),
 					this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory);
@@ -1008,18 +972,6 @@ public class Controler extends AbstractController {
 		}
 		return tripRouterFactory;
 	}
-
-	/*
-	 * ===================================================================
-	 * Informational methods
-	 * ===================================================================
-	 */
-
-	/*
-	 * ===================================================================
-	 * Factory methods
-	 * ===================================================================
-	 */
 
 	/**Design comments:<ul>
 	 * <li> yyyy It seems to me that one would need a factory at <i>this</i> level. kai, may'12
@@ -1114,18 +1066,6 @@ public class Controler extends AbstractController {
 		return this.scoreStats;
 	}
 
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new Controler(args);
-			controler.run();
-		}
-		System.exit(0);
-	}
-
 	public List<MobsimListener> getQueueSimulationListener() {
 		return this.simulationListener;
 	}
@@ -1215,7 +1155,7 @@ public class Controler extends AbstractController {
 	public int getWritePlansInterval() {
 		return this.writePlansInterval;
 	}
-	
+
 	public Map<String, TravelTime> getMultiModalTravelTimes() {
 		return this.multiModalTravelTimes;
 	}

@@ -52,8 +52,6 @@ public class PlansReplanning implements ReplanningListener {
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-//		Controler controler = event.getControler();
-//		controler.getStrategyManager().run(controler.getPopulation(), event.getIteration());
 		if ( this.calledViaOldConstructor ) {
 			this.population = event.getControler().getPopulation() ;
 			this.strategyManager = event.getControler().getStrategyManager() ;

@@ -201,7 +201,6 @@ public final class StrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ReRoute(controler));
 		} else if (name.equals("TransitChangeSingleLegMode") || name.equals("ChangeSingleTripMode")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
 			strategy.addStrategyModule(new TripsToLegsModule( controler ));
 			strategy.addStrategyModule(new ChangeSingleLegMode(config));
 			strategy.addStrategyModule(new ReRoute(controler));
@@ -211,7 +210,6 @@ public final class StrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ReRoute(controler));
 		} else if (name.equals("TransitChangeLegMode") || name.equals("ChangeTripMode")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
 			strategy.addStrategyModule(new TripsToLegsModule( controler ));
 			strategy.addStrategyModule(new ChangeLegMode(config));
 			strategy.addStrategyModule(new ReRoute(controler));
@@ -221,13 +219,11 @@ public final class StrategyManagerConfigLoader {
 			strategy.addStrategyModule(tam);
 		} else if (name.equals("TransitTimeAllocationMutator_ReRoute") || name.equals( "TripTimeAllocationMutator_ReRoute" )) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
 			strategy.addStrategyModule(new TripsToLegsModule( controler ));
 			strategy.addStrategyModule(new TimeAllocationMutator(config));
 			strategy.addStrategyModule(new ReRoute(controler));
 		} else if (name.equals("TransitSubtourModeChoice") || name.equals("TripSubtourModeChoice")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			//strategy.addStrategyModule(new TransitActsRemoverStrategy(config));
 			strategy.addStrategyModule(new TripsToLegsModule( controler ));
 			strategy.addStrategyModule(new SubtourModeChoice(config));
 			strategy.addStrategyModule(new ReRoute(controler));
