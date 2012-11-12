@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.mobilTUM;
+package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import java.util.Map;
 import java.util.SortedMap;
