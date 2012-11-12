@@ -34,7 +34,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
-import playground.andreas.aas.modules.multiAnalyzer.MultiAnalyzer;
 import playground.andreas.aas.modules.spatialAveragingLinkDemand.SpatialAveragingForLinkDemand;
 
 /**
@@ -88,10 +87,6 @@ public class AasRunner {
 //		tripAna.addZones(zones);
 //		this.anaModules.add(tripAna);
 		// finished TTtripAnalysisV4
-		
-		MultiAnalyzer mA = new MultiAnalyzer(ptDriverPrefix);
-		mA.init(this.scenario);
-		this.anaModules.add(mA);
 		
 		SpatialAveragingForLinkDemand sAD = new SpatialAveragingForLinkDemand(ptDriverPrefix);
 		sAD.init(this.scenario, this.shapeFile, 1);
