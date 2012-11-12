@@ -20,17 +20,26 @@
 package org.matsim.pt.router;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 public class DepartureTimeCache {
-	public HashMap<TransitRoute, double[]> sortedDepartureCache;
+	
+	private final Map<TransitRoute, double[]> sortedDepartureCache;
 
 	public DepartureTimeCache() {
-		this.sortedDepartureCache = new HashMap<TransitRoute, double[]>();
+		/*
+		 * This needs to be a ConcurrentHashMap since multiple threads might add
+		 * data concurrently. Alternatively, the map could be filled with data
+		 * before getNextDepartureTime(...) - then all concurrent accesses would be
+		 * read only.
+		 * cdobler, nov'12
+		 */
+		this.sortedDepartureCache = new ConcurrentHashMap<TransitRoute, double[]>();
 	}
 
 	public final double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {

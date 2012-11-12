@@ -45,10 +45,23 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	private double previousTime = Double.NaN;
 	private double cachedTravelTime = Double.NaN;
 
-	private DepartureTimeCache data = new DepartureTimeCache();
+	private final DepartureTimeCache data;
 
+	/*
+	 * If this constructor is used, every instance used its own DepartureTimeCache which might
+	 * consume a lot of memory.
+	 * 
+	 * cdobler, nov'12
+	 */
+	@Deprecated
 	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config) {
 		this.config = config;
+		this.data = new DepartureTimeCache();
+	}
+	
+	public TransitRouterNetworkTravelTimeAndDisutility(final TransitRouterConfig config, DepartureTimeCache data) {
+		this.config = config;
+		this.data = data;
 	}
 
 	@Override

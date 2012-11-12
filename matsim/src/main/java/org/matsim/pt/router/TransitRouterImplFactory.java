@@ -29,16 +29,19 @@ public class TransitRouterImplFactory implements TransitRouterFactory {
 	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;
 	private final TransitRouterNetwork routerNetwork;
+	private final DepartureTimeCache departureTimeCache;
 
 	public TransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
 		this.schedule = schedule;
 		this.config = config;
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.departureTimeCache = new DepartureTimeCache();
 	}
 
 	@Override
 	public TransitRouter createTransitRouter() {
-		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
+		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config, 
+				this.departureTimeCache);
 		return new TransitRouterImpl(this.config, this.routerNetwork, ttCalculator, ttCalculator);
 	}
 }
