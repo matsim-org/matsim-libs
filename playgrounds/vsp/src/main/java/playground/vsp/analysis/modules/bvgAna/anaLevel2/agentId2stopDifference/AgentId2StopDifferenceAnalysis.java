@@ -29,13 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.vsp.analysis.modules.bvgAna.anaLevel0.AgentId2PlannedDepartureTimeMapData;
 import playground.vsp.analysis.modules.bvgAna.anaLevel1.PersonId2DelayAtStopData;
 import playground.vsp.analysis.modules.bvgAna.anaLevel1.PersonId2DelayAtStopHandler;
-import playground.vsp.analysis.modules.bvgAna.anaLevel1.StopId2RouteId2DelayAtStopHandler;
 
 /**
  * Calculates the difference between realized time and planned time spent waiting at a stop for a given set of agent ids.<br>

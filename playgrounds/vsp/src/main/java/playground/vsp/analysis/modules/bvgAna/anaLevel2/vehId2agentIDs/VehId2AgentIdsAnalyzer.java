@@ -44,7 +44,7 @@ import playground.vsp.analysis.modules.bvgAna.anaLevel1.VehId2PersonEnterLeaveVe
 
 /**
  * 
- * @author ikaddoura, andreas
+ * @author ikaddoura, aneumann
  *
  */
 public class VehId2AgentIdsAnalyzer extends AbstractAnalyisModule{

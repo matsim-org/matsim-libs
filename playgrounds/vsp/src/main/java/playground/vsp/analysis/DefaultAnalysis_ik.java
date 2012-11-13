@@ -35,26 +35,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.carDistance.CarDistanceAnalyzer;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
-import playground.vsp.analysis.modules.emissionsWriter.EmissionEventsWriter;
-import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
-import playground.vsp.analysis.modules.level1.agentId2personEnterLeaveVehicle.AgentId2EnterLeaveVehicleAnalyzer;
-import playground.vsp.analysis.modules.level1.delayAtStop.VehDelayAtStopAnalyzer;
-import playground.vsp.analysis.modules.level1.delayAtStopHistogram.VehDelayAtStopHistogramAnalyzer;
-import playground.vsp.analysis.modules.level1.departureDelayAtStop.DepartureDelayAtStopAnalyzer;
-import playground.vsp.analysis.modules.level1.enterLeaveVehicle2Activity.EnterLeaveVehicle2ActivityAnalyzer;
-import playground.vsp.analysis.modules.level1.ptTripTravelTime.PtTripTravelTimeTransfersAnalyzer;
-import playground.vsp.analysis.modules.level1.stopId2lineId2pulk.StopId2LineId2PulkAnalyzer;
-import playground.vsp.analysis.modules.level1.stopId2personEnterLeaveVehicle.StopId2PersonEnterLeaveVehicleAnalyzer;
-import playground.vsp.analysis.modules.level1.stopId2personEnterLeaveVehicle.StopId2PersonEnterLeaveVehicleHandler;
-import playground.vsp.analysis.modules.level1.stopId2routeId2DelayAtStop.StopId2RouteId2DelayAtStopAnalyzer;
-import playground.vsp.analysis.modules.level1.vehicleId2personEnterLeaveVehicle.VehId2PersonEnterLeaveVehicleAnalyzer;
-import playground.vsp.analysis.modules.ptOperator.PtOperatorAnalyzer;
-import playground.vsp.analysis.modules.transferPayments.MonetaryPaymentsAnalyzer;
-import playground.vsp.analysis.modules.travelTime.TravelTimeAnalyzer;
-import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
-import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
+import playground.vsp.analysis.modules.bvgAna.anaLevel2.agentId2stopDifference.AgentId2StopDifferenceAnalyzer;
 
 /**
  * 
@@ -103,7 +84,7 @@ public class DefaultAnalysis_ik {
 //		TravelTimeAnalyzer ttAna = new TravelTimeAnalyzer(ptDriverPrefix);
 //		ttAna.init(scenario);
 //		this.anaModules.add(ttAna);
-		
+//		
 //		EmissionEventsWriter emiWriter = new EmissionEventsWriter(ptDriverPrefix, this.outputDir);
 //		// additional files, required for this analysis module:
 //		String emissionVehicleFile = "/Users/Ihab/Documents/workspace/shared-svn/projects/detailedEval/pop/merged/emissionVehicles_1pct.xml.gz";
@@ -124,13 +105,13 @@ public class DefaultAnalysis_ik {
 //		vcg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 //		emiWriter.init(scenario);
 //		this.anaModules.add(emiWriter);
-		
+//		
 //		// emission events file required for this analysis module:
 //		String emissionsEventsFile = "/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/test/output/test_fakePt/ITERS/it.0/analysis/EmissionEventsWriter/emission.events.xml";
 //		EmissionsAnalyzer emiAna = new EmissionsAnalyzer(ptDriverPrefix, emissionsEventsFile);
 //		emiAna.init(scenario);
 //		this.anaModules.add(emiAna);
-		
+//		
 //		PtOperatorAnalyzer ptOperatorAna = new PtOperatorAnalyzer(ptDriverPrefix);
 //		ptOperatorAna.init(scenario);
 //		this.anaModules.add(ptOperatorAna);
@@ -138,19 +119,19 @@ public class DefaultAnalysis_ik {
 //		WaitingTimesAnalyzer waitAna = new WaitingTimesAnalyzer(ptDriverPrefix);
 //		waitAna.init(scenario);
 //		this.anaModules.add(waitAna);
-		
+//		
 //		DepartureDelayAtStopAnalyzer delayAna = new DepartureDelayAtStopAnalyzer(ptDriverPrefix);
 //		delayAna.init(scenario);
 //		this.anaModules.add(delayAna);
-		
+//		
 //		AgentId2EnterLeaveVehicleAnalyzer agent2EnterLeaveAna = new AgentId2EnterLeaveVehicleAnalyzer(ptDriverPrefix);
 //		agent2EnterLeaveAna.init(scenario);
 //		this.anaModules.add(agent2EnterLeaveAna);
-		
+//		
 //		PtTripTravelTimeTransfersAnalyzer ptTTAna = new PtTripTravelTimeTransfersAnalyzer(ptDriverPrefix);
 //		ptTTAna.init(scenario);
 //		this.anaModules.add(ptTTAna);
-		
+//		
 //		EnterLeaveVehicle2ActivityAnalyzer enterLeaveActAna = new EnterLeaveVehicle2ActivityAnalyzer(ptDriverPrefix);
 //		enterLeaveActAna.init(scenario);
 //		this.anaModules.add(enterLeaveActAna);
@@ -158,28 +139,32 @@ public class DefaultAnalysis_ik {
 //		StopId2LineId2PulkAnalyzer pulkAna = new StopId2LineId2PulkAnalyzer(ptDriverPrefix);
 //		pulkAna.init(scenario);
 //		this.anaModules.add(pulkAna);
-		
+//		
 //		StopId2PersonEnterLeaveVehicleAnalyzer stopAna = new StopId2PersonEnterLeaveVehicleAnalyzer(ptDriverPrefix);
 //		stopAna.init(scenario);
 //		this.anaModules.add(stopAna);
-		
+//		
 //		StopId2RouteId2DelayAtStopAnalyzer delayAna = new StopId2RouteId2DelayAtStopAnalyzer(ptDriverPrefix);
 //		delayAna.init(scenario);
 //		this.anaModules.add(delayAna);
-		
+//		
 //		// number of detailed slots required for this analysis module
 //		int numberOfDetailedSlots = 5;
 //		VehDelayAtStopHistogramAnalyzer delayHistogramAna = new VehDelayAtStopHistogramAnalyzer(ptDriverPrefix, numberOfDetailedSlots);
 //		delayHistogramAna.init(scenario);
 //		this.anaModules.add(delayHistogramAna);
-
+//
 //		VehDelayAtStopAnalyzer vehDelayAna = new VehDelayAtStopAnalyzer(ptDriverPrefix);
 //		vehDelayAna.init(scenario);
 //		this.anaModules.add(vehDelayAna);
 //		
-		VehId2PersonEnterLeaveVehicleAnalyzer vehIdEnterLeaveAna = new VehId2PersonEnterLeaveVehicleAnalyzer(ptDriverPrefix);
-		vehIdEnterLeaveAna.init(scenario);
-		this.anaModules.add(vehIdEnterLeaveAna);
+//		VehId2PersonEnterLeaveVehicleAnalyzer vehIdEnterLeaveAna = new VehId2PersonEnterLeaveVehicleAnalyzer(ptDriverPrefix);
+//		vehIdEnterLeaveAna.init(scenario);
+//		this.anaModules.add(vehIdEnterLeaveAna);
+
+		AgentId2StopDifferenceAnalyzer stopDiffAna = new AgentId2StopDifferenceAnalyzer(ptDriverPrefix);
+		stopDiffAna.init(scenario);
+		this.anaModules.add(stopDiffAna);
 		
 		// END ugly code - Initialization needs to be configurable
 		
