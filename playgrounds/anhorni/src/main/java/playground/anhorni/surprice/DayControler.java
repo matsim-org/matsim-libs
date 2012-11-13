@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.roadpricing.RoadPricing;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -46,13 +47,13 @@ public class DayControler extends Controler {
 	} 
 		
 	protected void setUp() {
-	    super.setUp();	
-	    	    
-	  	SurpriceScoringFunctionFactory scoringFunctionFactory = new SurpriceScoringFunctionFactory(
-	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
-	  	this.setScoringFunctionFactory(scoringFunctionFactory);  
-	  	
+	    super.setUp();		  	
 	  	this.printPrefs();
+	}
+	
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new SurpriceScoringFunctionFactory(
+	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
 	}
 	
 	private void printPrefs() {
