@@ -20,7 +20,10 @@
 package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -28,6 +31,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
@@ -57,21 +61,25 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	private final double sigmaScale;
 	private final int timeBinSize;
 	private final boolean useFareAsWeight;
+	private boolean allowForSplitting;
 	
 	private HashMap<Id,HashMap<Integer,HashMap<Integer,Double>>> route2StartTimeSlot2EndTimeSlot2WeightMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Double>>>();
 	private TicketMachine ticketMachine;
 
+
 	public ReduceTimeServedRFare(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 3){
+		if(parameter.size() != 4){
 			log.error("Too many parameter. Will ignore: " + parameter);
 			log.error("Parameter 1: Scaling factor for sigma");
 			log.error("Parameter 2: Time bin size in seconds");
 			log.error("Parameter 3: true=use the fare as weight, false=use number of trips as weight");
+			log.error("Parameter 4: true=allow for picking one of the demand segments, false=enforce coverage of all demand segments");
 		}
 		this.sigmaScale = Double.parseDouble(parameter.get(0));
 		this.timeBinSize = Integer.parseInt(parameter.get(1));
 		this.useFareAsWeight = Boolean.parseBoolean(parameter.get(2));
+		this.allowForSplitting = Boolean.parseBoolean(parameter.get(3));
 		log.info("enabled");
 	}
 	
@@ -146,24 +154,92 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 		}
 		
 		// Get new slots to be served
-		double min = Integer.MAX_VALUE;
-		double max = Integer.MIN_VALUE;
+		if (allowForSplitting) {
+			return this.getSplittedTimeOfOperation(slotsAboveTreshold);
+		} else {
+			return this.getMaxTimeOfOperation(slotsAboveTreshold);
+		}
+	}
+
+	private Tuple<Double, Double> getSplittedTimeOfOperation(Set<Integer> slotsAboveTreshold) {
+		
+		// Sort the time slots
+		LinkedList<Integer> sortedSlotsAboveTreshold = new LinkedList<Integer>();
+		sortedSlotsAboveTreshold.addAll(slotsAboveTreshold);
+		Collections.sort(sortedSlotsAboveTreshold);
+		
+		// Generate seamlessly connected time slot tuples
+		List<Tuple<Integer, Integer>> timeSlotTuples = new LinkedList<Tuple<Integer,Integer>>();
+		
+		int currentStart = -1;
+		int currentEnd = -1;
+		for (Integer slot : sortedSlotsAboveTreshold) {
+			if (currentStart == -1) {
+				// a new slot begins
+				currentStart = slot.intValue();
+				currentEnd = currentStart;
+			} else {
+				// continue with the current slot
+				// it's an old time slot which needs to be enlarged or completed
+				if (slot.intValue() == currentEnd + 1) {
+					// this timeslot can be enlarged
+					currentEnd = slot.intValue();
+				} else {
+					// need to finish this one and start a new one
+					if (currentEnd == currentStart) {
+						// end time is not allowed to be the same as start time
+						currentEnd++;
+					}
+					timeSlotTuples.add(new Tuple<Integer, Integer>(new Integer(currentStart), new Integer(currentEnd)));
+					currentStart = slot.intValue();
+					currentEnd = currentStart;
+				}
+			}
+		}
+
+		// complete the last one
+		if (currentEnd == currentStart) {
+			// end time is not allowed to be the same as start time
+			currentEnd++;
+		}
+		timeSlotTuples.add(new Tuple<Integer, Integer>(new Integer(currentStart), new Integer(currentEnd)));
+		
+		// Get total weight of all time slot tuples
+		double totalWeight = 0.0;
+		for (Tuple<Integer, Integer> tuple : timeSlotTuples) {
+			int weight = tuple.getSecond() - tuple.getFirst();
+			totalWeight += weight;
+		}
+		
+		// Weighted random draw
+		double accumulatedWeight = 0.0;
+		double rndTreshold = MatsimRandom.getRandom().nextDouble() * totalWeight;
+		for (Tuple<Integer, Integer> tuple : timeSlotTuples) {
+			accumulatedWeight += tuple.getSecond() - tuple.getFirst();
+			if (rndTreshold <= accumulatedWeight) {
+				// ok, take this one
+				return getTimeOfOperationFromTimeSlots(tuple.getFirst().intValue(), tuple.getSecond().intValue());
+			}
+		}		
+		
+		log.error("Should never be able to get here");
+		return null;
+	}
+	
+	private Tuple<Double, Double> getMaxTimeOfOperation(Set<Integer> slotsAboveTreshold) {
+		int min = Integer.MAX_VALUE;
+		int max = Integer.MIN_VALUE;
 		
 		for (Integer slot : slotsAboveTreshold) {
 			if (slot.doubleValue() < min) {
-				min = slot.doubleValue();
+				min = slot.intValue();
 			}
 			if (slot.doubleValue() > max) {
-				max = slot.doubleValue();
+				max = slot.intValue();
 			}
 		}
 		
-		// convert slots to time
-		min = min * this.timeBinSize;
-		max = (max + 1) * this.timeBinSize;
-		
-		Tuple<Double, Double> timeSlotsOfOperation = new Tuple<Double, Double>(min, max);
-		return timeSlotsOfOperation;
+		return getTimeOfOperationFromTimeSlots(min, max);
 	}
 
 	@Override
@@ -208,5 +284,13 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 
 	private int getTimeSlotForTime(double time){
 		return ((int) time / this.timeBinSize);
+	}
+
+	private Tuple<Double, Double> getTimeOfOperationFromTimeSlots(int startSlot, int endSlot){
+		// convert slots to time
+		double startTime = ((double) startSlot) * this.timeBinSize;
+		double endTime = ((double) endSlot + 1) * this.timeBinSize;
+		
+		return new Tuple<Double, Double>(startTime, endTime);
 	}
 }
