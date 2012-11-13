@@ -8,11 +8,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/input/playground/dgrether/energy/trafficstate/TrafficStateTest/testTrafficState/network.xml" />
+		<param name="inputNetworkFile" value="test/input/playground/vsp/energy/trafficstate/TrafficStateTest/testTrafficState/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/playground/dgrether/energy/trafficstate/TrafficStateTest/testTrafficState/plans2000.xml.gz" />
+		<param name="inputPlansFile" value="test/input/playground/vsp/energy/trafficstate/TrafficStateTest/testTrafficState/plans2000.xml.gz" />
 	</module>
 
 	<module name="controler">
