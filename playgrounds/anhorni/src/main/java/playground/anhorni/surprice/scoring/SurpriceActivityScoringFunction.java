@@ -44,6 +44,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	
 	private CharyparNagelScoringParameters params;
 	private double alpha;
+	private double alphaTrip;
 	private Config config;
 	private final ActivityFacilities facilities;
 	private DayType day;
@@ -51,12 +52,13 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 //	private final static Logger log = Logger.getLogger(SurpriceActivityScoringFunction.class);
 		
 	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
-			ActivityFacilities facilities, double alpha, String day) {
+			ActivityFacilities facilities, double alpha, double alphaTrip, String day) {
 		super(params);
 		super.reset();
 		this.params = params;
 		this.config = config;
 		this.alpha = alpha;
+		this.alphaTrip = alphaTrip;
 		this.facilities = facilities;
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
@@ -106,7 +108,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
 		if (duration > 0) {
 			double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0));
-			double utilPerf = this.params.marginalUtilityOfPerforming_s * this.alpha * typicalDuration
+			double utilPerf = this.params.marginalUtilityOfPerforming_s * Math.max(alpha + alphaTrip, 0.0) * typicalDuration
 					* Math.log((duration / 3600.0) / zeroUtilityDuration);
 			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));

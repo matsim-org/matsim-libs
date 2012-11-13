@@ -69,7 +69,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 						
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
-				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(), this.alpha, this.day));
+				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(), this.alpha, this.alphaTrip, this.day));
 		
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
 				super.getParams(), controler.getNetwork(), controler.getConfig(),
