@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -50,11 +51,17 @@ public class ExtractHitchHikersWaitingTimes {
 	}
 
 	private static class Handler implements BasicEventHandler {
-		private final Map<String, Double> waitStarts = new HashMap<String, Double>();
+		private final Map<String, Tuple<String, Double>> waitStarts = new HashMap<String, Tuple<String,Double>>();
 		private final BufferedWriter writer;
 
 		public Handler(final String outFile) {
 			writer = IOUtils.getBufferedWriter( outFile );
+			try {
+				writer.write("agentId\tspotId\twaitTime" );
+			}
+			catch (IOException e) {
+				throw new UncheckedIOException( e );
+			}
 		}
 
 		@Override
@@ -66,28 +73,32 @@ public class ExtractHitchHikersWaitingTimes {
 			if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
 				waitStarts.put(
 						event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ),
-						event.getTime());
+						new Tuple<String, Double>(
+							event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_LINK ),
+							event.getTime()));
 			}
 			else if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
-				Double start = waitStarts.remove( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) );
+				String p = event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON );
+				Tuple<String, Double> start = waitStarts.remove( p );
 
 				try {
-					writer.write( ""+(event.getTime() - start) );
 					writer.newLine();
-				} catch (IOException e) {
+					writer.write( p+"\t"+start.getFirst()+"\t"+(event.getTime() - start.getSecond()) );
+				}
+				catch (IOException e) {
 					throw new UncheckedIOException( e );
 				}
 			}
 		}
 
 		public void finish() {
-			final int n = waitStarts.size();
-			for (int i=0; i < n; i++) {
+			for (Map.Entry<String, Tuple<String, Double>> e : waitStarts.entrySet()) {
 				try {
-					writer.write( "inf" );
 					writer.newLine();
-				} catch (IOException e) {
-					throw new UncheckedIOException( e );
+					writer.write( e.getKey()+"\t"+e.getValue().getFirst()+"\tInf" );
+				}
+				catch (IOException ex) {
+					throw new UncheckedIOException( ex );
 				}
 			}
 			try {
