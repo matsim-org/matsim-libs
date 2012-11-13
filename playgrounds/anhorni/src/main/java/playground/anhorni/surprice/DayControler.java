@@ -24,17 +24,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.roadpricing.PlansCalcAreaTollRoute;
 import org.matsim.roadpricing.RoadPricing;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
@@ -71,35 +61,38 @@ public class DayControler extends Controler {
 		ArrayList<Double> gamma = new ArrayList<Double>();
 		
 		for (Person p : this.population.getPersons().values()) {
-			SurpriceScoringFunctionFactory sf = (SurpriceScoringFunctionFactory) this.getScoringFunctionFactory().createNewScoringFunction(p.getSelectedPlan());
-			alpha.add(sf.getAlpha() + sf.getAlphaTrip());
-			gamma.add(sf.getGamma() + sf.getGammaTrip());
+			SurpriceScoringFunctionFactory sff = (SurpriceScoringFunctionFactory) this.getScoringFunctionFactory();
+					sff.createNewScoringFunction(p.getSelectedPlan());
+			alpha.add(sff.getAlpha() + sff.getAlphaTrip());
+			gamma.add(sff.getGamma() + sff.getGammaTrip());
 		}
 		boxPlotPrefs.addValuesPerCategory(alpha, "alpha", "alpha");
 		boxPlotPrefs.addValuesPerCategory(gamma, "gamma", "gamma");
 		boxPlotPrefs.createChart();
 		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename("prefs.png"), 800, 600);	
 	}
-	
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
-		
-		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class);
-		
-		if (scheme.getType().equals("area")) {		
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
-		return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts,
-				travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory, 
-				(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
-		}
-		else {
-			final TravelDisutilityFactory previousTravelCostCalculatorFactory = super.getTravelDisutilityFactory();
-			TravelDisutility costsIncludingTolls = new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(
-					travelTimes, this.config.planCalcScore()), 
-					(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
-			return super.createRoutingAlgorithm(costsIncludingTolls, travelTimes);
-		}
-	}
+
+// Man hat es nach der Umstellung zu einer Contrib schliesslich nach 3 Tagen und viel Hilfe doch noch hingekriegt, dass Roadpricing wieder laeuft. 
+// Was fuer ne Leistung! Aber immer schoen im Core rumhacken und sich dabei ausschliesslich auf grossartige 2 Testcases verlassen.
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
+//		
+//		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class);
+//		
+//		if (scheme.getType().equals("area")) {		
+//		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
+//		return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts,
+//				travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory, 
+//				(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
+//		}
+//		else {
+//			final TravelDisutilityFactory previousTravelCostCalculatorFactory = super.getTravelDisutilityFactory();
+//			TravelDisutility costsIncludingTolls = new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(
+//					travelTimes, this.config.planCalcScore()), 
+//					(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
+//			return super.createRoutingAlgorithm(costsIncludingTolls, travelTimes);
+//		}
+//	}
 	
 	protected void loadControlerListeners() {
 		super.loadControlerListeners();
