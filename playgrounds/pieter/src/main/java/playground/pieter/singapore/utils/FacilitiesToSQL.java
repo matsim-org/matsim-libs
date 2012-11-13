@@ -335,7 +335,7 @@ public class FacilitiesToSQL {
 			Iterator<ActivityOption> ao =facility.getActivityOptions().values().iterator();
 			while(ao.hasNext()){
 				ActivityOptionImpl i = (ActivityOptionImpl) ao.next();
-				i.setType(actType);
+//				i.setType(actType);
 			}
 		}
 	}
