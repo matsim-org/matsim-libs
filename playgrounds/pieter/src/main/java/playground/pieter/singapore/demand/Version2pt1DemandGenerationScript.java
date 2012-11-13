@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PushbackReader;
+import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import javax.management.timer.Timer;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -23,6 +26,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -32,6 +36,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.postgresql.PGConnection;
+import org.postgresql.copy.CopyManager;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -128,15 +134,10 @@ public class Version2pt1DemandGenerationScript {
 			// skip over non-travelers:
 			if (pax.modeSuggestion.equals("notravel"))
 				continue;
-			// only realise half the ptmix plans
-			if (pax.modeSuggestion.equals("ptmix")) {
-				if (Math.random() > 0.5)
-					continue;
-			}
 			PersonImpl person = (PersonImpl) popFactory
 					.createPerson(new IdImpl((long) pax.paxId));
 			person.setAge(pax.age);
-			person.setEmployed(pax.occup.equals("NA") ? false : true);
+			person.setEmployed(pax.occup.equals("XXX") ? false : true);
 			// the ptmix plans allowed through should have car assigned too if
 			// they have a license and have a car available
 			person.setCarAvail(pax.modeSuggestion.equals("car")
@@ -208,7 +209,7 @@ public class Version2pt1DemandGenerationScript {
 						act.setFacilityId(new IdImpl(pax.mainActFacility));
 						// default duration of 4 hours' school
 						act.setEndTime(getEndTime(lastActEndTime, dayEndTime,
-								Time.parseTime("08:00:00"), chainLength,
+								(pax.mainActStart + pax.mainActDur), chainLength,
 								actNumber));
 
 					}
@@ -254,29 +255,40 @@ public class Version2pt1DemandGenerationScript {
 			planCounter++;
 		}
 		scriptLog.info("Wrote a total of "+planCounter+" plans.");
+		scriptLog.info("There are "+carTripCounter + " car legs and "+ptTripCounter+" pt legs.");
 		popWriter.closeStreaming();
 	}
 
+	private Coord getFacilityCoordById(String mainActFacility) {
+		// TODO Auto-generated method stub
+		return scenario.getActivityFacilities().getFacilities().get(new IdImpl(mainActFacility)).getCoord();
+	}
+
 	private double getDayEndTime(PaxSG pax, int chainLength) {
+		if(pax.chainType == null)
+			return InputDataCollection.DEFAULT_END_TIME;
 		if (pax.chainType.equals("workOnly")
 				|| pax.chainType.equals("actBeforeWork")
 				|| pax.chainType.equals("actDuringWork"))
 			return Math.min(pax.mainActStart + pax.mainActDur,
 					InputDataCollection.LATEST_END_TIME);
-		if (pax.chainType.equals("schoolOnly")) {
-			String schoolType = pax.mainActType;
-			int age = pax.age;
-			if (schoolType.equals("s_primary"))
-				return Time.parseTime("13:00:00") + randomTime(1800d);
-			if (schoolType.equals("s_secondary"))
-				return Time.parseTime("15:00:00") + randomTime(1800d);
-			if (schoolType.equals("s_tertiary"))
-				return Time.parseTime("18:30:00") + randomTime(1800d);
-			if (schoolType.equals("s_other") && age < 10) {
-				return Time.parseTime("13:00:00") + randomTime(1800d);
-			} else {
-				return Time.parseTime("15:00:00") + randomTime(1800d);
-			}
+		if (pax.chainType.equals("schoolOnly")
+				|| pax.chainType.equals("actDuringSchool")) {
+//			String schoolType = pax.mainActType;
+//			int age = pax.age;
+//			if (schoolType.equals("s_primary"))
+//				return Time.parseTime("13:00:00") + randomTime(1800d);
+//			if (schoolType.equals("s_secondary"))
+//				return Time.parseTime("15:00:00") + randomTime(1800d);
+//			if (schoolType.equals("s_tertiary"))
+//				return Time.parseTime("18:30:00") + randomTime(1800d);
+//			if (schoolType.equals("s_other") && age < 10) {
+//				return Time.parseTime("13:00:00") + randomTime(1800d);
+//			} else {
+//				return Time.parseTime("15:00:00") + randomTime(1800d);
+//			}
+			return Math.min(pax.mainActStart + pax.mainActDur,
+					InputDataCollection.LATEST_END_TIME);
 		}
 		if (pax.chainType.equals("secOnly"))
 			return InputDataCollection.DEFAULT_END_TIME;
@@ -288,38 +300,43 @@ public class Version2pt1DemandGenerationScript {
 					+ (chainLength - 3) * 1800,
 					InputDataCollection.LATEST_END_TIME);
 		if (pax.chainType.equals("actAfterSchool")) {
-			String schoolType = pax.mainActType;
-			int age = pax.age;
-			if (schoolType.equals("s_primary"))
-				return Math.min(Time.parseTime("13:00:00") + randomTime(1800d)
-						+ (chainLength - 3) * 1800,
-						InputDataCollection.DEFAULT_END_TIME);
-			if (schoolType.equals("s_secondary"))
-				return Math.min(Time.parseTime("15:00:00") + randomTime(1800d)
-						+ (chainLength - 3) * 1800,
-						InputDataCollection.DEFAULT_END_TIME);
-			if (schoolType.equals("s_tertiary"))
-				return Math.min(Time.parseTime("18:30:00") + randomTime(1800d)
-						+ (chainLength - 3) * 1800,
-						InputDataCollection.LATEST_END_TIME);
-			if (schoolType.equals("s_other") && age < 10) {
-				return Math.min(Time.parseTime("13:00:00") + randomTime(1800d)
-						+ (chainLength - 3) * 1800,
-						InputDataCollection.DEFAULT_END_TIME);
-			} else {
-				return Math.min(Time.parseTime("15:00:00") + randomTime(1800d)
-						+ (chainLength - 3) * 1800,
-						InputDataCollection.DEFAULT_END_TIME);
-			}
+			return Math.min(pax.mainActStart + pax.mainActDur
+					+ (chainLength - 3) * 1800,
+					InputDataCollection.LATEST_END_TIME);
+//			String schoolType = pax.mainActType;
+//			int age = pax.age;
+//			if (schoolType.equals("s_primary"))
+//				return Math.min(Time.parseTime("13:00:00") + randomTime(1800d)
+//						+ (chainLength - 3) * 1800,
+//						InputDataCollection.DEFAULT_END_TIME);
+//			if (schoolType.equals("s_secondary"))
+//				return Math.min(Time.parseTime("15:00:00") + randomTime(1800d)
+//						+ (chainLength - 3) * 1800,
+//						InputDataCollection.DEFAULT_END_TIME);
+//			if (schoolType.equals("s_tertiary"))
+//				return Math.min(Time.parseTime("18:30:00") + randomTime(1800d)
+//						+ (chainLength - 3) * 1800,
+//						InputDataCollection.LATEST_END_TIME);
+//			if (schoolType.equals("s_other") && age < 10) {
+//				return Math.min(Time.parseTime("13:00:00") + randomTime(1800d)
+//						+ (chainLength - 3) * 1800,
+//						InputDataCollection.DEFAULT_END_TIME);
+//			} else {
+//				return Math.min(Time.parseTime("15:00:00") + randomTime(1800d)
+//						+ (chainLength - 3) * 1800,
+//						InputDataCollection.DEFAULT_END_TIME);
+//			}
 		}
-		if (pax.chainType.equals("actDuringSchool"))
-			return Time.parseTime("19:00:00") + randomTime(1800d);
+//		if (pax.chainType.equals("actDuringSchool"))
+//			return Time.parseTime("19:00:00") + randomTime(1800d);
 
 		// default return value
 		return InputDataCollection.DEFAULT_END_TIME;
 	}
 
 	private double getHomeDepartTime(PaxSG pax, int chainLength) {
+		if(pax.chainType == null)
+			return InputDataCollection.DEFAULT_START_TIME;
 		if (pax.chainType.equals("workOnly")
 				|| pax.chainType.equals("actAfterWork")
 				|| pax.chainType.equals("actDuringWork")
@@ -329,18 +346,20 @@ public class Version2pt1DemandGenerationScript {
 		if (pax.chainType.equals("schoolOnly")
 				|| pax.chainType.equals("actAfterSchool")
 				|| pax.chainType.equals("actDuringSchool")) {
-			String schoolType = pax.mainActType;
-			int age = pax.age;
-			if (schoolType.equals("s_primary")
-					|| schoolType.equals("s_secondary"))
-				return Time.parseTime("07:00:00") + randomTime(1800d);
-			if (schoolType.equals("s_tertiary"))
-				return Time.parseTime("07:30:00") + randomTime(1800d);
-			if (schoolType.equals("s_other") && age < 10) {
-				return Time.parseTime("07:30:00") + randomTime(1800d);
-			} else {
-				return Time.parseTime("08:00:00") + randomTime(1800d);
-			}
+//			String schoolType = pax.mainActType;
+//			int age = pax.age;
+//			if (schoolType.equals("s_primary")
+//					|| schoolType.equals("s_secondary"))
+//				return Time.parseTime("07:00:00") + randomTime(1800d);
+//			if (schoolType.equals("s_tertiary"))
+//				return Time.parseTime("07:30:00") + randomTime(1800d);
+//			if (schoolType.equals("s_other") && age < 10) {
+//				return Time.parseTime("07:30:00") + randomTime(1800d);
+//			} else {
+//				return Time.parseTime("08:00:00") + randomTime(1800d);
+//			}
+			return Math.max(pax.mainActStart - 600,
+					InputDataCollection.EARLIEST_START_TIME);
 		}
 		if (pax.chainType.equals("secOnly"))
 			return DEFAULT_LEISURE_HOME_DEPARTTIME + randomTime(3600d);
@@ -405,15 +424,7 @@ public class Version2pt1DemandGenerationScript {
 
 		int actcounter = 0;
 		int totalCounter = 0;
-		// write the allocations to SQL
-		try {
-			dba.executeStatement("DROP TABLE IF EXISTS matsim2.main_act_locations;");
-			dba.executeStatement("CREATE TABLE matsim2.main_act_locations (full_pop_pid int , facility_id varchar(255), distance double);");
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		} catch (NoConnectionException e1) {
-			e1.printStackTrace();
-		}
+
 		for (String actType : inputData.mainActivityTypes) {
 			int counter = 0;
 			primeActors[actcounter] = inputData.mainActPaxCollection.get(
@@ -446,7 +457,9 @@ public class Version2pt1DemandGenerationScript {
 					} catch (NullPointerException ne) {
 						// something went wrong, either the home or the work was
 						// null
-						scriptLog.error("Passing a person to the usual method");
+						scriptLog.error("Passing a person to the usual method cos of null");
+					}catch(ArrayIndexOutOfBoundsException ai){
+						scriptLog.error("Passing a person to the usual method cos of array out of bounds");
 					}
 					// if we came this far, the assignment was successful, go to
 					// the end of the assignment method
@@ -496,17 +509,7 @@ public class Version2pt1DemandGenerationScript {
 					p.mainActFacility = new LocationSampler(actType, ids,
 							samplingWeight).sampleLocations(1).getFirst()[0];
 				}
-				try {
-					distanceToWork = interFacilityDistance(p.household.homeFacilityId, p.mainActFacility);
-					dba.executeStatement(String
-							.format("INSERT INTO matsim2.main_act_locations VALUES(%d,\'%s\',%f)",
-									p.paxId, p.mainActFacility,distanceToWork
-									));
-				} catch (SQLException e) {
-					e.printStackTrace();
-				} catch (NoConnectionException e) {
-					e.printStackTrace();
-				}
+				p.distanceToWork = interFacilityDistance(p.household.homeFacilityId, p.mainActFacility);
 				counter++;
 				if ((primeActors[actcounter] % counter) == 0)
 					scriptLog.info(String.format(
@@ -529,6 +532,52 @@ public class Version2pt1DemandGenerationScript {
 							.format("%6d of %8d persons done in %.3f seconds at %.3f agents/sec, %s sec to go.",
 									totalCounter, totalCount, timePastSec,
 									agentsPerSecond, timeToGo));
+		}
+		// write the allocations to SQL
+		int modfactor = 1;
+		int counter = 0;
+		int lineCounter = 0;
+		int batchSize = 1000;
+		StringBuilder sb = new StringBuilder();
+		PushbackReader reader = new PushbackReader( new StringReader(""), 10000000 );
+		try {
+			CopyManager cpManager = ((PGConnection)dba.getConnection()).getCopyAPI();
+			dba.executeStatement("DROP TABLE IF EXISTS u_fouriep.main_act_locations_new;");
+			dba.executeStatement("CREATE TABLE u_fouriep.main_act_locations_new (full_pop_pid int , facility_id varchar(255), distance real);");
+			for(PaxSG p:inputData.getPersons().values()){
+				if(p.mainActType == null)
+					continue;
+				String sqlInserter = "%d,\'%s\',%f\n";
+				sb.append(String.format(sqlInserter,p.paxId,p.mainActFacility,p.distanceToWork));
+				lineCounter++;
+				if (lineCounter % batchSize == 0){
+					try {
+						reader.unread( sb.toString().toCharArray() );
+						cpManager.copyIn("COPY u_fouriep.main_act_locations_new FROM STDIN WITH CSV", reader );
+						sb.delete(0,sb.length());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if(lineCounter >= modfactor && lineCounter % modfactor == 0){
+					scriptLog.info(("Person main acts written to db = "+lineCounter));
+					modfactor = lineCounter;
+				}
+			}
+			try {
+				reader.unread( sb.toString().toCharArray() );
+				cpManager.copyIn("COPY u_fouriep.main_act_locations_new FROM STDIN WITH CSV", reader );
+				sb.delete(0,sb.length());
+				scriptLog.info(("Person main acts written to db = "+lineCounter));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} catch (NoConnectionException e1) {
+			e1.printStackTrace();
 		}
 	}
 
@@ -579,7 +628,7 @@ public class Version2pt1DemandGenerationScript {
 
 	private String assignSecondaryActivityLocation(String activityType,
 			PaxSG p, Id lastFacilityId) {
-		LocationSampler ls = inputData.locationSamplers.get(activityType);
+		LocationSampler ls = inputData.locationSamplers.get(activityType.trim());
 		int sampleSize = Integer.parseInt(this.diverseScriptProperties
 				.getProperty("locationSampleSize"));
 		Tuple<String[], double[]> locations = ls
@@ -688,9 +737,10 @@ public class Version2pt1DemandGenerationScript {
 	public static void main(String[] args) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException,
 			SQLException {
-		String dbaProperties = "data/matsim2.properties";
+		String dbaProperties = "data/matsim2postgres.properties";
 		String otherProperties = "data/matsimSG2DemandGen/demandAssignment.properties";
-		boolean deserialize = false;
+//		boolean deserialize = true;
+		boolean deserialize = true;
 		boolean facilitiesAllInOneXML = true;
 		if (args.length == 2) {
 			deserialize = Boolean.parseBoolean(args[0]);

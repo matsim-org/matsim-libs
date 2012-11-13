@@ -119,6 +119,7 @@ public class InputDataCollection implements Serializable {
 									.format("SELECT distinct age FROM %s where t6_purpose in(%s)",
 											secondaryActFrequenciesTable,
 											activityGroup));
+					inputLog.info("\t finished income_hh "+income);
 					while (rs_age.next()) {
 						int age = rs_age.getInt("age");
 						HashMap<String, HashMap<String, Double>> ageMap = new HashMap<String, HashMap<String, Double>>();
@@ -270,7 +271,8 @@ public class InputDataCollection implements Serializable {
 			for (String activityType : this.mainActivityTypes) {
 				if(!activityType.startsWith("w_"))
 					continue;
-				rs.beforeFirst();
+				rs = dba.executeQuery(String.format(
+						"select distinct subdgp  from %s order by subdgp", facilityToSubDGPTable));
 				while(rs.next()){
 					subDGPActivityMapping.get(rs.getInt("subdgp")).put(activityType, 
 							new Tuple<ArrayList<String>, ArrayList<Double>>(
@@ -348,7 +350,7 @@ public class InputDataCollection implements Serializable {
 								.createActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
 								DayType.wkday, Time.parseTime("10:00:00"), Time
-										.parseTime("19:00:00")));
+										.parseTime("22:00:00")));
 						option.setCapacity(secondaryCapacities
 								.get(activityType) * startCap);
 					}
@@ -360,7 +362,7 @@ public class InputDataCollection implements Serializable {
 								.createActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
 								DayType.wkday, Time.parseTime("10:00:00"), Time
-										.parseTime("19:00:00")));
+										.parseTime("22:00:00")));
 						option.setCapacity(secondaryCapacities
 								.get(activityType));
 					}
@@ -410,7 +412,7 @@ public class InputDataCollection implements Serializable {
 			this.mainActPaxCollection.put(activityType, new ArrayList<PaxSG>());
 		}
 		for (PaxSG p : this.getPersons().values()) {
-			if (p.mainActType.equals("NA"))
+			if (p.mainActType == null)
 				continue;
 			mainActPaxCollection.get(p.mainActType).add(p);
 		}
@@ -420,7 +422,7 @@ public class InputDataCollection implements Serializable {
 	public void dumpFacilitiesToSQL() throws SQLException,
 			NoConnectionException {
 		FacilitiesToSQL fc2sql = new FacilitiesToSQL(this.dba, this.scenario);
-		fc2sql.createCompleteFacilityAndActivityTable("matsim2.full_facility_list");
+		fc2sql.createCompleteFacilityAndActivityTablePostgres(diverseScriptProperties.getProperty("completeFacilitiesSQLTable"));
 
 	}
 
@@ -525,8 +527,19 @@ public class InputDataCollection implements Serializable {
 			facilitiesReader.readFile(diverseScriptProperties
 					.getProperty("eduFacilitiesXMLFile"));
 			loadFacilitiesFromSQL();
+			FacilitiesToSQL f2s = new FacilitiesToSQL(dba, scenario);
+			f2s.stripDescription();
 			addSecondaryActivityTypes();
 			dumpFacilitiesToXML();
+			try {
+				dumpFacilitiesToSQL();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -542,6 +555,10 @@ public class InputDataCollection implements Serializable {
 				.getProperty("homeFacilityId");
 		String householdTableNameField = diverseScriptProperties
 				.getProperty("householdTableName");
+		String householdSelectorTableNameField = diverseScriptProperties
+				.getProperty("householdSelectorTableName");
+		String householdSelectorField = diverseScriptProperties
+				.getProperty("householdSelectorField");
 
 		String personTableNameField = diverseScriptProperties
 				.getProperty("personTableName");
@@ -569,7 +586,7 @@ public class InputDataCollection implements Serializable {
 		String mainActTypeField = diverseScriptProperties
 				.getProperty("mainActType");
 
-		int householdLoadLimitField = Integer.parseInt(diverseScriptProperties
+		int householdLoadLimit = Integer.parseInt(diverseScriptProperties
 				.getProperty("householdLoadLimit"));
 		Date startDate = new Date();
 
@@ -577,31 +594,47 @@ public class InputDataCollection implements Serializable {
 		ResultSet rs;
 		try {
 			// sample random household ids without replacement
-			rs = dba.executeQuery(String.format("SELECT max(%s) FROM %s;",
-					synthHouseholdIdField, householdTableNameField));
-			rs.next();
-			int[] hhids = Sample.sampleMfromN(householdLoadLimitField,
-					rs.getInt(1));
-			//
-			if (householdLoadLimitField > 1000000) {
-				rs = dba.executeQuery(String.format(
-						"SELECT DISTINCT %s, %s, %s FROM %s LIMIT %d;",
-						synthHouseholdIdField, homeFacilityIdField,
-						carAvailabilityField, householdTableNameField,
-						householdLoadLimitField));
-			} else {
-				String hhidsToLoad = "" + hhids[0];
-				for (int i = 1; i < hhids.length; i++) {
-					hhidsToLoad = hhidsToLoad + "," + hhids[i];
-				}
+//			rs = dba.executeQuery(String.format("SELECT max(%s) FROM %s;",
+//					synthHouseholdIdField, householdTableNameField));
+//			rs.next();
+//			int[] hhids = Sample.sampleMfromN(householdLoadLimitField,
+//					rs.getInt(1));
+//			//
+//			if (householdLoadLimitField > 1000000) {
+//				rs = dba.executeQuery(String.format(
+//						"SELECT DISTINCT %s, %s, %s FROM %s LIMIT %d;",
+//						synthHouseholdIdField, homeFacilityIdField,
+//						carAvailabilityField, householdTableNameField,
+//						householdLoadLimitField));
+//			} else {
+//				String hhidsToLoad = "" + hhids[0];
+//				for (int i = 1; i < hhids.length; i++) {
+//					hhidsToLoad = hhidsToLoad + "," + hhids[i];
+//				}
 
-				rs = dba.executeQuery(String.format(
-						"SELECT DISTINCT %s, %s, %s FROM %s WHERE %s IN(%s);",
+//				rs = dba.executeQuery(String.format(
+//						"SELECT DISTINCT %s, %s, %s FROM %s WHERE %s IN(%s);",
+//						synthHouseholdIdField, homeFacilityIdField,
+//						carAvailabilityField, householdTableNameField,
+//						synthHouseholdIdField, hhidsToLoad));
+			rs = dba.executeQuery(String.format(
+					"SELECT count(*) as num FROM %s WHERE %s = 1;",
+					householdSelectorTableNameField,
+					householdSelectorField));	
+			rs.next();
+			int householdCount = rs.getInt("num");
+			
+			rs = dba.executeQuery(String.format(
+						"SELECT hhs.%s, hhs.%s, hhs.%s FROM %s hhs,%s sel WHERE hhs.%s = sel.%s and %s = 1;",
 						synthHouseholdIdField, homeFacilityIdField,
 						carAvailabilityField, householdTableNameField,
-						synthHouseholdIdField, hhidsToLoad));
-			}
+						householdSelectorTableNameField,
+						synthHouseholdIdField, synthHouseholdIdField,
+						householdSelectorField));
+//			}
 			while (rs.next()) {
+				if(counter>=householdLoadLimit)
+					break;
 				int synthHouseholdId = rs.getInt(synthHouseholdIdField);
 				int carAvailability = rs.getInt(carAvailabilityField);
 				String homeFacilityId = new String("home_"
@@ -613,12 +646,22 @@ public class InputDataCollection implements Serializable {
 						"SELECT * FROM %s WHERE %s = %d", personTableNameField,
 						synthHouseholdIdField, synthHouseholdId));
 				while (rspax.next()) {
+					String modeSuggestion = rspax
+							.getString(modeSuggestionField);
+					if ((modeSuggestion.equals("not_assigned") || modeSuggestion
+							.equals("notravel")))
+						continue;
+					String chainType = rspax.getString(chainTypeField);
+					if(chainType == null)
+						continue;
+					// generate half mixed mode users
+					if (modeSuggestion.equals("ptmix") && Math.random() > 0.5)
+						continue;
 					int paxId = rspax.getInt(paxIdField);
 					String foreigner = rspax.getString(foreignerField);
 					boolean carLicenseHolder = rspax
 							.getInt(carLicenseHolderField) > 0 ? true : false;
 					String chain = rspax.getString(chainField);
-					String chainType = rspax.getString(chainTypeField);
 					int age = 0;
 					if (rspax.getString(ageField).equals("age65_up"))
 						age = 70;
@@ -631,18 +674,10 @@ public class InputDataCollection implements Serializable {
 							.getString(incomePaxField));
 					int incomeHousehold = rspax.getInt(incomeHouseholdField);
 					String mainActType = rspax.getString(mainActTypeField);
-					String modeSuggestion = rspax
-							.getString(modeSuggestionField);
 					double mainActStart = Math.max(
 							rspax.getDouble(mainActStartField), 0);
 					double mainActDur = rspax.getDouble(mainActDurField);
 					//skip if this guy is not meant to be realised
-					if ((modeSuggestion.equals("not_assigned") || modeSuggestion
-							.equals("notravel")))
-						continue;
-					// generate half mixed mode users
-					if (modeSuggestion.equals("ptmix") && Math.random() > 0.5)
-						continue;
 					PaxSG newPax = new PaxSG(paxId, foreigner,
 							currentHousehold, carLicenseHolder, age, sex,
 							income, occup, chain, chainType, mainActStart,
@@ -657,19 +692,19 @@ public class InputDataCollection implements Serializable {
 					// timer info
 
 				}
-				if ((counter % 1000) == 0) {
+				if ((counter % 10000) == 0) {
 
 					Date currDate = new Date();
 					long timePastLong = currDate.getTime()
 							- startDate.getTime();
 					double timePastSec = (double) timePastLong
 							/ (double) Timer.ONE_SECOND;
-					int agentsToGo = householdLoadLimitField - counter;
+					int agentsToGo = householdCount - counter;
 					double agentsPerSecond = (double) counter / timePastSec;
 					long timeToGo = (long) ((double) agentsToGo / agentsPerSecond);
 					inputLog.info(String
 							.format("%6d of %8d households done in %.3f seconds at %.3f hhs/sec, %s sec to go.",
-									counter, householdLoadLimitField,
+									counter, householdCount,
 									timePastSec, agentsPerSecond, timeToGo));
 				}
 				counter++;

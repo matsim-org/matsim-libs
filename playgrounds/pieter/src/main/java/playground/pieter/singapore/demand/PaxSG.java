@@ -22,6 +22,7 @@ public class PaxSG implements Serializable{
 	String modeSuggestion;
 	Tuple<String[],double[]> bizActFrequencies;
 	Tuple<String[],double[]> leisureActFrequencies;
+	double distanceToWork;
 	
 	public PaxSG(int paxId, String foreigner, HouseholdSG household,
 			boolean carLicenseHolder, int age, String sex, int income,
