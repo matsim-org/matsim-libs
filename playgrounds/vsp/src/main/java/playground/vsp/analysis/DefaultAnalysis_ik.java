@@ -35,7 +35,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.bvgAna.anaLevel2.agentId2stopDifference.AgentId2StopDifferenceAnalyzer;
 
 /**
  * 
@@ -65,26 +64,7 @@ public class DefaultAnalysis_ik {
 		
 		// END of configuration file
 		
-//		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
-//		distAna.init(this.scenario);
-//		this.anaModules.add(distAna);
-//		
-//		UserBenefitsAnalyzer userBenefitsAna = new UserBenefitsAnalyzer(ptDriverPrefix);
-//		userBenefitsAna.init(this.scenario);
-//		this.anaModules.add(userBenefitsAna);
-//		
-//		MonetaryPaymentsAnalyzer moneyAna = new MonetaryPaymentsAnalyzer(ptDriverPrefix);
-//		moneyAna.init(this.scenario);
-//		this.anaModules.add(moneyAna);
-//		
-//		CarDistanceAnalyzer carDistAna = new CarDistanceAnalyzer(ptDriverPrefix);
-//		carDistAna.init(scenario);
-//		this.anaModules.add(carDistAna);
-//		
-//		TravelTimeAnalyzer ttAna = new TravelTimeAnalyzer(ptDriverPrefix);
-//		ttAna.init(scenario);
-//		this.anaModules.add(ttAna);
-//		
+
 //		EmissionEventsWriter emiWriter = new EmissionEventsWriter(ptDriverPrefix, this.outputDir);
 //		// additional files, required for this analysis module:
 //		String emissionVehicleFile = "/Users/Ihab/Documents/workspace/shared-svn/projects/detailedEval/pop/merged/emissionVehicles_1pct.xml.gz";
@@ -112,60 +92,13 @@ public class DefaultAnalysis_ik {
 //		emiAna.init(scenario);
 //		this.anaModules.add(emiAna);
 //		
-//		PtOperatorAnalyzer ptOperatorAna = new PtOperatorAnalyzer(ptDriverPrefix);
-//		ptOperatorAna.init(scenario);
-//		this.anaModules.add(ptOperatorAna);
-//		
-//		WaitingTimesAnalyzer waitAna = new WaitingTimesAnalyzer(ptDriverPrefix);
-//		waitAna.init(scenario);
-//		this.anaModules.add(waitAna);
-//		
-//		DepartureDelayAtStopAnalyzer delayAna = new DepartureDelayAtStopAnalyzer(ptDriverPrefix);
-//		delayAna.init(scenario);
-//		this.anaModules.add(delayAna);
-//		
-//		AgentId2EnterLeaveVehicleAnalyzer agent2EnterLeaveAna = new AgentId2EnterLeaveVehicleAnalyzer(ptDriverPrefix);
-//		agent2EnterLeaveAna.init(scenario);
-//		this.anaModules.add(agent2EnterLeaveAna);
-//		
-//		PtTripTravelTimeTransfersAnalyzer ptTTAna = new PtTripTravelTimeTransfersAnalyzer(ptDriverPrefix);
-//		ptTTAna.init(scenario);
-//		this.anaModules.add(ptTTAna);
-//		
-//		EnterLeaveVehicle2ActivityAnalyzer enterLeaveActAna = new EnterLeaveVehicle2ActivityAnalyzer(ptDriverPrefix);
-//		enterLeaveActAna.init(scenario);
-//		this.anaModules.add(enterLeaveActAna);
-//		
-//		StopId2LineId2PulkAnalyzer pulkAna = new StopId2LineId2PulkAnalyzer(ptDriverPrefix);
-//		pulkAna.init(scenario);
-//		this.anaModules.add(pulkAna);
-//		
-//		StopId2PersonEnterLeaveVehicleAnalyzer stopAna = new StopId2PersonEnterLeaveVehicleAnalyzer(ptDriverPrefix);
-//		stopAna.init(scenario);
-//		this.anaModules.add(stopAna);
-//		
-//		StopId2RouteId2DelayAtStopAnalyzer delayAna = new StopId2RouteId2DelayAtStopAnalyzer(ptDriverPrefix);
-//		delayAna.init(scenario);
-//		this.anaModules.add(delayAna);
-//		
 //		// number of detailed slots required for this analysis module
 //		int numberOfDetailedSlots = 5;
 //		VehDelayAtStopHistogramAnalyzer delayHistogramAna = new VehDelayAtStopHistogramAnalyzer(ptDriverPrefix, numberOfDetailedSlots);
 //		delayHistogramAna.init(scenario);
 //		this.anaModules.add(delayHistogramAna);
-//
-//		VehDelayAtStopAnalyzer vehDelayAna = new VehDelayAtStopAnalyzer(ptDriverPrefix);
-//		vehDelayAna.init(scenario);
-//		this.anaModules.add(vehDelayAna);
-//		
-//		VehId2PersonEnterLeaveVehicleAnalyzer vehIdEnterLeaveAna = new VehId2PersonEnterLeaveVehicleAnalyzer(ptDriverPrefix);
-//		vehIdEnterLeaveAna.init(scenario);
-//		this.anaModules.add(vehIdEnterLeaveAna);
 
-		AgentId2StopDifferenceAnalyzer stopDiffAna = new AgentId2StopDifferenceAnalyzer(ptDriverPrefix);
-		stopDiffAna.init(scenario);
-		this.anaModules.add(stopDiffAna);
-		
+
 		// END ugly code - Initialization needs to be configurable
 		
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
