@@ -71,7 +71,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	 * @param controler
 	 */
 	public PtSubModeTripRouterFactory(final Controler controler) {
-		
+		// TODO[dr] adapt changes from PTripRouterFactoryImpl constructor and createTripRouter, especially line 195
 		this.config = controler.getScenario().getConfig();
 		this.network = controler.getScenario().getNetwork();
 		this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
