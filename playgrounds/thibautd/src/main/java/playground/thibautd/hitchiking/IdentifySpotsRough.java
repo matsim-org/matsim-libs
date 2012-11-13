@@ -84,7 +84,7 @@ public class IdentifySpotsRough {
 		writeXy( hhLinks , outFile + ".xy" );
 	}
 
-	private static void writeXy(
+	static void writeXy(
 			final Collection<Link> hhLinks,
 			final String outFile) {
 		try {

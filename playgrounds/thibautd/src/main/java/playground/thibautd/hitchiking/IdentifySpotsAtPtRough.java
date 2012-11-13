@@ -98,6 +98,8 @@ public class IdentifySpotsAtPtRough {
 					carNetwork,
 					hhLinks),
 				spotsOutFile);
+		log.info( "write link coords to "+spotsOutFile+".xy" );
+		IdentifySpotsRough.writeXy( hhLinks , spotsOutFile + ".xy" );
 	}
 
 	private static void logInfo(final Collection<Link> hhLinks) {
