@@ -94,7 +94,7 @@ public class HITSToMATSim {
 				.createScenario(ConfigUtils.createConfig());
 		this.population = scenario.getPopulation();
 		new MatsimNetworkReader(scenario)
-				.readFile("data/singapore2.xml");
+				.readFile("data/singapore1_no_rail_CLEAN.xml");
 		NetworkImpl subNet = NetworkImpl.createNetwork();
 		TransportModeNetworkFilter t = new TransportModeNetworkFilter((NetworkImpl) scenario.getNetwork());
 		HashSet set = new HashSet<String>();
@@ -188,7 +188,8 @@ public class HITSToMATSim {
 				return null;
 
 			Activity act = population.getFactory().createActivityFromCoord(
-					hitsActTypeToMATSimType(actType), origin);
+//					hitsActTypeToMATSimType(actType), origin);
+			actType, origin);
 			
 			// make sure the end time is no earlier than the start of the
 			// simulation
@@ -805,7 +806,7 @@ public class HITSToMATSim {
 		Connection conn = null;
 		String userName = "fouriep";
 		String password = "K0s1R0s1";
-		String url = "jdbc:mysql://krakatau/hits";
+		String url = "jdbc:mysql://krakatau.sec.ethz.local/hits";
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
 		conn = DriverManager.getConnection(url, userName, password);
 		System.out.println("Database connection established");
