@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+
 /**
  * @author Sergio Ordóñez
  */
@@ -117,6 +118,10 @@ public class DataBaseAdmin {
 	 */
 	public void close() throws SQLException {
 		connection.close();
+	}
+	public Connection getConnection() {
+		// TODO Auto-generated method stub
+		return this.connection;
 	}
 	
 }
