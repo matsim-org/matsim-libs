@@ -77,7 +77,7 @@ public class DayControler extends Controler {
 		boxPlotPrefs.createChart();
 		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename(day + "prefs.png"), 800, 600);	
 		
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.prefs);
 		attributesWriter.writeFile(this.getControlerIO().getOutputFilename("../" + day + ".prefsAgents.txt")); 
 	}
 
