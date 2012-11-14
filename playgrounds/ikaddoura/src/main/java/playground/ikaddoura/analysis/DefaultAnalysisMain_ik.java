@@ -105,7 +105,6 @@ public class DefaultAnalysisMain_ik {
 		Gbl.printMemoryUsage();
 	}
 
-
 	private void readFiles(String shapeFile) {
 		
 		log.info("Reading scenario...");
