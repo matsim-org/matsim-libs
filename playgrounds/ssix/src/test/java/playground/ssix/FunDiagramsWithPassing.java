@@ -722,7 +722,7 @@ public class FunDiagramsWithPassing implements LinkEnterEventHandler{
 		this.permanentFlow_med = getActualFlow_med();
 		this.permanentFlow_fast = getActualFlow_fast();				
 		
-		if (tourNumber >= (this.permanentRegimeTour+2)){//Let the simulation go another turn around to eventually fill data gaps
+		if (tourNumber >= (this.permanentRegimeTour+3)){//Let the simulation go another turn around to eventually fill data gaps
 			int N_truck = 0; int N_med = 0; int N_fast = 0;
 			
 			if (this.tourNumberSpeed_truck.size() != 0){

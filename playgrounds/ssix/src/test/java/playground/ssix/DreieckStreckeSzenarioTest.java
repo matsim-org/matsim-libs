@@ -211,12 +211,12 @@ public class DreieckStreckeSzenarioTest {
 	}
 	
 	public static void main(String[] args) {
-		new DreieckStreckeSzenarioTest(3600).run();
+		new DreieckStreckeSzenarioTest(2600).run();
 	}
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)60,2);
+		createPopulation((long)45,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		/*
@@ -318,7 +318,8 @@ public class DreieckStreckeSzenarioTest {
 	
 	private void createPopulation(long numberOfPeople, int sekundenFrequenz){
 		Population population = scenario.getPopulation();
-		Random rand = MatsimRandom.getRandom();
+		Random rand = new Random();//for more randomness
+		//other option get MatsimRandom() is then more deterministic
 		
 		for (long i = 0; i<numberOfPeople; i++){
 			
