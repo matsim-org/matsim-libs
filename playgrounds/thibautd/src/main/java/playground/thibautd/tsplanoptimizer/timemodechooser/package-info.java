@@ -19,7 +19,12 @@
  * *********************************************************************** */
 
 /**
- * best-response module based on Matthias Feil "TimeModeChoicer" algorithm.
+ * Best-response module based on Matthias Feil "TimeModeChoicer" algorithm.
+ * It optimizes a plan activity durations and modes given the travel times
+ * observed in the previous iterations using tabu search.
+ * <br>
+ * The package contains a framework, which can be used to build Tabu Search
+ * based replaning modules, and a replaning module using this framework.
  * @author thibautd
  */
 package playground.thibautd.tsplanoptimizer.timemodechooser;
