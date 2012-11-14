@@ -17,64 +17,72 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.welfareAnalyzer;
+/**
+ * 
+ * @author ikaddoura
+ * 
+ */
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2PersonEnterLeaveVehicle;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.transferPayments.MonetaryPaymentsAnalyzer;
-import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
- * 
  * @author ikaddoura
  *
  */
-public class WelfareAnalyzer extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(WelfareAnalyzer.class);
+public class StopId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(StopId2PersonEnterLeaveVehicleAnalyzer.class);
 	private ScenarioImpl scenario;
-
+	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private MonetaryPaymentsAnalyzer transferAna;
-	private UserBenefitsAnalyzer userBenefitsAna;
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	
-	private double userBenefitsWithoutTransferPayments;
+	private StopId2PersonEnterLeaveVehicleHandler handler;
+	private Map<Id, List<PersonEntersVehicleEvent>> stopId2PersonEnterEvent;
+	private Map<Id, List<PersonLeavesVehicleEvent>> stopId2PersonLeaveEvent;
 	
-	public WelfareAnalyzer() {
-		super(WelfareAnalyzer.class.getSimpleName());
+	public StopId2PersonEnterLeaveVehicleAnalyzer() {
+		super(StopId2PersonEnterLeaveVehicleAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		
-		// (sub-modules)
-			
-		this.transferAna =  new MonetaryPaymentsAnalyzer();
-		this.transferAna.init(scenario);
-		this.anaModules.add(transferAna);
+		// (sub-)module
+		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
+		this.ptDriverPrefixAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverPrefixAnalyzer);
 		
-		this.userBenefitsAna = new UserBenefitsAnalyzer();
-		this.userBenefitsAna.init(scenario);
-		this.anaModules.add(userBenefitsAna);
+		this.handler = new StopId2PersonEnterLeaveVehicleHandler(this.ptDriverPrefixAnalyzer);
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
+
+		// from (sub-)modules
 		for (AbstractAnalyisModule module : this.anaModules) {
 			for (EventHandler handler : module.getEventHandler()) {
 				allEventHandler.add(handler);
 			}
 		}
+		
+		// own handler
+		allEventHandler.add(this.handler);
+		
 		return allEventHandler;
 	}
 
@@ -85,44 +93,32 @@ public class WelfareAnalyzer extends AbstractAnalyisModule{
 			module.preProcessData();
 		}
 		log.info("Preprocessing all (sub-)modules... done.");
-		
 	}
 
 	@Override
-	public void postProcessData() {		
+	public void postProcessData() {
 		log.info("Postprocessing all (sub-)modules...");
 		for (AbstractAnalyisModule module : this.anaModules) {
 			module.postProcessData();
 		}
 		log.info("Postprocessing all (sub-)modules... done.");
 		
-		// own postProcessing
-		log.info("sum of all transfer payments: " + this.transferAna.getAllUsersAmount());
-		log.info("all users logsum: " + this.userBenefitsAna.getAllUsersLogSum());
-		
-		this.userBenefitsWithoutTransferPayments = this.userBenefitsAna.getAllUsersLogSum() + this.transferAna.getAllUsersAmount();
+		this.stopId2PersonEnterEvent = this.handler.getStopId2PersonEnterEventMap();
+		this.stopId2PersonLeaveEvent = this.handler.getStopId2PersonLeaveEventMap();
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder + "welfare.txt";
-		File file = new File(fileName);
-			
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("userBenefits: " + this.userBenefitsAna.getAllUsersLogSum());
-			bw.newLine();
-			bw.write("transferPayments: " + this.transferAna.getAllUsersAmount());
-			bw.newLine();
-			bw.write("userBenefits without transferPayments : " + this.userBenefitsWithoutTransferPayments);
-			bw.newLine();
-			
-			bw.close();
-			log.info("Output written to " + fileName);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// ...
 	}
 
+	public Map<Id, List<PersonEntersVehicleEvent>> getStopId2PersonEnterEvent() {
+		return stopId2PersonEnterEvent;
+	}
+
+	public Map<Id, List<PersonLeavesVehicleEvent>> getStopId2PersonLeaveEvent() {
+		return stopId2PersonLeaveEvent;
+	}
+
+	
 }

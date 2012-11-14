@@ -34,6 +34,8 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+
 /**
  * Collects <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEventHandler</code> for each stop id.
  *
@@ -44,15 +46,15 @@ public class StopId2PersonEnterLeaveVehicleHandler implements VehicleArrivesAtFa
 
 	private final Logger log = Logger.getLogger(StopId2PersonEnterLeaveVehicleHandler.class);
 	private final Level logLevel = Level.WARN;
-	private String ptDriverPrefix;
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	
 	private Map<Id, Id> vehId2stopIdMap = new TreeMap<Id, Id>();
 	private Map<Id, List<PersonEntersVehicleEvent>> stopId2PersonEnterEventMap = new TreeMap<Id, List<PersonEntersVehicleEvent>>();
 	private Map<Id, List<PersonLeavesVehicleEvent>> stopId2PersonLeaveEventMap = new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
 
-	public StopId2PersonEnterLeaveVehicleHandler(String ptDriverPrefix) {
+	public StopId2PersonEnterLeaveVehicleHandler(PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer) {
 		this.log.setLevel(this.logLevel);
-		this.ptDriverPrefix = ptDriverPrefix;
+		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
 	}
 
 	/**
@@ -76,7 +78,7 @@ public class StopId2PersonEnterLeaveVehicleHandler implements VehicleArrivesAtFa
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (event.getPersonId().toString().startsWith(ptDriverPrefix)) {
+		if (event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())) {
 			// pt driver
 		} else {
 			if (this.vehId2stopIdMap.containsKey(event.getVehicleId())){
@@ -95,7 +97,7 @@ public class StopId2PersonEnterLeaveVehicleHandler implements VehicleArrivesAtFa
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (event.getPersonId().toString().startsWith(ptDriverPrefix)) {
+		if (event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())) {
 			// pt driver
 		} else {
 			if (this.vehId2stopIdMap.containsKey(event.getVehicleId())){
