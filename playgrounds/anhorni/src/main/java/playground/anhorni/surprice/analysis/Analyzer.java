@@ -207,25 +207,25 @@ public class Analyzer {
 	}
 	
 	private void writeDaily(String day) {
-		this.utilityBins.plotBinnedDistribution(outPath, "income", "");
-		this.ttBins.plotBinnedDistribution(outPath, "income", "");
-		this.tdBins.plotBinnedDistribution(outPath, "income", "");
-		this.tolltdBins.plotBinnedDistribution(outPath, "income", "");
+		this.utilityBins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
+		this.ttBins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
+		this.tdBins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
+		this.tolltdBins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
 		
 		for (Bins bins : this.modeBins.values()) {
-			bins.plotBinnedDistribution(outPath, "income", "");
+			bins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
 		}
 		this.boxPlotTravelTimesCarPerIncome.createChart();
-		this.boxPlotTravelTimesCarPerIncome.saveAsPng(outPath + "/" + day + ".ttCarPerIncome.png", 800, 600);
+		this.boxPlotTravelTimesCarPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".ttCarPerIncome.png", 800, 600);
 		
 		this.boxPlotTravelTimesPtPerIncome.createChart();
-		this.boxPlotTravelTimesPtPerIncome.saveAsPng(outPath + "/" + day + ".ttPtPerIncome.png", 800, 600);
+		this.boxPlotTravelTimesPtPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".ttPtPerIncome.png", 800, 600);
 		
 		this.boxPlotTravelDistancesCarPerIncome.createChart();
-		this.boxPlotTravelDistancesCarPerIncome.saveAsPng(outPath + "/" + day + ".tdCarPerIncome.png", 800, 600);
+		this.boxPlotTravelDistancesCarPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tdCarPerIncome.png", 800, 600);
 				
 		this.boxPlotTravelDistancesTolledPerIncome.createChart();
-		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + ".tolltdPerIncome.png", 800, 600);
+		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tolltdPerIncome.png", 800, 600);
 		
 		ObjectAttributes tollDistancesAgent = new ObjectAttributes();
 		
@@ -234,7 +234,7 @@ public class Analyzer {
 		}
 		
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(tollDistancesAgent);
-		attributesWriter.writeFile(outPath + "/" + day + ".tollDistancesAgent.txt");
+		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".tollDistancesAgent.txt");
 	}
 	
 	private void writePlots() {			

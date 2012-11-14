@@ -93,16 +93,16 @@ public class TwoRunAnalyzer {
 		double dist[] = new double[tollDistA.size()];
 		
 		chart.addSeries("alpha_dist", alpha, dist);
-		chart.saveAsPng(this.outPath + day + ".DiffAlphaDist", 800, 600);
+		chart.saveAsPng(this.outPath + "/" + day + "/" + day + ".DiffAlphaDist", 800, 600);
 	}
 	
 	private void readTollDistances(String day, ObjectAttributes oa, String path) {	
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/" + day + ".tollDistancesAgent.txt");
+		preferencesReader.parse(path + "/" + day + "/" + day + ".tollDistancesAgent.txt");
 	}
 	
 	private void readPrefs(String day, ObjectAttributes oa, String path) {	
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/" + day + ".prefsAgent.txt");
+		preferencesReader.parse(path + "/" + day + "/" + day + ".prefsAgent.txt");
 	}
 }
