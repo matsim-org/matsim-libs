@@ -29,7 +29,7 @@ import java.util.Random;
  * this class is just a container.
  * @author thibautd
  */
-public class TabuSearchConfiguration {
+public final class TabuSearchConfiguration {
 	private List<AppliedMoveListener> appliedMoveListeners = new ArrayList<AppliedMoveListener>();
 	private List<StartListener> startListeners = new ArrayList<StartListener>();
 	private List<EndListener> endListeners = new ArrayList<EndListener>();
@@ -47,9 +47,11 @@ public class TabuSearchConfiguration {
 		return random;
 	}
 
-	public void setRandom(final Random random) {
+	public Random setRandom(final Random random) {
 		checkLock();
+		Random old = this.random;
 		this.random = random;
+		return old;
 	}
 
 	public MoveGenerator getMoveGenerator() {
@@ -57,9 +59,11 @@ public class TabuSearchConfiguration {
 		return moveGenerator;
 	}
 
-	public void setMoveGenerator(final MoveGenerator moveGenerator) {
+	public MoveGenerator setMoveGenerator(final MoveGenerator moveGenerator) {
 		checkLock();
+		MoveGenerator old = this.moveGenerator;
 		this.moveGenerator = moveGenerator;
+		return old;
 	}
 
 	public TabuChecker getTabuChecker() {
@@ -67,9 +71,11 @@ public class TabuSearchConfiguration {
 		return tabuChecker;
 	}
 
-	public void setTabuChecker(final TabuChecker tabuChecker) {
+	public TabuChecker setTabuChecker(final TabuChecker tabuChecker) {
 		checkLock();
+		TabuChecker old = this.tabuChecker;
 		this.tabuChecker = tabuChecker;
+		return old;
 	}
 
 	public FitnessFunction getFitnessFunction() {
@@ -77,19 +83,11 @@ public class TabuSearchConfiguration {
 		return fitnessFunction;
 	}
 
-	public void setFitnessFunction(final FitnessFunction fitnessFunction) {
+	public FitnessFunction setFitnessFunction(final FitnessFunction fitnessFunction) {
 		checkLock();
+		FitnessFunction old = this.fitnessFunction;
 		this.fitnessFunction = fitnessFunction;
-	}
-
-	public void setInitialSolution(final Solution initialSolution) {
-		checkLock();
-		this.initialSolution = initialSolution;
-	}
-
-	public Solution getInitialSolution() {
-		lock();
-		return initialSolution.createClone();
+		return old;
 	}
 
 	/**
@@ -127,10 +125,12 @@ public class TabuSearchConfiguration {
 		return endListeners;
 	}
 
-	public void setEvolutionMonitor(
+	public EvolutionMonitor setEvolutionMonitor(
 			final EvolutionMonitor evolutionMonitor) {
 		checkLock();
+		EvolutionMonitor old = this.evolutionMonitor;
 		this.evolutionMonitor = evolutionMonitor;
+		return old;
 	}
 
 	public EvolutionMonitor getEvolutionMonitor() {

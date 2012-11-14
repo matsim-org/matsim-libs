@@ -30,7 +30,6 @@ import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.cliquessim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.CompositeMoveGenerator;
 import playground.thibautd.tsplanoptimizer.framework.CompositeTabuChecker;
-import playground.thibautd.tsplanoptimizer.framework.ConfigurationBuilder;
 import playground.thibautd.tsplanoptimizer.framework.EvolutionPlotter;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.ImprovementDelayMonitor;
@@ -43,20 +42,16 @@ import playground.thibautd.tsplanoptimizer.timemodechooser.FixedStepsIntegerMove
 /**
  * @author thibautd
  */
-public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
+class JointTimeModeChooserConfigBuilder {
 	// the mode optimisation is inconsistent...
 	private static final int N_ITER = 1000;
 	private static final List<Integer> RESTRICTED_STEPS = Arrays.asList( 60 , 300 , 1500 );
 
 	private final JointPlan plan;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-	private final TripRouterFactory tripRouterFactory;
 	private final String outputDir;
 	private final JointTimeModeChooserConfigGroup config;
 	private final Random random;
-
-	private boolean penalizeUnsynchro = false;
-	private JointTimeModeChooserSolution internalInitialSolution = null;
 
 	/**
 	 * Creates a builder for optimisation without debuging output
@@ -84,42 +79,14 @@ public class JointTimeModeChooserConfigBuilder implements ConfigurationBuilder {
 		this.plan = plan;
 		this.config = config;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.tripRouterFactory = tripRouterFactory;
 		this.outputDir = analysisOutputDir;
 	}
 
-	/**
-	 * Sets the synchronisation behaviour. The idea is that plans
-	 * should be optimised without taking care of synchronisation,
-	 * and then synchronized (the penalty strategy otherwise tends to trap
-	 * the algorithm in the first synchronized state found).
-	 * Mode is not optimised when synchronizing.
-	 * @param b wether the plans are to synchronize or not
-	 */
-	public void setIsSynchronizing(final boolean b) {
-		penalizeUnsynchro = b;
-	}
-
-	/**
-	 * Sets the initial solution. If null, a solution
-	 * representing the plan passed at construction is used
-	 * as starting point.
-	 * @param s the initial solution
-	 */
-	public void setInitialSolution(final Solution s) {
-		internalInitialSolution =  (JointTimeModeChooserSolution) s;
-	}
-
-	@Override
-	public void buildConfiguration(final TabuSearchConfiguration configuration) {
+	public void buildConfiguration(
+			final boolean penalizeUnsynchro,
+			final Solution initialSolution,
+			final TabuSearchConfiguration configuration) {
 		int cliqueSize = plan.getClique().getMembers().size();
-
-		JointTimeModeChooserSolution initialSolution =
-			internalInitialSolution != null ? internalInitialSolution :
-			new JointTimeModeChooserSolution(
-					plan,
-					tripRouterFactory.createTripRouter() );
-		configuration.setInitialSolution( initialSolution );
 
 		// different parameters depending on whether we optimise
 		// with or without synchro, as mode is not optimised when

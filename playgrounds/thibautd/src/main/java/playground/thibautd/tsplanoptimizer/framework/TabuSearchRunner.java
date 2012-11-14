@@ -30,36 +30,23 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
- * Class responsible for running the tabu search defined by the
- * {@link TabuSearchConfiguration} defined by a {@link ConfigurationBuilder}.
+ * Class responsible for running the tabu search defined by tuning
+ * a {@link TabuSearchConfiguration}.
+ * To build a best-response module based on tabu search,
+ * the plan algorithm mainly has to tune the configuration
+ * and launch the run method.
  *
  * @author thibautd
  */
-public class TabuSearchRunner {
+public final class TabuSearchRunner {
 	private static final Logger log =
 		Logger.getLogger(TabuSearchRunner.class);
 
-	/**
-	 * Runs the process.
-	 * @param configurationBuilder the builder to use to create the configuration
-	 * for the run.
-	 * @return the best {@link Solution} found during the search
-	 */
+	private TabuSearchRunner() {}
+
 	public static Solution runTabuSearch(
-			final ConfigurationBuilder configurationBuilder) {
-		// create config
-		// ---------------------------------------------------------------------
-		TabuSearchConfiguration configuration = new TabuSearchConfiguration();
-		configurationBuilder.buildConfiguration( configuration );
-		configuration.lock();
-
-		// run it
-		// ---------------------------------------------------------------------
-		return runTabuSearch( configuration );
-	}
-
-	private static Solution runTabuSearch(
-			final TabuSearchConfiguration configuration ) {
+			final TabuSearchConfiguration configuration,
+			final Solution initialSolution ) {
 		// get the elements
 		// -----------------------------------------------------------
 		EvolutionMonitor monitor = configuration.getEvolutionMonitor();
@@ -68,7 +55,7 @@ public class TabuSearchRunner {
 		FitnessFunction fitness = configuration.getFitnessFunction();
 		List<AppliedMoveListener> listeners = configuration.getAppliedMoveListeners();
 
-		Solution currentSolution = configuration.getInitialSolution();
+		Solution currentSolution = initialSolution;
 
 		Solution currentBestSolution = currentSolution.createClone();
 		double currentBestScore = fitness.computeFitnessValue( currentBestSolution );
@@ -135,6 +122,9 @@ public class TabuSearchRunner {
 		return currentBestSolution;
 	}
 
+	/**
+	 * Helps debuging: logs all plan elements of a plan getting an incorrect score.
+	 */
 	private static void logInvalidSolution(final Solution newSolution) {
 		log.error( "INVALID SOLUTION!" );
 		int i=0;

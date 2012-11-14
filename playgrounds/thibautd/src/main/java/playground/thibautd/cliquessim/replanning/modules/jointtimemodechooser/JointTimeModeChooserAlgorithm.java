@@ -32,7 +32,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.cliquessim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
-import playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner;
+import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
+import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
 
 /**
@@ -82,15 +83,24 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 					config.isDebugMode() ? controler.getControlerIO().getIterationPath( controler.getIterationNumber() ) : null);
 
 		// first run without synchro
-		builder.setInitialSolution( null );
-		builder.setIsSynchronizing( false  );
-		Solution bestSolution = TabuSearchRunner.runTabuSearch( builder );
+		TabuSearchConfiguration configuration = new TabuSearchConfiguration();
+		Solution initialSolution = new JointTimeModeChooserSolution(
+						(JointPlan) plan,
+						tripRouterFactory.createTripRouter());
+		builder.buildConfiguration(
+				false,
+				initialSolution,
+				configuration );
+		Solution bestSolution = runTabuSearch( configuration , initialSolution );
 
 		if (jointPlan.getClique().getMembers().size() > 1) {
 			// then start at the found solution and synchronize
-			builder.setInitialSolution( bestSolution );
-			builder.setIsSynchronizing( true  );
-			bestSolution = TabuSearchRunner.runTabuSearch( builder );
+			configuration = new TabuSearchConfiguration();
+			builder.buildConfiguration(
+					true,
+					bestSolution,
+					configuration );
+			bestSolution = runTabuSearch( configuration , bestSolution );
 		}
 
 		// two goals here:
