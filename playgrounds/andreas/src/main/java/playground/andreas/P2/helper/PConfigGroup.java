@@ -87,6 +87,7 @@ public class PConfigGroup extends Module{
 	private static final String RANDOM_STOP_PROVIDER_GRID_SIZE = "randomStopProviderGridSize";
 	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
 	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
+	private static final String DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION = "disableCreationOfNewCooperativesInIteration";
 	private static final String REROUTE_AGENTS_STUCK = "reRouteAgentsStuck";
 	private static final String PASSENGERS_BOARD_EVERY_LINE = "passengersBoardEveryLine";
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
@@ -133,6 +134,7 @@ public class PConfigGroup extends Module{
 	private double randomStopProviderGridSize = Double.MAX_VALUE;
 	private boolean useAdaptiveNumberOfCooperatives = false;
 	private double shareOfCooperativesWithProfit = 0.50;
+	private int disableCreationOfNewCooperativesInIteration = Integer.MAX_VALUE;
 	private boolean reRouteAgentsStuck = false;
 	private boolean passengersBoardEveryLine = false;
 	private String transitScheduleToStartWith = null;
@@ -220,6 +222,8 @@ public class PConfigGroup extends Module{
 			this.useAdaptiveNumberOfCooperatives = Boolean.parseBoolean(value);
 		} else if (SHARE_OF_COOPERATIVES_WITH_PROFIT.equals(key)){
 			this.shareOfCooperativesWithProfit = Double.parseDouble(value);
+		} else if (DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION.equals(key)){
+			this.disableCreationOfNewCooperativesInIteration = Integer.parseInt(value);
 		} else if (REROUTE_AGENTS_STUCK.equals(key)){
 			this.reRouteAgentsStuck = Boolean.parseBoolean(value);
 		} else if (PASSENGERS_BOARD_EVERY_LINE.equals(key)){
@@ -288,6 +292,7 @@ public class PConfigGroup extends Module{
 		map.put(RANDOM_STOP_PROVIDER_GRID_SIZE, Double.toString(this.randomStopProviderGridSize));
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, Double.toString(this.shareOfCooperativesWithProfit));
+		map.put(DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION, Integer.toString(this.disableCreationOfNewCooperativesInIteration));
 		map.put(REROUTE_AGENTS_STUCK, Boolean.toString(this.reRouteAgentsStuck));
 		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
@@ -297,7 +302,7 @@ public class PConfigGroup extends Module{
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
 			map.put(PMODULE_PROBABILITY + entry.getKey().toString(), Double.toString(entry.getValue().getProbability()));
-			map.put(PMODULE_DISABLEINITERATION + entry.getKey().toString(), Double.toString(entry.getValue().getDisableInIteration()));
+			map.put(PMODULE_DISABLEINITERATION + entry.getKey().toString(), Integer.toString(entry.getValue().getDisableInIteration()));
 			map.put(PMODULE_PARAMETER + entry.getKey().toString(), entry.getValue().getParametersAsString());
 		}
 		
@@ -341,6 +346,7 @@ public class PConfigGroup extends Module{
 		map.put(RANDOM_STOP_PROVIDER_GRID_SIZE, "The grid size (length and height) for aggregating activities. 0.0 turns of this features");
 		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
 		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
+		map.put(DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION, "No more new cooperatives will be found beginning with the iteration specified");
 		map.put(REROUTE_AGENTS_STUCK, "All agents stuck will be rerouted at the beginning of an iteration, if set to true.");
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one cooperative for each transit line with the given time of operation and number of vehicles");
@@ -487,6 +493,10 @@ public class PConfigGroup extends Module{
 
 	public double getShareOfCooperativesWithProfit() {
 		return this.shareOfCooperativesWithProfit;
+	}
+	
+	public int getDisableCreationOfNewCooperativesInIteration() {
+		return this.disableCreationOfNewCooperativesInIteration;
 	}
 	
 	public boolean getReRouteAgentsStuck() {

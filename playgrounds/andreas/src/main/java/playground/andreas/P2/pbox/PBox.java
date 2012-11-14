@@ -224,14 +224,16 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		
 		// delete bankrupt ones
 		this.cooperatives = cooperativesToKeep;
+		
+		if (this.pConfig.getDisableCreationOfNewCooperativesInIteration() > iteration) {
+			// recreate all other
+			LinkedList<Cooperative> newCoops1 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, numberOfNewCoopertives);
+			this.cooperatives.addAll(newCoops1);
 			
-		// recreate all other
-		LinkedList<Cooperative> newCoops1 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, numberOfNewCoopertives);
-		this.cooperatives.addAll(newCoops1);
-			
-		// too few cooperatives in play, increase to the minimum specified in the config
-		LinkedList<Cooperative> newCoops2 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
-		this.cooperatives.addAll(newCoops2);
+			// too few cooperatives in play, increase to the minimum specified in the config
+			LinkedList<Cooperative> newCoops2 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
+			this.cooperatives.addAll(newCoops2);
+		}
 	}
 
 	public TransitSchedule getpTransitSchedule() {
