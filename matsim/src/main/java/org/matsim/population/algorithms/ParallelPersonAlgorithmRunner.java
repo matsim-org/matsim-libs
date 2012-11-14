@@ -40,7 +40,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 	private final static Logger log = Logger.getLogger(ParallelPersonAlgorithmRunner.class);
 	
 	public interface PersonAlgorithmProvider {
-		public AbstractPersonAlgorithm getPersonAlgorithm();
+		public PersonAlgorithm getPersonAlgorithm();
 	}
 
 	/**
@@ -52,9 +52,9 @@ public abstract class ParallelPersonAlgorithmRunner {
 	 * @param numberOfThreads
 	 * @param algorithm
 	 */
-	public static void run(final Population population, final int numberOfThreads, final AbstractPersonAlgorithm algorithm) {
+	public static void run(final Population population, final int numberOfThreads, final PersonAlgorithm algorithm) {
 		run(population, numberOfThreads, new PersonAlgorithmProvider() {
-			@Override public AbstractPersonAlgorithm getPersonAlgorithm() {
+			@Override public PersonAlgorithm getPersonAlgorithm() {
 				return algorithm;
 			}
 		});
@@ -82,7 +82,7 @@ public abstract class ParallelPersonAlgorithmRunner {
 
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
-			AbstractPersonAlgorithm algo = algoProvider.getPersonAlgorithm();
+			PersonAlgorithm algo = algoProvider.getPersonAlgorithm();
 			if (i == 0) {
 				name = algo.getClass().getSimpleName();
 				counter = new Counter("[" + name + "] handled person # ");
@@ -125,13 +125,11 @@ public abstract class ParallelPersonAlgorithmRunner {
 	 */
 	private static class PersonAlgoThread implements Runnable {
 
-//		public final int threadId;
-		private final AbstractPersonAlgorithm personAlgo;
+		private final PersonAlgorithm personAlgo;
 		private final List<Person> persons = new LinkedList<Person>();
 		private final Counter counter;
 
-		public PersonAlgoThread(final AbstractPersonAlgorithm algo, final Counter counter) {
-//			this.threadId = i;
+		public PersonAlgoThread(final PersonAlgorithm algo, final Counter counter) {
 			this.personAlgo = algo;
 			this.counter = counter;
 		}
