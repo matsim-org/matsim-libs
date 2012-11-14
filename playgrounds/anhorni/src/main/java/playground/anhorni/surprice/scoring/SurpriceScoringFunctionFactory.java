@@ -55,7 +55,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 	
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
 		// generate alpha_trip with id of agent
-		this.random = new Random(Integer.parseInt(plan.getPerson().getId().toString()));
+		this.random = new Random(Integer.parseInt(plan.getPerson().getId().toString()) + Surprice.days.indexOf(day) * 10000);
 		
 		for (int i = 0; i < 100; i++) {
 			this.random.nextDouble();
