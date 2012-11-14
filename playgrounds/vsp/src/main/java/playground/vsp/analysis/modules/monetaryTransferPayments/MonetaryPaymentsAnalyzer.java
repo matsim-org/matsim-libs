@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.transferPayments;
+package playground.vsp.analysis.modules.monetaryTransferPayments;
 
 import java.io.BufferedWriter;
 import java.io.File;

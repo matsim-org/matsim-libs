@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.analysis.modules.transferPayments;
+package playground.vsp.analysis.modules.monetaryTransferPayments;
 
 import java.util.Collections;
 import java.util.Map;
