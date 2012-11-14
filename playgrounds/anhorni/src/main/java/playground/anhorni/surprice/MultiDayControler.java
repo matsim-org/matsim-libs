@@ -26,7 +26,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.anhorni.surprice.analysis.Analyzer;
-import playground.anhorni.surprice.analysis.SupriceBoxPlot;
 
 public class MultiDayControler {
 	
