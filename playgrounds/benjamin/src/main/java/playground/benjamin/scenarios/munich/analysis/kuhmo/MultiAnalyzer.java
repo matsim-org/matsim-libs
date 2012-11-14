@@ -95,10 +95,13 @@ public class MultiAnalyzer {
 	private final MultiAnalyzerWriter writer;
 	private final Map<String, Map<Id, Double>> case2personId2carDistance;
 
+	private final UserGroupUtils userGroupUtils;
+
 
 	MultiAnalyzer(){
 		this.writer = new MultiAnalyzerWriter(runDirectoryStub + cases[0] + "/");
 		this.case2personId2carDistance = new HashMap<String, Map<Id,Double>>();
+		this.userGroupUtils = new UserGroupUtils();
 	}
 
 	private void run() {
@@ -178,6 +181,12 @@ public class MultiAnalyzer {
 		eventsReader.parse(eventsFile);
 
 		Map<Id, Double> personId2Toll = moneyEventHandler.getPersonId2TollMap();
+		
+		// TODO: this could be probably done outside of the writer as follows:
+//		Map<UserGroup, Double> userGroup2Size = userGroupUtils.getSizePerGroup(pop);
+//		Map<UserGroup, Double> userGroup2TollPayers = userGroupUtils.getNrOfTollPayersPerGroup(personId2Toll);
+//		Map<UserGroup, Double> userGroup2Welfare = userGroupUtils.getUserLogsumPerGroup(scenario);
+//		Map<UserGroup, Double> userGroup2Toll = userGroupUtils.getTollPaidPerGroup(personId2Toll);
 
 		writer.setRunName(runName);
 		writer.writeWelfareTollInformation(configFile, pop, personId2Toll);
@@ -185,7 +194,6 @@ public class MultiAnalyzer {
 
 	private void calculateEmissionStatisticsByUserGroup(String emissionEventsFile, String runName) {
 		EmissionUtils summarizer = new EmissionUtils();
-		UserGroupUtils utils = new UserGroupUtils();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
@@ -200,7 +208,7 @@ public class MultiAnalyzer {
 		Map<Id, Map<WarmPollutant, Double>> person2warmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		Map<Id, Map<ColdPollutant, Double>> person2coldEmissions = coldHandler.getColdEmissionsPerPerson();
 		Map<Id, SortedMap<String, Double>> person2totalEmissions = summarizer.sumUpEmissionsPerId(person2warmEmissions, person2coldEmissions);
-		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = utils.getEmissionsPerGroup(person2totalEmissions);
+		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = userGroupUtils.getEmissionsPerGroup(person2totalEmissions);
 
 		writer.setRunName(runName);
 		writer.writeEmissionInformation(group2totalEmissions);
@@ -241,7 +249,7 @@ public class MultiAnalyzer {
 //		logger.warn(runName + ": number of car users with two activities followed one by another on the same link BUT driving to other acts: -" + personIsDrivingADistance);
 		logger.warn(runName + ": number of car users in traveltime map (users with departure and arrival events): " + mode2personId2TravelTime.get(TransportMode.car).size());
 		
-		
+		// TODO: this could be probably done outside of the writer (as for welfare above):
 		writer.setRunName(runName);
 		writer.writeAvgCarDistanceInformation(personId2carDistance, userGroup2carTrips);
 		writer.writeDetailedCarDistanceInformation(personId2carDistance);
