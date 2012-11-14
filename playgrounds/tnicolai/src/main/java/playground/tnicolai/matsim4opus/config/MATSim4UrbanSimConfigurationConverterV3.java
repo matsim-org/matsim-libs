@@ -808,6 +808,7 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		reroute.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(reroute);
 		
+		// tnicolai: deactivate only for nectar
 		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
 		changeSingleLegMode.setModuleName("ChangeSingleLegMode");		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		changeSingleLegMode.setProbability( 0.1 ); // tnicolai: make configurable via "matsimParameter", should be something like 0.1
@@ -820,7 +821,9 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter() ); 
 		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability() );
 		log.info("Strategy_3: " + reroute.getModuleName() + " Probability: " + reroute.getProbability() + " Disable After Itereation: " + reroute.getDisableAfter() );
+		// tnicolai: deactivate only for nectar
 		log.info("Strategy_4: " + changeSingleLegMode.getModuleName() + " Probability: " + changeSingleLegMode.getProbability() + " Disable After Itereation: " + changeSingleLegMode.getDisableAfter() );
+		log.warn("activate changeSingleLegMode after nectar!");
 		log.info("... done!");
 	}
 	
@@ -832,20 +835,16 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		// setting teleportation speeds in router
 		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
 		scenario.getConfig().plansCalcRoute().setBikeSpeed(4.16666666); // 4.16666666m/s corresponds to 15 km/h
+		// tnicolai: deactivate only for nectar
 		scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
 		// scenario.getConfig().plansCalcRoute().setTeleportedModeFreespeedFactor(TransportMode.pt, 2); // tnicolai: if this is enabled the router uses freespeed car * freespeed factor instead of PtSpeed!!!
-//		Map<String, Double> tms = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds();
-//		Collection<String> nm = scenario.getConfig().plansCalcRoute().getNetworkModes();
-		
-		// tnicolai: add additional "NetworkModes", i.e. modes for which the router is supposed to generate network routes (like car)
-		//			 currently NetworkModes contain only car and ride
-		// 
-		
+
 		log.info("PlanCalcRouteGroup settings:");							 
 		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
 		log.info("Bike Speed: " + scenario.getConfig().plansCalcRoute().getBikeSpeed() );
+		// tnicolai: deactivate only for nectar
 		log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
-//		log.info("Pt Speed Factor: " + scenario.getConfig().plansCalcRoute().getPtSpeedFactor() );
+		log.warn("activate Pt Speed after nectar!");
 		log.info("Beeline Distance Factor: " + scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor() );
 		
 		log.info("...done!");

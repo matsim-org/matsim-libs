@@ -35,20 +35,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -77,9 +66,9 @@ public class VISUM2TransitScheduleConverter {
 	private BufferedReader startWarteZeitenReader;
 	private TransitScheduleWriterV1 writer;
 	
-	private Dijkstra dijkstra;
+//	private Dijkstra dijkstra;
 	
-	private NetworkImpl network;
+//	private NetworkImpl network;
 	private Map<Long, Coord> transitStop;
 	private Map<Long, ArrayList<VISUMObject>> visumData;
 	
@@ -92,20 +81,22 @@ public class VISUM2TransitScheduleConverter {
 	private NumberFormat numberFormat;
 	private AverageTime avgWaitingTime;
 	
-	public VISUM2TransitScheduleConverter(){
+	public VISUM2TransitScheduleConverter(String zoneAttributesFile, String reiseZeitFile, String startWarteZeitFile, String outputFile){
 		
-		String networkFile 		  = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/ivtch-osm.xml";
-		String zoneAttributesFile = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv";
-		String reiseZeitFile      =	"/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT";
-		String startWarteZeitFile = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.OWTA";
-		destinationFile	  		  = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/transitSchedule.xml";
+//		String networkFile 		  = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/ivtch-osm.xml";
+//		String zoneAttributesFile = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv";
+//		String reiseZeitFile      =	"/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT";
+//		String startWarteZeitFile = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.OWTA";
+//		destinationFile	  		  = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/transitSchedule.xml";
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-		network = (NetworkImpl) scenario.getNetwork();
-
-		FreespeedTravelTimeAndDisutility cost = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
-		dijkstra = new Dijkstra(network, cost, cost);
+//		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		new MatsimNetworkReader(scenario).readFile(networkFile);
+//		network = (NetworkImpl) scenario.getNetwork();
+//
+//		FreespeedTravelTimeAndDisutility cost = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
+//		dijkstra = new Dijkstra(network, cost, cost);
+		
+		destinationFile = outputFile;
 		
 		zoneAttributeReader = IOUtils.getBufferedReader(zoneAttributesFile);
 		reiseZeitenReader	= IOUtils.getBufferedReader(reiseZeitFile);
@@ -332,9 +323,9 @@ public class VISUM2TransitScheduleConverter {
 		
 		for(int i = 0; i < removeTransitStops.size(); i++){
 			transitStop.remove(removeTransitStops.get(i));
-			log.warn("Removed transit stop:" + removeTransitStops.get(i) + ". It is not used in VISUM data ...");
+			log.warn("Removed transit stop:" + removeTransitStops.get(i) + ". It is not used in VISUM ...");
 		}	
-		log.info(removeTransitStops.size() + " transit stops and " + removedVISUMDataEntries + " VISUM data entries are removed.");
+		log.info(removeTransitStops.size() + " transit stops and " + removedVISUMDataEntries + " VISUM entries are removed.");
 	}
 	
 	////////////////////////////////
@@ -357,10 +348,11 @@ public class VISUM2TransitScheduleConverter {
 			// get transit stop id (origin)
 			Long transitStopKey = transitStopKeyList.get(i);
 			Coord coord = transitStop.get(transitStopKey);
-			Link nearestLink = network.getNearestLinkExactly(coord);
+//			Link nearestLink = network.getNearestLinkExactly(coord);
 			
 			TransitStopFacility stop = tsfi.createTransitStopFacility(new IdImpl(transitStopKey), coord, false);
-			((TransitStopFacilityImpl) stop).setLinkId(nearestLink.getId());
+//			((TransitStopFacilityImpl) stop).setLinkId(nearestLink.getId());
+			((TransitStopFacilityImpl) stop).setLinkId(new IdImpl(transitStopKey +""+ transitStopKey));
 			transitSchedule.addStopFacility(stop);
 		}
 		log.info("Creating transit stops done.");
@@ -372,9 +364,9 @@ public class VISUM2TransitScheduleConverter {
 		for(int i = 0; i < transitStopKeyList.size(); i++){
 			
 			
-			// for testing 
-			if(i == 10)
-				break;
+//			// for testing 
+//			if(i == 10)
+//				break;
 			
 			// get transit stop id (origin)
 			long transitStopA = transitStopKeyList.get(i);
@@ -405,8 +397,7 @@ public class VISUM2TransitScheduleConverter {
 								transitStopA, transitStopB, transitLine,
 								travelTimeA2B, waitTimeA2B);
 				}
-				
-				
+
 				VISUMObject voB2A = getVISUMObject(transitStopB, transitStopA);
 				if(voB2A != null && !voB2A.isHandeled()){// direction B -> A
 					
@@ -427,6 +418,7 @@ public class VISUM2TransitScheduleConverter {
 					transitSchedule.addTransitLine(transitLine);
 				}
 			}
+			log.info("Created Transit Lines: " + transitLineId);
 		}
 		
 		log.info("Writing TransitSchedule ...");
@@ -457,15 +449,18 @@ public class VISUM2TransitScheduleConverter {
 		stops.add(transitRouteStopOrigin);
 		stops.add(transitRouteStopDestination);
 		
-		Link linkOrigin 	 = network.getLinks().get(origin.getLinkId());
-		Link linkDestination = network.getLinks().get(destination.getLinkId());
-		Node nodeOrigin 	 = linkOrigin.getToNode();
-		Node nodeDestination = linkDestination.getToNode();
+//		Link linkOrigin 	 = network.getLinks().get(origin.getLinkId());
+//		Link linkDestination = network.getLinks().get(destination.getLinkId());
+//		Node nodeOrigin 	 = linkOrigin.getToNode();
+//		Node nodeDestination = linkDestination.getToNode();
+//		
+//		Path path = dijkstra.calcLeastCostPath(nodeOrigin, nodeDestination, 0, null, null);
+//		List<Id> linkIds = new ArrayList<Id>();
+//		for(Link l: path.links)
+//			linkIds.add(l.getId());
 		
-		Path path = dijkstra.calcLeastCostPath(nodeOrigin, nodeDestination, 0, null, null);
 		List<Id> linkIds = new ArrayList<Id>();
-		for(Link l: path.links)
-			linkIds.add(l.getId());
+		linkIds.add(new IdImpl(origin.getId() +""+ destination.getId()));
 		
 		NetworkRoute route = new LinkNetworkRouteImpl(origin.getLinkId(), destination.getLinkId());
 		route.setLinkIds(origin.getLinkId(), linkIds, destination.getLinkId());
@@ -488,11 +483,15 @@ public class VISUM2TransitScheduleConverter {
 	private VISUMObject getVISUMObject(long origin, long destination){
 		
 		ArrayList<VISUMObject> list = visumData.get( origin );
+		VISUMObject vo = null;
 		
 		for(int i = 0; i < list.size(); i++)
-			if (list.get(i).getDestinationBezirkNummer() == destination)
-				return list.get(i);
-		return null;
+			if (list.get(i).getDestinationBezirkNummer() == destination){
+				vo = list.get(i);
+				list.remove(i);
+				break;
+			}
+		return vo;
 	}
 	
 	private String getNumberFormat(int number){
@@ -504,11 +503,18 @@ public class VISUM2TransitScheduleConverter {
 	////////////////////////////////
 	
 	public static void main(String args[]){
-
-		VISUM2TransitScheduleConverter instance = new VISUM2TransitScheduleConverter();
-		instance.init();
-		instance.createTransitSchedule();
 		
+		if(args != null && args.length == 4){
+			
+			String zoneAttributesFile = args[0];
+			String reiseZeiten		  = args[1];
+			String warteZeiten		  = args[2];
+			String outputFile		  = args[3];
+			
+			VISUM2TransitScheduleConverter instance = new VISUM2TransitScheduleConverter(zoneAttributesFile, reiseZeiten, warteZeiten, outputFile);
+			instance.init();
+			instance.createTransitSchedule();
+		}
 		log.info("Done!");
 	}
 	
