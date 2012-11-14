@@ -17,19 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.bvgAna.anaLevel1;
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.agentId2PersonEnterLeaveVehicle;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
  * Collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> for a given set of agents.
@@ -38,14 +38,14 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
  *
  */
 public class AgentId2PersonEnterLeaveVehicleHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
-	private String ptDriverPrefix;
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	private final Logger log = Logger.getLogger(AgentId2PersonEnterLeaveVehicleHandler.class);
 	
 	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> agentId2EnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
 	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> agentId2LeaveEventMap = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 
-	public AgentId2PersonEnterLeaveVehicleHandler(String ptDriverPrefix) {
-		this.ptDriverPrefix = ptDriverPrefix;
+	public AgentId2PersonEnterLeaveVehicleHandler(PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer) {
+		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
 		log.warn("Ignoring the pt driver. Is that right or is the pt driver supposed to be considered? ik");
 		log.warn("Not differentiating between public and private vehicles. Is that supposed to happen here? ik");
 	}
@@ -67,7 +67,7 @@ public class AgentId2PersonEnterLeaveVehicleHandler implements PersonEntersVehic
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id agentId = event.getPersonId();
-		if(agentId.toString().startsWith(ptDriverPrefix)){
+		if(agentId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			// pt driver
 		} else {
 			if(this.agentId2EnterEventMap.get(agentId) == null){
@@ -80,7 +80,7 @@ public class AgentId2PersonEnterLeaveVehicleHandler implements PersonEntersVehic
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Id agentId = event.getPersonId();
-		if(agentId.toString().startsWith(ptDriverPrefix)){
+		if(agentId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			// pt driver
 		} else {
 			if(this.agentId2LeaveEventMap.get(agentId) == null){

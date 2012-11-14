@@ -55,7 +55,6 @@ public class TTtripAnalysis extends AbstractAnalyisModule{
 	private Collection<String> ptModes;
 	private Population population;
 	
-	
 	/**
 	 * 
 	 * @param ptModes, the modes specified in the {@link TransitConfigGroup}
@@ -64,8 +63,8 @@ public class TTtripAnalysis extends AbstractAnalyisModule{
 	 * @param population, the population corresponding to the analyzed eventsfile (i.e. analyze runId.iteration.events.xml.gz, use 
 	 * runId.iteration.plans.xml.gz!) 
 	 */
-	public TTtripAnalysis (Collection<String> ptModes, Collection<String> networkModes, String ptDriverPrefix, Population population){
-		super(TTtripAnalysis.class.getSimpleName(), ptDriverPrefix);
+	public TTtripAnalysis (Collection<String> ptModes, Collection<String> networkModes, Population population){
+		super(TTtripAnalysis.class.getSimpleName());
 		this.eventsHandler = new TTtripEventsHandler(ptModes);
 		this.ptModes = ptModes;
 		// not sure if this is necessary, but pt should be the default...

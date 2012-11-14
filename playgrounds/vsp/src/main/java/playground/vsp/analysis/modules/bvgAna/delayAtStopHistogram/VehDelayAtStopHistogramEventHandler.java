@@ -19,11 +19,6 @@
 
 package playground.vsp.analysis.modules.bvgAna.delayAtStopHistogram;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;

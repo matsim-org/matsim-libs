@@ -39,6 +39,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
  * This module analyzes the waiting times for public vehicles.
@@ -52,6 +53,10 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 public class WaitingTimesAnalyzer extends AbstractAnalyisModule {
 	private final static Logger log = Logger.getLogger(WaitingTimesAnalyzer.class);
 	private ScenarioImpl scenario;
+	
+	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	
 	private WaitingTimeHandler waitingTimeHandler;
 	private double sumOfAllWaitingTimes;
 	private double avgWaitingTime;
@@ -60,32 +65,59 @@ public class WaitingTimesAnalyzer extends AbstractAnalyisModule {
 	private Map <Id, Double> personID2avgWaitingTime;
 	private Map <Id, Double> stopFacilityID2avgWaitingTime;
 	
-	public WaitingTimesAnalyzer(String ptDriverPrefix) {
-		super(WaitingTimesAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public WaitingTimesAnalyzer() {
+		super(WaitingTimesAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
-		this.waitingTimeHandler = new WaitingTimeHandler(this.ptDriverPrefix);
+		
+		// (sub-)module
+		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
+		this.ptDriverPrefixAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverPrefixAnalyzer);		
+		
+		this.waitingTimeHandler = new WaitingTimeHandler(this.ptDriverPrefixAnalyzer);
 		this.personID2avgWaitingTime = new HashMap<Id, Double>();
 		this.stopFacilityID2avgWaitingTime = new HashMap<Id, Double>();
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.waitingTimeHandler);		
-		return handler;
+		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
+
+		// from (sub-)modules
+		for (AbstractAnalyisModule module : this.anaModules) {
+			for (EventHandler handler : module.getEventHandler()) {
+				allEventHandler.add(handler);
+			}
+		}
+		
+		// own handler
+		allEventHandler.add(waitingTimeHandler);
+		
+		return allEventHandler;
 	}
 
 	@Override
 	public void preProcessData() {
-		// nothing to do
+		log.info("Preprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.preProcessData();
+		}
+		log.info("Preprocessing all (sub-)modules... done.");
 	}
 
 	@Override
 	public void postProcessData() {
+		log.info("Postprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.postProcessData();
+		}
+		log.info("Postprocessing all (sub-)modules... done.");
 		
+		// own postProcessing
+	
 		List <Double> waitingTimes = this.waitingTimeHandler.getWaitingTimes();
 		
 		int waitCounter = 0;

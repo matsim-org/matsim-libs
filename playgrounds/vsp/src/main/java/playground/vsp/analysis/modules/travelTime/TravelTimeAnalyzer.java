@@ -39,6 +39,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
  * This module calculates for each mode the number of users, the number of departures, the total travel time,
@@ -51,6 +52,9 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(TravelTimeAnalyzer.class);
 	private ScenarioImpl scenario;
 	
+	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	
 	private TravelTimePerModeEventHandler ttHandler;
 	private Map<String, Map<Id, Double>> mode2personId2TravelTime;
 	private Map<String, Double> mode2noOfTrips;
@@ -60,13 +64,19 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule{
 	private Map<String, Double> mode2sumOfTravelTimes_min;
 
 	
-	public TravelTimeAnalyzer(String ptDriverPrefix) {
-		super(TravelTimeAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public TravelTimeAnalyzer() {
+		super(TravelTimeAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
-		this.ttHandler = new TravelTimePerModeEventHandler(this.ptDriverPrefix);
+		
+		// (sub-)module
+		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
+		this.ptDriverPrefixAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverPrefixAnalyzer);
+		
+		this.ttHandler = new TravelTimePerModeEventHandler(this.ptDriverPrefixAnalyzer);
 		this.mode2avgTravelTimeOfModePerTrip_mins = new HashMap<String, Double>();
 		this.mode2avgTravelTimeOfModePerUser_mins =  new HashMap<String, Double>();
 		this.mode2numberOfPersons = new HashMap<String, Integer>();
@@ -75,18 +85,41 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule{
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.ttHandler);		
-		return handler;
+		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
+
+		// from (sub-)modules
+		for (AbstractAnalyisModule module : this.anaModules) {
+			for (EventHandler handler : module.getEventHandler()) {
+				allEventHandler.add(handler);
+			}
+		}
+		
+		// own handler
+		allEventHandler.add(this.ttHandler);
+		
+		return allEventHandler;
 	}
 
 	@Override
 	public void preProcessData() {
-		// nothing to do
+		log.info("Preprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.preProcessData();
+		}
+		log.info("Preprocessing all (sub-)modules... done.");
 	}
 
 	@Override
 	public void postProcessData() {
+		
+		log.info("Postprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.postProcessData();
+		}
+		log.info("Postprocessing all (sub-)modules... done.");
+		
+		// own postProcessing		
+		
 		this.mode2personId2TravelTime = this.ttHandler.getMode2personId2TravelTime();
 		this.mode2noOfTrips = this.ttHandler.getUserGroup2mode2noOfTrips();
 		

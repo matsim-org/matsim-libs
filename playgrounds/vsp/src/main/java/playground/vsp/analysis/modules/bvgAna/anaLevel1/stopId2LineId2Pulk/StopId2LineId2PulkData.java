@@ -17,59 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.bvgAna.anaLevel1;
-
-import java.util.ArrayList;
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2LineId2Pulk;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 
 /**
- * Collects planned and realized departures at one stop.
- * List of planned and realized departures is not guaranteed to be synchronized.
+ * Collects the <code>VehicleDepartsAtFacilityEvent</code> of one vehicle and the event of its following vehicle to calculate their planned and realized headway.
  * 
  * @author aneumann
+ *
  */
-public class StopId2RouteId2DelayAtStopData {
+public class StopId2LineId2PulkData {
 	
-	private final Id stopId;
 	private final Id lineId;
-	private final Id routeId;
+	private final Id stopId;
 	
-	// Could be double[] ???
-	private ArrayList<Double> plannedDepartures = new ArrayList<Double>();
-	private ArrayList<Double> realizedDepartures = new ArrayList<Double>();
+	private final VehicleDepartsAtFacilityEvent vehDepOld;
+	private final VehicleDepartsAtFacilityEvent vehDepNew;
 	
-	public StopId2RouteId2DelayAtStopData(Id stopId, Id lineId, Id routeId){
-		this.stopId = stopId;
+	private double headwayIST;
+	private double headwaySOLL;
+	
+	protected StopId2LineId2PulkData(Id lineId, VehicleDepartsAtFacilityEvent oldEvent, VehicleDepartsAtFacilityEvent newEvent){
 		this.lineId = lineId;
-		this.routeId = routeId;
+		this.stopId = newEvent.getFacilityId();
+		this.vehDepOld = oldEvent;
+		this.vehDepNew = newEvent;
+		this.headwayIST = newEvent.getTime() - oldEvent.getTime();
+		this.headwaySOLL = (newEvent.getTime() - newEvent.getDelay()) - (oldEvent.getTime() - oldEvent.getDelay());
 	}
 	
-	public void addDepartureEvent(VehicleDepartsAtFacilityEvent departureEvent){
-		this.plannedDepartures.add(new Double(departureEvent.getTime() - departureEvent.getDelay()));
-		this.realizedDepartures.add(new Double(departureEvent.getTime()));
+	/**
+	 * @return Returns true if the two vehicles are considered to bunch
+	 */
+	public boolean isPulk(){
+		if(this.headwayIST < 0.5 * this.headwaySOLL){
+			return true;
+		} else {
+			return false;
+		}	
 	}
 	
-	public ArrayList<Double> getPlannedDepartures() {
-		return this.plannedDepartures;
-	}
-
-	public ArrayList<Double> getRealizedDepartures() {
-		return this.realizedDepartures;
-	}
-	
-	public Id getLineId() {
-		return this.lineId;
-	}
-
-	public Id getRouteId() {
-		return this.routeId;
-	}
-
 	@Override
 	public String toString() {
-		return "Stop: " + this.stopId + ", Line: " + this.lineId + ", Route: " + this.routeId + ", # planned Departures: " + this.plannedDepartures.size() + ", # realized Departures: " + this.realizedDepartures.size();
+		StringBuffer strB = new StringBuffer();
+		strB.append("Line " + this.lineId);
+		strB.append(" at stop " + this.stopId);
+		strB.append(" with headway IST " + this.headwayIST);
+		strB.append(" and headway SOLL " + this.headwaySOLL);
+		strB.append(" - veh dep event one " + this.vehDepOld);
+		strB.append(" - veh dep event two " + this.vehDepNew);
+		return strB.toString();
 	}
-
 }

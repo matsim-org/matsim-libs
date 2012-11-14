@@ -51,8 +51,8 @@ public class MonetaryPaymentsAnalyzer extends AbstractAnalyisModule{
 	private Map<Id, Double> personId2amount;
 	private double allUsersAmount;
 	
-	public MonetaryPaymentsAnalyzer(String ptDriverPrefix) {
-		super(MonetaryPaymentsAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public MonetaryPaymentsAnalyzer() {
+		super(MonetaryPaymentsAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
@@ -115,4 +115,12 @@ public class MonetaryPaymentsAnalyzer extends AbstractAnalyisModule{
 		
 	}
 
+	public Map<Id, Double> getPersonId2amount() {
+		return personId2amount;
+	}
+
+	public double getAllUsersAmount() {
+		return allUsersAmount;
+	}
+	
 }

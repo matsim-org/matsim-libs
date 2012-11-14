@@ -43,7 +43,7 @@ public class EmissionsPerGroupAnalysis {
 
 	private void run(String[] args) {
 
-		EmissionsAnalyzer ema = new EmissionsAnalyzer(null, emissionEventsFile);
+		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionEventsFile);
 		ema.init(null);
 		ema.preProcessData();
 		ema.postProcessData();

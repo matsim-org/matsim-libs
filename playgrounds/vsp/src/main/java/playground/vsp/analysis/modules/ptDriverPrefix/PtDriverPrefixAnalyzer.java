@@ -22,83 +22,60 @@
  * @author ikaddoura
  * 
  */
-package playground.vsp.analysis.modules.emissionsWriter;
+package playground.vsp.analysis.modules.ptDriverPrefix;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.emissions.ColdEmissionHandler;
-import playground.vsp.emissions.EmissionModule;
-import playground.vsp.emissions.WarmEmissionHandler;
 
 /**
- * This module requires a scenario with emission specific informations set in the VspExperimentalConfigGroup.
- * Emission events are written based on a standard events file.
  * 
- * @author ikaddoura, benjamin
+ * @author ikaddoura
  *
  */
-public class EmissionEventsWriter extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(EmissionEventsWriter.class);
+public class PtDriverPrefixAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(PtDriverPrefixAnalyzer.class);
 	private ScenarioImpl scenario;
-	private EmissionModule emissionModule;
-	private WarmEmissionHandler wEmiHandler;
-	private ColdEmissionHandler cEmiHandler;
-	private EventWriterXML emissionEventWriter;
-	private String outputPath;
-	private String filename;
 	
-	public EmissionEventsWriter(String outputFolder) {
-		super(EmissionEventsWriter.class.getSimpleName());
-		this.outputPath = outputFolder + this.getName() + "/";
+	private PtDriverPrefixHandler ptDriverPrefixHandler;
+	
+	public PtDriverPrefixAnalyzer() {
+		super(PtDriverPrefixAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
-		this.emissionModule = new EmissionModule(scenario);
-		this.emissionModule.createLookupTables();
-		this.emissionModule.createEmissionHandler();
-		this.wEmiHandler = emissionModule.getWarmEmissionHandler();
-		this.cEmiHandler = emissionModule.getColdEmissionHandler();
-		this.filename = "emission.events.xml.gz";
+		this.ptDriverPrefixHandler = new PtDriverPrefixHandler();
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> handler = new LinkedList<EventHandler>();
-		
-		handler.add(this.wEmiHandler);
-		handler.add(this.cEmiHandler);
-		
-		new File(this.outputPath).mkdirs();
-		this.emissionEventWriter = new EventWriterXML(this.outputPath + this.filename);
-		this.emissionModule.getEmissionEventsManager().addHandler(this.emissionEventWriter);
-		
+		handler.add(this.ptDriverPrefixHandler);		
 		return handler;
 	}
 
 	@Override
 	public void preProcessData() {
-		// nothing to do
 	}
 
 	@Override
 	public void postProcessData() {
-		// nothing to do
+		// Analyzing the ptDriverPrefix here would be to late. Getting the ptDriverPrefix while parsing the events.
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		// outputFolder is required earlier and therefore not used here, move in abstract class to constructor? ik
-		this.emissionEventWriter.closeFile();
-		this.emissionModule.writeEmissionInformation(this.outputPath + this.filename);
+		System.out.println(this.ptDriverPrefixHandler.getPtDriverPrefix());
+	}
+	
+	public String getPtDriverPrefix() {
+		return this.ptDriverPrefixHandler.getPtDriverPrefix();
 	}
 	
 }

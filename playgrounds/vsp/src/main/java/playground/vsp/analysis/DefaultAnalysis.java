@@ -67,7 +67,7 @@ public class DefaultAnalysis {
 		
 		// END of configuration file
 		
-		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution(ptDriverPrefix);
+		LegModeDistanceDistribution distAna = new LegModeDistanceDistribution();
 		distAna.init(this.scenario);
 		this.anaModules.add(distAna);
 		

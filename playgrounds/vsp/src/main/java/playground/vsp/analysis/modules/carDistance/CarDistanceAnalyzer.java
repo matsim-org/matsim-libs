@@ -38,6 +38,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
  * This module calculates the total car distance for each person
@@ -50,36 +51,65 @@ public class CarDistanceAnalyzer extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(CarDistanceAnalyzer.class);
 	private ScenarioImpl scenario;
 	
+	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	
 	private CarDistanceEventHandler carDistanceEventHandler;
 	private Map<Id, Double> personId2carDistance;
 	private int carTrips;
 	private double avgCarDistancePerCarUser_km;
 	private double avgCarDistancePerTrip_km;
 	
-	public CarDistanceAnalyzer(String ptDriverPrefix) {
-		super(CarDistanceAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public CarDistanceAnalyzer() {
+		super(CarDistanceAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		
-		this.carDistanceEventHandler = new CarDistanceEventHandler(scenario.getNetwork(), this.ptDriverPrefix);
+		// (sub-)module
+		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
+		this.ptDriverPrefixAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverPrefixAnalyzer);
+		
+		this.carDistanceEventHandler = new CarDistanceEventHandler(scenario.getNetwork(), this.ptDriverPrefixAnalyzer);
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.carDistanceEventHandler);		
-		return handler;
+		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
+
+		// from (sub-)modules
+		for (AbstractAnalyisModule module : this.anaModules) {
+			for (EventHandler handler : module.getEventHandler()) {
+				allEventHandler.add(handler);
+			}
+		}
+		
+		// own handler
+		allEventHandler.add(this.carDistanceEventHandler);
+		
+		return allEventHandler;
 	}
 
 	@Override
 	public void preProcessData() {
-		// nothing to do
+		log.info("Preprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.preProcessData();
+		}
+		log.info("Preprocessing all (sub-)modules... done.");
 	}
 
 	@Override
 	public void postProcessData() {
+		log.info("Postprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.postProcessData();
+		}
+		log.info("Postprocessing all (sub-)modules... done.");
+		
+		// own postProcessing
 		double totalCarDistance_km = 0.0;
 		int numberOfPersons = 0;
 		this.personId2carDistance = this.carDistanceEventHandler.getPersonId2CarDistance();
@@ -92,8 +122,6 @@ public class CarDistanceAnalyzer extends AbstractAnalyisModule{
 		
 		this.avgCarDistancePerCarUser_km = totalCarDistance_km / numberOfPersons;
 		this.avgCarDistancePerTrip_km = totalCarDistance_km / this.carTrips;
-		
-		
 	}
 
 	@Override

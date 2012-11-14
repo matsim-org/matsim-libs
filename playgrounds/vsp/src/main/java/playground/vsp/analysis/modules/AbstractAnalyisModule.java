@@ -38,18 +38,15 @@ import org.matsim.core.events.handler.EventHandler;
 public abstract class AbstractAnalyisModule {
 	
 	private final String name;
-	protected final String ptDriverPrefix;
 	protected LinkedList<String> ptModes = null;
 	protected HashMap<Id,String> lineIds2ptModeMap;
 	
 	/**
 	 * 
 	 * @param name The name of the module.
-	 * @param ptDriverPrefix The prefix identifying a driver of driving a public transit vehicles.
 	 */
-	public AbstractAnalyisModule(String name, String ptDriverPrefix){
+	public AbstractAnalyisModule(String name){
 		this.name = name;
-		this.ptDriverPrefix = ptDriverPrefix;
 	}
 	
 	/**

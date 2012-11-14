@@ -188,7 +188,7 @@ public class MultiAnalyzer {
 	}
 
 	private void calculateEmissionStatisticsByUserGroup(String emissionFile, String runName) {
-		EmissionsAnalyzer ema = new EmissionsAnalyzer(null, emissionFile);
+		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionFile);
 		ema.init(null);
 		ema.preProcessData();
 		ema.postProcessData();

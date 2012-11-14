@@ -70,8 +70,8 @@ public class EmissionsAnalyzer extends AbstractAnalyisModule{
 	private Map<Id, SortedMap<String, Double>> person2totalEmissions;
 	private SortedMap<String, Double> totalEmissions;
 	
-	public EmissionsAnalyzer(String ptDriverPrefix, String emissionsEventsFile) {
-		super(EmissionsAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public EmissionsAnalyzer(String emissionsEventsFile) {
+		super(EmissionsAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionsEventsFile;
 	}
 	

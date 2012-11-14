@@ -35,6 +35,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
+import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
 
 /**
  * 
@@ -58,12 +60,9 @@ public class DefaultAnalysis_ik {
 	}
 
 	public void init(String aasRunnerConfigFile){
-		log.info("This is currently not implemented. Initializing all modules with defaults...");
-		
-		String ptDriverPrefix = "pt_"; //TODO: replace by analysis module that finds the ptDriverPrefix
-		
+		log.info("Configuration through config file is currently not implemented. Initializing all modules with defaults...");
+				
 		// END of configuration file
-		
 
 //		EmissionEventsWriter emiWriter = new EmissionEventsWriter(ptDriverPrefix, this.outputDir);
 //		// additional files, required for this analysis module:
@@ -97,15 +96,22 @@ public class DefaultAnalysis_ik {
 //		VehDelayAtStopHistogramAnalyzer delayHistogramAna = new VehDelayAtStopHistogramAnalyzer(ptDriverPrefix, numberOfDetailedSlots);
 //		delayHistogramAna.init(scenario);
 //		this.anaModules.add(delayHistogramAna);
-
+		
+//		WelfareAnalyzer welfareAna = new WelfareAnalyzer();
+//		welfareAna.init(scenario);
+//		this.anaModules.add(welfareAna);
+		
+		WaitingTimesAnalyzer waitingTimeAna = new WaitingTimesAnalyzer();
+		waitingTimeAna.init(scenario);
+		this.anaModules.add(waitingTimeAna);
 
 		// END ugly code - Initialization needs to be configurable
-		
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			if (person.getId().toString().startsWith(ptDriverPrefix)){
-				throw new RuntimeException("Person " + person.getId() + " has the same prefix as the pt Driver: " + ptDriverPrefix + ". Aborting...");
-			}
-		}
+				
+//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//			if (person.getId().toString().startsWith(ptDriverPrefix)){
+//				throw new RuntimeException("Person " + person.getId() + " has the same prefix as the pt Driver: " + ptDriverPrefix + ". Aborting...");
+//			}
+//		}
 		
 		log.info("Initializing all modules with defaults... done.");
 	}

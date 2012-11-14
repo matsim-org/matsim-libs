@@ -33,12 +33,11 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
  *
  */
 public class MoneyEventHandler implements AgentMoneyEventHandler{
+	private SortedMap<Id, Double> id2amount = new TreeMap<Id, Double>();
 
-	SortedMap<Id, Double> id2amount = new TreeMap<Id, Double>();
-	
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
-		
+
 		Id id = event.getPersonId();
 		Double amountByEvent = event.getAmount();
 		Double amountSoFar = id2amount.get(id);

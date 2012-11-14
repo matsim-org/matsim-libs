@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.bvgAna.anaLevel1;
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtStop;
 
 import java.util.TreeMap;
 
@@ -40,7 +40,6 @@ public class StopId2RouteId2DelayAtStopHandler implements VehicleDepartsAtFacili
 
 	private final Logger log = Logger.getLogger(StopId2RouteId2DelayAtStopHandler.class);
 	private final Level logLevel = Level.OFF;
-	private String ptDriverPrefix;
 
 	private TreeMap<Id, TransitDriverStartsEvent> veh2LastStartsEvent = new TreeMap<Id, TransitDriverStartsEvent>();
 	private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>> stopId2RouteId2DelayAtStopMap = new TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>>();

@@ -39,14 +39,15 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+
 /**
  * 
  * @author ikaddoura
  *
  */
 public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler {
-	
-	private String ptDriverPrefix;
+	private PtDriverPrefixAnalyzer ptDriverPrefixAna;
 	private List<Id> vehicleIDs = new ArrayList<Id>();
 
 	private List <Double> waitingTimes = new ArrayList<Double>();
@@ -57,8 +58,8 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	private Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
 	private Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
 	
-	public WaitingTimeHandler(String ptDriverPrefix) {
-		this.ptDriverPrefix = ptDriverPrefix;
+	public WaitingTimeHandler(PtDriverPrefixAnalyzer ptDriverPrefixAna) {
+		this.ptDriverPrefixAna = ptDriverPrefixAna;
 	}
 
 	@Override
@@ -76,8 +77,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id personId = event.getPersonId();
 		Id vehId = event.getVehicleId();
-		
-		if (personId.toString().startsWith(ptDriverPrefix)){
+		if (personId.toString().startsWith(this.ptDriverPrefixAna.getPtDriverPrefix())){
 		 // pt driver
 	
 		} else {
@@ -129,7 +129,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		Id personId = event.getPersonId();
-		if (personId.toString().startsWith(ptDriverPrefix)){
+		if (personId.toString().startsWith(this.ptDriverPrefixAna.getPtDriverPrefix())){
 			// pt driver
 		} else {
 			if (event.getLegMode().toString().equals(TransportMode.pt)){

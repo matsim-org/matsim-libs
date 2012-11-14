@@ -61,7 +61,7 @@ public class EmissionsPerPersonAnalysis {
 	private void run() {
 		Scenario scenario = loadScenario(netFile, plansFile);
 
-		EmissionsAnalyzer ema = new EmissionsAnalyzer(null, emissionFile);
+		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionFile);
 		ema.init((ScenarioImpl) scenario);
 		ema.preProcessData();
 		ema.postProcessData();

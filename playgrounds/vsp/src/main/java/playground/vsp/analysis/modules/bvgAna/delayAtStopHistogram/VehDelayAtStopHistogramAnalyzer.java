@@ -65,8 +65,8 @@ public class VehDelayAtStopHistogramAnalyzer extends AbstractAnalyisModule{
 	 * @param numberOfDetailedSlots Number of separate slots. Each slot aggregates the delay within that minute, e.g. slot 1 delay from 1s to 59s.
 	 * Delays <= 0s are counted in the first slot, delays >= <code>numberOfDetailedSlots</code> in the last slot.
 	 */
-	public VehDelayAtStopHistogramAnalyzer(String ptDriverPrefix, int numberOfDetailedSlots) {
-		super(VehDelayAtStopHistogramAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public VehDelayAtStopHistogramAnalyzer(int numberOfDetailedSlots) {
+		super(VehDelayAtStopHistogramAnalyzer.class.getSimpleName());
 		this.numberOfDetailedSlots = numberOfDetailedSlots;
 	}
 	

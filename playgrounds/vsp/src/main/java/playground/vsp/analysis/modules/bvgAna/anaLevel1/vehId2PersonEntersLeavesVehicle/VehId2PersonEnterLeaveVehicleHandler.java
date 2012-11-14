@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.bvgAna.anaLevel1;
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.vehId2PersonEntersLeavesVehicle;
 
 import java.util.ArrayList;
 import java.util.TreeMap;

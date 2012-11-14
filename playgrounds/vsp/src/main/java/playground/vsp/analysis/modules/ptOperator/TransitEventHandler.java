@@ -40,6 +40,8 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+
 /**
  * @author ikaddoura
  *
@@ -49,14 +51,14 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 	private List<Id> vehicleIDs = new ArrayList<Id>();
 	private Network network;
 	private double vehicleKm;
-	private String ptDriverPrefix;
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	
 	private Map<Id, Double> personID2firstDepartureTime = new HashMap<Id, Double>();
 	private Map<Id, Double> personID2lastArrivalTime = new HashMap<Id, Double>();
 	
-	public TransitEventHandler(Network network, String ptDriverPrefix) {
+	public TransitEventHandler(Network network, PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer) {
 		this.network = network;
-		this.ptDriverPrefix = ptDriverPrefix;
+		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
 	}
 
 	@Override
@@ -81,7 +83,7 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id personId = event.getPersonId();
-		if (personId.toString().startsWith(this.ptDriverPrefix)){
+		if (personId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000;
 		} else {
 			// no public vehicle
@@ -98,7 +100,7 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if (event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			if (this.personID2firstDepartureTime.containsKey(event.getPersonId())){
 				if (event.getTime() < this.personID2firstDepartureTime.get(event.getPersonId())){
 					this.personID2firstDepartureTime.put(event.getPersonId(), event.getTime());
@@ -117,7 +119,7 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if (event.getPersonId().toString().startsWith(ptDriverPrefix)) {
+		if (event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())) {
 			if (this.personID2lastArrivalTime.containsKey(event.getPersonId())){
 				if (event.getTime() > this.personID2lastArrivalTime.get(event.getPersonId())){
 					this.personID2lastArrivalTime.put(event.getPersonId(), event.getTime());

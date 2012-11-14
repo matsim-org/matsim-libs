@@ -41,6 +41,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
  * This module analyzes pt trip travel times.
@@ -51,35 +52,65 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 public class PtTripTravelTimeTransfersAnalyzer extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(PtTripTravelTimeTransfersAnalyzer.class);
 	private ScenarioImpl scenario;
+	
+	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	
 	private PtTripTravelTimeEventHandler ptTtHandler;
 	private Map<Id, List<Double>> personId2ptTripTravelTimes;
 	private Map<Id, List<Integer>> personId2ptTripTransfers;
 			
-	public PtTripTravelTimeTransfersAnalyzer(String ptDriverPrefix) {
-		super(PtTripTravelTimeTransfersAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public PtTripTravelTimeTransfersAnalyzer() {
+		super(PtTripTravelTimeTransfersAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
-		this.ptTtHandler = new PtTripTravelTimeEventHandler(this.ptDriverPrefix);
+		
+		// (sub-)module
+		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
+		this.ptDriverPrefixAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverPrefixAnalyzer);
+		
+		this.ptTtHandler = new PtTripTravelTimeEventHandler(this.ptDriverPrefixAnalyzer);
 		this.personId2ptTripTravelTimes = new HashMap<Id, List<Double>>();
 		this.personId2ptTripTransfers = new HashMap<Id, List<Integer>>();
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.ptTtHandler);		
-		return handler;
+		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
+
+		// from (sub-)modules
+		for (AbstractAnalyisModule module : this.anaModules) {
+			for (EventHandler handler : module.getEventHandler()) {
+				allEventHandler.add(handler);
+			}
+		}
+		
+		// own handler
+		allEventHandler.add(this.ptTtHandler);
+		
+		return allEventHandler;
 	}
 
 	@Override
 	public void preProcessData() {
-		// nothing to do
+		log.info("Preprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.preProcessData();
+		}
+		log.info("Preprocessing all (sub-)modules... done.");
 	}
 
 	@Override
 	public void postProcessData() {
+		log.info("Postprocessing all (sub-)modules...");
+		for (AbstractAnalyisModule module : this.anaModules) {
+			module.postProcessData();
+		}
+		log.info("Postprocessing all (sub-)modules... done.");
+		
 		for(Id personId : this.ptTtHandler.getAgentId2PtTripTravelTimeData().keySet()) {
 			List<PtTripTravelTimeData> ptTripDataThisPerson = this.ptTtHandler.getAgentId2PtTripTravelTimeData().get(personId);
 			

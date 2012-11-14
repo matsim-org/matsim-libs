@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules.bvgAna.anaLevel1;
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.enterLeaveVehicle2Activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +38,8 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.pt.PtConstants;
 
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+
 /**
  * Collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> with their
  * corresponding <code>ActivityEndEvent</code> and <code>ActivityStartEvent</code> ignoring <code>pt interaction</code> events.
@@ -49,16 +51,16 @@ public class EnterLeaveVehicle2ActivityHandler implements PersonEntersVehicleEve
 
 	private final Logger log = Logger.getLogger(EnterLeaveVehicle2ActivityHandler.class);
 	private final Level logLevel = Level.DEBUG;
-	private String ptDriverPrefix;
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	private TreeMap<Id, ActivityEndEvent> agentId2ActEndEvent = new TreeMap<Id, ActivityEndEvent>();
 	private TreeMap<Id, List<PersonLeavesVehicleEvent>> agentId2LeaveVehEvent = new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
 
 	private HashMap<PersonEntersVehicleEvent, ActivityEndEvent> personsEntersVehicleEvent2ActivityEndEvent = new HashMap<PersonEntersVehicleEvent, ActivityEndEvent>();
 	private HashMap<PersonLeavesVehicleEvent, ActivityStartEvent> personLeavesVehicleEvent2ActivityStartEvent = new HashMap<PersonLeavesVehicleEvent, ActivityStartEvent>();
 
-	public EnterLeaveVehicle2ActivityHandler(String ptDriverPrefix){
+	public EnterLeaveVehicle2ActivityHandler(PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer){
 		this.log.setLevel(this.logLevel);
-		this.ptDriverPrefix = ptDriverPrefix;
+		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
 	}
 
 	/**
@@ -88,7 +90,7 @@ public class EnterLeaveVehicle2ActivityHandler implements PersonEntersVehicleEve
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		// simply collect the event
-		if (event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if (event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			// pt driver
 		} else {
 			List<PersonLeavesVehicleEvent> events = this.agentId2LeaveVehEvent.get(event.getPersonId());

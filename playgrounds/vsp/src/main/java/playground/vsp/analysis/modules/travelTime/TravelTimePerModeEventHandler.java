@@ -29,23 +29,25 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+
 /**
  * @author ikaddoura, benjamin
  *
  */
 public class TravelTimePerModeEventHandler implements AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private static final Logger logger = Logger.getLogger(TravelTimePerModeEventHandler.class);
+	private PtDriverPrefixAnalyzer ptDriverPrefixAna;
 
 	Map<String, Map<Id, Double>> mode2personId2DepartureTime;
 	Map<String, Map<Id, Double>> mode2personId2TravelTime;
 	Map<String, Double> mode2noOfTrips;
-	private String ptDriverPrefix;
 
-	public TravelTimePerModeEventHandler(String ptDriverPrefix) {
+	public TravelTimePerModeEventHandler(PtDriverPrefixAnalyzer ptDriverPrefixAna) {
+		this.ptDriverPrefixAna = ptDriverPrefixAna;
 		this.mode2personId2DepartureTime = new HashMap<String, Map<Id, Double>>();
 		this.mode2personId2TravelTime = new HashMap<String, Map<Id, Double>>();
 		this.mode2noOfTrips = new HashMap<String,Double>();
-		this.ptDriverPrefix = ptDriverPrefix;
 	}
 
 	@Override
@@ -66,7 +68,7 @@ public class TravelTimePerModeEventHandler implements AgentArrivalEventHandler, 
 		Id personId = event.getPersonId();
 		Double departureTime = event.getTime();
 		
-		if (personId.toString().startsWith(ptDriverPrefix)){
+		if (personId.toString().startsWith(this.ptDriverPrefixAna.getPtDriverPrefix())){
 			// pt driver!
 		} else {
 			if(this.mode2personId2DepartureTime.get(legMode) == null){
@@ -104,7 +106,7 @@ public class TravelTimePerModeEventHandler implements AgentArrivalEventHandler, 
 		Id personId = event.getPersonId();
 		Double arrivalTime = event.getTime();
 		
-		if (personId.toString().startsWith(ptDriverPrefix)){
+		if (personId.toString().startsWith(this.ptDriverPrefixAna.getPtDriverPrefix())){
 			// pt driver!
 		} else {
 			if(this.mode2personId2DepartureTime.get(legMode) == null){

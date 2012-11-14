@@ -22,16 +22,21 @@
  * @author ikaddoura
  * 
  */
-package playground.vsp.analysis.modules.ptOperator;
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.personId2DelayAtStop;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -39,26 +44,21 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
- * This module calculates the public transport parameters vehicle-hours, vehicle-km, number of public vehicles.
- * These parameters can be used for operator cost calculations.
- *  
  * @author ikaddoura
  *
  */
-public class PtOperatorAnalyzer extends AbstractAnalyisModule {
-	private final static Logger log = Logger.getLogger(PtOperatorAnalyzer.class);
+public class AgentId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(AgentId2PersonEnterLeaveVehicleAnalyzer.class);
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	
-	private TransitEventHandler transitHandler;
-	private int numberOfPtVehicles;
-	private double vehicleHours;
-	private double vehicleKm;
-
-	public PtOperatorAnalyzer() {
-		super(PtOperatorAnalyzer.class.getSimpleName());
+	private PersonId2DelayAtStopHandler handler;
+	private TreeMap<Id, PersonId2DelayAtStopData> personId2DelayAtStop;
+	
+	public AgentId2PersonEnterLeaveVehicleAnalyzer() {
+		super(AgentId2PersonEnterLeaveVehicleAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
@@ -67,14 +67,13 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		// (sub-)module
 		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
 		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);		
+		this.anaModules.add(ptDriverPrefixAnalyzer);
 		
-		this.transitHandler = new TransitEventHandler(this.scenario.getNetwork(), this.ptDriverPrefixAnalyzer);
+		this.handler = new PersonId2DelayAtStopHandler(this.ptDriverPrefixAnalyzer);
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		
 		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
 
 		// from (sub-)modules
@@ -85,8 +84,8 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		}
 		
 		// own handler
-		allEventHandler.add(this.transitHandler);
-				
+		allEventHandler.add(this.handler);
+		
 		return allEventHandler;
 	}
 
@@ -107,35 +106,18 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		}
 		log.info("Postprocessing all (sub-)modules... done.");
 		
-		// own postProcessing
-		this.numberOfPtVehicles = this.transitHandler.getVehicleIDs().size();
-		this.vehicleHours = this.transitHandler.getVehicleHours();
-		this.vehicleKm = this.transitHandler.getVehicleKm();
-		if (this.numberOfPtVehicles == 0.0) {
-			log.warn("Missing transit specific events. No public transport vehicles identified.");
-		}
+		this.personId2DelayAtStop = this.handler.getPersonId2DelayAtStopMap();
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder + "ptOperator.txt";
-		File file = new File(fileName);
-				
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("total number of pt vehicles: " + this.numberOfPtVehicles);
-			bw.newLine();
-			bw.write("pt vehicle-hours: " + this.vehicleHours);
-			bw.newLine();
-			bw.write("pt vehicle-kilometers: " + this.vehicleKm);
-			bw.newLine();
-			bw.close();
+		// ...
+	}
 
-			log.info("Output written to " + fileName);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public TreeMap<Id, PersonId2DelayAtStopData> getPersonId2DelayAtStop() {
+		return personId2DelayAtStop;
 	}
 	
+	
+
 }

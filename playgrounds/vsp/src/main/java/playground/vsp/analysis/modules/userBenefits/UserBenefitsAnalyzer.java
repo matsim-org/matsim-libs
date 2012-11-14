@@ -38,6 +38,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
  * This module calculates the logsum for each user and the sum of all user logsums in monetary units.
@@ -55,8 +56,8 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 	private int personWithNoValidPlanCnt;
 	private Map<Id, Double> personId2Logsum;
 
-	public UserBenefitsAnalyzer(String ptDriverPrefix) {
-		super(UserBenefitsAnalyzer.class.getSimpleName(), ptDriverPrefix);
+	public UserBenefitsAnalyzer() {
+		super(UserBenefitsAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
@@ -113,7 +114,16 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
+	public double getAllUsersLogSum() {
+		return allUsersLogSum;
+	}
+
+	public Map<Id, Double> getPersonId2Logsum() {
+		return personId2Logsum;
+	}
+
+	
+	
 }

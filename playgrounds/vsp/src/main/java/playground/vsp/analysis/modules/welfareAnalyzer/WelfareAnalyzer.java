@@ -17,12 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- * @author ikaddoura
- * 
- */
-package playground.vsp.analysis.modules.ptOperator;
+package playground.vsp.analysis.modules.welfareAnalyzer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,57 +31,50 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.transferPayments.MonetaryPaymentsAnalyzer;
+import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
 
 /**
- * This module calculates the public transport parameters vehicle-hours, vehicle-km, number of public vehicles.
- * These parameters can be used for operator cost calculations.
- *  
+ * 
  * @author ikaddoura
  *
  */
-public class PtOperatorAnalyzer extends AbstractAnalyisModule {
-	private final static Logger log = Logger.getLogger(PtOperatorAnalyzer.class);
+public class WelfareAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(WelfareAnalyzer.class);
 	private ScenarioImpl scenario;
-	
-	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
-	
-	private TransitEventHandler transitHandler;
-	private int numberOfPtVehicles;
-	private double vehicleHours;
-	private double vehicleKm;
 
-	public PtOperatorAnalyzer() {
-		super(PtOperatorAnalyzer.class.getSimpleName());
+	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private MonetaryPaymentsAnalyzer transferAna;
+	private UserBenefitsAnalyzer userBenefitsAna;
+	
+	private double totalWelfare;
+	
+	public WelfareAnalyzer() {
+		super(WelfareAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		
-		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);		
+		// (sub-modules)
+			
+		this.transferAna =  new MonetaryPaymentsAnalyzer();
+		this.transferAna.init(scenario);
+		this.anaModules.add(transferAna);
 		
-		this.transitHandler = new TransitEventHandler(this.scenario.getNetwork(), this.ptDriverPrefixAnalyzer);
+		this.userBenefitsAna = new UserBenefitsAnalyzer();
+		this.userBenefitsAna.init(scenario);
+		this.anaModules.add(userBenefitsAna);
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		
 		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
-
-		// from (sub-)modules
 		for (AbstractAnalyisModule module : this.anaModules) {
 			for (EventHandler handler : module.getEventHandler()) {
 				allEventHandler.add(handler);
 			}
 		}
-		
-		// own handler
-		allEventHandler.add(this.transitHandler);
-				
 		return allEventHandler;
 	}
 
@@ -97,10 +85,11 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 			module.preProcessData();
 		}
 		log.info("Preprocessing all (sub-)modules... done.");
+		
 	}
 
 	@Override
-	public void postProcessData() {
+	public void postProcessData() {		
 		log.info("Postprocessing all (sub-)modules...");
 		for (AbstractAnalyisModule module : this.anaModules) {
 			module.postProcessData();
@@ -108,34 +97,32 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		log.info("Postprocessing all (sub-)modules... done.");
 		
 		// own postProcessing
-		this.numberOfPtVehicles = this.transitHandler.getVehicleIDs().size();
-		this.vehicleHours = this.transitHandler.getVehicleHours();
-		this.vehicleKm = this.transitHandler.getVehicleKm();
-		if (this.numberOfPtVehicles == 0.0) {
-			log.warn("Missing transit specific events. No public transport vehicles identified.");
-		}
+		log.info("all users logsum: " + this.transferAna.getAllUsersAmount());
+		log.info("transfer payments sum : " + this.userBenefitsAna.getAllUsersLogSum());
+		
+		this.totalWelfare = this.userBenefitsAna.getAllUsersLogSum() + this.transferAna.getAllUsersAmount();
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder + "ptOperator.txt";
+		String fileName = outputFolder + "welfare.txt";
 		File file = new File(fileName);
-				
+			
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("total number of pt vehicles: " + this.numberOfPtVehicles);
+			bw.write("userBenefits: " + this.userBenefitsAna.getAllUsersLogSum());
 			bw.newLine();
-			bw.write("pt vehicle-hours: " + this.vehicleHours);
+			bw.write("transferPayments: " + this.transferAna.getAllUsersAmount());
 			bw.newLine();
-			bw.write("pt vehicle-kilometers: " + this.vehicleKm);
+			bw.write("totalWelfare: " + this.totalWelfare);
 			bw.newLine();
+			
 			bw.close();
-
 			log.info("Output written to " + fileName);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

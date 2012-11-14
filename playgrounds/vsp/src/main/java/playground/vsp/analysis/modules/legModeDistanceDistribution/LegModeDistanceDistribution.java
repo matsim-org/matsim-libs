@@ -67,9 +67,9 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 	private SortedMap<String, Integer> mode2LegCount;
 	private SortedMap<String, Double> mode2Share;
 
-	public LegModeDistanceDistribution(String ptDriverPrefix){
+	public LegModeDistanceDistribution(){
 		// why are the following two lines necessary? bk oct'12
-		super(LegModeDistanceDistribution.class.getSimpleName(), ptDriverPrefix);
+		super(LegModeDistanceDistribution.class.getSimpleName());
 		log.info("enabled");
 
 		this.distanceClasses = new ArrayList<Integer>();

@@ -22,43 +22,52 @@
  * @author ikaddoura
  * 
  */
-package playground.vsp.analysis.modules.ptOperator;
+package playground.vsp.analysis.modules.bvgAna.anaLevel1.enterLeaveVehicle2Activity;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.Time;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
 
 /**
- * This module calculates the public transport parameters vehicle-hours, vehicle-km, number of public vehicles.
- * These parameters can be used for operator cost calculations.
- *  
+ * This module collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> with their
+ * corresponding <code>ActivityEndEvent</code> and <code>ActivityStartEvent</code> ignoring <code>pt interaction</code> events
+ * not differentiating between public and private vehicles.
+ * 
  * @author ikaddoura
  *
  */
-public class PtOperatorAnalyzer extends AbstractAnalyisModule {
-	private final static Logger log = Logger.getLogger(PtOperatorAnalyzer.class);
+public class EnterLeaveVehicle2ActivityAnalyzer extends AbstractAnalyisModule{
+	private final static Logger log = Logger.getLogger(EnterLeaveVehicle2ActivityAnalyzer.class);
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	
-	private TransitEventHandler transitHandler;
-	private int numberOfPtVehicles;
-	private double vehicleHours;
-	private double vehicleKm;
-
-	public PtOperatorAnalyzer() {
-		super(PtOperatorAnalyzer.class.getSimpleName());
+	private EnterLeaveVehicle2ActivityHandler enterLeaveHandler;
+	private Map<PersonEntersVehicleEvent, ActivityEndEvent> enterVehicleEvent2ActivityEndEvent;
+	private Map<PersonLeavesVehicleEvent, ActivityStartEvent> leaveVehicleEvent2ActivityStartEvent;
+			
+	public EnterLeaveVehicle2ActivityAnalyzer() {
+		super(EnterLeaveVehicle2ActivityAnalyzer.class.getSimpleName());
 	}
 	
 	public void init(ScenarioImpl scenario) {
@@ -67,14 +76,13 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		// (sub-)module
 		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
 		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);		
-		
-		this.transitHandler = new TransitEventHandler(this.scenario.getNetwork(), this.ptDriverPrefixAnalyzer);
+		this.anaModules.add(ptDriverPrefixAnalyzer);
+				
+		this.enterLeaveHandler = new EnterLeaveVehicle2ActivityHandler(this.ptDriverPrefixAnalyzer);
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		
 		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
 
 		// from (sub-)modules
@@ -85,8 +93,8 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		}
 		
 		// own handler
-		allEventHandler.add(this.transitHandler);
-				
+		allEventHandler.add(this.enterLeaveHandler);
+		
 		return allEventHandler;
 	}
 
@@ -107,35 +115,26 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		}
 		log.info("Postprocessing all (sub-)modules... done.");
 		
-		// own postProcessing
-		this.numberOfPtVehicles = this.transitHandler.getVehicleIDs().size();
-		this.vehicleHours = this.transitHandler.getVehicleHours();
-		this.vehicleKm = this.transitHandler.getVehicleKm();
-		if (this.numberOfPtVehicles == 0.0) {
-			log.warn("Missing transit specific events. No public transport vehicles identified.");
-		}
+		this.enterVehicleEvent2ActivityEndEvent = this.enterLeaveHandler.getPersonEntersVehicleEvent2ActivityEndEvent();
+		this.leaveVehicleEvent2ActivityStartEvent = this.enterLeaveHandler.getPersonLeavesVehicleEvent2ActivityStartEvent();
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder + "ptOperator.txt";
-		File file = new File(fileName);
-				
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("total number of pt vehicles: " + this.numberOfPtVehicles);
-			bw.newLine();
-			bw.write("pt vehicle-hours: " + this.vehicleHours);
-			bw.newLine();
-			bw.write("pt vehicle-kilometers: " + this.vehicleKm);
-			bw.newLine();
-			bw.close();
 
-			log.info("Output written to " + fileName);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		for (PersonEntersVehicleEvent enterEvent : this.enterVehicleEvent2ActivityEndEvent.keySet()){
+//			ActivityEndEvent actend = this.enterVehicleEvent2ActivityEndEvent.get(enterEvent);
+//			log.info(enterEvent.getPersonId() + " enters vehicle " + enterEvent.getVehicleId() + " (Time:" + enterEvent.getTime() + ") after " + actend.getPersonId() + " ends activity " + actend.getActType() + " (Time: "+ actend.getTime()+")");
+//		}
+				
 	}
-	
+
+	public Map<PersonEntersVehicleEvent, ActivityEndEvent> getEnterVehicleEvent2ActivityEndEvent() {
+		return enterVehicleEvent2ActivityEndEvent;
+	}
+
+	public Map<PersonLeavesVehicleEvent, ActivityStartEvent> getLeaveVehicleEvent2ActivityStartEvent() {
+		return leaveVehicleEvent2ActivityStartEvent;
+	}
+
 }

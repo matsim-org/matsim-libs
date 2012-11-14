@@ -33,6 +33,8 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+
 /**
  * @author ikaddoura, benjamin
  *
@@ -43,17 +45,17 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 	private Map<Id, Double> personId2CarDistance;
 	private int carTrips;
 	private final Network network;
-	private String ptDriverPrefix;
+	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
 	
 	// the following is not neccessary any more...see below
 	private Map<Id, Id> personId2departureLinkId;
 	private Map<Id, Double> depArrOnSameLinkCnt;
 	
-	public CarDistanceEventHandler(Network network, String ptDriverPrefix) {
+	public CarDistanceEventHandler(Network network, PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer) {
 		this.personId2CarDistance = new HashMap<Id, Double>();
 		this.carTrips = 0;
 		this.network = network;
-		this.ptDriverPrefix = ptDriverPrefix;
+		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
 		
 		// the following is not neccessary any more...see below
 		this.personId2departureLinkId = new HashMap<Id, Id>();
@@ -77,7 +79,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		Id personId = event.getPersonId();
 		Id linkId = event.getLinkId();
 		Double linkLength_m = this.network.getLinks().get(linkId).getLength();
-		if (personId.toString().startsWith(ptDriverPrefix)){
+		if (personId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			// pt vehicle!
 		} else {
 			if(this.personId2CarDistance.get(personId) == null){
@@ -95,7 +97,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		// the following is not neccessary any more...see below
 		personId2departureLinkId.put(event.getPersonId(), event.getLinkId());
 
-		if (event.getPersonId().toString().startsWith(ptDriverPrefix)){
+		if (event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			// ptDriver!
 		} else {
 			// calculating the number of trips...
@@ -123,7 +125,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		Id personId = event.getPersonId();
 		Id linkId = event.getLinkId();
 
-		if (personId.toString().startsWith(ptDriverPrefix)){
+		if (personId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
 			// ptDriver!
 		} else {
 			if(personId2departureLinkId.get(personId) == null){
