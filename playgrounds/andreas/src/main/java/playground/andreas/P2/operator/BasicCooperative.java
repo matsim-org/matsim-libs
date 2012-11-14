@@ -85,9 +85,11 @@ public class BasicCooperative extends AbstractCooperative{
 		// Second replan, if testplan null
 		if (this.testPlan == null) {
 			strategy = pStrategyManager.chooseStrategy();
-			this.testPlan = strategy.run(this);
-			if (this.testPlan != null) {
-				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+			if (strategy != null) {
+				this.testPlan = strategy.run(this);
+				if (this.testPlan != null) {
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+				}
 			}
 		}
 		

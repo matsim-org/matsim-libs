@@ -138,7 +138,8 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		// This is different from the default behavior, since this is NOT called in the first iteration
+		// This is NOT called in the first iteration
+		this.strategyManager.updateStrategies(event.getIteration());
 		
 		// Adapt number of cooperatives
 		this.handleBankruptCopperatives(event.getIteration());

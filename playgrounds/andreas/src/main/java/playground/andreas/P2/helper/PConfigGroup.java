@@ -96,6 +96,7 @@ public class PConfigGroup extends Module{
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
+	private static final String PMODULE_DISABLEINITERATION = "ModuleDisableInIteration_";
 	private static final String PMODULE_PARAMETER = "ModuleParameter_";
 	
 	// Defaults
@@ -237,6 +238,9 @@ public class PConfigGroup extends Module{
 		} else if (key != null && key.startsWith(PMODULE_PROBABILITY)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE_PROBABILITY.length())), true);
 			settings.setProbability(Double.parseDouble(value));
+		} else if (key != null && key.startsWith(PMODULE_DISABLEINITERATION)) {
+			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE_DISABLEINITERATION.length())), true);
+			settings.setDisableInIteration(Integer.parseInt(value));
 		} else if (key != null && key.startsWith(PMODULE_PARAMETER)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE_PARAMETER.length())), true);
 			settings.setParameters(value);
@@ -293,6 +297,7 @@ public class PConfigGroup extends Module{
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
 			map.put(PMODULE_PROBABILITY + entry.getKey().toString(), Double.toString(entry.getValue().getProbability()));
+			map.put(PMODULE_DISABLEINITERATION + entry.getKey().toString(), Double.toString(entry.getValue().getDisableInIteration()));
 			map.put(PMODULE_PARAMETER + entry.getKey().toString(), entry.getValue().getParametersAsString());
 		}
 		
@@ -345,6 +350,7 @@ public class PConfigGroup extends Module{
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
 			map.put(PMODULE_PROBABILITY + entry.getKey().toString(), "probability that a strategy is applied to a given a plan. despite its name, this really is a ``weight''");
+			map.put(PMODULE_DISABLEINITERATION + entry.getKey().toString(), "removes the strategy from the choice set at the beginning of the given iteration");
 			map.put(PMODULE_PARAMETER + entry.getKey().toString(), "parameters of the strategy");
 		}
 
@@ -530,6 +536,7 @@ public class PConfigGroup extends Module{
 	public static class PStrategySettings{
 		private Id id;
 		private double probability = -1.0;
+		private int disableInIteration = -1;
 		private String moduleName = null;
 		private String[] parameters = null;
 
@@ -543,6 +550,14 @@ public class PConfigGroup extends Module{
 
 		public double getProbability() {
 			return this.probability;
+		}
+
+		public void setDisableInIteration(int disableInIteration) {
+			this.disableInIteration = disableInIteration;
+		}
+		
+		public int getDisableInIteration() {
+			return this.disableInIteration;
 		}
 
 		public void setModuleName(final String moduleName) {

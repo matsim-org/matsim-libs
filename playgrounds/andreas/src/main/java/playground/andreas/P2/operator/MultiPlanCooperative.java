@@ -126,26 +126,28 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		// Third, replan
 		if (this.bestPlan != null) {
 			PStrategy strategy = pStrategyManager.chooseStrategy();
-			PPlan newPlan = strategy.run(this);
-			if (newPlan != null) {
-				// check, if it is a duplicate of an existing plan
-				for (PPlan plan : this.plans) {
-					if(plan.isSameButVehSize(newPlan)) {
-						newPlan = null;
-						break;
+			if (strategy != null) {
+				PPlan newPlan = strategy.run(this);
+				if (newPlan != null) {
+					// check, if it is a duplicate of an existing plan
+					for (PPlan plan : this.plans) {
+						if(plan.isSameButVehSize(newPlan)) {
+							newPlan = null;
+							break;
+						}
+					}
+					
+					if (newPlan != null) {
+						// remove vehicle from worst plan
+//					this.findWorstPlanAndRemoveOneVehicle(this.plans);
+						
+						this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
+						this.plans.add(newPlan);
 					}
 				}
 				
-				if (newPlan != null) {
-					// remove vehicle from worst plan
-//					this.findWorstPlanAndRemoveOneVehicle(this.plans);
-
-					this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() - 1);
-					this.plans.add(newPlan);
-				}
+				this.bestPlan = null;
 			}
-			
-			this.bestPlan = null;
 		}
 		
 		// Fourth, move one vehicle from the worst negative plan to the best plan, if possible

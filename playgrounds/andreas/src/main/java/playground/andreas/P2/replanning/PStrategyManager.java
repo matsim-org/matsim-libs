@@ -65,6 +65,7 @@ public class PStrategyManager {
 	
 	private final ArrayList<PStrategy> strategies = new ArrayList<PStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
+	private final ArrayList<Integer> disableInIteration = new ArrayList<Integer>();
 	private double totalWeights = 0.0;
 	
 	private String pIdentifier;
@@ -78,13 +79,14 @@ public class PStrategyManager {
 	// TODO[an] always initialize TimeReduceDemand
 	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
+			String classname = settings.getModuleName();
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
+				log.info("The following strategy has a weight set to zero. Will drop it. " + classname);
 				continue;
 			}
-			String classname = settings.getModuleName();
 			PStrategy strategy = loadStrategy(classname, settings, eventsManager, stageContainerCreator, ticketMachine);
-			this.addStrategy(strategy, rate);
+			this.addStrategy(strategy, rate, settings.getDisableInIteration());
 		}
 		
 		log.info("enabled with " + this.strategies.size()  + " strategies");
@@ -171,10 +173,27 @@ public class PStrategyManager {
 		return strategy;
 	}
 
-	private void addStrategy(final PStrategy strategy, final double weight) {
+	private void addStrategy(final PStrategy strategy, final double weight, int disableInIteration) {
 		this.strategies.add(strategy);
 		this.weights.add(Double.valueOf(weight));
+		this.disableInIteration.add(Integer.valueOf(disableInIteration));
 		this.totalWeights += weight;
+	}
+
+	/**
+	 * Changes the weights of each strategy to zero and removes it from the choice set if it needs to be disabled
+	 * 
+	 * @param iteration
+	 */
+	public void updateStrategies(int iteration) {
+		for (int i = 0; i < this.disableInIteration.size(); i++) {
+			if (this.disableInIteration.get(i) == iteration) {
+				double weight = this.weights.get(i);
+				this.weights.set(i, new Double(0.0));
+				this.strategies.set(i, null);
+				this.totalWeights -= weight;
+			}
+		}
 	}
 
 	public PStrategy chooseStrategy() {
@@ -187,6 +206,7 @@ public class PStrategyManager {
 				return this.strategies.get(i);
 			}
 		}
+		// This line should not be reachable
 		return null;
 	}
 

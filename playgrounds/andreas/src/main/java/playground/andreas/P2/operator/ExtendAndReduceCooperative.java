@@ -122,16 +122,18 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 	 */
 	private void randomReplan(PStrategyManager pStrategyManager, int iteration) {
 		PStrategy s = pStrategyManager.chooseStrategy();
-		PPlan p = s.run(this);
-		
-		if(!(p == null)){
-			if(this.reduceStopsAfter.contains(s.getName()) || this.reduceTimeAfter.contains(s.getName())){
-				this.lastStrategy = s.getName();
-				this.inProgress = true;
+		if (s != null) {
+			PPlan p = s.run(this);
+
+			if(!(p == null)){
+				if(this.reduceStopsAfter.contains(s.getName()) || this.reduceTimeAfter.contains(s.getName())){
+					this.lastStrategy = s.getName();
+					this.inProgress = true;
+				}
+				this.testPlan = p;
+				this.testPlan.setNVehicles(1);
+				this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() -1);
 			}
-			this.testPlan = p;
-			this.testPlan.setNVehicles(1);
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() -1);
 		}
 	}
 
