@@ -44,6 +44,7 @@ import playground.andreas.P2.helper.PConstants;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AbstractPAnalyisModule;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageInVehicleTripTravelTimeSecondsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDeparturePerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDistancePerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageNumberOfStopsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageTripDistanceMeterPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageWaitingTimeSecondsPerMode;
@@ -90,7 +91,6 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 		this.pAnalyzesList.add(new CountTripsPerMode());
 		this.pAnalyzesList.add(new CountVehPerMode());
 		this.pAnalyzesList.add(new CountVehicleMeterPerMode(event.getControler().getNetwork()));
-		this.pAnalyzesList.add(new CountPassengerMeterPerMode(event.getControler().getNetwork()));
 		this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(event.getControler().getNetwork()));
 		this.pAnalyzesList.add(new AverageInVehicleTripTravelTimeSecondsPerMode());
 		this.pAnalyzesList.add(new AverageWaitingTimeSecondsPerMode());
@@ -98,9 +98,14 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 		this.pAnalyzesList.add(new CountTransfersPerModeModeCombination());
 		this.pAnalyzesList.add(new CountTripsPerPtModeCombination());
 		this.pAnalyzesList.add(new AverageLoadPerDeparturePerMode());
-		this.pAnalyzesList.add(new CountCapacityMeterPerMode(event.getControler().getNetwork()));
 		this.pAnalyzesList.add(new CountDeparturesWithNoCapacityLeftPerMode());
 		this.pAnalyzesList.add(new CountDeparturesPerMode());
+		
+		CountPassengerMeterPerMode countPassengerMeterPerMode = new CountPassengerMeterPerMode(event.getControler().getNetwork());
+		this.pAnalyzesList.add(countPassengerMeterPerMode);
+		CountCapacityMeterPerMode countCapacityMeterPerMode = new CountCapacityMeterPerMode(event.getControler().getNetwork());
+		this.pAnalyzesList.add(countCapacityMeterPerMode);
+		this.pAnalyzesList.add(new AverageLoadPerDistancePerMode(countPassengerMeterPerMode, countCapacityMeterPerMode));
 		
 		// register all analyzes
 		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {

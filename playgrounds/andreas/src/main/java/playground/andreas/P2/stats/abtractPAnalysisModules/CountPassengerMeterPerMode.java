@@ -114,5 +114,9 @@ public class CountPassengerMeterPerMode extends AbstractPAnalyisModule implement
 
 		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + this.network.getLinks().get(event.getLinkId()).getLength() * this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue()));
 	}
+	
+	public HashMap<String, Double> getResults(){
+		return this.ptMode2CountMap;
+	}
 
 }

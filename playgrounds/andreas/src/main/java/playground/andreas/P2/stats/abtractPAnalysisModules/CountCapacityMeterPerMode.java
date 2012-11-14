@@ -112,4 +112,8 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 
 		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + capacityMeterForThatLink));
 	}
+	
+	public HashMap<String, Double> getResults(){
+		return this.ptMode2CountMap;
+	}
 }
