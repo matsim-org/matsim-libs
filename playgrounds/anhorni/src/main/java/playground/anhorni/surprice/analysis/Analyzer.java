@@ -82,7 +82,8 @@ public class Analyzer {
 	private SupriceBoxPlot boxPlotTravelTimesCarPerIncome = new SupriceBoxPlot("Travel Times Car", "Income", "tt");
 	private SupriceBoxPlot boxPlotTravelTimesPtPerIncome = new SupriceBoxPlot("Travel Times Pt", "Income", "tt");
 	
-	private TreeMap<Id, Double> tollDistancesAgents;
+	private TreeMap<Id, Double> tolltdPerAgent;
+	private TreeMap<Id, Double> ttPerAgent;
 	
 	private String outPath;
 		
@@ -192,7 +193,8 @@ public class Analyzer {
 		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();	
 		this.tolltdSumIncomeWeighted[Surprice.days.indexOf(day)] = tollCalculator.getSumLengthIncomeWeighted();
 		this.boxPlotTravelTimes.addValuesPerCategory(ttCalculator.getTravelTimes(), day, "Travel Times");
-		this.tollDistancesAgents = tollCalculator.getTollDistancesAgents();
+		this.tolltdPerAgent = tollCalculator.getTollDistancesAgents();
+		this.ttPerAgent = ttCalculator.getTtPerAgent();
 		
 		this.computeModesPerIncome();
 		
@@ -227,14 +229,19 @@ public class Analyzer {
 		this.boxPlotTravelDistancesTolledPerIncome.createChart();
 		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tolltdPerIncome.png", 800, 600);
 		
-		ObjectAttributes tollDistancesAgent = new ObjectAttributes();
+		ObjectAttributes tolltdPerAgentOA = new ObjectAttributes();		
+		for (Id id : tolltdPerAgent.keySet()) {
+			tolltdPerAgentOA.putAttribute(id.toString(), "tolltd", this.tolltdPerAgent.get(id));
+		}		
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(tolltdPerAgentOA);
+		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".tollDistancesAgents.txt");
 		
-		for (Id id : tollDistancesAgents.keySet()) {
-			tollDistancesAgent.putAttribute(id.toString(), "tolltd", this.tollDistancesAgents.get(id));
-		}
-		
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(tollDistancesAgent);
-		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".tollDistancesAgent.txt");
+		ObjectAttributes ttPerAgentOA = new ObjectAttributes();		
+		for (Id id : ttPerAgent.keySet()) {
+			ttPerAgentOA.putAttribute(id.toString(), "tt", this.ttPerAgent.get(id));
+		}		
+		attributesWriter = new ObjectAttributesXmlWriter(ttPerAgentOA);
+		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".ttPerAgent.txt");
 	}
 	
 	private void writePlots() {			
