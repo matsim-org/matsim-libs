@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -41,17 +40,22 @@ import org.matsim.api.core.v01.population.Population;
  */
 public class EmissionWriter {
 	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
+	
+	private final EmissionUtils emu;
 
+	public EmissionWriter(EmissionUtils emu){
+		this.emu = emu;
+	}
+	
 	public void writeHomeLocation2TotalEmissions(
 			Population population,
-			SortedSet<String> listOfPollutants,
 			Map<Id, SortedMap<String, Double>> totalEmissions,
 			String outFile) {
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.append("personId \t xHome \t yHome \t");
-			for (String pollutant : listOfPollutants){
+			for (String pollutant : emu.getListOfPollutants()){
 				out.append(pollutant + "[g] \t");
 			}
 			out.append("\n");
@@ -67,7 +71,7 @@ public class EmissionWriter {
 				out.append(personId + "\t" + xHome + "\t" + yHome + "\t");
 
 				Map<String, Double> emissionType2Value = totalEmissions.get(personId);
-				for(String pollutant : listOfPollutants){
+				for(String pollutant : emu.getListOfPollutants()){
 					if(emissionType2Value.get(pollutant) != null){
 						out.append(emissionType2Value.get(pollutant) + "\t");
 					} else{
@@ -85,7 +89,6 @@ public class EmissionWriter {
 	}
 
 	void writeLinkLocation2Emissions(
-			SortedSet<String> listOfPollutants,
 			Map<Id, Map<String, Double>> emissions,
 			Network network,
 			String outFile){
@@ -93,7 +96,7 @@ public class EmissionWriter {
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.append("linkId\txLink\tyLink\t");
-			for (String pollutant : listOfPollutants){
+			for (String pollutant : emu.getListOfPollutants()){
 				out.append(pollutant + "[g]\t");
 			}
 			out.append("\n");
@@ -107,7 +110,7 @@ public class EmissionWriter {
 				out.append(linkId + "\t" + xLink + "\t" + yLink + "\t");
 
 				Map<String, Double> emissionType2Value = emissions.get(linkId);
-				for(String pollutant : listOfPollutants){
+				for(String pollutant : emu.getListOfPollutants()){
 					out.append(emissionType2Value.get(pollutant) + "\t");
 				}
 				out.append("\n");
