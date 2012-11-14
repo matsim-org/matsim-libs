@@ -39,7 +39,6 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -65,15 +64,19 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * <li> the route for the first departure time encountered, if the OD does not exist yet.
  * </ul>
  *
+ * Note that using a fixed route for the whole day
+ * is a rather drastic approach, which may cause problems,
+ * for instance when the first found route is a night line for a trip which
+ * optimal start time would be during the day, but more complex solutions
+ * (route per time bin, reset the memory every k TS iterations) were not tested.
+ * <br>
+ *
  * It modifies and returns the same instances over and over, so it is not thread
  * safe.
  * @author thibautd
  */
 public class FixedTransitRouteRoutingModule implements RoutingModule {
-	private static final Logger log =
-		Logger.getLogger(FixedTransitRouteRoutingModule.class);
-
-	private static final boolean useFixedRoutes = false;
+	private final boolean useFixedRoutes;
 	private final static double MIDNIGHT = 24.0*3600;
 	private final TransitSchedule schedule;
 	private final TransitRouterWrapper module;
@@ -83,15 +86,35 @@ public class FixedTransitRouteRoutingModule implements RoutingModule {
 	// /////////////////////////////////////////////////////////////////////////
 	// Construction
 	// /////////////////////////////////////////////////////////////////////////
+
 	public FixedTransitRouteRoutingModule(
 			final Plan plan,
 			final TransitSchedule schedule,
 			final TransitRouterWrapper module) {
+		this( plan , schedule , module , true );
+	}
+
+	/**
+	 * @param plan the plan to get initial fixed routes from
+	 * @param schedule the transit schedule
+	 * @param module the module to use to compute yet unkown routes
+	 * @param useFixedRoutes whether to cache routes per OD or not.
+	 * Not using is takes a great deal of time, but may be the only
+	 * way to get correct results in some scenarios. 
+	 * If this is false, this module basically wrapps the base module
+	 * and adds travel time information to all legs.
+	 */
+	public FixedTransitRouteRoutingModule(
+			final Plan plan,
+			final TransitSchedule schedule,
+			final TransitRouterWrapper module,
+			final boolean useFixedRoutes) {
 		this.module = module;
 		this.schedule = schedule;
 		this.routes = analysePlan(
 				module,
 				plan );
+		this.useFixedRoutes = useFixedRoutes;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -134,7 +157,7 @@ public class FixedTransitRouteRoutingModule implements RoutingModule {
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
-	private static Map<Tuple<Id, Id>, List<? extends PlanElement>> analysePlan(
+	private Map<Tuple<Id, Id>, List<? extends PlanElement>> analysePlan(
 			final TransitRouterWrapper module,
 			final Plan plan) {
 		Map< Tuple<Id, Id>, List<? extends PlanElement> > routes = new HashMap<Tuple<Id,Id>, List<? extends PlanElement>>();
@@ -199,8 +222,8 @@ public class FixedTransitRouteRoutingModule implements RoutingModule {
 
 		for (PlanElement pe : trip) {
 			if (pe instanceof Activity) {
-				((Activity) pe).setStartTime( now );
-				((Activity) pe).setEndTime( now );
+				((Activity) pe).setStartTime( Time.UNDEFINED_TIME );
+				((Activity) pe).setEndTime( Time.UNDEFINED_TIME );
 			}
 			else if (pe instanceof Leg) {
 				Route route = ((Leg) pe).getRoute();
