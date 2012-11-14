@@ -75,10 +75,10 @@ public class DayControler extends Controler {
 		boxPlotPrefs.addValuesPerCategory(alpha, "alpha", "alpha");
 		boxPlotPrefs.addValuesPerCategory(gamma, "gamma", "gamma");
 		boxPlotPrefs.createChart();
-		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename(day + "prefs.png"), 800, 600);	
+		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename("prefs.png"), 800, 600);	
 		
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.prefs);
-		attributesWriter.writeFile(this.getControlerIO().getOutputFilename(day + ".prefsAgents.txt")); 
+		attributesWriter.writeFile(this.getControlerIO().getOutputFilename("prefsAgents.txt")); 
 	}
 
 //	@Override
