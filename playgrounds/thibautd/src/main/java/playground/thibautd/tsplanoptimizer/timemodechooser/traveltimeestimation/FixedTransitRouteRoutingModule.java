@@ -111,10 +111,11 @@ public class FixedTransitRouteRoutingModule implements RoutingModule {
 			final boolean useFixedRoutes) {
 		this.module = module;
 		this.schedule = schedule;
+		this.useFixedRoutes = useFixedRoutes;
 		this.routes = analysePlan(
 				module,
-				plan );
-		this.useFixedRoutes = useFixedRoutes;
+				plan,
+				useFixedRoutes);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -157,9 +158,10 @@ public class FixedTransitRouteRoutingModule implements RoutingModule {
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
-	private Map<Tuple<Id, Id>, List<? extends PlanElement>> analysePlan(
+	private static Map<Tuple<Id, Id>, List<? extends PlanElement>> analysePlan(
 			final TransitRouterWrapper module,
-			final Plan plan) {
+			final Plan plan,
+			final boolean useFixedRoutes) {
 		Map< Tuple<Id, Id>, List<? extends PlanElement> > routes = new HashMap<Tuple<Id,Id>, List<? extends PlanElement>>();
 
 		if (useFixedRoutes) {

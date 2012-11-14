@@ -83,11 +83,11 @@ public class FixedTransitRouteModuleTest {
 						testPlan,
 						scenario.getTransitSchedule(),
 						transitRouter);
+			tripRouterWithFixedRoutes.setRoutingModule( TransportMode.pt , testee );
 			PlanRouter routerFixed = new PlanRouter( tripRouterWithFixedRoutes );
 			// using the following causes a test fail,
 			// so we are sure the test actually tests something.
 			// routerFixed = router;
-			tripRouterWithFixedRoutes.setRoutingModule( TransportMode.pt , testee );
 
 			for (int i=0; i < 10; i++) {
 				Activity first = (Activity) testPlan.getPlanElements().get( 0 );
