@@ -26,11 +26,12 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.anhorni.surprice.analysis.Analyzer;
+import playground.anhorni.surprice.analysis.SupriceBoxPlot;
 
 public class MultiDayControler {
 	
 	private final static Logger log = Logger.getLogger(MultiDayControler.class);
-			
+				
 	public static void main (final String[] args) {		
 		if (args.length != 2) {
 			log.error("Provide correct number of arguments ...");

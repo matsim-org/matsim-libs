@@ -77,10 +77,10 @@ public class Analyzer {
 	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt");
 	private SupriceBoxPlot boxPlotTravelDistancesCar = new SupriceBoxPlot("Travel Distances Car", "Day", "td");
 	
-	private SupriceBoxPlot boxPlotTravelDistancesTolledPerIncome = new SupriceBoxPlot("Tolled Travel Distances", "Day", "tolltd");
-	private SupriceBoxPlot boxPlotTravelDistancesCarPerIncome = new SupriceBoxPlot("Travel Distances Car", "Day", "td");	
-	private SupriceBoxPlot boxPlotTravelTimesCarPerIncome = new SupriceBoxPlot("Travel Times Car", "Day", "tt");
-	private SupriceBoxPlot boxPlotTravelTimesPtPerIncome = new SupriceBoxPlot("Travel Times Pt", "Day", "tt");
+	private SupriceBoxPlot boxPlotTravelDistancesTolledPerIncome = new SupriceBoxPlot("Tolled Travel Distances", "Income", "tolltd");
+	private SupriceBoxPlot boxPlotTravelDistancesCarPerIncome = new SupriceBoxPlot("Travel Distances Car", "Income", "td");	
+	private SupriceBoxPlot boxPlotTravelTimesCarPerIncome = new SupriceBoxPlot("Travel Times Car", "Income", "tt");
+	private SupriceBoxPlot boxPlotTravelTimesPtPerIncome = new SupriceBoxPlot("Travel Times Pt", "Income", "tt");
 	
 	private TreeMap<Id, Double> tollDistancesAgents;
 	
@@ -230,7 +230,7 @@ public class Analyzer {
 		ObjectAttributes tollDistancesAgent = new ObjectAttributes();
 		
 		for (Id id : tollDistancesAgents.keySet()) {
-			tollDistancesAgent.putAttribute(id.toString(), "toll_distance", this.tollDistancesAgents.get(id));
+			tollDistancesAgent.putAttribute(id.toString(), "tolltd", this.tollDistancesAgents.get(id));
 		}
 		
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(tollDistancesAgent);
