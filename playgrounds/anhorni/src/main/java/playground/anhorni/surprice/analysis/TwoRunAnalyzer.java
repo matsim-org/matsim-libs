@@ -49,16 +49,16 @@ public class TwoRunAnalyzer {
 	public void run() {
 		for (String day : Surprice.days) {						
 			ObjectAttributes run0td = new ObjectAttributes();
-			this.readTollDistances(run0td, this.run0path);
+			this.readTollDistances(day, run0td, this.run0path);
 			
 			ObjectAttributes run1td = new ObjectAttributes();
-			this.readTollDistances(run1td, this.run1path);
+			this.readTollDistances(day, run1td, this.run1path);
 			
 			ObjectAttributes run0prefs = new ObjectAttributes();
-			this.readPrefs(run0prefs, this.run0path);
+			this.readPrefs(day, run0prefs, this.run0path);
 			
 			ObjectAttributes run1prefs = new ObjectAttributes();
-			this.readPrefs(run1prefs, this.run1path);	
+			this.readPrefs(day, run1prefs, this.run1path);	
 			
 			ArrayList<Double> alphaDiffA = new ArrayList<Double>();
 			ArrayList<Double> tollDistA = new ArrayList<Double>();
@@ -96,13 +96,13 @@ public class TwoRunAnalyzer {
 		chart.saveAsPng(this.outPath + day + ".DiffAlphaDist", 800, 600);
 	}
 	
-	private void readTollDistances(ObjectAttributes oa, String path) {	
+	private void readTollDistances(String day, ObjectAttributes oa, String path) {	
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/tollDistancesAgent.txt");
+		preferencesReader.parse(path + "/" + day + ".tollDistancesAgent.txt");
 	}
 	
-	private void readPrefs(ObjectAttributes oa, String path) {	
+	private void readPrefs(String day, ObjectAttributes oa, String path) {	
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/prefsAgent.txt");
+		preferencesReader.parse(path + "/" + day + ".prefsAgent.txt");
 	}
 }
