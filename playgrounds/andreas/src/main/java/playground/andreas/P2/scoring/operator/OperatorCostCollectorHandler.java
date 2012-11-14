@@ -50,14 +50,16 @@ public class OperatorCostCollectorHandler implements TransitDriverStartsEventHan
 	private String pIdentifier;
 	private double costPerVehicleAndDay;
 	private double expensesPerMeter;
+	private double expensesPerSecond;
 	
 	private List<OperatorCostContainerHandler> operatorCostContainerHandlerList = new LinkedList<OperatorCostContainerHandler>();
 	private HashMap<Id, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<Id, OperatorCostContainer>();
 	
-	public OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter){
+	public OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond){
 		this.pIdentifier = pIdentifier;
 		this.costPerVehicleAndDay = costPerVehicleAndDay;
 		this.expensesPerMeter = expensesPerMeter;
+		this.expensesPerSecond = expensesPerSecond;
 		log.info("enabled");
 	}
 	
@@ -80,7 +82,7 @@ public class OperatorCostCollectorHandler implements TransitDriverStartsEventHan
 	
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		this.vehId2OperatorCostContainer.put(event.getVehicleId(), new OperatorCostContainer(this.costPerVehicleAndDay, this.expensesPerMeter));
+		this.vehId2OperatorCostContainer.put(event.getVehicleId(), new OperatorCostContainer(this.costPerVehicleAndDay, this.expensesPerMeter, this.expensesPerSecond));
 		this.vehId2OperatorCostContainer.get(event.getVehicleId()).handleTransitDriverStarts(event);
 	}
 
@@ -100,6 +102,7 @@ public class OperatorCostCollectorHandler implements TransitDriverStartsEventHan
 			if(event.getPersonId().toString().contains(this.pIdentifier)){
 				// it's the driver
 				OperatorCostContainer operatorCostContainer = this.vehId2OperatorCostContainer.remove(event.getVehicleId());
+				operatorCostContainer.handleTransitDriverAlights(event);
 				
 				// call all OperatorCostContainerHandler
 				for (OperatorCostContainerHandler operatorCostContainerHandler : this.operatorCostContainerHandlerList) {

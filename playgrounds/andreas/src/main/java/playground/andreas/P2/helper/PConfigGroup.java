@@ -70,6 +70,7 @@ public class PConfigGroup extends Module{
 	private static final String INITIAL_BUDGET = "initialBudget";
 	private static final String COST_PER_VEHICLE_AND_DAY = "costPerVehicleAndDay";
 	private static final String COST_PER_KILOMETER = "costPerKilometer";
+	private static final String COST_PER_HOUR = "costPerHour";
 	private static final String EARNINGS_PER_BOARDING_PASSENGER = "earningsPerBoardingPassenger";
 	private static final String EARNINGS_PER_KILOMETER_AND_PASSENGER = "earningsPerKilometerAndPassenger";
 	private static final String PRICE_PER_VEHICLE_BOUGHT = "pricePerVehicleBought";
@@ -114,6 +115,7 @@ public class PConfigGroup extends Module{
 	private double initialBudget = 0.0;
 	private double costPerVehicleAndDay = 0.0;
 	private double costPerKilometer = 0.30;
+	private double costPerHour = 0.0;
 	private boolean startWith24Hours = false;
 	private double minOperationTime = 6 * 3600;
 	private double earningsPerBoardingPassenger = 0.0;
@@ -183,6 +185,8 @@ public class PConfigGroup extends Module{
 			this.costPerVehicleAndDay = Double.parseDouble(value);
 		} else if (COST_PER_KILOMETER.equals(key)){
 			this.costPerKilometer = Double.parseDouble(value);
+		} else if (COST_PER_HOUR.equals(key)){
+			this.costPerHour = Double.parseDouble(value);
 		} else if (EARNINGS_PER_BOARDING_PASSENGER.equals(key)){
 			this.earningsPerBoardingPassenger = Double.parseDouble(value);
 		} else if (EARNINGS_PER_KILOMETER_AND_PASSENGER.equals(key)){
@@ -263,6 +267,7 @@ public class PConfigGroup extends Module{
 		map.put(PCE, Double.toString(this.passengerCarEquivalents));
 		map.put(COST_PER_VEHICLE_AND_DAY, Double.toString(this.costPerVehicleAndDay));
 		map.put(COST_PER_KILOMETER, Double.toString(this.costPerKilometer));
+		map.put(COST_PER_HOUR, Double.toString(this.costPerHour));
 		map.put(EARNINGS_PER_BOARDING_PASSENGER, Double.toString(this.earningsPerBoardingPassenger));
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, Double.toString(this.earningsPerKilometerAndPassenger));
 		map.put(PRICE_PER_VEHICLE_BOUGHT, Double.toString(this.pricePerVehicleBought));
@@ -314,6 +319,7 @@ public class PConfigGroup extends Module{
 		map.put(DELAY_PER_ALIGHTING_PASSENGER, "The amount of time a vehicle is delayed by one single alighting passenger in seconds.");
 		map.put(COST_PER_VEHICLE_AND_DAY, "cost per vehicle and day - will prevent companies from operating only short periods of a day");
 		map.put(COST_PER_KILOMETER, "cost per vehicle and kilometer travelled");
+		map.put(COST_PER_HOUR, "cost per vehicle and hour in service");
 		map.put(EARNINGS_PER_BOARDING_PASSENGER, "Price an agent has to pay when boarding, regardless how far he will travel");
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, "earnings per passenger kilometer");
 		map.put(PRICE_PER_VEHICLE_BOUGHT, "price of one vehicle bought");
@@ -407,6 +413,10 @@ public class PConfigGroup extends Module{
 	
 	public double getCostPerKilometer() {
 		return this.costPerKilometer;
+	}
+	
+	public double getCostPerHour() {
+		return this.costPerHour;
 	}
 
 	public double getEarningsPerBoardingPassenger() {

@@ -60,7 +60,8 @@ public class ScoreContainer {
 			this.costs += operatorCostContainer.getFixedCostPerDay();
 			this.isFirstTour = false;
 		}
-		this.costs += operatorCostContainer.getRunningCost();
+		this.costs += operatorCostContainer.getRunningCostDistance();
+		this.costs += operatorCostContainer.getRunningCostTime();
 	}
 
 	public double getTotalRevenue(){
