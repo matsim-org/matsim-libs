@@ -27,6 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.roadpricing.RoadPricing;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.analysis.SupriceBoxPlot;
@@ -37,6 +38,7 @@ public class DayControler extends Controler {
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
 	private ObjectAttributes preferences;
+	private ObjectAttributes prefs = new ObjectAttributes();
 		
 	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(config);	
@@ -66,15 +68,19 @@ public class DayControler extends Controler {
 					sff.createNewScoringFunction(p.getSelectedPlan());
 			alpha.add(sff.getAlpha() + sff.getAlphaTrip());
 			gamma.add(sff.getGamma() + sff.getGammaTrip());
+			
+			this.prefs.putAttribute(p.getId().toString(), "alpha", sff.getAlpha() + sff.getAlphaTrip());
+			this.prefs.putAttribute(p.getId().toString(), "gamma", sff.getGamma() + sff.getGammaTrip());
 		}
 		boxPlotPrefs.addValuesPerCategory(alpha, "alpha", "alpha");
 		boxPlotPrefs.addValuesPerCategory(gamma, "gamma", "gamma");
 		boxPlotPrefs.createChart();
-		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename("prefs.png"), 800, 600);	
+		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename(day + "prefs.png"), 800, 600);	
+		
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
+		attributesWriter.writeFile(this.getControlerIO().getOutputFilename(day + ".prefs.txt")); 
 	}
 
-// Man hat es nach der Umstellung zu einer Contrib schliesslich nach 3 Tagen und viel Hilfe doch noch hingekriegt, dass Roadpricing wieder laeuft. 
-// Was fuer ne Leistung! Aber immer schoen im Core rumhacken und sich dabei ausschliesslich auf grossartige 2 Testcases verlassen.
 //	@Override
 //	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 //		

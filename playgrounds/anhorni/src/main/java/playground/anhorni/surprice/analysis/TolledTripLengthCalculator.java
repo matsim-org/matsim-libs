@@ -51,6 +51,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	private Bins tolltdBins;
 	private ObjectAttributes incomes;
 	private TreeMap<Integer, ArrayList<Double>> tollDistances = new TreeMap<Integer, ArrayList<Double>>();
+	private TreeMap<Id, Double> tollDistancesAgents = new TreeMap<Id, Double>(); 
 
 	public TolledTripLengthCalculator(final Network network, final RoadPricingScheme scheme, Bins tolltdBins, ObjectAttributes incomes) {
 		this.scheme = scheme;
@@ -104,6 +105,12 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 			
 			this.sumLengthIncomeWeighted += length.doubleValue() * income;
 			
+			if (this.tollDistancesAgents.get(event.getPersonId()) == null) {
+				this.tollDistancesAgents.put(event.getPersonId(), 0.0);
+			}
+			double prevVal = this.tollDistancesAgents.get(event.getPersonId());
+			this.tollDistancesAgents.put(event.getPersonId(), prevVal + length.doubleValue());
+			
 			if (this.tollDistances.get((int)income) == null) {
 				this.tollDistances.put((int)income, new ArrayList<Double>());
 			}
@@ -122,6 +129,8 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	public void reset(final int iteration) {
 		this.sumLength = 0.0;
 		this.cntTrips = 0;
+		this.tollDistances.clear();
+		this.tollDistancesAgents.clear();
 	}
 
 	public double getAverageTripLength() {
@@ -137,5 +146,9 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 
 	public TreeMap<Integer, ArrayList<Double>> getTollDistances() {
 		return tollDistances;
+	}
+
+	public TreeMap<Id, Double> getTollDistancesAgents() {
+		return tollDistancesAgents;
 	}
 }

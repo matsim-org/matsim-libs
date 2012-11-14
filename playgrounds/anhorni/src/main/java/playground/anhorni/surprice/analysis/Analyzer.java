@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -45,6 +46,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.anhorni.surprice.Surprice;
 
@@ -80,9 +82,10 @@ public class Analyzer {
 	private SupriceBoxPlot boxPlotTravelTimesCarPerIncome = new SupriceBoxPlot("Travel Times Car", "Day", "tt");
 	private SupriceBoxPlot boxPlotTravelTimesPtPerIncome = new SupriceBoxPlot("Travel Times Pt", "Day", "tt");
 	
+	private TreeMap<Id, Double> tollDistancesAgents;
+	
 	private String outPath;
-	
-	
+		
 	public static void main (final String[] args) {		
 		if (args.length != 2) {
 			log.error("Provide correct number of arguments ...");
@@ -99,6 +102,7 @@ public class Analyzer {
 		log.info("config file: " + configFile);
 		log.info("incomes file: " + incomesFile);
 		this.incomes = new ObjectAttributes();
+			
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(this.incomes);
 		preferencesReader.parse(incomesFile);
 		
@@ -188,6 +192,7 @@ public class Analyzer {
 		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();	
 		this.tolltdSumIncomeWeighted[Surprice.days.indexOf(day)] = tollCalculator.getSumLengthIncomeWeighted();
 		this.boxPlotTravelTimes.addValuesPerCategory(ttCalculator.getTravelTimes(), day, "Travel Times");
+		this.tollDistancesAgents = tollCalculator.getTollDistancesAgents();
 		
 		this.computeModesPerIncome();
 		
@@ -198,10 +203,10 @@ public class Analyzer {
 			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
 			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistances().get(i), Integer.toString(i), "tt");
 		}		
-		this.writeDailyPlots(day);
+		this.writeDaily(day);
 	}
 	
-	private void writeDailyPlots(String day) {
+	private void writeDaily(String day) {
 		this.utilityBins.plotBinnedDistribution(outPath, "income", "");
 		this.ttBins.plotBinnedDistribution(outPath, "income", "");
 		this.tdBins.plotBinnedDistribution(outPath, "income", "");
@@ -221,6 +226,15 @@ public class Analyzer {
 				
 		this.boxPlotTravelDistancesTolledPerIncome.createChart();
 		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + ".tolltdPerIncome.png", 800, 600);
+		
+		ObjectAttributes tollDistancesAgent = new ObjectAttributes();
+		
+		for (Id id : tollDistancesAgents.keySet()) {
+			tollDistancesAgent.putAttribute(id.toString(), "toll_distance", this.tollDistancesAgents.get(id));
+		}
+		
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(tollDistancesAgent);
+		attributesWriter.writeFile(outPath + "/" + day + ".tollDistancesAgent.txt");
 	}
 	
 	private void writePlots() {			
