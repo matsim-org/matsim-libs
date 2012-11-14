@@ -70,8 +70,12 @@ public class EmissionUtils {
 				} else{
 					sumOfPollutant = warmPollutant2emissions.get(pollutant);
 				}
-			} else{
+			} else if(coldPollutant2emissions.containsKey(pollutant)){
 				sumOfPollutant = coldPollutant2emissions.get(pollutant);
+			} else {
+				sumOfPollutant = 0.0;
+				logger.warn("Pollutant " + pollutant + " is not found in the emission events file [probably an old file]." +
+						"Therefore setting it to " + sumOfPollutant);
 			}
 			pollutant2sumOfEmissions.put(pollutant, sumOfPollutant);
 		}

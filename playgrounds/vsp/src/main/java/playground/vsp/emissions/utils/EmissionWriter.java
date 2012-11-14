@@ -43,8 +43,8 @@ public class EmissionWriter {
 	
 	private final EmissionUtils emu;
 
-	public EmissionWriter(EmissionUtils emu){
-		this.emu = emu;
+	public EmissionWriter(){
+		this.emu = new EmissionUtils();
 	}
 	
 	public void writeHomeLocation2TotalEmissions(

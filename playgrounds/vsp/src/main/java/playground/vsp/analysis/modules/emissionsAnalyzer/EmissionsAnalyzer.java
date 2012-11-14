@@ -28,7 +28,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +47,13 @@ import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
- * This module requires an emissions events file
- * and calculates the total emissions.
+ * This module requires an emissions events file.
+ * 
+ * It then provides:
+ * - total emissions per emission type
+ * - warm emissions per person and emission type
+ * - cold emissions per person and emission type
+ * - sum of warm and cold emissions per person and emission type
  * 
  * @author ikaddoura, benjamin
  *
@@ -57,14 +61,14 @@ import playground.vsp.emissions.utils.EmissionUtils;
 public class EmissionsAnalyzer extends AbstractAnalyisModule{
 	private final static Logger log = Logger.getLogger(EmissionsAnalyzer.class);
 	private ScenarioImpl scenario;
-	private String emissionEventsFile;
+	private final String emissionEventsFile;
 	private EmissionUtils emissionUtils;
 	private EmissionsPerPersonWarmEventHandler warmHandler;
 	private EmissionsPerPersonColdEventHandler coldHandler;
 	private Map<Id, Map<WarmPollutant, Double>> person2warmEmissions;
 	private Map<Id, Map<ColdPollutant, Double>> person2coldEmissions;
 	private Map<Id, SortedMap<String, Double>> person2totalEmissions;
-	private Map<String, Double> totalEmissions;
+	private SortedMap<String, Double> totalEmissions;
 	
 	public EmissionsAnalyzer(String ptDriverPrefix, String emissionsEventsFile) {
 		super(EmissionsAnalyzer.class.getSimpleName(), ptDriverPrefix);
@@ -104,6 +108,7 @@ public class EmissionsAnalyzer extends AbstractAnalyisModule{
 		this.totalEmissions = this.emissionUtils.getTotalEmissions(this.person2totalEmissions);
 	}
 
+	// TODO: should probably also write out person2totalEmissions...
 	@Override
 	public void writeResults(String outputFolder) {
 		String fileName = outputFolder + "emissions.txt";
@@ -129,6 +134,22 @@ public class EmissionsAnalyzer extends AbstractAnalyisModule{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public SortedMap<String, Double> getTotalEmissions() {
+		return totalEmissions;
+	}
+
+	public Map<Id, Map<WarmPollutant, Double>> getPerson2warmEmissions() {
+		return person2warmEmissions;
+	}
+
+	public Map<Id, Map<ColdPollutant, Double>> getPerson2coldEmissions() {
+		return person2coldEmissions;
+	}
+
+	public Map<Id, SortedMap<String, Double>> getPerson2totalEmissions() {
+		return person2totalEmissions;
 	}
 	
 }

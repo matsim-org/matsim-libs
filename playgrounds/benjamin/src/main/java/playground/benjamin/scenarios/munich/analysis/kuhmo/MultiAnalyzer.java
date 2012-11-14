@@ -39,12 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
-import playground.vsp.emissions.events.EmissionEventsReader;
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
  * @author benjamin
@@ -192,22 +187,13 @@ public class MultiAnalyzer {
 		writer.writeWelfareTollInformation(configFile, pop, personId2Toll);
 	}
 
-	private void calculateEmissionStatisticsByUserGroup(String emissionEventsFile, String runName) {
-		EmissionUtils summarizer = new EmissionUtils();
-
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+	private void calculateEmissionStatisticsByUserGroup(String emissionFile, String runName) {
+		EmissionsAnalyzer ema = new EmissionsAnalyzer(null, emissionFile);
+		ema.init(null);
+		ema.preProcessData();
+		ema.postProcessData();
 		
-		EmissionsPerPersonWarmEventHandler warmHandler = new EmissionsPerPersonWarmEventHandler();
-		EmissionsPerPersonColdEventHandler coldHandler = new EmissionsPerPersonColdEventHandler();
-		
-		eventsManager.addHandler(warmHandler);
-		eventsManager.addHandler(coldHandler);
-		emissionReader.parse(emissionEventsFile);
-
-		Map<Id, Map<WarmPollutant, Double>> person2warmEmissions = warmHandler.getWarmEmissionsPerPerson();
-		Map<Id, Map<ColdPollutant, Double>> person2coldEmissions = coldHandler.getColdEmissionsPerPerson();
-		Map<Id, SortedMap<String, Double>> person2totalEmissions = summarizer.sumUpEmissionsPerId(person2warmEmissions, person2coldEmissions);
+		Map<Id, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
 		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = userGroupUtils.getEmissionsPerGroup(person2totalEmissions);
 
 		writer.setRunName(runName);
