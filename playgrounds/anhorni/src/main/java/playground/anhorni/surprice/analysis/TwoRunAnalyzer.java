@@ -142,7 +142,7 @@ public class TwoRunAnalyzer {
 	
 	private void readTollDistances(String day, ObjectAttributes oa, String path) {	
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/" + day + "/" + day + ".tollDistancesAgents.txt");
+		preferencesReader.parse(path + "/" + day + "/" + day + ".tolltdPerAgent.txt");
 	}
 	
 	private void readTT(String day, ObjectAttributes oa, String path) {	
@@ -152,6 +152,6 @@ public class TwoRunAnalyzer {
 	
 	private void readPrefs(String day, ObjectAttributes oa, String path) {	
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/" + day + "/" + day + ".prefsAgents.txt");
+		preferencesReader.parse(path + "/" + day + "/" + day + ".prefsPerAgent.txt");
 	}
 }

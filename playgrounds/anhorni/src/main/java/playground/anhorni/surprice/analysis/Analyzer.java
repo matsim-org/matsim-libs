@@ -234,7 +234,7 @@ public class Analyzer {
 			tolltdPerAgentOA.putAttribute(id.toString(), "tolltd", this.tolltdPerAgent.get(id));
 		}		
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(tolltdPerAgentOA);
-		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".tollDistancesAgents.txt");
+		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".tolltdPerAgent.txt");
 		
 		ObjectAttributes ttPerAgentOA = new ObjectAttributes();		
 		for (Id id : ttPerAgent.keySet()) {
