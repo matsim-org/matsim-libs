@@ -49,7 +49,7 @@ public class CreateToll {
     	tollWriter.writeFile(path + "/tolls.xml");	
     }
     
-    public void createLinkTolling(String path, NetworkImpl network, double startTime, double endTime, double amount, String type, String desc) { 	    	
+    public void createLinkTolling(String path, NetworkImpl network, Zone tollZone, double startTime, double endTime, double amount, String type, String desc) { 	    	
     	RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
     	scheme.setType(type);
     	scheme.setName("surprice");
@@ -59,7 +59,7 @@ public class CreateToll {
     	
     	// add links of center area
     	for (Link link : network.getLinks().values()) {
-    		if (link.getFreespeed() >= 60.0 / 3.6) {
+    		if (link.getFreespeed() >= 60.0 / 3.6 && tollZone.getlinksInZone().contains(link.getId())) {
     			scheme.addLink(link.getId());
     		}
     	} 

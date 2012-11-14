@@ -187,6 +187,7 @@ public class CreateScenario {
 				this.incomeCategoryFrequencies[income - 1] = this.incomeCategoryFrequencies[income - 1] + 1;
 			}
 		}
+		br.close();
 	}
 	
 	private void normalizeIncomes(TreeMap<Double, Integer> mapNormalized) {
@@ -213,26 +214,26 @@ public class CreateScenario {
 					);
 		}
 		
+		// dummy zone
+		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
+		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
+		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
+			if (bellevue.calcDistance(facility.getCoord()) < radius) {
+				tollZone.addFacility(facility);
+			}
+		}
+		
 		CreateToll tollCreator = new CreateToll();
 		tollCreator.createLinkTolling(
 				outPath, 
 				network,
+				tollZone,
 				6.0 * 3600.0,
 				20.0 * 3600.0,
 				1.0,
 				"link",
 				"ZH scenario"); 
-		
-//		// dummy zone
-//		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
-//		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
-
-//		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
-//			if (bellevue.calcDistance(facility.getCoord()) < radius) {
-//				tollZone.addFacility(facility);
-//			}
-//		}
-//		
+				
 //		CreateToll tollCreator = new CreateToll();
 //		tollCreator.create(
 //				outPath, 
