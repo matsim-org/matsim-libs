@@ -225,14 +225,17 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 					List<Frequency> frequencies = trip.getFrequencies();
 					if (frequencies != null){
 						if (frequencies.size() > 0){
+							int currentDepartureId = 0;
 							for (Frequency f : frequencies){
+								int interval = f.getSecondsPerDeparture();
+								if (interval == 0)
+									continue; // skip frequencies with no intervael.
+								
 								double currentTime = (double)(f.getStartTime().getTime() / 1000.0);
 								double endTime = (double)(f.getEndTime().getTime() / 1000.0);
-								int interval = f.getSecondsPerDeparture();
-								int i = 0;
 								
-								while (currentTime < endTime){
-									tRoute.addDeparture(schedFact.createDeparture(new IdImpl(i++), currentTime));
+								while (currentTime < endTime){									
+									tRoute.addDeparture(schedFact.createDeparture(new IdImpl(currentDepartureId++), currentTime));
 									currentTime += interval;
 								}
 							}

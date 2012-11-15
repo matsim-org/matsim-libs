@@ -52,7 +52,6 @@ public class GTFSSystem {
 			"trip_id",
 			"trip_headsign",
 			"direction_id",
-			"block_id",
 			"shape_id"});
 	private static final List<String> stopTimesFileHeaders = Arrays.asList(new String[]
 			{"trip_id",
@@ -62,8 +61,7 @@ public class GTFSSystem {
 			"stop_sequence",
 			"stop_headsign",
 			"pickup_type",
-			"drop_off_type",
-			"shape_dist_traveled"});
+			"drop_off_type"});
 	private static final List<String> routesFileHeaders = Arrays.asList(new String[]
 			{"route_id",
 			"agency_id",

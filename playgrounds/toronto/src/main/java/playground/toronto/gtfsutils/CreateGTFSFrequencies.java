@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 
-import javax.swing.JFileChooser;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -51,7 +49,7 @@ public class CreateGTFSFrequencies {
 	private static HashMap<IdImpl, String> routeIdNameMap;
 	private static HashSet<IdImpl> tripGroupsWithOneTrip;
 	
-	private static void loadFiles(String folder) throws FileNotFoundException, IOException{
+	private static void loadFiles(String folder, int service) throws FileNotFoundException, IOException{
 		
 		routeIdNameMap = new HashMap<IdImpl, String>();
 		trips = new HashMap<IdImpl, CreateGTFSFrequencies.Trip>();
@@ -71,12 +69,15 @@ public class CreateGTFSFrequencies {
 		tr.open();
 		tr.ignoreTrailingBlanks(true);
 		while (tr.next()){
+			int svc = Integer.parseInt(tr.current().get("service_id"));
+			if (svc != service) continue;
+			
 			Trip T = new Trip(new IdImpl(tr.current().get("trip_id")));
 			T.dir = tr.current().get("direction_id");
 			T.shape = tr.current().get("shape_id");
 			T.routeId = new IdImpl(tr.current().get("route_id"));
 			T.headsign = tr.current().get("trip_headsign");
-			T.serviceId = tr.current().get("service_id");
+			T.serviceId = "" + svc;
 			trips.put(T.id, T);
 		}
 		tr.close();
@@ -88,7 +89,7 @@ public class CreateGTFSFrequencies {
 		tr.ignoreTrailingBlanks(true);
 		while(tr.next()){
 			IdImpl tpId = new IdImpl(tr.current().get("trip_id"));
-			if (!trips.containsKey(tpId)) throw new IOException("Trip \"" + tpId.toString() + "\" could not be found! This is a problem with the data.");
+			if (!trips.containsKey(tpId)) continue;//throw new IOException("Trip \"" + tpId.toString() + "\" could not be found! This is a problem with the data.");
 			Trip T = trips.get(tpId);
 
 			double dep = Time.parseTime(tr.current().get("departure_time"));
@@ -183,11 +184,13 @@ public class CreateGTFSFrequencies {
 			for (int i = 2; i < tps.size(); i++){
 				Trip T = tps.get(i);
 				double dep = T.departure;
-				int hdwy = (int) (dep - prevDep);
+				int hdwy = (int) (dep - prevDep);			
+				
 				if (hdwy != prevHdwy){
 					//Headway has changed. Complete the current frequency period, and add it to the list.
 					f.endTime = dep;
 					f.headway = prevHdwy;
+					
 					frequencies.put(f.id, f);
 					
 					f = new Period(new IdImpl(currentPeriod++));
@@ -292,15 +295,8 @@ public class CreateGTFSFrequencies {
 	
 	public static void main(String[] args){
 
-		String folder = "";
-		JFileChooser fc = new JFileChooser();
-		fc.setDialogTitle("Please select a folder containing GTFS files");
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		int state = fc.showOpenDialog(null);
-		if (state == JFileChooser.APPROVE_OPTION){
-			folder = fc.getSelectedFile().getAbsolutePath();
-		}else if (state == JFileChooser.CANCEL_OPTION) return;
-		if (folder == "" || folder == null) return;
+		String folder = args[0];
+		int serviceId = Integer.parseInt(args[1]);
 		
 		//Don't want to overwrite an existing frequencies file.
 		if (new File(folder + "/frequencies.txt").exists()) {
@@ -311,7 +307,7 @@ public class CreateGTFSFrequencies {
 		try {
 			
 			///////////////////////////////////////////
-			loadFiles(folder);
+			loadFiles(folder, serviceId);
 			///////////////////////////////////////////
 			
 		} catch (FileNotFoundException e1) {
