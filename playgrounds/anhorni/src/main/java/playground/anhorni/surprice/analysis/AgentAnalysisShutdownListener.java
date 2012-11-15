@@ -27,7 +27,12 @@ public class AgentAnalysisShutdownListener implements ShutdownListener {
 		for (Person person : population.getPersons().values()) {
 			oa.putAttribute(person.getId().toString(), day + ".alpha_tot", person.getCustomAttributes().get(day + ".alpha_tot"));
 			oa.putAttribute(person.getId().toString(), day + ".gamma_tot", person.getCustomAttributes().get(day + ".gamma_tot"));
-			oa.putAttribute(person.getId().toString(), day + ".tollScore", person.getCustomAttributes().get(day + ".tollScore"));
+			if (person.getCustomAttributes().get(day + ".tollScore") != null) {
+				oa.putAttribute(person.getId().toString(), day + ".tollScore", person.getCustomAttributes().get(day + ".tollScore"));
+			}
+			else {
+				oa.putAttribute(person.getId().toString(), day + ".tollScore", 0.0);
+			}
 			oa.putAttribute(person.getId().toString(), day + ".actScore", person.getCustomAttributes().get(day + ".actScore"));
 			oa.putAttribute(person.getId().toString(), day + ".legScore", person.getCustomAttributes().get(day + ".legScore"));							
 		}
