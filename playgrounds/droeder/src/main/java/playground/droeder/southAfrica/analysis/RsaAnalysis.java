@@ -24,7 +24,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import playground.vsp.analysis.modules.ptAccessibility.PtAccesibilityMain;
+import playground.vsp.analysis.modules.ptAccessibility.PtAccesibility;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -116,7 +116,7 @@ public class RsaAnalysis {
 		activities.add("l5");
 		activityCluster.put("leisure", activities);	
 		
-		PtAccesibilityMain ptAcces = new PtAccesibilityMain(sc, cluster, activityCluster);
+		PtAccesibility ptAcces = new PtAccesibility(sc, cluster, activityCluster);
 		ptAcces.preProcessData();
 		ptAcces.postProcessData();
 		new File(dir.getOutputPath() + "/ptAcces/").mkdirs();
