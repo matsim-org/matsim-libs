@@ -197,8 +197,7 @@ public class Analyzer {
 		this.ttPerAgent = ttCalculator.getTtPerAgent();
 		
 		this.computeModesPerIncome();
-		
-		
+				
 		for (int i = 0; i < 9; i++) {
 			this.boxPlotTravelTimesCarPerIncome.addValuesPerCategory(ttCalculator.getCar().get(i), Integer.toString(i), "tt");
 			this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPt().get(i), Integer.toString(i), "tt");
@@ -242,6 +241,8 @@ public class Analyzer {
 		}		
 		attributesWriter = new ObjectAttributesXmlWriter(ttPerAgentOA);
 		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".ttPerAgent.txt");
+				
+		this.writeAgents(day);
 	}
 	
 	private void writePlots() {			
@@ -293,11 +294,21 @@ public class Analyzer {
 			}
 		}
 	}
+	
+	private void writeAgents(String day) {
+		ObjectAttributes oa = new ObjectAttributes();			
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(oa);
+					
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			oa.putAttribute(person.getId().toString(), "toll", person.getCustomAttributes().get("toll"));
+			oa.putAttribute(person.getId().toString(), "actScore", person.getCustomAttributes().get("actScore"));
+			oa.putAttribute(person.getId().toString(), "legScore", person.getCustomAttributes().get("legScore"));
+		}
+		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".perAgent.txt");
+	}
 			
-	private void write() {
-		
-		this.writePlots();
-		
+	private void write() {		
+		this.writePlots();		
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt")); 

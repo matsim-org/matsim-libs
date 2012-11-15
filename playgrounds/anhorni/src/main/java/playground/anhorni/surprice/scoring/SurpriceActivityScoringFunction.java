@@ -132,6 +132,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
 		}
+		plan.getPerson().getCustomAttributes().put("actScore", tmpScore);
 		return tmpScore;
 	}
 	

@@ -65,13 +65,13 @@ public class TwoRunAnalyzer {
 			
 			this.writePlots(day, run0prefs, run1prefs, run0td, run1td, "alpha", "tolltd", "tolltd_alpha_Diff", 10.0 * 1000.0);
 					
-//			ObjectAttributes run0tt = new ObjectAttributes();
-//			this.readTT(day, run0tt, this.run0path);
-//			
-//			ObjectAttributes run1tt = new ObjectAttributes();
-//			this.readTT(day, run1tt, this.run1path);
-//			
-//			this.writePlots(day, run0prefs, run1prefs, run0td, run1td, "alpha", "tt", "tt_alpha_dDiff", 3600.0);		
+			ObjectAttributes run0tt = new ObjectAttributes();
+			this.readTT(day, run0tt, this.run0path);
+			
+			ObjectAttributes run1tt = new ObjectAttributes();
+			this.readTT(day, run1tt, this.run1path);
+			
+			this.writePlots(day, run0prefs, run1prefs, run0td, run1td, "alpha", "tt", "tt_alpha_dDiff", 3600.0);		
 			
 		}	
 		log.info("=================== Finished analyses ====================");

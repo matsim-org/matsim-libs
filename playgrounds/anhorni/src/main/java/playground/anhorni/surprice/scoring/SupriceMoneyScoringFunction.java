@@ -19,6 +19,7 @@
 
 package playground.anhorni.surprice.scoring;
 
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -29,13 +30,15 @@ public class SupriceMoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	private static final double INITIAL_SCORE = 0.0;
 	private double gamma;
+	private PersonImpl person;
 
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 
-	public SupriceMoneyScoringFunction(final CharyparNagelScoringParameters params, double gamma) {
+	public SupriceMoneyScoringFunction(final CharyparNagelScoringParameters params, double gamma, PersonImpl person) {
 		this.params = params;
 		this.gamma = gamma;
+		this.person = person;
 		this.reset();
 	}
 
@@ -46,7 +49,8 @@ public class SupriceMoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	@Override
 	public void addMoney(final double amount) {
-		this.score += this.gamma * amount * this.params.marginalUtilityOfMoney ; // linear mapping of money to score
+		this.score += this.gamma * amount * this.params.marginalUtilityOfMoney; // linear mapping of money to score
+		this.person.getCustomAttributes().put("toll", this.gamma * amount * this.params.marginalUtilityOfMoney);
 	}
 
 	@Override

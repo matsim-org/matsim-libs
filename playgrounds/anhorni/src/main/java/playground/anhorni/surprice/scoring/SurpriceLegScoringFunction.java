@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
@@ -38,6 +39,7 @@ import playground.anhorni.surprice.Surprice;
 public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 	protected double score;
+	private PersonImpl person;
 	private double lastTime;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
@@ -65,7 +67,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
 
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
-    		String day, double alpha, double gamma, double alphaTrip, double gammaTrip) {
+    		String day, double alpha, double gamma, double alphaTrip, double gammaTrip, PersonImpl person) {
 		this.params = params;
         this.network = network;
         this.config = config;
@@ -81,6 +83,8 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     	this.constantPt = this.params.constantPt;
     	this.constantBike = this.params.constantBike;
     	this.constantWalk = this.params.constantWalk; 
+    	
+    	this.person = person;
         
 		this.reset();		
 				
@@ -179,6 +183,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			Math.max(this.gamma + this.gammaTrip, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantCar;
 		}
+		person.getCustomAttributes().put("legScore", tmpScore);
 		return tmpScore;
 	}
 
