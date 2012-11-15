@@ -69,7 +69,7 @@ public class RsaRunner {
 			configFile = args[0];
 			fixedSubMode = Boolean.parseBoolean(args[1]);
 		}else{
-			log.error("no config Found...");
+			log.error("need 2 args (String:configFile Boolean:routeOnSameMode ...");
 			System.exit(1);
 		}
 		

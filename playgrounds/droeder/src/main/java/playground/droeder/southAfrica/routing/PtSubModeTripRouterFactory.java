@@ -56,22 +56,39 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	private static final Logger log = Logger
 			.getLogger(PtSubModeTripRouterFactory.class);
 	
-	private final Config config;
-	private final Network network;
-	private final TravelDisutilityFactory travelDisutilityFactory;
-	private final TravelTime travelTime;
-	private final LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
-	private final ModeRouteFactory modeRouteFactory;
-	private final PopulationFactory populationFactory;
-	private final TransitRouterFactory transitRouterFactory;
-	private final TransitSchedule transitSchedule;
+	private Config config;
+	private Network network;
+	private TravelDisutilityFactory travelDisutilityFactory;
+	private TravelTime travelTime;
+	private LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
+	private ModeRouteFactory modeRouteFactory;
+	private PopulationFactory populationFactory;
+	private TransitRouterFactory transitRouterFactory;
+	private TransitSchedule transitSchedule;
+
+	private Controler controler;
 
 	/**
 	 * based on {@link TripRouterFactoryImpl}. Own Implementation is just necessary to add pt-submodes.
 	 * @param controler
 	 */
 	public PtSubModeTripRouterFactory(final Controler controler) {
-		// TODO[dr] adapt changes from PTripRouterFactoryImpl constructor and createTripRouter, especially line 195
+		// TODO[dr] adapt changes from PTripRouterFactoryImpl constructor and createTripRouter, especially line 195. Should be fixed by now
+		this.controler = controler;
+//		this.config = controler.getScenario().getConfig();
+//		this.network = controler.getScenario().getNetwork();
+//		this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
+//		this.travelTime = controler.getTravelTimeCalculator();
+//		this.leastCostPathAlgorithmFactory = controler.getLeastCostPathCalculatorFactory();
+//		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+//		this.populationFactory = controler.getScenario().getPopulation().getFactory();
+//		this.transitRouterFactory = controler.getTransitRouterFactory();
+//		this.transitSchedule = controler.getScenario().getTransitSchedule();
+	}
+	
+	@Override
+	public TripRouter createTripRouter() {
+		
 		this.config = controler.getScenario().getConfig();
 		this.network = controler.getScenario().getNetwork();
 		this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
@@ -81,10 +98,8 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		this.populationFactory = controler.getScenario().getPopulation().getFactory();
 		this.transitRouterFactory = controler.getTransitRouterFactory();
 		this.transitSchedule = controler.getScenario().getTransitSchedule();
-	}
-	
-	@Override
-	public TripRouter createTripRouter() {
+		
+		
 		TripRouter tripRouter = new TripRouter();
 		
 		PlansCalcRouteConfigGroup routeConfigGroup = config.plansCalcRoute();
