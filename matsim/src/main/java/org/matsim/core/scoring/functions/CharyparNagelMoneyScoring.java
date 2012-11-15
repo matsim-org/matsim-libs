@@ -31,17 +31,20 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
  */
 public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring {
 
-	protected double score;
-
 	private static final double INITIAL_SCORE = 0.0;
 
-	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	private double score;
+
+	private final double marginalUtilityOfMoney;
 
 	public CharyparNagelMoneyScoring(final CharyparNagelScoringParameters params) {
-		this.params = params;
+		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
 		this.reset();
+	}
 
+	public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+		this.reset();
 	}
 
 	@Override
@@ -51,12 +54,11 @@ public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring {
 
 	@Override
 	public void addMoney(final double amount) {
-		this.score += amount * this.params.marginalUtilityOfMoney ; // linear mapping of money to score
+		this.score += amount * this.marginalUtilityOfMoney ; // linear mapping of money to score
 	}
 
 	@Override
 	public void finish() {
-
 	}
 
 	@Override
