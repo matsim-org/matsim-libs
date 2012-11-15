@@ -689,39 +689,41 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		@Override
 		public void endTag(final String name, final String content, final Stack<String> context) {
 			if ("way".equals(name)) {
-				boolean used = false;
-				OsmHighwayDefaults osmHighwayDefaults = OsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
-				if (osmHighwayDefaults != null) {
-					int hierarchy = osmHighwayDefaults.hierarchy;
-					this.currentWay.hierarchy = hierarchy;
-					if (OsmNetworkReader.this.hierarchyLayers.isEmpty()) {
-						used = true;
-					}
-					if (this.collectNodes) {
-						used = true;
-					} else {
-						for (OsmFilter osmFilter : OsmNetworkReader.this.hierarchyLayers) {
-							for (Long nodeId : this.currentWay.nodes) {
-								OsmNode node = this.nodes.get(nodeId);
-								if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
-									used = true;
+				if (!this.currentWay.nodes.isEmpty()) {
+					boolean used = false;
+					OsmHighwayDefaults osmHighwayDefaults = OsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
+					if (osmHighwayDefaults != null) {
+						int hierarchy = osmHighwayDefaults.hierarchy;
+						this.currentWay.hierarchy = hierarchy;
+						if (OsmNetworkReader.this.hierarchyLayers.isEmpty()) {
+							used = true;
+						}
+						if (this.collectNodes) {
+							used = true;
+						} else {
+							for (OsmFilter osmFilter : OsmNetworkReader.this.hierarchyLayers) {
+								for (Long nodeId : this.currentWay.nodes) {
+									OsmNode node = this.nodes.get(nodeId);
+									if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
+										used = true;
+										break;
+									}
+								}
+								if (used) {
 									break;
 								}
 							}
-							if (used) {
-								break;
-							}
 						}
 					}
-				}
-				if (used) {
-					if (this.collectNodes) {
-						for (long id : this.currentWay.nodes) {
-							this.nodes.put(id, new OsmNode(id, new CoordImpl(0, 0)));
+					if (used) {
+						if (this.collectNodes) {
+							for (long id : this.currentWay.nodes) {
+								this.nodes.put(id, new OsmNode(id, new CoordImpl(0, 0)));
+							}
+						} else if (this.loadWays) {
+							this.ways.put(this.currentWay.id, this.currentWay);
+							this.wayCounter.incCounter();
 						}
-					} else if (this.loadWays) {
-						this.ways.put(this.currentWay.id, this.currentWay);
-						this.wayCounter.incCounter();
 					}
 				}
 				this.currentWay = null;

@@ -254,4 +254,56 @@ public class OsmNetworkReaderTest {
 		Assert.assertEquals(40.0/3.6, link3.getFreespeed(), 1e-8);
 		Assert.assertEquals(60.0/3.6, link5.getFreespeed(), 1e-8);
 	}
+
+	/**
+	 * Tests that the conversion does not fail if a way does not contain any node. This might
+	 * happen if the osm-file was edited, e.g. with JOSM, and a link was deleted. Then, the way 
+	 * still exists, but marked as deleted, and all nodes removed from it.
+	 * Reported by jjoubert,15nov2012. 
+	 */
+	@Test
+	public void testConversion_emptyWay() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network net = sc.getNetwork();
+		CoordinateTransformation ct = new IdentityTransformation();
+		
+		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
+		reader.setKeepPaths(true);
+		reader.setHighwayDefaults(1, "motorway", 1, 50.0/3.6, 1.0, 2000.0);
+		
+		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+				"<osm version=\"0.6\" generator=\"Osmosis 0.36\">\n" +
+				"  <bound box=\"0,0,90,180\" origin=\"0.37-SNAPSHOT\"/>\n" +
+				"  <node id=\"1\" lat=\"10.0\" lon=\"60.0\"/>\n" +
+				"  <node id=\"2\" lat=\"15.0\" lon=\"90.0\"/>\n" +
+				"  <node id=\"3\" lat=\"20.0\" lon=\"120.0\"/>\n" +
+				"  <node id=\"4\" lat=\"25.0\" lon=\"90.0\"/>\n" +
+				"  <node id=\"5\" lat=\"30.0\" lon=\"60.0\"/>\n" +
+				"  <way id=\"1\" version=\"6\" timestamp=\"2010-10-14T12:34:56Z\" uid=\"9876\" user=\"MATSim\" changeset=\"123456789\">\n" +
+				"    <nd ref=\"1\"/>\n" +
+				"    <nd ref=\"2\"/>\n" +
+				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
+				"  </way>\n" +
+				"  <way id=\"2\" version=\"6\" timestamp=\"2010-10-14T12:34:56Z\" uid=\"9876\" user=\"MATSim\" changeset=\"123456789\">\n" +
+				"    <nd ref=\"2\"/>\n" +
+				"    <nd ref=\"3\"/>\n" +
+				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
+				"  </way>\n" +
+				"  <way id=\"3\" version=\"6\" timestamp=\"2010-10-14T12:34:56Z\" uid=\"9876\" user=\"MATSim\" changeset=\"123456789\">\n" +
+				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
+				"  </way>\n" +
+				"</osm>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+		
+		/* this creates 4 links:
+		 * - links 1 & 2: for way 1, in both directions
+		 * - links 3 & 4: for way 2, in both directions
+		 */
+		
+		Link link1 = net.getLinks().get(new IdImpl("1"));
+		Link link3 = net.getLinks().get(new IdImpl("3"));
+		Assert.assertNotNull("Could not find converted link 1.", link1);
+		Assert.assertNotNull("Could not find converted link 3", link3);
+		Assert.assertNull(net.getLinks().get(new IdImpl("5")));
+	}
 }
