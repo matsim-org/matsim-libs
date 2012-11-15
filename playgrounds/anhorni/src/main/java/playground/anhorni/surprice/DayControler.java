@@ -24,6 +24,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
 
@@ -72,7 +73,8 @@ public class DayControler extends Controler {
 		//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!
 	  	this.addControlerListener(new Memorizer(this.memories, this.day));
 	  	this.addControlerListener(new ModeSharesControlerListener("times"));
-	  	this.addControlerListener(new ModeSharesControlerListener("distances"));
+	  	this.addControlerListener(new ModeSharesControlerListener("distances"));  	
+	  	this.addControlerListener(new AgentAnalysisShutdownListener(this.day, this.getControlerIO().getOutputPath()));
 	  	
 	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 	  		this.addControlerListener(new RoadPricing());

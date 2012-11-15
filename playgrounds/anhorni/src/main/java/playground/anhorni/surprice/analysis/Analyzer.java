@@ -71,6 +71,7 @@ public class Analyzer {
 	private Bins tolltdBins;
 	
 	private ObjectAttributes incomes;
+	private ObjectAttributes attributes;
 	
 	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
 	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
@@ -88,21 +89,27 @@ public class Analyzer {
 	private String outPath;
 		
 	public static void main (final String[] args) {		
-		if (args.length != 2) {
+		if (args.length != 3) {
 			log.error("Provide correct number of arguments ...");
 			System.exit(-1);
 		}
 		String configFile = args[0];
 		String incomesFile = args[1];
+		String attributesFile = args[2];
 		Analyzer analyzer = new Analyzer();
-		analyzer.init(configFile, incomesFile);
+		analyzer.init(configFile, incomesFile, attributesFile);
 		analyzer.run();	
 	}
 		
-	public void init(String configFile, String incomesFile) {
+	public void init(String configFile, String incomesFile, String attributesFile) {
 		log.info("config file: " + configFile);
 		log.info("incomes file: " + incomesFile);
+		log.info("attributes file " + attributesFile);
 		this.incomes = new ObjectAttributes();
+		this.attributes = new ObjectAttributes();
+		
+		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.attributes);
+		attributesReader.parse(attributesFile);
 			
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(this.incomes);
 		preferencesReader.parse(incomesFile);
@@ -227,8 +234,24 @@ public class Analyzer {
 				
 		this.boxPlotTravelDistancesTolledPerIncome.createChart();
 		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tolltdPerIncome.png", 800, 600);
-						
+		
 		this.writeAgents(day);
+	}
+	
+	private void writeAgents(String day) {							
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {					
+			this.attributes.putAttribute(person.getId().toString(), day + ".tt", this.ttPerAgent.get(person.getId()));
+			
+			if (this.tolltdPerAgent.get(person.getId()) != null) {
+				attributes.putAttribute(person.getId().toString(), day + ".tolltd", this.tolltdPerAgent.get(person.getId()));
+			}
+			else {
+				attributes.putAttribute(person.getId().toString(), day + ".tolltd", 0.0);
+			}
+		}
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.attributes);
+		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".perAgent.txt");
+		
 	}
 	
 	private void writePlots() {			
@@ -281,27 +304,7 @@ public class Analyzer {
 		}
 	}
 	
-	private void writeAgents(String day) {
-		ObjectAttributes oa = new ObjectAttributes();			
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(oa);
-					
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			oa.putAttribute(person.getId().toString(), day + ".alpha_tot", person.getCustomAttributes().get(day + ".alpha_tot"));
-			oa.putAttribute(person.getId().toString(), day + ".gamma_tot", person.getCustomAttributes().get(day + ".gamma_tot"));
-			oa.putAttribute(person.getId().toString(), day + ".tollScore", person.getCustomAttributes().get(day + ".tollScore"));
-			oa.putAttribute(person.getId().toString(), day + ".actScore", person.getCustomAttributes().get(day + ".actScore"));
-			oa.putAttribute(person.getId().toString(), day + ".legScore", person.getCustomAttributes().get(day + ".legScore"));							
-			oa.putAttribute(person.getId().toString(), day + ".tt", this.ttPerAgent.get(person.getId()));
-			
-			if (this.tolltdPerAgent.get(person.getId()) != null) {
-				oa.putAttribute(person.getId().toString(), day + ".tolltd", person.getCustomAttributes().get(day + ".tolltd"));
-			}
-			else {
-				oa.putAttribute(person.getId().toString(), day + ".tolltd", 0.0);
-			}
-		}
-		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".perAgent.txt");
-	}
+	
 			
 	private void write() {		
 		this.writePlots();		
