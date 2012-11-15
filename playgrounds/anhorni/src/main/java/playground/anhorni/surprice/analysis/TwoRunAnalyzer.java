@@ -51,28 +51,16 @@ public class TwoRunAnalyzer {
 	
 	public void run() {
 		for (String day : Surprice.days) {	
-			ObjectAttributes run0prefs = new ObjectAttributes();
-			this.readPrefs(day, run0prefs, this.run0path);
+			ObjectAttributes run0 = new ObjectAttributes();
+			ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(run0);
+			preferencesReader.parse(this.run0path + "/" + day + "/" + day + ".perAgent.txt");
 			
-			ObjectAttributes run1prefs = new ObjectAttributes();
-			this.readPrefs(day, run1prefs, this.run1path);
-					
-			ObjectAttributes run0td = new ObjectAttributes();
-			this.readTollDistances(day, run0td, this.run0path);
-			
-			ObjectAttributes run1td = new ObjectAttributes();
-			this.readTollDistances(day, run1td, this.run1path);
-			
-			this.writePlots(day, run0prefs, run1prefs, run0td, run1td, "alpha", "tolltd", "tolltd_alpha_Diff", 10.0 * 1000.0);
-					
-			ObjectAttributes run0tt = new ObjectAttributes();
-			this.readTT(day, run0tt, this.run0path);
-			
-			ObjectAttributes run1tt = new ObjectAttributes();
-			this.readTT(day, run1tt, this.run1path);
-			
-			this.writePlots(day, run0prefs, run1prefs, run0td, run1td, "alpha", "tt", "tt_alpha_dDiff", 3600.0);		
-			
+			ObjectAttributes run1 = new ObjectAttributes();
+			preferencesReader = new ObjectAttributesXmlReader(run1);
+			preferencesReader.parse(this.run1path + "/" + day + "/" + day + ".perAgent.txt");
+											
+			this.writePlots(day, run0, run1, day + ".alpha", day + ".tolltd", day + ".tolltd_alpha_Diff", 10.0 * 1000.0);						
+			this.writePlots(day, run0, run1, day + ".alpha", day + ".tt", day + ".tt_alpha_dDiff", 3600.0);					
 		}	
 		log.info("=================== Finished analyses ====================");
 	}
@@ -80,8 +68,8 @@ public class TwoRunAnalyzer {
 	/*
 	 * y can be limited!
 	 */
-	private void writePlots(String day, ObjectAttributes run0x, ObjectAttributes run1x,
-		ObjectAttributes run0y, ObjectAttributes run1y, String xName, String yName, String fileName, double range) {
+	private void writePlots(String day, ObjectAttributes run0, ObjectAttributes run1, 
+			String xName, String yName, String fileName, double range) {
 				
 		ArrayList<Double> xDiffA = new ArrayList<Double>();
 		ArrayList<Double> yDiffA = new ArrayList<Double>();
@@ -89,29 +77,85 @@ public class TwoRunAnalyzer {
 		TreeMap<Id, Double> yDiffsPerAgent = new TreeMap<Id, Double>();
 		TreeMap<Id, Double> xDiffsPerAgent = new TreeMap<Id, Double>();
 		
-		boolean cont = true;
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			double yDiff = 0.0;
-			if (run1y.getAttribute(p.getId().toString(), yName) != null) {
-				yDiff = (Double) run1y.getAttribute(p.getId().toString(), yName);
-				cont = false;
-			}
-			if (run0y.getAttribute(p.getId().toString(), yName) != null) {
-				yDiff -= (Double) run0y.getAttribute(p.getId().toString(), yName);
-				cont = false;
-			}
-			if (cont) continue;	
+			double yDiff = (Double) run1.getAttribute(p.getId().toString(), yName) -
+					(Double) run0.getAttribute(p.getId().toString(), yName);
 			yDiffA.add(yDiff);
 			
-			double xDiff = (Double) run1x.getAttribute(p.getId().toString(), xName) -
-					(Double) run0x.getAttribute(p.getId().toString(), xName);
+			double xDiff = (Double) run1.getAttribute(p.getId().toString(), xName) -
+					(Double) run0.getAttribute(p.getId().toString(), xName);
 			xDiffA.add(xDiff);	
 			yDiffsPerAgent.put(p.getId(), yDiff);
 			xDiffsPerAgent.put(p.getId(), xDiff);
 		}
 		this.write(day, xDiffA, yDiffA, fileName, range, xName, yName);
 		this.writeDiffsPerAgent(day, xDiffsPerAgent, yDiffsPerAgent, fileName + "PerAgent", xName, yName);
-	}
+	}	
+
+	
+//	public void run() {
+//		for (String day : Surprice.days) {	
+//			ObjectAttributes run0prefs = new ObjectAttributes();
+//			this.readPrefs(day, run0prefs, this.run0path);
+//			
+//			ObjectAttributes run1prefs = new ObjectAttributes();
+//			this.readPrefs(day, run1prefs, this.run1path);
+//					
+//			ObjectAttributes run0td = new ObjectAttributes();
+//			this.readTollDistances(day, run0td, this.run0path);
+//			
+//			ObjectAttributes run1td = new ObjectAttributes();
+//			this.readTollDistances(day, run1td, this.run1path);
+//			
+//			this.writePlots(day, run0prefs, run1prefs, run0td, run1td, "alpha", "tolltd", "tolltd_alpha_Diff", 10.0 * 1000.0);
+//					
+//			ObjectAttributes run0tt = new ObjectAttributes();
+//			this.readTT(day, run0tt, this.run0path);
+//			
+//			ObjectAttributes run1tt = new ObjectAttributes();
+//			this.readTT(day, run1tt, this.run1path);
+//			
+//			this.writePlots(day, run0prefs, run1prefs, run0td, run1td, "alpha", "tt", "tt_alpha_dDiff", 3600.0);		
+//			
+//		}	
+//		log.info("=================== Finished analyses ====================");
+//	}
+//	
+//	/*
+//	 * y can be limited!
+//	 */
+//	private void writePlots(String day, ObjectAttributes run0x, ObjectAttributes run1x,
+//		ObjectAttributes run0y, ObjectAttributes run1y, String xName, String yName, String fileName, double range) {
+//				
+//		ArrayList<Double> xDiffA = new ArrayList<Double>();
+//		ArrayList<Double> yDiffA = new ArrayList<Double>();
+//		
+//		TreeMap<Id, Double> yDiffsPerAgent = new TreeMap<Id, Double>();
+//		TreeMap<Id, Double> xDiffsPerAgent = new TreeMap<Id, Double>();
+//		
+//		boolean cont = true;
+//		for (Person p : this.scenario.getPopulation().getPersons().values()) {
+//			double yDiff = 0.0;
+//			if (run1y.getAttribute(p.getId().toString(), yName) != null) {
+//				yDiff = (Double) run1y.getAttribute(p.getId().toString(), yName);
+//				cont = false;
+//			}
+//			if (run0y.getAttribute(p.getId().toString(), yName) != null) {
+//				yDiff -= (Double) run0y.getAttribute(p.getId().toString(), yName);
+//				cont = false;
+//			}
+//			if (cont) continue;	
+//			yDiffA.add(yDiff);
+//			
+//			double xDiff = (Double) run1x.getAttribute(p.getId().toString(), xName) -
+//					(Double) run0x.getAttribute(p.getId().toString(), xName);
+//			xDiffA.add(xDiff);	
+//			yDiffsPerAgent.put(p.getId(), yDiff);
+//			xDiffsPerAgent.put(p.getId(), xDiff);
+//		}
+//		this.write(day, xDiffA, yDiffA, fileName, range, xName, yName);
+//		this.writeDiffsPerAgent(day, xDiffsPerAgent, yDiffsPerAgent, fileName + "PerAgent", xName, yName);
+//	}
 		
 	private void write(String day, ArrayList<Double> xDiffA, ArrayList<Double> yDiffA, String fileName, double range,
 			String xName, String yName) {		
@@ -138,20 +182,5 @@ public class TwoRunAnalyzer {
 		}		
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(diffsPerAgentOA);
 		attributesWriter.writeFile(this.outPath + "/" + day + "." + fileName + ".txt");
-	}
-	
-	private void readTollDistances(String day, ObjectAttributes oa, String path) {	
-		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/" + day + "/" + day + ".tolltdPerAgent.txt");
-	}
-	
-	private void readTT(String day, ObjectAttributes oa, String path) {	
-		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/" + day + "/" + day + ".ttPerAgent.txt");
-	}
-	
-	private void readPrefs(String day, ObjectAttributes oa, String path) {	
-		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(oa);
-		preferencesReader.parse(path + "/" + day + "/" + day + ".prefsPerAgent.txt");
 	}
 }
