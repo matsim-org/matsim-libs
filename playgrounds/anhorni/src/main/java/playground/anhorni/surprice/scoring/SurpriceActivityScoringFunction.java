@@ -187,7 +187,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	
 	@Override
 	public void reset() {
-		this.plan.getPerson().getCustomAttributes().put(day + ".actScore", null);
+		if (this.plan != null) this.plan.getPerson().getCustomAttributes().put(day + ".actScore", null);
 		super.reset();		
 	}
 }
