@@ -31,26 +31,32 @@ public class SupriceMoneyScoringFunction implements MoneyScoring, BasicScoring {
 	private static final double INITIAL_SCORE = 0.0;
 	private double gamma;
 	private PersonImpl person;
-
-	/** The parameters used for scoring */
+	private String day;
 	protected final CharyparNagelScoringParameters params;
 
-	public SupriceMoneyScoringFunction(final CharyparNagelScoringParameters params, double gamma, PersonImpl person) {
+	public SupriceMoneyScoringFunction(final CharyparNagelScoringParameters params, double gamma, PersonImpl person, String day) {
 		this.params = params;
 		this.gamma = gamma;
 		this.person = person;
+		this.day = day;
 		this.reset();
 	}
 
 	@Override
 	public void reset() {
 		this.score = INITIAL_SCORE;
+		this.person.getCustomAttributes().put(day + ".tollScore", null);
 	}
 
 	@Override
 	public void addMoney(final double amount) {
 		this.score += this.gamma * amount * this.params.marginalUtilityOfMoney; // linear mapping of money to score
-		this.person.getCustomAttributes().put("toll", this.gamma * amount * this.params.marginalUtilityOfMoney);
+		
+		double prevVal = 0.0;
+		if (this.person.getCustomAttributes().get(day + ".tollScore") != null) {
+			prevVal = (Double)this.person.getCustomAttributes().get(day + ".tollScore");
+		}		
+		this.person.getCustomAttributes().put(day + ".tollScore", prevVal + this.gamma * amount * this.params.marginalUtilityOfMoney);
 	}
 
 	@Override

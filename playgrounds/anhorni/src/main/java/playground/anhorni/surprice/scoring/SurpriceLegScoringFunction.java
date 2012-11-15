@@ -119,6 +119,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
 		this.score = INITIAL_SCORE;
+		this.person.getCustomAttributes().put(day + ".legScore", null);
 	}
 
 	@Override
@@ -183,7 +184,11 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			Math.max(this.gamma + this.gammaTrip, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantCar;
 		}
-		person.getCustomAttributes().put("legScore", tmpScore);
+		double prevVal = 0.0;
+		if (this.person.getCustomAttributes().get(day + ".legScore") != null) {
+			prevVal = (Double)this.person.getCustomAttributes().get(day + ".legScore");
+		}
+		person.getCustomAttributes().put(day + ".legScore", prevVal + tmpScore);
 		return tmpScore;
 	}
 

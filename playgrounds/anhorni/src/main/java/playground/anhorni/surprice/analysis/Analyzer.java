@@ -227,21 +227,7 @@ public class Analyzer {
 				
 		this.boxPlotTravelDistancesTolledPerIncome.createChart();
 		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tolltdPerIncome.png", 800, 600);
-		
-		ObjectAttributes tolltdPerAgentOA = new ObjectAttributes();		
-		for (Id id : tolltdPerAgent.keySet()) {
-			tolltdPerAgentOA.putAttribute(id.toString(), "tolltd", this.tolltdPerAgent.get(id));
-		}		
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(tolltdPerAgentOA);
-		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".tolltdPerAgent.txt");
-		
-		ObjectAttributes ttPerAgentOA = new ObjectAttributes();		
-		for (Id id : ttPerAgent.keySet()) {
-			ttPerAgentOA.putAttribute(id.toString(), "tt", this.ttPerAgent.get(id));
-		}		
-		attributesWriter = new ObjectAttributesXmlWriter(ttPerAgentOA);
-		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".ttPerAgent.txt");
-				
+						
 		this.writeAgents(day);
 	}
 	
@@ -300,9 +286,19 @@ public class Analyzer {
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(oa);
 					
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			oa.putAttribute(person.getId().toString(), "toll", person.getCustomAttributes().get("toll"));
-			oa.putAttribute(person.getId().toString(), "actScore", person.getCustomAttributes().get("actScore"));
-			oa.putAttribute(person.getId().toString(), "legScore", person.getCustomAttributes().get("legScore"));
+			oa.putAttribute(person.getId().toString(), day + ".alpha_tot", person.getCustomAttributes().get(day + ".alpha_tot"));
+			oa.putAttribute(person.getId().toString(), day + ".gamma_tot", person.getCustomAttributes().get(day + ".gamma_tot"));
+			oa.putAttribute(person.getId().toString(), day + ".tollScore", person.getCustomAttributes().get(day + ".tollScore"));
+			oa.putAttribute(person.getId().toString(), day + ".actScore", person.getCustomAttributes().get(day + ".actScore"));
+			oa.putAttribute(person.getId().toString(), day + ".legScore", person.getCustomAttributes().get(day + ".legScore"));							
+			oa.putAttribute(person.getId().toString(), day + ".tt", this.ttPerAgent.get(person.getId()));
+			
+			if (this.tolltdPerAgent.get(person.getId()) != null) {
+				oa.putAttribute(person.getId().toString(), day + ".tolltd", person.getCustomAttributes().get(day + ".tolltd"));
+			}
+			else {
+				oa.putAttribute(person.getId().toString(), day + ".tolltd", 0.0);
+			}
 		}
 		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".perAgent.txt");
 	}

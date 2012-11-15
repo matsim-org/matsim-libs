@@ -132,7 +132,11 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		if ((minimalDuration >= 0) && (duration < minimalDuration)) {
 			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
 		}
-		plan.getPerson().getCustomAttributes().put("actScore", tmpScore);
+		double prevVal = 0.0;
+		if (this.plan.getPerson().getCustomAttributes().get(day + ".actScore") != null) {
+			prevVal = (Double)this.plan.getPerson().getCustomAttributes().get(day + ".actScore");
+		}
+		this.plan.getPerson().getCustomAttributes().put(day + ".actScore", prevVal + tmpScore);
 		return tmpScore;
 	}
 	
@@ -179,5 +183,11 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
 		}
 		return openInterval;
+	}
+	
+	@Override
+	public void reset() {
+		super.reset();
+		this.plan.getPerson().getCustomAttributes().put(day + ".actScore", null);
 	}
 }

@@ -19,17 +19,12 @@
 
 package playground.anhorni.surprice;
 
-import java.util.ArrayList;
-
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
-import playground.anhorni.surprice.analysis.SupriceBoxPlot;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
 
 public class DayControler extends Controler {
@@ -37,7 +32,6 @@ public class DayControler extends Controler {
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
 	private ObjectAttributes preferences;
-	private ObjectAttributes prefs = new ObjectAttributes();
 		
 	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(config);	
@@ -46,39 +40,12 @@ public class DayControler extends Controler {
 		this.day = day;
 		this.preferences = preferences;
 	} 
-		
-	protected void setUp() {
-	    super.setUp();		  	
-	  	this.printPrefs();
-	}
-	
+			
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		return new SurpriceScoringFunctionFactory(
 	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
 	}
 	
-	private void printPrefs() {
-		SupriceBoxPlot boxPlotPrefs = new SupriceBoxPlot("Prefs", "pref", "prefs");
-		ArrayList<Double> alpha = new ArrayList<Double>();
-		ArrayList<Double> gamma = new ArrayList<Double>();
-		
-		for (Person p : this.population.getPersons().values()) {
-			SurpriceScoringFunctionFactory sff = (SurpriceScoringFunctionFactory) this.getScoringFunctionFactory();
-					sff.createNewScoringFunction(p.getSelectedPlan());
-			alpha.add(sff.getAlpha() + sff.getAlphaTrip());
-			gamma.add(sff.getGamma() + sff.getGammaTrip());
-			
-			this.prefs.putAttribute(p.getId().toString(), "alpha", sff.getAlpha() + sff.getAlphaTrip());
-			this.prefs.putAttribute(p.getId().toString(), "gamma", sff.getGamma() + sff.getGammaTrip());
-		}
-		boxPlotPrefs.addValuesPerCategory(alpha, "alpha", "alpha");
-		boxPlotPrefs.addValuesPerCategory(gamma, "gamma", "gamma");
-		boxPlotPrefs.createChart();
-		boxPlotPrefs.saveAsPng(this.getControlerIO().getOutputFilename("prefs.png"), 800, 600);	
-		
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.prefs);
-		attributesWriter.writeFile(this.getControlerIO().getOutputFilename("prefsAgents.txt")); 
-	}
 
 //	@Override
 //	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
