@@ -31,7 +31,7 @@ public class AgentAnalysisShutdownListener implements ShutdownListener {
 			oa.putAttribute(person.getId().toString(), day + ".actScore", person.getCustomAttributes().get(day + ".actScore"));
 			oa.putAttribute(person.getId().toString(), day + ".legScore", person.getCustomAttributes().get(day + ".legScore"));							
 		}
-		attributesWriter.writeFile(outPath + "/" + day + "/" + day + ".perAgent.txt");
+		attributesWriter.writeFile(outPath + "/" + day + ".perAgent.txt");
 	}
 
 }
