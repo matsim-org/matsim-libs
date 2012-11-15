@@ -216,8 +216,8 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		try {
 			URL url = new URL(systemId);
       URLConnection urlConn = url.openConnection();
-      urlConn.setConnectTimeout(8000);
-      urlConn.setReadTimeout(8000);
+      urlConn.setConnectTimeout(5000);
+      urlConn.setReadTimeout(5000);
       urlConn.setAllowUserInteraction(false);         
 
       InputStream is = urlConn.getInputStream();
@@ -227,7 +227,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			return new InputSource(is);
 		} catch (IOException e) {
 			// There was a problem getting the (remote) file, just show the error as information for the user
-			log.warn(e.toString() + ". May not be fatal." ) ;
+			log.info(e.toString() + ". May not be fatal, will try to load it locally.");
 		}
 		// systemId could not be resolved, try it locally
 		if (this.localDtdBase != null) {
