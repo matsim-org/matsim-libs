@@ -54,14 +54,14 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
 			ActivityFacilities facilities, double alpha, double alphaTrip, String day) {
 		super(params);
-		super.reset();
-		this.params = params;
-		this.config = config;
 		this.alpha = alpha;
 		this.alphaTrip = alphaTrip;
 		this.facilities = facilities;
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
+		this.params = params;
+		this.config = config;
+		super.reset();				
 	}
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
@@ -187,7 +187,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	
 	@Override
 	public void reset() {
-		super.reset();
 		this.plan.getPerson().getCustomAttributes().put(day + ".actScore", null);
+		super.reset();		
 	}
 }
