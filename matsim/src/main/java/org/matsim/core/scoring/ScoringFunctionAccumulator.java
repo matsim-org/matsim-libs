@@ -65,11 +65,11 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		void endLeg(final double time);
 	}
 	
-	public interface MoneyScoring {
+	public interface MoneyScoring extends BasicScoring {
 		void addMoney(final double amount);
 	}
 
-	public interface AgentStuckScoring {
+	public interface AgentStuckScoring extends BasicScoring {
 		void agentStuck(final double time);
 	}
 	
