@@ -213,7 +213,6 @@ public class IdentifiableArrayMapTest {
 		Map<Id, TO> map = new IdentifiableArrayMap<TO>();
 		Id id1 = new IdImpl(1);
 		Id id2 = new IdImpl(2);
-		Id id2b = new IdImpl(2);
 		Id id3 = new IdImpl(3);
 		
 		TO to1 = new TO(id1);

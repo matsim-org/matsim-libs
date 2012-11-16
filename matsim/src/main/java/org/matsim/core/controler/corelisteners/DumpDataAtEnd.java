@@ -38,15 +38,14 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 public class DumpDataAtEnd implements ShutdownListener {
 
-	Scenario scenarioData;
+	private final Scenario scenarioData;
 
-	OutputDirectoryHierarchy controlerIO;
+	private final OutputDirectoryHierarchy controlerIO;
 
 	public DumpDataAtEnd(Scenario scenarioData, OutputDirectoryHierarchy controlerIO) {
 		this.scenarioData = scenarioData;
@@ -56,12 +55,6 @@ public class DumpDataAtEnd implements ShutdownListener {
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		// dump plans
-		Knowledges kk ;
-		if (scenarioData.getConfig().scenario().isUseKnowledges()) {
-			kk = ((ScenarioImpl) scenarioData).getKnowledges();
-		} else {
-			kk = ((ScenarioImpl) scenarioData).retrieveNotEnabledKnowledges() ;
-		}
 		new PopulationWriter(scenarioData.getPopulation(), scenarioData.getNetwork()).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		// dump network
 		new NetworkWriter(scenarioData.getNetwork()).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
@@ -70,16 +63,14 @@ public class DumpDataAtEnd implements ShutdownListener {
 		// dump facilities
 		ActivityFacilities facilities = ((ScenarioImpl) scenarioData).getActivityFacilities();
 		if (facilities != null) {
-			new FacilitiesWriter((ActivityFacilitiesImpl) facilities)
-			.write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
+			new FacilitiesWriter((ActivityFacilitiesImpl) facilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
 		}
 		if (((NetworkFactoryImpl) scenarioData.getNetwork().getFactory()).isTimeVariant()) {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
 					((NetworkImpl) scenarioData.getNetwork()).getNetworkChangeEvents());
 		}
 		if (scenarioData.getConfig().scenario().isUseHouseholds()) {
-			new HouseholdsWriterV10(((ScenarioImpl) scenarioData).getHouseholds())
-			.writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
+			new HouseholdsWriterV10(((ScenarioImpl) scenarioData).getHouseholds()).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
 		}
 		if (scenarioData.getConfig().scenario().isUseLanes()) {
 			new LaneDefinitionsWriter20(scenarioData.getScenarioElement(LaneDefinitions20.class)).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
@@ -90,7 +81,5 @@ public class DumpDataAtEnd implements ShutdownListener {
 			IOUtils.copyFile(fromFile, toFile);
 		}
 	}
-
-
 
 }

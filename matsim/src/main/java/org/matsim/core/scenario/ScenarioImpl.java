@@ -218,15 +218,6 @@ public class ScenarioImpl implements Scenario {
 		}
 		return this.knowledges;
 	}
-	
-	/**
-	 * This method is there since the population reader tries to retrieve this even when it is not enabled.  
-	 * Thus one always gets the above warning.  I would assume that it has something to do with backwards
-	 * compatibility (knowledges were used in the KIT project).  kai, mar'12
-	 */
-	public Knowledges retrieveNotEnabledKnowledges() {
-		return this.knowledges ;
-	}
 
 	@Override
 	public TransitSchedule getTransitSchedule() {

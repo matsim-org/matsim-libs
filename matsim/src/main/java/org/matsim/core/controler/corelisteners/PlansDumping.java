@@ -28,8 +28,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.knowledges.Knowledges;
 
 /**
  * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the
@@ -66,7 +64,6 @@ public class PlansDumping implements BeforeMobsimListener {
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-//		Controler controler = event.getControler();
 		if ( calledViaOldConstructor ) {
 			this.sc = event.getControler().getScenario() ;
 			this.firstIteration = event.getControler().getFirstIteration() ;
@@ -78,14 +75,6 @@ public class PlansDumping implements BeforeMobsimListener {
 				|| (event.getIteration() == (firstIteration + 1)))) {
 			stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
-			Knowledges k = null ;
-			if ( sc.getConfig().scenario().isUseKnowledges() ) {
-				k = ((ScenarioImpl) sc).getKnowledges();
-			} else {
-				k = ((ScenarioImpl) sc).retrieveNotEnabledKnowledges();
-				// seems that this call is there for some backwards compatibility ... reading knowledges into the
-				// population even when knowledges is not enabled.  kai, mar'12
-			}
 			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");
