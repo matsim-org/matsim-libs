@@ -121,6 +121,12 @@ public class MyController extends AbstractController {
 		this.eventsManager.addHandler(legTimes);
 		run(config);
 	}
+	
+	@Override
+	protected boolean continueIterations(int iteration) {
+		return ( iteration <= config.controler().getLastIteration() ) ;
+	}
+
 
 	public static void main(String[] args) {
 		MyController myController = new MyController();

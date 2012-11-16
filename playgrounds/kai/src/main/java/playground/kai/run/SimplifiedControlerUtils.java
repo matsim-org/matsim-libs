@@ -161,4 +161,8 @@ public class SimplifiedControlerUtils {
 		qSim.run();
 	}
 
+	public static boolean continueIterationsDefault(Config config, int iteration) {
+		return ( iteration <= config.controler().getLastIteration() );
+	}
+
 }

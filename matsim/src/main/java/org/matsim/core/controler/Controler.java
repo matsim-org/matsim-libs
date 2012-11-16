@@ -49,12 +49,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -295,7 +295,7 @@ public class Controler extends AbstractController {
 	}
 
 	/**
-	 * Starts the simulation.
+	 * Starts the iterations.
 	 */
 	public void run() {
 		checkConfigConsistencyAndWriteToLog("Complete config dump directly after reading the config file.  " +
@@ -321,6 +321,26 @@ public class Controler extends AbstractController {
 		loadData();
 		run(config);
 	}
+	
+	public static interface TerminationCriterion {
+		boolean continueIterations( int iteration ) ;
+	}
+	
+	TerminationCriterion terminationCriterion = null ;
+	
+	public void setTerminationCriterion(TerminationCriterion terminationCriterion) {
+		this.terminationCriterion = terminationCriterion;
+	}
+
+	@Override
+	protected boolean continueIterations(int it) {
+		if ( terminationCriterion == null ) {
+			return (it <= config.controler().getLastIteration() ) ;
+		} else {
+			return terminationCriterion.continueIterations(it) ;
+		}
+	}
+
 
 	/**
 	 * Design decisions:

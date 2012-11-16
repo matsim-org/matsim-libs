@@ -190,6 +190,11 @@ public class KnSimplifiedController extends AbstractController {
 	protected void runMobSim(int iteration) {
 		SimplifiedControlerUtils.runMobsimDefault(scenario, events, iteration, controlerIO );
 	}
+	
+	@Override
+	protected boolean continueIterations(int iteration) {
+		return SimplifiedControlerUtils.continueIterationsDefault(config,iteration) ;
+	}
 
 
 	

@@ -87,7 +87,7 @@ public abstract class AbstractController {
 		this.controlerListenerManager.fireControlerStartupEvent();
 		this.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
 		prepareForSim();
-		doIterations(config.controler().getFirstIteration(), config.controler().getLastIteration(), config.global().getRandomSeed());
+		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
 		shutdown(false);
 	}
 	
@@ -108,12 +108,22 @@ public abstract class AbstractController {
 	
 	protected abstract void prepareForSim();
 	
-	private void doIterations(int firstIteration, int lastIteration, long rndSeed) {
+	/**
+	 * Stopping criterion for iterations.  Design thoughts:<ul>
+	 * <li> AbstractController only controls process, not content.  Stopping iterations controls process based on content.
+	 * All such coupling methods are abstract; thus this one has to be abstract, too.
+	 * <li> One can see this confirmed in the KnSimplifiedControler use case, where the function is delegated to a static
+	 * method in the SimplifiedControllerUtils class ... as with all other abstract methods.
+	 * </ul>
+	 */
+	protected abstract boolean continueIterations( int iteration ) ;
+	
+	private void doIterations(int firstIteration, long rndSeed) {
 
 		String divider = "###################################################";
 		String marker = "### ";
 
-		for (int iteration = firstIteration; iteration <= lastIteration; iteration++ ) {
+		for (int iteration = firstIteration; continueIterations(iteration) ; iteration++ ) {
 			this.stopwatch.setCurrentIteration(iteration) ;
 
 			log.info(divider);

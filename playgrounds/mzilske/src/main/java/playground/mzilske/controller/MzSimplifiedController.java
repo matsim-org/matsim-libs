@@ -253,5 +253,9 @@ public class MzSimplifiedController extends AbstractController {
 		Mobsim sim = simulation;
 		sim.run();
 	}
+	@Override
+	protected boolean continueIterations(int iteration) {
+		return ( iteration <= config.controler().getLastIteration() ) ;
+	}
 
 }

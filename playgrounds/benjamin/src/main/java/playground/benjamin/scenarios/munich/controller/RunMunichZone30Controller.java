@@ -268,4 +268,9 @@ public class RunMunichZone30Controller extends AbstractController {
 		this.ptRoutingNetwork = ptRoutingNetwork;
 	}
 
+	@Override
+	protected boolean continueIterations(int iteration) {
+		return ( iteration <= config.controler().getLastIteration() ) ;
+	}
+
 }
