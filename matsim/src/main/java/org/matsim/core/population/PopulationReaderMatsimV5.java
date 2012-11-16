@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -77,7 +76,6 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final static String ATTR_LEG_DEPTIME = "dep_time";
 	private final static String ATTR_LEG_TRAVTIME = "trav_time";
 	private final static String ATTR_LEG_ARRTIME = "arr_time";
-	private final static String ATTR_ROUTE_TYPE = "type";
 
 	private final static String VALUE_YES = "yes";
 	private final static String VALUE_NO = "no";
@@ -94,10 +92,6 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private String routeDescription = null;
 
 	private ActivityImpl prevAct = null;
-
-	private final static Logger log = Logger.getLogger(PopulationReaderMatsimV5.class);
-
-	private int warnPlanTypeCount = 0;
 
 	public PopulationReaderMatsimV5(final Scenario scenario) {
 		this.scenario = scenario;

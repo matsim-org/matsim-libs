@@ -53,7 +53,6 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 	private CyclicBarrier simStepEndBarrier;
 	private CyclicBarrier iterationEndBarrier;
 	private CyclicBarrier waitForEmptyQueuesBarrier;
-	private Thread[] threads;
 	private ProcessEventsRunnable[] runnables;
 	private EventsManager[] eventsManagers;
 	private EventsManager delegate;
@@ -189,14 +188,12 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 		uncaughtExceptionHandler = new ExceptionHandler(hadException, waitForEmptyQueuesBarrier, 
 				simStepEndBarrier, iterationEndBarrier);
 		
-		threads = new Thread[numOfThreads];
 		runnables = new ProcessEventsRunnable[numOfThreads];
 		for (int i = 0; i < numOfThreads; i++) {
 			ProcessEventsRunnable processEventsRunnable = new ProcessEventsRunnable(eventsManagers[i], processedEventsChecker,
 					waitForEmptyQueuesBarrier, simStepEndBarrier, iterationEndBarrier, eventsQueues.get(i), eventsQueues.get(i + 1));
 			runnables[i] = processEventsRunnable;
 			Thread thread = new Thread(processEventsRunnable);
-			threads[i] = thread;
 			thread.setDaemon(true);
 			thread.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 			thread.setName(ProcessEventsRunnable.class.toString() + i);

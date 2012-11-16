@@ -23,8 +23,6 @@ package org.matsim.core.api.experimental.events;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.core.api.experimental.events.Event;
-
 public abstract class Event {
 
 	public final static String ATTRIBUTE_TIME = "time";

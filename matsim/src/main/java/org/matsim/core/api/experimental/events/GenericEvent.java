@@ -22,8 +22,6 @@ package org.matsim.core.api.experimental.events;
 
 import java.util.Map;
 
-import org.matsim.core.api.experimental.events.GenericEvent;
-
 /**
  * @author nagel
  *

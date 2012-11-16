@@ -17,11 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  *
@@ -42,14 +42,14 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private int userDefined;
 	private int type;
 	private double colorval;
-	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE ;
+	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE;
 	private int intX;
 	private int intY;
-	private static int offset = 100 ;
+	private static int offset = 100;
 
 	public TeleportationVisData(double now, Id personId, Coord fromCoord, Coord toCoord, double travelTime ) {
 		this.starttime = now;
-		this.agentId = personId ;
+		this.agentId = personId;
 		this.startX = fromCoord.getX();
 		this.startY = fromCoord.getY();
 		double endX = toCoord.getX();
@@ -62,12 +62,12 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		this.normalY = dY / euclideanLength;
 		this.currentX = startX;
 		this.currentY = startY;
-		String idstr = personId.toString() ;
-		int hashCode = idstr.hashCode() ;
-		intX = hashCode%offset ;
-		hashCode -= intX ;
-		hashCode /= offset ;
-		intY = hashCode%offset ;
+		String idstr = personId.toString();
+		int hashCode = idstr.hashCode();
+		intX = hashCode%offset;
+		hashCode -= intX;
+		hashCode /= offset;
+		intY = hashCode%offset;
 	}
 
 	@Override
@@ -87,52 +87,52 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 
 	public void calculatePosition(double time) {
 		double step = (time - starttime) * this.stepsize;
-		this.currentX = this.startX + (step * this.normalX) + 0.1*(intX-offset/2) ;
-		this.currentY = this.startY  + (step * this.normalY) + 0.1*(intY-offset/2) ;
+		this.currentX = this.startX + (step * this.normalX) + 0.1*(intX-offset/2);
+		this.currentY = this.startY  + (step * this.normalY) + 0.1*(intY-offset/2);
 	}
 
 	@Override
 	public AgentState getAgentState() {
-		return this.state ;
+		return this.state;
 	}
 
 	@Override
 	public double getAzimuth() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public double getColorValueBetweenZeroAndOne() {
-		return this.colorval ;
+		return this.colorval;
 	}
 
 	@Override
 	public int getType() {
-		return this.type ;
+		return this.type;
 	}
 
 	@Override
 	public int getUserDefined() {
-		return this.userDefined ;
+		return this.userDefined;
 	}
 
 	@Override
 	public void setAgentState(AgentState state) {
-		this.state = state ;
+		this.state = state;
 	}
 
 	@Override
 	public void setColorValueBetweenZeroAndOne(double tmp) {
-		this.colorval = tmp ;
+		this.colorval = tmp;
 	}
 
 	@Override
 	public void setType(int tmp) {
-		this.type = tmp ;
+		this.type = tmp;
 	}
 
 	@Override
 	public void setUserDefined(int tmp) {
-		this.userDefined = tmp ;
+		this.userDefined = tmp;
 	}
 }
