@@ -20,16 +20,23 @@
 package playground.acmarmol.utils;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.StringUtils;
+
+import playground.acmarmol.matsim2030.microcensus2010.MZ2010ToXmlFiles;
 
 /**
  * @author mrieser
  */
 public abstract class MyCollectionUtils {
+	
+	private final static Logger log = Logger.getLogger(MyCollectionUtils.class);
 
 	public static final String idSetToString(final Set<Id> values) {
 		boolean isFirst = true;
@@ -112,5 +119,16 @@ public abstract class MyCollectionUtils {
 		   return result;
 		
 		}
+
+	public static final void printMap(Map mp) {
+	    Iterator it = mp.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pairs = (Map.Entry)it.next();
+	        it.remove(); // avoids a ConcurrentModificationException
+	    }
+	}
+	
 	
 }
+
+

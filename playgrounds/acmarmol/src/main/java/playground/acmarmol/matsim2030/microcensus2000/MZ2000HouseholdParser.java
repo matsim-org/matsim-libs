@@ -21,14 +21,9 @@ package playground.acmarmol.matsim2030.microcensus2000;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.households.IncomeImpl;
-import org.matsim.households.Income.IncomePeriod;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
@@ -87,7 +82,7 @@ public class MZ2000HouseholdParser {
 		
 		//household weight 
 		String hh_weight = entries[1];
-		householdAttributes.putAttribute(hhnr, "weight", hh_weight);
+		householdAttributes.putAttribute(hhnr, MZConstants.HOUSEHOLD_WEIGHT, hh_weight);
 		
 		//household size
 		//String size = entries[76].trim();
@@ -124,42 +119,42 @@ public class MZ2000HouseholdParser {
 		
 		//municipality BFS number
 		String municipality =  entries[5].trim();
-		householdAttributes.putAttribute(hhnr, "municipality", municipality);
+		householdAttributes.putAttribute(hhnr, MZConstants.MUNICIPALITY, municipality);
 		
 		//number of cars
 		String nr_cars = entries[27];
 		if(nr_cars.equals("-2")){nr_cars = MZConstants.NO_ANSWER;}
 		else if(nr_cars.equals("-1")){nr_cars = MZConstants.NOT_KNOWN;}
 		else if(nr_cars.equals("7")){nr_cars = "more than 6";}
-		householdAttributes.putAttribute(hhnr, "total cars ", nr_cars);
+		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_CARS, nr_cars);
 		
 		//number of motorcycles
 		String nr_mcycles = entries[28];
 		if(nr_mcycles.equals("-2")){nr_mcycles = MZConstants.NO_ANSWER;}
 		else if(nr_mcycles.equals("-1")){nr_mcycles = MZConstants.NOT_KNOWN;}
 		else if(nr_mcycles.equals("7")){nr_mcycles = "more than 6";}
-		householdAttributes.putAttribute(hhnr, "total motorcycles ", nr_mcycles);
+		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_MOTORCYCLES, nr_mcycles);
 		
 		//number of small motorcycles
 		String nr_smcycles = entries[29];
 		if(nr_smcycles.equals("-2")){nr_smcycles = MZConstants.NO_ANSWER;}
 		else if(nr_smcycles.equals("-1")){nr_smcycles = MZConstants.NOT_KNOWN;}
 		else if(nr_smcycles.equals("-1")){nr_smcycles = "more than 6";}
-		householdAttributes.putAttribute(hhnr, "total small motorcycles ", nr_smcycles);
+		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_SMALL_MOTORCYCLES, nr_smcycles);
 		
 		//number of mofa
 		String nr_mofas = entries[30];
 		if(nr_mofas.equals("-2")){nr_mofas = MZConstants.NO_ANSWER;}
 		else if(nr_mofas.equals("-1")){nr_mofas = MZConstants.NOT_KNOWN;}
 		else if(nr_mofas.equals("7")){nr_mofas = "more than 6";}
-		householdAttributes.putAttribute(hhnr, "total mofas ", nr_mofas);
+		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_MOFAS, nr_mofas);
 		
 		//number of bicycles
 		String nr_bikes = entries[31];
 		if(nr_bikes.equals("-2")){nr_bikes = MZConstants.NO_ANSWER;}
 		else if(nr_bikes.equals("-1")){nr_bikes = MZConstants.NOT_KNOWN;}
 		else if(nr_bikes.equals("7")){nr_bikes = "more than 6";}
-		householdAttributes.putAttribute(hhnr, "total bicycles", nr_bikes);
+		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_BYCICLES, nr_bikes);
 		
 		// creating matsim household
 		Household hh = households.getFactory().createHousehold(new IdImpl(hhnr));

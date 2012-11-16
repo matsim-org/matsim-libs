@@ -10,8 +10,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -21,6 +23,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -70,8 +73,19 @@ public class TimeSeriesInfoExtractor {
 				
 		String inputBase = "C:/local/marmolea/input/Activity Chains Forecast/";
 		String outputBase = "C:/local/marmolea/output/Activity Chains Forecast/";
-		final int[] COHORTS = {1990,1985,1980,1975,1970,1965,1960,1955,1950,1945,1940,0};
-		final String[] COHORTS_STRINGS =  {"1990-1994"  ,"1985-1989","1980-1984","1975-1979","1970-1974","1965-1969","1960-1964","1955-1959","1950-1954","1945-1949","1940-1944","<1940"};
+		
+		
+		//final int[] COHORTS = {1990,1980,1970,1960,1950,1940,1930,1910,0};
+		//final String[] COHORTS_STRINGS =  {"1990-1999","1980-1989","1970-1979","1960-1969","1950-1959","1940-1949","1930-1939","1910-1929","<1910"};
+				
+		final int[] COHORTS = {2000,1990,1980,1970,1960,1950,1940,1930,1920,1910,0};
+		final String[] COHORTS_STRINGS =  {">1999","1990-1999","1980-1989","1970-1979","1960-1969","1950-1959","1940-1949","1930-1939","1920-1929","1910-1919","<1910"};
+		
+		//5-year cohorts
+		//final int[] COHORTS = {1990,1985,1980,1975,1970,1965,1960,1955,1950,1945,1940,0};
+		//final String[] COHORTS_STRINGS =  {"1990-1994"  ,"1985-1989","1980-1984","1975-1979","1970-1974","1965-1969","1960-1964","1955-1959","1950-1954","1945-1949","1940-1944","<1940"};
+		
+		
 		final int[] AGE_GROUPS = {25,45,65,Integer.MAX_VALUE};
 		final String[] AGE_GROUPS_STRINGS = {"18-24","25-44","45-64","65+"};
 		
@@ -81,6 +95,8 @@ public class TimeSeriesInfoExtractor {
 		
 		populationInputFile = inputBase + "population.03.itnr.MZ2000.xml";
 		populationAttributesInputFile = inputBase + "populationAttributes.04.itnr.MZ2000.xml";
+		//populationInputFile = inputBase + "population.03.MZ2000.xml";
+		//populationAttributesInputFile = inputBase + "populationAttributes.04.MZ2000.xml";
 		householdAttributesInputFile = inputBase + "householdAttributes.03.MZ2000.xml";
 		TimeSeriesInfoExtractor extractorMZ2000 = new TimeSeriesInfoExtractor(populationInputFile,populationAttributesInputFile,householdAttributesInputFile, 2000, COHORTS, COHORTS_STRINGS,  AGE_GROUPS, AGE_GROUPS_STRINGS);	
 		
@@ -94,10 +110,9 @@ public class TimeSeriesInfoExtractor {
 		householdAttributesInputFile = inputBase + "householdAttributes.04.MZ2010.xml";
 		TimeSeriesInfoExtractor extractorMZ2010 = new TimeSeriesInfoExtractor(populationInputFile,populationAttributesInputFile,householdAttributesInputFile, 2010, COHORTS, COHORTS_STRINGS,  AGE_GROUPS, AGE_GROUPS_STRINGS);	
 
-		extractorMZ2000.extractAndPrint(outputBase + "TimeSeriesInfoMZ2000.txt");
+		//extractorMZ2000.extractAndPrint(outputBase + "TimeSeriesInfoMZ2000.txt");
 		extractorMZ2005.extractAndPrint(outputBase + "TimeSeriesInfoMZ2005.txt");
-		extractorMZ2010.extractAndPrint(outputBase + "TimeSeriesInfoMZ2010.txt");
-		
+		extractorMZ2010.extractAndPrint(outputBase + "TimeSeriesInfoMZ2010.txt");		
 		
 
 	}
@@ -109,8 +124,8 @@ public class TimeSeriesInfoExtractor {
 		out = IOUtils.getBufferedWriter(outputFile);
 		
 		printTitle();
-		filterPopulationOver18();
-//		ArrayList<Id>[] ids_cohort = getIdsByCohort();
+//		filterPopulationOver18();
+		ArrayList<Id>[] ids_cohort = getIdsByCohort();
 //		printTotalPersonsPerCohort(ids_cohort);
 //		printMeanAgePerCohort(ids_cohort);
 //		printDriverLicenseByCohortAndAge(ids_cohort);
@@ -143,13 +158,346 @@ public class TimeSeriesInfoExtractor {
 //		printMotorizedVsPTTrips(ids_PW_season);
 		
 		//newer graphs
-		printOccupancyRateData();
+//		printOccupancyRateData();
+//		printAverageTripsByCohortAndPWAvailability(ids_cohort);
+//		printDailyDistanceByCohortAndPWAvailability(ids_cohort);
+
+//		printHoursInAndOutOfHomeByCohort(ids_cohort);
+		printNumberOfJourneysByCohort(ids_cohort);		
+		printNumberOfActivitiesByCohort(ids_cohort);
+		printHoursInActivitiesByCohort(ids_cohort);
+		printHoursSpentbyActivity(ids_cohort);
 		
 		
 		
 		out.close();
 	
 	}
+
+	private void printHoursSpentbyActivity(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("HOURS SPENT BY ACTIVITY"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("\t work  \teducation \tshopping \tbusiness \tleisure \tother \thome" ); 
+		out.newLine();
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){	
+			
+			
+			out.write(cohorts_strings[i]);
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			double[] time_activities = new double[7];
+			
+			double sum_weight = 0;
+
+			for(Id id:ids){
+				
+//				if(!((PersonImpl)population.getPersons().get(id)).isEmployed())
+//					continue
+//					;
+			
+				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				
+				Plan plan = population.getPersons().get(id).getSelectedPlan();
+					
+				if(plan!=null){
+		
+					for(PlanElement pe: plan.getPlanElements()){
+						if(!(pe instanceof Activity))
+							continue;
+						Activity activity = (Activity)pe;
+						//[0]=work , [1]=education, [2]=shopping, [3]=business, [4]=leisure, [5]=other, [6]=home
+						int indexType = this.getIndexByActivityType(activity.getType());
+						double startTime = activity.getStartTime();
+						double endTime = activity.getEndTime();
+						if(startTime== Time.UNDEFINED_TIME)
+							startTime=0;
+						if(endTime== Time.UNDEFINED_TIME)
+							endTime= 24*3600;
+						time_activities[indexType]+=  (endTime - startTime)*pw;
+
+					}
+				}else{
+					time_activities[6] += 24*3600*pw;
+				}
+				
+				
+				sum_weight +=  pw*hhw;
+				
+			}	
+			
+			for(int j=0; j<time_activities.length;j++){
+				out.write( "\t" + time_activities[j]/sum_weight/3600);		
+			}
+			
+			out.newLine();
+		}
+
+		
+			
+		
+		
+	}
+
+
+	private void printNumberOfActivitiesByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("NUMBER OF ACTIVITIES "); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("\t work  \teducation \tshopping \tbusiness \tleisure \tother \thome" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			double[] number_activities = new double[7];
+			double sum_weight = 0;
+			double total = 0;
+			for(Id id:ids){
+			
+				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				
+				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				
+				int counter=0;
+				if(plan!=null){
+									
+			
+					for(PlanElement pe: plan.getPlanElements()){
+						if(!(pe instanceof Activity))
+							continue;
+						Activity activity = (Activity)pe;
+						
+						if(activity.getType().equals(MZConstants.HOME))
+							continue;
+						
+						//[0]=work , [1]=education, [2]=shopping, [3]=business, [4]=leisure, [5]=other, [6]=home
+						int indexType = this.getIndexByActivityType(activity.getType());
+						number_activities[indexType]+=  pw;
+						
+						counter++;
+					}
+				}
+				total += counter*pw*hhw;
+				sum_weight +=  pw*hhw;
+				
+			}	
+			for(int j=0; j<number_activities.length;j++){
+				out.write( "\t" + number_activities[j]/sum_weight);		
+			}
+			out.newLine();
+			//out.write( "\t" + total/sum_weight);		
+			//out.newLine();
+		}
+			
+		
+	}
+
+
+	private void printNumberOfJourneysByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("NUMBER OF JOURNEYS (HOME-TO-HOME)"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("\t work  \teducation \tshopping \tbusiness \tleisure \tother \thome" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			double sum_weight = 0;
+			double total = 0;
+			double[] cum_sum = new double[7];
+			for(Id id:ids){
+			
+				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				
+				//[0]=work , [1]=education, [2]=shopping, [3]=business, [4]=leisure, [5]=other, [6]=home
+				double[] activities = new double[7];
+				
+				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				
+				int counter=0;
+				if(plan!=null){
+									
+					boolean isFirst = true;
+					
+					for(PlanElement pe: plan.getPlanElements()){
+						if(!(pe instanceof Activity))
+							continue;
+						Activity activity = (Activity)pe;
+						if(!activity.getType().equals(MZConstants.HOME)){
+							int index = getIndexByActivityType(activity.getType());
+							activities[index] = 1;
+							continue;
+						}
+						if(isFirst){
+							isFirst=false;
+							activities = new double[7];
+							continue;
+						}
+						for(int j=0; j<activities.length;j++){
+							cum_sum[j]+=pw*activities[j];	
+						}
+						counter++;
+						//activities = new double[7];
+					}
+				}
+
+				total += counter*pw*hhw;
+				sum_weight +=  pw*hhw;
+				
+			}	
+			
+			for(int j=0; j<cum_sum.length;j++){
+				out.write( "\t" + cum_sum[j]/sum_weight);		
+			}
+			out.newLine();
+			//out.write( "\t" + total/sum_weight);		
+			//out.newLine();
+		}
+			
+	}
+
+	
+	private void printHoursInActivitiesByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("HOURS AT ACTIVITIES"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort   \t M \t F" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			double sum_weight = 0;
+			double total = 0;
+			for(Id id:ids){
+			
+				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				
+				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				
+				double time_activities=0;
+				if(plan!=null){
+								
+					
+					for(PlanElement pe: plan.getPlanElements()){
+						if(!(pe instanceof Activity))
+							continue;
+						Activity activity = (Activity)pe;
+						if(activity.getType().equals(MZConstants.HOME))
+							continue;
+						double startTime = activity.getStartTime();
+						double endTime = activity.getEndTime();
+						if (startTime == Time.UNDEFINED_TIME)
+							startTime = 0;
+						if(endTime == Time.UNDEFINED_TIME)
+							endTime = 86400;		
+						time_activities+=endTime-startTime;
+						
+					}
+				
+				}
+				total += time_activities/3600*pw*hhw;
+				sum_weight +=  pw*hhw;
+				
+			}	
+			out.write( "\t" + total/sum_weight);		
+			out.newLine();
+		}
+		
+		
+	}
+	
+	
+	private void printHoursInAndOutOfHomeByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("HOURS IN AND OUT OF HOME"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort   \t M \t F" ); 
+		out.newLine();
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){
+			
+			out.write(cohorts_strings[i]);
+			
+			ArrayList<Id> ids = ids_cohort[i];
+			
+			double sum_weight = 0;
+			double total = 0;
+			for(Id id:ids){
+			
+				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+				double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+				
+				Plan plan = population.getPersons().get(id).getSelectedPlan();
+				
+				double time_home=24*3600;
+				if(plan!=null){
+					
+					time_home=0;
+					
+					for(PlanElement pe: plan.getPlanElements()){
+						if(!(pe instanceof Activity))
+							continue;
+						Activity activity = (Activity)pe;
+						if(!activity.getType().equals(MZConstants.HOME))
+							continue;
+						double startTime = activity.getStartTime();
+						double endTime = activity.getEndTime();
+						if (startTime == Time.UNDEFINED_TIME)
+							startTime = 0;
+						if(endTime == Time.UNDEFINED_TIME)
+							endTime = 86400;		
+						time_home+=endTime-startTime;
+						
+					}
+				
+				}
+				total += time_home/3600*pw*hhw;
+				sum_weight +=  pw*hhw;
+				
+			}	
+			out.write( "\t" + total/sum_weight);		
+			out.newLine();
+		}
+		
+		
+	}
+
 
 	private void printOccupancyRateData() throws Exception  {
 		out.write("------------------------------"); 
@@ -238,7 +586,42 @@ public class TimeSeriesInfoExtractor {
 			
 	}
 
-
+	private int getIndexByActivityType(String type) {
+		
+			//[0]=work , [1]=education, [2]=shopping, [3]=business, [4]=leisure, [5]=other, [6]=home
+		
+		if(type.contains(MZConstants.WORK)){
+			return 0;}
+		
+		else if(type.contains(MZConstants.EDUCATION))
+			return 1;
+		else if(type.contains(MZConstants.SHOPPING))
+			return 2;
+		
+		else if(type.contains(MZConstants.BUSINESS)
+				||type.contains(MZConstants.DIENSTFAHRT)) 
+			return 3;
+		
+		else if(type.contains(MZConstants.LEISURE)) 
+			return 4;
+		
+		else if(type.contains(MZConstants.ACCOMPANYING_CHILDREN)
+				|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+				|| type.contains(MZConstants.ERRANDS)
+				|| type.contains(MZConstants.OTHER)
+				|| type.contains(MZConstants.FOREIGN_PROPERTY)
+				|| type.contains(MZConstants.OVERNIGHT)
+				|| type.contains(MZConstants.PSEUDOETAPPE))
+			return 5;
+		else if(type.contains(MZConstants.HOME))
+			return 6;
+		else{
+			Gbl.errorMsg("No type known for: " + type);
+			return -1;
+		}
+	
+	}
+	
 	private int getEtappenIndexByPurpose(Etappe etappe) {
 		//[0]=leisure
 		//[1]=other/services
@@ -901,6 +1284,177 @@ public class TimeSeriesInfoExtractor {
 		
 		
 	}
+	
+	private void printDailyDistanceByCohortAndPWAvailability(ArrayList<Id>[] ids_cohort) throws Exception {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("AVERGAE DAILY DISTANCE"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort   \t ALWAYS \t BY ARRANGEMENT \t NEVER" ); 
+		out.newLine();
+		
+		if(year==2000){
+		
+			TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.year);
+			
+			for(int i=cohorts_strings.length-1;i>=0;i--){
+				
+				out.write(cohorts_strings[i]);
+				System.out.println(cohorts_strings[i]);
+				
+				ArrayList<Id> ids = ids_cohort[i];
+				
+				 ArrayList<Id>[] groups = this.getIdsByPWOwnership_3Groups(ids);
+				 
+				for(ArrayList<Id> group: groups){ 
+			
+				double sum_weight = 0;
+				double total = 0;
+				for(Id id:group){
+	
+					ArrayList<Etappe> etappen = etappes.get(id.toString());
+					
+					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+					
+					Person person = population.getPersons().get(id);
+					
+					double dist=0;
+					if(etappen!=null){ //avoid people without plan or undefined etappes
+						
+						for(Etappe etappe:etappen){
+							
+							dist+= Double.parseDouble(etappe.getDistance());
+							
+						}
+					}					
+					total +=  dist*pw*hhw;
+					sum_weight +=  pw*hhw;
+				}	
+				out.write( "\t" + total/sum_weight);
+				}
+				out.newLine();
+			}
+		
+		}else{
+			
+			for(int i=cohorts_strings.length-1;i>=0;i--){
+				
+				out.write(cohorts_strings[i]);
+				System.out.println(cohorts_strings[i]);
+				
+				ArrayList<Id> ids = ids_cohort[i];
+				
+				 ArrayList<Id>[] groups = this.getIdsByPWOwnership_3Groups(ids);
+				 
+				for(ArrayList<Id> group: groups){ 
+			
+				double sum_weight = 0;
+				double total = 0;
+				for(Id id:group){
+	
+					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+					double dist= Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_DISTANCE));
+				
+					total +=  dist*pw*hhw;
+					sum_weight +=  pw*hhw;
+				}	
+				out.write( "\t" + total/sum_weight);
+				}
+				out.newLine();			
+		}
+		
+		}
+		
+		
+	}
+	
+	private void printAverageTripsByCohortAndPWAvailability(ArrayList<Id>[] ids_cohort) throws Exception {
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("AVERAGE TRIPS PER DAY"); 
+		out.newLine();
+		out.write("------------------------------"); 
+		out.newLine();
+		out.write("Cohort   \t ALWAYS \t BY ARRANGEMENT \t NEVER" ); 
+		out.newLine();
+		
+		if(year==2000){			
+			TreeMap<String, ArrayList<Etappe>> etappes = EtappenLoader.loadData(this.year);
+			
+		
+			for(int i=cohorts_strings.length-1;i>=0;i--){
+				
+				out.write(cohorts_strings[i]);
+				
+				ArrayList<Id> ids = ids_cohort[i];
+				
+				 ArrayList<Id>[] groups = this.getIdsByPWOwnership_3Groups(ids);
+				 
+				for(ArrayList<Id> group: groups){ 
+				
+				double sum_weight = 0;
+				double total = 0;
+				for(Id id:group){
+	
+					ArrayList<Etappe> etappen = etappes.get(id.toString());
+					
+					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+					
+					
+					int nr_wege=0;
+					if(etappen!=null){ //avoid people without plan or undefined etappes
+						
+						for(Etappe etappe:etappen){
+							if(etappe.getWegeNr()>nr_wege){
+								nr_wege = etappe.getWegeNr();
+							}						
+						}					
+					}				
+					total +=  nr_wege*pw*hhw;
+					sum_weight +=  pw*hhw;				
+				}							
+				out.write( "\t" + total/sum_weight);			
+				}			
+				out.newLine();
+			}
+		}else{
+			
+			for(int i=cohorts_strings.length-1;i>=0;i--){
+				
+				out.write(cohorts_strings[i]);
+				System.out.println(cohorts_strings[i]);
+				
+				ArrayList<Id> ids = ids_cohort[i];
+				
+				 ArrayList<Id>[] groups = this.getIdsByPWOwnership_3Groups(ids);
+				 
+				for(ArrayList<Id> group: groups){ 
+			
+				double sum_weight = 0;
+				double total = 0;
+				for(Id id:group){
+	
+					double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+					double hhw = 1;//Double.parseDouble((String) this.householdAttributes.getAttribute((String)this.populationAttributes.getAttribute(id.toString(), "household number"), "weight"));
+					double nr_wege= Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), MZConstants.TOTAL_TRIPS_INLAND));
+				
+					total +=  nr_wege*pw*hhw;
+					sum_weight +=  pw*hhw;
+				}	
+				out.write( "\t" + total/sum_weight);
+				}
+				out.newLine();			
+		}
+		
+		}
+		
+
+	}
 
 
 	private void printRegionalTicketOwnershipByCohort(ArrayList<Id>[] ids_cohort) throws IOException {
@@ -1400,10 +1954,26 @@ public class TimeSeriesInfoExtractor {
 		out.newLine();
 		
 		
-		for(int i=0;i<cohorts_strings.length;i++){
-			out.write(cohorts_strings[i] + "\t" + ids_cohort[i].size() + "\t" + (float)(((float)ids_cohort[i].size()*100)/population.getPersons().size())+ "%");
+		double sum_weight=0;
+		double[] cum_sum = new double[cohorts_strings.length];
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){	
+			
+			ArrayList<Id> ids = ids_cohort[i];
+						
+			for(Id id:ids){
+				double pw = Double.parseDouble((String) this.populationAttributes.getAttribute(id.toString(), "person weight"));
+				cum_sum[i]+=pw;
+				sum_weight +=pw;
+			}
+		}
+		
+		
+		for(int i=cohorts_strings.length-1;i>=0;i--){	
+			out.write(cohorts_strings[i] + "\t" + ids_cohort[i].size() + "\t" + (float)((cum_sum[i]*100)/sum_weight)+ "%");
 			out.newLine();
 		}
+		
 		
 		
 	}
@@ -1573,8 +2143,34 @@ public class TimeSeriesInfoExtractor {
 		return ids_PW;
 	}
 	
+	private ArrayList<Id>[] getIdsByPWOwnership_3Groups(ArrayList<Id> ids) throws IOException {
+		
+		//PW[0] = ALWAYS
+		//PW[1] = BY ARRANGEMENT
+		//PW[2] = NEVER
+		// keine Antwort, Keine Angabe, F40200a ungleich 1 are disregarded, ~30%
+		
+		ArrayList<Id>[] ids_PW = new ArrayList[3];
+		for(int i=0;i<ids_PW.length;i++){
+			ids_PW[i] = new ArrayList<Id>();
+		}
+		
+			for(Id id:ids){
+					
+				String av = (String)this.populationAttributes.getAttribute(id.toString(), "availability: car");
+				if(av.equals(MZConstants.ALWAYS)){
+					ids_PW[0].add(id);
+				}else if(av.equals(MZConstants.ARRANGEMENT)){
+					ids_PW[1].add(id);
+				}else if(av.equals(MZConstants.NEVER)){
+					ids_PW[2].add(id);
+				}
+			}
+		return ids_PW;
+	}	
 	
-private ArrayList<Id>[] getIdsByPWAndSeasonTicket() throws IOException {
+	
+	private ArrayList<Id>[] getIdsByPWAndSeasonTicket() throws IOException {
 		
 		//PW[0] = vehicle and season ticket
 		//PW[1] = no vehicle but season ticket

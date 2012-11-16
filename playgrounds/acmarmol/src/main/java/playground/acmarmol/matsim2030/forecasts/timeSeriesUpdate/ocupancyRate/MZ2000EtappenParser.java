@@ -65,6 +65,9 @@ public class MZ2000EtappenParser {
 				//person number (intnr)
 				String pid = entries[0].trim();
 				
+				//wege number
+				int wege_nr = Integer.parseInt(entries[2].trim());
+				
 				
 				//WP
 				String person_weight = entries[4].trim();
@@ -112,25 +115,41 @@ public class MZ2000EtappenParser {
 				else if(wzweck1.equals("9")){purpose = MZConstants.NO_ANSWER;}
 				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 				
-				//distance
+				//distance (no missing values)
 				String distance = entries[16].trim();
 				
+				//duration (no missing values)
+				String duration = entries[32]; 
+		
+				boolean skip = false;
 				
-				//create new etappe
-				Etappe etappe = new Etappe();
-				etappe.setWeight(person_weight);
-				etappe.setMode(mode);
-				etappe.setTotalPeople(total_people);
-				etappe.setPurpose(purpose);
-				etappe.setDistance(distance);
-				
-				
-				//add it to list
-				if(!this.etappes.containsKey(pid)){
-					this.etappes.put(pid, new ArrayList<Etappe>());
+				//ausland etappe?  
+				String ausland = entries[34].trim();
+				if(ausland.equals("1")){
+					skip=true;
 				}
-				this.etappes.get(pid).add(etappe);
 				
+				
+				
+				if(!skip){
+					//create new etappe
+					Etappe etappe = new Etappe();
+					etappe.setWeight(person_weight);
+					etappe.setMode(mode);
+					etappe.setTotalPeople(total_people);
+					etappe.setPurpose(purpose);
+					etappe.setDuration(duration);
+					etappe.setDistance(distance);
+					etappe.setWegeNr(wege_nr);
+					
+					
+					
+					//add it to list
+					if(!this.etappes.containsKey(pid)){
+						this.etappes.put(pid, new ArrayList<Etappe>());
+					}
+					this.etappes.get(pid).add(etappe);
+				}				
 				
 				
 			}

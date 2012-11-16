@@ -223,7 +223,7 @@ public class MZ2010ToXmlFiles {
 		new HouseholdsWriterV10(households).writeFile(outputBase+"/households.04.xml.gz");
 		households_axmlw.writeFile(outputBase+"/householdAttributes.04.xml.gz");
 		new PopulationWriter(population, null).write(outputBase+"population.04.xml.gz");
-		population_axmlw.writeFile(outputBase+"/populationAttributes.04.xml");
+		population_axmlw.writeFile(outputBase+"/populationAttributes.04.xml.gz");
 		ObjectAttributesXmlWriter wege_axmlw = new ObjectAttributesXmlWriter(wegeAttributes);
 		wege_axmlw.putAttributeConverter(CoordImpl.class, new CoordConverter());
 		wege_axmlw.putAttributeConverter(Etappe.class, new EtappeConverter());
@@ -361,7 +361,7 @@ public class MZ2010ToXmlFiles {
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("changing  MZ modes to matsim modes...");
 		MZPopulationUtils.changeToMatsimModes(population);
-		new PopulationWriter(population, null).write(outputBase+"population.13.xml");
+		new PopulationWriter(population, null).write(outputBase+"population.13.xml.gz");
 		System.out.println("  done.");
 
 

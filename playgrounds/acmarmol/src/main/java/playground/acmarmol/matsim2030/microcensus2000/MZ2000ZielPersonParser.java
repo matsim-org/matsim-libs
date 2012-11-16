@@ -95,11 +95,11 @@ public class MZ2000ZielPersonParser {
 		String zp = entries[3].trim();
 		String intnr = entries[0].trim();
 		//String intnr = hhnr.concat(zp);
-		populationAttributes.putAttribute(intnr, "household number", hhnr);
+		populationAttributes.putAttribute(intnr, MZConstants.HOUSEHOLD_NUMBER, hhnr);
 		
 		//person weight 
 		String person_weight = entries[4];
-		populationAttributes.putAttribute(intnr, "person weight", person_weight);
+		populationAttributes.putAttribute(intnr, MZConstants.HOUSEHOLD_WEIGHT, person_weight);
 		
 		//person age 
 		String age = entries[10];
@@ -122,7 +122,7 @@ public class MZ2000ZielPersonParser {
 		else if(dow.equals("6")){dow = MZConstants.SATURDAY;}
 		else if(dow.equals("7")){dow = MZConstants.SUNDAY;}
 				else Gbl.errorMsg("This should never happen!  Day of week: " + dow + " doesn't exist");
-		populationAttributes.putAttribute(intnr, "day of week", dow);
+		populationAttributes.putAttribute(intnr, MZConstants.DAY_OF_WEEK, dow);
 		
 		
 		//employment status
@@ -191,7 +191,7 @@ public class MZ2000ZielPersonParser {
 		}else {
 			licence = MZConstants.NO;
 		}
-		populationAttributes.putAttribute(intnr, "driving licence", licence);
+		populationAttributes.putAttribute(intnr, MZConstants.DRIVING_LICENCE, licence);
 		
 		//car availability
 		String car_av = entries[36];
@@ -201,7 +201,7 @@ public class MZ2000ZielPersonParser {
 		else if(car_av.equals("-2") | car_av.equals(" ")){car_av = MZConstants.NO_ANSWER;}
 		else if(car_av.equals("-1")){car_av = MZConstants.NOT_KNOWN;}//
 		else Gbl.errorMsg("This should never happen!  Car availability: " + car_av+ " doesn't exist");
-		populationAttributes.putAttribute(intnr, "availability: car", car_av);
+		populationAttributes.putAttribute(intnr, MZConstants.CAR_AVAILABILITY, car_av);
 		
 		//motorcycle availability
 		String mcycle_av = entries[35];
@@ -211,7 +211,7 @@ public class MZ2000ZielPersonParser {
 		else if(mcycle_av.equals("-2") | mcycle_av.equals(" ")){car_av = MZConstants.NO_ANSWER;}
 		else if(mcycle_av.equals("-1")){mcycle_av = MZConstants.NOT_KNOWN;}
 		else Gbl.errorMsg("This should never happen!  Motorcycle availability: " + mcycle_av+ " doesn't exist");
-		populationAttributes.putAttribute(intnr, "availability: motorcycle", mcycle_av);
+		populationAttributes.putAttribute(intnr, MZConstants.MOTORCYCLE_AVAILABILITY, mcycle_av);
 		
 //		//small motorcycle availability
 //		String smcycle_av = entries[65];
@@ -232,7 +232,7 @@ public class MZ2000ZielPersonParser {
 		else if(mofa_av.equals("-2") | mofa_av.equals(" ")){car_av = MZConstants.NO_ANSWER;}
 		else if(mofa_av.equals("--1")){mofa_av = MZConstants.NOT_KNOWN;}
 		else Gbl.errorMsg("This should never happen!  Mofa availability: " + mofa_av+ " doesn't exist");
-		populationAttributes.putAttribute(intnr, "availability: mofa", mofa_av);
+		populationAttributes.putAttribute(intnr, MZConstants.MOFA_AVAILABILITY, mofa_av);
 		
 		//Bicycle availability
 		String bike_av = entries[33];
@@ -242,7 +242,7 @@ public class MZ2000ZielPersonParser {
 		else if(bike_av.equals("-2") | bike_av.equals(" ")){car_av = MZConstants.NO_ANSWER;}
 		else if(bike_av.equals("-1")){bike_av = MZConstants.NOT_KNOWN;}// -review
 		else Gbl.errorMsg("This should never happen!  Bike availability: " + bike_av+ " doesn't exist");
-		populationAttributes.putAttribute(intnr, "availability: bicycle", bike_av);
+		populationAttributes.putAttribute(intnr, MZConstants.BICYCLE_AVAILABILITY, bike_av);
 		
 //		//car-sharing membership
 //		String sharing = entries[56];

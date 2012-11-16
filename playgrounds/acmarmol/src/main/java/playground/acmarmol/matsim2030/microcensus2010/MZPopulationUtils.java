@@ -50,6 +50,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.acmarmol.utils.MyCollectionUtils;
+
 import com.google.common.base.Supplier;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -165,8 +167,8 @@ public class MZPopulationUtils {
 		int counter = 0;
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			String hhnr = (String) populationAttributes.getAttribute(person.getId().toString(), "household number");
-			CoordImpl homeCoord = (CoordImpl)householdAttributes.getAttribute(hhnr, "coord");
+			String hhnr = (String) populationAttributes.getAttribute(person.getId().toString(), MZConstants.HOUSEHOLD_NUMBER);
+			CoordImpl homeCoord = (CoordImpl)householdAttributes.getAttribute(hhnr, MZConstants.COORD);
 
 			if(plan!=null){ //avoid persons without activities
 				for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
@@ -195,7 +197,7 @@ public class MZPopulationUtils {
 			if(((PersonImpl) person).isEmployed()){
 				
 				Plan plan = person.getSelectedPlan();
-				CoordImpl workCoord = (CoordImpl)populationAttributes.getAttribute(person.getId().toString(), "work: location coord");
+				CoordImpl workCoord = (CoordImpl)populationAttributes.getAttribute(person.getId().toString(), MZConstants.WORK_LOCATION_COORD);
 				
 				if(plan!=null){ //avoid persons without activities
 					for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
@@ -737,7 +739,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 
 	public static void classifyActivityChains(Population population){
 		
-		Set<String> actChains = new HashSet<String>();
+		HashMap<String,Integer> actChains = new HashMap<String,Integer>();
 			
 		for(Person person: population.getPersons().values()){
 		
@@ -753,18 +755,28 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						String type = act.getType();
 						
 						if(type.contains(MZConstants.WORK)
-						|| type.contains(MZConstants.BUSINESS)
-						||type.contains(MZConstants.DIENSTFAHRT)){actChain.append("W");}
+								||type.contains(MZConstants.BUSINESS)
+								||type.contains(MZConstants.DIENSTFAHRT)){actChain.append("W");}
+						
+						else if(type.contains(MZConstants.BUSINESS)
+								||type.contains(MZConstants.DIENSTFAHRT)) {actChain.append("B");}
 						
 						else if(type.contains(MZConstants.LEISURE)
-						||type.contains(MZConstants.ACCOMPANYING_CHILDREN)
-						|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
-						|| type.contains(MZConstants.ERRANDS)
-						|| type.contains(MZConstants.OTHER)
-						|| type.contains(MZConstants.FOREIGN_PROPERTY)
-						|| type.contains(MZConstants.OVERNIGHT)
-						|| type.contains(MZConstants.PSEUDOETAPPE)) {actChain.append("L");}
+								||type.contains(MZConstants.ACCOMPANYING_CHILDREN)
+								|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+								|| type.contains(MZConstants.ERRANDS)
+								|| type.contains(MZConstants.OTHER)
+								|| type.contains(MZConstants.FOREIGN_PROPERTY)
+								|| type.contains(MZConstants.OVERNIGHT)
+								|| type.contains(MZConstants.PSEUDOETAPPE)) {actChain.append("L");}
 						
+						else if(type.contains(MZConstants.ACCOMPANYING_CHILDREN)
+								|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+								|| type.contains(MZConstants.ERRANDS)
+								|| type.contains(MZConstants.OTHER)
+								|| type.contains(MZConstants.FOREIGN_PROPERTY)
+								|| type.contains(MZConstants.OVERNIGHT)
+								|| type.contains(MZConstants.PSEUDOETAPPE)	) {actChain.append("O");}
 						
 						else if(type.contains(MZConstants.SHOPPING)) {actChain.append("S");}
 						
@@ -777,12 +789,20 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 					
 					
 				}
-				actChains.add(actChain.toString());	
+				
+				if(actChains.containsKey(actChain.toString())){
+					int total = actChains.get(actChain.toString());
+					actChains.put(actChain.toString(), total+1);
+				}else{
+					actChains.put(actChain.toString(),1);	
+				}
+				
+				
 			}		
 		
 		}
-		
-		System.out.println("Total of different activity chains: " + actChains.size());
+		MyCollectionUtils.printMap(actChains);
+		System.out.println("Total of different activity chains: " + actChains.keySet().size());
 		
 		
 	}

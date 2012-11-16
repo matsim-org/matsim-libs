@@ -8,6 +8,7 @@ public class Etappe {
 	private String purpose;
 	private String distance;
 	private String duration;
+	private int wegeNr;
 	
 	
 	public void Ettape(){
@@ -72,6 +73,16 @@ public class Etappe {
 
 	public void setDuration(String duration) {
 		this.duration = duration;
+	}
+
+
+	public int getWegeNr() {
+		return wegeNr;
+	}
+
+
+	public void setWegeNr(int wegeNr) {
+		this.wegeNr = wegeNr;
 	}
 
 

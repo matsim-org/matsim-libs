@@ -43,10 +43,10 @@ public class MZConstants{
 		public static final String EMPLOYEE = "employee";
 		public static final String TRAINEE = "apprentice-trainee";
 		public static final String UNEMPLOYED = "unemployed";
-		public static final String NOT_LABOR_FORCE = "not in labor force";
+		public static final String AUSBILDUNG = "education or training";
 		public static final String RETIRED = "retired";
 		public static final String DISABLED = "disabled";
-		public static final String HOUSEWIFE_HOUSEHUSBAND = "housewife/hosehusband";
+		public static final String HOUSEWIFE_HOUSEHUSBAND = "housewife/househusband";
 		public static final String OTHER_INACTIVE = "other inactive";
 		//wege information
 		public static final String TOTAL_TRIPS_INLAND = "total weges inland";
@@ -141,6 +141,55 @@ public class MZConstants{
 		public static final String PRINCIPAL_MODE = "principal mode";
 		public static final String NUMBER_STAGES = "number of stages";
 		public static final String STAGE = "stage";
+		
+	//other activities
+		public static final String NO_OTHER = "no other activity";
+		public static final String REGISTERED_UNEMPLOYED = " registered as unemployed";
+		public static final String LOOKING_JOB = "not registered, but looking for a job";
+		public static final String UNEMPLOYED_NO_OTHER = "unemployed/no other"; 
+		
+	
+	//attribute names
+		//zielpersonen parser
+		public static final String PERSON_WEIGHT = "person weight";
+		public static final String HOUSEHOLD_SIZE = "household size";
+		public static final String HOUSEHOLD_INCOME= "household income";
+		public static final String DAY_OF_WEEK = "day of week";
+		public static final String EMPLOYMENT_STATUS = "work: employment status";
+		public static final String LEVEL_EMPLOYMENT = "work: level of employment";
+		public static final String OTHER_ACTIVITY1 = "other activity-1";
+		public static final String OTHER_ACTIVITY2 = "other activity-2";
+		public static final String OTHER_ACTIVITY3 = "other activity-3";
+		public static final String WORK_LOCATION_COORD = "work: location coord";
+		public static final String DRIVING_LICENCE = "driving licence";
+		public static final String CAR_AVAILABILITY = "availability: car";
+		public static final String MOTORCYCLE_AVAILABILITY = "availability: motorcycle";
+		public static final String SMALL_MOTORCYCLE_AVAILABILITY = "availability: small motorcycle";
+		public static final String MOFA_AVAILABILITY = "availability: mofa";
+		public static final String BICYCLE_AVAILABILITY = "availability: bicycle";
+		public static final String CAR_SHARING_MEMBERSHIP = "car sharing membership";
+		public static final String ABBO_HT = "abonnement: Halbtax";
+		public static final String ABBO_GA1 = "abonnement: GA first class";
+		public static final String ABBO_GA2 = "abonnement: GA second class";
+		public static final String ABBO_VERBUND = "abonnement: Verbund";
+		public static final String ABBO_STRECKEN = "abonnement: Stecken";
+		public static final String ABBO_GLEIS7 = "abonnement: Gleis 7";
+
+		//household parse
+		public static final String HOUSEHOLD_NUMBER = "household number";
+		public static final String HOUSEHOLD_WEIGHT = "household weight";
+		public static final String MUNICIPALITY = "municipality";
+		public static final String REGION = "region";
+		public static final String CANTON = "canton";
+		public static final String COORD = "coord";
+		public static final String TOTAL_CARS = "total cars";
+		public static final String TOTAL_MOTORCYCLES = "total motorcycles";
+		public static final String TOTAL_SMALL_MOTORCYCLES = "total small motorcycles";
+		public static final String TOTAL_MOFAS = "total mofas";
+		public static final String TOTAL_BYCICLES = "total bicycles";
+		
+		
+		
 
 		
 		

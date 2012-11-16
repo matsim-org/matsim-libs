@@ -20,7 +20,7 @@ import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
 
 /**
  * 
- * Parses the etappen.dat file from MZ2010
+ * Parses the etappen.dat file from MZ2005
  *
  * @author acmarmol
  * 
@@ -54,6 +54,7 @@ public class MZ2005EtappenParser {
 			BufferedReader br = new BufferedReader(fr);
 			String curr_line = br.readLine(); // Skip header	
 							
+			int counter = 0;
 			while ((curr_line = br.readLine()) != null) {
 				
 					
@@ -65,6 +66,9 @@ public class MZ2005EtappenParser {
 				//person number (zielpnr)
 				String zielpnr = entries[1].trim();
 				String pid = hhnr.concat(zielpnr);
+				
+				//wege number
+				int wege_nr = Integer.parseInt(entries[3].trim());
 				
 				
 				//WP
@@ -118,19 +122,21 @@ public class MZ2005EtappenParser {
 				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 				
 				//distance
-				boolean skip = false;; //skip etappe if no distance can be estimated <1%
+				boolean skip = false; //skip etappe if no distance can be estimated <1%
 				double distance = Double.parseDouble(entries[46].trim());
-				if(distance == -99){ //S_QAL <> 1 oder Z_QAL <>1. Although precision is not the best, duration will anyway be computed as
+				if(distance == -99){ //S_QAL <> 1 oder Z_QAL <>1. Although precision is not the best, distance will anyway be computed as
 											//the euclidian distance
 					double  xs = Double.parseDouble(entries[23]); 
 					double  ys = Double.parseDouble(entries[24]); 
 					double  xz = Double.parseDouble(entries[34]); 
 					double  yz = Double.parseDouble(entries[35]); 
 					
-					if(xs!=-97 && ys!=-97 && xz!=-97 && yz!=-97){				
-						distance = Math.sqrt(Math.pow((xz-xs)/1000, 2) + Math.pow((yz-ys)/1000, 2)); 
+					if(xs!=-97 && ys!=-97 && xz!=-97 && yz!=-97){	
+						distance = Math.sqrt(Math.pow(xz-xs, 2) + Math.pow(yz-ys, 2))/1000; 
 					}else{
 						skip = true;
+						counter++;
+						System.out.println("skipped: " + counter);
 					}
 				}
 				
@@ -139,6 +145,13 @@ public class MZ2005EtappenParser {
 				if(duration.equals("-99")||duration.equals(" ")){ //pseudoetappe
 					skip = true;
 				}
+				
+				//ausland etappe?  
+				String ausland = entries[72].trim();
+				if(ausland.equals("1")){
+					skip=true;
+				}
+				
 				
 				//create new etappe
 				if(!skip){
@@ -149,6 +162,7 @@ public class MZ2005EtappenParser {
 					etappe.setPurpose(purpose);
 					etappe.setDuration(duration);
 					etappe.setDistance(String.valueOf(distance));
+					etappe.setWegeNr(wege_nr);
 					
 					
 					//add it to list

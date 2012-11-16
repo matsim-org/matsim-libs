@@ -97,15 +97,15 @@ public class MZ2000HouseholdPersonParser {
 				if(halbtax.equals("1") | halbtax.equals("2")| halbtax.equals("3")){halbtax = MZConstants.YES;}
 				else {halbtax = MZConstants.NO;} 
 				//else Gbl.errorMsg("This should never happen!  Halbtax: " + halbtax+ " doesn't exist");
-				populationAttributes.putAttribute(zid, "abonnement: Halbtax", halbtax);
+				populationAttributes.putAttribute(zid, MZConstants.ABBO_HT, halbtax);
 				
 				//GA (no distinction first/second class, will be stores as second class)
 				String gaSecondClass = entries[13];
 				if(gaSecondClass.equals("1")){gaSecondClass = MZConstants.YES;}
 				else {gaSecondClass = MZConstants.NO;}
 				//else Gbl.errorMsg("This should never happen!  GA Second Class: " + gaSecondClass+ " doesn't exist");
-				populationAttributes.putAttribute(zid, "abonnement: GA second class", gaSecondClass);
-				populationAttributes.putAttribute(zid, "abonnement: GA first class", MZConstants.NO); //completeness
+				populationAttributes.putAttribute(zid, MZConstants.ABBO_GA2, gaSecondClass);
+				populationAttributes.putAttribute(zid, MZConstants.ABBO_GA1, MZConstants.NO); //completeness
 				
 				//verbund abonnement
 				String verbund = entries[14];
@@ -114,7 +114,7 @@ public class MZ2000HouseholdPersonParser {
 					}
 				else {verbund = MZConstants.NO;}
 				//else Gbl.errorMsg("This should never happen!  Verbund abonnement: " + verbund+ " doesn't exist");
-				populationAttributes.putAttribute(zid, "abonnement: Verbund", verbund);
+				populationAttributes.putAttribute(zid, MZConstants.ABBO_VERBUND, verbund);
 				
 				populationAttributes.putAttribute(zid, MZConstants.TOTAL_TRIPS_DISTANCE, "0");
 				populationAttributes.putAttribute(zid, MZConstants.TOTAL_TRIPS_DURATION, "0");

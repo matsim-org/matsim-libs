@@ -68,6 +68,9 @@ public class MZ2010EtappenParser {
 				String zielpnr = entries[1].trim();
 				String pid = hhnr.concat(zielpnr);
 				
+				//wege number
+				int wege_nr = Integer.parseInt(entries[3].trim());
+				
 				//WP
 				String person_weight = entries[2].trim();
 				
@@ -119,7 +122,7 @@ public class MZ2010EtappenParser {
 				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 				
 				//distance
-				boolean skip = false;; //skip etappe if no distance can be estimated <1%
+				boolean skip = false;//skip etappe if no distance can be estimated <1%
 				double distance = Double.parseDouble(entries[113].trim());
 				if(distance == -99){ //S_QAL <> 1 oder Z_QAL <>1. Although precision is not the best, duration will anyway be computed as
 											//the euclidian distance
@@ -138,7 +141,13 @@ public class MZ2010EtappenParser {
 				//duration
 				String duration = entries[97];
 				if(duration.equals("-99")){ //pseudoetappe
-					duration = "0";
+					skip = true;
+				}
+				
+				//ausland etappe?  
+				String ausland = entries[114].trim();
+				if(ausland.equals("1")){
+					skip=true;
 				}
 				
 				//create new etappe
@@ -150,6 +159,7 @@ public class MZ2010EtappenParser {
 					etappe.setPurpose(purpose);
 					etappe.setDuration(duration);
 					etappe.setDistance(String.valueOf(distance));
+					etappe.setWegeNr(wege_nr);
 					
 					
 					//add it to list
