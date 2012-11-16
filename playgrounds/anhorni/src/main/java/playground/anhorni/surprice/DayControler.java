@@ -27,6 +27,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
+import playground.anhorni.surprice.scoring.SurpriceTravelCostCalculatorFactoryImpl;
 
 public class DayControler extends Controler {
 	
@@ -47,7 +48,13 @@ public class DayControler extends Controler {
 	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
 	}
 	
-
+	protected void setUp() {
+		SurpriceTravelCostCalculatorFactoryImpl costCalculatorFactory = new SurpriceTravelCostCalculatorFactoryImpl();
+		this.setTravelDisutilityFactory(costCalculatorFactory);
+		super.setUp();
+	}
+	
+	
 //	@Override
 //	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 //		
@@ -79,5 +86,9 @@ public class DayControler extends Controler {
 	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 	  		this.addControlerListener(new RoadPricing());
 		}
+	}
+	
+	private void generateAlphaGammaTrip() {
+		
 	}
 }
