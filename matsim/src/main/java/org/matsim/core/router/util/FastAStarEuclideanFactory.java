@@ -52,11 +52,14 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 
 		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
 		
-		if (fastRouterType == FastRouterType.ARRAY) {
+		switch (fastRouterType) {
+		case ARRAY:
 			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
-		} else if (fastRouterType == FastRouterType.POINTER) {			
+			break;
+		case POINTER:
 			this.routingNetworkFactory = new PointerRoutingNetworkFactory(preProcessData);
-		} else {
+			break;
+		default:
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 	}
@@ -68,7 +71,8 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 		FastRouterDelegateFactory fastRouterFactory = null;
 		RoutingNetwork rn = null;
 		
-		if (fastRouterType == FastRouterType.ARRAY) {	
+		switch (fastRouterType) {
+		case ARRAY: {
 			RoutingNetwork routingNetwork = this.routingNetworks.get(network);
 			if (routingNetwork == null) {
 				routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
@@ -76,11 +80,17 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 			}
 			rn = routingNetwork;
 			fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		} else if (fastRouterType == FastRouterType.POINTER) {
+			break;
+		}
+		case POINTER: {
 			// Create a new instance since routing data is stored in the network!
 			rn = this.routingNetworkFactory.createRoutingNetwork(network);
-			fastRouterFactory = new PointerFastRouterDelegateFactory();			
-		}		
+			fastRouterFactory = new PointerFastRouterDelegateFactory();
+			break;
+		}
+		default:
+			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
+		}
 		
 		return new FastAStarEuclidean(network, this.preProcessData, travelCosts, travelTimes, 1,
 			rn, fastRouterFactory);

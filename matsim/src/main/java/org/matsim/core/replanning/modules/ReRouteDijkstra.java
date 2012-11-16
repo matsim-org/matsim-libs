@@ -49,7 +49,7 @@ public class ReRouteDijkstra extends AbstractMultithreadedModule {
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 		this.configGroup = config.plansCalcRoute();
-		this.routeFactory = routeFactory;;
+		this.routeFactory = routeFactory;
 	}
 
 	@Override

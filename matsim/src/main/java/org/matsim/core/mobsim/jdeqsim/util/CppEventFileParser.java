@@ -22,7 +22,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class CppEventFileParser {
 
-	private static ArrayList<EventLog> eventLog = null;
+//	private static ArrayList<EventLog> eventLog = null;
 
 	public static void main(final String[] args) {
 		String eventFileName = args[0];
@@ -31,7 +31,7 @@ public class CppEventFileParser {
 	}
 
 	public void parse(final String eventFileName) {
-		CppEventFileParser.eventLog = CppEventFileParser.parseFile(eventFileName);
+//		CppEventFileParser.eventLog = CppEventFileParser.parseFile(eventFileName);
 		// for (int i = 0; i < eventLog.size(); i++) {
 		// eventLog.get(i).print();
 		// }

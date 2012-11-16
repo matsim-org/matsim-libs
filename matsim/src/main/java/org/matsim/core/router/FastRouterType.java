@@ -24,4 +24,3 @@ public enum FastRouterType {
 	ARRAY, POINTER
 }
 
-//static FastRouterType type = FastRouterType.ARRAY;
