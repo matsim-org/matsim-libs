@@ -39,14 +39,10 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
-	private final Double mutationRange;
+	private final double mutationRange;
 	private final Random random;
 
-	public PlanMutateTimeAllocation(final int mutationRange, final Random random) {
-		this.mutationRange = new Double(mutationRange);
-		this.random = random;
-	}
-	public PlanMutateTimeAllocation(final Double mutationRange, final Random random) {
+	public PlanMutateTimeAllocation(final double mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}
@@ -84,7 +80,6 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-//					if (this.useActivityDurations) {
 						if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 							// mutate the durations of all 'middle' activities
 							act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
@@ -99,19 +94,7 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 							act.setEndTime(newEndTime);
 							now = newEndTime;
 						}
-//					} 
-//					else {
-//						if (act.getEndTime() == Time.UNDEFINED_TIME) {
-//							throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
-//						}
-//						double newEndTime = mutateTime(act.getEndTime());
-//						if (newEndTime < now) {
-//							newEndTime = now;
-//						}
-//						act.setEndTime(newEndTime);
-//						now = newEndTime;
-//					}
-//				// handle last activity
+				// handle last activity
 				} else {
 
 					// assume that there will be no delay between arrival time and activity start time
@@ -151,9 +134,4 @@ public class PlanMutateTimeAllocation implements PlanAlgorithm {
 		return t;
 	}
 
-//	public void setUseActivityDurations(boolean useActivityDurations) {
-//		this.useActivityDurations = useActivityDurations;
-//	}
-
-	
 }

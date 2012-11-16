@@ -30,7 +30,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 
-
 /**
  * Copy/Paste of PlanMutateTimeAllocation, but with special handling
  * for transit interaction activities (like line changes): they are
@@ -40,11 +39,11 @@ import org.matsim.pt.PtConstants;
  */
 public class TransitPlanMutateTimeAllocation implements PlanAlgorithm {
 
-	private final Double mutationRange;
+	private final double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations;
 
-	public TransitPlanMutateTimeAllocation(final Double mutationRange, final Random random) {
+	public TransitPlanMutateTimeAllocation(final double mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}

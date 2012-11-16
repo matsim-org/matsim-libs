@@ -30,9 +30,9 @@ public class TimeAllocationMutatorConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "TimeAllocationMutator";
 	
-	public static final String MUTATION_RANGE = "mutationRange" ;
+	public static final String MUTATION_RANGE = "mutationRange";
 	
-	private Double mutationRange=1800. ;
+	private double mutationRange = 1800.0;
 
 	public TimeAllocationMutatorConfigGroup() {
 		super(GROUP_NAME);
@@ -42,10 +42,10 @@ public class TimeAllocationMutatorConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (MUTATION_RANGE.equals(key)) {
 			Logger.getLogger(this.getClass()).warn("Please replace the getValue access to the time mutator range in your code" +
-					"by the typed access (config.timeAllocationMutator().getMutationRange()).") ;
+					"by the typed access (config.timeAllocationMutator().getMutationRange()).");
 			Logger.getLogger(this.getClass()).warn("When I see this in 2013 or later, I will disable getValue access to the time " +
-					"mutation range without warning. kai, jun'12") ;
-			return this.getMutationRange().toString() ;
+					"mutation range without warning. kai, jun'12");
+			return Double.toString(this.getMutationRange());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -54,7 +54,7 @@ public class TimeAllocationMutatorConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (MUTATION_RANGE.equals(key)) {
-			this.setMutationRange( Double.valueOf(value) ) ;
+			this.setMutationRange(Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -63,24 +63,24 @@ public class TimeAllocationMutatorConfigGroup extends Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
-		comments.put(MUTATION_RANGE, "Defines how many seconds a time mutation can maximally shift a time." ) ; 
+		comments.put(MUTATION_RANGE, "Defines how many seconds a time mutation can maximally shift a time."); 
 		return comments;
 	}
 
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(MUTATION_RANGE, this.mutationRange.toString() );
+		map.put(MUTATION_RANGE, Double.toString(this.mutationRange));
 		return map;
 	}
 
 	/* direct access */
 
-	public Double getMutationRange() {
-		return this.mutationRange ;
+	public double getMutationRange() {
+		return this.mutationRange;
 	}
 
-	public void setMutationRange(final Double val) {
+	public void setMutationRange(final double val) {
 		this.mutationRange = val;
 	}
 

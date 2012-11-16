@@ -38,14 +38,10 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
-	private final Double mutationRange;
+	private final double mutationRange;
 	private final Random random;
 
-	public PlanMutateTimeAllocationSimplified(final int mutationRange, final Random random) {
-		this.mutationRange = new Double(mutationRange);
-		this.random = random;
-	}
-	public PlanMutateTimeAllocationSimplified(final Double mutationRange, final Random random) {
+	public PlanMutateTimeAllocationSimplified(final double mutationRange, final Random random) {
 		this.mutationRange = mutationRange;
 		this.random = random;
 	}
@@ -57,16 +53,16 @@ public class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
 	private void mutatePlan(final Plan plan) {
 
-		for ( PlanElement pe : plan.getPlanElements() ) {
-			if ( pe instanceof Activity ) {
-				Activity act = (Activity) pe ;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 
 				// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
-				if ( act.getEndTime()!=Time.UNDEFINED_TIME ) {
-					act.setEndTime(mutateTime(act.getEndTime())) ;
+				if (act.getEndTime() != Time.UNDEFINED_TIME) {
+					act.setEndTime(mutateTime(act.getEndTime()));
 				}
-				if ( act.getMaximumDuration()!=Time.UNDEFINED_TIME ) {
-					act.setMaximumDuration(mutateTime(act.getMaximumDuration())) ;
+				if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+					act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
 				}
 				
 			} 
@@ -78,10 +74,11 @@ public class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 		double t = time;
 		t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
 
-		if (t < 0) t = 0;
+		if (t < 0) {
+			t = 0;
+		}
 		// note that this also affects duration
 		
-//		if (t > 24*3600) t = 24*3600;
 		return t;
 	}
 
