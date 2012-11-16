@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -71,19 +70,17 @@ class VehicularDepartureHandler implements DepartureHandler {
 		if ( ! (agent instanceof UmlaufDriver) ) {
 			// (UmlaufDriver somehow is different. kai, dec'11)
 			if (linkId.equals(agent.getDestinationLinkId())) {
-				if ( agent instanceof DriverAgent ) {
-					if ( ((DriverAgent)agent).chooseNextLinkId() == null ) {
+				if ( agent.chooseNextLinkId() == null ) {
 
-						// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
-						// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
-						// consistently implemented.  One could also decide to not have these departure/arrival events here
-						// (we would still have actEnd/actStart events).  kai, nov'11
+					// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
+					// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
+					// consistently implemented.  One could also decide to not have these departure/arrival events here
+					// (we would still have actEnd/actStart events).  kai, nov'11
 
-						agent.endLegAndComputeNextState(now) ;
-						this.qNetsimEngine.internalInterface.arrangeNextAgentState(agent) ;
-						return;
-					}
-				} 
+					agent.endLegAndComputeNextState(now) ;
+					this.qNetsimEngine.internalInterface.arrangeNextAgentState(agent) ;
+					return;
+				}
 			}
 		}		
 		Id vehicleId = agent.getPlannedVehicleId() ;

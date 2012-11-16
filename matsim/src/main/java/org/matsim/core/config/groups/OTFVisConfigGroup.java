@@ -237,18 +237,19 @@ public class OTFVisConfigGroup extends Module {
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(AGENT_SIZE, "The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts"
-				+ " rather ungracefully, or displays no agents at all." ) ;
+				+ " rather ungracefully, or displays no agents at all.");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
-		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'." );
+		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'.");
 		
-		String allowedColorings = null ;
-		for ( ColoringScheme scheme : ColoringScheme.values() ) {
-			allowedColorings += " " + scheme.toString() ; 
+		StringBuffer allowedColorings = new StringBuffer();
+		for (ColoringScheme scheme : ColoringScheme.values()) {
+			allowedColorings.append(' ');
+			allowedColorings.append(scheme.toString());
 		}
-		map.put(COLORING, "coloring scheme for otfvis.  Currently (2012) allowed values:" + allowedColorings );
+		map.put(COLORING, "coloring scheme for otfvis.  Currently (2012) allowed values:" + allowedColorings);
 		
 		map.put(MAP_OVERLAY_MODE, "Render everything on top of OpenStreetMap tiles.");
-		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization. ");
+		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization.");
 		//		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
 //				"May affect all non-moving items.") ;
 		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11

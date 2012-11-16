@@ -218,13 +218,14 @@ public class ControlerConfigGroup extends Module {
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
 				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		
-		String mobsimTypes = "" ;
+		StringBuilder mobsimTypes = new StringBuilder();
 		for ( MobsimType mtype : MobsimType.values() ) {
-			mobsimTypes += (mtype.toString() + " ") ;
+			mobsimTypes.append(mtype.toString());
+			mobsimTypes.append(' ');
 		}
-		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes );
+		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes);
 		
-		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.") ;
+		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.");
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
 				"to a file. `0' disables snapshots writing completely");
 		return map;
