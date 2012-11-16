@@ -66,11 +66,11 @@ public final class NetworkImpl implements Network, BasicLocations {
 
 	private double capperiod = 3600.0 ;
 
-	protected final Map<Id, Node> nodes = new LinkedHashMap<Id, Node>();
+	private final Map<Id, Node> nodes = new LinkedHashMap<Id, Node>();
 
 	private Map<Id, Link> links = new LinkedHashMap<Id, Link>();
 
-	protected QuadTree<Node> nodeQuadTree = null;
+	private QuadTree<Node> nodeQuadTree = null;
 	
 	private LinkQuadTree linkQuadTree = null;
 
@@ -80,7 +80,7 @@ public final class NetworkImpl implements Network, BasicLocations {
 
 	private double effectiveLaneWidth = 3.75;
 
-	protected NetworkFactoryImpl factory;
+	private NetworkFactoryImpl factory;
 
 	private Collection<NetworkChangeEvent> networkChangeEvents = null;
 
