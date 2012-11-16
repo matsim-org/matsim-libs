@@ -35,6 +35,12 @@ public class AgentStuckEvent extends Event {
 	private final Id linkId;
 	private final String legMode;
 
+	public AgentStuckEvent(final double time, final Id agentId, final Id linkId, final String legMode) {
+		super(time);
+		this.personId = agentId;
+		this.linkId = linkId;
+		this.legMode = legMode;
+	}
 
 	@Override
 	public Map<String, String> getAttributes() {
@@ -53,13 +59,6 @@ public class AgentStuckEvent extends Event {
 
 	public Id getLinkId() {
 		return this.linkId;
-	}
-
-	public AgentStuckEvent(final double time, final Id agentId, final Id linkId, final String legMode) {
-		super(time);
-		this.personId = agentId;
-		this.linkId = linkId;
-		this.legMode = legMode;
 	}
 
 	@Override

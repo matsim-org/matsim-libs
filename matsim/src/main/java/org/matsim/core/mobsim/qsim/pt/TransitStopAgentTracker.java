@@ -27,15 +27,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author mrieser
  */
 public class TransitStopAgentTracker {
 
+	private final EventsManager events;
 	private final Map<Id, List<PTPassengerAgent>> agentsAtStops = new HashMap<Id, List<PTPassengerAgent>>();
 
-	public void addAgentToStop(final PTPassengerAgent agent, final Id stopId) {
+	public TransitStopAgentTracker(final EventsManager events) {
+		this.events = events;
+	}
+	
+	public void addAgentToStop(final double now, final PTPassengerAgent agent, final Id stopId) {
 		if (stopId == null) {
 			throw new NullPointerException("stop must not be null.");
 		}
@@ -45,6 +52,8 @@ public class TransitStopAgentTracker {
 			this.agentsAtStops.put(stopId, agents);
 		}
 		agents.add(agent);
+		Id destinationStopId = agent.getDesiredDestinationStopId();
+		events.processEvent(new AgentWaitingForPtEvent(now, agent.getId(), stopId, destinationStopId));
 	}
 
 	public void removeAgentFromStop(final PTPassengerAgent agent, final Id stopId) {

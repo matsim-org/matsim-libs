@@ -253,6 +253,11 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	public Id getDesiredAccessStopId() {
 		return delegate.getDesiredAccessStopId();
 	}
+	
+	@Override
+	public Id getDesiredDestinationStopId() {
+		return this.delegate.getDesiredDestinationStopId();
+	}
 
 	@Override
 	public double getWeight() {

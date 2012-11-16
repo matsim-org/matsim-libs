@@ -24,6 +24,6 @@ package playground.mrieser.core.mobsim.api;
  */
 public interface DepartureHandler {
 
-	public void handleDeparture(final PlanAgent agent);
+	public void handleDeparture(final double now, final PlanAgent agent);
 
 }

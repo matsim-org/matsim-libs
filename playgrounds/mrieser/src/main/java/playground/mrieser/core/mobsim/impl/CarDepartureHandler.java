@@ -34,9 +34,9 @@ import org.matsim.vehicles.VehicleTypeImpl;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.DriverAgent;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
@@ -79,7 +79,7 @@ public class CarDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
+	public void handleDeparture(final double now, final PlanAgent agent) {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 

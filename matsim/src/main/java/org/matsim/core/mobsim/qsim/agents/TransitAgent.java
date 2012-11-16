@@ -37,7 +37,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-
 /**
  * @author mrieser
  */
@@ -105,6 +104,12 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 			Id accessStopId = route.getAccessStopId();
 			return accessStopId;
 		}
+	}
+	
+	@Override
+	public Id getDesiredDestinationStopId() {
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		return route.getEgressStopId();
 	}
 
 }

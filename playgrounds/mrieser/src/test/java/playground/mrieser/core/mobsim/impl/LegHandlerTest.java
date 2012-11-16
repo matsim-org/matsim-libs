@@ -153,7 +153,7 @@ public class LegHandlerTest {
 		public int count = 0;
 
 		@Override
-		public void handleDeparture(final PlanAgent agent) {
+		public void handleDeparture(final double now, final PlanAgent agent) {
 			this.count++;
 		}
 

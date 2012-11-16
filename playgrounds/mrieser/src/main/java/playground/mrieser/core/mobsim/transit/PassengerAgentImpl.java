@@ -80,6 +80,11 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		// Probably not used in your simulation because you ask this before you pass the route in. //mz
 		return route.getAccessStopId();
 	}
+	
+	@Override
+	public Id getDesiredDestinationStopId() {
+		return route.getEgressStopId();
+	}
 
 	@Override
 	public void setVehicle(MobsimVehicle veh) {

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonEntersVehicleEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -25,42 +24,51 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 /**
- * @author mrieser
+ * @author mrieser / senozon
  */
-public class PersonEntersVehicleEvent extends Event {
+public class AgentWaitingForPtEvent extends Event {
 
-	public static final String EVENT_TYPE = "PersonEntersVehicle";
-	public static final String ATTRIBUTE_PERSON = "person";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String TRANSIT_ROUTE_ID = "transitRouteId";
-	private final Id vehicleId;
-	private final Id personId;
-
-	/*package*/ public PersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
-		super(time);
-		this.personId = personId;
-		this.vehicleId = vehicleId;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		return attrs;
+	public static final String EVENT_TYPE = "waitingForPt";
+	public static final String ATTRIBUTE_AGENT = "agent";
+	public static final String ATTRIBUTE_WAITSTOP = "atStop";
+	public static final String ATTRIBUTE_DESTINATIONSTOP = "destinationStop";
+	public final Id agentId;
+	public final Id waitingAtStopId;
+	public final Id destinationStopId;
+	
+	public AgentWaitingForPtEvent(final double now, final Id agentId, final Id waitingAtStopId, final Id destinationStopId) {
+		super(now);
+		this.agentId = agentId;
+		this.waitingAtStopId = waitingAtStopId;
+		this.destinationStopId = destinationStopId;
 	}
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-
-	public Id getVehicleId() {
-		return this.vehicleId;
-	}
-
-	public Id getPersonId() {
-		return this.personId;
+	
+	public Id getAgentId() {
+		return this.agentId;
 	}
 	
+	public Id getWaitingAtStopId() {
+		return this.waitingAtStopId;
+	}
+	
+	public Id getDestinationStopId() {
+		return this.destinationStopId;
+	}
+	
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		
+		attr.put(ATTRIBUTE_AGENT, this.agentId.toString());
+		attr.put(ATTRIBUTE_WAITSTOP, this.waitingAtStopId.toString());
+		attr.put(ATTRIBUTE_DESTINATIONSTOP, this.destinationStopId.toString());
+		
+		return attr;
+	}
+
 }

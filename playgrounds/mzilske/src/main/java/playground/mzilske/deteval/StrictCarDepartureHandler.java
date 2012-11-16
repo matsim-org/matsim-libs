@@ -49,7 +49,7 @@ public class StrictCarDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
+	public void handleDeparture(final double now, final PlanAgent agent) {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 

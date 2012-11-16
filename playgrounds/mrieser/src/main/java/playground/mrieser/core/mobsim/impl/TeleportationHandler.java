@@ -55,7 +55,7 @@ public class TeleportationHandler implements DepartureHandler, MobsimFeature, Mo
 	}
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
+	public void handleDeparture(final double now, final PlanAgent agent) {
 		Leg leg = (Leg) agent.getCurrentPlanElement();
 		double travelTime = leg.getTravelTime();
 		if (travelTime == Time.UNDEFINED_TIME) {

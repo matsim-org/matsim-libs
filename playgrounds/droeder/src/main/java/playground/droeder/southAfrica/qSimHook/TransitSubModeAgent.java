@@ -200,5 +200,21 @@ public class TransitSubModeAgent extends PersonDriverAgentImpl implements Mobsim
 			return accessStopId;
 		}
 	}
+
+	@Override
+	public Id getDesiredDestinationStopId() {
+		Leg leg = getCurrentLeg();
+		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
+			log.info("route: "
+					+ leg.getRoute().getClass().getCanonicalName()
+					+ " "
+					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+			return null;
+		} else {
+			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			return route.getEgressStopId();
+		}
+	}
 }
 

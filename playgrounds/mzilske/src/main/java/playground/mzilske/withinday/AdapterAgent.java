@@ -434,5 +434,11 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public Id getDesiredDestinationStopId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

@@ -92,7 +92,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	public TransitQSimEngine(QSim queueSimulation) {
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
-		this.agentTracker = new TransitStopAgentTracker();
+		this.agentTracker = new TransitStopAgentTracker(this.qSim.getEventsManager());
 	}
 
 	// For tests (which create an Engine, and externally create Agents as well).
@@ -198,7 +198,8 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		}
 		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-			this.agentTracker.addAgentToStop((PTPassengerAgent) planAgent, stop.getId());
+			double now = this.qSim.getSimTimer().getTimeOfDay();
+			this.agentTracker.addAgentToStop(now, (PTPassengerAgent) planAgent, stop.getId());
 			this.internalInterface.registerAdditionalAgentOnLink(planAgent) ;
 		} else {
 			throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");

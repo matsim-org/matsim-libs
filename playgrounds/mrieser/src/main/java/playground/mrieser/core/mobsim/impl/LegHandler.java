@@ -61,7 +61,7 @@ public class LegHandler implements PlanElementHandler, MobsimKeepAlive {
 		if (depHandler == null) {
 			throw new NullPointerException("No DepartureHandler registered for mode " + leg.getMode());
 		}
-		depHandler.handleDeparture(agent);
+		depHandler.handleDeparture(this.simEngine.getCurrentTime(), agent);
 		this.onRoute.incrementAndGet();
 	}
 

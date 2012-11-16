@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -94,7 +94,7 @@ public class TransitMobsimFactory implements MobsimFactory {
 		RefQueueNetworkFeature netFeature = new RefQueueNetworkFeature(scenario.getNetwork(), engine);
 
 		// setup transit stuff
-		TransitStopAgentTracker agentTracker = new TransitStopAgentTracker();
+		TransitStopAgentTracker agentTracker = new TransitStopAgentTracker(eventsManager);
 		TransitFeature transitFeature = new TransitFeature(agentTracker);
 		AgentSource transitAgentSource = new TransitDriverAgentSource(schedule, transitVehicles, scenario.getNetwork(), agentTracker, TRANSIT_VEHICLE_LEG_TYPE);
 		DepartureHandler transitDriverDepartureHandler = new TransitDriverDepartureHandler(engine, netFeature, transitFeature, scenario);

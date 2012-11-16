@@ -63,7 +63,7 @@ public class TeleportationHandlerTest {
 		agent.useNextPlanElement(); // home
 		engine.setCurrentTime(5.0 * 3600);
 		agent.useNextPlanElement(); // leg
-		th.handleDeparture(agent);
+		th.handleDeparture(5*3600, agent);
 		th.doSimStep(5.0 * 3600 + 1.0);
 		Assert.assertEquals(0, engine.countHandleAgent);
 		th.doSimStep(5.0 * 3600 + 99.0);
@@ -74,7 +74,7 @@ public class TeleportationHandlerTest {
 		agent.useNextPlanElement(); // leg
 
 		engine.setCurrentTime(11.0 * 3600);
-		th.handleDeparture(agent);
+		th.handleDeparture(11*3600, agent);
 		th.doSimStep(11.0 * 3600 + 1.0);
 		Assert.assertEquals(1, engine.countHandleAgent);
 		th.doSimStep(11.0 * 3600 + 79.0);

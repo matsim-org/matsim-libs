@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.core.mobsim.transit;
+package org.matsim.core.events;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-
-import playground.mrieser.core.mobsim.api.DepartureHandler;
-import playground.mrieser.core.mobsim.api.PlanAgent;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author mrieser
+ * @author mrieser / senozon
  */
-public class TransitDepartureHandler implements DepartureHandler {
+public class AgentWaitingForPtEventTest {
 
-	private final TransitStopAgentTracker agentTracker;
+	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
-	public TransitDepartureHandler(final TransitStopAgentTracker agentTracker) {
-		this.agentTracker = agentTracker;
-	}
-
-	@Override
-	public void handleDeparture(final double now, final PlanAgent agent) {
-		Leg leg = (Leg) agent.getCurrentPlanElement();
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-		Id accessStopId = route.getAccessStopId();
-		PTPassengerAgent passenger = new PassengerAgentImpl(agent.getPlan().getPerson().getId(), route, agent.getWeight());
-		this.agentTracker.addAgentToStop(now, passenger, accessStopId);
+	@Test
+	public void testReadWriteXml() {
+		PersonImpl person = new PersonImpl(new IdImpl(1));
+		Id waitStopId = new IdImpl("1980");
+		Id destinationStopId = new IdImpl("0511");
+		double time = 5.0 * 3600 + 11.0 + 60;
+		AgentWaitingForPtEvent event = new AgentWaitingForPtEvent(time, person.getId(), waitStopId, destinationStopId);
+		AgentWaitingForPtEvent event2 = XmlEventsTester.testWriteReadXml(helper.getOutputDirectory() + "events.xml", event);
+		Assert.assertEquals("wrong time of event.", time, event2.getTime(), 1e-8);
+		Assert.assertEquals("1", event2.getAgentId().toString());
+		Assert.assertEquals("1980", event2.getWaitingAtStopId().toString());
+		Assert.assertEquals("0511", event2.getDestinationStopId().toString());
 	}
 
 }

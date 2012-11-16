@@ -20,17 +20,16 @@
 
 package playground.mrieser;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author mrieser
@@ -44,7 +43,8 @@ public class MyRuns {
 		log.info("start");
 
 
-		String networkFile = "/Volumes/Data/vis/ch25pct_kti/network.c.xml.gz";
+		String networkFile = "/Volumes/Data/coding/eclipse42git/matsimExamples/tutorial/lesson-3/network.xml";
+//		String networkFile = "/Volumes/Data/vis/ch25pct_kti/network.c.xml.gz";
 //		String networkFile = "/Volumes/Data/talks/20120322_UsrMtg_Via/data_basic/network.xml.gz";
 		String inPlansFile = "/Volumes/Data/talks/20120322_UsrMtg_Via/data_basic/0.plans.xml.gz";
 		String outPlansFile = "/Volumes/Data/talks/20120322_UsrMtg_Via/data_basic/0.plans.selected.xml.gz";
@@ -68,29 +68,29 @@ public class MyRuns {
 //			}
 //		}
 
-		CoordinateTransformation t = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
-		
-		BufferedReader rdr = IOUtils.getBufferedReader("/Users/cello/Downloads/tracks.xy");
-		BufferedWriter wrtr = IOUtils.getBufferedWriter ("/Users/cello/Downloads/tracksCH1903.xy");
-		
-		String line = rdr.readLine();
-		wrtr.write(line.replace("lat", "x").replace("lon", "y"));
-		wrtr.write('\n');
-		
-		while ((line = rdr.readLine()) != null) {
-			String[] parts = StringUtils.explode(line, '\t');
-			Coord c = t.transform(new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[0])));
-			
-			wrtr.write(Double.toString(c.getX()));
-			wrtr.write('\t');
-			wrtr.write(Double.toString(c.getY()));
-			for (int i = 2, n = parts.length; i < n; i++) {
-				wrtr.write('\t');
-				wrtr.write(parts[i]);
-			}
-			wrtr.write('\n');
-		}
-		wrtr.close();
+//		CoordinateTransformation t = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+//		
+//		BufferedReader rdr = IOUtils.getBufferedReader("/Users/cello/Downloads/tracks.xy");
+//		BufferedWriter wrtr = IOUtils.getBufferedWriter ("/Users/cello/Downloads/tracksCH1903.xy");
+//		
+//		String line = rdr.readLine();
+//		wrtr.write(line.replace("lat", "x").replace("lon", "y"));
+//		wrtr.write('\n');
+//		
+//		while ((line = rdr.readLine()) != null) {
+//			String[] parts = StringUtils.explode(line, '\t');
+//			Coord c = t.transform(new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[0])));
+//			
+//			wrtr.write(Double.toString(c.getX()));
+//			wrtr.write('\t');
+//			wrtr.write(Double.toString(c.getY()));
+//			for (int i = 2, n = parts.length; i < n; i++) {
+//				wrtr.write('\t');
+//				wrtr.write(parts[i]);
+//			}
+//			wrtr.write('\n');
+//		}
+//		wrtr.close();
 		
 		
 //		Coord c = t.transform(new CoordImpl(679976, 248958));
@@ -123,15 +123,15 @@ public class MyRuns {
 
 
 
-//		{
-//			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//			new MatsimNetworkReader(s).readFile("/Volumes/Data/vis/ch25pct_kti/network.c.xml.gz");
-//			FreespeedTravelTimeAndDisutility ttc = new FreespeedTravelTimeAndDisutility(s.getConfig().planCalcScore());
-//			PreProcessLandmarks preProcessData = new PreProcessLandmarks(ttc);
-//			log.info("start preprocess");
-//			preProcessData.run(s.getNetwork());
-//			log.info("stop preprocess");
-//		}
+		{
+			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			new MatsimNetworkReader(s).readFile(networkFile);
+			for (Link l : s.getNetwork().getLinks().values()) {
+				l.setCapacity(l.getCapacity() / 10.0);
+			}
+			((NetworkImpl) s.getNetwork()).setCapacityPeriod(3600);
+			new NetworkWriter(s.getNetwork()).write(networkFile);
+		}
 
 
 
@@ -155,9 +155,6 @@ public class MyRuns {
 //		new NetworkWriter(s.getNetwork()).write("/Users/cello/goteborg.xml.gz");
 
 //		log.info("done.");
-		
-		System.out.println(010);
-		System.out.println(020);
 
 	}
 

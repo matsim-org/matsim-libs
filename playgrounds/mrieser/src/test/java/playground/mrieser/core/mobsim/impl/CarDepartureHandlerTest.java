@@ -44,9 +44,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.utils.LogCounter;
 
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.api.PlanElementHandler;
-import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.fakes.FakeSimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
@@ -82,7 +82,7 @@ public class CarDepartureHandlerTest {
 		Assert.assertEquals(veh, link.getParkedVehicle(veh.getId()));
 		agent.useNextPlanElement(); // homeAct
 		agent.useNextPlanElement(); // leg
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(10, agent);
 		Assert.assertNull(link.getParkedVehicle(veh.getId()));
 	}
 
@@ -131,7 +131,7 @@ public class CarDepartureHandlerTest {
 		agent.useNextPlanElement(); // leg w/ empty route
 		Assert.assertEquals(0, actCounter.countStart);
 		Assert.assertEquals(0, legCounter.countStart);
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(10, agent);
 		Assert.assertEquals(1, actCounter.countStart);
 		Assert.assertEquals(1, legCounter.countEnd);
 		Assert.assertEquals("vehicle should still be parked.", veh, link.getParkedVehicle(veh.getId()));
@@ -185,7 +185,7 @@ public class CarDepartureHandlerTest {
 
 		agent.useNextPlanElement(); // home
 		agent.useNextPlanElement(); // leg
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(9, agent);
 
 		f.networkFeature.doSimStep(10); // agent moved to link0.buffer
 		f.networkFeature.doSimStep(11); // agent moved to link1
@@ -197,7 +197,7 @@ public class CarDepartureHandlerTest {
 		Assert.assertNotNull(vehicle);
 
 		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(209, agent);
 
 		f.networkFeature.doSimStep(210); // agent moved to link2.buffer
 		f.networkFeature.doSimStep(211); // agent moved to link3
@@ -205,7 +205,7 @@ public class CarDepartureHandlerTest {
 
 		Assert.assertEquals(vehicle, f.networkFeature.getSimNetwork().getLinks().get(f.ids[3]).getParkedVehicle(personId));
 		Assert.assertTrue(agent.useNextPlanElement() instanceof Leg); // leg
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(309, agent);
 
 		f.networkFeature.doSimStep(310); // agent moved to link3.buffer
 		f.networkFeature.doSimStep(311); // agent moved to link4
@@ -261,7 +261,7 @@ public class CarDepartureHandlerTest {
 
 		agent.useNextPlanElement(); // home
 		agent.useNextPlanElement(); // leg car
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(9, agent);
 
 		f.networkFeature.doSimStep(10); // agent moved to link0.buffer
 		f.networkFeature.doSimStep(11); // agent moved to link1
@@ -278,7 +278,7 @@ public class CarDepartureHandlerTest {
 
 		LogCounter counter = new LogCounter(Level.ERROR);
 		counter.activiate();
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(201, agent);
 		counter.deactiviate();
 		Assert.assertEquals(1, counter.getErrorCount());
 	}
@@ -330,7 +330,7 @@ public class CarDepartureHandlerTest {
 
 		agent.useNextPlanElement(); // home
 		agent.useNextPlanElement(); // leg car
-		cdh.handleDeparture(agent);
+		cdh.handleDeparture(9, agent);
 
 		f.networkFeature.doSimStep(10); // agent moved to link0.buffer
 		f.networkFeature.doSimStep(11); // agent moved to link1
@@ -347,7 +347,7 @@ public class CarDepartureHandlerTest {
 
 		LogCounter counter = new LogCounter(Level.WARN);
 		counter.activiate();
-		cdh.handleDeparture(agent); // vehicle will be teleported from link2 to link3
+		cdh.handleDeparture(250, agent); // vehicle will be teleported from link2 to link3
 		counter.deactiviate();
 		Assert.assertEquals(1, counter.getWarnCount());
 

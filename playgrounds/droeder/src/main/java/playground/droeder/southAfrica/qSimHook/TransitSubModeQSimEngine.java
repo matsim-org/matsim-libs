@@ -66,7 +66,7 @@ public class TransitSubModeQSimEngine extends TransitQSimEngine {
 		}
 		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-			this.agentTracker.addAgentToStop((PTPassengerAgent) planAgent, stop.getId());
+			this.agentTracker.addAgentToStop(this.qSim.getSimTimer().getTimeOfDay(), (PTPassengerAgent) planAgent, stop.getId());
 			super.getInternalInterface().registerAdditionalAgentOnLink(planAgent) ;
 		} else {
 			throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");

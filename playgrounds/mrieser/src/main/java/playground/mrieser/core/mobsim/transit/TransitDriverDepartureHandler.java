@@ -76,7 +76,7 @@ public class TransitDriverDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public void handleDeparture(final PlanAgent agent) {
+	public void handleDeparture(final double now, final PlanAgent agent) {
 		if (!(agent instanceof TransitDriverPlanAgent)) {
 			log.error("TransitDriverDepartureHandler only supports agents of type " + TransitDriverPlanAgent.class.getCanonicalName());
 		}

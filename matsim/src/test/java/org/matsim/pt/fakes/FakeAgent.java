@@ -85,42 +85,25 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 
 	@Override
 	public Id getCurrentLinkId() {
-		return null ;
+		return null;
 	}
 
-//	@Override
-//	public Leg getCurrentLeg() {
-//		return this.dummyLeg;
-//	}
-	
 	@Override
 	public Double getExpectedTravelTime() {
 		// since the class does not tell what it is supposed to do I do not know what is a reasonable answer here.  kai, jun'11
-		return null ;
+		return null;
 	}
 	
 	@Override
 	public String getMode() {
-		return this.dummyLeg.getMode() ;
+		return this.dummyLeg.getMode();
 	}
 	
 	@Override
 	public Id getPlannedVehicleId() {
-		return ((NetworkRoute)this.dummyLeg.getRoute()).getVehicleId() ; // not sure if this is very clever.  kai, jun'11
+		return ((NetworkRoute)this.dummyLeg.getRoute()).getVehicleId(); // not sure if this is very clever.  kai, jun'11
 	}
 	
-
-//	@Override
-//	public Activity getCurrentActivity() {
-//		// As far as I can see, there is never a current Activity. cdobler, nov'10
-//		return null;
-//	}
-
-//	@Override
-//	public PlanElement getCurrentPlanElement() {
-//		return this.dummyLeg ;
-//	}
-
 	@Override
 	public double getActivityEndTime() {
 		return 0;
@@ -130,11 +113,6 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	public Id getDestinationLinkId() {
 		return null;
 	}
-
-//	@Override
-//	public PersonImpl getPerson() {
-//		return this.dummyPerson;
-//	}
 
 	@Override
 	public void endLegAndComputeNextState(final double now) {
@@ -167,14 +145,9 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 		return null;
 	}
 
-//	@Override
-//	public PlanElement getNextPlanElement() {
-//		throw new UnsupportedOperationException() ;
-//	}
-
 	@Override
 	public Id getId() {
-		return this.dummyPerson.getId() ;
+		return this.dummyPerson.getId();
 	}
 
 	@Override
@@ -184,7 +157,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 
 	@Override
 	public State getState() {
-		return MobsimAgent.State.ABORT ;
+		return MobsimAgent.State.ABORT;
 	}
 
 	@Override
@@ -192,8 +165,9 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 		return null;
 	}
 
-//	@Override
-//	public Plan getSelectedPlan() {
-//		return PopulationUtils.unmodifiablePlan(this.dummyPerson.getSelectedPlan());
-//	}
+	@Override
+	public Id getDesiredDestinationStopId() {
+		return null;
+	}
+	
 }

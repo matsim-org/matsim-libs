@@ -23,7 +23,9 @@ package org.matsim.core.mobsim.qsim.pt;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -39,7 +41,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 	private static final Logger log = Logger.getLogger(TransitStopAgentTrackerTest.class);
 
 	public void testAddAgent() {
-		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		EventsManager events = EventsUtils.createEventsManager();
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		PTPassengerAgent agent1 = new FakeAgent(null, null);
 		PTPassengerAgent agent2 = new FakeAgent(null, null);
@@ -48,14 +51,14 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
 		assertFalse(tracker.getAgentsAtStop(stop1.getId()).contains(agent1));
-		tracker.addAgentToStop(agent1, stop1.getId());
+		tracker.addAgentToStop(10, agent1, stop1.getId());
 		assertTrue(tracker.getAgentsAtStop(stop1.getId()).contains(agent1));
 		assertFalse(tracker.getAgentsAtStop(stop2.getId()).contains(agent1));
 		assertFalse(tracker.getAgentsAtStop(stop1.getId()).contains(agent2));
-		tracker.addAgentToStop(agent2, stop1.getId());
+		tracker.addAgentToStop(10, agent2, stop1.getId());
 		assertTrue(tracker.getAgentsAtStop(stop1.getId()).contains(agent2));
 
-		tracker.addAgentToStop(agent3, stop2.getId());
+		tracker.addAgentToStop(10, agent3, stop2.getId());
 		assertFalse(tracker.getAgentsAtStop(stop1.getId()).contains(agent3));
 		assertFalse(tracker.getAgentsAtStop(stop2.getId()).contains(agent1));
 		assertFalse(tracker.getAgentsAtStop(stop2.getId()).contains(agent2));
@@ -63,7 +66,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 	}
 
 	public void testRemoveAgent() {
-		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		EventsManager events = EventsUtils.createEventsManager();
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		PTPassengerAgent agent1 = new FakeAgent(null, null);
 		PTPassengerAgent agent2 = new FakeAgent(null, null);
@@ -71,9 +75,9 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
 		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(3, 4), false);
 
-		tracker.addAgentToStop(agent1, stop1.getId());
-		tracker.addAgentToStop(agent2, stop1.getId());
-		tracker.addAgentToStop(agent3, stop2.getId());
+		tracker.addAgentToStop(10, agent1, stop1.getId());
+		tracker.addAgentToStop(10, agent2, stop1.getId());
+		tracker.addAgentToStop(10, agent3, stop2.getId());
 		assertEquals(2, tracker.getAgentsAtStop(stop1.getId()).size());
 		assertEquals(1, tracker.getAgentsAtStop(stop2.getId()).size());
 		assertTrue(tracker.getAgentsAtStop(stop1.getId()).contains(agent1));
@@ -87,7 +91,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 	}
 
 	public void testGetAgentsAtStopImmutable() {
-		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
+		EventsManager events = EventsUtils.createEventsManager();
+		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		PTPassengerAgent agent1 = new FakeAgent(null, null);
 		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(2, 3), false);
@@ -100,7 +105,7 @@ public class TransitStopAgentTrackerTest extends TestCase {
 			log.info("catched expected exception.", e);
 		}
 
-		tracker.addAgentToStop(agent1, stop1.getId());
+		tracker.addAgentToStop(10, agent1, stop1.getId());
 		try {
 			tracker.getAgentsAtStop(stop1.getId()).remove(0);
 			fail("missing exception, non-empty list should be immutable.");

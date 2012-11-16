@@ -73,6 +73,11 @@ public class FakePassengerAgent implements PTPassengerAgent {
 	public Id getDesiredAccessStopId() {
 		return null;
 	}
+	
+	@Override
+	public Id getDesiredDestinationStopId() {
+		return null;
+	}
 
 	@Override
 	public void setVehicle(MobsimVehicle veh) {

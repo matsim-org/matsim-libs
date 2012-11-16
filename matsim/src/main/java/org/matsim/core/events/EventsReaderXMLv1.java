@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
@@ -181,8 +182,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			String state = atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALGROUP_STATE);
 			SignalGroupState newState = SignalGroupState.valueOf(state);
 			this.events.processEvent(this.builder.createSignalGroupStateChangedEvent(time, systemId, groupId, newState));
-		} 
-		else if (LinkChangeFlowCapacityEvent.EVENT_TYPE.equals(eventType)) {
+		} else if (LinkChangeFlowCapacityEvent.EVENT_TYPE.equals(eventType)) {
 			String changeTypeString = atts.getValue(LinkChangeFlowCapacityEvent.CHANGETYPE);
 			NetworkChangeEvent.ChangeType changeType = null;
 			if (changeTypeString.equals(LinkChangeFlowCapacityEvent.CHANGETYPEABSOLUTE)) changeType = NetworkChangeEvent.ChangeType.ABSOLUTE;
@@ -206,23 +206,26 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			double value = Double.valueOf(atts.getValue(LinkChangeLanesEvent.CHANGEVALUE));
 			NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(changeType, value);
 			this.events.processEvent(this.builder.createLinkChangeLanesEvent(time, new IdImpl(atts.getValue(LinkChangeLanesEvent.ATTRIBUTE_LINK)), changeValue));
-		} 
-		else if (BoardingDeniedEvent.EVENT_TYPE.equals(eventType)){
+		} else if (BoardingDeniedEvent.EVENT_TYPE.equals(eventType)){
 			Id personId = new IdImpl(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_PERSON_ID));
 			Id vehicleId = new  IdImpl(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_VEHICLE_ID));
 			this.events.processEvent(new BoardingDeniedEvent(time, personId, vehicleId));
-		}
-		else {
+		} else if (AgentWaitingForPtEvent.EVENT_TYPE.equals(eventType)){
+			Id agentId = new IdImpl(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_AGENT));
+			Id waitStopId = new  IdImpl(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP));
+			Id destinationStopId = new  IdImpl(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP));
+			this.events.processEvent(new AgentWaitingForPtEvent(time, agentId, waitStopId, destinationStopId));
+		} else {
 			Event event = this.builder.createGenericEvent( eventType, time );
-			for ( int ii=0 ; ii<atts.getLength() ; ii++ ) {
-				String key = atts.getLocalName(ii) ;
+			for ( int ii=0; ii<atts.getLength(); ii++ ) {
+				String key = atts.getLocalName(ii);
 				if ( key.equals("time") || key.equals("type") ) {
-					continue ;
+					continue;
 				}
-				String value = atts.getValue(ii) ;
-				event.getAttributes().put(key, value) ;
+				String value = atts.getValue(ii);
+				event.getAttributes().put(key, value);
 			}
-			this.events.processEvent(event) ;
+			this.events.processEvent(event);
 		}
 	}
 
