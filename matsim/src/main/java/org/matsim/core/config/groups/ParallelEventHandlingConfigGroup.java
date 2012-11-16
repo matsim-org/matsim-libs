@@ -33,16 +33,16 @@ public class ParallelEventHandlingConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "parallelEventHandling";
 
-	final String NUMBER_OF_THREADS = "numberOfThreads";
-	private Integer numberOfThreads = null ;
+	private final static String NUMBER_OF_THREADS = "numberOfThreads";
+	private Integer numberOfThreads = null;
 
-	final String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
-	private Long estimatedNumberOfEvents = null ;
+	private final static String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
+	private Long estimatedNumberOfEvents = null;
 
-	final String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps"; 
-	Boolean synchronizeOnSimSteps = null;
+	private final static String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps"; 
+	private Boolean synchronizeOnSimSteps = null;
 	
-	private boolean locked = false ;
+	private boolean locked = false;
 
 	public ParallelEventHandlingConfigGroup() {
 		super(GROUP_NAME);
@@ -51,7 +51,7 @@ public class ParallelEventHandlingConfigGroup extends Module {
 	@Override
 	public String getValue(final String key) {
 		if ( NUMBER_OF_THREADS.equals(key) || ESTIMATED_NUMBER_OF_EVENTS.equals(key) ) {
-			throw new RuntimeException( "getValue access disabled; use direct getter ") ;
+			throw new RuntimeException("getValue access disabled; use direct getter");
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -60,9 +60,9 @@ public class ParallelEventHandlingConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if ( NUMBER_OF_THREADS.equals(key) ) {
-			this.setNumberOfThreads(Integer.parseInt(value)) ; 
+			this.setNumberOfThreads(Integer.parseInt(value)); 
 		} else if ( ESTIMATED_NUMBER_OF_EVENTS.equals(key) ) {
-			this.setEstimatedNumberOfEvents( Long.parseLong(value) ) ; 
+			this.setEstimatedNumberOfEvents(Long.parseLong(value)); 
 		} else if ( SYNCHRONIZE_ON_SIMSTEPS.equals(key)) {
 			this.setSynchronizeOnSimSteps(Boolean.parseBoolean(value));
 		}
