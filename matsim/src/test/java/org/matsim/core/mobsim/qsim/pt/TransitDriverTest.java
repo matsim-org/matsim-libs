@@ -278,7 +278,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		events.finishProcessing() ;
 		assertTrue(handler.isOk) ;
 	}
-	class EventHandlerForTesting implements EventHandler, BasicEventHandler {
+	
+	private static class EventHandlerForTesting implements EventHandler, BasicEventHandler {
 		boolean isOk = false ;
 		@Override
 		public void reset(int iteration) {
@@ -289,10 +290,9 @@ public class TransitDriverTest extends MatsimTestCase {
 				BoardingDeniedEvent eve = (BoardingDeniedEvent) ev ;
 				assertEquals( "1", eve.getPersonId().toString() ) ;
 				assertEquals( "1976", eve.getVehicleId().toString() ) ;
-				isOk = true ;
+				isOk = true;
 			}
 		}
-		
 	}
 
 	public void testHandleStop_ExitPassengers() {

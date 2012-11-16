@@ -191,7 +191,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 	}
 	
-	private class CollectorScenario extends ScenarioImpl {
+	private static class CollectorScenario extends ScenarioImpl {
 		
 		private final Scenario scenario;
 		private final CollectorPopulation population;
@@ -234,7 +234,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 	}
 	
-	private class CollectorPopulation implements Population {
+	private static class CollectorPopulation implements Population {
 
 		private final Population population;
 		
@@ -280,7 +280,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	 * Alternatively we could ensure that KnowledgesImpl is thread-safe
 	 * and add data directly to it instead of using this collector.
 	 */
-	private class CollectorKnowledges extends KnowledgesImpl {
+	private static class CollectorKnowledges extends KnowledgesImpl {
 
 		private final Map<Id, KnowledgeImpl> knowledgeByPersonId;
 		

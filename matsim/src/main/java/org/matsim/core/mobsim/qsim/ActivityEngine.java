@@ -42,7 +42,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 * in the mean time, it might be inserted at the wrong position.
 	 * cdobler, apr'12
 	 */
-	private class AgentEntry {
+	private static class AgentEntry {
 		public AgentEntry(MobsimAgent agent, double activityEndTime) {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;

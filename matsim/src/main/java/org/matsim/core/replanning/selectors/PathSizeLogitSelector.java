@@ -196,7 +196,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		wc.sumWeights = sumweight;
 	}
 
-	class WeightsContainer {
+	private static class WeightsContainer {
 		double[] weights;
 		double sumWeights;
 		double maxScore;

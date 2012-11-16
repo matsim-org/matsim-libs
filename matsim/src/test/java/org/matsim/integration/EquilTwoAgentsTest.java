@@ -112,7 +112,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 	}
 
 
-	private class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
+	private static class TestSingleIterationEventHandler implements LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
 		private final double agent1LeaveHomeTime, agent2LeaveHomeTime;
 
