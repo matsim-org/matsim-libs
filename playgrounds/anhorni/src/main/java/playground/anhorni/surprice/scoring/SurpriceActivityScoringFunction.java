@@ -61,7 +61,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		this.plan = plan;
 		this.params = params;
 		this.config = config;
-		super.reset();				
+		this.resetting();				
 	}
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
@@ -185,9 +185,8 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		return openInterval;
 	}
 	
-	@Override
-	public void reset() {
-		if (this.plan != null) this.plan.getPerson().getCustomAttributes().put(day + ".actScore", null);
+	public void resetting() {
+		this.plan.getPerson().getCustomAttributes().put(day + ".actScore", null);
 		super.reset();		
 	}
 }
