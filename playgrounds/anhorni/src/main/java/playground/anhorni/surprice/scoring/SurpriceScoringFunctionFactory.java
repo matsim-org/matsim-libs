@@ -19,8 +19,6 @@
 
 package playground.anhorni.surprice.scoring;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -38,8 +36,7 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 	private final Controler controler;
 	private AgentMemories memories = new AgentMemories();
 	private String day;
-	private ObjectAttributes preferences;
-	private Random random;
+	
 
 	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
 			AgentMemories memories, String day, ObjectAttributes preferences) {
@@ -47,38 +44,27 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		this.controler = controler;
 		this.memories = memories;
 		this.day = day;
-		this.preferences = preferences;	
 	}
 	
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
 		// generate alpha_trip with id of agent
-		this.random = new Random(Integer.parseInt(plan.getPerson().getId().toString()) + Surprice.days.indexOf(day) * 10000);
 		
-		for (int i = 0; i < 100; i++) {
-			this.random.nextDouble();
-		}
-		double alphaTripRange = Double.parseDouble(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "alphaTripRange"));
-		double r = this.random.nextDouble();
-		double alphaTrip = alphaTripRange * (0.5 - r);	// tripRange * [-0.5 .. 0.5]
-		double gammaTrip = -1.0 * alphaTrip;
-		double alpha = (Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "alpha");
-		double gamma = (Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "gamma");
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 						
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
-				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(), alpha, alphaTrip, this.day));
+				plan, super.getParams(), controler.getConfig(), this.controler.getFacilities(), 
+				(Double)plan.getPerson().getCustomAttributes().get("alpha_tot"), this.day));
 		
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
 				super.getParams(), controler.getNetwork(), controler.getConfig(),
 				this.memories.getMemory(plan.getPerson().getId()),
-				this.day, alpha, gamma, alphaTrip, gammaTrip, (PersonImpl)plan.getPerson()));
+				this.day, (Double)plan.getPerson().getCustomAttributes().get("alpha_tot"), 
+				(Double)plan.getPerson().getCustomAttributes().get("gamma_tot"), (PersonImpl)plan.getPerson()));
 		
 		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 			scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(
-					super.getParams(), gamma, (PersonImpl)plan.getPerson(), this.day));
+					super.getParams(), (Double)plan.getPerson().getCustomAttributes().get("gamma_tot"), (PersonImpl)plan.getPerson(), this.day));
 		}		
-		plan.getPerson().getCustomAttributes().put(day + ".alpha_tot", alpha + alphaTrip);
-		plan.getPerson().getCustomAttributes().put(day + ".gamma_tot", gamma + gammaTrip);
 		
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;

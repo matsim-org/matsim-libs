@@ -19,6 +19,9 @@
 
 package playground.anhorni.surprice;
 
+import java.util.Random;
+
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -34,6 +37,7 @@ public class DayControler extends Controler {
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
 	private ObjectAttributes preferences;
+	private Random random;
 		
 	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(config);	
@@ -52,6 +56,7 @@ public class DayControler extends Controler {
 		SurpriceTravelCostCalculatorFactoryImpl costCalculatorFactory = new SurpriceTravelCostCalculatorFactoryImpl();
 		this.setTravelDisutilityFactory(costCalculatorFactory);
 		super.setUp();
+		this.generateAlphaGammaTrip();
 	}
 	
 	
@@ -89,6 +94,22 @@ public class DayControler extends Controler {
 	}
 	
 	private void generateAlphaGammaTrip() {
-		
+		for (Person p : this.scenarioData.getPopulation().getPersons().values()) {
+			this.random = new Random(Integer.parseInt(p.getId().toString()) + Surprice.days.indexOf(this.day) * 10000);
+			
+			for (int i = 0; i < 100; i++) {
+				this.random.nextDouble();
+			}
+			
+			double alphaTripRange = Double.parseDouble(this.getConfig().findParam(Surprice.SURPRICE_RUN, "alphaTripRange"));
+			double r = this.random.nextDouble();
+			double alphaTrip = alphaTripRange * (0.5 - r);	// tripRange * [-0.5 .. 0.5]
+			double gammaTrip = -1.0 * alphaTrip;
+			double alpha = (Double)this.preferences.getAttribute(p.getId().toString(), "alpha");
+			double gamma = (Double)this.preferences.getAttribute(p.getId().toString(), "gamma");
+			
+			p.getCustomAttributes().put("alpha_tot", alpha + alphaTrip);
+			p.getCustomAttributes().put("gamma", gamma + gammaTrip);
+		}
 	}
 }

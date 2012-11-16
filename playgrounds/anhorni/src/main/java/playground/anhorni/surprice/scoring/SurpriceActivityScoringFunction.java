@@ -43,8 +43,7 @@ import playground.anhorni.surprice.Surprice;
 public class SurpriceActivityScoringFunction extends CharyparNagelActivityScoring {
 	
 	private CharyparNagelScoringParameters params;
-	private double alpha;
-	private double alphaTrip;
+	private double alpha_tot;
 	private Config config;
 	private final ActivityFacilities facilities;
 	private DayType day;
@@ -52,10 +51,9 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 //	private final static Logger log = Logger.getLogger(SurpriceActivityScoringFunction.class);
 		
 	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
-			ActivityFacilities facilities, double alpha, double alphaTrip, String day) {
+			ActivityFacilities facilities, double alpha_tot, String day) {
 		super(params);
-		this.alpha = alpha;
-		this.alphaTrip = alphaTrip;
+		this.alpha_tot = alpha_tot;
 		this.facilities = facilities;
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
@@ -67,7 +65,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		
 		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePrefs"))) {
-			this.alpha = 1.0;
+			this.alpha_tot = 1.0;
 		}
 
 		double tmpScore = 0.0;
@@ -108,7 +106,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(act.getType());
 		if (duration > 0) {
 			double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0));
-			double utilPerf = this.params.marginalUtilityOfPerforming_s * Math.max(alpha + alphaTrip, 0.0) * typicalDuration
+			double utilPerf = this.params.marginalUtilityOfPerforming_s * Math.max(alpha_tot, 0.0) * typicalDuration
 					* Math.log((duration / 3600.0) / zeroUtilityDuration);
 			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));

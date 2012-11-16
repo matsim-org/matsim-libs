@@ -28,7 +28,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import playground.anhorni.surprice.analysis.Analyzer;
 
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
@@ -82,7 +81,7 @@ public class SurpriceTravelTimeAndDistanceBasedTravelDisutility implements Trave
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
 		
-		log.error("shit this one taaaaken");
+		log.error("this one should not be used :( ");
 
 //		if (this.marginalCostOfDistance == 0.0) {
 //			return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;
