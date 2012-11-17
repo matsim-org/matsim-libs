@@ -30,9 +30,15 @@ import org.matsim.core.router.util.TravelTime;
  *
  */
 public class SurpriceTravelCostCalculatorFactoryImpl implements TravelDisutilityFactory {
+	
+	private String day;
+	
+	public SurpriceTravelCostCalculatorFactoryImpl(String day) {
+		this.day = day;
+	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new SurpriceTravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
+		return new SurpriceTravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup, day);
 	}
 }

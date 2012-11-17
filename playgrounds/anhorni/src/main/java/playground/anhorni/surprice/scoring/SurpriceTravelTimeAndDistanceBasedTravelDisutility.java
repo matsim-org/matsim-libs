@@ -41,10 +41,12 @@ public class SurpriceTravelTimeAndDistanceBasedTravelDisutility implements Trave
 	private final double marginalCostOfDistance;
 	
 	private static int wrnCnt = 0 ;
+	private String day;
 	
 	private final static Logger log = Logger.getLogger(SurpriceTravelTimeAndDistanceBasedTravelDisutility.class);
 
-	public SurpriceTravelTimeAndDistanceBasedTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public SurpriceTravelTimeAndDistanceBasedTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, String day) {
+		this.day = day;
 		this.timeCalculator = timeCalculator;
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
@@ -72,8 +74,8 @@ public class SurpriceTravelTimeAndDistanceBasedTravelDisutility implements Trave
 //		}
 		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
 		
-		double alpha_tot = (Double) person.getCustomAttributes().get("alpha_tot");
-		double gamma_tot = (Double) person.getCustomAttributes().get("gamma_tot");
+		double alpha_tot = (Double) person.getCustomAttributes().get(this.day + ".alpha_tot");
+		double gamma_tot = (Double) person.getCustomAttributes().get(this.day + ".gamma_tot");
 		
 		return this.marginalCostOfTime * alpha_tot * travelTime + this.marginalCostOfDistance * link.getLength() * gamma_tot;
 	}
@@ -82,6 +84,7 @@ public class SurpriceTravelTimeAndDistanceBasedTravelDisutility implements Trave
 	public double getLinkMinimumTravelDisutility(final Link link) {
 		
 		log.error("this one should not be used :( ");
+		System.exit(99);
 
 //		if (this.marginalCostOfDistance == 0.0) {
 //			return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;

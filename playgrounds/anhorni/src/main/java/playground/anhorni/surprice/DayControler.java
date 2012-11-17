@@ -53,10 +53,10 @@ public class DayControler extends Controler {
 	}
 	
 	protected void setUp() {
-		SurpriceTravelCostCalculatorFactoryImpl costCalculatorFactory = new SurpriceTravelCostCalculatorFactoryImpl();
-		this.setTravelDisutilityFactory(costCalculatorFactory);
-		super.setUp();
 		this.generateAlphaGammaTrip();
+		SurpriceTravelCostCalculatorFactoryImpl costCalculatorFactory = new SurpriceTravelCostCalculatorFactoryImpl(this.day);
+		this.setTravelDisutilityFactory(costCalculatorFactory);
+		super.setUp();	
 	}
 	
 	
@@ -108,8 +108,8 @@ public class DayControler extends Controler {
 			double alpha = (Double)this.preferences.getAttribute(p.getId().toString(), "alpha");
 			double gamma = (Double)this.preferences.getAttribute(p.getId().toString(), "gamma");
 			
-			p.getCustomAttributes().put("alpha_tot", alpha + alphaTrip);
-			p.getCustomAttributes().put("gamma", gamma + gammaTrip);
+			p.getCustomAttributes().put(day + ".alpha_tot", alpha + alphaTrip);
+			p.getCustomAttributes().put(day + ".gamma_tot", gamma + gammaTrip);
 		}
 	}
 }
