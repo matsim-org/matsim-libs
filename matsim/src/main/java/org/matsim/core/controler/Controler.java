@@ -49,12 +49,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -178,6 +178,18 @@ public class Controler extends AbstractController {
 	protected Population population = null;
 	private Counts counts = null;
 
+	public static interface TerminationCriterion {
+		boolean continueIterations( int iteration ) ;
+	}
+	
+	private TerminationCriterion terminationCriterion = new TerminationCriterion() {
+	
+		@Override
+		public boolean continueIterations(int iteration) {
+			return (iteration <= config.controler().getLastIteration());
+		}
+		
+	};
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	private TravelDisutility travelCostCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
@@ -321,26 +333,6 @@ public class Controler extends AbstractController {
 		loadData();
 		run(config);
 	}
-	
-	public static interface TerminationCriterion {
-		boolean continueIterations( int iteration ) ;
-	}
-	
-	TerminationCriterion terminationCriterion = null ;
-	
-	public void setTerminationCriterion(TerminationCriterion terminationCriterion) {
-		this.terminationCriterion = terminationCriterion;
-	}
-
-	@Override
-	protected boolean continueIterations(int it) {
-		if ( terminationCriterion == null ) {
-			return (it <= config.controler().getLastIteration() ) ;
-		} else {
-			return terminationCriterion.continueIterations(it) ;
-		}
-	}
-
 
 	/**
 	 * Design decisions:
@@ -663,6 +655,11 @@ public class Controler extends AbstractController {
 		return manager;
 	}
 
+	@Override
+	protected boolean continueIterations(int it) {
+		return terminationCriterion.continueIterations(it);
+	}
+	
 	@Override
 	protected void runMobSim(int iteration) {
 		this.iteration = iteration;
@@ -1128,6 +1125,10 @@ public class Controler extends AbstractController {
 	 */
 	public Integer getIterationNumber() {
 		return this.iteration;
+	}
+	
+	public void setTerminationCriterion(TerminationCriterion terminationCriterion) {
+		this.terminationCriterion = terminationCriterion;
 	}
 
 	public MobsimFactory getMobsimFactory() {
