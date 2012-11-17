@@ -89,7 +89,7 @@ public class DayControler extends Controler {
 	  	this.addControlerListener(new AgentAnalysisShutdownListener(this.day, this.getControlerIO().getOutputPath()));
 	  	
 	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
-	  		this.addControlerListener(new RoadPricing());
+	  		this.addControlerListener(new RoadPricing(this.day));
 		}
 	}
 	

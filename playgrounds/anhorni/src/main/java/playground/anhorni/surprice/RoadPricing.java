@@ -37,7 +37,7 @@ import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
+
 
 /**
  * Integrates the RoadPricing functionality into the MATSim Controler.
@@ -51,8 +51,13 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	private final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 	private CalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
+	private String day;
 
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
+	
+	public RoadPricing(String day) {
+		this.day = day;
+	}
 	
 	@Override
 	public void notifyStartup(final StartupEvent event) {
@@ -87,7 +92,10 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 				public TravelDisutility createTravelDisutility(
 						TravelTime timeCalculator,
 						PlanCalcScoreConfigGroup cnScoringGroup) {
-					return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), RoadPricing.this.scheme);
+					return new SurpriceTravelDisutilityIncludingToll(
+							previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
+							RoadPricing.this.scheme,
+							RoadPricing.this.day);
 				}
 				
 			};
