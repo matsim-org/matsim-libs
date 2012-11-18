@@ -141,6 +141,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		}		
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
+		double tmpMonetaryCosts = 0.0;
 		
 		// ============= CAR =======================================================
 		if (TransportMode.car.equals(leg.getMode())) {			
@@ -151,6 +152,8 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * Math.max(alpha_tot, 0.0) + 
 			Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantCar;
+			
+			tmpMonetaryCosts += Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 						
 		// ============= CAR =======================================================
 		} else if (TransportMode.pt.equals(leg.getMode())) {			
@@ -160,7 +163,10 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s * Math.max(alpha_tot, 0.0) + 
 			Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
-			tmpScore += this.constantPt;			
+			tmpScore += this.constantPt;	
+			
+			tmpMonetaryCosts += Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
+			
 		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s * Math.max(alpha_tot, 0.0);
 			tmpScore +=  this.constantWalk;
@@ -175,12 +181,20 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * Math.max(alpha_tot, 0.0) + 
 			Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantCar;
+			
+			tmpMonetaryCosts += Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 		}
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".legScore") != null) {
 			prevVal = (Double)this.person.getCustomAttributes().get(day + ".legScore");
 		}
 		person.getCustomAttributes().put(day + ".legScore", prevVal + tmpScore);
+		
+		prevVal = 0.0;
+		if (this.person.getCustomAttributes().get(day + ".legMonetaryCosts") != null) {
+			prevVal = (Double) this.person.getCustomAttributes().get(day + ".legMonetaryCosts");
+		}
+		person.getCustomAttributes().put(day + ".legMonetaryCosts" , prevVal + tmpMonetaryCosts);
 		return tmpScore;
 	}
 
