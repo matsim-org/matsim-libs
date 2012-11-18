@@ -50,7 +50,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	
 	private Bins tolltdBins;
 	private ObjectAttributes incomes;
-	private TreeMap<Integer, ArrayList<Double>> tollDistances = new TreeMap<Integer, ArrayList<Double>>();
+	private TreeMap<Integer, ArrayList<Double>> tollDistancesPerIncome = new TreeMap<Integer, ArrayList<Double>>();
 	private TreeMap<Id, Double> tollDistancesAgents = new TreeMap<Id, Double>(); 
 
 	public TolledTripLengthCalculator(final Network network, final RoadPricingScheme scheme, Bins tolltdBins, ObjectAttributes incomes) {
@@ -111,10 +111,10 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 			double prevVal = this.tollDistancesAgents.get(event.getPersonId());
 			this.tollDistancesAgents.put(event.getPersonId(), prevVal + length.doubleValue());
 			
-			if (this.tollDistances.get((int)income) == null) {
-				this.tollDistances.put((int)income, new ArrayList<Double>());
+			if (this.tollDistancesPerIncome.get((int)income) == null) {
+				this.tollDistancesPerIncome.put((int)income, new ArrayList<Double>());
 			}
-			this.tollDistances.get((int)income).add(length.doubleValue());
+			this.tollDistancesPerIncome.get((int)income).add(length.doubleValue());
 			
 			// ... and reset the agent-individual accumlated length to zero:
 			this.agentDistance.put(event.getPersonId(), zero);
@@ -129,7 +129,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	public void reset(final int iteration) {
 		this.sumLength = 0.0;
 		this.cntTrips = 0;
-		this.tollDistances.clear();
+		this.tollDistancesPerIncome.clear();
 		this.tollDistancesAgents.clear();
 	}
 
@@ -144,8 +144,8 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 		return this.sumLengthIncomeWeighted / (this.getAverageTripLength() * this.cntTrips);
 	}
 
-	public TreeMap<Integer, ArrayList<Double>> getTollDistances() {
-		return tollDistances;
+	public TreeMap<Integer, ArrayList<Double>> getTollDistancesPerIncome() {
+		return tollDistancesPerIncome;
 	}
 
 	public TreeMap<Id, Double> getTollDistancesAgents() {

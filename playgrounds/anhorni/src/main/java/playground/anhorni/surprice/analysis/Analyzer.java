@@ -49,6 +49,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.anhorni.surprice.Surprice;
+import playground.anhorni.utils.Utils;
 
 public class Analyzer {
 	private ScenarioImpl scenario = null; 
@@ -199,15 +200,15 @@ public class Analyzer {
 		this.computeModesPerIncome();
 				
 		for (int i = 0; i < 9; i++) {
-			this.boxPlotTravelTimesCarPerIncome.addValuesPerCategory(ttCalculator.getCar().get(i), Integer.toString(i), "tt");
-			this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPt().get(i), Integer.toString(i), "tt");
+			this.boxPlotTravelTimesCarPerIncome.addValuesPerCategory(ttCalculator.getCarPerIncome().get(i), Integer.toString(i), "tt");
+			this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPtPerIncome().get(i), Integer.toString(i), "tt");
 			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
-			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistances().get(i), Integer.toString(i), "tt");
+			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistancesPerIncome().get(i), Integer.toString(i), "tt");
 		}		
-		this.writeDaily(day);
+		this.writeDaily(day, ttCalculator, tollCalculator);
 	}
 	
-	private void writeDaily(String day) {
+	private void writeDaily(String day, TravelTimeCalculator ttCalculator, TolledTripLengthCalculator tollCalculator) {
 		this.utilityBins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
 		this.ttBins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
 		this.tdBins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
@@ -229,6 +230,36 @@ public class Analyzer {
 		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tolltdPerIncome.png", 800, 600);
 		
 		this.writeAgents(day);
+		
+		DecimalFormat formatter = new DecimalFormat("0.00");
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + ".summary.txt")); 
+			
+			bufferedWriter.write("travel times:\n");
+			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\n");
+			
+			for (int i = 0; i < 9; i++) {
+				String line = i + "\t";
+				line += formatter.format(Utils.mean(ttCalculator.getCarPerIncome().get(i)));
+				line += formatter.format(Utils.median(ttCalculator.getCarPerIncome().get(i)));
+				line += formatter.format(Utils.getStdDev(ttCalculator.getCarPerIncome().get(i)));				
+				bufferedWriter.append(line);
+			}			
+			bufferedWriter.write("toll td:\n");
+			for (int i = 0; i < 9; i++) {
+				String line = i + "\t";
+				line += formatter.format(Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i)));
+				line += formatter.format(Utils.median(tollCalculator.getTollDistancesPerIncome().get(i)));
+				line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)));				
+				bufferedWriter.append(line);
+			}
+			
+			bufferedWriter.flush();
+		    bufferedWriter.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void writeAgents(String day) {
@@ -392,9 +423,7 @@ public class Analyzer {
 				avgTollTDIW += tolltd / Surprice.days.size();
 			}	
 			line += formatter.format(avgTollTDIW) + "\n";
-			bufferedWriter.append(line);
-			bufferedWriter.newLine();					
-			
+			bufferedWriter.append(line);		
 		    bufferedWriter.flush();
 		    bufferedWriter.close();
 		} 
