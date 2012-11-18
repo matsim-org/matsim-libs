@@ -113,6 +113,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.lastTime = INITIAL_LAST_TIME;
 		this.score = INITIAL_SCORE;
 		this.person.getCustomAttributes().put(day + ".legScore", null);
+		this.person.getCustomAttributes().put(day + ".legMonetaryCosts", null);
 	}
 
 	@Override
