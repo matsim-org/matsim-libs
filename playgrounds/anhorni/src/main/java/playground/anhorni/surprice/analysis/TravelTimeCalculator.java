@@ -46,7 +46,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	private int sumTrips = 0;
 	private TreeMap<Integer, ArrayList<Double>> carTimesPerIncome = new TreeMap<Integer, ArrayList<Double>>();
 	private TreeMap<Integer, ArrayList<Double>> ptTimesPerIncome = new TreeMap<Integer, ArrayList<Double>>();
-	private TreeMap<Integer, ArrayList<Double>> ttTimesPerIncome = new TreeMap<Integer, ArrayList<Double>>();
+	private TreeMap<Integer, ArrayList<Double>> travelTimesPerIncome = new TreeMap<Integer, ArrayList<Double>>();
 	private Bins ttBins;
 	private ObjectAttributes incomes;
 	private TreeMap<Id, Double> ttPerAgent = new TreeMap<Id, Double>(); 
@@ -100,10 +100,10 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 				}
 				this.ptTimesPerIncome.get((int)income).add(travTime);
 			}
-			if (this.ttTimesPerIncome.get((int)income) == null) {
-				this.ttTimesPerIncome.put((int)income, new ArrayList<Double>());
+			if (this.travelTimesPerIncome.get((int)income) == null) {
+				this.travelTimesPerIncome.put((int)income, new ArrayList<Double>());
 			}			
-			this.ttTimesPerIncome.get((int)income).add(travTime);
+			this.travelTimesPerIncome.get((int)income).add(travTime);
 			double val = this.ttPerAgent.get(event.getPersonId());
 			this.ttPerAgent.put(event.getPersonId(), val + travTime);
 		}
@@ -120,6 +120,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 		this.carTimesPerIncome.clear();
 		this.ptTimesPerIncome.clear();
 		this.ttPerAgent.clear();
+		this.travelTimesPerIncome.clear();
 	}
 	
 	public ArrayList<Double> getTravelTimes() {
@@ -146,6 +147,6 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 		return ttPerAgent;
 	}
 	public TreeMap<Integer, ArrayList<Double>> getTTPerIncome() {
-		return this.ttTimesPerIncome;
+		return this.travelTimesPerIncome;
 	}
 }

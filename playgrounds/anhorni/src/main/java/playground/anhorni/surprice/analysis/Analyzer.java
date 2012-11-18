@@ -259,8 +259,7 @@ public class Analyzer {
 				line += formatter.format(Utils.median(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
 				line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\n";				
 				bufferedWriter.append(line);
-			}
-			
+			}			
 			bufferedWriter.flush();
 		    bufferedWriter.close();
 		}
