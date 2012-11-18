@@ -233,7 +233,7 @@ public class Analyzer {
 		
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + ".summary.txt")); 
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary.txt")); 
 			
 			bufferedWriter.write("travel times:\n");
 			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\n");
@@ -241,8 +241,8 @@ public class Analyzer {
 			for (int i = 0; i < 9; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getCarPerIncome().get(i))) + "\t";
-				line += formatter.format(Utils.median(ttCalculator.getCarPerIncome().get(i)) + "\t");
-				line += formatter.format(Utils.getStdDev(ttCalculator.getCarPerIncome().get(i)) + "\n");				
+				line += formatter.format(Utils.median(ttCalculator.getCarPerIncome().get(i))) + "\t";
+				line += formatter.format(Utils.getStdDev(ttCalculator.getCarPerIncome().get(i))) + "\n";				
 				bufferedWriter.append(line);
 			}			
 			bufferedWriter.write("toll td:\n");
