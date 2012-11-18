@@ -26,7 +26,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SimStepParallelEventsManagerImpl;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -62,7 +61,7 @@ public class WithinDayQSimFactory implements MobsimFactory {
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = factory.createQSimEngine(qSim1, MatsimRandom.getRandom());
+		QNetsimEngine netsimEngine = factory.createQSimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();

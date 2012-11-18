@@ -19,7 +19,6 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-import java.util.Random;
 
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -34,8 +33,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 public class MyParallelQNetsimEngineFactory implements QNetsimEngineFactory {
 
 	@Override
-	public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
-		return new MyParallelQNetsimEngine( (QSim) sim, random);
+	public QNetsimEngine createQSimEngine(Netsim sim) {
+		return new MyParallelQNetsimEngine( (QSim) sim);
 	}
 
 }

@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -107,7 +106,6 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
 
-	private final Random random;
 	private final QSim qsim;
 
 	private final AgentSnapshotInfoBuilder positionInfoBuilder;
@@ -123,12 +121,11 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		this.internalInterface = internalInterface ;
 	}
 
-	public QNetsimEngine(final QSim sim, final Random random ) {
-		this( sim, random, null ) ;
+	public QNetsimEngine(final QSim sim ) {
+		this( sim, null ) ;
 	}
 
-	public QNetsimEngine(final QSim sim, final Random random, NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
-		this.random = random;
+	public QNetsimEngine(final QSim sim, NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
 		this.qsim = sim;
 
 		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
@@ -261,7 +258,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 					 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
 					 * -marcel/20aug2008
 					 */
-					node.doSimStep(time, random);
+					node.doSimStep(time);
 				}
 			}			
 		} else {
@@ -271,7 +268,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 			while (simNodes.hasNext()) {
 				node = simNodes.next();
-				node.doSimStep(time, random);
+				node.doSimStep(time);
 
 				if (!node.isActive()) simNodes.remove();
 			}

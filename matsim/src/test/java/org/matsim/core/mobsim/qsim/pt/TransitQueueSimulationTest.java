@@ -65,7 +65,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -299,7 +298,7 @@ public class TransitQueueSimulationTest {
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
+		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
@@ -566,7 +565,7 @@ public class TransitQueueSimulationTest {
 			ActivityEngine activityEngine = new ActivityEngine();
 			qSim2.addMobsimEngine(activityEngine);
 			qSim2.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim2, MatsimRandom.getRandom());
+			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim2);
 			qSim2.addMobsimEngine(netsimEngine);
 			qSim2.addDepartureHandler(netsimEngine.getDepartureHandler());
 			TeleportationEngine teleportationEngine = new TeleportationEngine();

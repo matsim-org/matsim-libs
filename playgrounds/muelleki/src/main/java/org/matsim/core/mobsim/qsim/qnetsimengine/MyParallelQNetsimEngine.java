@@ -38,8 +38,8 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	private final ExecutorService es;
 
 
-	MyParallelQNetsimEngine(final QSim sim, final Random random) {
-		super(sim, random);
+	MyParallelQNetsimEngine(final QSim sim) {
+		super(sim);
 		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
 
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();

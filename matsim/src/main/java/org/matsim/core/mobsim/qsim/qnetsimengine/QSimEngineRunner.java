@@ -121,9 +121,8 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 				 */
 				if (useNodeArray) {
 					for (QNode node : nodesArray) {
-						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
 						if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
-							node.doSimStep(time, random);
+							node.doSimStep(time);
 						}
 					}
 				} else {
@@ -133,7 +132,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 					while (simNodes.hasNext()) {
 						node = simNodes.next();
 						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-						node.doSimStep(time, random);
+						node.doSimStep(time);
 
 						if (!node.isActive()) simNodes.remove();
 					}

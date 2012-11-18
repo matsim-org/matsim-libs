@@ -45,7 +45,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -434,7 +433,7 @@ public class DreieckStreckeSzenarioTest {
 		QNetsimEngine netsimEngine = new QNetsimEngineFactory() {
 			
 			@Override
-			public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
+			public QNetsimEngine createQSimEngine(Netsim sim) {
 				NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
 
 					@Override
@@ -449,9 +448,9 @@ public class DreieckStreckeSzenarioTest {
 
 
 				};
-				return new QNetsimEngine((QSim) sim, random, netsimNetworkFactory) ;
+				return new QNetsimEngine((QSim) sim, netsimNetworkFactory) ;
 			}
-		}.createQSimEngine(qSim, MatsimRandom.getRandom());
+		}.createQSimEngine(qSim);
 		////////////////////////////////////////////////////////
 		
 		qSim.addMobsimEngine(netsimEngine);

@@ -15,7 +15,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -98,7 +97,7 @@ class MyControler {
 					return new QNode(node, network);
 				}
 			};
-			QNetsimEngine netsimEngine = new QNetsimEngine(qSim, MatsimRandom.getRandom(), netsimNetworkFactory) ;
+			QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory) ;
 //			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());

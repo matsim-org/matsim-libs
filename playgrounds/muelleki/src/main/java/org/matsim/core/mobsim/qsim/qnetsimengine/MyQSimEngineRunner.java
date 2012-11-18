@@ -95,7 +95,7 @@ public class MyQSimEngineRunner extends NetElementActivator {
 			for (QNode node : nodesArray) {
 				if (simulateAllNodes || node.isActive() /*|| node.isSignalized()*/) {
 					Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-					node.doSimStep(time, random);
+					node.doSimStep(time);
 				}
 			}
 		} else {
@@ -105,7 +105,7 @@ public class MyQSimEngineRunner extends NetElementActivator {
 			while (simNodes.hasNext()) {
 				node = simNodes.next();
 				Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
-				node.doSimStep(time, random);
+				node.doSimStep(time);
 
 				if (!node.isActive()) simNodes.remove();
 			}

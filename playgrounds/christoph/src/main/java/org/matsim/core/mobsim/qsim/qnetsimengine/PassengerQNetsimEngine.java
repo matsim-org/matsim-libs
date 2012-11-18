@@ -38,7 +38,7 @@ public class PassengerQNetsimEngine extends QNetsimEngine {
 	
 	public PassengerQNetsimEngine(final QSim sim, final Random random,
 			JointDepartureOrganizer jointDepartureOrganizer) {
-		super(sim, random);
+		super(sim);
 		this.departureHandler = new PassengerDepartureHandler(this, jointDepartureOrganizer);
 	}
 	

@@ -177,7 +177,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qSim = new QSim(sc, eventsManager);
 		QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Random;
 
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -31,5 +30,5 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  */
 public interface QNetsimEngineFactory extends MatsimFactory {
 	
-	public QNetsimEngine createQSimEngine(final Netsim sim, final Random random);
+	public QNetsimEngine createQSimEngine(final Netsim sim);
 }

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * Represents a node in the QSimulation.
@@ -57,6 +58,8 @@ public class QNode implements NetsimNode {
 
 	private QNetwork network;
 
+	private Random random;
+
 	public QNode(final Node n, final QNetwork network) {
 		this.node = n;
 		this.network = network; 
@@ -64,8 +67,17 @@ public class QNode implements NetsimNode {
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLinkInternalI[nofInLinks];
 		this.tempLinks = new QLinkInternalI[nofInLinks];
+		this.random = MatsimRandom.getRandom();
+		if (network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads() > 1) {
+			// This could just as well be the "normal" case. The second alternative
+			// is just there so some scenarios / test cases stay
+			// "event-file-compatible". Consider removing the second alternative.
+			this.random = MatsimRandom.getLocalInstance();
+		} else {
+			this.random = MatsimRandom.getRandom();
+		}
 	}
-
+	
 	/**
 	 * Loads the inLinks-array with the corresponding links.
 	 * Cannot be called in constructor, as the queueNetwork does not yet know
@@ -76,8 +88,6 @@ public class QNode implements NetsimNode {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
 			this.inLinksArrayCache[i] = network.getNetsimLinks().get(l.getId());
-			// yyyy changed simEngine.getQSim.getQNetwork to simEngine.getQNetwork.  Not sure if this is the same in parallel
-			// implementations.  kai, oct'10
 			i++;
 		}
 		/* As the order of nodes has an influence on the simulation results,
@@ -124,9 +134,9 @@ public class QNode implements NetsimNode {
 	 *
 	 * @param now
 	 *          The current time in seconds from midnight.
-	 * @param random the random number generator to be used
 	 */
-	/*package*/ void doSimStep(final double now, final Random random) {
+	/*package*/ void doSimStep(final double now) {
+		
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
@@ -259,7 +269,7 @@ public class QNode implements NetsimNode {
 		network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
 	}
 
-	/*packag*/ void moveVehicleFromInlinkToOutlink(final QVehicle veh, final AbstractQLane fromLane, QLinkInternalI nextQueueLink) {
+	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, final AbstractQLane fromLane, QLinkInternalI nextQueueLink) {
 		fromLane.popFirstVehicle();
 		veh.getDriver().notifyMoveOverNode(nextQueueLink.getLink().getId());
 		nextQueueLink.addFromIntersection(veh);

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Random;
 
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -32,8 +31,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 public final class DefaultQSimEngineFactory implements QNetsimEngineFactory {
 
 	@Override
-	public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
-		return new QNetsimEngine( (QSim) sim, random);
+	public QNetsimEngine createQSimEngine(Netsim sim) {
+		return new QNetsimEngine( (QSim) sim);
 	}
 
 }

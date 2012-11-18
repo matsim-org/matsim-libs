@@ -22,14 +22,12 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 
 /**
@@ -65,8 +63,8 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	private CyclicBarrier endBarrier;
 
 
-	ParallelQNetsimEngine(final QSim sim, final Random random) {
-		super(sim, random);
+	ParallelQNetsimEngine(final QSim sim) {
+		super(sim);
 		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
 
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
@@ -253,7 +251,6 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 		int roundRobin = 0;
 		for (QNode node : allNodes) {
-			node.getCustomAttributes().put(Random.class.getName(), MatsimRandom.getLocalInstance());
 			parallelNodesLists.get(roundRobin % this.numOfThreads).add(node);
 			roundRobin++;
 		}

@@ -41,7 +41,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -1048,7 +1047,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			ActivityEngine activityEngine = new ActivityEngine();
 			qSim1.addMobsimEngine(activityEngine);
 			qSim1.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
+			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1);
 			qSim1.addMobsimEngine(netsimEngine);
 			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 			TeleportationEngine teleportationEngine = new TeleportationEngine();

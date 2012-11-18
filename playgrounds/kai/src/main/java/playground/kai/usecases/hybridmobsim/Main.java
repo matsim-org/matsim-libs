@@ -23,7 +23,6 @@ package playground.kai.usecases.hybridmobsim;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -52,7 +51,7 @@ public class Main {
 				final KaiHybridEngine hybridEngine = new KaiHybridEngine() ;
 				qsim.addMobsimEngine(hybridEngine) ;
 
-				QNetsimEngine netsimEngine = new QNetsimEngine( qsim, MatsimRandom.getRandom(), new KaiHybridNetworkFactory(hybridEngine) ) ; 
+				QNetsimEngine netsimEngine = new QNetsimEngine( qsim, new KaiHybridNetworkFactory(hybridEngine) ) ; 
 				qsim.addMobsimEngine(netsimEngine);
 				qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
 

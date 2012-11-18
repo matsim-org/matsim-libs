@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -184,7 +183,7 @@ public class RunLongLink {
 		QNetsimEngine netsimEngine = new QNetsimEngineFactory() {
 		
 					@Override
-					public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
+					public QNetsimEngine createQSimEngine(Netsim sim) {
 						NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
 		
 							@Override
@@ -199,9 +198,9 @@ public class RunLongLink {
 		
 		
 						};
-						return new QNetsimEngine((QSim) sim, random, netsimNetworkFactory) ;
+						return new QNetsimEngine((QSim) sim, netsimNetworkFactory) ;
 					}
-				}.createQSimEngine(qSim1, MatsimRandom.getRandom());
+				}.createQSimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();

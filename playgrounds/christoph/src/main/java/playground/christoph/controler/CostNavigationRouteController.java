@@ -223,7 +223,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 			ActivityEngine activityEngine = new ActivityEngine();
 			qSim1.addMobsimEngine(activityEngine);
 			qSim1.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1, MatsimRandom.getRandom());
+			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1);
 			qSim1.addMobsimEngine(netsimEngine);
 			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 			TeleportationEngine teleportationEngine = new TeleportationEngine();

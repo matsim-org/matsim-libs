@@ -32,7 +32,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.*;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.*;
@@ -300,8 +299,7 @@ public class SingleIterOnlineDvrpLauncher
         ActivityEngine activityEngine = new ActivityEngine();
         qSim.addMobsimEngine(activityEngine);
         qSim.addActivityHandler(activityEngine);
-        QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim,
-                MatsimRandom.getRandom());
+        QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
         qSim.addMobsimEngine(netsimEngine);
         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
         TeleportationEngine teleportationEngine = new TeleportationEngine();
