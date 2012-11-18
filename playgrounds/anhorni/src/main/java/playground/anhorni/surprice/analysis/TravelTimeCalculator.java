@@ -100,7 +100,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 				}
 				this.ptTimesPerIncome.get((int)income).add(travTime);
 			}
-			if (this.ttTimesPerIncome.get((int)income) != null) {
+			if (this.ttTimesPerIncome.get((int)income) == null) {
 				this.ttTimesPerIncome.put((int)income, new ArrayList<Double>());
 			}			
 			this.ttTimesPerIncome.get((int)income).add(travTime);
