@@ -131,9 +131,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 					while (simNodes.hasNext()) {
 						node = simNodes.next();
-						Random random = (Random) node.getCustomAttributes().get(Random.class.getName());
 						node.doSimStep(time);
-
 						if (!node.isActive()) simNodes.remove();
 					}
 				}
