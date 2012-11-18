@@ -60,8 +60,8 @@ public class TwoRunAnalyzer {
 			preferencesReader.parse(this.run1path + "/" + day + "/" + day + ".perAgent.txt");
 											
 			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tolltd", day + ".tolltd_alpha_Diff", 10.0 * 1000.0);						
-			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tt", day + ".tt_alpha_dDiff", 3600.0);			
-			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tollScore", day + ".tollScore_alpha_dDiff", 3600.0);	
+			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tt", day + ".tt_alpha_dDiff", 1200.0);			
+			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tollScore", day + ".tollScore_alpha_dDiff", 10.0);	
 		}	
 		log.info("=================== Finished analyses ====================");
 	}
