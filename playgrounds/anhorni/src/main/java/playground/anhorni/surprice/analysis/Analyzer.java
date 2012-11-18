@@ -195,13 +195,13 @@ public class Analyzer {
 		this.tolltdSumIncomeWeighted[Surprice.days.indexOf(day)] = tollCalculator.getSumLengthIncomeWeighted();
 		this.boxPlotTravelTimes.addValuesPerCategory(ttCalculator.getTravelTimes(), day, "Travel Times");
 		this.tolltdPerAgent = tollCalculator.getTollDistancesAgents();
-		this.ttPerAgent = ttCalculator.getTtPerAgent();
+		this.ttPerAgent = ttCalculator.getTTPerAgent();
 		
 		this.computeModesPerIncome();
 				
 		for (int i = 0; i < 9; i++) {
 			this.boxPlotTravelTimesCarPerIncome.addValuesPerCategory(ttCalculator.getCarPerIncome().get(i), Integer.toString(i), "tt");
-			this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPtPerIncome().get(i), Integer.toString(i), "tt");
+			this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPTPerIncome().get(i), Integer.toString(i), "tt");
 			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
 			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistancesPerIncome().get(i), Integer.toString(i), "tt");
 		}		
@@ -234,10 +234,17 @@ public class Analyzer {
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary.txt")); 
-			
-			bufferedWriter.write("travel times:\n");
 			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\n");
 			
+			bufferedWriter.write("travel times:\n");			
+			for (int i = 0; i < 9; i++) {
+				String line = i + "\t";
+				line += formatter.format(Utils.mean(ttCalculator.getTTPerIncome().get(i))) + "\t";
+				line += formatter.format(Utils.median(ttCalculator.getTTPerIncome().get(i))) + "\t";
+				line += formatter.format(Utils.getStdDev(ttCalculator.getTTPerIncome().get(i))) + "\n";				
+				bufferedWriter.append(line);
+			}		
+			bufferedWriter.write("car travel times:\n");			
 			for (int i = 0; i < 9; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getCarPerIncome().get(i))) + "\t";

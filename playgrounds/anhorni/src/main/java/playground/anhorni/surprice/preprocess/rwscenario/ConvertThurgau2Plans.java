@@ -159,6 +159,9 @@ public class ConvertThurgau2Plans {
 		else {
 			Gbl.errorMsg("pid = " + pid + ": m = " + m + " not known!");
 		}
+		
+		// STARTING ALL PLANS WITH CAR NOW DUE TO INCONSISTENCIES! -> needs to be captured by replanning
+		mode = TransportMode.car;
 	
 		// adding acts/legs
 		if (plan.getPlanElements().size() != 0) { // already lines parsed and added
