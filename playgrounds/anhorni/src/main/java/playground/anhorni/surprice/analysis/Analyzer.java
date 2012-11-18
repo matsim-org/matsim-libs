@@ -201,7 +201,9 @@ public class Analyzer {
 				
 		for (int i = 0; i < 9; i++) {
 			this.boxPlotTravelTimesCarPerIncome.addValuesPerCategory(ttCalculator.getCarPerIncome().get(i), Integer.toString(i), "tt");
-			this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPTPerIncome().get(i), Integer.toString(i), "tt");
+			if (ttCalculator.getPTPerIncome().size() > 0) {
+				this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPTPerIncome().get(i), Integer.toString(i), "tt");
+			}
 			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
 			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistancesPerIncome().get(i), Integer.toString(i), "tt");
 		}		
