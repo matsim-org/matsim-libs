@@ -45,11 +45,13 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 	private Bins tdBins;
 	private ObjectAttributes incomes;
 	private TreeMap<Integer, ArrayList<Double>> carDistances = new TreeMap<Integer, ArrayList<Double>>();
+	private String day;
 
-	public TravelDistanceCalculator(final Network network, Bins tdBins, ObjectAttributes incomes) {
+	public TravelDistanceCalculator(final Network network, Bins tdBins, ObjectAttributes incomes, String day) {
 		this.network = network;
 		this.tdBins = tdBins;
 		this.incomes = incomes;
+		this.day = day;
 	}
 
 	@Override
@@ -60,7 +62,7 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 	@Override
 	public void run(final Plan plan) {
 		
-		plan.getPerson().getCustomAttributes().put("td", 0.0);
+		plan.getPerson().getCustomAttributes().put(this.day + ".td", 0.0);
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
@@ -87,8 +89,8 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 					}
 					this.carDistances.get((int)income).add(dist);
 					
-					double prevVal = (Double) plan.getPerson().getCustomAttributes().get("td");
-					plan.getPerson().getCustomAttributes().put("td", prevVal + dist);
+					double prevVal = (Double) plan.getPerson().getCustomAttributes().get(this.day + ".td");
+					plan.getPerson().getCustomAttributes().put(this.day + ".td", prevVal + dist);
 				}
 			}
 		}

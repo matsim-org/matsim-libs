@@ -156,7 +156,7 @@ public class Analyzer {
 		this.modeBins.put("walk", new Bins(1, 9, day + ".walkPerIncome"));
 		
 		log.info("	analyzing travel distances ...");
-		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork(), this.tdBins, this.incomes);			
+		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork(), this.tdBins, this.incomes, day);			
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			tdCalculator.run(person.getSelectedPlan());
 		}
