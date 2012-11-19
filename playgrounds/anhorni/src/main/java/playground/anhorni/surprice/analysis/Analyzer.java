@@ -236,14 +236,16 @@ public class Analyzer {
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary.txt")); 
-			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\n");
+			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");
 			
 			bufferedWriter.write("travel times:\n");			
 			for (int i = 0; i < 9; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getTTPerIncome().get(i))) + "\t";
 				line += formatter.format(Utils.median(ttCalculator.getTTPerIncome().get(i))) + "\t";
-				line += formatter.format(Utils.getStdDev(ttCalculator.getTTPerIncome().get(i))) + "\n";				
+				line += formatter.format(Utils.getStdDev(ttCalculator.getTTPerIncome().get(i))) + "\n";
+				line += formatter.format(Utils.getStdDev(ttCalculator.getTTPerIncome().get(i)) /
+						Utils.mean(ttCalculator.getTTPerIncome().get(i))) + "\n";
 				bufferedWriter.append(line);
 			}		
 			bufferedWriter.write("car travel times:\n");			
@@ -251,7 +253,9 @@ public class Analyzer {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getCarPerIncome().get(i))) + "\t";
 				line += formatter.format(Utils.median(ttCalculator.getCarPerIncome().get(i))) + "\t";
-				line += formatter.format(Utils.getStdDev(ttCalculator.getCarPerIncome().get(i))) + "\n";				
+				line += formatter.format(Utils.getStdDev(ttCalculator.getCarPerIncome().get(i))) + "\n";
+				line += formatter.format(Utils.getStdDev(ttCalculator.getCarPerIncome().get(i)) /
+						Utils.mean(ttCalculator.getCarPerIncome().get(i))) + "\n";
 				bufferedWriter.append(line);
 			}			
 			bufferedWriter.write("toll td:\n");
@@ -259,7 +263,9 @@ public class Analyzer {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
 				line += formatter.format(Utils.median(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
-				line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\n";				
+				line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\n";
+				line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)) /
+						Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i))) + "\n";
 				bufferedWriter.append(line);
 			}			
 			bufferedWriter.flush();
