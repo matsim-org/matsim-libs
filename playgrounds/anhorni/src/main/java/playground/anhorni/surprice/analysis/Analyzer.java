@@ -59,6 +59,7 @@ public class Analyzer {
 	private double tdAvg[] = new double[8]; 
 	private double tolltdAvg[] = new double[8];
 	private double utilitiesAvg[] = new double[8];
+	private double nTripsAvg[] = new double[8];
 	 
 	private double tdSumIncomeWeighted[] = new double[8]; 
 	private double tolltdSumIncomeWeighted[] = new double[8];
@@ -175,6 +176,7 @@ public class Analyzer {
 		EventsManager events = EventsUtils.createEventsManager();
 		TravelTimeCalculator ttCalculator = new TravelTimeCalculator(this.ttBins, this.incomes);
 		events.addHandler(ttCalculator);
+		this.nTripsAvg[Surprice.days.indexOf(day)] = ttCalculator.getTravelTimes().size() / this.scenario.getPopulation().getPersons().size();
 
 		log.info("	analyzing toll travel distances ...");
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl(); //(RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
@@ -356,7 +358,19 @@ public class Analyzer {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt")); 
 			
 			bufferedWriter.write("tt\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
-			String line = "tt\t";
+			String line = "avgNbrTrips\t";
+			double avgNbrTrips = 0.0;
+			for (String day : Surprice.days) {	
+				double n = this.nTripsAvg[Surprice.days.indexOf(day)];
+				line += formatter.format(n) + "\t";			
+				avgNbrTrips += n / Surprice.days.size();
+			}	
+			line += formatter.format(avgNbrTrips) + "\n";
+			bufferedWriter.append(line);
+			bufferedWriter.newLine();
+			
+			bufferedWriter.write("tt\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
+			line = "tt\t";
 			double avgTT = 0.0;
 			for (String day : Surprice.days) {	
 				double tt = this.ttAvg[Surprice.days.indexOf(day)];
