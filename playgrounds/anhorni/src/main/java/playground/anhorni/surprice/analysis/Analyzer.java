@@ -113,7 +113,7 @@ public class Analyzer {
 	}
 		
 	public void run() {
-		log.info("Starting analysis .... ");
+		log.info("Starting analysis $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
 		outPath = config.controler().getOutputDirectory();
 		this.analyze();
 		log.info("=================== Finished analyses ====================");
