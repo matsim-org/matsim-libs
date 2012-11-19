@@ -41,7 +41,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * This module analyzes pt trip travel times.
@@ -54,7 +54,7 @@ public class PtTripTravelTimeTransfersAnalyzer extends AbstractAnalyisModule{
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private PtTripTravelTimeEventHandler ptTtHandler;
 	private Map<Id, List<Double>> personId2ptTripTravelTimes;
@@ -68,11 +68,11 @@ public class PtTripTravelTimeTransfersAnalyzer extends AbstractAnalyisModule{
 		this.scenario = scenario;
 		
 		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);
+		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
+		this.ptDriverIdAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverIdAnalyzer);
 		
-		this.ptTtHandler = new PtTripTravelTimeEventHandler(this.ptDriverPrefixAnalyzer);
+		this.ptTtHandler = new PtTripTravelTimeEventHandler(this.ptDriverIdAnalyzer);
 		this.personId2ptTripTravelTimes = new HashMap<Id, List<Double>>();
 		this.personId2ptTripTransfers = new HashMap<Id, List<Integer>>();
 	}

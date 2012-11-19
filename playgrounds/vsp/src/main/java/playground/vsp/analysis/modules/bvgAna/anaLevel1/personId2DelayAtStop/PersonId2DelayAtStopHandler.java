@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * Collects the <code>AgentDepartureEventHandler</code> and the corresponding <code>PersonEntersVehicleEventHandler</code>.
@@ -39,18 +39,18 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
  */
 public class PersonId2DelayAtStopHandler implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler{
 	private final Logger log = Logger.getLogger(PersonId2DelayAtStopHandler.class);
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private TreeMap<Id, PersonId2DelayAtStopData> id2DelayAtStopMap = new TreeMap<Id, PersonId2DelayAtStopData>();
 	
-	public PersonId2DelayAtStopHandler(PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer){
-		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
+	public PersonId2DelayAtStopHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer){
+		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 
-		if(event.getPersonId().toString().startsWith(ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if(this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())){
 			// pt driver
 		} else {
 

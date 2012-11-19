@@ -38,7 +38,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * This module calculates the total car distance for each person
@@ -52,7 +52,7 @@ public class CarDistanceAnalyzer extends AbstractAnalyisModule{
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private CarDistanceEventHandler carDistanceEventHandler;
 	private Map<Id, Double> personId2carDistance;
@@ -68,11 +68,11 @@ public class CarDistanceAnalyzer extends AbstractAnalyisModule{
 		this.scenario = scenario;
 		
 		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);
+		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
+		this.ptDriverIdAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverIdAnalyzer);
 		
-		this.carDistanceEventHandler = new CarDistanceEventHandler(scenario.getNetwork(), this.ptDriverPrefixAnalyzer);
+		this.carDistanceEventHandler = new CarDistanceEventHandler(scenario.getNetwork(), this.ptDriverIdAnalyzer);
 	}
 	
 	@Override

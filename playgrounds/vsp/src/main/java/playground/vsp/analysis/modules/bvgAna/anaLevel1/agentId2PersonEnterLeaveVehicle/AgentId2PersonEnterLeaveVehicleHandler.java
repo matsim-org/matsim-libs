@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * Collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> for a given set of agents.
@@ -38,14 +38,14 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
  *
  */
 public class AgentId2PersonEnterLeaveVehicleHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	private final Logger log = Logger.getLogger(AgentId2PersonEnterLeaveVehicleHandler.class);
 	
 	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> agentId2EnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
 	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> agentId2LeaveEventMap = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 
-	public AgentId2PersonEnterLeaveVehicleHandler(PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer) {
-		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
+	public AgentId2PersonEnterLeaveVehicleHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
+		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
 		log.warn("Ignoring the pt driver. Is that right or is the pt driver supposed to be considered? ik");
 		log.warn("Not differentiating between public and private vehicles. Is that supposed to happen here? ik");
 	}
@@ -67,7 +67,7 @@ public class AgentId2PersonEnterLeaveVehicleHandler implements PersonEntersVehic
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id agentId = event.getPersonId();
-		if(agentId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if(this.ptDriverIdAnalyzer.isPtDriver(agentId)){
 			// pt driver
 		} else {
 			if(this.agentId2EnterEventMap.get(agentId) == null){
@@ -80,7 +80,7 @@ public class AgentId2PersonEnterLeaveVehicleHandler implements PersonEntersVehic
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		Id agentId = event.getPersonId();
-		if(agentId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if(this.ptDriverIdAnalyzer.isPtDriver(agentId)){
 			// pt driver
 		} else {
 			if(this.agentId2LeaveEventMap.get(agentId) == null){

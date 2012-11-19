@@ -39,7 +39,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * This module analyzes the waiting times for public vehicles.
@@ -55,7 +55,7 @@ public class WaitingTimesAnalyzer extends AbstractAnalyisModule {
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private WaitingTimeHandler waitingTimeHandler;
 	private double sumOfAllWaitingTimes;
@@ -73,11 +73,11 @@ public class WaitingTimesAnalyzer extends AbstractAnalyisModule {
 		this.scenario = scenario;
 		
 		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);		
+		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
+		this.ptDriverIdAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverIdAnalyzer);		
 		
-		this.waitingTimeHandler = new WaitingTimeHandler(this.ptDriverPrefixAnalyzer);
+		this.waitingTimeHandler = new WaitingTimeHandler(this.ptDriverIdAnalyzer);
 		this.personID2avgWaitingTime = new HashMap<Id, Double>();
 		this.stopFacilityID2avgWaitingTime = new HashMap<Id, Double>();
 	}

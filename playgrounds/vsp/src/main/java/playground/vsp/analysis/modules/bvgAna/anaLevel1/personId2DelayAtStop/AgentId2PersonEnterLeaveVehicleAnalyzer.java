@@ -41,7 +41,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * @author ikaddoura
@@ -52,7 +52,7 @@ public class AgentId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModu
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private PersonId2DelayAtStopHandler handler;
 	private TreeMap<Id, PersonId2DelayAtStopData> personId2DelayAtStop;
@@ -65,11 +65,11 @@ public class AgentId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModu
 		this.scenario = scenario;
 		
 		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);
+		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
+		this.ptDriverIdAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverIdAnalyzer);
 		
-		this.handler = new PersonId2DelayAtStopHandler(this.ptDriverPrefixAnalyzer);
+		this.handler = new PersonId2DelayAtStopHandler(this.ptDriverIdAnalyzer);
 	}
 	
 	@Override

@@ -36,7 +36,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * This module calculates the public transport parameters vehicle-hours, vehicle-km, number of public vehicles.
@@ -50,7 +50,7 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private TransitEventHandler transitHandler;
 	private int numberOfPtVehicles;
@@ -65,11 +65,11 @@ public class PtOperatorAnalyzer extends AbstractAnalyisModule {
 		this.scenario = scenario;
 		
 		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);		
+		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
+		this.ptDriverIdAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverIdAnalyzer);		
 		
-		this.transitHandler = new TransitEventHandler(this.scenario.getNetwork(), this.ptDriverPrefixAnalyzer);
+		this.transitHandler = new TransitEventHandler(this.scenario.getNetwork(), this.ptDriverIdAnalyzer);
 	}
 	
 	@Override

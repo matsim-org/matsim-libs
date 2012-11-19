@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TransitEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,63 +20,46 @@
 
 /**
  * 
- * @author ikaddoura
- * 
  */
 package playground.vsp.analysis.modules.ptDriverPrefix;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
-
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
+ * Collects the public vehicle Driver IDs.
  * 
  * @author ikaddoura
  *
  */
-public class PtDriverPrefixAnalyzer extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(PtDriverPrefixAnalyzer.class);
-	private ScenarioImpl scenario;
-	
-	private PtDriverPrefixHandler ptDriverPrefixHandler;
-	
-	public PtDriverPrefixAnalyzer() {
-		super(PtDriverPrefixAnalyzer.class.getSimpleName());
-	}
-	
-	public void init(ScenarioImpl scenario) {
-		this.scenario = scenario;
-		this.ptDriverPrefixHandler = new PtDriverPrefixHandler();
-	}
-	
+public class PtDriverIdHandler implements TransitDriverStartsEventHandler {
+	private final static Logger log = Logger.getLogger(PtDriverIdHandler.class);
+	private List<Id> ptDriverIDs = new ArrayList<Id>();
+
 	@Override
-	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		handler.add(this.ptDriverPrefixHandler);		
-		return handler;
+	public void reset(int iteration) {
+		this.ptDriverIDs.clear();
 	}
 
 	@Override
-	public void preProcessData() {
+	public void handleEvent(TransitDriverStartsEvent event) {
+		Id ptDriverId = event.getDriverId();
+		
+		if (!this.ptDriverIDs.contains(ptDriverId)){
+			this.ptDriverIDs.add(ptDriverId);
+		}
 	}
 
-	@Override
-	public void postProcessData() {
-		// Analyzing the ptDriverPrefix here would be to late. Getting the ptDriverPrefix while parsing the events.
-	}
-
-	@Override
-	public void writeResults(String outputFolder) {
-		System.out.println(this.ptDriverPrefixHandler.getPtDriverPrefix());
-	}
-	
-	public String getPtDriverPrefix() {
-		return this.ptDriverPrefixHandler.getPtDriverPrefix();
+	public List<Id> getPtDriverIDs() {
+		if (ptDriverIDs.isEmpty()){
+			log.warn("No pt driver(s) identified. List is empty!");
+		}
+		return ptDriverIDs;
 	}
 	
 }

@@ -39,7 +39,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * This module calculates for each mode the number of users, the number of departures, the total travel time,
@@ -53,7 +53,7 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule{
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private TravelTimePerModeEventHandler ttHandler;
 	private Map<String, Map<Id, Double>> mode2personId2TravelTime;
@@ -72,11 +72,11 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule{
 		this.scenario = scenario;
 		
 		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);
+		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
+		this.ptDriverIdAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverIdAnalyzer);
 		
-		this.ttHandler = new TravelTimePerModeEventHandler(this.ptDriverPrefixAnalyzer);
+		this.ttHandler = new TravelTimePerModeEventHandler(this.ptDriverIdAnalyzer);
 		this.mode2avgTravelTimeOfModePerTrip_mins = new HashMap<String, Double>();
 		this.mode2avgTravelTimeOfModePerUser_mins =  new HashMap<String, Double>();
 		this.mode2numberOfPersons = new HashMap<String, Integer>();

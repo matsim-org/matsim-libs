@@ -45,7 +45,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * This module collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> with their
@@ -60,7 +60,7 @@ public class EnterLeaveVehicle2ActivityAnalyzer extends AbstractAnalyisModule{
 	private ScenarioImpl scenario;
 	
 	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private EnterLeaveVehicle2ActivityHandler enterLeaveHandler;
 	private Map<PersonEntersVehicleEvent, ActivityEndEvent> enterVehicleEvent2ActivityEndEvent;
@@ -74,11 +74,11 @@ public class EnterLeaveVehicle2ActivityAnalyzer extends AbstractAnalyisModule{
 		this.scenario = scenario;
 		
 		// (sub-)module
-		this.ptDriverPrefixAnalyzer = new PtDriverPrefixAnalyzer();
-		this.ptDriverPrefixAnalyzer.init(scenario);
-		this.anaModules.add(ptDriverPrefixAnalyzer);
+		this.ptDriverIdAnalyzer = new PtDriverIdAnalyzer();
+		this.ptDriverIdAnalyzer.init(scenario);
+		this.anaModules.add(ptDriverIdAnalyzer);
 				
-		this.enterLeaveHandler = new EnterLeaveVehicle2ActivityHandler(this.ptDriverPrefixAnalyzer);
+		this.enterLeaveHandler = new EnterLeaveVehicle2ActivityHandler(this.ptDriverIdAnalyzer);
 	}
 	
 	@Override

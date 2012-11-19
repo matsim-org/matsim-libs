@@ -39,7 +39,7 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * 
@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
  *
  */
 public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler {
-	private PtDriverPrefixAnalyzer ptDriverPrefixAna;
+	private PtDriverIdAnalyzer ptDriverIdAna;
 	private List<Id> vehicleIDs = new ArrayList<Id>();
 
 	private List <Double> waitingTimes = new ArrayList<Double>();
@@ -58,8 +58,8 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	private Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
 	private Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
 	
-	public WaitingTimeHandler(PtDriverPrefixAnalyzer ptDriverPrefixAna) {
-		this.ptDriverPrefixAna = ptDriverPrefixAna;
+	public WaitingTimeHandler(PtDriverIdAnalyzer ptDriverIdAna) {
+		this.ptDriverIdAna = ptDriverIdAna;
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Id personId = event.getPersonId();
 		Id vehId = event.getVehicleId();
-		if (personId.toString().startsWith(this.ptDriverPrefixAna.getPtDriverPrefix())){
+		if (this.ptDriverIdAna.isPtDriver(personId)){
 		 // pt driver
 	
 		} else {
@@ -129,7 +129,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		Id personId = event.getPersonId();
-		if (personId.toString().startsWith(this.ptDriverPrefixAna.getPtDriverPrefix())){
+		if (this.ptDriverIdAna.isPtDriver(personId)){
 			// pt driver
 		} else {
 			if (event.getLegMode().toString().equals(TransportMode.pt)){

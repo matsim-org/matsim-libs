@@ -36,7 +36,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.pt.PtConstants;
 
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * Calculates the trip travel time and the number of transfers needed for each given agent id and pt trip.
@@ -50,13 +50,13 @@ public class PtTripTravelTimeEventHandler implements ActivityStartEventHandler, 
 	private final Logger log = Logger.getLogger(PtTripTravelTimeEventHandler.class);
 	private final Level logLevel = Level.DEBUG;
 	
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	private TreeMap<Id, ArrayList<PtTripTravelTimeData>> agentId2PtTripTravelTimeMap = new TreeMap<Id, ArrayList<PtTripTravelTimeData>>();
 	private TreeMap<Id, PtTripTravelTimeData> tempList = new TreeMap<Id, PtTripTravelTimeData>();
 	
-	public PtTripTravelTimeEventHandler(PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer){
+	public PtTripTravelTimeEventHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer){
 		this.log.setLevel(this.logLevel);
-		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
+		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public class PtTripTravelTimeEventHandler implements ActivityStartEventHandler, 
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if(event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if(this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())){
 			// pt driver
 		} else {
 			if(event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk) || event.getLegMode().equalsIgnoreCase(TransportMode.pt)){
@@ -104,7 +104,7 @@ public class PtTripTravelTimeEventHandler implements ActivityStartEventHandler, 
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if(event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if(this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())){
 			// pt driver
 		} else {
 			if(event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk) || event.getLegMode().equalsIgnoreCase(TransportMode.pt)){

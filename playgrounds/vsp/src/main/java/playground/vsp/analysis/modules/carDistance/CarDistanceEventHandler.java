@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverPrefixAnalyzer;
+import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * @author ikaddoura, benjamin
@@ -45,17 +45,17 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 	private Map<Id, Double> personId2CarDistance;
 	private int carTrips;
 	private final Network network;
-	private PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer;
+	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	// the following is not neccessary any more...see below
 	private Map<Id, Id> personId2departureLinkId;
 	private Map<Id, Double> depArrOnSameLinkCnt;
 	
-	public CarDistanceEventHandler(Network network, PtDriverPrefixAnalyzer ptDriverPrefixAnalyzer) {
+	public CarDistanceEventHandler(Network network, PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
 		this.personId2CarDistance = new HashMap<Id, Double>();
 		this.carTrips = 0;
 		this.network = network;
-		this.ptDriverPrefixAnalyzer = ptDriverPrefixAnalyzer;
+		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
 		
 		// the following is not neccessary any more...see below
 		this.personId2departureLinkId = new HashMap<Id, Id>();
@@ -79,7 +79,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		Id personId = event.getPersonId();
 		Id linkId = event.getLinkId();
 		Double linkLength_m = this.network.getLinks().get(linkId).getLength();
-		if (personId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){
 			// pt vehicle!
 		} else {
 			if(this.personId2CarDistance.get(personId) == null){
@@ -97,7 +97,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		// the following is not neccessary any more...see below
 		personId2departureLinkId.put(event.getPersonId(), event.getLinkId());
 
-		if (event.getPersonId().toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if (this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())){
 			// ptDriver!
 		} else {
 			// calculating the number of trips...
@@ -125,7 +125,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 		Id personId = event.getPersonId();
 		Id linkId = event.getLinkId();
 
-		if (personId.toString().startsWith(this.ptDriverPrefixAnalyzer.getPtDriverPrefix())){
+		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){
 			// ptDriver!
 		} else {
 			if(personId2departureLinkId.get(personId) == null){
