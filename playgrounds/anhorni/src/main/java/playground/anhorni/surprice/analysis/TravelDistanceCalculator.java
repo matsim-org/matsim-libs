@@ -59,6 +59,9 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 
 	@Override
 	public void run(final Plan plan) {
+		
+		plan.getPerson().getCustomAttributes().put("td", 0.0);
+		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
@@ -83,6 +86,9 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 						this.carDistances.put((int)income, new ArrayList<Double>());
 					}
 					this.carDistances.get((int)income).add(dist);
+					
+					double prevVal = (Double) plan.getPerson().getCustomAttributes().get("td");
+					plan.getPerson().getCustomAttributes().put("td", prevVal + dist);
 				}
 			}
 		}

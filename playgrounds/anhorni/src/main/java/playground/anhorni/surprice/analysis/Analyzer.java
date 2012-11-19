@@ -277,6 +277,7 @@ public class Analyzer {
 		
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {					
 			attributes.putAttribute(person.getId().toString(), day + ".tt", this.ttPerAgent.get(person.getId()));
+			attributes.putAttribute(person.getId().toString(), day + ".td", person.getCustomAttributes().get(day + ".td"));	
 			
 			if (this.tolltdPerAgent.get(person.getId()) != null) {
 				attributes.putAttribute(person.getId().toString(), day + ".tolltd", this.tolltdPerAgent.get(person.getId()));
