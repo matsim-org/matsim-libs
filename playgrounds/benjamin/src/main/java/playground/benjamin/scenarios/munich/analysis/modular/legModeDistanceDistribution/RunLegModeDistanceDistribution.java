@@ -21,12 +21,12 @@ package playground.benjamin.scenarios.munich.analysis.modular.legModeDistanceDis
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -99,9 +99,12 @@ public class RunLegModeDistanceDistribution {
 			PersonFilter personFilter = new PersonFilter();
 			Population pop = scenario.getPopulation();
 			Population relevantPop = personFilter.getPopulation(pop, userGroup);
-
-			ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario((ConfigUtils.createConfig()));
-			sc.setPopulation(relevantPop);
+			
+			Scenario sc = ScenarioUtils.createScenario((ConfigUtils.createConfig()));
+			for(Person person : relevantPop.getPersons().values()){
+				sc.getPopulation().addPerson(person);
+			}
+//			sc.setPopulation(relevantPop);
 			relevantScenario = sc;
 		}
 		return relevantScenario;

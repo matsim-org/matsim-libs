@@ -35,8 +35,8 @@ public class RunLegModeDistanceDistributionSingle {
 	static String configFile = baseFolder + "output_config.xml.gz";
 	static String iteration = "0";
 	
-	static UserGroup userGroup = null;
-//	static UserGroup userGroup = UserGroup.URBAN;
+//	static UserGroup userGroup = null;
+	static UserGroup userGroup = UserGroup.URBAN;
 
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
