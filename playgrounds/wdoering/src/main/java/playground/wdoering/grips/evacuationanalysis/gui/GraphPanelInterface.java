@@ -18,7 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wdoering.grips.evacuationanalysis;
+package playground.wdoering.grips.evacuationanalysis.gui;
+
+import playground.wdoering.grips.evacuationanalysis.data.EventData;
 
 public interface GraphPanelInterface {
 	

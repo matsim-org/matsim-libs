@@ -19,8 +19,9 @@
  * *********************************************************************** */
 
 
-package playground.wdoering.grips.evacuationanalysis;
+package playground.wdoering.grips.evacuationanalysis.data;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,6 +44,12 @@ public class EventData {
 	private HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes;
 	private int maxUtilization;
 	private double maxClearingTime;
+	
+	private AttributeData<Color> evacuationTimeVisData;
+	private AttributeData<Color> clearingTimeVisData;
+	private AttributeData<Double> linkUtilizationVisData;
+	
+	//TODO getLinkUtilization(linkid) -> anz agenten die link verlassen haben
 	
 	public EventData(String eventName, QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Tuple<Double,Integer>> arrivalTimes, Rect boundingBox) {
 		this.eventName = eventName;
@@ -154,6 +161,30 @@ public class EventData {
 	public double getMaxClearingTime() {
 		
 		return this.maxClearingTime;
+	}
+	
+	public AttributeData<Color> getEvacuationTimeVisData() {
+		return evacuationTimeVisData;
+	}
+	
+	public AttributeData<Color> getClearingTimeVisData() {
+		return clearingTimeVisData;
+	}
+	
+	public AttributeData<Double> getLinkUtilizationVisData() {
+		return linkUtilizationVisData;
+	}
+	
+	public void setEvacuationTimeVisData(AttributeData<Color> evacuationTimeVisData) {
+		this.evacuationTimeVisData = evacuationTimeVisData;
+	}
+	
+	public void setClearingTimeVisData(AttributeData<Color> clearingTimeVisData) {
+		this.clearingTimeVisData = clearingTimeVisData;
+	}
+	
+	public void setLinkUtilizationVisData(AttributeData<Double> linkUtilizationVisData) {
+		this.linkUtilizationVisData = linkUtilizationVisData;
 	}
 
 }

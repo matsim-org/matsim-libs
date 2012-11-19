@@ -96,6 +96,13 @@ import org.matsim.core.utils.misc.Time;
 import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
 import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
+import playground.wdoering.grips.evacuationanalysis.control.EventHandler;
+import playground.wdoering.grips.evacuationanalysis.control.EventReaderThread;
+import playground.wdoering.grips.evacuationanalysis.data.Cell;
+import playground.wdoering.grips.evacuationanalysis.data.EventData;
+import playground.wdoering.grips.evacuationanalysis.gui.AbstractGraphPanel;
+import playground.wdoering.grips.evacuationanalysis.gui.EvacuationTimeGraphPanel;
+import playground.wdoering.grips.evacuationanalysis.gui.MyMapViewer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -135,7 +142,7 @@ public class EvacuationAnalysis implements ActionListener{
 	private JButton calcButton;
 	private ArrayList<File> eventFiles;
 	private JComboBox iterationsList;
-	private JTextField gridSizeField;
+	private JSlider gridSizeSlider;
 	private JComboBox modeList;
 	private JSlider transparencySlider;
 	private float cellTransparency;
@@ -295,13 +302,13 @@ public class EvacuationAnalysis implements ActionListener{
 		
 		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		this.gridSizeField = new JTextField(""+cellSize);
-		this.gridSizeField.setActionCommand("changeIteration");
-		this.gridSizeField.addActionListener(this);
-		this.gridSizeField.addKeyListener(new TypeNumber());
-		this.gridSizeField.setPreferredSize(new Dimension(220,24));
+		this.gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 1, 100, (int)this.cellSize);
+//		this.gridSizeSlider.setActionCommand("changeIteration");
+//		this.gridSizeSlider.addActionListener(this);
+//		this.gridSizeSlider.addKeyListener(new TypeNumber());
+		this.gridSizeSlider.setPreferredSize(new Dimension(220,24));
 		gridSizeSelectionPanel.add(new JLabel(" grid size: ", SwingConstants.RIGHT));
-		gridSizeSelectionPanel.add(this.gridSizeField);
+		gridSizeSelectionPanel.add(this.gridSizeSlider);
 		
 		JPanel modeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		modeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));

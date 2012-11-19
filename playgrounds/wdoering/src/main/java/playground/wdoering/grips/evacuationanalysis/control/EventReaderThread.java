@@ -1,4 +1,4 @@
-package playground.wdoering.grips.evacuationanalysis;
+package playground.wdoering.grips.evacuationanalysis.control;
 
 import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
 

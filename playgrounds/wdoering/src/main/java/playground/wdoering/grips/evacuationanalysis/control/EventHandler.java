@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wdoering.grips.evacuationanalysis;
+package playground.wdoering.grips.evacuationanalysis.control;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +61,11 @@ import playground.gregor.sim2d_v3.events.XYVxVyEvent;
 import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
+import playground.wdoering.grips.evacuationanalysis.control.vis.ClearingTimeVisualizer;
+import playground.wdoering.grips.evacuationanalysis.control.vis.EvacuationTimeVisualizer;
+import playground.wdoering.grips.evacuationanalysis.data.Cell;
+import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
+import playground.wdoering.grips.evacuationanalysis.data.EventData;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -109,6 +114,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes;
 	private double maxClearingTime;
 	
+	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
 	
 
 	public EventHandler(String eventFilename, Scenario sc, double cellSize, Thread readerThread)
@@ -355,6 +361,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		
 		EventData eventData = new EventData(eventName);
 		
+		
 		eventData.setCellTree(cellTree);
 		eventData.setCellSize(cellSize);
 		eventData.setTimeSum(timeSum);
@@ -366,6 +373,11 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		eventData.setLinkLeaveTimes(linkLeaveTimes);
 		eventData.setMaxUtilization(maxUtilization);
 		eventData.setMaxClearingTime(maxClearingTime);
+		
+		//set visualization attributes
+		eventData.setEvacuationTimeVisData(EvacuationTimeVisualizer.getVisualData(eventData, this.colorationMode));
+		eventData.setClearingTimeVisData(ClearingTimeVisualizer.getVisualData(eventData, this.colorationMode));
+		
 		
 		return eventData;
 	}
@@ -405,162 +417,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			}
 			
 		}
-	}
-
-	@Deprecated
-	private void calculateClearanceTimes()
-	{
-		
-		//get all cells from celltree
-		LinkedList<Cell> cells = new LinkedList<Cell>();
-		cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
-		
-		for (Cell cell : cells)
-		{
-			List<Tuple<Tuple<Id,Id>, Double>> cellLinkEnterTimes = cell.getLinkEnterTimes();
-			List<Tuple<Tuple<Id,Id>, Double>> cellLinkLeaveTimes = cell.getLinkLeaveTimes();
-			
-			HashMap<Id,Tuple<Integer,Double>> enterTimeCount = new HashMap<Id, Tuple<Integer,Double>>();
-			HashMap<Id,Tuple<Integer,Double>> leaveTimeCount = new HashMap<Id, Tuple<Integer,Double>>();
-			
-			HashMap<Id,Double> avgEnterTime = new HashMap<Id, Double>();
-			HashMap<Id,Double> avgLeaveTime = new HashMap<Id, Double>();
-			
-			HashMap<Id,Double> avgDuration = new HashMap<Id, Double>();
-			
-			ArrayList<Id> linkIds = new ArrayList<Id>();
-			
-			//for both calculating the average link enter (1) and leave (2) times 
-			Id linkId = null;
-			Id personId = null;
-			Double time = 0d;
-			Iterator<?> it = null;
-			
-			
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////        __  
-			//find out which link leads to which link                                                                   |  |
-			////////////////////////////////////////////////////////////////////////////////////////////////////        |__|
-			
-			
-			Link link = this.network.getLinks().get(linkId);
-			
-			
-			
-			
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
-			//calculating the average link ENTER times for the specified link                                            |
-			////////////////////////////////////////////////////////////////////////////////////////////////////         |
-			for (int i = 0; i < cellLinkEnterTimes.size(); i++)
-			{
-				
-				Tuple<Tuple<Id, Id>, Double> linkEnterTime = cellLinkEnterTimes.get(i);
-				linkId = linkEnterTime.getFirst().getFirst();
-				personId = linkEnterTime.getFirst().getSecond();
-				time = linkEnterTime.getSecond();
-				
-				//add link id if not found yet
-				if (!linkIds.contains(linkId))
-					linkIds.add(linkId);
-				
-				//check if there is any existing data for the specified link id 
-				if (!enterTimeCount.containsKey(linkId))
-					enterTimeCount.put(linkId, new Tuple<Integer,Double>(1,time));
-				else
-				{
-					//get old count + time tuple
-					Tuple<Integer, Double> currentTimeCountTuple = enterTimeCount.get(linkId);
-					
-					//update values
-					Integer newCount = currentTimeCountTuple.getFirst() + 1;
-					Double newTime = currentTimeCountTuple.getSecond() + time;
-					enterTimeCount.put(linkId, new Tuple<Integer,Double>(newCount,newTime));
-				}
-				
-			}
-			
-			//store average time to HashMap<linkid, time>
-			it = enterTimeCount.entrySet().iterator();
-		    while (it.hasNext())
-		    {
-		        Map.Entry<Id,Tuple<Integer,Double>> pairs = (Map.Entry)it.next();
-	        	Tuple<Integer, Double> timeCountTuple = (Tuple<Integer,Double>)pairs.getValue();
-	        	double avgTime = timeCountTuple.getSecond() / timeCountTuple.getFirst();
-	        	avgEnterTime.put((Id)pairs.getKey(), avgTime);
-		    }
-			
-			
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////       __  
-			//calculating the average link LEAVE times for the specified link                                           __|
-			////////////////////////////////////////////////////////////////////////////////////////////////////       |__
-			for (int i = 0; i < cellLinkLeaveTimes.size(); i++)
-			{
-				Tuple<Tuple<Id, Id>, Double> linkLeaveTime = cellLinkLeaveTimes.get(i);
-				linkId = linkLeaveTime.getFirst().getFirst();
-				personId = linkLeaveTime.getFirst().getSecond();
-				time = linkLeaveTime.getSecond();
-				
-				//add link id if not found yet
-				if (!linkIds.contains(linkId))
-					linkIds.add(linkId);			
-				
-				//check if there is any existing data for the specified link id 
-				if (!leaveTimeCount.containsKey(linkId))
-					leaveTimeCount.put(linkId, new Tuple<Integer,Double>(1,time));
-				else
-				{
-					//get old count + time tuple
-					Tuple<Integer, Double> currentTimeCountTuple = leaveTimeCount.get(linkId);
-					
-					//update values
-					Integer newCount = currentTimeCountTuple.getFirst() + 1;
-					Double newTime = currentTimeCountTuple.getSecond() + time;
-					leaveTimeCount.put(linkId, new Tuple<Integer,Double>(newCount,newTime));
-				}
-			}
-				
-			//store average time to HashMap<linkid, time>
-			it = leaveTimeCount.entrySet().iterator();
-		    while (it.hasNext())
-		    {
-		        Map.Entry<Id,Tuple<Integer,Double>> pairs = (Map.Entry)it.next();
-	        	Tuple<Integer, Double> timeCountTuple = (Tuple<Integer,Double>)pairs.getValue();
-	        	double avgTime = timeCountTuple.getSecond() / timeCountTuple.getFirst();
-	        	avgLeaveTime.put((Id)pairs.getKey(), avgTime);
-		    }
-				
-				
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////       __  
-//calculating the average link duration for the specified link                                                          __|
-////////////////////////////////////////////////////////////////////////////////////////////////////                    __|
-		    
-		    
-
-		    for (Id currentLinkId : linkIds)
-		    {
-		    	double currentAvgEnterTime = 0;
-		    	double currentAvgLeaveTime = 0;
-		    	double duration = 0;
-		    	
-		    	//only calculate duration if the link id is both in enter&leave map, otherwise: set duration to -1
-		    	if ((avgEnterTime.containsKey(currentLinkId)) && (avgLeaveTime.containsKey(currentLinkId)))
-		    	{
-		    		currentAvgEnterTime = avgEnterTime.get(currentLinkId);
-		    		currentAvgLeaveTime = avgLeaveTime.get(currentLinkId);
-		    		duration = currentAvgLeaveTime - currentAvgEnterTime;
-		    		avgDuration.put(linkId, duration);
-		    	}
-		    	else
-		    		avgDuration.put(linkId, -1d);
-		    	
-		    }
-
-		    
-				
-			
-		}
-		
-		
 	}
 
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wdoering.grips.evacuationanalysis;
+package playground.wdoering.grips.evacuationanalysis.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,6 +27,8 @@ import java.util.HashMap;
 import javax.swing.JPanel;
 
 import org.matsim.core.utils.collections.QuadTree;
+
+import playground.wdoering.grips.evacuationanalysis.data.EventData;
 
 public abstract class AbstractGraphPanel extends JPanel implements GraphPanelInterface {
 	

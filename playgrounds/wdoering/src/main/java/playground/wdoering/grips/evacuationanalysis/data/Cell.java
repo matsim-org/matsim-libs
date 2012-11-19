@@ -18,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wdoering.grips.evacuationanalysis;
+package playground.wdoering.grips.evacuationanalysis.data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -38,7 +39,7 @@ public class Cell<T>
 	private List<Tuple<Tuple<Id,Id>, Double>> linkEnterTimes;
 	private CoordImpl coord;
 	private double clearingTime;
-	private int id;
+	private IdImpl id;
 	
 	private static int currentId = 0;
 	
@@ -53,7 +54,7 @@ public class Cell<T>
 		this.clearingTime = 0d;
 		
 		currentId++;
-		this.id = currentId;
+		this.id = new IdImpl(currentId);
 	}
 	
 	
@@ -146,7 +147,7 @@ public class Cell<T>
 	}
 
 
-	public int getId() {
+	public IdImpl getId() {
 		return this.id;
 	}
 

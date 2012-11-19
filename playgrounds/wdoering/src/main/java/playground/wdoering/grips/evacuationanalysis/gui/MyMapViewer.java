@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.wdoering.grips.evacuationanalysis;
+package playground.wdoering.grips.evacuationanalysis.gui;
 
 
 import java.awt.BasicStroke;
@@ -61,7 +61,13 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis;
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
+import playground.wdoering.grips.evacuationanalysis.data.AttributeData;
+import playground.wdoering.grips.evacuationanalysis.data.Cell;
+import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
+import playground.wdoering.grips.evacuationanalysis.data.EventData;
+import playground.wdoering.grips.evacuationanalysis.data.MetaData;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -77,7 +83,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	boolean editMode = false;
 	boolean freezeMode = false;
 	
-	private enum ColoringMode { RYG };
 
 
 	private final MouseListener m [];
@@ -86,7 +91,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private final KeyListener k [];
 
 
-	private ColoringMode coloringMode = ColoringMode.RYG;
+	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED; 
 
 
 	private ArrayList<Link> links;
@@ -382,6 +387,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 			//get viewport offset
 			Rectangle b = this.getViewportBounds();
 			
+			
 			//draw area polygon
 			if (areaPolygon == null)
 				areaPolygon = this.evacAnalysis.getAreaPolygon();
@@ -412,6 +418,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 				g.fillPolygon(x, y, areaPolygon.getExteriorRing().getNumPoints());
 			}
+			
 
 			
 			//draw utilization
@@ -454,10 +461,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				g.setColor(Color.BLACK);
 				g2D.setStroke(new BasicStroke(1F));
 				
-				//get max cell time sum from data
-				double maxCellTimeSum = data.getMaxCellTimeSum();
-				double maxClearingTime = data.getMaxClearingTime();
-				
 				//get all cells from celltree
 				LinkedList<Cell> cells = new LinkedList<Cell>();
 				cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
@@ -465,6 +468,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				this.selectedCell = null;
 				for (Cell cell : cells)
 				{
+					
 					
 					//get cell coordinate (+ gridsize) and transform into pixel coordinates
 					CoordImpl cellCoord = cell.getCoord();
@@ -495,38 +499,35 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					g2D.setStroke(new BasicStroke(1F));
 					
-					//calculate travel time in relation to the overall maximum travel time per cell 
-					double relTravelTime = cell.getTimeSum() / maxCellTimeSum;
-					double relClearingTime = cell.getClearingTime() / maxClearingTime;
 
-					//might be NAN or less than zero: make it a zero
-					if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
-						relTravelTime = 0d;
-
-					
-					//colorize cell depending on the picked colorization, cell data and the relative travel or clearance time
-					g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); //default
-					if (mode.equals(Mode.EVACUATION))
+					//color grid (if mode equals evacuation or clearing time)
+					if ((mode.equals(Mode.EVACUATION)) || (mode.equals(Mode.CLEARING)))
 					{
-						if (cell.getCount()>0)
-							setCellColor(g, cell, relTravelTime);
-					}
-					else if (mode.equals(Mode.CLEARING))
-					{
-						if (cell.getClearingTime()>0)
-							setCellColor(g, cell, relClearingTime);
+						AttributeData<Color> visData;
 						
-					}
-					
-
-					
-					//color grid (if mode equals evacuation)
-					if ( (mode.equals(Mode.CLEARING)) || (mode.equals(Mode.EVACUATION)) ) 
+						//colorize cell depending on the picked colorization, cell data and the relative travel or clearance time
+						g.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); //default
+						
+						if (mode.equals(Mode.EVACUATION))
+						{
+							visData = (AttributeData<Color>) data.getEvacuationTimeVisData();
+							if ((cell.getCount()>0))
+								g.setColor(visData.getAttribute(cell.getId()));
+						}
+						else if (mode.equals(Mode.CLEARING))
+						{
+							visData = (AttributeData<Color>) data.getClearingTimeVisData();
+							if (cell.getClearingTime()>0)
+								g.setColor(visData.getAttribute(cell.getId()));
+						}
+						
 						g.fillRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+					}
 					
 					//draw grid
 					g.setColor(ToolConfig.COLOR_GRID);
 					g.drawRect(gridX1, gridY1, gridX2-gridX1, gridY2-gridY1);
+					
 					
 					if (currentMousePosition!=null)
 					{
@@ -547,6 +548,12 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					
 				}
+				
+				
+				
+				g.setColor(Color.BLACK);
+//				System.out.println("w:" + getWidth() + "|h:" + getHeight());
+				g.drawString("w:" + getWidth() + "|h:" + getHeight(), 10, getHeight()-140);
 				
 				if ((this.selectedCell!=null) && (this.currentMousePosition!=null))
 				{
@@ -574,31 +581,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	}
 
 
-	private void setCellColor(Graphics g, Cell cell, Double value) {
-		//depending on the selected colorization, set red, green and blue values
-		//RED <-> YELLOW <-> GREEN 
-		if (coloringMode.equals(ColoringMode.RYG))
-		{
-			int red,green,blue;
-			
-			if (value>.5)
-			{
-				red = 255;
-				green = (int)(255 - 255*(value-.5)*2);
-				blue = 0;
-			}
-			else
-			{
-				red = (int)(255*value*2);
-				green = 255;
-				blue = 0;
-				
-			}
-			g.setColor(new Color(red,green,blue,(int)(255*cellTransparency)));
-		}
-		else
-			g.setColor(new Color(0,127,(int)(255*value),100));
-	}
 
 	public void updateEventData(EventData data)
 	{
