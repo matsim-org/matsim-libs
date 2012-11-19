@@ -17,8 +17,7 @@ public class ClearingTimeVisualizer {
 	{
 		AttributeData<Color> coloration = new AttributeData<Color>();
 		
-		LinkedList<Cell> cells = new LinkedList<Cell>();
-		data.getCellTree().get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
+		LinkedList<Cell> cells = getCells(data);
 		
 		for (Cell cell : cells)
 		{
@@ -28,5 +27,15 @@ public class ClearingTimeVisualizer {
 		
 		return coloration;
 	}
+	
+	static LinkedList<Cell> getCells(EventData data)
+	{
+		LinkedList<Cell> cells = new LinkedList<Cell>();
+		data.getCellTree().get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
+		return cells;
+	}
+
+
+	
 
 }

@@ -47,7 +47,7 @@ public class EventData {
 	
 	private AttributeData<Color> evacuationTimeVisData;
 	private AttributeData<Color> clearingTimeVisData;
-	private AttributeData<Double> linkUtilizationVisData;
+	private AttributeData<Tuple<Float,Color>> linkUtilizationVisData;
 	
 	//TODO getLinkUtilization(linkid) -> anz agenten die link verlassen haben
 	
@@ -171,7 +171,7 @@ public class EventData {
 		return clearingTimeVisData;
 	}
 	
-	public AttributeData<Double> getLinkUtilizationVisData() {
+	public AttributeData<Tuple<Float,Color>> getLinkUtilizationVisData() {
 		return linkUtilizationVisData;
 	}
 	
@@ -183,7 +183,7 @@ public class EventData {
 		this.clearingTimeVisData = clearingTimeVisData;
 	}
 	
-	public void setLinkUtilizationVisData(AttributeData<Double> linkUtilizationVisData) {
+	public void setLinkUtilizationVisData(AttributeData<Tuple<Float,Color>> linkUtilizationVisData) {
 		this.linkUtilizationVisData = linkUtilizationVisData;
 	}
 

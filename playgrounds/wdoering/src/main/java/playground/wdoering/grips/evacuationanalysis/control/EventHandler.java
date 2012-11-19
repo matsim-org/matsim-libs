@@ -63,6 +63,7 @@ import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.grips.evacuationanalysis.control.vis.ClearingTimeVisualizer;
 import playground.wdoering.grips.evacuationanalysis.control.vis.EvacuationTimeVisualizer;
+import playground.wdoering.grips.evacuationanalysis.control.vis.UtilizationVisualizer;
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
 import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
 import playground.wdoering.grips.evacuationanalysis.data.EventData;
@@ -377,7 +378,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		//set visualization attributes
 		eventData.setEvacuationTimeVisData(EvacuationTimeVisualizer.getVisualData(eventData, this.colorationMode));
 		eventData.setClearingTimeVisData(ClearingTimeVisualizer.getVisualData(eventData, this.colorationMode));
-		
+		eventData.setLinkUtilizationVisData(UtilizationVisualizer.getVisualData(links, eventData, this.colorationMode));
 		
 		return eventData;
 	}
@@ -418,6 +419,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			
 		}
 	}
+	
 
 
 }

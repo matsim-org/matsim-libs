@@ -53,6 +53,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.config.ToolConfig;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -441,11 +442,25 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 						Coord toCoord = this.ctInverse.transform(new CoordImpl(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()));
 						Point2D toP2D = this.getTileFactory().geoToPixel(new GeoPosition(toCoord.getY(),toCoord.getX()), this.getZoom());
 						
-						float strokeWidth = (((float)enterTimes.size()/(float)data.getMaxUtilization())*80f) / (float)Math.pow(2,this.getZoom()); 
+						float strokeWidth = 1;
+						Color linkColor = Color.BLUE;
+						
+						if (data.getLinkUtilizationVisData()!=null)
+						{
+							if (data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId())!=null)
+							{
+								Tuple<Float,Color> currentColoration = data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId());
+								strokeWidth = ((currentColoration.getFirst() *80f) / (float)Math.pow(2,this.getZoom()) );
+								linkColor = currentColoration.getSecond();
+							}
+						}
+						
+//						float strokeWidth = (((float)enterTimes.size()/(float)data.getMaxUtilization())*80f) / (float)Math.pow(2,this.getZoom()); 
 								
 						g2D.setStroke(new BasicStroke(strokeWidth));
 						
-						g.setColor(Color.RED);
+						g.setColor(linkColor);
+//						g.setColor(Color.RED);
 						g.drawLine((int)fromP2D.getX()-b.x, (int)fromP2D.getY()-b.y, (int)toP2D.getX()-b.x, (int)toP2D.getY()-b.y);
 					}
 					
