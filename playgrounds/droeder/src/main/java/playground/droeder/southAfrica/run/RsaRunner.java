@@ -20,12 +20,28 @@
 package playground.droeder.southAfrica.run;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -36,6 +52,10 @@ import playground.andreas.P2.hook.PHook;
 import playground.andreas.P2.hook.PTransitRouterFactory;
 import playground.droeder.southAfrica.helper.Mode2LineSetterRSA;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
+import playground.droeder.southAfrica.replanning.PlanStrategyReRoutePtFixedSubMode;
+import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemoverStrategy;
+import playground.droeder.southAfrica.replanning.modules.ReRoutePtSubModeStrategy;
+import playground.droeder.southAfrica.replanning.modules.ReturnToOldModesStrategy;
 import playground.droeder.southAfrica.routing.PtSubModeTripRouterFactory;
 
 
@@ -116,46 +136,3 @@ public class RsaRunner {
 	}
 	
 }
-//class ReRouteStuckHandler implements AgentStuckEventHandler, IterationStartsListener, StartupListener{
-//	
-//	
-//	private List<Id> agentToReRoute;
-//
-//	public ReRouteStuckHandler(){
-//		this.agentToReRoute = new ArrayList<Id>();
-//	}
-//
-//	@Override
-//	public void reset(int iteration) {
-//	}
-//
-//	@Override
-//	public void notifyIterationStarts(IterationStartsEvent event) {
-//		PlanStrategy strategy = null;
-//		for(PlanStrategy ps: event.getControler().getStrategyManager().getStrategies()){
-//			if(ps instanceof PlanStrategyReRoutePtFixedSubMode){
-//				strategy = ps;
-//				break;
-//			}
-//		}
-//		if(!(strategy == null)){
-//			Person p;
-//			for(Id id: this.agentToReRoute){
-//				p = event.getControler().getPopulation().getPersons().get(id);
-//				strategy.run(p);
-//			}
-//		}
-//		this.agentToReRoute.clear();
-//	}
-//
-//	@Override
-//	public void handleEvent(AgentStuckEvent event) {
-//		this.agentToReRoute.add(event.getPersonId());
-//	}
-//
-//	@Override
-//	public void notifyStartup(StartupEvent event) {
-//		event.getControler().getEvents().addHandler(this);
-//	}
-//	
-//}

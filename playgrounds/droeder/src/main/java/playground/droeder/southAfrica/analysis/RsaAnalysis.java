@@ -12,7 +12,9 @@ import java.util.TreeMap;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -24,8 +26,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccesibility;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
+import playground.vsp.analysis.modules.stuckAgents.GetStuckAgentsAndSelectedPlans;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -49,7 +53,11 @@ public class RsaAnalysis {
 //		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 //		new MatsimPopulationReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_POPULATION));
 		
-		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "transitSchedule.xml.gz"));
+		if(new File(dir.getIterationFilename(Integer.parseInt(args[2]), "transitSchedule.xml.gz")).exists()){
+			new TransitScheduleReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "transitSchedule.xml.gz"));
+		}else{
+			new TransitScheduleReader(sc).readFile(dir.getOutputFilename( "0.transitSchedule.xml.gz"));
+		}
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "plans.xml.gz"));
 		
@@ -116,11 +124,7 @@ public class RsaAnalysis {
 		activities.add("l5");
 		activityCluster.put("leisure", activities);	
 		
-		PtAccesibility ptAcces = new PtAccesibility(sc, cluster, activityCluster);
-		ptAcces.preProcessData();
-		ptAcces.postProcessData();
-		new File(dir.getOutputPath() + "/ptAcces/").mkdirs();
-		ptAcces.writeResults(dir.getOutputPath() + "/ptAcces/");
+		
 		
 		
 		Set<String> ptModes = new HashSet<String>(){{
@@ -133,27 +137,32 @@ public class RsaAnalysis {
 			add("car");
 			add("ride");
 		}};
+//		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(dir.getOutputPath() + "/possibleRoutes.shp");
+//		
+//		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
+//		for(Feature f: features){
+//			zones.put(String.valueOf(f.getAttribute(1)), (Geometry) f.getAttribute(0));
+//		}
+//		
 		
 		
+		GetStuckAgentsAndSelectedPlans writeStuck = new GetStuckAgentsAndSelectedPlans(sc);
+		PtAccesibility ptAcces = new PtAccesibility(sc, cluster, activityCluster);
 		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
-		Set<Feature> features = new ShapeFileReader().readFileAndInitialize(dir.getOutputPath() + "/possibleRoutes.shp");
+//		tripAna.addZones(zones);
 		
-		Map<String, Geometry> zones =  new HashMap<String, Geometry>();
-		for(Feature f: features){
-			zones.put(String.valueOf(f.getAttribute(1)), (Geometry) f.getAttribute(0));
-		}
 		
-		tripAna.addZones(zones);
-		tripAna.preProcessData();
 		
-		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(tripAna.getEventHandler().get(0));
-		
-		new MatsimEventsReader(manager).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), Controler.FILENAME_EVENTS_XML));
-		tripAna.writeResults(dir.getOutputPath() + "/tripAna/");
-		
+		VspAnalyzer analyzer = new VspAnalyzer(dir.getOutputPath(), 
+								dir.getIterationFilename(Integer.parseInt(args[2]), Controler.FILENAME_EVENTS_XML));
+		analyzer.addAnalysisModule(writeStuck);
+		analyzer.addAnalysisModule(ptAcces);
+		analyzer.addAnalysisModule(tripAna);
+
+		analyzer.run();
 	}
 	
 }
+
 
 
