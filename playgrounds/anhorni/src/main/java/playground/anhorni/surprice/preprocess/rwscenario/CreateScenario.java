@@ -115,19 +115,19 @@ public class CreateScenario {
 		ObjectAttributes preferences = new ObjectAttributes();
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
 			
-//				// incomes 0..8				
-//				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] [low .. high]
-//				double alpha = 0.5 + incomeNzd; // alpha [0.5 ... 1.5]
-//								
-//				double k = (8.0 - personWeeks.getIncome()) / 8.0; // [0.0 .. 1.0] [high .. low]
-//				double gamma = 0.5 + k; // gamma [0.5 ... 1.5]
-			
 				// incomes 0..8				
 				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] [low .. high]
-				double alpha = 2.0 + incomeNzd; // alpha [0.5 ... 1.5]
+				double alpha = 0.5 + incomeNzd; // alpha [0.5 ... 1.5]
 								
 				double k = (8.0 - personWeeks.getIncome()) / 8.0; // [0.0 .. 1.0] [high .. low]
-				double gamma = 2.0 + k; // gamma [0.5 ... 1.5]
+				double gamma = 0.5 + k; // gamma [0.5 ... 1.5]
+			
+//				// incomes 0..8				
+//				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] [low .. high]
+//				double alpha = 2.0 + incomeNzd; // alpha [0.5 ... 1.5]
+//								
+//				double k = (8.0 - personWeeks.getIncome()) / 8.0; // [0.0 .. 1.0] [high .. low]
+//				double gamma = 2.0 + k; // gamma [0.5 ... 1.5]
 				
 				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "alpha", alpha);
 				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "gamma", gamma);
