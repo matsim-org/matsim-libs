@@ -36,8 +36,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
-import com.vividsolutions.jts.geom.Polygon;
-
 /**
  * @author droeder
  *
