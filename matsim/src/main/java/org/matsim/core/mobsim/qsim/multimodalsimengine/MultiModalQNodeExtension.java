@@ -52,8 +52,7 @@ public class MultiModalQNodeExtension {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link link : node.getInLinks().values()) {
-			NetsimLink qLink = simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(link.getId());
-			this.inLinksArrayCache[i] = simEngine.getMultiModalQLinkExtension(qLink);
+			this.inLinksArrayCache[i] = simEngine.getMultiModalQLinkExtension(link.getId());
 			i++;
 		}
 	}
@@ -133,8 +132,8 @@ public class MultiModalQNodeExtension {
 			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
 			
 			// move Agent over the Node
-			((MobsimDriverAgent)personAgent).notifyMoveOverNode(nextLink.getId());
-			simEngine.getMultiModalQLinkExtension(nextQLink).addAgentFromIntersection(personAgent, now);
+			((MobsimDriverAgent)personAgent).notifyMoveOverNode(nextLinkId);
+			simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(personAgent, now);
 		}
 		// --> nextLink == null
 		else

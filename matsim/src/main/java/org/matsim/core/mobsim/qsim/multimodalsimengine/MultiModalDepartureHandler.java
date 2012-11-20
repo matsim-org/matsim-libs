@@ -28,17 +28,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 public class MultiModalDepartureHandler implements DepartureHandler {
 
-	private QSim qSim;
 	private MultiModalSimEngine simEngine;
 	private Set<String> handledModes = new HashSet<String>();
 	
-	public MultiModalDepartureHandler(QSim qSim, MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
-		this.qSim = qSim;
+	public MultiModalDepartureHandler(MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
 		this.simEngine = simEngine;
 		
 		String simulatedModes = multiModalConfigGroup.getSimulatedModes();
@@ -65,7 +62,7 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 	
 	private void handleMultiModalDeparture(double now, MobsimDriverAgent personAgent, Id linkId) {
 		
-		MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(qSim.getNetsimNetwork().getNetsimLink(linkId));
+		MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(linkId);
 		
 		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 			personAgent.endLegAndComputeNextState(now);

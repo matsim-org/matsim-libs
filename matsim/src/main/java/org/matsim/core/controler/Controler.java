@@ -738,7 +738,7 @@ public class Controler extends AbstractController {
 				QSim qSim = (QSim) simulation;
 				MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
 				qSim.addMobsimEngine(multiModalEngine);
-				qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, config.multiModal()));
+				qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, config.multiModal()));
 			}
 		}
 	}

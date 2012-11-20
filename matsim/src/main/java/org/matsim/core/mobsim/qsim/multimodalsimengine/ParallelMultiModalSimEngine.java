@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
 import org.matsim.core.router.util.TravelTime;
 
@@ -226,15 +225,14 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 
 		for (NetsimNode node : this.getMobsim().getNetsimNetwork().getNetsimNodes().values()) {
 			MultiModalSimEngine simEngine = engines[roundRobin % this.numOfThreads];
-			super.getMultiModalQNodeExtension(node).setMultiModalSimEngine(simEngine);
+			super.getMultiModalQNodeExtension(node.getNode().getId()).setMultiModalSimEngine(simEngine);
 		
 			/*
 			 * Assign each link to its in-node to ensure that they are processed by the same
 			 * thread which should avoid running into some race conditions.
 			 */
 			for (Link l : node.getNode().getOutLinks().values()) {
-				NetsimLink link = this.getMobsim().getNetsimNetwork().getNetsimLinks().get(l.getId());
-				super.getMultiModalQLinkExtension(link).setMultiModalSimEngine(simEngine);
+				super.getMultiModalQLinkExtension(l.getId()).setMultiModalSimEngine(simEngine);
 			}
 			
 			roundRobin++;

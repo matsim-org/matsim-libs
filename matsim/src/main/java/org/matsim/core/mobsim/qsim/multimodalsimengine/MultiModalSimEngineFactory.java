@@ -25,10 +25,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 import org.matsim.core.router.util.TravelTime;
 
 public class MultiModalSimEngineFactory implements MatsimFactory {
@@ -46,29 +42,7 @@ public class MultiModalSimEngineFactory implements MatsimFactory {
 		}
 		else {
 			simEngine = new MultiModalSimEngine(sim, map);
-		}
-		
-		addMultiModalToQNetwork(sim.getNetsimNetwork(), simEngine);
-		
+		}		
 		return simEngine;
-	}
-	
-	private void addMultiModalToQNetwork(NetsimNetwork network, MultiModalSimEngine simEngine) {
-		for (NetsimNode node : network.getNetsimNodes().values()) {
-			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(node.getNode(), simEngine);
-			node.getCustomAttributes().put(MultiModalQNodeExtension.class.getName(), extension);
-		}
-		
-		for (NetsimLink link : network.getNetsimLinks().values()) {
-			QNode toNode = (QNode) network.getNetsimNodes().get(link.getLink().getToNode().getId());
-			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, simEngine, toNode);
-			link.getCustomAttributes().put(MultiModalQLinkExtension.class.getName(), extension);
-		}
-		
-		for (NetsimNode node : network.getNetsimNodes().values()) {
-			MultiModalQNodeExtension extension = simEngine.getMultiModalQNodeExtension(node);
-			extension.init();
-		}
-
 	}
 }
