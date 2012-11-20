@@ -80,6 +80,10 @@ public class DayControler extends Controler {
 //		}
 //	}
 	
+	private void setTermination(double stoppingRate) {
+		super.setTerminationCriterion(new TerminationCriterionScoreBased(stoppingRate, this.getScoreStats()));
+	}
+	
 	protected void loadControlerListeners() {
 		super.loadControlerListeners();
 		//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!
@@ -91,6 +95,10 @@ public class DayControler extends Controler {
 	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 	  		this.addControlerListener(new RoadPricing(this.day));
 		}
+	  	double stoppingCriterionVal = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "stoppingCriterionVal"));
+	  	if (stoppingCriterionVal > 0.0) {	
+	  		this.setTermination(stoppingCriterionVal);
+	  	}	  	
 	}
 	
 	private void generateAlphaGammaTrip() {
