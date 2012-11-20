@@ -131,8 +131,6 @@ public class RsaRunner {
 		controler.setUseTripRouting(true);
 
 		controler.run();
-		
-
 	}
 	
 }

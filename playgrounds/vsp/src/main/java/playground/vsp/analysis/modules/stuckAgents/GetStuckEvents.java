@@ -35,15 +35,15 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author droeder
  *
  */
-public class StuckEventHandler extends AbstractAnalyisModule implements AgentStuckEventHandler{
+public class GetStuckEvents extends AbstractAnalyisModule implements AgentStuckEventHandler{
 	
 	private Collection<AgentStuckEvent> stuckEvents;
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(StuckEventHandler.class);
+	private static final Logger log = Logger.getLogger(GetStuckEvents.class);
 
-	public StuckEventHandler() {
-		super(StuckEventHandler.class.getSimpleName());
+	public GetStuckEvents() {
+		super(GetStuckEvents.class.getSimpleName());
 		this.stuckEvents = new ArrayList<AgentStuckEvent>();
 	}
 

@@ -46,6 +46,12 @@ public class GetSelectedPlansSubset extends AbstractAnalyisModule{
 	private Scenario sc;
 	private Scenario newSc;
 
+	/**
+	 * writes persons and their selected plans from sc to a file. when ids is null
+	 * all persons are selected, otherwise only the persons with the specified id's. 
+	 * @param sc, the scenario, containing population AND network
+	 * @param ids, the person-ids of the persons you want to write. might be null.
+	 */
 	public GetSelectedPlansSubset(Scenario sc, Collection<Id> ids) {
 		super(GetSelectedPlansSubset.class.getSimpleName());
 		this.ids = ids;
@@ -65,12 +71,14 @@ public class GetSelectedPlansSubset extends AbstractAnalyisModule{
 	@Override
 	public void postProcessData() {
 		this.newSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Person p;
 		// get selected plans
-		for(Id id: this.ids){
-			p = this.newSc.getPopulation().getFactory().createPerson(id);
-			p.addPlan(this.sc.getPopulation().getPersons().get(id).getSelectedPlan());
-			this.newSc.getPopulation().addPerson(p);
+		Person newPerson;
+		for(Person p: this.sc.getPopulation().getPersons().values()){
+			if((this.ids == null) || this.ids.contains(p.getId())){
+				newPerson = this.newSc.getPopulation().getFactory().createPerson(p.getId());
+				newPerson.addPlan(p.getSelectedPlan());
+				this.newSc.getPopulation().addPerson(newPerson);
+			}
 		}
 	}
 	@Override

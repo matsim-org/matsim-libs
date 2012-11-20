@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
@@ -58,15 +59,44 @@ public class VspAnalyzer {
 		this.eventsFile = eventsFile;
 	}
 	
+	/**
+	 * Simple container-class to handle {@link AbstractAnalysisModule}s.
+	 * The modules are processed in the order as they are added.
+	 * The initialization of the single modules has to be done before.
+	 * Make sure you add the correct data to the module!
+	 * 
+	 * If you use this constructor, no events will be handled!!!
+	 * 
+	 * @param outdir, the output-directory 
+	 */
+	public VspAnalyzer(String outdir) {
+		this.outdir = outdir;
+		this.modules = new ArrayList<AbstractAnalyisModule>();
+		this.eventsFile = null;
+	}
+	
 	public void addAnalysisModule(AbstractAnalyisModule module){
 		this.modules.add(module);
 	}
 	
 	public void run(){
+		log.info("running " + VspAnalyzer.class.getSimpleName());
+		Gbl.startMeasurement();
 		this.preProcess();
-		this.handleEvents();
+		Gbl.printElapsedTime();
+		if(!(this.eventsFile == null)){
+			if(new File(this.eventsFile).exists()){
+				this.handleEvents();
+				Gbl.printElapsedTime();
+			}else{
+				log.warn("can not handle events, because the specified file does not exist!");
+			}
+		}
 		this.postProcess();
+		Gbl.printElapsedTime();
 		this.writeResults();
+		Gbl.printElapsedTime();
+		log.info("finished " + VspAnalyzer.class.getSimpleName());
 	}
 
 	/**
@@ -75,9 +105,10 @@ public class VspAnalyzer {
 	private void preProcess() {
 		log.info("preprocessing all modules...");
 		for(AbstractAnalyisModule module: this.modules){
+			log.info("preprocessing " + module.getName());
 			module.preProcessData();
 		}
-		log.info("finished...");
+		log.info("preprocessing finished...");
 	}
 
 	/**
@@ -87,23 +118,25 @@ public class VspAnalyzer {
 		log.info("handling events for all modules...");
 		EventsManager manager = EventsUtils.createEventsManager();
 		for(AbstractAnalyisModule module: this.modules){
+			log.info("adding eventHandler from " + module.getName());
 			for(EventHandler handler: module.getEventHandler()){
 				manager.addHandler(handler);
 			}
 		}
 		new MatsimEventsReader(manager).readFile(this.eventsFile);
-		log.info("finished...");
+		log.info("event-handling finished...");
 	}
 
 	/**
 	 * 
 	 */
 	private void postProcess() {
-		log.info("postprocessing all modules...");
+		log.info("post-processing all modules...");
 		for(AbstractAnalyisModule module: this.modules){
+			log.info("postprocessing " + module.getName());
 			module.postProcessData();
 		}
-		log.info("finished...");
+		log.info("post-processing finished...");
 		
 	}
 
@@ -115,12 +148,13 @@ public class VspAnalyzer {
 		String outdir;
 		for(AbstractAnalyisModule module: this.modules){
 			outdir = this.outdir + "/" + module.getName() + "/";
+			log.info("writing output for " + module.getName() + " to " + outdir);
 			if(!new File(outdir).exists()){
 				new File(outdir).mkdirs();
 			}
 			module.writeResults(outdir);
 		}
-		log.info("finished...");
+		log.info("writing finished...");
 	}
 }
 

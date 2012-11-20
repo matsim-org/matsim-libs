@@ -39,18 +39,18 @@ import playground.vsp.analysis.modules.selectedPlans.GetSelectedPlansSubset;
  * @author droeder
  *
  */
-public class GetStuckAgentsAndSelectedPlans extends AbstractAnalyisModule{
+public class GetStuckEventsAndSelectedPlans extends AbstractAnalyisModule{
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
-			.getLogger(GetStuckAgentsAndSelectedPlans.class);
-	private StuckEventHandler stuckEventHandler;
+			.getLogger(GetStuckEventsAndSelectedPlans.class);
+	private GetStuckEvents stuckEventHandler;
 	private Scenario sc;
 	private GetSelectedPlansSubset plans;
 
-	public GetStuckAgentsAndSelectedPlans(Scenario sc) {
-		super(GetStuckAgentsAndSelectedPlans.class.getSimpleName());
-		this.stuckEventHandler = new StuckEventHandler();
+	public GetStuckEventsAndSelectedPlans(Scenario sc) {
+		super(GetStuckEventsAndSelectedPlans.class.getSimpleName());
+		this.stuckEventHandler = new GetStuckEvents();
 		this.sc = sc;
 	}
 

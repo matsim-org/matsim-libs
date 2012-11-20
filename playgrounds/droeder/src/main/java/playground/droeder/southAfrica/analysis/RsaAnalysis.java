@@ -29,7 +29,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccesibility;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
-import playground.vsp.analysis.modules.stuckAgents.GetStuckAgentsAndSelectedPlans;
+import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndSelectedPlans;
+import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -146,8 +147,9 @@ public class RsaAnalysis {
 //		
 		
 		
-		GetStuckAgentsAndSelectedPlans writeStuck = new GetStuckAgentsAndSelectedPlans(sc);
+		GetStuckEventsAndSelectedPlans writeStuck = new GetStuckEventsAndSelectedPlans(sc);
 		PtAccesibility ptAcces = new PtAccesibility(sc, cluster, activityCluster);
+		WaitingTimesAnalyzer waitAna = new WaitingTimesAnalyzer();
 		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
 //		tripAna.addZones(zones);
 		
@@ -157,6 +159,7 @@ public class RsaAnalysis {
 								dir.getIterationFilename(Integer.parseInt(args[2]), Controler.FILENAME_EVENTS_XML));
 		analyzer.addAnalysisModule(writeStuck);
 		analyzer.addAnalysisModule(ptAcces);
+		analyzer.addAnalysisModule(waitAna);
 		analyzer.addAnalysisModule(tripAna);
 
 		analyzer.run();
