@@ -22,10 +22,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-class MzPerson implements Identifiable {
-	private static final Logger log =
-		Logger.getLogger(MzPerson.class);
+import playground.thibautd.initialdemandgeneration.activitychainsextractor.MzConfig.Statistics;
 
+class MzPerson implements Identifiable {
 	private static final String HOME = "h";
 	private static final String EDUC = "e";
 	private static final String SHOP = "s";
@@ -37,42 +36,7 @@ class MzPerson implements Identifiable {
 
 	// /////////////////////////////////////////////////////////////////////////
 	// static fields
-	private static final Statistics stats = new Statistics();
-	private static boolean structureIsKnown = false;
-
-
-	private static interface Consts2000 {
-		static final String EDUCATION_NAME = "F50004";
-		static final String EMPLOYED_NAME = "F50003";
-		static final String ID_NAME = "INTNR";
-		static final String DOW_NAME = "DAYSTTAG";
-		static final String LICENCE_NAME = "F50005";
-		static final String AGE_NAME = "F50001";
-		static final String WEIGHT_NAME = "WP";
-		static final String GENDER_NAME = "F50002";
-	}
-
-	private static interface Consts1994 {
-		static final String EDUCATION_NAME = "ZP04";
-		static final String EMPLOYED_NAME = "ZP03";
-		static final String PERSON_NAME = "PERSON";
-		static final String HH_NAME = "HAUSHALT";
-		static final String DOW_NAME = "ZP_WTAGF";
-		static final String LICENCE_NAME = "ZP05";
-		static final String AGE_NAME = "ZP01";
-		static final String WEIGHT_NAME = "WP";
-		static final String GENDER_NAME = "ZP02";
-	}
-
-	private static int employedIndex = -1;
-	private static int educationIndex = -1;
-	private static int personIndex = -1;
-	private static int hhIndex = -1;
-	private static int dayOfWeekIndex = -1;
-	private static int licenceIndex = -1;
-	private static int ageIndex = -1;
-	private static int weightIndex = -1;
-	private static int genderIndex = -1;
+	private final Statistics stats;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// attributes
@@ -90,143 +54,27 @@ class MzPerson implements Identifiable {
 	private final Map<Id, MzWeg> wege = new HashMap<Id, MzWeg>();
 
 	// /////////////////////////////////////////////////////////////////////////
-	// static methods
-	public static void notifyStructure(final String headLine) {
-		String[] names = headLine.split("\t");
-
-		switch (GlobalMzInformation.getMzYear()) {
-			case 2000:
-				for (int i=0; i < names.length; i++) {
-					if (names[ i ].equals( Consts2000.EMPLOYED_NAME )) {
-						employedIndex = i;
-					}
-					if (names[ i ].equals( Consts2000.EDUCATION_NAME )) {
-						educationIndex = i;
-					}
-					else if (names[ i ].equals( Consts2000.ID_NAME )) {
-						personIndex  = i;
-					}
-					else if (names[ i ].equals( Consts2000.DOW_NAME )) {
-						dayOfWeekIndex = i;
-					}
-					else if (names[ i ].equals( Consts2000.LICENCE_NAME )) {
-						licenceIndex = i;
-					}
-					else if (names[ i ].equals( Consts2000.AGE_NAME )) {
-						ageIndex = i;
-					}
-					else if (names[ i ].equals( Consts2000.WEIGHT_NAME )) {
-						weightIndex = i;
-					}
-					else if (names[ i ].equals( Consts2000.GENDER_NAME )) {
-						genderIndex = i;
-					}
-				}
-				break;
-			case 1994:
-				for (int i=0; i < names.length; i++) {
-					if (names[ i ].equals( Consts1994.EMPLOYED_NAME )) {
-						employedIndex = i;
-					}
-					if (names[ i ].equals( Consts1994.EDUCATION_NAME )) {
-						educationIndex = i;
-					}
-					else if (names[ i ].equals( Consts1994.PERSON_NAME )) {
-						personIndex  = i;
-					}
-					else if (names[ i ].equals( Consts1994.HH_NAME )) {
-						hhIndex  = i;
-					}
-					else if (names[ i ].equals( Consts1994.DOW_NAME )) {
-						dayOfWeekIndex = i;
-					}
-					else if (names[ i ].equals( Consts1994.LICENCE_NAME )) {
-						licenceIndex = i;
-					}
-					else if (names[ i ].equals( Consts1994.AGE_NAME )) {
-						ageIndex = i;
-					}
-					else if (names[ i ].equals( Consts1994.WEIGHT_NAME )) {
-						weightIndex = i;
-					}
-					else if (names[ i ].equals( Consts1994.GENDER_NAME )) {
-						genderIndex = i;
-					}
-				}
-				break;
-			default:
-				throw new IllegalStateException( "unhandled mz year "+GlobalMzInformation.getMzYear() );
-		}
-
-		structureIsKnown = true;
-	}
-
-	public static void printStatistcs() {
-		stats.printStats();
-	}
-
-	static Id id94(final String pers , final String hh) {
-		return new IdImpl( pers.trim() + "-" + hh.trim() );
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
 	// construction
 	// /////////////////////////////////////////////////////////////////////////
-	public MzPerson(final String line) {
-		if (!structureIsKnown) throw new IllegalStateException( "structure of file unknown" );
-		String[] lineArray = line.split("\t");
-
-		try {
-			switch (GlobalMzInformation.getMzYear()) {
-				case 2000:
-					this.id = new IdImpl( lineArray[ personIndex ].trim() );
-					break;
-				case 1994:
-					this.id = id94( lineArray[ personIndex ] , lineArray[ hhIndex ] );
-					break;
-				default:
-					throw new IllegalStateException( "unhandled year "+GlobalMzInformation.getMzYear());
-			}
-
-			this.employed = booleanField( lineArray[ employedIndex ] );
-			this.education = booleanField( lineArray[ educationIndex ] );
-			this.dayOfWeek = dayOfWeek( lineArray[ dayOfWeekIndex ] );
-			this.age = Integer.parseInt( lineArray[ ageIndex ] );
-			this.license = licence( age , lineArray[ licenceIndex ] );
-			this.weight = Double.parseDouble( lineArray[ weightIndex ] );
-			this.gender = gender( lineArray[ genderIndex] );
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"problem while parsing line"+Arrays.toString(lineArray),
-					e);
-		}
-	}
-
-	private Boolean licence(final int age, final String value) {
-		// for children, no value
-		if ( age < 18 ) return false;
-		return booleanField( value );
-	}
-
-	private Boolean booleanField( final String value ) {
-		int intValue = Integer.parseInt( value );
-
-		return intValue == 1 ? true :
-			(intValue == 2 ? false : null);
-	}
-
-	private int dayOfWeek( final String value ) {
-		int intValue = Integer.parseInt( value );
-
-		if (intValue < 1 || intValue > 7) throw new IllegalArgumentException( "unknown day "+value );
-
-		return intValue;
-	}
-
-	private String gender( final String value ) {
-		int intValue = Integer.parseInt( value );
-
-		return intValue == 1 ? "m" : (intValue == 2 ? "f" : null);
+	public MzPerson(
+			final Statistics stats,
+			final Id id,
+			final Boolean employed,
+			final Boolean education,
+			final int dayOfWeek,
+			final Boolean license,
+			final int age,
+			final double weight,
+			final String gender) {
+		this.stats = stats;
+		this.id = id;
+		this.employed = employed;
+		this.education = education;
+		this.dayOfWeek = dayOfWeek;
+		this.age = age;
+		this.license = license;
+		this.weight = weight;
+		this.gender = gender;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -469,81 +317,5 @@ class MzPerson implements Identifiable {
 		if (enclosingWeg == null) throw new RuntimeException( "trying to add an etappe before the weg" );
 
 		enclosingWeg.addEtappe( etappe );
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// statistics tracking: helper class
-	// /////////////////////////////////////////////////////////////////////////
-	// TODO: "externalize"
-	private static class Statistics {
-		private int addressInconsistencies = 0;
-		private int timeSequenceInconsistencies = 0;
-		private int tripDurationInconsistencies = 0;
-		private int totalPersonsProcessed = 0;
-		private int totallyProcessedPersons = 0;
-		private int roundTrips = 0;
-		private int unhandledActivityType = 0;
-		private int nonHomeBased = 0;
-		private int longServePassengerAct = 0;
-		private int numerousServePassengersLegs = 0;
-
-		public void numerousServePassengersLegs() {
-			numerousServePassengersLegs++;
-		}
-
-		public void longServePassengerAct() {
-			longServePassengerAct++;
-		}
-
-		public void nonHomeBased() {
-			nonHomeBased++;
-		}
-
-		public void roundTrip() {
-			roundTrips++;
-		}
-
-		public void addressInconsistency() {
-			addressInconsistencies++;
-		}
-
-		public void timeSequenceInconsistency() {
-			timeSequenceInconsistencies++;
-		}
-
-		public void tripDurationInconsistency() {
-			tripDurationInconsistencies++;
-		}
-
-		public void totalPersonsProcessed() {
-			totalPersonsProcessed++;
-		}
-
-		public void totallyProcessedPerson() {
-			totallyProcessedPersons++;
-		}
-
-		public void unhandledActivityType() {
-			unhandledActivityType++;
-		}
-
-		public void printStats() {
-			log.info( "-----------> statistics on the processing." );
-			log.info( "beware: the counts count the reason for which plan construction was aborted" );
-			log.info( "Actual number of interviews of each type may  be bigger." );
-			log.info( "" );
-			log.info( "round trips: "+roundTrips );
-			log.info( "adress inconsistencies: "+addressInconsistencies );
-			log.info( "time sequence inconsistencies: "+timeSequenceInconsistencies );
-			log.info( "trip duration inconsistencies: "+tripDurationInconsistencies );
-			log.info( "plans with unhandled activity types: "+unhandledActivityType );
-			log.info( "plans with long serve passenger activities: "+longServePassengerAct );
-			// log.info( "plans with numerous serve passenger legs: "+numerousServePassengersLegs );
-			log.info( "non home based plans: "+nonHomeBased );
-			log.info( "total number of persons: "+totalPersonsProcessed );
-			log.info( "number of persons retained: "+totallyProcessedPersons );
-			MzAdress.printStatistics();
-			log.info( "<----------- end of statistics on the processing" );
-		}
 	}
 }

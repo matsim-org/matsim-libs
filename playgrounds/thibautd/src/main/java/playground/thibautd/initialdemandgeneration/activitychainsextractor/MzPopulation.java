@@ -3,7 +3,6 @@ package playground.thibautd.initialdemandgeneration.activitychainsextractor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -17,13 +16,14 @@ import org.matsim.core.scenario.ScenarioUtils;
  * interview number used as a person id
  */
 class MzPopulation {
-	private static final Logger log =
-		Logger.getLogger(MzPopulation.class);
-
+	private final MzConfig config;
 	private final MzActivityChainsExtractor.Interval interval;
 	private final Map<Id, MzPerson> persons = new HashMap<Id, MzPerson>();
 
-	public MzPopulation(final MzActivityChainsExtractor.Interval interval) {
+	public MzPopulation(
+			final MzConfig config,
+			final MzActivityChainsExtractor.Interval interval) {
+		this.config = config;
 		this.interval = interval;
 	}
 
@@ -46,7 +46,7 @@ class MzPopulation {
 			population.addPerson( matsimPerson );
 		}
 
-		MzPerson.printStatistcs();
+		config.printStats();
 		return scen;
 	}
 

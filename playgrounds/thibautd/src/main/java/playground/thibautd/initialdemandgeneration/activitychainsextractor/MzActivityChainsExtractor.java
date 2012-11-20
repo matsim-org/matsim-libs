@@ -72,8 +72,7 @@ public class MzActivityChainsExtractor {
 			final String etFile,
 			final String start,
 			final String end) {
-		GlobalMzInformation.setMzYear( 2000 );
-		return run(zpFile, wgFile, etFile, new Interval(start, end));
+		return run(2000, zpFile, wgFile, etFile, new Interval(start, end));
 	}
 
 	public Scenario run1994(
@@ -81,29 +80,30 @@ public class MzActivityChainsExtractor {
 			final String wgFile,
 			final String start,
 			final String end) {
-		GlobalMzInformation.setMzYear( 1994 );
-		return run(zpFile, wgFile, null, new Interval(start, end));
+		return run(1994, zpFile, wgFile, null, new Interval(start, end));
 	}
 
 	private Scenario run(
+			final int year,
 			final String zpFile,
 			final String wgFile,
 			final String etFile,
 			final Interval interval) {
-		MzPopulation population = new MzPopulation( interval );
+		MzConfig mzConfig = new MzConfig( year );
+		MzPopulation population = new MzPopulation( mzConfig , interval );
 
 		try {
 			// ////// add person info ///////
 			BufferedReader reader = IOUtils.getBufferedReader( zpFile );
 
-			MzPerson.notifyStructure( reader.readLine() );
+			MzPersonFactory personFactory = mzConfig.createMzPersonFactory( reader.readLine() );
 			String line = reader.readLine();
 
 			Counter count = new Counter("MzPerson # ");
 			while (line != null) {
 				count.incCounter();
 				population.addPerson(
-						new MzPerson( line ) );
+						personFactory.createMzPersonFromZpLine( line ) );
 				line = reader.readLine();
 			}
 			count.printCounter();
@@ -111,30 +111,28 @@ public class MzActivityChainsExtractor {
 			// ////// add trip info //////////
 			reader = IOUtils.getBufferedReader( wgFile );
 
-			MzWeg.notifyStructure( reader.readLine() );
+			MzWegFactory wegFactory = mzConfig.createMzWegFactory( reader.readLine() );
 			line = reader.readLine();
 
 			count = new Counter("MzWeg # ");
 			while (line != null) {
 				count.incCounter();
-				population.addWeg(
-						new MzWeg( line ) );
+				population.addWeg( wegFactory.createMzWeg( line ) );
 				line = reader.readLine();
 			}
 			count.printCounter();
 
 			// ////// add etap info //////////
-			if (GlobalMzInformation.getMzYear() == 2000) {
+			if (etFile != null) {
 				reader = IOUtils.getBufferedReader( etFile );
 
-				MzEtappe.notifyStructure( reader.readLine() );
+				MzEtappeFactory etappeFactory = mzConfig.createMzEtappeFactory( reader.readLine() );
 				line = reader.readLine();
 
 				count = new Counter("MzEtappe # ");
 				while (line != null) {
 					count.incCounter();
-					population.addEtappe(
-							new MzEtappe( line ) );
+					population.addEtappe( etappeFactory.createMzEtappe( line ) );
 					line = reader.readLine();
 				}
 				count.printCounter();
