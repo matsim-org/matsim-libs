@@ -47,7 +47,7 @@ public class VspAnalyzer {
 	 * The modules are processed in the order as they are added.
 	 * The initialization of the single modules has to be done before.
 	 * Make sure you add the correct data to the module, especially if you are
-	 * handling events. There will be only only one events-file handled!
+	 * handling events.Only one events-file will be handled!
 	 * 
 	 * @param outdir, the output-directory where you want your modules create their output-directories.
 	 * @param eventsFile, the events
