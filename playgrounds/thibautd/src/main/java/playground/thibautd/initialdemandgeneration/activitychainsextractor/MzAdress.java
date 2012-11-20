@@ -7,7 +7,8 @@ class MzAdress {
 		Logger.getLogger(MzAdress.class);
 
 	private final String adress;
-	
+
+	private	static boolean warnXy = true;
 	private static int nCreatedAdresses = 0;
 	private static int nCreatedFullAdresses = 0;
 
@@ -15,12 +16,16 @@ class MzAdress {
 			final String ortCode,
 			final String street,
 			final String streetNr) {
-		this.adress = (street.toLowerCase().trim()+
+		this( (street.toLowerCase().trim()+
 				" "+streetNr.toLowerCase().trim()+
-				" "+ortCode.trim()).trim();
+				" "+ortCode.trim()).trim() );
 
 		nCreatedAdresses++;
 		if (!adress.equals( ortCode.trim() )) nCreatedFullAdresses++;
+	}
+
+	private MzAdress(final String adress) {
+		this.adress = adress;
 	}
 
 	public static void printStatistics() {
@@ -48,5 +53,15 @@ class MzAdress {
 			final String street,
 			final String streetNr) {
 		return new MzAdress(ortCode , street , streetNr);
+	}
+
+	static MzAdress createAdress(
+			final int x,
+			final int y) {
+		if ( warnXy ) {
+			log.warn( "You are using X-Y coordinates as adresses. Double check the results, as it is not sure that the same place will always have the same X-Y pair associated..." );
+			warnXy = false;
+		}
+		return new MzAdress( "("+x+";"+y+")" );
 	}
 }
