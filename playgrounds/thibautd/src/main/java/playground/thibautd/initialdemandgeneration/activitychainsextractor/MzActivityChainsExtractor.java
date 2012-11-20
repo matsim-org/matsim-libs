@@ -66,31 +66,15 @@ import org.matsim.core.utils.misc.Counter;
  * @author thibautd
  */
 public class MzActivityChainsExtractor {
-	public Scenario run2000(
-			final String zpFile,
-			final String wgFile,
-			final String etFile,
-			final String start,
-			final String end) {
-		return run(2000, zpFile, wgFile, etFile, new Interval(start, end));
-	}
-
-	public Scenario run1994(
-			final String zpFile,
-			final String wgFile,
-			final String start,
-			final String end) {
-		return run(1994, zpFile, wgFile, null, new Interval(start, end));
-	}
-
-	private Scenario run(
+	public Scenario run(
 			final int year,
 			final String zpFile,
 			final String wgFile,
 			final String etFile,
-			final Interval interval) {
+			final String start,
+			final String end) {
 		MzConfig mzConfig = new MzConfig( year );
-		MzPopulation population = new MzPopulation( mzConfig , interval );
+		MzPopulation population = new MzPopulation( mzConfig , new Interval( start , end ) );
 
 		try {
 			// ////// add person info ///////

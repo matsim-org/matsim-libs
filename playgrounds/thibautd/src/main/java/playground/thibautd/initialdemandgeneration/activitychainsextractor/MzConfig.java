@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.activitychainsextractor;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -33,6 +36,7 @@ public class MzConfig {
 	private static final Logger log =
 		Logger.getLogger(MzConfig.class);
 
+	private static final List<Integer> knownYears = Arrays.asList( 1994 , 2000 );
 	private final int year;
 	private final Statistics stats = new Statistics();
 
@@ -40,6 +44,9 @@ public class MzConfig {
 			final int year) {
 		if (year <= 0) {
 			throw new IllegalArgumentException( "Really? A swiss microcensus in "+(-year)+" B.C.?" );
+		}
+		else if (!knownYears.contains( year )) {
+			throw new IllegalArgumentException( "Cannot handle the "+year+" MZ. Handled years are "+knownYears );
 		}
 		else {
 			log.info( "setting MZ year to "+year );

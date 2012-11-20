@@ -26,7 +26,7 @@ import playground.thibautd.initialdemandgeneration.activitychainsextractor.MzAct
 import playground.thibautd.utils.MoreIOUtils;
 
 /**
- * executable class to extract activity chains from MZ2000
+ * executable class to extract activity chains from MZ
  * @author thibautd
  */
 public class ExtractActivityChainsFromMz {
@@ -38,7 +38,7 @@ public class ExtractActivityChainsFromMz {
 		String startDay = "1";
 		String endDay = "7";
 
-		String year = null;
+		int year = -1;
 		String zpFile = null;
 		String wgFile = null;
 		String etFile = null;
@@ -66,32 +66,20 @@ public class ExtractActivityChainsFromMz {
 				endDay = keyValue[ 1 ];
 			}
 			if (keyValue[ 0 ].equals("year")) {
-				year = keyValue[ 1 ];
+				year = Integer.parseInt( keyValue[ 1 ] );
 			}
 		}
 
 		MoreIOUtils.initOut( outDir );
 		MzActivityChainsExtractor extractor = new MzActivityChainsExtractor();
 
-		Scenario scen; 
-		if (year.equals( "2000" )) {
-			scen = extractor.run2000(
-					zpFile,
-					wgFile,
-					etFile,
-					startDay,
-					endDay);
-		}
-		else if (year.equals( "1994" )) {
-			scen = extractor.run1994(
-					zpFile,
-					wgFile,
-					startDay,
-					endDay);
-		}
-		else {
-			throw new IllegalArgumentException( "year "+year );
-		}
+		Scenario scen = extractor.run(
+				year,
+				zpFile,
+				wgFile,
+				etFile,
+				startDay,
+				endDay);
 
 		(new PopulationWriter(scen.getPopulation(),
 							  scen.getNetwork())).write(
