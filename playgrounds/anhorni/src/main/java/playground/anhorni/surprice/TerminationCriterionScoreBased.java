@@ -20,7 +20,7 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 		if (iteration >= 1) {
 			prevBestScore = scoreStats.getHistory()[INDEX_BEST][iteration - 1];
 		}
-		double bestScore = scoreStats.getHistory()[INDEX_BEST][iteration - 1];
+		double bestScore = scoreStats.getHistory()[INDEX_BEST][iteration];
 		
 		if (Math.abs((bestScore - prevBestScore) / prevBestScore) < this.stoppingCriterionVal) {
 			return false;
