@@ -1,5 +1,8 @@
 package playground.anhorni.surprice.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -60,8 +63,9 @@ public class TwoRunAnalyzer {
 			preferencesReader.parse(this.run1path + "/" + day + "/" + day + ".perAgent.txt");
 											
 			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tolltd", day + ".tolltd_alpha_Diff", 10.0 * 1000.0);						
-			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tt", day + ".tt_alpha_dDiff", 1200.0);			
-			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tollScore", day + ".tollScore_alpha_dDiff", 10.0);	
+			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tt", day + ".tt_alpha_Diff", 1200.0);			
+			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".tollScore", day + ".tollScore_alpha_Diff", 10.0);	
+			this.writePlots(day, run0, run1, day + ".alpha_tot", day + ".td", day + ".td_alpha_Diff", 10.0);
 		}	
 		log.info("=================== Finished analyses ====================");
 	}
@@ -110,7 +114,7 @@ public class TwoRunAnalyzer {
 	}
 	
 	private void writeDiffsPerAgent(String day, TreeMap<Id, Double> xDiffsPerAgent, TreeMap<Id, Double> yDiffsPerAgent, String fileName,
-			String xName, String yName) {
+			String xName, String yName) {		
 		ObjectAttributes diffsPerAgentOA = new ObjectAttributes();		
 		for (Id id : yDiffsPerAgent.keySet()) {
 			diffsPerAgentOA.putAttribute(id.toString(), "diff_" + xName, xDiffsPerAgent.get(id));
@@ -118,5 +122,20 @@ public class TwoRunAnalyzer {
 		}		
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(diffsPerAgentOA);
 		attributesWriter.writeFile(this.outPath + "/" + day + "." + fileName + ".txt");
+		
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(this.outPath + "/" + day + ".table." + fileName + ".txt")); 
+			bufferedWriter.write("id\txd\tyd\n");	
+			
+			for (Id id : yDiffsPerAgent.keySet()) {
+				String line = id + "\t" + xDiffsPerAgent.get(id) + "\t" + yDiffsPerAgent.get(id) + "\n";
+				bufferedWriter.write(line);
+			}		
+			bufferedWriter.flush();
+			bufferedWriter.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
