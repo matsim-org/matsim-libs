@@ -49,7 +49,7 @@ public class VspAnalyzer {
 	 * Make sure you add the correct data to the module, especially if you are
 	 * handling events.Only one events-file will be handled!
 	 * 
-	 * @param outdir, the output-directory where you want your modules create their output-directories.
+	 * @param outdir, the output-directory 
 	 * @param eventsFile, the events
 	 */
 	public VspAnalyzer(String outdir, String eventsFile) {
