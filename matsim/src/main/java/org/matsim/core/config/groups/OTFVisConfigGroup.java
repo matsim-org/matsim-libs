@@ -73,6 +73,18 @@ public class OTFVisConfigGroup extends Module {
 	private boolean drawScaleBar = false;
 	private boolean showTeleportedAgents = false;
 
+	/**
+	 * this is here so that the entry can be communicated from the network (which seems to be known only by the
+	 * otfvis server) to the otfvis client.  I am not sure if this is really a hack; might also just make this 
+	 * configurable in the sense that it tries to find a useful value either from network or from config or from
+	 * the saved config.  this is, however, not implemented.  kai, jan'11
+	 */
+	private Double effectiveLaneWidth = 3.75 ;
+
+	private String mapBaseURL = "";
+
+	private String mapLayer = "";
+
 	private final List<ZoomEntry> zooms = new ArrayList<ZoomEntry>();
 
 	private boolean scaleQuadTreeRect;
@@ -93,6 +105,8 @@ public class OTFVisConfigGroup extends Module {
 	public static final String CAPACITY = "capacity" ;
 
 	private static final String MAP_OVERLAY_MODE = "mapOverlayMode";
+	private static final String MAP_BASE_URL = "mapBaseURL";
+	private static final String MAP_LAYER = "mapLayer";
 	
 	private String linkWidthIsProportionalTo = NUMBER_OF_LANES ;
 	
@@ -210,6 +224,12 @@ public class OTFVisConfigGroup extends Module {
 		else if (NODE_OFFSET.equalsIgnoreCase(key)){
 			this.nodeOffset = Double.parseDouble(value);
 		}
+		else if (MAP_BASE_URL.equalsIgnoreCase(key)) {
+			this.mapBaseURL = value;
+		}
+		else if (MAP_LAYER.equalsIgnoreCase(key)) {
+			this.mapLayer = value;
+		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
@@ -230,6 +250,8 @@ public class OTFVisConfigGroup extends Module {
 		map.put(COLORING, this.getColoringScheme().toString() );
 		map.put(MAP_OVERLAY_MODE, Boolean.toString(this.isMapOverlayMode()));
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
+		map.put(MAP_BASE_URL, this.mapBaseURL);
+		map.put(MAP_LAYER, this.mapLayer);
 		return map;
 	}
 
@@ -248,7 +270,11 @@ public class OTFVisConfigGroup extends Module {
 		}
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2012) allowed values:" + allowedColorings);
 		
-		map.put(MAP_OVERLAY_MODE, "Render everything on top of OpenStreetMap tiles.");
+		map.put(MAP_OVERLAY_MODE, "Render everything on top of map tiles. Default: From tiles.openstreetmap.org");
+		map.put(MAP_BASE_URL, "URL to get WMS tiles from. For a local GeoServer instance, use http://localhost:8080/geoserver/wms?service=WMS&");
+		map.put(MAP_LAYER, "The WMS layer to display. For GeoServer and a layer called clipped in workspace mz, use mz:clipped");
+		
+		
 		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization.");
 		//		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
 //				"May affect all non-moving items.") ;
@@ -436,13 +462,6 @@ public class OTFVisConfigGroup extends Module {
 		this.coloring = value ;
 	}
 
-	/**
-	 * this is here so that the entry can be communicated from the network (which seems to be known only by the
-	 * otfvis server) to the otfvis client.  I am not sure if this is really a hack; might also just make this 
-	 * configurable in the sense that it tries to find a useful value either from network or from config or from
-	 * the saved config.  this is, however, not implemented.  kai, jan'11
-	 */
-	private Double effectiveLaneWidth = 3.75 ;
 	public void setEffectiveLaneWidth(Double effectiveLaneWidth) {
 		this.effectiveLaneWidth = effectiveLaneWidth ;
 	}
@@ -482,6 +501,22 @@ public class OTFVisConfigGroup extends Module {
 	
 	public void setNodeOffset(double nodeOffset) {
 		this.nodeOffset = nodeOffset;
+	}
+
+	public void setMapBaseUrl(String mapBaseURL) {
+		this.mapBaseURL = mapBaseURL;
+	}
+
+	public void setMapLayer(String mapLayer) {
+		this.mapLayer = mapLayer;
+	}
+
+	public String getMapBaseURL() {
+		return mapBaseURL;
+	}
+
+	public String getMapLayer() {
+		return mapLayer;
 	}
 
 

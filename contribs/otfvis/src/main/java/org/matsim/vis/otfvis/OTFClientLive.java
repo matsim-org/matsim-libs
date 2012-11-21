@@ -27,6 +27,7 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
@@ -98,9 +99,15 @@ public class OTFClientLive {
 				mainDrawer.setQueryHandler(queryControl);
 				otfClient.addDrawerAndInitialize(mainDrawer, saver);
 				if (config.otfVis().isMapOverlayMode()) {
-
-					assertZoomLevel17(config);
-					otfClient.addMapViewer(osmTileFactory());
+					TileFactory tf;
+					if (config.otfVis().getMapBaseURL().isEmpty()) {
+						assertZoomLevel17(config);
+						tf = osmTileFactory();
+					} else {
+						WMSService wms = new WMSService(config.otfVis().getMapBaseURL(), config.otfVis().getMapLayer());
+						tf = new OTFVisWMSTileFactory(wms, config.otfVis().getMaximumZoom());
+					}
+					otfClient.addMapViewer(tf);
 				}
 				otfClient.show();
 			}
@@ -129,6 +136,22 @@ public class OTFClientLive {
 		};
 		TileFactory tf = new DefaultTileFactory(info);
 		return tf;
+	}
+	
+	private static class OTFVisWMSTileFactory extends DefaultTileFactory {
+		public OTFVisWMSTileFactory(final WMSService wms, final int maxZoom) {
+			super(new TileFactoryInfo(0, maxZoom, maxZoom, 
+					256, true, true, // tile size and x/y orientation is r2l & t2b
+					"","x","y","zoom") {
+				@Override
+				public String getTileUrl(int x, int y, int zoom) {
+					int zz = maxZoom - zoom;
+					int z = (int)Math.pow(2,(double)zz-1);
+					return wms.toWMSURL(x-z, z-1-y, zz, getTileSize(zoom));
+				}
+
+			});
+		}
 	}
 
 }
