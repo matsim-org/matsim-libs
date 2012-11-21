@@ -186,7 +186,7 @@ public class DreieckStreckeSzenarioTest {
 	
 	private static double FREESPEED = 50.;//in km/h
 	private static double P_TRUCK = 2.;//no need to worry much about those, are normalized when choosing effective transport mode
-	private static double P_MED = 2.;
+	//private static double P_MED = 2.;
 	private static double P_FAST = 2.;
 	
 	private Scenario scenario;
@@ -199,7 +199,7 @@ public class DreieckStreckeSzenarioTest {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
-		config.getQSimConfigGroup().setMainModes(Arrays.asList("fast","med","truck"));
+		config.getQSimConfigGroup().setMainModes(Arrays.asList("fast"/*,"med"*/,"truck"));
 		config.getQSimConfigGroup().setStuckTime(100*3600.);
 		
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
@@ -330,15 +330,17 @@ public class DreieckStreckeSzenarioTest {
 			//Assigning this person to a randomly chosen transport mode
 			String transportMode="";
 			double p = rand.nextDouble();
-			double psum = DreieckStreckeSzenarioTest.P_FAST+DreieckStreckeSzenarioTest.P_MED+DreieckStreckeSzenarioTest.P_TRUCK;
-			double p_med = DreieckStreckeSzenarioTest.P_MED/psum;
+			double psum = DreieckStreckeSzenarioTest.P_FAST/*+DreieckStreckeSzenarioTest.P_MED*/+DreieckStreckeSzenarioTest.P_TRUCK;
+			//double p_med = DreieckStreckeSzenarioTest.P_MED/psum;
 			double p_truck = DreieckStreckeSzenarioTest.P_TRUCK/psum;
 			if (p<p_truck){
 				transportMode = "truck";
 				//System.out.println("A truck was made.");
+			/*
 			} else if (p<(p_truck+p_med)) {
 				transportMode = "med";
 				//System.out.println("A med was made.");
+			*/
 			} else {
 				transportMode = "fast";
 				//System.out.println("A fast was made.");
@@ -471,12 +473,12 @@ public class DreieckStreckeSzenarioTest {
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 		VehicleType truck = VehicleUtils.getFactory().createVehicleType(new IdImpl("truck"));
 		truck.setPcuEquivalents(1.0);
-		truck.setMaximumVelocity(7.0);
+		truck.setMaximumVelocity(9.0);
 		modeVehicleTypes.put("truck", truck);
 		VehicleType med = VehicleUtils.getFactory().createVehicleType(new IdImpl("med"));
 		med.setPcuEquivalents(1.0);
 		med.setMaximumVelocity(10.0);
-		modeVehicleTypes.put("med", med);
+		//modeVehicleTypes.put("med", med);
 		VehicleType fast = VehicleUtils.getFactory().createVehicleType(new IdImpl("fast"));
 		fast.setPcuEquivalents(1.0);
 		fast.setMaximumVelocity(13.88);
