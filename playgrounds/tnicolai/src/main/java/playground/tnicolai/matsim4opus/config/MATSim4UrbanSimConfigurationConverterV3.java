@@ -378,7 +378,11 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 			logitScaleParameter = scenario.getConfig().planCalcScore().getBrainExpBeta();
 		else
 			logitScaleParameter = matsim4UrbanSimParameter.getAccessibilityParameter().getLogitScaleParameter();
-	
+		
+		// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
+		assert(logitScaleParameter == 1.0);
+		if(logitScaleParameter != 1.0)
+			log.error("Please use an accessibility scale parameter (beta scale) of 1! This run will continue with your selected parameter: beta scale = " + logitScaleParameter);
 		
 		if(useMATSimCarParameter){
 			// usually travelling_utils are negative
@@ -721,57 +725,6 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		log.info("... done!");
 	}
 	
-//	/**
-//	 * setting simulation
-//	 */
-//	private void initSimulation(){
-//		log.info("Setting SimulationConfigGroup to config...");
-//		
-//		SimulationConfigGroup simulation = scenario.getConfig().simulation();
-//		if( simulation == null){		
-//			simulation = new SimulationConfigGroup();
-//			scenario.getConfig().addSimulationConfigGroup( simulation );
-//		}
-//		
-//		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
-//		
-//		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
-//		
-//		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
-//		simulation.setFlowCapFactor( popSampling );	
-//		
-//		// Adapting the storageCapFactor has the following reason:
-//		// Too low SorageCapacities especially with small sampling 
-//		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
-//		// This leads to an unstable behavior of the simulation (by breakdowns 
-//		// during the learning progress).
-//		// The correction fetch factor introduced here raises the 
-//		// storage capacity at low sampling rates and becomes flatten 
-//		// with increasing sampling rates (at a 100% sample, the 
-//		// storage capacity == 1).			tnicolai nov'11
-//		if(popSampling <= 0.){
-//			popSampling = 0.01;
-//			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
-//		}
-//		// tnicolai dec'11
-//		double storageCapCorrectionFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
-//		double storageCap = popSampling * storageCapCorrectionFactor;
-//		
-//		// setting StorageCapFactor
-//		simulation.setStorageCapFactor( storageCap );	
-//		
-//		boolean removeStuckVehicles = false;
-//		simulation.setRemoveStuckVehicles( removeStuckVehicles );
-//		simulation.setStuckTime(10.);
-//		
-//		log.info("SimulationConfigGroup settings:");
-//		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
-//		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + storageCapCorrectionFactor + ")" );
-//		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
-//		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
-//		log.info("... done!");
-//	}
-	
 	/**
 	 * setting strategy
 	 */
@@ -809,20 +762,20 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		scenario.getConfig().strategy().addStrategySettings(reroute);
 		
 		// tnicolai: deactivate only for nectar
-		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
-		changeSingleLegMode.setModuleName("ChangeSingleLegMode");		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
-		changeSingleLegMode.setProbability( 0.1 ); // tnicolai: make configurable via "matsimParameter", should be something like 0.1
-		changeSingleLegMode.setDisableAfter(disableStrategyAfterIteration);
-		scenario.getConfig().strategy().addStrategySettings(changeSingleLegMode);
-		// this sets some additional modes. by default car and pt is available
-		scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
+//		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
+//		changeSingleLegMode.setModuleName("ChangeSingleLegMode");		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
+//		changeSingleLegMode.setProbability( 0.1 ); // tnicolai: make configurable via "matsimParameter", should be something like 0.1
+//		changeSingleLegMode.setDisableAfter(disableStrategyAfterIteration);
+//		scenario.getConfig().strategy().addStrategySettings(changeSingleLegMode);
+//		// this sets some additional modes. by default car and pt is available
+//		scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
 		
 		log.info("StrategyConfigGroup settings:");
 		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter() ); 
 		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability() );
 		log.info("Strategy_3: " + reroute.getModuleName() + " Probability: " + reroute.getProbability() + " Disable After Itereation: " + reroute.getDisableAfter() );
 		// tnicolai: deactivate only for nectar
-		log.info("Strategy_4: " + changeSingleLegMode.getModuleName() + " Probability: " + changeSingleLegMode.getProbability() + " Disable After Itereation: " + changeSingleLegMode.getDisableAfter() );
+		// log.info("Strategy_4: " + changeSingleLegMode.getModuleName() + " Probability: " + changeSingleLegMode.getProbability() + " Disable After Itereation: " + changeSingleLegMode.getDisableAfter() );
 		log.warn("activate changeSingleLegMode after nectar!");
 		log.info("... done!");
 	}
@@ -836,14 +789,14 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
 		scenario.getConfig().plansCalcRoute().setBikeSpeed(4.16666666); // 4.16666666m/s corresponds to 15 km/h
 		// tnicolai: deactivate only for nectar
-		scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
+		// scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
 		// scenario.getConfig().plansCalcRoute().setTeleportedModeFreespeedFactor(TransportMode.pt, 2); // tnicolai: if this is enabled the router uses freespeed car * freespeed factor instead of PtSpeed!!!
 
 		log.info("PlanCalcRouteGroup settings:");							 
 		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
 		log.info("Bike Speed: " + scenario.getConfig().plansCalcRoute().getBikeSpeed() );
 		// tnicolai: deactivate only for nectar
-		log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
+		// log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
 		log.warn("activate Pt Speed after nectar!");
 		log.info("Beeline Distance Factor: " + scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor() );
 		
