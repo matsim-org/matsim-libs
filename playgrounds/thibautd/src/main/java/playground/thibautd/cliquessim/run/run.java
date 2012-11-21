@@ -42,8 +42,6 @@ public class run {
 					"scoresStats",
 					true));
 		controler.addControlerListener(new ModeAnalysis( true ));
-		controler.setOverwriteFiles(true);
-		//controler.addControlerListener(new JointReplanningControlerListener());
 
 		controler.run();
 	}
