@@ -20,6 +20,7 @@
 package playground.anhorni.surprice;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -45,6 +46,8 @@ public class MultiDayControler {
 		ObjectAttributes preferences = new ObjectAttributes();
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(preferences);
 		preferencesReader.parse(path + "/preferences.xml");
+		
+		Population populationPreviousDay = null;
 				
 		for (String day : Surprice.days) {			
 			config.setParam("controler", "outputDirectory", outPath + "/" + day);
@@ -53,8 +56,12 @@ public class MultiDayControler {
 			
 			AgentMemories memories = new AgentMemories();
 			
-			DayControler controler = new DayControler(config, memories, day, preferences);
+			DayControler controler = new DayControler(config, memories, day, preferences, populationPreviousDay);
 			controler.run();
+			
+			if (day.equals("sat")) {
+				populationPreviousDay = null;
+			}
 		}
 		// only used for small-scale scenario
 //		UtilityAnalyzer analyzer = new UtilityAnalyzer();

@@ -22,6 +22,7 @@ package playground.anhorni.surprice;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -31,6 +32,7 @@ import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
 import playground.anhorni.surprice.scoring.SurpriceTravelCostCalculatorFactoryImpl;
+import playground.anhorni.surprice.warmstart.AdaptNextDay;
 
 public class DayControler extends Controler {
 	
@@ -38,13 +40,15 @@ public class DayControler extends Controler {
 	private String day;	
 	private ObjectAttributes preferences;
 	private Random random;
+	private Population populationPreviousDay = null;
 		
-	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences) {
+	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay) {
 		super(config);	
 		super.setOverwriteFiles(true);
 		this.memories = memories;	
 		this.day = day;
 		this.preferences = preferences;
+		this.populationPreviousDay = populationPreviousDay;
 	} 
 			
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
@@ -58,27 +62,6 @@ public class DayControler extends Controler {
 		this.setTravelDisutilityFactory(costCalculatorFactory);
 		super.setUp();	
 	}
-	
-	
-//	@Override
-//	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
-//		
-//		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class);
-//		
-//		if (scheme.getType().equals("area")) {		
-//		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
-//		return new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts,
-//				travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory, 
-//				(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
-//		}
-//		else {
-//			final TravelDisutilityFactory previousTravelCostCalculatorFactory = super.getTravelDisutilityFactory();
-//			TravelDisutility costsIncludingTolls = new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(
-//					travelTimes, this.config.planCalcScore()), 
-//					(RoadPricingSchemeImpl) this.scenarioData.getScenarioElement(RoadPricingScheme.class));
-//			return super.createRoutingAlgorithm(costsIncludingTolls, travelTimes);
-//		}
-//	}
 	
 	private void setTermination(double stoppingRate) {
 		super.setTerminationCriterion(new TerminationCriterionScoreBased(stoppingRate, this.getScoreStats()));
@@ -98,7 +81,10 @@ public class DayControler extends Controler {
 	  	double stoppingCriterionVal = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "stoppingCriterionVal"));
 	  	if (stoppingCriterionVal > 0.0) {	
 	  		this.setTermination(stoppingCriterionVal);
-	  	}	  	
+	  	}
+	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "warmstart"))) {
+	  		this.addControlerListener(new AdaptNextDay(this.populationPreviousDay));
+	  	}
 	}
 	
 	private void generateAlphaGammaTrip() {
