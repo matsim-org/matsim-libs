@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playgrounds.ssix;
+package main.java.playgrounds.ssix;
 
 import java.util.List;
 
@@ -51,6 +51,7 @@ import org.matsim.core.utils.misc.Time;
  * Also saved locally the method calculateDepartureTime that was only package-wide reachable.
  * These three changes are put at the end of this class. 
  */
+
 public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, PlanAgent {
 	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
 	// use this class directly.  kai, nov'10

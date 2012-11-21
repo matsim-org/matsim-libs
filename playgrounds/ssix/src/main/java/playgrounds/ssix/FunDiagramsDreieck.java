@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playgrounds.ssix;
+package main.java.playgrounds.ssix;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,13 +33,16 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
-import playgrounds.ssix.FundamentalDiagrams;
+import main.java.playgrounds.ssix.FundamentalDiagrams;
 
 /* A class supposed to go attached to the DreieckStreckeSzenario class.
  * It aims at analyzing the flow of events in order to detect:
  * The permanent regime of the system and the following searched values:
  * the permanent flow, the permanent density and the permanent average 
  * velocity.
+ * Is only usable to get aggregated values. See FunDiagramsWithPassing for
+ * disaggregated analysis.
+ * 
  * */
 
 public class FunDiagramsDreieck implements LinkEnterEventHandler{

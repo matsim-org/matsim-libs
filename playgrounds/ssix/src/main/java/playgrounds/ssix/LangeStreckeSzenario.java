@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playgrounds.ssix;
+package main.java.playgrounds.ssix;
 
 import java.util.Random;
 

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playgrounds.ssix;
+package main.java.playgrounds.ssix;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -34,6 +34,12 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
+
+/*
+ * A class supposed to be used in conjonction with LangeStreckeSzenario.
+ * See LangeStreckeSzenario for example.
+ * 
+ */
 
 public class FundamentalDiagrams implements LinkLeaveEventHandler, LinkEnterEventHandler{
 	

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ssix;
+package test.java.playground.ssix;
 
 import java.util.ArrayList;
 import java.util.List;
