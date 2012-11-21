@@ -19,15 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.herbie.run;
 
+import herbie.running.config.HerbieConfigGroup;
+
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
-import herbie.running.config.HerbieConfigGroup;
-
 import playground.thibautd.analysis.listeners.CliqueScoreStats;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
@@ -44,7 +44,7 @@ public class Run {
 		Config config = ConfigUtils.createConfig();
 		config.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
 		JointControlerUtils.loadConfig( config , configFile );
-		ScenarioWithCliques sc = JointControlerUtils.createScenario( config ); 
+		Scenario sc = JointControlerUtils.createScenario( config ); 
 		Controler controler = new JointHerbieControler( sc );
 		controler.addControlerListener(new CliqueScoreStats(
 					"scoresStats",

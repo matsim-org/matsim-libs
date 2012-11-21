@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.aposteriorianalysis;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
@@ -26,7 +27,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scoring.EventsToScore;
 
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
@@ -42,7 +42,7 @@ public class ScoreExecutedPlans {
 		String outputFile = args[2];
 
 		Controler controler = JointControlerUtils.createControler(configFile);
-		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
+		Scenario scenario = controler.getScenario();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(

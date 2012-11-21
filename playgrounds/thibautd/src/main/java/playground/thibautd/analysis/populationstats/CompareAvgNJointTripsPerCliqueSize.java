@@ -27,6 +27,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,8 +36,7 @@ import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.thibautd.cliquessim.population.Clique;
 import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.PopulationOfCliques;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
@@ -64,8 +64,8 @@ public class CompareAvgNJointTripsPerCliqueSize {
 		String configFile2 = args[1];
 		String outputPath = args[2];
 
-		ScenarioWithCliques scenario1 = JointControlerUtils.createScenario(configFile1);
-		ScenarioWithCliques scenario2 = JointControlerUtils.createScenario(configFile2);
+		Scenario scenario1 = JointControlerUtils.createScenario(configFile1);
+		Scenario scenario2 = JointControlerUtils.createScenario(configFile2);
 
 		//BoxAndWhiskerXYNumberDataset dataset = new BoxAndWhiskerXYNumberDataset();
 
@@ -151,9 +151,13 @@ public class CompareAvgNJointTripsPerCliqueSize {
 	//}
 
 	private static void addSeries(
-			final ScenarioWithCliques scenario,
+			final Scenario scenario,
 			final XYLineChart chart) {
-		SortedMap<Integer, Double> series = new TreeMap<Integer, Double>(getAverageNTrips(scenario.getCliques()));
+		SortedMap<Integer, Double> series =
+				new TreeMap<Integer, Double>(
+						getAverageNTrips(
+								JointControlerUtils.getCliques(
+										scenario )));
 		double[] xSeries = new double[series.size()];
 		double[] ySeries = new double[series.size()];
 		int i=0;
@@ -172,7 +176,7 @@ public class CompareAvgNJointTripsPerCliqueSize {
 
 
 	private static Map<Integer, List<Integer>> getNJointTripsPerPerson(
-			final PopulationOfCliques cliques) {
+			final Cliques cliques) {
 		Map<Integer, List<Integer>> out = new HashMap<Integer, List<Integer>>();
 		List<Integer> sizeCounts;
 		int cliqueSize;
@@ -195,7 +199,7 @@ public class CompareAvgNJointTripsPerCliqueSize {
 	}
 
 	private static Map<Integer, Double> getAverageNTrips(
-			final PopulationOfCliques cliques) {
+			final Cliques cliques) {
 		Map<Integer, Double> out = new HashMap<Integer, Double>();
 		double cumul;
 		double count;

@@ -34,7 +34,7 @@
 // 
 // import playground.thibautd.householdsfromcensus.CliquesWriter;
 // import playground.thibautd.cliquessim.population.Clique;
-// import playground.thibautd.cliquessim.population.PopulationOfCliques;
+// import playground.thibautd.cliquessim.population.Cliques;
 // import playground.thibautd.cliquessim.population.PopulationWithCliques;
 // import playground.thibautd.cliquessim.population.PopulationWithJointTripsWriterHandler;
 // import playground.thibautd.cliquessim.population.ScenarioWithCliques;
@@ -67,7 +67,7 @@
 // 		
 // 		Config config = JointControlerUtils.createConfig(configFile);
 // 		ScenarioWithCliques scenario = JointControlerUtils.createScenario(config);
-// 		PopulationOfCliques populationOfCliques = scenario.getCliques();
+// 		Cliques populationOfCliques = scenario.getCliques();
 // 		Population population = scenario.getPopulation();
 // 
 // 		Map<Id, ? extends Clique> cliques = populationOfCliques.getCliques();

@@ -30,6 +30,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -49,18 +51,17 @@ public class CliquesXmlReader extends MatsimXmlParser {
 	private String currentCliqueId;
 	private ArrayList<String> currentMembers;
 
-	private final PopulationWithCliques population;
-	private final PopulationOfCliques populationOfCliques;
-	private final PopulationOfCliquesFactory factory;
+	private final Population population;
+	private final Cliques populationOfCliques;
 	private final String filePath;
 
 	// constructor
-	public CliquesXmlReader(ScenarioWithCliques scenario) {
+	public CliquesXmlReader(final Scenario scenario) {
 		//do not check XML for consistency (no dtd)
 		super(false);
-		this.population = (PopulationWithCliques) scenario.getPopulation();
-		this.populationOfCliques = population.getCliques();
-		this.factory = (PopulationOfCliquesFactory) this.populationOfCliques.getFactory();
+		this.population = scenario.getPopulation();
+		this.populationOfCliques = new Cliques( );
+		scenario.addScenarioElement( populationOfCliques );
 
 		CliquesConfigGroup configGroup;
 		configGroup = (CliquesConfigGroup) scenario.getConfig().getModule(CliquesConfigGroup.GROUP_NAME);
@@ -87,7 +88,7 @@ public class CliquesXmlReader extends MatsimXmlParser {
 			}
 
 			// search corresponding members in the population and put them in a clique
-			currentClique = this.factory.createClique(new IdImpl(id));
+			currentClique = new Clique(new IdImpl(id));
 			currentMembers = cliques.get(id);
 
 			for (String memberId: currentMembers) {

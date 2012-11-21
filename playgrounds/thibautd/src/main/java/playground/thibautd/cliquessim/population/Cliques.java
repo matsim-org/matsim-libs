@@ -46,14 +46,13 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  *
  * @author thibautd
  */
-public class PopulationOfCliques implements Population {
+public class Cliques implements Population {
 
-	private static final Logger log = Logger.getLogger(PopulationOfCliques.class);
+	private static final Logger log = Logger.getLogger(Cliques.class);
 	
 	private String name = null;
 
 	private Map<Id, Clique> cliques = new TreeMap<Id, Clique>();
-	private final PopulationFactory factory;
 	private final ObjectAttributes personAttributes = new ObjectAttributes();
 
 	/*
@@ -61,16 +60,6 @@ public class PopulationOfCliques implements Population {
 	 * constructors
 	 * =========================================================================
 	 */
-	/**
-	 * Constructs an instance.
-	 *
-	 * Do not call: use {@link PopulationWithCliques} to constuct simultaneously
-	 * population and cliques.
-	 */
-	PopulationOfCliques(ScenarioWithCliques sc) {
-		this.factory = new PopulationOfCliquesFactory(sc);
-		//this.cliques = this.extractCliques(sc.getConfig());
-	}
 
 	/*
 	 * =========================================================================
@@ -101,7 +90,7 @@ public class PopulationOfCliques implements Population {
 	 */
 	@Override
 	public PopulationFactory getFactory() {
-		return this.factory;
+		return null;
 	}
 
 	@Override

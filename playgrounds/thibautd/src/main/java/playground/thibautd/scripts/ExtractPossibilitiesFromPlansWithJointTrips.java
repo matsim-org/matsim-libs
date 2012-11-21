@@ -20,17 +20,15 @@
 package playground.thibautd.scripts;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.cliquessim.population.Clique;
@@ -38,11 +36,10 @@ import playground.thibautd.cliquessim.population.DriverRoute;
 import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.cliquessim.population.JointPlan;
 import playground.thibautd.cliquessim.population.PassengerRoute;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
-import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLWriter;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Od;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Possibility;
+import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLWriter;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
@@ -56,12 +53,12 @@ public class ExtractPossibilitiesFromPlansWithJointTrips {
 		log.warn( "this converter assumes the PU and DO for the passenger are at its origin and destination!" );
 		String confFile = args[ 0 ];
 		String outFile = args[ 1 ];
-		ScenarioWithCliques sc = JointControlerUtils.createScenario( confFile );
+		Scenario sc = JointControlerUtils.createScenario( confFile );
 
 		JointTripPossibilities poss = new JointTripPossibilities( "from "+sc.getPopulation().getName() );
 
 		Counter counter = new Counter( "analysing clique # " );
-		for (Clique cl : sc.getCliques().getCliques().values()) {
+		for (Clique cl : JointControlerUtils.getCliques( sc ).getCliques().values()) {
 			counter.incCounter();
 			JointPlan plan = (JointPlan) cl.getSelectedPlan();
 			TripCount tripCount = new TripCount();

@@ -25,13 +25,13 @@ import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.run.JointControler;
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
@@ -50,7 +50,7 @@ public class JointHerbieControler extends JointControler {
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 	
-	public JointHerbieControler( final ScenarioWithCliques scenario ) {
+	public JointHerbieControler( final Scenario scenario ) {
 		super( scenario );
 		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
 	}

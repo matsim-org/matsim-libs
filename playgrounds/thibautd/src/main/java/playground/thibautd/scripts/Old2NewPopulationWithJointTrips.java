@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,7 +38,6 @@ import playground.thibautd.cliquessim.population.DriverRoute;
 import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.cliquessim.population.JointPlan;
 import playground.thibautd.cliquessim.population.PassengerRoute;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
@@ -49,10 +49,10 @@ import playground.thibautd.cliquessim.utils.JointControlerUtils;
  */
 public class Old2NewPopulationWithJointTrips {
 	public static void main(final String[] args) {
-		ScenarioWithCliques sc = JointControlerUtils.createScenario( args[ 0 ] );
+		Scenario sc = JointControlerUtils.createScenario( args[ 0 ] );
 		String outFile = args[1];
 
-		for (Clique cl : sc.getCliques().getCliques().values()) {
+		for (Clique cl : JointControlerUtils.getCliques( sc ).getCliques().values()) {
 			for (JointPlan jp : cl.getPlans()) {
                // in the plan file, pu activities are numbered. If two pick ups have
                // the same number in the same joint plan, the following legs are

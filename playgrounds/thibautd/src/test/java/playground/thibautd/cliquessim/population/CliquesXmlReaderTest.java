@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.cliquessim.config.CliquesConfigGroup;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 
@@ -47,7 +47,7 @@ public class CliquesXmlReaderTest {
 		config.addModule( CliquesConfigGroup.GROUP_NAME , new CliquesConfigGroup() );
 		ConfigUtils.loadConfig( config , utils.getInputDirectory() + "config-no-agent-7.xml" );
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		ScenarioWithCliques scen = JointControlerUtils.createScenario( config );
+		Scenario scen = JointControlerUtils.createScenario( config );
 
 		Assert.assertFalse(
 				"agent not in any clique still in the population",

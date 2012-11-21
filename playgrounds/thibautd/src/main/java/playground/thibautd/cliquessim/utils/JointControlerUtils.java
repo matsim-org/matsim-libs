@@ -31,6 +31,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -44,8 +45,8 @@ import playground.thibautd.cliquessim.population.CliquesXmlReader;
 import playground.thibautd.cliquessim.population.DriverRoute;
 import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.population.PopulationWithJointTripsReader;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilitiesXMLReader;
 import playground.thibautd.cliquessim.run.JointControler;
@@ -72,7 +73,7 @@ public class JointControlerUtils {
 	public static Controler createControler(final String configFile) {
 		Config config = createConfig(configFile);
 
-		ScenarioWithCliques scenario = createScenario(config);
+		Scenario scenario = createScenario(config);
 
 		Controler controler = new JointControler(scenario);
 		setScoringFunction(controler);
@@ -86,7 +87,7 @@ public class JointControlerUtils {
 	 * @param configFile the path to the configFile
 	 * @return a ready to use scenario
 	 */
-	public static ScenarioWithCliques createScenario(final String configFile) {
+	public static Scenario createScenario(final String configFile) {
 		return createScenario(createConfig(configFile));
 	}
 
@@ -94,8 +95,8 @@ public class JointControlerUtils {
 	 * @param config a loaded config
 	 * @return a ready to use scenario
 	 */
-	public static ScenarioWithCliques createScenario(final Config config) {
-		ScenarioWithCliques scenario = new ScenarioWithCliques(config);
+	public static Scenario createScenario(final Config config) {
+		Scenario scenario = ScenarioUtils.createScenario( config );
 		tuneScenario( scenario );
 
 		//(new ScenarioLoaderImpl(scenario)).loadScenario();
@@ -107,7 +108,8 @@ public class JointControlerUtils {
 		// TODO: adapt to new state
 		(new PopulationWithJointTripsReader(scenario)).readFile(config.plans().getInputFile());
 
-		scenario.setJointTripPossibilities( readPossibilities( config ) );
+		JointTripPossibilities poss = readPossibilities( config );
+		if (poss != null) scenario.addScenarioElement( poss );
 
 		try {
 			new CliquesXmlReader(scenario).parse();
@@ -116,6 +118,14 @@ public class JointControlerUtils {
 		}
 
 		return scenario;
+	}
+
+	public static Cliques getCliques(final Scenario sc) {
+		return sc.getScenarioElement( Cliques.class );
+	}
+
+	public static JointTripPossibilities getJointTripPossibilities(final Scenario sc) {
+		return sc.getScenarioElement( JointTripPossibilities.class );
 	}
 
 	private static JointTripPossibilities readPossibilities(final Config config) {

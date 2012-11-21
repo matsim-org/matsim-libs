@@ -45,7 +45,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.cliquessim.population.Clique;
 import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.PopulationWithCliques;
+import playground.thibautd.cliquessim.population.Cliques;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.utils.charts.BoxAndWhiskersChart;
 import playground.thibautd.utils.charts.XYChartUtils;
 
@@ -98,12 +99,12 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 		this.fileName = fileName;
 	}
 
-	private Map<Integer, List<Clique>> getCliques(final PopulationWithCliques pop) {
+	private Map<Integer, List<Clique>> getCliques(final Cliques pop) {
 		Map<Integer, List<Clique>> output = new HashMap<Integer, List<Clique>>();
 		int currentSize;
 		List<Clique> currentList;
 
-		for (Clique clique : pop.getCliques().getCliques().values()) {
+		for (Clique clique : pop.getCliques().values()) {
 			currentSize = clique.getMembers().size();
 
 			currentList = output.get(currentSize);
@@ -133,7 +134,7 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 		int cliqueSize;
 
 		Map<Integer, List<Clique>> cliquesPerSize =
-			getCliques((PopulationWithCliques) controler.getPopulation());
+			getCliques((Cliques) JointControlerUtils.getCliques( controler.getScenario() ));
 
 		try {
 			for (Map.Entry<Integer, List<Clique>> entry : cliquesPerSize.entrySet()) {

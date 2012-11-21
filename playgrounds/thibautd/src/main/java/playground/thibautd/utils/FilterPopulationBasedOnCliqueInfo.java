@@ -30,10 +30,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.thibautd.cliquessim.population.Clique;
-import playground.thibautd.cliquessim.population.PopulationOfCliques;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.run.JointControler;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
@@ -57,8 +57,8 @@ public class FilterPopulationBasedOnCliqueInfo {
 		String configFile = args[0];
 
 		JointControler controler = (JointControler) JointControlerUtils.createControler(configFile);
-		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
-		PopulationOfCliques cliques = scenario.getCliques();
+		ScenarioImpl scenario = controler.getScenario();
+		Cliques cliques = JointControlerUtils.getCliques( scenario );
 		Population population = scenario.getPopulation();
 
 		log.debug(cliques.getCliques().size()+" cliques");

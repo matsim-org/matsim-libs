@@ -19,13 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.replanning;
 
+import org.apache.log4j.Logger;
+
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.cliquessim.population.Clique;
-import playground.thibautd.cliquessim.population.PopulationOfCliques;
+import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.replanning.selectors.WorstJointPlanForRemovalSelector;
 
 /**
@@ -36,12 +42,23 @@ import playground.thibautd.cliquessim.replanning.selectors.WorstJointPlanForRemo
  * @author thibautd
  */
 public class JointStrategyManager extends StrategyManager {
+	private static final Logger log =
+		Logger.getLogger(JointStrategyManager.class);
+
 
 	// TODO: pass it in a less hard-coded way. Beware on consistency with
 	// StrategyManager if doing this!
 	private final PlanSelector removalPlanSelector = 
 		new WorstJointPlanForRemovalSelector();
-	
+
+	// This is quite ugly. The reason for it is that there are TWO replanning listenners,
+	// the core one and the joint plan one. The joint passes a population of clique,
+	// which is what we want, but we can't remove the core listenner, and overriding
+	// the loadCoreListenners method breaks too often. The trick is thus to check
+	// what is the passed population, and to return an "inactive" strategy if it is
+	// not a population of cliques.
+	private boolean isAPopulationOfCliques = false;
+	private PlanStrategy inactiveStrategy = new PlanStrategyImpl( new KeepSelected() );
 
 	/*
 	 * =========================================================================
@@ -54,9 +71,9 @@ public class JointStrategyManager extends StrategyManager {
 	 * operate selection on PersonImpl agents.
 	 */
 	@Override
-	protected void beforePopulationRunHook(Population population) {
-		if (population instanceof PopulationOfCliques) {
-			PopulationOfCliques cliques = (PopulationOfCliques) population;
+	protected void beforePopulationRunHook(final Population population) {
+		if (population instanceof Cliques) {
+			Cliques cliques = (Cliques) population;
 			int maxNumPlans = super.getMaxPlansPerAgent();
 
 			if (maxNumPlans >0) {
@@ -67,16 +84,28 @@ public class JointStrategyManager extends StrategyManager {
 					}
 				}
 			}
-		} else {
-			throw new IllegalArgumentException("JointStrategyManager has been "+
-					"ran on a population of non-clique agents.");
+
+			log.debug( "Got a population of cliques. Replanning will be performed." );
+			isAPopulationOfCliques = true;
+		}
+		else {
+			log.debug( "Did not got a population of cliques. No replanning will be performed." );
+			isAPopulationOfCliques = false;
 		}
 	}
 
-	private final void removePlans(Clique clique, int maxNumPlans) {
+	private final void removePlans(
+			final Clique clique,
+			final int maxNumPlans) {
 		while (clique.getPlans().size() > maxNumPlans) {
 			Plan plan = this.removalPlanSelector.selectPlan(clique);
 			clique.removePlan(plan);
 		}
+	}
+
+	@Override
+	public PlanStrategy chooseStrategy(final Person person) {
+		if (isAPopulationOfCliques) return super.chooseStrategy( person );
+		return inactiveStrategy;
 	}
 }

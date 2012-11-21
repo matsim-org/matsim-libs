@@ -24,7 +24,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
+import playground.thibautd.cliquessim.utils.JointControlerUtils;
 
 /**
  * @author thibautd
@@ -42,7 +42,7 @@ public class JointTripMutatorModule extends AbstractMultithreadedModule {
 		return new JointTripMutatorAlgorithm(
 				controler.getScenario().getNetwork(),
 				controler.getTripRouterFactory().createTripRouter(),
-				((ScenarioWithCliques) controler.getScenario()).getJointTripPossibilities(),
+				JointControlerUtils.getJointTripPossibilities( controler.getScenario() ),
 				MatsimRandom.getLocalInstance());
 	}
 }

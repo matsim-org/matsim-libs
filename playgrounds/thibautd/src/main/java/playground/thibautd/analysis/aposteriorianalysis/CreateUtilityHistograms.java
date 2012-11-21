@@ -34,6 +34,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -45,7 +46,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.cliquessim.population.Clique;
 import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.ScenarioWithCliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
 import playground.thibautd.utils.charts.WrapperChartUtil;
 import playground.thibautd.utils.charts.XYLineHistogramDataset;
@@ -87,8 +87,8 @@ public class CreateUtilityHistograms {
 			String configFile2 = args[1];
 			outputPath = args[2];
 
-			ScenarioWithCliques scenarioIndividual = JointControlerUtils.createScenario(configFile1);
-			ScenarioWithCliques scenarioJoint = JointControlerUtils.createScenario(configFile2);
+			Scenario scenarioIndividual = JointControlerUtils.createScenario(configFile1);
+			Scenario scenarioJoint = JointControlerUtils.createScenario(configFile2);
 
 			dataset = getHistogramDataset(scenarioJoint, scenarioIndividual, outputPath);
 		}
@@ -200,8 +200,8 @@ public class CreateUtilityHistograms {
 
 
 	private static XYLineHistogramDataset getHistogramDataset(
-			final ScenarioWithCliques scenario,
-			final ScenarioWithCliques scenarioIndividual,
+			final Scenario scenario,
+			final Scenario scenarioIndividual,
 			final String outputPath) {
 		List<Double> globalScores = new ArrayList<Double>();
 		List<Double> jointScores = new ArrayList<Double>();
@@ -223,7 +223,7 @@ public class CreateUtilityHistograms {
 			BufferedWriter individualWriter = IOUtils.getBufferedWriter(outputPath+"/individual-popJoint.txt");
 			Map<Id, ? extends Person> individuals = scenarioIndividual.getPopulation().getPersons();
 
-			for (Clique clique : scenario.getCliques().getCliques().values()) {
+			for (Clique clique : JointControlerUtils.getCliques( scenario ).getCliques().values()) {
 				if (N_MEMBERS > 0 && clique.getMembers().size() != N_MEMBERS) continue;
 				for (Person person : clique.getMembers().values()) {
 					currentPlan = person.getSelectedPlan();
