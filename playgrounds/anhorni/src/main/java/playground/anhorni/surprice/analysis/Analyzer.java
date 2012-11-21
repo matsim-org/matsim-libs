@@ -176,8 +176,7 @@ public class Analyzer {
 		EventsManager events = EventsUtils.createEventsManager();
 		TravelTimeCalculator ttCalculator = new TravelTimeCalculator(this.ttBins, this.incomes);
 		events.addHandler(ttCalculator);
-		this.nTripsAvg[Surprice.days.indexOf(day)] = ttCalculator.getTravelTimes().size() / this.scenario.getPopulation().getPersons().size();
-
+		
 		log.info("	analyzing toll travel distances ...");
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl(); //(RoadPricingSchemeImpl)this.scenario.getScenarioElement(RoadPricingScheme.class);
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);		
@@ -198,6 +197,7 @@ public class Analyzer {
 		this.boxPlotTravelTimes.addValuesPerCategory(ttCalculator.getTravelTimes(), day, "Travel Times");
 		this.tolltdPerAgent = tollCalculator.getTollDistancesAgents();
 		this.ttPerAgent = ttCalculator.getTTPerAgent();
+		this.nTripsAvg[Surprice.days.indexOf(day)] = ttCalculator.getTravelTimes().size() / this.scenario.getPopulation().getPersons().size();
 		
 		this.computeModesPerIncome();
 				
@@ -357,7 +357,7 @@ public class Analyzer {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt")); 
 			
-			bufferedWriter.write("tt\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
+			bufferedWriter.write("avgNbrTrips\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
 			String line = "avgNbrTrips\t";
 			double avgNbrTrips = 0.0;
 			for (String day : Surprice.days) {	
