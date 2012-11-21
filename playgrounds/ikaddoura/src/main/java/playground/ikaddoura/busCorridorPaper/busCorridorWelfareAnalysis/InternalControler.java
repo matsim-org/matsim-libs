@@ -23,10 +23,7 @@
  */
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -81,7 +78,9 @@ public class InternalControler {
 	
 		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt(); // estimated parameter -2.08; is being adjusted via config
 		log.warn("Setting constant for PT to " + this.CONSTANT_PT);
-		this.LATE_ARRIVAL = -1. * this.PERFORMING * 2.; // coming early (which is the opportunity costs of time) multiplied by 3 --> multiplying by 2 (see Hollander 2006)
+		log.warn("Setting randomSeed to " + scenario.getConfig().global().getRandomSeed());
+//		this.LATE_ARRIVAL = -1. * this.PERFORMING * 2.; // coming early (which is the opportunity costs of time) multiplied by 3 --> multiplying by 2 (see Hollander 2006)
+
 	}
 	
 	public void run() {
@@ -92,7 +91,7 @@ public class InternalControler {
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.addControlerListener(new PtControlerListener(this.fare, this.ptLegHandler));
+		controler.addControlerListener(new PtControlerListener(this.scenario, this.fare, this.ptLegHandler));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt + "/internalIterations");

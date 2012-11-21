@@ -25,12 +25,10 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -63,14 +61,14 @@ class ExternalControler {
 		
 	public static void main(final String[] args) throws IOException {
 
-//		configFile = "../../shared-svn/studies/ihab/busCorridor/input_Latsis/config_welfareBusCorridor_TC.xml";
-//		outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/carLegTest";
+//		configFile = "/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/optimization3/input_latsis/7_config_TC_noCongestion_white_300.xml";
+//		outputExternalIterationDirPath = "/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/optimization3/output_test1";
 //		
-//		lastExternalIterationParam1 = 2;
-//		lastExternalIterationParam2 = 2;
-//		
-		op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-		op2 = OptimizationParameter2.FARE;
+//		lastExternalIterationParam1 = 12;
+//		lastExternalIterationParam2 = 12;
+		
+//		op1 = OptimizationParameter1.FARE;
+//		op2 = OptimizationParameter2.FARE;
 				
 		incrBusNumber = 1;
 		incrFare = -0.25;
@@ -82,19 +80,19 @@ class ExternalControler {
 		outputExternalIterationDirPath = args[1];
 		
 		lastExternalIterationParam1 = Integer.parseInt(args[2]);
-		lastExternalIterationParam2 = Integer.parseInt(args[3]);
+//		lastExternalIterationParam2 = Integer.parseInt(args[3]);
 //		
-//		String op1String = args[4];
-//
-//		if(op1String.equals(OptimizationParameter1.FARE.toString())){
-//			op1 = OptimizationParameter1.FARE;
-//		} else if(op1String.equals(OptimizationParameter1.CAPACITY.toString())){
-//			op1 = OptimizationParameter1.CAPACITY;
-//		} else if(op1String.equals(OptimizationParameter1.NUMBER_OF_BUSES.toString())){
-//			op1 = OptimizationParameter1.NUMBER_OF_BUSES;
-//		} else {
-//			throw new RuntimeException("Optimization parameter " + op1String + " is unknown. Aborting... ");
-//		}
+		String op1String = args[3];
+
+		if(op1String.equals(OptimizationParameter1.FARE.toString())){
+			op1 = OptimizationParameter1.FARE;
+		} else if(op1String.equals(OptimizationParameter1.CAPACITY.toString())){
+			op1 = OptimizationParameter1.CAPACITY;
+		} else if(op1String.equals(OptimizationParameter1.NUMBER_OF_BUSES.toString())){
+			op1 = OptimizationParameter1.NUMBER_OF_BUSES;
+		} else {
+			throw new RuntimeException("Optimization parameter " + op1String + " is unknown. Aborting... ");
+		}
 //		
 //		String op2String = args[5];
 //
@@ -233,11 +231,11 @@ class ExternalControler {
 			if (op1.equals(OptimizationParameter1.FARE)){
 				this.fare = -0.;
 				this.capacity = 50;
-				this.numberOfBuses = 5;
+				this.numberOfBuses = 6;
 			} else if (op1.equals(OptimizationParameter1.CAPACITY)){
 				this.fare = -3.;
 				this.capacity = 20; // standing room + seats (realistic values between 19 and 101)
-				this.numberOfBuses = 5;
+				this.numberOfBuses = 6;
 			} else if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES)){
 				this.fare = -3.;
 				this.capacity = 50;
@@ -250,7 +248,7 @@ class ExternalControler {
 			if (op1.equals(OptimizationParameter1.NUMBER_OF_BUSES) && op2.equals(OptimizationParameter2.FARE)){
 				this.fare = -0.;
 				this.capacity = 50;
-				this.numberOfBuses = 1;
+				this.numberOfBuses = 6;
 			} else if (op1.equals(OptimizationParameter1.FARE) && op2.equals(OptimizationParameter2.NUMBER_OF_BUSES)){
 				this.fare = -0.;
 				this.capacity = 50;

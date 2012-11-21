@@ -24,10 +24,12 @@
 
 package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.ScoringEvent;
+
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+
 import org.matsim.core.controler.listener.StartupListener;
 
 /**
@@ -35,14 +37,17 @@ import org.matsim.core.controler.listener.StartupListener;
  *
  */
 
-public class PtControlerListener implements StartupListener, ScoringListener{
+public class PtControlerListener implements StartupListener {
+	private final static Logger log = Logger.getLogger(InternalControler.class);
 
 	private final double fare;
 	private final PtLegHandler ptLegHandler;
+	private Scenario scenario;
 
-	public PtControlerListener(double fare, PtLegHandler ptLegHandler){
+	public PtControlerListener(Scenario scenario, double fare, PtLegHandler ptLegHandler){
 		this.fare = fare;
 		this.ptLegHandler = ptLegHandler;
+		this.scenario = scenario;
 	}
 	
 	@Override
@@ -53,8 +58,4 @@ public class PtControlerListener implements StartupListener, ScoringListener{
 		event.getControler().getEvents().addHandler(ptLegHandler);
 	}
 
-	@Override
-	public void notifyScoring(ScoringEvent event) {
-		System.out.println("Scoring begins...");
-	}
 }
