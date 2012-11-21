@@ -215,12 +215,12 @@ public class DreieckStreckeSzenarioTest {
 	
 	public void run(){
 		fillNetworkData();
-		createPopulation((long)45,2);
+		createPopulation((long)55,2);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		/*
 		FunDiagramsDreieck fundi2 = new FunDiagramsDreieck(this.scenario);
-		events.addHandler(fundi2);
+		events.addHandler(fundi2)
 		*/
 		FunDiagramsWithPassing fundi3 = new FunDiagramsWithPassing(this.scenario);
 		events.addHandler(fundi3);
