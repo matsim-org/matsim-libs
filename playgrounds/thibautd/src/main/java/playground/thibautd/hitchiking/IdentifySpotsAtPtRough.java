@@ -43,6 +43,8 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
+import playground.thibautd.parknride.herbiespecific.RelevantCoordinates;
+
 /**
  * chooses car links near PT stops.
  * It chooses the shortest link ending on nodes near PT stops,
@@ -55,6 +57,8 @@ public class IdentifySpotsAtPtRough {
 	private static final Logger log =
 		Logger.getLogger(IdentifySpotsAtPtRough.class);
 
+	private static final Coord CENTER = RelevantCoordinates.HAUPTBAHNHOF;
+	private static final double MAX_DIST_TO_CENTER = 40 * 1000;
 	private static final double MIN_DIST = 1000;
 
 	public static void main(final String[] args) {
@@ -160,6 +164,9 @@ public class IdentifySpotsAtPtRough {
 		private final List<Coord> coords = new ArrayList<Coord>();
 
 		public boolean add(final Coord toAdd) {
+			if ( CoordUtils.calcDistance( CENTER , toAdd ) > MAX_DIST_TO_CENTER ) {
+				return false;
+			}
 			for (Coord c : coords) {
 				if ( CoordUtils.calcDistance( c , toAdd ) < MIN_DIST ) {
 					return false;
