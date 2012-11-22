@@ -41,7 +41,7 @@ public class AdaptNextDay implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {		
-		// on monday or saturday return
+		// on monday or saturday no warmstarting
 		if (this.populationPreviousDay == null) return;
 		log.info("Adapting plans of next day ... ");
 		
@@ -73,7 +73,6 @@ public class AdaptNextDay implements StartupListener {
 			if (pe instanceof Activity) {
 				ActivityImpl act = (ActivityImpl)pe;
 				ActivityImpl actPreviousDay = null;
-				planElementIndex += 2;
 				cntAct++;
 				
 				if (planPreviousDay.getPlanElements().size() >= planElementIndex) {
@@ -84,27 +83,26 @@ public class AdaptNextDay implements StartupListener {
 						act.setEndTime(actPreviousDay.getEndTime());
 						act.setStartTime(
 								Math.max(0.0, act.getEndTime() - plan.getPerson().getDesires().getActivityDuration(act.getType())));
+						// leg departure time automatically set
 						
-						if (planElementIndex < plan.getPlanElements().size()) {
-							LegImpl leg = (LegImpl) plan.getNextLeg(act);
-							leg.setDepartureTime(act.getEndTime());
-						}
-						
-						ActivityImpl previousAct = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(act));
-						ActivityImpl previousActPreviousDay = (ActivityImpl) planPreviousDay.getPreviousActivity(planPreviousDay.getPreviousLeg(act));;
-						
-						// identical route and mode
-						if (act.getFacilityId().equals(actPreviousDay.getFacilityId()) && 
-								previousAct.getType().equals(previousActPreviousDay.getType()) &&
-								previousAct.getFacilityId().equals(previousActPreviousDay.getFacilityId())) {
+						if (planElementIndex > 0) { 
+							ActivityImpl previousAct = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(act));
+							ActivityImpl previousActPreviousDay = (ActivityImpl) planPreviousDay.getPreviousActivity(planPreviousDay.getPreviousLeg(act));;
 							
-							LegImpl leg = (LegImpl) plan.getPreviousLeg(act);
-							leg.setMode(planPreviousDay.getPreviousLeg(actPreviousDay).getMode());
-							leg.setRoute(planPreviousDay.getPreviousLeg(actPreviousDay).getRoute());
-							cntRouteMode++;
+							// identical route and mode
+							if (act.getFacilityId().equals(actPreviousDay.getFacilityId()) && 
+									previousAct.getType().equals(previousActPreviousDay.getType()) &&
+									previousAct.getFacilityId().equals(previousActPreviousDay.getFacilityId())) {
+								
+								LegImpl leg = (LegImpl) plan.getPreviousLeg(act);
+								leg.setMode(planPreviousDay.getPreviousLeg(actPreviousDay).getMode());
+								leg.setRoute(planPreviousDay.getPreviousLeg(actPreviousDay).getRoute());
+								cntRouteMode++;
+							}
 						}
 					}
 				}
+				planElementIndex += 2;
 			}
 		}
 		int [] res = {cntTime, cntRouteMode, cntAct};
