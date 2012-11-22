@@ -39,6 +39,12 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 
 	@Override
 	public boolean continueIterations(int iteration) {
+		
+		if (iteration > this.controler.getLastIteration()) {
+			this.finalIteration = iteration - 1;
+			return false;
+		}
+		
 		double prevBestScore = -999.0;
 		double bestScore = 999.0;
 		// let us do at least 10 iterations
