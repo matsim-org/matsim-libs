@@ -53,7 +53,7 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 			bestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 1];
 		}		
 		if (Math.abs((bestScore - prevBestScore) / prevBestScore) < this.stoppingCriterionVal) {
-			log.info("Run terminated at iteration " + iteration + ". Relative score diff: " + Math.abs((bestScore - prevBestScore) / prevBestScore));
+			log.info("Run terminated at iteration " + (iteration - 1) + ". Relative score diff: " + Math.abs((bestScore - prevBestScore) / prevBestScore));
 			this.finalIteration = iteration - 1;
 			return false;
 		}
