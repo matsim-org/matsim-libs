@@ -48,26 +48,35 @@ public class AdaptNextDay implements StartupListener {
 		Population population = event.getControler().getPopulation();
 		int cntTime = 0;
 		int cntRouteMode = 0;
-		for (Person p : this.populationPreviousDay.getPersons().values()) {
+		int cntActs = 0;
+		for (Person p : this.populationPreviousDay.getPersons().values()) {			
 			Plan plan = population.getPersons().get(p.getId()).getSelectedPlan();
-			int [] res = this.adaptPlan((PlanImpl)p.getSelectedPlan(), (PlanImpl)plan, cntTime, cntRouteMode);
+			int [] res = this.adaptPlan((PlanImpl)p.getSelectedPlan(), (PlanImpl)plan);
 			cntTime += res[0];
 			cntRouteMode += res[1];
+			cntActs += res[2];
 		}
+		log.info("number of persons : " + this.populationPreviousDay.getPersons().size());
+		log.info("total number of acts : " + cntActs);
 		log.info("number of acts with identical end time and leg departure times: " + cntTime);
 		log.info("number of legs with identical routes and modes:" + cntRouteMode);
 	}
 	
-	private int[] adaptPlan(PlanImpl planPreviousDay, PlanImpl plan, int cntTime, int cntRouteMode) {
+	private int[] adaptPlan(PlanImpl planPreviousDay, PlanImpl plan) {
 		int planElementIndex = 0;
 		ActivityImpl previousAct = null;
 		ActivityImpl previousActPreviousDay = null;
+		
+		int cntTime = 0;
+		int cntRouteMode = 0;
+		int cntAct = 0;
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				ActivityImpl act = (ActivityImpl)pe;
 				ActivityImpl actPreviousDay = null;
 				planElementIndex += 2;
+				cntAct++;
 				
 				if (planPreviousDay.getPlanElements().size() >= planElementIndex) {
 					actPreviousDay = (ActivityImpl) planPreviousDay.getPlanElements().get(planElementIndex);
@@ -100,7 +109,7 @@ public class AdaptNextDay implements StartupListener {
 				previousActPreviousDay = actPreviousDay;
 			}
 		}
-		int [] res = {cntTime, cntRouteMode};
+		int [] res = {cntTime, cntRouteMode, cntAct};
 		return res;
 	}	
 }
