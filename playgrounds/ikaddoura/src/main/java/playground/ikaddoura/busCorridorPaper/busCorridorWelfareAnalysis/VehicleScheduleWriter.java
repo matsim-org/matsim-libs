@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 /**
  * @author Ihab
@@ -64,7 +65,6 @@ public class VehicleScheduleWriter {
 		generator.setStartTime(4.0 * 3600);	// [sec]
 		generator.setEndTime(24.0 * 3600);	// [sec]
 		generator.setStopTime(10.0); 		// [sec]
-		// TODO: adjust ptSpeed for schedule!
 		generator.setScheduleSpeed(8.3333);	// [m/sec] 
 		generator.setPausenzeit(5.0 * 60); 	// [sec]
 		generator.setNetwork(this.network);
@@ -78,6 +78,7 @@ public class VehicleScheduleWriter {
 		generator.setVehTypeId(new IdImpl("bus"));
 		generator.setAccessSeconds(2.0); 	// [sec/person]
 		generator.setEgressSeconds(1.5); 	// [sec/person]
+		generator.setDoorOperationMode(DoorOperationMode.parallel);
 		generator.setSeats(busSeats);
 		generator.setStandingRoom(standingRoom);
 		generator.setLength(length);

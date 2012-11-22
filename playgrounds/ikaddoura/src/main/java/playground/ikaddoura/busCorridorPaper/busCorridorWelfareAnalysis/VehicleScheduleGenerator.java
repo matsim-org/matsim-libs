@@ -51,6 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
@@ -81,6 +82,7 @@ public class VehicleScheduleGenerator {
 	private double egressSeconds;
 	private double accessSeconds;
 	private double scheduleSpeed;
+	private DoorOperationMode doorOperationMode;
 	
 	private double headway;
 		
@@ -309,6 +311,8 @@ public class VehicleScheduleGenerator {
 		type.setLength(length);
 		type.setAccessTime(accessSeconds);
 		type.setEgressTime(egressSeconds);
+		type.setDoorOperationMode(doorOperationMode);
+		
 		veh.getVehicleTypes().put(this.vehTypeId, type); 
 		
 		for (int vehicleNr=1 ; vehicleNr<=numberOfBuses ; vehicleNr++){
@@ -417,6 +421,10 @@ public class VehicleScheduleGenerator {
 
 	public void setPausenzeit(double pausenzeit) {
 		this.pausenzeit = pausenzeit;
+	}
+
+	public void setDoorOperationMode(DoorOperationMode doorOperationMode) {
+		this.doorOperationMode = doorOperationMode;
 	}
 
 	public double getHeadway() {
