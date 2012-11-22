@@ -21,6 +21,7 @@ package playground.anhorni.surprice.warmstart;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -71,12 +72,12 @@ public class AdaptNextDay implements StartupListener {
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				ActivityImpl act = (ActivityImpl)pe;
-				ActivityImpl actPreviousDay = null;
+				Activity act = (Activity)pe;
+				Activity actPreviousDay = null;
 				cntAct++;
 				
 				if (planPreviousDay.getPlanElements().size() >= planElementIndex) {
-					actPreviousDay = (ActivityImpl) planPreviousDay.getPlanElements().get(planElementIndex);
+					actPreviousDay = (Activity) planPreviousDay.getPlanElements().get(planElementIndex);
 					cntTime++;
 					// identical times
 					if (act.getType().equals(actPreviousDay.getType())) {
@@ -86,15 +87,17 @@ public class AdaptNextDay implements StartupListener {
 						// leg departure time automatically set
 						
 						if (planElementIndex > 0) { 
-							ActivityImpl previousAct = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(act));
-							ActivityImpl previousActPreviousDay = (ActivityImpl) planPreviousDay.getPreviousActivity(planPreviousDay.getPreviousLeg(act));;
+							Activity previousAct = plan.getPreviousActivity(plan.getPreviousLeg(act));
+							
+							Leg previousLegPreviousDay = planPreviousDay.getPreviousLeg(actPreviousDay);
+							Activity previousActPreviousDay = planPreviousDay.getPreviousActivity(previousLegPreviousDay);;
 							
 							// identical route and mode
 							if (act.getFacilityId().equals(actPreviousDay.getFacilityId()) && 
 									previousAct.getType().equals(previousActPreviousDay.getType()) &&
 									previousAct.getFacilityId().equals(previousActPreviousDay.getFacilityId())) {
 								
-								LegImpl leg = (LegImpl) plan.getPreviousLeg(act);
+								Leg leg = plan.getPreviousLeg(act);
 								leg.setMode(planPreviousDay.getPreviousLeg(actPreviousDay).getMode());
 								leg.setRoute(planPreviousDay.getPreviousLeg(actPreviousDay).getRoute());
 								cntRouteMode++;
