@@ -40,7 +40,7 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 		double prevBestScore = -999.0;
 		double bestScore = 999.0;
 		// let us do at least 10 iterations
-		if (iteration >= 10) {
+		if (iteration > 10) {
 			prevBestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 2];
 			bestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 1];
 		}		
