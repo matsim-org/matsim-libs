@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
@@ -35,6 +37,7 @@ import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.utils.heatMap.HeatMap;
 
 /**
  * @author droeder
@@ -50,18 +53,24 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	private Map<Id, Double> alightTotal;
 	private Map<Id, TransitStopFacility> stops;
 	private boolean writeHeatMaps = false;
-//	private HashMap<String, HashMap<String, Polygon>> alightGeometries;
-//	private double tileSize = Double.MAX_VALUE;
+	private HashMap<String, HeatMap> heatMaps;
+	private Integer gridSize = Integer.MAX_VALUE;
 
+	/**
+	 * Counts number of boarding and alighting per stop and interval.
+	 * 
+	 * @param sc, the scenario containing the transitStops
+	 * @param interval, interval-size in seconds
+	 */
 	public BoardingAlightingCountAnalyzer(Scenario sc, int interval) {
 		super(BoardingAlightingCountAnalyzer.class.getSimpleName());
 		this.handler = new BoardAlightEventHandler(interval);
 		this.stops = sc.getTransitSchedule().getFacilities();
 	}
 	
-	public void setWriteHeatMaps(boolean b, double heatMapTileSize){
+	public void setWriteHeatMaps(boolean b, int heatMapGridSize){
 		this.writeHeatMaps = b;
-//		this.tileSize  = heatMapTileSize;
+		this.gridSize  = heatMapGridSize;
 	}
 
 	@Override
@@ -89,14 +98,26 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	 */
 	private void createHeatMapGeometries() {
 		//TODO[dr]
-//		this.alightGeometries = new HashMap<String, HashMap<String, Polygon>>();
-//		HeatMap heatmap;
-//		//create for board
-//		heatmap = new HeatMap(this.tileSize);
-//		//total
-		
-		
-		
+		this.heatMaps = new HashMap<String, HeatMap>();
+		HeatMap heatmap;
+		//create for boarding all
+		heatmap = new HeatMap(this.gridSize);
+		for(Entry<Id, Double> e: this.boardTotal.entrySet()){
+			Coord coord = this.stops.get(e.getKey()).getCoord();
+			heatmap.addValue(coord, e.getValue());
+		}
+		heatmap.createHeatMap();
+		this.heatMaps.put("boardingAll", heatmap);
+		//create for alighting all
+		heatmap = new HeatMap(this.gridSize);
+		for(Entry<Id, Double> e: this.alightTotal.entrySet()){
+			Coord coord = this.stops.get(e.getKey()).getCoord();
+			heatmap.addValue(coord, e.getValue());
+		}
+		heatmap.createHeatMap();
+		this.heatMaps.put("alightingAll", heatmap);
+		//total
+		//TODO[dr] create for timeSlots
 	}
 
 	/**
@@ -136,8 +157,9 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	 * @param outputFolder
 	 */
 	private void writeHeatMaps(String outputFolder) {
-		// TODO[dr] Auto-generated method stub
-		
+		for(Entry<String, HeatMap> e: this.heatMaps.entrySet()){
+			HeatMap.writeHeatMapShape(e.getKey(), e.getValue(), outputFolder + e.getKey() + ".shp");
+		}
 	}
 
 	/**

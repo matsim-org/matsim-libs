@@ -33,23 +33,23 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.selectedPlans.GetSelectedPlansSubset;
+import playground.vsp.analysis.modules.plansSubset.GetPlansSubset;
 
 /**
  * @author droeder
  *
  */
-public class GetStuckEventsAndSelectedPlans extends AbstractAnalyisModule{
+public class GetStuckEventsAndPlans extends AbstractAnalyisModule{
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
-			.getLogger(GetStuckEventsAndSelectedPlans.class);
+			.getLogger(GetStuckEventsAndPlans.class);
 	private GetStuckEvents stuckEventHandler;
 	private Scenario sc;
-	private GetSelectedPlansSubset plans;
+	private GetPlansSubset plans;
 
-	public GetStuckEventsAndSelectedPlans(Scenario sc) {
-		super(GetStuckEventsAndSelectedPlans.class.getSimpleName());
+	public GetStuckEventsAndPlans(Scenario sc) {
+		super(GetStuckEventsAndPlans.class.getSimpleName());
 		this.stuckEventHandler = new GetStuckEvents();
 		this.sc = sc;
 	}
@@ -72,7 +72,7 @@ public class GetStuckEventsAndSelectedPlans extends AbstractAnalyisModule{
 		for(AgentStuckEvent e: this.stuckEventHandler.getEvents()){
 			stuckAgents.add(e.getPersonId());
 		}
-		this.plans = new GetSelectedPlansSubset(this.sc, stuckAgents);
+		this.plans = new GetPlansSubset(this.sc, stuckAgents, false);
 		this.plans.postProcessData();
 	}
 

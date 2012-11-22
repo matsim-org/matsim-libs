@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.analysis.modules.selectedPlans;
+package playground.vsp.analysis.modules.plansSubset;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PopulationWriter;
@@ -38,24 +38,37 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author droeder
  *
  */
-public class GetSelectedPlansSubset extends AbstractAnalyisModule{
+public class GetPlansSubset extends AbstractAnalyisModule{
 
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(GetSelectedPlansSubset.class);
+	private static final Logger log = Logger.getLogger(GetPlansSubset.class);
 	private Collection<Id> ids;
 	private Scenario sc;
 	private Scenario newSc;
+	private boolean selectedOnly;
 
 	/**
-	 * writes persons and their selected plans from sc to a file. when ids is null
+	 * writes persons and their plans from sc to a file. when ids is null
+	 * all persons are selected, otherwise only the persons with the specified id's. 
+	 * @param sc, the scenario, containing population AND network
+	 * @param ids, the person-ids of the persons you want to write. might be null.
+	 * @param selectedPlansOnly, set this true if you are interested in the selected plans only
+	 */
+	public GetPlansSubset(Scenario sc, Collection<Id> ids, boolean selectedPlansOnly) {
+		super(GetPlansSubset.class.getSimpleName());
+		this.ids = ids;
+		this.sc = sc;
+		this.selectedOnly = selectedPlansOnly;
+	}
+
+	/**
+	  * writes persons and their plans from sc to a file. when ids is null
 	 * all persons are selected, otherwise only the persons with the specified id's. 
 	 * @param sc, the scenario, containing population AND network
 	 * @param ids, the person-ids of the persons you want to write. might be null.
 	 */
-	public GetSelectedPlansSubset(Scenario sc, Collection<Id> ids) {
-		super(GetSelectedPlansSubset.class.getSimpleName());
-		this.ids = ids;
-		this.sc = sc;
+	public GetPlansSubset(Scenario sc, Collection<Id> ids) {
+		this(sc, ids, false);
 	}
 
 	@Override
@@ -76,14 +89,21 @@ public class GetSelectedPlansSubset extends AbstractAnalyisModule{
 		for(Person p: this.sc.getPopulation().getPersons().values()){
 			if((this.ids == null) || this.ids.contains(p.getId())){
 				newPerson = this.newSc.getPopulation().getFactory().createPerson(p.getId());
-				newPerson.addPlan(p.getSelectedPlan());
+				if(this.selectedOnly){
+					newPerson.addPlan(p.getSelectedPlan());
+				}else{
+					for(Plan plan : p.getPlans()){
+						
+						newPerson.addPlan(plan);
+					}
+				}
 				this.newSc.getPopulation().addPerson(newPerson);
 			}
 		}
 	}
 	@Override
 	public void writeResults(String outputFolder) {
-		new PopulationWriter(this.newSc.getPopulation(), this.sc.getNetwork()).write(outputFolder + "selectedPlans.xml");
+		new PopulationWriter(this.newSc.getPopulation(), this.sc.getNetwork()).write(outputFolder + "plans.xml.gz");
 	}
 }
 

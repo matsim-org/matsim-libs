@@ -30,7 +30,8 @@ import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccesibility;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
-import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndSelectedPlans;
+import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndPlans;
+import playground.vsp.analysis.modules.transitVehicleVolume.TransitVehicleVolumeAnalyzer;
 import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -41,7 +42,7 @@ public class RsaAnalysis {
 
 	/**
 	 * 
-	 * @param args OutputDir RunId iteration
+	 * @param args OutputDir RunId iteration nrOfHeatMapTiles
 	 */
 	public static void main(String[] args) {
 		
@@ -55,11 +56,11 @@ public class RsaAnalysis {
 //		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 //		new MatsimPopulationReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_POPULATION));
 		
-		if(new File(dir.getIterationFilename(Integer.parseInt(args[2]), "transitSchedule.xml.gz")).exists()){
-			new TransitScheduleReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "transitSchedule.xml.gz"));
-		}else{
-			new TransitScheduleReader(sc).readFile(dir.getOutputFilename( "0.transitSchedule.xml.gz"));
-		}
+		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "transitScheduleScored.xml.gz"));
+//		if(new File(dir.getIterationFilename(Integer.parseInt(args[2]), "transitSchedule.xml.gz")).exists()){
+//		}else{
+//			new TransitScheduleReader(sc).readFile(dir.getOutputFilename( "0.transitSchedule.xml.gz"));
+//		}
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "plans.xml.gz"));
 		
@@ -148,13 +149,17 @@ public class RsaAnalysis {
 //		
 		
 		
-		GetStuckEventsAndSelectedPlans writeStuck = new GetStuckEventsAndSelectedPlans(sc);
+		GetStuckEventsAndPlans writeStuck = new GetStuckEventsAndPlans(sc);
 		PtAccesibility ptAcces = new PtAccesibility(sc, cluster, activityCluster);
 //		WaitingTimesAnalyzer waitAna = new WaitingTimesAnalyzer();
+		
 		TTtripAnalysis tripAna = new TTtripAnalysis(ptModes, networkModes, sc.getPopulation());
+//		tripAna.addZones(zones);
+
 		BoardingAlightingCountAnalyzer boardingAlightingCountAnalyzes = 
 					new BoardingAlightingCountAnalyzer(sc, 3600);
-//		tripAna.addZones(zones);
+		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
+		TransitVehicleVolumeAnalyzer ptVehVolAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600.);
 		
 		
 		
@@ -165,6 +170,7 @@ public class RsaAnalysis {
 //		analyzer.addAnalysisModule(waitAna);
 		analyzer.addAnalysisModule(tripAna);
 		analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
+		analyzer.addAnalysisModule(ptVehVolAnalyzer);
 
 		analyzer.run();
 	}
