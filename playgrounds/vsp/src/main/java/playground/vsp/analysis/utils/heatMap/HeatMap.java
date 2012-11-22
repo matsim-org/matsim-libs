@@ -52,7 +52,6 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class HeatMap {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(HeatMap.class);
 	private List<Tuple<Coord, Double>> values;
 	private double maxX = -Double.MAX_VALUE;
@@ -62,6 +61,54 @@ public class HeatMap {
 	private QuadTree<Tile> tiles;
 	private Integer gridSize;
 	
+	private class Tile{
+		
+		private Polygon area;
+		private Double value;
+
+		/**
+		 * @param x
+		 * @param d
+		 * @param y
+		 * @param e
+		 */
+		public Tile(double minX, double maxX, double minY, double maxY) {
+			GeometryFactory factory = new GeometryFactory();
+			Coordinate[] c = new Coordinate[5];
+			Double min = 0.999999999;
+			Double max = 1.000000001;
+			// extend the tile for a very small distance, so that the border is within the tile!
+			c[0] = new Coordinate(min * minX, min * minY, 0.);
+			c[1] = new Coordinate(max * maxX, min * minY, 0.);
+			c[2] = new Coordinate(max * maxX, max * maxY, 0.);
+			c[3] = new Coordinate(min * minX, max * maxY, 0.);
+			c[4] = c[0];
+			this.area = factory.createPolygon(factory.createLinearRing(c), null);
+			this.value = 0.;
+		}
+		
+		public Coord getCentroid(){
+			return MGC.point2Coord(this.area.getCentroid());
+		}
+		
+		public Polygon getGeometry(){
+			return this.area;
+		}
+		
+		public void add(Double d){
+			this.value += d;
+		}
+		
+		public double getValue(){
+			return this.value;
+		}
+	}
+	
+	/**
+	 * a class to create a simple HeatMap from coordinates and corresponding values.
+	 * 
+	 * @param gridSize, the number of tiles of the HeatMap
+	 */
 	public HeatMap(Integer gridSize) {
 		this.gridSize = gridSize;
 		this.values = new ArrayList<Tuple<Coord,Double>>();
@@ -133,7 +180,7 @@ public class HeatMap {
 		}
 	}
 	
-	public Collection<Tile> getTiles(){
+	private Collection<Tile> getTiles(){
 		return this.tiles.values();
 	}
 
@@ -172,63 +219,7 @@ public class HeatMap {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void main(String[] args) {
-		HeatMap map = new HeatMap(50);
-		
-		for(int x = -145000; x < 100000; x += 1000){
-			for(int y = -14300 ; y < 19200; y += 100 ){
-				map.addValue(new CoordImpl(x,y), 100 * Math.random());
-			}
-		}
-		
-		map.createHeatMap();
-		
-		writeHeatMapShape("test", map, "C:/Users/Daniel/Desktop/test2.shp");
-		
-	}
 }
-class Tile{
-	
-	private Polygon area;
-	private Double value;
 
-	/**
-	 * @param x
-	 * @param d
-	 * @param y
-	 * @param e
-	 */
-	public Tile(double minX, double maxX, double minY, double maxY) {
-		GeometryFactory factory = new GeometryFactory();
-		Coordinate[] c = new Coordinate[5];
-		Double min = 0.999999999;
-		Double max = 1.000000001;
-		// extend the tile for a very small distance, so that the border is within the tile!
-		c[0] = new Coordinate(min * minX, min * minY, 0.);
-		c[1] = new Coordinate(max * maxX, min * minY, 0.);
-		c[2] = new Coordinate(max * maxX, max * maxY, 0.);
-		c[3] = new Coordinate(min * minX, max * maxY, 0.);
-		c[4] = c[0];
-		this.area = factory.createPolygon(factory.createLinearRing(c), null);
-		this.value = 0.;
-	}
-	
-	public Coord getCentroid(){
-		return MGC.point2Coord(this.area.getCentroid());
-	}
-	
-	public Polygon getGeometry(){
-		return this.area;
-	}
-	
-	public void add(Double d){
-		this.value += d;
-	}
-	
-	public double getValue(){
-		return this.value;
-	}
-}
 
 

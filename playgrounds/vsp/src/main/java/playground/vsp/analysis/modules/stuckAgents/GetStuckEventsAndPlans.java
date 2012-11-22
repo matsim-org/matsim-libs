@@ -48,6 +48,11 @@ public class GetStuckEventsAndPlans extends AbstractAnalyisModule{
 	private Scenario sc;
 	private GetPlansSubset plans;
 
+	/**
+	 * A class to collect all StuckEvents from the eventsFile and all corresponding Persons
+	 * from the Population. 
+	 * @param sc, the scenario containing the plans
+	 */
 	public GetStuckEventsAndPlans(Scenario sc) {
 		super(GetStuckEventsAndPlans.class.getSimpleName());
 		this.stuckEventHandler = new GetStuckEvents();

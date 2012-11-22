@@ -69,6 +69,13 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 	private TransitVehicleVolumeHandler handler;
 	private HashMap<String, Map<Id, Double>> mode2Link2Total;
 
+	/**
+	 * creates a shapefiles (per pt-mode) containing the links used by pt-vehicles.
+	 * Every single Geometry provides fields containing informations about the number of vehicles
+	 * per interval and in total.
+	 * @param sc, the scenario containing the links
+	 * @param interval, the interval (normally in seconds)
+	 */
 	public TransitVehicleVolumeAnalyzer(Scenario sc, Double interval) {
 		super(TransitVehicleVolumeAnalyzer.class.getSimpleName());
 		this.sc = sc;
@@ -159,11 +166,6 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 					featureAttribs[3 + i] = c.getVolume(i).getValue();
 				}
 			}
-//			System.out.println(featureAttribs.toString());
-//			for(Object o: featureAttribs){
-//				System.out.print(o.toString());
-//			}
-//			System.out.println();
 			try {
 				features.add(featureType.create(featureAttribs));
 			} catch (IllegalAttributeException e1) {
