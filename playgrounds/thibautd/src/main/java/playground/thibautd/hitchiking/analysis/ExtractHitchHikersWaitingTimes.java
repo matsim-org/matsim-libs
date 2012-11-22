@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
+package playground.thibautd.hitchiking.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
