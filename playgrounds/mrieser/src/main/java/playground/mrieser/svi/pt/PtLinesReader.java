@@ -63,14 +63,18 @@ public class PtLinesReader {
 				for (int i = 2; i < parts.length; i++) {
 					Id id = new IdImpl(parts[i]);
 					Node node = this.network.getNodes().get(id);
+					if (node == null) {
+						log.error("Could not find node with id " + id.toString() + " in line " + line + "/" + direction);
+						links.clear();
+						break;
+					}
 					if (prevNode != null) {
 						Link link = NetworkUtils.getConnectingLink(prevNode, node);
 						if (link == null) {
-							log.error("Bad pt line description for line " + line + "/" + direction + ": No link between node " + prevNode.getId() + " and " + node.getId());
-							links.clear();
-							break;
+							log.warn("Bad pt line description for line " + line + "/" + direction + ": No link between node " + prevNode.getId() + " and " + node.getId());
+						} else {
+							links.add(link);
 						}
-						links.add(link);
 					}
 					prevNode = node;
 				}
