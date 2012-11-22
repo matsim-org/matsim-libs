@@ -28,9 +28,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.misc.Time;
 
 public class AdaptNextDay implements StartupListener {
 	private Population populationPreviousDay;
@@ -78,13 +77,16 @@ public class AdaptNextDay implements StartupListener {
 				
 				if (planPreviousDay.getPlanElements().size() >= planElementIndex) {
 					actPreviousDay = (Activity) planPreviousDay.getPlanElements().get(planElementIndex);
-					cntTime++;
+					
 					// identical times
-					if (act.getType().equals(actPreviousDay.getType())) {
-						act.setEndTime(actPreviousDay.getEndTime());
+					if (act.getType().equals(actPreviousDay.getType())) { // set act times, leg departure time automatically set
+						if (actPreviousDay.getEndTime() > Time.UNDEFINED_TIME) {	// it is not last home act of plan
+							act.setEndTime(actPreviousDay.getEndTime());
+						} // else do not touch end time
 						act.setStartTime(
 								Math.max(0.0, act.getEndTime() - plan.getPerson().getDesires().getActivityDuration(act.getType())));
-						// leg departure time automatically set
+						
+						cntTime++;
 						
 						if (planElementIndex > 0) { 
 							Activity previousAct = plan.getPreviousActivity(plan.getPreviousLeg(act));
@@ -94,7 +96,6 @@ public class AdaptNextDay implements StartupListener {
 							
 							// identical route and mode
 							if (act.getFacilityId().equals(actPreviousDay.getFacilityId()) && 
-									previousAct.getType().equals(previousActPreviousDay.getType()) &&
 									previousAct.getFacilityId().equals(previousActPreviousDay.getFacilityId())) {
 								
 								Leg leg = plan.getPreviousLeg(act);
@@ -103,6 +104,9 @@ public class AdaptNextDay implements StartupListener {
 								cntRouteMode++;
 							}
 						}
+					}
+					else {
+						break;
 					}
 				}
 				planElementIndex += 2;
