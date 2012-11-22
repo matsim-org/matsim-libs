@@ -64,7 +64,7 @@ public class DayControler extends Controler {
 	}
 	
 	private void setTermination(double stoppingRate) {
-		super.setTerminationCriterion(new TerminationCriterionScoreBased(stoppingRate, this.getScoreStats()));
+		super.setTerminationCriterion(new TerminationCriterionScoreBased(stoppingRate, this));
 	}
 	
 	protected void loadControlerListeners() {

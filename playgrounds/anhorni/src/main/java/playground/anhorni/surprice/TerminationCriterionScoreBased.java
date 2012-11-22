@@ -20,28 +20,28 @@
 package playground.anhorni.surprice;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.ScoreStats;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Controler.TerminationCriterion;
 
 public class TerminationCriterionScoreBased implements TerminationCriterion {
 	
 	private double stoppingCriterionVal = 0.1;
 	final private static int INDEX_BEST = 1;
-	private ScoreStats scoreStats;
+	private Controler controler;
 	private final static Logger log = Logger.getLogger(TerminationCriterionScoreBased.class);
 	
-	public TerminationCriterionScoreBased(double stoppingCriterionVal, ScoreStats scoreStats) {
+	public TerminationCriterionScoreBased(double stoppingCriterionVal, Controler controler) {
 		this.stoppingCriterionVal = stoppingCriterionVal;
-		this.scoreStats = scoreStats;
+		this.controler = controler;
 	}
 
 	@Override
 	public boolean continueIterations(int iteration) {
 		double prevBestScore = 0.0;
 		if (iteration >= 1) {
-			prevBestScore = scoreStats.getHistory()[INDEX_BEST][iteration - 1];
+			prevBestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 1];
 		}
-		double bestScore = scoreStats.getHistory()[INDEX_BEST][iteration];
+		double bestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration];
 		
 		if (Math.abs((bestScore - prevBestScore) / prevBestScore) < this.stoppingCriterionVal) {
 			return false;
