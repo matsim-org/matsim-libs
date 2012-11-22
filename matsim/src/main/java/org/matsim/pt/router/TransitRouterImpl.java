@@ -70,6 +70,7 @@ public class TransitRouterImpl implements TransitRouter {
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
 		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
+//		this.transitNetwork = null; // enable to save memory if no routing should be done
 	}
 
 	public TransitRouterImpl(final TransitRouterConfig config, final TransitRouterNetwork routerNetwork, final TravelTime travelTime, TransitTravelDisutility travelDisutility) {
@@ -78,11 +79,10 @@ public class TransitRouterImpl implements TransitRouter {
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
+//		this.dijkstra = null; // enable to save memory if no routing should be done
 	}
-
-	@Override
-	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
-		// find possible start stops
+	
+	private Map<Node, InitialNode> locateWrappedFromOrToNodes(Coord fromCoord, double departureTime){
 		Collection<TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.searchRadius);
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
@@ -97,22 +97,15 @@ public class TransitRouterImpl implements TransitRouter {
 			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
+		return wrappedFromNodes;
+	}
 
+	@Override
+	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
+		// find possible start stops
+		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedFromOrToNodes(fromCoord, departureTime);
 		// find possible end stops
-		Collection<TransitRouterNetworkNode> toNodes = this.transitNetwork.getNearestNodes(toCoord, this.config.searchRadius);
-		if (toNodes.size() < 2) {
-			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toCoord);
-			double distance = CoordUtils.calcDistance(toCoord, nearestNode.stop.getStopFacility().getCoord());
-			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.extensionRadius);
-		}
-		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
-		for (TransitRouterNetworkNode node : toNodes) {
-			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
-			double initialTime = distance / this.config.getBeelineWalkSpeed();
-			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
-			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
-		}
+		Map<Node, InitialNode> wrappedToNodes  = this.locateWrappedFromOrToNodes(toCoord, departureTime);
 
 		// find routes between start and end stops
 		Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
