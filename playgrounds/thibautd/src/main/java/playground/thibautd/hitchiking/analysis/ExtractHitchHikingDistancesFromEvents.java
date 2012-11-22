@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PassengerDepartsWithDriverEvent.java
+ * ExtractHitchHikingDistancesFromEvents.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,45 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.hitchiking.qsim.events;
+package playground.thibautd.hitchiking.analysis;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author thibautd
  */
-public class PassengerDepartsWithDriverEvent extends WaitingEvent {
-	public static final String ATTRIBUTE_DRIVER = "driverId";
-	public static final String TYPE = "passengerDepartsWithDriverEvent";
-	private final Id driverId;
+public class ExtractHitchHikingDistancesFromEvents {
+	public static void main(final String[] args) {
+		final String networkFile = args[ 0 ];
+		final String eventsFile = args[ 1 ];
+		final String outfile = args[ 2 ];
 
-	public PassengerDepartsWithDriverEvent(
-			final double time,
-			final Id passengerId,
-			final Id driverId,
-			final Id linkId) {
-		super(time, passengerId, linkId);
-		this.driverId = driverId;
-	}
-
-	@Override
-	public String getEventType() {
-		return TYPE;
-	}
-
-	public Id getDriverId() {
-		return driverId;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> atts = super.getAttributes();
-
-		atts.put( ATTRIBUTE_DRIVER  , ""+driverId );
-
-		return atts;
+		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new MatsimNetworkReader( sc ).readFile( networkFile );
+		HitchHikingDistancesEventHandler handler =
+			new HitchHikingDistancesEventHandler(
+					sc.getNetwork(),
+					outfile);
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler( handler );
+		new EventsReaderXMLv1( events ).parse( eventsFile );
+		handler.close();
 	}
 }
 
