@@ -65,6 +65,7 @@ public class MultiDayControler {
 			else {
 				populationPreviousDay = controler.getPopulation();
 			}
+			log.info("storing final iteration: " + controler.getFinalIteration());
 			finalIterations[Surprice.days.indexOf(day)] = controler.getFinalIteration();
 		}
 		// only used for small-scale scenario
