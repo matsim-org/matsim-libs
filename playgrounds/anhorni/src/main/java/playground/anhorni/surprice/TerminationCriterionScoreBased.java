@@ -37,7 +37,7 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 
 	@Override
 	public boolean continueIterations(int iteration) {
-		double prevBestScore = 0.0;
+		double prevBestScore = -999.0;
 		double bestScore = 999.0;
 		// let us do at least 10 iterations
 		if (iteration >= 10) {
@@ -45,10 +45,10 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 			bestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 1];
 		}		
 		if (Math.abs((bestScore - prevBestScore) / prevBestScore) < this.stoppingCriterionVal) {
+			log.info("Run terminated at iteration " + iteration + ". Relative score diff: " + Math.abs((bestScore - prevBestScore) / prevBestScore));
 			return false;
 		}
-		else {
-			log.info("Run terminated at iteration " + iteration + ". Relative score diff: " + Math.abs((bestScore - prevBestScore) / prevBestScore));
+		else {			
 			return true;
 		}
 	}
