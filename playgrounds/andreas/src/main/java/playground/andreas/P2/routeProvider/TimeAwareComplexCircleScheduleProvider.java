@@ -77,6 +77,7 @@ public class TimeAwareComplexCircleScheduleProvider implements PRouteProvider{
 		Set<String> modes =  new HashSet<String>(){{
 			// this is the networkmode and explicitly not the transportmode
 			add(TransportMode.car);
+//			add(TransportMode.pt);
 			}};
 		((Dijkstra)this.routingAlgo).setModeRestriction(modes);
 		
@@ -179,10 +180,7 @@ public class TimeAwareComplexCircleScheduleProvider implements PRouteProvider{
 			}
 			
 			// different from {@link ComplexCircleScheduleProvider}
-			double offsetFromLastIteration = this.handler.getOffsetForRouteAndStopNumber(routeID, stops.size());
-			if (runningTime < offsetFromLastIteration) {
-				runningTime = offsetFromLastIteration;
-			}
+			runningTime = modifyRunningTimeAccordingToTheLastIterationIfPossible(runningTime, this.handler.getOffsetForRouteAndStopNumber(routeID, stops.size()));
 			// end
 			
 			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.linkId2StopFacilityMap.get(link.getId()), runningTime, runningTime);
@@ -193,11 +191,9 @@ public class TimeAwareComplexCircleScheduleProvider implements PRouteProvider{
 		runningTime += this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getLength() / (this.net.getLinks().get(tempStopsToBeServed.get(0).getLinkId()).getFreespeed() * this.planningSpeedFactor);
 		
 		// different from {@link ComplexCircleScheduleProvider}
-		double offsetFromLastIteration = this.handler.getOffsetForRouteAndStopNumber(routeID, stops.size());
-		if (runningTime < offsetFromLastIteration) {
-			runningTime = offsetFromLastIteration;
-		}
+		runningTime = modifyRunningTimeAccordingToTheLastIterationIfPossible(runningTime, this.handler.getOffsetForRouteAndStopNumber(routeID, stops.size()));
 		// end
+		
 		routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(tempStopsToBeServed.get(0), runningTime, runningTime);
 		stops.add(routeStop);
 		
@@ -218,5 +214,12 @@ public class TimeAwareComplexCircleScheduleProvider implements PRouteProvider{
 	@Override
 	public Collection<TransitStopFacility> getAllPStops() {
 		return this.scheduleWithStopsOnly.getFacilities().values();
+	}
+	
+	private double modifyRunningTimeAccordingToTheLastIterationIfPossible(double runningTime, double offsetFromLastIteration){
+		if (offsetFromLastIteration != -Double.MAX_VALUE) {
+			runningTime = offsetFromLastIteration;
+		}
+		return runningTime;
 	}
 }
