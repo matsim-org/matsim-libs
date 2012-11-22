@@ -64,9 +64,7 @@ public class AdaptNextDay implements StartupListener {
 	
 	private int[] adaptPlan(PlanImpl planPreviousDay, PlanImpl plan) {
 		int planElementIndex = 0;
-		ActivityImpl previousAct = null;
-		ActivityImpl previousActPreviousDay = null;
-		
+			
 		int cntTime = 0;
 		int cntRouteMode = 0;
 		int cntAct = 0;
@@ -92,9 +90,11 @@ public class AdaptNextDay implements StartupListener {
 							leg.setDepartureTime(act.getEndTime());
 						}
 						
+						ActivityImpl previousAct = (ActivityImpl) plan.getPreviousActivity(plan.getPreviousLeg(act));
+						ActivityImpl previousActPreviousDay = (ActivityImpl) planPreviousDay.getPreviousActivity(planPreviousDay.getPreviousLeg(act));;
+						
 						// identical route and mode
 						if (act.getFacilityId().equals(actPreviousDay.getFacilityId()) && 
-								previousAct != null && previousActPreviousDay != null &&
 								previousAct.getType().equals(previousActPreviousDay.getType()) &&
 								previousAct.getFacilityId().equals(previousActPreviousDay.getFacilityId())) {
 							
@@ -104,9 +104,7 @@ public class AdaptNextDay implements StartupListener {
 							cntRouteMode++;
 						}
 					}
-				}	
-				previousAct = act;
-				previousActPreviousDay = actPreviousDay;
+				}
 			}
 		}
 		int [] res = {cntTime, cntRouteMode, cntAct};
