@@ -25,6 +25,6 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
  */
 public enum OptimizationParameter1 {
 	
-	NUMBER_OF_BUSES, FARE, CAPACITY
+	HEADWAY, FARE, CAPACITY
 
 }
