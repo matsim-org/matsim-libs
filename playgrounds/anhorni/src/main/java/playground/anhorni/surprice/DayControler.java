@@ -41,6 +41,7 @@ public class DayControler extends Controler {
 	private ObjectAttributes preferences;
 	private Random random;
 	private Population populationPreviousDay = null;
+	private TerminationCriterionScoreBased terminationCriterion = null;
 		
 	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay) {
 		super(config);	
@@ -64,7 +65,8 @@ public class DayControler extends Controler {
 	}
 	
 	private void setTermination(double stoppingRate) {
-		super.setTerminationCriterion(new TerminationCriterionScoreBased(stoppingRate, this));
+		this.terminationCriterion = new TerminationCriterionScoreBased(stoppingRate, this);
+		super.setTerminationCriterion(this.terminationCriterion);
 	}
 	
 	protected void loadControlerListeners() {
@@ -85,6 +87,15 @@ public class DayControler extends Controler {
 	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "warmstart"))) {
 	  		this.addControlerListener(new AdaptNextDay(this.populationPreviousDay));
 	  	}
+	}
+	
+	public int getFinalIteration() {
+		if (this.terminationCriterion == null) {
+			return this.getLastIteration();
+		}
+		else {
+			return this.terminationCriterion.getFinalIteration();
+		}
 	}
 	
 	private void generateAlphaGammaTrip() {

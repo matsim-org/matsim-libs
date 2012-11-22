@@ -48,7 +48,7 @@ public class MultiDayControler {
 		preferencesReader.parse(path + "/preferences.xml");
 		
 		Population populationPreviousDay = null;
-				
+		int finalIterations[] = new int[7];		
 		for (String day : Surprice.days) {			
 			config.setParam("controler", "outputDirectory", outPath + "/" + day);
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
@@ -65,6 +65,7 @@ public class MultiDayControler {
 			else {
 				populationPreviousDay = controler.getPopulation();
 			}
+			finalIterations[Surprice.days.indexOf(day)] = controler.getFinalIteration();
 		}
 		// only used for small-scale scenario
 //		UtilityAnalyzer analyzer = new UtilityAnalyzer();
@@ -73,6 +74,7 @@ public class MultiDayControler {
 //		analyzer.analyze(config, outPath, sideLength);
 		
 		Analyzer analyzer = new Analyzer();
+		analyzer.setFinalIterations(finalIterations);
 		analyzer.init(configFile, incomesFile);
 		analyzer.run();
 		

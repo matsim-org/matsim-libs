@@ -29,10 +29,12 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 	final private static int INDEX_BEST = 1;
 	private Controler controler;
 	private final static Logger log = Logger.getLogger(TerminationCriterionScoreBased.class);
+	private int finalIteration = 0;
 	
 	public TerminationCriterionScoreBased(double stoppingCriterionVal, Controler controler) {
 		this.stoppingCriterionVal = stoppingCriterionVal;
 		this.controler = controler;
+		this.finalIteration = this.controler.getLastIteration();
 	}
 
 	@Override
@@ -46,10 +48,15 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 		}		
 		if (Math.abs((bestScore - prevBestScore) / prevBestScore) < this.stoppingCriterionVal) {
 			log.info("Run terminated at iteration " + iteration + ". Relative score diff: " + Math.abs((bestScore - prevBestScore) / prevBestScore));
+			this.finalIteration = iteration - 1;
 			return false;
 		}
 		else {			
 			return true;
 		}
+	}
+
+	public int getFinalIteration() {
+		return finalIteration;
 	}
 }

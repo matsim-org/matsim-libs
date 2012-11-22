@@ -88,6 +88,8 @@ public class Analyzer {
 	private TreeMap<Id, Double> ttPerAgent;
 	
 	private String outPath;
+	
+	private int finalIterations[] = null;
 		
 	public static void main (final String[] args) {		
 		if (args.length != 2) {
@@ -100,6 +102,10 @@ public class Analyzer {
 		analyzer.init(configFile, incomesFile);
 		analyzer.run();	
 	}
+	
+	public void setFinalIterations(int finalIterations[]) {
+		this.finalIterations = finalIterations;
+	}
 		
 	public void init(String configFile, String incomesFile) {
 		log.info("config file: " + configFile);
@@ -111,6 +117,14 @@ public class Analyzer {
 		
 		this.config = ConfigUtils.loadConfig(configFile);
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		
+		if (this.finalIterations == null) {
+			this.finalIterations = new int[7];
+			int lastIterationConfig = this.scenario.getConfig().controler().getLastIteration();
+			for (int i = 0; i < 7; i++) {
+				this.finalIterations[i] = lastIterationConfig;
+	 		}
+		}
 	}
 		
 	public void run() {
