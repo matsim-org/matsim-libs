@@ -38,11 +38,12 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 	@Override
 	public boolean continueIterations(int iteration) {
 		double prevBestScore = 0.0;
-		if (iteration >= 1) {
-			prevBestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 1];
-		}
-		double bestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration];
-		
+		double bestScore = 999.0;
+		// let us do at least 10 iterations
+		if (iteration >= 10) {
+			prevBestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 2];
+			bestScore = this.controler.getScoreStats().getHistory()[INDEX_BEST][iteration - 1];
+		}		
 		if (Math.abs((bestScore - prevBestScore) / prevBestScore) < this.stoppingCriterionVal) {
 			return false;
 		}
