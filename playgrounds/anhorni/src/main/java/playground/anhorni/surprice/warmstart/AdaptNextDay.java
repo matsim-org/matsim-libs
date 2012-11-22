@@ -51,13 +51,15 @@ public class AdaptNextDay implements StartupListener {
 		int cntRouteMode = 0;
 		for (Person p : this.populationPreviousDay.getPersons().values()) {
 			Plan plan = population.getPersons().get(p.getId()).getSelectedPlan();
-			this.comparePlans((PlanImpl)p.getSelectedPlan(), (PlanImpl)plan, cntTime, cntRouteMode);
+			int [] res = this.comparePlans((PlanImpl)p.getSelectedPlan(), (PlanImpl)plan, cntTime, cntRouteMode);
+			cntTime += res[0];
+			cntRouteMode += res[1];
 		}
 		log.info("number of acts with identical end time and leg departure times: " + cntTime);
 		log.info("number of legs with identical routes and modes:" + cntRouteMode);
 	}
 	
-	private void comparePlans(PlanImpl planPreviousDay, PlanImpl plan, int cntTime, int cntRouteMode) {
+	private int[] comparePlans(PlanImpl planPreviousDay, PlanImpl plan, int cntTime, int cntRouteMode) {
 		int planElementIndex = 0;
 		ActivityImpl previousAct = null;
 		ActivityImpl previousActPreviousDay = null;
@@ -99,6 +101,8 @@ public class AdaptNextDay implements StartupListener {
 				previousActPreviousDay = actPreviousDay;
 			}
 		}
+		int [] res = {cntTime, cntRouteMode};
+		return res;
 	}	
 }
 

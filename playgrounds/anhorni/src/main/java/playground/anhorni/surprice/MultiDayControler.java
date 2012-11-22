@@ -62,6 +62,9 @@ public class MultiDayControler {
 			if (day.equals("sat")) {
 				populationPreviousDay = null;
 			}
+			else {
+				populationPreviousDay = controler.getPopulation();
+			}
 		}
 		// only used for small-scale scenario
 //		UtilityAnalyzer analyzer = new UtilityAnalyzer();
