@@ -19,6 +19,7 @@
 
 package playground.anhorni.surprice;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.core.controler.Controler.TerminationCriterion;
 
@@ -27,6 +28,7 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 	private double stoppingCriterionVal = 0.1;
 	final private static int INDEX_BEST = 1;
 	private ScoreStats scoreStats;
+	private final static Logger log = Logger.getLogger(TerminationCriterionScoreBased.class);
 	
 	public TerminationCriterionScoreBased(double stoppingCriterionVal, ScoreStats scoreStats) {
 		this.stoppingCriterionVal = stoppingCriterionVal;
@@ -45,6 +47,7 @@ public class TerminationCriterionScoreBased implements TerminationCriterion {
 			return false;
 		}
 		else {
+			log.info("Run terminated at iteration " + iteration + ". Relative score diff: " + Math.abs((bestScore - prevBestScore) / prevBestScore));
 			return true;
 		}
 	}

@@ -31,8 +31,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.anhorni.surprice.preprocess.rwscenario.ConvertThurgau2Plans;
-
 public class AdaptNextDay implements StartupListener {
 	private Population populationPreviousDay;
 	private final static Logger log = Logger.getLogger(AdaptNextDay.class);
@@ -45,13 +43,14 @@ public class AdaptNextDay implements StartupListener {
 	public void notifyStartup(StartupEvent event) {		
 		// on monday or saturday return
 		if (this.populationPreviousDay == null) return;
+		log.info("Adapting plans of next day ... ");
 		
 		Population population = event.getControler().getPopulation();
 		int cntTime = 0;
 		int cntRouteMode = 0;
 		for (Person p : this.populationPreviousDay.getPersons().values()) {
 			Plan plan = population.getPersons().get(p.getId()).getSelectedPlan();
-			int [] res = this.comparePlans((PlanImpl)p.getSelectedPlan(), (PlanImpl)plan, cntTime, cntRouteMode);
+			int [] res = this.adaptPlan((PlanImpl)p.getSelectedPlan(), (PlanImpl)plan, cntTime, cntRouteMode);
 			cntTime += res[0];
 			cntRouteMode += res[1];
 		}
@@ -59,7 +58,7 @@ public class AdaptNextDay implements StartupListener {
 		log.info("number of legs with identical routes and modes:" + cntRouteMode);
 	}
 	
-	private int[] comparePlans(PlanImpl planPreviousDay, PlanImpl plan, int cntTime, int cntRouteMode) {
+	private int[] adaptPlan(PlanImpl planPreviousDay, PlanImpl plan, int cntTime, int cntRouteMode) {
 		int planElementIndex = 0;
 		ActivityImpl previousAct = null;
 		ActivityImpl previousActPreviousDay = null;
