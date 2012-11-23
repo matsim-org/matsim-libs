@@ -116,21 +116,25 @@ public class TransitRouterImpl implements TransitRouter {
 
 		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
+		
 		if (directWalkCost < pathCost) {
-			List<Leg> legs = new ArrayList<Leg>();
-			Leg leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
-			Route walkRoute = new GenericRouteImpl(null, null);
-			leg.setRoute(walkRoute);
-			leg.setTravelTime(walkTime);
-			legs.add(leg);
-			return legs;
+			return this.createDirectWalkLegList(fromCoord, toCoord);
 		}
-
-		return convert( departureTime, p, fromCoord, toCoord ) ;
+		return convertPathToLegList( departureTime, p, fromCoord, toCoord ) ;
 	}
 
-	protected List<Leg> convert( double departureTime, Path p, Coord fromCoord, Coord toCoord ) {
+	private List<Leg> createDirectWalkLegList(Coord fromCoord, Coord toCoord){
+		List<Leg> legs = new ArrayList<Leg>();
+		Leg leg = new LegImpl(TransportMode.transit_walk);
+		double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+		Route walkRoute = new GenericRouteImpl(null, null);
+		leg.setRoute(walkRoute);
+		leg.setTravelTime(walkTime);
+		legs.add(leg);
+		return legs;
+	}
+	
+	protected List<Leg> convertPathToLegList( double departureTime, Path p, Coord fromCoord, Coord toCoord ) {
 		// yy there could be a better name for this method.  kai, apr'10
 
 		// now convert the path back into a series of legs with correct routes
