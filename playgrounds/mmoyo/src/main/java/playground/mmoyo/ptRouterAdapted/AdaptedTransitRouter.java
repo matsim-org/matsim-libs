@@ -133,7 +133,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 			}
 		}
 
-		return convert( departureTime, p, fromCoord, toCoord ) ;
+		return convertPathToLegList( departureTime, p, fromCoord, toCoord ) ;
 	}
 
 	/**necessary to override since it uses a different algo than marcel.  kai, apr'10
