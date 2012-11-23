@@ -148,6 +148,8 @@ class ExternalControler {
 				
 				InternalControler internalControler = new InternalControler(sc, directoryExtItParam2Param1, this.fare);
 				internalControler.run();
+				
+				deleteUnnecessaryInternalIterations(directoryExtItParam2Param1+"/internalIterations/ITERS/", sc.getConfig().controler().getFirstIteration(), sc.getConfig().controler().getLastIteration()); 
 	
 				operator.setParametersForExtIteration(this.capacity, this.numberOfBuses);
 				users.setParametersForExtIteration(sc);
@@ -192,7 +194,7 @@ class ExternalControler {
 				textWriter.writeWaitDataPerPerson(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				textWriter.writeLoadData1(directoryExtItParam2Param1, this.extIt2information, extItParam1);
 				textWriter.writeLoadData2(directoryExtItParam2Param1, this.extIt2information, extItParam1);
-				chartWriter.write(directoryExtItParam2, this.extIt2information);
+//				chartWriter.write(directoryExtItParam2, this.extIt2information);
 								
 				// settings for next external iteration (optimization parameter 1)
 				if (extItParam1 < lastExternalIterationParam1){
@@ -239,6 +241,25 @@ class ExternalControler {
 
 //	***************************************************************************************************************************
 	
+	private void deleteUnnecessaryInternalIterations(String itersPath, int firstIt, int lastIt) {
+		log.info("Deleting unnecessary internal iteration output files...");
+		for (int i = firstIt; i < lastIt ; i++){
+			File path = new File(itersPath + "it." + i);
+			deleteTree(path);
+		}
+		log.info("Deleting unnecessary internal iteration output files... Done.");
+	}
+
+	private void deleteTree( File path ) {
+	  for ( File file : path.listFiles() )
+	  {
+	    if ( file.isDirectory() )
+	      deleteTree( file );
+	    file.delete();
+	  }
+	  path.delete();
+	}
+
 	private void setDefaultParameters() {
 		if (op1 != null && op2 == null){
 			log.info("Optimization parameter: " + op1 + ". lastExternalIterationParam2 set to 0.");
