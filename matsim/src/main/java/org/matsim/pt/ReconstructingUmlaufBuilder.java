@@ -73,15 +73,19 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 			umlaeufe = new HashMap<Id,Umlauf>();
 			createEmptyUmlaeufe();
 			createUmlaufStuecke();
-			int cnt = 0 ;
-			for (UmlaufStueck umlaufStueck : umlaufStuecke) {
-				Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
-				umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
-				cnt++ ;
-				printStatus(cnt);
-			}
+			createUmlaeufe();
 		}
 		return umlaeufe.values();
+	}
+	
+	private void createUmlaeufe(){
+		int cnt = 0 ;
+		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
+			Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
+			umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
+			cnt++ ;
+			printStatus(cnt);
+		}
 	}
 
 	private void createEmptyUmlaeufe() {
