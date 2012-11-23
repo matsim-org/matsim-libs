@@ -5,8 +5,7 @@
 	elementFormDefault="qualified" version="1.0">
 	<xs:import namespace="http://www.opengis.net/gml"
 		schemaLocation="http://schemas.opengis.net/gml/2.1.2/feature.xsd" />
-	<xs:element name="sim2DEnvironment" type="FeatureCollectionType"
-		substitutionGroup="gml:_FeatureCollection" />
+	<xs:element name="sim2DEnvironment" type="FeatureCollectionType" substitutionGroup="gml:_FeatureCollection"/>
 	<xs:complexType name="FeatureCollectionType">
 		<xs:complexContent>
 			<xs:extension base="gml:AbstractFeatureCollectionType">
@@ -15,7 +14,7 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:element name="sim2dEnvironmentSection" type="sim2dEnvironmentSectionType"  />
+	<xs:element name="sim2dEnvironmentSection" type="sim2dEnvironmentSectionType"  substitutionGroup="gml:_Feature"/>
 	<xs:complexType name="sim2dEnvironmentSectionType">
 		<xs:complexContent>
 			<xs:extension base="gml:AbstractFeatureType">
@@ -48,7 +47,7 @@
 		</xs:annotation>
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
-				<xs:attribute name="integer" type="xs:string" use="required" />
+				<!-- <xs:attribute name="integer" type="xs:string" use="required" />-->
 				<xs:attribute name="vs" type="xs:string" use="optional"
 					default="&#x20;" />
 			</xs:extension>
