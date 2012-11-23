@@ -31,7 +31,7 @@ public class UmlaufInterpolator {
 
 	public void addUmlaufStueckToUmlauf(UmlaufStueck umlaufStueck, Umlauf umlauf) {
 		List<UmlaufStueckI> umlaufStueckeOfThisUmlauf = umlauf.getUmlaufStuecke();
-		if (!umlaufStueckeOfThisUmlauf.isEmpty()) {
+		if (! umlaufStueckeOfThisUmlauf.isEmpty()) {
 			UmlaufStueckI previousUmlaufStueck = umlaufStueckeOfThisUmlauf.get(umlaufStueckeOfThisUmlauf.size() - 1);
 			NetworkRoute previousCarRoute = previousUmlaufStueck.getCarRoute();
 			Id fromLinkId = previousCarRoute.getEndLinkId();

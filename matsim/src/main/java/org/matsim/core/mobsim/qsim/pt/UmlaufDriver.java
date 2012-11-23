@@ -93,7 +93,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
-		PersonImpl driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		PersonImpl driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
 		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
 			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()), transportMode);

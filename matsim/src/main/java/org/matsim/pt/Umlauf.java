@@ -32,7 +32,10 @@ public interface Umlauf extends Identifiable {
 	public Id getVehicleId();
 
 	public void setVehicleId(Id vehicleId);
-
+	/**
+	 * @deprecated as a Umlauf can contain UmlaufStueckI from several Lines. Use getId() instead. dg, nov 2012
+	 */
+	@Deprecated
 	Id getLineId();
 
 }

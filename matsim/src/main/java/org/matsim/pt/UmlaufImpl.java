@@ -54,11 +54,6 @@ public class UmlaufImpl implements Umlauf {
 			if (umlaufStueck.isFahrt()) {
 				if (lineId == null) {
 					lineId = umlaufStueck.getLine().getId();
-				} else {
-					if (!lineId.equals(umlaufStueck.getLine().getId())) {
-						throw new IllegalStateException(
-								"Expected an Umlauf which serves a single line. Got one which serves multiple lines.");
-					}
 				}
 			}
 		}
