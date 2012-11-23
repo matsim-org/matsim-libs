@@ -75,8 +75,8 @@ public class MultiDayControler {
 //		analyzer.analyze(config, outPath, sideLength);
 		
 		Analyzer analyzer = new Analyzer();
-		analyzer.setFinalIterations(finalIterations);
 		analyzer.init(configFile, incomesFile);
+		analyzer.setFinalIterations(finalIterations);
 		analyzer.run();
 		
 		log.info("Week simulated, yep, .................................................................");

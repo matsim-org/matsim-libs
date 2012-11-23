@@ -147,8 +147,8 @@ public class Analyzer {
 			MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 			populationReader.readFile(plansFilePath);						
 			
-			String eventsfile = outPath + "/" + day + "/ITERS/it." + this.config.controler().getLastIteration() +
-					"/" + day + "." + this.config.controler().getLastIteration() + ".events.xml.gz";
+			String eventsfile = outPath + "/" + day + "/ITERS/it." + finalIterations[Surprice.days.indexOf(day)] +
+					"/" + day + "." + finalIterations[Surprice.days.indexOf(day)] + ".events.xml.gz";
 			
 			this.analyzeDay(eventsfile, day, config, utilitiesRelative, utilitiesAbsolute);
 		
