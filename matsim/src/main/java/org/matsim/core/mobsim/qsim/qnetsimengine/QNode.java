@@ -200,7 +200,11 @@ public class QNode implements NetsimNode {
 	}
 
 
-	private void checkNextLinkSemantics(Link currentLink, Link nextLink, QVehicle veh){
+	private void checkNextLinkSemantics(Link currentLink, Id nextLinkId, QLinkInternalI nextQLink, QVehicle veh){
+		if (nextQLink == null){
+			throw new IllegalStateException("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + " plans to travel on that link from link " + veh.getCurrentLink().getId());
+		}
+		Link nextLink = nextQLink.getLink();
 		if (currentLink.getToNode() != nextLink.getFromNode()) {
 			throw new RuntimeException("Cannot move vehicle " + veh.getId() +
 					" from link " + currentLink.getId() + " to link " + nextLink.getId());
@@ -236,7 +240,7 @@ public class QNode implements NetsimNode {
 		}
 
 		QLinkInternalI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
-		this.checkNextLinkSemantics(currentLink, nextQueueLink.getLink(), veh);
+		this.checkNextLinkSemantics(currentLink, nextLinkId, nextQueueLink, veh);
 
 		if (nextQueueLink.hasSpace()) {
 			moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextQueueLink);
