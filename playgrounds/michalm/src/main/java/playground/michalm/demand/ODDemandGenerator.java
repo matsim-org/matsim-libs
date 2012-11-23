@@ -130,13 +130,10 @@ public class ODDemandGenerator
                         plan.addLeg(pf.createLeg(TransportMode.car));
                     }
 
-                    // searches for the destinationLink until it is different from the startLink
-                    Activity endActivity = null;
-                    do {
-                        Coord dCoord = getRandomCoordInZone(dZone);
-                        endActivity = createActivity(plan, "dummy", dCoord, startAct.getLinkId());
-                    }
-                    while (endActivity == null);
+                    Coord dCoord = getRandomCoordInZone(dZone);
+                    Activity endAct = createActivity(plan, "dummy", dCoord);
+                    
+                    createAndInitPerson(plan);
                 }
             }
         }

@@ -88,6 +88,8 @@ public class DemandGenerator
 
                 act = createActivity(plan, "h", home);
                 act.setStartTime(19 * 3600 + timeShift);
+
+                createAndInitPerson(plan);
             }
 
             // W - workers: h-w-l-h
@@ -147,6 +149,8 @@ public class DemandGenerator
                     act = createActivity(plan, "h", home);
                     act.setStartTime(20 * 3600 + timeShift);
                 }
+                
+                createAndInitPerson(plan);
             }
 
             // O - others: h-l-h
@@ -170,6 +174,8 @@ public class DemandGenerator
 
                 act = createActivity(plan, "h", home);
                 act.setStartTime(16 * 3600 + timeShift);
+                
+                createAndInitPerson(plan);
             }
         }
     }

@@ -139,15 +139,20 @@ public class AbstractDemandGenerator
 
     Plan createPlan()
     {
+        return pf.createPlan();
+    }
+
+
+    Person createAndInitPerson(Plan plan)
+    {
         String strId = Integer.toString(id);
         id++;
 
         Person person = pf.createPerson(scenario.createId(strId));
-        scenario.getPopulation().addPerson(person);
-
-        Plan plan = pf.createPlan();
         person.addPlan(plan);
-        return plan;
+
+        scenario.getPopulation().addPerson(person);
+        return person;
     }
 
 
