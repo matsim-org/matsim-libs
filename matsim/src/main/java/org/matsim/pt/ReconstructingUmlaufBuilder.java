@@ -78,14 +78,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 				Umlauf umlauf = umlaeufe.get(umlaufStueck.getDeparture().getVehicleId());
 				umlaufInterpolator.addUmlaufStueckToUmlauf(umlaufStueck, umlauf);
 				cnt++ ;
-				if ( cnt%100==0 ) {
-					System.out.print('.');
-					System.out.flush();
-				}
-				if ( cnt%10000==0 ) {
-					System.out.println();
-					System.out.flush();
-				}
+				printStatus(cnt);
 			}
 		}
 		return umlaeufe.values();
@@ -109,18 +102,22 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route, departure);
 					umlaufStuecke.add(umlaufStueck);
 					cnt++ ;
-					if ( cnt%100==0 ) {
-						System.out.print('.');
-						System.out.flush();
-					}
-					if ( cnt%10000==0 ) {
-						System.out.println();
-						System.out.flush();
-					}
+					printStatus(cnt);
 				}
 			}
 		}
 		Collections.sort(this.umlaufStuecke, departureTimeComparator);
+	}
+	
+	private void printStatus(int cnt){
+		if ( cnt%100==0 ) {
+			System.out.print('.');
+			System.out.flush();
+		}
+		if ( cnt%10000==0 ) {
+			System.out.println();
+			System.out.flush();
+		}
 	}
 
 }
