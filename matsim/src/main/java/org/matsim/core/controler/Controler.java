@@ -293,6 +293,8 @@ public class Controler extends AbstractController {
 				this.config = ConfigUtils.loadConfig(this.configFileName);
 				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			}
+			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
+			"See later for config dump after setup.");
 			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		}
 		this.network = this.scenarioData.getNetwork();
@@ -310,9 +312,6 @@ public class Controler extends AbstractController {
 	 * Starts the iterations.
 	 */
 	public void run() {
-		checkConfigConsistencyAndWriteToLog("Complete config dump directly after reading the config file.  " +
-				"See later for config dump after setup.");
-
 		/*
 		 * use writeEventsInterval from config file, only if not already
 		 * initialized programmatically
@@ -334,30 +333,30 @@ public class Controler extends AbstractController {
 		run(config);
 	}
 
-	/**
-	 * Design decisions:
-	 * <ul>
-	 * <li>I extracted this method since it is now called <i>twice</i>: once
-	 * directly after reading, and once before the iterations start. The second
-	 * call seems more important, but I wanted to leave the first one there in
-	 * case the program fails before that config dump. Might be put into the
-	 * "unexpected shutdown hook" instead. kai, dec'10
-	 * </ul>
-	 *
-	 * @param message
-	 *            the message that is written just before the config dump
-	 */
-	protected final void checkConfigConsistencyAndWriteToLog(final String message) {
-		log.info(message);
-		String newline = System.getProperty("line.separator");// use native line endings for logfile
-		StringWriter writer = new StringWriter();
-		new ConfigWriter(this.scenarioData.getConfig()).writeStream(new PrintWriter(writer), newline);
-		log.info(newline + newline + writer.getBuffer().toString());
-		log.info("Complete config dump done.");
-		log.info("Checking consistency of config...");
-		this.scenarioData.getConfig().checkConsistency();
-		log.info("Checking consistency of config done.");
-	}
+//	/**
+//	 * Design decisions:
+//	 * <ul>
+//	 * <li>I extracted this method since it is now called <i>twice</i>: once
+//	 * directly after reading, and once before the iterations start. The second
+//	 * call seems more important, but I wanted to leave the first one there in
+//	 * case the program fails before that config dump. Might be put into the
+//	 * "unexpected shutdown hook" instead. kai, dec'10
+//	 * </ul>
+//	 *
+//	 * @param message
+//	 *            the message that is written just before the config dump
+//	 */
+//	protected static final void checkConfigConsistencyAndWriteToLog(final Config config, final String message) {
+//		log.info(message);
+//		String newline = System.getProperty("line.separator");// use native line endings for logfile
+//		StringWriter writer = new StringWriter();
+//		new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
+//		log.info(newline + newline + writer.getBuffer().toString());
+//		log.info("Complete config dump done.");
+//		log.info("Checking consistency of config...");
+//		config.checkConsistency();
+//		log.info("Checking consistency of config done.");
+//	}
 
 	private final void setupMultiModalSimulation() {
 		log.info("setting up multi modal simulation");

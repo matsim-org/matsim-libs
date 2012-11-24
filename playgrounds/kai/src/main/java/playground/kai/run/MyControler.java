@@ -45,11 +45,12 @@ class MyControler {
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
 		
-		// prepare the scenario
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+//		// prepare the scenario
+//		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		// not needed as long as one does not change anything here.
 
 		// prepare the control(l)er:
-		Controler controler = new Controler( scenario ) ;
+		Controler controler = new Controler( config ) ;
 		controler.setOverwriteFiles(true) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());

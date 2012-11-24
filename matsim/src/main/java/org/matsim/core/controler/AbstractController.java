@@ -85,7 +85,7 @@ public abstract class AbstractController {
 	protected final void run(Config config) {
 		loadCoreListeners();
 		this.controlerListenerManager.fireControlerStartupEvent();
-		this.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
+		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
 		prepareForSim();
 		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
 		shutdown(false);
@@ -171,7 +171,7 @@ public abstract class AbstractController {
 	 * @param message
 	 *            the message that is written just before the config dump
 	 */
-	protected final void checkConfigConsistencyAndWriteToLog(Config config,
+	protected static final void checkConfigConsistencyAndWriteToLog(Config config,
 			final String message) {
 				log.info(message);
 				String newline = System.getProperty("line.separator");// use native line endings for logfile
