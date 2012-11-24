@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
+package tutorial.unsupported.example50WithinDayReplanningFromPlans;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;

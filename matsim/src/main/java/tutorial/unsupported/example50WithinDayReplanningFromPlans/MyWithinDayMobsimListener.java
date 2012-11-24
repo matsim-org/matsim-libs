@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
+package tutorial.unsupported.example50WithinDayReplanningFromPlans;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,7 +53,7 @@ import org.matsim.withinday.utils.EditRoutes;
  * @author nagel
  *
  */
-public class MyWithinDayMobsimListener2 implements MobsimListener, MobsimBeforeSimStepListener {
+public class MyWithinDayMobsimListener implements MobsimListener, MobsimBeforeSimStepListener {
     private static final Logger log = Logger.getLogger("dummy");
 
 	
@@ -62,7 +62,7 @@ public class MyWithinDayMobsimListener2 implements MobsimListener, MobsimBeforeS
 	private PlansCalcRoute routeAlgo ;
 	private Scenario scenario;
 
-	MyWithinDayMobsimListener2 (TravelDisutility travelCostCalculator, TravelTime travelTimeCalculator ) {
+	MyWithinDayMobsimListener (TravelDisutility travelCostCalculator, TravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}

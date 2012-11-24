@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
+package tutorial.unsupported.example50WithinDayReplanningFromPlans;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -42,9 +42,6 @@ public class MyMobsimFactory implements MobsimFactory {
 	private TravelDisutility travCostCalc;
 	private TravelTime travTimeCalc;
 
-	private enum ReplanningType { general, carPlans }
-	private ReplanningType replanningType = ReplanningType.general ;
-
 	MyMobsimFactory(TravelDisutility travelCostCalculator, TravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
@@ -62,11 +59,8 @@ public class MyMobsimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
-		if ( replanningType.equals( ReplanningType.general ) ) {
-			qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
-		} else if ( replanningType.equals( ReplanningType.carPlans ) ) {
-			qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener2(this.travCostCalc,this.travTimeCalc)) ;
-		}
+		qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
+
 		ExperimentalBasicWithindayAgentFactory fac = new ExperimentalBasicWithindayAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), fac, qSim);
 		qSim.addAgentSource(agentSource);		
