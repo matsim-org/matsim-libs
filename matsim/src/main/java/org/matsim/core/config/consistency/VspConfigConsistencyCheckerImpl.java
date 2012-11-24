@@ -79,9 +79,9 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 //			problem = true ;
 			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This will be more strictly" +
 					" enforced in the future. This means you have to add the following lines to your config file: ") ;
-			System.out.println("<module name=\"TimeAllocationMutator\">");
-			System.out.println("	<param name=\"mutationRange\" value=\"7200.0\" />");
-			System.out.println("</module>");
+			log.warn("<module name=\"TimeAllocationMutator\">");
+			log.warn("	<param name=\"mutationRange\" value=\"7200.0\" />");
+			log.warn("</module>");
 		}
 		
 		// added before nov'12
@@ -109,9 +109,9 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			log.warn("You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
 					"problems during paper writing.) This will be more strictly "
 					+ " enforced in the future. This means you have to add the following lines to your config file: ") ;
-			System.out.println("<module name=\"planCalcScore\">");
-			System.out.println("	<param name=\"BrainExpBeta\" value=\"1.0\" />");
-			System.out.println("</module>");
+			log.warn("<module name=\"planCalcScore\">");
+			log.warn("	<param name=\"BrainExpBeta\" value=\"1.0\" />");
+			log.warn("</module>");
 		}
 		
 		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel)
