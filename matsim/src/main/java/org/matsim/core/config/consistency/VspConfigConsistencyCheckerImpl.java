@@ -113,7 +113,8 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			System.out.println("</module>");
 		}
 		
-		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals( VspExperimentalConfigGroup.ABORT ) ) {
+		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel)
+				.equals( VspExperimentalConfigGroup.ABORT ) ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
 			log.fatal( str ) ; 
 			throw new RuntimeException( str ) ;
