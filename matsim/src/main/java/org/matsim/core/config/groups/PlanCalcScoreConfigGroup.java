@@ -384,6 +384,11 @@ public class PlanCalcScoreConfigGroup extends Module {
 			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() > 0.001)) {
 				hasOpeningTimeAndLatePenalty = true;
 			}
+			if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
+				log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
+						"time set to 24:00. This is most probably not the same as not setting them at all.  " +
+						"In particular, activities which extend past midnight may not accumulate scores.") ;
+			}
 		}
 		if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
 			log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n\n"
