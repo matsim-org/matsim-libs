@@ -28,7 +28,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
-import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -45,12 +44,11 @@ class MyControler {
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
 		
-//		// prepare the scenario
-//		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		// not needed as long as one does not change anything here.
+		// prepare the scenario
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
 		// prepare the control(l)er:
-		Controler controler = new Controler( config ) ;
+		Controler controler = new Controler( scenario ) ;
 		controler.setOverwriteFiles(true) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
