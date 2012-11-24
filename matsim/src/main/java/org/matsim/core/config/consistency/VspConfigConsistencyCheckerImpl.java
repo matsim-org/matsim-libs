@@ -74,6 +74,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			log.warn("did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 		
+		// added before nov'12
 		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
 //			problem = true ;
 			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This will be more strictly" +
@@ -83,12 +84,14 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			System.out.println("</module>");
 		}
 		
+		// added before nov'12
 		if ( !config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 //			problem = true ;
 			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.  This will be more strictly" +
 					" enforced in the future.") ;
 		}
 		
+		// added before nov'12
 		if (VspExperimentalConfigGroup.ActivityDurationInterpretation.endTimeOnly
 				.compareTo(config.vspExperimental().getActivityDurationInterpretation()) == 0 
 				&& config.scenario().isUseTransit()) {
@@ -99,6 +102,16 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
 		// todo
+		
+		// use beta_brain=1 // added as of nov'12
+		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
+//			problem = true ;
+			log.warn("You are using a brainExpBeta != 1; vsp default is 1.  This will be more strictly "
+					+ " enforced in the future. This means you have to add the following lines to your config file: ") ;
+			System.out.println("<module name=\"planCalcScore\">");
+			System.out.println("	<param name=\"BrainExpBeta\" value=\"1.0\" />");
+			System.out.println("</module>");
+		}
 		
 		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).equals( VspExperimentalConfigGroup.ABORT ) ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
