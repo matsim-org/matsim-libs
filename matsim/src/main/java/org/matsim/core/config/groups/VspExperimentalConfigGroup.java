@@ -248,6 +248,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 //				map.put(key.toString(), "comment") ;
 				break;
 			case scoreMSAStartsAtIteration:
+				map.put(key.toString(), "first iteration of MSA score averaging. The matsim theory department " +
+						"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
 				break;
 			case vspDefaultsCheckingLevel:
 				break;

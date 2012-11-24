@@ -188,10 +188,10 @@ LinkEnterEventHandler, TravelledEventHandler {
 			if (oldScore == null) {
 				plan.setScore(score);
 			} else {
-				if ( this.scoreMSAstartsAtIteration == null || this.iteration <= this.scoreMSAstartsAtIteration ) {
+				if ( this.scoreMSAstartsAtIteration == null || this.iteration < this.scoreMSAstartsAtIteration ) {
 					plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
 				} else {
-					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration) ;
+					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
 					plan.setScore( alpha * score + (1.-alpha) * oldScore ) ;
 					// the above is some variant of MSA (method of successive
 					// averages). It is not the same as MSA since
@@ -201,7 +201,7 @@ LinkEnterEventHandler, TravelledEventHandler {
 					// still diverges in the same way as 1/x
 					// when integrated, so MSA should still converge to the
 					// correct result. kai, oct'12
-					// yyyy this has never been tested, and there is no test case.  :-(  kai, oct'12
+					// yyyy this has never been tested with scenarios.  At least there is a test case  :-(  kai, oct'12
 				}
 			}
 

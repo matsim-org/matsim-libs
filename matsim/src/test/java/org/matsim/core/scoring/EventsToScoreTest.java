@@ -90,6 +90,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 			events.resetHandlers(mockIteration) ;
 
+			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
 			events.processEvent(new AgentMoneyEvent(3600.0, person.getId(), mockIteration-98 ));
 			
 			e2s.finish() ;
@@ -101,13 +102,16 @@ public class EventsToScoreTest extends MatsimTestCase {
 				assertEquals(1.0, person.getSelectedPlan().getScore() ) ;
 				break ;
 			case 100:
+				// first MSA iteration; plain score should be ok:
 				assertEquals(2.0, person.getSelectedPlan().getScore() ) ;
 				break ;
 			case 101:
-				assertEquals(3.0, person.getSelectedPlan().getScore() ) ;
+				// second MSA iteration: (2+3)/2 = 2.5:
+				assertEquals(2.5, person.getSelectedPlan().getScore() ) ;
 				break ;
 			case 102:
-				assertEquals(3.5, person.getSelectedPlan().getScore() ) ;
+				// 3rd MSA iteration: (2+3+4)/3 = 3:
+				assertEquals(3.0, person.getSelectedPlan().getScore() ) ;
 				break ;
 			}
 			
