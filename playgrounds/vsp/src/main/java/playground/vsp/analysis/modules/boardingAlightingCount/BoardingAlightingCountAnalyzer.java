@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -33,6 +35,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -49,15 +52,22 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	private static final Logger log = Logger
 			.getLogger(BoardingAlightingCountAnalyzer.class);
 	private BoardAlightEventHandler handler;
-	private Map<Id, Double> boardTotal;
-	private Map<Id, Double> alightTotal;
+//	private Map<Id, Double> boardUnclassifiedTotal;
+//	private Map<Id, Double> alightUnclassifiedTotal;
+//	private Map<Id, Double> boardStartTotal;
+//	private Map<Id, Double> alightEndTotal;
+//	private Map<Id, Double> boardSwitchSTotal;
+//	private Map<Id, Double> alightSwitchTotal;
+	
 	private Map<Id, TransitStopFacility> stops;
 	private boolean writeHeatMaps = false;
-	private HashMap<String, HeatMap> heatMaps;
+	private SortedMap<String, HeatMap> heatMaps;
 	private Integer gridSize = Integer.MAX_VALUE;
+	private SortedMap<String, Map<Id, Double>> totals;
 
 	/**
-	 * Counts number of boarding and alighting per stop and interval.
+	 * Counts number of boarding and alighting per stop/interval. and differs between boardings 
+	 * at the beginning or in the middle of a trip and alightings in the middle or at the end of trip.
 	 * 
 	 * @param sc, the scenario containing the transitStops
 	 * @param interval, interval-size in seconds
@@ -68,6 +78,11 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 		this.stops = sc.getTransitSchedule().getFacilities();
 	}
 	
+	/**
+	 * a simple heatmap will be created for the total counts with a number of @heatMapgridSize at the longer side.
+	 * @param b
+	 * @param heatMapGridSize
+	 */
 	public void setWriteHeatMaps(boolean b, int heatMapGridSize){
 		this.writeHeatMaps = b;
 		this.gridSize  = heatMapGridSize;
@@ -87,63 +102,51 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		this.createTotals();
 		if(this.writeHeatMaps){
-			createHeatMapGeometries();
+			this.heatMaps = new TreeMap<String, HeatMap>();
+		}
+		this.totals = new TreeMap<String, Map<Id, Double>>();
+		for(Entry<String, Counts> e: this.handler.getClassification2Counts().entrySet()){
+			totals.put(e.getKey() + "Total", this.createTotals(e.getValue(), e.getKey()));
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private void createHeatMapGeometries() {
-		//TODO[dr]
-		this.heatMaps = new HashMap<String, HeatMap>();
+	private Map<Id, Double> createTotals(Counts counts, String name) {
+		//TODO[dr] create HeatMaps for timeslots
+		// count totals
+		Map<Id, Double> totals = new HashMap<Id, Double>();
+		Double total;
+		for(Count c: counts.getCounts().values()){
+			total = new Double(0.);
+			for(Volume v: c.getVolumes().values()){
+				total += v.getValue();
+			}
+			totals.put(c.getLocId(), total);
+		}
+		if(this.writeHeatMaps){
+			createHeatMapTotals(totals, name + "Totals");
+		}
+		return totals;
+	}
+	
+	/**
+	 * 
+	 */
+	private void createHeatMapTotals(Map<Id, Double> totals, String name) {
 		HeatMap heatmap;
 		//create for boarding all
 		heatmap = new HeatMap(this.gridSize);
-		for(Entry<Id, Double> e: this.boardTotal.entrySet()){
+		for(Entry<Id, Double> e: totals.entrySet()){
 			Coord coord = this.stops.get(e.getKey()).getCoord();
 			heatmap.addValue(coord, e.getValue());
 		}
 		heatmap.createHeatMap();
-		this.heatMaps.put("boardingAll", heatmap);
-		//create for alighting all
-		heatmap = new HeatMap(this.gridSize);
-		for(Entry<Id, Double> e: this.alightTotal.entrySet()){
-			Coord coord = this.stops.get(e.getKey()).getCoord();
-			heatmap.addValue(coord, e.getValue());
-		}
-		heatmap.createHeatMap();
-		this.heatMaps.put("alightingAll", heatmap);
-		//total
-		//TODO[dr] create for timeSlots
+		this.heatMaps.put(name, heatmap);
 	}
-
-	/**
-	 * 
-	 */
-	private void createTotals() {
-		// count totals
-		Double total;
-		this.boardTotal = new HashMap<Id, Double>();
-		for(Count c: this.handler.getBoarding().getCounts().values()){
-			total = new Double(0.);
-			for(Volume v: c.getVolumes().values()){
-				total += v.getValue();
-			}
-			this.boardTotal.put(c.getLocId(), total);
-		}
-		
-		this.alightTotal = new HashMap<Id, Double>();
-		for(Count c: this.handler.getAlight().getCounts().values()){
-			total = new Double(0.);
-			for(Volume v: c.getVolumes().values()){
-				total += v.getValue();
-			}
-			this.alightTotal.put(c.getLocId(), total);
-		}
-	}
+	
 
 	@Override
 	public void writeResults(String outputFolder) {
@@ -167,7 +170,10 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	 */
 	private void writeCSV(String outputFolder) {
 		BufferedWriter w;
-		String header = "id;x;y;board;alight;";
+		String header = "id;x;y;";
+		for(String s: this.totals.keySet()){
+			header = header + s + ";";
+		}
 		//write totals
 		w = IOUtils.getBufferedWriter(outputFolder + "total.csv");
 		try {
@@ -176,15 +182,12 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 				w.write(f.getId().toString() + ";");
 				w.write(f.getCoord().getX() + ";");
 				w.write(f.getCoord().getY() + ";");
-				if(this.boardTotal.containsKey(f.getId())){
-					w.write(this.boardTotal.get(f.getId()) + ";");
-				}else{
-					w.write(0. + ";");
-				}
-				if(this.alightTotal.containsKey(f.getId())){
-					w.write(this.alightTotal.get(f.getId()) + ";");
-				}else{
-					w.write(0. + ";");
+				for(Map<Id, Double> total: this.totals.values()){
+					if(total.containsKey(f.getId())){
+						w.write(total.get(f.getId()) + ";");
+					}else{
+						w.write(0. + ";");
+					}	
 				}
 				w.write("\n");
 			}
@@ -195,6 +198,10 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 		}
 		
 		//write timeSlices
+		header = "id;x;y;";
+		for(String s: this.handler.getClassification2Counts().keySet()){
+			header = header + s + ";";
+		}
 		for(int i = 0 ; i < this.handler.getMaxTimeSlice() + 1; i++){
 			w = IOUtils.getBufferedWriter(outputFolder + i +".csv");
 			try {
@@ -204,25 +211,16 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 					w.write(f.getCoord().getX() + ";");
 					w.write(f.getCoord().getY() + ";");
 					//boarding-value
-					Count count = this.handler.getBoarding().getCounts().get(f.getId());
-					if(count == null){
-						w.write(0. + ";");
-					}else{
-						if(count.getVolume(i) == null){
+					for(Counts counts: this.handler.getClassification2Counts().values()){
+						Count count = counts.getCount(f.getId());
+						if(count == null){
 							w.write(0. + ";");
 						}else{
-							w.write(String.valueOf(count.getVolume(i).getValue()) + ";");
-						}
-					}
-					//boarding-value
-					count = this.handler.getAlight().getCounts().get(f.getId());
-					if(count == null){
-						w.write(0. + ";");
-					}else{
-						if(count.getVolume(i) == null){
-							w.write(0. + ";");
-						}else{
-							w.write(String.valueOf(count.getVolume(i).getValue()) + ";");
+							if(count.getVolume(i) == null){
+								w.write(0. + ";");
+							}else{
+								w.write(String.valueOf(count.getVolume(i).getValue()) + ";");
+							}
 						}
 					}
 					w.write("\n");

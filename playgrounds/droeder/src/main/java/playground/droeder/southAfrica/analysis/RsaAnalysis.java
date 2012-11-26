@@ -1,40 +1,32 @@
 package playground.droeder.southAfrica.analysis;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import playground.vsp.analysis.VspAnalyzer;
+import playground.vsp.analysis.modules.act2mode.ActivityToMode;
+import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccesibility;
 import playground.vsp.analysis.modules.ptTripAnalysis.traveltime.TTtripAnalysis;
 import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndPlans;
+import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
 import playground.vsp.analysis.modules.transitVehicleVolume.TransitVehicleVolumeAnalyzer;
-import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 
 
@@ -57,11 +49,8 @@ public class RsaAnalysis {
 //		new MatsimPopulationReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_POPULATION));
 		
 		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "transitScheduleScored.xml.gz"));
-//		if(new File(dir.getIterationFilename(Integer.parseInt(args[2]), "transitSchedule.xml.gz")).exists()){
-//		}else{
-//			new TransitScheduleReader(sc).readFile(dir.getOutputFilename( "0.transitSchedule.xml.gz"));
-//		}
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
+		new MatsimFacilitiesReader((ScenarioImpl) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
 		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(Integer.parseInt(args[2]), "plans.xml.gz"));
 		
 		List<Integer> cluster = new ArrayList<Integer>(){{
@@ -160,6 +149,8 @@ public class RsaAnalysis {
 					new BoardingAlightingCountAnalyzer(sc, 3600);
 		boardingAlightingCountAnalyzes.setWriteHeatMaps(true, Integer.valueOf(args[3]));
 		TransitVehicleVolumeAnalyzer ptVehVolAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600.);
+		TransitSchedule2Shp shp = new TransitSchedule2Shp(sc);
+		ActivityToModeAnalysis atm = new ActivityToModeAnalysis(sc, null, 3600);
 		
 		
 		
@@ -171,6 +162,8 @@ public class RsaAnalysis {
 		analyzer.addAnalysisModule(tripAna);
 		analyzer.addAnalysisModule(boardingAlightingCountAnalyzes);
 		analyzer.addAnalysisModule(ptVehVolAnalyzer);
+		analyzer.addAnalysisModule(shp);
+		analyzer.addAnalysisModule(atm);
 
 		analyzer.run();
 	}
