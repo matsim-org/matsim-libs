@@ -51,7 +51,7 @@ class CtFlightDemandReader {
 				String to = result[1]; // result[1] => Zielflughafen; in Arraylist schreiben
 				int noTrips = Integer.parseInt(result[2]); // result[2] => monatl. Passagierzahl; geteilt durch 30 fuer
 																														// Tageswert (Sep 2010 => 30Tage)
-				FlightODRelation od = new FlightODRelation(from, to, noTrips);
+				FlightODRelation od = new FlightODRelation(from, to, new Double(noTrips));
 				gelesenedaten.add(od);
 			}
 		} catch (FileNotFoundException e) {

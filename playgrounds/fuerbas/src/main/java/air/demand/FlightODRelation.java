@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package air.demand;
 
-class FlightODRelation {
+public class FlightODRelation {
 	
 	private String fromAirportCode;
 	private String toAirportCode;
-	private int numberOfTrips;
+	private Double numberOfTrips = null;
 
-	FlightODRelation(String fromAirportCode, String toAirportCode, int numberOfTrips){
+	public FlightODRelation(String fromAirportCode, String toAirportCode, Double numberOfTrips){
 		this.fromAirportCode = fromAirportCode;
 		this.toAirportCode = toAirportCode;
 		this.numberOfTrips = numberOfTrips;
@@ -42,8 +42,13 @@ class FlightODRelation {
 	}
 
 	
-	public int getNumberOfTrips() {
+	public Double getNumberOfTrips() {
 		return numberOfTrips;
+	}
+
+
+	public void setNumberOfTrips(Double i) {
+		this.numberOfTrips = i;
 	}
 	
 }

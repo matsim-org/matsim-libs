@@ -60,10 +60,10 @@ public class DgCreateDgFlightScenario {
 	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	
-	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_60vph_storage_restriction/";
+	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/";
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
-	private boolean useAirportCapacities = false;
+	private boolean useAirportCapacities = true;
 	public static final boolean useSingleDayOfOperation = true;
 	private String airportCapacityFile = dataBaseDirectory + "shared-svn/projects/throughFlightData/airportCapacityData/2012-08-14_airport_capacity_from_www.csv";
 	

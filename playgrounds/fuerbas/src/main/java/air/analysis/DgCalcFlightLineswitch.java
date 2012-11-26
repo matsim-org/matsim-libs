@@ -56,6 +56,9 @@ public class DgCalcFlightLineswitch implements ActivityEndEventHandler {
 			int ptinteractions = this.personIdPtInteractionMap.get(event.getPersonId());
 			ptinteractions++;
 			this.personIdPtInteractionMap.put(event.getPersonId(), ptinteractions);
+			if (ptinteractions > 3){
+				log.debug(event.getPersonId().toString() + " 5 pt interacts...");
+			}
 		}
 	}
 	
@@ -63,7 +66,7 @@ public class DgCalcFlightLineswitch implements ActivityEndEventHandler {
 		Map<Integer, Integer> noLineSwitchCountMap = new HashMap<Integer, Integer>();
 		for (Entry<Id, Integer> e : this.personIdPtInteractionMap.entrySet()) {
 			if (e.getValue() < 2) {
-				log.warn("Person id " + e.getKey() + " has " + e.getValue() + " pt interactions");
+//				log.warn("Person id " + e.getKey() + " has " + e.getValue() + " pt interactions");
 			}
 			int lineSwitch = e.getValue() - 2;
 			Integer count = noLineSwitchCountMap.get(lineSwitch);
@@ -91,7 +94,7 @@ public class DgCalcFlightLineswitch implements ActivityEndEventHandler {
 	}
 	
 	public static void main(String[] args) {
-		String events = "/home/dgrether/data/work/repos/runs-svn/run1833/ITERS/it.500/1833.500.events.xml.gz";
+		String events = "/home/dgrether/data/work/repos/runs-svn/run1835/ITERS/it.500/1835.500.events.xml.gz";
 		new DgCalcFlightLineswitch().calcLineswitch(events);
 		
 		

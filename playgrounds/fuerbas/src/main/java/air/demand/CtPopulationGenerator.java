@@ -68,7 +68,7 @@ public class CtPopulationGenerator {
 //	private static final String outputPopulation = repos + "shared-svn/studies/countries/de/flight/ct_demand/population.xml.gz";
 	
 	private static final String odDemand = "/media/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/demand_september_2011_tabelle_2.2.2.csv";
-	private static final String outputPopulation = repos + "shared-svn/studies/countries/de/flight/demand/destatis/2011_september/population_september_2011_tabelle_2.2.2.xml.gz";
+	private static final String outputPopulation = repos + "shared-svn/studies/countries/de/flight/demand/destatis/2011_september/population_september_2011_tabelle_2.2.2_new.xml.gz";
 	
 	public static void ctmain(String[] args) {
 		
@@ -80,6 +80,7 @@ public class CtPopulationGenerator {
 	public static void main(String[] args) throws IOException {
 		List<FlightODRelation> demandList = new DgDemandReader().readFile(odDemand);
 		CtPopulationGenerator ctPopGen = new CtPopulationGenerator();
+		DgDemandUtils.convertToDailyDemand(demandList);
 		ctPopGen.createPopulation(demandList);
 	}
 
@@ -96,6 +97,8 @@ public class CtPopulationGenerator {
 	}
 	
 	
+
+	
 	public void createPopulation(List<FlightODRelation> airportdaten){
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(inputNetworkFile);
@@ -105,18 +108,19 @@ public class CtPopulationGenerator {
 		Population population = sc.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
 		int personid_zaehler = 1;
+		String missingFromAirports = "";
+		String missingOdPais = "";
 		for (FlightODRelation od : airportdaten){	
 			String fromLinkIdString = od.getFromAirportCode();
 			Id fromLinkId = sc.createId(fromLinkIdString);
 			Link fromLink = sc.getNetwork().getLinks().get(fromLinkId);
 			if (fromLink == null) {
 				log.warn("Link id " + fromLinkIdString + " not found in network!");
+				missingFromAirports = missingFromAirports + " " + fromLinkIdString;
 				continue;
 			}
 			
-			int aktuellepassagierzahl = od.getNumberOfTrips() / 30;
-			
-			for ( int i=0; i< aktuellepassagierzahl; i++){		// eingangsdatearraynindex+2 ist aktuelle Passagieranzahl
+			for ( int i=0; i< od.getNumberOfTrips(); i++){		// eingangsdatearraynindex+2 ist aktuelle Passagieranzahl
 				String toLinkIdString = od.getToAirportCode();
 				Id toLinkId = sc.createId(toLinkIdString);
 				if (fromLinkIdString.compareTo(toLinkIdString) == 0) {
@@ -125,6 +129,7 @@ public class CtPopulationGenerator {
 				Link destinationLink = sc.getNetwork().getLinks().get(toLinkId);
 				if (destinationLink == null) {	// abfangen von Flughäfen die in den Passagierdaten von DeStatis vorkommen, allerdings nicht im verwendeten Flugnetzwerk vorkommen
 					log.warn("Link id " + fromLinkIdString + " not found in network!");
+					missingOdPais = missingOdPais + " " + fromLinkIdString + " -> " + toLinkIdString; 
 					continue;
 				}
 				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personid_zaehler)));	// ID für aktuellen Passagier
@@ -149,6 +154,8 @@ public class CtPopulationGenerator {
 		}
 		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
 		popWriter.write(outputPopulation);
+		log.info(missingFromAirports);
+		log.info(missingOdPais);
 	}
 	
 	

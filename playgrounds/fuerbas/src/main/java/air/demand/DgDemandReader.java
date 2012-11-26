@@ -52,12 +52,12 @@ public class DgDemandReader {
 				tripsString = tripsString.replace(" ", "");
 				if (tripsString.compareTo("-") != 0) {
 					int trips = Integer.parseInt(tripsString);
-					result.add(new FlightODRelation(fromAirportCode, toAirportCode, trips));
+					result.add(new FlightODRelation(fromAirportCode, toAirportCode, Double.valueOf(trips)));
 					log.info("Read " + trips + " from " + fromAirportCode + " to " + toAirportCode);
 				}
-//				else {
-//					log.info("Skipping " + tripsString + " from " + fromAirportCode + " to " + toAirportCode);
-//				}
+				else {
+					result.add(new FlightODRelation(fromAirportCode, toAirportCode, null));
+				}
 			}
 			line = br.readLine();
 		}
