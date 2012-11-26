@@ -109,7 +109,7 @@ public class DgCreateDgFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);
@@ -125,7 +125,7 @@ public class DgCreateDgFlightScenario {
 
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory,
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory,
 				SfAirScheduleBuilder.EURO_COUNTRIES, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
@@ -141,7 +141,7 @@ public class DgCreateDgFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory,
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory,
 				SfAirScheduleBuilder.GERMAN_COUNTRIES, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 

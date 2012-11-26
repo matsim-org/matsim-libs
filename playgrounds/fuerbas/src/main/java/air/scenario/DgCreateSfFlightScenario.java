@@ -83,7 +83,7 @@ public class DgCreateSfFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
+		airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
 		String outputAirportsFilename = baseDirectory + SfAirScheduleBuilder.AIRPORTS_OUTPUT_FILE;
@@ -106,7 +106,7 @@ public class DgCreateSfFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, 
+		airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory, 
 				SfAirScheduleBuilder.EURO_COUNTRIES, utcOffsetfile, oagFlightsFilename);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
@@ -131,7 +131,7 @@ public class DgCreateSfFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		airScheduleBuilder.filter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.GERMAN_COUNTRIES, 
+		airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory, SfAirScheduleBuilder.GERMAN_COUNTRIES, 
 				utcOffsetfile, oagFlightsFilename);
 
 		String outputNetworkFilename = baseDirectory + "air_network.xml";
