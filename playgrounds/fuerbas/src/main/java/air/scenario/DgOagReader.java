@@ -53,7 +53,7 @@ public class DgOagReader {
 				DgOagLine l = new DgOagLine(lineEntries);
 				ret.add(l);
 			}
-			if (lines % 10000 == 0){
+			if (lines % 50000 == 0){
 				log.info("Read " + lines +  " lines of oag data...");
 			}
 		}

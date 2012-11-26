@@ -30,15 +30,7 @@ public class DgRunCreateFlightScenario {
 	 * Separate main due to eclipse compile problems
 	 */
 	public static void main(String[] args) throws Exception {
-		//WORLD WIDE AIR TRAFFIC
-		new DgCreateDgFlightScenario().createWorldFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, DgCreateDgFlightScenario.inputOagFilename);
-
-		//	//EUROPEAN AIR TRAFFIC
-		new DgCreateDgFlightScenario().createEuropeanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, DgCreateDgFlightScenario.inputOagFilename);
-
-	// GERMAN AIR TRAFFIC
-		new DgCreateDgFlightScenario().createGermanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, DgCreateDgFlightScenario.inputOagFilename);
-	
+		new DgCreateDgFlightScenario().createFlightScenaios();
 	}
 
 }

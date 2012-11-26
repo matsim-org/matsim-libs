@@ -101,8 +101,14 @@ public class SfAirScheduleBuilder {
 		}
 	}
 
+	public void readDataAndFilter(String inputOsmFilename, String inputOagFilename,
+			String baseDirectory, Object countries, String utcOffsetfile, String oagFlightsFilename) {
+		throw new UnsupportedOperationException("load data in this method hor change to new interface");
+	}
+
+
 	@SuppressWarnings("rawtypes")
-	public DgOagFlightsData readDataAndFilter(String inputAirportListFile, String inputOagFile,
+	public DgOagFlightsData readDataAndFilter(String inputAirportListFile, List<DgOagLine> oagLines,
 			String outputDirectory, String[] countries, String utcOffsetInputfile,
 			String oagFlightsOutputFilename) throws Exception {
 		
@@ -111,8 +117,6 @@ public class SfAirScheduleBuilder {
 		this.availableAirportCoordinates = new DgAirportsReader()
 				.loadAirportCoordinates(inputAirportListFile);
 		this.utcOffset = new DgUTCOffsetsReader().loadUtcOffsets(utcOffsetInputfile);
-		
-		List<DgOagLine> oagLines = new DgOagReader().readOagLines(inputOagFile);
 		
 		flights = this.filter(oagLines, outputDirectory, oagFlightsOutputFilename);
 		
@@ -481,6 +485,5 @@ public class SfAirScheduleBuilder {
 		// builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES, UTC_OFFSET_FILE);
 
 	}
-
 
 }
