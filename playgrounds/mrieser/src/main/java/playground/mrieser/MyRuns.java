@@ -23,13 +23,6 @@ package playground.mrieser;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author mrieser
@@ -123,16 +116,16 @@ public class MyRuns {
 
 
 
-		{
-			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimNetworkReader(s).readFile(networkFile);
-			for (Link l : s.getNetwork().getLinks().values()) {
-				l.setCapacity(l.getCapacity() / 10.0);
-			}
-			((NetworkImpl) s.getNetwork()).setCapacityPeriod(3600);
-			new NetworkWriter(s.getNetwork()).write(networkFile);
-		}
-
+//		{
+//			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//			new MatsimNetworkReader(s).readFile(networkFile);
+//			for (Link l : s.getNetwork().getLinks().values()) {
+//				l.setCapacity(l.getCapacity() / 10.0);
+//			}
+//			((NetworkImpl) s.getNetwork()).setCapacityPeriod(3600);
+//			new NetworkWriter(s.getNetwork()).write(networkFile);
+//		}
+//
 
 
 
@@ -156,6 +149,43 @@ public class MyRuns {
 
 //		log.info("done.");
 
+//		System.out.println(Long.MAX_VALUE);
+//		System.out.println(Long.MAX_VALUE / 8);
+//		System.out.println(Long.MAX_VALUE / 8 / 1024);
+//		System.out.println(Long.MAX_VALUE / 8 / 1024 / 1024);
+//		System.out.println(Long.MAX_VALUE / 8 / 1024 / 1024 / 1024);
+//		
+//		System.out.println();
+//		
+//		System.out.println(Integer.MAX_VALUE);
+//		System.out.println(Integer.MAX_VALUE / 8);
+//		System.out.println(Integer.MAX_VALUE / 8 / 1024);
+//		System.out.println(Integer.MAX_VALUE / 8 / 1024 / 1024);
+//		System.out.println(Integer.MAX_VALUE / 8 / 1024 / 1024 / 1024);
+
+		System.out.println(0x00000000000000FFL);
+		System.out.println(0x000000000000FF00L >>> 8);
+		System.out.println(0x0000000000FF0000L >>> 16);
+		System.out.println(0x00000000FF000000L >>> 24);
+		System.out.println(0x000000FF00000000L >>> 32);
+		System.out.println(0x0000FF0000000000L >>> 40);
+		System.out.println(0x00FF000000000000L >>> 48);
+		System.out.println(0xFF00000000000000L >>> 56);
+
+		System.out.println(Long.toBinaryString(1));
+		System.out.println(Long.toBinaryString(82346120));
+		
+		for (int i = 0; i < 64; i++) {
+			System.out.println(Long.toBinaryString(~(1L << i)));
+		}
+		
+		System.out.println(Long.toBinaryString(-6884868992138582017L));
+		System.out.println(Long.toBinaryString(-6884868992138582017L & 0x00000000000000FFL));
+		System.out.println(Long.toBinaryString((-6884868992138582017L & 0x00000000000000FFL) >>> 0));
+
+		long v = 0;
+		v |= 1L << (255 - 192);
+		System.out.println(Long.toBinaryString(v));
 	}
 
 }
