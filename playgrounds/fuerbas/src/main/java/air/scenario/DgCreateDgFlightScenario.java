@@ -53,6 +53,7 @@ public class DgCreateDgFlightScenario {
 	private static final String OAG_FLIGHTS_OUTPUT_FILENAME = "oag_flights.txt";
 	private static final String FLIGHT_TRANSIT_SCHEDULE = "flight_transit_schedule.xml";
 	private static final String FLIGHT_TRANSIT_VEHICLES = "flight_transit_vehicles.xml";
+	private static final String MODEL_STATISTICS_TABLE = "model_statistics.txt";
 
 	private static String dataBaseDirectory = "/media/data/work/repos/";
 	private static String utcOffsetfile = dataBaseDirectory + "shared-svn/studies/countries/world/flight/sf_oag_flight_model/utc_offsets.txt";
@@ -113,6 +114,7 @@ public class DgCreateDgFlightScenario {
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);
+		airScheduleBuilder.writeModelStatisticsTable(baseDirectory + MODEL_STATISTICS_TABLE);
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}	
@@ -130,6 +132,7 @@ public class DgCreateDgFlightScenario {
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);
+		airScheduleBuilder.writeModelStatisticsTable(baseDirectory + MODEL_STATISTICS_TABLE);
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
@@ -146,6 +149,7 @@ public class DgCreateDgFlightScenario {
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);
+		airScheduleBuilder.writeModelStatisticsTable(baseDirectory + MODEL_STATISTICS_TABLE);
 
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}

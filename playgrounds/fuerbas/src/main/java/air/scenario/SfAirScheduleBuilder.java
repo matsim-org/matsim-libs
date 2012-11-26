@@ -90,10 +90,14 @@ public class SfAirScheduleBuilder {
 
 	private int ignoredDueAirportFilter = 0;
 
+	private DgOagFlightsData flights;
+
 	public void setCountryFilter(String[] countries) {
-		this.countryFilter = new HashSet<String>();
-		for (String s : countries){
-			this.countryFilter.add(s.toUpperCase());
+		if (countries != null) {
+			this.countryFilter = new HashSet<String>();
+			for (String s : countries){
+				this.countryFilter.add(s.toUpperCase());
+			}
 		}
 	}
 
@@ -110,7 +114,7 @@ public class SfAirScheduleBuilder {
 		
 		List<DgOagLine> oagLines = new DgOagReader().readOagLines(inputOagFile);
 		
-		DgOagFlightsData flights = this.filter(oagLines, outputDirectory, oagFlightsOutputFilename);
+		flights = this.filter(oagLines, outputDirectory, oagFlightsOutputFilename);
 		
 		this.writeFlightsToFile(flights, oagFlightsOutputFilename);
 		
@@ -138,10 +142,22 @@ public class SfAirScheduleBuilder {
 		log.info("Anzahl der City Pairs: " + this.routeDurationMap.size());
 		log.info("Anzahl der Zeilen die durch den Länderfilter gefiltert wurden: "
 				+ this.ignoredFlightsDueToCountryFilter);
-
 		
 		return flights;
 	}
+	
+	public void writeModelStatisticsTable(String outputFile) throws Exception {
+		String header = "Airports & Airports missing & O-D Pairs & Flights & Missing flights due to missing airports";
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+		writer.write(header);
+		writer.newLine();
+		String line = Integer.toString(this.airportsInModel.size()) + " & " + Integer.toString(this.missingAirportCodes.size()) + " & " 
+		+ this.routeDurationMap.size() + " & " + flights.getFlightDesignatorFlightMap().size() +  " & " + this.ignoredDueMissingAirportCoordinates;
+		writer.write(line);
+		writer.newLine();
+		writer.close();
+	}
+
 
 	private boolean airportCoordinatesAvailable(String originAirport, String destinationAirport,
 			Map<String, Coord> availableAirportCoordinates) {
@@ -161,6 +177,9 @@ public class SfAirScheduleBuilder {
 	}
 
 	private boolean isCountryOfInterest(String originCountry, String destinationCountry) {
+		if (countryFilter == null) {
+			return true;
+		}
 			if (countryFilter.contains(originCountry) || countryFilter.contains(destinationCountry)){
 				return true;
 			}
@@ -462,5 +481,6 @@ public class SfAirScheduleBuilder {
 		// builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES, UTC_OFFSET_FILE);
 
 	}
+
 
 }
