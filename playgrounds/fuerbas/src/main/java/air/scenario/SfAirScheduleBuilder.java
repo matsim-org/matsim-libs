@@ -131,177 +131,162 @@ public class SfAirScheduleBuilder {
 		return line.isCodeshareFlight();
 	}
 
-	public DgOagFlightsData filter(List<DgOagLine> oagLines, String outputDirectory,
+	private boolean isBusOrTrainFlight(DgOagLine line) {
+		String aircraftType = line.getAircraftType();
+		if (aircraftType.equalsIgnoreCase("BUS") // filter busses
+				|| aircraftType.equalsIgnoreCase("RFS") // filter bus/train
+				|| aircraftType.equalsIgnoreCase("TRN")) { // filter trains
+			return true;
+		}
+		return false;
+	}
+
+	private boolean hasOtherBadData(DgOagLine line) {
+		// && seatsAvail > 0 // filter for flights with 1 PAX or more only
+		// && !originAirport.equalsIgnoreCase(destinationAirport)
+		// && (stops < 1) && (duration > 0.) && (fullRouting.length() <= 6)) {
+		if (line.getSeatsAvailable() <= 0
+				|| line.getOriginAirport().equalsIgnoreCase(line.getDestinationAirport())
+				|| line.getStops() < 1 || line.getFlightDurationSeconds() < 0.0
+				|| line.getFullRouting().length() > 6) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isAiportFilterApplying(String originAirport, String destinationAirport) {
+		if ((DgCreateSfFlightScenario.filter.containsKey(destinationAirport) && DgCreateSfFlightScenario.filter
+				.get(destinationAirport).equals(DgCreateSfFlightScenario.Direction.INBOUND))
+				|| (DgCreateSfFlightScenario.filter.containsKey(originAirport) && DgCreateSfFlightScenario.filter
+						.get(originAirport).equals(DgCreateSfFlightScenario.Direction.OUTBOUND))
+				|| (DgCreateSfFlightScenario.filter.containsKey(originAirport) && DgCreateSfFlightScenario.filter
+						.get(originAirport).equals(DgCreateSfFlightScenario.Direction.BOTH))
+				|| (DgCreateSfFlightScenario.filter.containsKey(destinationAirport) && DgCreateSfFlightScenario.filter
+						.get(destinationAirport).equals(DgCreateSfFlightScenario.Direction.BOTH))) {
+			return true;
+		}
+		return false;
+	}
+	
+	private double calculateFlightDurationWithStar(String destinationAirport, double duration){
+		// desired values for STARs can be defined in DgCreateFlightScenario, otherwise default values will be
+		// used
+		if (DgCreateSfFlightScenario.STARoffset.containsKey(destinationAirport)) {
+			duration = duration - (DgCreateSfFlightScenario.STARoffset.get(destinationAirport));
+		}
+		else {
+			duration = duration - DgCreateSfFlightScenario.STARoffset.get("default");
+		}
+		return duration;
+	}
+	
+	private double calculateFlightDuration(DgOagLine l, String route){
+		double duration = l.getFlightDurationSeconds();
+		if (duration > 24.0 * 3600) {
+			log.warn("Flight " + l.getFlightNumber() + " has a duration of " + Time.writeTime(duration)
+					+ " hh:mm:ss that is considered as not realistic, substracting 24 h...");
+			duration -= (24.0 * 3600.0);
+		}
+
+		if (DgCreateSfFlightScenario.doCreateStars) {
+			duration = this.calculateFlightDurationWithStar(l.getDestinationAirport(), duration);
+		}
+
+		if (! this.routeDurationMap.containsKey(route)) {
+			this.routeDurationMap.put(route, duration);
+		}
+		return duration;
+	}
+
+	private DgOagFlightsData filter(List<DgOagLine> oagLines, String outputDirectory,
 			String oagFlightsOutputFilename, Map<String, Coord> availableAirportCoordinates,
 			Map<String, Double> utcOffset2) throws Exception {
 		DgOagFlightsData data = new DgOagFlightsData();
-		int counter = 0;
 		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(oagFlightsOutputFilename)));
 
 		Map<String, String> flights = new HashMap<String, String>();
 
 		for (DgOagLine l : oagLines) {
-			String originCountry = l.getOriginCountry();
-			String destinationCountry = l.getDestinationCountry();
-			String originAirport = l.getOriginAirport();
-			String destinationAirport = l.getDestinationAirport();
-
-			if (!isCountryOfInterest(originCountry, destinationCountry)) {
+			if (!isCountryOfInterest(l.getOriginCountry(), l.getDestinationCountry())) {
 				continue;
 			}
-			if (!airportCoordinatesAvailable(originAirport, destinationAirport,
+			if (!airportCoordinatesAvailable(l.getOriginAirport(), l.getDestinationAirport(),
 					availableAirportCoordinates)) {
 				continue;
 			}
-			if (!isUTCOffsetAvailable(originAirport, destinationAirport)) {
+			if (!isUTCOffsetAvailable(l.getOriginAirport(), l.getDestinationAirport())) {
 				continue;
 			}
 			if (isCodeshareFlight(l)) {
 				continue;
 			}
+			if (isBusOrTrainFlight(l)) {
+				continue;
+			}
 
-			String carrier = l.getCarrier();
 			String flightNumber = l.getFlightNumber();
-			String flightDesignator = carrier + flightNumber;
-			String route = originAirport + "_" + destinationAirport;
+			String flightDesignator = l.getCarrier() + flightNumber;
+			String route = l.getOriginAirport() + "_" + l.getDestinationAirport();
 			// log.debug("route:  " + route);
-			double flightDistance = l.getFlightDistanceMiles() * 1.609344; // statute miles to kilometers
-			double duration = l.getHours() * 3600 + l.getMinutes() * 60;
 			double departureInSec = l.getDepartureTimeSeconds();
-
-			// Getting UTC Offset from separate file which need to be created with SfUtcOffset
-			// log.debug("originAirport: " + originAirport);
-			double utcOffset = this.utcOffset.get(originAirport);
+			double utcOffset = this.utcOffset.get(l.getOriginAirport());
 			departureInSec = departureInSec - utcOffset;
 
 			if (departureInSec < 0) {
 				departureInSec += (24.0 * 3600.0); // shifting flights with departure on previous day in UTC time +24 hours
 			}
-			double stops = l.getStops();
-			String fullRouting = l.getFullRouting();
 
-			String aircraftType = l.getAircraftType();
-			int seatsAvail = l.getSeatsAvailable();
 			char[] opsDays = l.getDaysOfOperation();
-			// filtering days of operation, bus and train segment, flights with stops and duration of zero
-			if (
-			// first two filters currently applied further down
-			// DgCreateDgFlightScenario.useSingleDayOfOperation
-			// && daysOfOperation.contains("2") && //filter for Tuesday flights only
-			!flights.containsKey(flightDesignator)
-					&& seatsAvail > 0 // filter for flights with 1 PAX or more only
-					&& !originAirport.equalsIgnoreCase(destinationAirport)
-					&& !aircraftType.equalsIgnoreCase("BUS") // filter busses
-					&& !aircraftType.equalsIgnoreCase("RFS") // filter bus/train
-					&& !aircraftType.equalsIgnoreCase("TRN") // filter trains
-					&& (stops < 1) && (duration > 0.) && (fullRouting.length() <= 6)) {
 
-				if // filter for desired airports that may be set in DgCreateFlightScenario
-				((!DgCreateSfFlightScenario.doApplyFilter)
-						|| (DgCreateSfFlightScenario.filter.containsKey(destinationAirport) && DgCreateSfFlightScenario.filter
-								.get(destinationAirport).equals(DgCreateSfFlightScenario.Direction.INBOUND))
-						|| (DgCreateSfFlightScenario.filter.containsKey(originAirport) && DgCreateSfFlightScenario.filter
-								.get(originAirport).equals(DgCreateSfFlightScenario.Direction.OUTBOUND))
-						|| (DgCreateSfFlightScenario.filter.containsKey(originAirport) && DgCreateSfFlightScenario.filter
-								.get(originAirport).equals(DgCreateSfFlightScenario.Direction.BOTH))
-						|| (DgCreateSfFlightScenario.filter.containsKey(destinationAirport) && DgCreateSfFlightScenario.filter
-								.get(destinationAirport).equals(DgCreateSfFlightScenario.Direction.BOTH))) {
+			if (hasOtherBadData(l)) {
+				continue;
+			}
+			if (flights.containsKey(flightDesignator)) {
+				log.warn("Flight already exists: " + flightDesignator);
+				continue;
+			}
 
-					if (duration > 24.0 * 3600) {
-						log.warn("Flight " + flightNumber + " has a duration of " + Time.writeTime(duration)
-								+ " hh:mm:ss that is considered as not realistic, substracting 24 h...");
-						duration -= (24.0 * 3600.0);
-					}
-
-					if (DgCreateSfFlightScenario.doCreateStars) {
-						// desired values for STARs can be defined in DgCreateFlightScenario, otherwise default values will be
-						// used
-
-						if (DgCreateSfFlightScenario.STARoffset.containsKey(destinationAirport))
-							duration = duration - (DgCreateSfFlightScenario.STARoffset.get(destinationAirport));
-						else
-							duration = duration - DgCreateSfFlightScenario.STARoffset.get("default");
-					}
-
-					if (!this.routeDurationMap.containsKey(route)) {
-						this.routeDurationMap.put(route, duration);
-					}
-
-					this.cityPairDistance.put(route, flightDistance);
-
-					if ((flightDistance * 1000 / duration) <= 40.)
-						log.debug("too low speed :" + flightDesignator);
-
-					// used to generate Tuesday flights only, for other days change the daysOfOperation filter below to desired
-					// day
-					if (DgCreateDgFlightScenario.useSingleDayOfOperation && this.operatesTuesdays(opsDays)) {
-						bwOag.write(route + "\t" + // TransitRoute
-								route + "_" + carrier + "\t" + // TransitLine
-								flightDesignator + "\t" + // vehicleId
-								departureInSec + "\t" + // departure time in seconds
-								duration + "\t" + // journey time in seconds
-								aircraftType + "\t" + // aircraft type
-								seatsAvail + "\t" + // seats avail
-								flightDistance); // distance in km
-						DgOagFlight dgf = new DgOagFlight(flightDesignator);
-						dgf.setAircraftType(aircraftType);
-						dgf.setCarrier(carrier);
-						dgf.setDepartureTime(departureInSec);
-						dgf.setDuration(duration);
-						dgf.setAircraftType(aircraftType);
-						dgf.setSeatsAvailable(seatsAvail);
-						dgf.setRoute(route);
-						dgf.setDistanceKm(flightDistance);
-						dgf.setOriginCode(originAirport);
-						dgf.setDestinationCode(destinationAirport);
-						data.addFlight(dgf);
-
-						flights.put(flightDesignator, "");
-						bwOag.newLine();
-						counter++;
-						this.airportsInModel.put(originAirport, availableAirportCoordinates.get(originAirport));
-						this.airportsInModel.put(destinationAirport,
-								availableAirportCoordinates.get(destinationAirport));
-					}
-					// used to generate air traffic of an entire week with departures being shifted 24 hours for each day
-					else if (!DgCreateDgFlightScenario.useSingleDayOfOperation) {
-						for (int dayCount = 0; dayCount <= opsDays.length; dayCount++) {
-							flightDesignator = flightDesignator + "_" + opsDays[dayCount];
-							int opsDay = Integer.parseInt(String.valueOf(opsDays[dayCount]));
-							departureInSec = (departureInSec + opsDay * 24 * 3600.) - 24 * 3600.0;
-							bwOag.write(route + "\t" + // TransitRoute
-									route + "_" + carrier + "\t" + // TransitLine
-									flightDesignator + "\t" + // vehicleId
-									departureInSec + "\t" + // departure time in seconds
-									duration + "\t" + // journey time in seconds
-									aircraftType + "\t" + // aircraft type
-									seatsAvail + "\t" + // seats avail
-									flightDistance); // distance in km
-							DgOagFlight dgf = new DgOagFlight(flightDesignator);
-							dgf.setAircraftType(aircraftType);
-							dgf.setCarrier(carrier);
-							dgf.setDepartureTime(departureInSec);
-							dgf.setDuration(duration);
-							dgf.setAircraftType(aircraftType);
-							dgf.setSeatsAvailable(seatsAvail);
-							dgf.setRoute(route);
-							dgf.setDistanceKm(flightDistance);
-							dgf.setOriginCode(originAirport);
-							dgf.setDestinationCode(destinationAirport);
-							data.addFlight(dgf);
-
-							flights.put(flightDesignator, "");
-							bwOag.newLine();
-							counter++;
-							this.airportsInModel.put(originAirport,
-									availableAirportCoordinates.get(originAirport));
-							this.airportsInModel.put(destinationAirport,
-									availableAirportCoordinates.get(destinationAirport));
-						}
-					}
+			if (DgCreateSfFlightScenario.doApplyAirportFilter) {
+				if (! isAiportFilterApplying(l.getOriginAirport(), l.getDestinationAirport())) {
+					continue;
 				}
 			}
 
+			
+			double duration = this.calculateFlightDuration(l, route);
+
+			this.cityPairDistance.put(route, l.getFlightDistanceKm());
+
+			if ((l.getFlightDistanceKm() * 1000 / duration) <= 40.) {
+				log.debug("too low speed :" + flightDesignator);
+			}
+
+			// used to generate Tuesday flights only, for other days change the daysOfOperation filter below to desired
+			// day
+			DgOagFlight dgOagFlight = null;
+			if (DgCreateDgFlightScenario.useSingleDayOfOperation && this.operatesTuesdays(opsDays)) {
+				dgOagFlight = this.createFlight(flightDesignator, departureInSec, duration, route, l);
+				data.addFlight(dgOagFlight);
+				this.writeFlight(dgOagFlight, bwOag);
+				
+				flights.put(flightDesignator, "");
+			}
+			// used to generate air traffic of an entire week with departures being shifted 24 hours for each day
+			else {
+				for (int dayCount = 0; dayCount <= opsDays.length; dayCount++) {
+					flightDesignator = flightDesignator + "_" + opsDays[dayCount];
+					int opsDay = Integer.parseInt(String.valueOf(opsDays[dayCount]));
+					departureInSec = (departureInSec + opsDay * 24 * 3600.) - 24 * 3600.0;
+					
+					dgOagFlight = this.createFlight(flightDesignator, departureInSec, duration, route, l);
+					data.addFlight(dgOagFlight);
+					this.writeFlight(dgOagFlight, bwOag);
+					flights.put(flightDesignator, "");
+					
+				}
+			}
+			this.airportsInModel.put(l.getOriginAirport(), availableAirportCoordinates.get(l.getOriginAirport()));
+			this.airportsInModel.put(l.getDestinationAirport(), 	availableAirportCoordinates.get(l.getDestinationAirport()));
 		}
 
 		bwOag.flush();
@@ -317,10 +302,36 @@ public class SfAirScheduleBuilder {
 		log.info("Anzahl der Airports: " + this.airportsInModel.size());
 		log.info("Anzahl der Airports ohne Coordinaten: " + this.missingAirportCodes.size());
 		log.info("Anzahl der City Pairs: " + this.routeDurationMap.size());
-		log.info("Anzahl der Flüge: " + counter);
+		log.info("Anzahl der Flüge: " + data.getFlightDesignatorFlightMap().size());
 		log.info("Anzahl der Zeilen die durch den Länderfilter gefiltert wurden: "
 				+ this.filteredDueToCountry);
 		return data;
+	}
+	
+	private void writeFlight(DgOagFlight dgOagFlight, BufferedWriter bwOag) throws Exception{
+		bwOag.write(dgOagFlight.getRoute() + "\t" + // TransitRoute
+				dgOagFlight.getRoute() + "_" + dgOagFlight.getCarrier() + "\t" + // TransitLine
+				dgOagFlight.getFlightDesignator() + "\t" + // vehicleId
+				dgOagFlight.getDepartureTime() + "\t" + // departure time in seconds
+				dgOagFlight.getScheduledDuration() + "\t" + // journey time in seconds
+				 dgOagFlight.getAircraftType() + "\t" + // aircraft type
+				 dgOagFlight.getSeatsAvailable() + "\t" + // seats avail
+				 dgOagFlight.getDistanceKm()); // distance in km
+		bwOag.newLine();
+	}
+	
+	private DgOagFlight createFlight(String flightDesignator, double departureInSec, double duration, String route, DgOagLine l){
+		DgOagFlight dgf = new DgOagFlight(flightDesignator);
+		dgf.setAircraftType( l.getAircraftType());
+		dgf.setCarrier(l.getCarrier());
+		dgf.setDepartureTime(departureInSec);
+		dgf.setDuration(duration);
+		dgf.setSeatsAvailable( l.getSeatsAvailable());
+		dgf.setRoute(route);
+		dgf.setDistanceKm(l.getFlightDistanceKm());
+		dgf.setOriginCode(l.getOriginAirport());
+		dgf.setDestinationCode(l.getDestinationAirport());
+		return dgf;
 	}
 
 	private void writeRouteDurations(String outputDirectory) throws IOException {

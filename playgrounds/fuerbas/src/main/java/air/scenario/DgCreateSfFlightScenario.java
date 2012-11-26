@@ -37,7 +37,7 @@ import air.analysis.DgNet2Shape;
 
 public class DgCreateSfFlightScenario {
 	
-	public static final boolean doApplyFilter = false;
+	public static final boolean doApplyAirportFilter = false;
 	public static enum Direction {INBOUND, OUTBOUND, BOTH};
 	public static final Map<String, Direction> filter = new HashMap<String, Direction>();
 	static {

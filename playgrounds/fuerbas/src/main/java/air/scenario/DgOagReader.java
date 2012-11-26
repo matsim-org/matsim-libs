@@ -101,6 +101,10 @@ class DgOagLine{
 		return Double.parseDouble(lineEntries[42]);
 	}
 	
+	public double getFlightDistanceKm(){
+		return this.getFlightDistanceMiles() * 1.609344; // statute miles to kilometers
+	}
+	
 	public double getMinutes(){
 		String minutes = lineEntries[13].substring(3);
 		return Double.parseDouble(minutes);
@@ -126,6 +130,10 @@ class DgOagLine{
 	
 	public String getAircraftType(){
 		return lineEntries[21];
+	}
+	
+	public double getFlightDurationSeconds(){
+		return getHours() * 3600.0 + getMinutes() * 60.0;
 	}
 	
 	public Integer getSeatsAvailable(){
