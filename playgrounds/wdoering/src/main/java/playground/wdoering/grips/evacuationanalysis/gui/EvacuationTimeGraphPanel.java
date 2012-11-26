@@ -37,7 +37,7 @@ import org.jfree.data.statistics.HistogramType;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
-public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
+public class EvacuationTimeGraphPanel extends AbstractDataPanel {
 	
 	private ChartPanel chartPanel;
 
@@ -49,15 +49,15 @@ public class EvacuationTimeGraphPanel extends AbstractGraphPanel {
 	
 	public EvacuationTimeGraphPanel(int width, int height)
 	{
-		this.setGraphSize(width, height);
+		this.setPanelSize(width, height);
 //		this.setBackground(new Color(80,140,220));
 		
-		drawGraph();
+		drawDataPanel();
 	}
 
 	
 	@Override
-	public void drawGraph()
+	public void drawDataPanel()
 	{
 		//if data is not set yet: do nothing
 		if (data==null)

@@ -625,4 +625,11 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		
 	}
 
+
+	public void setColorationMode(ColorationMode mode)
+	{
+		this.colorationMode = mode; 
+		
+	}
+
 }

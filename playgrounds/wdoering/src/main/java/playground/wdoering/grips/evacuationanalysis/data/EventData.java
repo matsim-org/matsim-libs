@@ -22,13 +22,18 @@
 package playground.wdoering.grips.evacuationanalysis.data;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
+
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 
 public class EventData {
 	
@@ -48,6 +53,8 @@ public class EventData {
 	private AttributeData<Color> evacuationTimeVisData;
 	private AttributeData<Color> clearingTimeVisData;
 	private AttributeData<Tuple<Float,Color>> linkUtilizationVisData;
+	
+//	private HashMap<Mode, List<Tuple<Id,String>>> colorClasses;
 	
 	//TODO getLinkUtilization(linkid) -> anz agenten die link verlassen haben
 	
@@ -186,5 +193,42 @@ public class EventData {
 	public void setLinkUtilizationVisData(AttributeData<Tuple<Float,Color>> linkUtilizationVisData) {
 		this.linkUtilizationVisData = linkUtilizationVisData;
 	}
+	
+	public LinkedList<Cell> getCells()
+	{
+		LinkedList<Cell> cells = new LinkedList<Cell>();
+		getCellTree().get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
+		return cells;
+	}
+	
+//	public ArrayList<Tuple<Color,String>> getColorClasses(Mode mode)
+//	{
+//		ArrayList<Tuple<Color,String>> currentColorClasses = new ArrayList<Tuple<Color,String>>(); 
+//		
+//		for (Tuple<Id,String> colorClass : colorClasses.get(mode))
+//		{
+//			Tuple<Color,String> colorStringTuple;
+//			
+//			if (mode.equals(Mode.EVACUATION))
+//				colorStringTuple = new Tuple<Color,String>(evacuationTimeVisData.getAttribute((IdImpl)colorClass.getFirst()), colorClass.getSecond());
+//			else if (mode.equals(Mode.CLEARING))
+//				colorStringTuple = new Tuple<Color,String>(clearingTimeVisData.getAttribute((IdImpl)colorClass.getFirst()),  colorClass.getSecond());
+//			else
+//				colorStringTuple = new Tuple<Color,String>(linkUtilizationVisData.getAttribute((IdImpl)colorClass.getFirst()).getSecond(), colorClass.getSecond());
+//			
+//			currentColorClasses.add(colorStringTuple);
+//		}
+//		
+//		return currentColorClasses;
+//	}
+//
+//	public void setColorClasses(Mode mode, List<Tuple<Id, String>> colorClasses)
+//	{
+//		if (this.colorClasses==null)
+//			this.colorClasses = new HashMap<Mode, List<Tuple<Id,String>>>();
+//		
+//		this.colorClasses.put(mode, colorClasses);
+//	}
+	
 
 }

@@ -18,10 +18,31 @@ import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
 import playground.wdoering.grips.evacuationanalysis.data.EventData;
 
 public class UtilizationVisualizer {
-	
-	public static AttributeData<Tuple<Float,Color>> getVisualData(List<Link> links, EventData data, ColorationMode colorationMode)
+
+	private AttributeData<Tuple<Float,Color>> coloration;
+	private List<Link> links;
+	private EventData data;
+	private ColorationMode colorationMode;
+	private float cellTransparency;
+
+	public UtilizationVisualizer(List<Link> links, EventData eventData, ColorationMode colorationMode, float cellTransparency)
 	{
-		AttributeData<Tuple<Float,Color>> coloration = new AttributeData<Tuple<Float,Color>>();
+		this.links = links;
+		this.data = eventData;
+		this.colorationMode = colorationMode;
+		this.cellTransparency = cellTransparency;
+		processVisualData();
+
+	}
+	
+	public void setColorationMode(ColorationMode colorationMode) {
+		this.colorationMode = colorationMode;
+	}
+	
+
+	public void processVisualData()
+	{
+		coloration = new AttributeData<Tuple<Float,Color>>();
 
 		HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes = data.getLinkLeaveTimes();
 		HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes = data.getLinkEnterTimes();
@@ -35,14 +56,18 @@ public class UtilizationVisualizer {
 				
 				float relUtilization = (((float)enterTimes.size()/(float)data.getMaxUtilization())); 
 				
-				Tuple<Float, Color> currentColoration = new Tuple(relUtilization, Coloration.getColor(relUtilization, colorationMode));
+				Tuple<Float, Color> currentColoration = new Tuple(relUtilization, Coloration.getColor(relUtilization, colorationMode, cellTransparency));
 				coloration.setAttribute((IdImpl)link.getId(), currentColoration);
 				
 			}
 		}
 		
-		return coloration;
 	}
+
+	public AttributeData<Tuple<Float,Color>> getColoration() {
+		return this.coloration;
+	}
+	
 	
 
 }

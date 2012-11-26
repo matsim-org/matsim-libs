@@ -13,29 +13,41 @@ import playground.wdoering.grips.evacuationanalysis.data.EventData;
 
 public class ClearingTimeVisualizer {
 	
-	public static AttributeData<Color> getVisualData(EventData data, ColorationMode colorationMode)
+	private AttributeData<Color> coloration;
+	private EventData data;
+	private ColorationMode colorationMode;
+	private float cellTransparency;
+	
+	public ClearingTimeVisualizer(EventData eventData, ColorationMode colorationMode, float cellTransparency)
 	{
-		AttributeData<Color> coloration = new AttributeData<Color>();
+		this.data = eventData;
+		this.colorationMode = colorationMode;
+		this.cellTransparency = cellTransparency;
+		processVisualData();
+
+	}
+	
+	public void setColorationMode(ColorationMode colorationMode) {
+		this.colorationMode = colorationMode;
+	}
+	
+	public void processVisualData()
+	{
+		coloration = new AttributeData<Color>();
 		
-		LinkedList<Cell> cells = getCells(data);
+		LinkedList<Cell> cells = data.getCells();
 		
 		for (Cell cell : cells)
 		{
 			double relClearingTime = cell.getClearingTime() / data.getMaxClearingTime();
-			coloration.setAttribute(cell.getId(), Coloration.getColor(relClearingTime, colorationMode));
+			coloration.setAttribute(cell.getId(), Coloration.getColor(relClearingTime, colorationMode, cellTransparency));
 		}
 		
-		return coloration;
 	}
 	
-	static LinkedList<Cell> getCells(EventData data)
-	{
-		LinkedList<Cell> cells = new LinkedList<Cell>();
-		data.getCellTree().get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
-		return cells;
+	public AttributeData<Color> getColoration() {
+		return coloration;
 	}
-
-
 	
 
 }

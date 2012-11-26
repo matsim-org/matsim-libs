@@ -116,6 +116,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private double maxClearingTime;
 	
 	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
+	private float cellTransparency;
 	
 
 	public EventHandler(String eventFilename, Scenario sc, double cellSize, Thread readerThread)
@@ -362,7 +363,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		
 		EventData eventData = new EventData(eventName);
 		
-		
 		eventData.setCellTree(cellTree);
 		eventData.setCellSize(cellSize);
 		eventData.setTimeSum(timeSum);
@@ -376,13 +376,24 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		eventData.setMaxClearingTime(maxClearingTime);
 		
 		//set visualization attributes
-		eventData.setEvacuationTimeVisData(EvacuationTimeVisualizer.getVisualData(eventData, this.colorationMode));
-		eventData.setClearingTimeVisData(ClearingTimeVisualizer.getVisualData(eventData, this.colorationMode));
-		eventData.setLinkUtilizationVisData(UtilizationVisualizer.getVisualData(links, eventData, this.colorationMode));
+		setVisualData(eventData);
 		
 		return eventData;
 	}
 	
+	private void setVisualData(EventData eventData)
+	{
+		
+		EvacuationTimeVisualizer eVis = new EvacuationTimeVisualizer(eventData, this.colorationMode, this.cellTransparency); 
+		ClearingTimeVisualizer cVis = new ClearingTimeVisualizer(eventData, this.colorationMode, this.cellTransparency); 
+		UtilizationVisualizer uVis = new UtilizationVisualizer(links, eventData, this.colorationMode, this.cellTransparency); 
+		
+		eventData.setEvacuationTimeVisData(eVis.getColoration());
+		eventData.setClearingTimeVisData(cVis.getColoration());
+		eventData.setLinkUtilizationVisData(uVis.getColoration());
+		
+	}
+
 	private void getClearingTimes()
 	{
 				
@@ -420,6 +431,15 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		}
 	}
 	
+	public void setColorationMode(ColorationMode colorationMode) {
+		this.colorationMode = colorationMode;
+	}
+
+	public void setTransparency(float cellTransparency)
+	{
+		this.cellTransparency = cellTransparency;
+		
+	}
 
 
 }

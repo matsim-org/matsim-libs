@@ -99,9 +99,11 @@ import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 import playground.wdoering.grips.evacuationanalysis.control.EventHandler;
 import playground.wdoering.grips.evacuationanalysis.control.EventReaderThread;
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
+import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
 import playground.wdoering.grips.evacuationanalysis.data.EventData;
-import playground.wdoering.grips.evacuationanalysis.gui.AbstractGraphPanel;
+import playground.wdoering.grips.evacuationanalysis.gui.AbstractDataPanel;
 import playground.wdoering.grips.evacuationanalysis.gui.EvacuationTimeGraphPanel;
+import playground.wdoering.grips.evacuationanalysis.gui.KeyPanel;
 import playground.wdoering.grips.evacuationanalysis.gui.MyMapViewer;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -134,10 +136,10 @@ public class EvacuationAnalysis implements ActionListener{
 	private Polygon areaPolygon;
 	private File currentEventFile;
 	private Thread readerThread;
-	private double cellSize = 100;
+	private double cellSize = 200;
 	private QuadTree<Cell> cellTree;
 	private EventHandler eventHandler;
-	private AbstractGraphPanel graphPanel;
+	private AbstractDataPanel graphPanel;
 	private JPanel controlPanel;
 	private JButton calcButton;
 	private ArrayList<File> eventFiles;
@@ -149,6 +151,10 @@ public class EvacuationAnalysis implements ActionListener{
 	private String itersOutputDir;
 	private boolean firstLoad;
 	private Mode mode = Mode.EVACUATION;
+	private ColorationMode colorationMode = ColorationMode.GREEN_RED;
+	private KeyPanel keyPanel;
+	private JLabel gridSizeLabel;
+	private String cellSizeText = " cell size: ";
 	
 	
 
@@ -235,7 +241,7 @@ public class EvacuationAnalysis implements ActionListener{
 		this.frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		this.blockPanel = new JPanel();
 		this.blockPanel.setLayout(new BoxLayout(this.blockPanel, BoxLayout.Y_AXIS));
-		this.blockPanel.setSize(new Dimension(400, 368));
+		this.blockPanel.setSize(new Dimension(400, 450));
 
 
 		//////////////////////////////////////////////////////////////////////////////
@@ -251,9 +257,12 @@ public class EvacuationAnalysis implements ActionListener{
 		//////////////////////////////////////////////////////////////////////////////
 		
 		this.graphPanel = new EvacuationTimeGraphPanel(360,280);
+		this.keyPanel = new KeyPanel(this.mode, 360,140);
+		this.keyPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
 		this.controlPanel = new JPanel(new GridLayout(7, 3));
-		this.controlPanel.setPreferredSize(new Dimension(360,30));
-		this.controlPanel.setSize(new Dimension(360,30));
+		this.controlPanel.setPreferredSize(new Dimension(360,220));
+		this.controlPanel.setSize(new Dimension(360,220));
 
 		//FIXME: this part is meant to display the graph in another window
 //		JFrame graphFrame = new JFrame();
@@ -266,6 +275,7 @@ public class EvacuationAnalysis implements ActionListener{
 		
 //		this.blockPanel.add(this.panelDescriptions);
 		this.blockPanel.add(graphPanel);
+		this.blockPanel.add(keyPanel);
 		this.blockPanel.add(controlPanel);
 		this.blockPanel.setPreferredSize(new Dimension(360,700));
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -296,18 +306,28 @@ public class EvacuationAnalysis implements ActionListener{
 		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		this.iterationsList = new JComboBox();
 		this.iterationsList.addActionListener(this);
+		this.iterationsList.setActionCommand("changeIteration");
 		this.iterationsList.setPreferredSize(new Dimension(220,24));
 		iterationSelectionPanel.add(new JLabel(" event file: ", SwingConstants.RIGHT));
 		iterationSelectionPanel.add(this.iterationsList);
 		
 		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		this.gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 1, 100, (int)this.cellSize);
+		this.gridSizeSlider = new JSlider(JSlider.HORIZONTAL, 100, 600, (int)this.cellSize);
+		this.gridSizeSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				updateCellSize( ((JSlider)(e.getSource())).getValue()  );
+			}
+		});
+		
 //		this.gridSizeSlider.setActionCommand("changeIteration");
 //		this.gridSizeSlider.addActionListener(this);
 //		this.gridSizeSlider.addKeyListener(new TypeNumber());
 		this.gridSizeSlider.setPreferredSize(new Dimension(220,24));
-		gridSizeSelectionPanel.add(new JLabel(" grid size: ", SwingConstants.RIGHT));
+		
+		gridSizeLabel = new JLabel(cellSizeText + "200m ", SwingConstants.RIGHT);
+		gridSizeSelectionPanel.add(gridSizeLabel);
 		gridSizeSelectionPanel.add(this.gridSizeSlider);
 		
 		JPanel modeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -372,6 +392,13 @@ public class EvacuationAnalysis implements ActionListener{
 
 	}
 	
+	protected void updateCellSize(int value)
+	{
+		this.cellSize = value;
+		this.gridSizeLabel.setText(cellSizeText + value + "m* ");
+		
+	}
+
 	public void updateTransparency(float transparency)
 	{
 		this.cellTransparency = transparency;
@@ -450,7 +477,6 @@ public class EvacuationAnalysis implements ActionListener{
 				//get all available events 
 				eventFiles = getAvailableEventFiles(this.itersOutputDir);
 				
-				
 				//check if empty
 				if (eventFiles.isEmpty())
 				{
@@ -488,6 +514,10 @@ public class EvacuationAnalysis implements ActionListener{
 			readEvents();
 			if (this.jMapViewer != null)
 				this.jMapViewer.repaint();
+			
+			if (this.gridSizeLabel.getText().contains("*"))
+				this.gridSizeLabel.setText(cellSizeText  + (int)this.cellSize + "m ");
+			
 		}
 
 		if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) 
@@ -552,6 +582,9 @@ public class EvacuationAnalysis implements ActionListener{
 		//get data from eventhandler (if not null)
 		if (eventHandler!=null)
 		{
+			eventHandler.setColorationMode(this.colorationMode);
+			eventHandler.setTransparency(this.cellTransparency);
+			
 			//get data
 			EventData data = eventHandler.getData();
 			
@@ -598,6 +631,7 @@ public class EvacuationAnalysis implements ActionListener{
 		}
 		this.jMapViewer.setCenterPosition(getNetworkCenter());
 		this.jMapViewer.setZoom(2);
+		this.jMapViewer.setColorationMode(this.colorationMode);
 		this.compositePanel.repaint();
 	}
 
