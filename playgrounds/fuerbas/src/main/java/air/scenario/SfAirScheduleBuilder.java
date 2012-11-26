@@ -20,10 +20,8 @@
 
 package air.scenario;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -62,31 +60,87 @@ public class SfAirScheduleBuilder {
 
 	private static final String MISSING_AIRPORTS = "missing_airports.txt";
 
-	private int filteredDueToCountry = 0;
+	private static final char two = '2';
 
+	
+	
 	private Map<String, Coord> airportsInModel = new HashMap<String, Coord>();
 	private Map<String, Double> routeDurationMap = new HashMap<String, Double>();
 	private Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
 	private Set<String> missingAirportCodes = new HashSet<String>();
 
-	private String[] countryFilter = null;
+	private Set<String> countryFilter = null;
+
+	private int ignoredBusOrTrainFlights = 0;
+
+	private int ignoredFlightsDueToCountryFilter = 0;
+	private int ignoredDueMissingAirportCoordinates = 0;
+
+	private int ignoredDueToBadData = 0;
+
+	private int ignoredCodeshareFlights = 0;
+	
+	private int ignoredDueToUTCOffsetMissing = 0;
+
+	private Map<String, Coord> availableAirportCoordinates;
+
+
+	private int ignoredDueDuplicatedEntry = 0;
+
+	private int ignoredDueAirportFilter = 0;
 
 	public void setCountryFilter(String[] countries) {
-		this.countryFilter = countries;
+		this.countryFilter = new HashSet<String>();
+		for (String s : countries){
+			this.countryFilter.add(s.toUpperCase());
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	public DgOagFlightsData readDataAndFilter(String inputAirportListFile, String inputOagFile,
 			String outputDirectory, String[] countries, String utcOffsetInputfile,
 			String oagFlightsOutputFilename) throws Exception {
-		Map<String, Coord> availableAirportCoordinates = new DgAirportsReader()
+		
+		this.setCountryFilter(countries);
+		
+		this.availableAirportCoordinates = new DgAirportsReader()
 				.loadAirportCoordinates(inputAirportListFile);
-		Map<String, Double> utcOffset = new DgUTCOffsetsReader().loadUtcOffsets(utcOffsetInputfile);
-		this.countryFilter = countries;
+		this.utcOffset = new DgUTCOffsetsReader().loadUtcOffsets(utcOffsetInputfile);
+		
 		List<DgOagLine> oagLines = new DgOagReader().readOagLines(inputOagFile);
-		return this.filter(oagLines, outputDirectory, oagFlightsOutputFilename,
-				availableAirportCoordinates, utcOffset);
+		
+		DgOagFlightsData flights = this.filter(oagLines, outputDirectory, oagFlightsOutputFilename);
+		
+		this.writeFlightsToFile(flights, oagFlightsOutputFilename);
+		
+		// produce some more output
+		this.writeAirportsInModel(outputDirectory);
+
+		this.writeRouteDurations(outputDirectory);
+
+		this.writeMissingAirports(outputDirectory);
+
+		log.info("Anzahl der Zeilen/Flüge im OAG file: " + oagLines.size());
+		log.info("Anzahl der Flüge im Modell: " + flights.getFlightDesignatorFlightMap().size());
+		log.info("Anzahl der gefilterten Flüge: " + (this.ignoredFlightsDueToCountryFilter + this.ignoredBusOrTrainFlights + this.ignoredCodeshareFlights + 
+				this.ignoredDueMissingAirportCoordinates + this.ignoredDueToBadData + this.ignoredDueToUTCOffsetMissing));
+		log.info("Anzahl der Airports: " + this.airportsInModel.size());
+		log.info("Anzahl der Coordinaten für Airports: " + this.availableAirportCoordinates.size());
+		log.info("Anzahl der Airports ohne Coordinaten: " + this.missingAirportCodes.size());
+		log.info("Anzahl der Flüge, die aufgrund fehlender UTC Offsets weggelassen wurden: " + this.ignoredDueToUTCOffsetMissing);
+		log.info("Anzahl der Flüge, die aufgrund fehlender Coordinaten weggelassen wurden: " + this.ignoredDueMissingAirportCoordinates);
+		log.info("Anzahl an Bus/Zug Flügen " + this.ignoredBusOrTrainFlights);
+		log.info("Anzahl der Codeshare-Flüge: " + this.ignoredCodeshareFlights);
+		log.info("Anzahl schlechte Daten: " + this.ignoredDueToBadData);
+		log.info("Anzahl der doppelten Flugnummern: " + this.ignoredDueDuplicatedEntry);
+		log.info("Anzahl der durch den AirportFilter entfernten Flüge: " + this.ignoredDueAirportFilter);
+		log.info("Anzahl der City Pairs: " + this.routeDurationMap.size());
+		log.info("Anzahl der Zeilen die durch den Länderfilter gefiltert wurden: "
+				+ this.ignoredFlightsDueToCountryFilter);
+
+		
+		return flights;
 	}
 
 	private boolean airportCoordinatesAvailable(String originAirport, String destinationAirport,
@@ -94,41 +148,44 @@ public class SfAirScheduleBuilder {
 		if (!availableAirportCoordinates.containsKey(originAirport)) {
 			log.warn("No coordinates for Airport: " + originAirport);
 			this.missingAirportCodes.add(originAirport);
+			this.ignoredDueMissingAirportCoordinates++;
 			return false;
 		}
 		if (!availableAirportCoordinates.containsKey(destinationAirport)) {
 			log.warn("No coordinates for Airport: " + destinationAirport);
 			this.missingAirportCodes.add(destinationAirport);
+			this.ignoredDueMissingAirportCoordinates++;
 			return false;
 		}
 		return true;
 	}
 
 	private boolean isCountryOfInterest(String originCountry, String destinationCountry) {
-		if (countryFilter != null) {
-			if (!(checkCountry(originCountry, countryFilter) || checkCountry(destinationCountry,
-					countryFilter))) {// either origin country or destination country
-				// log.info("Neither origin country: " + originCountry + " nor destination country: " + destinationCountry +
-				// " matches filter.");
-				// log.info("skipping flight from " + originAirport + " to " + destinationAirport);
-				filteredDueToCountry++;
-				return false;
+			if (countryFilter.contains(originCountry) || countryFilter.contains(destinationCountry)){
+				return true;
 			}
-		}
-		return true;
+//				 log.info("Neither origin country: " + originCountry + " nor destination country: " + destinationCountry +
+//				 " matches filter.");
+				// log.info("skipping flight from " + originAirport + " to " + destinationAirport);
+				ignoredFlightsDueToCountryFilter++;
+		return false;
 	}
-
+	
 	private boolean isUTCOffsetAvailable(String originAirport, String destinationAirport) {
-		if (!(this.utcOffset.containsKey(originAirport) && this.utcOffset
-				.containsKey(destinationAirport))) {
-			log.warn("No UTC Offset found for airport " + originAirport + " or " + destinationAirport);
-			return false;
+		if ( this.utcOffset.containsKey(originAirport) && this.utcOffset.containsKey(destinationAirport)) {
+			return true;
 		}
-		return true;
+		this.ignoredDueToUTCOffsetMissing++;
+		log.warn("No UTC Offset found for airport " + originAirport + " or " + destinationAirport);
+		return false;
 	}
 
 	private boolean isCodeshareFlight(DgOagLine line) {
-		return line.isCodeshareFlight();
+		if (line.isCodeshareFlight()){
+			this.ignoredCodeshareFlights++;
+			return true;
+		}
+		return false;
 	}
 
 	private boolean isBusOrTrainFlight(DgOagLine line) {
@@ -136,6 +193,7 @@ public class SfAirScheduleBuilder {
 		if (aircraftType.equalsIgnoreCase("BUS") // filter busses
 				|| aircraftType.equalsIgnoreCase("RFS") // filter bus/train
 				|| aircraftType.equalsIgnoreCase("TRN")) { // filter trains
+			this.ignoredBusOrTrainFlights ++;
 			return true;
 		}
 		return false;
@@ -147,8 +205,9 @@ public class SfAirScheduleBuilder {
 		// && (stops < 1) && (duration > 0.) && (fullRouting.length() <= 6)) {
 		if (line.getSeatsAvailable() <= 0
 				|| line.getOriginAirport().equalsIgnoreCase(line.getDestinationAirport())
-				|| line.getStops() < 1 || line.getFlightDurationSeconds() < 0.0
+				|| line.getStops() > 1 || line.getFlightDurationSeconds() <= 0.0
 				|| line.getFullRouting().length() > 6) {
+			this.ignoredDueToBadData++;
 			return true;
 		}
 		return false;
@@ -197,66 +256,80 @@ public class SfAirScheduleBuilder {
 		}
 		return duration;
 	}
+	
+	private void writeFlightsToFile(DgOagFlightsData flightsData, String oagFlightsOutputFilename) throws Exception {
+		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(oagFlightsOutputFilename)));
+		for (DgOagFlight flight : flightsData.getFlightDesignatorFlightMap().values()){
+			this.writeFlight(flight, bwOag);
+		}
+		bwOag.flush();
+		bwOag.close();
+
+	}
 
 	private DgOagFlightsData filter(List<DgOagLine> oagLines, String outputDirectory,
-			String oagFlightsOutputFilename, Map<String, Coord> availableAirportCoordinates,
-			Map<String, Double> utcOffset2) throws Exception {
+			String oagFlightsOutputFilename) throws Exception {
 		DgOagFlightsData data = new DgOagFlightsData();
-		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(oagFlightsOutputFilename)));
-
-		Map<String, String> flights = new HashMap<String, String>();
 
 		for (DgOagLine l : oagLines) {
+			boolean skipLine = false;
 			if (!isCountryOfInterest(l.getOriginCountry(), l.getDestinationCountry())) {
 				continue;
-			}
-			if (!airportCoordinatesAvailable(l.getOriginAirport(), l.getDestinationAirport(),
-					availableAirportCoordinates)) {
-				continue;
-			}
-			if (!isUTCOffsetAvailable(l.getOriginAirport(), l.getDestinationAirport())) {
-				continue;
+//				skipLine = true;
 			}
 			if (isCodeshareFlight(l)) {
+//				skipLine = true;
 				continue;
 			}
 			if (isBusOrTrainFlight(l)) {
+//				skipLine = true;
 				continue;
 			}
-
-			String flightNumber = l.getFlightNumber();
-			String flightDesignator = l.getCarrier() + flightNumber;
-			String route = l.getOriginAirport() + "_" + l.getDestinationAirport();
-			// log.debug("route:  " + route);
-			double departureInSec = l.getDepartureTimeSeconds();
-			double utcOffset = this.utcOffset.get(l.getOriginAirport());
-			departureInSec = departureInSec - utcOffset;
-
-			if (departureInSec < 0) {
-				departureInSec += (24.0 * 3600.0); // shifting flights with departure on previous day in UTC time +24 hours
-			}
-
-			char[] opsDays = l.getDaysOfOperation();
-
-			if (hasOtherBadData(l)) {
-				continue;
-			}
-			if (flights.containsKey(flightDesignator)) {
+			String flightDesignator = l.getCarrier() + l.getFlightNumber();
+			if (data.getFlightDesignatorFlightMap().containsKey(flightDesignator)) {
 				log.warn("Flight already exists: " + flightDesignator);
+				this.ignoredDueDuplicatedEntry++;
+//				skipLine = true;
 				continue;
 			}
 
 			if (DgCreateSfFlightScenario.doApplyAirportFilter) {
 				if (! isAiportFilterApplying(l.getOriginAirport(), l.getDestinationAirport())) {
+					this.ignoredDueAirportFilter++;
+//					skipLine = true;
 					continue;
 				}
+			}
+			//the filters below are relevant for detection of data accuracy for data that is not provided by oag
+			//--> skipLine instead of continue
+			if (!airportCoordinatesAvailable(l.getOriginAirport(), l.getDestinationAirport(),
+					availableAirportCoordinates)) {
+				skipLine = true;
+			}
+			if (!isUTCOffsetAvailable(l.getOriginAirport(), l.getDestinationAirport())) {
+				skipLine = true;
+			}
+			if (hasOtherBadData(l)) {
+				skipLine = true;
+			}
+			if (skipLine){
+				continue;
+			}
+			
+
+			String route = l.getOriginAirport() + "_" + l.getDestinationAirport();
+			// log.debug("route:  " + route);
+			double departureInSec = l.getDepartureTimeSeconds();
+			double utcOffset = this.utcOffset.get(l.getOriginAirport());
+			departureInSec = departureInSec - utcOffset;
+			if (departureInSec < 0) {
+				departureInSec += (24.0 * 3600.0); // shifting flights with departure on previous day in UTC time +24 hours
 			}
 
 			
 			double duration = this.calculateFlightDuration(l, route);
 
 			this.cityPairDistance.put(route, l.getFlightDistanceKm());
-
 			if ((l.getFlightDistanceKm() * 1000 / duration) <= 40.) {
 				log.debug("too low speed :" + flightDesignator);
 			}
@@ -264,15 +337,17 @@ public class SfAirScheduleBuilder {
 			// used to generate Tuesday flights only, for other days change the daysOfOperation filter below to desired
 			// day
 			DgOagFlight dgOagFlight = null;
-			if (DgCreateDgFlightScenario.useSingleDayOfOperation && this.operatesTuesdays(opsDays)) {
-				dgOagFlight = this.createFlight(flightDesignator, departureInSec, duration, route, l);
-				data.addFlight(dgOagFlight);
-				this.writeFlight(dgOagFlight, bwOag);
-				
-				flights.put(flightDesignator, "");
+			if (DgCreateDgFlightScenario.useSingleDayOfOperation) {
+				if (this.operatesTuesdays(l.getDaysOfOperation())){
+					dgOagFlight = this.createFlight(flightDesignator, departureInSec, duration, route, l);
+					data.addFlight(dgOagFlight);
+					this.airportsInModel.put(l.getOriginAirport(), availableAirportCoordinates.get(l.getOriginAirport()));
+					this.airportsInModel.put(l.getDestinationAirport(), 	availableAirportCoordinates.get(l.getDestinationAirport()));
+				}
 			}
 			// used to generate air traffic of an entire week with departures being shifted 24 hours for each day
 			else {
+				char[] opsDays = l.getDaysOfOperation();
 				for (int dayCount = 0; dayCount <= opsDays.length; dayCount++) {
 					flightDesignator = flightDesignator + "_" + opsDays[dayCount];
 					int opsDay = Integer.parseInt(String.valueOf(opsDays[dayCount]));
@@ -280,31 +355,12 @@ public class SfAirScheduleBuilder {
 					
 					dgOagFlight = this.createFlight(flightDesignator, departureInSec, duration, route, l);
 					data.addFlight(dgOagFlight);
-					this.writeFlight(dgOagFlight, bwOag);
-					flights.put(flightDesignator, "");
-					
+					this.airportsInModel.put(l.getOriginAirport(), availableAirportCoordinates.get(l.getOriginAirport()));
+					this.airportsInModel.put(l.getDestinationAirport(), 	availableAirportCoordinates.get(l.getDestinationAirport()));
+	
 				}
 			}
-			this.airportsInModel.put(l.getOriginAirport(), availableAirportCoordinates.get(l.getOriginAirport()));
-			this.airportsInModel.put(l.getDestinationAirport(), 	availableAirportCoordinates.get(l.getDestinationAirport()));
 		}
-
-		bwOag.flush();
-		bwOag.close();
-
-		// produce some more output
-		this.writeAirportsInModel(outputDirectory);
-
-		this.writeRouteDurations(outputDirectory);
-
-		this.writeMissingAirports(outputDirectory);
-
-		log.info("Anzahl der Airports: " + this.airportsInModel.size());
-		log.info("Anzahl der Airports ohne Coordinaten: " + this.missingAirportCodes.size());
-		log.info("Anzahl der City Pairs: " + this.routeDurationMap.size());
-		log.info("Anzahl der Flüge: " + data.getFlightDesignatorFlightMap().size());
-		log.info("Anzahl der Zeilen die durch den Länderfilter gefiltert wurden: "
-				+ this.filteredDueToCountry);
 		return data;
 	}
 	
@@ -348,8 +404,8 @@ public class SfAirScheduleBuilder {
 	}
 
 	private boolean operatesTuesdays(char[] opsDays) {
-		for (char c : opsDays) {
-			if ("2".equals(c)) {
+		for (Character c : opsDays) {
+			if (two == c) {
 				return true;
 			}
 		}
@@ -381,28 +437,9 @@ public class SfAirScheduleBuilder {
 		bwOsm.close();
 	}
 
-	private static boolean checkCountry(String originCountry, String[] countries) {
-		for (int i = 0; i < countries.length; i++) {
-			if (countries[i].equalsIgnoreCase(originCountry)) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	public Map<String, Coord> getAirportCoordMap() {
 		return this.airportsInModel;
-	}
-
-	private void getUtcOffsetMap(String inputfile) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(new File(inputfile)));
-		while (br.ready()) {
-			String oneLine = br.readLine();
-			String[] lineEntries = new String[2];
-			lineEntries = oneLine.split("\t");
-			this.utcOffset.put(lineEntries[0], Double.parseDouble(lineEntries[1]));
-		}
-		br.close();
 	}
 
 	public static void main(String[] args) throws Exception {

@@ -44,7 +44,7 @@ public class DgUTCOffsetsReader {
 		while (brUtc.ready()) {
 			String line = brUtc.readLine();
 			String[] entries = line.split("\t");
-			String airportCode = entries[0];
+			String airportCode = entries[0].trim();
 			double offset = Double.parseDouble(entries[1]);
 			utcOffset.put(airportCode, offset);
 		}
