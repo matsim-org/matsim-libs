@@ -28,7 +28,7 @@ package playground.ikaddoura.busCorridorPaper.analyze;
  */
 public class AnaMain {
 
-	private String runFolder = "/Users/Ihab/Desktop/RUN/";
+	private String runFolder = "/Users/Ihab/Desktop/RUN2/";
 //	private String runFolder = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/output/A_TC_10000/";
 
 	
@@ -40,9 +40,10 @@ public class AnaMain {
 	private void run() {
 		ExtItOutputAnalyzer dataReader = new ExtItOutputAnalyzer(runFolder);
 		dataReader.loadData();
-		dataReader.loadWelfareDensityData();
-//		dataReader.writeWelfareData("/Users/Ihab/Desktop/RUN/");
-		dataReader.writeDensityData("/Users/Ihab/Desktop/RUN/");
+		dataReader.loadParameterData();
+		dataReader.writeGlobalMaxWelfareMatrix(runFolder);
+//		dataReader.writeNumberOfBuses2optimalFareFrequency(runFolder);
+		dataReader.writeFare2optimalNumberOfBusesFrequency(runFolder);
 	}
 
 }

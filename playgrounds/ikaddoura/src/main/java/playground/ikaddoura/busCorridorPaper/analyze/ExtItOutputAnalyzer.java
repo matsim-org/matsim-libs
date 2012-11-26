@@ -44,7 +44,10 @@ import org.apache.log4j.Logger;
 public class ExtItOutputAnalyzer {
 	private static final Logger log = Logger.getLogger(ExtItOutputAnalyzer.class);
 	private Map<Integer, Map<Integer, ExtItAnaInfo>> runNr2itNr2ana = new HashMap<Integer, Map <Integer, ExtItAnaInfo>>();
-	private Map<Integer, MaxWelfareData> runNr2maxWelfareData = new HashMap<Integer, MaxWelfareData>();
+	private Map<Integer, MaxWelfareData> runNr2globalMaxWelfareData = new HashMap<Integer, MaxWelfareData>();
+	private Map<Integer, List<Double>> numberOfBuses2optFare = new HashMap<Integer, List<Double>>();
+	private Map<Double, List<Integer>> fare2optBusNr = new HashMap<Double, List<Integer>>();
+
 	private List<Integer> numberOfBuses = new ArrayList<Integer>();
     private List<Double> fares = new ArrayList<Double>();
 	private String runFolder;
@@ -206,26 +209,19 @@ public class ExtItOutputAnalyzer {
 		return avg;
 	}
 
-	public void loadWelfareDensityData() {
+	public void writeGlobalMaxWelfareMatrix(String outputPath) {
 		for (Integer runNr : this.runNr2itNr2ana.keySet()){
 			
-	    	// find optimal point for this run
+	    	// find global max. point for this run
 			Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
 			double maxWelfareFare = 0.;
 			int maxWelfareNumberOfBuses = 0;
-			double minWelfareFare = 0.;
-			int minWelfareNumberOfBuses = 0;
 			double maxWelfare = Double.NEGATIVE_INFINITY;
-			double minWelfare = Double.POSITIVE_INFINITY;
 	    	for (Integer it : itNr2ana.keySet()){
 	    		if (itNr2ana.get(it).getWelfare() > maxWelfare){
 	    			maxWelfare = itNr2ana.get(it).getWelfare();
 	    			maxWelfareFare = itNr2ana.get(it).getFare();
 	    			maxWelfareNumberOfBuses = itNr2ana.get(it).getNumberOfBuses();
-	    		} else if (itNr2ana.get(it).getWelfare() < minWelfare){
-	    			minWelfare = itNr2ana.get(it).getWelfare();
-	    			minWelfareFare = itNr2ana.get(it).getFare();
-	    			minWelfareNumberOfBuses = itNr2ana.get(it).getNumberOfBuses();
 	    		} else if (itNr2ana.get(it).getWelfare() == maxWelfare) {
 	    			throw new RuntimeException("Oups, exactly the same welfare found in two iterations. Don't know what to do. Aborting...");
 	    		}	
@@ -233,36 +229,17 @@ public class ExtItOutputAnalyzer {
 	    	MaxWelfareData maxWelfareData = new MaxWelfareData();
 	    	maxWelfareData.setRunNr(runNr);
 	    	maxWelfareData.setMaxWelfare(maxWelfare);
-	    	maxWelfareData.setMinWelfare(minWelfare);
 	    	maxWelfareData.setMaxWelfareFare(maxWelfareFare);
-	    	maxWelfareData.setMinWelfareFare(minWelfareFare);
 	    	maxWelfareData.setMaxWelfareNumberOfBuses(maxWelfareNumberOfBuses);
-	    	maxWelfareData.setMinWelfareNumberOfBuses(minWelfareNumberOfBuses);
 	    
-	    	this.runNr2maxWelfareData.put(runNr, maxWelfareData);
-	    	
-	    } 
-	}
-
-	public void writeDensityData(String outputPath) {
+	    	this.runNr2globalMaxWelfareData.put(runNr, maxWelfareData);
+	    }
+		
 		log.info("Writing analysis output...");
-		File file = new File(outputPath + "maxWelfareDensity.txt");
+		File file = new File(outputPath + "runNr2globalMaxWelfareMatrix.txt");
 		   
 	    try {
 	    bw = new BufferedWriter(new FileWriter(file));
-
-	    Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
-    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
-	    	int nrOfBuses = firstRunItNr2ana.get(iteration).getNumberOfBuses();
-	    	double fare = firstRunItNr2ana.get(iteration).getFare();
-	    	if (!this.numberOfBuses.contains(nrOfBuses)){
-	    		this.numberOfBuses.add(nrOfBuses);
-	    	}
-	    	
-	    	if (!this.fares.contains(fare)){
-	    		this.fares.add(fare);
-	    	}
-	    }
 
 	    for (Double d : this.fares){
 	    	String fare = String.valueOf(-1 * d);
@@ -284,22 +261,168 @@ public class ExtItOutputAnalyzer {
 	    bw.close();
 	    log.info("Textfile written to "+file.toString());
     
-	    } catch (IOException e) {}				
+	    } catch (IOException e) {}	
 	}
 
 	private Map<Double, Integer> getFare2frequency(int numberOfBuses) {
 		Map<Double, Integer> fare2frequency = new HashMap<Double, Integer>();
 		for (Double fare : this.fares){
 			int frequencyThisFare = 0;
-			for (MaxWelfareData maxWelfareData : this.runNr2maxWelfareData.values()){
+			for (MaxWelfareData maxWelfareData : this.runNr2globalMaxWelfareData.values()){
 				if (maxWelfareData.getMaxWelfareFare() == fare && maxWelfareData.getMaxWelfareNumberOfBuses() == numberOfBuses){
 					frequencyThisFare++;
 				}
 			}
-			System.out.println(fare + " . " + frequencyThisFare);
 			fare2frequency.put(fare, frequencyThisFare);
 		}
 		return fare2frequency;
+	}
+
+	public void loadParameterData() {
+		Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
+    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
+	    	int nrOfBuses = firstRunItNr2ana.get(iteration).getNumberOfBuses();
+	    	double fare = firstRunItNr2ana.get(iteration).getFare();
+	    	if (!this.numberOfBuses.contains(nrOfBuses)){
+	    		this.numberOfBuses.add(nrOfBuses);
+	    	}
+	    	
+	    	if (!this.fares.contains(fare)){
+	    		this.fares.add(fare);
+	    	}
+	    }
+	}
+
+	public void writeNumberOfBuses2optimalFareFrequency(String outputPath) {
+		
+    	// find welfare maximizing fare for each number of buses
+		
+		for (Integer nrOfBuses : this.numberOfBuses){
+			List<Double> optFares = null;
+			for (Integer runNr : this.runNr2itNr2ana.keySet()){
+				if (numberOfBuses2optFare.get(nrOfBuses) == null){
+					optFares = new ArrayList<Double>();
+				} else {
+					optFares = numberOfBuses2optFare.get(nrOfBuses);
+				}
+				Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+				double maxWelfareFare = 0.;
+				double maxWelfare = Double.NEGATIVE_INFINITY;
+		    	for (Integer it : itNr2ana.keySet()){
+		    		if (itNr2ana.get(it).getWelfare() > maxWelfare && itNr2ana.get(it).getNumberOfBuses() == nrOfBuses){
+		    			maxWelfare = itNr2ana.get(it).getWelfare();
+		    			maxWelfareFare = itNr2ana.get(it).getFare();
+		    		} else if (itNr2ana.get(it).getWelfare() == maxWelfare && itNr2ana.get(it).getNumberOfBuses() == nrOfBuses) {
+		    			throw new RuntimeException("Oups, exactly the same welfare found in two iterations. Don't know what to do. Aborting...");
+		    		}	
+				}
+		    	optFares.add(maxWelfareFare);
+		    	numberOfBuses2optFare.put(nrOfBuses, optFares);
+		    }
+		}
+		
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "busNumber2welfareMaxFare.txt");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    
+	    bw.write("Number of buses");
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(" ; " + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	System.out.println("buses: " + nrOfBuses);
+
+		    for (Double fare : this.fares){
+		    	System.out.println("fare: " + fare);
+		    	int fareCounter = 0;
+		    	
+		    	for (Double welfareMaxFare : this.numberOfBuses2optFare.get(nrOfBuses)){
+			    	System.out.println("welfareMaxFare: " + welfareMaxFare);
+		    		if (welfareMaxFare.doubleValue() == fare.doubleValue()) {
+		    			System.out.println("equal!");
+		    			fareCounter++;
+		    		}
+		    	}
+		    	bw.write(" ; " + fareCounter);
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}	
+	}
+
+	public void writeFare2optimalNumberOfBusesFrequency(String outputPath) {
+		// find welfare maximizing bus number for each fare
+		
+		for (Double fare : this.fares){
+			List<Integer> optBusNr = null;
+			for (Integer runNr : this.runNr2itNr2ana.keySet()){
+				if (this.fare2optBusNr.get(fare) == null){
+					optBusNr = new ArrayList<Integer>();
+				} else {
+					optBusNr = this.fare2optBusNr.get(fare);
+				}
+				Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+				int maxWelfareBusNr = 0;
+				double maxWelfare = Double.NEGATIVE_INFINITY;
+		    	for (Integer it : itNr2ana.keySet()){
+		    		if (itNr2ana.get(it).getWelfare() > maxWelfare && itNr2ana.get(it).getFare() == fare){
+		    			maxWelfare = itNr2ana.get(it).getWelfare();
+		    			maxWelfareBusNr = itNr2ana.get(it).getNumberOfBuses();
+		    		} else if (itNr2ana.get(it).getWelfare() == maxWelfare && itNr2ana.get(it).getFare() == fare) {
+		    			throw new RuntimeException("Oups, exactly the same welfare found in two iterations. Don't know what to do. Aborting...");
+		    		}	
+				}
+		    	optBusNr.add(maxWelfareBusNr);
+		    	fare2optBusNr.put(fare, optBusNr);
+		    }
+		}
+		
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "fare2welfareMaxBusNumber.txt");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    
+	    bw.write("Fare (AUD)");
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(" ; " + nrOfBuses);
+	    }
+	    
+	    bw.newLine();
+	    
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(fare.toString());
+
+		    for (Integer busNr : this.numberOfBuses){
+		    	int busNrCounter = 0;
+		    	
+		    	for (Integer welfareMaxBusNr : this.fare2optBusNr.get(d)){
+		    		if (welfareMaxBusNr.doubleValue() == busNr.doubleValue()) {
+		    			busNrCounter++;
+		    		}
+		    	}
+		    	bw.write(" ; " + busNrCounter);
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}	
 	}
 	
 }

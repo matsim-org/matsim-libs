@@ -32,9 +32,6 @@ public class MaxWelfareData {
 	private int maxWelfareNumberOfBuses;
 	private double maxWelfareFare;
 	private double maxWelfare;
-	private double minWelfare;
-	private int minWelfareNumberOfBuses;
-	private double minWelfareFare;
 	
 	public int getMaxWelfareNumberOfBuses() {
 		return maxWelfareNumberOfBuses;
@@ -53,24 +50,6 @@ public class MaxWelfareData {
 	}
 	public void setMaxWelfare(double maxWelfare) {
 		this.maxWelfare = maxWelfare;
-	}
-	public double getMinWelfare() {
-		return minWelfare;
-	}
-	public void setMinWelfare(double minWelfare) {
-		this.minWelfare = minWelfare;
-	}
-	public int getMinWelfareNumberOfBuses() {
-		return minWelfareNumberOfBuses;
-	}
-	public void setMinWelfareNumberOfBuses(int minWelfareNumberOfBuses) {
-		this.minWelfareNumberOfBuses = minWelfareNumberOfBuses;
-	}
-	public double getMinWelfareFare() {
-		return minWelfareFare;
-	}
-	public void setMinWelfareFare(double minWelfareFare) {
-		this.minWelfareFare = minWelfareFare;
 	}
 	public int getRunNr() {
 		return runNr;
