@@ -20,6 +20,7 @@
 package air.scenario;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -102,15 +103,27 @@ public class DgCreateDgFlightScenario {
 		writeConnectionData(baseDirectory, scenario, airports, flightsData, targetCrs);
 		
 	}
+	
+	public void createFlightScenaios() throws Exception {
+		List<DgOagLine> flightData = new DgOagReader().readOagLines(inputOagFilename);
+		//WORLD WIDE AIR TRAFFIC
+		createWorldFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+
+		//	//EUROPEAN AIR TRAFFIC
+		createEuropeanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+
+	// GERMAN AIR TRAFFIC
+		createGermanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+	}
 
 	public void createWorldFlightScenario(String inputOsmFilename,
-			String inputOagFilename) throws Exception {
+			List<DgOagLine> flightData) throws Exception {
 		String baseDirectory = dataBaseDirectory + "shared-svn/studies/countries/world/flight/" + flightScenarioDirectoryName;
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);
@@ -120,14 +133,14 @@ public class DgCreateDgFlightScenario {
 	}	
 
 	
-	public void createEuropeanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
+	public void createEuropeanFlightScenario(String inputOsmFilename, List<DgOagLine> flightData) throws Exception{
 		String baseDirectory = dataBaseDirectory + "shared-svn/studies/countries/eu/flight/" + flightScenarioDirectoryName;
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory,
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory,
 				SfAirScheduleBuilder.EURO_COUNTRIES, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
@@ -138,13 +151,13 @@ public class DgCreateDgFlightScenario {
 	}
 
 	
-	public void createGermanFlightScenario(String inputOsmFilename, String inputOagFilename) throws Exception{
+	public void createGermanFlightScenario(String inputOsmFilename, List<DgOagLine> flightData) throws Exception{
 		String baseDirectory = dataBaseDirectory + "shared-svn/studies/countries/de/flight/" + flightScenarioDirectoryName;
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(baseDirectory);
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, inputOagFilename, baseDirectory,
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory,
 				SfAirScheduleBuilder.GERMAN_COUNTRIES, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
