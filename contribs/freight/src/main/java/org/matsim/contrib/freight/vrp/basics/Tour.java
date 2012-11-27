@@ -1,9 +1,13 @@
 package org.matsim.contrib.freight.vrp.basics;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface Tour {
 
-	public Collection<TourActivity> getActivities();
+	public List<TourActivity> getActivities();
+	
+	public int getLoad();
+	
+	public double getTotalCost();
 
 }

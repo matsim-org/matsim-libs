@@ -41,7 +41,7 @@ public class CalculatesServiceInsertion implements JobInsertionCalculator{
 		TourImpl tour = vehicleRoute.getTour();
 		Double bestCost = bestKnownCosts;
 		Service service = (Service)job;
-		if(!checkCapacity(tour,service.getCapacityDemand(),newVehicle)){
+		if(tour.getLoad() + service.getCapacityDemand() > newVehicle.getCapacity()){
 			return InsertionData.createNoInsertionFound();
 		}
 		Delivery deliveryAct = new Delivery(service);
@@ -50,7 +50,10 @@ public class CalculatesServiceInsertion implements JobInsertionCalculator{
 		TourActivity prevAct = actIter.next();
 		while(actIter.hasNext()){
 			TourActivity currAct = actIter.next();
-			if(!checkTimeWindowConstraints(prevAct,currAct,deliveryAct)){
+			if(deliveryAct.getLatestOperationStartTime() < prevAct.getEarliestOperationStartTime()){
+				break;
+			}
+			if(deliveryAct.getEarliestOperationStartTime() > currAct.getLatestOperationStartTime()){
 				prevAct = currAct;
 				continue;
 			}
@@ -64,23 +67,9 @@ public class CalculatesServiceInsertion implements JobInsertionCalculator{
 		if(insertionIndex == null){
 			return InsertionData.createNoInsertionFound();
 		}
+		if(tour.getLoad() + service.getCapacityDemand() > newVehicle.getCapacity()){
+			throw new IllegalStateException("cannot be");
+		}
 		return new InsertionData(bestCost, new int[]{insertionIndex});
-	}
-
-	private boolean checkCapacity(TourImpl tour, int demand, Vehicle vehicle) {
-		if(tour.tourData.totalLoad + demand > vehicle.getCapacity()){
-			return false;
-		}
-		return true;
-	}
-	
-	private boolean checkTimeWindowConstraints(TourActivity prevAct, TourActivity currAct, TourActivity deliveryAct) {
-		if(deliveryAct.getLatestOperationStartTime() < prevAct.getEarliestOperationStartTime()){
-			return false;
-		}
-		if(deliveryAct.getEarliestOperationStartTime() > currAct.getLatestOperationStartTime()){
-			return false;
-		}
-		return true;
 	}
 }

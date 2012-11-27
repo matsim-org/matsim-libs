@@ -19,6 +19,10 @@ public class End implements TourActivity, TourState {
 	private double practical_earliestOperationStartTime;
 
 	private double practical_latestOperationStartTime;
+	
+	private final double theoretical_earliestOperationStartTime;
+	
+	private final double theoretical_latestOperationStartTime;
 
 	private int currentLoad;
 
@@ -26,20 +30,32 @@ public class End implements TourActivity, TourState {
 
 	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
 
-	public End(String locationId) {
+	public End(String locationId, double theoreticalStart, double theoreticalEnd) {
 		super();
 		this.locationId = locationId;
+		theoretical_earliestOperationStartTime = theoreticalStart;
+		theoretical_latestOperationStartTime = theoreticalEnd;
+		practical_earliestOperationStartTime = theoreticalStart;
+		practical_latestOperationStartTime = theoreticalEnd;
 	}
 
 	public End(End end) {
 		this.locationId = end.getLocationId();
-		practical_earliestOperationStartTime = end
-				.getEarliestOperationStartTime();
+		practical_earliestOperationStartTime = end.getEarliestOperationStartTime();
 		practical_latestOperationStartTime = end.getLatestOperationStartTime();
+		theoretical_earliestOperationStartTime = end.getTheoreticalEarliestOperationStartTime();
+		theoretical_latestOperationStartTime = end.getTheoreticalLatestOperationStartTime();
 		this.currentLoad = end.getCurrentLoad();
 		this.currentCost = end.getCurrentCost();
-		this.tourStateSnapshot = new TourStateSnapshot(
-				end.getTourStateSnapshot());
+		this.tourStateSnapshot = new TourStateSnapshot(end.getTourStateSnapshot());
+	}
+
+	public double getTheoreticalEarliestOperationStartTime() {
+		return theoretical_earliestOperationStartTime;
+	}
+
+	public double getTheoreticalLatestOperationStartTime() {
+		return theoretical_latestOperationStartTime;
 	}
 
 	@Override
@@ -85,8 +101,18 @@ public class End implements TourActivity, TourState {
 
 	@Override
 	public String toString() {
-		return "End" + " @ " + getLocationId();
+		return "End" + " @ " + getLocationId() 
+		+ " @ practTW(" + round(practical_earliestOperationStartTime)
+		+ "," + round(practical_latestOperationStartTime) + ")";
 	}
+	
+	private String round(double time) {
+		if (time == Double.MAX_VALUE) {
+			return "oo";
+		}
+		return "" + Math.round(time);
+	}
+
 
 	@Override
 	public double getCurrentCost() {

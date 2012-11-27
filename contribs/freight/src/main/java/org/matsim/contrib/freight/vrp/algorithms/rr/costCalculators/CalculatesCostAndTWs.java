@@ -14,26 +14,18 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators;
 
 import java.util.Iterator;
 
-import org.matsim.contrib.freight.vrp.basics.Delivery;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Pickup;
 import org.matsim.contrib.freight.vrp.basics.Service;
-import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.core.utils.misc.Counter;
 
 
 /**
- * Updates time windows of a given tour. Earliest arrival times are computed by starting the tour right from the beginning. 
- * Latest arr. times are computed by starting computation from the end of a tour.
- * 
- * It is important to note that this class can consider time dependent cost. However, a conflict occurs when updating latest arrival time.
- * Basically, computations is conducted by going back in time. For time dependent vehicle routing however, one requires a start time for travel
- * time calculation. The start time is unfortunately exactly the variable, computation is done for. For now, travel time is thus calculated 
- * based on the first time slice (assuming that we have approximately free flow speed in that slice).
  * 
  * @author stefan schroeder
  *
@@ -52,7 +44,6 @@ public class CalculatesCostAndTWs implements TourStateCalculator{
 		this.costs = costs;
 	}
 
-	@Override
 	public boolean calculate(TourImpl tour, Vehicle vehicle, Driver driver) {
 //		counter.incCounter();
 //		counter.printCounter();
@@ -72,51 +63,66 @@ public class CalculatesCostAndTWs implements TourStateCalculator{
 	}
 	
 	private void updateEarliestArrivalTimes(TourImpl tour, Vehicle vehicle, Driver driver) {
-		TourActivity prevAct = null;
-		for(TourActivity currentAct : tour.getActivities()){
-			if(prevAct == null){
-				prevAct = currentAct;
-				continue;
-			}
-			updateLoad(tour,prevAct,currentAct);
+
+		int load = 0;
+		Iterator<TourActivity> actIter = tour.getActivities().iterator();
+		TourActivity prevAct = actIter.next();
+
+		
+		while(actIter.hasNext()){
+			TourActivity currentAct = actIter.next();
+			
+			load += getLoad(currentAct);
 			
 			double startTimeAtPrevAct = prevAct.getEarliestOperationStartTime() + prevAct.getOperationTime();
 			double transportTime = getTransportTime(prevAct, currentAct, startTimeAtPrevAct, driver, vehicle);
 			double earliestArrTimeAtCurrAct = startTimeAtPrevAct + transportTime; 
-			double earliestOperationStartTime = Math.max(currentAct.getEarliestOperationStartTime(), earliestArrTimeAtCurrAct);
+			double earliestOperationStartTime = Math.max(currentAct.getTheoreticalEarliestOperationStartTime(), earliestArrTimeAtCurrAct);
 			currentAct.setEarliestOperationStartTime(earliestOperationStartTime);
 	
-			tour.tourData.transportCosts += (this.costs.getTransportCost(prevAct.getLocationId(), currentAct.getLocationId(), startTimeAtPrevAct, driver, vehicle));
+			double transportCost = this.costs.getTransportCost(prevAct.getLocationId(), currentAct.getLocationId(), startTimeAtPrevAct, driver, vehicle);
+			
+			tour.tourData.transportCosts += transportCost;
 			tour.tourData.transportTime += transportTime;
+			
+			currentAct.setCurrentCost(tour.tourData.transportCosts);
 			
 			prevAct = currentAct;
 		}
+		tour.setLoad(load);
+		tour.setTotalCost(tour.tourData.transportCosts);
 	}
 
 	private boolean updateLatestArrivalTimes(TourImpl tour, Vehicle vehicle, Driver driver) {
-		TourActivity prevAct = null;
-		Iterator<TourActivity> actIterator = tour.getActivities().descendingIterator(); 
-		while(actIterator.hasNext()){
-			if(prevAct == null){
-				prevAct = actIterator.next();
-				continue;
-			}
-			TourActivity currAct = actIterator.next();
-			double backwardArrAtCurrAct = prevAct.getLatestOperationStartTime() - getBackwardTransportTime(currAct, prevAct, prevAct.getLatestOperationStartTime(),driver,vehicle);
+		TourActivity prevAct = tour.getActivities().get(tour.getActivities().size()-1);
+		double startAtPrevAct = prevAct.getTheoreticalLatestOperationStartTime();
+		for(int i=tour.getActivities().size()-2;i>=0;i--){
+			TourActivity currAct = tour.getActivities().get(i);
+			double backwardArrAtCurrAct = startAtPrevAct - getBackwardTransportTime(currAct, prevAct, startAtPrevAct, driver,vehicle);
 			double potentialLatestOperationStartTimeAtCurrAct = backwardArrAtCurrAct - currAct.getOperationTime();
-			double latestOperationStartTime = Math.min(currAct.getLatestOperationStartTime(), potentialLatestOperationStartTimeAtCurrAct);
+			double latestOperationStartTime = Math.min(currAct.getTheoreticalLatestOperationStartTime(), potentialLatestOperationStartTimeAtCurrAct);
 			currAct.setLatestOperationStartTime(latestOperationStartTime);
 			if(ensureFeasibilityOfTours){
 				if(currAct.getEarliestOperationStartTime() > currAct.getLatestOperationStartTime()){
-//					throw new IllegalStateException("tour is not feasible");
 					return false;
 				}
 			}
 			prevAct = currAct;
+			startAtPrevAct = latestOperationStartTime;
 		}
 		return true;
 		
 	}
+	
+	private double getLoad(TourActivity currentAct) {
+		if(currentAct instanceof JobActivity){
+			if(currentAct instanceof Pickup){
+				return ((JobActivity) currentAct).getJob().getCapacityDemand();
+			}
+		}
+		return 0;
+	}
+
 
 	private void updateLoad(TourImpl tour, TourActivity prevAct, TourActivity currentAct) {
 		if(currentAct instanceof JobActivity){

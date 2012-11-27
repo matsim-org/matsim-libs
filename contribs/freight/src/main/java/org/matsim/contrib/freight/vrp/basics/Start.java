@@ -19,6 +19,10 @@ public class Start implements TourActivity, TourState {
 	private double practical_earliestOperationStartTime;
 
 	private double practical_latestOperationStartTime;
+	
+	private final double theoretical_earliestOperationStartTime;
+	
+	private final double theoretical_latestOperationStartTime;
 
 	private int currentLoad;
 
@@ -26,21 +30,32 @@ public class Start implements TourActivity, TourState {
 
 	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
 
-	public Start(String locationId) {
+	public Start(String locationId, double theoreticalStart, double theoreticalEnd) {
 		super();
 		this.locationId = locationId;
+		this.theoretical_earliestOperationStartTime = theoreticalStart;
+		this.theoretical_latestOperationStartTime = theoreticalEnd;
+		this.practical_earliestOperationStartTime = theoreticalStart;
+		this.practical_latestOperationStartTime = theoreticalEnd;
 	}
 
 	public Start(Start start) {
 		this.locationId = start.getLocationId();
-		practical_earliestOperationStartTime = start
-				.getEarliestOperationStartTime();
-		practical_latestOperationStartTime = start
-				.getLatestOperationStartTime();
+		practical_earliestOperationStartTime = start.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = start.getLatestOperationStartTime();
+		theoretical_earliestOperationStartTime = start.getTheoreticalEarliestOperationStartTime();
+		theoretical_latestOperationStartTime = start.getTheoreticalLatestOperationStartTime();
 		this.currentLoad = start.getCurrentLoad();
 		this.currentCost = start.getCurrentCost();
-		this.tourStateSnapshot = new TourStateSnapshot(
-				start.getTourStateSnapshot());
+		this.tourStateSnapshot = new TourStateSnapshot(start.getTourStateSnapshot());
+	}
+
+	public double getTheoreticalEarliestOperationStartTime() {
+		return theoretical_earliestOperationStartTime;
+	}
+
+	public double getTheoreticalLatestOperationStartTime() {
+		return theoretical_latestOperationStartTime;
 	}
 
 	@Override
@@ -86,8 +101,18 @@ public class Start implements TourActivity, TourState {
 
 	@Override
 	public String toString() {
-		return "Start" + " @ " + getLocationId();
+		return "Start" + " @ " + getLocationId() 
+		+ " @ practTW(" + round(practical_earliestOperationStartTime)
+		+ "," + round(practical_latestOperationStartTime) + ")";
 	}
+	
+	private String round(double time) {
+		if (time == Double.MAX_VALUE) {
+			return "oo";
+		}
+		return "" + Math.round(time);
+	}
+
 
 	@Override
 	public double getCurrentCost() {

@@ -18,17 +18,21 @@ public class Delivery implements TourActivity, JobActivity, TourState {
 
 	private final String locationId;
 
-	private double practical_earliestOperationStartTime;
-
-	private double practical_latestOperationStartTime;
-
-	private int currentLoad;
-
-	private double currentCost;
+	private final double theoretical_earliestOperationStartTime;
+	
+	private final double theoretical_latestOperationStartTime;
 
 	private final int demand;
 
 	private final double serviceTime;
+	
+	private double practical_earliestOperationStartTime;
+
+	private double practical_latestOperationStartTime;
+		
+	private int currentLoad;
+
+	private double currentCost;
 
 	private TourStateSnapshot tourStateSnapshot = new TourStateSnapshot();
 
@@ -38,8 +42,9 @@ public class Delivery implements TourActivity, JobActivity, TourState {
 		this.locationId = shipment.getToId();
 		this.demand = shipment.getCapacityDemand();
 		this.serviceTime = shipment.getDeliveryServiceTime();
-		practical_earliestOperationStartTime = shipment.getDeliveryTW()
-				.getStart();
+		theoretical_earliestOperationStartTime = shipment.getDeliveryTW().getStart();
+		theoretical_latestOperationStartTime = shipment.getDeliveryTW().getEnd();
+		practical_earliestOperationStartTime = shipment.getDeliveryTW().getStart();
 		practical_latestOperationStartTime = shipment.getDeliveryTW().getEnd();
 	}
 
@@ -48,10 +53,10 @@ public class Delivery implements TourActivity, JobActivity, TourState {
 		this.locationId = deliveryService.getLocationId();
 		this.demand = deliveryService.getCapacityDemand();
 		this.serviceTime = deliveryService.getServiceTime();
-		practical_earliestOperationStartTime = deliveryService
-				.getEarliestServiceTime();
-		practical_latestOperationStartTime = deliveryService
-				.getLatestServiceTime();
+		practical_earliestOperationStartTime = deliveryService.getEarliestServiceTime();
+		practical_latestOperationStartTime = deliveryService.getLatestServiceTime();
+		theoretical_earliestOperationStartTime = deliveryService.getEarliestServiceTime();
+		theoretical_latestOperationStartTime = deliveryService.getLatestServiceTime();
 	}
 
 	public Delivery(Delivery delivery) {
@@ -59,14 +64,23 @@ public class Delivery implements TourActivity, JobActivity, TourState {
 		this.locationId = delivery.getLocationId();
 		this.demand = delivery.getCapacityDemand() * -1;
 		this.serviceTime = delivery.getOperationTime();
-		practical_earliestOperationStartTime = delivery
-				.getEarliestOperationStartTime();
-		practical_latestOperationStartTime = delivery
-				.getLatestOperationStartTime();
+		practical_earliestOperationStartTime = delivery.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = delivery.getLatestOperationStartTime();
+		theoretical_earliestOperationStartTime = delivery.getTheoreticalEarliestOperationStartTime();
+		theoretical_latestOperationStartTime = delivery.getTheoreticalLatestOperationStartTime();
 		this.currentLoad = delivery.getCurrentLoad();
 		this.currentCost = delivery.getCurrentCost();
-		this.tourStateSnapshot = new TourStateSnapshot(
-				delivery.getTourStateSnapshot());
+		this.tourStateSnapshot = new TourStateSnapshot(delivery.getTourStateSnapshot());
+	}
+	
+	
+
+	public double getTheoreticalEarliestOperationStartTime() {
+		return theoretical_earliestOperationStartTime;
+	}
+
+	public double getTheoreticalLatestOperationStartTime() {
+		return theoretical_latestOperationStartTime;
 	}
 
 	@Override

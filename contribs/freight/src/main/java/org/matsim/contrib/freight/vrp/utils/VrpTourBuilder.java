@@ -48,24 +48,21 @@ public class VrpTourBuilder {
 		this.tour = tour;
 	}
 
-	public Start scheduleStart(String locationId, double earliestDeparture,
-			double latestDeparture) {
+	public Start scheduleStart(String locationId, double earliestDeparture, double latestDeparture) {
 		if (tourStarted) {
 			throw new IllegalStateException("tour has already started");
 		}
-		Start start = new Start(locationId);
-		start.setEarliestOperationStartTime(earliestDeparture);
-		start.setLatestOperationStartTime(latestDeparture);
+		Start start = new Start(locationId, earliestDeparture, latestDeparture);
 		tourStarted = true;
-		tour.getActivities().add(start);
+		tour.addActivity(start);
 		return start;
 	}
 
 	public Collection<JobActivity> addShipment(Shipment shipment,int pickupIndex, int deliveryIndex) {
 		Pickup pickup = new Pickup(shipment);
 		Delivery delivery = new Delivery(shipment);
-		tour.getActivities().add(deliveryIndex, delivery);
-		tour.getActivities().add(pickupIndex, pickup);
+		tour.addActivity(deliveryIndex, delivery);
+		tour.addActivity(pickupIndex, pickup);
 		Collection<JobActivity> acts = new ArrayList<JobActivity>();
 		acts.add(pickup);
 		acts.add(delivery);
@@ -73,63 +70,28 @@ public class VrpTourBuilder {
 	}
 
 	public boolean removeShipment(Shipment shipment) {
-		List<Integer> index2beRemoved = new ArrayList<Integer>();
-		for (int i = 0; i < tour.getActivities().size(); i++) {
-			TourActivity act = tour.getActivities().get(i);
-			if (act instanceof JobActivity) {
-				if (((JobActivity) act).getJob().getId()
-						.equals(shipment.getId())) {
-					index2beRemoved.add(i);
-					if (index2beRemoved.size() == 2)
-						break;
-				}
-			}
-		}
-		if (index2beRemoved.size() == 2) {
-			tour.getActivities().remove(index2beRemoved.get(1));
-			tour.getActivities().remove(index2beRemoved.get(0));
-			return true;
-		}
-		return false;
+		return tour.removeJob(shipment);
 	}
 
 	public boolean removeService(Service service) {
-		Integer index2remove = null;
-		for (int i = 0; i < tour.getActivities().size(); i++) {
-			TourActivity act = tour.getActivities().get(i);
-			if (act instanceof JobActivity) {
-				if (((JobActivity) act).getJob().getId()
-						.equals(service.getId())) {
-					index2remove = i;
-					break;
-				}
-			}
-		}
-		if (index2remove != null) {
-			tour.getActivities().remove(index2remove);
-			return true;
-		}
-		return false;
+		return tour.removeJob(service);
 	}
 
 	public JobActivity addService(Service service, int serviceActIndex) {
 		Delivery delivery = new Delivery(service);
-		tour.getActivities().add(serviceActIndex, delivery);
+		tour.addActivity(serviceActIndex, delivery);
 		return delivery;
 	}
 
-	public End scheduleEnd(String locationId, double earliestArrival,
-			double latestArrival) {
+	public End scheduleEnd(String locationId, double earliestArrival, double latestArrival) {
 		if (!tourStarted) {
 			throw new IllegalStateException("tour must start before end");
 		}
 		if (openShipments.size() > 0) {
 			throw new IllegalStateException("there are still open shipments");
 		}
-		End end = new End(locationId);
-		end.setEarliestOperationStartTime(earliestArrival);
-		end.setLatestOperationStartTime(latestArrival);
-		tour.getActivities().add(end);
+		End end = new End(locationId, earliestArrival, latestArrival);
+		tour.addActivity(end);
 		tourEnded = true;
 		return end;
 	}
@@ -142,7 +104,7 @@ public class VrpTourBuilder {
 			}
 			openShipments.add(shipment);
 		}
-		tour.getActivities().add(pickup);
+		tour.addActivity(pickup);
 		return pickup;
 	}
 
@@ -155,7 +117,7 @@ public class VrpTourBuilder {
 			}
 			openShipments.remove(shipment);
 		}
-		tour.getActivities().add(delivery);
+		tour.addActivity(delivery);
 		return delivery;
 	}
 
@@ -165,7 +127,7 @@ public class VrpTourBuilder {
 
 	public Delivery scheduleDeliveryService(Service service) {
 		Delivery delivery = new Delivery(service);
-		tour.getActivities().add(delivery);
+		tour.addActivity(delivery);
 		return delivery;
 	}
 

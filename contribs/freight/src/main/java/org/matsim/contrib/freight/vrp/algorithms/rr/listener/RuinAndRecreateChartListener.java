@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateSolution;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.core.utils.charts.XYLineChart;
 
 /**
@@ -52,14 +52,14 @@ public class RuinAndRecreateChartListener implements IterationEndsListener, Algo
 	}
 
 	@Override
-	public void informIterationEnds(int currentIteration,RuinAndRecreateSolution awardedSolution,RuinAndRecreateSolution rejectedSolution) {
+	public void informIterationEnds(int currentIteration,VehicleRoutingProblemSolution awardedSolution,VehicleRoutingProblemSolution rejectedSolution) {
 		// System.out.println()
-		bestResultList.add(awardedSolution.getResult());
-		tentativeResultList.add(rejectedSolution.getResult());
+		bestResultList.add(awardedSolution.getTotalCost());
+		tentativeResultList.add(rejectedSolution.getTotalCost());
 	}
 
 	@Override
-	public void informAlgorithmEnds(RuinAndRecreateSolution currentSolution) {
+	public void informAlgorithmEnds(VehicleRoutingProblemSolution currentSolution) {
 		log.info("create chart " + filename);
 		bestResults = new double[bestResultList.size()];
 		tentativeResults = new double[tentativeResultList.size()];
@@ -76,7 +76,7 @@ public class RuinAndRecreateChartListener implements IterationEndsListener, Algo
 	}
 
 	@Override
-	public void informMainRunStarts(RuinAndRecreateSolution initialSolution) {
+	public void informMainRunStarts(VehicleRoutingProblemSolution initialSolution) {
 		informIterationEnds(0, initialSolution, initialSolution);
 	}
 

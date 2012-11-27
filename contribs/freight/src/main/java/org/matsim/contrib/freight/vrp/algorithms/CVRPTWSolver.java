@@ -11,7 +11,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCo
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.StandardRouteAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionBestInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionFactory;
@@ -60,24 +60,24 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver {
 		checkWhetherProblemIsOfCorrectType();
 
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp);
-		InitialSolutionFactory iniSolutionFactory = new InitialSolutionBestInsertion(getSPFactory());
+		RouteAgentFactory routeAgentFactory = getSPFactory();
+		InitialSolutionFactory iniSolutionFactory = new InitialSolutionBestInsertion(routeAgentFactory);
 		ruinAndRecreateAlgo.setInitialSolutionFactory(iniSolutionFactory);
 		
 		ruinAndRecreateAlgo.setIterations(iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmupIterations);
-		ruinAndRecreateAlgo.setTourAgentFactory(getSPFactory());
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 
-		RecreationBestInsertion bestInsertion = new RecreationBestInsertion();
+		RecreationBestInsertion bestInsertion = new RecreationBestInsertion(routeAgentFactory);
 		bestInsertion.setRandom(random);
 		ruinAndRecreateAlgo.setRecreationStrategy(bestInsertion);
 
-		RuinRadial radialRuin = new RuinRadial(vrp, new JobDistanceAvgCosts(
+		RuinRadial radialRuin = new RuinRadial(vrp, routeAgentFactory, new JobDistanceAvgCosts(
 				vrp.getCosts()));
 		radialRuin.setRuinFraction(0.3);
 		radialRuin.setRandom(random);
 
-		RuinRandom randomRuin = new RuinRandom(vrp);
+		RuinRandom randomRuin = new RuinRandom(vrp, routeAgentFactory);
 		randomRuin.setRuinFraction(0.5);
 		randomRuin.setRandom(random);
 
@@ -106,8 +106,7 @@ public class CVRPTWSolver implements VehicleRoutingProblemSolver {
 						+ tour.tourData.transportCosts;
 			}
 		};
-		RouteAgentFactoryImpl factory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(vrp.getCosts(),new CalculatesLocalActInsertion(vrp.getCosts())), 
-				new CalculatesCostAndTWs(vrp.getCosts()));
+		StandardRouteAgentFactory factory = new StandardRouteAgentFactory(new CalculatesShipmentInsertion(vrp.getCosts(),new CalculatesLocalActInsertion(vrp.getCosts())), new CalculatesCostAndTWs(vrp.getCosts()));
 		return factory;
 	}
 

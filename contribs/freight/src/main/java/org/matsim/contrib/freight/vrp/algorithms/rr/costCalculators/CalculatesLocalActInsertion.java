@@ -34,7 +34,7 @@ public class CalculatesLocalActInsertion implements ActivityInsertionCalculator 
 		double tt_prevAct2newAct = costs.getTransportTime(prevAct.getLocationId(), newAct.getLocationId(), earliestDepTimeFromPrevAct, driver, vehicle);
 		
 		double earliestArrTimeAtNewAct = earliestDepTimeFromPrevAct + tt_prevAct2newAct;
-		double earliestOperationStartTimeAtNewAct = Math.max(earliestArrTimeAtNewAct, newAct.getEarliestOperationStartTime());
+		double earliestOperationStartTimeAtNewAct = Math.max(earliestArrTimeAtNewAct, newAct.getTheoreticalEarliestOperationStartTime());
 		
 		double depTimeFromNewAct = earliestOperationStartTimeAtNewAct + newAct.getOperationTime();
 		double tt_newAct2nextAct = costs.getTransportTime(newAct.getLocationId(),nextAct.getLocationId(), depTimeFromNewAct, driver, vehicle);
@@ -45,9 +45,9 @@ public class CalculatesLocalActInsertion implements ActivityInsertionCalculator 
 		double backwardArrTimeAtNewAct = nextAct.getLatestOperationStartTime() - costs.getBackwardTransportTime(newAct.getLocationId(), nextAct.getLocationId(), nextAct.getLatestOperationStartTime(), driver, vehicle);
 		double potentialLatestOperationStartTimeAtNewAct = backwardArrTimeAtNewAct - newAct.getOperationTime();
 		
-		double latestOperationStartTimeAtNewAct = Math.min(newAct.getLatestOperationStartTime(), potentialLatestOperationStartTimeAtNewAct);
+		double latestOperationStartTimeAtNewAct = Math.min(newAct.getTheoreticalLatestOperationStartTime(), potentialLatestOperationStartTimeAtNewAct);
 		
-		double backwardArrTimeAtPrevAct = backwardArrTimeAtNewAct - costs.getBackwardTransportTime(prevAct.getLocationId(),newAct.getLocationId(), backwardArrTimeAtNewAct, driver, vehicle);
+		double backwardArrTimeAtPrevAct = latestOperationStartTimeAtNewAct - costs.getBackwardTransportTime(prevAct.getLocationId(),newAct.getLocationId(), latestOperationStartTimeAtNewAct, driver, vehicle);
 		double potentialLatestOperationStartTimeAtPrevAct = backwardArrTimeAtPrevAct - prevAct.getOperationTime();
 		
 		double latestOperationStartTimeAtPrevAct = Math.min(prevAct.getLatestOperationStartTime(), potentialLatestOperationStartTimeAtPrevAct);
@@ -63,11 +63,11 @@ public class CalculatesLocalActInsertion implements ActivityInsertionCalculator 
 			return Double.MAX_VALUE;
 		}
 		else{
-			double marginalCost = 
-				costs.getTransportCost(prevAct.getLocationId(), newAct.getLocationId(), earliestDepTimeFromPrevAct, driver, vehicle) +
-				costs.getTransportCost(newAct.getLocationId(), nextAct.getLocationId(), depTimeFromNewAct, driver, vehicle) -
-				costs.getTransportCost(prevAct.getLocationId(), nextAct.getLocationId(), earliestDepTimeFromPrevAct, driver, vehicle);
-			return marginalCost;
+			double oldCost = nextAct.getCurrentCost() - prevAct.getCurrentCost();
+			double new1 = costs.getTransportCost(prevAct.getLocationId(), newAct.getLocationId(), earliestDepTimeFromPrevAct, driver, vehicle);
+			double new2 = costs.getTransportCost(newAct.getLocationId(), nextAct.getLocationId(), depTimeFromNewAct, driver, vehicle);
+			double marginalTransportCost = new1 + new2 - oldCost;
+			return marginalTransportCost;
 		}
 	}
 

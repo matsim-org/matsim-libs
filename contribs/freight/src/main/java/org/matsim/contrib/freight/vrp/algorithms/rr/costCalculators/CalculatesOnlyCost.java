@@ -12,6 +12,8 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
@@ -49,38 +51,40 @@ public class CalculatesOnlyCost implements TourStateCalculator{
 	
 	@Override
 	public boolean calculate(TourImpl tour, Vehicle vehicle, Driver driver){
-		tour.tourData.reset();
+		if(tour == null){
+			throw new IllegalStateException("tour is null. this must not be.");
+		}
+		tour.reset();
 		if(tour.isEmpty()){
 			return true;
 		}
-//		counter.incCounter();
-//		counter.printCounter();
-		TourActivity prevAct = null;
-		for(TourActivity currAct : tour.getActivities()){
-			if(prevAct == null){
-				prevAct = currAct;
-				continue;
-			}
-			updateLoad(tour, prevAct, currAct);
-			
-			tour.tourData.transportCosts += (costs.getTransportCost(prevAct.getLocationId(),currAct.getLocationId(), 0.0, driver, vehicle));
+		int load = 0;
+		Iterator<TourActivity> actIter = tour.getActivities().iterator();
+		TourActivity prevAct = actIter.next();
+
+		while(actIter.hasNext()){
+			TourActivity currAct = actIter.next();
+			load += getLoad(currAct);
+
+			double transportCost = costs.getTransportCost(prevAct.getLocationId(),currAct.getLocationId(), 0.0, driver, vehicle);
+			tour.tourData.transportCosts += transportCost;
 			tour.tourData.transportTime  += costs.getTransportTime(prevAct.getLocationId(),currAct.getLocationId(), 0.0, driver, vehicle);
+			currAct.setCurrentCost(tour.tourData.transportCosts);
 			
 			prevAct = currAct;
 		}
+		tour.setLoad(load);
+		tour.setTotalCost(tour.tourData.transportCosts);
 		return true;
 	}
-
-	private void updateLoad(TourImpl tour, TourActivity prevAct, TourActivity currAct) {
-		if(currAct instanceof JobActivity){
-			currAct.setCurrentLoad(prevAct.getCurrentLoad() + ((JobActivity)currAct).getCapacityDemand());
-			if(currAct instanceof Pickup){
-				tour.tourData.totalLoad += ((Pickup) currAct).getCapacityDemand();
+	
+	private double getLoad(TourActivity currentAct) {
+		if(currentAct instanceof JobActivity){
+			if(currentAct instanceof Pickup){
+				return ((JobActivity) currentAct).getJob().getCapacityDemand();
 			}
 		}
-		else{
-			currAct.setCurrentLoad(prevAct.getCurrentLoad());
-		}
+		return 0;
 	}
 
 

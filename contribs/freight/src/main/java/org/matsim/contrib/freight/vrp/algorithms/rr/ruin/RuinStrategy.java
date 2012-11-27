@@ -14,8 +14,8 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
 import java.util.Collection;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 
 /**
  * 
@@ -29,9 +29,9 @@ public interface RuinStrategy {
 	 * Ruins a current solution, i.e. removes jobs from service providers and
 	 * returns a collection of these removed, and thus unassigned, jobs.
 	 * 
-	 * @param serviceProviders
+	 * @param vehicleRoutes
 	 * @return
 	 */
-	public Collection<Job> ruin(Collection<? extends RouteAgent> serviceProviders);
+	public Collection<Job> ruin(Collection<VehicleRoute> vehicleRoutes);
 
 }

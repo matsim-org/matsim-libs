@@ -30,12 +30,11 @@ import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
 public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateFactory {
 
-	private static Logger logger = Logger
-			.getLogger(RuinAndRecreateStandardAlgorithmFactory.class);
+	private static Logger logger = Logger.getLogger(RuinAndRecreateStandardAlgorithmFactory.class);
 
 	private Random random = RandomNumberGeneration.getRandom();
 
-	private final RouteAgentFactory serviceProviderFactory;
+	private final RouteAgentFactory routeAgentFactory;
 
 	public int warmup = 50;
 
@@ -43,9 +42,9 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 
 	public String jobDistance = "vrpCost";
 
-	public RuinAndRecreateStandardAlgorithmFactory(RouteAgentFactory serviceProviderFactory) {
+	public RuinAndRecreateStandardAlgorithmFactory(RouteAgentFactory routeAgentFactory) {
 		super();
-		this.serviceProviderFactory = serviceProviderFactory;
+		this.routeAgentFactory = routeAgentFactory;
 	}
 
 	public void setRandom(Random random) {
@@ -55,22 +54,21 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 	@Override
 	public final RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp) {
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp);
-		InitialSolutionFactory iniSolutionFactory = new InitialSolutionBestInsertion(serviceProviderFactory);
+		InitialSolutionFactory iniSolutionFactory = new InitialSolutionBestInsertion(routeAgentFactory);
 		ruinAndRecreateAlgo.setInitialSolutionFactory(iniSolutionFactory);
 		ruinAndRecreateAlgo.setIterations(iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmup);
-		ruinAndRecreateAlgo.setTourAgentFactory(serviceProviderFactory);
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 
-		RecreationBestInsertion bestInsertion = new RecreationBestInsertion();
+		RecreationBestInsertion bestInsertion = new RecreationBestInsertion(routeAgentFactory);
 		bestInsertion.setRandom(random);
 		ruinAndRecreateAlgo.setRecreationStrategy(bestInsertion);
 
-		RuinRadial radialRuin = new RuinRadial(vrp, getJobDistance(vrp));
+		RuinRadial radialRuin = new RuinRadial(vrp, routeAgentFactory, getJobDistance(vrp));
 		radialRuin.setRuinFraction(0.3);
 		radialRuin.setRandom(random);
 
-		RuinRandom randomRuin = new RuinRandom(vrp);
+		RuinRandom randomRuin = new RuinRandom(vrp, routeAgentFactory);
 		randomRuin.setRuinFraction(0.5);
 		randomRuin.setRandom(random);
 
@@ -106,18 +104,17 @@ public class RuinAndRecreateStandardAlgorithmFactory implements RuinAndRecreateF
 		
 		ruinAndRecreateAlgo.setIterations(iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmup);
-		ruinAndRecreateAlgo.setTourAgentFactory(serviceProviderFactory);
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 
-		RecreationBestInsertion bestInsertion = new RecreationBestInsertion();
+		RecreationBestInsertion bestInsertion = new RecreationBestInsertion(routeAgentFactory);
 		bestInsertion.setRandom(random);
 		ruinAndRecreateAlgo.setRecreationStrategy(bestInsertion);
 
-		RuinRadial radialRuin = new RuinRadial(vrp, getJobDistance(vrp));
+		RuinRadial radialRuin = new RuinRadial(vrp, routeAgentFactory, getJobDistance(vrp));
 		radialRuin.setRuinFraction(0.3);
 		radialRuin.setRandom(random);
 
-		RuinRandom randomRuin = new RuinRandom(vrp);
+		RuinRandom randomRuin = new RuinRandom(vrp, routeAgentFactory);
 		randomRuin.setRuinFraction(0.5);
 		randomRuin.setRandom(random);
 

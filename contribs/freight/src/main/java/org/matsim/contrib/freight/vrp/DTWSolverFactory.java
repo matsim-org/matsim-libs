@@ -17,7 +17,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCo
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.StandardRouteAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
@@ -34,8 +34,7 @@ public class DTWSolverFactory implements MatsimVrpSolverFactory {
 	@Override
 	public MatsimVrpSolver createSolver(Carrier carrier, Network network, TourCost tourCost, VehicleRoutingCosts costs) {
 		verifyDistributionProblem(carrier.getShipments(), carrier.getCarrierCapabilities().getCarrierVehicles());
-		RouteAgentFactory spFactory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
-				new CalculatesCostAndTWs(costs)); 
+		RouteAgentFactory spFactory = new StandardRouteAgentFactory(new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), new CalculatesCostAndTWs(costs)); 
 		MatsimVrpSolverImpl rrSolver = new MatsimVrpSolverImpl(carrier,costs);
 		RuinAndRecreateStandardAlgorithmFactory ruinAndRecreateFactory = new RuinAndRecreateStandardAlgorithmFactory(spFactory);
 		rrSolver.setVrpSolverFactory(ruinAndRecreateFactory);

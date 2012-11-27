@@ -14,13 +14,17 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
@@ -43,41 +47,63 @@ public final class RuinRandom implements RuinStrategy {
 	private List<Job> unassignedJobs = new ArrayList<Job>();
 
 	private Random random = RandomNumberGeneration.getRandom();
+	
+	private RouteAgentFactory routeAgentFactory;
 
 	public void setRandom(Random random) {
 		this.random = random;
 	}
 
-	public RuinRandom(VehicleRoutingProblem vrp) {
+	public RuinRandom(VehicleRoutingProblem vrp, RouteAgentFactory routeAgentFactory) {
 		super();
 		this.vrp = vrp;
+		this.routeAgentFactory = routeAgentFactory;
 		logger.info("initialise random ruin");
 		logger.info("done");
 	}
 
 	@Override
-	public Collection<Job> ruin(
-			Collection<? extends RouteAgent> serviceProviders) {
+	public Collection<Job> ruin(Collection<VehicleRoute> vehicleRoutes) {
 		clear();
+		Collection<RouteAgent> routeAgents = makeRouteAgents(vehicleRoutes);
 		int nOfJobs2BeRemoved = selectNuOfJobs2BeRemoved();
-		LinkedList<Job> availableJobs = new LinkedList<Job>(vrp.getJobs()
-				.values());
+		LinkedList<Job> availableJobs = new LinkedList<Job>(vrp.getJobs().values());
+		Set<RouteAgent> agents2update = new HashSet<RouteAgent>();
 		for (int i = 0; i < nOfJobs2BeRemoved; i++) {
 			Job job = pickRandomJob(availableJobs);
 			unassignedJobs.add(job);
 			availableJobs.remove(job);
-			agentsRemove(serviceProviders, job);
+			boolean removed = false;
+			for (RouteAgent agent : routeAgents) {
+				 removed = agent.removeJobWithoutTourUpdate(job);
+				if (removed) {
+					agents2update.add(agent);
+					break;
+				}
+			}
+			if(!removed) logger.warn("job " + job.getId() + " cannot be removed");
+		}
+		for(RouteAgent agent : agents2update){
+			agent.updateTour();
 		}
 		return unassignedJobs;
 	}
 
-	private void agentsRemove(
-			Collection<? extends RouteAgent> agents, Job job) {
+	private Collection<RouteAgent> makeRouteAgents(Collection<VehicleRoute> vehicleRoutes) {
+		Collection<RouteAgent> agents = new ArrayList<RouteAgent>();
+		for(VehicleRoute r : vehicleRoutes){
+			agents.add(routeAgentFactory.createAgent(r));
+		}
+		return agents;
+	}
+
+	private void agentsRemove(Collection<RouteAgent> agents, Job job) {
 		for (RouteAgent sp : agents) {
-			if (sp.removeJob(job)) {
+			if (sp.removeJobWithoutTourUpdate(job)) {
 				return;
 			}
 		}
+		logger.warn("job " + job.getId() + " cannot be removed");
 	}
 
 	private Job pickRandomJob(LinkedList<Job> availableJobs) {
@@ -90,8 +116,7 @@ public final class RuinRandom implements RuinStrategy {
 	}
 
 	private int selectNuOfJobs2BeRemoved() {
-		return (int) Math.ceil(vrp.getJobs().values().size()
-				* fractionOfAllNodes2beRuined);
+		return (int) Math.ceil(vrp.getJobs().values().size() * fractionOfAllNodes2beRuined);
 	}
 
 	private void clear() {

@@ -121,7 +121,7 @@ public class CalculatesShipmentInsertion implements JobInsertionCalculator{
 	}
 
 	private boolean checkCapacity(TourImpl tour, Shipment shipment, Vehicle vehicle) {
-		if(tour.tourData.totalLoad + shipment.getCapacityDemand() > vehicle.getCapacity()){
+		if(tour.getLoad() + shipment.getCapacityDemand() > vehicle.getCapacity()){
 			return false;
 		}
 		return true;

@@ -14,12 +14,16 @@ package org.matsim.contrib.freight.vrp.basics;
 
 public class Pickup implements TourActivity, JobActivity, TourState {
 
-	private Shipment shipment;
+	private final double theoretical_earliestOperationStartTime;
+	
+	private final double theoretical_latestOperationStartTime;
+
+	private final Shipment shipment;
 
 	private double practical_earliestOperationStartTime;
 
 	private double practical_latestOperationStartTime;
-
+	
 	private int currentLoad;
 
 	private double currentCost;
@@ -29,21 +33,29 @@ public class Pickup implements TourActivity, JobActivity, TourState {
 	public Pickup(Shipment shipment) {
 		super();
 		this.shipment = shipment;
-		practical_earliestOperationStartTime = shipment.getPickupTW()
-				.getStart();
+		this.theoretical_earliestOperationStartTime = shipment.getPickupTW().getStart();
+		this.theoretical_latestOperationStartTime = shipment.getPickupTW().getEnd();
+		practical_earliestOperationStartTime = shipment.getPickupTW().getStart();
 		practical_latestOperationStartTime = shipment.getPickupTW().getEnd();
 	}
 
 	public Pickup(Pickup pickup) {
 		this.shipment = (Shipment) pickup.getJob();
-		practical_earliestOperationStartTime = pickup
-				.getEarliestOperationStartTime();
-		practical_latestOperationStartTime = pickup
-				.getLatestOperationStartTime();
+		this.theoretical_earliestOperationStartTime = pickup.getTheoreticalEarliestOperationStartTime();
+		this.theoretical_latestOperationStartTime = pickup.getTheoreticalLatestOperationStartTime();
+		practical_earliestOperationStartTime = pickup.getEarliestOperationStartTime();
+		practical_latestOperationStartTime = pickup.getLatestOperationStartTime();
 		this.currentLoad = pickup.getCurrentLoad();
 		this.currentCost = pickup.getCurrentCost();
-		this.tourStateSnapshot = new TourStateSnapshot(
-				pickup.getTourStateSnapshot());
+		this.tourStateSnapshot = new TourStateSnapshot(pickup.getTourStateSnapshot());
+	}
+	
+	public double getTheoreticalEarliestOperationStartTime(){
+		return theoretical_earliestOperationStartTime;
+	}
+	
+	public double getTheoreticalLatestOperationStartTime(){
+		return theoretical_latestOperationStartTime;
 	}
 
 	@Override

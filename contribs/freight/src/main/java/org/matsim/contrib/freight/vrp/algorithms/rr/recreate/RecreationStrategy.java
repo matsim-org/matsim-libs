@@ -15,7 +15,9 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.recreate;
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.basics.InsertionData;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 
 /**
  * 
@@ -25,13 +27,36 @@ import org.matsim.contrib.freight.vrp.basics.Job;
 
 public interface RecreationStrategy {
 
+	public class Insertion {
+		
+		public RouteAgent getAgent() {
+			return agent;
+		}
+
+		public InsertionData getInsertionData() {
+			return insertionData;
+		}
+
+		private RouteAgent agent;
+		
+		private InsertionData insertionData;
+
+		public Insertion(RouteAgent agent, InsertionData insertionData) {
+			super();
+			this.agent = agent;
+			this.insertionData = insertionData;
+		}
+		
+	}
+
+	
 	/**
 	 * Assigns the unassigned jobs to service-providers
 	 * 
-	 * @param serviceProviders
+	 * @param vehicleRoutes
 	 * @param unassignedJobs
 	 * @param result2beat
 	 */
-	public void recreate(Collection<? extends RouteAgent> serviceProviders,Collection<Job> unassignedJobs, double result2beat);
+	public void recreate(Collection<VehicleRoute> vehicleRoutes, Collection<Job> unassignedJobs, double result2beat);
 
 }

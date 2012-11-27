@@ -42,34 +42,37 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFa
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreate.RecreationBestInsertion;
 import org.matsim.contrib.freight.vrp.basics.DriverImpl;
 import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
+import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
 
 public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 
-	private static Logger logger = Logger
-			.getLogger(InitialSolutionBestInsertion.class);
+	private static Logger logger = Logger.getLogger(InitialSolutionBestInsertion.class);
 
-	private RouteAgentFactory serviceProviderFactory;
+	private RouteAgentFactory routeAgentFactory;
 
-	public InitialSolutionBestInsertion(RouteAgentFactory serviceProviderFactory) {
+	public InitialSolutionBestInsertion(RouteAgentFactory routeAgentFactory) {
 		super();
-		this.serviceProviderFactory = serviceProviderFactory;
+		this.routeAgentFactory = routeAgentFactory;
 	}
 
 	@Override
-	public RuinAndRecreateSolution createInitialSolution(VehicleRoutingProblem vrp) {
+	public VehicleRoutingProblemSolution createInitialSolution(VehicleRoutingProblem vrp) {
 		logger.info("create initial solution.");
-		List<RouteAgent> serviceProviders = createEmptyServiceProviders(vrp);
-		RecreationBestInsertion bestInsertion = new RecreationBestInsertion();
-		bestInsertion.recreate(serviceProviders, getUnassignedJobs(vrp),Double.MAX_VALUE);
-		double totalCost = getTotalCost(serviceProviders);
-		return new RuinAndRecreateSolution(serviceProviders, totalCost);
+		List<VehicleRoute> vehicleRoutes = createEmptyRoutes(vrp);
+		RecreationBestInsertion bestInsertion = new RecreationBestInsertion(routeAgentFactory);
+		bestInsertion.recreate(vehicleRoutes, getUnassignedJobs(vrp),Double.MAX_VALUE);
+		double totalCost = getTotalCost(vehicleRoutes);
+		return new VehicleRoutingProblemSolution(vehicleRoutes, totalCost);
 	}
 
-	private double getTotalCost(List<RouteAgent> serviceProviders) {
+	private double getTotalCost(List<VehicleRoute> serviceProviders) {
 		double c = 0.0;
-		for(RouteAgent a : serviceProviders){
+		for(VehicleRoute a : serviceProviders){
 			c += a.getCost();
 		}
 		return c;
@@ -80,16 +83,21 @@ public class InitialSolutionBestInsertion implements InitialSolutionFactory {
 		return jobs;
 	}
 
-	private List<RouteAgent> createEmptyServiceProviders(VehicleRoutingProblem vrp) {
-		List<RouteAgent> emptyTours = new ArrayList<RouteAgent>();
+	private List<VehicleRoute> createEmptyRoutes(VehicleRoutingProblem vrp) {
+		List<VehicleRoute> emptyRoutes = new ArrayList<VehicleRoute>();
 		for (Vehicle v : vrp.getVehicles()) {
 			DriverImpl driver = new DriverImpl("driver");
 			driver.setEarliestStart(v.getEarliestDeparture());
 			driver.setLatestEnd(v.getLatestArrival());
 			driver.setHomeLocation(v.getLocationId());
-			emptyTours.add(serviceProviderFactory.createAgent(v, driver));
+			
+			VrpTourBuilder vrpTourBuilder = new VrpTourBuilder();
+			vrpTourBuilder.scheduleStart(v.getLocationId(), v.getEarliestDeparture(), Double.MAX_VALUE);
+			vrpTourBuilder.scheduleEnd(v.getLocationId(), 0.0, v.getLatestArrival());
+			TourImpl tour = vrpTourBuilder.build();
+			emptyRoutes.add(new VehicleRoute(tour,driver,v));
 		}
-		return emptyTours;
+		return emptyRoutes;
 	}
 
 }

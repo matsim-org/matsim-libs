@@ -15,6 +15,10 @@ package org.matsim.contrib.freight.vrp.basics;
 public interface TourActivity {
 
 	public abstract String getLocationId();
+	
+	public double getTheoreticalEarliestOperationStartTime();
+	
+	public double getTheoreticalLatestOperationStartTime();
 
 	public abstract void setEarliestOperationStartTime(double early);
 

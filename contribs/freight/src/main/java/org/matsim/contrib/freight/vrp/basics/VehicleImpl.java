@@ -20,6 +20,14 @@ package org.matsim.contrib.freight.vrp.basics;
 
 public class VehicleImpl implements Vehicle {
 
+	public static class NoVehicle extends VehicleImpl {
+
+		public NoVehicle() {
+			super("noVehicle", null, null);
+		}
+		
+	}
+	
 	public static class Type {
 		public final String typeId;
 		public final int capacity;
@@ -76,6 +84,10 @@ public class VehicleImpl implements Vehicle {
 		return new Factory();
 	}
 
+	public static NoVehicle createNoVehicle(){
+		return new NoVehicle();
+	}
+	
 	private Type type;
 
 	private String locationId;

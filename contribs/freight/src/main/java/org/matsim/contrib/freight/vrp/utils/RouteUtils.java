@@ -3,6 +3,7 @@ package org.matsim.contrib.freight.vrp.utils;
 import java.util.Collection;
 
 import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 
 public class RouteUtils {
 
@@ -34,7 +35,33 @@ public class RouteUtils {
 			if(r.getTour().isEmpty()){
 				continue;
 			}
-			total += r.getTour().tourData.totalCost;
+			total += r.getTour().getTotalCost();
+		}
+		return total;
+	}
+	
+	
+	public static double getTotalServiceTime(Collection<VehicleRoute> routes){
+		double total = 0.0;
+		for (VehicleRoute r : routes) {
+			if(r.getTour().isEmpty()){
+				continue;
+			}
+			for(org.matsim.contrib.freight.vrp.basics.TourActivity act : r.getTour().getActivities()){
+				total += act.getOperationTime();
+			}
+		}
+		return total;
+	}
+	
+	
+	public static double getTotalFixCost(Collection<VehicleRoute> routes){
+		double total = 0.0;
+		for (VehicleRoute r : routes) {
+			if(r.getTour().isEmpty()){
+				continue;
+			}
+			total += r.getVehicle().getType().vehicleCostParams.fix;
 		}
 		return total;
 	}

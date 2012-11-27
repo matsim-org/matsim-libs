@@ -13,12 +13,36 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 public class VehicleRoute {
+	
+	public interface VehicleRouteCostCalculator{
+
+		double calculate(TourImpl tour, Vehicle vehicle, Driver driver);
+		
+	}
+			
+	public static VehicleRouteCostCalculator VehicleRouteCostCalculator = new VehicleRouteCostCalculator() {
+	
+		@Override
+		public double calculate(TourImpl tour, Vehicle vehicle, Driver driver) {
+			return tour.getTotalCost();
+		}
+		
+	};;; 
 
 	private TourImpl tour;
 
 	private Vehicle vehicle;
 	
 	private Driver driver;
+	
+	private double cost;
+	
+	public double getCost() {
+		if(tour.isEmpty()){
+			return 0.0;
+		}
+		return VehicleRouteCostCalculator.calculate(tour,vehicle,driver);
+	}
 
 	public VehicleRoute(TourImpl tour, Vehicle vehicle) {
 		super();
@@ -45,5 +69,19 @@ public class VehicleRoute {
 	public Driver getDriver() {
 		return driver;
 	}
+
+	public void setTour(TourImpl tour) {
+		this.tour = tour;
+	}
+
+	public void setVehicle(Vehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+
+	public void setDriver(Driver driver) {
+		this.driver = driver;
+	}
+	
+	
 
 }

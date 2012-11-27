@@ -27,7 +27,6 @@ public class VehicleRoutingProblemSolution {
 
 	public void setCosts(double totalCost) {
 		this.totalCost = totalCost;
-		
 	}
 
 }

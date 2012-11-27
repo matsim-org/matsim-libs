@@ -39,8 +39,6 @@ public class RuinAndRecreateAlgorithmBuilder {
 		this.thresholdFunction = thresholdFunction;
 	}
 
-	private RouteAgentFactory serviceProviderAgentFactory;
-
 	private VehicleRoutingProblemSolution iniSolution;
 
 	public void setRandom(Random random) {
@@ -55,11 +53,6 @@ public class RuinAndRecreateAlgorithmBuilder {
 
 	public void addControlerListener(RuinAndRecreateListener l) {
 		this.contolerListeners.add(l);
-	}
-
-	public void setRouteAgentFactory(
-			RouteAgentFactory serviceProviderAgentFactory) {
-		this.serviceProviderAgentFactory = serviceProviderAgentFactory;
 	}
 
 	public void setInitialSolutionFactory(InitialSolutionFactory initialSolutionFactory) {
@@ -95,8 +88,6 @@ public class RuinAndRecreateAlgorithmBuilder {
 			throw new IllegalStateException("set either an initial solutionFactory or a concrete initial solution");
 		if (recreationStrategy == null)
 			throw new IllegalStateException("no recreationstrategy set");
-		if (serviceProviderAgentFactory == null)
-			throw new IllegalStateException("no serviceproviderFactory set");
 		checkRuinManager();
 		RuinAndRecreate rr = new RuinAndRecreate(vrp);
 		rr.setCurrentSolution(iniSolution);
@@ -105,7 +96,6 @@ public class RuinAndRecreateAlgorithmBuilder {
 		rr.setWarmUpIterations(warmup);
 		rr.setRecreationStrategy(recreationStrategy);
 		rr.setRuinStrategyManager(ruinStrategyManager);
-		rr.setTourAgentFactory(serviceProviderAgentFactory);
 		rr.setThresholdFunction(thresholdFunction);
 		for (RuinAndRecreateListener l : contolerListeners) {
 			rr.getControlerListeners().add(l);
