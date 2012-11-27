@@ -83,8 +83,12 @@ public class GetPtAndCarPartTimes {
 			Trip trip = trips.get( event.getPersonId() );
 
 			if (trip == null) {
-				if (event.getLegMode().equals( TransportMode.car )) {
-					trips.put( event.getPersonId() , new Trip( event.getTime() ) );
+				final String m = event.getLegMode();
+				if (m.equals( TransportMode.car )) {
+					trips.put( event.getPersonId() , new Trip( true , event.getTime() ) );
+				}
+				else if (m.equals( TransportMode.transit_walk )) {
+					trips.put( event.getPersonId() , new Trip( false , event.getTime() ) );
 				}
 			}
 			else {
@@ -131,15 +135,27 @@ public class GetPtAndCarPartTimes {
 
 	private static class Trip  {
 		private static enum State { car , interact , pt };
-		private State state = State.car;
+		private State state;
+		private final boolean fromCarToPt;
 
-		private double carDeparture;
+		private double carDeparture = -1;
 		private double carArrival = -1;
 		private double ptDeparture = -1;
 		private double ptArrival = -1;
 
-		public Trip(final double departure) {
-			this.carDeparture = departure;
+		public Trip(
+				final boolean fromCarToPt,
+				final double departure) {
+			this.fromCarToPt = fromCarToPt;
+
+			if (fromCarToPt)  {
+				carDeparture = departure;
+				state = State.car;
+			}
+			else {
+				ptDeparture = departure;
+				state = State.pt;
+			}
 		}
 
 		public void notifyDeparture(final double time, final String mode) {
@@ -147,12 +163,21 @@ public class GetPtAndCarPartTimes {
 				case car:
 					throw new IllegalStateException( ""+state );
 				case interact:
-					if (!(mode.equals( TransportMode.pt ) ||
+					if (fromCarToPt) { 
+						if (!(mode.equals( TransportMode.pt ) ||
 							mode.equals( TransportMode.transit_walk)) ) {
-						throw new IllegalArgumentException( mode );
+							throw new IllegalArgumentException( mode );
+						}
+						state = State.pt;
+						ptDeparture = time;
 					}
-					state = State.pt;
-					ptDeparture = time;
+					else {
+						if (!mode.equals( TransportMode.car )) { 
+							throw new IllegalArgumentException( mode );
+						}
+						state = State.car;
+						carDeparture = time;
+					}
 					break;
 				default:
 					break;
@@ -173,25 +198,27 @@ public class GetPtAndCarPartTimes {
 		}
 
 		public boolean notifyActStarts(final String actType) {
+			if ( actType.equals( ParkAndRideConstants.PARKING_ACT ) ) {
+				state = State.interact;
+				return true;
+			}
+
 			switch (state) {
 				case car:
-					if ( actType.equals( ParkAndRideConstants.PARKING_ACT ) ) {
-						state = State.interact;
-						return true;
-					}
+					// the case car -> pt is already considered above
 					return false;
 				case pt:
-					if ( actType.equals( PtConstants.TRANSIT_ACTIVITY_TYPE ) ) {
-						return true;
-					}
-					return false;
+					return actType.equals( PtConstants.TRANSIT_ACTIVITY_TYPE );
 				default:
 					throw new IllegalStateException( ""+state );
 			}
 		}
 
 		public boolean isCompletePnr() {
-			return state.equals( State.pt ) && ptArrival > 0;
+			return carDeparture >= 0 &&
+				carArrival >= 0 &&
+				ptDeparture >= 0 &&
+				ptArrival >= 0;
 		}
 
 		public double getCarTime() {
