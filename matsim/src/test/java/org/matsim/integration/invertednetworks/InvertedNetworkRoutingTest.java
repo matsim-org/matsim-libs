@@ -80,10 +80,8 @@ public class InvertedNetworkRoutingTest {
 	
 	@Test
 	public final void testLanesInvertedNetworkRouting() {
-		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.scenario().setUseLanes(true);
-		Fixture f = new Fixture(config, false);
+		Fixture f = new Fixture(false, true, false);
+		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
 		c.setCreateGraphs(false);
@@ -100,10 +98,8 @@ public class InvertedNetworkRoutingTest {
 
 	@Test
 	public final void testSignalsInvertedNetworkRouting() {
-		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.scenario().setUseSignalSystems(true);
-		Fixture f = new Fixture(config, false);
+		Fixture f = new Fixture(false, false, true);
+		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
 		c.setCreateGraphs(false);
@@ -121,9 +117,8 @@ public class InvertedNetworkRoutingTest {
 	@Test
 	@Ignore
 	public final void testModesInvertedNetworkRouting() {
-		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		Fixture f = new Fixture(config, true);
+		Fixture f = new Fixture(true, false, false);
+		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
 		c.setCreateGraphs(false);
@@ -141,11 +136,10 @@ public class InvertedNetworkRoutingTest {
 	@Test
 	@Ignore
 	public final void testModesNotInvertedNetworkRouting() {
-		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		Fixture f = new Fixture(config, true);
-		config.controler().setLinkToLinkRoutingEnabled(false);
-		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(false);
+		Fixture f = new Fixture(true, false, false);
+		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
+		f.scenario.getConfig().controler().setLinkToLinkRoutingEnabled(false);
+		f.scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(false);
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
 		c.setCreateGraphs(false);
@@ -205,22 +199,27 @@ public class InvertedNetworkRoutingTest {
 		public final ScenarioImpl scenario;
 		private Map<Integer, Id> ids = new HashMap<Integer, Id>();
 
-		public Fixture(Config config, boolean doCreateModes) {
+		public Fixture(boolean doCreateModes, boolean doCreateLanes, boolean doCreateSignals) {
+			Config config = ConfigUtils.createConfig();
 			config.controler().setLastIteration(0);
 			config.controler().setLinkToLinkRoutingEnabled(true);
 			config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 			config.controler().setMobsim("qsim");
 			config.global().setNumberOfThreads(1);
 			config.addQSimConfigGroup(new QSimConfigGroup());
+			config.getQSimConfigGroup().setRemoveStuckVehicles(false);
 			ActivityParams params = new ActivityParams("home");
 			params.setTypicalDuration(24.0 * 3600.0);
 			config.planCalcScore().addActivityParams(params);
+			config.scenario().setUseLanes(doCreateLanes);
+			config.scenario().setUseSignalSystems(doCreateSignals);
+			
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 			createNetwork();
-			if (config.scenario().isUseLanes()){
+			if (doCreateLanes){
 				createLanes();
 			}
-			if (config.scenario().isUseSignalSystems()){
+			if (doCreateSignals){
 				createSignals();
 			}
 			if (doCreateModes){
