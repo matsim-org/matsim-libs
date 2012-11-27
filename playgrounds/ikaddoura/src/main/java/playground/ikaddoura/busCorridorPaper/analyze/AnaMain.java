@@ -22,14 +22,17 @@
  */
 package playground.ikaddoura.busCorridorPaper.analyze;
 
+import java.io.File;
+
 /**
  * @author ikaddoura
  *
  */
 public class AnaMain {
 
-	private String runFolder = "/Users/Ihab/Desktop/RUN2/";
-//	private String runFolder = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/output/A_TC_10000/";
+//	private String runFolder = "/Users/Ihab/Desktop/RUN2/";
+	private String outputFolder = "/Users/Ihab/Desktop/analysis_output/A_TC_10000/";
+	private String runFolder = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/output/A_TC_10000/";
 
 	
 	public static void main(String[] args) {
@@ -38,12 +41,18 @@ public class AnaMain {
 	}
 
 	private void run() {
+		
 		ExtItOutputAnalyzer dataReader = new ExtItOutputAnalyzer(runFolder);
 		dataReader.loadData();
 		dataReader.loadParameterData();
-		dataReader.writeGlobalMaxWelfareMatrix(runFolder);
-//		dataReader.writeNumberOfBuses2optimalFareFrequency(runFolder);
-		dataReader.writeFare2optimalNumberOfBusesFrequency(runFolder);
+		
+		File file = new File(outputFolder);
+		file.mkdirs();
+		
+		dataReader.writeWelfareData(outputFolder);
+		dataReader.writeGlobalMaxWelfareMatrix(outputFolder);
+		dataReader.writeNumberOfBuses2optimalFareFrequency(outputFolder);
+		dataReader.writeFare2optimalNumberOfBusesFrequency(outputFolder);
 	}
 
 }

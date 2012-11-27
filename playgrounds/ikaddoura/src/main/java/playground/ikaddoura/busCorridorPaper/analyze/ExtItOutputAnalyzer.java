@@ -133,7 +133,7 @@ public class ExtItOutputAnalyzer {
 
 	public void writeWelfareData(String outputPath) {
 		log.info("Writing analysis output...");
-		File file = new File(outputPath + "welfare.txt");
+		File file = new File(outputPath + "welfare.csv");
 		   
 	    try {
 	    bw = new BufferedWriter(new FileWriter(file));
@@ -236,7 +236,7 @@ public class ExtItOutputAnalyzer {
 	    }
 		
 		log.info("Writing analysis output...");
-		File file = new File(outputPath + "runNr2globalMaxWelfareMatrix.txt");
+		File file = new File(outputPath + "runNr2globalMaxWelfareMatrix.csv");
 		   
 	    try {
 	    bw = new BufferedWriter(new FileWriter(file));
@@ -322,10 +322,13 @@ public class ExtItOutputAnalyzer {
 		}
 		
 		log.info("Writing analysis output...");
-		File file = new File(outputPath + "busNumber2welfareMaxFare.txt");
+		File file = new File(outputPath + "busNumber2welfareMaxFare.csv");
 		   
 	    try {
 	    bw = new BufferedWriter(new FileWriter(file));
+	    
+	    bw.write("for each headway --> frequency of welfare maximum fare");
+	    bw.newLine();
 	    
 	    bw.write("Number of buses");
 	    for (Double d : this.fares){
@@ -336,16 +339,12 @@ public class ExtItOutputAnalyzer {
 	    bw.newLine();
 	    for (Integer nrOfBuses : this.numberOfBuses){
 	    	bw.write(nrOfBuses.toString());
-	    	System.out.println("buses: " + nrOfBuses);
 
 		    for (Double fare : this.fares){
-		    	System.out.println("fare: " + fare);
 		    	int fareCounter = 0;
 		    	
 		    	for (Double welfareMaxFare : this.numberOfBuses2optFare.get(nrOfBuses)){
-			    	System.out.println("welfareMaxFare: " + welfareMaxFare);
 		    		if (welfareMaxFare.doubleValue() == fare.doubleValue()) {
-		    			System.out.println("equal!");
 		    			fareCounter++;
 		    		}
 		    	}
@@ -389,11 +388,13 @@ public class ExtItOutputAnalyzer {
 		}
 		
 		log.info("Writing analysis output...");
-		File file = new File(outputPath + "fare2welfareMaxBusNumber.txt");
+		File file = new File(outputPath + "fare2welfareMaxBusNumber.csv");
 		   
 	    try {
 	    bw = new BufferedWriter(new FileWriter(file));
-	    
+	    bw.write("for each fare --> frequency of welfare maximum number of buses");
+	    bw.newLine();
+
 	    bw.write("Fare (AUD)");
 	    for (Integer nrOfBuses : this.numberOfBuses){
 	    	bw.write(" ; " + nrOfBuses);
