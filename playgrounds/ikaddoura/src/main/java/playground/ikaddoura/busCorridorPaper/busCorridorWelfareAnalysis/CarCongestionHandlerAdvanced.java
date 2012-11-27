@@ -160,8 +160,12 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 
 		if (event.getPersonId().toString().contains("person")){
 			// a car is departing
+			
 			this.personId2enteringTime.put(event.getPersonId(), null);
 			
+			// setting t0 and tAct to zero, otherwise agents performing two activities on one link won't have a traveltime.
+			this.personId2t0.put(event.getPersonId(), null);
+			this.personId2tAct.put(event.getPersonId(), null);
 		}
 	}
 
@@ -170,9 +174,14 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 		if (event.getPersonId().toString().contains("person")){
 			// a car is arriving
 			
-			// congestion indicator for this trip
-			double t0minusTActDivT0 = (this.personId2t0.get(event.getPersonId()) - this.personId2tAct.get(event.getPersonId())) / this.personId2t0.get(event.getPersonId());
-			this.t0minusTActDividedByT0.add(t0minusTActDivT0);
+//			 congestion indicator for this trip
+			if (this.personId2t0.get(event.getPersonId()) == null){
+				// two activities performed on the same link!
+			} else {
+				// t0 is not 0, so the agent is to be considered when analyzing congestion effects
+				double t0minusTActDivT0 = (this.personId2t0.get(event.getPersonId()) - this.personId2tAct.get(event.getPersonId())) / this.personId2t0.get(event.getPersonId());
+				this.t0minusTActDividedByT0.add(t0minusTActDivT0);
+			}
 			
 			// setting to 0 for next trip
 			this.personId2t0.put(event.getPersonId(), 0.);
