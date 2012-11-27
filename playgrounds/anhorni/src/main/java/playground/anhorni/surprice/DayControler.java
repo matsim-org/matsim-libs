@@ -115,6 +115,13 @@ public class DayControler extends Controler {
 			
 			p.getCustomAttributes().put(day + ".alpha_tot", alpha + alphaTrip);
 			p.getCustomAttributes().put(day + ".gamma_tot", gamma + gammaTrip);
+			
+			for (int i = 0; i < 100; i++) {
+				this.random.nextDouble();
+			}
+			
+			double fLagged = 0.5 * this.random.nextDouble(); // [0.5 .. 1.5]
+			p.getCustomAttributes().put(day + ".fLagged", fLagged);
 		}
 	}
 }

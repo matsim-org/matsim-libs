@@ -87,20 +87,20 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 	}
         
     private void adaptCoefficientsLagged() {    	
-    	double f_lagged = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "f_lagged"));
+    	double fLagged = (Double) this.person.getCustomAttributes().get(day + ".fLagged");
     	
 		// adapt for tue - sun: 
 		if (!this.day.equals("mon")) {
 			String mode = this.memory.getMainModePreviousDay(this.day);
 			
 			if (mode.equals("car")) {
-				this.constantCar *= f_lagged;
+				this.constantCar *= fLagged;
 			} else if (mode.equals("pt")) {
-				this.constantPt *= f_lagged;
+				this.constantPt *= fLagged;
 			} else if (mode.equals("bike")) {
-				this.constantBike *= f_lagged;			
+				this.constantBike *= fLagged;			
 			} else if (mode.equals("walk")) {
-				this.constantWalk *= f_lagged;
+				this.constantWalk *= fLagged;
 			}
 			else {
 				// do nothing
