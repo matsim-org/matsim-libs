@@ -85,6 +85,9 @@ public class OptSettingsReader {
 	            			
 	            		} else if (parts[0].equals("incrBusNumber")){
 	                		this.optSettings.setIncrBusNumber(Integer.parseInt(parts[1]));
+	                		if (this.optSettings.getIncrBusNumber() == 0){
+	    						log.info("incrBusNumber is set to 0. Using standard values...");
+	                		}
 	                		
 	                	} else if (parts[0].equals("incrFare")){
 	                		this.optSettings.setIncrFare(Double.parseDouble(parts[1]));

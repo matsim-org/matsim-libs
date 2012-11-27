@@ -105,7 +105,7 @@ class ExternalControler {
 			throw new RuntimeException("Optimization parameter " + op2String + " is unknown. Aborting... ");
 		}
 		
-//		incrBusNumber = settings.getIncrBusNumber();
+		incrBusNumber = settings.getIncrBusNumber();
 		incrFare = settings.getIncrFare();
 		incrCapacity = settings.getIncrCapacity();
 		
@@ -201,11 +201,14 @@ class ExternalControler {
 					if(op1.equals(OptimizationParameter1.FARE)) this.fare = this.fare + incrFare;
 					if(op1.equals(OptimizationParameter1.CAPACITY)) this.capacity = this.capacity + incrCapacity;
 					if(op1.equals(OptimizationParameter1.HEADWAY)) {
-						// not using the parameter from the settingsFile
-						if (extItParam1 >= 9) {
-							this.numberOfBuses = this.numberOfBuses + 2;
+						if (incrBusNumber == 0) {						
+							if (extItParam2 >= 9) {
+								this.numberOfBuses = this.numberOfBuses + 2;
+							} else {
+								this.numberOfBuses = this.numberOfBuses + 1;
+							}
 						} else {
-							this.numberOfBuses = this.numberOfBuses + 1;
+							this.numberOfBuses = this.numberOfBuses + incrBusNumber;
 						}
 					}
 				}
@@ -223,12 +226,17 @@ class ExternalControler {
 					this.numberOfBuses = startBusNumber;
 				}
 				if(op2.equals(OptimizationParameter2.HEADWAY)){
-					// not using the parameter from the settingsFile
-					if (extItParam2 >= 9) {
-						this.numberOfBuses = this.numberOfBuses + 2;
+					
+					if (incrBusNumber == 0) {						
+						if (extItParam2 >= 9) {
+							this.numberOfBuses = this.numberOfBuses + 2;
+						} else {
+							this.numberOfBuses = this.numberOfBuses + 1;
+						}
 					} else {
-						this.numberOfBuses = this.numberOfBuses + 1;
+						this.numberOfBuses = this.numberOfBuses + incrBusNumber;
 					}
+					
 					this.fare = startFare;
 				}
 			}
