@@ -20,15 +20,13 @@ package org.matsim.contrib.freight.vrp.algorithms.rr;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.junit.Ignore;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.StandardRouteAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.algorithms.rr.iniSolution.InitialSolutionBestInsertion;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
@@ -38,14 +36,15 @@ import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.utils.VrpBuilder;
 import org.matsim.contrib.freight.vrp.utils.VrpUtils;
 
 @Ignore
-public class VRPTestCase extends TestCase {
+public class VRPTestCase  {
 
 	static class MyLocations implements Locations {
 
@@ -122,8 +121,7 @@ public class VRPTestCase extends TestCase {
 		return vrpBuilder.build();
 	}
 
-	protected RuinAndRecreateSolution getInitialSolution(
-			VehicleRoutingProblem vrp) {
+	protected VehicleRoutingProblemSolution getInitialSolution(VehicleRoutingProblem vrp) {
 		TourCost tourCost = new TourCost() {
 
 			@Override
@@ -134,8 +132,7 @@ public class VRPTestCase extends TestCase {
 
 		};
 		return new InitialSolutionBestInsertion(
-				new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
-						new CalculatesCostAndTWs(costs)))
+				new StandardRouteAgentFactory(new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), new CalculatesCostAndTWs(costs)))
 				.createInitialSolution(vrp);
 	}
 
@@ -150,10 +147,9 @@ public class VRPTestCase extends TestCase {
 			}
 
 		};
-		RouteAgentFactory spFactory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
-				new CalculatesCostAndTWs(costs));;
-		return spFactory.createAgent(vehicle, new Driver() {
-		}, tour1);
+		RouteAgentFactory spFactory = new StandardRouteAgentFactory(new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), new CalculatesCostAndTWs(costs));;
+		return spFactory.createAgent(new VehicleRoute(tour1,new Driver() {
+		}, vehicle));
 	}
 
 	private Coordinate makeCoord(int i, int j) {

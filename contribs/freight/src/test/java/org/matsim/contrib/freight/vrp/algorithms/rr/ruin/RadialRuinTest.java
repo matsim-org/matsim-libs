@@ -17,35 +17,51 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateSolution;
+import org.junit.Before;
+import org.junit.Test;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.StandardRouteAgentFactory;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
 
 public class RadialRuinTest extends VRPTestCase {
 
 	VehicleRoutingProblem vrp;
 
-	RuinAndRecreateSolution solution;
+	VehicleRoutingProblemSolution solution;
 
 	RuinRadial radialRuin;
+	
+	RouteAgentFactory routeAgentFactory;
 
-	@Override
+	@Before
 	public void setUp() {
 		initJobsInPlainCoordinateSystem();
 		vrp = getVRP(2, 2);
 		solution = getInitialSolution(vrp);
-		radialRuin = new RuinRadial(vrp,
-				new JobDistanceAvgCosts(vrp.getCosts()));
+		
+		CalculatesCostAndTWs tourStateCalculator = new CalculatesCostAndTWs(costs);
+		routeAgentFactory = new StandardRouteAgentFactory(new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), tourStateCalculator);
+		radialRuin = new RuinRadial(vrp, routeAgentFactory, new JobDistanceAvgCosts(vrp.getCosts()));
 		radialRuin.setRuinFraction(0.25);
 		RandomNumberGeneration.reset();
 		/*
@@ -53,32 +69,35 @@ public class RadialRuinTest extends VRPTestCase {
 		 */
 	}
 
-	public void testSizeOfRuinedSolution() {
-		radialRuin.ruin(solution.getTourAgents());
-		assertEquals(2, solution.getTourAgents().size());
+	@Test
+	public void whenRuinSolution_sizeOfRemainingSolution_is2() {
+		radialRuin.ruin(solution.getRoutes());
+		assertEquals(2, solution.getRoutes().size());
 	}
 
-	public void testRemainingSolution() {
+	@Test
+	public void whenRuiningSolution_nOfRemainingAct_is8() {
 		int nOfRemainingActivities = 0;
-		for (RouteAgent a : solution.getTourAgents()) {
-			nOfRemainingActivities += a.getRoute().getTour().getActivities().size();
+		for (VehicleRoute route : solution.getRoutes()) {
+			nOfRemainingActivities += route.getTour().getActivities().size();
 		}
 		assertEquals(10, nOfRemainingActivities);
-		radialRuin.ruin(solution.getTourAgents());
+		
+		radialRuin.ruin(solution.getRoutes());
 		nOfRemainingActivities = 0;
-		for (RouteAgent a : solution.getTourAgents()) {
-			nOfRemainingActivities += a.getRoute().getTour().getActivities().size();
+		for (VehicleRoute r : solution.getRoutes()) {
+			nOfRemainingActivities += r.getTour().getActivities().size();
 		}
 		assertEquals(8, nOfRemainingActivities);
 	}
 
-	public void testWhetherJobInUnassignedJobListIsReallyAnUnassignedJob() {
-		Collection<Job> unassignedJobs = radialRuin.ruin(solution
-				.getTourAgents());
+	@Test
+	public void whenRuiningASolution_theRemovedJobs_mustBeInUnassignedListAndNotInRouteAnymore() {
+		Collection<Job> unassignedJobs = radialRuin.ruin(solution.getRoutes());
 		Job unassignedJob = unassignedJobs.iterator().next();
 		boolean jobFoundInAgentsTour = false;
-		for (RouteAgent a : solution.getTourAgents()) {
-			for (TourActivity act : a.getRoute().getTour().getActivities()) {
+		for (VehicleRoute r : solution.getRoutes()) {
+			for (TourActivity act : r.getTour().getActivities()) {
 				if (act instanceof JobActivity) {
 					if (((JobActivity) act).getJob().equals(unassignedJob)) {
 						jobFoundInAgentsTour = true;
@@ -89,25 +108,23 @@ public class RadialRuinTest extends VRPTestCase {
 		assertFalse(jobFoundInAgentsTour);
 	}
 
+	@Test
 	public void testWhetherRadialRuinActualRemovesClosestJob() {
-		Collection<Job> unassignedJs = radialRuin
-				.ruin(solution.getTourAgents());
+		Collection<Job> unassignedJs = radialRuin.ruin(solution.getRoutes());
 		List<Job> unassignedJobs = new ArrayList<Job>(unassignedJs);
 		assertEquals("2", unassignedJobs.get(0).getId());
 	}
 
+	@Test
 	public void testNuOfUnassignedJobs() {
-		Collection<Job> unassignedJobs = radialRuin.ruin(solution
-				.getTourAgents());
+		Collection<Job> unassignedJobs = radialRuin.ruin(solution.getRoutes());
 		assertEquals(1, unassignedJobs.size());
 	}
 
+	@Test
 	public void testRandomRuinWithNoCustomer() {
-		try {
-			radialRuin.ruin(Collections.EMPTY_LIST);
-			assertTrue(true);
-		} catch (Exception e) {
-			assertTrue(false);
-		}
+		radialRuin.ruin(Collections.EMPTY_LIST);
+		assertTrue(true);
+		
 	}
 }

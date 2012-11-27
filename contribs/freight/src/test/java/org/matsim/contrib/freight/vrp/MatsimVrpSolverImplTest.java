@@ -10,7 +10,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateStandardAlgor
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.StandardRouteAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
@@ -82,8 +82,7 @@ public class MatsimVrpSolverImplTest extends MatsimTestCase{
 			}
 		};
 		solver.setVrpSolverFactory(new RuinAndRecreateStandardAlgorithmFactory(
-				new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(tcc, new CalculatesLocalActInsertion(tcc)), 
-						new CalculatesCostAndTWs(tcc))));
+				new StandardRouteAgentFactory(new CalculatesShipmentInsertion(tcc, new CalculatesLocalActInsertion(tcc)), new CalculatesCostAndTWs(tcc))));
 		solver.useSelectedPlanAsInitialSolution(true);
 		solver.solve();
 		

@@ -23,7 +23,7 @@ public class TestVehicleFleetManager extends TestCase{
 		v2 = VehicleImpl.getFactory().createVehicle("foo", "foo", VehicleImpl.getFactory().createType("foo", 30, VehicleImpl.getFactory().createVehicleCostParams(0,10,10)));
 		vehicles.add(v1);
 		vehicles.add(v2);
-		fleetManager = new VehicleFleetManager(vehicles);	
+		fleetManager = new VehicleFleetManagerImpl(vehicles);	
 	}
 	
 	public void testGetTypes(){

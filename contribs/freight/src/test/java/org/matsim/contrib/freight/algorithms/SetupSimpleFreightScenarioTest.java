@@ -22,7 +22,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class SetupSimpleFreightScenarioTest extends MatsimTestCase{
 	
 	public void testSetupScenario(){
-		try{
+//		try{
 		
 			Config config = new Config();
 			config.addCoreModules();
@@ -79,10 +79,10 @@ public class SetupSimpleFreightScenarioTest extends MatsimTestCase{
 			
 			assertTrue(true);
 
-		}
-		catch(Exception e){
-			assertTrue(false);
-		}
+//		}
+//		catch(Exception e){
+//			assertTrue(false);
+//		}
 		
 		
 	}

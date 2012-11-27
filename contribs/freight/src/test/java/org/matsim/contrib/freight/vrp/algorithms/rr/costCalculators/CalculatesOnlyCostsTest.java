@@ -17,8 +17,11 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators;
 
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesOnlyCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
@@ -26,7 +29,7 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleImpl;
 import org.matsim.contrib.freight.vrp.utils.VrpTourBuilder;
 
-public class TourCostProcessorTest extends VRPTestCase {
+public class CalculatesOnlyCostsTest extends VRPTestCase {
 
 	TourImpl tour;
 
@@ -38,7 +41,7 @@ public class TourCostProcessorTest extends VRPTestCase {
 
 	CalculatesOnlyCost statusUpdater;
 
-	@Override
+	@Before
 	public void setUp() {
 		initJobsInPlainCoordinateSystem();
 		VrpTourBuilder tourBuilder = new VrpTourBuilder();
@@ -69,29 +72,33 @@ public class TourCostProcessorTest extends VRPTestCase {
 		vehicle = new VehicleImpl("dummy", "dummy", null);
 	}
 
-	@Override
-	public void tearDown() {
-
-	}
-
-	public void testCalculatedCosts() {
+	@Test
+	public void whenCalculating_totalTransportCost_is40() {
 		statusUpdater.calculate(tour, vehicle, driver);
-		assertEquals(40.0, tour.tourData.transportCosts);
+		assertEquals(40.0, tour.tourData.transportCosts, 0.1);
 	}
 
-	public void testCalculatedTime() {
+	@Test
+	public void whenCalculating_totalTime_is40() {
 		statusUpdater.calculate(tour, vehicle, driver);
-		assertEquals(40.0, tour.tourData.transportTime);
+		assertEquals(40.0, tour.tourData.transportTime, 0.1);
 	}
 
-	public void testCalculatedCostsForAnotherTour() {
+	@Test
+	public void whenCalculatingCostOfAnotherTour_totalTransportCost_is38() {
 		statusUpdater.calculate(anotherTour, vehicle, driver);
-		assertEquals(38.0, anotherTour.tourData.transportCosts);
+		assertEquals(38.0, anotherTour.tourData.transportCosts, 0.1);
 	}
 
-	public void testCalculatedTimeForAnotherTour() {
+	@Test
+	public void whenCalculatingCostOfAnotherTour_totalTransportTime_is38() {
 		statusUpdater.calculate(anotherTour, vehicle, driver);
-		assertEquals(38.0, anotherTour.tourData.transportTime);
+		assertEquals(38.0, anotherTour.tourData.transportTime, 0.1);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void whenAdding_aNullTour_throwException(){
+		statusUpdater.calculate(null, vehicle, driver);
 	}
 
 }

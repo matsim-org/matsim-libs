@@ -17,31 +17,33 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Before;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesCostAndTWs;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesLocalActInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesOnlyCost;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.CalculatesShipmentInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.RouteAgentFactoryImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.StandardRouteAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.costCalculators.TourCost;
 import org.matsim.contrib.freight.vrp.basics.Driver;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingCosts;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemType;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblemSolution;
 import org.matsim.contrib.freight.vrp.utils.RandomNumberGeneration;
+import org.matsim.contrib.freight.vrp.utils.RouteUtils;
 import org.matsim.contrib.freight.vrp.utils.VrpBuilder;
 import org.matsim.contrib.freight.vrp.utils.VrpUtils;
 import org.matsim.core.basic.v01.IdImpl;
@@ -54,7 +56,7 @@ import org.matsim.core.basic.v01.IdImpl;
  * 
  */
 
-public class RuinAndRecreateTest extends TestCase {
+public class RuinAndRecreateTest {
 
 	VehicleRoutingProblem vrp;
 
@@ -68,9 +70,9 @@ public class RuinAndRecreateTest extends TestCase {
 
 	VrpBuilder vrpBuilder;
 
-	RouteAgentFactory spFactory;
+	RouteAgentFactory agentFactory;
 
-	@Override
+	@Before
 	public void setUp() {
 		Logger.getRootLogger().setLevel(Level.INFO);
 		/*
@@ -100,8 +102,7 @@ public class RuinAndRecreateTest extends TestCase {
 		costs = new VehicleRoutingCosts() {
 
 			@Override
-			public double getTransportTime(String fromId, String toId,
-					double time, Driver driver, Vehicle vehicle) {
+			public double getTransportTime(String fromId, String toId,double time, Driver driver, Vehicle vehicle) {
 				int fromInt = 0;
 				try {
 					fromInt = Integer.parseInt(fromId);
@@ -117,20 +118,17 @@ public class RuinAndRecreateTest extends TestCase {
 			}
 
 			@Override
-			public double getTransportCost(String fromId, String toId,
-					double time, Driver driver, Vehicle vehicle) {
+			public double getTransportCost(String fromId, String toId,double time, Driver driver, Vehicle vehicle) {
 				return getTransportTime(fromId, toId, 0.0, null, null);
 			}
 
 			@Override
-			public double getBackwardTransportCost(String fromId, String toId,
-					double arrivalTime, Driver driver, Vehicle vehicle) {
+			public double getBackwardTransportCost(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
 				return getTransportCost(fromId, toId, arrivalTime, null, null);
 			}
 
 			@Override
-			public double getBackwardTransportTime(String fromId, String toId,
-					double arrivalTime, Driver driver, Vehicle vehicle) {
+			public double getBackwardTransportTime(String fromId, String toId,double arrivalTime, Driver driver, Vehicle vehicle) {
 				return getTransportTime(fromId, toId, arrivalTime, null, null);
 			}
 
@@ -144,18 +142,7 @@ public class RuinAndRecreateTest extends TestCase {
 					VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
 		}
 
-		TourCost tourCost = new TourCost() {
-
-			@Override
-			public double getTourCost(TourImpl tour, Driver driver,
-					Vehicle vehicle) {
-				return tour.tourData.transportCosts;
-			}
-
-		};
-
-		spFactory = new RouteAgentFactoryImpl(tourCost, new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), 
-				new CalculatesOnlyCost(costs));
+		agentFactory = new StandardRouteAgentFactory(new CalculatesShipmentInsertion(costs, new CalculatesLocalActInsertion(costs)), new CalculatesOnlyCost(costs));
 
 		// RuinAndRecreateConfig.RadialRuinConfig.jobDistance =
 		// RuinAndRecreateConfig.RadialRuinConfig.VRPCOST;
@@ -163,47 +150,30 @@ public class RuinAndRecreateTest extends TestCase {
 		RandomNumberGeneration.reset();
 	}
 
+	@Test
 	public void testSizeOfSolution() {
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23, "standard"));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
-				.createAlgorithm(vrp);
-		algo.run();
-		int active = getActiveVehicles(getTours(algo.getSolution()));
+		algo = new RuinAndRecreateStandardAlgorithmFactory(agentFactory).createAlgorithm(vrp);
+		VehicleRoutingProblemSolution solution = algo.solve();
+		int active = RouteUtils.getNuOfActiveRoutes(solution.getRoutes());
 		assertEquals(2, active);
 	}
 
-	private Id makeId(String string) {
-		return new IdImpl(string);
-	}
-
-	private Collection<TourImpl> getTours(RuinAndRecreateSolution solution) {
-		List<TourImpl> tours = new ArrayList<TourImpl>();
-		for (RouteAgent a : solution.getTourAgents()) {
-			tours.add(a.getRoute().getTour());
-		}
-		return tours;
-	}
-
+	@Test
 	public void testSolutionValue() {
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23, "standard"));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
-				.createAlgorithm(vrp);
-		algo.run();
-
-		Collection<TourImpl> solution = getTours(algo.getSolution());
-		int solVal = 0;
-		for (TourImpl t : solution) {
-			solVal += t.tourData.transportCosts;
-		}
-		assertEquals(397, solVal);
+		algo = new RuinAndRecreateStandardAlgorithmFactory(agentFactory).createAlgorithm(vrp);
+		VehicleRoutingProblemSolution solution = algo.solve();
+		assertEquals(397.0, RouteUtils.getTransportCosts(solution.getRoutes()),0.1);
 	}
 
+	@Test
 	public void testSolutionSizeWithCapacity16() {
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16, "standard"));
@@ -211,13 +181,12 @@ public class RuinAndRecreateTest extends TestCase {
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("4", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("5", "0", 16, "standard"));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
-				.createAlgorithm(vrp);
-		algo.run();
-		int active = getActiveVehicles(getTours(algo.getSolution()));
-		assertEquals(3, active);
+		algo = new RuinAndRecreateStandardAlgorithmFactory(agentFactory).createAlgorithm(vrp);
+		VehicleRoutingProblemSolution solution = algo.solve();
+		assertEquals(3, RouteUtils.getNuOfActiveRoutes(solution.getRoutes()));
 	}
 
+	@Test
 	public void testSolutionValueWithCapacity16() {
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("1", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16, "standard"));
@@ -225,26 +194,9 @@ public class RuinAndRecreateTest extends TestCase {
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("4", "0", 16, "standard"));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("5", "0", 16, "standard"));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new RuinAndRecreateStandardAlgorithmFactory(spFactory)
-				.createAlgorithm(vrp);
-		algo.run();
-
-		Collection<TourImpl> solution = getTours(algo.getSolution());
-		int solVal = 0;
-		for (TourImpl t : solution) {
-			solVal += t.tourData.transportCosts;
-		}
-		assertEquals(solVal, 445);
-	}
-
-	private int getActiveVehicles(Collection<TourImpl> solution) {
-		int active = 0;
-		for (TourImpl t : solution) {
-			if (t.getActivities().size() > 2) {
-				active++;
-			}
-		}
-		return active;
+		algo = new RuinAndRecreateStandardAlgorithmFactory(agentFactory).createAlgorithm(vrp);
+		VehicleRoutingProblemSolution solution = algo.solve();
+		assertEquals(445.0, RouteUtils.getTransportCosts(solution.getRoutes()),0.1);
 	}
 
 }
