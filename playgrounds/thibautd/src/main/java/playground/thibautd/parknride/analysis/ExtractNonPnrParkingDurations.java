@@ -27,7 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -36,22 +39,33 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
+import playground.thibautd.parknride.herbiespecific.RelevantCoordinates;
 import playground.thibautd.parknride.ParkAndRideConstants;
 
 /**
  * @author thibautd
  */
 public class ExtractNonPnrParkingDurations {
-	public static void main(final String[] args) {
-		final String eventsFile = args[ 0 ];
-		final String outFile = args[ 1 ];
+	private static final Coord CENTER = RelevantCoordinates.HAUPTBAHNHOF;
 
-		Handler handler = new Handler( outFile );
+	public static void main(final String[] args) {
+		final String networkFile = args[ 0 ];
+		final String eventsFile = args[ 1 ];
+		final String outFile = args[ 2 ];
+
+		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new MatsimNetworkReader( sc ).readFile( networkFile );
+
+		Handler handler = new Handler( sc.getNetwork() , outFile );
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler( handler );
 		new EventsReaderXMLv1( events ).parse( eventsFile );
@@ -59,15 +73,17 @@ public class ExtractNonPnrParkingDurations {
 	}
 
 	private static class Handler implements AgentArrivalEventHandler, AgentDepartureEventHandler, ActivityStartEventHandler {
+		private final Network network;
 		private final BufferedWriter writer;
 		private final List<Id> justParkedAgents = new ArrayList<Id>();
 		private final Map<Id, Double> payedParkingStarts = new HashMap<Id, Double>();
 
-		public Handler(final String file) {
+		public Handler(final Network network, final String file) {
+			this.network = network;
 			this.writer = IOUtils.getBufferedWriter( file );
 
 			try {
-				writer.write( "agentId\tduration" );
+				writer.write( "agentId\tduration\tdistanceToHb" );
 			} catch (IOException e) {
 				throw new UncheckedIOException( e );
 			}
@@ -102,9 +118,12 @@ public class ExtractNonPnrParkingDurations {
 			Double startOfParking = payedParkingStarts.remove( event.getPersonId() );
 			if (startOfParking == null) return;
 
+			final double dist = CoordUtils.calcDistance(
+					CENTER,
+					network.getLinks().get( event.getLinkId() ).getCoord());
 			try {
 				writer.newLine();
-				writer.write( event.getPersonId()+"\t"+(event.getTime() - startOfParking) );
+				writer.write( event.getPersonId()+"\t"+(event.getTime() - startOfParking)+"\t"+dist );
 			} catch (IOException e) {
 				throw new UncheckedIOException( e );
 			}
