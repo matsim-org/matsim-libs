@@ -21,11 +21,11 @@ public class TextFileWriter {
 	private final static Logger log = Logger.getLogger(TextFileWriter.class);
 
 	public void writeExtItData(String directoryExtItParam, SortedMap<Integer, ExtItInformation> extIt2information) {
-		File file = new File(directoryExtItParam+"/extItData.txt");
+		File file = new File(directoryExtItParam+"/extItData.csv");
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; Headway (hh:mm:ss) ; Fare (AUD) ; Capacity (Pers/Veh) ; OperatorCosts (AUD) ; OperatorRevenue (AUD); OperatorProfit (AUD) ; UsersLogSum (AUD) ; Welfare (AUD) ; CarLegs ; PtLegs ; WalkLegs ; AvgWaitingTimeAll (sec) ; AvgWaitingTimeNotMissing (sec) ; AvgWaitingTimeMissing (sec) ; NumberOfMissedBusTrips ; NumberOfNotMissedBusTrips ; MissedBusses ; t0MinusTActSum (sec) ; avgT0MinusTActPerPerson (sec) ; NumberOfAgentsNoValidPlan";
+	    String zeile1 = "ITERATION;NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);Capacity (Pers/Veh);OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;NumberOfAgentsNoValidPlan";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -50,9 +50,10 @@ public class TextFileWriter {
 	    	double missedBusses = extIt2information.get(iteration).getNumberOfMissedVehicles();
 	    	double t0MinustActSum = extIt2information.get(iteration).getT0MinusTActSum();
 	    	double avgT0MinustActPerPerson = extIt2information.get(iteration).getAvgT0MinusTActPerPerson();
+	    	double avgT0MinusTActDivT0perTrip = extIt2information.get(iteration).getAvgT0MinusTActDivT0PerTrip();
 	    	double numberOfAgentsNoValidPlan = extIt2information.get(iteration).getNoValidPlanScore();
 	    	
-	    	String zeile = iteration+ " ; "+numberOfBuses+" ; "+headway+" ; "+fare+" ; "+capacity+" ; "+costs+ " ; "+revenue+" ; "+operatorProfit+" ; "+userScoreSum+" ; "+totalScore+" ; "+carLegs+" ; "+ptLegs+" ; "+walkLegs+" ; "+avgWaitTimeAll+" ; " +avgWaitTimeNotMissing+" ; "+avgWaitTimeMissing+" ; "+waitingTimeMoreThanHeadway+" ; "+waitingTimeLessThanHeadway+" ; "+missedBusses+ " ; " +t0MinustActSum+ " ; " +avgT0MinustActPerPerson+ " ; " +numberOfAgentsNoValidPlan;
+	    	String zeile = iteration+ ";"+numberOfBuses+";"+headway+";"+fare+";"+capacity+";"+costs+ ";"+revenue+";"+operatorProfit+";"+userScoreSum+";"+totalScore+";"+carLegs+";"+ptLegs+";"+walkLegs+";"+avgWaitTimeAll+";" +avgWaitTimeNotMissing+";"+avgWaitTimeMissing+";"+waitingTimeMoreThanHeadway+";"+waitingTimeLessThanHeadway+";"+missedBusses+ ";" +t0MinustActSum+ ";" +avgT0MinustActPerPerson+ ";" +avgT0MinusTActDivT0perTrip+ ";" +numberOfAgentsNoValidPlan;
 	
 	    	bw.write(zeile);
 	        bw.newLine();
@@ -73,6 +74,7 @@ public class TextFileWriter {
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2carLegs = new TreeMap<Integer, SortedMap<Double, Double>>();
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2ptLegs = new TreeMap<Integer, SortedMap<Double, Double>>();
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2avgT0MinusTAktPerPerson = new TreeMap<Integer, SortedMap<Double, Double>>();
+		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2avgT0MinusTActDivT0PerTrip = new TreeMap<Integer, SortedMap<Double, Double>>();
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2numberOfMissedBusTrips = new TreeMap<Integer, SortedMap<Double, Double>>();
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2avgWaitingTimeMissing = new TreeMap<Integer, SortedMap<Double, Double>>();
 		SortedMap<Integer, SortedMap<Double, Double>> busNumber2fare2avgWaitingTimeNotMissing = new TreeMap<Integer, SortedMap<Double, Double>>();
@@ -88,6 +90,7 @@ public class TextFileWriter {
 			SortedMap<Double, Double> fare2carLegs = new TreeMap<Double, Double>();
 			SortedMap<Double, Double> fare2ptLegs = new TreeMap<Double, Double>();
 			SortedMap<Double, Double> fare2avgT0MinusTAktPerPerson = new TreeMap<Double, Double>();
+			SortedMap<Double, Double> fare2avgT0MinusTActDivT0PerTrip = new TreeMap<Double, Double>();
 			SortedMap<Double, Double> fare2numberOfMissedBusTrips = new TreeMap<Double, Double>();
 			SortedMap<Double, Double> fare2avgWaitingTimeMissing = new TreeMap<Double, Double>();
 			SortedMap<Double, Double> fare2avgWaitingTimeNotMissing = new TreeMap<Double, Double>();
@@ -102,6 +105,7 @@ public class TextFileWriter {
 					fare2carLegs.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getNumberOfCarLegs());
 					fare2ptLegs.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getNumberOfPtLegs());
 					fare2avgT0MinusTAktPerPerson.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getAvgT0MinusTActPerPerson());
+					fare2avgT0MinusTActDivT0PerTrip.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getAvgT0MinusTActDivT0PerTrip());
 					fare2numberOfMissedBusTrips.put(it2information.get(it2).getFare()*(-1), (double) it2information.get(it2).getMissedBusTrips());
 					fare2avgWaitingTimeMissing.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getAvgWaitingTimeMissingBus());
 					fare2avgWaitingTimeNotMissing.put(it2information.get(it2).getFare()*(-1), it2information.get(it2).getAvgWaitingTimeNotMissingBus());
@@ -116,6 +120,7 @@ public class TextFileWriter {
 			busNumber2fare2carLegs.put((int) numberOfBuses, fare2carLegs);
 			busNumber2fare2ptLegs.put((int) numberOfBuses, fare2ptLegs);
 			busNumber2fare2avgT0MinusTAktPerPerson.put((int) numberOfBuses, fare2avgT0MinusTAktPerPerson);
+			busNumber2fare2avgT0MinusTActDivT0PerTrip.put((int) numberOfBuses, fare2avgT0MinusTActDivT0PerTrip);
 			busNumber2fare2numberOfMissedBusTrips.put((int) numberOfBuses, fare2numberOfMissedBusTrips);
 			busNumber2fare2avgWaitingTimeMissing.put((int) numberOfBuses, fare2avgWaitingTimeMissing);
 			busNumber2fare2avgWaitingTimeNotMissing.put((int) numberOfBuses, fare2avgWaitingTimeNotMissing);
@@ -126,15 +131,16 @@ public class TextFileWriter {
 	    }
 		
 		// Write sorted data to text file
-		writeMatrix(busNumber2fare2welfare, directoryExtItParam, "matrix_welfare.txt", "Welfare (AUD)");
-		writeMatrix(busNumber2fare2profit, directoryExtItParam, "matrix_profit.txt", "Profit (AUD)");
-		writeMatrix(busNumber2fare2userLogsum, directoryExtItParam, "matrix_userLogsum.txt", "UserLogSum (AUD)");
-		writeMatrix(busNumber2fare2carLegs, directoryExtItParam, "matrix_carLegs.txt", "Number of Car Legs");
-		writeMatrix(busNumber2fare2ptLegs, directoryExtItParam, "matrix_ptLegs.txt", "Number of Pt Legs");
-		writeMatrix(busNumber2fare2avgT0MinusTAktPerPerson, directoryExtItParam, "matrix_car_avgT0MinusTAktPerPerson.txt", "avg t0-tAkt per car-user (sec)");
-		writeMatrix(busNumber2fare2numberOfMissedBusTrips, directoryExtItParam, "matrix_pt_numberOfMissedBusTrips.txt", "Number of Trips when a bus was missed");
-		writeMatrix(busNumber2fare2avgWaitingTimeMissing, directoryExtItParam, "matrix_pt_avgWaitingTimeMissing.txt", "avg waiting time per pt-user when a bus was missed (sec)");
-		writeMatrix(busNumber2fare2avgWaitingTimeNotMissing, directoryExtItParam, "matrix_pt_avgWaitingTimeNotMissing.txt", "avg waiting time per pt-user when person got the first arriving bus (sec)");
+		writeMatrix(busNumber2fare2welfare, directoryExtItParam, "matrix_welfare.csv", "Welfare (AUD)");
+		writeMatrix(busNumber2fare2profit, directoryExtItParam, "matrix_profit.csv", "Profit (AUD)");
+		writeMatrix(busNumber2fare2userLogsum, directoryExtItParam, "matrix_userLogsum.csv", "UserLogSum (AUD)");
+		writeMatrix(busNumber2fare2carLegs, directoryExtItParam, "matrix_carLegs.csv", "Number of Car Legs");
+		writeMatrix(busNumber2fare2ptLegs, directoryExtItParam, "matrix_ptLegs.csv", "Number of Pt Legs");
+		writeMatrix(busNumber2fare2avgT0MinusTAktPerPerson, directoryExtItParam, "matrix_car_avgT0MinusTAktPerPerson.csv", "avg t0-tAkt per car-user (sec)");
+		writeMatrix(busNumber2fare2avgT0MinusTActDivT0PerTrip, directoryExtItParam, "matrix_car_avgT0MinusTActDivT0PerTrip.csv", "avg (t0-tAct)/t0 per car-trip");
+		writeMatrix(busNumber2fare2numberOfMissedBusTrips, directoryExtItParam, "matrix_pt_numberOfMissedBusTrips.csv", "Number of Trips when a bus was missed");
+		writeMatrix(busNumber2fare2avgWaitingTimeMissing, directoryExtItParam, "matrix_pt_avgWaitingTimeMissing.csv", "avg waiting time per pt-user when a bus was missed (sec)");
+		writeMatrix(busNumber2fare2avgWaitingTimeNotMissing, directoryExtItParam, "matrix_pt_avgWaitingTimeNotMissing.csv", "avg waiting time per pt-user when person got the first arriving bus (sec)");
 		
 		// ...
 	}
@@ -152,7 +158,7 @@ public class TextFileWriter {
 //		String zeile = "BusNumber / Fare (AUD) ";
 	    String zeile = "";
 		for (Double fare : busNumber2fare2value.get(busNumber2fare2value.firstKey()).keySet()){
-		   zeile = zeile + " ; " + fare.toString();
+		   zeile = zeile + ";" + fare.toString();
 		}
 		bw.write(zeile);
 		bw.newLine();
@@ -160,7 +166,7 @@ public class TextFileWriter {
 		for (Integer busNumber : busNumber2fare2value.keySet()){
 	        String zeileX = busNumber.toString();
 	        for (Double fare : busNumber2fare2value.get(busNumber).keySet()){
-	        	zeileX = zeileX + " ; " + busNumber2fare2value.get(busNumber).get(fare).toString();
+	        	zeileX = zeileX + ";" + busNumber2fare2value.get(busNumber).get(fare).toString();
 	        }
 	    bw.write(zeileX);
 		bw.newLine();
@@ -178,7 +184,7 @@ public class TextFileWriter {
 		File directory = new File(path);
 		directory.mkdirs();
 
-		File file = new File(path + "/transitStopWaitData.txt");
+		File file = new File(path + "/transitStopWaitData.csv");
 			
 		try {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -187,7 +193,7 @@ public class TextFileWriter {
 		bw.write(zeile0);
 		bw.newLine();
 		    
-		String zeile1 = "TransitStopId ; SumOfWaitingTime (sec) ; AverageWaitingTime (sec) ; WaitingTime > Headway (trips) ; MissedVehicles";
+		String zeile1 = "TransitStopId;SumOfWaitingTime (sec);AverageWaitingTime (sec);WaitingTime > Headway (trips);MissedVehicles";
 		bw.write(zeile1);
 		bw.newLine();
 		
@@ -199,7 +205,7 @@ public class TextFileWriter {
 	    	int waitTimeMoreThanHeadway = facilityInfo.getNumberOfWaitingTimesMoreThanHeadway();
 	    	int missedVehicles = facilityInfo.getNumberOfMissedVehicles();
 	    	
-	    	String zeile = facilityId + " ; " + sumWaitTime + " ; " + avgWaitTime + " ; " + waitTimeMoreThanHeadway + " ; " + missedVehicles;
+	    	String zeile = facilityId + ";" + sumWaitTime + ";" + avgWaitTime + ";" + waitTimeMoreThanHeadway + ";" + missedVehicles;
 	
 	    	bw.write(zeile);
 	        bw.newLine();
@@ -219,7 +225,7 @@ public class TextFileWriter {
 		
 		for (FacilityWaitTimeInfo facilityInfo : extIt2information.get(extItParam1).getId2facilityWaitInfo().values()) {
 			
-			File file = new File(path + "/transitStopWaitData_" + facilityInfo.getFacilityId().toString() + ".txt");
+			File file = new File(path + "/transitStopWaitData_" + facilityInfo.getFacilityId().toString() + ".csv");
 			
 			try {
 			    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -228,7 +234,7 @@ public class TextFileWriter {
 			    bw.write(zeile0);
 			    bw.newLine();
 			    
-			    String zeile1 = "WaitingTimeId ; Daytime (sec) (when entering a vehicle) ; PersonId ; WaitingTime (sec)";
+			    String zeile1 = "WaitingTimeId;Daytime (sec) (when entering a vehicle);PersonId;WaitingTime (sec)";
 			    bw.write(zeile1);
 			    bw.newLine();
 			   			   	
@@ -238,7 +244,7 @@ public class TextFileWriter {
 			    	Double waitingTime = facilityInfo.getWaitingEvent2WaitingTime().get(waitingTimeId);
 			    	Id personId = facilityInfo.getWaitingEvent2PersonId().get(waitingTimeId);
 			    	
-			    	String zeile = waitingTimeId + " ; " + dayTime + " ; " + personId + " ; "+ waitingTime;
+			    	String zeile = waitingTimeId + ";" + dayTime + ";" + personId + ";"+ waitingTime;
 			
 			    	bw.write(zeile);
 			        bw.newLine();
@@ -250,8 +256,6 @@ public class TextFileWriter {
 		    
 			    } catch (IOException e) {}		
 			
-			
-			
 		}
 		
 	}
@@ -261,7 +265,7 @@ public class TextFileWriter {
 		File directory = new File(path);
 		directory.mkdirs();
 
-		File file = new File(path + "/LoadDataTransitStops.txt");
+		File file = new File(path + "/LoadDataTransitStops.csv");
 			
 		try {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -287,7 +291,7 @@ public class TextFileWriter {
 				bw.write(zeilePeriod);
 				bw.newLine();
 	
-				String zeile2 = "TransitStopId ; EnteringAgents ; LeavingAgents ; PassengersWhenLeavingTransitStop";
+				String zeile2 = "TransitStopId;EnteringAgents;LeavingAgents;PassengersWhenLeavingTransitStop";
 				bw.write(zeile2);
 				bw.newLine();
 				
@@ -295,7 +299,7 @@ public class TextFileWriter {
 				List<Id> stopIDs = anaPeriod.getRouteId2RouteInfo().get(routeId).getStopIDs();
 				
 				for (Id stopId : stopIDs){
-					String zeile3 = stopId.toString() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPersonEntering() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPersonLeaving() + " ; " + stopId2FacilityLoadInfo.get(stopId).getPassengersWhenLeavingFacility();
+					String zeile3 = stopId.toString() + ";" + stopId2FacilityLoadInfo.get(stopId).getPersonEntering() + ";" + stopId2FacilityLoadInfo.get(stopId).getPersonLeaving() + ";" + stopId2FacilityLoadInfo.get(stopId).getPassengersWhenLeavingFacility();
 					bw.write(zeile3);
 					bw.newLine();
 				}		
@@ -314,7 +318,7 @@ public class TextFileWriter {
 		File directory = new File(path);
 		directory.mkdirs();
 
-		File file = new File(path + "/LoadData.txt");
+		File file = new File(path + "/LoadData.csv");
 			
 		try {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -325,12 +329,12 @@ public class TextFileWriter {
 		
 		ExtItInformation info = extIt2information.get(extItParam1);
 
-		String zeile1 = "Period (from-to) ; EnteringAgents ; LeavingAgents";
+		String zeile1 = "Period (from-to);EnteringAgents;LeavingAgents";
 		bw.write(zeile1);
 		bw.newLine();
 		
 		for (AnalysisPeriod anaPeriod : info.getAnalysisPeriods().values()){
-			String zeile = anaPeriod.getStart()/3600. + " - " + anaPeriod.getEnd()/3600. + " ; " + anaPeriod.getEntering() + " ; " + anaPeriod.getLeaving();
+			String zeile = anaPeriod.getStart()/3600. + " - " + anaPeriod.getEnd()/3600. + ";" + anaPeriod.getEntering() + ";" + anaPeriod.getLeaving();
 			bw.write(zeile);
 			bw.newLine();
 		}
@@ -348,7 +352,7 @@ public class TextFileWriter {
 		File directory = new File(path);
 		directory.mkdirs();
 
-		File file = new File(path + "/personWaitData.txt");
+		File file = new File(path + "/personWaitData.csv");
 			
 		try {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -357,7 +361,7 @@ public class TextFileWriter {
 		bw.write(zeile0);
 		bw.newLine();
 		    
-		String zeile1 = "PersonId ; WaitingTimes [sec]";
+		String zeile1 = "PersonId;WaitingTimes [sec]";
 		bw.write(zeile1);
 		bw.newLine();
 		
@@ -368,7 +372,7 @@ public class TextFileWriter {
 			String zeile = personId.toString();
 	    	
 	    	for (Double time : waitingTimes){
-	    		zeile = zeile + " ; " + time.toString();
+	    		zeile = zeile + ";" + time.toString();
 	    	}
 	 
 	    	bw.write(zeile);

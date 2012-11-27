@@ -51,6 +51,7 @@ public class ExtItInformation {
 	
 	private double avgT0MinusTActPerPerson;
 	private double t0MinusTActSum;
+	private double avgT0MinusTActDivT0PerTrip;
 	
 	private List <Double> waitingTimes = new ArrayList<Double>();
 	private List <Double> waitingTimesMissed = new ArrayList<Double>();
@@ -284,6 +285,17 @@ public class ExtItInformation {
 
 	public double getT0MinusTActSum() {
 		return t0MinusTActSum;
+	}
+
+	public double getAvgT0MinusTActDivT0PerTrip() {
+		if (Math.abs(this.avgT0MinusTActDivT0PerTrip) < 0.0001){
+			this.avgT0MinusTActDivT0PerTrip = 0.;
+		}
+		return avgT0MinusTActDivT0PerTrip;
+	}
+
+	public void setAvgT0MinusTActDivT0PerTrip(double avgT0MinusTActDivT0PerTrip) {
+		this.avgT0MinusTActDivT0PerTrip = avgT0MinusTActDivT0PerTrip;
 	}
 		
 }
