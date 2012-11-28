@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -421,6 +422,7 @@ public class DataPloter {
 		TextTitle title = chart.getTitle();
 		Font font = title.getFont();
 		title.setFont( font.deriveFont( TITLE_FONT_SIZE ) );
+		chart.getPlot().setBackgroundPaint(new Color(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
