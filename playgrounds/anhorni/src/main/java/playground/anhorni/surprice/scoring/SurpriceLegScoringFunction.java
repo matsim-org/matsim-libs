@@ -90,13 +90,13 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			String mode = this.memory.getMainModePreviousDay(this.day);
 			
 			if (mode.equals("car")) {
-				this.constantCar = this.params.constantCar * fLagged;
+				this.constantCar = this.params.constantCar * fLagged + 2 * (1.0 - fLagged);
 			} else if (mode.equals("pt")) {
-				this.constantPt = this.params.constantPt * fLagged;
+				this.constantPt = this.params.constantPt * fLagged + 2 * (1.0 - fLagged);
 			} else if (mode.equals("bike")) {
-				this.constantBike = this.params.constantBike * fLagged;			
+				this.constantBike = this.params.constantBike * fLagged + 2 * (1.0 - fLagged);			
 			} else if (mode.equals("walk")) {
-				this.constantWalk = this.params.constantWalk * fLagged;
+				this.constantWalk = this.params.constantWalk * fLagged + 2 * (1.0 - fLagged);
 			}
 			else {
 				// do nothing
