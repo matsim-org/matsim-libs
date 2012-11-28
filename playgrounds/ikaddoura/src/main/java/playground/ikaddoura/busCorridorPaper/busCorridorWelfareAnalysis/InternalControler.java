@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 public class InternalControler {
 	private final static Logger log = Logger.getLogger(InternalControler.class);
 
-	PtLegHandler ptLegHandler;
+	private PtLegHandler ptLegHandler;
 	
 	private final Scenario scenario;
 	private final String directoryExtIt;
@@ -76,9 +76,9 @@ public class InternalControler {
 		this.fare = fare;
 		this.ptLegHandler = new PtLegHandler();
 	
-		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt(); // estimated parameter -2.08; is being adjusted via config
-		log.warn("Setting constant for PT to " + this.CONSTANT_PT);
-		log.warn("Setting randomSeed to " + scenario.getConfig().global().getRandomSeed());
+		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt(); //adjusted via config
+		log.info("Setting constant for PT to " + this.CONSTANT_PT);
+		log.info("Setting randomSeed to " + scenario.getConfig().global().getRandomSeed());
 //		this.LATE_ARRIVAL = -1. * this.PERFORMING * 2.; // coming early (which is the opportunity costs of time) multiplied by 3 --> multiplying by 2 (see Hollander 2006)
 
 	}
@@ -123,6 +123,7 @@ public class InternalControler {
 		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
 		
+		controler.setCreateGraphs(false);
 		controler.run();		
 	}
 
