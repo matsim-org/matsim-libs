@@ -324,7 +324,7 @@ public class DynusTMobsim implements Mobsim {
 		for (Tuple<Double, Double> t : this.dc.getVehTrajectoryExtracts()) {
 			String filename = "VehTrajectories_" + Time.writeTime(t.getFirst(), Time.TIMEFORMAT_HHMM, '_') + "-" + Time.writeTime(t.getSecond(), Time.TIMEFORMAT_HHMM, '_') + ".dat";
 			String outputFile = this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), filename);
-			Extractor.filterVehTrajectory(vehTrajFilename, t.getFirst(), t.getSecond(), outputFile);
+			Extractor.filterVehTrajectory(vehTrajFilename, t.getFirst() / 60.0, t.getSecond() / 60.0, outputFile); // convert times from seconds to minutes
 		}
 	}
 }

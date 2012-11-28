@@ -56,7 +56,7 @@ public class Extractor {
 		filterVehTrajectory(inputVehTrajectory, startTimeInMinutes, stopTimeInMinutes, outputVehTrajectory);
 	}
 	
-	public static void filterVehTrajectory(final String inputFile, final double startTime, final double stopTime, final String outputFile) {
+	public static void filterVehTrajectory(final String inputFile, final double startTimeInMinutes, final double stopTimeInMinutes, final String outputFile) {
 		BufferedReader reader = IOUtils.getBufferedReader(inputFile);
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
@@ -122,7 +122,7 @@ public class Extractor {
 				}
 				
 				// now decide if we use this veh trajectory
-				if ((sTime >= startTime) && (sTime < stopTime)) {
+				if ((sTime >= startTimeInMinutes) && (sTime < stopTimeInMinutes)) {
 					// copy lines to output File
 					for (String tmp : tmpLines) {
 						writer.write(tmp);
