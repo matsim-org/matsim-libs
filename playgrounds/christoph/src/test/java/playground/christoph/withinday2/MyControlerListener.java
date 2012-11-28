@@ -1,15 +1,15 @@
 package playground.christoph.withinday2;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 
-public class MyControlerListener implements StartupListener {
+public class MyControlerListener implements IterationStartsListener {
 
 	@Override
-	public void notifyStartup(StartupEvent event) {
+	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler controler = event.getControler() ;
-		controler.setMobsimFactory(new MyMobsimFactory(controler.getTravelDisutilityFactory(), controler.getMultiModalTravelTimes()));
+		controler.setMobsimFactory(new MyMobsimFactory(controler.getTravelDisutilityFactory(), controler.getMultiModalTravelTimes()));		
 	}
 
 }

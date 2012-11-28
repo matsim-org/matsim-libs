@@ -19,12 +19,15 @@
 
 package playground.christoph.withinday;
 
+import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EquilTest extends MatsimTestCase {
 
 	public void testScenario(){
-		MyWithinDayControler.start(this.loadConfig(this.getInputDirectory() + "config.xml"));
+		Config config = this.loadConfig(this.getInputDirectory() + "config.xml");
+		config.multiModal().setMultiModalSimulationEnabled(true);
+		MyWithinDayControler.start(config);
 	}
 
 }
