@@ -44,13 +44,21 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 
 	private final GripsConfigModule gcm;
 
-	public GripsConfigDeserializer(GripsConfigModule gcm) {
-		this(GripsConfigSerializer.SCHEMA,gcm);
+
+	private final boolean validate;
+
+	public GripsConfigDeserializer(GripsConfigModule gcm, boolean validate) {
+		this(GripsConfigSerializer.SCHEMA,gcm,validate);
 	}
 	
-	protected GripsConfigDeserializer(String schemaLocation, GripsConfigModule gcm) {
+	public GripsConfigDeserializer(GripsConfigModule gcm) {
+		this(GripsConfigSerializer.SCHEMA,gcm,true);
+	}
+	
+	protected GripsConfigDeserializer(String schemaLocation, GripsConfigModule gcm, boolean validate) {
 		super(schemaLocation);
 		this.gcm = gcm;
+		this.validate = validate;
 	}
 
 	@Override
@@ -62,9 +70,11 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 		try {
 			jc = JAXBContext.newInstance(org.matsim.contrib.grips.io.jaxb.gripsconfig.ObjectFactory.class);
 			Unmarshaller u = jc.createUnmarshaller();
-			// validate XML file
-			log.info("starting to validate " + filename);
-			super.validateFile(filename, u);
+			if (this.validate) {
+				// validate XML file
+				log.info("starting to validate " + filename);
+				super.validateFile(filename, u);				
+			}
 			log.info("starting unmarshalling " + filename);
 			stream = IOUtils.getInputStream(filename);
 			JAXBElement<GripsConfigType> el = (JAXBElement<GripsConfigType>)u.unmarshal(stream);
@@ -92,6 +102,7 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 		this.gcm.setPopulationFileName(gct.getPopulationFile().getInputFile());
 		this.gcm.setSampleSize(gct.getSampleSize()+"");
 		this.gcm.setDepartureTimeDistribution(gct.getDepartureTimeDistribution());
+		this.gcm.setMainTrafficType(gct.getMainTrafficType().value());
 		
 	}
 

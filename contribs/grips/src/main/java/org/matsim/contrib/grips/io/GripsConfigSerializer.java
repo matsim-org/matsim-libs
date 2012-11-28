@@ -34,6 +34,7 @@ import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.FileType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.GripsConfigType;
+import org.matsim.contrib.grips.io.jaxb.gripsconfig.MainTrafficTypeType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.ObjectFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
@@ -85,7 +86,9 @@ private static final Logger log = Logger.getLogger(GripsConfigSerializer.class);
 		outDir.setInputFile(this.gcm.getOutputDir());
 		DepartureTimeDistributionType depTimeDistr = this.gcm.getDepartureTimeDistribution();
 		
+		MainTrafficTypeType mtt = MainTrafficTypeType.fromValue(this.gcm.getMainTrafficType());
 		
+		gct.setMainTrafficType(mtt);
 		gct.setEvacuationAreaFile(evacArea);
 		gct.setNetworkFile(net);
 		gct.setOutputDir(outDir);
@@ -161,6 +164,7 @@ private static final Logger log = Logger.getLogger(GripsConfigSerializer.class);
 		gct.setPopulationFile(pop);
 		gct.setDepartureTimeDistribution(this.gcm.getDepartureTimeDistribution());
 		gct.setSampleSize(this.gcm.getSampleSize());
+		gct.setMainTrafficType(MainTrafficTypeType.fromValue(this.gcm.getMainTrafficType()));
 		
 		
 		

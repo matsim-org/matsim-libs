@@ -155,10 +155,20 @@ public class GripsConfigModule extends Module {
 
 	//from here things only work for the xsd based config
 	private DepartureTimeDistributionType distribution;
+
 	public void setDepartureTimeDistribution(DepartureTimeDistributionType departureTimeDistributionType) {
 		this.distribution = departureTimeDistributionType;
 	}
 	public DepartureTimeDistributionType getDepartureTimeDistribution() {
 		return this.distribution;
+	}
+
+	private String mainTrafficType = null;
+	public String getMainTrafficType() {
+		return this.mainTrafficType;
+	}
+	
+	public void setMainTrafficType(String mainTrafficType) {
+		this.mainTrafficType = mainTrafficType;
 	}
 }

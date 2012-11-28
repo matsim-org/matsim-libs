@@ -38,6 +38,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			String networkFile = "network-dummy-file-name";
 			String outputDir = "dummy-output-dir-name";
 			String populationFile = "population-dummy-file-name";
+			String mainTrafficType = "mixed";
 			DistributionType distrType = DistributionType.LOG_NORMAL;
 			double mu = 0;
 			double sigma = .25;
@@ -52,6 +53,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			gcm.setOutputDir(outputDir);
 			gcm.setPopulationFileName(populationFile);
 			gcm.setSampleSize(Double.toString(sampleSize));
+			gcm.setMainTrafficType(mainTrafficType);
 			
 			
 			ObjectFactory fac = new ObjectFactory();
@@ -68,7 +70,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			serializer.serialize(outputFile);
 			
 			GripsConfigModule gcm2 = new GripsConfigModule("grips");
-			GripsConfigDeserializer deserializer = new GripsConfigDeserializer(gcm2);
+			GripsConfigDeserializer deserializer = new GripsConfigDeserializer(gcm2,false);
 			deserializer.readFile(outputFile);
 			
 			assertEquals(evacuationAreaFile, gcm2.getEvacuationAreaFileName());
@@ -81,6 +83,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			assertEquals(mu, gcm2.getDepartureTimeDistribution().getMu());
 			assertEquals(earliest, gcm2.getDepartureTimeDistribution().getEarliest());
 			assertEquals(latest, gcm2.getDepartureTimeDistribution().getLatest());
+			assertEquals(mainTrafficType, gcm2.getMainTrafficType());
 		}
 
 }

@@ -14,34 +14,34 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for distributionType.
+ * <p>Java class for mainTrafficTypeType.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="distributionType">
+ * &lt;simpleType name="mainTrafficTypeType">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="normal"/>
- *     &lt;enumeration value="log-normal"/>
- *     &lt;enumeration value="dirac-delta"/>
+ *     &lt;enumeration value="vehicular"/>
+ *     &lt;enumeration value="pedestrian"/>
+ *     &lt;enumeration value="mixed"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "distributionType")
+@XmlType(name = "mainTrafficTypeType")
 @XmlEnum
-public enum DistributionType {
+public enum MainTrafficTypeType {
 
-    @XmlEnumValue("normal")
-    NORMAL("normal"),
-    @XmlEnumValue("log-normal")
-    LOG_NORMAL("log-normal"),
-    @XmlEnumValue("dirac-delta")
-    DIRAC_DELTA("dirac-delta");
+    @XmlEnumValue("vehicular")
+    VEHICULAR("vehicular"),
+    @XmlEnumValue("pedestrian")
+    PEDESTRIAN("pedestrian"),
+    @XmlEnumValue("mixed")
+    MIXED("mixed");
     private final String value;
 
-    DistributionType(String v) {
+    MainTrafficTypeType(String v) {
         value = v;
     }
 
@@ -49,8 +49,8 @@ public enum DistributionType {
         return value;
     }
 
-    public static DistributionType fromValue(String v) {
-        for (DistributionType c: DistributionType.values()) {
+    public static MainTrafficTypeType fromValue(String v) {
+        for (MainTrafficTypeType c: MainTrafficTypeType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }
