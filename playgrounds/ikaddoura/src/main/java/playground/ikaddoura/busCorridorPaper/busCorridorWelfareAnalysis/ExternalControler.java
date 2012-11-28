@@ -119,7 +119,7 @@ class ExternalControler {
 	}
 
 	private void run() throws IOException {
-		ChartFileWriter chartWriter = new ChartFileWriter();
+//		ChartFileWriter chartWriter = new ChartFileWriter();
 		TextFileWriter textWriter = new TextFileWriter();
 		
 		setDefaultParameters();
