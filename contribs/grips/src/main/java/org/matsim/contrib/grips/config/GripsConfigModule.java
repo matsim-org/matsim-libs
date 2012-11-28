@@ -163,7 +163,7 @@ public class GripsConfigModule extends Module {
 		return this.distribution;
 	}
 
-	private String mainTrafficType = null;
+	private String mainTrafficType = "vehicular";
 	public String getMainTrafficType() {
 		return this.mainTrafficType;
 	}
