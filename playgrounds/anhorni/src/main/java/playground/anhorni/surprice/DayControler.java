@@ -120,7 +120,7 @@ public class DayControler extends Controler {
 				this.random.nextDouble();
 			}
 			
-			double fLagged = 0.5 * this.random.nextDouble(); // [0.5 .. 1.5]
+			double fLagged = 0.5 + this.random.nextDouble(); // [0.5 .. 1.5]
 			p.getCustomAttributes().put(day + ".fLagged", fLagged);
 		}
 	}

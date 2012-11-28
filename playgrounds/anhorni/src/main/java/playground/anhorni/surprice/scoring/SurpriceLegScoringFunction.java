@@ -80,10 +80,6 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     	this.person = person;
         
 		this.reset();		
-				
-		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
-			this.adaptCoefficientsLagged();
-		}
 	}
         
     private void adaptCoefficientsLagged() {    	
@@ -94,13 +90,13 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			String mode = this.memory.getMainModePreviousDay(this.day);
 			
 			if (mode.equals("car")) {
-				this.constantCar *= fLagged;
+				this.constantCar = this.params.constantCar * fLagged;
 			} else if (mode.equals("pt")) {
-				this.constantPt *= fLagged;
+				this.constantPt = this.params.constantPt * fLagged;
 			} else if (mode.equals("bike")) {
-				this.constantBike *= fLagged;			
+				this.constantBike = this.params.constantBike * fLagged;			
 			} else if (mode.equals("walk")) {
-				this.constantWalk *= fLagged;
+				this.constantWalk = this.params.constantWalk * fLagged;
 			}
 			else {
 				// do nothing
@@ -114,6 +110,10 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 		this.person.getCustomAttributes().put(day + ".legScore", null);
 		this.person.getCustomAttributes().put(day + ".legMonetaryCosts", null);
+		this.constantCar = this.params.constantCar;
+    	this.constantPt = this.params.constantPt;
+    	this.constantBike = this.params.constantBike;
+    	this.constantWalk = this.params.constantWalk;
 	}
 
 	@Override
@@ -135,6 +135,10 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
+		
+		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
+			this.adaptCoefficientsLagged();			
+		}
 		
 		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePrefs"))) {
 			this.alpha_tot = 1.0;
