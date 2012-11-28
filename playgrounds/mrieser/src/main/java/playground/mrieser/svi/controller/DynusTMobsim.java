@@ -19,6 +19,8 @@
 
 package playground.mrieser.svi.controller;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -72,9 +74,10 @@ public class DynusTMobsim implements Mobsim {
 			Plan plan = person.getSelectedPlan();
 			collector.run(plan);
 		}
-		log.info("Number of Trips handed over to DynusT: " + collector.getCounter());
-
-		log.info("write demand for Dynus-T");
+		log.info("Number of trips handed over to DynusT: " + collector.getCounter());
+		printModeShares(collector);
+		
+		log.info("write demand for Dynus-T with factor " + this.dc.getDemandFactor());
 		DynusTDynamicODDemandWriter writer = new DynusTDynamicODDemandWriter(odm, this.dc.getZoneIdToIndexMapping());
 		writer.setMultiplyFactor(this.dc.getDemandFactor());
 		writer.writeTo(this.dc.getOutputDirectory() + "/demand.dat");
@@ -104,5 +107,16 @@ public class DynusTMobsim implements Mobsim {
 		linkStats.writeLinkTravelTimesToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelTimes.txt"));
 		linkStats.writeLinkTravelSpeedsToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelSpeeds.txt"));
 	}
-
+	
+	private void printModeShares(final DynamicODDemandCollector collector) {
+		log.info("Mode share statistics:");
+		int sum = 0;
+		for (Map.Entry<String, Integer> e : collector.getModeCounts().entrySet()) {
+			sum += e.getValue().intValue();
+		}
+		for (Map.Entry<String, Integer> e : collector.getModeCounts().entrySet()) {
+			log.info("   # trips with mode " + e.getKey() + " = " + e.getValue() + " (" + ((e.getValue().doubleValue() / (double) sum) * 100) + "%)");
+		}		
+	}
+	
 }

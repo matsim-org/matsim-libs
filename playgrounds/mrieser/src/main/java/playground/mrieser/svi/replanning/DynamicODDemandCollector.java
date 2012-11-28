@@ -19,6 +19,9 @@
 
 package playground.mrieser.svi.replanning;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,6 +41,7 @@ public class DynamicODDemandCollector implements PlanAlgorithm {
 	private final DynamicODMatrix odm;
 	private final ActivityToZoneMapping mapping;
 	private int counter = 0;
+	private final Map<String, Integer> modeCounts = new HashMap<String, Integer>();
 	
 	public DynamicODDemandCollector(final DynamicODMatrix odm, final ActivityToZoneMapping actToZoneMapping) {
 		this.odm = odm;
@@ -62,15 +66,25 @@ public class DynamicODDemandCollector implements PlanAlgorithm {
 
 				String zoneId = activityZones[idx];
 
-				if (lastAct != null && lastLeg != null && lastLeg.getMode().equals(TransportMode.car)) {
+				if (lastAct != null && lastLeg != null) {
+					String mode = lastLeg.getMode();
 					
-					double tripStartTime = lastAct.getEndTime();
-					if (tripStartTime == Time.UNDEFINED_TIME) {
-						tripStartTime = lastAct.getStartTime() + lastAct.getMaximumDuration();
+					Integer cnt = this.modeCounts.get(mode);
+					if (cnt == null) {
+						this.modeCounts.put(mode, 1);
+					} else {
+						this.modeCounts.put(mode, 1 + cnt.intValue());
 					}
 					
-					this.odm.addTrip(tripStartTime, lastZoneId, zoneId);
-					this.counter++;
+					if (mode.equals(TransportMode.car)) {
+						double tripStartTime = lastAct.getEndTime();
+						if (tripStartTime == Time.UNDEFINED_TIME) {
+							tripStartTime = lastAct.getStartTime() + lastAct.getMaximumDuration();
+						}
+						
+						this.odm.addTrip(tripStartTime, lastZoneId, zoneId);
+						this.counter++;
+					}
 				}
 
 				lastLeg = null;
@@ -83,6 +97,10 @@ public class DynamicODDemandCollector implements PlanAlgorithm {
 	
 	public int getCounter() {
 		return counter;
+	}
+	
+	public Map<String, Integer> getModeCounts() {
+		return this.modeCounts;
 	}
 
 }
