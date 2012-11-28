@@ -42,6 +42,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -261,22 +262,41 @@ public class ScenarioGenerator {
 		// for now grips network meta format is osm
 		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
 		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", this.c.global().getCoordinateSystem());
-		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, true);
-		//				reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
-		//				reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
-		//		reader.setHighwayDefaults(2, "trunk",         2,  30.0/3.6, 1., 10000);
-		//		reader.setHighwayDefaults(2, "trunk_link",    2,  30.0/3.6, 1.0, 10000);
-		//		reader.setHighwayDefaults(3, "primary",       2,  30.0/3.6, 1.0, 10000);
-		//		reader.setHighwayDefaults(3, "primary_link",  2,  30.0/3.6, 1.0, 10000);
-		//		reader.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 5000);
-		//		reader.setHighwayDefaults(5, "tertiary",      1,  30.0/3.6, 1.0,  5000);
-		//		reader.setHighwayDefaults(6, "minor",         1,  30.0/3.6, 1.0,  5000);
-		//		reader.setHighwayDefaults(6, "unclassified",  1,  30.0/3.6, 1.0,  5000);
-		//		reader.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  5000);
-		//		reader.setHighwayDefaults(6, "living_street", 1,  30.0/3.6, 1.0,  5000);
-		//		reader.setHighwayDefaults(6,"path",           1,  5.0/3.6, 1.0,  2500);
-		//		reader.setHighwayDefaults(6,"cycleay",        1,  5.0/3.6, 1.0,  2500);
-		//		reader.setHighwayDefaults(6,"footway",        1,  5.0/3.6, 1.0,  1000);
+		
+		OsmNetworkReader reader = null;
+		if (gcm.getMainTrafficType().equals("vehicular")) {
+			reader = new OsmNetworkReader(sc.getNetwork(), ct, true);
+		} else if (gcm.getMainTrafficType().equals("pedestrian")) {
+			
+			reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
+			
+			//capacity per lane and hour 1.3/m/s * 0.6 m * 3600s/h 
+			double laneCap = 2808 * 2; // 2 lanes
+			
+//					reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
+//					reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
+					reader.setHighwayDefaults(2, "trunk",         2,  1.34, 1., laneCap);
+					reader.setHighwayDefaults(2, "trunk_link",    2,  1.34, 1.0,laneCap);
+					reader.setHighwayDefaults(3, "primary",       2,  1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(3, "primary_link",  2,  1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(4, "secondary",     2,  1.34, 1.0, laneCap);
+					reader.setHighwayDefaults(5, "tertiary",      2,  1.34, 1.0,  laneCap);
+					reader.setHighwayDefaults(6, "minor",         2,  1.34, 1.0,  laneCap);
+					reader.setHighwayDefaults(6, "unclassified",  2,  1.34, 1.0,  laneCap);
+					reader.setHighwayDefaults(6, "residential",   2,  1.34, 1.0,  laneCap);
+					reader.setHighwayDefaults(6, "living_street", 2,  1.34, 1.0,  laneCap);
+					reader.setHighwayDefaults(6,"path",           2,  1.34, 1.0,  laneCap);
+					reader.setHighwayDefaults(6,"cycleway",       2,  1.34, 1.0,  laneCap);
+					reader.setHighwayDefaults(6,"footway",        2,  1.34, 1.0,  laneCap);
+					
+					// max density is set to 5.4 p/m^2
+					((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.6);
+					((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.31);
+		}else if (gcm.getMainTrafficType().equals("mixed")) {
+			//TODO OSMReader for mixed
+			log.warn("You are using an experimental feature. Only use this if you exactly know what are you doing!");
+			throw new RuntimeException("not yet implemented");
+		}
 		reader.setKeepPaths(true);
 		reader.parse(gripsNetworkFile);
 
