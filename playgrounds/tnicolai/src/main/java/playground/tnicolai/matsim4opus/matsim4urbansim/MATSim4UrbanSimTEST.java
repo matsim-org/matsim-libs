@@ -401,14 +401,16 @@ public class MATSim4UrbanSimTEST implements MATSim4UrbanSimInterface{
 		this.shapeFile					= moduleMATSim4UrbanSim.getShapeFileCellBasedAccessibility();
 		// using custom bounding box, defining the study area for accessibility computation
 		this.nwBoundaryBox 				= new NetworkBoundaryBox();
-		if(moduleMATSim4UrbanSim.isUseCustomBoundingBox()){
+		if(Paths.pathExsits(this.shapeFile))						// using shape file for accessibility computation
+			log.info("Using shape file for accessibility computation.");		
+		else if(moduleMATSim4UrbanSim.isUseCustomBoundingBox()){	// using custom boundary box for accessibility computation
+			log.info("Using custon boundig box for accessibility computation.");
 			nwBoundaryBox.setCustomBoundaryBox(moduleMATSim4UrbanSim.getBoundingBoxLeft(), 
 													moduleMATSim4UrbanSim.getBoundingBoxBottom(), 
 													moduleMATSim4UrbanSim.getBoundingBoxRight(), 
 													moduleMATSim4UrbanSim.getBoundingBoxTop());
 		}
-		// using boundary of hole network for accessibility computation
-		else{
+		else{														// using boundary of hole network for accessibility computation
 			log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
 		}

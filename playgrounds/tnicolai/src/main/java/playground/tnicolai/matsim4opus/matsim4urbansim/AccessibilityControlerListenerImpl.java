@@ -312,7 +312,7 @@ public class AccessibilityControlerListenerImpl{
 //			measuringPointIterator = testSet.getZones().iterator();
 
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
-		Map<Id,ArrayList<Zone<Id>>> aggregatedMeasurePoints = new HashMap<Id, ArrayList<Zone<Id>>>();
+		Map<Id,ArrayList<Zone<Id>>> aggregatedMeasurementPoints = new HashMap<Id, ArrayList<Zone<Id>>>();
 
 		// go through all measuring points ...
 		while( measuringPointIterator.hasNext() ){
@@ -330,22 +330,22 @@ public class AccessibilityControlerListenerImpl{
 			Id id = fromNode.getId();
 			
 			// create new entry if key does not exist!
-			if(!aggregatedMeasurePoints.containsKey(id))
-				aggregatedMeasurePoints.put(id, new ArrayList<Zone<Id>>());
+			if(!aggregatedMeasurementPoints.containsKey(id))
+				aggregatedMeasurementPoints.put(id, new ArrayList<Zone<Id>>());
 			// assign measure point (origin) to it's nearest node
-			aggregatedMeasurePoints.get(id).add(measurePoint);
+			aggregatedMeasurementPoints.get(id).add(measurePoint);
 		}
 		
 		log.info("");
 		log.info("Number of measure points: " + numberOfMeasuringPoints);
-		log.info("Number of aggregated measure points: " + aggregatedMeasurePoints.size());
+		log.info("Number of aggregated measure points: " + aggregatedMeasurementPoints.size());
 		log.info("");
 		
 
-		ProgressBar bar = new ProgressBar( aggregatedMeasurePoints.size() );
+		ProgressBar bar = new ProgressBar( aggregatedMeasurementPoints.size() );
 		
 		// contains all nodes that have a measuring point (origin) assigned
-		Iterator<Id> keyIterator = aggregatedMeasurePoints.keySet().iterator();
+		Iterator<Id> keyIterator = aggregatedMeasurementPoints.keySet().iterator();
 		// contains all network nodes
 		Map<Id, Node> networkNodesMap = network.getNodes();
 		
@@ -364,7 +364,7 @@ public class AccessibilityControlerListenerImpl{
 			lcptTravelDistance.calculate(network, fromNode, depatureTime);
 			
 			// get list with origins that are assigned to "fromNode"
-			ArrayList<Zone<Id>> origins = aggregatedMeasurePoints.get( nodeId );
+			ArrayList<Zone<Id>> origins = aggregatedMeasurementPoints.get( nodeId );
 			Iterator<Zone<Id>> originsIterator = origins.iterator();
 			
 			while( originsIterator.hasNext() ){
@@ -386,8 +386,8 @@ public class AccessibilityControlerListenerImpl{
 				
 				double walkTravelTimePoint2Road_h 			= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
 
-				double carTravelTimeOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
 				double freeSpeedTravelTimeOnNearestLink_meterpersec= nearestLink.getFreespeed();
+				double carTravelTimeOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
 				
 				double road2NodeFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTimeOnNearestLink_meterpersec * 3600);
 				double road2NodeCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTimeOnNearestLink_meterpersec * 3600.);
@@ -412,8 +412,9 @@ public class AccessibilityControlerListenerImpl{
 					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					
+					// tnicolai not needed anymore? since having the aggregated costs on the opportunity side
 					// using number of aggregated opportunities as weight for log sum measure
-					int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects(); // tnicolai not needed anymore? since having the aggregated costs on the opportunity side
+					// int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects(); 
 
 					// congested car travel times in hours
 					double arrivalTime 			= lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime(); // may also use .getCost() !!!
@@ -428,7 +429,7 @@ public class AccessibilityControlerListenerImpl{
 					double walkTravelTime_h		= (travelDistance_meter / this.walkSpeedMeterPerHour) + road2NodeWalkTime_h;
 					
 					
-					sumGeneralizedCosts(gcs, 
+					sumDisutilityOfTravel(gcs, 
 							this.aggregatedOpportunities[i],
 							distanceMeasuringPoint2Road_meter,
 							distanceRoad2Node_meter, 
@@ -437,8 +438,7 @@ public class AccessibilityControlerListenerImpl{
 							freeSpeedTravelTime_h,
 							bikeTravelTime_h,
 							walkTravelTime_h, 
-							congestedCarTravelTime_h,
-							opportunityWeight);
+							congestedCarTravelTime_h);
 				}
 				
 				// aggregated value
@@ -481,9 +481,8 @@ public class AccessibilityControlerListenerImpl{
 	 * @param travelDistance_meter
 	 * @param bikeTravelTime_h
 	 * @param walkTravelTime_h
-	 * @param congestedCarTravelTime_h
 	 */
-	protected void sumGeneralizedCosts(GeneralizedCostSum gcs,
+	protected void sumDisutilityOfTravel(GeneralizedCostSum gcs,
 									   AggregateObject2NearestNode aggregatedOpportunities,
 									   double distanceMeasuringPoint2Road_meter,
 									   double distanceRoad2Node_meter, 
@@ -492,8 +491,7 @@ public class AccessibilityControlerListenerImpl{
 									   double freeSpeedTravelTime_h,
 									   double bikeTravelTime_h,
 									   double walkTravelTime_h, 
-									   double congestedCarTravelTime_h,
-									   int opportunityWeight) {
+									   double congestedCarTravelTime_h) {
 		
 		double sumWalkExpCostDestinationNode2Opportunities = (aggregatedOpportunities.getSumWalkTravelTimeCost() +
 															  aggregatedOpportunities.getSumWalkPowerTravelTimeCost() +

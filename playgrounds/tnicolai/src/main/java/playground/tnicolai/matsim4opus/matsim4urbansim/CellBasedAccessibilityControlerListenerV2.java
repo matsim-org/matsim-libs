@@ -250,7 +250,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					Id nodeID = destinationNode.getId();
 					
 					// using number of aggregated opportunities as weight for log sum measure
-					int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
+					// int opportunityWeight = this.aggregatedOpportunities[i].getNumberOfObjects();
 
 					// free speed car travel times in hours
 					double freeSpeedTravelTime_h = (lcptFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost() / 3600.) + offsetFreeSpeedTime_h;
@@ -264,7 +264,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					double arrivalTime = lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime(); // may also use .getCost() !!!
 					double congestedCarTravelTime_h = ((arrivalTime - depatureTime) / 3600.) + offsetCongestedCarTime_h;
 					
-					sumGeneralizedCosts(gcs, 
+					sumDisutilityOfTravel(gcs, 
 										this.aggregatedOpportunities[i],
 										distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
 										distanceRoad2Node_meter, 
@@ -273,8 +273,7 @@ public class CellBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 										freeSpeedTravelTime_h,
 										bikeTravelTime_h,
 										walkTravelTime_h, 
-										congestedCarTravelTime_h,
-										opportunityWeight);
+										congestedCarTravelTime_h);
 				}
 				
 				// aggregated value

@@ -191,7 +191,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 					double arrivalTime = lcptCongestedCarTravelTime.getTree().get( nodeID ).getTime(); // may also use .getCost() !!!
 					double congestedCarTravelTime_h = (arrivalTime - depatureTime) / 3600. + offsetCongestedCarTime_h;
 
-					sumGeneralizedCosts(gcs, 
+					sumDisutilityOfTravel(gcs, 
 							this.aggregatedOpportunities[i],
 							distanceMeasuringPoint2Road_meter + averageDistanceRoad2Opportunitiy_meter,
 							distanceRoad2Node_meter, 
@@ -200,8 +200,7 @@ public class ZoneBasedAccessibilityControlerListenerV2 extends AccessibilityCont
 							freeSpeedTravelTime_h,
 							bikeTravelTime_h,
 							walkTravelTime_h, 
-							congestedCarTravelTime_h,
-							opportunityWeight);
+							congestedCarTravelTime_h);
 				}
 				
 				// aggregated value
