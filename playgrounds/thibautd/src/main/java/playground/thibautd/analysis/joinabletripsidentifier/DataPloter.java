@@ -66,6 +66,7 @@ public class DataPloter {
 
 	private static final float TITLE_FONT_SIZE = 17;
 	private static final boolean PLOT_STD_DEV = false;
+	private static final boolean DEUTSCH = true;
 
 	private final JoinableTrips trips;
 
@@ -89,8 +90,8 @@ public class DataPloter {
 
 		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
 			title,
-			"time of day (h)",
-			"number of joinable trips",
+			DEUTSCH ? "Zeit [h]" : "time of day (h)",
+			DEUTSCH ? "Anzahl Fahrzeugfahrer" : "number of joinable trips",
 			1,
 			PLOT_STD_DEV);
 
@@ -124,8 +125,8 @@ public class DataPloter {
 
 		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
 			title,
-			"trip length (km)",
-			"number of joinable trips",
+			DEUTSCH ? "Lange der Fahrten [km]" : "trip length (km)",
+			DEUTSCH ? "Anzahl Fahrzeugfahrer" : "number of joinable trips",
 			1,
 			PLOT_STD_DEV);
 
@@ -156,8 +157,12 @@ public class DataPloter {
 	 		final List<? extends TwofoldTripValidator> conditions) {
 		String title = "Number of possible joint trips for different criteria";
 
-		TwoCategoriesBoxAndWhiskerChart chart = new TwoCategoriesBoxAndWhiskerChart(
-				title , "", "number of possible joint trips", PLOT_STD_DEV);
+		TwoCategoriesBoxAndWhiskerChart chart =
+			new TwoCategoriesBoxAndWhiskerChart(
+				title ,
+				"",
+				DEUTSCH ? "Anzahl Fahrzeugfahrer" : "number of possible joint trips",
+				PLOT_STD_DEV);
 
 		Collections.sort(conditions, new ConditionComparator());
 		
@@ -209,8 +214,8 @@ public class DataPloter {
 
 		JFreeChart chart = ChartFactory.createXYLineChart(
 				"departures histogram",
-				"time (h)",
-				"number of departure",
+				DEUTSCH ? "Zeit [h]" : "time (h)",
+				DEUTSCH ? "Anzahl Abfahrten" : "number of departure",
 				dataset,
 				PlotOrientation.VERTICAL,
 				true, // display legend
@@ -246,8 +251,8 @@ public class DataPloter {
 
 		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
 			title,
-			"driver trip length (km)",
-			"number of possible passengers",
+			DEUTSCH ? "Lange der Fahrten der Fahrer [km]" : "driver trip length (km)",
+			DEUTSCH ? "Anzahl Passagiere" : "number of possible passengers",
 			1,
 			PLOT_STD_DEV);
 
@@ -303,8 +308,8 @@ public class DataPloter {
 			final PassengerFilter filter,
 	 		final List<? extends TwofoldTripValidator> conditions) {
 		String title = "proportion of passenger trips really having a joint trip opportunity";
-		String xLabel = "condition";
-		String yLabel = "proportion";
+		String xLabel = DEUTSCH ? "" : "condition";
+		String yLabel = DEUTSCH ? "Anteil" : "proportion";
 
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
