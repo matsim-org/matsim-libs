@@ -376,8 +376,10 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		
 		if(useMATSimLogitScaleParameter)
 			logitScaleParameter = scenario.getConfig().planCalcScore().getBrainExpBeta();
-		else
+		else{
 			logitScaleParameter = matsim4UrbanSimParameter.getAccessibilityParameter().getLogitScaleParameter();
+			scenario.getConfig().planCalcScore().setBrainExpBeta( matsim4UrbanSimParameter.getAccessibilityParameter().getLogitScaleParameter() );
+		}
 		
 		// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
 		assert(logitScaleParameter == 1.0);
