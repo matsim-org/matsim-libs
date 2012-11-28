@@ -20,8 +20,6 @@
 
 package org.matsim.core.controler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -46,7 +44,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -713,8 +710,7 @@ public class Controler extends AbstractController {
 			for (MobsimListener l : this.getQueueSimulationListener()) {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}
-		}
-		if (simulation instanceof ObservableMobsim) {
+
 			int itNumber = this.getIterationNumber();
 			if (config.controler().getWriteSnapshotsInterval() != 0 && itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);

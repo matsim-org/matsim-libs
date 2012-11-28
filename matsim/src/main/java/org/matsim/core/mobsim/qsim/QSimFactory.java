@@ -51,26 +51,26 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
  */
 public class QSimFactory implements MobsimFactory {
 
-    private final static Logger log = Logger.getLogger(QSimFactory.class);
+	private final static Logger log = Logger.getLogger(QSimFactory.class);
 
-    @Override
-    public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	@Override
+	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
-        QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
-        if (conf == null) {
-            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-        }
+		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		if (conf == null) {
+			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+		}
 
-        // Get number of parallel Threads
-        int numOfThreads = conf.getNumberOfThreads();
-        QNetsimEngineFactory netsimEngFactory;
-        if (numOfThreads > 1) {
-            eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-            netsimEngFactory = new ParallelQNetsimEngineFactory();
-            log.info("Using parallel QSim with " + numOfThreads + " threads.");
-        } else {
-            netsimEngFactory = new DefaultQSimEngineFactory();
-        }
+		// Get number of parallel Threads
+		int numOfThreads = conf.getNumberOfThreads();
+		QNetsimEngineFactory netsimEngFactory;
+		if (numOfThreads > 1) {
+			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
+			netsimEngFactory = new ParallelQNetsimEngineFactory();
+			log.info("Using parallel QSim with " + numOfThreads + " threads.");
+		} else {
+			netsimEngFactory = new DefaultQSimEngineFactory();
+		}
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
@@ -80,25 +80,25 @@ public class QSimFactory implements MobsimFactory {
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
-        
+
 		AgentFactory agentFactory;
-        if (sc.getConfig().scenario().isUseTransit()) {
-            agentFactory = new TransitAgentFactory(qSim);
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setUseUmlaeufe(true);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-            qSim.addMobsimEngine(transitEngine);
-        } else {
-            agentFactory = new DefaultAgentFactory(qSim);
-        }
-        if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (sc.getConfig().scenario().isUseTransit()) {
+			agentFactory = new TransitAgentFactory(qSim);
+			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+			transitEngine.setUseUmlaeufe(true);
+			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			qSim.addDepartureHandler(transitEngine);
+			qSim.addAgentSource(transitEngine);
+			qSim.addMobsimEngine(transitEngine);
+		} else {
+			agentFactory = new DefaultAgentFactory(qSim);
+		}
+		if (sc.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
-        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-        return qSim;
-    }
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		qSim.addAgentSource(agentSource);
+		return qSim;
+	}
 
 }
