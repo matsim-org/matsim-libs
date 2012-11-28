@@ -19,7 +19,12 @@
 
 package playground.mrieser.svi.controller;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.mrieser.svi.data.DynamicODMatrix;
 import playground.mrieser.svi.data.DynusTDynamicODDemandWriter;
@@ -77,6 +83,9 @@ public class DynusTMobsim implements Mobsim {
 		log.info("Number of trips handed over to DynusT: " + collector.getCounter());
 		printModeShares(collector);
 		
+		log.info("write marginal sums");
+		exportMarginalSums(odm, this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "nachfrageRandsummen.txt"));
+		
 		log.info("write demand for Dynus-T with factor " + this.dc.getDemandFactor());
 		DynusTDynamicODDemandWriter writer = new DynusTDynamicODDemandWriter(odm, this.dc.getZoneIdToIndexMapping());
 		writer.setMultiplyFactor(this.dc.getDemandFactor());
@@ -119,4 +128,64 @@ public class DynusTMobsim implements Mobsim {
 		}		
 	}
 	
+	private void exportMarginalSums(final DynamicODMatrix matrix, final String filename) {
+		Map<String, Integer> origins = new HashMap<String, Integer>();
+		Map<String, Integer> destinations = new HashMap<String, Integer>();
+		
+		for (int i = 0; i < matrix.getNOfBins(); i++) {
+			Map<String, Map<String, Integer>> timeMatrix = matrix.getMatrixForTimeBin(i);
+			
+			for (Map.Entry<String, Map<String, Integer>> fromZone : timeMatrix.entrySet()) {
+				String fromZoneId = fromZone.getKey();
+				for (Map.Entry<String, Integer> toZone : fromZone.getValue().entrySet()) {
+					String toZoneId = toZone.getKey();
+					Integer volume = toZone.getValue();
+					
+					Integer origVol = origins.get(fromZoneId);
+					if (origVol == null) {
+						origins.put(fromZoneId, volume);
+					} else {
+						origins.put(fromZoneId, volume.intValue() + origVol.intValue());
+					}
+
+					Integer destVol = destinations.get(toZoneId);
+					if (destVol == null) {
+						destinations.put(toZoneId, volume);
+					} else {
+						destinations.put(toZoneId, volume.intValue() + destVol.intValue());
+					}
+				}
+			}
+		}
+
+		Set<String> zoneIds = new HashSet<String>(origins.keySet());
+		zoneIds.addAll(destinations.keySet());
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+
+		try {
+			writer.write("ZONE\tQuellverkehr\rZielverkehr" + IOUtils.NATIVE_NEWLINE);
+			
+			for (String id : zoneIds) {
+				writer.write(id + "\t");
+				Integer vol = origins.get(id);
+				if (vol != null) {
+					writer.write(vol.toString());
+				}
+				writer.write("\t");
+				vol = destinations.get(id);
+				if (vol != null) {
+					writer.write(vol.toString());
+				}
+				writer.write(IOUtils.NATIVE_NEWLINE);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
