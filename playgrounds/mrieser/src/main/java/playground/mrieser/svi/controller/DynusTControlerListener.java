@@ -34,6 +34,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkWriter;
 
 import playground.mrieser.svi.data.ActivityToZoneMappingWriter;
 import playground.mrieser.svi.data.CalculateActivityToZoneMapping;
@@ -81,6 +82,10 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 		this.ttMatrix.clear();
 		
 		if (this.isFirstIteration) {
+			String filename = c.getControlerIO().getOutputFilename("network.dynust.xml");
+			log.info("Writing DynusT-network to " + filename);
+			new NetworkWriter(dynusTNetwork).write(filename);
+
 			log.info("Reading zones for DynusT..." + this.dc.getZonesShapeFile());
 			new ShapeZonesReader(this.dc.getZones()).readShapefile(this.dc.getZonesShapeFile());
 

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
@@ -72,10 +71,7 @@ public abstract class DynusTUtils {
 		log.info("Reading DynusT-network..." + dc.getModelDirectory());
 		Network dynusTNetwork = NetworkImpl.createNetwork();
 		new DynusTNetworkReader(dynusTNetwork).readFiles(dc.getModelDirectory() + "/xy.dat", dc.getModelDirectory()+ "/network.dat");
-		String filename = controler.getControlerIO().getOutputFilename("network.dynust.xml");
-		log.info("Writing DynusT-network to " + filename);
-		new NetworkWriter(dynusTNetwork).write(filename);
-
+		
 		controler.addControlerListener(new DynusTControlerListener(dc, ttMatrix, dynusTNetwork));
 
 		boolean useOnlyDynusT = Boolean.parseBoolean(controler.getConfig().getParam("dynus-t", "useOnlyDynusT"));

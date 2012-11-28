@@ -28,7 +28,7 @@ public class SviController {
 
 	public static void main(String[] args) {
 
-//		args = new String[] {"/Volumes/Data/projects/sviDosierungsanlagen/scenarios/kreuzlingen/configDosierung3.xml"};
+//		args = new String[] {"/Volumes/Data/projects/sviDosierungsanlagen/scenarios/kreuzlingen/configDynusT.xml"};
 
 		Controler controler = new Controler(args);
 
