@@ -133,9 +133,22 @@ public class DynusTExe {
 		String cmd = this.tmpDir + "/" + exeName;
 		log.info("running command: " + cmd + " in directory " + this.tmpDir);
 		int timeout = 3600; // 1 hour should hopefully be enough
-		int exitcode = ExeRunner.run(cmd, logfileName, timeout, this.tmpDir);
-		if (exitcode != 0) {
-			throw new RuntimeException("There was a problem running Dynus-T. exit code: " + exitcode);
+		int errorCnt = 0;
+		int maxTries = 3;
+		while (errorCnt < maxTries) {
+			if (errorCnt > 0) {
+				log.warn("Trying to re-run Dynus-T");
+			}
+			int exitcode = ExeRunner.run(cmd, logfileName, timeout, this.tmpDir);
+			if (exitcode != 0) {
+				log.error("There was a problem running Dynus-T. exit code: " + exitcode);
+				errorCnt++;
+				if (errorCnt >= maxTries) {
+					throw new RuntimeException("Too many failures trying to run Dynus-T.");
+				}
+			} else {
+				break;
+			}
 		}
 
 		if (cleanUp) {
