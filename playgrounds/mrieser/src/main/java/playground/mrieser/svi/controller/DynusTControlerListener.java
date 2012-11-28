@@ -132,7 +132,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 			log.info("removing unnecessary files.");
 			File outDir = new File(this.dc.getOutputDirectory());
 			for (File f : outDir.listFiles()) {
-				if (f.isFile() && !f.getName().equals("VehTrajectory.dat")) {
+				if (f.isFile() && !f.getName().equals("VehTrajectory.dat") && !f.getName().equalsIgnoreCase("node.csv")) {
 					log.info("   deleting file " + f.getAbsolutePath());
 					f.delete();
 				}

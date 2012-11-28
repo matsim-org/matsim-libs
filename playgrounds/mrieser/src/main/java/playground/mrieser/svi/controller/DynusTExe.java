@@ -72,7 +72,8 @@ public class DynusTExe {
 				"xy.dat",
 				"TrafficFlowModel.dat",
 
-				"parameter.dat"
+				"parameter.dat",
+				"node.csv"
 		};
 
 		log.info("Creating iteration-directory...");
@@ -96,15 +97,6 @@ public class DynusTExe {
 			}
 		}
 		log.info("Copying model files to iteration-directory...");
-//		List<String> modelFiles = new ArrayList<String>();
-//		for (File f : new File(this.modelDir).listFiles()) {
-//			if (!(f.getName().toLowerCase(Locale.ROOT).matches("demand.dat"))) {
-//				String filename = f.getName();
-//				modelFiles.add(filename);
-//				log.info("  Copying " + filename);
-//				IOUtils.copyFile(f, new File(this.tmpDir + "/" + filename));
-//			}
-//		}
 		for (String filename : modelFiles) {
 			log.info("  Copying " + filename);
 			IOUtils.copyFile(new File(this.modelDir + "/" + filename), new File(this.tmpDir + "/" + filename));
