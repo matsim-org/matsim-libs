@@ -19,12 +19,16 @@
 
 package playground.mrieser.svi.data.vehtrajectories;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author mrieser
  */
 public class CalculateTravelTimeMatrixFromVehTrajectories implements VehicleTrajectoryHandler {
 
 	private final DynamicTravelTimeMatrix matrix;
+	private final Set<String> zoneIds = new HashSet<String>();
 
 	public CalculateTravelTimeMatrixFromVehTrajectories(final DynamicTravelTimeMatrix matrix) {
 		this.matrix = matrix;
@@ -32,7 +36,13 @@ public class CalculateTravelTimeMatrixFromVehTrajectories implements VehicleTraj
 
 	@Override
 	public void handleVehicleTrajectory(final VehicleTrajectory trajectory) {
+		this.zoneIds.add(trajectory.getOrigZone());
+		this.zoneIds.add(trajectory.getDestZone());
 		this.matrix.addTravelTime(trajectory.getStartTime(), trajectory.getTravelTime(), trajectory.getOrigZone(), trajectory.getDestZone());
+	}
+	
+	public Set<String> getZoneIds() {
+		return this.zoneIds;
 	}
 
 }

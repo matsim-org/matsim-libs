@@ -19,7 +19,11 @@
 
 package playground.mrieser.svi.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.mrieser.svi.data.ActivityToZoneMapping;
 import playground.mrieser.svi.data.ZoneIdToIndexMapping;
@@ -40,6 +44,7 @@ public class DynusTConfig {
 	private int timeBinSize_min = 10;
 	private String ptLinesFile = null;
 	private TravelTimeCalculator ttc = null;
+	private List<Tuple<Double, Double>> vehTrajExtracts = new ArrayList<Tuple<Double, Double>>();
 
 	private final Zones zones = new Zones();
 	private final ActivityToZoneMapping actToZoneMapping = new ActivityToZoneMapping();
@@ -135,5 +140,13 @@ public class DynusTConfig {
 	
 	public TravelTimeCalculator getTravelTimeCalculator()	 {
 		return this.ttc;
+	}
+	
+	public void addVehTrajectoryExtract(final double fromTime, final double toTime) {
+		this.vehTrajExtracts.add(new Tuple<Double, Double>(fromTime, toTime));
+	}
+	
+	public Iterable<Tuple<Double, Double>> getVehTrajectoryExtracts() {
+		return this.vehTrajExtracts;
 	}
 }

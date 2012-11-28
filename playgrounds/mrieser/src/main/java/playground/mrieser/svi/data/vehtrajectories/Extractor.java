@@ -42,10 +42,10 @@ public class Extractor {
 		String outputVehTrajectory;
 
 		if (args.length == 4) {
-			inputVehTrajectory = args[1];
-			startTimeInMinutes = Double.parseDouble(args[2]);
-			stopTimeInMinutes = Double.parseDouble(args[3]);
-			outputVehTrajectory = args[4];
+			inputVehTrajectory = args[0];
+			startTimeInMinutes = Double.parseDouble(args[1]);
+			stopTimeInMinutes = Double.parseDouble(args[2]);
+			outputVehTrajectory = args[3];
 		} else {
 			inputVehTrajectory = "/Volumes/Data/virtualbox/exchange/dynusT_output/ITERS/it.2/2.DynusT/VehTrajectory.dat";
 			startTimeInMinutes = 6.0 * 60;

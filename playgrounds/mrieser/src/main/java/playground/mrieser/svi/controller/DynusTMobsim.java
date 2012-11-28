@@ -35,7 +35,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.svi.data.DynamicODMatrix;
 import playground.mrieser.svi.data.DynusTDynamicODDemandWriter;
@@ -43,9 +45,11 @@ import playground.mrieser.svi.data.vehtrajectories.CalculateLinkStatsFromVehTraj
 import playground.mrieser.svi.data.vehtrajectories.CalculateLinkTravelTimesFromVehTrajectories;
 import playground.mrieser.svi.data.vehtrajectories.CalculateTravelTimeMatrixFromVehTrajectories;
 import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
+import playground.mrieser.svi.data.vehtrajectories.Extractor;
 import playground.mrieser.svi.data.vehtrajectories.MultipleVehicleTrajectoryHandler;
 import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoriesReader;
 import playground.mrieser.svi.replanning.DynamicODDemandCollector;
+import playground.mrieser.svi.replanning.MultimodalDynamicODDemandCollector;
 
 /**
  * @author mrieser
@@ -83,6 +87,16 @@ public class DynusTMobsim implements Mobsim {
 		log.info("Number of trips handed over to DynusT: " + collector.getCounter());
 		printModeShares(collector);
 		
+		log.info("Collect demand per mode");
+		MultimodalDynamicODDemandCollector mmCollector = new MultimodalDynamicODDemandCollector(3600, 24*3600.0, this.dc.getActToZoneMapping());
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			mmCollector.run(plan);
+		}
+		
+		log.info("Write demand per mode");
+		exportDemand(mmCollector);
+		
 		log.info("write marginal sums");
 		exportMarginalSums(odm, this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "nachfrageRandsummen.txt"));
 		
@@ -100,9 +114,13 @@ public class DynusTMobsim implements Mobsim {
 		log.info("read in Vehicle Trajectories from DynusT");
 		String vehTrajFilename = this.dc.getOutputDirectory() + "/VehTrajectory.dat";
 		
+		DynamicTravelTimeMatrix hourlyTravelTimesMatrix = new DynamicTravelTimeMatrix(3600, 24*3600);
+		
 		MultipleVehicleTrajectoryHandler multiHandler = new MultipleVehicleTrajectoryHandler();
 		CalculateTravelTimeMatrixFromVehTrajectories ttmCalc = new CalculateTravelTimeMatrixFromVehTrajectories(this.ttMatrix);
 		multiHandler.addTrajectoryHandler(ttmCalc);
+		CalculateTravelTimeMatrixFromVehTrajectories hourlyTtmCalc = new CalculateTravelTimeMatrixFromVehTrajectories(hourlyTravelTimesMatrix);
+		multiHandler.addTrajectoryHandler(hourlyTtmCalc);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(this.dynusTnet, this.scenario.getConfig().travelTimeCalculator());
 		CalculateLinkTravelTimesFromVehTrajectories lttCalc = new CalculateLinkTravelTimesFromVehTrajectories(ttc, this.dynusTnet);
 		multiHandler.addTrajectoryHandler(lttCalc);
@@ -115,8 +133,10 @@ public class DynusTMobsim implements Mobsim {
 		linkStats.writeLinkVolumesToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkVolumes.txt"));
 		linkStats.writeLinkTravelTimesToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelTimes.txt"));
 		linkStats.writeLinkTravelSpeedsToFile(this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_linkTravelSpeeds.txt"));
+		exportTravelTimes(hourlyTravelTimesMatrix, hourlyTtmCalc.getZoneIds(), this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "dynust_odTravelTimes.txt"));
+		extractVehTrajectories(vehTrajFilename);
 	}
-	
+
 	private void printModeShares(final DynamicODDemandCollector collector) {
 		log.info("Mode share statistics:");
 		int sum = 0;
@@ -186,6 +206,120 @@ public class DynusTMobsim implements Mobsim {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private void exportDemand(final MultimodalDynamicODDemandCollector collector) {
+		Map<String, DynamicODMatrix> modeDemand = collector.getDemand();
+		
+		try {
+			for (Map.Entry<String, DynamicODMatrix> e : modeDemand.entrySet()) {
+				String mode = e.getKey();
+				DynamicODMatrix timeMatrices = e.getValue();
+				
+				String filename = this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), "demand_" + mode + ".txt");
+				BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+				
+				int binCount = timeMatrices.getNOfBins();
+				int binSize = timeMatrices.getBinSize();
+				
+				Set<String> fromZoneIds = new HashSet<String>();
+				Set<String> toZoneIds = new HashSet<String>();
+				
+				for (int i = 0; i < binCount; i++) {
+					Map<String, Map<String, Integer>> odm = timeMatrices.getMatrixForTimeBin(i);
+					if (odm != null) {
+						fromZoneIds.addAll(odm.keySet());
+						for (Map<String, Integer> ds : odm.values()) {
+							toZoneIds.addAll(ds.keySet());
+						}
+					}
+				}
+				
+				// header
+				writer.write("VON_ZONE\tNACH_ZONE");
+				for (int i = 0; i < binCount; i++) {
+					writer.write("\t");
+					writer.write(Time.writeTime(i * binSize, Time.TIMEFORMAT_HHMM, '_'));
+				}
+				writer.write(IOUtils.NATIVE_NEWLINE);
+				
+				// content
+				for (String fromZoneId : fromZoneIds) {
+					for (String toZoneId : toZoneIds) {
+						writer.write(fromZoneId);
+						writer.write('\t');
+						writer.write(toZoneId);
+						for (int i = 0; i < binCount; i++) {
+							writer.write('\t');
+							Map<String, Map<String, Integer>> odm = timeMatrices.getMatrixForTimeBin(i);
+							if (odm == null) {
+								writer.write('0');
+							} else {
+								Map<String, Integer> rows = odm.get(fromZoneId);
+								if (rows == null) {
+									writer.write('0');
+								} else {
+									Integer val = rows.get(toZoneId);
+									if (val == null) {
+										writer.write('0');
+									} else {
+										writer.write(val.toString());
+									}
+								}
+							}
+						}
+						writer.write(IOUtils.NATIVE_NEWLINE);
+					}
+				}
+				writer.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void exportTravelTimes(final DynamicTravelTimeMatrix matrix, final Set<String> zoneIds, final String filename) {
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+			
+			int binCount = matrix.getNOfBins();
+			int binSize = matrix.getBinSize();
+			
+			// header
+			writer.write("VON_ZONE\tNACH_ZONE");
+			for (int i = 0; i < binCount; i++) {
+				writer.write("\t");
+				writer.write(Time.writeTime(i * binSize, Time.TIMEFORMAT_HHMM, '_'));
+			}
+			writer.write(IOUtils.NATIVE_NEWLINE);
+			
+			// content
+			for (String fromZoneId : zoneIds) {
+				for (String toZoneId : zoneIds) {
+					writer.write(fromZoneId);
+					writer.write('\t');
+					writer.write(toZoneId);
+					for (int i = 0; i < binCount; i++) {
+						double time = i * binSize;
+						writer.write('\t');
+						double tt = matrix.getAverageTravelTime(time, fromZoneId, toZoneId);
+						writer.write(Double.toString(tt));
+					}
+					writer.write(IOUtils.NATIVE_NEWLINE);
+				}
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	private void extractVehTrajectories(final String vehTrajFilename) {
+		for (Tuple<Double, Double> t : this.dc.getVehTrajectoryExtracts()) {
+			String filename = "VehTrajectories_" + Time.writeTime(t.getFirst(), Time.TIMEFORMAT_HHMM, '_') + "-" + Time.writeTime(t.getSecond(), Time.TIMEFORMAT_HHMM, '_');
+			String outputFile = this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), filename);
+			Extractor.filterVehTrajectory(vehTrajFilename, t.getFirst(), t.getSecond(), outputFile);
 		}
 	}
 }

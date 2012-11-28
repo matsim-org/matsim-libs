@@ -24,7 +24,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.mrieser.svi.converters.DynusTNetworkReader;
 import playground.mrieser.svi.data.vehtrajectories.DynamicTravelTimeMatrix;
@@ -52,13 +55,27 @@ public abstract class DynusTUtils {
 			dc.setTimeBinSize_min(Integer.parseInt(config.getParam("dynus-t", "timeBinSize_min")));
 		}
 		dc.setPtLinesFile(config.findParam("dynus-t", "ptLinesFile"));
+
+		{
+			String param = config.findParam("dynus-t", "extractVehTrajectories");
+			if (param != null) {
+				String[] parts = StringUtils.explode(param, ',');
+				for (String part : parts) {
+					String[] times = StringUtils.explode(part, '-');
+					dc.addVehTrajectoryExtract(Time.parseTime(times[0].trim()), Time.parseTime(times[1].trim()));
+				}
+			}
+		}
 		
 		final DynamicTravelTimeMatrix ttMatrix = new DynamicTravelTimeMatrix(600, 30*3600.0); // 10min time bins, at most 30 hours
 		
 		log.info("Reading DynusT-network..." + dc.getModelDirectory());
 		Network dynusTNetwork = NetworkImpl.createNetwork();
 		new DynusTNetworkReader(dynusTNetwork).readFiles(dc.getModelDirectory() + "/xy.dat", dc.getModelDirectory()+ "/network.dat");
-		
+		String filename = controler.getControlerIO().getOutputFilename("network.dynust.xml");
+		log.info("Writing DynusT-network to " + filename);
+		new NetworkWriter(dynusTNetwork).write(filename);
+
 		controler.addControlerListener(new DynusTControlerListener(dc, ttMatrix, dynusTNetwork));
 
 		boolean useOnlyDynusT = Boolean.parseBoolean(controler.getConfig().getParam("dynus-t", "useOnlyDynusT"));
