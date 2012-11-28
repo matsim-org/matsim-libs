@@ -202,12 +202,26 @@ class ExternalControler {
 					if(op1.equals(OptimizationParameter1.FARE)) this.fare = this.fare + incrFare;
 					if(op1.equals(OptimizationParameter1.CAPACITY)) this.capacity = this.capacity + incrCapacity;
 					if(op1.equals(OptimizationParameter1.HEADWAY)) {
+						
 						if (incrBusNumber == 0) {						
-							if (extItParam2 >= 9) {
-								this.numberOfBuses = this.numberOfBuses + 2;
+							if (extItParam2 == 10) {
+								this.numberOfBuses = this.numberOfBuses + 2; // set from 12 to 14
+							} else if (extItParam2 == 11) {
+								this.numberOfBuses = this.numberOfBuses + 2; // set from 14 to 16
+							} else if (extItParam2 == 12) {
+								this.numberOfBuses = this.numberOfBuses + 3; // set from 16 to 19
+							} else if (extItParam2 == 13) {
+								this.numberOfBuses = this.numberOfBuses + 4; // set from 19 to 23
+							} else if (extItParam2 == 14) {
+								this.numberOfBuses = this.numberOfBuses + 7; // set from 23 to 30
+							} else if (extItParam2 == 15) {
+								this.numberOfBuses = this.numberOfBuses + 12; // set from 30 to 42
+							} else if (extItParam2 == 16) {
+								this.numberOfBuses = this.numberOfBuses + 29; // set from 42 to 71
 							} else {
 								this.numberOfBuses = this.numberOfBuses + 1;
 							}
+						
 						} else {
 							this.numberOfBuses = this.numberOfBuses + incrBusNumber;
 						}
@@ -229,8 +243,20 @@ class ExternalControler {
 				if(op2.equals(OptimizationParameter2.HEADWAY)){
 					
 					if (incrBusNumber == 0) {						
-						if (extItParam2 >= 9) {
-							this.numberOfBuses = this.numberOfBuses + 2;
+						if (extItParam2 == 10) {
+							this.numberOfBuses = this.numberOfBuses + 2; // set from 12 to 14
+						} else if (extItParam2 == 11) {
+							this.numberOfBuses = this.numberOfBuses + 2; // set from 14 to 16
+						} else if (extItParam2 == 12) {
+							this.numberOfBuses = this.numberOfBuses + 3; // set from 16 to 19
+						} else if (extItParam2 == 13) {
+							this.numberOfBuses = this.numberOfBuses + 4; // set from 19 to 23
+						} else if (extItParam2 == 14) {
+							this.numberOfBuses = this.numberOfBuses + 7; // set from 23 to 30
+						} else if (extItParam2 == 15) {
+							this.numberOfBuses = this.numberOfBuses + 12; // set from 30 to 42
+						} else if (extItParam2 == 16) {
+							this.numberOfBuses = this.numberOfBuses + 29; // set from 42 to 71
 						} else {
 							this.numberOfBuses = this.numberOfBuses + 1;
 						}
