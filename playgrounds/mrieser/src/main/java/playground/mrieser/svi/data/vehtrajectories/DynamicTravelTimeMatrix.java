@@ -103,6 +103,30 @@ public class DynamicTravelTimeMatrix {
 		}
 		return 15.0*60; // well, then... we have to return something, otherwise the scores will be all NaN
 	}
+
+	public double getAverageTravelTimeWithUnknown(final double depTime, final String fromZoneId, final String toZoneId) {
+		int slot = getTimeSlot(depTime);
+		double tt = getAverageTravelTime(slot, fromZoneId, toZoneId);
+		if (!Double.isNaN(tt)) {
+			return tt;
+		}
+		while (slot > 0) {
+			slot--;
+			tt = getAverageTravelTime(slot, fromZoneId, toZoneId);
+			if (!Double.isNaN(tt)) {
+				return tt;
+			}
+		}
+		slot = getTimeSlot(depTime);
+		while (slot*this.binSize < this.maxTime) {
+			slot++;
+			tt = getAverageTravelTime(slot, fromZoneId, toZoneId);
+			if (!Double.isNaN(tt)) {
+				return tt;
+			}
+		}
+		return Double.NaN;
+	}
 	
 	private double getAverageTravelTime(final int timeSlot, final String fromZoneId, final String toZoneId) {
 		Map<String, Map<String, Tuple<Double, Integer>>> odm = this.odms.get(timeSlot);

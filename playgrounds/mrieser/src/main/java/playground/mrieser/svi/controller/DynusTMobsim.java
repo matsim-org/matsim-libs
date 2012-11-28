@@ -183,7 +183,7 @@ public class DynusTMobsim implements Mobsim {
 		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 
 		try {
-			writer.write("ZONE\tQuellverkehr\rZielverkehr" + IOUtils.NATIVE_NEWLINE);
+			writer.write("ZONE\tQuellverkehr\tZielverkehr" + IOUtils.NATIVE_NEWLINE);
 			
 			for (String id : zoneIds) {
 				writer.write(id + "\t");
@@ -308,7 +308,7 @@ public class DynusTMobsim implements Mobsim {
 					for (int i = 0; i < binCount; i++) {
 						double time = i * binSize;
 						writer.write('\t');
-						double tt = matrix.getAverageTravelTime(time, fromZoneId, toZoneId);
+						double tt = matrix.getAverageTravelTimeWithUnknown(time, fromZoneId, toZoneId);
 						writer.write(Double.toString(tt));
 					}
 					writer.write(IOUtils.NATIVE_NEWLINE);
@@ -322,7 +322,7 @@ public class DynusTMobsim implements Mobsim {
 
 	private void extractVehTrajectories(final String vehTrajFilename) {
 		for (Tuple<Double, Double> t : this.dc.getVehTrajectoryExtracts()) {
-			String filename = "VehTrajectories_" + Time.writeTime(t.getFirst(), Time.TIMEFORMAT_HHMM, '_') + "-" + Time.writeTime(t.getSecond(), Time.TIMEFORMAT_HHMM, '_');
+			String filename = "VehTrajectories_" + Time.writeTime(t.getFirst(), Time.TIMEFORMAT_HHMM, '_') + "-" + Time.writeTime(t.getSecond(), Time.TIMEFORMAT_HHMM, '_') + ".dat";
 			String outputFile = this.controler.getControlerIO().getIterationFilename(this.controler.getIterationNumber(), filename);
 			Extractor.filterVehTrajectory(vehTrajFilename, t.getFirst(), t.getSecond(), outputFile);
 		}
