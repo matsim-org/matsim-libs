@@ -236,6 +236,9 @@ public class DynusTMobsim implements Mobsim {
 					}
 				}
 				
+				fromZoneIds.remove(null);
+				toZoneIds.remove(null);
+				
 				// header
 				writer.write("VON_ZONE\tNACH_ZONE");
 				for (int i = 0; i < binCount; i++) {
@@ -285,6 +288,8 @@ public class DynusTMobsim implements Mobsim {
 			
 			int binCount = matrix.getNOfBins();
 			int binSize = matrix.getBinSize();
+			
+			zoneIds.remove(null);
 			
 			// header
 			writer.write("VON_ZONE\tNACH_ZONE");
