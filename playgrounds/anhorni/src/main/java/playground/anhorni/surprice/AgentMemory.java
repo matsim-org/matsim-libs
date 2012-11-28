@@ -130,7 +130,7 @@ public class AgentMemory {
 		
 		int dayIndex = Surprice.days.indexOf(day);
 		if (dayIndex > 0) { 
-			dayIndex--;
+			dayIndex--; // previous day
 		}
 		else {
 			return mode;

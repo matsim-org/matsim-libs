@@ -101,6 +101,10 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			else {
 				// do nothing
 			}
+			this.person.getCustomAttributes().put(day + ".constantCar", this.constantCar);
+			this.person.getCustomAttributes().put(day + ".constantPt", this.constantPt);
+			this.person.getCustomAttributes().put(day + ".constantBike", this.constantBike);
+			this.person.getCustomAttributes().put(day + ".constantWalk", this.constantWalk);
 		}
 	}
 	
@@ -110,6 +114,12 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 		this.person.getCustomAttributes().put(day + ".legScore", null);
 		this.person.getCustomAttributes().put(day + ".legMonetaryCosts", null);
+		
+		this.person.getCustomAttributes().put(day + ".constantCar", null);
+		this.person.getCustomAttributes().put(day + ".constantPt", null);
+		this.person.getCustomAttributes().put(day + ".constantBike", null);
+		this.person.getCustomAttributes().put(day + ".constantWalk", null);
+		
 		this.constantCar = this.params.constantCar;
     	this.constantPt = this.params.constantPt;
     	this.constantBike = this.params.constantBike;
@@ -132,7 +142,6 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 	private void handleLeg(Leg leg, final double time) {
 		this.score += calcLegScore(this.lastTime, time, leg);
 	}
-
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
 		

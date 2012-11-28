@@ -47,15 +47,14 @@ public class MultiDayControler {
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(preferences);
 		preferencesReader.parse(path + "/preferences.xml");
 		
+		AgentMemories memories = new AgentMemories();
 		Population populationPreviousDay = null;
 		int finalIterations[] = new int[7];		
 		for (String day : Surprice.days) {			
 			config.setParam("controler", "outputDirectory", outPath + "/" + day);
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
-			
-			AgentMemories memories = new AgentMemories();
-			
+						
 			DayControler controler = new DayControler(config, memories, day, preferences, populationPreviousDay);
 			controler.run();
 			
