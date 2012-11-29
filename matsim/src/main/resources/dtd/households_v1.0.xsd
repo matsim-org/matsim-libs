@@ -6,8 +6,8 @@ xml:lang="en">
 <!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
 <!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
 
-<!--<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>-->
-<xs:include schemaLocation="http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd"/>
+<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+<!--<xs:include schemaLocation="http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd"/>-->
 
 <xs:element name="household" type="householdType"/>
 
@@ -42,7 +42,7 @@ xml:lang="en">
       <xs:element name="vehicles" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="vehicleDefinitionId" minOccurs="1" maxOccurs="unbounded" />
+            <xs:element name="vehicleDefinitionId"  type="idRefType" minOccurs="1" maxOccurs="unbounded" />
           </xs:sequence>
         </xs:complexType>
       </xs:element>
