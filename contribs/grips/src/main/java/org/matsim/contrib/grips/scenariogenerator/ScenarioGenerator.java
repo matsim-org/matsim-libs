@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.grips.algorithms.FeatureTransformer;
 import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.events.InfoEvent;
+import org.matsim.contrib.grips.experimental.CustomizedOsmNetworkReader;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -39,6 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -101,30 +103,36 @@ public class ScenarioGenerator {
 		log.info("loading config file");
 		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
 		this.em.processEvent(e);
-		
+
 
 		try {
 			this.c = ConfigUtils.createConfig();
 			GripsConfigModule gcm = new GripsConfigModule("grips");
 			this.c.addModule("grips", gcm);
-			
+
 			this.c.global().setCoordinateSystem("EPSG:3395");
-			
+
 			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
 			parser.readFile(this.configFile);
 		} catch(Exception ee) {
 			//TODO for backwards compatibility should be remove soon
 			log.warn("File is not a  grips config file. Guessing it is a common MATSim config file");
 			this.c = ConfigUtils.loadConfig(this.configFile);
-			
+
 		}
 
 		this.c.addSimulationConfigGroup(new SimulationConfigGroup());
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.c.controler().setMobsim("qsim");
+		
+		
+		QSimConfigGroup qsim = new QSimConfigGroup();
+		qsim.setEndTime(30*3600);
+		this.c.addModule("qsim", qsim);
 		
 		this.c.timeAllocationMutator().setMutationRange(0.);
-		
+
 		this.sc = ScenarioUtils.createScenario(this.c);
 		this.safeLinkId = this.sc.createId("el1");
 
@@ -134,7 +142,7 @@ public class ScenarioGenerator {
 		if (!outputDirFile.exists()) {
 			outputDirFile.mkdirs();
 		}
-		
+
 		log.info("generating network file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating network file");
 		this.em.processEvent(e);
@@ -166,14 +174,14 @@ public class ScenarioGenerator {
 		this.c.strategy().addParam("ModuleProbability_1", "0.1");
 		this.c.strategy().addParam("Module_2", "ChangeExpBeta");
 		this.c.strategy().addParam("ModuleProbability_2", "0.9");
-		
-	
+
+
 
 		this.c.simulation().setRemoveStuckVehicles(false);
-		
+
 		this.c.travelTimeCalculator().setTraveltimeBinSize(120);
 		this.c.travelTimeCalculator().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap");
-		
+
 		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
 
 		new ConfigWriter(this.c).write(this.matsimConfigFile);
@@ -239,10 +247,10 @@ public class ScenarioGenerator {
 		post.setOpeningTime(49);
 		sc.getConfig().planCalcScore().addActivityParams(pre);
 		sc.getConfig().planCalcScore().addActivityParams(post);
-		
+
 		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);
 		sc.getConfig().planCalcScore().setPerforming_utils_hr(0.);
-		
+
 		//		sc.getConfig().planCalcScore().addParam("activityPriority_0", "1");
 		//		sc.getConfig().planCalcScore().addParam("activityTypicalDuration_0", "00:00:49");
 		//		sc.getConfig().planCalcScore().addParam("activityMinimalDuration_0", "00:00:49");
@@ -262,43 +270,53 @@ public class ScenarioGenerator {
 		// for now grips network meta format is osm
 		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
 		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", this.c.global().getCoordinateSystem());
+
 		
-		OsmNetworkReader reader = null;
 		if (gcm.getMainTrafficType().equals("vehicular")) {
-			reader = new OsmNetworkReader(sc.getNetwork(), ct, true);
+			OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, true);
+			reader.setKeepPaths(true);
+			reader.parse(gripsNetworkFile);
 		} else if (gcm.getMainTrafficType().equals("pedestrian")) {
-			
-			reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
-			
+
+			OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
+			reader.setKeepPaths(true);
+			reader.parse(gripsNetworkFile);
 			//capacity per lane and hour 1.3/m/s * 0.6 m * 3600s/h 
 			double laneCap = 2808 * 2; // 2 lanes
-			
-//					reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
-//					reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
-					reader.setHighwayDefaults(2, "trunk",         2,  1.34, 1., laneCap);
-					reader.setHighwayDefaults(2, "trunk_link",    2,  1.34, 1.0,laneCap);
-					reader.setHighwayDefaults(3, "primary",       2,  1.34, 1.0, laneCap);
-					reader.setHighwayDefaults(3, "primary_link",  2,  1.34, 1.0, laneCap);
-					reader.setHighwayDefaults(4, "secondary",     2,  1.34, 1.0, laneCap);
-					reader.setHighwayDefaults(5, "tertiary",      2,  1.34, 1.0,  laneCap);
-					reader.setHighwayDefaults(6, "minor",         2,  1.34, 1.0,  laneCap);
-					reader.setHighwayDefaults(6, "unclassified",  2,  1.34, 1.0,  laneCap);
-					reader.setHighwayDefaults(6, "residential",   2,  1.34, 1.0,  laneCap);
-					reader.setHighwayDefaults(6, "living_street", 2,  1.34, 1.0,  laneCap);
-					reader.setHighwayDefaults(6,"path",           2,  1.34, 1.0,  laneCap);
-					reader.setHighwayDefaults(6,"cycleway",       2,  1.34, 1.0,  laneCap);
-					reader.setHighwayDefaults(6,"footway",        2,  1.34, 1.0,  laneCap);
-					
-					// max density is set to 5.4 p/m^2
-					((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.6);
-					((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.31);
+
+			//					reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
+			//					reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
+			reader.setHighwayDefaults(2, "trunk",         2,  1.34, 1., laneCap);
+			reader.setHighwayDefaults(2, "trunk_link",    2,  1.34, 1.0,laneCap);
+			reader.setHighwayDefaults(3, "primary",       2,  1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(3, "primary_link",  2,  1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(4, "secondary",     2,  1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(5, "tertiary",      2,  1.34, 1.0,  laneCap);
+			reader.setHighwayDefaults(6, "minor",         2,  1.34, 1.0,  laneCap);
+			reader.setHighwayDefaults(6, "unclassified",  2,  1.34, 1.0,  laneCap);
+			reader.setHighwayDefaults(6, "residential",   2,  1.34, 1.0,  laneCap);
+			reader.setHighwayDefaults(6, "living_street", 2,  1.34, 1.0,  laneCap);
+			reader.setHighwayDefaults(6,"path",           2,  1.34, 1.0,  laneCap);
+			reader.setHighwayDefaults(6,"cycleway",       2,  1.34, 1.0,  laneCap);
+			reader.setHighwayDefaults(6,"footway",        2,  1.34, 1.0,  laneCap);
+
+			// max density is set to 5.4 p/m^2
+			((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.31);
+			reader.setKeepPaths(true);
+			reader.parse(gripsNetworkFile);
 		}else if (gcm.getMainTrafficType().equals("mixed")) {
 			//TODO OSMReader for mixed
 			log.warn("You are using an experimental feature. Only use this if you exactly know what are you doing!");
-			throw new RuntimeException("not yet implemented");
+			CustomizedOsmNetworkReader reader = new CustomizedOsmNetworkReader(sc.getNetwork(), ct, true);
+			reader.setHighwayDefaults(6,"path",           2,  1.34, 1.0,  1);
+			reader.setHighwayDefaults(6,"cycleway",       2,  1.34, 1.0,  1);
+			reader.setHighwayDefaults(6,"footway",        2,  1.34, 1.0,  1);
+			reader.setHighwayDefaults(6,"steps",        2,  1.34, 1.0,  1);
+			reader.setKeepPaths(true);
+			reader.parse(gripsNetworkFile);
 		}
-		reader.setKeepPaths(true);
-		reader.parse(gripsNetworkFile);
+
 
 
 
@@ -339,8 +357,8 @@ public class ScenarioGenerator {
 		new EvacuationNetworkGenerator(sc, p,this.safeLinkId).run();
 
 		String networkOutputFile = gcm.getOutputDir()+"/network.xml.gz";
-//		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
-//		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
+		//		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
+		//		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
 		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
 		sc.getConfig().network().setInputFile(networkOutputFile);
 	}
