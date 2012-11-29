@@ -251,10 +251,8 @@ public class Analyzer {
 		
 		DecimalFormat formatter = new DecimalFormat("0.00");
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary.txt")); 
-			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");
-			
-			bufferedWriter.write("travel times:\n");			
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary_tt.txt")); 
+			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");			
 			for (int i = 0; i < 9; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getTTPerIncome().get(i))) + "\t";
@@ -263,8 +261,16 @@ public class Analyzer {
 				line += formatter.format(Utils.getStdDev(ttCalculator.getTTPerIncome().get(i)) /
 						Utils.mean(ttCalculator.getTTPerIncome().get(i))) + "\n";
 				bufferedWriter.append(line);
-			}		
-			bufferedWriter.write("car travel times:\n");			
+			}					
+			bufferedWriter.flush();
+		    bufferedWriter.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary_cartt.txt")); 
+			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");			
 			for (int i = 0; i < 9; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getCarPerIncome().get(i))) + "\t";
@@ -273,8 +279,16 @@ public class Analyzer {
 				line += formatter.format(Utils.getStdDev(ttCalculator.getCarPerIncome().get(i)) /
 						Utils.mean(ttCalculator.getCarPerIncome().get(i))) + "\n";
 				bufferedWriter.append(line);
-			}			
-			bufferedWriter.write("toll td:\n");
+			}					
+			bufferedWriter.flush();
+		    bufferedWriter.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary_tolltd.txt")); 
+			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");
 			for (int i = 0; i < 9; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
