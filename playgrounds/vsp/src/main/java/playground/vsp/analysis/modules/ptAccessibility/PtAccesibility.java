@@ -175,9 +175,26 @@ public class PtAccesibility extends AbstractAnalyisModule {
 		
 		// write activity-cluster
 		PtAccesShapeWriter.writeActivityLocations(this.locationMap, outputFolder + "activityLocations.shp", "activities");
+		// write locations to csv
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder + "activityLocations.csv");
+		try {
+			writer.write("index;x;y;type;");
+			writer.newLine();
+			int i = 0;
+			for(Entry<String, List<ActivityLocation>> e: this.locationMap.getType2Locations().entrySet()){
+				for(ActivityLocation l: e.getValue()){
+					writer.write(String.valueOf(i) + ";" + l.getCoord().x + ";" + l.getCoord().y + ";" + l.getType() + ";");
+					writer.newLine();
+					i++;
+				}
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 		
-		//write csv-file
-		BufferedWriter writer;
+		//write csv-file, agregated
 		// get the number of activities in distanceCluster, per mode
 		for(Entry<String, DistCluster2ActCnt> e: this.mode2DistanceCluster2ActCnt.entrySet()){
 			writer = IOUtils.getBufferedWriter(outputFolder + e.getKey().toString() + ".csv");

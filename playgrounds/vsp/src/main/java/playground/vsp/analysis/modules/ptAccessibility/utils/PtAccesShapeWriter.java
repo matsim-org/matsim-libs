@@ -44,8 +44,8 @@ import playground.vsp.analysis.modules.ptAccessibility.activity.LocationMap;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author droeder
@@ -100,9 +100,10 @@ public class PtAccesShapeWriter {
 	}
 	
 	public static void writeActivityLocations(LocationMap locationMap, String filename, String name){
-		AttributeType[] attribs = new AttributeType[2];
-		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("MultiPoint", MultiPoint.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
+		AttributeType[] attribs = new AttributeType[3];
+		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
 		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
+		attribs[2] = AttributeTypeFactory.newAttributeType("type", String.class);
 		FeatureType featureType = null ;
 		try {
 			featureType = FeatureTypeBuilder.newFeatureType(attribs, name);
@@ -118,15 +119,15 @@ public class PtAccesShapeWriter {
 		GeometryFactory factory = new GeometryFactory();
 		Coordinate[] c;
 		for(Entry<String, List<ActivityLocation>> e: locationMap.getType2Locations().entrySet()){
-			c = new Coordinate[e.getValue().size()];
-			for(int i  = 0; i < e.getValue().size(); i++){
-				c[i] = e.getValue().get(i).getCoord();
-			}
-			featureAttribs = new Object[2];
-			featureAttribs[0] = factory.createMultiPoint(c);
-			featureAttribs[1] = e.getKey();
+			
 			try {
-				features.add(featureType.create(featureAttribs));
+				for(int i  = 0; i < e.getValue().size(); i++){
+					featureAttribs = new Object[3];
+					featureAttribs[0] = factory.createPoint(e.getValue().get(i).getCoord());
+					featureAttribs[1] = e.getKey() + "_" + String.valueOf(i);
+					featureAttribs[1] = e.getKey();
+					features.add(featureType.create(featureAttribs));
+				}
 			} catch (IllegalAttributeException e1) {
 				e1.printStackTrace();
 			}

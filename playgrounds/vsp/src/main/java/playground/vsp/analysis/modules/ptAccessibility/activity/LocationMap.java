@@ -63,9 +63,9 @@ public class LocationMap {
 			}
 		}
 		ActivityLocation loc = new ActivityLocation(activity.getCoord(), type);
-		if(!this.type2locations.get(type).contains(loc)){
-			this.type2locations.get(type).add(loc);
-		}
+		this.type2locations.get(type).add(loc);
+//		if(!this.type2locations.get(type).contains(loc)){
+//		}
 	}
 	
 	public Map<String, List<ActivityLocation>> getType2Locations(){

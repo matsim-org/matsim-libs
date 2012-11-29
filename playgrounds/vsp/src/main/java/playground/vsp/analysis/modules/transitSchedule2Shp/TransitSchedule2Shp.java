@@ -40,8 +40,10 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
@@ -108,11 +110,14 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 	
 	
 	private Collection<Feature> getTransitLineFeatures(TransitLine l){
-		AttributeType[] attribs = new AttributeType[4];
+		AttributeType[] attribs = new AttributeType[7];
 		attribs[0] = AttributeTypeFactory.newAttributeType("LineString", LineString.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
 		attribs[1] = AttributeTypeFactory.newAttributeType("line", String.class);
 		attribs[2] = AttributeTypeFactory.newAttributeType("route", String.class);
-		attribs[3] =  AttributeTypeFactory.newAttributeType("mode", String.class);
+		attribs[3] = AttributeTypeFactory.newAttributeType("mode", String.class);
+		attribs[4] = AttributeTypeFactory.newAttributeType("tourLength", Double.class);
+		attribs[5] = AttributeTypeFactory.newAttributeType("tourTime", Double.class);
+		attribs[6] = AttributeTypeFactory.newAttributeType("nrVeh", Double.class);
 		
 		FeatureType featureType = null ;
 		try {
@@ -127,7 +132,7 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		
 		Object[] featureAttribs;
 		for(TransitRoute r: l.getRoutes().values()){
-			featureAttribs = getRouteFeatureAttribs(r,l.getId(),  new Object[4]);
+			featureAttribs = getRouteFeatureAttribs(r,l.getId(),  new Object[7]);
 			try {
 				features.add(featureType.create(featureAttribs));
 			} catch (IllegalAttributeException e1) {
@@ -163,7 +168,52 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		o[1] = lineId.toString();
 		o[2] = r.getId();
 		o[3] = r.getTransportMode();
+		o[4] = getTourLength(r);
+		o[5] = getTourTime(r);
+		o[6] = getNrVeh(r);
 		return o;
+	}
+
+	/**
+	 * @param r
+	 * @return
+	 */
+	private Double getTourLength(TransitRoute r) {
+		Double l = 0.;
+		l += this.network.getLinks().get(r.getRoute().getStartLinkId()).getLength();
+		for(Id id: r.getRoute().getLinkIds()){
+			l += this.network.getLinks().get(id).getLength();
+		}
+		l += this.network.getLinks().get(r.getRoute().getEndLinkId()).getLength();
+		return l;
+	}
+
+	/**
+	 * @param r
+	 * @return
+	 */
+	private Double getTourTime(TransitRoute r) {
+		Double t = - Double.MAX_VALUE;
+		for(TransitRouteStop s: r.getStops()){
+			if(s.getDepartureOffset() > t){
+				t = s.getDepartureOffset();
+			}
+		}
+		return t;
+	}
+
+	/**
+	 * @param r
+	 * @return
+	 */
+	private Double getNrVeh(TransitRoute r) {
+		List<Id> ids = new ArrayList<Id>();
+		for(Departure d: r.getDepartures().values()){
+			if(!ids.contains(d.getVehicleId())){
+				ids.add(d.getVehicleId());
+			}
+		}
+		return (double) ids.size();
 	}
 	
 }
