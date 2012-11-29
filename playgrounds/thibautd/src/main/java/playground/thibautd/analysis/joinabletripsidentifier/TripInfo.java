@@ -46,5 +46,19 @@ public class TripInfo {
 	public double getMinDoWalkDistance() {
 		return minDoWalkDistance;
 	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if ( !(other instanceof TripInfo) ) return false;
+		double eps = 1E-7;
+		double puDiff = minPuWalkDistance - ((TripInfo) other).minPuWalkDistance;
+		double doDiff = minDoWalkDistance - ((TripInfo) other).minDoWalkDistance;
+		return Math.abs( puDiff ) < eps && Math.abs( doDiff ) < eps;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) (minPuWalkDistance + minDoWalkDistance);
+	}
 }
 

@@ -519,6 +519,20 @@ public class JoinableTrips {
 		public Collection<AcceptabilityCondition> getFullfilledConditions() {
 			return fullfilledConditions.keySet();
 		}
+
+		@Override
+		public boolean equals(final Object other) {
+			if ( !(other instanceof JoinableTrip) ) return false;
+			JoinableTrip o = (JoinableTrip) other;
+			return o.tripId.equals( tripId ) &&
+				o.passengerTripId.equals( passengerTripId ) &&
+				o.fullfilledConditions.equals( fullfilledConditions );
+		}
+
+		@Override
+		public int hashCode() {
+			return tripId.hashCode() + passengerTripId.hashCode() + fullfilledConditions.hashCode();
+		}
 	}
 
 	/**
