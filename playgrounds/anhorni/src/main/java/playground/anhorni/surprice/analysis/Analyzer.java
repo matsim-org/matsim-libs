@@ -74,15 +74,15 @@ public class Analyzer {
 	
 	private ObjectAttributes incomes;
 	
-	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
-	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
-	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt");
-	private SupriceBoxPlot boxPlotTravelDistancesCar = new SupriceBoxPlot("Travel Distances Car", "Day", "td");
+	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility", 0.0, 0.0);
+	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility", -100.0, 400.0);
+	private SupriceBoxPlot boxPlotTravelTimes = new SupriceBoxPlot("Travel Times", "Day", "tt", 0, 2400.0);
+	private SupriceBoxPlot boxPlotTravelDistancesCar = new SupriceBoxPlot("Travel Distances Car", "Day", "td", 0.0, 3500.0);
 	
-	private SupriceBoxPlot boxPlotTravelDistancesTolledPerIncome = new SupriceBoxPlot("Tolled Travel Distances", "Income", "tolltd");
-	private SupriceBoxPlot boxPlotTravelDistancesCarPerIncome = new SupriceBoxPlot("Travel Distances Car", "Income", "td");	
-	private SupriceBoxPlot boxPlotTravelTimesCarPerIncome = new SupriceBoxPlot("Travel Times Car", "Income", "tt");
-	private SupriceBoxPlot boxPlotTravelTimesPtPerIncome = new SupriceBoxPlot("Travel Times Pt", "Income", "tt");
+	private SupriceBoxPlot boxPlotTravelDistancesTolledPerIncome = new SupriceBoxPlot("Tolled Travel Distances", "Income", "tolltd", 0.0, 3500.0);
+	private SupriceBoxPlot boxPlotTravelDistancesCarPerIncome = new SupriceBoxPlot("Travel Distances Car", "Income", "td", 0.0, 3500.0);	
+	private SupriceBoxPlot boxPlotTravelTimesCarPerIncome = new SupriceBoxPlot("Travel Times Car", "Income", "tt",0, 2400.0);
+	private SupriceBoxPlot boxPlotTravelTimesPtPerIncome = new SupriceBoxPlot("Travel Times Pt", "Income", "tt", 0, 2400.0);
 	
 	private TreeMap<Id, Double> tolltdPerAgent;
 	private TreeMap<Id, Double> ttPerAgent;

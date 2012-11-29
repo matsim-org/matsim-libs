@@ -48,8 +48,8 @@ public class UtilityAnalyzer {
 	
 	private List<Zone> zones = new Vector<Zone>();
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility");
-	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility");
+	private SupriceBoxPlot boxPlotRelative = new SupriceBoxPlot("Utilities", "Day", "Utility", 0.0, 0.0);
+	private SupriceBoxPlot boxPlotAbsolute = new SupriceBoxPlot("Utilities", "Day", "Utility", 0.0, 0.0);
 	
 	private final static Logger log = Logger.getLogger(UtilityAnalyzer.class);
 	

@@ -41,12 +41,16 @@ public class SupriceBoxPlot {
 	private DefaultBoxAndWhiskerCategoryDataset dataset;
 	private String xAxisName = "";
 	private String yAxisName = "";
+	private double yrangeLower = 0.0;
+	private double yrangeUpper = 0.0;
 
-	public SupriceBoxPlot(final String chartTitle, String xAxisName, String yAxisName) {
+	public SupriceBoxPlot(final String chartTitle, String xAxisName, String yAxisName, double yrangeLower, double yrangeUpper) {
 		dataset = new DefaultBoxAndWhiskerCategoryDataset();
 		this.chartTitle = chartTitle;
 		this.xAxisName = xAxisName;
 		this.yAxisName = yAxisName;
+		this.yrangeLower = yrangeLower;
+		this.yrangeUpper = yrangeUpper;
 	}
 		
 	public void addValuesPerCategory(ArrayList<Double> values, String category, String name) {
@@ -62,6 +66,10 @@ public class SupriceBoxPlot {
 		
 		final NumberAxis yAxis = new NumberAxis(this.yAxisName);
 		yAxis.setAutoRangeIncludesZero(true);
+		
+		if (Math.abs(yrangeLower - yrangeUpper) > Double.MIN_VALUE) {
+			yAxis.setRange(yrangeLower, yrangeUpper);
+		}
 
 		final BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();
 		renderer.setFillBox(false);
