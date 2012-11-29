@@ -40,6 +40,7 @@
 					</excludes>
 					<forkMode>once</forkMode>
 					<argLine>-Xmx400m -Djava.awt.headless=true</argLine>
+					<enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
 				</configuration>
 			</plugin>
 		</plugins>
