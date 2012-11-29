@@ -60,10 +60,6 @@ public class OTFVisVisualization {
 	}
 
 	public void run() {
-		log.info("preparing JOGL");
-		JOGLSetup.configureJOGL();
-		log.info("done.");
-		
 		
 		Config config = ConfigUtils.loadConfig(this.config);
 		
