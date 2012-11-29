@@ -24,6 +24,7 @@ import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.TourImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoute;
+import org.matsim.contrib.freight.vrp.basics.VehicleImpl.NoVehicle;
 
 public class CalculatesServiceInsertion implements JobInsertionCalculator{
 	
@@ -38,6 +39,8 @@ public class CalculatesServiceInsertion implements JobInsertionCalculator{
 
 	@Override
 	public InsertionData calculate(VehicleRoute vehicleRoute, Job job, Vehicle newVehicle, Driver newDriver, double bestKnownCosts) {
+		if(job == null) throw new IllegalStateException("job is null. cannot calculate the insertion of a null-job.");
+		if(newVehicle == null || newVehicle instanceof NoVehicle) throw new IllegalStateException("no vehicle given. set para vehicle!");
 		TourImpl tour = vehicleRoute.getTour();
 		Double bestCost = bestKnownCosts;
 		Service service = (Service)job;

@@ -20,6 +20,8 @@ public class InsertionData {
 	
 	private Vehicle selectedVehicle;
 	
+	private Driver selectedDriver;
+	
 	private Map<String,Object> additionalInformation = new HashMap<String, Object>();
 	
 	public Map<String, Object> getAdditionalInformation() {

@@ -46,6 +46,7 @@ public class TourImpl implements Tour {
 
 	private Set<Job> jobs = new HashSet<Job>();
 	
+	@Deprecated
 	public TourData tourData = new TourData();
 	
 	private int load = 0;
@@ -131,11 +132,11 @@ public class TourImpl implements Tour {
 		setLoad(0);
 		setTotalCost(0.0);
 		jobs.clear();
-		for(TourActivity act : tourActivities){
-			addJob(act);
-			act.setCurrentCost(0.0);
-			act.setCurrentLoad(0);
-		}
+		tourActivities.get(0).setCurrentCost(0.0);
+		tourActivities.get(0).setCurrentLoad(0);
+		tourActivities.get(tourActivities.size()-1).setCurrentCost(0.0);
+		tourActivities.get(tourActivities.size()-1).setCurrentLoad(0);
+		
 	}
 
 	@Override

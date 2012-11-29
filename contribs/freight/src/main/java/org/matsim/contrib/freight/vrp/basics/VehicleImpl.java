@@ -26,6 +26,10 @@ public class VehicleImpl implements Vehicle {
 			super("noVehicle", null, null);
 		}
 		
+		public int getCapacity(){
+			return 0;
+		}
+		
 	}
 	
 	public static class Type {

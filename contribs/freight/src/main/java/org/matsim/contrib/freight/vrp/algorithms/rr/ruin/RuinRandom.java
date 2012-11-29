@@ -97,15 +97,6 @@ public final class RuinRandom implements RuinStrategy {
 		return agents;
 	}
 
-	private void agentsRemove(Collection<RouteAgent> agents, Job job) {
-		for (RouteAgent sp : agents) {
-			if (sp.removeJobWithoutTourUpdate(job)) {
-				return;
-			}
-		}
-		logger.warn("job " + job.getId() + " cannot be removed");
-	}
-
 	private Job pickRandomJob(LinkedList<Job> availableJobs) {
 		int randomIndex = random.nextInt(availableJobs.size());
 		return availableJobs.get(randomIndex);
