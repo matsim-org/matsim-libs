@@ -19,8 +19,11 @@
 
 package playground.mmoyo.randomizerPtRouter;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -30,7 +33,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility;
 import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility.DataCollection;
-import playground.mmoyo.utils.DataLoader;
 
 public class RndPtRouterLauncher {
 
@@ -50,13 +52,15 @@ public class RndPtRouterLauncher {
 	public static void main(final String[] args) {
 		String configFile ;
 		if(args.length==0){
-			configFile = "";
+			configFile = "../../ptManuel/calibration/100plans_bestValues_config.xml";
 		}else{
 			configFile = args[0];
 		}
+		
+		Config config = ConfigUtils.loadConfig(configFile) ;
 
 		//load data
-		ScenarioImpl scn = new DataLoader().loadScenario(configFile);
+		Scenario scn = ScenarioUtils.loadScenario(config);
 		final TransitRouterConfig trConfig = new TransitRouterConfig( scn.getConfig() ) ; 
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scn.getTransitSchedule(), trConfig.beelineWalkConnectionDistance);
 		
@@ -66,7 +70,7 @@ public class RndPtRouterLauncher {
 		//set the controler
 		Controler controler = new Controler(scn);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
-		//controler.addControlerListener(new CadytsPtControlerListener(controler));  //<-set cadyts as controler listener
+//		controler.addControlerListener(new CadytsPtControlerListener(controler));  //<-set cadyts as controler listener
 		controler.setOverwriteFiles(true);
 		
 		controler.run();
