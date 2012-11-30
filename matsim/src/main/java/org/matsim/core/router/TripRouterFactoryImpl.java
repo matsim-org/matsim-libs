@@ -108,6 +108,9 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 			throw new NullPointerException("travelDisutilityFactory cannot be null, as it will be unconditionally dereferenced later.");
 		}
 		this.travelDisutilityFactory = travelDisutilityFactory;
+		if (travelTime == null) {
+			throw new NullPointerException("travelTime cannot be null, as it will be unconditionally dereferenced later.");
+		}
 		this.travelTime = travelTime;
 		if (leastCostPathAlgoFactory == null) {
 			throw new NullPointerException("leastCostPathAlgorithmFactory cannot be null, as it will be unconditionally dereferenced later.");
