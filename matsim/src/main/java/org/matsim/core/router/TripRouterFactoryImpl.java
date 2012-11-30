@@ -22,7 +22,6 @@ package org.matsim.core.router;
 import java.util.Collections;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -51,8 +50,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author thibautd
  */
 public class TripRouterFactoryImpl implements TripRouterFactory {
-	private static final Logger log =
-		Logger.getLogger(TripRouterFactoryImpl.class);
+	private static final Logger log = Logger.getLogger(TripRouterFactoryImpl.class);
 
 	private final Config config;
 	private final Network network;
@@ -106,8 +104,14 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 			final TransitSchedule transitSchedule) {
 		this.config = config;
 		this.network = network;
+		if (travelDisutilityFactory == null) {
+			throw new NullPointerException("travelDisutilityFactory cannot be null, as it will be unconditionally dereferenced later.");
+		}
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.travelTime = travelTime;
+		if (leastCostPathAlgoFactory == null) {
+			throw new NullPointerException("leastCostPathAlgorithmFactory cannot be null, as it will be unconditionally dereferenced later.");
+		}
 		this.leastCostPathAlgorithmFactory = leastCostPathAlgoFactory;
 		this.modeRouteFactory = modeRouteFactory;
 		this.populationFactory = populationFactory;
