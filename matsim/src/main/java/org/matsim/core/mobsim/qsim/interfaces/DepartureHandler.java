@@ -25,6 +25,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public interface DepartureHandler {
 	
+	/**
+	 * @return <code>true</code> if the departure is handled, <code>false</code> if other DepartureHandlers should be tried as well.
+	 */
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId);
 
 }
