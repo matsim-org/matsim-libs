@@ -30,6 +30,7 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
 /**Design decisions:<ul>
  * <li> I have decided to modify those setters/getters that do not use SI units such that the units are attached.
@@ -544,7 +545,16 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	public void addActivityParams(final ActivityParams params) {
-		this.activityTypes.put(params.getType(), params);
+		ActivityParams result = this.activityTypes.put(params.getType(), params);
+		if ( result != null ) {
+			if ( result.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				log.warn("activity parameters for activity type " + result.getType() + " were just overwritten. This happens most " +
+						"likely because you defined them in the config file and the Controler overwrites them.  Or the other way " +
+						"round.  Make sure this is what you want; it is normally better to not touch this activity type.  kai, nov'12") ;
+			} else {
+				log.info("activity parameters for activity type " + result.getType() + " were just overwritten.") ;
+			}
+		}
 	}
 
 	/* complex classes */
