@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.graph;
 
-import junit.framework.TestCase;
-
+import org.junit.Ignore;
+import org.junit.Test;
 
 import playground.johannes.sna.graph.SparseGraph;
 import playground.johannes.sna.graph.io.SparseGraphMLReader;
@@ -30,8 +30,9 @@ import playground.johannes.socialnetworks.graph.analysis.Centrality;
  * @author illenberger
  *
  */
-public class CentralityTest extends TestCase {
+public class CentralityTest {
 
+	@Ignore @Test
 	public void test() {
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		SparseGraph graph = reader.readGraph("/Users/jillenberger/Work/socialnets/data/graphs/cond-mat-2005-gc.graphml");
