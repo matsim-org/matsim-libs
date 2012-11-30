@@ -22,6 +22,7 @@ package playground.gregor.sim2d_v2.controller;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -39,7 +40,7 @@ public class Controller2DTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+	@Ignore @Test
 	public void testController2D() {
 		String testEventsFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
 		String configFile = this.utils.getInputDirectory() + "config2d.xml";

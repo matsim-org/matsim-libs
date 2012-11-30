@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +33,7 @@ public class GraphGeneratorTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+	@Ignore @Test
 	public void testGraphGenerator() {
 
 
