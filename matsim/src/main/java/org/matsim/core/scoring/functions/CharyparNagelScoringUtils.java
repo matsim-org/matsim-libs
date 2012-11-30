@@ -31,8 +31,7 @@ public class CharyparNagelScoringUtils {
 
 	public static double computeZeroUtilityDuration(final double priority,
 			final double typicalDuration_s) {
-		final double zeroUtilityDuration = 3600.*(typicalDuration_s / 3600.0)
-				* Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
+		final double zeroUtilityDuration = typicalDuration_s * Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
 		// ( the 3600s are in there because the original formulation was in "hours".  So the values in seconds are first
 		// translated into hours.  kai, sep'12 )
 

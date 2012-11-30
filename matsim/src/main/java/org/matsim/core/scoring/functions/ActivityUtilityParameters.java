@@ -148,8 +148,12 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		this.type = type;
 		this.typicalDuration_s = typicalDuration_s;
 		
-		this.zeroUtilityDuration_h = (1./3600.) * CharyparNagelScoringUtils.computeZeroUtilityDuration(priority,
-				typicalDuration_s);
+//		this.zeroUtilityDuration_h = (typicalDuration_s / 3600.0)
+//		* Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
+		// replacing the above two lines with the two lines below causes the test failure of ReRoutingTest.  kai, nov'12
+		
+		this.zeroUtilityDuration_h = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority,
+				typicalDuration_s) / 3600. ;
 
 		// example: pt interaction activity with typical duration = 120sec.
 		// 120/3600 * exp( -10 / (120 / 3600) ) =  1.7 x 10^(-132)  (!!!!!!!!!!)
