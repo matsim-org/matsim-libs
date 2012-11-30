@@ -378,6 +378,9 @@ public class Controler extends AbstractController {
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		this.config.planCalcScore().addActivityParams(transitActivityParams);
+		// yy would this overwrite user-defined definitions of "pt interaction"?  If so, since when does it work this way 
+		// (since sergioo, at matsim dev mtg'12, reported setting it explicitly and from this obtaining a different behavior).
+		// kai, nov'12
 	
 		// the QSim reads the config by itself, and configures itself as a
 		// transit-enabled mobsim. kai, nov'11
