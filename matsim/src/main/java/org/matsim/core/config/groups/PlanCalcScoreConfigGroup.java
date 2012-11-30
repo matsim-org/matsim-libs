@@ -548,9 +548,11 @@ public class PlanCalcScoreConfigGroup extends Module {
 		ActivityParams result = this.activityTypes.put(params.getType(), params);
 		if ( result != null ) {
 			if ( result.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-				log.warn("activity parameters for activity type " + result.getType() + " were just overwritten. This happens most " +
+				log.error("ERROR: Activity parameters for activity type " + result.getType() + " were just overwritten. This happens most " +
 						"likely because you defined them in the config file and the Controler overwrites them.  Or the other way " +
-						"round.  Make sure this is what you want; it is normally better to not touch this activity type.  kai, nov'12") ;
+						"round.  pt interaction has problems, but doing what you are doing here will just cause " +
+						"other (less visible) problem. Please take the effort to discuss with the core team " +
+						"what needs to be done.  kai, nov'12") ;
 			} else {
 				log.info("activity parameters for activity type " + result.getType() + " were just overwritten.") ;
 			}
