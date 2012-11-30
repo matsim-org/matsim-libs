@@ -68,10 +68,10 @@ public class Interpolate {
 		NetworkBoundaryBox boundary = new NetworkBoundaryBox();
 		boundary.setCustomBoundaryBox(inputSG.getXmin(), inputSG.getYmin(), inputSG.getXmax(), inputSG.getYmax());
 		SpatialGrid outputSG= new SpatialGrid(boundary.getBoundingBox(), cellSizeInMeter);
-
+		
 		for(double x = outputSG.getXmin(); x < outputSG.getXmax(); x = x+cellSizeInMeter){
 			for(double y = outputSG.getYmin(); y < outputSG.getYmax(); y = y+cellSizeInMeter){
-				
+
 				if(inputSG.getValue(x, y) == Double.NaN)
 					continue;
 				
