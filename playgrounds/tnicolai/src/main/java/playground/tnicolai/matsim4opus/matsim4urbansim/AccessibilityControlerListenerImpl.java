@@ -493,98 +493,112 @@ public class AccessibilityControlerListenerImpl{
 									   double walkTravelTime_h, 
 									   double congestedCarTravelTime_h) {
 		
-		double sumWalkExpCostDestinationNode2Opportunities = (aggregatedOpportunities.getSumWalkTravelTimeCost() +
-															  aggregatedOpportunities.getSumWalkPowerTravelTimeCost() +
-															  aggregatedOpportunities.getSumWalkLnTravelTimeCost() +
-															  aggregatedOpportunities.getSumWalkDistanceCost() +
-															  aggregatedOpportunities.getSumWalkPowerDistanceCost());
-		
 		// for debugging free speed accessibility
 		freeTT = getAsUtil(betaCarTT, freeSpeedTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
+		freeTT = Math.exp(logitScaleParameter * freeTT) * aggregatedOpportunities.getSumWalkTravelTimeCost();
 		freeTTPower = getAsUtil(betaCarTTPower, freeSpeedTravelTime_h * freeSpeedTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
+		freeTTPower = Math.exp(logitScaleParameter * freeTTPower) * aggregatedOpportunities.getSumWalkPowerTravelTimeCost();
 		freeLnTT = getAsUtil(betaCarLnTT, Math.log(freeSpeedTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h));
+		freeLnTT = Math.exp(logitScaleParameter * freeLnTT) * aggregatedOpportunities.getSumWalkLnTravelTimeCost();
 		
 		freeTD = getAsUtil(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter);
+		freeTD = Math.exp(logitScaleParameter * freeTD) * aggregatedOpportunities.getSumWalkDistanceCost();
 		freeTDPower = getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
+		freeTDPower = Math.exp(logitScaleParameter * freeTDPower) * aggregatedOpportunities.getSumWalkPowerDistanceCost();
 		freeLnTD = getAsUtil(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
+		freeLnTD = Math.exp(logitScaleParameter * freeLnTD) * aggregatedOpportunities.getSumWalkLnDistanceCost();
 		
 		freeTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
 		freeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
 		freeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double freeSpeedExpCostOrigin2DestinationNode = Math.exp(logitScaleParameter *
-																  (freeTT + freeTTPower + freeLnTT
-																  + freeTD + freeTDPower + freeLnTD
-																  + freeTC + freeTCPower + freeLnTC) );
+		double freeSpeedExpCostOrigin2DestinationNode = (freeTT + freeTTPower + freeLnTT
+														+ freeTD + freeTDPower + freeLnTD
+														+ freeTC + freeTCPower + freeLnTC);
 		
 		// sum free speed travel times
-		gcs.addFreeSpeedCost( freeSpeedExpCostOrigin2DestinationNode * sumWalkExpCostDestinationNode2Opportunities);
+		gcs.addFreeSpeedCost( freeSpeedExpCostOrigin2DestinationNode );
 		
 		// for debugging car accessibility
 		carTT = getAsUtil(betaCarTT, congestedCarTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
+		carTT = Math.exp(logitScaleParameter * carTT) * aggregatedOpportunities.getSumWalkTravelTimeCost();
 		carTTPower = getAsUtil(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
+		carTTPower = Math.exp(logitScaleParameter * carTTPower) * aggregatedOpportunities.getSumWalkPowerTravelTimeCost();
 		carLnTT	= getAsUtil(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h));
+		carLnTT = Math.exp(logitScaleParameter * carTTPower) * aggregatedOpportunities.getSumWalkLnTravelTimeCost();
 		
 		carTD = getAsUtil(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); // carOffsetWalkTime2NearestLink_meter
+		carTD = Math.exp(logitScaleParameter * carTD) * aggregatedOpportunities.getSumWalkDistanceCost();
 		carTDPower = getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
+		carTDPower = Math.exp(logitScaleParameter * carTDPower) * aggregatedOpportunities.getSumWalkPowerDistanceCost();
 		carLnTD = getAsUtil(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
+		carLnTD = Math.exp(logitScaleParameter * carLnTD) * aggregatedOpportunities.getSumWalkLnDistanceCost();
 		
 		carTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
 		carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		carLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double congestedCarExpCostOrigin2DestinationNode = Math.exp(logitScaleParameter *
-																	(carTT + carTTPower + carLnTT 
-																	+ carTD + carTDPower + carLnTD 
-																	+ carTC + carTCPower + carLnTC));
+		double congestedCarExpCostOrigin2DestinationNode = 	(carTT + carTTPower + carLnTT 
+															+ carTD + carTDPower + carLnTD 
+															+ carTC + carTCPower + carLnTC);
 		
 		// sum congested travel times
-		gcs.addCongestedCarCost( congestedCarExpCostOrigin2DestinationNode * sumWalkExpCostDestinationNode2Opportunities);
+		gcs.addCongestedCarCost( congestedCarExpCostOrigin2DestinationNode );
 		
 		// for debugging bike accessibility
 		bikeTT 		= getAsUtil(betaBikeTT, bikeTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
+		bikeTT      = Math.exp(logitScaleParameter * bikeTT) * aggregatedOpportunities.getSumWalkTravelTimeCost();
 		bikeTTPower = getAsUtil(betaBikeTTPower, bikeTravelTime_h * bikeTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
+		bikeTTPower = Math.exp(logitScaleParameter * bikeTTPower) * aggregatedOpportunities.getSumWalkPowerTravelTimeCost();
 		bikeLnTT	= getAsUtil(betaBikeLnTT, Math.log(bikeTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h));
+		bikeLnTT    = Math.exp(logitScaleParameter * bikeLnTT) * aggregatedOpportunities.getSumWalkLnTravelTimeCost();
 		
-		bikeTD = getAsUtil(betaBikeTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); 
+		bikeTD 		= getAsUtil(betaBikeTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); 
+		bikeTD	    = Math.exp(logitScaleParameter * bikeTD) * aggregatedOpportunities.getSumWalkDistanceCost();
 		bikeTDPower = getAsUtil(betaBikeTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
-		bikeLnTD = getAsUtil(betaBikeLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
+		bikeTDPower = Math.exp(logitScaleParameter * bikeTDPower) *  aggregatedOpportunities.getSumWalkPowerDistanceCost();
+		bikeLnTD    = getAsUtil(betaBikeLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
+		bikeLnTD    = Math.exp(logitScaleParameter * bikeLnTD) * aggregatedOpportunities.getSumWalkLnDistanceCost();
 		
 		bikeTC 		= 0.; 	// since MATSim doesn't gives monetary costs jet 
 		bikeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
 		bikeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double bikeExpCostOrigin2DestinationNode = Math.exp(logitScaleParameter
-															* (bikeTT + bikeTTPower + bikeLnTT 
-															+ bikeTD + bikeTDPower + bikeLnTD 
-															+ bikeTC + bikeTCPower + bikeLnTC));
+		double bikeExpCostOrigin2DestinationNode = (bikeTT + bikeTTPower + bikeLnTT 
+												   + bikeTD + bikeTDPower + bikeLnTD 
+												   + bikeTC + bikeTCPower + bikeLnTC);
 		
 		// sum congested travel times
-		gcs.addBikeCost( bikeExpCostOrigin2DestinationNode * sumWalkExpCostDestinationNode2Opportunities);
+		gcs.addBikeCost( bikeExpCostOrigin2DestinationNode );
 		
 		// for debugging walk accessibility
 		double totalWalkTravelTime = walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour);
 		double totalTravelDistance = travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter;
 		
-		walkTT = getAsUtil(betaWalkTT, totalWalkTravelTime,0, 0);
+		walkTT 		= getAsUtil(betaWalkTT, totalWalkTravelTime,0, 0);
+		walkTT	    = Math.exp(logitScaleParameter * walkTT) * aggregatedOpportunities.getSumWalkTravelTimeCost();
 		walkTTPower = getAsUtil(betaWalkTTPower, totalWalkTravelTime * totalWalkTravelTime, 0 ,0);
-		walkLnTT = getAsUtil(betaWalkLnTT, Math.log(totalWalkTravelTime), 0, 0);
+		walkTTPower = Math.exp(logitScaleParameter * walkTTPower) *  aggregatedOpportunities.getSumWalkPowerTravelTimeCost();
+		walkLnTT 	= getAsUtil(betaWalkLnTT, Math.log(totalWalkTravelTime), 0, 0);
+		walkLnTT    = Math.exp(logitScaleParameter * walkLnTT) *  aggregatedOpportunities.getSumWalkLnTravelTimeCost();
 		
-		walkTD = getAsUtil(betaWalkTD, totalTravelDistance, 0, 0);
+		walkTD 		= getAsUtil(betaWalkTD, totalTravelDistance, 0, 0);
+		walkTD 	    = Math.exp(logitScaleParameter * walkTD) * aggregatedOpportunities.getSumWalkDistanceCost();
 		walkTDPower = getAsUtil(betaWalkTDPower, totalTravelDistance * totalTravelDistance, 0, 0);
-		walkLnTD = getAsUtil(betaWalkLnTD, Math.log(totalTravelDistance), 0, 0);
+		walkTDPower = Math.exp(logitScaleParameter * walkTDPower) * aggregatedOpportunities.getSumWalkPowerDistanceCost();
+		walkLnTD 	= getAsUtil(betaWalkLnTD, Math.log(totalTravelDistance), 0, 0);
+		walkLnTD    = Math.exp(logitScaleParameter * walkLnTD) * aggregatedOpportunities.getSumWalkLnDistanceCost();
 
 		walkTC 		= 0.;	// since MATSim doesn't gives monetary costs jet 
 		walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
 		walkLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double walkExpCostOrigin2DestinationNode = Math.exp(logitScaleParameter
-															* (walkTT + walkTTPower + walkLnTT 
-															+ walkTD + walkTDPower + walkLnTD 
-															+ walkTC + walkTCPower + walkLnTC));
+		double walkExpCostOrigin2DestinationNode = (walkTT + walkTTPower + walkLnTT 
+												   + walkTD + walkTDPower + walkLnTD 
+												   + walkTC + walkTCPower + walkLnTC);
 
 		// sum walk travel times (substitute for distances)
-		gcs.addWalkCost(walkExpCostOrigin2DestinationNode * sumWalkExpCostDestinationNode2Opportunities);
+		gcs.addWalkCost(walkExpCostOrigin2DestinationNode);
 	}
 	
 	/**
