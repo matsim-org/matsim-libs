@@ -512,12 +512,12 @@ public class AccessibilityControlerListenerImpl{
 		freeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
 		freeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double freeSpeedExpCostOrigin2DestinationNode = (freeTT + freeTTPower + freeLnTT
-														+ freeTD + freeTDPower + freeLnTD
-														+ freeTC + freeTCPower + freeLnTC);
+		double freeSpeedCost = (freeTT + freeTTPower + freeLnTT
+							  + freeTD + freeTDPower + freeLnTD
+							  + freeTC + freeTCPower + freeLnTC);
 		
 		// sum free speed travel times
-		gcs.addFreeSpeedCost( freeSpeedExpCostOrigin2DestinationNode );
+		gcs.addFreeSpeedCost( freeSpeedCost );
 		
 		// for debugging car accessibility
 		carTT = getAsUtil(betaCarTT, congestedCarTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
@@ -538,12 +538,12 @@ public class AccessibilityControlerListenerImpl{
 		carTCPower 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		carLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double congestedCarExpCostOrigin2DestinationNode = 	(carTT + carTTPower + carLnTT 
-															+ carTD + carTDPower + carLnTD 
-															+ carTC + carTCPower + carLnTC);
+		double congestedCarCost = (carTT + carTTPower + carLnTT 
+								 + carTD + carTDPower + carLnTD 
+								 + carTC + carTCPower + carLnTC);
 		
 		// sum congested travel times
-		gcs.addCongestedCarCost( congestedCarExpCostOrigin2DestinationNode );
+		gcs.addCongestedCarCost( congestedCarCost );
 		
 		// for debugging bike accessibility
 		bikeTT 		= getAsUtil(betaBikeTT, bikeTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
@@ -564,12 +564,12 @@ public class AccessibilityControlerListenerImpl{
 		bikeTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
 		bikeLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double bikeExpCostOrigin2DestinationNode = (bikeTT + bikeTTPower + bikeLnTT 
-												   + bikeTD + bikeTDPower + bikeLnTD 
-												   + bikeTC + bikeTCPower + bikeLnTC);
+		double bikeCost = (bikeTT + bikeTTPower + bikeLnTT 
+						 + bikeTD + bikeTDPower + bikeLnTD 
+						 + bikeTC + bikeTCPower + bikeLnTC);
 		
 		// sum congested travel times
-		gcs.addBikeCost( bikeExpCostOrigin2DestinationNode );
+		gcs.addBikeCost( bikeCost );
 		
 		// for debugging walk accessibility
 		double totalWalkTravelTime = walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour);
@@ -593,12 +593,23 @@ public class AccessibilityControlerListenerImpl{
 		walkTCPower = 0.;	// since MATSim doesn't gives monetary costs jet 
 		walkLnTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
 		
-		double walkExpCostOrigin2DestinationNode = (walkTT + walkTTPower + walkLnTT 
-												   + walkTD + walkTDPower + walkLnTD 
-												   + walkTC + walkTCPower + walkLnTC);
+		double walkCost = (walkTT + walkTTPower + walkLnTT 
+						 + walkTD + walkTDPower + walkLnTD 
+						 + walkTC + walkTCPower + walkLnTC);
 
 		// sum walk travel times (substitute for distances)
-		gcs.addWalkCost(walkExpCostOrigin2DestinationNode);
+		gcs.addWalkCost(walkCost);
+	}
+	
+	private double getTotalUtility(double TT, double TTPower, double LnTT, double TD, double TDPower, double LnTD){
+		
+		double tmp = 0.;
+		double ret = 0.;
+		
+		// TODO
+			
+		return ret;
+		
 	}
 	
 	/**
