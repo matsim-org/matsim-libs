@@ -97,7 +97,8 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 				&& config.scenario().isUseTransit()) {
 			problem = true;
 			log.error("You are using " + config.vspExperimental().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +
-			"conjunction with the matsim transit module. This is not working at all as pt interaction activities will never end!");
+			"conjunction with the matsim transit module. This is not working at all as pt interaction activities never have an end time and " +
+			"thus will never end!");
 		}
 		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
