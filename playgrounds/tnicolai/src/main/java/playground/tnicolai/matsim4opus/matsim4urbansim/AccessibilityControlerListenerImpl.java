@@ -43,6 +43,9 @@ import com.vividsolutions.jts.geom.Point;
  *   The "least cost path tree" for measuring points with the same nearest node are now only executed once. 
  *   Only the cost calculations from the measuring point to the network is done individually.
  *   
+ * improvements nov'12
+ * - bug fixed aggregatedOpportunities method for compound cost factors like time and distance    
+ *   
  * @author thomas
  *
  */
@@ -208,11 +211,18 @@ public class AccessibilityControlerListenerImpl{
 	}
 	
 	/**
-	 * Aggregates opportunities having the same nearest node on the network
-	 * @param parcelsOrZones
-	 * @param jobSample
-	 * @param network
-	 * @return
+	 * This aggregates the disjutilities Vjk to get from node j to all k that are attached to j.
+	 * Finally the sum(Vjk) is assigned to node j, which is done in this method.
+	 * 
+	 *     j---k1 
+	 *     |\
+	 *     | \
+	 *     k2 k3
+	 *     
+	 * @param parcelsOrZones opportunities like work places either given at a parcel- or zone level
+	 * @param jobSample allows to reduce the sample size of opportunities
+	 * @param network the road network
+	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assignet to j from node j 
 	 */
 	protected AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcelMode){
 		
@@ -473,15 +483,37 @@ public class AccessibilityControlerListenerImpl{
 	}
 	
 	/**
-	 * @param gcs
-	 * @param distanceMeasuringPoint2Road_meter
-	 * @param distanceRoad2Node_meter
-	 * @param walkTravelTimePoint2Road_h
-	 * @param opportunityWeight
-	 * @param freeSpeedTravelTime_h
-	 * @param travelDistance_meter
-	 * @param bikeTravelTime_h
-	 * @param walkTravelTime_h
+	 * This calculates the logsum for origin i over all opportunities k attached to node j
+	 * 
+	 * i ----------j---k1
+	 *             | \
+	 * 			   k2 k3
+	 * 
+	 * The disutilities Vjk to get from node j to all opportunities k are attached to j:
+	 * 
+	 * S_j = sum_k (exp(Vjk)) = exp(Vjk1) + exp(Vjk2) + exp(Vjk3)
+	 * 
+	 * The log sum is given as :
+	 * 
+	 * A_i = 1/betascale * ln ( sum_j ( exp(Vij) * sum_k_in_j( exp(Vjk) ) ) ) = 1/beatascale * ln (sum_j (exp(Vij) * S_j ) )
+	 * 
+	 * Thus the computation can be done in 2 steps:
+	 * 
+	 * 1) compute S_j
+	 * 2) compute the disutility to get to node j (Vij) and multiply with S_j
+	 * 
+	 * Step 1 is done above in method "aggregatedOpportunities". The result is stored in "aggregatedOpportunities"
+	 * Step 2 is done in this method 
+	 * 
+	 * @param gcs stores the value for the term "exp(Vik)"
+	 * @param distanceMeasuringPoint2Road_meter distance in meter from origin i to the network
+	 * @param distanceRoad2Node_meter if the mapping of i on the network is on a link, this is the distance in meter from this mapping to the nearest node on the network
+	 * @param travelDistance_meter travel distances in meter on the network to get to destination node j
+	 * @param walkTravelTimePoint2Road_h walk travel time in h to get from origin i to the network
+	 * @param freeSpeedTravelTime_h free speed travel times in h on the network to get to destination node j
+	 * @param bikeTravelTime_h bike travel times in h on the network to get to destination node j
+	 * @param walkTravelTime_h walk travel times in h on the network to get to destination node j
+	 * @param congestedCarTravelTime_h congested car travel times in h on the network to get to destination node j
 	 */
 	protected void sumDisutilityOfTravel(GeneralizedCostSum gcs,
 									   AggregateObject2NearestNode aggregatedOpportunities,
@@ -494,19 +526,13 @@ public class AccessibilityControlerListenerImpl{
 									   double walkTravelTime_h, 
 									   double congestedCarTravelTime_h) {
 		
-//		double sumWalkExpCostDestinationNode2Opportunities = (aggregatedOpportunities.getSumWalkTravelTimeCost() +
-//															  aggregatedOpportunities.getSumWalkPowerTravelTimeCost() +
-//															  aggregatedOpportunities.getSumWalkLnTravelTimeCost() +
-//															  aggregatedOpportunities.getSumWalkDistanceCost() +
-//															  aggregatedOpportunities.getSumWalkPowerDistanceCost());
-		
 		// for debugging free speed accessibility
 		VijFreeTT 	= getAsUtil(betaCarTT, freeSpeedTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
-		VijFreeTTPower = getAsUtil(betaCarTTPower, freeSpeedTravelTime_h * freeSpeedTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
+		VijFreeTTPower= getAsUtil(betaCarTTPower, freeSpeedTravelTime_h * freeSpeedTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
 		VijFreeLnTT = getAsUtil(betaCarLnTT, Math.log(freeSpeedTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h));
 		
 		VijFreeTD 	= getAsUtil(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter);
-		VijFreeTDPower = getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
+		VijFreeTDPower= getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
 		VijFreeLnTD = getAsUtil(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
 		
 		VijFreeTC 	= 0.;	// since MATSim doesn't gives monetary costs jet 
