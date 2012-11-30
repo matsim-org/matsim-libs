@@ -47,7 +47,7 @@ public class Interpolate {
 	public static void main(String[] args) {
 		
 		if(args == null || args.length != 2){
-			log.info("Please enter the following parameter:");
+			log.info("Enter the following parameter:");
 			log.info("1) input table");
 			log.info("2) resolution (as side length in merter)");
 			log.info("Please try again.");
