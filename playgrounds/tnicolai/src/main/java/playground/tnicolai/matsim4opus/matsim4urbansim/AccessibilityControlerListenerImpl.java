@@ -222,7 +222,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param parcelsOrZones opportunities like work places either given at a parcel- or zone level
 	 * @param jobSample allows to reduce the sample size of opportunities
 	 * @param network the road network
-	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assignet to j from node j 
+	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
 	protected AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcelMode){
 		
