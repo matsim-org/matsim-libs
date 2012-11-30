@@ -685,13 +685,13 @@ public class ReadFromUrbanSimModel {
 			
 			if( jobClusterMap.containsKey( jo.getParcelID() ) ){
 				AggregateObject2NearestNode jco = jobClusterMap.get( jo.getParcelID() );
-				jco.addObject( jo.getObjectID(), 0.);
+				jco.addObjectOld( jo.getObjectID(), 0.);
 			}
 			else
 				jobClusterMap.put(
 						jo.getParcelID(),
-						new AggregateObject2NearestNode(jo.getObjectID(), jo.getParcelID(), jo.getZoneID(), jo.getCoord(),
-								0.));
+						new AggregateObject2NearestNode(0., jo.getObjectID(), jo.getParcelID(), jo.getZoneID(),
+								jo.getCoord()));
 		}
 		
 		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ jobClusterMap.size() ];
@@ -1050,15 +1050,15 @@ public class ReadFromUrbanSimModel {
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){
 								AggregateObject2NearestNode co = personClusterMap.get( nearestNode.getId() );
-								co.addObject( personId, 0.);
+								co.addObjectOld( personId, 0.);
 							}
 							else
-								personClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(personId,
-																							 homeParcelId,
+								personClusterMap.put( nearestNode.getId(), new AggregateObject2NearestNode(0.,
+																							 personId,
+																						  	 homeParcelId,
 																						  	 null,
 																						  	 nearestNode.getCoord(),
-																						  	 nearestNode,
-																						  	0.) );
+																						  	nearestNode) );
 						}
 					}
 				}

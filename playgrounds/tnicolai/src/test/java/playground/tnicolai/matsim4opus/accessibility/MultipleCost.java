@@ -40,11 +40,6 @@ public class MultipleCost {
 	 *						  cjk3	 
 	 * 
 	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
 	 */
 	public static void main(String[] args) {
 		
