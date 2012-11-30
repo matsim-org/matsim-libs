@@ -26,7 +26,10 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -74,4 +77,18 @@ public class FeatureCoordinateTransformer {
 		}
 	}
 
+	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
+		String input = "some_input_file.shp";
+		String output = "some_output_file.shp";
+		ShapeFileReader reader = new ShapeFileReader();
+		reader.readFileAndInitialize(input);
+		CoordinateReferenceSystem sourceCRS = reader.getCoordinateSystem();
+		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:3395"); // World Mercator coordinate system change this if needed!
+		FeatureCoordinateTransformer transform = new FeatureCoordinateTransformer(sourceCRS, targetCRS);
+		Collection<Feature> coll = reader.getFeatureSet();
+		transform.transform(coll);
+		ShapeFileWriter.writeGeometries(coll, output);
+		
+		
+	}
 }
