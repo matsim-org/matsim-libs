@@ -355,10 +355,11 @@ public class Controler extends AbstractController {
 	
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
+
+		// The following two lines were introduced in nov/12.  _In addition_, the conversion of ActivityParams to
+		// ActivityUtilityParameters will set the scoreAtAll flag to false (also introduced in nov/12).  kai, nov'12
 		transitActivityParams.setOpeningTime(0.) ;
 		transitActivityParams.setClosingTime(0.) ;
-		// yyyy I think that the previous two lines would make sense, but they would destroy backwards compatibility.  Need to think
-		// about introduction path.  kai, nov'12
 		
 		this.config.planCalcScore().addActivityParams(transitActivityParams);
 		// yy would this overwrite user-defined definitions of "pt interaction"?
