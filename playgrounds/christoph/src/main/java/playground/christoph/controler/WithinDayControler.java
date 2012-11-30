@@ -36,7 +36,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -114,7 +114,7 @@ public class WithinDayControler extends WithinDayController {
 
 	private void setConstructorParameters() {
 		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
+		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
 	}
 
 	/*

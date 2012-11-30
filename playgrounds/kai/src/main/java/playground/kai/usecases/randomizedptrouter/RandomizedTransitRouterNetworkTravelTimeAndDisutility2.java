@@ -24,10 +24,20 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.DepartureTimeCache;
@@ -36,11 +46,13 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 /**
@@ -191,51 +203,59 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 		return disutl;
 	}
 	
-	@Override
-	protected double offVehicleWaitTime(final Link link, final double time) {
-		//calculate off vehicle waiting time as new router parameter
-		double offVehWaitTime=0;
-		double nextVehArrivalTime = getVehArrivalTime(link, time);
-		if (time < nextVehArrivalTime){ // it means the agent waits outside the veh				
-			offVehWaitTime = nextVehArrivalTime-time;
-		}
-		return offVehWaitTime;
-	}
-	
-//variables for caching offVehWaitTime
-	Link previousWaitLink;
-	double previousWaitTime;
-	double cachedVehArrivalTime;
-	
-	/* package (for a test) */ double getVehArrivalTime(final Link link, final double now){
-		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
-			return this.cachedVehArrivalTime;
-		}
-		this.previousWaitLink = link;
-		this.previousWaitTime = now;
-		
-		//first find out vehicle arrival time to fromStop according to transit schedule
-		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-		if (wrapped.getRoute() == null) { 
-			throw new RuntimeException("should not happen") ;
-		}
-		TransitRouteStop fromStop = wrapped.fromNode.stop;
-		
-		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
-		
-		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
-		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
-		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
-		cachedVehArrivalTime = vehArrivalTime ;
-		return vehArrivalTime ;		
-	}
+//	@Override
+//	protected double offVehicleWaitTime(final Link link, final double time) {
+//		//calculate off vehicle waiting time as new router parameter
+//		double offVehWaitTime=0;
+//		double nextVehArrivalTime = getVehArrivalTime(link, time);
+//		if (time < nextVehArrivalTime){ // it means the agent waits outside the veh				
+//			offVehWaitTime = nextVehArrivalTime-time;
+//		}
+//		return offVehWaitTime;
+//	}
+//	
+////variables for caching offVehWaitTime
+//	Link previousWaitLink;
+//	double previousWaitTime;
+//	double cachedVehArrivalTime;
+//	
+//	/* package (for a test) */ double getVehArrivalTime(final Link link, final double now){
+//		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
+//			return this.cachedVehArrivalTime;
+//		}
+//		this.previousWaitLink = link;
+//		this.previousWaitTime = now;
+//		
+//		//first find out vehicle arrival time to fromStop according to transit schedule
+//		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
+//		if (wrapped.getRoute() == null) { 
+//			throw new RuntimeException("should not happen") ;
+//		}
+//		TransitRouteStop fromStop = wrapped.fromNode.stop;
+//		
+//		double nextDepartureTime = data.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
+//		
+//		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
+//		double vehWaitAtStopTime = fromStop.getDepartureOffset()- fromStopArrivalOffset; //time in which the veh stops at station
+//		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime; //instead of a method "bestArrivalTime" we calculate the bestDeparture- stopTime 
+//		cachedVehArrivalTime = vehArrivalTime ;
+//		return vehArrivalTime ;		
+//	}
 
 
 	public static void main(String[] args) {
-		final Controler ctrl = new Controler(args) ;
+		final Config config = ConfigUtils.loadConfig(args[0]) ;
+
+		config.planCalcScore().setWriteExperiencedPlans(true) ;
+
+		config.otfVis().setDrawTransitFacilities(false) ; // this DOES work
+		config.otfVis().setShowTeleportedAgents(true) ;
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		final Controler ctrl = new Controler(scenario) ;
 		
 		ctrl.setOverwriteFiles(true) ;
-		ctrl.getConfig().vspExperimental().setUsingOpportunityCostOfTimeInPtRouting(true) ;
 		
 		final TransitSchedule schedule = ctrl.getScenario().getTransitSchedule() ;
 		
@@ -244,7 +264,6 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
 		
 		ctrl.setTransitRouterFactory( new TransitRouterFactory() {
-
 			@Override
 			public TransitRouter createTransitRouter() {
 				RandomizedTransitRouterNetworkTravelTimeAndDisutility2 ttCalculator = new RandomizedTransitRouterNetworkTravelTimeAndDisutility2(trConfig);
@@ -252,8 +271,19 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility2  extends Tra
 				ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
 				return new TransitRouterImpl(trConfig, routerNetwork, ttCalculator, ttCalculator);
 			}
-			
 		}) ;
+		
+		ctrl.setMobsimFactory(new MobsimFactory(){
+
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+				
+				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+				OTFClientLive.run(sc.getConfig(), server);
+				
+				return qSim ;
+			}}) ;
 		
 		ctrl.run() ;
 

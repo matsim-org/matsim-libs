@@ -46,12 +46,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -280,6 +280,9 @@ public class Controler extends AbstractController {
 			this.scenarioLoaded = true;
 			this.scenarioData = (ScenarioImpl) scenario;
 			this.config = scenario.getConfig();
+			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
+			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
+			"See later for config dump after setup.");
 		} else {
 			if (this.configFileName == null) {
 				if (config == null) {
@@ -288,8 +291,8 @@ public class Controler extends AbstractController {
 				this.config = config;
 			} else {
 				this.config = ConfigUtils.loadConfig(this.configFileName);
-				this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			}
+			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
 			"See later for config dump after setup.");
 			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
@@ -330,31 +333,6 @@ public class Controler extends AbstractController {
 		run(config);
 	}
 
-//	/**
-//	 * Design decisions:
-//	 * <ul>
-//	 * <li>I extracted this method since it is now called <i>twice</i>: once
-//	 * directly after reading, and once before the iterations start. The second
-//	 * call seems more important, but I wanted to leave the first one there in
-//	 * case the program fails before that config dump. Might be put into the
-//	 * "unexpected shutdown hook" instead. kai, dec'10
-//	 * </ul>
-//	 *
-//	 * @param message
-//	 *            the message that is written just before the config dump
-//	 */
-//	protected static final void checkConfigConsistencyAndWriteToLog(final Config config, final String message) {
-//		log.info(message);
-//		String newline = System.getProperty("line.separator");// use native line endings for logfile
-//		StringWriter writer = new StringWriter();
-//		new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
-//		log.info(newline + newline + writer.getBuffer().toString());
-//		log.info("Complete config dump done.");
-//		log.info("Checking consistency of config...");
-//		config.checkConsistency();
-//		log.info("Checking consistency of config done.");
-//	}
-
 	private final void setupMultiModalSimulation() {
 		log.info("setting up multi modal simulation");
 	
@@ -377,8 +355,8 @@ public class Controler extends AbstractController {
 	
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
-//		transitActivityParams.setOpeningTime(0.) ;
-//		transitActivityParams.setClosingTime(0.) ;
+		transitActivityParams.setOpeningTime(0.) ;
+		transitActivityParams.setClosingTime(0.) ;
 		// yyyy I think that the previous two lines would make sense, but they would destroy backwards compatibility.  Need to think
 		// about introduction path.  kai, nov'12
 		

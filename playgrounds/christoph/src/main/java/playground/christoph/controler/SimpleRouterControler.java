@@ -40,7 +40,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayController;
@@ -155,7 +155,7 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 //		this.getNetwork().getFactory().setLinkFactory(new MyLinkFactoryImpl());
 
 		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
+		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
 	}
 
 	/*

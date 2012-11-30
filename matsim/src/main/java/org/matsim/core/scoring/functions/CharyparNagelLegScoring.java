@@ -105,6 +105,8 @@ public class CharyparNagelLegScoring implements LegScoring {
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist;
 			tmpScore += this.params.constantPt ;
+			// (yyyyyy NOTE: pt wait is not separately scored!! --> should be done!  kai, nov'12)
+			// (yyyyyy NOTE: the pt constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
 		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
 			double dist = 0.0; // distance in meters
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {

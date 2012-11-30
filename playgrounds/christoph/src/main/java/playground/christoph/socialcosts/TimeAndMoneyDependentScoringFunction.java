@@ -20,7 +20,7 @@
 
 package playground.christoph.socialcosts;
 
-import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunction;
+import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunction;
 
 /**
  * Also the scoring function has to take social costs into account. Otherwise
@@ -30,7 +30,7 @@ import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunction;
  * 
  * @author cdobler
  */
-public class TimeAndMoneyDependentScoringFunction extends OnlyTimeDependentScoringFunction {
+public class TimeAndMoneyDependentScoringFunction extends OnlyTravelTimeDependentScoringFunction {
 
 	@Override
 	public void addMoney(final double amount) {

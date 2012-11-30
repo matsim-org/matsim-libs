@@ -165,13 +165,13 @@ public class CharyparNagelScoringFunctionTest {
 		double zeroUtilDurW2 = getZeroUtilDuration_h(8.0, 2.0);
 
 		ActivityUtilityParameters params = new ActivityUtilityParameters("w", 1.0, 8.0 * 3600);
-		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration(), EPSILON);
+		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
 
 		params = new ActivityUtilityParameters("h", 1.0, 16.0 * 3600);
-		assertEquals(zeroUtilDurH, params.getZeroUtilityDuration(), EPSILON);
+		assertEquals(zeroUtilDurH, params.getZeroUtilityDuration_h(), EPSILON);
 
 		params = new ActivityUtilityParameters("w2", 2.0, 8.0 * 3600); // test that the priority is respected as well
-		assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration(), EPSILON);
+		assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration_h(), EPSILON);
 	}
 
 	/**

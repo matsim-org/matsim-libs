@@ -181,7 +181,7 @@ public class MyActivityScoringFunction implements ActivityScoring, BasicScoring 
 		if (duration > 0) {
 			if (!act.getType().toString().equals("pt interaction")){
 				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
+						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;	
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 //				log.info("Activity: "+act+" / Duration: "+Time.writeTime(duration, Time.TIMEFORMAT_HHMMSS)+" / Score: "+utilPerf);

@@ -21,11 +21,110 @@
 package org.matsim.core.scoring.functions;
 
 import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 
+/**
+ * Class that converts the config parameters into parameters that are used by the scoring.
+ * </p>
+ * Design thoughts:<ul>
+ * <li> Class name feels a bit like a misnomer to me since the class seems to make sense only for the
+ * so-called Charypar-Nagel scoring, especially with the zeroUtilityDuration in the ctor.
+ *   Yet maybe one might be able to rework the approach so that the most
+ * important params (such as typical duration, slope at typical duration, ...) become universal. kai, nov'12
+ * </ul>
+ * 
+ * @author nagel
+ *
+ */
 public class ActivityUtilityParameters implements MatsimParameters {
 
+	/**
+	 * This is now deliberately an unmodifiable object which can only instantiated by a factory.  If you want/need to modify
+	 * this design, please talk to kai nagel or michael zilske or marcel rieser.  kai, nov'12
+	 * 
+	 * @author nagel
+	 */
+	public static class Factory {
+		private String type;
+		private double priority = 1. ;
+		private double typicalDuration_s;
+		private double closingTime;
+		private double earliestEndTime;
+		private double latestStartTime;
+		private double minimalDuration;
+		private double openingTime;
+		private boolean scoreAtAll;
+		
+		/**
+		 * empty constructor; deliberately permitted
+		 */
+		public Factory() {
+		}
+		
+		/**
+		 * Convenience constructor for main use case
+		 */
+		public Factory(ActivityParams ppp ) {
+			this.type = ppp.getType() ;
+			this.priority = ppp.getPriority() ;
+			this.typicalDuration_s = ppp.getTypicalDuration() ;
+			this.closingTime = ppp.getClosingTime() ;
+			this.earliestEndTime = ppp.getEarliestEndTime() ;
+			this.latestStartTime = ppp.getLatestStartTime() ;
+			this.minimalDuration = ppp.getMinimalDuration() ;
+			this.openingTime = ppp.getOpeningTime() ;
+			this.scoreAtAll = true ; // yy
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+
+		public void setPriority(double priority) {
+			this.priority = priority;
+		}
+
+		public void setTypicalDuration_s(double typicalDurationS) {
+			typicalDuration_s = typicalDurationS;
+		}
+
+		public void setClosingTime(double closingTime) {
+			this.closingTime = closingTime;
+		}
+
+		public void setEarliestEndTime(double earliestEndTime) {
+			this.earliestEndTime = earliestEndTime;
+		}
+
+		public void setLatestStartTime(double latestStartTime) {
+			this.latestStartTime = latestStartTime;
+		}
+
+		public void setMinimalDuration(double minimalDuration) {
+			this.minimalDuration = minimalDuration;
+		}
+
+		public void setOpeningTime(double openingTime) {
+			this.openingTime = openingTime;
+		}
+
+		public void setScoreAtAll(boolean scoreAtAll) {
+			this.scoreAtAll = scoreAtAll;
+		}
+
+		public ActivityUtilityParameters create() {
+			ActivityUtilityParameters params = new ActivityUtilityParameters( this.type, this.priority, this.typicalDuration_s ) ;
+			params.setClosingTime(this.closingTime) ;
+			params.setEarliestEndTime(this.earliestEndTime) ;
+			params.setLatestStartTime(this.latestStartTime) ;
+			params.setMinimalDuration(this.minimalDuration) ;
+			params.setOpeningTime(this.openingTime) ;
+			params.setScoreAtAll(this.scoreAtAll) ;
+			return params ;
+		}
+	}
+
 	private final String type;
-	private final double priority;
 	private final double typicalDuration_s;
 
 	/**
@@ -33,53 +132,51 @@ public class ActivityUtilityParameters implements MatsimParameters {
 	 * (from Dave's paper, ga-acts-iatbr03.tex, though he called it t_0)
 	 * (In decimal number of hours.)
 	 */
-	private final double zeroUtilityDuration; // in hours!
+	private final double zeroUtilityDuration_h; // in hours!
 	private double minimalDuration = -1;
 	private double openingTime = -1;
 	private double closingTime = -1;
 	private double latestStartTime = -1;
 	private double earliestEndTime = -1;
 	private boolean scoreAtAll=true;
-
-	public ActivityUtilityParameters(final String type, final double priority, final double typicalDuration_s) {
+	
+	@Deprecated // use factory.  nov'12
+	/*package!*/ ActivityUtilityParameters(final String type, final double priority, final double typicalDuration_s) {
 		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
 		// to have activities with a typical duration <=48 seconds (GL/June2011)
 		super();
 		this.type = type;
-		this.priority = priority;
 		this.typicalDuration_s = typicalDuration_s;
-
-		this.zeroUtilityDuration = (typicalDuration_s / 3600.0)
-		* Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
-		// ( the 3600s are in there because the original formulation was in "hours".  So the values in seconds are first
-		// translated into hours.  kai, sep'12 )
+		
+		this.zeroUtilityDuration_h = (1./3600.) * CharyparNagelScoringUtils.computeZeroUtilityDuration(priority,
+				typicalDuration_s);
 
 		// example: pt interaction activity with typical duration = 120sec.
 		// 120/3600 * exp( -10 / (120 / 3600) ) =  1.7 x 10^(-132)  (!!!!!!!!!!)
 		// In consequence, even a pt interaction of one seconds causes a fairly large utility.
 
-		if (this.zeroUtilityDuration <= 0.0) {
+		if (this.zeroUtilityDuration_h <= 0.0) {
 			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
 		}
 	}
 
-	public final void setMinimalDuration(final double dur) {
+	/*package!*/ final void setMinimalDuration(final double dur) {
 		this.minimalDuration = dur;
 	}
 
-	public final void setOpeningTime(final double time) {
+	/*package!*/ final void setOpeningTime(final double time) {
 		this.openingTime = time;
 	}
 
-	public final void setClosingTime(final double time) {
+	/*package!*/ final void setClosingTime(final double time) {
 		this.closingTime = time;
 	}
 
-	public final void setLatestStartTime(final double time) {
+	/*package!*/ final void setLatestStartTime(final double time) {
 		this.latestStartTime = time;
 	}
 
-	public final void setEarliestEndTime(final double time) {
+	/*package!*/ final void setEarliestEndTime(final double time) {
 		this.earliestEndTime = time;
 	}
 
@@ -87,16 +184,17 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		return this.type;
 	}
 
-	public final double getPriority() {
-		return this.priority;
-	}
+//	public final double getPriority() {
+//		return this.priority;
+//	}
+	// nobody seems to be using this, and it should not be used anyways ...  kai, nov'12
 
 	public final double getTypicalDuration() {
 		return this.typicalDuration_s;
 	}
 
-	public final double getZeroUtilityDuration() {
-		return this.zeroUtilityDuration;
+	public final double getZeroUtilityDuration_h() {
+		return this.zeroUtilityDuration_h;
 	}
 
 	public final double getMinimalDuration() {
@@ -119,11 +217,11 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		return this.earliestEndTime;
 	}
 
-	public boolean isScoreAtAll() {
+	public final boolean isScoreAtAll() {
 		return scoreAtAll;
 	}
 
-	public void setScoreAtAll(boolean scoreAtAll) {
+	/*package!*/ void setScoreAtAll(boolean scoreAtAll) {
 		this.scoreAtAll = scoreAtAll;
 	}
 

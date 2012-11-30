@@ -187,7 +187,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, BasicScori
 
 			if (duration > 0) {
 				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration());
+						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 			} else {

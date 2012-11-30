@@ -95,10 +95,18 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 				// Construct a scoring function which does not score the home activity. Because the analytical calculations against which 
 				// we are testing here are based on that.
 				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
-				ActivityUtilityParameters activityUtilityParameters = new ActivityUtilityParameters("h", 1.0, 123456789.0);
-				activityUtilityParameters.setScoreAtAll(false);
+//				ActivityUtilityParameters activityUtilityParameters = new ActivityUtilityParameters("h", 1.0, 123456789.0);
+//				activityUtilityParameters.setScoreAtAll(false);
+
+				ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory() ;
+				factory.setScoreAtAll(false) ;
+				factory.setType("h") ;
+				factory.setTypicalDuration_s(123456789.0) ;
+				ActivityUtilityParameters activityUtilityParameters = factory.create() ;
+
 				params.utilParams.put("h", activityUtilityParameters);
-				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), new CharyparNagelScoringFunctionFactory(params, controler.getScenario().getNetwork()));
+				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), 
+						new CharyparNagelScoringFunctionFactory(params, controler.getScenario().getNetwork()));
 				
 				controler.getEvents().addHandler(EquilTwoAgentsTest.this.planScorer);
 			}

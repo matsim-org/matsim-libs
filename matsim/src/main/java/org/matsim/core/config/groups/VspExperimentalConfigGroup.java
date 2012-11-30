@@ -33,31 +33,16 @@ interface ConfigKey {}
  */
 public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
-	// === testing area begin ===
-	// The following contains the beginning of a more general infrastructure for config, since I am getting tired of
-	// re-typing the same thing many times every time I add a config parameter.
-	// The idea is essentially based on the fact that "toString()" of an enum type returns the enum type string.
-	// Unfortunately, I did not get around to finishing this.
-
 		public static enum VspExperimentalConfigKey implements ConfigKey {
 //			activityDurationInterpretation,
 			vspDefaultsCheckingLevel,
 			logitScaleParamForPlansRemoval,
 			scoreMSAStartsAtIteration,
-			isGeneratingBoardingDeniedEvent
+			isGeneratingBoardingDeniedEvent,
+			isAbleToOverwritePtInteractionParams
 		}
 	
 		private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
-	
-		// this should eventually be able to replace the @Override addParam( String, String )
-	//	private void addParamNew( final String keyStr, final String value ) {
-	//		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
-	//			if ( keyStr.equalsIgnoreCase( key.toString() ) ) {
-	//				addParam( key, value ) ;
-	//			}
-	//		}
-	//		throw new RuntimeException("keyStr was not found as key: " + keyStr ) ;
-	//	}
 	
 		public void addParam( final ConfigKey key, final String value ) {
 			String retVal = this.typedParam.put( key,value );
@@ -175,6 +160,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			case isGeneratingBoardingDeniedEvent:
 				this.addParam( key, "false" ) ; // default is that this event is NOT generated.  kai, oct'12 
 				break;
+			case isAbleToOverwritePtInteractionParams:
+				this.addParam( key, "false" ) ; // default is that this NOT allowed.  kai, nov'12 
+				break;
 			}
 		}
 	}
@@ -183,6 +171,26 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 
+		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
+			switch(key) {
+			case logitScaleParamForPlansRemoval:
+//				map.put(key.toString(), "comment") ;
+				break;
+			case scoreMSAStartsAtIteration:
+				map.put(key.toString(), "first iteration of MSA score averaging. The matsim theory department " +
+						"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
+				break;
+			case vspDefaultsCheckingLevel:
+				break;
+			case isGeneratingBoardingDeniedEvent:
+				break;
+			case isAbleToOverwritePtInteractionParams:
+				map.put(key.toString(), "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
+						"parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, " +
+						"set the following to true.") ;
+				break;
+			}
+		}
 		map.put(MATSIM_GLOBAL_TIME_FORMAT, "changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  " +
 		"default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats");
 
@@ -242,21 +250,6 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				"This is only a suggestion since there is (by matsim design) no way to enforce that mental modules " +
 		"obey this." ) ;
 		
-		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
-			switch(key) {
-			case logitScaleParamForPlansRemoval:
-//				map.put(key.toString(), "comment") ;
-				break;
-			case scoreMSAStartsAtIteration:
-				map.put(key.toString(), "first iteration of MSA score averaging. The matsim theory department " +
-						"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
-				break;
-			case vspDefaultsCheckingLevel:
-				break;
-			case isGeneratingBoardingDeniedEvent:
-				break;
-			}
-		}
 		return map;
 	}
 

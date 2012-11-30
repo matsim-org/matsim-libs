@@ -99,7 +99,7 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesActivit
 
 		if (duration > 0) {
 			double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
+					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration_h());
 
 
 

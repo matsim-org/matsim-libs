@@ -62,7 +62,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.households.Household;
@@ -246,7 +246,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		EvacuationConfig.printConfig();
 		
 		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
+		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
 		
 		// register this as a Controller and Simulation Listener
 		super.getFixedOrderSimulationListener().addSimulationListener(this);

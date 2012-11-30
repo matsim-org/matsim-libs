@@ -62,7 +62,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -521,7 +521,7 @@ public class MultiModalDemo {
 		public MultiModalDemoControler(Scenario scenario) {
 			super(scenario);
 			
-			this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
+			this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
 			this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
 		}
 		

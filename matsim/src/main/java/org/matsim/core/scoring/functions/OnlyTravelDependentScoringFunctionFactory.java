@@ -28,11 +28,11 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * Returns a Scoring Function that only respects the travel time.
  * @author cdobler
  */
-public class OnlyTimeDependentScoringFunctionFactory implements ScoringFunctionFactory {
+public class OnlyTravelDependentScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
-		return new OnlyTimeDependentScoringFunction();
+		return new OnlyTravelTimeDependentScoringFunction();
 	}
 }
 

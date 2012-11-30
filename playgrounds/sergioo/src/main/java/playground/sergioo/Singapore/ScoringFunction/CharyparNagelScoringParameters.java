@@ -104,28 +104,34 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 
 		for (ActivityParams params : config.getActivityParams()) {
-			String type = params.getType();
-			double priority = params.getPriority();
-			double typDurationSecs = params.getTypicalDuration();
-			ActivityUtilityParameters actParams = new ActivityUtilityParameters(type, priority, typDurationSecs);
-			if (params.getMinimalDuration() >= 0) {
-				actParams.setMinimalDuration(params.getMinimalDuration());
+//			String type = params.getType();
+//			double priority = params.getPriority();
+//			double typDurationSecs = params.getTypicalDuration();
+//			ActivityUtilityParameters actParams = new ActivityUtilityParameters(type, priority, typDurationSecs);
+//			if (params.getMinimalDuration() >= 0) {
+//				actParams.setMinimalDuration(params.getMinimalDuration());
+//			}
+//			if (params.getOpeningTime() >= 0) {
+//				actParams.setOpeningTime(params.getOpeningTime());
+//			}
+//			if (params.getLatestStartTime() >= 0) {
+//				actParams.setLatestStartTime(params.getLatestStartTime());
+//			}
+//			if (params.getEarliestEndTime() >= 0) {
+//				actParams.setEarliestEndTime(params.getEarliestEndTime());
+//			}
+//			if (params.getClosingTime() >= 0) {
+//				actParams.setClosingTime(params.getClosingTime());
+//			}
+//			if(type.equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
+//				actParams.setScoreAtAll(false);
+//			utilParams.put(type, actParams);
+
+			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
+			if (params.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				factory.setScoreAtAll(false) ;
 			}
-			if (params.getOpeningTime() >= 0) {
-				actParams.setOpeningTime(params.getOpeningTime());
-			}
-			if (params.getLatestStartTime() >= 0) {
-				actParams.setLatestStartTime(params.getLatestStartTime());
-			}
-			if (params.getEarliestEndTime() >= 0) {
-				actParams.setEarliestEndTime(params.getEarliestEndTime());
-			}
-			if (params.getClosingTime() >= 0) {
-				actParams.setClosingTime(params.getClosingTime());
-			}
-			if(type.equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
-				actParams.setScoreAtAll(false);
-			utilParams.put(type, actParams);
+			utilParams.put(params.getType(), factory.create() ) ;
 		}
 
 	}

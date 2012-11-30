@@ -21,14 +21,17 @@ package org.matsim.core.config.consistency;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
+import org.matsim.pt.PtConstants;
 
 /**
  * Implementation of the ConfigCosistencyChecker interface.
@@ -187,6 +190,15 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		if (c.planCalcScore().getTravelingWalk_utils_hr() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
+		}
+		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
+		if ( ptAct != null ) {
+			if ( ptAct.getClosingTime()!=0. ) {
+				if ( !c.vspExperimental().getValue(VspExperimentalConfigKey.isAbleToOverwritePtInteractionParams).toString().equalsIgnoreCase("true") ) {
+					throw new RuntimeException("setting the pt interaction activity closing time away from 0 is not allowed because it breaks pt scoring." +
+					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
+				}
+			}
 		}
 	}
 

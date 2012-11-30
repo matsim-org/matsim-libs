@@ -35,6 +35,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
 
 /**
@@ -243,7 +244,7 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 
 		if (duration > 0) {
 			double utilPerf = marginalUtilityOfPerforming * typicalDuration
-					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration());
+					* Math.log((duration / 3600.0) / params.getZeroUtilityDuration_h());
 			double utilWait = marginalUtilityOfWaiting * duration;
 			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 		} else {
@@ -340,26 +341,33 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 	 */
 	private static final void readUtilityValues(PlanCalcScoreConfigGroup config) {
 		for (ActivityParams params : config.getActivityParams()) {
-			String type = params.getType();
-			double priority = params.getPriority();
-			double typDurationSecs = params.getTypicalDuration();
-			ActivityUtilityParameters actParams = new ActivityUtilityParameters(type, priority, typDurationSecs);
-			if (params.getMinimalDuration() >= 0) {
-				actParams.setMinimalDuration(params.getMinimalDuration());
+//			String type = params.getType();
+//			double priority = params.getPriority();
+//			double typDurationSecs = params.getTypicalDuration();
+//			ActivityUtilityParameters actParams = new ActivityUtilityParameters(type, priority, typDurationSecs);
+//			if (params.getMinimalDuration() >= 0) {
+//				actParams.setMinimalDuration(params.getMinimalDuration());
+//			}
+//			if (params.getOpeningTime() >= 0) {
+//				actParams.setOpeningTime(params.getOpeningTime());
+//			}
+//			if (params.getLatestStartTime() >= 0) {
+//				actParams.setLatestStartTime(params.getLatestStartTime());
+//			}
+//			if (params.getEarliestEndTime() >= 0) {
+//				actParams.setEarliestEndTime(params.getEarliestEndTime());
+//			}
+//			if (params.getClosingTime() >= 0) {
+//				actParams.setClosingTime(params.getClosingTime());
+//			}
+//			utilParams.put(type, actParams);
+			
+			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
+			if (params.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				factory.setScoreAtAll(false) ;
 			}
-			if (params.getOpeningTime() >= 0) {
-				actParams.setOpeningTime(params.getOpeningTime());
-			}
-			if (params.getLatestStartTime() >= 0) {
-				actParams.setLatestStartTime(params.getLatestStartTime());
-			}
-			if (params.getEarliestEndTime() >= 0) {
-				actParams.setEarliestEndTime(params.getEarliestEndTime());
-			}
-			if (params.getClosingTime() >= 0) {
-				actParams.setClosingTime(params.getClosingTime());
-			}
-			utilParams.put(type, actParams);
+			utilParams.put(params.getType(), factory.create() ) ;
+
 		}
 	}
 

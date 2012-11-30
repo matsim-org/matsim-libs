@@ -1,13 +1,20 @@
 package org.matsim.core.scoring;
 
-import java.util.Map.Entry;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -15,6 +22,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * 
@@ -30,10 +38,11 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 
 	private final TreeMap<Id,  ScoringFunction> agentScorers = new TreeMap<Id,ScoringFunction>();
 	
-	private final TreeMap<Id,  PlanImpl> agentRecords = new TreeMap<Id,PlanImpl>();
+	private final Map<Id,  Plan> agentRecords = new TreeMap<Id,Plan>();
+	private final Map<Id,List<Double>> partialScores = new TreeMap<Id,List<Double>>() ;
 
 	private Scenario scenario;
-
+	
 	public ScoringFunctionsForPopulation(Scenario scenario, ScoringFunctionFactory scoringFunctionFactory) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.scenario = scenario;
@@ -45,6 +54,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				this.agentRecords.put(person.getId(), new PlanImpl());
+				this.partialScores.put(person.getId(), new ArrayList<Double>() ) ;
 			}
 		}
 	}
@@ -70,6 +80,8 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
             scoringFunctionForAgent.handleActivity(activity);
             if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
                 agentRecords.get(agentId).addActivity(activity);
+                Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
+                partialScoresForAgent.add( scoringFunctionForAgent.getScore() ) ;
             }
         }
     }
@@ -81,6 +93,8 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
             scoringFunctionForAgent.handleLeg(leg);
             if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
             	agentRecords.get(agentId).addLeg(leg);
+                Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
+                partialScoresForAgent.add( scoringFunctionForAgent.getScore() ) ;
             }
         }
     }
@@ -89,18 +103,41 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		for (ScoringFunction sf : agentScorers.values()) {
 			sf.finish();
 		}
+		if ( scenario.getConfig().planCalcScore().isWriteExperiencedPlans() ) {
+			for ( Entry<Id, List<Double>> entry : this.partialScores.entrySet() ) {
+				entry.getValue().add( 1, this.getScoringFunctionForAgent(entry.getKey()).getScore() ) ;
+			}
+		}
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
 		PopulationImpl population = new PopulationImpl((ScenarioImpl) scenario);
-		for (Entry<Id, PlanImpl> entry : agentRecords.entrySet()) {
-			PersonImpl person = new PersonImpl(entry.getKey());
-			PlanImpl plan = entry.getValue();
+		for (Entry<Id, Plan> entry : agentRecords.entrySet()) {
+			Person person = new PersonImpl(entry.getKey());
+			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
-		new PopulationWriter(population, scenario.getNetwork()).writeV5(iterationFilename);	
+		new PopulationWriter(population, scenario.getNetwork()).writeV5(iterationFilename);
+		
+		BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename+".scores") ;
+		for ( Entry<Id,List<Double>> entry : partialScores.entrySet() ) {
+			try {
+				out.write( entry.getKey().toString() ) ;
+				for ( Double score : entry.getValue() ) {
+					out.write( '\t'+ score.toString() ) ;
+				}
+				out.newLine() ;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			out.close() ;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} ;
 	}
 
 }

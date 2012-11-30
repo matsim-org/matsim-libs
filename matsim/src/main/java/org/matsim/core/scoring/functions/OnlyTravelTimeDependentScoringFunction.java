@@ -30,12 +30,12 @@ import org.matsim.core.scoring.ScoringFunctionAdapter;
  * 
  * @author cdobler
  */
-public class OnlyTimeDependentScoringFunction extends ScoringFunctionAdapter {
+public class OnlyTravelTimeDependentScoringFunction extends ScoringFunctionAdapter {
 	
 	protected double score;
 	protected double startTime;
 	
-	public OnlyTimeDependentScoringFunction() {
+	public OnlyTravelTimeDependentScoringFunction() {
 	}
 	
 	/**
