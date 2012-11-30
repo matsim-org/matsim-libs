@@ -319,6 +319,16 @@ public class CharyparNagelScoringFunctionTest {
 
 		// only the home-activity should add to the score
 		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+
+		// test 4: work opens and closes at same time but while agent is there
+		// (this may be useful to emulate that the activity is never open ... such as pt interaction)
+
+		wParams.setOpeningTime(8.*3600.0 + 15.*60. );
+		wParams.setClosingTime (8.*3600.0 + 15.*60. );
+		// (note that even _some_ opening time causes zero score, since the minDuration needs to be overcome!)
+		
+		// only the home-activity should add to the score
+		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
 	}
 
 	/**
@@ -620,6 +630,12 @@ public class CharyparNagelScoringFunctionTest {
 			thirdLegStartTime = 13 * 3600;
 			fourthLegStartTime = 16 * 3600;
 			fourthLegTravelTime = 15 * 60;
+			// home act end 7am
+			// work 7:30 to 10:00
+			// work 10:15 to 13:00
+			// work 13:30 to 16:00
+			// home 15:15 to ...
+			
 			this.config = ConfigUtils.createConfig();
 			PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
 			scoring.setBrainExpBeta(2.0);
