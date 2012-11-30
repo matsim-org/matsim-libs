@@ -51,4 +51,12 @@ public class ScenarioLoaderImplTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getPopulation().getPersonAttributes().getAttribute("1", "hello"));
 	}
+
+	@Test
+	public void testLoadScenario_loadTransitLinesAttributes() {
+		Config config = util.loadConfig(util.getClassInputDirectory() + "transitConfig.xml");
+		config.transit().setTransitLinesAttributesFile(util.getClassInputDirectory() + "transitLinesAttributes.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Assert.assertEquals("world", scenario.getTransitSchedule().getTransitLinesAttributes().getAttribute("Blue Line", "hello"));
+	}
 }

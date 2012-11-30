@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Stores a complete transit schedules with multiple lines, multiple routes per line, all the time data
@@ -56,4 +57,6 @@ public interface TransitSchedule extends MatsimToplevelContainer {
 	@Override
 	public abstract TransitScheduleFactory getFactory();
 
+	public abstract ObjectAttributes getTransitLinesAttributes();
+	
 }

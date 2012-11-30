@@ -38,11 +38,13 @@ public class TransitConfigGroup extends Module {
 	public static final String GROUP_NAME = "transit";
 
 	/*package*/ static final String TRANSIT_SCHEDULE_FILE = "transitScheduleFile";
+	private static final String TRANSIT_LINES_ATTRIBUTES = "transitLinesAttributesFile";
 	/*package*/ static final String VEHICLES_FILE = "vehiclesFile";
 	/*package*/ static final String TRANSIT_MODES = "transitModes";
 
 	private String transitScheduleFile = null;
 	private String vehiclesFile = null;
+	private String transitLinesAttributesFile = null;
 
 	private Set<String> transitModes;
 
@@ -61,6 +63,8 @@ public class TransitConfigGroup extends Module {
 				setVehiclesFile(value);
 		} else if (TRANSIT_MODES.equals(paramName)) {
 			this.transitModes = Collections.unmodifiableSet(CollectionUtils.stringToSet(value));
+		} else if (TRANSIT_LINES_ATTRIBUTES.equals(paramName)) {
+			this.transitLinesAttributesFile = value;
 		} else {
 			throw new IllegalArgumentException(paramName);
 		}
@@ -95,6 +99,9 @@ public class TransitConfigGroup extends Module {
 		addParameterToMap(params, TRANSIT_SCHEDULE_FILE);
 		addParameterToMap(params, VEHICLES_FILE);
 		addParameterToMap(params, TRANSIT_MODES);
+		if (this.transitLinesAttributesFile != null) {
+			params.put(TRANSIT_LINES_ATTRIBUTES, this.transitLinesAttributesFile);
+		}
 		return params;
 	}
 
@@ -104,6 +111,7 @@ public class TransitConfigGroup extends Module {
 		comments.put(TRANSIT_SCHEDULE_FILE, "Input file containing the transit schedule to be simulated.");
 		comments.put(VEHICLES_FILE, "Input file containing the vehicles used by the departures in the transit schedule.");
 		comments.put(TRANSIT_MODES, "Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt'.");
+		comments.put(TRANSIT_LINES_ATTRIBUTES, "Optional input file containing additional attributes for transit lines, stored as ObjectAttributes.");
 		return comments;
 	}
 
@@ -131,4 +139,11 @@ public class TransitConfigGroup extends Module {
 		return this.transitModes;
 	}
 
+	public String getTransitLinesAttributesFile() {
+		return transitLinesAttributesFile;
+	}
+	
+	public void setTransitLinesAttributesFile(final String transitLinesAttributesFile) {
+		this.transitLinesAttributesFile = transitLinesAttributesFile;
+	}
 }
