@@ -5,5 +5,5 @@ bin
 .settings
 bin
 target
-/test
 output
+/test

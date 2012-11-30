@@ -377,9 +377,14 @@ public class Controler extends AbstractController {
 	
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
+//		transitActivityParams.setOpeningTime(0.) ;
+//		transitActivityParams.setClosingTime(0.) ;
+		// yyyy I think that the previous two lines would make sense, but they would destroy backwards compatibility.  Need to think
+		// about introduction path.  kai, nov'12
+		
 		this.config.planCalcScore().addActivityParams(transitActivityParams);
-		// yy would this overwrite user-defined definitions of "pt interaction"?  If so, since when does it work this way 
-		// (since sergioo, at matsim dev mtg'12, reported setting it explicitly and from this obtaining a different behavior).
+		// yy would this overwrite user-defined definitions of "pt interaction"?
+		// No, I think that the user-defined parameters are set later, in fact overwriting this setting here.
 		// kai, nov'12
 	
 		// the QSim reads the config by itself, and configures itself as a
