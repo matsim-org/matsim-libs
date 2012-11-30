@@ -27,18 +27,22 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 
@@ -170,7 +174,9 @@ public class RandomizedTransitRouterNetworkTravelTimeAndDisutility extends Trans
 
 
 	public static void main(String[] args) {
-		final Controler ctrl = new Controler(args) ;
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Scenario sc = ScenarioUtils.loadScenario(config);
+		final Controler ctrl = new Controler(sc) ;
 		
 		ctrl.setOverwriteFiles(true) ;
 		ctrl.getConfig().vspExperimental().setUsingOpportunityCostOfTimeInPtRouting(true) ;
