@@ -151,10 +151,11 @@ public class EvacuationAnalysis implements ActionListener{
 	private String itersOutputDir;
 	private boolean firstLoad;
 	private Mode mode = Mode.EVACUATION;
-	private ColorationMode colorationMode = ColorationMode.GREEN_RED;
+	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
 	private KeyPanel keyPanel;
 	private JLabel gridSizeLabel;
 	private String cellSizeText = " cell size: ";
+	private int k = 7;
 	
 	
 
@@ -513,7 +514,9 @@ public class EvacuationAnalysis implements ActionListener{
 		{
 			readEvents();
 			if (this.jMapViewer != null)
+			{
 				this.jMapViewer.repaint();
+			}
 			
 			if (this.gridSizeLabel.getText().contains("*"))
 				this.gridSizeLabel.setText(cellSizeText  + (int)this.cellSize + "m ");
@@ -553,6 +556,9 @@ public class EvacuationAnalysis implements ActionListener{
 		if (jMapViewer!=null)
 			jMapViewer.setMode(mode);
 		
+		if (keyPanel!=null)
+			keyPanel.setMode(mode);
+		
 	}
 	
 	public Mode getMode() {
@@ -584,6 +590,7 @@ public class EvacuationAnalysis implements ActionListener{
 		{
 			eventHandler.setColorationMode(this.colorationMode);
 			eventHandler.setTransparency(this.cellTransparency);
+			eventHandler.setK(k);
 			
 			//get data
 			EventData data = eventHandler.getData();
@@ -591,6 +598,7 @@ public class EvacuationAnalysis implements ActionListener{
 			//update data in both the map viewer and the graphs
 			jMapViewer.updateEventData(data);
 			graphPanel.updateData(data);
+			keyPanel.updateData(data);
 		}
 	}
 	

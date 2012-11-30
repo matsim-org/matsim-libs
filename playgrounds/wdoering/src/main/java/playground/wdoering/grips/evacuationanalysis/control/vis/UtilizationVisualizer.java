@@ -12,6 +12,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
+import playground.wdoering.grips.evacuationanalysis.control.Clusterizer;
 import playground.wdoering.grips.evacuationanalysis.data.AttributeData;
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
 import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
@@ -22,13 +24,17 @@ public class UtilizationVisualizer {
 	private AttributeData<Tuple<Float,Color>> coloration;
 	private List<Link> links;
 	private EventData data;
+	private Clusterizer clusterizer;
+	private int k;
 	private ColorationMode colorationMode;
 	private float cellTransparency;
 
-	public UtilizationVisualizer(List<Link> links, EventData eventData, ColorationMode colorationMode, float cellTransparency)
+	public UtilizationVisualizer(List<Link> links, EventData eventData, Clusterizer clusterizer, int k, ColorationMode colorationMode, float cellTransparency)
 	{
 		this.links = links;
 		this.data = eventData;
+		this.clusterizer = clusterizer;
+		this.k = k;
 		this.colorationMode = colorationMode;
 		this.cellTransparency = cellTransparency;
 		processVisualData();
@@ -42,6 +48,8 @@ public class UtilizationVisualizer {
 
 	public void processVisualData()
 	{
+		LinkedList<Tuple<Id,Double>> linkTimes = new LinkedList<Tuple<Id,Double>>(); 
+				
 		coloration = new AttributeData<Tuple<Float,Color>>();
 
 		HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes = data.getLinkLeaveTimes();
@@ -56,11 +64,15 @@ public class UtilizationVisualizer {
 				
 				float relUtilization = (((float)enterTimes.size()/(float)data.getMaxUtilization())); 
 				
+				linkTimes.add(new Tuple(link.getId(),(double)enterTimes.size()));
+				
 				Tuple<Float, Color> currentColoration = new Tuple(relUtilization, Coloration.getColor(relUtilization, colorationMode, cellTransparency));
 				coloration.setAttribute((IdImpl)link.getId(), currentColoration);
 				
 			}
 		}
+		
+		this.data.updateClusters(Mode.UTILIZATION, clusterizer.getClusters(linkTimes, k));
 		
 	}
 

@@ -61,6 +61,7 @@ import playground.gregor.sim2d_v3.events.XYVxVyEvent;
 import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
+import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 import playground.wdoering.grips.evacuationanalysis.control.vis.ClearingTimeVisualizer;
 import playground.wdoering.grips.evacuationanalysis.control.vis.EvacuationTimeVisualizer;
 import playground.wdoering.grips.evacuationanalysis.control.vis.UtilizationVisualizer;
@@ -118,6 +119,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
 	private float cellTransparency;
 	
+	private int k;
+	
 
 	public EventHandler(String eventFilename, Scenario sc, double cellSize, Thread readerThread)
 	{
@@ -127,6 +130,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.cellSize = cellSize;
 		this.arrivalTimes = new ArrayList<Tuple<Double, Integer>>();
 		init();
+	}
+	
+	public void setK(int k) {
+		this.k = k;
 	}
 	
 	private void init() {
@@ -383,10 +390,14 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private void setVisualData(EventData eventData)
 	{
+		AverageClusterizer clusterizer = new AverageClusterizer();
 		
-		EvacuationTimeVisualizer eVis = new EvacuationTimeVisualizer(eventData, this.colorationMode, this.cellTransparency); 
-		ClearingTimeVisualizer cVis = new ClearingTimeVisualizer(eventData, this.colorationMode, this.cellTransparency); 
-		UtilizationVisualizer uVis = new UtilizationVisualizer(links, eventData, this.colorationMode, this.cellTransparency); 
+		System.out.println(Mode.EVACUATION);
+		EvacuationTimeVisualizer eVis = new EvacuationTimeVisualizer(eventData, clusterizer, k, this.colorationMode, this.cellTransparency); 
+		System.out.println(Mode.CLEARING);
+		ClearingTimeVisualizer cVis = new ClearingTimeVisualizer(eventData, clusterizer, k, this.colorationMode, this.cellTransparency); 
+		System.out.println(Mode.UTILIZATION);
+		UtilizationVisualizer uVis = new UtilizationVisualizer(links, eventData, clusterizer, k, this.colorationMode, this.cellTransparency); 
 		
 		eventData.setEvacuationTimeVisData(eVis.getColoration());
 		eventData.setClearingTimeVisData(cVis.getColoration());

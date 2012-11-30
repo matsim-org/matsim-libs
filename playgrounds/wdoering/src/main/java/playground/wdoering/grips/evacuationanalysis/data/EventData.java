@@ -54,7 +54,8 @@ public class EventData {
 	private AttributeData<Color> clearingTimeVisData;
 	private AttributeData<Tuple<Float,Color>> linkUtilizationVisData;
 	
-//	private HashMap<Mode, List<Tuple<Id,String>>> colorClasses;
+	private HashMap<Mode,LinkedList<Tuple<Id,Double>>> clusters;
+	
 	
 	//TODO getLinkUtilization(linkid) -> anz agenten die link verlassen haben
 	
@@ -201,34 +202,28 @@ public class EventData {
 		return cells;
 	}
 	
-//	public ArrayList<Tuple<Color,String>> getColorClasses(Mode mode)
-//	{
-//		ArrayList<Tuple<Color,String>> currentColorClasses = new ArrayList<Tuple<Color,String>>(); 
-//		
-//		for (Tuple<Id,String> colorClass : colorClasses.get(mode))
-//		{
-//			Tuple<Color,String> colorStringTuple;
-//			
-//			if (mode.equals(Mode.EVACUATION))
-//				colorStringTuple = new Tuple<Color,String>(evacuationTimeVisData.getAttribute((IdImpl)colorClass.getFirst()), colorClass.getSecond());
-//			else if (mode.equals(Mode.CLEARING))
-//				colorStringTuple = new Tuple<Color,String>(clearingTimeVisData.getAttribute((IdImpl)colorClass.getFirst()),  colorClass.getSecond());
-//			else
-//				colorStringTuple = new Tuple<Color,String>(linkUtilizationVisData.getAttribute((IdImpl)colorClass.getFirst()).getSecond(), colorClass.getSecond());
-//			
-//			currentColorClasses.add(colorStringTuple);
-//		}
-//		
-//		return currentColorClasses;
-//	}
-//
-//	public void setColorClasses(Mode mode, List<Tuple<Id, String>> colorClasses)
-//	{
-//		if (this.colorClasses==null)
-//			this.colorClasses = new HashMap<Mode, List<Tuple<Id,String>>>();
-//		
-//		this.colorClasses.put(mode, colorClasses);
-//	}
+	public void updateClusters(Mode mode, LinkedList<Tuple<Id,Double>> clusters)
+	{
+		if (this.clusters==null)
+			this.clusters = new HashMap<Mode,LinkedList<Tuple<Id,Double>>>();
+		
+		this.clusters.put(mode, clusters);
+				
+	}
 	
+	public LinkedList<Tuple<Id,Double>> getClusters(Mode mode)
+	{
+		if (this.clusters!=null)
+			return this.clusters.get(mode);
+		else
+			return null;
+	}
+	
+	public HashMap<Mode,LinkedList<Tuple<Id,Double>>> getClusters()
+	{
+		return this.clusters;
+	}
 
+	
+	
 }

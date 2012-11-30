@@ -30,6 +30,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -42,6 +43,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -72,21 +75,39 @@ public class KeyPanel extends AbstractDataPanel {
 	public void drawDataPanel()
 	{
 		
-		if (this.data!=null)
+		if (this.data==null)
 			return;
 		
+		LinkedList<Tuple<Id,Double>> clusters = this.data.getClusters(mode);
+		int k = clusters.size();
 		
-		String class1Val = "", class2Val = "", class3Val = "", class4Val = "", class5Val = "";
-		Color class1Color, class2Color, class3Color, class4Color, class5Color;
-		class1Color = class2Color = class3Color = class4Color = class5Color = Color.white;
+		String [] classVal = new String[k];
+		Color [] classColor = new Color[k];
 		
-		for (int i = 1; i < 6; i++)
+		JLabel [] colorLabels = new JLabel[k];
+		JLabel [] valueLabels = new JLabel[k];
+		
+		for (int i = 0; i < k; i++)
 		{
 			if (mode.equals(Mode.EVACUATION))
 			{
-				
-				
+				classColor[i] = this.data.getEvacuationTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
+				classVal[i] = ""+clusters.get(i).getSecond();
 			}
+			else if (mode.equals(Mode.CLEARING))
+			{
+				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
+				classVal[i] = ""+clusters.get(i).getSecond();
+			}
+			else 
+			{
+				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl)clusters.get(i).getFirst()).getSecond();
+				classVal[i] = ""+clusters.get(i).getSecond();
+			}
+			
+			System.out.println("val:");
+			System.out.println(clusters.get(i).getFirst() + ":" + clusters.get(i).getSecond());
+			
 		}
 		
 		JPanel keyPanel = new JPanel(new GridBagLayout());
@@ -94,64 +115,33 @@ public class KeyPanel extends AbstractDataPanel {
 		keyPanel.setSize(this.width, this.height);
 		keyPanel.setPreferredSize(new Dimension(this.width,this.height));
 		
-		JLabel class1Label = new JLabel(" "); class1Label.setOpaque(true); class1Label.setBackground(class1Color); class1Label.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class2Label = new JLabel(" "); class2Label.setOpaque(true); class2Label.setBackground(class2Color); class2Label.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class3Label = new JLabel(" "); class3Label.setOpaque(true); class3Label.setBackground(class3Color); class3Label.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class4Label = new JLabel(" "); class4Label.setOpaque(true); class4Label.setBackground(class4Color); class4Label.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class5Label = new JLabel(" "); class5Label.setOpaque(true); class5Label.setBackground(class5Color); class5Label.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		
-		JLabel class1 = new JLabel(class1Val); class1.setOpaque(true);class1.setBackground(Color.WHITE); class1.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class2 = new JLabel(class2Val); class2.setOpaque(true); class2.setBackground(Color.WHITE); class2.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class3 = new JLabel(class3Val); class3.setOpaque(true); class3.setBackground(Color.WHITE); class3.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class4 = new JLabel(class4Val); class4.setOpaque(true);  class4.setBackground(Color.WHITE); class4.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		JLabel class5 = new JLabel(class5Val); class5.setOpaque(true); class5.setBackground(Color.WHITE); class5.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-		
 		GridBagConstraints c = new GridBagConstraints();
 		
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.3; c.gridx = 0; c.gridy = 0;
-		keyPanel.add(class1Label, c);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.7; c.gridwidth = 2; c.gridx = 1; c.gridy = 0;
-		keyPanel.add(class1, c);
-		
-		//2. klasse
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.3; c.gridx = 0; c.gridy = 1;
-		keyPanel.add(class2Label, c);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.7; c.gridwidth = 2; c.gridx = 1; c.gridy = 1;
-		keyPanel.add(class2, c);
-		
-		//3. klasse
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.3; c.gridx = 0; c.gridy = 2;
-		keyPanel.add(class3Label, c);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.7; c.gridwidth = 2; c.gridx = 1; c.gridy = 2;
-		keyPanel.add(class3, c);
-		
-		//4. klasse
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.3; c.gridx = 0; c.gridy = 3;
-		keyPanel.add(class4Label, c);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.7; c.gridwidth = 2; c.gridx = 1; c.gridy = 3;
-		keyPanel.add(class4, c);
-		
-		//5. klasse
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.3; c.gridx = 0; c.gridy = 4;
-		keyPanel.add(class5Label, c);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.7; c.gridwidth = 2; c.gridx = 1; c.gridy = 4;
-		keyPanel.add(class5, c);
+		for (int i = 0; i < k; i++)
+		{
+			colorLabels[i] = new JLabel(" "); colorLabels[i].setOpaque(true); colorLabels[i].setBackground(classColor[i]); colorLabels[i].setBorder(BorderFactory.createLineBorder(Color.black, 1));
+			valueLabels[i] = new JLabel(classVal[i]); valueLabels[i].setOpaque(true); valueLabels[i].setBackground(Color.WHITE); valueLabels[i].setBorder(BorderFactory.createLineBorder(Color.black, 1));
+			
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.weightx = 0.3; c.gridx = 0; c.gridy = i;
+			keyPanel.add(colorLabels[i], c);
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.weightx = 0.7; c.gridwidth = 2; c.gridx = 1; c.gridy = i;
+			keyPanel.add(valueLabels[i], c);
+		}
 		
 		this.add(keyPanel);
 		this.validate();
 		this.setSize(this.width, this.height);
 		this.setPreferredSize(new Dimension(this.width,this.height));
 
+	}
+
+
+	public void setMode(Mode mode)
+	{
+		this.mode = mode;
+		drawDataPanel();
 	}
 
 }

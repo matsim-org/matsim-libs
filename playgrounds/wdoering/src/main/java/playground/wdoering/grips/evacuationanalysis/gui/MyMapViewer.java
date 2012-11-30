@@ -35,6 +35,9 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -84,6 +89,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	boolean editMode = false;
 	boolean freezeMode = false;
 	
+	int screenshotIndex = 0;
 
 
 	private final MouseListener m [];
@@ -93,7 +99,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 
 	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED; 
-
 
 	private ArrayList<Link> links;
 
@@ -118,13 +123,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 	private QuadTree<Cell> cellTree;
 
 	private EventData data;
-
 	private boolean drawNetworkBoundingBox = false;
-	
 	private float cellTransparency;
-
 	private Cell selectedCell;
-
 	private Mode mode;
 
 
@@ -631,5 +632,6 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		this.colorationMode = mode; 
 		
 	}
+	
 
 }
