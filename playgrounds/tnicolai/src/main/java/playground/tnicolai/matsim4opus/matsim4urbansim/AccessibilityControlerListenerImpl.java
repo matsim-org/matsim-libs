@@ -483,27 +483,24 @@ public class AccessibilityControlerListenerImpl{
 	}
 	
 	/**
-	 * This calculates the logsum for origin i over all opportunities k attached to node j
+	 * This calculates the logsum for a given origin i over all opportunities k attached to node j
 	 * 
 	 * i ----------j---k1
 	 *             | \
 	 * 			   k2 k3
 	 * 
-	 * The disutilities Vjk to get from node j to all opportunities k are attached to j:
+	 * This caluclation is done in 2 steps:
+	 * 
+	 * 1) The disutilities Vjk to get from node j to all opportunities k are attached to j.
+	 *    This is already done above in "aggregatedOpportunities" method and the result is 
+	 *    stored in "aggregatedOpportunities" object:
 	 * 
 	 * S_j = sum_k (exp(Vjk)) = exp(Vjk1) + exp(Vjk2) + exp(Vjk3)
 	 * 
-	 * The log sum is given as :
+	 * 2) The disutility Vij to get from origin location i to destination node j is calculated in this method.
+	 *    Finally the following logsum is taken:   
 	 * 
 	 * A_i = 1/betascale * ln ( sum_j ( exp(Vij) * sum_k_in_j( exp(Vjk) ) ) ) = 1/beatascale * ln (sum_j (exp(Vij) * S_j ) )
-	 * 
-	 * Thus the computation can be done in 2 steps:
-	 * 
-	 * 1) compute S_j
-	 * 2) compute the disutility to get to node j (Vij) and multiply with S_j
-	 * 
-	 * Step 1 is done above in method "aggregatedOpportunities". The result is stored in "aggregatedOpportunities"
-	 * Step 2 is done in this method 
 	 * 
 	 * @param gcs stores the value for the term "exp(Vik)"
 	 * @param distanceMeasuringPoint2Road_meter distance in meter from origin i to the network
