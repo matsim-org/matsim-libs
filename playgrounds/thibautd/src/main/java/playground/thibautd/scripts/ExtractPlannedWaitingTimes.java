@@ -42,9 +42,9 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * @author thibautd

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.router;
+package playground.thibautd.socnetsim.router;
 
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +31,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * Based on the {@link PlanRouter}, but transmits passenger information

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * package-info.java
+ * JointTripsToLegsModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,11 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.socnetsim.router;
+
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
- * Provides plugins for the QSim to allow fine joint traveling simulation.
- *
  * @author thibautd
  */
-package playground.thibautd.cliquessim.qsim;
+public class JointTripsToLegsModule extends AbstractMultithreadedModule {
+	private final TripRouterFactory tripRouterFactory;
+
+	public JointTripsToLegsModule(final Controler controler) {
+		super( controler.getConfig().global() );
+		this.tripRouterFactory = controler.getTripRouterFactory();
+	}
+
+	@Override
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return new JointTripsToLegsAlgorithm( tripRouterFactory.createTripRouter() );
+	}
+}
 

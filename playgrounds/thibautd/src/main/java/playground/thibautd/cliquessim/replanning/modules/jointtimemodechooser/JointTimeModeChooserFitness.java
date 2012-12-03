@@ -39,9 +39,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointPlan;
-import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.tsplanoptimizer.framework.FitnessFunction;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 

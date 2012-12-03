@@ -4,4 +4,4 @@
  * 
  * @author thibautd
  */
-package playground.thibautd.cliquessim.scoring;
+package playground.thibautd.socnetsim.scoring;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.router;
+package playground.thibautd.socnetsim.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -36,7 +36,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * @author thibautd

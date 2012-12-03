@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScoresAggregator.java
+ * HomogeneousScoreAggregator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.scoring;
+package playground.thibautd.socnetsim.scoring;
 
 import java.util.Collection;
 
 import org.matsim.api.core.v01.population.Plan;
 
 /**
- * Interface for classes meant to compute the joint score from the
- * individual ones.
- * <br>
- * Instances should be stateless!
+ * A simple {@link ScoresAggregator} which simply returns the sum of the
+ * individual scores.
  *
  * @author thibautd
  */
-public interface ScoresAggregator {
-	/**
-	 * Computes the joint score based on the information passed at construction.
-	 * This information should mainly consist of the individual plans, plus some
-	 * parameters.
-	 *
-	 * @return the joint score.
-	 */
-	public Double getJointScore(Collection<? extends Plan> plans);
+public class HomogeneousScoreAggregator implements ScoresAggregator {
+	@Override
+	public Double getJointScore(final Collection<? extends Plan> individualPlans) {
+		double score = 0d;
+
+		for (Plan plan : individualPlans) {
+			try {
+				score += plan.getScore();
+			} catch (NullPointerException e) {
+				// at least one of the individuals is "unscored"
+				return null;
+			}
+		}
+
+		return score;
+	}
 }
 

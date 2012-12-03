@@ -45,13 +45,13 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.JointPlan;
-import playground.thibautd.cliquessim.population.PassengerRoute;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Od;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities.Possibility;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * @author thibautd

@@ -42,9 +42,6 @@ import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripPossibilitiesConfigGroup;
 import playground.thibautd.cliquessim.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.cliquessim.population.CliquesXmlReader;
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.PassengerRoute;
 import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.population.PopulationWithJointTripsReader;
 import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTripPossibilities;
@@ -52,6 +49,9 @@ import playground.thibautd.cliquessim.population.jointtrippossibilities.JointTri
 import playground.thibautd.cliquessim.run.JointControler;
 import playground.thibautd.scoring.CarPoolingLegScoringFunction;
 import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * Helper class to create a fully configured {@link JointControler} from a config file,

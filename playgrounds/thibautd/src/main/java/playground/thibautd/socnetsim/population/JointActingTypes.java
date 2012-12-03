@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.population;
+package playground.thibautd.socnetsim.population;
 
 import java.util.Arrays;
 import java.util.List;

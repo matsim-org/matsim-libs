@@ -46,7 +46,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * @author thibautd

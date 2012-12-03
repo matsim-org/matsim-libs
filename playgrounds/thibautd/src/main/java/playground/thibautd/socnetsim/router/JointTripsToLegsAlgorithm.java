@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.router;
+package playground.thibautd.socnetsim.router;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * Similar to TripsToLegsAlgorithm, but remembers joint routes

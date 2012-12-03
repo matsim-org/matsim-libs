@@ -30,7 +30,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.cliquessim.config.JointTimeModeChooserConfigGroup;
-import playground.thibautd.cliquessim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.tsplanoptimizer.framework.Solution;
 import playground.thibautd.tsplanoptimizer.framework.TabuSearchConfiguration;
 import static playground.thibautd.tsplanoptimizer.framework.TabuSearchRunner.runTabuSearch;

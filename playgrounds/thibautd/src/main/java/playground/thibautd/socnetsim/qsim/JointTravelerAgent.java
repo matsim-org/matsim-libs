@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.qsim;
+package playground.thibautd.socnetsim.qsim;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +38,9 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * A mobsim agent adding some information related to joint traveling

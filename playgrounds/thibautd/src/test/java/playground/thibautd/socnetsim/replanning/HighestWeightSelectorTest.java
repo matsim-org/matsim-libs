@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripsToLegsModule.java
+ * HighestWeightSelectorTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.router;
+package playground.thibautd.socnetsim.replanning;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.junit.Test;
+
+import playground.thibautd.socnetsim.PlanLinks;
 
 /**
  * @author thibautd
  */
-public class JointTripsToLegsModule extends AbstractMultithreadedModule {
-	private final TripRouterFactory tripRouterFactory;
-
-	public JointTripsToLegsModule(final Controler controler) {
-		super( controler.getConfig().global() );
-		this.tripRouterFactory = controler.getTripRouterFactory();
-	}
-
-	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
-		return new JointTripsToLegsAlgorithm( tripRouterFactory.createTripRouter() );
+public class HighestWeightSelectorTest {
+	@Test
+	public void testWithIndividualPlans() throws Exception {
+		HighestScoreSumSelector selector = new HighestScoreSumSelector( new PlanLinks() );
 	}
 }
 

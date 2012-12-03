@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HomogeneousScoreAggregator.java
+ * package-info.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.scoring;
-
-import java.util.Collection;
-
-import org.matsim.api.core.v01.population.Plan;
 
 /**
- * A simple {@link ScoresAggregator} which simply returns the sum of the
- * individual scores.
+ * Provides plugins for the QSim to allow fine joint traveling simulation.
  *
  * @author thibautd
  */
-public class HomogeneousScoreAggregator implements ScoresAggregator {
-	@Override
-	public Double getJointScore(final Collection<? extends Plan> individualPlans) {
-		double score = 0d;
-
-		for (Plan plan : individualPlans) {
-			try {
-				score += plan.getScore();
-			} catch (NullPointerException e) {
-				// at least one of the individuals is "unscored"
-				return null;
-			}
-		}
-
-		return score;
-	}
-}
+package playground.thibautd.socnetsim.qsim;
 

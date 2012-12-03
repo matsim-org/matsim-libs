@@ -38,8 +38,8 @@ import herbie.running.config.HerbieConfigGroup;
 import herbie.running.pt.DistanceCalculations;
 import herbie.running.scoring.TravelScoringFunction;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.hitchiking.HitchHikingConstants;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * @author thibautd

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.qsim;
+package playground.thibautd.socnetsim.qsim;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * Handles departure for passenger and driver modes.

@@ -34,11 +34,11 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.thibautd.cliquessim.population.Clique;
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.JointPlan;
-import playground.thibautd.cliquessim.population.PassengerRoute;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * Parses a population data file as it was before the inclusion

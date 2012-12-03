@@ -31,8 +31,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlan;
 
 /**
  * @author thibautd

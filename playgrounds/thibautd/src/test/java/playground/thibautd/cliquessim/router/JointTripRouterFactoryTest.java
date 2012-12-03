@@ -54,9 +54,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.socnetsim.router.JointPlanRouter;
+import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 
 /**
  * @author thibautd

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.population;
+package playground.thibautd.socnetsim.population;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.thibautd.cliquessim.scoring.HomogeneousScoreAggregator;
-import playground.thibautd.cliquessim.scoring.ScoresAggregator;
+import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
+import playground.thibautd.socnetsim.scoring.ScoresAggregator;
 
 /**
  * class for handling synchronized plans.

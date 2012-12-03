@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.qsim;
+package playground.thibautd.socnetsim.qsim;
 
 import java.util.Map;
 

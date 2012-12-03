@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTravelerAgentFactory.java
+ * ScoresAggregator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.qsim;
+package playground.thibautd.socnetsim.scoring;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import java.util.Collection;
+
+import org.matsim.api.core.v01.population.Plan;
 
 /**
+ * Interface for classes meant to compute the joint score from the
+ * individual ones.
+ * <br>
+ * Instances should be stateless!
+ *
  * @author thibautd
  */
-public class JointTravelerAgentFactory implements AgentFactory {
-	private final AgentFactory factory;
-
-	public JointTravelerAgentFactory(final AgentFactory wrapped) {
-		factory = wrapped;
-	}
-
-	@Override
-	public MobsimAgent createMobsimAgentFromPerson(final Person p) {
-		return new JointTravelerAgent( (MobsimDriverAgent) factory.createMobsimAgentFromPerson( p ) );
-	}
+public interface ScoresAggregator {
+	/**
+	 * Computes the joint score based on the information passed at construction.
+	 * This information should mainly consist of the individual plans, plus some
+	 * parameters.
+	 *
+	 * @return the joint score.
+	 */
+	public Double getJointScore(Collection<? extends Plan> plans);
 }
 

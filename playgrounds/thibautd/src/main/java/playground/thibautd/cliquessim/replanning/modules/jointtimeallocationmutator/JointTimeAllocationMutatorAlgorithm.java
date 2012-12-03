@@ -30,9 +30,9 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.JointPlan;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlan;
 
 /**
  * Executes a time allocation mutator on each individual plan.

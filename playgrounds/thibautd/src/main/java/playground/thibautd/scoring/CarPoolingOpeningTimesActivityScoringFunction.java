@@ -46,7 +46,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * Activity scoring function based on the KTI activity scoring.

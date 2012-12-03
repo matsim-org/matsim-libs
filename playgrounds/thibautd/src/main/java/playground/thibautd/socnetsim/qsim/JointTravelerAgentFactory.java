@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointChooseModeForSubtourAlgorithm.java
+ * JointTravelerAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.replanning.modules;
+package playground.thibautd.socnetsim.qsim;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
-import playground.thibautd.socnetsim.population.JointPlan;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 
 /**
  * @author thibautd
  */
-public class PlanAlgorithmForRandomPlanRunner implements PlanAlgorithm {
-	private final PlanAlgorithm delegate;
-	private final Random random;
+public class JointTravelerAgentFactory implements AgentFactory {
+	private final AgentFactory factory;
 
-	public PlanAlgorithmForRandomPlanRunner(
-			final PlanAlgorithm delegate,
-			final Random random) {
-		this.delegate = delegate;
-		this.random = random;
+	public JointTravelerAgentFactory(final AgentFactory wrapped) {
+		factory = wrapped;
 	}
 
 	@Override
-	public void run(final Plan plan) {
-		List<Plan> plans = new ArrayList<Plan>( ((JointPlan) plan).getIndividualPlans().values() );
-		Plan individualPlanToMutate = plans.get( random.nextInt( plans.size() ) );
-		delegate.run( individualPlanToMutate );
+	public MobsimAgent createMobsimAgentFromPerson(final Person p) {
+		return new JointTravelerAgent( (MobsimDriverAgent) factory.createMobsimAgentFromPerson( p ) );
 	}
 }
+

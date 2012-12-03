@@ -44,9 +44,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.cliquessim.population.Clique;
-import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.utils.charts.BoxAndWhiskersChart;
 import playground.thibautd.utils.charts.XYChartUtils;
 

@@ -39,7 +39,7 @@ import playground.thibautd.agentsmating.greedysavings.FacilitiesFactory;
 import playground.thibautd.agentsmating.logitbasedmating.framework.CliquesConstructor;
 import playground.thibautd.agentsmating.logitbasedmating.framework.Mating;
 import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
-import playground.thibautd.cliquessim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * Default implementation of a clique constructor. It can only handle

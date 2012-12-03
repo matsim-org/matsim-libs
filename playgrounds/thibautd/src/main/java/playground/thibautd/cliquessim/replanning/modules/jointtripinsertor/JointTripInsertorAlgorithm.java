@@ -39,10 +39,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.cliquessim.config.JointTripInsertorConfigGroup;
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.JointPlan;
-import playground.thibautd.cliquessim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * An algorithm which creates joint trips from nothing,

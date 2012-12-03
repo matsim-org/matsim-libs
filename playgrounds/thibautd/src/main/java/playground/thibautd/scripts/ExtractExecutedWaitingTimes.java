@@ -36,8 +36,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.qsim.PassengerDepartsWithDriverEvent;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.qsim.PassengerDepartsWithDriverEvent;
 
 /**
  * @author thibautd

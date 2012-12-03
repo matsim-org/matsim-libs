@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.cliquessim.router;
+package playground.thibautd.socnetsim.router;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,7 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 
-import playground.thibautd.cliquessim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.DriverRoute;
 
 /**
  * @author thibautd

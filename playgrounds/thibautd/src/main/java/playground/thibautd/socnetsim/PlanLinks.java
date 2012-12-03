@@ -26,7 +26,7 @@ import java.util.WeakHashMap;
 
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.cliquessim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlan;
 
 /**
  * Stores links between individual plans,

@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.thibautd.cliquessim.population.Clique;
-import playground.thibautd.cliquessim.population.JointActingTypes;
 import playground.thibautd.cliquessim.population.Cliques;
 import playground.thibautd.cliquessim.utils.JointControlerUtils;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * output plots comparing the avg number of joint trips per agent

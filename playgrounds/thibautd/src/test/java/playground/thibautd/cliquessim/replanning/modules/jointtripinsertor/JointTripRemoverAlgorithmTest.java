@@ -46,11 +46,11 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.cliquessim.population.Clique;
-import playground.thibautd.cliquessim.population.DriverRoute;
-import playground.thibautd.cliquessim.population.JointActingTypes;
-import playground.thibautd.cliquessim.population.JointPlan;
-import playground.thibautd.cliquessim.population.PassengerRoute;
 import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTrip;
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
  * @author thibautd

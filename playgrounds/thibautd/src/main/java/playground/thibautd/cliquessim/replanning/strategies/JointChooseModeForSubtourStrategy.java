@@ -26,7 +26,7 @@ import playground.thibautd.cliquessim.replanning.modules.ExecuteModuleOnAllPlans
 import playground.thibautd.cliquessim.replanning.modules.jointchoosemodeforsubtour.JointChooseModeForSubtourModule;
 import playground.thibautd.cliquessim.replanning.modules.reroute.JointReRouteModule;
 import playground.thibautd.cliquessim.replanning.selectors.RandomPlanSelectorWithoutCasts;
-import playground.thibautd.cliquessim.router.JointTripsToLegsModule;
+import playground.thibautd.socnetsim.router.JointTripsToLegsModule;
 
 /**
  * @author thibautd

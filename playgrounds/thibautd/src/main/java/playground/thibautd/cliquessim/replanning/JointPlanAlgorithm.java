@@ -22,7 +22,7 @@ package playground.thibautd.cliquessim.replanning;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlan;
 
 /**
  * Simple abstract class to extend to provide PlanAlgorithms for

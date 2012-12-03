@@ -32,6 +32,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.thibautd.socnetsim.population.JointPlan;
+
 /**
  * Defines a "clique" agregating several agents.
  *

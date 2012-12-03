@@ -37,11 +37,11 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.qsim.JointQSimFactory;
 import playground.thibautd.cliquessim.replanning.JointPlansReplanning;
 import playground.thibautd.cliquessim.replanning.JointStrategyManager;
-import playground.thibautd.cliquessim.router.JointPlanRouter;
-import playground.thibautd.cliquessim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.qsim.JointQSimFactory;
+import playground.thibautd.socnetsim.router.JointPlanRouter;
+import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 
 /**
  * Custom controler for handling clique replanning

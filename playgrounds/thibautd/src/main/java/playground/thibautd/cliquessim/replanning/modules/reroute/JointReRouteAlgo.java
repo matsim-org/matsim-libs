@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.cliquessim.population.JointPlan;
 import playground.thibautd.cliquessim.replanning.JointPlanAlgorithm;
+import playground.thibautd.socnetsim.population.JointPlan;
 
 /**
  * Similar to the {@link org.matsim.core.replanning.modules.ReRoute} algorithm, on all plans of a joint plan.
