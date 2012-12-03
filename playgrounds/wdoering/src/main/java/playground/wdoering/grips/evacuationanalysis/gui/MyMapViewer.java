@@ -488,9 +488,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					//get cell coordinate (+ gridsize) and transform into pixel coordinates
 					CoordImpl cellCoord = cell.getCoord();
-					Coord transformedCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX(), cellCoord.getY()));
+					Coord transformedCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()-gridSize/2, cellCoord.getY()-gridSize/2));
 					Point2D cellCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(transformedCoord.getY(),transformedCoord.getX()), this.getZoom());
-					Coord cellPlusGridCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()+gridSize, cellCoord.getY()+gridSize));
+					Coord cellPlusGridCoord = this.ctInverse.transform(new CoordImpl(cellCoord.getX()+gridSize/2, cellCoord.getY()+gridSize/2));
 					Point2D cellPlusGridCoordP2D = this.getTileFactory().geoToPixel(new GeoPosition(cellPlusGridCoord.getY(),cellPlusGridCoord.getX()), this.getZoom());
 					
 					//adjust viewport
