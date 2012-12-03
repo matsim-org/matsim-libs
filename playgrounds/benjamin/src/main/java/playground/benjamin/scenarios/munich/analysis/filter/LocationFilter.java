@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TestProcessing.java
+ * HomeLocationFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.processing;
+package playground.benjamin.scenarios.munich.analysis.filter;
 
-import processing.core.PApplet;
+import java.util.Set;
+
+import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * @author benjamin
  *
  */
-public class TestProcessing extends PApplet{
+public class LocationFilter {
 
-	@Override
-	public void setup() {
-		size(200,200);
-		background(0);
-	}
-
-	@Override
-	public void draw() {
-		stroke(255);
-		if (mousePressed) {
-			line(mouseX,mouseY,pmouseX,pmouseY);
+	public boolean isPersonsHomeInShape(Person person, Set<Feature> featuresInShape) {
+		boolean isInShape = false;
+		Coord homeCoord = getHomeActivityCoord(person);
+		GeometryFactory factory = new GeometryFactory();
+		Geometry geo = factory.createPoint(new Coordinate(homeCoord.getX(), homeCoord.getY()));
+		for(Feature feature : featuresInShape){
+			if(feature.getDefaultGeometry().contains(geo)){
+				//logger.debug("found homeLocation of person " + person.getId() + " in feature " + feature.getID());
+				isInShape = true;
+				break;
+			}
 		}
+		return isInShape;
 	}
-
-	public static void main(String[] args) {
-		PApplet.main(new String[] {"--present", "playground.benjamin.processing.TestProcessing"});
+	
+	public Coord getHomeActivityCoord(Person person){
+		Coord homeActCoord = null;
+		Activity homeAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+		homeActCoord = homeAct.getCoord();
+		return homeActCoord;
 	}
 }
