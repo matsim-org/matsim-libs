@@ -49,7 +49,6 @@ public class JointPlan implements Plan {
 	private final Map<Id,Plan> individualPlans = new HashMap<Id,Plan>();
 	private final boolean setAtIndividualLevel;
 
-	private final Clique clique;
 	private ScoresAggregator aggregator;
 
 	/**
@@ -58,50 +57,43 @@ public class JointPlan implements Plan {
 	 * equivalent to JointPlan(clique, plans, true, true).
 	 */
 	public JointPlan(
-			final Clique clique,
 			final Map<Id, ? extends Plan> plans) {
-		this(clique, plans, true);
+		this(plans, true);
 	}
 
 	/**
 	 * equivalent to JointPlan(clique, plans, addAtIndividualLevel, true)
 	 */
 	public JointPlan(
-			final Clique clique,
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel) {
-		this(clique, plans, addAtIndividualLevel, new HomogeneousScoreAggregator());
+		this( plans, addAtIndividualLevel, new HomogeneousScoreAggregator());
 	}
 
 	/**
 	 * Creates a joint plan from individual plans.
 	 * Two individual trips to be shared must have their Pick-Up activity type set
 	 * to 'pu_i', where i is an integer which identifies the joint trip.
-	 * @param clique the clique this plan pertains to
 	 * @param plans the individual plans. If they consist of Joint activities, 
 	 * those activities are referenced, otherwise, they are copied in a joint activity.
 	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
-	 * set to false for a temporary plan (in a replanning for example).
-	 * @param toSynchronize if true, the activity durations will be modified so
-	 * that the joint activities are simultaneous (not implemented yet)
+	 * set to false for a temporary plan (in a replaning for example).
 	 */
 	//TODO: separate in several helpers (too messy)
 	public JointPlan(
-			final Clique clique,
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
 			final ScoresAggregator aggregator) {
 		this.setAtIndividualLevel = addAtIndividualLevel;
 
 		if (addAtIndividualLevel) {
-			for (Person person : clique.getMembers().values()) {
-				Plan plan = plans.get( person.getId() );
+			for (Plan plan : plans.values()) {
+				Person person = plan.getPerson();
 				if (!person.getPlans().contains( plan )) {
 					person.addPlan( plan );
 				}
 			}
 		}
-		this.clique = clique;
 		this.individualPlans.putAll( plans );
 		this.aggregator = aggregator;
 	}
@@ -110,7 +102,7 @@ public class JointPlan implements Plan {
 	 * makes a <u>shallow</u> copy of the plan.
 	 */
 	public JointPlan(final JointPlan plan) {
-		this(	plan.getClique(),
+		this(
 				cloneIndividualPlans( plan ),
 				plan.setAtIndividualLevel,
 				plan.getScoresAggregator());
@@ -168,7 +160,17 @@ public class JointPlan implements Plan {
 
 	@Override
 	public boolean isSelected() {
-		return this.getPerson().getSelectedPlan() == this;
+		int nsel = 0;
+		int tot = 0;
+		for (Plan plan : individualPlans.values()) {
+			if (plan.isSelected()) nsel++;
+			tot++;
+		}
+
+		if (nsel == 0) return false;
+		if (nsel == tot) return true;
+
+		throw new IllegalStateException( "various selection status in "+individualPlans );
 	}
 
 	@Override
@@ -190,7 +192,7 @@ public class JointPlan implements Plan {
 	 */
 	@Override
 	public Person getPerson() {
-		return this.getClique();
+		throw new UnsupportedOperationException( "JointPlans have no Person" );
 	}
 
 	/**
@@ -199,8 +201,7 @@ public class JointPlan implements Plan {
 	 */
 	@Override
 	public void setPerson(final Person person) {
-		throw new UnsupportedOperationException("JointPlan instances can only be"
-				+" associated to a clique at construction");
+		throw new UnsupportedOperationException("JointPlans have no Person" );
 	}
 
 	@Override
@@ -214,10 +215,6 @@ public class JointPlan implements Plan {
 	 * JointPlan specific methods
 	 * =========================================================================
 	 */
-	public Clique getClique() {
-		return this.clique;
-	}
-
 	public Plan getIndividualPlan(final Person person) {
 		return this.getIndividualPlan(person.getId());
 	}
@@ -228,52 +225,6 @@ public class JointPlan implements Plan {
 
 	public Map<Id,Plan> getIndividualPlans() {
 		return this.individualPlans;
-	}
-
-	/**
-	 * Transforms this plan so that it is identical to the argument plan.
-	 * Used in the replanning module.<BR>
-	 * Caution: this does NOT make a copy of the plan, but makes the internal
-	 * individual plan references to be equal. This is OK in the case of the
-	 * replanning module (where the argument plan is just a local instance),
-	 * but could lead to strange results if the two plan are used in different
-	 * places.<BR>
-	 * Caution 2: if the plan is set at individual level, the types of the new
-	 * individual plans are set identical to the "old" ones.
-	 *
-	 */
-	public void resetFromPlan(final JointPlan plan) {
-		if (plan == this) {
-			return;
-		}
-
-		if (plan.getClique() != this.clique) {
-			throw new UnsupportedOperationException("resetting a joint plan from"+
-					" a plan of a different clique is unsupported.");
-		}
-
-		if (this.setAtIndividualLevel) {
-			PlanImpl currentPlan;
-			for (Person currentIndividual : this.clique.getMembers().values()) {
-				// remove the corresponding plan at the individual level
-				currentIndividual.getPlans().remove(
-						this.individualPlans.get(currentIndividual.getId()));
-				// replace it by the new plan
-				currentPlan = (PlanImpl) plan.getIndividualPlan(currentIndividual);
-				//currentPlan.setType(this.individualPlanType);
-				currentIndividual.addPlan(currentPlan);
-				// set it as selected if it was the selected plan
-				if (this.isSelected()) {
-					// no possibility to set the selected plan with the Person interface
-					((PersonImpl) currentIndividual).setSelectedPlan(
-						plan.getIndividualPlan(currentIndividual));
-				}
-			}
-		}
-
-		this.individualPlans.clear();
-		this.individualPlans.putAll(plan.individualPlans);
-		this.aggregator = plan.getScoresAggregator();
 	}
 
 	/**
@@ -310,7 +261,7 @@ public class JointPlan implements Plan {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": clique="+clique+", plans="+getIndividualPlans()+", addAtIndividualLevel="+
+		return getClass().getSimpleName()+": plans="+getIndividualPlans()+", addAtIndividualLevel="+
 			setAtIndividualLevel+", isSelected="+this.isSelected();
 	}
 

@@ -449,7 +449,7 @@ public class JointTimeModeChooserSolution implements Solution {
 			final Id destination,
 			final Id driver,
 			final Id passenger) {
-		log.error( " COULD NOT FIND A VALID DRIVER TRIP FOR CLIQUE "+plan.getClique().getId()+"! " );
+		log.error( " COULD NOT FIND A VALID DRIVER TRIP FOR PLAN "+plan+"! " );
 		log.error( "passenger: "+passenger+", with OD "+origin+" -> "+destination );
 		log.error( "with plan:" );
 		int i=1;

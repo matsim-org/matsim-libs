@@ -374,7 +374,6 @@ public class Clique implements Person {
 
 			for (Map.Entry<String, Map<Id, PlanImpl>> entry : individualPlans.entrySet()) {
 				newJointPlan = new JointPlan(
-						this,
 						entry.getValue(),
 						true); //add at individual level
 				//TODO: use this.addPlan (when implemented)

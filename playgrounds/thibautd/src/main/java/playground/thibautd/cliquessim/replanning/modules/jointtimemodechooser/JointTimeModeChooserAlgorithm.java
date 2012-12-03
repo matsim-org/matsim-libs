@@ -93,7 +93,7 @@ public class JointTimeModeChooserAlgorithm implements PlanAlgorithm {
 				configuration );
 		Solution bestSolution = runTabuSearch( configuration , initialSolution );
 
-		if (jointPlan.getClique().getMembers().size() > 1) {
+		if (jointPlan.getIndividualPlans().size() > 1) {
 			// then start at the found solution and synchronize
 			configuration = new TabuSearchConfiguration();
 			builder.buildConfiguration(

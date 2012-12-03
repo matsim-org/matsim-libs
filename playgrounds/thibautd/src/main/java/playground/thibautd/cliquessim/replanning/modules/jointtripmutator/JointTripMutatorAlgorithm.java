@@ -90,7 +90,7 @@ public class JointTripMutatorAlgorithm implements PlanAlgorithm {
 	private void jointRun(final JointPlan plan) {
 		List<Possibility> cliquePossibilities = new ArrayList<Possibility>();
 
-		for (Id person : plan.getClique().getMembers().keySet()) {
+		for (Id person : plan.getIndividualPlans().keySet()) {
 			cliquePossibilities.addAll( possibilities.getDriverPossibilities( person ) );
 		}
 

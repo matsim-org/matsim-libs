@@ -86,7 +86,7 @@ class JointTimeModeChooserConfigBuilder {
 			final boolean penalizeUnsynchro,
 			final Solution initialSolution,
 			final TabuSearchConfiguration configuration) {
-		int cliqueSize = plan.getClique().getMembers().size();
+		int cliqueSize = plan.getIndividualPlans().size();
 
 		// different parameters depending on whether we optimise
 		// with or without synchro, as mode is not optimised when
