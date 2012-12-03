@@ -28,7 +28,7 @@ import playground.tnicolai.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Distances;
-import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.SpatialReferenceObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.network.NetworkUtil;
@@ -228,7 +228,7 @@ public class AccessibilityControlerListenerImpl{
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
-		List<PersonAndJobsObject> jobSampleList = this.main.getReadFromUrbanSimModel().readJobs(parcelsOrZones, jobSample, isParcelMode);
+		List<SpatialReferenceObject> jobSampleList = this.main.getReadFromUrbanSimModel().readJobs(parcelsOrZones, jobSample, isParcelMode);
 		assert( jobSampleList != null );
 		
 		// Since the aggregated opportunities in jobClusterArray does contain coordinates of their nearest node 
@@ -243,13 +243,13 @@ public class AccessibilityControlerListenerImpl{
 		for(int i = 0; i < jobSampleList.size(); i++){
 			bar.update();
 			
-			PersonAndJobsObject jo = jobSampleList.get( i );
-			assert( jo.getCoord() != null );
-			Node nearestNode = network.getNearestNode( jo.getCoord() );
+			SpatialReferenceObject sro = jobSampleList.get( i );
+			assert( sro.getCoord() != null );
+			Node nearestNode = network.getNearestNode( sro.getCoord() );
 			assert( nearestNode != null );
 
 			// get euclidian distance to nearest node
-			double distance_meter 	= NetworkUtil.getEuclidianDistance(jo.getCoord(), nearestNode.getCoord());
+			double distance_meter 	= NetworkUtil.getEuclidianDistance(sro.getCoord(), nearestNode.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 			
 			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
@@ -270,15 +270,15 @@ public class AccessibilityControlerListenerImpl{
 			// add Vjk to sum
 			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
 				AggregateObject2NearestNode jco = opportunityClusterMap.get( nearestNode.getId() );
-				jco.addObject( jo.getObjectID(), Vjk);
+				jco.addObject( sro.getObjectID(), Vjk);
 			}
 			// assign Vjk to given network node
 			else
 				opportunityClusterMap.put(
 						nearestNode.getId(),
-						new AggregateObject2NearestNode(jo.getObjectID(), 
-														jo.getParcelID(), 
-														jo.getZoneID(), 
+						new AggregateObject2NearestNode(sro.getObjectID(), 
+														sro.getParcelID(), 
+														sro.getZoneID(), 
 														nearestNode.getCoord(), 
 														nearestNode, 
 														Vjk));

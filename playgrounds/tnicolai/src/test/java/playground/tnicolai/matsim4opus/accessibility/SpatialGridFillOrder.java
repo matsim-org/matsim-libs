@@ -41,7 +41,7 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
-import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.SpatialReferenceObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbanSimModel;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -196,15 +196,15 @@ public class SpatialGridFillOrder {
 		Id zoneID = new IdImpl(1);
 		Id parcelID1 = new IdImpl(1);
 		Id parcelID2 = new IdImpl(2);
-		List<PersonAndJobsObject> dummyJobSampleList = new ArrayList<PersonAndJobsObject>();
+		List<SpatialReferenceObject> dummyJobSampleList = new ArrayList<SpatialReferenceObject>();
 		// 1 job at node 1
-		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(0), parcelID1, zoneID, new CoordImpl(0, 210)));
+		dummyJobSampleList.add( new SpatialReferenceObject(new IdImpl(0), parcelID1, zoneID, new CoordImpl(0, 210)));
 		// 5 jobs at node 7
-		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(2), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(3), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(4), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(5), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(6), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new SpatialReferenceObject(new IdImpl(2), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new SpatialReferenceObject(new IdImpl(3), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new SpatialReferenceObject(new IdImpl(4), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new SpatialReferenceObject(new IdImpl(5), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new SpatialReferenceObject(new IdImpl(6), parcelID2, zoneID, new CoordImpl(200, 110)));
 
 		// aggregate jobs
 		AggregateObject2NearestNode[] dummyJobClusterArray = dummyUrbanSimPracelModel.aggregateJobsWithSameParcelID(dummyJobSampleList);

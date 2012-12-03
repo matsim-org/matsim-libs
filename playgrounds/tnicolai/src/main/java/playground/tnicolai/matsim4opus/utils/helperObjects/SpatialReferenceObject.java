@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
  * @author thomas
  *
  */
-public class PersonAndJobsObject {
+public class SpatialReferenceObject {
 	
 	private Id objectID = null; // either a person or job id
 	private Id parcelID = null;
@@ -45,7 +45,7 @@ public class PersonAndJobsObject {
 	 * @param zoneID
 	 * @param coord
 	 */
-	public PersonAndJobsObject(final Id objectID, final Id parcelID, final Id zoneID, final Coord coord){
+	public SpatialReferenceObject(final Id objectID, final Id parcelID, final Id zoneID, final Coord coord){
 		this.objectID 	= objectID;
 		this.parcelID 	= parcelID;
 		this.zoneID 	= zoneID;

@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.CreateHomeWorkHomePlan;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
-import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.SpatialReferenceObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
 import playground.tnicolai.matsim4opus.utils.io.writer.AnalysisPopulationCSVWriter;
 import playground.tnicolai.matsim4opus.utils.misc.ProgressBar;
@@ -672,7 +672,7 @@ public class ReadFromUrbanSimModel {
 	 * @param jobObjectMap
 	 */
 	@Deprecated
-	public AggregateObject2NearestNode[] aggregateJobsWithSameParcelID(List<PersonAndJobsObject> jobSampleList) {
+	public AggregateObject2NearestNode[] aggregateJobsWithSameParcelID(List<SpatialReferenceObject> jobSampleList) {
 		
 		log.info("Aggregating Job with identical parcel ID ...");
 		Map<Id, AggregateObject2NearestNode> jobClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
@@ -681,7 +681,7 @@ public class ReadFromUrbanSimModel {
 		
 		for(int i = 0; i < jobSampleList.size(); i++){
 			bar.update();
-			PersonAndJobsObject jo = jobSampleList.get( i );
+			SpatialReferenceObject jo = jobSampleList.get( i );
 			
 			if( jobClusterMap.containsKey( jo.getParcelID() ) ){
 				AggregateObject2NearestNode jco = jobClusterMap.get( jo.getParcelID() );
@@ -773,12 +773,12 @@ public class ReadFromUrbanSimModel {
 	 * @param jobSample
 	 * @return
 	 */
-	public List<PersonAndJobsObject> readJobs(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final boolean isParcel) {
+	public List<SpatialReferenceObject> readJobs(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final boolean isParcel) {
 		
 		JobCounter cnt = new JobCounter();
 		
- 		List<PersonAndJobsObject> jobSampleList = new ArrayList<PersonAndJobsObject>();
-		List<PersonAndJobsObject> backupList = new ArrayList<PersonAndJobsObject>();
+ 		List<SpatialReferenceObject> jobSampleList = new ArrayList<SpatialReferenceObject>();
+		List<SpatialReferenceObject> backupList = new ArrayList<SpatialReferenceObject>();
 		
 		
 		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
@@ -840,8 +840,8 @@ public class ReadFromUrbanSimModel {
 	}
 
 	private void createJobParcel(final JobCounter cnt,
-			final List<PersonAndJobsObject> jobSampleList,
-			final List<PersonAndJobsObject> backupList,
+			final List<SpatialReferenceObject> jobSampleList,
+			final List<SpatialReferenceObject> backupList,
 			final Map<Id, ActivityFacility> facilityMap, 
 			final int indexJobID,
 			final int indexParcelID, 
@@ -865,19 +865,19 @@ public class ReadFromUrbanSimModel {
 			assert( coord != null );
 			
 			if(isBackup){
-				backupList.add( new PersonAndJobsObject(jobID, parcelID, zoneID, coord) );
+				backupList.add( new SpatialReferenceObject(jobID, parcelID, zoneID, coord) );
 				cnt.backupJobs++;
 			}
 			else
-				jobSampleList.add( new PersonAndJobsObject(jobID, parcelID, zoneID, coord) );
+				jobSampleList.add( new SpatialReferenceObject(jobID, parcelID, zoneID, coord) );
 		}
 		else
 			cnt.skippedJobs++;	// counting number of skipped jobs ...
 	}
 	
 	private void createJobZone(final JobCounter cnt,
-			final List<PersonAndJobsObject> jobSampleList,
-			final List<PersonAndJobsObject> backupList,
+			final List<SpatialReferenceObject> jobSampleList,
+			final List<SpatialReferenceObject> backupList,
 			final Map<Id, ActivityFacility> facilityMap, 
 			final int indexJobID,
 			final int indexZoneID,
@@ -897,11 +897,11 @@ public class ReadFromUrbanSimModel {
 			assert( coord != null );
 			
 			if(isBackup){
-				backupList.add( new PersonAndJobsObject(jobID, new IdImpl(-1), zoneID, coord) );
+				backupList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
 				cnt.backupJobs++;
 			}
 			else
-				jobSampleList.add( new PersonAndJobsObject(jobID, new IdImpl(-1), zoneID, coord) );
+				jobSampleList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
 		}
 		else
 			cnt.skippedJobs++;	// counting number of skipped jobs ...
@@ -913,7 +913,7 @@ public class ReadFromUrbanSimModel {
 	 * @param jobObjectMap
 	 * @param backupList
 	 */
-	private void checkAndAdjustJobSampleSize(double jobSample, JobCounter cnt, List<PersonAndJobsObject> jobSampleList, List<PersonAndJobsObject> backupList) {
+	private void checkAndAdjustJobSampleSize(double jobSample, JobCounter cnt, List<SpatialReferenceObject> jobSampleList, List<SpatialReferenceObject> backupList) {
 		
 		cnt.allowedJobs = Math.round( jobSample*cnt.numberOfUrbanSimJobs );
 		
@@ -925,7 +925,7 @@ public class ReadFromUrbanSimModel {
 			log.info("Size of actual added jobs (" + jobSampleList.size() + ") is smaller than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Adding jobs, stored in backupList ... ");
 			Collections.shuffle( backupList );
 			
-			for(PersonAndJobsObject jObject : backupList){
+			for(SpatialReferenceObject jObject : backupList){
 				if(cnt.allowedJobs > jobSampleList.size()){
 					jobSampleList.add( jObject );
 					cnt.addedJobsFromBackup++;
@@ -1015,7 +1015,7 @@ public class ReadFromUrbanSimModel {
 		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		log.info( "Starting to read persons table from " + filename );
 		
-		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
+		Map<Id, SpatialReferenceObject> personLocations = new HashMap<Id, SpatialReferenceObject>();
 		Map<Id, AggregateObject2NearestNode> personClusterMap = new HashMap<Id, AggregateObject2NearestNode>();
 		
 		try {
@@ -1041,7 +1041,7 @@ public class ReadFromUrbanSimModel {
 					
 					
 					if(homeLocation != null){
-						personLocations.put(personId, new PersonAndJobsObject(personId, homeParcelId, null, homeLocation.getCoord()));
+						personLocations.put(personId, new SpatialReferenceObject(personId, homeParcelId, null, homeLocation.getCoord()));
 						
 						{ // aggregating persons to nearest network nodes
 							assert( homeLocation.getCoord() != null );

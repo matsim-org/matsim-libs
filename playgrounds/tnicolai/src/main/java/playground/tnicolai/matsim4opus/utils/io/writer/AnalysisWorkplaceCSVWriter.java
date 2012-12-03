@@ -9,7 +9,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
-import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.SpatialReferenceObject;
 
 public class AnalysisWorkplaceCSVWriter {
 	
@@ -61,7 +61,7 @@ public class AnalysisWorkplaceCSVWriter {
 	 * @param file
 	 * @param jobSampleList
 	 */
-	public static void writeWorkplaceData2CSV(final String file, final List<PersonAndJobsObject> jobSampleList){
+	public static void writeWorkplaceData2CSV(final String file, final List<SpatialReferenceObject> jobSampleList){
 		
 		try{
 			log.info("Dumping workplace information as csv to " + file + " ...");
@@ -75,11 +75,11 @@ public class AnalysisWorkplaceCSVWriter {
 								 InternalConstants.Y_COORDINATE);
 			bwWorkplaces.newLine();
 			
-			Iterator<PersonAndJobsObject> jobIterator = jobSampleList.iterator();
+			Iterator<SpatialReferenceObject> jobIterator = jobSampleList.iterator();
 
 			while(jobIterator.hasNext()){
 				
-				PersonAndJobsObject job = jobIterator.next();
+				SpatialReferenceObject job = jobIterator.next();
 				
 				bwWorkplaces.write(job.getObjectID() + "," + 
 								   job.getParcelID() + "," +

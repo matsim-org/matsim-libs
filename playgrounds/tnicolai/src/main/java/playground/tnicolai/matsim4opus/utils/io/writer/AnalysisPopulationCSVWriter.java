@@ -10,7 +10,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
-import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.SpatialReferenceObject;
 
 public class AnalysisPopulationCSVWriter {
 	
@@ -22,7 +22,7 @@ public class AnalysisPopulationCSVWriter {
 	 * @param file
 	 * @param personLocations
 	 */
-	public static void writePopulationData2CSV(final Map<Id, PersonAndJobsObject> personLocations){
+	public static void writePopulationData2CSV(final Map<Id, SpatialReferenceObject> personLocations){
 		
 		try{
 			log.info("Initializing AnalysisPopulationCSVWriter ...");
@@ -36,11 +36,11 @@ public class AnalysisPopulationCSVWriter {
 								 InternalConstants.Y_COORDINATE);
 			bwPopulation.newLine();
 			
-			Iterator<PersonAndJobsObject> personIterator = personLocations.values().iterator();
+			Iterator<SpatialReferenceObject> personIterator = personLocations.values().iterator();
 
 			while(personIterator.hasNext()){
 				
-				PersonAndJobsObject person = personIterator.next();
+				SpatialReferenceObject person = personIterator.next();
 				
 				bwPopulation.write(person.getObjectID() + "," + 
 								   person.getParcelID() + "," +

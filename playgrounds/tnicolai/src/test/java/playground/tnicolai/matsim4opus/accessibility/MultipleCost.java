@@ -57,7 +57,7 @@ public class MultipleCost {
 		
 		// travel distance costs (m)
 		double cijTD = 500.;	// distance to reach j from i
-		double cjk1TD= 80.;	// distance to reach cjk1 from j
+		double cjk1TD= 80.;		// distance to reach cjk1 from j
 		double cjk2TD= 30.;		// distance to reach cjk2 from j
 		double cjk3TD= 50.;		// distance to reach cjk3 from j
 		double cik1TD= cijTD + cjk1TD;
@@ -81,7 +81,5 @@ public class MultipleCost {
 		
 		double Ai2= Math.log( Math.exp(Vij) * Sumjk);
 		System.out.println(Ai2);
-		
 	}
-
 }
