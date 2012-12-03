@@ -24,7 +24,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.PlanLinks;
 import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
 import playground.thibautd.socnetsim.scoring.ScoresAggregator;
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim;
+package playground.thibautd.socnetsim.population;
 
 import java.lang.ref.WeakReference;
 
@@ -26,7 +26,6 @@ import java.util.WeakHashMap;
 
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.population.JointPlan;
 
 /**
  * Stores links between individual plans,
@@ -41,6 +40,8 @@ import playground.thibautd.socnetsim.population.JointPlan;
 public class PlanLinks {
 	private final Map<Plan, WeakReference<JointPlan>> jointPlans =
 		new WeakHashMap<Plan, WeakReference<JointPlan>>();
+	
+	PlanLinks() {}
 
 	public JointPlan getJointPlan(final Plan indivPlan) {
 		return jointPlans.get( indivPlan ).get();
