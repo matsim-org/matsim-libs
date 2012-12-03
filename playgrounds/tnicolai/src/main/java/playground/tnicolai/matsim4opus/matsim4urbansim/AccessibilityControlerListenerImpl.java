@@ -612,13 +612,14 @@ public class AccessibilityControlerListenerImpl{
 	}
 	
 	/**
-	 * returns an util value for given betas and travel costs/offset
+	 * converts travel costs (e.g. travel times or distances) into utils by 
+	 * using the corresponding marginal utilities
 	 * 
-	 * @param betaModeX
-	 * @param ModeTravelCostX
-	 * @param betaWalkX
-	 * @param walkOrigin2NetworkX
-	 * @return
+	 * @param betaModeX marginal utility for a travel mode other than walk
+	 * @param ModeTravelCostX travel costs like travel times or distances
+	 * @param betaWalkX marginal utility for traveling on foot
+	 * @param walkOrigin2NetworkX travel costs like travel times or distances for traveling on foot
+	 * @return disutility of traveling
 	 */
 	protected double getAsUtil(final double betaModeX, final double ModeTravelCostX, final double betaWalkX, final double walkOrigin2NetworkX){
 		if(betaModeX != 0.)
@@ -702,6 +703,12 @@ public class AccessibilityControlerListenerImpl{
 	// inner classes
 	// ////////////////////////////////////////////////////////////////////
 	
+	
+	/**
+	 * stores travel disutilities for different modes
+	 * @author thomas
+	 *
+	 */
 	public static class GeneralizedCostSum {
 		
 		private double sumFREESPEED = 0.;
