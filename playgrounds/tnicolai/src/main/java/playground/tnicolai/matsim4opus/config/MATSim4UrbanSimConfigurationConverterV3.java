@@ -381,8 +381,8 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
 		assert(logitScaleParameter == 1.0);
 		if(logitScaleParameter != 1.0)
-			log.error("Use an accessibility scale parameter (beta scale) of 1! This run will continue with your selected parameter: beta scale = " + logitScaleParameter);
-		log.info("The scale parameter (beta scale) is used only for accessibility computation. It does not set scale parameter (beta brain) for the traffic simulation!");
+			log.error("Set the accessibility scale parameter (logit scale parameter) to 1! This run will continue with your selected parameter: beta scale = " + logitScaleParameter);
+		log.info("The logit scale parameter is used for accessibility computation only. It does not set scale parameter (beta brain) inside MATSim that is used for the traffic simulation!");
 		
 		if(useMATSimCarParameter){
 			// usually travelling_utils are negative
