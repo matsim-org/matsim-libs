@@ -38,13 +38,15 @@ import org.matsim.api.core.v01.population.Plan;
  * @author thibautd
  */
 public class PlanLinks {
+	// this assumes equality for Plans is actually identity
 	private final Map<Plan, WeakReference<JointPlan>> jointPlans =
 		new WeakHashMap<Plan, WeakReference<JointPlan>>();
 	
 	PlanLinks() {}
 
 	public JointPlan getJointPlan(final Plan indivPlan) {
-		return jointPlans.get( indivPlan ).get();
+		final WeakReference<JointPlan> value = jointPlans.get( indivPlan );
+		return value == null ? null : value.get();
 	}
 
 	public void removeJointPlan(final JointPlan jointPlan) {

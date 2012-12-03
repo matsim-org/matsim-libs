@@ -49,5 +49,24 @@ public class GroupPlans {
 	public Collection<Plan> getIndividualPlans() {
 		return individualPlans;
 	}
+
+	@Override
+	public int hashCode() {
+		return jointPlans.hashCode() + individualPlans.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return o instanceof GroupPlans &&
+			((GroupPlans) o).jointPlans.size() == jointPlans.size() &&
+			((GroupPlans) o).jointPlans.containsAll( jointPlans ) &&
+			((GroupPlans) o).individualPlans.size() == individualPlans.size() &&
+			((GroupPlans) o).individualPlans.containsAll( individualPlans );
+	}
+
+	@Override
+	public String toString() {
+		return "{GroupPlans: jointPlans="+jointPlans+"; individualPlans="+individualPlans+"}";
+	}
 }
 

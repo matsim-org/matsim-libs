@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.replanning;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -41,16 +44,23 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
  * @author thibautd
  */
 public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSelector {
+	private static final Logger log =
+		Logger.getLogger(AbstractHighestWeightSelector.class);
+
 	@Override
 	public GroupPlans selectPlans(final ReplanningGroup group) {
+		if (log.isTraceEnabled()) log.trace( "handling group "+group );
 		Map<Id, PersonRecord> personRecords = getPersonRecords( group );
 
 		PlanString allocation = buildPlanString(
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
-				Collections.EMPTY_LIST,
+				Collections.EMPTY_SET,
 				null);
 
+		if (allocation == null) throw new NullPointerException();
+
+		if (log.isTraceEnabled()) log.trace( "returning allocation "+allocation );
 		return toGroupPlans( allocation );
 	}
 
@@ -93,18 +103,27 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	private PlanString buildPlanString(
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> persons,
-			final List<Id> alreadyAllocatedPersons,
+			final Set<Id> alreadyAllocatedPersons,
 			final PlanString str) {
-		PersonRecord currentPerson = persons.get(0);
-		List<PersonRecord> remainingPersons =
+		final PersonRecord currentPerson = persons.get(0);
+
+		if (log.isTraceEnabled()) {
+			log.trace( "looking ar person "+currentPerson.person.getId()+
+					" with already selected "+alreadyAllocatedPersons );
+		}
+
+		final List<PersonRecord> remainingPersons =
 			persons.size() > 1 ?
 			persons.subList( 1, persons.size() ) :
 			Collections.EMPTY_LIST;
+		final Set<Id> newAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
+		newAllocatedPersons.add( currentPerson.person.getId() );
 
 		// get a list of plans in decreasing order of maximum possible weight
 		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
+		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 		for (PlanRecord r : records) {
-			r.cachedMaximumWeight = getMaxWeightFromPersons( r , alreadyAllocatedPersons , remainingPersons );
+			r.cachedMaximumWeight = alreadyAllocatedWeight + getMaxWeightFromPersons( r , alreadyAllocatedPersons , remainingPersons );
 		}
 		Collections.sort(
 				records,
@@ -113,7 +132,8 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 					public int compare(
 							final PlanRecord o1,
 							final PlanRecord o2) {
-						return Double.compare(
+						// sort in DECREASING order
+						return -Double.compare(
 							o1.cachedMaximumWeight,
 							o2.cachedMaximumWeight );
 					}
@@ -125,13 +145,19 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 
 		for (PlanRecord r : records) {
 			if (constructedString != null &&
-					r.cachedMaximumWeight <= constructedString.getWeight()) break;
+					r.cachedMaximumWeight <= constructedString.getWeight()) {
+				if (log.isTraceEnabled()) {
+					log.trace( "maximum weight from now on: "+r.cachedMaximumWeight );
+					log.trace( "weight obtained: "+constructedString.getWeight() );
+					log.trace( " => CUTOFF" );
+				}
+				break;
+			}
 
 			PlanString tail = str;
 			// TODO: find a better way to filter persons (should be
 			// possible in PlanString)
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
-			List<Id> newAllocatedPersons = new ArrayList<Id>(alreadyAllocatedPersons);
 			JointPlan jointPlan = r.jointPlan ;
 			if (jointPlan != null) {
 				if ( contains( jointPlan , alreadyAllocatedPersons ) ) continue;
@@ -139,19 +165,26 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 				actuallyRemainingPersons = filter( remainingPersons , jointPlan );
 				newAllocatedPersons.addAll( jointPlan.getIndividualPlans().keySet() );
 			}
-			else {
-				newAllocatedPersons.add( r.plan.getPerson().getId() );
-			}
 
+			PlanString newString;
 			if ( actuallyRemainingPersons.size() > 0 ) {
-				constructedString = buildPlanString(
+				newString = buildPlanString(
 						allPersonsRecord,
 						actuallyRemainingPersons,
 						newAllocatedPersons,
 						new PlanString( r , tail ));
 			}
 			else {
-				constructedString = new PlanString( r , tail );
+				newString = new PlanString( r , tail );
+			}
+
+			if (constructedString == null ||
+					newString.getWeight() > constructedString.getWeight()) {
+				constructedString = newString;
+				if (log.isTraceEnabled()) log.trace( "new string "+constructedString );
+			}
+			else if (log.isTraceEnabled()) {
+				log.trace( "string "+newString+" did not improve" );
 			}
 		}
 
@@ -177,17 +210,17 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			final JointPlan jointPlan,
 			final Map<Id, PersonRecord> allPersonsRecords,
 			final PlanString additionalTail) {
-		PlanRecord head = null;
-		PlanString tail = additionalTail;
+		PlanString str = additionalTail;
 
 		for (Plan p : jointPlan.getIndividualPlans().values()) {
 			if (p == r.plan) continue;
 
-			tail = new PlanString( head , tail );
-			head = allPersonsRecords.get( p.getPerson().getId() ).getRecord( p );
+			str = new PlanString(
+					allPersonsRecords.get( p.getPerson().getId() ).getRecord( p ),
+					str);
 		}
 
-		return new PlanString( head , tail );
+		return str;
 	}
 
 	/**
@@ -198,8 +231,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 	private static double getMaxWeightFromPersons(
 			final PlanRecord planToSelect,
 			// the joint plans linking to persons with a plan
-			// already selected cannot be selected
-			final List<Id> personsSelected,
+			// already selected cannot be selected.
+			// This list contains the agent to be selected.
+			final Collection<Id> personsSelected,
 			final List<PersonRecord> remainingPersons) {
 		double score = planToSelect.weight;
 
@@ -215,33 +249,44 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			for (PersonRecord record : remainingPersons) {
 				Plan plan = plans.get( record.person.getId() );
 				if ( plan != null ) {
+					// person is part of joint plan: get the corresponding weight
 					PlanRecord planRecord = record.getRecord( plan );
 					score += planRecord.weight;
 				}
 				else {
+					// put in persons to search
 					personsWithChoice.add( record );
 				}
 			}
 		}
 
-		for (PersonRecord record : remainingPersons) {
-			for (PlanRecord plan : record.plans) {
-				// the plans are sorted by decreasing weight:
-				// consider the first valid plan
-				if (plan.jointPlan == null || contains( plan.jointPlan , personsSelected )) {
-					score += plan.weight;
-					break;
-				}
-			}
-			throw new RuntimeException( "no valid plan for record "+record );
+		for (PersonRecord record : personsWithChoice) {
+			score += getMaxWeight( record , personsSelected );
 		}
 
 		return score;
 	}
 
+	/**
+	 * @return the highest weight of a plan wich does not pertains to a joint
+	 * plan shared with agents in personsSelected
+	 */
+	private static double getMaxWeight(
+			final PersonRecord record,
+			final Collection<Id> personsSelected) {
+		for (PlanRecord plan : record.plans) {
+			// the plans are sorted by decreasing weight:
+			// consider the first valid plan
+			if (plan.jointPlan == null || !contains( plan.jointPlan , personsSelected )) {
+				return plan.weight;
+			}
+		}
+		throw new RuntimeException( "no valid plan for record "+record+" without persons "+personsSelected );
+	}
+
 	private static boolean contains(
 			final JointPlan jp,
-			final List<Id> personsSelected) {
+			final Collection<Id> personsSelected) {
 		for (Id id : personsSelected) {
 			if (jp.getIndividualPlans().containsKey( id )) return true;
 		}
@@ -278,6 +323,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			return (planRecord == null ? Double.NEGATIVE_INFINITY : planRecord.weight)
 				+ (tail == null ? 0 : tail.getWeight());
 		}
+
+		@Override
+		public String toString() {
+			return "("+planRecord+"; "+tail+")";
+		}
 	}
 
 	private static class PersonRecord {
@@ -290,13 +340,14 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			this.person = person;
 			this.plans = plans;
 			Collections.sort(
-					plans,
+					this.plans,
 					new Comparator<PlanRecord>() {
 						@Override
 						public int compare(
 								final PlanRecord o1,
 								final PlanRecord o2) {
-							return Double.compare( o1.weight , o2.weight );
+							// sort in DECREASING order
+							return -Double.compare( o1.weight , o2.weight );
 						}
 					});
 		}
@@ -308,6 +359,10 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			throw new IllegalArgumentException();
 		}
 
+		@Override
+		public String toString() {
+			return "{PersonRecord: person="+person+"; plans="+plans+"}";
+		}
 	}
 
 	private static class PlanRecord {
@@ -327,6 +382,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 			this.plan = plan;
 			this.jointPlan = jointPlan;
 			this.weight = weight;
+		}
+
+		@Override
+		public String toString() {
+			return "{PlanRecord: plan="+plan+"; jointPlan="+jointPlan+"; weight="+weight+"}";
 		}
 	}
 }
