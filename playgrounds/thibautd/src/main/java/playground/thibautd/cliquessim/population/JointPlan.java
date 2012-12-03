@@ -24,9 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -36,9 +34,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.thibautd.cliquessim.scoring.HomogeneousScoreAggregatorFactory;
+import playground.thibautd.cliquessim.scoring.HomogeneousScoreAggregator;
 import playground.thibautd.cliquessim.scoring.ScoresAggregator;
-import playground.thibautd.cliquessim.scoring.ScoresAggregatorFactory;
 
 /**
  * class for handling synchronized plans.
@@ -53,10 +50,7 @@ public class JointPlan implements Plan {
 	private final boolean setAtIndividualLevel;
 
 	private final Clique clique;
-
-	private ScoresAggregator aggregator = null;
-	// for replanning modules to be able to replicate aggregator
-	private final ScoresAggregatorFactory aggregatorFactory;
+	private ScoresAggregator aggregator;
 
 	/**
 	 * Creates a joint plan from individual plans.
@@ -76,7 +70,7 @@ public class JointPlan implements Plan {
 			final Clique clique,
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel) {
-		this(clique, plans, addAtIndividualLevel, new HomogeneousScoreAggregatorFactory());
+		this(clique, plans, addAtIndividualLevel, new HomogeneousScoreAggregator());
 	}
 
 	/**
@@ -96,7 +90,7 @@ public class JointPlan implements Plan {
 			final Clique clique,
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
-			final ScoresAggregatorFactory aggregatorFactory) {
+			final ScoresAggregator aggregator) {
 		this.setAtIndividualLevel = addAtIndividualLevel;
 
 		if (addAtIndividualLevel) {
@@ -109,9 +103,7 @@ public class JointPlan implements Plan {
 		}
 		this.clique = clique;
 		this.individualPlans.putAll( plans );
-		this.aggregatorFactory = aggregatorFactory;
-		this.aggregator =
-			aggregatorFactory.createScoresAggregator(this.individualPlans.values());
+		this.aggregator = aggregator;
 	}
 
 	/**
@@ -121,7 +113,7 @@ public class JointPlan implements Plan {
 		this(	plan.getClique(),
 				cloneIndividualPlans( plan ),
 				plan.setAtIndividualLevel,
-				plan.getScoresAggregatorFactory());
+				plan.getScoresAggregator());
 		//this.setJointTripPossibilities( plan.getJointTripPossibilities() );
 	}
 
@@ -190,7 +182,7 @@ public class JointPlan implements Plan {
 	 */
 	@Override
 	public Double getScore() {
-		return this.aggregator.getJointScore();
+		return this.aggregator.getJointScore( individualPlans.values() );
 	}
 
 	/**
@@ -281,11 +273,7 @@ public class JointPlan implements Plan {
 
 		this.individualPlans.clear();
 		this.individualPlans.putAll(plan.individualPlans);
-		// update the aggregator, so that it considers the scores of the new plans
-		// in fact, without doing it, the new plans should already be considered if
-		// the collection in the aggregator points towards the values collection
-		// of the map, but it would become messy (and implementation dependant)
-		this.aggregator = this.aggregatorFactory.createScoresAggregator(this.individualPlans.values());
+		this.aggregator = plan.getScoresAggregator();
 	}
 
 	/**
@@ -326,7 +314,7 @@ public class JointPlan implements Plan {
 			setAtIndividualLevel+", isSelected="+this.isSelected();
 	}
 
-	public ScoresAggregatorFactory getScoresAggregatorFactory() {
-		return this.aggregatorFactory;
+	public ScoresAggregator getScoresAggregator() {
+		return this.aggregator;
 	}
 }

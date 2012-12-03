@@ -30,18 +30,11 @@ import org.matsim.api.core.v01.population.Plan;
  * @author thibautd
  */
 public class HomogeneousScoreAggregator implements ScoresAggregator {
-
-	private final Collection<? extends Plan> individualPlans;
-
-	public HomogeneousScoreAggregator(final Collection<? extends Plan> individualPlans) {
-		this.individualPlans = individualPlans;
-	}
-
 	@Override
-	public Double getJointScore() {
+	public Double getJointScore(final Collection<? extends Plan> individualPlans) {
 		double score = 0d;
 
-		for (Plan plan : this.individualPlans) {
+		for (Plan plan : individualPlans) {
 			try {
 				score += plan.getScore();
 			} catch (NullPointerException e) {

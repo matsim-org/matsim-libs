@@ -19,9 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.cliquessim.scoring;
 
+import java.util.Collection;
+
+import org.matsim.api.core.v01.population.Plan;
+
 /**
  * Interface for classes meant to compute the joint score from the
  * individual ones.
+ * <br>
+ * Instances should be stateless!
  *
  * @author thibautd
  */
@@ -33,6 +39,6 @@ public interface ScoresAggregator {
 	 *
 	 * @return the joint score.
 	 */
-	public Double getJointScore();
+	public Double getJointScore(Collection<? extends Plan> plans);
 }
 
