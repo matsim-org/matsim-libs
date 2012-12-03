@@ -21,7 +21,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.benjamin.scenarios.munich.analysis.filter.HomeLocationFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 
 import com.sun.istack.logging.Logger;
@@ -157,7 +157,7 @@ public class Mobility {
 			PersonFilter personFilter = new PersonFilter();
 			boolean isPersonFreight = personFilter.isPersonFreight(person.getId());
 			if(!isPersonFreight){
-				HomeLocationFilter homeLocationFilter = new HomeLocationFilter();
+				LocationFilter homeLocationFilter = new LocationFilter();
 				boolean isPersonsHomeInShape = homeLocationFilter.isPersonsHomeInShape(person, featuresInShape);
 				if(isPersonsHomeInShape){
 					filteredPopulation.addPerson(person);
