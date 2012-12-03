@@ -33,6 +33,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlanFactory;
 
 /**
  * Defines a "clique" agregating several agents.
@@ -236,7 +237,7 @@ public class Clique implements Person {
 	}
 
 	public Plan copySelectedPlan() {
-		JointPlan plan = new JointPlan(this.selectedPlan);
+		JointPlan plan = JointPlanFactory.copyJointPlan(this.selectedPlan);
 		//TODO: use this.addPlan (when implemented)
 		this.plans.add(plan);
 		this.setSelectedPlan(plan);
@@ -375,7 +376,7 @@ public class Clique implements Person {
 			this.plans.clear();
 
 			for (Map.Entry<String, Map<Id, PlanImpl>> entry : individualPlans.entrySet()) {
-				newJointPlan = new JointPlan(
+				newJointPlan = JointPlanFactory.createJointPlan(
 						entry.getValue(),
 						true); //add at individual level
 				//TODO: use this.addPlan (when implemented)

@@ -50,6 +50,7 @@ import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTrip;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
@@ -129,7 +130,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"one passenger",
-				new JointPlan( plans ),
+				JointPlanFactory.createJointPlan( plans ),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),
@@ -213,7 +214,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"two passengers full overlap",
-				new JointPlan( plans ),
+				JointPlanFactory.createJointPlan( plans ),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),
@@ -312,7 +313,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"two passengers intern overlap",
-				new JointPlan( plans ),
+				JointPlanFactory.createJointPlan( plans ),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),
@@ -411,7 +412,7 @@ public class JointTripRemoverAlgorithmTest {
 
 		return new Fixture(
 				"two passengers extern overlap",
-				new JointPlan(plans),
+				JointPlanFactory.createJointPlan(plans),
 				expectedAfterRemoval,
 				new JointTrip(
 					driver.getId(),

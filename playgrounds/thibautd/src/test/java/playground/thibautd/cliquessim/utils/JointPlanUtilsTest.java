@@ -46,6 +46,7 @@ import playground.thibautd.cliquessim.utils.JointPlanUtils.JointTravelStructure;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**
@@ -115,7 +116,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg ),
 								passenger1.getId(),
 								passengerLeg))),
-					new JointPlan( plans )));
+					JointPlanFactory.createJointPlan( plans )));
 
 		// plan 2
 		// two passenger, two ODs
@@ -195,7 +196,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg2 ),
 								passenger2.getId(),
 								passengerLeg2))),
-					new JointPlan( plans )));
+					JointPlanFactory.createJointPlan( plans )));
 
 		// plan 3
 		// two passenger, two ODs, two JT for one passenger
@@ -304,7 +305,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg3 ),
 								passenger1.getId(),
 								passengerLeg3))),
-					new JointPlan( plans )));
+					JointPlanFactory.createJointPlan( plans )));
 
 		// plan 4
 		// two passengers, "midle trip"
@@ -391,7 +392,7 @@ public class JointPlanUtilsTest {
 								Arrays.asList( driverLeg2 ),
 								passenger2.getId(),
 								passengerLeg2))),
-					new JointPlan( plans )));
+					JointPlanFactory.createJointPlan( plans )));
 	}
 
 	@Test

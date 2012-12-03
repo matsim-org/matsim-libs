@@ -53,25 +53,6 @@ public class JointPlan implements Plan {
 
 	/**
 	 * Creates a joint plan from individual plans.
-	 * The plans are added at the individual level.
-	 * equivalent to JointPlan(clique, plans, true, true).
-	 */
-	public JointPlan(
-			final Map<Id, ? extends Plan> plans) {
-		this(plans, true);
-	}
-
-	/**
-	 * equivalent to JointPlan(clique, plans, addAtIndividualLevel, true)
-	 */
-	public JointPlan(
-			final Map<Id, ? extends Plan> plans,
-			final boolean addAtIndividualLevel) {
-		this( plans, addAtIndividualLevel, new HomogeneousScoreAggregator());
-	}
-
-	/**
-	 * Creates a joint plan from individual plans.
 	 * Two individual trips to be shared must have their Pick-Up activity type set
 	 * to 'pu_i', where i is an integer which identifies the joint trip.
 	 * @param plans the individual plans. If they consist of Joint activities, 
@@ -80,7 +61,7 @@ public class JointPlan implements Plan {
 	 * set to false for a temporary plan (in a replaning for example).
 	 */
 	//TODO: separate in several helpers (too messy)
-	public JointPlan(
+	JointPlan(
 			final Map<Id, ? extends Plan> plans,
 			final boolean addAtIndividualLevel,
 			final ScoresAggregator aggregator) {
@@ -101,7 +82,7 @@ public class JointPlan implements Plan {
 	/**
 	 * makes a <u>shallow</u> copy of the plan.
 	 */
-	public JointPlan(final JointPlan plan) {
+	JointPlan(final JointPlan plan) {
 		this(
 				cloneIndividualPlans( plan ),
 				plan.setAtIndividualLevel,
