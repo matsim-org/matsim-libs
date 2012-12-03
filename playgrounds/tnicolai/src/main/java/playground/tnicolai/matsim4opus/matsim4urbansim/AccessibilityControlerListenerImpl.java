@@ -495,12 +495,12 @@ public class AccessibilityControlerListenerImpl{
 	 *    This is already done above in "aggregatedOpportunities" method and the result is 
 	 *    stored in "aggregatedOpportunities" object:
 	 * 
-	 * S_j = sum_k (exp(Vjk)) = exp(Vjk1) + exp(Vjk2) + exp(Vjk3)
+	 * S_j = sum_k_in_j (exp(Vjk)) = exp(Vjk1) + exp(Vjk2) + exp(Vjk3)
 	 * 
 	 * 2) The disutility Vij to get from origin location i to destination node j is calculated in this method.
 	 *    Finally the following logsum is taken:   
 	 * 
-	 * A_i = 1/betascale * ln ( sum_j ( exp(Vij) * sum_k_in_j( exp(Vjk) ) ) ) = 1/beatascale * ln (sum_j (exp(Vij) * S_j ) )
+	 * A_i = 1/beatascale * ln (sum_j (exp(Vij) * S_j ) )
 	 * 
 	 * @param gcs stores the value for the term "exp(Vik)"
 	 * @param distanceMeasuringPoint2Road_meter distance in meter from origin i to the network
