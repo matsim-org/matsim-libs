@@ -2,10 +2,10 @@ package playground.sergioo.Visualizer2D;
 
 import org.apache.commons.math.geometry.Vector3D;
 
-public class Camera3DPersp extends Camera2D implements Camera {
+public class Camera3DPersp extends Camera2D implements Camera3D {
 	
 	//Constantes
-	private static final double ZOOM_RATE = 5.0/4.0;
+	private static final double ZOOM_RATE = 1000;
 	private static final double WIDTH_CAM = 100;
 	
 	//Attributes
@@ -21,7 +21,7 @@ public class Camera3DPersp extends Camera2D implements Camera {
 		l = new Vector3D(-100, -100, 100);
 		d = new Vector3D(1, 1, -1).normalize();
 		h = new Vector3D(1, 1, 2).normalize();
-		tanTetaOverTwo = Math.tan(Math.PI/3);
+		tanTetaOverTwo = Math.tan(Math.PI/4);
 	}
 	public Camera3DPersp(Vector3D l, Vector3D d, Vector3D h, double teta) {
 		super();
@@ -54,13 +54,13 @@ public class Camera3DPersp extends Camera2D implements Camera {
 	@Override
 	public void zoomIn(double x, double y) {
 		double[] center0 = new double[]{x, y, 0};
-		size.scale(1/ZOOM_RATE);
+		l = l.add(d.scalarMultiply(ZOOM_RATE));
 		centerCamera(center0);
 	}
 	@Override
 	public void zoomOut(double x, double y) {
 		double[] center0 = new double[]{x, y, 0};
-		size.scale(ZOOM_RATE);
+		l = l.add(d.scalarMultiply(ZOOM_RATE));
 		centerCamera(center0);
 	}
 	@Override
@@ -96,7 +96,7 @@ public class Camera3DPersp extends Camera2D implements Camera {
 		double yB = -h.getY()*xB/h.getX()+pA.getY()+pA.getX()*h.getX()/h.getY();
 		Vector3D pB = new Vector3D(xB, yB, 0);
 		Vector3D m = pA.add(pB.subtract(pA).scalarMultiply(0.5));
-		double r = m.getNorm()/tanTetaOverTwo;
+		double r = pA.subtract(m).getNorm()/tanTetaOverTwo;
 		Vector3D o = new Vector3D(m.getX()-r*Math.sin(h.getDelta())*Math.cos(d.getAlpha()), m.getY()-r*Math.sin(h.getDelta())*Math.sin(d.getAlpha()), r*Math.cos(h.getDelta()));
 		l = o.add(d.scalarMultiply(WIDTH_CAM/(2*tanTetaOverTwo)));
 	}
@@ -199,6 +199,11 @@ public class Camera3DPersp extends Camera2D implements Camera {
 	public boolean isInside(double[] point) {
 		double[] params = getParameters(point);
 		return params[0]<size.getX()/2 && params[0]>-size.getX()/2 && params[1]>size.getY()/2 && params[1]<-size.getY()/2;
+	}
+	@Override
+	public double getDistanceToCamera(double[] point) {
+		Vector3D vector = new Vector3D(point[0], point[1], point.length>2?point[2]:0); 
+		return getDistanceToCamera(vector);
 	}
 
 }

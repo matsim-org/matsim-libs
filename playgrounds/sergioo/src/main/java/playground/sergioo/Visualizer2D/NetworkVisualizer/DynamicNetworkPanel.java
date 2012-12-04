@@ -43,7 +43,6 @@ import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.DynamicNetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleDynamicNetworkWindow.Options;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Labels;
 
@@ -75,7 +74,7 @@ public class DynamicNetworkPanel extends LayersPanel implements MouseListener, M
 	}
 	private void calculateBoundaries() {
 		Collection<double[]> coords = new ArrayList<double[]>();
-		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
+		for(Link link:((DynamicNetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
 				coords.add(new double[]{link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()});
 				coords.add(new double[]{link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()});
@@ -90,35 +89,19 @@ public class DynamicNetworkPanel extends LayersPanel implements MouseListener, M
 			camera.centerCamera(p);
 		else {
 			if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(p[0], p[1]);
+				((DynamicNetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(p[0], p[1]);
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectLink();
+				((DynamicNetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectLink();
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(p[0], p[1]);
+				((DynamicNetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(p[0], p[1]);
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectNode();
-				window.refreshLabel(Labels.NODE);
-			}
-			else if(window.getOption().equals(Options.ADD_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addLink(p[0], p[1]);
-				window.refreshLabel(Labels.LINK);
-			}
-			else if(window.getOption().equals(Options.ADD_LINK) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeLink(p[0], p[1]);
-				window.refreshLabel(Labels.LINK);
-			}
-			else if(window.getOption().equals(Options.ADD_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().addNode(p[0], p[1]);
-				window.refreshLabel(Labels.NODE);
-			}
-			else if(window.getOption().equals(Options.ADD_NODE) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().removeNode(p[0], p[1]);
+				((DynamicNetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectNode();
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
@@ -130,7 +113,7 @@ public class DynamicNetworkPanel extends LayersPanel implements MouseListener, M
 	}
 	public String getLabelText(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		try {
-			return (String) NetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
+			return (String) NetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((DynamicNetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -189,7 +172,7 @@ public class DynamicNetworkPanel extends LayersPanel implements MouseListener, M
 			getActiveLayer().changeVisible();
 			break;
 		case 'o':
-			((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().selectOppositeLink();
+			((DynamicNetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().selectOppositeLink();
 			window.refreshLabel(Labels.LINK);
 			break;
 		case 'i':

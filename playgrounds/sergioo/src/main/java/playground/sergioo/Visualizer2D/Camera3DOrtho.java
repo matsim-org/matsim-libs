@@ -2,7 +2,7 @@ package playground.sergioo.Visualizer2D;
 
 import org.apache.commons.math.geometry.Vector3D;
 
-public class Camera3DOrtho extends Camera2D implements Camera {
+public class Camera3DOrtho extends Camera2D implements Camera3D {
 	
 	//Constantes
 	private static final double ZOOM_RATE = 5.0/4.0;
@@ -168,6 +168,11 @@ public class Camera3DOrtho extends Camera2D implements Camera {
 	public boolean isInside(double[] point) {
 		double[] params = getParameters(point);
 		return params[0]<size.getX()/2 && params[0]>-size.getX()/2 && params[1]>size.getY()/2 && params[1]<-size.getY()/2;
+	}
+	@Override
+	public double getDistanceToCamera(double[] point) {
+		Vector3D vector = new Vector3D(point[0], point[1], point.length>2?point[2]:0); 
+		return getDistanceToCamera(vector);
 	}
 
 }

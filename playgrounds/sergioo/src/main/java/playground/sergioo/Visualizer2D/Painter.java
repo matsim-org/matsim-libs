@@ -2,11 +2,13 @@ package playground.sergioo.Visualizer2D;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
+import java.text.NumberFormat;
 
 import org.matsim.api.core.v01.Coord;
 
@@ -56,5 +58,24 @@ public abstract class Painter {
 			polygon.addPoint(screenPoint[0], screenPoint[1]);
 		}
 		g2.fill(polygon);
+	}
+	protected void paintVertical3DScale(Graphics2D g2, LayersPanel layersPanel,	double startHeight, double endHeight, double startValue, double endValue, int divisions, double baseSize, Font font, NumberFormat format, Stroke stroke, Color color) {
+		double[] base = new double[]{layersPanel.getCamera().getCenter()[0], layersPanel.getCamera().getCenter()[1], startHeight};
+		double[] top = new double[]{layersPanel.getCamera().getCenter()[0], layersPanel.getCamera().getCenter()[1], endHeight};
+		paintLine(g2, layersPanel, base, top, stroke, color);
+		paintLine(g2, layersPanel, new double[]{base[0]+baseSize, base[1], 0}, new double[]{base[0]-baseSize, base[1], 0}, stroke, color);
+		paintLine(g2, layersPanel, new double[]{base[0], base[1]+baseSize, 0}, new double[]{base[0], base[1]-baseSize, 0}, stroke, color);
+		double deltaHeight = (endHeight-startHeight)/divisions;
+		double deltaValue = (endValue-startValue)/divisions;
+		g2.setFont(font);
+		for(double i=1; i<divisions+1; i++) {
+			int[] screen = layersPanel.getScreenXY(new double[]{base[0], base[1], i*deltaHeight});	
+			g2.drawLine(screen[0]-4, screen[1], screen[0]+4, screen[1]);
+			g2.drawRect(screen[0]+4, screen[1]-font.getSize()-2, (font.getSize()/2)*format.format(i*deltaValue).length()+6, font.getSize()+6);
+			g2.setColor(new Color(255-color.getRed(), 255-color.getGreen(), 255-color.getBlue()));
+			g2.fillRect(screen[0]+4, screen[1]-font.getSize()-2, (font.getSize()/2)*format.format(i*deltaValue).length()+6, font.getSize()+6);
+			g2.setColor(color);
+			g2.drawString(format.format(i*deltaValue)+"", screen[0]+7, screen[1]);
+		}
 	}
 }
