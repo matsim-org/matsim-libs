@@ -42,6 +42,7 @@ public class OptSettings {
 	private int startBusNumber;
 	private double startFare;
 	private int startCapacity;
+	private int randomSeed;
 	
 	public String getConfigFile() {
 		return configFile;
@@ -115,8 +116,11 @@ public class OptSettings {
 	public void setStartCapacity(int startCapacity) {
 		this.startCapacity = startCapacity;
 	}
-	
-	
-	
+	public int getRandomSeed() {
+		return randomSeed;
+	}
+	public void setRandomSeed(int randomSeed) {
+		this.randomSeed = randomSeed;
+	}
 
 }

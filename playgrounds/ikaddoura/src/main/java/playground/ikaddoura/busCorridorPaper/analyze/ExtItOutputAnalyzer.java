@@ -64,7 +64,7 @@ public class ExtItOutputAnalyzer {
 		int runNr = 0;
 		for ( File file : folder.listFiles() ) {
 			if (file.isDirectory() && !file.isHidden()){
-				String runOutputFile = file.toString() + "/extItData.txt";
+				String runOutputFile = file.toString() + "/extItData.csv";
 				loadRunOutputFile(runOutputFile, runNr);
 				runNr++;
 			}
@@ -83,7 +83,7 @@ public class ExtItOutputAnalyzer {
 	            while((line = br.readLine()) != null) {
 	            		            	
 	                if (lineCounter > 0) {
-	                	String[] parts = line.split(" ; "); 
+	                	String[] parts = line.split(";"); 
 	                	ExtItAnaInfo extItAnaInfo = new ExtItAnaInfo();
 	                	
 	                	extItAnaInfo.setIteration(Integer.parseInt(parts[0]));
@@ -103,7 +103,8 @@ public class ExtItOutputAnalyzer {
 	                	extItAnaInfo.setNumberOfNotMissedBusTrips(Double.parseDouble(parts[17]));
 	                	extItAnaInfo.setT0MinusTActSum(Double.parseDouble(parts[19]));
 	                	extItAnaInfo.setAvgT0MinusTActPerPerson(Double.parseDouble(parts[20]));
-	                	extItAnaInfo.setNoValidPlanScore(Double.parseDouble(parts[19]));
+	                	extItAnaInfo.setAvgT0MinusTActDivByT0perTrip(Double.parseDouble(parts[21]));
+	                	extItAnaInfo.setNoValidPlanScore(Double.parseDouble(parts[22]));
 	                	
 	                	it2Ana.put((int) extItAnaInfo.getIteration(), extItAnaInfo);
 	                }
@@ -137,7 +138,7 @@ public class ExtItOutputAnalyzer {
 		   
 	    try {
 	    bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; Fare (AUD) ";
+	    String zeile1 = "ITERATION;NumberOfBuses;Fare (AUD)";
 	    bw.write(zeile1);
 	    
 	    int iterations = 0;
@@ -148,7 +149,7 @@ public class ExtItOutputAnalyzer {
 	    	}
 	    }
 	    
-	    bw.write(" ; AVG ; MIN ; MAX ");
+	    bw.write(";AVG;MIN;MAX");
 	    
 	    bw.newLine();
 	    
@@ -156,16 +157,63 @@ public class ExtItOutputAnalyzer {
 	    
     	Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
     	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
-		    bw.write(iteration + " ; " + firstRunItNr2ana.get(iteration).getNumberOfBuses() + " ; " + firstRunItNr2ana.get(iteration).getFare());
+		    bw.write(iteration + ";" + firstRunItNr2ana.get(iteration).getNumberOfBuses() + ";" + firstRunItNr2ana.get(iteration).getFare() * (-1));
 		    List<Double> memValues = new ArrayList<Double>();
 		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
 		   		double welfare = this.runNr2itNr2ana.get(runNr).get(iteration).getWelfare();
 		   		memValues.add(welfare);
-		   		bw.write(" ; " + String.valueOf(welfare));
+		   		bw.write(";" + String.valueOf(welfare));
 		   	}
-		   	bw.write(" ; " + getAverage(memValues).toString());
-		   	bw.write(" ; " + getMin(memValues).toString());
-		   	bw.write(" ; " + getMax(memValues).toString());
+		   	bw.write(";" + getAverage(memValues).toString());
+		   	bw.write(";" + getMin(memValues).toString());
+		   	bw.write(";" + getMax(memValues).toString());
+	        bw.newLine();
+	    }
+
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}		
+	}
+	
+	public void writePtTripData(String outputPath) {
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "ptTrips.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "ITERATION;NumberOfBuses;Fare (AUD)";
+	    bw.write(zeile1);
+	    
+	    int iterations = 0;
+	    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+	    	bw.write(";PtTripsRunNr_" + runNr.toString());
+	    	if (this.runNr2itNr2ana.get(runNr).size() != iterations && iterations != 0) {
+	    		throw new RuntimeException("Different number of iterations in different runs. Aborting...");
+	    	}
+	    }
+	    
+	    bw.write(";AVG;MIN;MAX");
+	    
+	    bw.newLine();
+	    
+	    // ..........
+	    
+    	Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
+    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
+		    bw.write(iteration + ";" + firstRunItNr2ana.get(iteration).getNumberOfBuses() + ";" + firstRunItNr2ana.get(iteration).getFare() * (-1));
+		    List<Double> memValues = new ArrayList<Double>();
+		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+		   		
+		    	double data = this.runNr2itNr2ana.get(runNr).get(iteration).getNumberOfPtLegs();
+		   		memValues.add(data);
+		   		
+		   		bw.write(";" + String.valueOf(data));
+		   	}
+		   	bw.write(";" + getAverage(memValues).toString());
+		   	bw.write(";" + getMin(memValues).toString());
+		   	bw.write(";" + getMax(memValues).toString());
 	        bw.newLine();
 	    }
 
@@ -176,6 +224,146 @@ public class ExtItOutputAnalyzer {
 	    } catch (IOException e) {}		
 	}
 
+	public void writeCarTripData(String outputPath) {
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "carTrips.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "ITERATION;NumberOfBuses;Fare (AUD)";
+	    bw.write(zeile1);
+	    
+	    int iterations = 0;
+	    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+	    	bw.write(";CarTripsRunNr_" + runNr.toString());
+	    	if (this.runNr2itNr2ana.get(runNr).size() != iterations && iterations != 0) {
+	    		throw new RuntimeException("Different number of iterations in different runs. Aborting...");
+	    	}
+	    }
+	    
+	    bw.write(";AVG;MIN;MAX");
+	    
+	    bw.newLine();
+	    
+	    // ..........
+	    
+    	Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
+    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
+		    bw.write(iteration + ";" + firstRunItNr2ana.get(iteration).getNumberOfBuses() + ";" + firstRunItNr2ana.get(iteration).getFare() * (-1));
+		    List<Double> memValues = new ArrayList<Double>();
+		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+		   		
+		    	double data = this.runNr2itNr2ana.get(runNr).get(iteration).getNumberOfCarLegs();
+		   		memValues.add(data);
+		   		
+		   		bw.write(";" + String.valueOf(data));
+		   	}
+		   	bw.write(";" + getAverage(memValues).toString());
+		   	bw.write(";" + getMin(memValues).toString());
+		   	bw.write(";" + getMax(memValues).toString());
+	        bw.newLine();
+	    }
+
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}		
+	}
+	
+	public void writeMissedBusTrips(String outputPath) {
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "missedBusTrips.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "ITERATION;NumberOfBuses;Fare (AUD)";
+	    bw.write(zeile1);
+	    
+	    int iterations = 0;
+	    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+	    	bw.write(";MissedBusTrips_RunNr_" + runNr.toString());
+	    	if (this.runNr2itNr2ana.get(runNr).size() != iterations && iterations != 0) {
+	    		throw new RuntimeException("Different number of iterations in different runs. Aborting...");
+	    	}
+	    }
+	    
+	    bw.write(";AVG;MIN;MAX");
+	    
+	    bw.newLine();
+	    
+	    // ..........
+	    
+    	Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
+    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
+		    bw.write(iteration + ";" + firstRunItNr2ana.get(iteration).getNumberOfBuses() + ";" + firstRunItNr2ana.get(iteration).getFare() * (-1));
+		    List<Double> memValues = new ArrayList<Double>();
+		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+		   		
+		    	double data = this.runNr2itNr2ana.get(runNr).get(iteration).getNumberOfMissedBusTrips();
+		   		memValues.add(data);
+		   		
+		   		bw.write(";" + String.valueOf(data));
+		   	}
+		   	bw.write(";" + getAverage(memValues).toString());
+		   	bw.write(";" + getMin(memValues).toString());
+		   	bw.write(";" + getMax(memValues).toString());
+	        bw.newLine();
+	    }
+
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}		
+	}
+	
+	public void writeAvgT0minusTActDivByT0perCarTrip(String outputPath) {
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "avgT0minusTActDivByT0perCarTrip.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "ITERATION;NumberOfBuses;Fare (AUD)";
+	    bw.write(zeile1);
+	    
+	    int iterations = 0;
+	    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+	    	bw.write(";avgT0minusTActDivByT0perCarTrip_RunNr_" + runNr.toString());
+	    	if (this.runNr2itNr2ana.get(runNr).size() != iterations && iterations != 0) {
+	    		throw new RuntimeException("Different number of iterations in different runs. Aborting...");
+	    	}
+	    }
+	    
+	    bw.write(";AVG;MIN;MAX");
+	    
+	    bw.newLine();
+	    
+	    // ..........
+	    
+    	Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
+    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
+		    bw.write(iteration + ";" + firstRunItNr2ana.get(iteration).getNumberOfBuses() + ";" + firstRunItNr2ana.get(iteration).getFare() * (-1));
+		    List<Double> memValues = new ArrayList<Double>();
+		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+		   		
+		    	double data = this.runNr2itNr2ana.get(runNr).get(iteration).getAvgT0MinusTActDivByT0perTrip();
+		   		memValues.add(data);
+		   		
+		   		bw.write(";" + String.valueOf(data));
+		   	}
+		   	bw.write(";" + getAverage(memValues).toString());
+		   	bw.write(";" + getMin(memValues).toString());
+		   	bw.write(";" + getMax(memValues).toString());
+	        bw.newLine();
+	    }
+
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}		
+	}
 	
 	private Double getMin(List<Double> memValues) {
 		double min = Double.POSITIVE_INFINITY;
@@ -243,7 +431,7 @@ public class ExtItOutputAnalyzer {
 
 	    for (Double d : this.fares){
 	    	String fare = String.valueOf(-1 * d);
-	    	bw.write(" ; " + fare);
+	    	bw.write(";" + fare);
 	    }
 	    
 	    bw.newLine();
@@ -252,7 +440,7 @@ public class ExtItOutputAnalyzer {
 	    	
 		    Map<Double, Integer> fare2frequency = getFare2frequency(nrOfBuses);
 		    for (Double fare : this.fares){
-		    	bw.write(" ; " + fare2frequency.get(fare).toString());
+		    	bw.write(";" + fare2frequency.get(fare).toString());
 		    }
 	    	bw.newLine();
 	    }
@@ -333,7 +521,7 @@ public class ExtItOutputAnalyzer {
 	    bw.write("Number of buses");
 	    for (Double d : this.fares){
 	    	String fare = String.valueOf(-1 * d);
-	    	bw.write(" ; " + fare);
+	    	bw.write(";" + fare);
 	    }
 	    
 	    bw.newLine();
@@ -348,7 +536,7 @@ public class ExtItOutputAnalyzer {
 		    			fareCounter++;
 		    		}
 		    	}
-		    	bw.write(" ; " + fareCounter);
+		    	bw.write(";" + fareCounter);
 		    }
 	    	bw.newLine();
 	    }
@@ -397,7 +585,7 @@ public class ExtItOutputAnalyzer {
 
 	    bw.write("Fare (AUD)");
 	    for (Integer nrOfBuses : this.numberOfBuses){
-	    	bw.write(" ; " + nrOfBuses);
+	    	bw.write(";" + nrOfBuses);
 	    }
 	    
 	    bw.newLine();
@@ -414,7 +602,7 @@ public class ExtItOutputAnalyzer {
 		    			busNrCounter++;
 		    		}
 		    	}
-		    	bw.write(" ; " + busNrCounter);
+		    	bw.write(";" + busNrCounter);
 		    }
 	    	bw.newLine();
 	    }

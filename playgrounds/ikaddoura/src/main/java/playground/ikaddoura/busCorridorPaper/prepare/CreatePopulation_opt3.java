@@ -64,7 +64,7 @@ public class CreatePopulation_opt3 implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(this.population, scenario.getNetwork());
-		populationWriter.write("/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/opt3/input_opt3/population_opt3.xml");
+		populationWriter.write("/Users/Ihab/Documents/workspace/shared-svn/studies/ihab/opt3/input_opt3/population_opt3_20000.xml");
 
 	}
 
@@ -75,8 +75,8 @@ public class CreatePopulation_opt3 implements Runnable {
 	}
 	
 	private void generatePopulation() {
-		createCommuters(3500);
-		createNonCommuters(6500);
+		createCommuters(7000);
+		createNonCommuters(13000);
 	}
 
 	private void createCommuters(int quantity) {

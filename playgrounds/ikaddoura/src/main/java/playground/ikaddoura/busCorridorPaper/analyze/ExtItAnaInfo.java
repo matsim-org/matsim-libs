@@ -42,6 +42,7 @@ public class ExtItAnaInfo {
 	private double noValidPlanScore;
 	private double avgT0MinusTActPerPerson;
 	private double t0MinusTActSum;
+	private double avgT0MinusTActDivByT0perTrip;
 	
 	private double avgWaitingTimeAll;
 	private double avgWaitingTimeNotMissing;
@@ -156,6 +157,12 @@ public class ExtItAnaInfo {
 	}
 	public void setNumberOfNotMissedBusTrips(double numberOfNotMissedBusTrips) {
 		this.numberOfNotMissedBusTrips = numberOfNotMissedBusTrips;
+	}
+	public double getAvgT0MinusTActDivByT0perTrip() {
+		return avgT0MinusTActDivByT0perTrip;
+	}
+	public void setAvgT0MinusTActDivByT0perTrip(double t0MinusTActDivByT0perTrip) {
+		this.avgT0MinusTActDivByT0perTrip = t0MinusTActDivByT0perTrip;
 	}
 	
 }
