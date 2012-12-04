@@ -138,8 +138,11 @@ public class GeospatialEventFilter implements EventFilter {
 
 	private boolean containsLink(Id linkId) {
 		Link link = this.network.getLinks().get(linkId);
-		Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
-		return this.doFeaturesContainCoordinate(coordinate);
+		if (link != null){
+			Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
+			return this.doFeaturesContainCoordinate(coordinate);
+		}
+		return false;
 	}
 
 
