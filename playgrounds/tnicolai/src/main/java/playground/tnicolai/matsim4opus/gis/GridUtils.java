@@ -34,19 +34,19 @@ public class GridUtils {
 	private static final Logger log = Logger.getLogger(GridUtils.class);
 	
 	/**
-	 * @param shpFile
-	 * @param srid gives the spatial reference id for the shapefile
-	 * @return
+	 * 
+	 * @param shapeFile
+	 * @return Geometry determines the scenario boundary for the accessibility measure
 	 */
-	public static Geometry getBoundary(String shpFile, int srid){
+	public static Geometry getBoundary(String shapeFile){
 		
 		try{
 			// get boundaries of study area
-			Set<Feature> featureSet = FeatureSHP.readFeatures(shpFile);
+			Set<Feature> featureSet = FeatureSHP.readFeatures(shapeFile);
 			log.info("Extracting boundary of the shape file ...");
 			Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
-			boundary.setSRID( srid );
-			log.warn("Using SRID: " + srid);
+			// boundary.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
+			// log.warn("Using SRID: " + srid);
 			log.info("Done extracting boundary ...");
 			
 			return boundary;
@@ -59,13 +59,14 @@ public class GridUtils {
 	}
 	
 	/**
+	 * creates measuring points for accessibility computation
 	 * 
 	 * @param <T>
 	 * @param gridSize
 	 * @param boundary
 	 * @return
 	 */
-	public static ZoneLayer<Id> createGridLayerByGridSizeByShapeFile(double gridSize, Geometry boundary, int srid) {
+	public static ZoneLayer<Id> createGridLayerByGridSizeByShapeFile(double gridSize, Geometry boundary) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -104,7 +105,7 @@ public class GridUtils {
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-					polygon.setSRID( srid ); 
+					// polygon.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
 					
 					Zone<Id> zone = new Zone<Id>(polygon);
 					zone.setAttribute( new IdImpl( setPoints ) );
@@ -124,6 +125,7 @@ public class GridUtils {
 	}
 	
 	/**
+	 * creates measuring points for accessibility computation
 	 * 
 	 * @param <T>
 	 * @param gridSize
@@ -131,7 +133,7 @@ public class GridUtils {
 	 * @param boundary
 	 * @return
 	 */
-	public static ZoneLayer<Id> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox, int srid) {
+	public static ZoneLayer<Id> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -176,7 +178,7 @@ public class GridUtils {
 					// Linear Ring defines an artificial zone
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
-					polygon.setSRID( srid ); 
+					// polygon.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
 					
 					Zone<Id> zone = new Zone<Id>(polygon);
 					zone.setAttribute( new IdImpl( setPoints ) );
@@ -198,11 +200,10 @@ public class GridUtils {
 	/**
 	 * Converting zones (or zone centroids) of type ActivityFacilitiesImpl into a ZoneLayer
 	 * 
-	 * @param facility
-	 * @param srid
-	 * @return
+	 * @param facility ActivityFacilitiesImpl
+	 * @return ZoneLayer<Id>
 	 */
-	public static ZoneLayer<Id> convertActivityFacilities2ZoneLayer(ActivityFacilitiesImpl facility, int srid){
+	public static ZoneLayer<Id> convertActivityFacilities2ZoneLayer(ActivityFacilitiesImpl facility){
 		
 		int setPoints = 0;
 		
@@ -219,7 +220,7 @@ public class GridUtils {
 			Coord coord = af.getCoord();
 			// Point defines the artificial zone centroid
 			Point point = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-			point.setSRID(srid);
+			// point.setSRID(srid); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
 			
 			Zone<Id> zone = new Zone<Id>(point);
 			zone.setAttribute( af.getId() );
@@ -240,7 +241,11 @@ public class GridUtils {
 	}
 	
 	/**
-	 * @param boundary
+	 * returns a spatial grid for a given geometry (e.g. shape file) with a given grid size
+	 * 
+	 * @param gridSize side length of the grid
+	 * @param boundary a boundary, e.g. from a shape file
+	 * @return SpatialGrid storing accessibility values
 	 */
 	public static SpatialGrid createSpatialGridByShapeBoundary(double gridSize, Geometry boundary) {
 		Envelope env = boundary.getEnvelopeInternal();
@@ -253,9 +258,10 @@ public class GridUtils {
 	}
 
 	/**
+	 * stores measured accessibilities in a file
 	 * 
-	 * @param grid
-	 * @param fileName
+	 * @param grid SpatialGrid containing measured accessibilities
+	 * @param fileName output file
 	 */
 	public static void writeSpatialGridTable(SpatialGrid grid, String fileName){
 		
@@ -270,10 +276,11 @@ public class GridUtils {
 	}
 
 	/**
+	 * stores measured accessibilities as a kmz file for google earth
 	 * 
-	 * @param measuringPoints
-	 * @param grid
-	 * @param fileName
+	 * @param measuringPoints cell centroid (projected coordinate using a srid; spatial reference id)
+	 * @param grid side length of the grid
+	 * @param fileName output file
 	 */
 	public static void writeKMZFiles(ZoneLayer<Id> measuringPoints, SpatialGrid grid, String fileName) {
 		log.info("Writing Google Erath file " + fileName + " ...");
@@ -295,6 +302,14 @@ public class GridUtils {
 		log.info("... done!");
 	}
 	
+	/**
+	 * consistency checker for conversion from 
+	 * ActivityFacilitiesImpl into ZoneLayer<Id> structure
+	 * 
+	 * @param facility ActivityFacilitiesImpl
+	 * @param layer ZoneLayer<Id>
+	 * @return true if no inconsistency found, else false
+	 */
 	private static boolean checkConversion(ActivityFacilitiesImpl facility, ZoneLayer<Id> layer){
 		
 		boolean isEqual = true;

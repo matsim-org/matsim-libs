@@ -27,6 +27,8 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	public static final String PROJECT_NAME = "projectName";
 	
+	public static final String IS_PARCEL_MODE = "isParcelMode";
+	
 	public static final String POPULATION_SAMPLING_RATE = "populationSampleRate";
 	
 	public static final String YEAR = "year";
@@ -54,6 +56,8 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	public static final String IS_BACKUP_RUN_DATA = "isBackup";
 	
 	private String projectName;
+	
+	private boolean isParcel;
 	
 	private double populationSampleRate;
 	
@@ -109,6 +113,17 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 		return this.projectName;
 	}
 
+	public void setSpatialUnitFlag(String spatialUnit){
+		if(spatialUnit.equalsIgnoreCase("parcel"))
+			this.isParcel = true;
+		else if(spatialUnit.equalsIgnoreCase("zone"))
+			this.isParcel = false;
+	}
+	
+	public boolean isParcelMode(){
+		return this.isParcel;
+	}
+	
 	public void setPopulationSampleRate(double sampleRate){
 		this.populationSampleRate = sampleRate;
 	}

@@ -72,7 +72,7 @@ public class JAXBUnmaschalV3 extends MatsimJaxbXmlParser{
 		// Java representation of the schema file.
 		MatsimConfigType matsimConfig = null;
 		
-		log.info("Staring unmaschalling MATSim configuration from: " + matsimConfigFile );
+		log.info("Unmaschalling MATSim configuration from: " + matsimConfigFile );
 		log.info("...");
 		try{
 			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
@@ -167,7 +167,7 @@ public class JAXBUnmaschalV3 extends MatsimJaxbXmlParser{
 	@Override
 	public void readFile(String filename) throws JAXBException, SAXException,
 			ParserConfigurationException, IOException {
-		throw new UnsupportedOperationException("Use unmaschalMATSimConfig() method");
+		throw new UnsupportedOperationException("Use unmaschalMATSimConfig()");
 	}
 
 }

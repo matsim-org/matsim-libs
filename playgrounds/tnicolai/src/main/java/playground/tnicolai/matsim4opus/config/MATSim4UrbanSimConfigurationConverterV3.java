@@ -153,7 +153,6 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 			initInputPlansFile(matsimParameter);
 			initControler(matsimParameter);
 			initPlanCalcScore(matsimParameter);
-			// initSimulation(); // tnicolai: this is replaced by "initQSim"
 			initStrategy(matsimParameter);
 			initPlanCalcRoute();
 			initQSim();
@@ -168,8 +167,9 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 	private void initExternalMATSimConfig(ConfigType matsimParameter){
 		String standardMATSimConfig = matsimParameter.getMatsimConfig().getInputFile();
 		if(standardMATSimConfig != null && Paths.pathExsits(standardMATSimConfig)){
-			log.info("Initializing MATSim from standard MATSim config file: " + standardMATSimConfig);
+			log.info("Initializing MATSim settings from external MATSim config: " + standardMATSimConfig);
 			scenario = (ScenarioImpl)ScenarioUtils.createScenario(ConfigUtils.loadConfig( standardMATSimConfig.trim() ));
+			log.info("NOTE: Some external config settigs can be overwritten by UrbanSim settings from the travel model configuration section!");
 		}
 		else{
 			log.info("Creating an empty MATSim scenario.");
@@ -191,7 +191,7 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 	}
 	
 	/**
-	 * store matsim4urbansim parameter in MATSim config.Param()
+	 * Preparing MATSim4UrbanSim to store UrbanSim settings in internal modules.
 	 * 
 	 * @param matsim4UrbanSimParameter
 	 */
@@ -236,6 +236,7 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		boolean backupRunData 	= matsim4UrbanSimParameter.getUrbansimParameter().isBackupRunData();
 		String testParameter 	= matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
 		
+		// set parameter in module 
 		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
 		module.setProjectName(projectName);
 		module.setPopulationSampleRate(populationSamplingRate);
@@ -309,15 +310,15 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		boolean computeCellBasedAccessibilityNetwork   = false;
 		boolean computeCellbasedAccessibilityShapeFile = false;
 		// if cell-based accessibility is enabled, check whether a shapefile is given 
-		// (cell-based shape file computation enabled) or not (cell-based network computation enabled) 
 		if(computeCellBasedAccessibility){ 
-			if(shapeFile == null)
+			if(shapeFile == null) // since no shape file found, accessibility computation is applied on the area covering the network
 				computeCellBasedAccessibilityNetwork   = true;
 			else
 				computeCellbasedAccessibilityShapeFile = true;
 		}
-		double timeOfADay						= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getTimeOfADay();
+		double timeOfDay						= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getTimeOfADay();
 
+		// set parameter in module 
 		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
 		module.setAgentPerformance(computeAgentPerformanceFeedback);
 		module.setZone2ZoneImpedance(computeZone2ZoneImpedance);
@@ -332,15 +333,15 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		module.setBoundingBoxBottom(boundingBoxBottom);
 		module.setBoundingBoxRight(boundingBoxRight);
 		module.setBoundingBoxTop(boundingBoxTop);
-		module.setTimeOfADay(timeOfADay);
+		module.setTimeOfDay(timeOfDay);
 		
 		// view results
 		log.info("MATSim4UrbanSimControler settings:");
 		log.info("Compute Agent-performance: " + module.isAgentPerformance() );
 		log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
 		log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
-		log.info("Compute Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
-		log.info("Compute Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
+		log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
+		log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
 		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
 		log.info("Use (Custom) Network Boundaries: " + module.isUseCustomBoundingBox() );
 		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
@@ -348,7 +349,7 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
 		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
 		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
-		log.info("Time of a day: " + module.getTimeOfADay() );
+		log.info("Time of day: " + module.getTimeOfDay() );
 	}
 	
 	private void initAccessibilityParameter(Matsim4UrbansimType matsim4UrbanSimParameter){
@@ -379,9 +380,11 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		else
 			logitScaleParameter = matsim4UrbanSimParameter.getAccessibilityParameter().getLogitScaleParameter();		
 		// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
-		assert(logitScaleParameter == 1.0);
-		if(logitScaleParameter != 1.0)
-			log.error("Set the accessibility scale parameter (logit scale parameter) to 1! This run will continue with your selected parameter: beta scale = " + logitScaleParameter);
+		if(logitScaleParameter != 1.0){
+			log.error("You are using a logit scale parameter != 1! The default is 1.");
+			log.error("(Different values may cause conceptual problems during paper writing.)");
+			log.error(" This run proceeds with a logit scale parameter = " + logitScaleParameter);
+		}
 		log.info("The logit scale parameter is used for accessibility computation only. It does not set scale parameter (beta brain) inside MATSim that is used for the traffic simulation!");
 		
 		if(useMATSimCarParameter){
@@ -457,6 +460,7 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 			betaWalkLnTC	= matsim4UrbanSimParameter.getAccessibilityParameter().getBetaWalkLnTravelCost();
 		}
 		
+		// set parameter in module 
 		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
 		module.setAccessibilityDestinationSamplingRate(opportunitySamplingRate);
 		module.setUseLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
@@ -544,11 +548,19 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) scenario.getConfig().getModule(NetworkConfigGroup.GROUP_NAME);
-		if(!networkFile.isEmpty())
+		// the MATSim4UrbanSim config contains a network file
+		if(!networkFile.isEmpty()){
+			// check if a network was already set by an external matsim config.
+			if(networkCG.getInputFile() != null && !networkCG.getInputFile().isEmpty()){
+				log.warn("A network file is already set by an external matsim config: " + networkCG.getInputFile());
+				log.warn("It will be replaced by the MATSim4UrbanSim network file: " + networkFile);
+				log.warn("To avoid this, keep the network parameter in MATSim4UrbanSim empty!");
+			}
 			// set MATSim4UrbanSim network
 			networkCG.setInputFile( networkFile );
-		else if (networkCG.getInputFile().isEmpty()){
-			log.error("Missing MATSim network! The network must be be specified either directly in the MATSim4UrbanSim configuration or in an external MATSim configuration.");
+		}
+		else if (networkCG.getInputFile() == null || networkCG.getInputFile().isEmpty()){
+			log.error("Missing MATSim network! The network must be specified either directly in the MATSim4UrbanSim configuration or in an external MATSim configuration.");
 			System.exit( InternalConstants.NO_MATSIM_NETWORK );
 		}
 			
@@ -563,7 +575,7 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 	 * @param matsimParameter
 	 */
 	private void initInputPlansFile(ConfigType matsimParameter){
-		log.info("Looking for warm or hot start...");
+		log.info("Checking warm or hot start...");
 		// get plans file for hot start
 		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
 		// get plans file for warm start 
@@ -626,9 +638,6 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		controlerCG.setLastIteration( lastIteration);
 		controlerCG.setOutputDirectory( InternalConstants.MATSIM_4_OPUS_OUTPUT );
 		
-//		HashSet<String> hs = new HashSet<String>();
-//		hs.add("otfvis");
-//		controlerCG.setSnapshotFormat(Collections.unmodifiableSet(hs));
 		controlerCG.setSnapshotFormat(Arrays.asList("otfvis")); // otfvis dosn't work ???
 		controlerCG.setWriteSnapshotsInterval( 0 ); // 0 = disabling snapshots
 
@@ -762,21 +771,19 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		scenario.getConfig().strategy().addStrategySettings(reroute);
 		
 		// tnicolai: deactivate only for nectar
-//		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
-//		changeSingleLegMode.setModuleName("ChangeSingleLegMode");		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
-//		changeSingleLegMode.setProbability( 0.1 ); // tnicolai: make configurable via "matsimParameter", should be something like 0.1
-//		changeSingleLegMode.setDisableAfter(disableStrategyAfterIteration);
-//		scenario.getConfig().strategy().addStrategySettings(changeSingleLegMode);
-//		// this sets some additional modes. by default car and pt is available
-//		scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
+		StrategyConfigGroup.StrategySettings changeSingleLegMode = new StrategyConfigGroup.StrategySettings(IdFactory.get(4));
+		changeSingleLegMode.setModuleName("ChangeSingleLegMode");		// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
+		changeSingleLegMode.setProbability( 0.1 ); // tnicolai: make configurable via "matsimParameter", should be something like 0.1
+		changeSingleLegMode.setDisableAfter(disableStrategyAfterIteration);
+		scenario.getConfig().strategy().addStrategySettings(changeSingleLegMode);
+		// this sets some additional modes. by default car and pt is available
+		scenario.getConfig().setParam("changeLegMode", "modes", TransportMode.car +","+ TransportMode.pt +"," + TransportMode.bike + "," + TransportMode.walk);
 		
 		log.info("StrategyConfigGroup settings:");
 		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter() ); 
 		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability() );
 		log.info("Strategy_3: " + reroute.getModuleName() + " Probability: " + reroute.getProbability() + " Disable After Itereation: " + reroute.getDisableAfter() );
-		// tnicolai: deactivate only for nectar
-		// log.info("Strategy_4: " + changeSingleLegMode.getModuleName() + " Probability: " + changeSingleLegMode.getProbability() + " Disable After Itereation: " + changeSingleLegMode.getDisableAfter() );
-		log.warn("activate changeSingleLegMode after nectar!");
+		log.info("Strategy_4: " + changeSingleLegMode.getModuleName() + " Probability: " + changeSingleLegMode.getProbability() + " Disable After Itereation: " + changeSingleLegMode.getDisableAfter() );
 		log.info("... done!");
 	}
 	
@@ -789,15 +796,12 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
 		scenario.getConfig().plansCalcRoute().setBikeSpeed(4.16666666); // 4.16666666m/s corresponds to 15 km/h
 		// tnicolai: deactivate only for nectar
-		// scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
-		// scenario.getConfig().plansCalcRoute().setTeleportedModeFreespeedFactor(TransportMode.pt, 2); // tnicolai: if this is enabled the router uses freespeed car * freespeed factor instead of PtSpeed!!!
+		 scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
 
 		log.info("PlanCalcRouteGroup settings:");							 
 		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
 		log.info("Bike Speed: " + scenario.getConfig().plansCalcRoute().getBikeSpeed() );
-		// tnicolai: deactivate only for nectar
-		// log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
-		log.warn("activate Pt Speed after nectar!");
+		log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
 		log.info("Beeline Distance Factor: " + scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor() );
 		
 		log.info("...done!");

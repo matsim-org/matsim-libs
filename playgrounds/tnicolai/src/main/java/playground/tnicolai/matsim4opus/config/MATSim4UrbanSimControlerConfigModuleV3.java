@@ -57,7 +57,7 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
     
     private double boundingBoxBottom;
     
-    private double timeOfADay;
+    private double timeOfDay;
     
     private boolean isColdStart;
     
@@ -178,12 +178,12 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
         this.boundingBoxBottom = value;
     }
     
-    public void setTimeOfADay(double time){
-    	this.timeOfADay = time;
+    public void setTimeOfDay(double time){
+    	this.timeOfDay = time;
     }
     
-    public double getTimeOfADay(){
-    	return this.timeOfADay;
+    public double getTimeOfDay(){
+    	return this.timeOfDay;
     }
 
     public boolean isColdStart(){

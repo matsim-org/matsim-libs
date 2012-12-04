@@ -95,7 +95,7 @@ public class InternalConstants {
 	public static final String FILE_TYPE_TAB = ".tab";
 	public static final String FILE_TYPE_CSV = ".csv";
 	public static final String FILE_TYPE_DBL = ".dbl";
-	public static final String FILE_TYPE_ESRI = ".esri";
+	public static final String FILE_TYPE_ESRI= ".esri";
 	public static final String FILE_TYPE_GZ  = ".gz";
 	public static final String FILE_TYPE_XML = ".xml";
 	public static final String FILE_TYPE_KMZ = ".kmz";
@@ -170,9 +170,6 @@ public class InternalConstants {
 	public static final String V3_XSD_FILE_NAME = "matsim4urbansim_v3.xsd";
 	public static final String JAXB_PARSER_PACKAGE_NAME = "matsim4urbansim.jaxbconfig";
 	
-	/** MATSim properties */
-	public static final String MATSIM_PROPERTIES_FILE = "matsim.properties";
-	
 	/** MATSim config modules */
 	public static final String MATSIM_CONFIG_MODULE_CONTROLLER = "matsimControler";
 	public static final String MATSIM_CONFIG_MODULE_PLANS = "plans";
@@ -182,11 +179,12 @@ public class InternalConstants {
 	public static final String MATSIM_CONFIG_PARAMETER_TEMP_DIRECTORY = "tempDirectory";
 	
 	/** exit codes */
-	public static final int NOT_VALID_PATH		= 0;
-	public static final int MATSIM_PROPERTIES_FILE_NOT_FOUND = 1;
-	public static final int EXCEPTION_OCCURED	= 2;
-	public static final int UNMARSCHALLING_FAILED = 3;
-	public static final int NO_MATSIM_NETWORK = 4;
+	public static final int NOT_VALID_PATH					= 0;
+	public static final int MATSIM_PROPERTIES_FILE_NOT_FOUND= 1;
+	public static final int EXCEPTION_OCCURED				= 2;
+	public static final int UNMARSCHALLING_FAILED 			= 3;
+	public static final int NO_MATSIM_NETWORK 				= 4;
+	public static final int INCOMPLETE_PARAMETER_SETTINGS	= 5;
 	
 	/** MATSim 4 UrbanSim (urbansimParameter) parameter names **/
 	public static final String URBANSIM_PARAMETER = "urbansimParameter";
@@ -228,15 +226,7 @@ public class InternalConstants {
 	public static final String BETA_WALK_LN_TRAVEL_COSTS = "betaWalkTravelCostPower2";
 	public static final String BETA_WALK_TRAVEL_COSTS_POWER = "betaWalkLnTravelCost";
 	
-	/** Spatial IDs and spatial conversion factors */
-	
-	public static final String PROJECT_NAME_BRUSSELS_ZONE	= "brussels_zone";
-	public static final String PROJECT_NAME_ZURICH_PARCEL 	= "zurich_parcel";
-	public static final String PROJECT_NAME_SEATTLE_PARCEL	= "seattle_parcel";
-	public static final String PROJECT_NAME_PSRC_PARCEL		= "psrc_parcel";	
-	public static final int SRID_WASHINGTON_NORTH = 2926;	// srid 2285 also worked, but was last updated in 2001 instead of 2007
-	public static final int SRID_SWITZERLAND = 21781;		// 
-	public static final int SRID_BELGIUM = 31300;			// this is the EPSG id of Belgium (old id 31300, new id 3447)
+	/** Spatialconversion factors */
 	public static final double FEET_IN_METER_CONVERSION_FACTOR = 0.3048; 			// this means 1ft corresponds to 0.348m
 	public static final double METER_IN_FEET_CONVERSION_FACTOR = 3.280839895013124;	// here 1 meter corresponds to 3.28084ft
 	
@@ -247,12 +237,6 @@ public class InternalConstants {
 	public static final String COLD_START = "cold_start";
 	public static final String WARM_START = "warm_start";
 	public static final String HOT_START = "hot_start";
-	
-	/** MATSim4OPUS TEST data folder structure */
-	public static final String MATSIM_TEST_DATA_WARM_START_URBANSIM_OUTPUT = "warmstart/urbanSimOutput";
-	public static final String MATSIM_TEST_DATA_WARM_START_INPUT_PLANS = "warmstart/inputPlan";
-	public static final String MATSIM_TEST_DATA_WARM_START_NETWORK = "warmstart/network";
-	public static final String MATSIM_TEST_DATA_DEFAULT_URBANSIM_OUTPUT = "urbanSimOutput";
 	
 }
 

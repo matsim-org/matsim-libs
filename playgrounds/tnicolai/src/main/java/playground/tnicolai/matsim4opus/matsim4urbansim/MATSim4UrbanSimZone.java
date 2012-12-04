@@ -179,8 +179,6 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	 * @param controler
 	 */
 	void addControlerListener(ActivityFacilitiesImpl zones, Controler controler) {
-		
-		int srid = InternalConstants.SRID_BELGIUM;
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
@@ -194,7 +192,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		
 		if(computeZoneBasedAccessibilities){
 
-			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones, srid);
+			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones);
 			
 			// creates zone based table of log sums
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3( this,
@@ -216,8 +214,7 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			if(computeParcelBasedAccessibilitiesNetwork){
 				fileExtension = ParcelBasedAccessibilityControlerListenerV3.NETWORK;
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-																			   nwBoundaryBox.getBoundingBox(),
-																			   srid);
+																			   nwBoundaryBox.getBoundingBox());
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				carGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				bikeGrid = new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
@@ -225,10 +222,9 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 			}
 			else{
 				fileExtension = ParcelBasedAccessibilityControlerListenerV3.SHAPE_FILE;
-				Geometry boundary = GridUtils.getBoundary(shapeFile, srid);
+				Geometry boundary = GridUtils.getBoundary(shapeFile);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-																				   boundary, 
-																				   srid);
+																				   boundary);
 				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				carGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				bikeGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
