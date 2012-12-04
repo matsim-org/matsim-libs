@@ -22,6 +22,9 @@ package air.analysis.lhi;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 
 
@@ -37,12 +40,19 @@ public class CreateLegHistogramImproved {
 				 "1811"
 				};
 		
+		String vehiclesFile = "/home/dgrether/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/flight_transit_vehicles.xml";
+		Vehicles veh = VehicleUtils.createVehiclesContainer();
+		VehicleReaderV1 vreader = new VehicleReaderV1(veh);
+		vreader.readFile(vehiclesFile);
+		
 		for (int i = 0; i < runs.length; i++){
 			String rundir = baseDirectory + "runs-svn/run" + runs[i] + "/";
 			String eventsFilename = rundir + "ITERS/it.0/" + runs[i] + ".0.events.xml.gz";
 			String txtOutput = rundir + "ITERS/it.0/" + runs[i] + ".0.leg_histogram_improved.csv";
 			String pngOutput = rundir + "ITERS/it.0/" + runs[i] + ".0.leg_histogram_improved_all.png";
 			String pngOutputPt = rundir + "ITERS/it.0/" + runs[i] + ".0.leg_histogram_improved_pt.png";
+			String txtOutputVeh = rundir + "ITERS/it.0/" + runs[i] + ".0.vehicle_histogram_improved.csv";
+			String pngOutputVeh = rundir + "ITERS/it.0/" + runs[i] + ".0.vehicle_histogram_improved_all.png";
 
 //			eventsFilename = "/home/dgrether/data/work/matsim/matsimOutput/flight_model_one_line/ITERS/it.0/0.events.xml.gz";
 //			txtOutput = "/home/dgrether/data/work/matsim/matsimOutput/flight_model_one_line/ITERS/it.0/0.leg_histogram_improved.csv";
@@ -51,11 +61,15 @@ public class CreateLegHistogramImproved {
 			
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			LegModeHistogramImproved handler = new LegModeHistogramImproved();
+			VehicleSeatsModeHistogramImproved vehHisto = new VehicleSeatsModeHistogramImproved(veh);
 			eventsManager.addHandler(handler);
+			eventsManager.addHandler(vehHisto);
 			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 			reader.readFile(eventsFilename);
 			handler.write(txtOutput);
 			handler.writeGraphic(pngOutput);
+			vehHisto.write(txtOutputVeh);
+			vehHisto.writeGraphic(pngOutputVeh);
 //			handler.writeGraphic(pngOutputPt, "pt");
 			
 		}

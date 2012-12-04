@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -34,16 +35,17 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 import air.analysis.modehistogram.AbstractModeHistogram;
-import air.analysis.modehistogram.ModeHistogramUtils;
 import air.analysis.modehistogram.ModeHistogramData;
+import air.analysis.modehistogram.ModeHistogramUtils;
 
 /**
  * Improved version of LegHistogram - no maximal time bin size - some additional data is collected as number of seats
@@ -52,11 +54,16 @@ import air.analysis.modehistogram.ModeHistogramData;
  * @author dgrether based on the implementation of mrieser in the org.matsim project
  * 
  */
-public class LegModeHistogramImproved extends AbstractModeHistogram implements
-		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class VehicleSeatsModeHistogramImproved extends AbstractModeHistogram implements
+		VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	public LegModeHistogramImproved() {
-		this(5 * 60);
+	private static final Logger log = Logger.getLogger(VehicleSeatsModeHistogramImproved.class);
+
+	private Map<Id, VehicleArrivesAtFacilityEvent> vehArrivesEventsByVehicleId = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
+	private Vehicles vehicles;
+	
+	public VehicleSeatsModeHistogramImproved(Vehicles vehicles) {
+		this(5 * 60, vehicles);
 	}
 
 	/**
@@ -67,33 +74,37 @@ public class LegModeHistogramImproved extends AbstractModeHistogram implements
 	 * @param nofBins
 	 *          The number of time bins for this analysis.
 	 */
-	public LegModeHistogramImproved(final int binSize) {
+	public VehicleSeatsModeHistogramImproved(final int binSize, Vehicles vehicles) {
 		super(binSize);
+		this.vehicles = vehicles;
 		reset(0);
 	}
 
 	@Override
 	public void reset(int iteration) {
+		this.vehArrivesEventsByVehicleId.clear();
 		super.resetIteration(iteration);
 	}
 
-	/* Implementation of EventHandler-Interfaces */
-
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
-		super.increase(event.getTime(), event.getLegMode());
+	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+		VehicleArrivesAtFacilityEvent arrivalEvent = this.vehArrivesEventsByVehicleId.get(event.getVehicleId());
+		if (arrivalEvent == null){
+			log.error("no arrival event for vehicle :  " + event.getVehicleId() + " assuming first arrival!");
+			return;
+		}
+		Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
+		int seats = vehicle.getType().getCapacity().getSeats();
+		super.increase(arrivalEvent.getTime(), seats, null);
+		super.decrease(event.getTime(), seats, null);
 	}
 
+	@Override
+	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+		this.vehArrivesEventsByVehicleId.put(event.getVehicleId(), event);
+		
+	}
 	
-	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
-		super.decrease(event.getTime(), event.getLegMode());
-	}
-
-	@Override
-	public void handleEvent(final AgentStuckEvent event) {
-		super.abort(event.getTime(), event.getLegMode());
-	}
 
 	/**
 	 * Writes the gathered data tab-separated into a text stream.
@@ -167,5 +178,6 @@ public class LegModeHistogramImproved extends AbstractModeHistogram implements
 		plot.setDomainAxis(new NumberAxis("time"));
 		return chart;
 	}
+
 
 }
