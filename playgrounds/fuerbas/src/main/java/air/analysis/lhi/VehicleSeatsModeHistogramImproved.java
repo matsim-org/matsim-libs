@@ -95,8 +95,8 @@ public class VehicleSeatsModeHistogramImproved extends AbstractModeHistogram imp
 		}
 		Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
 		int seats = vehicle.getType().getCapacity().getSeats();
-		super.increase(arrivalEvent.getTime(), seats, null);
-		super.decrease(event.getTime(), seats, null);
+		super.increase(event.getTime(), seats, null);
+		super.decrease(arrivalEvent.getTime(), seats, null);
 	}
 
 	@Override
