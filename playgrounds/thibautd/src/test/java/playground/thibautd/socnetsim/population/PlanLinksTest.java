@@ -31,12 +31,14 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
+
 /**
  * @author thibautd
  */
 public class PlanLinksTest {
 	@Test
-	public void testException() throws Exception {
+	public void testExceptionAdd() throws Exception {
 		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
 		Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
 		Plan p3 = new PlanImpl( new PersonImpl( new IdImpl( 3 ) ) );
@@ -63,5 +65,40 @@ public class PlanLinksTest {
 				"got no exception when associating two joint plans to one individual plan",
 				gotException);
 	}
+
+	@Test
+	public void testExceptionRemove() throws Exception {
+		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
+		Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
+		Plan p3 = new PlanImpl( new PersonImpl( new IdImpl( 3 ) ) );
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		jp1.put( p1.getPerson().getId() , p1 );
+		jp1.put( p2.getPerson().getId() , p2 );
+
+		// XXX should be tested independently on JPFactory!
+		JointPlanFactory.createJointPlan( jp1 );
+
+		// create a new joint plan with the same individual plan:
+		// this must result in a exception at removal
+		JointPlan wrongInstance = 
+			new JointPlan(
+					jp1,
+					false,
+					new HomogeneousScoreAggregator());
+
+		boolean gotException = false;
+		try {
+			JointPlanFactory.getPlanLinks().removeJointPlan( wrongInstance );
+		}
+		catch (PlanLinks.PlanLinkException e) {
+			gotException = true;
+		}
+
+		Assert.assertTrue(
+				"got no exception when associating two joint plans to one individual plan",
+				gotException);
+	}
+
 }
 

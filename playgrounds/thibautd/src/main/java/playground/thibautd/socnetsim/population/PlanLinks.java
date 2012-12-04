@@ -52,7 +52,7 @@ public class PlanLinks {
 	public void removeJointPlan(final JointPlan jointPlan) {
 		for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
 			JointPlan removed = jointPlans.remove( indivPlan ).get();
-			if (removed != jointPlan) throw new RuntimeException( removed+" differs from "+indivPlan );
+			if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
 		}
 	}
 
