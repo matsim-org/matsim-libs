@@ -62,9 +62,15 @@ public class PlanLinks {
 					indivPlan,
 					new WeakReference<JointPlan>(jointPlan) );
 			if (removed != null && removed.get() != jointPlan) {
-				throw new RuntimeException( removed+" was associated to "+indivPlan+
+				throw new PlanLinkException( removed+" was associated to "+indivPlan+
 						" while trying to associate "+jointPlan );
 			}
+		}
+	}
+
+	public static class PlanLinkException extends RuntimeException {
+		private PlanLinkException( final String msg ) {
+			super( msg );
 		}
 	}
 }

@@ -1,0 +1,67 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PlanLinksTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.thibautd.socnetsim.population;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+
+/**
+ * @author thibautd
+ */
+public class PlanLinksTest {
+	@Test
+	public void testException() throws Exception {
+		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
+		Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
+		Plan p3 = new PlanImpl( new PersonImpl( new IdImpl( 3 ) ) );
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		jp1.put( p1.getPerson().getId() , p1 );
+		jp1.put( p2.getPerson().getId() , p2 );
+
+		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		jp2.put( p1.getPerson().getId() , p1 );
+		jp2.put( p3.getPerson().getId() , p3 );
+
+		// XXX should be tested independently on JPFactory!
+		JointPlanFactory.createJointPlan( jp1 );
+		boolean gotException = false;
+		try {
+			JointPlanFactory.createJointPlan( jp2 );
+		}
+		catch (PlanLinks.PlanLinkException e) {
+			gotException = true;
+		}
+
+		Assert.assertTrue(
+				"got no exception when associating two joint plans to one individual plan",
+				gotException);
+	}
+}
+
