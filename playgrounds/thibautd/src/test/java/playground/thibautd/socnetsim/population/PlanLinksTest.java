@@ -19,10 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import java.lang.ref.WeakReference;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
@@ -132,6 +135,58 @@ public class PlanLinksTest {
 					JointPlanFactory.getPlanLinks().getJointPlan( p ),
 					jp2 );
 		}
+	}
+
+	@Test
+	@Ignore
+	// this fails... come back to it in case of memory leaks
+	// It may fail only because the assert is done while the GC is running...
+	public void testForgetting() throws Exception {
+		WeakReference<JointPlan> refToJp;
+
+		{
+			Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
+			Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
+
+			Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+			jp1.put( p1.getPerson().getId() , p1 );
+			jp1.put( p2.getPerson().getId() , p2 );
+
+			refToJp = new WeakReference<JointPlan>(
+					JointPlanFactory.createJointPlan( jp1 ) );
+		}
+
+		gc();
+		Assert.assertEquals(
+				"PlanLinks did not forget",
+				null,
+				refToJp.get());
+	}
+
+	@Test
+	public void testDoNotForgetTooEarly() throws Exception {
+		WeakReference<JointPlan> refToJp;
+
+		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
+		Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		jp1.put( p1.getPerson().getId() , p1 );
+		jp1.put( p2.getPerson().getId() , p2 );
+
+		refToJp = new WeakReference<JointPlan>(
+				JointPlanFactory.createJointPlan( jp1 ) );
+
+		gc();
+		Assert.assertNotNull(
+				"PlanLinks did forget while Plans are still referenced",
+				refToJp.get());
+	}
+
+	private static void gc() {
+		// trick to be sure the gc is run (need this to test the forgetting behavior)
+		WeakReference ref = new WeakReference<Object>( new Object() );
+		while (ref.get() != null) System.gc();
 	}
 }
 
