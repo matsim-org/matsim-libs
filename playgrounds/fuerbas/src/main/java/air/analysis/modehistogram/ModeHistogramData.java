@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgLegHistogramUtils
+ * HistogramData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,40 +19,17 @@
  * *********************************************************************** */
 package air.analysis.modehistogram;
 
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+public class ModeHistogramData {
+	final SortedMap<Integer, Integer> countsDep;
+	final SortedMap<Integer, Integer> countsArr;
+	public final SortedMap<Integer, Integer> countsStuck;
 
-/**
- * @author dgrether
- *
- */
-public final class ModeHistogramUtils {
-
-	static void increaseMapEntry(Map<Integer, Integer> map, Integer key){
-		Integer value = map.get(key);
-		if (value == null){
-			value = 0;
-		}
-		value++;
-		map.put(key, value);
+	public ModeHistogramData() {
+		this.countsDep = new TreeMap<Integer, Integer>();
+		this.countsArr = new TreeMap<Integer, Integer>();
+		this.countsStuck = new TreeMap<Integer, Integer>();
 	}
-	
-	static void add2MapEntry(Map<Integer, Integer> map, Integer key, Integer summand){
-		Integer value = map.get(key);
-		if (value == null){
-			value = 0;
-		}
-		value = value + summand;
-		map.put(key, value);
-	}
-	
-	
-	public static Integer getNotNullInteger(Map map, Object key){
-		Integer i = (Integer) map.get(key);
-		if (i == null) {
-			return Integer.valueOf(0);
-		}
-		return i;
-	}
-	
 }

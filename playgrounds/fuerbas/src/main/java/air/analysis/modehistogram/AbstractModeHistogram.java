@@ -35,7 +35,7 @@ public abstract class AbstractModeHistogram {
 
 	public static final String allModes = "all";
 
-	private final Map<String, HistogramModeData> data = new HashMap<String, HistogramModeData>();
+	private final Map<String, ModeHistogramData> data = new HashMap<String, ModeHistogramData>();
 	private int iteration = 0;
 	private final int binSize;
 	private Integer firstIndex;
@@ -49,14 +49,14 @@ public abstract class AbstractModeHistogram {
 	protected void resetIteration(final int iter) {
 		this.setIteration(iter);
 		this.getModeData().clear();
-		this.getModeData().put(allModes, new HistogramModeData());
+		this.getModeData().put(allModes, new ModeHistogramData());
 		this.setFirstIndex(null);
 		this.setLastIndex(null);
 	}
 
 	public abstract void write(final PrintStream stream);
 	
-	public abstract JFreeChart getGraphic(final HistogramModeData modeData, final String modeName);
+	public abstract JFreeChart getGraphic(final ModeHistogramData modeData, final String modeName);
 	/**
 	 * Writes the gathered data tab-separated into a text file.
 	 *
@@ -73,13 +73,18 @@ public abstract class AbstractModeHistogram {
 		write(stream);
 		stream.close();
 	}
+	
 
 	public void increase(double time_seconds, String mode){
+		this.increase(time_seconds, 1, mode);
+	}
+	
+	public void increase(double time_seconds, int count, String mode){
 		int index = getBinIndex(time_seconds);
-		ModeHistogramUtils.increaseMapEntry(this.getModeData().get(allModes).countsDep, index);
+		ModeHistogramUtils.add2MapEntry(this.getModeData().get(allModes).countsDep, index, count);
 		if (mode != null) {
-			HistogramModeData modeData = getDataForMode(mode);
-			ModeHistogramUtils.increaseMapEntry(modeData.countsDep, index);
+			ModeHistogramData modeData = getDataForMode(mode);
+			ModeHistogramUtils.add2MapEntry(modeData.countsDep, index, count);
 		}
 	}
 	
@@ -98,15 +103,20 @@ public abstract class AbstractModeHistogram {
 				index);
 	}
 
-	
-	public void decrease(double time_seconds, String mode){
+	public void decrease(double time_seconds, int count, String mode){
 		int index = this.getBinIndex(time_seconds);
-		ModeHistogramUtils.increaseMapEntry(this.getModeData().get(allModes).countsArr, index);
+		ModeHistogramUtils.add2MapEntry(this.getModeData().get(allModes).countsArr, index, count);
 		if (mode != null) {
-			HistogramModeData modeData = getDataForMode(mode);
-			ModeHistogramUtils.increaseMapEntry(modeData.countsArr, index);
+			ModeHistogramData modeData = getDataForMode(mode);
+			ModeHistogramUtils.add2MapEntry(modeData.countsArr, index, count);
 		}
 
+	}
+
+	
+	
+	public void decrease(double time_seconds, String mode){
+		this.decrease(time_seconds, 1, mode);
 	}
 
 	
@@ -114,7 +124,7 @@ public abstract class AbstractModeHistogram {
 		int index = this.getBinIndex(time_seconds);
 		ModeHistogramUtils.increaseMapEntry(this.getModeData().get(allModes).countsStuck, index);
 		if (mode != null) {
-			HistogramModeData modeData = getDataForMode(mode);
+			ModeHistogramData modeData = getDataForMode(mode);
 			ModeHistogramUtils.increaseMapEntry(modeData.countsStuck, index);
 		}
 	}
@@ -186,16 +196,16 @@ public abstract class AbstractModeHistogram {
 		return bin;
 	}
 
-	protected HistogramModeData getDataForMode(final String legMode) {
-		HistogramModeData modeData = this.getModeData().get(legMode);
+	protected ModeHistogramData getDataForMode(final String legMode) {
+		ModeHistogramData modeData = this.getModeData().get(legMode);
 		if (modeData == null) {
-			modeData = new HistogramModeData(); // +1 for all times out of our range
+			modeData = new ModeHistogramData(); // +1 for all times out of our range
 			this.getModeData().put(legMode, modeData);
 		}
 		return modeData;
 	}
 
-	public Map<String, HistogramModeData> getModeData() {
+	public Map<String, ModeHistogramData> getModeData() {
 		return data;
 	}
 
