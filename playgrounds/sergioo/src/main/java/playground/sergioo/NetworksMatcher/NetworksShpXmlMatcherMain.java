@@ -1,5 +1,7 @@
 package playground.sergioo.NetworksMatcher;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,15 +17,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.config.ConfigUtils;
 
+import playground.sergioo.NetworkBusLaneAdder.gui.NetworkTwoNodesPainter;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.InfiniteRegion;
@@ -46,13 +46,13 @@ public class NetworksShpXmlMatcherMain {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		Network networkLowResolution = getNetworkFromShapeFileLength(args[1]);
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
+		/*CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolution.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		new NetworkWriter(networkLowResolution).write("./data/forPieter.xml");
-		return;
-		/*Network networkHighResolution = scenario.getNetwork();
-		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", new NetworkNodesPainter(networkHighResolution, Color.BLACK, Color.CYAN), new NetworkNodesPainter(networkLowResolution, Color.BLACK, Color.CYAN));
+		return;*/
+		Network networkHighResolution = scenario.getNetwork();
+		LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", new NetworkTwoNodesPainter(networkHighResolution, Color.BLACK, new BasicStroke(), Color.CYAN), new NetworkTwoNodesPainter(networkLowResolution, Color.BLACK, new BasicStroke(), Color.CYAN));
 		windowHR.setVisible(true);
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
@@ -68,7 +68,7 @@ public class NetworksShpXmlMatcherMain {
 				e.printStackTrace();
 			}
 		matchingProcess.applyProperties(false);
-		System.out.println(networkHighResolution.getLinks().size()+" "+networkLowResolution.getLinks().size());*/
+		System.out.println(networkHighResolution.getLinks().size()+" "+networkLowResolution.getLinks().size());
 	}
 
 
