@@ -115,7 +115,8 @@ public class WeigthsNetworkWindow extends LayersWindow implements ActionListener
 			labels[i].setBorder(null);
 			labelsPanel.add(labels[i]);
 		}
-		infoPanel.add(labelsPanel, BorderLayout.CENTER);JPanel coordsPanel = new JPanel();
+		infoPanel.add(labelsPanel, BorderLayout.CENTER);
+		JPanel coordsPanel = new JPanel();
 		coordsPanel.setLayout(new GridLayout(1,2));
 		coordsPanel.setBorder(new TitledBorder("Coordinates"));
 		coordsPanel.add(lblCoords[0]);

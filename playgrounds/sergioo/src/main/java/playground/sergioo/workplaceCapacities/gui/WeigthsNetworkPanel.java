@@ -76,13 +76,17 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 				Coord coord = dataMPAreas.get(data.getKey().getSecond()).getCoord();
 				double[] point = new double[]{coord.getX(), coord.getY()};
 				coord = stopsBase.get(data.getKey().getFirst().toString());
-				double[] pointS = new double[]{coord.getX(), coord.getY()};
-				arrowsPainter.addLine(pointS, point);
-				float scale = 50;
-				if(data.getValue().getFirst())
-					arrowsPainter.addColor(new Color(-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,0,0));
-				else
-					arrowsPainter.addColor(new Color(-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,0));
+				if(coord==null)
+					System.out.println(data.getKey().getFirst().toString());
+				else {
+					double[] pointS = new double[]{coord.getX(), coord.getY()};
+					arrowsPainter.addLine(pointS, point);
+					float scale = 50;
+					if(data.getValue().getFirst())
+						arrowsPainter.addColor(new Color(-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,0,0));
+					else
+						arrowsPainter.addColor(new Color(-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,-0.5f*(new Double(Math.exp(-scale*data.getValue().getSecond()))).floatValue()+1f,0));
+				}
 			}
 		}
 		addLayer(new Layer(arrowsPainter));
