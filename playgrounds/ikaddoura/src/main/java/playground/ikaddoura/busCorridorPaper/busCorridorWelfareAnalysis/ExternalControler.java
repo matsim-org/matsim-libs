@@ -45,7 +45,7 @@ class ExternalControler {
 	
 	static String configFile;
 	static String outputExternalIterationDirPath;
-	static int randomSeed;
+	static long randomSeed;
 	
 	static int lastExternalIterationParam1;
 	static int lastExternalIterationParam2;
@@ -80,8 +80,13 @@ class ExternalControler {
 		log.info("Setting run parameters...");
 
 		configFile = settings.getConfigFile();
-		outputExternalIterationDirPath = settings.getOutputPath();
-		randomSeed = settings.getRandomSeed();
+
+//		outputExternalIterationDirPath = settings.getOutputPath();
+//		randomSeed = settings.getRandomSeed();
+		
+		outputExternalIterationDirPath = args[1];
+		randomSeed = Long.parseLong(args[2]);
+		
 		lastExternalIterationParam1 = settings.getLastExtIt1();
 		lastExternalIterationParam2 = settings.getLastExtIt2();
 	
