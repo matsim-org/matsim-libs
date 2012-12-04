@@ -29,6 +29,8 @@ import playground.thibautd.socnetsim.population.PlanLinks;
 public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
 	@Override
 	public double getWeight(final Plan indivPlan) {
-		return indivPlan.getScore();
+		Double score = indivPlan.getScore();
+		// if there are unscored plan, one of them is selected
+		return score == null ? Double.POSITIVE_INFINITY : score;
 	}
 }
