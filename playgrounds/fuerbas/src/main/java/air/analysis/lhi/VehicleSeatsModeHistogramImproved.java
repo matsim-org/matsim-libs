@@ -59,7 +59,7 @@ public class VehicleSeatsModeHistogramImproved extends AbstractModeHistogram imp
 
 	private static final Logger log = Logger.getLogger(VehicleSeatsModeHistogramImproved.class);
 
-	private Map<Id, VehicleArrivesAtFacilityEvent> vehArrivesEventsByVehicleId = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
+	private Map<Id, VehicleDepartsAtFacilityEvent> vehDepartsEventsByVehicleId = new HashMap<Id, VehicleDepartsAtFacilityEvent>();
 	private Vehicles vehicles;
 	
 	public VehicleSeatsModeHistogramImproved(Vehicles vehicles) {
@@ -82,26 +82,26 @@ public class VehicleSeatsModeHistogramImproved extends AbstractModeHistogram imp
 
 	@Override
 	public void reset(int iteration) {
-		this.vehArrivesEventsByVehicleId.clear();
+		this.vehDepartsEventsByVehicleId.clear();
 		super.resetIteration(iteration);
 	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		VehicleArrivesAtFacilityEvent arrivalEvent = this.vehArrivesEventsByVehicleId.get(event.getVehicleId());
-		if (arrivalEvent == null){
-			log.error("no arrival event for vehicle :  " + event.getVehicleId() + " assuming first arrival!");
-			return;
-		}
-		Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
-		int seats = vehicle.getType().getCapacity().getSeats();
-		super.increase(event.getTime(), seats, null);
-		super.decrease(arrivalEvent.getTime(), seats, null);
+		this.vehDepartsEventsByVehicleId.put(event.getVehicleId(), event);
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.vehArrivesEventsByVehicleId.put(event.getVehicleId(), event);
+		VehicleDepartsAtFacilityEvent departureEvent = this.vehDepartsEventsByVehicleId.get(event.getVehicleId());
+		if (departureEvent == null){
+			log.error("no departure event for vehicle :  " + event.getVehicleId() + " assuming first arrival!");
+			return;
+		}
+		Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
+		int seats = vehicle.getType().getCapacity().getSeats();
+		super.increase(departureEvent.getTime(), seats, null);
+		super.decrease(event.getTime(), seats, null);
 		
 	}
 	

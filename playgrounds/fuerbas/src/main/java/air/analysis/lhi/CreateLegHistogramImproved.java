@@ -19,12 +19,13 @@
  * *********************************************************************** */
 package air.analysis.lhi;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+
+import playground.dgrether.events.EventsFilterManager;
+import playground.dgrether.events.EventsFilterManagerImpl;
 
 
 
@@ -45,6 +46,11 @@ public class CreateLegHistogramImproved {
 		VehicleReaderV1 vreader = new VehicleReaderV1(veh);
 		vreader.readFile(vehiclesFile);
 		
+//		String europeOnlyNetworkFile = "";
+//		Config c = ConfigUtils.createConfig();
+//		c.network().setInputFile(europeOnlyNetworkFile);
+//		Network europeOnlyNetwork = ScenarioUtils.loadScenario(c).getNetwork();
+		
 		for (int i = 0; i < runs.length; i++){
 			String rundir = baseDirectory + "runs-svn/run" + runs[i] + "/";
 			String eventsFilename = rundir + "ITERS/it.0/" + runs[i] + ".0.events.xml.gz";
@@ -59,7 +65,9 @@ public class CreateLegHistogramImproved {
 //			pngOutput = "/home/dgrether/data/work/matsim/matsimOutput/flight_model_one_line/ITERS/it.0/0.leg_histogram_improved.png";
 
 			
-			EventsManager eventsManager = EventsUtils.createEventsManager();
+			EventsFilterManager eventsManager = new EventsFilterManagerImpl();
+//			GeospatialEventFilter filter = new GeospatialEventFilter(europeOnlyNetwork);
+//			eventsManager.addFilter(filter);
 			LegModeHistogramImproved handler = new LegModeHistogramImproved();
 			VehicleSeatsModeHistogramImproved vehHisto = new VehicleSeatsModeHistogramImproved(veh);
 			eventsManager.addHandler(handler);
