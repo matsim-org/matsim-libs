@@ -5,9 +5,9 @@
       <plan selected="yes">
          <act end_time="05:01:00" y="10" x="0"  type="home"/>
          <leg mode="pt"/>
-         <act end_time="10:35:00" y="10" x="2015"  type="home"/>
+         <act end_time="05:15:00" y="10" x="2015"  type="home"/>
          <leg mode="pt"/>
-         <act end_time="15:35:00" y="10" x="0"  type="home"/>
+         <act y="10" x="0"  type="home"/>
       </plan>
    </person>
 </plans>
