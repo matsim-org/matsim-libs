@@ -327,19 +327,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return false;
 	}
 
-	private static List<Id> getPersonIds(final PlanString s) {
-		List<Id> ids = new ArrayList<Id>();
-		ids.add( s.planRecord.plan.getPerson().getId() );
-		
-		for (PlanString tail = s.tail;
-				tail != null;
-				tail = tail.tail) {
-			ids.add( tail.planRecord.plan.getPerson().getId() );
-		}
-
-		return ids;
-	}
-
 	// /////////////////////////////////////////////////////////////////////////
 	// classes: data structures used during the search process
 	// /////////////////////////////////////////////////////////////////////////
