@@ -27,7 +27,14 @@ import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -44,7 +51,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
 
 public class Test {
 
@@ -53,8 +59,8 @@ public class Test {
 
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
 		//		String ref = "6 6 6 6 4 6 4 5 5 5 5 4 5 7 4 5 4 7 5 6 5";
-		String p = "/Users/laemmel/devel/convexdecomp/polygon03_.shp";
-		String initOpen = "/Users/laemmel/devel/convexdecomp/intialOpenings.shp";
+		String p = "/Users/laemmel/devel/convexdecomp/05_simple.shp";
+		String network = "/Users/laemmel/tmp/vis/network.xml";
 		//		String p = "/Users/laemmel/tmp/dump.shp";
 //				DecompGuiDebugger dbg = new DecompGuiDebugger();
 //				dbg.setVisible(true);
@@ -64,22 +70,21 @@ public class Test {
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(p);
 
-		ShapeFileReader reader2 = new ShapeFileReader();
-		reader2.readFileAndInitialize(initOpen);
 		List<LineString> openings = new ArrayList<LineString>();
-		for (Feature ft : reader2.getFeatureSet()) {
-			Geometry geo = ft.getDefaultGeometry();
-			if (geo instanceof LineString) {
-				openings.add((LineString) geo);
-			} else if (geo instanceof MultiLineString) {
-				for (int i = 0; i < geo.getNumGeometries(); i++) {
-					openings.add((LineString) geo.getGeometryN(i));
-
-				}
+		Config c = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(c);
+		new MatsimNetworkReader(sc).readFile(network);
+		
+		for (Link  l : sc.getNetwork().getLinks().values()) {
+			if (l.getFromNode().getInLinks().size() <= 2 ||l.getToNode().getInLinks().size() <= 2){
+				continue;
 			}
+			Coordinate c0 = MGC.coord2Coordinate(l.getFromNode().getCoord());
+			Coordinate c1 = MGC.coord2Coordinate(l.getToNode().getCoord());
+			Coordinate[] coords = new Coordinate[]{c0,c1};
+			LineString ls = geofac.createLineString(coords);
+			openings.add(ls);
 		}
-
-
 
 		ApproxConvexDecomposer decomp = new ApproxConvexDecomposer(openings);
 
