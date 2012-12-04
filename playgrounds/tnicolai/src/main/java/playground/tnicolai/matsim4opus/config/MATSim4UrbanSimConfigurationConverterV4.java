@@ -255,7 +255,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		String spatialUnit = null;	 // meaning parcel or zone
 		if(matsim4UrbanSimModule != null)
 			spatialUnit = matsim4UrbanSimModule.getValue(SPATIAL_UNIT);
-		if(spatialUnit == null || !spatialUnit.equalsIgnoreCase("parcel") || !spatialUnit.equalsIgnoreCase("zone") ){
+
+		if(spatialUnit == null || !(spatialUnit.equalsIgnoreCase("parcel") || spatialUnit.equalsIgnoreCase("zone")) ){
 			log.error("The spatial unit (parcel or zone) of the current UrbanSim application is not given.");
 			log.error("Enter the spatial unit in the external MATSim config file as follows:");
 			log.error("<module name=\"matsim4urbansimParameter\" >");
