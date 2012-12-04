@@ -23,6 +23,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.pt.PtConstants;
 
+/**
+ * 
+ * @author sergioo
+ *
+ */
 public class TimeDistributionJourney implements AgentDepartureEventHandler, ActivityStartEventHandler {
 
 	//Private classes

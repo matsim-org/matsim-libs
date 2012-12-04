@@ -44,6 +44,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 
+/**
+ * 
+ * @author sergioo
+ *
+ */
 public class DistanceDistributionJourneyEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, TravelledEventHandler, AgentStuckEventHandler {
 
 	//Private classes

@@ -37,6 +37,11 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+/**
+ * 
+ * @author sergioo
+ *
+ */
 public class DistanceDistributionStage {
 
 	//Private classes

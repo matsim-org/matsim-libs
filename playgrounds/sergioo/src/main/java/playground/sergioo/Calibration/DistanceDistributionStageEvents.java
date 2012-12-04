@@ -46,6 +46,11 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+/**
+ * 
+ * @author sergioo
+ *
+ */
 public class DistanceDistributionStageEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, TravelledEventHandler, AgentStuckEventHandler {
 
 	//Private classes

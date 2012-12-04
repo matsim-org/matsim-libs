@@ -36,7 +36,11 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
+/**
+ * 
+ * @author sergioo
+ *
+ */
 public class DistanceDistributionJourney {
 
 	//Private classes

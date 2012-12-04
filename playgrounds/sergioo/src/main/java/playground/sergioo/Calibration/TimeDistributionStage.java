@@ -32,6 +32,11 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+/**
+ * 
+ * @author sergioo
+ *
+ */
 public class TimeDistributionStage implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, AgentDepartureEventHandler, ActivityStartEventHandler {
 
 	//Private classes
