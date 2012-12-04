@@ -1,4 +1,4 @@
-package playground.sergioo.BestTravelTimeRouter;
+package playground.sergioo.bestTravelTimeRouter;
 
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 
-import playground.sergioo.BestTravelTimeRouter.BestTravelTimePathCalculator.Path;
+import playground.sergioo.bestTravelTimeRouter.BestTravelTimePathCalculator.Path;
 
 public class TestBestTravelTimeRouter {
 
