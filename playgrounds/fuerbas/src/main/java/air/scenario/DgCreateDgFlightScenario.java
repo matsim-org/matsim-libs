@@ -104,16 +104,16 @@ public class DgCreateDgFlightScenario {
 		
 	}
 	
-	public void createFlightScenaios() throws Exception {
+	public void createFlightScenarios() throws Exception {
 		List<DgOagLine> flightData = new DgOagReader().readOagLines(inputOagFilename);
 		//WORLD WIDE AIR TRAFFIC
-		createWorldFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+//		createWorldFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
 
 		//	//EUROPEAN AIR TRAFFIC
 		createEuropeanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
 
 	// GERMAN AIR TRAFFIC
-		createGermanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+//		createGermanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
 	}
 
 	public void createWorldFlightScenario(String inputOsmFilename,

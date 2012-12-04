@@ -30,7 +30,7 @@ public class DgRunCreateFlightScenario {
 	 * Separate main due to eclipse compile problems
 	 */
 	public static void main(String[] args) throws Exception {
-		new DgCreateDgFlightScenario().createFlightScenaios();
+		new DgCreateDgFlightScenario().createFlightScenarios();
 	}
 
 }
