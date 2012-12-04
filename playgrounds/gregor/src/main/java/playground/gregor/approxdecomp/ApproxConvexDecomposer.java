@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 
-import playground.gregor.approxdecomp.DecompGuiDebugger.GuiDebugger;
 import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
@@ -44,7 +43,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * Approximate convex decomposition algorithm as proposed by:
  * Lien, J.-M. & Amato, N. Approximate convex decomposition of polygons Computational Geometry, 2006, 35, 100-123
- * This is am extended version that allows Steiner points insertion 
+ * This is an extended version that allows Steiner points insertion 
  * @author laemmel
  *
  */
@@ -54,15 +53,28 @@ public class ApproxConvexDecomposer {
 
 	private static final double S_D = 0.1;
 	private static final double S_C = .1;
-	private static final double TAU = 2;
-	private static final boolean ALLOW_STEINER_VERTICES = false;
+	private static final double TAU = 0.;
+	private static final boolean ALLOW_STEINER_VERTICES = true;
 	private static final double epsilon = 0.0001;
 
 	private final GeometryFactory geofac = new GeometryFactory();
+
+	private final List<LineString> initOpeningsIntersections;
 	
-	public List<Polygon> decompose(Geometry geo) {
+	public ApproxConvexDecomposer(List<LineString> openings) {
+		this.initOpeningsIntersections = openings;
+	}
+	
+	public ApproxConvexDecomposer() {
+		this(null);
+	}
+
+	public List<PolygonInfo> decompose(Geometry geo) {
 		if (geo instanceof Polygon) {
-			return decomposePolygon((Polygon)geo);
+			log.info("decomposing polygon consisting of:" + ((Polygon)geo).getExteriorRing().getCoordinates().length + " vertices");
+			PolygonInfo pi = new PolygonInfo();
+			pi.p = (Polygon) geo;
+			return decomposePolygon(pi);
 		} else if (geo instanceof MultiPolygon) {
 			return deomposeMultiPolygon((MultiPolygon)geo);
 		} else {
@@ -70,30 +82,72 @@ public class ApproxConvexDecomposer {
 		}
 	}
 
-	private List<Polygon> deomposeMultiPolygon(MultiPolygon geo) {
-		List<Polygon> ret = new ArrayList<Polygon>();
+	private void createIntialOpenings(PolygonInfo pi) {
+		
+		Coordinate[] coords = pi.p.getExteriorRing().getCoordinates();
+		for (int i = 0; i < coords.length-1; i++) {
+			Coordinate c0 = coords[i];
+			Coordinate c1 = coords[i+1];
+			for (LineString ls : this.initOpeningsIntersections) {
+				if (intersects(ls,c0,c1)) {
+					Opening op = new Opening();
+					op.edge = i;
+					pi.openings.add(op);
+					break;
+				}
+			}
+		}
+	}
+
+	private boolean intersects(LineString ls, Coordinate c0, Coordinate c1) {
+		for (int i = 0; i < ls.getCoordinates().length-1; i++) {
+			Coordinate d0 = ls.getCoordinates()[i];
+			Coordinate d1 = ls.getCoordinates()[i+1];
+			double l0 = Algorithms.isLeftOfLine(c0, d0, d1);
+			double l1 = Algorithms.isLeftOfLine(c1, d0, d1);
+			if (l0 * l1 < 0) {
+				double m0 = Algorithms.isLeftOfLine(d0, c0, c1);
+				double m1 = Algorithms.isLeftOfLine(d1, c0, c1);
+				if (m0 * m1 < 0) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	private List<PolygonInfo> deomposeMultiPolygon(MultiPolygon geo) {
+		List<PolygonInfo> ret = new ArrayList<PolygonInfo>();
 		for (int i = 0; i < geo.getNumGeometries(); i++) {
 			Polygon p = (Polygon) geo.getGeometryN(i);
-			ret.addAll(decomposePolygon(p));
+			ret.addAll(decompose(p));
 		}
+		
+		
 		return ret;
 	}
 
-	private List<Polygon> decomposePolygon(Polygon geo) {
+	private List<PolygonInfo> decomposePolygon(PolygonInfo geo) {
+		if (this.initOpeningsIntersections != null) {
+			createIntialOpenings(geo);
+		}
+		
 
-
-		List<Polygon> ret = new ArrayList<Polygon>();
-		Queue<Polygon> open = new ConcurrentLinkedQueue<Polygon>();
+		List<PolygonInfo> ret = new ArrayList<PolygonInfo>();
+		Queue<PolygonInfo> open = new ConcurrentLinkedQueue<PolygonInfo>();
+//		PolygonInfo ppi = new PolygonInfo();
+//		ppi.p = geo;
 		open.add(geo);
 
 		while (open.size() > 0) {
-			Polygon p = open.poll();
-			System.out.println("ps:" + open.size() + " vertices current:"+p.getExteriorRing().getNumPoints());
-			GuiDebugger.addObject(p);
+			PolygonInfo pi = open.poll();
+//			System.out.println("ps:" + open.size() + " vertices current:"+pi.p.getExteriorRing().getNumPoints());
+//			GuiDebugger.addObject(pi.p);
 			
 			//TODO holes
 			
-			double[] c = computeShellConcavity(p); 
+			double[] c = computeShellConcavity(pi.p); 
 
 			double maxConcave = 0;
 			int mostConcaveVertex = 0;
@@ -106,14 +160,18 @@ public class ApproxConvexDecomposer {
 					}
 				}
 			if (maxConcave <= TAU) {
-				ret.add(p); //convex enough
+				ret.add(pi); //convex enough
+			} else if (mostConcaveVertex == 0) {
+				rotateRing(pi);
+				open.add(pi);
 			} else {		
-				mostConcaveVertex += c.length-1; //since in Java "x % y" for x < 0 is not the same as "x mod y", we add this offset here to x so that later on we can calculate "(x-1) % y" safely  
-				Collection<Polygon> resolved = splitPolygon(p,mostConcaveVertex, c);
+//				mostConcaveVertex += c.length-1; //since in Java "x % y" for x < 0 is not the same as "x mod y", we add this offset here to x so that later on we can calculate "(x-1) % y" safely
+
+				Collection<PolygonInfo> resolved = splitPolygon(pi,mostConcaveVertex, c);
 				if (resolved.size() > 0) {
 					open.addAll(resolved);
 				} else {
-					ret.add(p);//could not split or add Steiner points
+					ret.add(pi);//could not split or add Steiner points
 				}
 					
 			}
@@ -125,30 +183,57 @@ public class ApproxConvexDecomposer {
 
 
 
-	private Collection<Polygon> splitPolygon(Polygon p, int vIdx, double[] c) {
+	private void rotateRing(PolygonInfo pi) {
+		Coordinate[] ring = pi.p.getExteriorRing().getCoordinates();
+		Coordinate [] coords = new Coordinate[ring.length];
+		int pos = 0;
+		coords[pos++] = ring[ring.length-2];
+		for (int j = 0; j < ring.length-1; j++) {
+			coords[pos++] = ring[j];
+		}
+		LinearRing lr = this.geofac.createLinearRing(coords);
+		Polygon p = this.geofac.createPolygon(lr, null);
+		pi.p = p;
 		
-		Collection<Polygon> ret = new ArrayList<Polygon>();
+		//revise openings
+		for (Opening o : pi.openings) {
+			if (o.edge != 0){
+				o.edge--;
+			}else {
+				o.edge = coords.length-2;
+			}
+		}
 		
-		Coordinate [] ring = p.getExteriorRing().getCoordinates();
+	}
+
+	private Collection<PolygonInfo> splitPolygon(PolygonInfo pi, int vIdx, double[] c) {
+		
+		Collection<PolygonInfo> ret = new ArrayList<PolygonInfo>();
+		
+		Coordinate [] ring = pi.p.getExteriorRing().getCoordinates();
 		Coordinate split = ring[vIdx%(ring.length-1)];
 		
 		Coordinate pred = ring[(vIdx-1)%(ring.length-1)];
 		Coordinate succ = ring[(vIdx+1)%(ring.length-1)];
 		
 		
-		double bestScore = -1;
+		double bestScore = Double.NEGATIVE_INFINITY;
+		boolean splitPointFound = false;
 		int wIdx = 0;
 		
 		double oldLeftPred = 0;
 		double oldLeftSucc = 0;
 		
-		int steiner2Idx = 0;
+		int steiner2Idx = -1;
 		
-		for (int i = 0; i < p.getExteriorRing().getCoordinates().length-1; i++) {
+		
+		for (int i = 0; i < pi.p.getExteriorRing().getCoordinates().length; i++) {
+			Coordinate test = ring[i];
+			
 			if (i >= vIdx -1 && i <= vIdx + 1) {
 				continue;
 			}
-			Coordinate test = ring[i];
+			
 			double leftPred = Algorithms.isLeftOfLine(test, pred, split);
 			double leftSucc = Algorithms.isLeftOfLine(test, split,succ);
 			
@@ -156,6 +241,7 @@ public class ApproxConvexDecomposer {
 			
 			
 			if (leftPred < 0 && leftSucc < 0 && notIntersecting(split,test,ring)) {
+				splitPointFound = true;
 				double score = (1+S_C*c[i])/(S_D*split.distance(test));
 				if (score > bestScore) {
 					bestScore = score;
@@ -170,10 +256,17 @@ public class ApproxConvexDecomposer {
 			}
 		}
 		
-		if (bestScore > -1) {
-			splitPolygonAt(ring,vIdx,wIdx,ret);
+		if (splitPointFound) {
+			splitPolygonAt(pi,vIdx,wIdx,ret);
 		} else if (ALLOW_STEINER_VERTICES){
-			insertSteinerPointAndReturnPolygon(ring,vIdx,(steiner2Idx-1)%(ring.length-1),steiner2Idx,ret);
+			int steiner1Idx;
+			if (steiner2Idx == 0) {
+				steiner2Idx = ring.length-1;
+				steiner1Idx = ring.length-2;
+			} else {
+				steiner1Idx = steiner2Idx-1;
+			}
+			insertSteinerPointAndReturnPolygon(pi,vIdx,steiner1Idx,steiner2Idx,ret);
 		} else {
 			log.warn("Can not split here and Steiner points are not allowed so leaving current polygon as it is!");
 		}
@@ -207,8 +300,10 @@ public class ApproxConvexDecomposer {
 		return true;
 	}
 
-	private void insertSteinerPointAndReturnPolygon(Coordinate[] ring,
-			int vIdx, int steiner1Idx, int steiner2Idx, Collection<Polygon> ret) {
+	private void insertSteinerPointAndReturnPolygon(PolygonInfo pi,
+			int vIdx, int steiner1Idx, int steiner2Idx, Collection<PolygonInfo> ret) {
+		
+		Coordinate [] ring = pi.p.getExteriorRing().getCoordinates();
 		Coordinate steiner = computeSteinerCoordinate(ring,vIdx,steiner1Idx,steiner2Idx);
 		
 		
@@ -224,7 +319,23 @@ public class ApproxConvexDecomposer {
 		}
 		LinearRing lr = this.geofac.createLinearRing(coords);
 		Polygon p = this.geofac.createPolygon(lr, null);
-		ret.add(p);
+		pi.p = p;
+		
+		//revise openings
+		Opening steinerOpening = null;
+		for (Opening open : pi.openings) {
+			if (open.edge == steiner1Idx) {
+				steinerOpening = new Opening();
+				steinerOpening.edge = open.edge+1;
+			} else if (open.edge > steiner1Idx){
+				open.edge++;
+			}
+		}
+		if (steinerOpening != null) {
+			pi.openings.add(steinerOpening);
+		}
+		
+		ret.add(pi);
 	}
 
 	private Coordinate computeSteinerCoordinate(Coordinate[] ring, int vIdx,
@@ -247,22 +358,33 @@ public class ApproxConvexDecomposer {
 		return new Coordinate((c1.x+c2.x)/2,(c1.y+c2.y)/2);
 	}
 
-	private void splitPolygonAt(Coordinate[] ring, int vIdx, int wIdx,
-			Collection<Polygon> ret) {
+	private void splitPolygonAt(PolygonInfo pi, int vIdx, int wIdx,
+			Collection<PolygonInfo> ret) {
+		
+		Coordinate [] ring = pi.p.getExteriorRing().getCoordinates();
 		List<Coordinate> left = new ArrayList<Coordinate>();
 		List<Coordinate> right = new ArrayList<Coordinate>();
-		int idx = vIdx%(ring.length-1);
-		do {
-			left.add(ring[idx%(ring.length-1)]);
-			idx++;
-		}while((idx%(ring.length-1)) != (wIdx+1)%(ring.length-1));
-		idx = wIdx;
-		do {
-			right.add(ring[idx%(ring.length-1)]);
-			idx++;
-		} while ((idx%(ring.length-1)) != (vIdx+1)%(ring.length-1));
-		left.add(left.get(0));
+
+		if (vIdx > wIdx) {
+			int tmp = vIdx;
+			vIdx = wIdx;
+			wIdx = tmp;
+		}
+		
+		for (int i = 0; i <= vIdx; i++) {
+			left.add(ring[i]);
+		}
+		for (int i = wIdx; i < ring.length; i++) {
+			left.add(ring[i]);
+		}
+		
+		for (int i = vIdx; i <= wIdx; i++) {
+			right.add(ring[i]);
+		}
 		right.add(right.get(0));
+		
+
+		
 		Coordinate[] lCoords =  left.toArray(new Coordinate[0]);
 		Coordinate[] rCoords = right.toArray(new Coordinate[0]);
 		
@@ -272,8 +394,35 @@ public class ApproxConvexDecomposer {
 		Polygon lp = this.geofac.createPolygon(llr, null);
 		Polygon rp = this.geofac.createPolygon(rlr, null);
 
-		ret.add(lp);
-		ret.add(rp);
+		PolygonInfo lpi = new PolygonInfo();
+		PolygonInfo rpi = new PolygonInfo();
+		lpi.p = lp;
+		rpi.p = rp;
+		
+		//add new Openings
+		Opening ol = new Opening();
+		ol.edge = vIdx;
+		lpi.openings.add(ol);
+		Opening or = new Opening();
+		or.edge = wIdx - vIdx;
+		rpi.openings.add(or);
+
+		//revise old openings
+		for (Opening open : pi.openings) {
+			if (open.edge < vIdx) {
+				lpi.openings.add(open);
+			}else if (open.edge < wIdx) {
+				open.edge -= vIdx;
+				rpi.openings.add(open);
+			} else {
+				open.edge += -(wIdx - vIdx) + 1;
+				lpi.openings.add(open);
+
+			}
+		}
+		
+		ret.add(lpi);
+		ret.add(rpi);
 	}
 	
 	
@@ -367,7 +516,7 @@ public class ApproxConvexDecomposer {
 		double y = a0.y + ua * (a1.y - a0.y);
 		intersectionCoordinate.x = x;
 		intersectionCoordinate.y = y;
-
+		
 		return true;
 	}
 	
@@ -375,6 +524,15 @@ public class ApproxConvexDecomposer {
 	/*package*/ static final class PocketBridge {
 		int betaMinus;
 		int betaPlus;
+	}
+	
+	/*package*/ static final class PolygonInfo {
+		Polygon p;
+		List<Opening> openings = new ArrayList<Opening>();
+	}
+	
+	/*package*/ static final class Opening {
+		int edge;
 	}
 
 }
