@@ -81,7 +81,9 @@ public class HighestWeightSelectorTest {
 				new Fixture[]{createIndividualPlans()},
 				new Fixture[]{createFullyJointPlans()},
 				new Fixture[]{createPartiallyJointPlansOneSelectedJp()},
-				new Fixture[]{createPartiallyJointPlansTwoSelectedJps()});
+				new Fixture[]{createPartiallyJointPlansTwoSelectedJps()},
+				new Fixture[]{createPartiallyJointPlansMessOfJointPlans()},
+				new Fixture[]{createPartiallyJointPlansNoSelectedJp()});
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -345,6 +347,206 @@ public class HighestWeightSelectorTest {
 					Collections.EMPTY_LIST ) );
 	}
 
+	public static Fixture createPartiallyJointPlansMessOfJointPlans() {
+		ReplanningGroup group = new ReplanningGroup();
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp5 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp6 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp7 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp8 = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 20d );
+		jp3.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 30d );
+		jp5.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 40d );
+		jp7.put( id , plan );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -200d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -100d );
+		jp4.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 500d );
+		jp5.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 200d );
+		jp8.put( id , plan );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 100d );
+		jp4.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 11d );
+		jp6.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 101d );
+		jp7.put( id , plan );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 333d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 666d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 777d );
+		jp6.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 444d );
+		jp8.put( id , plan );
+
+		id = new IdImpl( "haddock" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 500d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+		jp3.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 100d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		jp5.put( id , plan );
+
+		JointPlanFactory.createJointPlan( jp1 );
+		JointPlanFactory.createJointPlan( jp2 );
+		JointPlanFactory.createJointPlan( jp3 );
+		JointPlanFactory.createJointPlan( jp4 );
+		JointPlan sel1 = JointPlanFactory.createJointPlan( jp5 );
+		JointPlan sel2 = JointPlanFactory.createJointPlan( jp6 );
+		JointPlanFactory.createJointPlan( jp7 );
+		JointPlanFactory.createJointPlan( jp8 );
+
+		return new Fixture(
+				"partially joint, multiple combinations",
+				group,
+				new GroupPlans(
+					Arrays.asList( sel1 , sel2 ),
+					Collections.EMPTY_LIST ) );
+	}
+
+
+	public static Fixture createPartiallyJointPlansNoSelectedJp() {
+		ReplanningGroup group = new ReplanningGroup();
+
+		List<Plan> toBeSelected = new ArrayList<Plan>();
+
+		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
+
+		Id id = new IdImpl( "tintin" );
+		PersonImpl person = new PersonImpl( id );
+		group.addPerson( person );
+		PlanImpl plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		toBeSelected.add( plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1000d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+
+		id = new IdImpl( "milou" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		toBeSelected.add( plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1000d );
+		jp1.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+
+		id = new IdImpl( "tim" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		toBeSelected.add( plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		jp3.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1000d );
+		jp2.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+
+		id = new IdImpl( "struppy" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		toBeSelected.add( plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		jp4.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1000d );
+		jp3.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+
+		id = new IdImpl( "haddock" );
+		person = new PersonImpl( id );
+		group.addPerson( person );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 10d );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 1000d );
+		toBeSelected.add( plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( -1000d );
+		jp4.put( id , plan );
+		plan = person.createAndAddPlan( false );
+		plan.setScore( 5d );
+
+		JointPlanFactory.createJointPlan( jp1 );
+		JointPlanFactory.createJointPlan( jp2 );
+		JointPlanFactory.createJointPlan( jp3 );
+		JointPlanFactory.createJointPlan( jp4 );
+
+		return new Fixture(
+				"partially joint, no selected joint trips",
+				group,
+				new GroupPlans(
+					Collections.EMPTY_LIST,
+					toBeSelected ) );
+	}
 	@Before
 	public void setupLogging() {
 		Logger.getRootLogger().setLevel( Level.TRACE );
