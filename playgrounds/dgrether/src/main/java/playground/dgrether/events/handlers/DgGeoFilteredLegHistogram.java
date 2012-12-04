@@ -57,6 +57,7 @@ import playground.dgrether.events.GeospatialEventTools;
 
 /**
  * @author dgrether
+ *  based on implementation of mrieser in the org.matsim project
  *
  */
 public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
