@@ -41,14 +41,20 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
 /**
  * Selects the plan combination with the highest (implementation specific)
  * weight.
+ * <br>
+ * To do so, it iteratively constructs the joint plan using a branch-and-bound
+ * approach, which avoids exploring the full set of combinations.
  * @author thibautd
  */
 public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSelector {
 	private static final Logger log =
 		Logger.getLogger(AbstractHighestWeightSelector.class);
 
+	// /////////////////////////////////////////////////////////////////////////
+	// interface and abstract method
+	// /////////////////////////////////////////////////////////////////////////
 	@Override
-	public GroupPlans selectPlans(final ReplanningGroup group) {
+	public final GroupPlans selectPlans(final ReplanningGroup group) {
 		if (log.isTraceEnabled()) log.trace( "handling group "+group );
 		Map<Id, PersonRecord> personRecords = getPersonRecords( group );
 
@@ -64,6 +70,11 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return toGroupPlans( allocation );
 	}
 
+	public abstract double getWeight(final Plan indivPlan);
+
+	// /////////////////////////////////////////////////////////////////////////
+	// "translation" to and from the internal data structures
+	// /////////////////////////////////////////////////////////////////////////
 	private GroupPlans toGroupPlans(final PlanString allocation) {
 		Set<JointPlan> jointPlans = new HashSet<JointPlan>();
 		List<Plan> individualPlans = new ArrayList<Plan>();
@@ -100,31 +111,51 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return map;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// actual branching and bounding methods
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Recursively decends in the tree of possible joint plans.
+	 *
+	 * @param allPersonRecord helper map, just links persons to ids
+	 * @param personsStillToAllocate in the name
+	 * @param alreadyAllocatedPersons set of the ids of the already allocated persons,
+	 * used to determine which joint plans are stil possible
+	 * @param str the PlanString of the plan constructed until now
+	 */
 	private PlanString buildPlanString(
 			final Map<Id, PersonRecord> allPersonsRecord,
-			final List<PersonRecord> persons,
+			final List<PersonRecord> personsStillToAllocate,
 			final Set<Id> alreadyAllocatedPersons,
 			final PlanString str) {
-		final PersonRecord currentPerson = persons.get(0);
+		final PersonRecord currentPerson = personsStillToAllocate.get(0);
 
 		if (log.isTraceEnabled()) {
 			log.trace( "looking ar person "+currentPerson.person.getId()+
 					" with already selected "+alreadyAllocatedPersons );
 		}
 
+		// do one step forward: "point" to the next person
 		final List<PersonRecord> remainingPersons =
-			persons.size() > 1 ?
-			persons.subList( 1, persons.size() ) :
+			personsStillToAllocate.size() > 1 ?
+			personsStillToAllocate.subList( 1, personsStillToAllocate.size() ) :
 			Collections.EMPTY_LIST;
 		final Set<Id> newAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
 		newAllocatedPersons.add( currentPerson.person.getId() );
 
-		// get a list of plans in decreasing order of maximum possible weight
+		// get a list of plans in decreasing order of maximum possible weight.
+		// The weight is always computed on the full joint plan, and thus consists
+		// of the weight until now plus the upper bound
 		List<PlanRecord> records = new ArrayList<PlanRecord>( currentPerson.plans );
 		final double alreadyAllocatedWeight = str == null ? 0 : str.getWeight();
 		for (PlanRecord r : records) {
-			r.cachedMaximumWeight = alreadyAllocatedWeight + getMaxWeightFromPersons( r , alreadyAllocatedPersons , remainingPersons );
+			r.cachedMaximumWeight = alreadyAllocatedWeight +
+				getMaxWeightFromPersons( r , alreadyAllocatedPersons , remainingPersons );
 		}
+
+		// Sort in decreasing order of upper bound: we can stop as soon
+		// as the constructed plan has weight greater than the upper bound
+		// of the next branch.
 		Collections.sort(
 				records,
 				new Comparator<PlanRecord>() {
@@ -191,38 +222,6 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return constructedString;
 	}
 
-	private static List<PersonRecord> filter(
-			final List<PersonRecord> toFilter,
-			final JointPlan jointPlan) {
-		List<PersonRecord> newList = new ArrayList<PersonRecord>();
-
-		for (PersonRecord r : toFilter) {
-			if (!jointPlan.getIndividualPlans().containsKey( r.person.getId() )) {
-				newList.add( r );
-			}
-		}
-
-		return newList;
-	}
-
-	private static PlanString getOtherPlansAsString(
-			final PlanRecord r,
-			final JointPlan jointPlan,
-			final Map<Id, PersonRecord> allPersonsRecords,
-			final PlanString additionalTail) {
-		PlanString str = additionalTail;
-
-		for (Plan p : jointPlan.getIndividualPlans().values()) {
-			if (p == r.plan) continue;
-
-			str = new PlanString(
-					allPersonsRecords.get( p.getPerson().getId() ).getRecord( p ),
-					str);
-		}
-
-		return str;
-	}
-
 	/**
 	 * Gets the maximum plan weight that can be obtained from the
 	 * plans of remainingPersons, given the alradySelected has been
@@ -284,6 +283,41 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		throw new RuntimeException( "no valid plan for record "+record+" without persons "+personsSelected );
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// various small helper methods
+	// /////////////////////////////////////////////////////////////////////////
+	private static List<PersonRecord> filter(
+			final List<PersonRecord> toFilter,
+			final JointPlan jointPlan) {
+		List<PersonRecord> newList = new ArrayList<PersonRecord>();
+
+		for (PersonRecord r : toFilter) {
+			if (!jointPlan.getIndividualPlans().containsKey( r.person.getId() )) {
+				newList.add( r );
+			}
+		}
+
+		return newList;
+	}
+
+	private static PlanString getOtherPlansAsString(
+			final PlanRecord r,
+			final JointPlan jointPlan,
+			final Map<Id, PersonRecord> allPersonsRecords,
+			final PlanString additionalTail) {
+		PlanString str = additionalTail;
+
+		for (Plan p : jointPlan.getIndividualPlans().values()) {
+			if (p == r.plan) continue;
+
+			str = new PlanString(
+					allPersonsRecords.get( p.getPerson().getId() ).getRecord( p ),
+					str);
+		}
+
+		return str;
+	}
+
 	private static boolean contains(
 			final JointPlan jp,
 			final Collection<Id> personsSelected) {
@@ -306,7 +340,9 @@ public abstract class AbstractHighestWeightSelector implements GroupLevelPlanSel
 		return ids;
 	}
 
-	public abstract double getWeight(final Plan indivPlan);
+	// /////////////////////////////////////////////////////////////////////////
+	// classes: data structures used during the search process
+	// /////////////////////////////////////////////////////////////////////////
 
 	private static class PlanString {
 		public final PlanRecord planRecord;
