@@ -132,7 +132,7 @@ public class ExtItOutputAnalyzer {
 		return runNr2itNr2ana;
 	}
 
-	public void writeWelfareData(String outputPath) {
+	public void writeWelfare(String outputPath) {
 		log.info("Writing analysis output...");
 		File file = new File(outputPath + "welfare.csv");
 		   
@@ -177,7 +177,7 @@ public class ExtItOutputAnalyzer {
 	    } catch (IOException e) {}		
 	}
 	
-	public void writePtTripData(String outputPath) {
+	public void writePtTrips(String outputPath) {
 		log.info("Writing analysis output...");
 		File file = new File(outputPath + "ptTrips.csv");
 		   
@@ -224,7 +224,7 @@ public class ExtItOutputAnalyzer {
 	    } catch (IOException e) {}		
 	}
 
-	public void writeCarTripData(String outputPath) {
+	public void writeCarTrips(String outputPath) {
 		log.info("Writing analysis output...");
 		File file = new File(outputPath + "carTrips.csv");
 		   
@@ -348,6 +348,100 @@ public class ExtItOutputAnalyzer {
 		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
 		   		
 		    	double data = this.runNr2itNr2ana.get(runNr).get(iteration).getAvgT0MinusTActDivByT0perTrip();
+		   		memValues.add(data);
+		   		
+		   		bw.write(";" + String.valueOf(data));
+		   	}
+		   	bw.write(";" + getAverage(memValues).toString());
+		   	bw.write(";" + getMin(memValues).toString());
+		   	bw.write(";" + getMax(memValues).toString());
+	        bw.newLine();
+	    }
+
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}		
+	}
+	
+	public void writeOperatorProfit(String outputPath) {
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "operatorProfit.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "ITERATION;NumberOfBuses;Fare (AUD)";
+	    bw.write(zeile1);
+	    
+	    int iterations = 0;
+	    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+	    	bw.write(";OperatorProfitRunNr_" + runNr.toString());
+	    	if (this.runNr2itNr2ana.get(runNr).size() != iterations && iterations != 0) {
+	    		throw new RuntimeException("Different number of iterations in different runs. Aborting...");
+	    	}
+	    }
+	    
+	    bw.write(";AVG;MIN;MAX");
+	    
+	    bw.newLine();
+	    
+	    // ..........
+	    
+    	Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
+    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
+		    bw.write(iteration + ";" + firstRunItNr2ana.get(iteration).getNumberOfBuses() + ";" + firstRunItNr2ana.get(iteration).getFare() * (-1));
+		    List<Double> memValues = new ArrayList<Double>();
+		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+		   		
+		    	double data = this.runNr2itNr2ana.get(runNr).get(iteration).getOperatorProfit();
+		   		memValues.add(data);
+		   		
+		   		bw.write(";" + String.valueOf(data));
+		   	}
+		   	bw.write(";" + getAverage(memValues).toString());
+		   	bw.write(";" + getMin(memValues).toString());
+		   	bw.write(";" + getMax(memValues).toString());
+	        bw.newLine();
+	    }
+
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}		
+	}
+	
+	public void writeUsersLogSum(String outputPath) {
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "userBenefits.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+	    String zeile1 = "ITERATION;NumberOfBuses;Fare (AUD)";
+	    bw.write(zeile1);
+	    
+	    int iterations = 0;
+	    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+	    	bw.write(";UserBenefitsRunNr_" + runNr.toString());
+	    	if (this.runNr2itNr2ana.get(runNr).size() != iterations && iterations != 0) {
+	    		throw new RuntimeException("Different number of iterations in different runs. Aborting...");
+	    	}
+	    }
+	    
+	    bw.write(";AVG;MIN;MAX");
+	    
+	    bw.newLine();
+	    
+	    // ..........
+	    
+    	Map<Integer, ExtItAnaInfo> firstRunItNr2ana = this.runNr2itNr2ana.get(0);
+    	for (int iteration = 0; iteration <= firstRunItNr2ana.size()-1; iteration++){
+		    bw.write(iteration + ";" + firstRunItNr2ana.get(iteration).getNumberOfBuses() + ";" + firstRunItNr2ana.get(iteration).getFare() * (-1));
+		    List<Double> memValues = new ArrayList<Double>();
+		    for (Integer runNr : this.runNr2itNr2ana.keySet()){
+		   		
+		    	double data = this.runNr2itNr2ana.get(runNr).get(iteration).getUsersLogSum();
 		   		memValues.add(data);
 		   		
 		   		bw.write(";" + String.valueOf(data));
@@ -612,6 +706,387 @@ public class ExtItOutputAnalyzer {
 	    log.info("Textfile written to "+file.toString());
     
 	    } catch (IOException e) {}	
+	}
+
+	public void writeAvgWelfareMatrix(String outputPath) {
+		
+		log.info("Writing analysis output...");
+		File file = new File(outputPath + "avgWelfareMatrix.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(";" + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	
+		    for (Double fare : this.fares){
+		    	
+		    	// calculate average welfare for this headway - fare combination
+		    	
+		    	List<Double> memValues = new ArrayList<Double>();
+
+		    	// for each random Seed run
+		    	for (Integer runNr : this.runNr2itNr2ana.keySet()){
+			    	
+			    	Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+			    	// for each external iteration (headway-fare combination)
+			    	for (Integer it : itNr2ana.keySet()){
+			    		
+			    		ExtItAnaInfo extItAna = itNr2ana.get(it);
+			    		if (extItAna.getNumberOfBuses() == nrOfBuses && extItAna.getFare() == fare){
+
+			    			// extIt of this headway - fare combination
+			    			double welfare = extItAna.getWelfare();
+			    			memValues.add(welfare);
+			    		}
+			    	}
+			   	}
+			   	double avgWelfare = getAverage(memValues);
+			   	
+		    	// done - average welfare calculated
+		    	
+		    	bw.write(";" + String.valueOf(avgWelfare));
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+	    
+	}
+
+
+	public void writeAvgPtTripsMatrix(String outputFolder) {
+		log.info("Writing analysis output...");
+		File file = new File(outputFolder + "avgPtTripsMatrix.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(";" + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	
+		    for (Double fare : this.fares){
+		    	
+		    	// calculate average data for this headway - fare combination
+		    	
+		    	List<Double> memValues = new ArrayList<Double>();
+
+		    	// for each random Seed run
+		    	for (Integer runNr : this.runNr2itNr2ana.keySet()){
+			    	
+			    	Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+			    	// for each external iteration (headway-fare combination)
+			    	for (Integer it : itNr2ana.keySet()){
+			    		
+			    		ExtItAnaInfo extItAna = itNr2ana.get(it);
+			    		if (extItAna.getNumberOfBuses() == nrOfBuses && extItAna.getFare() == fare){
+
+			    			// extIt of this headway - fare combination
+			    			double data = extItAna.getNumberOfPtLegs();
+			    			memValues.add(data);
+			    		}
+			    	}
+			   	}
+			   	double avgData = getAverage(memValues);
+			   	
+		    	// done - average data calculated
+		    	
+		    	bw.write(";" + String.valueOf(avgData));
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+	}
+
+	public void writeAvgCarTripsMatrix(String outputFolder) {
+		log.info("Writing analysis output...");
+		File file = new File(outputFolder + "avgCarTripsMatrix.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(";" + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	
+		    for (Double fare : this.fares){
+		    	
+		    	// calculate average data for this headway - fare combination
+		    	
+		    	List<Double> memValues = new ArrayList<Double>();
+
+		    	// for each random Seed run
+		    	for (Integer runNr : this.runNr2itNr2ana.keySet()){
+			    	
+			    	Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+			    	// for each external iteration (headway-fare combination)
+			    	for (Integer it : itNr2ana.keySet()){
+			    		
+			    		ExtItAnaInfo extItAna = itNr2ana.get(it);
+			    		if (extItAna.getNumberOfBuses() == nrOfBuses && extItAna.getFare() == fare){
+
+			    			// extIt of this headway - fare combination
+			    			double data = extItAna.getNumberOfCarLegs();
+			    			memValues.add(data);
+			    		}
+			    	}
+			   	}
+			   	double avgData = getAverage(memValues);
+			   	
+		    	// done - average data calculated
+		    	
+		    	bw.write(";" + String.valueOf(avgData));
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+	}
+
+	public void writeAvgAvgT0minusTActDivByT0perCarTripMatrix(String outputFolder) {
+		log.info("Writing analysis output...");
+		File file = new File(outputFolder + "avgAvgT0minusTActDivByT0perCarTripMatrix.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(";" + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	
+		    for (Double fare : this.fares){
+		    	
+		    	// calculate average data for this headway - fare combination
+		    	
+		    	List<Double> memValues = new ArrayList<Double>();
+
+		    	// for each random Seed run
+		    	for (Integer runNr : this.runNr2itNr2ana.keySet()){
+			    	
+			    	Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+			    	// for each external iteration (headway-fare combination)
+			    	for (Integer it : itNr2ana.keySet()){
+			    		
+			    		ExtItAnaInfo extItAna = itNr2ana.get(it);
+			    		if (extItAna.getNumberOfBuses() == nrOfBuses && extItAna.getFare() == fare){
+
+			    			// extIt of this headway - fare combination
+			    			double data = extItAna.getAvgT0MinusTActDivByT0perTrip();
+			    			memValues.add(data);
+			    		}
+			    	}
+			   	}
+			   	double avgData = getAverage(memValues);
+			   	
+		    	// done - average data calculated
+		    	
+		    	bw.write(";" + String.valueOf(avgData));
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+	}
+
+	public void writeAvgMissedBusTripsMatrix(String outputFolder) {
+		log.info("Writing analysis output...");
+		File file = new File(outputFolder + "avgMissedBusTripsMatrix.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(";" + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	
+		    for (Double fare : this.fares){
+		    	
+		    	// calculate average data for this headway - fare combination
+		    	
+		    	List<Double> memValues = new ArrayList<Double>();
+
+		    	// for each random Seed run
+		    	for (Integer runNr : this.runNr2itNr2ana.keySet()){
+			    	
+			    	Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+			    	// for each external iteration (headway-fare combination)
+			    	for (Integer it : itNr2ana.keySet()){
+			    		
+			    		ExtItAnaInfo extItAna = itNr2ana.get(it);
+			    		if (extItAna.getNumberOfBuses() == nrOfBuses && extItAna.getFare() == fare){
+
+			    			// extIt of this headway - fare combination
+			    			double data = extItAna.getNumberOfMissedBusTrips();
+			    			memValues.add(data);
+			    		}
+			    	}
+			   	}
+			   	double avgData = getAverage(memValues);
+			   	
+		    	// done - average data calculated
+		    	
+		    	bw.write(";" + String.valueOf(avgData));
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+	}
+
+	public void writeAvgOperatorProfitMatrix(String outputFolder) {
+		log.info("Writing analysis output...");
+		File file = new File(outputFolder + "avgOperatorProfitMatrix.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(";" + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	
+		    for (Double fare : this.fares){
+		    	
+		    	// calculate average data for this headway - fare combination
+		    	
+		    	List<Double> memValues = new ArrayList<Double>();
+
+		    	// for each random Seed run
+		    	for (Integer runNr : this.runNr2itNr2ana.keySet()){
+			    	
+			    	Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+			    	// for each external iteration (headway-fare combination)
+			    	for (Integer it : itNr2ana.keySet()){
+			    		
+			    		ExtItAnaInfo extItAna = itNr2ana.get(it);
+			    		if (extItAna.getNumberOfBuses() == nrOfBuses && extItAna.getFare() == fare){
+
+			    			// extIt of this headway - fare combination
+			    			double data = extItAna.getOperatorProfit();
+			    			memValues.add(data);
+			    		}
+			    	}
+			   	}
+			   	double avgData = getAverage(memValues);
+			   	
+		    	// done - average data calculated
+		    	
+		    	bw.write(";" + String.valueOf(avgData));
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
+	}
+
+	public void writeAvgUsersLogSumMatrix(String outputFolder) {
+		log.info("Writing analysis output...");
+		File file = new File(outputFolder + "avgUsersLogSumMatrix.csv");
+		   
+	    try {
+	    bw = new BufferedWriter(new FileWriter(file));
+
+	    for (Double d : this.fares){
+	    	String fare = String.valueOf(-1 * d);
+	    	bw.write(";" + fare);
+	    }
+	    
+	    bw.newLine();
+	    for (Integer nrOfBuses : this.numberOfBuses){
+	    	bw.write(nrOfBuses.toString());
+	    	
+		    for (Double fare : this.fares){
+		    	
+		    	// calculate average data for this headway - fare combination
+		    	
+		    	List<Double> memValues = new ArrayList<Double>();
+
+		    	// for each random Seed run
+		    	for (Integer runNr : this.runNr2itNr2ana.keySet()){
+			    	
+			    	Map<Integer, ExtItAnaInfo> itNr2ana = this.runNr2itNr2ana.get(runNr);
+			    	// for each external iteration (headway-fare combination)
+			    	for (Integer it : itNr2ana.keySet()){
+			    		
+			    		ExtItAnaInfo extItAna = itNr2ana.get(it);
+			    		if (extItAna.getNumberOfBuses() == nrOfBuses && extItAna.getFare() == fare){
+
+			    			// extIt of this headway - fare combination
+			    			double data = extItAna.getUsersLogSum();
+			    			memValues.add(data);
+			    		}
+			    	}
+			   	}
+			   	double avgData = getAverage(memValues);
+			   	
+		    	// done - average data calculated
+		    	
+		    	bw.write(";" + String.valueOf(avgData));
+		    }
+	    	bw.newLine();
+	    }
+	    	    
+	    bw.flush();
+	    bw.close();
+	    log.info("Textfile written to "+file.toString());
+    
+	    } catch (IOException e) {}
 	}
 	
 }

@@ -30,11 +30,14 @@ import java.io.File;
  */
 public class AnaMain {
 
-	private String outputFolder = "/Users/Ihab/Desktop/analysis_output/B_NTC/";
-	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/B_NTC/";
+//	private String outputFolder = "/Users/Ihab/Desktop/analysis_output/B_NTC/";
+//	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/B_NTC/";
 
 //	private String outputFolder = "/Users/Ihab/Desktop/analysis_output/A_TC/";
 //	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/A_TC/";
+	
+	private String outputFolder = "/Users/Ihab/Desktop/TEST_analysis_output/";
+	private String runFolder = "/Users/Ihab/Desktop/TEST/";
 	
 	public static void main(String[] args) {
 		AnaMain ana = new AnaMain();
@@ -43,25 +46,33 @@ public class AnaMain {
 
 	private void run() {
 		
-		ExtItOutputAnalyzer dataReader = new ExtItOutputAnalyzer(runFolder);
-		dataReader.loadData();
-		dataReader.loadParameterData();
+		ExtItOutputAnalyzer dataAnalyzer = new ExtItOutputAnalyzer(runFolder);
+		dataAnalyzer.loadData();
+		dataAnalyzer.loadParameterData();
 		
 		File file = new File(outputFolder);
 		file.mkdirs();
 		
-		dataReader.writeWelfareData(outputFolder);
-		dataReader.writePtTripData(outputFolder);
-		dataReader.writeCarTripData(outputFolder);
-		dataReader.writeMissedBusTrips(outputFolder);
-		dataReader.writeAvgT0minusTActDivByT0perCarTrip(outputFolder);
+		dataAnalyzer.writeWelfare(outputFolder);
+		dataAnalyzer.writePtTrips(outputFolder);
+		dataAnalyzer.writeCarTrips(outputFolder);
+		dataAnalyzer.writeMissedBusTrips(outputFolder);
+		dataAnalyzer.writeAvgT0minusTActDivByT0perCarTrip(outputFolder);
+		dataAnalyzer.writeOperatorProfit(outputFolder);
+		dataAnalyzer.writeUsersLogSum(outputFolder);
 		
-//		dataReader.writeAvgWelfareMatrix(outputFolder);
-//		...
+		dataAnalyzer.writeAvgWelfareMatrix(outputFolder);
+		dataAnalyzer.writeAvgPtTripsMatrix(outputFolder);
+		dataAnalyzer.writeAvgCarTripsMatrix(outputFolder);
+		dataAnalyzer.writeAvgMissedBusTripsMatrix(outputFolder);
+		dataAnalyzer.writeAvgAvgT0minusTActDivByT0perCarTripMatrix(outputFolder);
+		dataAnalyzer.writeAvgOperatorProfitMatrix(outputFolder);
+		dataAnalyzer.writeAvgUsersLogSumMatrix(outputFolder);
 		
-		dataReader.writeGlobalMaxWelfareMatrix(outputFolder);
-		dataReader.writeNumberOfBuses2optimalFareFrequency(outputFolder);
-		dataReader.writeFare2optimalNumberOfBusesFrequency(outputFolder);
+		dataAnalyzer.writeGlobalMaxWelfareMatrix(outputFolder);
+//		dataAnalyzer.writeGlobalMaxOperatorProfitMatrix(outputFolder); // TODO
+		dataAnalyzer.writeNumberOfBuses2optimalFareFrequency(outputFolder);
+		dataAnalyzer.writeFare2optimalNumberOfBusesFrequency(outputFolder);
 	}
 
 }
