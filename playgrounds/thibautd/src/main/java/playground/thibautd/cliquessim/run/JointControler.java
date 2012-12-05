@@ -48,11 +48,6 @@ import playground.thibautd.socnetsim.router.JointTripRouterFactory;
  * @author thibautd
  */
 public class JointControler extends Controler {
-	/**
-	 * replacement for the private super() fields.
-	 */
-	private PlansScoring plansScoring = null;
-
 	/*
 	 * =========================================================================
 	 * Constructors
@@ -106,11 +101,6 @@ public class JointControler extends Controler {
 	protected void loadData() {
 		setMobsimFactory( new JointQSimFactory() );
 		super.loadData();
-	}
-
-	@Override
-	public PlansScoring getPlansScoring() {
-		return plansScoring;
 	}
 
 	@Override
