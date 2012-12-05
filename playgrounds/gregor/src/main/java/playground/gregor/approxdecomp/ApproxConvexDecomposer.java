@@ -53,7 +53,7 @@ public class ApproxConvexDecomposer {
 
 	private static final double S_D = 0.1;
 	private static final double S_C = .1;
-	private static final double TAU = 0.;
+	private static final double TAU = 1.;
 	private static final boolean ALLOW_STEINER_VERTICES = true;
 	private static final double epsilon = 0.0001;
 
