@@ -69,7 +69,7 @@ public class ImmutableJointControler extends AbstractController {
 	private final MobsimFactory mobsimFactory = new JointQSimFactory();
 	private final TripRouterFactory tripRouterFactory;
 
-	public ImmutableJointControler(
+	ImmutableJointControler(
 			final Scenario scenario,
 			final ReplanningListener replanner,
 			final ScoringFunctionFactory scoringFunctionFactory) {
