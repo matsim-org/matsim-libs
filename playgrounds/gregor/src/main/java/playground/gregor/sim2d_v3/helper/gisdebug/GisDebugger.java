@@ -59,7 +59,7 @@ public class GisDebugger {
 
 	private static boolean init = false;
 
-	private static String CRS = "EPSG: 32632";
+	private static String CRS = "EPSG: 3395";
 
 	public static final GeometryFactory geofac = new GeometryFactory();
 
