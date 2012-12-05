@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.bestTravelTimeRouter;
+package playground.sergioo.MostSimilarTravelTimeRouter;
 //package org.matsim.core.router;
 
 import java.util.ArrayList;

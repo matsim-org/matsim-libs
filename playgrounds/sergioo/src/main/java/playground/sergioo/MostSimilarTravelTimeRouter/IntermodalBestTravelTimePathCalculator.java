@@ -1,11 +1,9 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * LeastCostPathCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,34 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.bestTravelTimeRouter;
-//package org.matsim.core.router.util;
+package playground.sergioo.MostSimilarTravelTimeRouter;
+//package org.matsim.core.router;
 
-import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+//import org.matsim.core.router.util.BestTravelTimePathCalculator;
 
-public interface BestTravelTimePathCalculator {
+public interface IntermodalBestTravelTimePathCalculator extends BestTravelTimePathCalculator {
 
-	public Path calcBestTravelTimePath(Node fromNode, Node toNode, double travelTime, double starttime);
-	
-	public class Path {
-		public final List<Node> nodes;
-		public final List<Link> links;
-		public final double travelTime;
-		
-		public Path(final List<Node> nodes, final List<Link> links, final double travelTime) {
-			this.nodes = nodes;
-			this.links = links;
-			this.travelTime = travelTime;
-		}
-		@Override
-		public String toString() {
-			String res = "|";
-			for(Link link:links)
-				res+=link.getId()+"|";
-			return res;
-		}
-	}
+	/**
+	 * Restricts the router to only use links that have at least on of the given modes set as allowed.
+	 * Set to <code>null</code> to disable any restrictions, i.e. to use all available modes.
+	 *
+	 * @param modeRestriction {@link TransportMode}s that can be used to find a route
+	 *
+	 * @see Link#setAllowedModes(Set)
+	 */
+	public void setModeRestriction(final Set<String> modeRestriction);
+
 }
