@@ -34,6 +34,9 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelector;
 

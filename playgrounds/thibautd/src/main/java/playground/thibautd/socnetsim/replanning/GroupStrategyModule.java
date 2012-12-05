@@ -23,6 +23,8 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+
 /**
  * Generalizes {@link PlanStrategyModule} to group-level plans.
  * @author thibautd

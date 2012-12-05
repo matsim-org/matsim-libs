@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.replanning.GroupPlans;
-import playground.thibautd.socnetsim.replanning.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
 /**
  * Selects the plan combination with the highest (implementation specific)

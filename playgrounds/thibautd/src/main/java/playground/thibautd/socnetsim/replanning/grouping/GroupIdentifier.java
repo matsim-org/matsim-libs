@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningGroup.java
+ * GroupIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,33 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.replanning.grouping;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 
 /**
- * Groups together agents which may interact.
+ * Identifies groups of agents to replan together.
+ * Various approaches are valid:
+ * <ul>
+ * <li> fixed groups (e.g. households)
+ * <li> dynamically determined based on the joint plans
+ * <li>...
+ * </ul>
+ *
+ * Note that new joint plans can only be created for agents belonging
+ * to the same group.
  * @author thibautd
  */
-public class ReplanningGroup {
-	private final List<Person> persons = new ArrayList<Person>();
-	private final Collection<Person> immutablePersons = Collections.unmodifiableList( persons );
-
-	public boolean addPerson(final Person person) {
-		return persons.add( person );
-	}
-
-	public boolean removePerson(final Person person) {
-		return persons.remove( person );
-	}
-
-	public Collection<Person> getPersons() {
-		return immutablePersons;
-	}
+public interface GroupIdentifier {
+	public Collection<ReplanningGroup> identifyGroups(final Population population);
 }
-

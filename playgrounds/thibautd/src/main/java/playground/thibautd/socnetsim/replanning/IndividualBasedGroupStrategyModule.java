@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * Delegates action on individual plans to a {@link PlanStrategyModule}

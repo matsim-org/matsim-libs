@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import playground.thibautd.socnetsim.replanning.GroupPlans;
-import playground.thibautd.socnetsim.replanning.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
 /**
  * @author thibautd

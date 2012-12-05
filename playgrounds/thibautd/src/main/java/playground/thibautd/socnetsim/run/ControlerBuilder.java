@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.thibautd.socnetsim.replanning.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
-import playground.thibautd.socnetsim.replanning.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
 /**
  * @author thibautd

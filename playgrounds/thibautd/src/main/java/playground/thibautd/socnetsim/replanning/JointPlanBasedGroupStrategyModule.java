@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * Delegates to a {@link PlanStrategyModule} which handles JointPlans.
