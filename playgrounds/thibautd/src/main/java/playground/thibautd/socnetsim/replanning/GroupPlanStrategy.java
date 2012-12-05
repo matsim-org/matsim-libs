@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 /**
  * Generalizes the PlanStrategy concept to joint replanning.

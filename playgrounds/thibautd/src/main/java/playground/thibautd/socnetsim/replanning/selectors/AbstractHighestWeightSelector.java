@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.replanning.selectors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlans;
+import playground.thibautd.socnetsim.replanning.ReplanningGroup;
 
 /**
  * Selects the plan combination with the highest (implementation specific)

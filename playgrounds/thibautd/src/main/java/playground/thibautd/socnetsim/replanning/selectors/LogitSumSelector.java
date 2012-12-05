@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractHighestWeightSelectorTest.java
+ * LogitSumSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,58 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.replanning.selectors;
+
+import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.population.PlanLinks;
-
 /**
+ * A selector which draws gumbel-distributed scores for individual plans.
+ * Without joint plan, this results in logit marginals for the selection for
+ * each agent.
+ *
  * @author thibautd
  */
-public class HighestScoreSumSelector extends AbstractHighestWeightSelector {
+public class LogitSumSelector extends AbstractHighestWeightSelector {
+	private static final Logger log =
+		Logger.getLogger(LogitSumSelector.class);
+
+	private final Random random;
+	private final double scaleParameter;
+
+	public LogitSumSelector(
+			final Random random,
+			final double scaleParameter) {
+		this.random = random;
+		this.scaleParameter = scaleParameter;
+	}
+
 	@Override
 	public double getWeight(final Plan indivPlan) {
-		Double score = indivPlan.getScore();
-		// if there are unscored plan, one of them is selected
-		return score == null ? Double.POSITIVE_INFINITY : score;
+		final Double score = indivPlan.getScore();
+		if (score == null) return Double.POSITIVE_INFINITY;
+		return score + nextErrorTerm();
+	}
+
+	private double nextErrorTerm() {
+		// "inversion sampling": sample a number between 0 and 1,
+		// and apply the inverse of the CDF to it.
+		double choice = random.nextDouble();
+
+		double value = Math.log( choice );
+		if (value == Double.MIN_VALUE) {
+			log.warn( "underflow 1 for choice "+choice );
+		}
+
+		value = Math.log( -value );
+		if (value == Double.MIN_VALUE) {
+			log.warn( "underflow 2 for choice "+choice );
+		}
+
+		return -value / scaleParameter;
 	}
 }
+

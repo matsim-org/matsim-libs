@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.replanning.selectors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +44,9 @@ import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlans;
+import playground.thibautd.socnetsim.replanning.ReplanningGroup;
+import playground.thibautd.socnetsim.replanning.selectors.HighestScoreSumSelector;
 
 /**
  * @author thibautd
