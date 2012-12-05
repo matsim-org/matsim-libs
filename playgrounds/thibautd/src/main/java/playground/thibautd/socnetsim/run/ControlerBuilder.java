@@ -30,8 +30,10 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.socnetsim.replanning.GroupIdentifier;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
+import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.ReplanningGroup;
 
 /**
@@ -41,6 +43,7 @@ public class ControlerBuilder {
 	private final Scenario scenario;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private GroupIdentifier groupIdentifier;
+	private final GroupStrategyRegistry registry = new GroupStrategyRegistry();
 
 	public ControlerBuilder( final Scenario scenario ) {
 		this.scenario = scenario;
@@ -78,6 +81,13 @@ public class ControlerBuilder {
 		return this;
 	}
 
+	public ControlerBuilder withStrategy(
+			final GroupPlanStrategy strategy,
+			final double weight) {
+		registry.addStrategy( strategy , weight );
+		return this;
+	}
+
 	public ImmutableJointControler build() {
 		return new ImmutableJointControler(
 				scenario,
@@ -85,6 +95,7 @@ public class ControlerBuilder {
 					scenario.getPopulation(),
 					new GroupStrategyManager(
 						groupIdentifier,
+						registry,
 						scenario.getConfig().strategy().getMaxAgentPlanMemorySize())),
 				scoringFunctionFactory);
 	}

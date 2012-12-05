@@ -41,9 +41,7 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
  * @author thibautd
  */
 public class GroupStrategyManager {
-	private final List<GroupPlanStrategy> strategies = new ArrayList<GroupPlanStrategy>();
-	private final List<Double> weights = new ArrayList<Double>();
-	private double sumOfWeights = 0;
+	private GroupStrategyRegistry registry;
 
 	private final GroupLevelPlanSelector selectorForRemoval;
 	private final GroupIdentifier groupIdentifier;
@@ -51,25 +49,20 @@ public class GroupStrategyManager {
 
 	public GroupStrategyManager(
 			final GroupIdentifier groupIdentifier,
+			final GroupStrategyRegistry registry,
 			final int maxPlanPerAgent) {
-		this( new LowestScoreSumSelector() , groupIdentifier , maxPlanPerAgent );
+		this( new LowestScoreSumSelector() , registry , groupIdentifier , maxPlanPerAgent );
 	}
 
 	public GroupStrategyManager(
 			final GroupLevelPlanSelector selectorForRemoval,
+			final GroupStrategyRegistry registry,
 			final GroupIdentifier groupIdentifier,
 			final int maxPlanPerAgent) {
 		this.selectorForRemoval = selectorForRemoval;
+		this.registry = registry;
 		this.groupIdentifier = groupIdentifier;
 		this.maxPlanPerAgent = maxPlanPerAgent;
-	}
-
-	public final void addStrategy(
-			final GroupPlanStrategy strategy,
-			final double weight) {
-		strategies.add( strategy );
-		weights.add( weight );
-		sumOfWeights += weight;
 	}
 
 	public final void run(final Population population) {
@@ -80,7 +73,7 @@ public class GroupStrategyManager {
 		for (ReplanningGroup g : groups) {
 			removeExtraPlans( g );
 
-			GroupPlanStrategy strategy = chooseStrategy();
+			GroupPlanStrategy strategy = registry.chooseStrategy();
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
 
 			if (alloc == null) {
@@ -94,20 +87,6 @@ public class GroupStrategyManager {
 		for (Map.Entry<GroupPlanStrategy, List<ReplanningGroup>> e : strategyAllocations.entrySet()) {
 			e.getKey().run( e.getValue() );
 		}
-	}
-
-	private GroupPlanStrategy chooseStrategy() {
-		final double choice = MatsimRandom.getRandom().nextDouble();
-		double cumul = 0;
-		int i = 0;
-
-		Iterator<Double> iter = weights.iterator();
-		while ( choice > cumul ) {
-			cumul += iter.next();
-			i++;
-		}
-
-		return strategies.get( i );
 	}
 
 	private final void removeExtraPlans(final ReplanningGroup group) {
