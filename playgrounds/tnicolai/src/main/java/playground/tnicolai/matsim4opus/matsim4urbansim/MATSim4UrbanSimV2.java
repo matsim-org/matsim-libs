@@ -37,7 +37,6 @@ import playground.tnicolai.matsim4opus.config.AccessibilityParameterConfigModule
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import playground.tnicolai.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import playground.tnicolai.matsim4opus.config.UrbanSimParameterConfigModuleV3;
-import playground.tnicolai.matsim4opus.constants.InternalConstants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
@@ -73,7 +72,7 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 	// needed for controler listeners
 	AggregateObject2NearestNode[] aggregatedOpportunities = null;
 	
-	boolean isParcelMode = true; // tnicolai todo!!!
+	boolean isParcelMode = true;
 	
 	double timeOfDay	 = -1.;
 	
@@ -90,8 +89,6 @@ public class MATSim4UrbanSimV2 implements MATSim4UrbanSimInterface{
 	double cellSizeInMeter 							 = -1;
 	double opportunitySampleRate 					 = 1.;
 	NetworkBoundaryBox nwBoundaryBox				 = null;
-	
-//	int srid					   					 = -1;
 
 	/**
 	 * constructor
