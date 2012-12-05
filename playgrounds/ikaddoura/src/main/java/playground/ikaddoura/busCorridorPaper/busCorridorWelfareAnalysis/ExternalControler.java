@@ -45,6 +45,8 @@ class ExternalControler {
 	
 	static String configFile;
 	static String outputExternalIterationDirPath;
+	static String rndSeedsFile;
+	static int rndSeedNr;
 	static long randomSeed;
 	
 	static int lastExternalIterationParam1;
@@ -85,7 +87,14 @@ class ExternalControler {
 //		randomSeed = settings.getRandomSeed();
 		
 		outputExternalIterationDirPath = args[1];
-		randomSeed = Long.parseLong(args[2]);
+		log.info("OutputPath: " + outputExternalIterationDirPath);
+		
+		rndSeedsFile = args[2];		
+		rndSeedNr = Integer.parseInt(args[3]);
+		log.info("Loading RandomSeed #" + rndSeedNr + " from file " + rndSeedsFile + "...");
+
+		RndSeedsLoader rndSeedsLoader = new RndSeedsLoader(rndSeedsFile);
+		randomSeed = rndSeedsLoader.getRandomSeed(rndSeedNr);
 		
 		lastExternalIterationParam1 = settings.getLastExtIt1();
 		lastExternalIterationParam2 = settings.getLastExtIt2();

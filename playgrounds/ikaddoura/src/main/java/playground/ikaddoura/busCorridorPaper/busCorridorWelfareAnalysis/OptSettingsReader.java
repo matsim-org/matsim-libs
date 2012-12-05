@@ -96,7 +96,7 @@ public class OptSettingsReader {
 	                		this.optSettings.setIncrCapacity(Integer.parseInt(parts[1]));
 	                	
 	                	} else if (parts[0].equals("randomSeed")){
-	                		this.optSettings.setRandomSeed(Integer.parseInt(parts[1]));
+	                		this.optSettings.setRandomSeed(Long.parseLong(parts[1]));
 	                		
 	            		} else {
 	            			throw new RuntimeException(parts[0] +" is an unknown parameter in the optimization settings file. Aborting...");
