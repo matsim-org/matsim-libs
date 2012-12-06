@@ -62,7 +62,7 @@ public class DgCreateDgFlightScenario {
 	public static String inputOagFilename = dataBaseDirectory + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
 	private CoordinateReferenceSystem targetCrs = MGC.getCRS("EPSG:3395");
 	
-	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/";
+	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_germany_only_2_runways_airport_capacities_www_storage_restriction/";
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
 	private boolean useAirportCapacities = true;
@@ -78,6 +78,19 @@ public class DgCreateDgFlightScenario {
 		return scenario;
 	}
 
+	
+	public void createFlightScenarios() throws Exception {
+		List<DgOagLine> flightData = new DgOagReader().readOagLines(inputOagFilename);
+		//WORLD WIDE AIR TRAFFIC
+//		createWorldFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+
+		//	//EUROPEAN AIR TRAFFIC
+//		createEuropeanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+
+	// GERMAN AIR TRAFFIC
+		createGermanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
+	}
+	
 	private void readAirportCapacities(DgFlightScenarioData scenarioData){
 		new DgAirportCapacityReader(scenarioData.getAirportsCapacityData()).readFile(airportCapacityFile);
 	}
@@ -104,17 +117,7 @@ public class DgCreateDgFlightScenario {
 		
 	}
 	
-	public void createFlightScenarios() throws Exception {
-		List<DgOagLine> flightData = new DgOagReader().readOagLines(inputOagFilename);
-		//WORLD WIDE AIR TRAFFIC
-//		createWorldFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
 
-		//	//EUROPEAN AIR TRAFFIC
-		createEuropeanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
-
-	// GERMAN AIR TRAFFIC
-//		createGermanFlightScenario(DgCreateDgFlightScenario.inputAirportsCoordinatesFilename, flightData);
-	}
 
 	public void createWorldFlightScenario(String inputOsmFilename,
 			List<DgOagLine> flightData) throws Exception {
@@ -123,7 +126,7 @@ public class DgCreateDgFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory, null, utcOffsetfile, oagFlightsFilename);
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);
@@ -140,8 +143,9 @@ public class DgCreateDgFlightScenario {
 
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
+		airScheduleBuilder.setCountryFilter(new DgEuropeCountryFilter(true));
 		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory,
-				SfAirScheduleBuilder.EURO_COUNTRIES, utcOffsetfile, oagFlightsFilename);
+				 utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);
@@ -157,8 +161,8 @@ public class DgCreateDgFlightScenario {
 		String oagFlightsFilename = baseDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory,
-				SfAirScheduleBuilder.GERMAN_COUNTRIES, utcOffsetfile, oagFlightsFilename);
+		airScheduleBuilder.setCountryFilter(new DgGermanyCountryFilter(true));
+		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory, utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();
 
 		createScenario(baseDirectory, flightsData, airports);

@@ -44,14 +44,6 @@ public class SfAirScheduleBuilder {
 
 	private static final Logger log = Logger.getLogger(SfAirScheduleBuilder.class);
 
-	public final static String[] EURO_COUNTRIES = { "AD", "AL", "AM", "AT", "AX", "AZ", "BA", "BE",
-			"BG", "BY", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FO", "FR", "GB", "GI", "GE",
-			"GG", "GR", "HR", "HU", "IE", "IM", "IS", "IT", "JE", "KZ", "LI", "LT", "LU", "LV", "MC",
-			"MD", "ME", "MK", "MT", "NL", "NO", "PL", "PT", "RO", "RS", "RU", "SE", "SI", "SJ", "SK",
-			"SM", "TR", "UA", "VA" };
-
-	public final static String[] GERMAN_COUNTRIES = { "DE" };
-
 	public static final String AIRPORTS_OUTPUT_FILE = "airports.txt";
 
 	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
@@ -62,15 +54,13 @@ public class SfAirScheduleBuilder {
 
 	private static final char two = '2';
 
-	
-	
 	private Map<String, Coord> airportsInModel = new HashMap<String, Coord>();
 	private Map<String, Double> routeDurationMap = new HashMap<String, Double>();
 	private Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	private Map<String, Double> utcOffset = new HashMap<String, Double>();
 	private Set<String> missingAirportCodes = new HashSet<String>();
 
-	private Set<String> countryFilter = null;
+	private DgCountryFilter countryFilter = new DgWorldCountryFilter();
 
 	private int ignoredBusOrTrainFlights = 0;
 
@@ -92,27 +82,19 @@ public class SfAirScheduleBuilder {
 
 	private DgOagFlightsData flights;
 
-	public void setCountryFilter(String[] countries) {
-		if (countries != null) {
-			this.countryFilter = new HashSet<String>();
-			for (String s : countries){
-				this.countryFilter.add(s.toUpperCase());
-			}
-		}
+	public void setCountryFilter(DgCountryFilter filter) {
+		this.countryFilter = filter;
 	}
 
 	public void readDataAndFilter(String inputOsmFilename, String inputOagFilename,
-			String baseDirectory, Object countries, String utcOffsetfile, String oagFlightsFilename) {
-		throw new UnsupportedOperationException("load data in this method hor change to new interface");
+			String baseDirectory, String utcOffsetfile, String oagFlightsFilename) {
+		throw new UnsupportedOperationException("load data in this method or change to new interface");
 	}
 
 
 	@SuppressWarnings("rawtypes")
 	public DgOagFlightsData readDataAndFilter(String inputAirportListFile, List<DgOagLine> oagLines,
-			String outputDirectory, String[] countries, String utcOffsetInputfile,
-			String oagFlightsOutputFilename) throws Exception {
-		
-		this.setCountryFilter(countries);
+			String outputDirectory, String utcOffsetInputfile, String oagFlightsOutputFilename) throws Exception {
 		
 		this.availableAirportCoordinates = new DgAirportsReader()
 				.loadAirportCoordinates(inputAirportListFile);
@@ -181,16 +163,11 @@ public class SfAirScheduleBuilder {
 	}
 
 	private boolean isCountryOfInterest(String originCountry, String destinationCountry) {
-		if (countryFilter == null) {
+		if (this.countryFilter.isCountryOfInterest(originCountry, destinationCountry)) {
 			return true;
 		}
-			if (countryFilter.contains(originCountry) || countryFilter.contains(destinationCountry)){
-				return true;
-			}
-//				 log.info("Neither origin country: " + originCountry + " nor destination country: " + destinationCountry +
-//				 " matches filter.");
-				// log.info("skipping flight from " + originAirport + " to " + destinationAirport);
-				ignoredFlightsDueToCountryFilter++;
+		// log.info("skipping flight from " + originAirport + " to " + destinationAirport);
+		ignoredFlightsDueToCountryFilter++;
 		return false;
 	}
 	
