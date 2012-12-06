@@ -34,14 +34,17 @@ import java.util.Map;
  */
 public class AnaMain {
 
-//	private String outputFolder = "/Users/Ihab/Desktop/analysis_output/B_NTC/";
-//	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/B_NTC/";
+	private String outputFolder = "/Users/Ihab/Desktop/B_NTC_anaOutputRndSeedRuns_preliminary/";
+	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/FINAL_OUTPUT/B_NTC/";
 
-//	private String outputFolder = "/Users/Ihab/Desktop/analysis_output/A_TC/";
-//	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/A_TC/";
+//	private String outputFolder = "/Users/Ihab/Desktop/A_TC_anaOutputRndSeedRuns/";
+//	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3/output/FINAL_OUTPUT/A_TC/";
 	
-	private String outputFolder = "/Users/Ihab/Desktop/TEST_analysis_output3/";
-	private String runFolder = "/Users/Ihab/Desktop/TEST/";
+//	private String outputFolder = "/Users/Ihab/Desktop/C_TC_anaOutputRndSeedRuns/";
+//	private String runFolder = "/Users/Ihab/ils4/kaddoura/welfareBusCorridor_opt3.1/output/C_TC/";
+	
+//	private String outputFolder = "/Users/Ihab/Desktop/TEST_analysis_output3/";
+//	private String runFolder = "/Users/Ihab/Desktop/TEST/";
 	
 	public static void main(String[] args) {
 		AnaMain ana = new AnaMain();
