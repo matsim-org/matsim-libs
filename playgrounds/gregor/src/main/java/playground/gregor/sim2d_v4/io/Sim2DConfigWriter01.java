@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
@@ -86,10 +87,10 @@ public class Sim2DConfigWriter01 extends MatsimJaxbXmlWriter {
 			xmlEnv.setNetworkFilePath(this.conf.getNetworkPath(env));
 			xmlEnv.setSim2DEnvironmentPath(env);
 			XMLQSimSim2DNetworkNodesMappingsType xmlMappings = fac.createXMLQSimSim2DNetworkNodesMappingsType();
-			for (String accessor : this.conf.getSim2DEnvAccessorNodes(env)) {
+			for (Id accessor : this.conf.getSim2DEnvAccessorNodes(env)) {
 				XMLQSimSim2DNetworkNodesMappingType xmlMapping = fac.createXMLQSimSim2DNetworkNodesMappingType();
-				xmlMapping.setSim2DNodeId(accessor);
-				xmlMapping.setQSimNodeId(this.conf.getQSimNode(accessor));
+				xmlMapping.setSim2DNodeId(accessor.toString());
+				xmlMapping.setQSimNodeId(this.conf.getQSimNode(accessor).toString());
 				xmlMappings.getQSimSim2DNetworkNodesMapping().add(xmlMapping );
 			}
 			xmlEnv.setQSimSim2DNetworkNodesMappings(xmlMappings);

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -35,7 +36,9 @@ public class Sim2DEnvironment {
 	private Envelope envelope;
 	private CoordinateReferenceSystem crs;
 	private final Map<Id, Section> sections = new HashMap<Id,Section>();
-
+	private final Map<Id,Id> accessorNodeQSimNodeMapping = new HashMap<Id,Id>();
+	private Network net;
+	
 	public void setEnvelope(Envelope e) {
 		this.envelope = e;
 	}
@@ -62,6 +65,22 @@ public class Sim2DEnvironment {
 
 	public Map<Id,Section> getSections() {
 		return this.sections ;
+	}
+
+
+	public void addAccessorNodeQSimNodeMapping(Id i, Id m) {
+		Id old = this.accessorNodeQSimNodeMapping.put(i, m);
+		if (old != null){
+			throw new RuntimeException("A mapping for node "+ i + " already exist. sim2d nodes can only be mapped to one qsim node.");
+		}
+	}
+
+	public void setNetwork(Network net) {
+		this.net = net;
+	}
+	
+	public Network getEnvironmentNetwork(){
+		return this.net;
 	}
 
 

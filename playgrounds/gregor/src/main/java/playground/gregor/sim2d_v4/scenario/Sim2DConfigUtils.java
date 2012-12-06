@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DScenario.java
+ * Sim2DConfigUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,44 +20,19 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
-import java.util.ArrayList;
-import java.util.List;
+import playground.gregor.sim2d_v4.io.Sim2DConfigReader01;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+public abstract class Sim2DConfigUtils {
 
-public class Sim2DScenario {
 	
-	
-	private final List<Sim2DEnvironment> envs = new ArrayList<Sim2DEnvironment>();
-	
-	/*package*/ Sim2DScenario() {}
-	
-	
-	public List<Sim2DEnvironment> getSim2DEnvironments() {
-		return this.envs;
+	public static Sim2DConfig createConfig() {
+		Sim2DConfig config = new Sim2DConfig();
+		return config;
 	}
 	
-	public void connect(Scenario sc) {
-		sc.addScenarioElement(this);
-		Network scNet = sc.getNetwork();
-		for (Sim2DEnvironment env : this.envs) {
-			Network envNet = env.getEnvironmentNetwork();
-			connect(envNet,scNet);
-		}
+	public static Sim2DConfig loadConfig(String path) {
+		Sim2DConfig config = new Sim2DConfig();
+		new Sim2DConfigReader01(config, false).readFile(path);
+		return config;
 	}
-
-
-	private void connect(Network envNet, Network scNet) {
-		for (Node n : envNet.getNodes().values()) {
-			scNet.addNode(n);
-		}
-		for (Link l : envNet.getLinks().values()) {
-			scNet.addLink(l); //TODO check if capperiod, effectivecellsize, lanewidth is the same for both networks
-		}
-	}
-	
-
 }

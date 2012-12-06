@@ -21,6 +21,8 @@
 package playground.gregor.sim2d_v4.io;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.referencing.CRS;
@@ -32,9 +34,9 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
-import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
 import playground.gregor.sim2d_v4.scenario.Section;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -46,8 +48,48 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class SerializerDeserializerTest extends MatsimTestCase {
 
+	
 	@Test
-	public void testSerializerDeserializer() {
+	public void testSim2DConfigSerializerDeserializer() {
+		String outDir = getOutputDirectory();
+		String envOut = outDir + "/env.gml.gz";
+		String netOut = outDir + "/net.xml";
+		String configOut = outDir +"/config.xml";
+		Sim2DConfig conf = Sim2DConfigUtils.createConfig();
+		conf.setEventsInterval(1);
+		conf.setTimeStepSize(0.1);
+		conf.addSim2DEnvironmentPath(envOut);
+		conf.addSim2DEnvNetworkMapping(envOut, netOut);
+		conf.addSim2DEnvAccessorNode(envOut, new IdImpl("15699"));
+		conf.addSim2DEnvAccessorNode(envOut, new IdImpl("7678"));
+		conf.addSim2DAccessorNodeQSimAccessorNodeMapping(new IdImpl("15699"), new IdImpl("607200281"));
+		conf.addSim2DAccessorNodeQSimAccessorNodeMapping(new IdImpl("7678"), new IdImpl("535985128"));
+		new Sim2DConfigWriter01(conf).write(configOut);
+		
+		Sim2DConfig conf2 = Sim2DConfigUtils.loadConfig(configOut);
+		String envOut2 = conf2.getSim2DEnvironmentPaths().iterator().next();
+		assertEquals(envOut, envOut2);
+		String netOut2 = conf2.getNetworkPath(envOut2);
+		assertEquals(netOut, netOut2);
+		List<Id> l = conf.getSim2DEnvAccessorNodes(envOut);
+		Collections.sort(l);
+		List<Id> l2 = conf2.getSim2DEnvAccessorNodes(envOut2);
+		Collections.sort(l2);
+		Iterator<Id> it = l.iterator();
+		Iterator<Id> it2 = l2.iterator();
+		while (it.hasNext()) {
+			Id id = it.next();
+			Id id2 = it2.next();
+			assertEquals(id, id2);
+			
+			Id nid = conf.getQSimNode(id);
+			Id nid2 = conf2.getQSimNode(id2);
+			assertEquals(nid,nid2);
+		}
+	}
+	
+	@Test
+	public void testSim2DEnvironmentSerializerDeserializer() {
 		
 		String outDir = getOutputDirectory();
 
@@ -111,8 +153,4 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 
 	}
 
-	public static void main(String [] args) {
-		SerializerDeserializerTest test = new SerializerDeserializerTest();
-		test.testSerializerDeserializer();
-	}
 }

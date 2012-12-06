@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DScenario.java
+ * Sim2DScenarioUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,44 +20,39 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
-public class Sim2DScenario {
-	
-	
-	private final List<Sim2DEnvironment> envs = new ArrayList<Sim2DEnvironment>();
-	
-	/*package*/ Sim2DScenario() {}
-	
-	
-	public List<Sim2DEnvironment> getSim2DEnvironments() {
-		return this.envs;
-	}
-	
-	public void connect(Scenario sc) {
-		sc.addScenarioElement(this);
-		Network scNet = sc.getNetwork();
-		for (Sim2DEnvironment env : this.envs) {
-			Network envNet = env.getEnvironmentNetwork();
-			connect(envNet,scNet);
-		}
-	}
+import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
 
-
-	private void connect(Network envNet, Network scNet) {
-		for (Node n : envNet.getNodes().values()) {
-			scNet.addNode(n);
-		}
-		for (Link l : envNet.getLinks().values()) {
-			scNet.addLink(l); //TODO check if capperiod, effectivecellsize, lanewidth is the same for both networks
-		}
-	}
+public abstract class Sim2DScenarioUtils {
 	
+	
+	public Sim2DScenario loadSim2DScenario(Sim2DConfig conf) {
+		Sim2DScenario scenario = new Sim2DScenario();
+		for (String envPath : conf.getSim2DEnvironmentPaths()){
+			Sim2DEnvironment env = new Sim2DEnvironment();
+			new Sim2DEnvironmentReader02(env, false).readFile(envPath);
+			scenario.getSim2DEnvironments().add(env);
+			for (Id i : conf.getSim2DEnvAccessorNodes(envPath)) {
+				Id m = conf.getQSimNode(i);
+				env.addAccessorNodeQSimNodeMapping(i,m);
+			}
+			String netPath = conf.getNetworkPath(envPath);
+			
+			Config c = ConfigUtils.createConfig();
+			Scenario sc = ScenarioUtils.createScenario(c);
+			new MatsimNetworkReader(sc).readFile(netPath);
+			Network net = sc.getNetwork();
+			env.setNetwork(net);
+		}
+		
+		return scenario;
+	}
 
 }

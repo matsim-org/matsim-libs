@@ -51,6 +51,7 @@ import playground.gregor.sim2d_v4.io.Sim2DConfigWriter01;
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -174,15 +175,15 @@ public class Test {
 		//TODO repair schema (does not yet validate!!)
 		new Sim2DEnvironmentReader02(env2, false).readFile(output);
 
-		Sim2DConfig conf = new Sim2DConfig();
+		Sim2DConfig conf = Sim2DConfigUtils.createConfig();
 		conf.setEventsInterval(1);
 		conf.setTimeStepSize(0.1);
 		conf.addSim2DEnvironmentPath(output);
 		conf.addSim2DEnvNetworkMapping(output, network);
-		conf.addSim2DEnvAccessorNode(output, "15699");
-		conf.addSim2DEnvAccessorNode(output, "7678");
-		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("15699", "607200281");
-		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("7678", "535985128");
+		conf.addSim2DEnvAccessorNode(output, new IdImpl("15699"));
+		conf.addSim2DEnvAccessorNode(output, new IdImpl("7678"));
+		conf.addSim2DAccessorNodeQSimAccessorNodeMapping(new IdImpl("15699"), new IdImpl("607200281"));
+		conf.addSim2DAccessorNodeQSimAccessorNodeMapping(new IdImpl("7678"), new IdImpl("535985128"));
 //		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("7144", "999");
 		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d/input/sim2dConfig.xml");
 		
