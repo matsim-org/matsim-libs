@@ -308,6 +308,8 @@ public class ScenarioGenerator {
 		}else if (gcm.getMainTrafficType().equals("mixed")) {
 			//TODO OSMReader for mixed
 			log.warn("You are using an experimental feature. Only use this if you exactly know what are you doing!");
+			((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.31);
 			CustomizedOsmNetworkReader reader = new CustomizedOsmNetworkReader(sc.getNetwork(), ct, true);
 			reader.setHighwayDefaults(6,"path",           2,  1.34, 1.0,  1);
 			reader.setHighwayDefaults(6,"cycleway",       2,  1.34, 1.0,  1);
