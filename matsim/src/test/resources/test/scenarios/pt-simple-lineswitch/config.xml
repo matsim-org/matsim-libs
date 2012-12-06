@@ -44,6 +44,9 @@
 		<param name="isAbleToOverwritePtInteractionParams" value="true" />
 	</module>
 
+	<module name="otfvis">
+		<param name="showTeleportation" value="true" />
+	</module>
 
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->

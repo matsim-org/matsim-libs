@@ -70,58 +70,13 @@ public class TransitControler {
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
 			
-//			EventsManager eventsManager1 = eventsManager;
-//
-//			QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
-//			if (conf == null) {
-//				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-//			}
-//
-//			// Get number of parallel Threads
-//			int numOfThreads = conf.getNumberOfThreads();
-//			QNetsimEngineFactory netsimEngFactory;
-//			if (numOfThreads > 1) {
-//				eventsManager1 = new SynchronizedEventsManagerImpl(eventsManager1);
-//				netsimEngFactory = new ParallelQNetsimEngineFactory();
-//			} else {
-//				netsimEngFactory = new DefaultQSimEngineFactory();
-//			}
-//			QSim qSim = new QSim(sc, eventsManager1);
-//			
-//			ActivityEngine activityEngine = new ActivityEngine();
-//			qSim.addMobsimEngine(activityEngine);
-//			qSim.addActivityHandler(activityEngine);
-//			
-//			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-//			qSim.addMobsimEngine(netsimEngine);
-//			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-//			
-//			qSim.addMobsimEngine(new TeleportationEngine());
-//			
-//			if ( useTransit ) {
-//				AgentFactory agentFactory= new TransitAgentFactory(qSim);
-//				TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-//				transitEngine.setUseUmlaeufe(true);
-//				transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//				qSim.addDepartureHandler(transitEngine);
-//				qSim.addMobsimEngine(transitEngine);
-//				qSim.addAgentSource(transitEngine);
-//				PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-//				qSim.addAgentSource(agentSource);
-//
-//				//			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//				//			transitEngine.setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
-//			} else {
-//				Logger.getLogger(this.getClass()).warn("useTransit is switched off; is this what I want?") ;
-//			}
-//			
-//			//			this.events.addHandler(new LogOutputEventHandler());
 
 			if ( useOTFVis ) {
 				// otfvis configuration.  There is more you can do here than via file!
 				final OTFVisConfigGroup otfVisConfig = qSim.getScenario().getConfig().otfVis();
 				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
 				//				otfVisConfig.setShowParking(true) ; // this does not really work
+				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg2) ;
 
 
 				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
