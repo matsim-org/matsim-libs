@@ -97,11 +97,11 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_MAXSPEED = "maxspeed";
 	private final static String TAG_JUNCTION = "junction";
 	private final static String TAG_ONEWAY = "oneway";
-	private final static String TAG_MATSIM_MIN_WIDTH = "matsim_min_width";
-	private final static String TAG_MATSIM_FREESPEED = "matsim_freespeed";
-	private final static String TAG_MATSIM_FLOWCAPACITY = "matsim_flowcapacity";
-	private final static String TAG_MATSIM_TRANSPORT_MODE = "matsim_transport_mode";
-	private static final String TAG_MATSIM_LANES = "matsim_lanes";
+	private final static String TAG_MATSIM_MIN_WIDTH = "m_width";
+	private final static String TAG_MATSIM_FREESPEED = "m_fspeed";
+	private final static String TAG_MATSIM_FLOWCAPACITY = "m_flowcap";
+	private final static String TAG_MATSIM_TRANSPORT_MODE = "m_tra_mode";
+	private static final String TAG_MATSIM_LANES = "m_lanes";
 	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY,TAG_MATSIM_FLOWCAPACITY,TAG_MATSIM_FREESPEED,TAG_MATSIM_MIN_WIDTH,TAG_MATSIM_TRANSPORT_MODE};
 
 
