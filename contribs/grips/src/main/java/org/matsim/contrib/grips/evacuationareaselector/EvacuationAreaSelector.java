@@ -244,7 +244,7 @@ public class EvacuationAreaSelector implements ActionListener{
 					}
 					catch(Exception ee)
 					{
-						throw new RuntimeException("File is not a  grips config file! Exiting!");
+						throw new RuntimeException("File is not a  grips config file! Exiting!" + ee.getMessage());
 					}
 		            loadMapView(this.gcm.getNetworkFileName());
 		        } else {
