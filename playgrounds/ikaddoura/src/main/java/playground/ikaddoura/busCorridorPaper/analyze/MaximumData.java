@@ -26,30 +26,30 @@ package playground.ikaddoura.busCorridorPaper.analyze;
  * @author ikaddoura
  *
  */
-public class MaxWelfareData {
+public class MaximumData {
 
 	private int runNr;
-	private int maxWelfareNumberOfBuses;
-	private double maxWelfareFare;
-	private double maxWelfare;
+	private int maxNumberOfBuses;
+	private double maxFare;
+	private double maximumValue;
 	
-	public int getMaxWelfareNumberOfBuses() {
-		return maxWelfareNumberOfBuses;
+	public int getMaxNumberOfBuses() {
+		return maxNumberOfBuses;
 	}
-	public void setMaxWelfareNumberOfBuses(int maxWelfareNumberOfBuses) {
-		this.maxWelfareNumberOfBuses = maxWelfareNumberOfBuses;
+	public void setMaxNumberOfBuses(int maxWelfareNumberOfBuses) {
+		this.maxNumberOfBuses = maxWelfareNumberOfBuses;
 	}
-	public double getMaxWelfareFare() {
-		return maxWelfareFare;
+	public double getMaxFare() {
+		return maxFare;
 	}
-	public void setMaxWelfareFare(double maxWelfareFare) {
-		this.maxWelfareFare = maxWelfareFare;
+	public void setMaxFare(double value) {
+		this.maxFare = value;
 	}
-	public double getMaxWelfare() {
-		return maxWelfare;
+	public double getMaximumValue() {
+		return maximumValue;
 	}
-	public void setMaxWelfare(double maxWelfare) {
-		this.maxWelfare = maxWelfare;
+	public void setMaximumValue(double value) {
+		this.maximumValue = value;
 	}
 	public int getRunNr() {
 		return runNr;
@@ -57,6 +57,5 @@ public class MaxWelfareData {
 	public void setRunNr(int runNr) {
 		this.runNr = runNr;
 	}
-	
-	
+
 }
