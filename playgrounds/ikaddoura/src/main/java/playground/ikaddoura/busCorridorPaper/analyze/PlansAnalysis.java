@@ -16,8 +16,8 @@ public class PlansAnalysis {
 
 	String netFile = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/input_test/network_opt3.xml";
 	
-	String plansFile = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/output/test1_standard/extIt0/extITERS/extIt0.0/internalIterations/output_plans.xml.gz";
-//	String plansFile = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/output/test1_standard/extIt0/extITERS/extIt0.1/internalIterations/output_plans.xml.gz";
+//	String plansFile = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/output/test11_standard_50buses_fasterBuses_NTC_noCongestion/extIt0/extITERS/extIt0.0/internalIterations/output_plans.xml.gz";
+	String plansFile = "/Users/Ihab/ils/kaddoura/welfareBusCorridor_opt3/output/test11_standard_50buses_fasterBuses_NTC_noCongestion/extIt0/extITERS/extIt0.1/internalIterations/output_plans.xml.gz";
 
 	public static void main(String[] args) {
 		PlansAnalysis analyse = new PlansAnalysis();
