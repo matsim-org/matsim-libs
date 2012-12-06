@@ -47,11 +47,11 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.gregor.approxdecomp.ApproxConvexDecomposer.Opening;
 import playground.gregor.approxdecomp.ApproxConvexDecomposer.PolygonInfo;
 import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
-import playground.gregor.sim2d_v4.io.Sim2DConfigSerializer;
+import playground.gregor.sim2d_v4.io.Sim2DConfigWriter01;
+import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
+import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
-import playground.gregor.sim2dio.Sim2DEnvironmentReader02;
-import playground.gregor.sim2dio.Sim2DEnvironmentWriter02;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -181,10 +181,10 @@ public class Test {
 		conf.addSim2DEnvNetworkMapping(output, network);
 		conf.addSim2DEnvAccessorNode(output, "15699");
 		conf.addSim2DEnvAccessorNode(output, "7678");
-		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("15699", "999");
-		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("7678", "999");
+		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("15699", "607200281");
+		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("7678", "535985128");
 //		conf.addSim2DAccessorNodeQSimAccessorNodeMapping("7144", "999");
-		new Sim2DConfigSerializer(conf).write("/Users/laemmel/devel/burgdorf2d/input/sim2dConfig.xml");
+		new Sim2DConfigWriter01(conf).write("/Users/laemmel/devel/burgdorf2d/input/sim2dConfig.xml");
 		
 		
 		

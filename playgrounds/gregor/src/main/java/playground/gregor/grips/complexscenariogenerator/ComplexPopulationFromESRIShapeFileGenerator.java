@@ -163,29 +163,21 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 
 		List<Double> randVariables = new ArrayList<Double>();
 
-			double mu_h = Math.log(mu);
-			double sigma_h = Math.log(sigma);
+			double incr = (max-min)/RAND_SAMPLES;
 			for (int i = 0; i < RAND_SAMPLES; i ++) {
-				double sec, hrs;
-				do {
-					double r = MatsimRandom.getRandom().nextGaussian();
-					// eine Zahl zwischen -inf und +inf, normal-verteilt
-					// besser mit Stunden rechnen!
-					hrs = Math.exp(mu_h + sigma_h*r);
-					sec = hrs*3600.0;
-				} while(hrs < min || hrs > max);
-				randVariables.add(sec);
+				randVariables.add(min*3600);
+				min += incr;
 			}
 
-		Collections.sort(randVariables);
+//		Collections.sort(randVariables);
 		this.depTimeLookup = randVariables;
-		double offset = this.depTimeLookup.get(0);
-		// offset >= earliest // otherwise throw Exception?
-		for (int i = 0; i < this.depTimeLookup.size(); i++) {
-			double depTime = this.depTimeLookup.get(i)-offset;
-			// departure time relative to the first agent, i.e. the start of the simulation
-			this.depTimeLookup.set(i, depTime);
-		}
+//		double offset = this.depTimeLookup.get(0);
+//		// offset >= earliest // otherwise throw Exception?
+//		for (int i = 0; i < this.depTimeLookup.size(); i++) {
+//			double depTime = this.depTimeLookup.get(i)-offset;
+//			// departure time relative to the first agent, i.e. the start of the simulation
+//			this.depTimeLookup.set(i, depTime);
+//		}
 		Collections.shuffle(this.depTimeLookup);
 	}
 	

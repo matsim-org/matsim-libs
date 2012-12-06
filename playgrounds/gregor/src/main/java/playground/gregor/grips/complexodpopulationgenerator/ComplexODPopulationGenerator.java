@@ -465,7 +465,7 @@ public class ComplexODPopulationGenerator implements ActionListener{
 					c.addModule("grips", gcm);
 					c.global().setCoordinateSystem("EPSG:3395");
 					
-					GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
+					GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm,false);
 					parser.readFile(this.configFile);
 				}
 				catch(Exception ee)
@@ -740,7 +740,7 @@ class SelectionListener implements ListSelectionListener
 		if (!this.populationAreaSelector.editing)
 		{
 			int sel = this.populationAreaSelector.getAreaTable().getSelectedRow();
-			int id = (Integer)(this.populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 0);
+			int id = Integer.parseInt(this.populationAreaSelector.getAreaTable().getModel().getValueAt(sel, 0).toString());
 			String pop = String.valueOf((this.populationAreaSelector.getAreaTable().getModel()).getValueAt(sel, 1));
 			
 			this.populationAreaSelector.setSelectedAreaID(id);
