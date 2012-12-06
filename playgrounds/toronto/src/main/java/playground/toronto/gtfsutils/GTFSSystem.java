@@ -123,7 +123,7 @@ public class GTFSSystem {
 	//INTERNAL METHODS----------------------------------------------------------------------------------------------------------------------
 	
 		private void loadStops(String fileName) throws FileNotFoundException, IOException{
-			TableReader tr = new TableReader(fileName);
+			TableReader tr = new TableReader(fileName, ",");
 			tr.open();
 			if (!tr.checkHeaders(stopsFileHeaders)) throw new IOException("Stops file is incorrectly formatted!");
 			tr.ignoreTrailingBlanks(true);
@@ -140,7 +140,7 @@ public class GTFSSystem {
 		}
 		
 		private void loadCalendar(String filename) throws FileNotFoundException, IOException{
-			TableReader tr = new TableReader(filename);
+			TableReader tr = new TableReader(filename, ",");
 			tr.open();
 			if (!tr.checkHeaders(calendarFileHeaders)) throw new IOException("Calendar file is incorrectly formatted!");
 			
@@ -171,7 +171,7 @@ public class GTFSSystem {
 		}
 		
 		private void loadRoutes(String filename) throws FileNotFoundException, IOException{
-			TableReader tr = new TableReader(filename);
+			TableReader tr = new TableReader(filename, ",");
 			tr.open();
 			if (!tr.checkHeaders(routesFileHeaders)) throw new IOException("Routes file is incorrectly formatted!");
 			
@@ -185,7 +185,7 @@ public class GTFSSystem {
 		}
 		
 		private void loadTrips(String fileName) throws FileNotFoundException, IOException{
-			TableReader tr = new TableReader(fileName);
+			TableReader tr = new TableReader(fileName, ",");
 			tr.open();
 			if (!tr.checkHeaders(tripsFileHeaders)) throw new IOException("Trips file is incorrectly formatted!");
 			
@@ -211,7 +211,7 @@ public class GTFSSystem {
 		}
 		
 		private void loadStopTimes(String filename) throws FileNotFoundException, IOException{
-			TableReader tr = new TableReader(filename);
+			TableReader tr = new TableReader(filename, ",");
 			tr.open();
 			if (!tr.checkHeaders(stopTimesFileHeaders)) throw new IOException("Stop times file is incorrectly formatted!");
 			tr.ignoreTrailingBlanks(true);
@@ -245,7 +245,7 @@ public class GTFSSystem {
 		}
 		
 		private void loadFrequencies(String filename) throws FileNotFoundException, IOException{
-			TableReader tr = new TableReader(filename);
+			TableReader tr = new TableReader(filename, ",");
 			tr.open();
 			if (!tr.checkHeaders(frequenciesFileHeaders)) throw new IOException("Frequencies file is incorrectly formatted!");
 			

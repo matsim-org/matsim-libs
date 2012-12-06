@@ -196,7 +196,13 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 							if (l == null){
 								//Need a new link
 								l = netFact.createLink(linkId, fromNode, toNode, network, dist, freespeed, 9999, 1.0);
-								if (mode.toString().equals("BUS")){
+								l.setAllowedModes(Collections.singleton(mode.toString()));
+								
+								HashSet<Id> s = new HashSet<Id>();
+								s.add(routeId);
+								this.linkRouteMap.put(linkId, s);
+								
+								/*if (mode.toString().equals("BUS")){
 									HashSet<String> modes = new HashSet<String>();
 									modes.add(mode.toString());
 									modes.add(TransportMode.car);
@@ -208,13 +214,14 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 								}else{
 									l.setAllowedModes(Collections.singleton(mode.toString()));
 									linkRouteMap.get(l.getId()).add(routeId);
-								}
+								}*/
 								
 								this.network.addLink(l);
 							}else{
 								//Update the speed on the old link if necessary.
 								if (freespeed > l.getFreespeed())
 									l.setFreespeed(freespeed);
+								this.linkRouteMap.get(linkId).add(routeId);
 							}
 							itinerary.add(l.getId());
 						}
