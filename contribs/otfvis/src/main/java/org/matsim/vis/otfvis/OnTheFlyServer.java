@@ -40,6 +40,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -75,6 +77,21 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 		@Override
 		public Map<Id, Plan> getPlans() {
+			Map<Id, Plan> plans = new HashMap<Id, Plan>();
+			if (visMobsim != null ) {
+				Collection<MobsimAgent> agents = visMobsim.getAgents();
+				for (MobsimAgent agent : agents) {
+					if (agent instanceof PlanAgent) {
+						PlanAgent pa = (PlanAgent) agent;
+						plans.put(pa.getSelectedPlan().getPerson().getId(), pa.getSelectedPlan());
+					}
+				}
+			} else {
+				for (Person person : scenario.getPopulation().getPersons().values()) {
+					Plan plan = person.getSelectedPlan();
+					plans.put(person.getId(), plan);
+				}
+			}
 			return plans;
 		}
 
@@ -90,12 +107,12 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 		@Override
 		public void addTrackedAgent(Id agentId) {
-			
+
 		}
 
 		@Override
 		public void removeTrackedAgent(Id agentId) {
-			
+
 		}
 
 		@Override
@@ -107,7 +124,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 		public OTFServerQuadTree getNetworkQuadTree() {
 			return quad;
 		}
-		
+
 		@Override
 		public VisData getNonNetwokAgentSnapshots() {
 			if (visMobsim != null) {
@@ -148,9 +165,9 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private volatile double stepToTime = 0;
 
 	private VisMobsim visMobsim;
-	
+
 	private Map<Id, AgentSnapshotInfo> snapshots = new LinkedHashMap<Id, AgentSnapshotInfo>();
-	
+
 	private final VisData visData = new VisData() {
 
 		@Override
@@ -175,10 +192,6 @@ public class OnTheFlyServer implements OTFLiveServer {
 	OnTheFlyServer(Scenario scenario, EventsManager events) {
 		this.scenario = scenario;
 		this.events = events; 
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			this.plans.put(person.getId(), plan);
-		}
 	}
 
 	public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events) {
@@ -316,7 +329,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 				quad.addAdditionalElement(teleportationWriter);
 			}
 			quad.initQuadTree(connect);
-			
+
 			for(OTFDataWriter<?> writer : additionalElements) {
 				log.info("Adding additional element: " + writer.getClass().getName());
 				quad.addAdditionalElement(writer);
@@ -440,7 +453,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 			@Override
 			public void endSnapshot() {
-				
+
 			}
 
 			@Override
