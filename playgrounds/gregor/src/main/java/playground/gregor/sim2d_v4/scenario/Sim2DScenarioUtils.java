@@ -33,8 +33,8 @@ import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
 public abstract class Sim2DScenarioUtils {
 	
 	
-	public Sim2DScenario loadSim2DScenario(Sim2DConfig conf) {
-		Sim2DScenario scenario = new Sim2DScenario();
+	public static  Sim2DScenario loadSim2DScenario(Sim2DConfig conf) {
+		Sim2DScenario scenario = new Sim2DScenario(conf);
 		for (String envPath : conf.getSim2DEnvironmentPaths()){
 			Sim2DEnvironment env = new Sim2DEnvironment();
 			new Sim2DEnvironmentReader02(env, false).readFile(envPath);

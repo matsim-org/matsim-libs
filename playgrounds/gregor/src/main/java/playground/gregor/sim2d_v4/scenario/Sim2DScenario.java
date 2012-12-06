@@ -32,9 +32,15 @@ public class Sim2DScenario {
 	
 	
 	private final List<Sim2DEnvironment> envs = new ArrayList<Sim2DEnvironment>();
+	private final Sim2DConfig config;
 	
-	/*package*/ Sim2DScenario() {}
+	/*package*/ Sim2DScenario(Sim2DConfig conf) {
+		this.config = conf;
+	}
 	
+	public Sim2DConfig getSim2DConfig() {
+		return this.config;
+	}
 	
 	public List<Sim2DEnvironment> getSim2DEnvironments() {
 		return this.envs;
