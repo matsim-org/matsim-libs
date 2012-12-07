@@ -108,12 +108,39 @@ public class Test {
 			for (PolygonInfo  pi : decs) {
 				decomposed.add(pi);
 				Coordinate[] coords = pi.p.getExteriorRing().getCoordinates();
+				Set<Integer> handled = new HashSet<Integer>();
+				for (Opening open : pi.openings) {
+					handled.add(open.edge);
+				}
+				for (int i = 0; i < coords.length-1; i++) {
+					if (handled.contains(i)) {
+						continue;
+					}
+					Coordinate c0 = coords[i];
+					Coordinate c1 = coords[i+1];
+					if (c0.x == c1.x) {
+						if (c0.x == reader.getBounds().getMinX() || c0.x == reader.getBounds().getMaxX()){
+							Opening no = new Opening();
+							no.edge = i;
+							pi.openings.add(no );
+						}
+					} else if (c0.y == c1.y) {
+						if (c0.y == reader.getBounds().getMinY() || c0.y == reader.getBounds().getMaxY()) {
+							Opening no = new Opening();
+							no.edge = i;
+							pi.openings.add(no );							
+						}
+					}
+				}
 				for (Opening open : pi.openings) {
 					Coordinate c0 = coords[open.edge];
 					Coordinate c1 = coords[open.edge+1];
 					LineString ls = geofac.createLineString(new Coordinate[]{c0,c1});
 					GisDebugger.addGeometry(ls);
+					handled.add(open.edge);
 				}
+
+				
 			}
 
 		}
