@@ -32,7 +32,7 @@ import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
 
 public abstract class Sim2DScenarioUtils {
 	
-	
+	//TODO make scenario identifiable so we can have several environments  
 	public static  Sim2DScenario loadSim2DScenario(Sim2DConfig conf) {
 		Sim2DScenario scenario = new Sim2DScenario(conf);
 		for (String envPath : conf.getSim2DEnvironmentPaths()){
@@ -44,12 +44,13 @@ public abstract class Sim2DScenarioUtils {
 				env.addAccessorNodeQSimNodeMapping(i,m);
 			}
 			String netPath = conf.getNetworkPath(envPath);
-			
-			Config c = ConfigUtils.createConfig();
-			Scenario sc = ScenarioUtils.createScenario(c);
-			new MatsimNetworkReader(sc).readFile(netPath);
-			Network net = sc.getNetwork();
-			env.setNetwork(net);
+			if (netPath != null) { //not yet clear if this can be null, maybe it even must be null [gl dec 12]
+				Config c = ConfigUtils.createConfig();
+				Scenario sc = ScenarioUtils.createScenario(c);
+				new MatsimNetworkReader(sc).readFile(netPath);
+				Network net = sc.getNetwork();
+				env.setNetwork(net);
+			}
 		}
 		
 		return scenario;

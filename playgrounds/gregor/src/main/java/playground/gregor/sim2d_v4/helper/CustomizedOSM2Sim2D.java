@@ -103,6 +103,7 @@ public class CustomizedOSM2Sim2D {
 	private HashMap<Id, OSMNode> nodes;
 	private final MathTransform transform;
 
+	//TODO we need the possibility to have several environments. This means that parse a scenario and not an environment 
 	public CustomizedOSM2Sim2D(Sim2DEnvironment env) {
 		this.env = env;
 		this.env.setEnvelope(this.e);

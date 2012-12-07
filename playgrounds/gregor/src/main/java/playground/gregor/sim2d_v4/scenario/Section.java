@@ -21,10 +21,11 @@
 package playground.gregor.sim2d_v4.scenario;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 import com.vividsolutions.jts.geom.Polygon;
 
-public class Section {
+public class Section implements Identifiable {
 
 	private final Id id;
 	private final Polygon p;
@@ -56,6 +57,7 @@ public class Section {
 		return this.neighbors;
 	}
 	
+	@Override
 	public Id getId() {
 		return this.id;
 	}

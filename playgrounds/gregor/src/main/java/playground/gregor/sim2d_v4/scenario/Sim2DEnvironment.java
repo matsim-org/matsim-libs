@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Network;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -31,7 +32,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
 
 
-public class Sim2DEnvironment {
+public class Sim2DEnvironment implements Identifiable{
 
 	private Envelope envelope;
 	private CoordinateReferenceSystem crs;
@@ -81,6 +82,12 @@ public class Sim2DEnvironment {
 	
 	public Network getEnvironmentNetwork(){
 		return this.net;
+	}
+
+	@Override
+	public Id getId() {
+		//TODO fix it
+		throw new RuntimeException("not yet implemented");
 	}
 
 
