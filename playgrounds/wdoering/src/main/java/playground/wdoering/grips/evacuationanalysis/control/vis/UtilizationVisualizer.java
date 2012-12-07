@@ -54,6 +54,8 @@ public class UtilizationVisualizer {
 
 		HashMap<Id, List<Tuple<Id,Double>>> linkLeaveTimes = data.getLinkLeaveTimes();
 		HashMap<Id, List<Tuple<Id,Double>>> linkEnterTimes = data.getLinkEnterTimes();
+		
+		
 		for (Link link : links)
 		{
 			List<Tuple<Id,Double>> leaveTimes = linkLeaveTimes.get(link.getId());
@@ -62,17 +64,53 @@ public class UtilizationVisualizer {
 			if ((enterTimes != null) && (enterTimes.size() > 0) && (leaveTimes!=null))
 			{
 				
-				float relUtilization = (((float)enterTimes.size()/(float)data.getMaxUtilization())); 
-				
-				linkTimes.add(new Tuple(link.getId(),(double)enterTimes.size()));
-				
-				Tuple<Float, Color> currentColoration = new Tuple(relUtilization, Coloration.getColor(relUtilization, colorationMode, cellTransparency));
-				coloration.setAttribute((IdImpl)link.getId(), currentColoration);
+				if (!linkTimes.contains(enterTimes.size()))
+				{
+					linkTimes.add(new Tuple(link.getId(),(double)enterTimes.size()));
+				}
+//				float relUtilization = (((float)enterTimes.size()/(float)data.getMaxUtilization())); 
+//				Tuple<Float, Color> currentColoration = new Tuple(relUtilization, Coloration.getColor(relUtilization, colorationMode, cellTransparency));
+//				coloration.setAttribute((IdImpl)link.getId(), currentColoration);
 				
 			}
 		}
 		
-		this.data.updateClusters(Mode.UTILIZATION, clusterizer.getClusters(linkTimes, k));
+		LinkedList<Tuple<Id,Double>> clusters = this.clusterizer.getClusters(linkTimes, k);
+		
+		//calculate data clusters
+		this.data.updateClusters(Mode.UTILIZATION, clusters);
+		
+		
+		for (Tuple<Id,Double> cluster : clusters)
+			System.out.println("UTIL CL: " + cluster.getFirst() + ":" + cluster.getSecond());
+		
+		//assign clusterized colors to all link ids 
+		for (Link link : links)
+		{
+			List<Tuple<Id,Double>> enterTimes = linkEnterTimes.get(link.getId());
+			
+			if ((enterTimes != null) && (enterTimes.size() > 0))
+			{
+				double enterTime = enterTimes.size();
+				
+				if (enterTime < clusters.get(0).getSecond())
+				{
+					coloration.setAttribute((IdImpl)link.getId(), new Tuple<Float,Color>(0f,Coloration.getColor(0, colorationMode, cellTransparency)));
+					continue;
+				}
+				for (int i = 1; i < k; i++)
+				{
+					if ((enterTime >= clusters.get(i-1).getSecond()) && enterTime < clusters.get(i).getSecond())
+					{
+						float ik = (float)i/(float)k;
+						coloration.setAttribute((IdImpl)link.getId(), new Tuple<Float,Color>(ik,Coloration.getColor(ik, colorationMode, cellTransparency)));
+						break;
+					}
+				}
+				if (enterTime>=clusters.get(k-1).getSecond())
+					coloration.setAttribute((IdImpl)link.getId(), new Tuple<Float,Color>(1f,Coloration.getColor(1f, colorationMode, cellTransparency)));
+			}
+		}
 		
 	}
 

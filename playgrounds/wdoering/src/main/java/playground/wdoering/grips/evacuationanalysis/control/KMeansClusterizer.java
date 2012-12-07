@@ -27,7 +27,9 @@ public class KMeansClusterizer implements Clusterizer {
 		});
 		
 		int m = (data.size()/n)>0?(data.size()/n):1; int i = 0;
+		
 		System.out.println("m:" + m + "|n:" + n + "|size:" + data.size());
+		
 		for (Tuple<Id,Double> element : data)
 		{
 			if ((i++%m==0) && clusters.size()<n)

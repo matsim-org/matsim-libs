@@ -30,6 +30,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class KeyPanel extends AbstractDataPanel {
 	private ChartPanel chartPanel;
 	private Mode mode;
 
+	enum Unit { TIME, PEOPLE };
 
 	//inherited field:
 	//protected EventData data
@@ -77,6 +79,8 @@ public class KeyPanel extends AbstractDataPanel {
 		
 		if (this.data==null)
 			return;
+		else
+			this.removeAll();
 		
 		LinkedList<Tuple<Id,Double>> clusters = this.data.getClusters(mode);
 		int k = clusters.size();
@@ -91,22 +95,23 @@ public class KeyPanel extends AbstractDataPanel {
 		{
 			if (mode.equals(Mode.EVACUATION))
 			{
-				classColor[i] = this.data.getEvacuationTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
-				classVal[i] = ""+clusters.get(i).getSecond();
+				classColor[i] =this.data.getEvacuationTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
+				
+				classVal[i] =  getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 			}
 			else if (mode.equals(Mode.CLEARING))
 			{
 				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
-				classVal[i] = ""+clusters.get(i).getSecond();
+				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 			}
 			else 
 			{
 				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl)clusters.get(i).getFirst()).getSecond();
-				classVal[i] = ""+clusters.get(i).getSecond();
+				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
 			}
 			
-			System.out.println("val:");
-			System.out.println(clusters.get(i).getFirst() + ":" + clusters.get(i).getSecond());
+//			System.out.println("val:");
+//			System.out.println(clusters.get(i).getFirst() + ":" + clusters.get(i).getSecond());
 			
 		}
 		
@@ -130,6 +135,7 @@ public class KeyPanel extends AbstractDataPanel {
 			keyPanel.add(valueLabels[i], c);
 		}
 		
+		
 		this.add(keyPanel);
 		this.validate();
 		this.setSize(this.width, this.height);
@@ -142,6 +148,44 @@ public class KeyPanel extends AbstractDataPanel {
 	{
 		this.mode = mode;
 		drawDataPanel();
+	}
+	
+	public String getReadableTime(double value, Unit unit)
+	{
+		if (unit.equals(Unit.PEOPLE))
+			return (int)value + " people";
+		
+		double minutes = 0;
+		double hours = 0;
+		double seconds = 0;
+		
+		if (value<0d)
+			return "";
+		else
+		{
+			if (value/60>1d) //check if minutes need to be displayed
+			{
+				if (value/3600>1d) //check if hours need to be displayed
+				{
+					hours = Math.floor(value/3600);
+					minutes = Math.floor((value-hours*3600)/60);
+					seconds = Math.floor((value-(hours*3600)-(minutes*60)));
+					return (int)hours + "h, " + (int)minutes + "m, " + (int)seconds + "s";
+				}
+				else
+				{
+					minutes = Math.floor(value/60);
+					seconds = Math.floor((value-(minutes*60)));
+					return (int)minutes + "m, " + (int)seconds + "s";
+					
+				}
+				
+			}
+			else
+			{
+				return (int)seconds + "s";								
+			}
+		}
 	}
 
 }

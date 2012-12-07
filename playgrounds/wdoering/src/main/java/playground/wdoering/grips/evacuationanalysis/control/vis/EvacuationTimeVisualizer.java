@@ -55,14 +55,11 @@ public class EvacuationTimeVisualizer {
 		
 		for (Cell cell : cells)
 		{
-			
 			if (!cellTimes.contains(cell.getTimeSum()))
 			{
 				cellTimes.add(cell.getTimeSum());
 				cellIdsAndTimes.add(new Tuple<Id,Double>(cell.getId(), cell.getTimeSum()));
 			}
-			
-//			coloration.setAttribute(cell.getId(), Coloration.getColor(relTravelTime, colorationMode, cellTransparency));
 		}
 		
 		//calculate data clusters
@@ -70,24 +67,17 @@ public class EvacuationTimeVisualizer {
 		this.data.updateClusters(Mode.EVACUATION, clusters);
 		
 		LinkedList<Double> clusterValues = new LinkedList<Double>();
-		for (Tuple<Id,Double> cluster: clusters)
+		for (Tuple<Id,Double> cluster : clusters)
 		{
 			clusterValues.add(cluster.getSecond());
-			System.out.println("V:" + cluster.getSecond());
+			System.out.println("evac clusters:" + cluster.getSecond());
 		}
 		
 		
-//		for (Tuple<Id, Double> cellTime : cellTimes)
 		for (Cell cell : cells)
 		{
 			double cellTimeSum = cell.getTimeSum();
-			System.out.println(cellTimeSum);
-//			double relTravelTime = cell.getTimeSum() / data.getMaxCellTimeSum();
-			
-//			//might be NAN or less than zero: make it a zero
-//			if ((Double.isNaN(relTravelTime)) || (relTravelTime < 0))
-//				relTravelTime = 0d;
-			
+//			System.out.println(cellTimeSum);
 			
 			if (cellTimeSum < clusterValues.get(0))
 			{
@@ -99,17 +89,13 @@ public class EvacuationTimeVisualizer {
 				if ((cellTimeSum >= clusterValues.get(i-1)) && cellTimeSum < clusterValues.get(i))
 				{
 					float ik = (float)i/(float)k;
-					System.out.println(ik);
 					coloration.setAttribute(cell.getId(), Coloration.getColor(ik, colorationMode, cellTransparency));
 					break;
 				}
 			}
-			
 			if (cellTimeSum>=clusterValues.get(k-1))
 				coloration.setAttribute(cell.getId(), Coloration.getColor(1, colorationMode, cellTransparency));
 			
-//			coloration.setAttribute(, data)
-//			System.out.println(cellTime.getFirst() + ":" + cellTime.getSecond());
 		}
 		
 		

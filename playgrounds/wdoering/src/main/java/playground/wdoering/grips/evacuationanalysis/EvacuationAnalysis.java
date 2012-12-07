@@ -155,7 +155,7 @@ public class EvacuationAnalysis implements ActionListener{
 	private KeyPanel keyPanel;
 	private JLabel gridSizeLabel;
 	private String cellSizeText = " cell size: ";
-	private int k = 7;
+	private int k = 5;
 	
 	
 

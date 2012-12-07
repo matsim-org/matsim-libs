@@ -451,7 +451,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 							if (data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId())!=null)
 							{
 								Tuple<Float,Color> currentColoration = data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId());
-								strokeWidth = ((currentColoration.getFirst() *80f) / (float)Math.pow(2,this.getZoom()) );
+								strokeWidth = ((currentColoration.getFirst() *35f) / (float)Math.pow(2,this.getZoom()) );
 								linkColor = currentColoration.getSecond();
 							}
 						}
