@@ -200,10 +200,10 @@ public class CreateDemand {
 					plan.addActivity(activity);
 				}
 				previousPerson = personId;
-				bufferedReader.close();
 			}
 			log.info("Number of workers: " + this.pusWorkers.size());
 			log.info("Number of non-workers: " + this.pusNonWorkers.size());
+			bufferedReader.close();
 		} // end try
 		catch (IOException e) {
 			e.printStackTrace();
