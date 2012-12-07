@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -82,6 +83,12 @@ public class Sim2DEnvironment implements Identifiable{
 	
 	public Network getEnvironmentNetwork(){
 		return this.net;
+	}
+	
+	
+	//TODO link --> section mapping (and link --> evironment mapping) [gl dec 2012]
+	public Section getSection(Link link) {
+		return null;
 	}
 
 	@Override

@@ -46,6 +46,8 @@ public class Sim2DScenario {
 		return this.envs;
 	}
 	
+	
+	//TODO link --> section mapping, means links must not intersect section boundaries. think about this [gl dec 2012] 
 	public void connect(Scenario sc) {
 		sc.addScenarioElement(this);
 		Network scNet = sc.getNetwork();
