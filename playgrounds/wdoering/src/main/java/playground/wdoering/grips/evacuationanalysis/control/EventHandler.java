@@ -245,6 +245,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(AgentDepartureEvent event)
 	{
+		if (event.getPersonId().toString().contains("veh"))
+			return;
+		
+		
 		//just save departure event
 		this.events.put(event.getPersonId(), event);
 		
@@ -263,6 +267,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(AgentArrivalEvent event)
 	{
+		
+		if (event.getPersonId().toString().contains("veh"))
+			return;
+		
 		//get cell from person id
 		AgentDepartureEvent departure = (AgentDepartureEvent)this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
@@ -287,6 +295,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		if (lastTime!=event.getTime())
 		{
 			this.arrivalTimes.add(new Tuple(event.getTime(), this.arrivals));
+			cell.addArrivalTime(event.getTime());
 			lastTime = event.getTime();
 		}
 		
@@ -302,6 +311,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkEnterEvent event)
 	{
+		if (event.getPersonId().toString().contains("veh"))
+			return;
+		
+		
 		//get link id
 		Id linkId = event.getLinkId();
 		Id personId = event.getPersonId();

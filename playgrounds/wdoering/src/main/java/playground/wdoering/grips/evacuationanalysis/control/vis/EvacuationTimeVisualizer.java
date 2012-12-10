@@ -55,10 +55,10 @@ public class EvacuationTimeVisualizer {
 		
 		for (Cell cell : cells)
 		{
-			if (!cellTimes.contains(cell.getTimeSum()))
+			if (!cellTimes.contains(cell.getMedianArrivalTime()))
 			{
-				cellTimes.add(cell.getTimeSum());
-				cellIdsAndTimes.add(new Tuple<Id,Double>(cell.getId(), cell.getTimeSum()));
+				cellTimes.add(cell.getMedianArrivalTime());
+				cellIdsAndTimes.add(new Tuple<Id,Double>(cell.getId(), cell.getMedianArrivalTime()));
 			}
 		}
 		
@@ -76,24 +76,24 @@ public class EvacuationTimeVisualizer {
 		
 		for (Cell cell : cells)
 		{
-			double cellTimeSum = cell.getTimeSum();
+			double arrivalTime = cell.getMedianArrivalTime();
 //			System.out.println(cellTimeSum);
 			
-			if (cellTimeSum < clusterValues.get(0))
+			if (arrivalTime < clusterValues.get(0))
 			{
 				coloration.setAttribute(cell.getId(), Coloration.getColor(0, colorationMode, cellTransparency));
 				continue;
 			}
 			for (int i = 1; i < k; i++)
 			{
-				if ((cellTimeSum >= clusterValues.get(i-1)) && cellTimeSum < clusterValues.get(i))
+				if ((arrivalTime >= clusterValues.get(i-1)) && arrivalTime < clusterValues.get(i))
 				{
 					float ik = (float)i/(float)k;
 					coloration.setAttribute(cell.getId(), Coloration.getColor(ik, colorationMode, cellTransparency));
 					break;
 				}
 			}
-			if (cellTimeSum>=clusterValues.get(k-1))
+			if (arrivalTime>=clusterValues.get(k-1))
 				coloration.setAttribute(cell.getId(), Coloration.getColor(1, colorationMode, cellTransparency));
 			
 		}

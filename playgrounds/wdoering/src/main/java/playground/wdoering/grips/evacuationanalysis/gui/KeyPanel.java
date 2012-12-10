@@ -139,7 +139,7 @@ public class KeyPanel extends AbstractDataPanel {
 		this.add(keyPanel);
 		this.validate();
 		this.setSize(this.width, this.height);
-		this.setPreferredSize(new Dimension(this.width,this.height));
+		this.setPreferredSize(new Dimension(this.width,this	.height));
 
 	}
 
@@ -153,7 +153,7 @@ public class KeyPanel extends AbstractDataPanel {
 	public String getReadableTime(double value, Unit unit)
 	{
 		if (unit.equals(Unit.PEOPLE))
-			return (int)value + " people";
+			return " " + (int)value + " people";
 		
 		double minutes = 0;
 		double hours = 0;
@@ -170,20 +170,20 @@ public class KeyPanel extends AbstractDataPanel {
 					hours = Math.floor(value/3600);
 					minutes = Math.floor((value-hours*3600)/60);
 					seconds = Math.floor((value-(hours*3600)-(minutes*60)));
-					return (int)hours + "h, " + (int)minutes + "m, " + (int)seconds + "s";
+					return " > " + (int)hours + "h, " + (int)minutes + "m, " + (int)seconds + "s";
 				}
 				else
 				{
 					minutes = Math.floor(value/60);
 					seconds = Math.floor((value-(minutes*60)));
-					return (int)minutes + "m, " + (int)seconds + "s";
+					return " > " + (int)minutes + "m, " + (int)seconds + "s";
 					
 				}
 				
 			}
 			else
 			{
-				return (int)seconds + "s";								
+				return " > " + (int)seconds + "s";								
 			}
 		}
 	}

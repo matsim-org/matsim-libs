@@ -21,6 +21,7 @@
 package playground.wdoering.grips.evacuationanalysis.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
@@ -149,6 +150,39 @@ public class Cell<T>
 
 	public IdImpl getId() {
 		return this.id;
+	}
+	
+	public void addArrivalTime(double time)
+	{
+		arrivalTimes.add(time);
+	}
+	
+	public double getMeanArrivalTime()
+	{
+		double mean = 0d;
+		
+		for (double time : this.arrivalTimes)
+			mean+=time;
+		
+		return mean/this.arrivalTimes.size();
+	}
+	
+	public double getMedianArrivalTime()
+	{
+		if (this.arrivalTimes.size()<1)
+			return 0d;
+		
+	    Collections.sort(this.arrivalTimes);
+	 
+	    if (this.arrivalTimes.size() % 2 == 1)
+	    	return this.arrivalTimes.get((this.arrivalTimes.size()+1)/2-1);
+	    else
+	    {
+			double lower = this.arrivalTimes.get(this.arrivalTimes.size()/2-1);
+			double upper = this.arrivalTimes.get(this.arrivalTimes.size()/2);
+		 
+			return (lower + upper) / 2.0;
+	    }
 	}
 
 }
