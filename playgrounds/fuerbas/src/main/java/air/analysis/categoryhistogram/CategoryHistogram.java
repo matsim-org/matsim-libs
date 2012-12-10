@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
 /**
  * Class that helps to create histograms over time for certain categories.
  * @author dgrether
@@ -30,6 +32,8 @@ import java.util.TreeMap;
  */
 public final class CategoryHistogram {
 
+	private static final Logger log = Logger.getLogger(CategoryHistogram.class);
+	
 	private Map<String, CategoryHistogramData> data = new TreeMap<String, CategoryHistogramData>();
 	private int iteration = 0;
 	private int binSizeSeconds;
@@ -78,7 +82,8 @@ public final class CategoryHistogram {
 	public void abort(double time_seconds, int count, String category){
 		int index = this.getBinIndex(time_seconds);
 		CategoryHistogramData categoryData = getDataForCategory(category);
-		CategoryHistogramUtils.add2MapEntry(categoryData.abortByBin, count, index);
+		CategoryHistogramUtils.add2MapEntry(categoryData.abortByBin, index, count);
+//		log.error("abort at " + time_seconds + " index " + index + " map value for cat "  + category + " is " + categoryData.abortByBin.get(index));
 	}
 	
 	
@@ -104,7 +109,7 @@ public final class CategoryHistogram {
 		CategoryHistogramData categoryData = this.data.get(legMode);
 		if (categoryData == null) {
 			categoryData = new CategoryHistogramData(); // +1 for all times out of our range
-			this.getCategoryData().put(legMode, categoryData);
+			this.data.put(legMode, categoryData);
 		}
 		return categoryData;
 	}

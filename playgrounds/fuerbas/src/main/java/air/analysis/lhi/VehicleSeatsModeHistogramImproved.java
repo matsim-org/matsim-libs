@@ -45,7 +45,7 @@ public class VehicleSeatsModeHistogramImproved implements
 
 	private static final Logger log = Logger.getLogger(VehicleSeatsModeHistogramImproved.class);
 
-	private static int noDepartureEventVeh = 0;
+	private int seatsTotal;
 	
 	private CategoryHistogram histogram;
 	
@@ -68,6 +68,7 @@ public class VehicleSeatsModeHistogramImproved implements
 		this.histogram = new CategoryHistogram(binSize);
 		this.vehicles = vehicles;
 		reset(0);
+		this.seatsTotal = 0;
 	}
 
 	@Override
@@ -84,16 +85,15 @@ public class VehicleSeatsModeHistogramImproved implements
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		VehicleDepartsAtFacilityEvent departureEvent = this.vehDepartsEventsByVehicleId.get(event.getVehicleId());
-		if (departureEvent == null){
-//			log.error("no departure event for vehicle :  " + event.getVehicleId() + " assuming first arrival!");
-			noDepartureEventVeh++;
-		}
-		else {
+		if (departureEvent != null){
 			Vehicle vehicle = this.vehicles.getVehicles().get(event.getVehicleId());
 			int seats = vehicle.getType().getCapacity().getSeats();
 			this.histogram.increase(departureEvent.getTime(), seats, "seats");
 			this.histogram.decrease(event.getTime(), seats, "seats");
 		}
+//		else {
+//			log.error("no departure event for vehicle :  " + event.getVehicleId() + " assuming first arrival!");
+//		}
 	}
 
 	public CategoryHistogram getCategoryHistogram() {

@@ -36,13 +36,16 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.core.utils.misc.Time;
 
 
 /**
  * @author dgrether
  */
 public class CategoryHistogramWriter {
-
+	
+//	private static final Logger log = Logger.getLogger(CategoryHistogramWriter.class);
+	
 	private String title = "Leg Histogram";
 	private String departuresName = "departures";
 	private String arrivalsName = "arrivals";
@@ -64,8 +67,9 @@ public class CategoryHistogramWriter {
 	}
 
 	public void write(CategoryHistogram histo, PrintStream stream){
+		this.checkIndex(histo);
 		// data about modes, add all first
-		stream.print("time");
+		stream.print("time\ttime");
 		for (String legMode : histo.getCategoryData().keySet()) {
 			stream.print("\t"+departuresName+"_" + legMode + "\t" + arrivalsName + "_" + legMode + "\t"+ abortName + "_" + legMode
 					+ "\ten-route_" + legMode);
@@ -73,18 +77,19 @@ public class CategoryHistogramWriter {
 		stream.print("\n");
 
 		Map<String, Integer> enRouteMap = new HashMap<String, Integer>();
-		if (histo.getFirstIndex() == null && histo.getLastIndex() == null){
-			throw new RuntimeException("No data in histogram");
-		}
-		for (int i = histo.getFirstIndex() - 2; i <= histo.getLastIndex() + 2; i++) {
-			stream.print(Integer.toString(i * histo.getBinSizeSeconds()));
-			for (String m : histo.getCategoryData().keySet()) {
-				int departures = histo.getDepartures(m, i);
-				int arrivals = histo.getArrivals(m, i);
-				int stuck = histo.getAbort(m, i);
-				int enRoute = CategoryHistogramUtils.getNotNullInteger(enRouteMap, m);
+		for (int i = this.getFirstIndex(histo); i <= histo.getLastIndex() + 2; i++) {
+			int seconds = i * histo.getBinSizeSeconds();
+			stream.print(Time.writeTime(seconds));
+			stream.print("\t");
+			stream.print(Integer.toString(seconds));
+			for (String cat : histo.getCategoryData().keySet()) {
+				int departures = histo.getDepartures(cat, i);
+				int arrivals = histo.getArrivals(cat, i);
+				int stuck = histo.getAbort(cat, i);
+//				log.error("Cat: " + cat + " index " + i + " dep " + departures + " arr " + arrivals + " stuck " + stuck);
+				int enRoute = CategoryHistogramUtils.getNotNullInteger(enRouteMap, cat);
 				int modeEnRoute = enRoute + departures - arrivals - stuck;
-				enRouteMap.put(m, modeEnRoute);
+				enRouteMap.put(cat, modeEnRoute);
 				stream.print("\t" + departures + "\t" + arrivals + "\t" + stuck + "\t" + modeEnRoute);
 			}
 			// new line
@@ -98,21 +103,33 @@ public class CategoryHistogramWriter {
 		}
 	}
 
-	public JFreeChart getGraphic(final CategoryHistogram modeData, final String modeName) {
+	private void checkIndex(CategoryHistogram histo){
+		if (histo.getFirstIndex() == null && histo.getLastIndex() == null){
+			throw new RuntimeException("No data in histogram");
+		}
+	}
+	
+	private int getFirstIndex(CategoryHistogram histo){
+		int first = histo.getFirstIndex();
+		if (first >= 2) {
+			first -= 2;
+		}
+		return first;
+	}
+	
+	public JFreeChart getGraphic(final CategoryHistogram histo, final String modeName) {
+		this.checkIndex(histo);
 		final XYSeriesCollection xyData = new XYSeriesCollection();
 		final XYSeries departuresSerie = new XYSeries(this.departuresName, false, true);
 		final XYSeries arrivalsSerie = new XYSeries(this.arrivalsName, false, true);
 		final XYSeries onRouteSerie = new XYSeries(this.enRouteName, false, true);
 		Integer enRoute = 0;
-		if (modeData.getFirstIndex() == null && modeData.getLastIndex() == null){
-			throw new RuntimeException("No data in histogram");
-		}
-		for (int i = modeData.getFirstIndex() - 2; i <= modeData.getLastIndex() + 2; i++) {
-			int departures = modeData.getDepartures(modeName, i);
-			int arrivals = modeData.getArrivals(modeName, i);
-			int stuck = modeData.getAbort(modeName, i);
+		for (int i = this.getFirstIndex(histo); i <= histo.getLastIndex() + 2; i++) {
+			int departures = histo.getDepartures(modeName, i);
+			int arrivals = histo.getArrivals(modeName, i);
+			int stuck = histo.getAbort(modeName, i);
 			enRoute = enRoute + departures - arrivals - stuck;
-			double hour = i * modeData.getBinSizeSeconds() / 60.0 / 60.0;
+			double hour = i * histo.getBinSizeSeconds() / 60.0 / 60.0;
 			departuresSerie.add(hour, departures);
 			arrivalsSerie.add(hour, arrivals);
 			onRouteSerie.add(hour, enRoute);
@@ -122,7 +139,7 @@ public class CategoryHistogramWriter {
 		xyData.addSeries(onRouteSerie);
 
 		final JFreeChart chart = ChartFactory.createXYStepChart(this.title + ", " + modeName + ", it."
-				+ modeData.getIteration(), "time [h]", yTitle , xyData, PlotOrientation.VERTICAL, true, // legend
+				+ histo.getIteration(), "time [h]", yTitle , xyData, PlotOrientation.VERTICAL, true, // legend
 				false, // tooltips
 				false // urls
 				);

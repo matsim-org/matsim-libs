@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GeospatialLinkVehicleEventFilter
+ * GeospatialLeavesEntersVehicleEventFilter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,15 +20,17 @@
 package air.analysis.lhi;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 
 import playground.dgrether.events.filters.EventFilter;
 
@@ -37,22 +39,23 @@ import playground.dgrether.events.filters.EventFilter;
  * @author dgrether
  *
  */
-public class GeospatialLinkVehicleEventFilter implements EventFilter {
+public class GeospatialLeavesEntersVehicleEventFilter implements EventFilter {
 
 	private Network network;
 	private Map<Id, Boolean> networkContainedLastLinkEnterByVehicleId;
-	private Map<Id, VehicleDepartsAtFacilityEvent> vehDepartsEventsByVehicleId;
+	private Set<Id> countedPersonIds;
 	
 	/**
 	 * @param network
 	 */
-	public GeospatialLinkVehicleEventFilter(Network network) {
+	public GeospatialLeavesEntersVehicleEventFilter(Network network) {
 		this.network =network;
 		this.networkContainedLastLinkEnterByVehicleId = new HashMap<Id, Boolean>();
-		this.vehDepartsEventsByVehicleId  = new HashMap<Id, VehicleDepartsAtFacilityEvent>();
+		this.countedPersonIds = new HashSet<Id>();
 	}
 
-
+	
+	
 	@Override
 	public boolean doProcessEvent(Event event) {
 		Id linkId = null;
@@ -67,20 +70,30 @@ public class GeospatialLinkVehicleEventFilter implements EventFilter {
 			linkId = e.getLinkId();
 			vehId = e.getVehicleId();
 		}
-		else if (event instanceof VehicleDepartsAtFacilityEvent){
-			VehicleDepartsAtFacilityEvent e = (VehicleDepartsAtFacilityEvent) event;
+		else if (event instanceof PersonEntersVehicleEvent){
+			PersonEntersVehicleEvent e = (PersonEntersVehicleEvent) event;
+			if (e.getPersonId().toString().startsWith("pt_")){
+				return false;
+			}
 			if (this.networkContainedLastLinkEnterByVehicleId.containsKey(e.getVehicleId()) 
 					&& this.networkContainedLastLinkEnterByVehicleId.get(e.getVehicleId())){
-				
-				this.vehDepartsEventsByVehicleId.put(e.getVehicleId(), e);
+				this.countedPersonIds.add(e.getPersonId());
 				return true;
 			}
 		}
-		else if (event instanceof VehicleArrivesAtFacilityEvent) {
-			VehicleArrivesAtFacilityEvent e = (VehicleArrivesAtFacilityEvent) event;
+		else if (event instanceof PersonLeavesVehicleEvent){
+			PersonLeavesVehicleEvent e = (PersonLeavesVehicleEvent) event;
+			if (e.getPersonId().toString().startsWith("pt_")){
+				return false;
+			}
 			if (this.networkContainedLastLinkEnterByVehicleId.containsKey(e.getVehicleId()) 
 					&& this.networkContainedLastLinkEnterByVehicleId.get(e.getVehicleId()) 
-					&& this.vehDepartsEventsByVehicleId.containsKey(e.getVehicleId())){
+					&& countedPersonIds.contains(e.getPersonId())){
+				countedPersonIds.remove(e.getPersonId());
+				return true;
+			}
+			else if (this.countedPersonIds.contains(e.getPersonId())){
+				countedPersonIds.remove(e.getPersonId());
 				return true;
 			}
 		}
@@ -96,7 +109,13 @@ public class GeospatialLinkVehicleEventFilter implements EventFilter {
 			}
 		}
 
+		
+		
 		return false;
 	}
+
+	
+	
+	
 	
 }
