@@ -57,8 +57,10 @@ import org.matsim.core.utils.misc.RouteUtils;
  * @author michaz
  *
  */
-public class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, TravelledEventHandler {
-
+public final class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, TravelledEventHandler {
+	// made this, for the time being, final.  This is currently not pluggable at this level.  If you need such
+	// functionality, please talk to Michael Zilske. kai & dominik, dec'12
+	
 	public interface LegHandler {
 	    void handleLeg(Id agentId, Leg leg);
 	}

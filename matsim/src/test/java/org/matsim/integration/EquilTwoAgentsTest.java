@@ -29,6 +29,8 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -81,6 +83,14 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		String netFileName = "test/scenarios/equil/network.xml";
 		config.network().setInputFile(netFileName);
 		config.plans().setInputFile(this.getClassInputDirectory() + "plans2.xml");
+
+		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
+		ActivityParams params = new ActivityParams("h") ; ;
+		params.setTypicalDuration(123456789.0) ; // probably dummy
+		params.setOpeningTime(0.) ;
+		params.setClosingTime(0.) ; // cannot access "setScoreAtAll" at this level.
+		pcsConfig.addActivityParams(params) ;
+		
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
@@ -92,19 +102,20 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 				handler = new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime);
 				controler.getEvents().addHandler(handler);
 				
+				
 				// Construct a scoring function which does not score the home activity. Because the analytical calculations against which 
 				// we are testing here are based on that.
 				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
 //				ActivityUtilityParameters activityUtilityParameters = new ActivityUtilityParameters("h", 1.0, 123456789.0);
 //				activityUtilityParameters.setScoreAtAll(false);
 
-				ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory() ;
-				factory.setScoreAtAll(false) ;
-				factory.setType("h") ;
-				factory.setTypicalDuration_s(123456789.0) ;
-				ActivityUtilityParameters activityUtilityParameters = factory.create() ;
-
-				params.utilParams.put("h", activityUtilityParameters);
+//				ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory() ;
+//				factory.setScoreAtAll(false) ;
+//				factory.setType("h") ;
+//				factory.setTypicalDuration_s(123456789.0) ;
+//				ActivityUtilityParameters activityUtilityParameters = factory.create() ;
+//
+//				params.utilParams.put("h", activityUtilityParameters);
 				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), 
 						new CharyparNagelScoringFunctionFactory(params, controler.getScenario().getNetwork()));
 				

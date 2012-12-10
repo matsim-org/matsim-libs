@@ -4,7 +4,7 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="coordinateSystem" value="Atlantis" />
+		<!--<param name="coordinateSystem" value="Atlantis" />-->
 	</module>
 
 	<module name="network">
@@ -39,9 +39,9 @@
 	</module>
 	
 	<module name="vspExperimental" >
-		<param name="isGeneratingBoardingDeniedEvent" value="true" />
+		<!--<param name="isGeneratingBoardingDeniedEvent" value="true" />-->
 		<param name="vspDefaultsCheckingLevel" value="abort" />
-		<param name="isAbleToOverwritePtInteractionParams" value="true" />
+		<!--<param name="isAbleToOverwritePtInteractionParams" value="true" />-->
 	</module>
 
 	<module name="otfvis">
@@ -51,12 +51,13 @@
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="05:00:00" />
-		<param name="endTime" value="18:00:00" />
-		<param name="snapshotperiod" value="00:00:00"/> 
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
+		<!--<param name="endTime" value="18:00:00" />-->
+		<!--<param name="snapshotperiod" value="00:00:00"/> -->
 		<param name="removeStuckVehicles" value="false" />
-		<param name="vehicleBehavior" value="wait" />
-		<param name="flowCapacityFactor" value="1.0" />
-		<param name="storageCapacityFactor" value="1.0" />
+		<!--<param name="vehicleBehavior" value="wait" />-->
+		<!--<param name="flowCapacityFactor" value="1.0" />-->
+		<!--<param name="storageCapacityFactor" value="1.0" />-->
 		<param name="snapshotStyle" value="queue" />
 	</module>
 
@@ -78,36 +79,36 @@
 	</module>
 	
 	<module name="strategy">
-		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+	<!--	<param name="maxAgentPlanMemorySize" value="5" /> -->
 
 		<param name="ModuleProbability_1" value="0.8" />
 		<param name="Module_1" value="ChangeExpBeta" />
 
-		<param name="ModuleProbability_2" value="0.1" />
-		<param name="Module_2" value="ReRoute" />
-		<param name="ModuleDisableAfterIteration_3" value="90" />
-		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="TransitTimeAllocationMutator" />
-		<param name="ModuleDisableAfterIteration_4" value="10" />
-		<param name="ModuleProbability_4" value="0.9" />
-		<param name="Module_4" value="TransitTimeAllocationMutator" />
+	<!--	<param name="ModuleProbability_2" value="0.1" />-->
+	<!--	<param name="Module_2" value="ReRoute" />-->
+	<!--	<param name="ModuleDisableAfterIteration_3" value="90" />-->
+	<!--	<param name="ModuleProbability_3" value="0.1" />-->
+	<!--	<param name="Module_3" value="TransitTimeAllocationMutator" />-->
+	<!--	<param name="ModuleDisableAfterIteration_4" value="10" />-->
+	<!--	<param name="ModuleProbability_4" value="0.9" />-->
+	<!--	<param name="Module_4" value="TransitTimeAllocationMutator" />-->
 
 	</module>
 
-		<module name="transitRouter" >
+		<!--<module name="transitRouter" >-->
 
 		<!-- additional time the router allocates when a line switch happens, Can be interpreted as a 'savity' time that agents need to savely transfer from one line to another -->
-		<param name="additionalTransferTime" value="0.0" />
+		<!--<param name="additionalTransferTime" value="0.0" />-->
 
 		<!-- step size to increase searchRadius if no stops are found -->
-		<param name="extensionRadius" value="1000.0" />
+		<!--<param name="extensionRadius" value="10000.0" />-->
 
 		<!-- maximum beeline distance between stops that agents could transfer to by walking -->
-		<param name="maxBeelineWalkConnectionDistance" value="1500.0" />
+		<!--<param name="maxBeelineWalkConnectionDistance" value="1500.0" />-->
 
 		<!-- the radius in which stop locations are searched, given a start or target coordinate -->
-		<param name="searchRadius" value="10000.0" />
-	</module>
+		<!--<param name="searchRadius" value="10000.0" />-->
+	<!--</module>-->
 	
 
 </config>

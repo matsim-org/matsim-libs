@@ -20,6 +20,9 @@
 
 package org.matsim.core.scoring.functions;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.core.api.internal.MatsimParameters;
@@ -28,7 +31,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.pt.PtConstants;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
-	public final TreeMap<String, ActivityUtilityParameters> utilParams = new TreeMap<String, ActivityUtilityParameters>();
+	public final Map<String, ActivityUtilityParameters> utilParams ;
 	public final double marginalUtilityOfWaiting_s;
 	public final double marginalUtilityOfLateArrival_s;
 	public final double marginalUtilityOfEarlyDeparture_s;
@@ -101,28 +104,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 				marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
-
+		SortedMap<String,ActivityUtilityParameters> tmpUtlParams = new TreeMap<String, ActivityUtilityParameters>() ;
 		for (ActivityParams params : config.getActivityParams()) {
-//			String type = params.getType();
-//			double priority = params.getPriority();
-//			double typDurationSecs = params.getTypicalDuration();
-//			ActivityUtilityParameters actParams = new ActivityUtilityParameters(type, priority, typDurationSecs);
-//			if (params.getMinimalDuration() >= 0) {
-//				actParams.setMinimalDuration(params.getMinimalDuration());
-//			}
-//			if (params.getOpeningTime() >= 0) {
-//				actParams.setOpeningTime(params.getOpeningTime());
-//			}
-//			if (params.getLatestStartTime() >= 0) {
-//				actParams.setLatestStartTime(params.getLatestStartTime());
-//			}
-//			if (params.getEarliestEndTime() >= 0) {
-//				actParams.setEarliestEndTime(params.getEarliestEndTime());
-//			}
-//			if (params.getClosingTime() >= 0) {
-//				actParams.setClosingTime(params.getClosingTime());
-//			}
-//			utilParams.put(type, actParams);
 			
 			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
 			
@@ -130,9 +113,10 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			if (params.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				factory.setScoreAtAll(false) ;
 			}
-			utilParams.put(params.getType(), factory.create() ) ;
+			tmpUtlParams.put(params.getType(), factory.create() ) ;
 
 		}
+		utilParams = Collections.unmodifiableMap(tmpUtlParams );
 
 	}
 
