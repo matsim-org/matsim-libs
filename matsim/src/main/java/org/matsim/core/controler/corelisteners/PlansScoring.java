@@ -65,6 +65,8 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
+		// yyyy the awkward syntax with eventsToScore and eventsToScore2 is to facilitate easy switching between the two
+		// (done by modifying ONLY the following line).  If eventsToScore2 is successful, eventsToScore can be removed.   kai, dec'12
 		this.eventsToScore2 = new EventsToScore2( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
 		if ( eventsToScore != null ) {
 			this.events.addHandler(this.eventsToScore);
