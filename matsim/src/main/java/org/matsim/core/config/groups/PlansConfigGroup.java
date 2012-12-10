@@ -59,7 +59,7 @@ public class PlansConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (INPUT_FILE.equals(key)) {
-			setInputFile(value.replace('\\', '/'));
+			setInputFile(value);
 		} else if (NETWORK_ROUTE_TYPE.equals(key)) {
 			setNetworkRouteType(value);
 		} else if (INPUT_PERSON_ATTRIBUTES_FILE.equals(key)) {

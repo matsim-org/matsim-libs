@@ -52,13 +52,7 @@ public class Module {
 		if (this.params.containsKey(paramName)) {
 			log.info(this.toString() + "[paramName=" + paramName + ",oldValue=" + this.params.get(paramName) + ",value=" + value + " value replaced]");
 		}
-
-		// changing windows path backslashes into unix path slashes
-		String newValue = value.replace('\\','/');
-		if (!newValue.equals(value)) {
-			log.info(this.toString() + "[value=" + value + ",newValue=" + newValue + " replaced backslashes with slashes]");
-		}
-		this.params.put(paramName,newValue);
+		this.params.put(paramName, value);
 	}
 
 	/**

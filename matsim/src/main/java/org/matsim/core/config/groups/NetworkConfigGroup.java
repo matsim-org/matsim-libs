@@ -66,13 +66,13 @@ public class NetworkConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (NetworkConfigGroup.INPUT_FILE.equals(key)) {
-			setInputFile(value.replace('\\', '/'));
+			setInputFile(value);
 		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
-			setChangeEventInputFile(value.replace('\\', '/'));
+			setChangeEventInputFile(value);
 		} else if (NetworkConfigGroup.TIME_VARIANT_NETWORK.equals(key)) {
 			setTimeVariantNetwork("true".equals(value) || "yes".equals(value));
 		} else if (NetworkConfigGroup.LANEDEFINITIONSINPUTFILE.equals(key)){
-			setLaneDefinitionsFile(value.replace('\\', '/'));
+			setLaneDefinitionsFile(value);
 		}	else {
 			throw new IllegalArgumentException(key);
 		}

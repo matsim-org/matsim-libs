@@ -128,7 +128,7 @@ public class ControlerConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (OUTPUT_DIRECTORY.equals(key)) {
-			setOutputDirectory(value.replace('\\', '/'));
+			setOutputDirectory(value);
 		} else if (FIRST_ITERATION.equals(key)) {
 			setFirstIteration(Integer.parseInt(value));
 		} else if (LAST_ITERATION.equals(key)) {

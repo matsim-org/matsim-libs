@@ -72,19 +72,19 @@ public class SignalSystemsConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value){
 		if (SIGNALSYSTEM_FILE.equalsIgnoreCase(key)){
-			this.signalSystemFile = value.replace("\\", "/").trim();
+			this.signalSystemFile = value.trim();
 		}
 		else if (SIGNALCONTROL_FILE.equalsIgnoreCase(key)) {
-			this.signalControlFile = value.replace("\\", "/").trim();
+			this.signalControlFile = value.trim();
 		}
 		else if (SIGNALGROUPS_FILE.equalsIgnoreCase(key)){
-			this.signalGroupsFile = value.replace("\\", "/").trim();
+			this.signalGroupsFile = value.trim();
 		}
 		else if (AMBERTIMES_FILE.equalsIgnoreCase(key)){
-			this.amberTimesFile = value.replace("\\", "/").trim();
+			this.amberTimesFile = value.trim();
 		}
 		else if (INTERGREENTIMES_FILE.equalsIgnoreCase(key)){
-			this.intergreenTimesFile = value.replace("\\", "/").trim();
+			this.intergreenTimesFile = value.trim();
 		}
 		else if (USE_INTERGREEN_TIMES.equalsIgnoreCase(key)){
 			this.setUseIntergreenTimes(Boolean.parseBoolean(value.trim()));

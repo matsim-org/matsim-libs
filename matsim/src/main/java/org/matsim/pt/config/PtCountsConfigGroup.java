@@ -109,11 +109,11 @@ public class PtCountsConfigGroup extends Module {
 		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
 			setDistanceFilterCenterNode(value);
 		} else if (OCCUPANCY_COUNTS_INPUT_FILENAME.equals(key)) {
-			setOccupancyCountsFileName(value.replace('\\', '/'));
+			setOccupancyCountsFileName(value);
 		} else if (BOARD_COUNTS_INPUT_FILENAME.equals(key)) {
-			setBoardCountsFileName(value.replace('\\', '/'));
+			setBoardCountsFileName(value);
 		} else if (ALIGHT_COUNTS_INPUT_FILENAME.equals(key)) {
-			setAlightCountsFileName(value.replace('\\', '/'));
+			setAlightCountsFileName(value);
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			this.setCountsScaleFactor(Double.parseDouble(value));
 		} else if (PT_COUNTS_INTERVAL.equals(key)) {

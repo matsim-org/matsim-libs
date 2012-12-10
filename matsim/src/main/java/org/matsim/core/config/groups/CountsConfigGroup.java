@@ -106,7 +106,7 @@ public class CountsConfigGroup extends Module {
 		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
 			setDistanceFilterCenterNode(value);
 		} else if (COUNTSINPUTFILENAME.equals(key)) {
-			setCountsFileName(value.replace('\\', '/'));
+			setCountsFileName(value);
 		} else if (COUNTSSCALEFACTOR.equals(key)) {
 			this.setCountsScaleFactor(Double.parseDouble(value));
 		} else if (WRITECOUNTSINTERVAL.equals(key)) {

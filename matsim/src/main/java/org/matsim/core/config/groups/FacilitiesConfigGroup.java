@@ -48,7 +48,7 @@ public class FacilitiesConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (INPUT_FILE.equals(key)) {
-			setInputFile(value.replace('\\', '/'));
+			setInputFile(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
