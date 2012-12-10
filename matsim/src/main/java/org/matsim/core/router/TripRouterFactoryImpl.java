@@ -213,21 +213,21 @@ public class TripRouterFactoryImpl implements TripRouterFactory {
 		}
 
 		if ( config.scenario().isUseTransit() ) {
-			tripRouter.setRoutingModule(
-					TransportMode.pt,
-					 new TransitRouterWrapper(
-						transitRouterFactory.createTransitRouter(),
-						transitSchedule,
-						// use a walk router in case no PT path is found
-						new LegRouterWrapper(
+			TransitRouterWrapper routingModule = new TransitRouterWrapper(
+					transitRouterFactory.createTransitRouter(),
+					transitSchedule,
+					// use a walk router in case no PT path is found
+					new LegRouterWrapper(
 							TransportMode.transit_walk,
 							populationFactory,
 							new TeleportationLegRouter(
-								modeRouteFactory,
-								routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-								routeConfigGroup.getBeelineDistanceFactor()))));
+									modeRouteFactory,
+									routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
+									routeConfigGroup.getBeelineDistanceFactor())));
+			for (String mode : this.config.transit().getTransitModes()) {
+				tripRouter.setRoutingModule(mode, routingModule);
+			}
 		}
-
 		return tripRouter;
 	}
 }
