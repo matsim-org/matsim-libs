@@ -20,6 +20,8 @@
 
 package org.matsim.core.utils.io;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -88,26 +90,26 @@ public class IOUtils {
 		try {
 			if (new File(filename).exists()) {
 				if (filename.endsWith(GZ)) {
-					infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename)), charset));
+					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename))), charset));
 				} else {
-					infile = new BufferedReader(new InputStreamReader(new FileInputStream(filename), charset));
+					infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new FileInputStream(filename)), charset));
 				}
 			} else if (new File(filename + GZ).exists()) {
-				infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(filename  + GZ)), charset));
+				infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(new FileInputStream(filename  + GZ))), charset));
 			} else {
 				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
 				if (stream != null) {
 					if (filename.endsWith(GZ)) {
-						infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream), charset));
+						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
 						log.info("loading file from classpath: " + filename);
 					} else {
-						infile = new BufferedReader(new InputStreamReader(stream, charset));
+						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(stream), charset));
 						log.info("loading file from classpath: " + filename);
 					}
 				} else {
 					stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
 					if (stream != null) {
-						infile = new BufferedReader(new InputStreamReader(new GZIPInputStream(stream), charset));
+						infile = new BufferedReader(new InputStreamReader(new UnicodeInputStream(new GZIPInputStream(stream)), charset));
 						log.info("loading file from classpath: " + filename + GZ);
 					}
 				}
@@ -525,10 +527,33 @@ public class IOUtils {
 			if (inputStream == null) {
 				throw new FileNotFoundException(filename);
 			}
-			return inputStream;
+			return new BufferedInputStream(new UnicodeInputStream(inputStream));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
+	/**
+	 * Returns a buffered and optionally gzip-compressed output stream to the specified file.
+	 * If the given filename ends with ".gz", the written file content will be automatically 
+	 * compressed with the gzip-algorithm.
+	 * 
+	 * @throws UncheckedIOException if the file cannot be created.
+	 * 
+	 * @author mrieser
+	 */
+	public static OutputStream getOutputStream(final String filename)  {
+		if (filename == null) {
+			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
+		}
+		try {
+			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
+				return new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename)));
+			} else {
+				return new BufferedOutputStream(new FileOutputStream (filename));
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 }

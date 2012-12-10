@@ -22,7 +22,10 @@ package org.matsim.core.utils.io;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import org.apache.log4j.Logger;
@@ -324,6 +327,123 @@ public class IOUtilsTest {
 		writer.close();
 		File file = new File(filename);
 		Assert.assertTrue("compressed file should be less than 50 bytes, but is " + file.length(), file.length() < 50);
+	}
+
+	@Test
+	public void testGetInputStream_UTFwithoutBOM() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt";
+		FileOutputStream out = new FileOutputStream(filename);
+		out.write("ABCdef".getBytes());
+		out.close();
+		
+		InputStream in = IOUtils.getInputStream(filename);
+		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		in.close();
+	}
+
+	@Test
+	public void testGetInputStream_UTFwithBOM() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt";
+		FileOutputStream out = new FileOutputStream(filename);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+		
+		InputStream in = IOUtils.getInputStream(filename);
+		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		in.close();
+	}
+	
+	@Test
+	public void testGetInputStream_UTFwithBOM_Compressed() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt.gz";
+		OutputStream out = IOUtils.getOutputStream(filename);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+
+		InputStream in = IOUtils.getInputStream(filename);
+		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		in.close();
+	}
+	
+	@Test
+	public void testGetBufferedReader_UTFwithoutBOM() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt";
+		FileOutputStream out = new FileOutputStream(filename);
+		out.write("ABCdef".getBytes());
+		out.close();
+		
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_UTF8);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_WINDOWS_ISO88591);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+	}
+	
+	@Test
+	public void testGetBufferedReader_UTFwithBOM() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt";
+		FileOutputStream out = new FileOutputStream(filename);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+		
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_UTF8);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_WINDOWS_ISO88591);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+	}
+
+	@Test
+	public void testGetBufferedReader_UTFwithBOM_Compressed() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt.gz";
+		OutputStream out = IOUtils.getOutputStream(filename);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+		
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename.substring(0, filename.length() - 3)); // without the .gz extension
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_UTF8);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_WINDOWS_ISO88591);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
 	}
 
 }
