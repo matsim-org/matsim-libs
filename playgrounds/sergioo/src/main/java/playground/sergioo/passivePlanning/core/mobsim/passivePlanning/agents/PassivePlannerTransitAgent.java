@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -50,7 +51,7 @@ public abstract class PassivePlannerTransitAgent extends PassivePlannerAgent imp
 
 	//Methods
 	@Override
-	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
+	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		if(state == State.LEG) {
 			Leg leg = (Leg)getCurrentPlanElement();
 			if(leg.getRoute() instanceof ExperimentalTransitRoute) {

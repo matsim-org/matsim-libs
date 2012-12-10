@@ -167,7 +167,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 			}
 			List<TransitRouteStop> stops = this.route.getStops();
 			List<TransitRouteStop> stopsToCome = stops.subList(this.nextStopIndex, stops.size());
-			if (agent.getEnterTransitRoute(this.line, this.route, stopsToCome)) {
+			if (agent.getEnterTransitRoute(this.line, this.route, stopsToCome, null)) {
 				passengersEntering.add(agent);
 				availCap -= agent.getWeight();
 			}

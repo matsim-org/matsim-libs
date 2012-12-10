@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -69,7 +70,7 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 	}
 
 	@Override
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome) {
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		
 		if(containsId(stopsToCome, route.getEgressStopId())){

@@ -24,6 +24,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -44,7 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 	@Override
 	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute,
-			final List<TransitRouteStop> stopsToCome) {
+			final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		if (line.getId().equals(route.getLineId())) {
 			return containsId(stopsToCome, route.getEgressStopId());
 		}

@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.router.TripRouter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -239,8 +240,8 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	public boolean getEnterTransitRoute(
 			final TransitLine line,
 			final TransitRoute transitRoute,
-			final List<TransitRouteStop> stopsToCome) {
-		return delegate.getEnterTransitRoute(line, transitRoute, stopsToCome);
+			final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+		return delegate.getEnterTransitRoute(line, transitRoute, stopsToCome, null);
 	}
 
 	@Override

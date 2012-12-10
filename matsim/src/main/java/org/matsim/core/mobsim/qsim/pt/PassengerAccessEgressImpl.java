@@ -109,7 +109,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 					break;
 				}
 			}
-			if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome)) {
+			if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
 				if ( !this.isGeneratingDeniedBoardingEvents ) {
 					// this tries to leave the pre-existing code intact; thus the replication of code below
 					passengersEntering.add(agent);

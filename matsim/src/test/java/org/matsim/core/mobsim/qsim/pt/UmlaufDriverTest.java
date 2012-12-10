@@ -569,7 +569,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 		@Override
 		public boolean getEnterTransitRoute(TransitLine line,
-				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
+				TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 			this.offeredLine = line;
 			return false;
 		}

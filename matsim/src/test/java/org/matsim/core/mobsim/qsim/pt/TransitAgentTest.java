@@ -95,10 +95,10 @@ public class TransitAgentTest extends TestCase {
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 
-		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops()));
-		assertFalse(agent.getEnterTransitRoute(line1, route1b, route1b.getStops()));
-		assertFalse(agent.getEnterTransitRoute(line2, route2a, route2a.getStops()));
-		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops())); // offering the same line again should yield "true"
+		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null));
+		assertFalse(agent.getEnterTransitRoute(line1, route1b, route1b.getStops(), null));
+		assertFalse(agent.getEnterTransitRoute(line2, route2a, route2a.getStops(), null));
+		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops(), null)); // offering the same line again should yield "true"
 	}
 
 	public void testArriveAtStop() {

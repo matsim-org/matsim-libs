@@ -41,12 +41,13 @@ public interface PTPassengerAgent extends PassengerAgent, Identifiable {
 	 * has arrived and is ready to be boarded.
 	 *
 	 * @param line the transit line that is available
-	 * @param route the route being served
 	 * @param stopsToCome the remaining stops on the route to be served by this vehicle before the trip ends
-	 *
+	 * @param transitVehicle TODO
+	 * @param route the route being served
 	 * @return <code>true<code> if the passenger wants to board the line, <code>false</code> otherwise
 	 */
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome);
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, 
+			final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle);
 
 	/**
 	 * Informs a passenger in a transit vehicle that the vehicle has

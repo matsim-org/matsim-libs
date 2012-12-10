@@ -13,6 +13,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -408,7 +409,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 
 	@Override
 	public boolean getEnterTransitRoute(TransitLine line,
-			TransitRoute transitRoute, List<TransitRouteStop> stopsToCome) {
+			TransitRoute transitRoute, List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		// Do I want to enter that bus?
 		return false;
 	}
