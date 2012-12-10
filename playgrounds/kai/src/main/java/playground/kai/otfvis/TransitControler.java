@@ -76,7 +76,7 @@ public class TransitControler {
 				final OTFVisConfigGroup otfVisConfig = qSim.getScenario().getConfig().otfVis();
 				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
 				//				otfVisConfig.setShowParking(true) ; // this does not really work
-				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg2) ;
+				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
 
 
 				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
