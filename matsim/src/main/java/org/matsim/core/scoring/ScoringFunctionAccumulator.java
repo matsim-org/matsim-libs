@@ -74,6 +74,10 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		void agentStuck(final double time);
 	}
 	
+	public interface ArbitraryEventScoring extends BasicScoring {
+		void handleEvent( final Event event ) ;
+	}
+	
 	private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
@@ -81,6 +85,9 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
+	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>() ;
+	
+	public ScoringFunctionAccumulator() {} // empty constructor so I can find where this is called.  kai, dec'12
 
 	public final void handleActivity(Activity activity) {
         if (activity.getStartTime() != Time.UNDEFINED_TIME) {
@@ -131,6 +138,13 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	public void endLeg(double time) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.endLeg(time);
+		}
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		for ( ArbitraryEventScoring eventScoringFunction : this.arbtraryEventScoringFunctions ) {
+			eventScoringFunction.handleEvent(event) ;
 		}
 	}
 
@@ -187,17 +201,15 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 		if (scoringFunction instanceof MoneyScoring) {
 			moneyScoringFunctions.add((MoneyScoring) scoringFunction);
 		}
+		
+		if (scoringFunction instanceof ArbitraryEventScoring ) {
+			this.arbtraryEventScoringFunctions.add((ArbitraryEventScoring) scoringFunction) ;
+		}
 
 	}
 
 	public ArrayList<ActivityScoring> getActivityScoringFunctions() {
 		return activityScoringFunctions;
-	}
-
-	@Override
-	public void handleEvent(Event event) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

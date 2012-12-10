@@ -25,13 +25,14 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.HasPersonId;
 
 
 /**
  * @author nagel
  *
  */
-public class BoardingDeniedEvent extends Event 
+public class BoardingDeniedEvent extends Event implements HasPersonId 
 {
 	public static final String EVENT_TYPE="BoardingDeniedEvent" ;
 	

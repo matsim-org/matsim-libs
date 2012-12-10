@@ -105,6 +105,7 @@ public class EventsToScore2 implements BasicEventHandler {
 
 	@Override
 	public void handleEvent(Event event) {
+		// this is for the activity and leg related stuff ("old" scoring function)
 		if ( event instanceof LinkEnterEvent ) {
 			eventsToLegs.handleEvent((LinkEnterEvent) event) ;
 		} else if ( event instanceof LinkLeaveEvent ) {
@@ -121,6 +122,11 @@ public class EventsToScore2 implements BasicEventHandler {
 			eventsToLegs.handleEvent( (TravelledEvent) event ) ;
 		} 
 
+		// this is for the stuff that is directly based on events.
+		// note that this passes on _all_ person events, even those already passed above.
+		// for the time being, not all PersonEvents may "implement HasPersonId".
+		// link enter/leave events are NOT passed on, for performance reasons.
+		// kai/dominik, dec'12
 		if ( event instanceof HasPersonId ) {
 			ScoringFunction sf = getScoringFunctionForAgent( ((HasPersonId)event).getPersonId());
 			if (sf != null) {

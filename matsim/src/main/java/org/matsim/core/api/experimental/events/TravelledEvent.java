@@ -22,8 +22,9 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.HasPersonId;
 
-public class TravelledEvent extends Event {
+public class TravelledEvent extends Event implements HasPersonId {
 
 
 	public static final String ATTRIBUTE_PERSON = "person";

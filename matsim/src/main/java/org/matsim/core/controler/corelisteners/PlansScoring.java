@@ -65,7 +65,7 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
+		this.eventsToScore2 = new EventsToScore2( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
 		if ( eventsToScore != null ) {
 			this.events.addHandler(this.eventsToScore);
 		} else {

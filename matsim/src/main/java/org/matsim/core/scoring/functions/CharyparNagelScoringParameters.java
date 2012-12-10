@@ -47,6 +47,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	public final double constantBike ;
 	public final double constantPt ;
 	public final double constantOther ;
+	
+	public final double utilityOfLineSwitch ;
 
 	@Deprecated
 	public final double marginalUtilityOfDistanceCar_m;
@@ -82,6 +84,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		constantWalk = config.getConstantWalk() ;
 		constantPt = config.getConstantPt() ;
 		constantOther = config.getConstantOther() ;
+		
+		utilityOfLineSwitch = config.getUtilityOfLineSwitch() ;
 
 		marginalUtilityOfDistanceCar_m = config.getMonetaryDistanceCostRateCar() * config.getMarginalUtilityOfMoney() ;
 		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceCostRatePt() * config.getMarginalUtilityOfMoney() ;
