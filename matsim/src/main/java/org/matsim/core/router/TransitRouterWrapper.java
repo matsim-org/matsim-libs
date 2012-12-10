@@ -54,11 +54,17 @@ public class TransitRouterWrapper implements RoutingModule {
 	 * @param toWrap the router to add
 	 */
 	public TransitRouterWrapper(
-			final TransitRouter toWrap,
+			final TransitRouter router,
 			final TransitSchedule transitSchedule,
 			final RoutingModule walkRouter) {
-		this.router = toWrap;
+		if (router == null) {
+			throw new NullPointerException("The router object is null, but is required later.");
+		}
+		this.router = router;
 		this.transitSchedule = transitSchedule;
+		if (walkRouter == null) {
+			throw new NullPointerException("The walkRouter object is null, but is required later.");
+		}
 		this.walkRouter = walkRouter;
 	}
 
