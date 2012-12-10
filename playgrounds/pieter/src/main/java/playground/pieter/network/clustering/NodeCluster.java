@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -24,9 +25,10 @@ import org.matsim.core.network.LinkImpl;
  * @author fouriep
  * 
  */
-public class NodeCluster{
+public class NodeCluster {
 	private NodeClusteringAlgorithm algo;
-	private int clusterStep;
+	private int clusterStepFormed;
+	private int clusterStepParented;
 	private int id;
 	private double internalFlow = Double.NaN;
 	private Map<Id, ClusterLink> outLinks;
@@ -43,7 +45,7 @@ public class NodeCluster{
 	private double outFlowSum;
 	private HashSet<NodeCluster> outBoundClusters;
 	private LinkedHashMap<Id, ClusterLink> newInterlinks;
-	private static long invocations =0;
+	private static long invocations = 0;
 
 	//
 	//
@@ -54,16 +56,17 @@ public class NodeCluster{
 	 * 
 	 * @param n
 	 *            the node being converted
-	 * @param algorithm
-	 * @param linkMethod 
-	 * @param args 
+	 * @param nca
+	 * @param linkMethod
+	 * @param args
 	 */
-	public NodeCluster(ClusterNode n, NodeClusteringAlgorithm algorithm, 
+	public NodeCluster(ClusterNode n, NodeClusteringAlgorithm nca,
 			int clusterStep, int id, Method linkMethod, Object[] args) {
 		this.id = id;
-		this.clusterStep = clusterStep;
+		this.clusterStepFormed = clusterStep;
+		this.clusterStepParented = clusterStep;
 		isLeaf = true;
-		this.algo = algorithm;
+		this.algo = nca;
 		leafNode = n;
 		inLinks = new LinkedHashMap<Id, ClusterLink>(n.getInLinks().size());
 		outLinks = new LinkedHashMap<Id, ClusterLink>(n.getOutLinks().size());
@@ -72,7 +75,7 @@ public class NodeCluster{
 		for (Link l : n.getInLinks().values()) {
 			inLinks.put(l.getId(), algo.getLinks().get(l.getId()));
 			// the links don't know yet who's their daddy
-//			 inLinks.get(l.getId()).setNewRoot(this, false);
+			// inLinks.get(l.getId()).setNewRoot(this, false);
 			inLinks.get(l.getId()).setToCluster(this);
 		}
 		for (Link l : n.getOutLinks().values()) {
@@ -82,22 +85,35 @@ public class NodeCluster{
 		}
 		// by definition, there is no flow internal to a point
 		internalFlow = 0;
-//		setInFlowSum(linkMethod, args);
-//		setOutFlowSum(linkMethod, args);
+		// setInFlowSum(linkMethod, args);
+		// setOutFlowSum(linkMethod, args);
 		setInvocations(getInvocations() + 1);
 	}
 
 	public NodeCluster(NodeCluster nc1, NodeCluster nc2, Method linkMethod,
 			Object[] args, int clusterStep, int id) {
-		
+
 		isLeaf = false;
-		this.clusterStep = clusterStep;
+		this.clusterStepFormed = clusterStep;
+		this.clusterStepParented = clusterStep;
 		this.id = id;
 		this.child1 = nc1;
 		this.child2 = nc2;
+		newInterlinks = findInterLInks(nc1, nc2);
+		setInternalFlow(nc1, nc2, linkMethod, args, newInterlinks);
+		setDeltaFlow();
+		// setInFlowSum(linkMethod, args);
+		// setOutFlowSum(linkMethod, args);
+		setInvocations(getInvocations() + 1);
+	}
+
+	public void freezeCluster() {
+
 		inLinks = new LinkedHashMap<Id, ClusterLink>();
 		outLinks = new LinkedHashMap<Id, ClusterLink>();
 		interLinks = new LinkedHashMap<Id, ClusterLink>();
+		NodeCluster nc1 = this.getChild1();
+		NodeCluster nc2 = this.getChild2();
 		nodes = new LinkedHashMap<Id, ClusterNode>(nc1.getNodes().size()
 				+ nc2.getNodes().size(), 1f);
 		// first add all in and out links, then subtract them using the set of
@@ -108,20 +124,17 @@ public class NodeCluster{
 		outLinks.putAll(nc2.getOutLinks());
 		nodes.putAll(nc1.getNodes());
 		nodes.putAll(nc2.getNodes());
+		removeInterLinksFromOtherLinkMaps();
 		// first add all the existing interLinks for the two NodeClusters, but
 		// only if they are not leaves
 		if (!nc1.isLeaf)
 			interLinks.putAll(nc1.getInterLinks());
 		if (!nc2.isLeaf)
 			interLinks.putAll(nc2.getInterLinks());
-		newInterlinks = findInterLInks(nc1, nc2);
 		interLinks.putAll(newInterlinks);
-//		removeInterLinksFromOtherLinkMaps();
-		setInternalFlow(nc1, nc2, linkMethod, args,newInterlinks);
-		setDeltaFlow();
-//		setInFlowSum(linkMethod, args);
-//		setOutFlowSum(linkMethod, args);
-		setInvocations(getInvocations() + 1);
+		//a new cluster has its kids always at one clusterstep below
+		nc1.setClusterStepParented(this.clusterStepFormed-1);
+		nc2.setClusterStepParented(this.clusterStepFormed-1);
 	}
 
 	/**
@@ -142,17 +155,18 @@ public class NodeCluster{
 	 * @param nc2
 	 *            the second NodeCluster
 	 */
-	private LinkedHashMap<Id, ClusterLink> findInterLInks(NodeCluster nc1, NodeCluster nc2) {
+	private LinkedHashMap<Id, ClusterLink> findInterLInks(NodeCluster nc1,
+			NodeCluster nc2) {
 		LinkedHashMap<Id, ClusterLink> newInterlinks = new LinkedHashMap<Id, ClusterLink>();
 		for (ClusterLink l : nc1.getInLinks().values()) {
 			if (nc2.getOutLinks().get(l.getId()) != null) {
-//				interLinks.put(l.getId(), l);
+				// interLinks.put(l.getId(), l);
 				newInterlinks.put(l.getId(), l);
 			}
 		}
 		for (ClusterLink l : nc2.getInLinks().values()) {
 			if (nc1.getOutLinks().get(l.getId()) != null) {
-//				interLinks.put(l.getId(), l);
+				// interLinks.put(l.getId(), l);
 				newInterlinks.put(l.getId(), l);
 			}
 		}
@@ -162,16 +176,17 @@ public class NodeCluster{
 	/**
 	 * Checks if any newly formed interlinks are in the outerlink or innerlink
 	 * collections
-	 * @param newInterlinks 
+	 * 
+	 * @param newInterlinks
 	 */
 	public void removeInterLinksFromOtherLinkMaps() {
 		for (ClusterLink l : newInterlinks.values()) {
-//			if (newInterlinks.get(l.getId()) != null) {
-				inLinks.remove(l.getId());
-//			}
-//			if (newInterlinks.get(l.getId()) != null) {
-				outLinks.remove(l.getId());
-//			}
+			// if (newInterlinks.get(l.getId()) != null) {
+			inLinks.remove(l.getId());
+			// }
+			// if (newInterlinks.get(l.getId()) != null) {
+			outLinks.remove(l.getId());
+			// }
 		}
 	}
 
@@ -226,7 +241,7 @@ public class NodeCluster{
 	 *            the first NodeCluster
 	 * @param nc2
 	 *            the second NodeCluster
-	 * @param newInterlinks 
+	 * @param newInterlinks
 	 * @param linkMethodAndParameters
 	 *            an array of strings, starting with the link method name, and
 	 *            its required parameters
@@ -235,31 +250,30 @@ public class NodeCluster{
 	 * @throws IllegalAccessException
 	 */
 	private void setInternalFlow(NodeCluster nc1, NodeCluster nc2,
-			Method linkMethod, Object[] args, LinkedHashMap<Id,ClusterLink> newInterlinks) {
+			Method linkMethod, Object[] args,
+			LinkedHashMap<Id, ClusterLink> newInterlinks) {
 		// only call if internal flow has not yet been calculated
 		if (!Double.isNaN(getInternalFlow()))
 			return;
-		double result = nc1.getInternalFlow()+nc2.getInternalFlow();
-//		if (this.interLinks.size() > 0) {
-			for (Link l :newInterlinks.values()) {
-				try {
-					result += (Double) linkMethod.invoke(l, args);
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		double result = nc1.getInternalFlow() + nc2.getInternalFlow();
+		// if (this.interLinks.size() > 0) {
+		for (Link l : newInterlinks.values()) {
+			try {
+				result += (Double) linkMethod.invoke(l, args);
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-//		}
+		}
+		// }
 		this.internalFlow = result;
 	}
-
-
 
 	public void setInFlowSum(Method linkMethod, Object[] args) {
 		double result = 0;
@@ -301,7 +315,6 @@ public class NodeCluster{
 
 	}
 
-
 	public Map<Id, ClusterLink> getInLinks() {
 		return this.inLinks;
 	}
@@ -314,12 +327,12 @@ public class NodeCluster{
 		return this.interLinks;
 	}
 
-	public int getClusterStep() {
-		return clusterStep;
+	public int getClusterStepFormed() {
+		return clusterStepFormed;
 	}
 
-	public void setClusterStep(int clusterStep) {
-		this.clusterStep = clusterStep;
+	public void setClusterStepFormed(int clusterStep) {
+		this.clusterStepFormed = clusterStep;
 	}
 
 	public NodeClusteringAlgorithm getAlgo() {
@@ -370,23 +383,20 @@ public class NodeCluster{
 		return deltaFlow;
 	}
 
-	public HashSet<NodeCluster> getOutBoundClusters(){
-		//check first if this set has been calculated yet
-//		if(this.outBoundClusters == null){
-			this.outBoundClusters = new HashSet<NodeCluster> ();
-			for(ClusterLink l:this.outLinks.values()){
-//				if(l.getToCluster()==null)
-//					continue;
-				outBoundClusters.add(l.getToCluster());
-			}
-//		}
+	public HashSet<NodeCluster> getOutBoundClusters() {
+		// check first if this set has been calculated yet
+		// if(this.outBoundClusters == null){
+		this.outBoundClusters = new HashSet<NodeCluster>();
+		for (ClusterLink l : this.outLinks.values()) {
+			// if(l.getToCluster()==null)
+			// continue;
+			outBoundClusters.add(l.getToCluster());
+		}
+		// }
 		return this.outBoundClusters;
-		
-	}
-	
 
-	
-	
+	}
+
 	public double getInFlowSum() {
 		// TODO Auto-generated method stub
 		return this.inFlowSum;
@@ -396,14 +406,13 @@ public class NodeCluster{
 		// TODO Auto-generated method stub
 		return this.outFlowSum;
 	}
-	
-	public String toString(){
-		
-		return  this.getId()+
-				(isLeaf ? "" : 
-					("["+this.getChild1()+","+this.getChild2()+"]"))
-					;
-		
+
+	public String toString() {
+
+		return this.getId() + "("+this.getClusterStepParented()+")"
+				+ (isLeaf ? "" : ("[" + this.getChild1() + ","
+						+ this.getChild2() + "]"));
+
 	}
 
 	public static long getInvocations() {
@@ -413,4 +422,25 @@ public class NodeCluster{
 	private static void setInvocations(long invocations) {
 		NodeCluster.invocations = invocations;
 	}
+
+	public TreeMap<Integer, NodeCluster> getChildren() {
+		
+		TreeMap<Integer, NodeCluster> childClusters = null;
+		if(!isLeaf){
+			childClusters  = new TreeMap<Integer, NodeCluster>();
+			childClusters.put(child1.getId(), child1);
+			childClusters.put(child2.getId(), child2);
+			
+		}
+		return childClusters;
+	}
+
+	public int getClusterStepParented() {
+		return clusterStepParented;
+	}
+
+	public void setClusterStepParented(int clusterStepParented) {
+		this.clusterStepParented = clusterStepParented;
+	}
+	
 }
