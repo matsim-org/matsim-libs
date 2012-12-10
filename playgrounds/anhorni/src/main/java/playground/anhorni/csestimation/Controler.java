@@ -24,19 +24,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.anhorni.surprice.MultiDayControler;
-
 public class Controler {
 
 	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk", ""));
 	public static ArrayList<String> frequency = new ArrayList<String>(Arrays.asList("VeryOften", "Often", "OnceAWhile", "Seldom", "Never", "NULL", ""));
-	private ArrayList<Person> population = new ArrayList<Person>();
+	private TreeMap<Id, Person> population = new TreeMap<Id, Person>();
 	
 	private final static Logger log = Logger.getLogger(Controler.class);
 	
@@ -53,7 +52,6 @@ public class Controler {
 		this.readDumpedPersons(personFile);
 		log.info(this.population.size() + " persons created");
 		this.readDumpedPersonShops(personShopsFile);
-		this.readDumpedAddedShops(addedShopsFile);	
 		log.info("finished .......................................");
 	}
 	
@@ -71,10 +69,10 @@ public class Controler {
 			String curr_line;
 			while ((curr_line = br.readLine()) != null) {
 				String[] entrs = curr_line.split(";", -1);
-				Id id = new IdImpl(entrs[0].trim());
+				Id userId = new IdImpl(entrs[0].trim().substring(4, 8));
 				
-				Person person = new Person(id);
-				this.population.add(person);
+				Person person = new Person(userId);
+				this.population.put(userId, person);
 				
 				person.setAge(Integer.parseInt(entrs[1].trim()));
 				person.setSex(entrs[2].trim());
@@ -120,31 +118,62 @@ public class Controler {
 			e.printStackTrace();
 		} 		
 	}
-	
+
+// 0:	id, 			1: shop_id,		2: uname,		3: visitedByUser,	4: addedByUser,	5: awareness,	6: frequency,
+// 7: iProducts,		8: iPtChange,	9: iDistance,	10: iPrize,			11: iParking,	12: iAtmo,		13: iOpentimes,	14: furtherReasons,
+// 15: disadvantages,	16: disad_text,	
+// 17: startLoc,	18: endLoc,			19: saved,		20: inCS	
+
 	private void readDumpedPersonShops(String file) {		
 		try {
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 			String curr_line;
+			Id prevId = new IdImpl(-99);
+			int countAware = 0;
+			int countVisited = 0;
 			while ((curr_line = br.readLine()) != null) {
-				String[] entrs = curr_line.split("\t", -1);
-
-				Id id = new IdImpl(entrs[0].trim());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 		
-	}
-	
-	private void readDumpedAddedShops(String file) {		
-		try {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String curr_line;
-			while ((curr_line = br.readLine()) != null) {
-				String[] entrs = curr_line.split("\t", -1);
-
-				Id id = new IdImpl(entrs[0].trim());
+				String[] entrs = curr_line.split(";", -1);
+				Id shopId = new IdImpl(entrs[1].trim());
+				Id userId = new IdImpl(entrs[2].trim().substring(4, 8));
+				
+				Person person = this.population.get(userId);
+				ShopLocation store = new ShopLocation();				
+				store.setId(shopId);
+				int aware = 0;
+				int visited = 0;
+				
+				if (entrs[5].trim().equals("yes")) {
+					aware = 1;
+					countAware++;
+				}
+				else if (entrs[5].trim().equals("no")) {
+					aware = -1;
+					store.setVisitFrequency("never");
+				}
+				if (entrs[3].trim().equals("yes")) {
+					visited = 1;
+					store.setVisitFrequency(entrs[6].trim());
+					countVisited++;
+				}
+				else if (entrs[3].trim().equals("no")) {
+					visited = -1;
+					store.setVisitFrequency(entrs[6].trim());
+				}
+				if (person == null) {
+					log.error("person null for user " + userId);
+					System.exit(1);
+				}
+				else {
+					person.addStore(store, aware, visited);	
+				}
+				if (prevId.compareTo(userId) != 0 && prevId.compareTo(new IdImpl(-99)) != 0) {
+					log.info("parsed user: " + prevId + " " + countAware + " aware stores " + countVisited + " visited stores");
+					countAware = 0;
+					countVisited = 0;
+				}
+				prevId = new IdImpl(entrs[2].trim().substring(4, 8));
+				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

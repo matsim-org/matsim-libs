@@ -24,8 +24,12 @@ import java.util.ArrayList;
 public class PersonLocations {
 	private Location workLocation = null;
 	private Location homeLocation = null;
-	private ArrayList<ShopLocation> unknownStoresInQuerySet = new ArrayList<ShopLocation>();
-	private ArrayList<ShopLocation> knownStoresInQuerySet = new ArrayList<ShopLocation>();
+	private ArrayList<ShopLocation> awareStoresInQuerySet = new ArrayList<ShopLocation>();
+	private ArrayList<ShopLocation> unawareStoresInQuerySet = new ArrayList<ShopLocation>();
+	
+	private ArrayList<ShopLocation> visitedStoresInQuerySet = new ArrayList<ShopLocation>();
+	private ArrayList<ShopLocation> unvisitedStoresInQuerySet = new ArrayList<ShopLocation>();
+	
 	
 	public Location getWorkLocation() {
 		return workLocation;
@@ -39,15 +43,24 @@ public class PersonLocations {
 	public void setHomeLocation(Location homeLocation) {
 		this.homeLocation = homeLocation;
 	}
-	public ArrayList<ShopLocation> getUnknownStoresInQuerySet() {
-		return unknownStoresInQuerySet;
-	}	
-	public void addUnknownStoreIntoQuerySet(ShopLocation location) {
-		this.unknownStoresInQuerySet.add(location);
-	}	
+	public void addStore(ShopLocation store, int aware, int visited) {
+		if (aware == -1) {
+			this.unawareStoresInQuerySet.add(store);
+		}
+		else if (aware == 1) {
+			this.awareStoresInQuerySet.add(store);
+		}
+		if (visited == -1) {
+			this.unvisitedStoresInQuerySet.add(store);
+		}
+		else if (visited == 1) {
+			this.visitedStoresInQuerySet.add(store);
+		}
+	}
+	
 	public ArrayList<ShopLocation> getStoresPerFrequency(String frequency) {
 		ArrayList<ShopLocation> returnSet = new ArrayList<ShopLocation>();
-		for (ShopLocation location : this.knownStoresInQuerySet) {
+		for (ShopLocation location : this.awareStoresInQuerySet) {
 			if (location.getVisitFrequency().equals(frequency)) {
 				returnSet.add(location);
 			}

@@ -27,6 +27,7 @@ public class ShopLocation extends Location {
 	private int [] reasonsForVisit = new int[7];
 	private boolean [] reasonsForNonVisit = new boolean[8];
 	
+	
 	public int getPrevLoc() {
 		return prevLoc;
 	}

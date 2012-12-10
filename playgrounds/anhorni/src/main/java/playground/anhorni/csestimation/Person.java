@@ -52,6 +52,9 @@ public class Person {
 	public void setWorkLocation(Location location) {
 		this.locations.setWorkLocation(location);
 	}
+	public void addStore(ShopLocation store, int aware, int visited)  {
+		this.locations.addStore(store, aware, visited);
+	}	
 	public void setModeForWorking(int index, boolean value) {
 		this.modes.setModeForWorking(index, value);
 	}
