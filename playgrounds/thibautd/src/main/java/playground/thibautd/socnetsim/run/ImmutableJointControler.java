@@ -29,16 +29,14 @@ import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -104,7 +102,9 @@ public class ImmutableJointControler extends AbstractController {
 				scenario,
 				new TravelCostCalculatorFactoryImpl(),
 				travelTime,
-				new AStarLandmarksFactory(),
+				new AStarLandmarksFactory(
+						scenario.getNetwork(), 
+						new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime, scenario.getConfig().planCalcScore())),
 				null); // last arg: transit router factory.
 	}
 
