@@ -17,23 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.AStarLandmarks;
 
-
 /**
  * @author dgrether
- *
  */
 public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
 	private PreProcessLandmarks preProcessData;
-	
-	public AStarLandmarksFactory() {
-		// Nothing to do.
-	}
 	
 	public AStarLandmarksFactory(Network network, final TravelDisutility fsttc) {
 		processNetwork(network, fsttc, 8);
