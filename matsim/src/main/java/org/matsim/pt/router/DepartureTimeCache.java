@@ -42,7 +42,7 @@ public class DepartureTimeCache {
 		this.sortedDepartureCache = new ConcurrentHashMap<TransitRoute, double[]>();
 	}
 
-	public final double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {
+	public double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {
 	
 		double earliestDepartureTimeAtTerminus = depTime - stop.getDepartureOffset();
 		// This shifts my time back to the terminus.
