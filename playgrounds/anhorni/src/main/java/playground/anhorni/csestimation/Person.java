@@ -31,7 +31,7 @@ public class Person {
 	private int hhIncome = -99;
 	private int hhSize = -99;
 	private int nbrPersonShoppingTripsMonth = -99;
-	private int nbrShoppingTripsMonth = -99;		
+	private String nbrShoppingTripsMonth = "-99";		
 		
 	// ----------------------------------------------------
 	private boolean isWorker;		
@@ -91,7 +91,7 @@ public class Person {
 	public int getNbrPersonShoppingTripsMonth() {
 		return nbrPersonShoppingTripsMonth;
 	}
-	public int getNbrShoppingTripsMonth() {
+	public String getNbrShoppingTripsMonth() {
 		return nbrShoppingTripsMonth;
 	}
 	public boolean isWorker() {
@@ -115,7 +115,7 @@ public class Person {
 	public void setHhSize(int hhSize) {
 		this.hhSize = hhSize;
 	}
-	public void setNbrShoppingTripsMonth(int nbrShoppingTripsMonth) {
+	public void setNbrShoppingTripsMonth(String nbrShoppingTripsMonth) {
 		this.nbrShoppingTripsMonth = nbrShoppingTripsMonth;
 	}
 	public void setNbrPersonShoppingTripsMonth(int nbrPersonShoppingTripsMonth) {

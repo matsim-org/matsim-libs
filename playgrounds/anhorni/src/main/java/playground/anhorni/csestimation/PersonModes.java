@@ -20,7 +20,7 @@
 package playground.anhorni.csestimation;
 
 public class PersonModes {
-	private boolean modesForWorking [] = new boolean[4];
+	private boolean modesForWorking [] = {false, false, false, false};
 	private int modesForShopping [] = new int[4];
 	
 	public void setModeForWorking(int index, boolean value) {
