@@ -23,6 +23,7 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 
 /**
@@ -130,6 +131,12 @@ public class OnlyTravelTimeDependentScoringFunction extends ScoringFunctionAdapt
 
 	@Override
 	public void endActivity(double time, Activity activity) {
+		
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		// TODO Auto-generated method stub
 		
 	}
 	

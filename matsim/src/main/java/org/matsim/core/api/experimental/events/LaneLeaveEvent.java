@@ -25,6 +25,13 @@ import org.matsim.api.core.v01.Id;
 
 
 /**
+  * Design considerations: <ul>
+ * <li> This class deliberately does <i>not</i> implement HasPersonId.  One reason is that it does not really
+ * belong at this level (since it is the vehicle that enters/leaves links); another reason is that this would
+ * make an "instanceof HasPersonId" considerably more expensive. kai/dg, dec'12
+ * </ul> 
+ * 
+ * 
  * @author dgrether
  *
  */

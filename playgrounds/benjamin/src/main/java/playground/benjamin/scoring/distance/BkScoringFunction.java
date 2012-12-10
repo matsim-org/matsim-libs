@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
@@ -400,6 +401,12 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 		LegImpl leg = (LegImpl)this.plan.getPlanElements().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index++;
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

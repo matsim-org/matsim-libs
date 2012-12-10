@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -94,6 +95,12 @@ public class OwnScoringFunctionAndReplanning {
 		@Override
 		public void reset() {
 			delegate.reset();
+		}
+
+		@Override
+		public void handleEvent(Event event) {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}

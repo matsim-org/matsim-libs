@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -275,6 +276,12 @@ public class PSSControlerDumbCharging extends PSSControler {
                     public void reset() {
                         //To change body of implemented methods use File | Settings | File Templates.
                     }
+
+					@Override
+					public void handleEvent(Event event) {
+						// TODO Auto-generated method stub
+						
+					}
                 };
 			}
 		});

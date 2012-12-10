@@ -23,12 +23,13 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.HasPersonId;
 
 /**
  *
  * @author mrieser
  */
-public class PersonLeavesVehicleEvent extends Event {
+public class PersonLeavesVehicleEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "PersonLeavesVehicle";
 	

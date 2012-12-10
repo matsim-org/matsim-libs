@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.scoring.ScoringFunction;
@@ -166,6 +167,12 @@ public class ParkAndRideScoringFunction implements ScoringFunction {
 
 	boolean lastLegWasCar()  {
 		return lastLegWasCar;
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

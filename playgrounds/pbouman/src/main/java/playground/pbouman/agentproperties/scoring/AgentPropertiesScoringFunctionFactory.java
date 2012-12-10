@@ -5,6 +5,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -130,6 +131,12 @@ public class AgentPropertiesScoringFunctionFactory implements ScoringFunctionFac
 			public void reset()
 			{
 				score = 0;
+			}
+
+			@Override
+			public void handleEvent(Event event) {
+				// TODO Auto-generated method stub
+				
 			} 
 		};
 	}

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -186,6 +187,12 @@ public class EventsToScoreTest extends MatsimTestCase {
 		@Override
 		public void endActivity(double time, Activity activity) {
 			this.cntEndAct++;
+		}
+
+		@Override
+		public void handleEvent(Event event) {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}

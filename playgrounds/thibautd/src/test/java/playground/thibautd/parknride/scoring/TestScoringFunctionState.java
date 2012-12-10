@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -60,6 +61,11 @@ public class TestScoringFunctionState {
 		public double getScore() { return 0; }
 		@Override
 		public void reset() {}
+		@Override
+		public void handleEvent(Event event) {
+			// TODO Auto-generated method stub
+			
+		}
 	};
 	private static final ParkingPenalty DUMMY_PENALTY = new ParkingPenalty() {
 		@Override

@@ -23,8 +23,9 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.HasPersonId;
 
-public class ActivityEndEvent extends Event {
+public class ActivityEndEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "actend";
 	public static final String ATTRIBUTE_LINK = "link";

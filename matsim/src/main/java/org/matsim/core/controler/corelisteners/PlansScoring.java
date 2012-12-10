@@ -31,6 +31,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.EventsToScore2;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -44,7 +45,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener {
 
-	private EventsToScore eventsToScore;
+	private EventsToScore eventsToScore = null ;
+	private EventsToScore2 eventsToScore2 = null ;
 
 	private Scenario sc;
 
@@ -64,19 +66,36 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
-		this.events.addHandler(this.eventsToScore);
+		if ( eventsToScore != null ) {
+			this.events.addHandler(this.eventsToScore);
+		} else {
+			this.events.addHandler(this.eventsToScore2);
+		}
+			
 	}
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
-		this.eventsToScore.finish();
+		if ( eventsToScore != null ) {
+			this.eventsToScore.finish();
+		} else {
+			this.eventsToScore2.finish() ;
+		}
 	}
 	
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.events.removeHandler(this.eventsToScore);
+		if ( eventsToScore != null ) { 
+			this.events.removeHandler(this.eventsToScore);
+		} else {
+			this.events.removeHandler(this.eventsToScore2) ;
+		}
 		if(sc.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
+			if ( eventsToScore != null ){
+				this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
+			} else {
+				this.eventsToScore2.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
+			}
 		}
 	}
 

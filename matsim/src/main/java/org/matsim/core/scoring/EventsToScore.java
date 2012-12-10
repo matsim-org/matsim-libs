@@ -163,14 +163,8 @@ LinkEnterEventHandler, TravelledEventHandler {
 	}
 
 
-	/**
-	 * Finishes the calculation of the plans' scores and assigns the new scores
-	 * to the plans.
-	 * I think this should be split into two methods: One can want to close the ScoringFunctions to look
-	 * at scores WITHOUT wanting something to be written into Plans.
-	 * Actually, I think the two belong in different classes. michaz '12
-	 * <p/>
-	 * yy Absolutely.  kai, oct'12
+	/* (non-Javadoc)
+	 * @see org.matsim.core.scoring.EventsToScoreI#finish()
 	 */
 	public void finish() {
 		eventsToActivities.finish();	
@@ -212,12 +206,8 @@ LinkEnterEventHandler, TravelledEventHandler {
 
 	
 
-	/**
-	 * Returns the actual average plans' score before it was assigned to the
-	 * plan and possibility mixed with old scores (learningrate).
-	 *
-	 * @return the average score of the plans before mixing with the old scores
-	 *         (learningrate)
+	/* (non-Javadoc)
+	 * @see org.matsim.core.scoring.EventsToScoreI#getAveragePlanPerformance()
 	 */
 	public double getAveragePlanPerformance() {
 		if (this.scoreSum == 0)
@@ -226,13 +216,8 @@ LinkEnterEventHandler, TravelledEventHandler {
 			return (this.scoreSum / this.scoreCount);
 	}
 
-	/**
-	 * Returns the score of a single agent. This method only returns useful
-	 * values if the method {@link #finish() } was called before. description
-	 *
-	 * @param agentId
-	 *            The id of the agent the score is requested for.
-	 * @return The score of the specified agent.
+	/* (non-Javadoc)
+	 * @see org.matsim.core.scoring.EventsToScoreI#getAgentScore(org.matsim.api.core.v01.Id)
 	 */
 	public Double getAgentScore(final Id agentId) {
 		if (!finished) {
@@ -244,6 +229,9 @@ LinkEnterEventHandler, TravelledEventHandler {
 		return scoringFunction.getScore();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.scoring.EventsToScoreI#reset(int)
+	 */
 	@Override
 	public void reset(final int iteration) {
 		this.eventsToActivities.reset(iteration);
@@ -254,10 +242,16 @@ LinkEnterEventHandler, TravelledEventHandler {
 		// ("reset" is called just before the mobsim starts, so it probably has the correct iteration number for our purposes) 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.scoring.EventsToScoreI#getScoringFunctionForAgent(org.matsim.api.core.v01.Id)
+	 */
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
 		return scoringFunctionsForPopulation.getScoringFunctionForAgent(agentId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.core.scoring.EventsToScoreI#writeExperiencedPlans(java.lang.String)
+	 */
 	public void writeExperiencedPlans(String iterationFilename) {
 		scoringFunctionsForPopulation.writeExperiencedPlans(iterationFilename);
 	}

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
@@ -234,6 +235,12 @@ public class ScoringFunctionAccumulatorWithAttrRecorder extends
 
 	public ArrayList<ActivityScoring> getActivityScoringFunctions() {
 		return activityScoringFunctions;
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

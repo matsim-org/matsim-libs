@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -191,6 +192,12 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 
 	public ArrayList<ActivityScoring> getActivityScoringFunctions() {
 		return activityScoringFunctions;
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

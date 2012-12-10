@@ -23,6 +23,7 @@ package org.matsim.core.scoring;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.Event;
 
 /**
  * A scoring function calculates the score for one plan of an agent.  The score
@@ -86,5 +87,7 @@ public interface ScoringFunction {
 	 * time information.
 	 */
 	public void reset();
+	
+	public void handleEvent( Event event ) ;
 
 }
