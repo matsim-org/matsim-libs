@@ -49,6 +49,7 @@ public class ActivityEndEvent extends Event implements HasPersonId {
 		this.personId = agentId;
 	}
 
+	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}

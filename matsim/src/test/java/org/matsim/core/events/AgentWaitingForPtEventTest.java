@@ -44,7 +44,7 @@ public class AgentWaitingForPtEventTest {
 		AgentWaitingForPtEvent event = new AgentWaitingForPtEvent(time, person.getId(), waitStopId, destinationStopId);
 		AgentWaitingForPtEvent event2 = XmlEventsTester.testWriteReadXml(helper.getOutputDirectory() + "events.xml", event);
 		Assert.assertEquals("wrong time of event.", time, event2.getTime(), 1e-8);
-		Assert.assertEquals("1", event2.getAgentId().toString());
+		Assert.assertEquals("1", event2.getPersonId().toString());
 		Assert.assertEquals("1980", event2.getWaitingAtStopId().toString());
 		Assert.assertEquals("0511", event2.getDestinationStopId().toString());
 	}

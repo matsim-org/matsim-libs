@@ -22,11 +22,12 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.HasPersonId;
 
 /**
  * @author mrieser / senozon
  */
-public class AgentWaitingForPtEvent extends Event {
+public class AgentWaitingForPtEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "waitingForPt";
 	public static final String ATTRIBUTE_AGENT = "agent";
@@ -48,7 +49,7 @@ public class AgentWaitingForPtEvent extends Event {
 		return EVENT_TYPE;
 	}
 	
-	public Id getAgentId() {
+	public Id getPersonId() {
 		return this.agentId;
 	}
 	
