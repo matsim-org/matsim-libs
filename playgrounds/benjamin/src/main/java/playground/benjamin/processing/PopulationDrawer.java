@@ -41,8 +41,8 @@ import processing.core.PVector;
  * @author benjamin
  *
  */
-public class PopulationAnalysis extends PApplet {
-	private static final Logger logger = Logger.getLogger(PopulationAnalysis.class);
+public class PopulationDrawer extends PApplet {
+	private static final Logger logger = Logger.getLogger(PopulationDrawer.class);
 
 	LocationFilter locFilter;
 	PersonFilter personFilter;
