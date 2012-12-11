@@ -119,8 +119,8 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 
 	private AcceptabilityCondition getCondition(final Attributes atts) {
 		AcceptabilityCondition condition = new AcceptabilityCondition(
-				Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.DIST)),
-				Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.TIME)));
+				(int) Math.round( Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.DIST)) ),
+				(int) Math.round( Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.TIME)) ));
 
 		int i = conditions.indexOf(condition);
 		return i == -1 ? condition : conditions.get(i);

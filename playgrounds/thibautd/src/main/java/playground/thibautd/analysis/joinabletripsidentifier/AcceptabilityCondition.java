@@ -26,22 +26,21 @@ import java.util.List;
  * @author thibautd
  */
 public class AcceptabilityCondition {
-	private static final double EPSILON = 1E-7;
-	private final double distance;
-	private final double time;
+	private final int distance;
+	private final int time;
 
 	public AcceptabilityCondition(
-			final double distance,
-			final double time) {
+			final int distance,
+			final int time) {
 		this.distance = distance;
 		this.time = time;
 	}
 
-	public double getDistance() {
+	public int getDistance() {
 		return distance;
 	}
 
-	public double getTime() {
+	public int getTime() {
 		return time;
 	}
 
@@ -99,14 +98,12 @@ public class AcceptabilityCondition {
 			return false;
 		}
 
-		double distDiff = Math.abs(this.distance - condition.distance);
-		double timeDiff = Math.abs(this.time - condition.time);
-		return (distDiff < EPSILON) && (timeDiff < EPSILON) ;
+		return condition.distance == distance && condition.time == time;
 	}
 
 	@Override
 	public int hashCode() {
-		return (int) (distance + (time * 100000));
+		return distance + time * 1000;
 	}
 
 	public static class Fullfillment {

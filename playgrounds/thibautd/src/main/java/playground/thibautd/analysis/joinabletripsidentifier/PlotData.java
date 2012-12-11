@@ -95,9 +95,9 @@ public class PlotData {
 
 		for (Map.Entry<String, String> entry : params.entrySet()) {
 			if (entry.getKey().matches(DIST)) {
-				double dist = Double.parseDouble(entry.getValue());
+				int dist = (int) Math.round( Double.parseDouble(entry.getValue()) );
 				String num = entry.getKey().split("_")[1];
-				double time = Double.parseDouble(params.get(TIME + num));
+				int time = (int) Math.round( Double.parseDouble(params.get(TIME + num)) );
 				conditions.add(
 						new ConditionValidator(
 							network,
@@ -328,15 +328,15 @@ class ConditionValidator implements TwofoldTripValidator {
 
 	public ConditionValidator(
 			final Network network,
-			final double distance,
-			final double time) {
+			final int distance,
+			final int time) {
 		this( network , distance , time , Double.POSITIVE_INFINITY );
 	}
 
 	public ConditionValidator(
 			final Network network,
-			final double distance,
-			final double time,
+			final int distance,
+			final int time,
 			final double alphaWalk) {
 		this.condition = new AcceptabilityCondition(distance, time);
 		this.alphaWalk = alphaWalk;

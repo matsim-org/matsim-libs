@@ -64,9 +64,9 @@ public class RunExtractData {
 
 		for (Map.Entry<String, String> entry : params.entrySet()) {
 			if (entry.getKey().matches(DIST)) {
-				double dist = Double.parseDouble(entry.getValue());
+				int dist = (int) Math.round( Double.parseDouble(entry.getValue()) );
 				String num = entry.getKey().split("_")[1];
-				double time = Double.parseDouble(params.get(TIME + num));
+				int time = (int) Math.round( Double.parseDouble(params.get(TIME + num)) );
 				conditions.add(new AcceptabilityCondition(dist, time));
 			}
 		}
