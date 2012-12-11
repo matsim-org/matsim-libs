@@ -45,8 +45,8 @@ public class GroupPlans {
 	public GroupPlans(
 			final Collection<JointPlan> jointPlans,
 			final Collection<Plan> individualPlans) {
-		this.jointPlans = jointPlans;
-		this.individualPlans = individualPlans;
+		this.jointPlans = new ArrayList<JointPlan>(jointPlans);
+		this.individualPlans = new ArrayList<Plan>(individualPlans);
 	}
 
 	public Collection<JointPlan> getJointPlans() {
