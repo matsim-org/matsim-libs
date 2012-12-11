@@ -37,8 +37,9 @@ import org.xml.sax.Attributes;
  */
 public class JoinableTripsXmlReader extends MatsimXmlParser {
 
-	private List<AcceptabilityCondition> conditions =
-		new ArrayList<AcceptabilityCondition>();
+	private final Map<String, AcceptabilityCondition> conditions = new HashMap<String, AcceptabilityCondition>();
+	//private List<AcceptabilityCondition> conditions =
+	//	new ArrayList<AcceptabilityCondition>();
 	private Map<Id, JoinableTrips.TripRecord> trips =
 		new HashMap<Id, JoinableTrips.TripRecord>();
 
@@ -56,7 +57,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 
 	private void reset() {
 		count.reset();
-		conditions = new ArrayList<AcceptabilityCondition>();
+		conditions.clear();
 		trips = new HashMap<Id, JoinableTrips.TripRecord>();
 		currentJoinableTrips = null;
 		currentJoinableTrip = null;
@@ -68,12 +69,12 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 			final Attributes atts,
 			final Stack<String> context) {
 		if ( name.equals(JoinableTripsXmlSchemaNames.CONDITION_TAG) ) {
-			if (context.peek().equals(JoinableTripsXmlSchemaNames.CONDITIONS_TAG)) {
-				conditions.add(getCondition(atts));
-			}
-			else {
+			//if (context.peek().equals(JoinableTripsXmlSchemaNames.CONDITIONS_TAG)) {
+			//	conditions.put(getCondition(atts));
+			//}
+			//else {
 				currentCondition = getCondition(atts);
-			}
+			//}
 		}
 		else if ( name.equals(JoinableTripsXmlSchemaNames.TRIP_TAG) ) {
 			count.incCounter();
@@ -118,12 +119,20 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 	}
 
 	private AcceptabilityCondition getCondition(final Attributes atts) {
-		AcceptabilityCondition condition = new AcceptabilityCondition(
-				(int) Math.round( Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.DIST)) ),
-				(int) Math.round( Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.TIME)) ));
+		final String d = atts.getValue(JoinableTripsXmlSchemaNames.DIST);
+		final String t = atts.getValue(JoinableTripsXmlSchemaNames.TIME);
+		final String key = d+"_"+t;
 
-		int i = conditions.indexOf(condition);
-		return i == -1 ? condition : conditions.get(i);
+		AcceptabilityCondition condition = conditions.get( key );
+
+		if (condition == null) {
+			condition = new AcceptabilityCondition(
+					(int) Math.round( Double.parseDouble( d ) ),
+					(int) Math.round( Double.parseDouble( t ) ));
+			conditions.put( key , condition );
+		}
+
+		return condition;
 	}
 
 	private static TripInfo getTripInfo(final Attributes atts) {
@@ -133,7 +142,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 	}
 
 	public JoinableTrips getJoinableTrips() {
-		return new JoinableTrips(conditions, trips);
+		return new JoinableTrips(new ArrayList<AcceptabilityCondition>(conditions.values()), trips);
 	}
 }
 
