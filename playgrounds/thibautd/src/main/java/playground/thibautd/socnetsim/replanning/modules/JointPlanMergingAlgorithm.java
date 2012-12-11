@@ -53,7 +53,6 @@ class JointPlanMergingAlgorithm implements GroupPlansAlgorithm {
 
 	private void mergePlans(final GroupPlans plans) {
 		final List<JointPlanBuilder> builders = new ArrayList<JointPlanBuilder>();
-		builders.add( new JointPlanBuilder() );
 
 		for ( JointPlan jp : plans.getJointPlans() ) {
 			Collections.shuffle( builders , random );

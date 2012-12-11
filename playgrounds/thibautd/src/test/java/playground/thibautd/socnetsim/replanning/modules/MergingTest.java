@@ -20,7 +20,10 @@
 package playground.thibautd.socnetsim.replanning.modules;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -28,12 +31,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
@@ -57,6 +62,26 @@ public class MergingTest {
 		for (int i=0; i<20; i++) {
 			plans.add( new PlanImpl( new PersonImpl( new IdImpl( i ) ) ) );
 		}
+
+		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
+	}
+
+	@Before
+	public void allJoints() {
+		List<JointPlan> plans = new ArrayList<JointPlan>();
+
+		for (int i=0; i<10; i++) {
+			final Map<Id, Plan> indivPlans = new HashMap<Id, Plan>();
+			for (int j=0; j<1000; j+=100) {
+				Id id = new IdImpl( i + j );
+				indivPlans.put(
+						id,
+						new PlanImpl( new PersonImpl( id ) ) );
+			}
+			plans.add( JointPlanFactory.createJointPlan( indivPlans ) );
+		}
+
+		testPlans.add( new GroupPlans( plans , Collections.EMPTY_LIST ) );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -92,20 +117,26 @@ public class MergingTest {
 	public void testProbZero() throws Exception {
 		JointPlanMergingAlgorithm algo =
 			new JointPlanMergingAlgorithm(
-					1d,
+					0d,
 					new Random( 12 ));
 
 		for (GroupPlans gp : testPlans) {
 			int nplans = countPlans( gp );
+			int nindivplans = gp.getIndividualPlans().size();
+			int njointplans = gp.getJointPlans().size();
 			algo.run( gp );
 			assertEquals(
 					"unexpected number of joint plans",
-					0,
+					njointplans,
 					gp.getJointPlans().size());
 			assertEquals(
 					"unexpected number of individual plans",
-					nplans,
+					nindivplans,
 					gp.getIndividualPlans().size());
+			assertEquals(
+					"unexpected overall number of plans",
+					nplans,
+					countPlans( gp ));
 		}
 	}
 
