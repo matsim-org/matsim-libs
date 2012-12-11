@@ -32,12 +32,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
@@ -88,7 +92,128 @@ public class SplittingTest {
 						Collections.EMPTY_LIST),
 					0,
 					plans.size(),
-					"from one to no JP"));
+					"from one to no JP empty plans"));
+	}
+
+	@Before
+	public void fromOneToNoneNotEmpty() {
+		Map<Id, Plan> plans = new HashMap<Id, Plan>();
+
+		final Id origin = new IdImpl( "origin" );
+		final Id destination = new IdImpl( "destination" );
+
+		for (int i=0; i < 10; i++) {
+			Id id = new IdImpl( i );
+			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
+			plans.put( id , p );
+			p.createAndAddActivity( "orig" , origin );
+			Leg l = p.createAndAddLeg( "unicycle" );
+			p.createAndAddActivity( "dest" , destination );
+		}
+
+		fixtures.add(
+				new Fixture(
+					new GroupPlans(
+						Collections.singleton( JointPlanFactory.createJointPlan( plans ) ),
+						Collections.EMPTY_LIST),
+					0,
+					plans.size(),
+					"from one to no JP non empty plans"));
+	}
+
+	@Before
+	public void fromOneToOne() {
+		Map<Id, Plan> plans = new HashMap<Id, Plan>();
+
+		final Id origin = new IdImpl( "origin" );
+		final Id destination = new IdImpl( "destination" );
+
+		final Id driverId = new IdImpl( "driver" );
+		final DriverRoute driverRoute = new DriverRoute( origin , destination );
+		for (int i=0; i < 10; i++) {
+			Id id = new IdImpl( i );
+			driverRoute.addPassenger( id );
+			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
+			plans.put( id , p );
+			p.createAndAddActivity( "orig" , origin );
+			Leg l = p.createAndAddLeg( JointActingTypes.PASSENGER );
+			p.createAndAddActivity( "dest" , destination );
+			PassengerRoute r = new PassengerRoute( origin , destination );
+			r.setDriverId( driverId );
+			l.setRoute( r );
+		}
+
+		PlanImpl p = new PlanImpl( new PersonImpl( driverId ) );
+		plans.put( driverId , p );
+		p.createAndAddActivity( "orig" , origin );
+		Leg l = p.createAndAddLeg( JointActingTypes.DRIVER );
+		p.createAndAddActivity( "dest" , destination );
+		l.setRoute( driverRoute );
+
+		fixtures.add(
+				new Fixture(
+					new GroupPlans(
+						Collections.singleton( JointPlanFactory.createJointPlan( plans ) ),
+						Collections.EMPTY_LIST),
+					1,
+					0,
+					"from one to one JP"));
+	}
+
+	@Before
+	public void fromOneToOneTwoJointTrips() {
+		Map<Id, Plan> plans = new HashMap<Id, Plan>();
+
+		final Id origin = new IdImpl( "origin" );
+		final Id destination = new IdImpl( "destination" );
+
+		final Id driverId = new IdImpl( "driver" );
+		final DriverRoute driverRoute1 = new DriverRoute( origin , destination );
+		for (int i=0; i < 10; i++) {
+			Id id = new IdImpl( i );
+			driverRoute1.addPassenger( id );
+			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
+			plans.put( id , p );
+			p.createAndAddActivity( "orig" , origin );
+			Leg l = p.createAndAddLeg( JointActingTypes.PASSENGER );
+			p.createAndAddActivity( "dest" , destination );
+			PassengerRoute r = new PassengerRoute( origin , destination );
+			r.setDriverId( driverId );
+			l.setRoute( r );
+		}
+
+		final DriverRoute driverRoute2 = new DriverRoute( destination , origin );
+		for (int i=100; i < 110; i++) {
+			Id id = new IdImpl( i );
+			driverRoute2.addPassenger( id );
+			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
+			plans.put( id , p );
+			p.createAndAddActivity( "dest" , destination );
+			Leg l = p.createAndAddLeg( JointActingTypes.PASSENGER );
+			p.createAndAddActivity( "orig" , origin );
+			PassengerRoute r = new PassengerRoute( origin , destination );
+			r.setDriverId( driverId );
+			l.setRoute( r );
+		}
+
+		PlanImpl p = new PlanImpl( new PersonImpl( driverId ) );
+		plans.put( driverId , p );
+		p.createAndAddActivity( "orig" , origin );
+		Leg l = p.createAndAddLeg( JointActingTypes.DRIVER );
+		l.setRoute( driverRoute1 );
+		p.createAndAddActivity( "dest" , destination );
+		l = p.createAndAddLeg( JointActingTypes.DRIVER );
+		l.setRoute( driverRoute2 );
+		p.createAndAddActivity( "orig" , origin );
+
+		fixtures.add(
+				new Fixture(
+					new GroupPlans(
+						Collections.singleton( JointPlanFactory.createJointPlan( plans ) ),
+						Collections.EMPTY_LIST),
+					1,
+					0,
+					"from one to one JP with two joint trips"));
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
