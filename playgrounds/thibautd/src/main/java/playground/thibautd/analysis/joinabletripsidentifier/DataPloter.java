@@ -68,6 +68,8 @@ public class DataPloter {
 	private static final float TITLE_FONT_SIZE = 17;
 	private static final boolean PLOT_STD_DEV = false;
 	private static final boolean DEUTSCH = true;
+	// 10% simul: all agents represent 10 individuals
+	private static final int AGENT_WEIGHT = 10;
 
 	private final JoinableTrips trips;
 
@@ -105,7 +107,7 @@ public class DataPloter {
 				}
 			}
 
-			chart.add(trip.getDepartureTime() / 3600d, count);
+			chart.add(trip.getDepartureTime() / 3600d, count * AGENT_WEIGHT);
 		}
 
 		formatChart( chart );
@@ -142,7 +144,7 @@ public class DataPloter {
 
 			double tripLength = trip.getDistance(network);
 
-			chart.add(tripLength / 1000d, count);
+			chart.add(tripLength / 1000d, count * AGENT_WEIGHT);
 		}
 
 		formatChart( chart );
@@ -182,7 +184,7 @@ public class DataPloter {
 					}
 				}
 
-				counts.add(count);
+				counts.add(count * AGENT_WEIGHT);
 			}
 			chart.addItem(counts, validator.getFirstCriterion(), validator.getSecondCriterion());
 		}
@@ -206,7 +208,9 @@ public class DataPloter {
 				filter.filterRecords(trips);
 			
 			for (JoinableTrips.TripRecord record : filteredTrips) {
-				departureTimes.add(record.getDepartureTime() / 3600d);
+				for (int i=0; i < AGENT_WEIGHT; i++) {
+					departureTimes.add(record.getDepartureTime() / 3600d);
+				}
 			}
 
 			dataset.addSeries(filter.toString(), departureTimes);
@@ -283,7 +287,7 @@ public class DataPloter {
 						count++;
 					}
 
-					counts.put( driverTrip.getTripId() , count );
+					counts.put( driverTrip.getTripId() , count * AGENT_WEIGHT );
 				}
 			}
 		}
